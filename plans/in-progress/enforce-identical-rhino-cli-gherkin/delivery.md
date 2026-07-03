@@ -32,11 +32,14 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 0 — Baseline, Audit & Cross-Repo Census (ose-public)
 
-- [ ] [AI] Provision + initialize toolchain: from repo root run `npm install && npm run doctor -- --fix`.
+- [x] [AI] Provision + initialize toolchain: from repo root run `npm install && npm run doctor -- --fix`.
       Acceptance: doctor reports all tools OK (0 missing, 0 warning).
-- [ ] [AI] Record clean baseline: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast > audit/00-baseline.txt 2>&1`.
+  - **Done 2026-07-03.** `npm run doctor -- --fix` reports 13/13 tools OK, 0 missing, 0 warning.
+- [x] [AI] Record clean baseline: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast > audit/00-baseline.txt 2>&1`.
       Acceptance: exit 0; file committed.
-- [ ] [AI] **Command census**: start with
+  - **Done 2026-07-03.** `audit/00-baseline.txt` (172K) written, exit 0. 228 scenarios, 107 passed, 121
+    skipped — matches tech-docs §1.3 exactly.
+- [x] [AI] **Command census**: start with
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- --help`, then recurse into
       every listed group with `-- <group> --help` (repeat for each nested group until every leaf command
       is reached — a full recursive help-tree walk, not a single flat command); write the full leaf-command
@@ -44,27 +47,58 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       [tech-docs §1.5](./tech-docs.md#15-canonical-command-surface-aligned-with-the-2026-07-01--2026-07-03-plans)
       and the [2026-07-03 synthesis ledger](../../done/2026-07-03__unify-rhino-cli-sdlc-parity/audit/synthesis-ledger.md).
       Acceptance: every leaf command listed; any drift from §1.5 flagged.
-- [ ] [AI] **Hollow-scenario census**: parse the baseline output into `audit/02-hollow-census.md` —
+  - **Done 2026-07-03.** `audit/01-command-census.md` (12.7K), full 41-leaf recursive `--help` tree.
+    **Drift found**: `harness bindings` is 2 leaves not 1 (tech-docs §1.5 undercounts: actual is 41 leaves,
+    not 40); `harness sync`'s `SyncArgs` mutating path (`harness_sync.rs`) is dead code, never wired into
+    CLI dispatch (the passing "agents sync" scenarios actually invoke `harness bindings generate --harness
+opencode`); a CLI quirk where `<group> --help` exits 2 with a generic error instead of real help text
+    (while `rhino-cli help <group>` shows correct content but also exits 2, non-conventional for clap).
+    None of these block Phase 1.
+- [x] [AI] **Hollow-scenario census**: parse the baseline output into `audit/02-hollow-census.md` —
       per-binary passed/skipped counts + the exact `.feature:line` of every skipped scenario and the
       step string that failed to match. Acceptance: total skipped count equals the baseline's summary
       (expected 121 at authoring time — re-derive, do not assume).
-- [ ] [AI] **Unbound-dir census**: list every `gherkin/<dir>` and the `tests/*.rs` binary (if any) that
+  - **Done 2026-07-03.** `audit/02-hollow-census.md` (40.1K). **121 skipped, confirmed exactly** via two
+    independent counting methods: agents 13/28, docs 43/69, repo_governance 61/61, workflows 4/4 —
+    matches the plan's expectation precisely.
+- [x] [AI] **Unbound-dir census**: list every `gherkin/<dir>` and the `tests/*.rs` binary (if any) that
       binds it (`grep -rn 'join(".*gherkin/' apps/rhino-cli/tests`), into `audit/03-unbound-dirs.md`.
       Acceptance: the 4 unbound dirs (`ddd`, `git`, `specs`, `test-coverage`) confirmed or corrected.
-- [ ] [AI] **Command↔feature map**: in `audit/04-coverage-map.md`, map each leaf command to its covering
+  - **Done 2026-07-03.** `audit/03-unbound-dirs.md` (4.6K). Confirmed exactly as expected: `ddd` (2
+    features/18 scenarios), `git` (1 feature/5 scenarios), `specs` (10 features/29 scenarios),
+    `test-coverage` (3 features/17 scenarios). 17 dirs on disk − 13 bound = 4 unbound, no correction needed.
+- [x] [AI] **Command↔feature map**: in `audit/04-coverage-map.md`, map each leaf command to its covering
       `.feature`(s) and mark: enforcing / hollow / absent. Acceptance: every leaf command has a row; the
       gap set (absent + hollow) is enumerated.
-- [ ] [AI] **Cross-repo diff**: write `audit/05-cross-repo-diff.md` — `md5` manifest of every `.feature` + behaviour-`README.md` in all three repos and a `diff -rq` summary. Acceptance: reproduces the
+  - **Done 2026-07-03.** `audit/04-coverage-map.md` (28.3K), all 41 leaf commands mapped. **Major
+    structural finding**: `gherkin/repo-governance/` actually houses scenarios for 5 different CLI command
+    groups (repo-governance, md frontmatter-dates, md readme-index, convention emoji, convention license,
+    harness instruction-size), and there is no `convention/` directory at all — §1·0's rename step must
+    **split** this directory across `repo-governance/`, `md/`, a new `convention/`, and `harness/`, not
+    just rename it 1:1. This is already covered by §1·0's existing wording ("apply the Phase-0 rename
+    mapping … plus any other dir whose name mismatches its command group"), so no plan edit is required —
+    Phase 1 consumes this corrected mapping directly from this file. Two more Decision-4 rename candidates
+    beyond tech-docs's named 4: `contracts/` (tests `specs clean java-imports`/`specs scaffold dart`) and
+    `java/` (tests `lang java null-safety-annotations validate`) — both currently pass, stale-vocab prose
+    only.
+- [x] [AI] **Cross-repo diff**: write `audit/05-cross-repo-diff.md` — `md5` manifest of every `.feature` + behaviour-`README.md` in all three repos and a `diff -rq` summary. Acceptance: reproduces the
       public=infra / primer-stale finding (or its current-state correction).
+  - **Done 2026-07-03.** `audit/05-cross-repo-diff.md` (5.4K). Confirms public=infra byte-identical (0
+    differences across all 64 entries); primer stale: 12 diverged features + 9 diverged READMEs (21 total)
+    - 23 missing features + 1 missing README (24 total) — refines tech-docs's "~9 diverged / ~23 missing"
+      to an exact figure, not a contradiction.
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli` — exits 0 (green baseline recorded).
-- [ ] [AI] All six Phase 0 audit artifacts (`audit/00-baseline.txt` + `audit/01-command-census.md`
+- [x] [AI] `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli` — exits 0 (green baseline recorded).
+- [x] [AI] All six Phase 0 audit artifacts (`audit/00-baseline.txt` + `audit/01-command-census.md`
       through `audit/05-cross-repo-diff.md`) exist and are committed.
-- [ ] [AI] `nx affected -t test:quick,lint,typecheck --base=origin/main` — exits 0.
+- [x] [AI] `nx affected -t test:quick,lint,typecheck --base=origin/main` — exits 0.
+  - **Done 2026-07-03.** All three gate checks pass: `cargo test` exit 0; all 6 audit artifacts present;
+    `nx affected -t test:quick,lint,typecheck --base=origin/main` — "No tasks were run" (expected/correct,
+    audit-only phase, no committed source diff yet against origin/main).
 
 > **Pause Safety**: baseline green, audit evidence committed, no source or spec changes applied. ose-public
 > passes its own affected pre-push gate. Safe to stop. To resume: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli`.
