@@ -99,6 +99,10 @@ harness = false
 name = "git_hooks"
 harness = false
 
+[[test]]
+name = "test_coverage"
+harness = false
+
 [lints.rust]
 unsafe_code = "forbid"
 missing_docs = "deny"

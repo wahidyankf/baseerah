@@ -461,19 +461,27 @@ warnings` + `fmt --check` clean.
 
 #### 1e-iv. Wire `test-coverage` (17 scenarios, 3 feature files)
 
-- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+- [x] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
       `apps/rhino-cli/tests/test_coverage.rs` bound to `gherkin/test-coverage/`, with an empty step
       scaffold. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test test_coverage`. Acceptance: scenarios
       execute and fail/undefined (proving the dir is now bound).
+  - **Done 2026-07-04.** All 17 scenarios confirmed undefined/skipped pre-GREEN.
   - **Gherkin (binds) →** — aggregate BDD binder for all 17 scenarios in `gherkin/test-coverage/**`:
     "Merging two LCOV files produces correct combined coverage"; "Merging with validation passes when coverage meets threshold"; "Merging with validation fails when coverage is below threshold"; "A Go coverage file above the threshold reports success"; "A Go coverage file below the threshold reports failure"; "An LCOV file above the threshold reports success"; "Coverage at exactly the threshold passes"; "JSON output includes structured coverage metrics"; "Per-file flag shows individual file coverage"; "A Cobertura XML file above the threshold reports success"; "A Cobertura XML file with partial branches classifies correctly"; "Exclude flag removes files from coverage calculation"; "A non-existent coverage file reports an error"; "No changed lines reports 100% coverage"; "Changed lines with full coverage pass threshold"; "Changed lines with missing coverage fail threshold"; "Excluded files are not counted in diff coverage"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement step defs asserting the **internal** `application/testcoverage/{diff,merge}.rs`
+- [x] [AI] **GREEN**: implement step defs asserting the **internal** `application/testcoverage/{diff,merge}.rs`
       behaviour directly (or scoped to `test-coverage validate` where a real CLI verb exists) — never
       invent a non-existent CLI verb. Command: same. Acceptance: all 17 scenarios in `test-coverage/` pass,
       `0 skipped`.
-- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `test_coverage.rs` step defs.
+  - **Done 2026-07-04.** Confirmed `test-coverage validate` is the only real subcommand — 10
+    `test-coverage-validate.feature` scenarios drive it via `assert_cmd` subprocess; 3 merge + 4 diff
+    scenarios call `application::testcoverage::{merge,diff}` functions directly in-process (no CLI verb
+    invented). Root-cause fix: `test-coverage validate` on a missing file printed only "coverage check
+    failed" with no path (swallowed by an `anyhow::Context` chain) — changed to fold the real cause into
+    the top-level message. All 17/17 pass, 64/64 steps. Full suite: 0 skipped/0 failed anywhere.
+- [x] [AI] **REFACTOR**: none needed unless duplication appears across the new `test_coverage.rs` step defs.
       Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** `clippy -D warnings` (fixed 2 findings) + `fmt --check` clean.
 
 ### 1f. Gap-fill uncovered leaf commands
 

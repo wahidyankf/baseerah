@@ -5,7 +5,7 @@
 
 use std::path::Path;
 
-use anyhow::{Context, Error, anyhow};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::application::testcoverage::{
@@ -56,15 +56,14 @@ pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Res
         .ok_or_else(|| anyhow!("non-utf8 coverage file path"))?;
 
     let result: CoverageResult = match detect::detect_format(abs_path_str) {
-        Format::Lcov => {
-            lcov::compute_lcov_result(abs_path_str, threshold).context("coverage check failed")?
-        }
+        Format::Lcov => lcov::compute_lcov_result(abs_path_str, threshold)
+            .map_err(|e| anyhow!("coverage check failed: {e}"))?,
         Format::Jacoco => jacoco::compute_jacoco_result(abs_path_str, threshold)
-            .context("coverage check failed")?,
+            .map_err(|e| anyhow!("coverage check failed: {e}"))?,
         Format::Cobertura => cobertura::compute_cobertura_result(abs_path_str, threshold)
-            .context("coverage check failed")?,
+            .map_err(|e| anyhow!("coverage check failed: {e}"))?,
         Format::Go => go_coverage::compute_go_result(abs_path_str, threshold)
-            .context("coverage check failed")?,
+            .map_err(|e| anyhow!("coverage check failed: {e}"))?,
         Format::Diff => {
             return Err(anyhow!(
                 "diff format is not a valid input format for validate"
