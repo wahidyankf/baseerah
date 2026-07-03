@@ -699,7 +699,10 @@ fn then_diff_excluded_no_effect(w: &mut TestCoverageWorld) {
 
 #[tokio::main]
 async fn main() {
-    TestCoverageWorld::run(feature_dir()).await;
+    TestCoverageWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

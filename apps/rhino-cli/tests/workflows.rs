@@ -192,7 +192,10 @@ fn then_frontmatter_mismatch(w: &mut WorkflowsWorld) {
 
 #[tokio::main]
 async fn main() {
-    WorkflowsWorld::run(feature_dir()).await;
+    WorkflowsWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

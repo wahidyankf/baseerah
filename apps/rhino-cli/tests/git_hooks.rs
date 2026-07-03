@@ -301,7 +301,10 @@ fn then_links_exclusion_honored(w: &mut GitHooksWorld) {
 
 #[tokio::main]
 async fn main() {
-    GitHooksWorld::run(feature_dir()).await;
+    GitHooksWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

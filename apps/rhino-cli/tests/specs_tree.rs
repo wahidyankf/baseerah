@@ -1254,7 +1254,10 @@ fn then_wt_resolves_to_worktree(w: &mut SpecsTreeWorld) {
 
 #[tokio::main]
 async fn main() {
-    SpecsTreeWorld::run(feature_dir()).await;
+    SpecsTreeWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

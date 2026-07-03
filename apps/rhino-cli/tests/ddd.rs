@@ -730,7 +730,10 @@ fn then_output_contains_a_warning(w: &mut DddWorld) {
 
 #[tokio::main]
 async fn main() {
-    DddWorld::run(feature_dir()).await;
+    DddWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

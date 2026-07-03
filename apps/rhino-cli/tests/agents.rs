@@ -1393,7 +1393,10 @@ fn then_exit_fail(w: &mut AgentsWorld) {
 
 #[tokio::main]
 async fn main() {
-    AgentsWorld::run(feature_dir()).await;
+    AgentsWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

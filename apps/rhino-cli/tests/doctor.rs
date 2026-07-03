@@ -410,7 +410,10 @@ fn then_nothing_to_fix(w: &mut DoctorWorld) {
 
 #[tokio::main]
 async fn main() {
-    DoctorWorld::run(feature_dir()).await;
+    DoctorWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

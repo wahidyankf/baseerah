@@ -151,7 +151,10 @@ fn then_no_surface_repo_is_clean(_w: &mut EnvContractWorld) {
 
 #[tokio::main]
 async fn main() {
-    EnvContractWorld::run(feature_dir()).await;
+    EnvContractWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

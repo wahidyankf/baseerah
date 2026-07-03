@@ -680,7 +680,10 @@ fn then_audit_include_category_filter(w: &mut GovernanceWorld) {
 
 #[tokio::main]
 async fn main() {
-    GovernanceWorld::run(feature_dir()).await;
+    GovernanceWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

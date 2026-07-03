@@ -171,7 +171,10 @@ fn then_identifies_missing_annotation(w: &mut JavaWorld) {
 
 #[tokio::main]
 async fn main() {
-    JavaWorld::run(feature_dir()).await;
+    JavaWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

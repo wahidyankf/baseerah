@@ -675,11 +675,26 @@ gherkin-cardinality validate`, modernizing primer's stale
 
 ### 1g. Enable cucumber fail-on-skip (lock 0-skip — Decision 6)
 
-- [ ] [AI] **RED**: configure every cucumber World runner (`apps/rhino-cli/tests/*.rs`) with
+- [x] [AI] **RED**: configure every cucumber World runner (`apps/rhino-cli/tests/*.rs`) with
       `.fail_on_skipped()` (or the 0.23 equivalent); introduce one temporary bogus/undefined step in any
       binary to confirm the config takes effect. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast`.
       Acceptance: the bogus scenario's binary now **fails** (non-zero exit) — proving `fail_on_skipped` is
       wired.
+  - **Done 2026-07-04.** Confirmed all 22 `tests/*.rs` binaries: 18 are cucumber-based
+    (`agent_naming_validator.rs`, `agents.rs`, `contracts.rs`, `convention.rs`, `ddd.rs`, `docs.rs`,
+    `doctor.rs`, `env.rs`, `env_contract.rs`, `git_hooks.rs`, `java.rs`, `repo_config_data_driven.rs`,
+    `repo_config_validate.rs`, `repo_governance.rs`, `spec_coverage.rs`, `specs_tree.rs`,
+    `test_coverage.rs`, `workflows.rs`) and 4 use the plain `#[test]` harness only
+    (`cli_smoke.rs`, `env_validate_integration.rs`, `golden_master.rs`, `mermaid_golden_corpus.rs` — no
+    cucumber `World`, `.fail_on_skipped()` does not apply). Per cucumber 0.23's own doc example
+    (`cucumber-0.23.0/src/cucumber.rs`), converted every `XWorld::run(input).await;` shorthand to the
+    explicit builder chain `XWorld::cucumber().fail_on_skipped().run_and_exit(input).await;` in all 18
+    cucumber binaries. RED proof: temporarily renamed the last step text in
+    `tests/agent_naming_validator.rs` (`then_no_singular_trigger_path`) to a bogus, non-matching string;
+    `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast --test
+agent_naming_validator` exited **101** with `1 scenario (1 failed)`, `4 steps (3 passed, 1 failed)`,
+    and a `thread 'main' panicked ... 1 step failed` — proving the undefined step (previously silently
+    "skipped") is now converted to a hard failure.
   - **Gherkin (binds) →** "A skipped or undefined cucumber step reddens the build" (AC-12)
 
     ```gherkin
@@ -692,10 +707,18 @@ gherkin-cardinality validate`, modernizing primer's stale
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **GREEN**: revert the temporary bogus step. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast`.
+- [x] [AI] **GREEN**: revert the temporary bogus step. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast`.
       Acceptance: exits 0, `0 skipped` in every binary (all scenarios de-hollowed in 1a–1f).
-- [ ] [AI] **REFACTOR**: none needed unless duplication appears from the temporary bogus-step revert.
+  - **Done 2026-07-04.** Reverted the bogus step text in `tests/agent_naming_validator.rs`. Full suite
+    (`cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast`) exits
+    **0**. All 18 cucumber binaries report `steps (N passed)` with no `failed`/`skipped` suffix (0
+    skipped, 0 failed across every one); the 4 plain-test binaries plus lib/main unittests also pass.
+- [x] [AI] **REFACTOR**: none needed unless duplication appears from the temporary bogus-step revert.
       Command: same. Acceptance: exits 0, `0 skipped` in every binary.
+  - **Done 2026-07-04.** No duplication introduced — the revert was a single-line text restore with no
+    residual `TEMP-BOGUS` string anywhere in the tree (verified via repo-wide grep). `cargo clippy
+--release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --all-targets -- -D warnings` clean;
+    `cargo fmt --check` clean.
 
 ### 1h. @covers completeness for rhino-cli (Decision 7)
 

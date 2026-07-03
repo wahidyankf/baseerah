@@ -1483,7 +1483,10 @@ fn then_exit_fail(w: &mut DocsWorld) {
 
 #[tokio::main]
 async fn main() {
-    DocsWorld::run(feature_dir()).await;
+    DocsWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

@@ -1038,7 +1038,10 @@ fn then_output_lists_would_be_restored(w: &mut EnvWorld) {
 
 #[tokio::main]
 async fn main() {
-    EnvWorld::run(feature_dir()).await;
+    EnvWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {

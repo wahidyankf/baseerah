@@ -270,7 +270,10 @@ fn then_multilang_matched(w: &mut SpecWorld) {
 #[tokio::main]
 async fn main() {
     let features = repo_feature_dir();
-    SpecWorld::run(features).await;
+    SpecWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(features)
+        .await;
 }
 
 fn repo_feature_dir() -> PathBuf {

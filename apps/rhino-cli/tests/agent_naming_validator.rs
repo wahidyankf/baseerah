@@ -157,7 +157,10 @@ fn then_no_singular_trigger_path(_w: &mut AgentNamingWorld) {
 
 #[tokio::main]
 async fn main() {
-    AgentNamingWorld::run(feature_dir()).await;
+    AgentNamingWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(feature_dir())
+        .await;
 }
 
 fn feature_dir() -> PathBuf {
