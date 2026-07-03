@@ -11,7 +11,7 @@ RUN node -e " \
 " && npm install --ignore-scripts
 
 # Install web-ui transitive dependencies not already in wahidyankf-www
-RUN npm install --save radix-ui@^1.0.0 --ignore-scripts
+RUN npm install --save radix-ui@^1.0.0 cmdk@1.1.1 --ignore-scripts
 
 # Copy workspace libs as resolvable node_modules packages
 COPY libs/web-ui/src/ ./node_modules/@open-sharia-enterprise/web-ui/src/
