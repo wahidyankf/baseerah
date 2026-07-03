@@ -939,13 +939,15 @@ validate` command (output does not contain the string `stub`) — proving the pr
 
 ## Phase 3 — Propagate to ose-primer
 
-- [ ] [AI] Copy canonical `apps/rhino-cli/` (excluding `target/`, `dist/`, `cover.out`, `lcov.info`) from
+- [x] [AI] Copy canonical `apps/rhino-cli/` (excluding `target/`, `dist/`, `cover.out`, `lcov.info`) from
       ose-public into `/Users/wkf/ose-projects/ose-primer/apps/rhino-cli/`. Command:
       `rsync -a --delete --exclude=target --exclude=dist --exclude=cover.out --exclude=lcov.info
 /Users/wkf/ose-projects/ose-public/apps/rhino-cli/ /Users/wkf/ose-projects/ose-primer/apps/rhino-cli/`.
       Acceptance: `diff -rq --exclude=target --exclude=dist ose-public/apps/rhino-cli ose-primer/apps/rhino-cli`
       shows only untracked-artifact/README differences (zero source/tests/feature diffs).
-- [ ] [AI] Replace primer's `specs/apps/rhino/behavior/rhino-cli/gherkin/` tree with the canonical tree
+  - **Done 2026-07-04.** Verified `ose-primer` clean before running (no uncommitted WIP at risk). Diff
+    shows only `cover.out`/`lcov.info` artifact differences — zero source/tests/feature diffs.
+- [x] [AI] Replace primer's `specs/apps/rhino/behavior/rhino-cli/gherkin/` tree with the canonical tree
       (`.feature` + behaviour-`README.md`); delete the 2 stale files (`env/env-validate.feature`,
       `repo-governance/repo-governance-gherkin-keyword-cardinality.feature`). Command:
       `rsync -a --delete
@@ -953,18 +955,40 @@ validate` command (output does not contain the string `stub`) — proving the pr
 /Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/` (the `--delete`
       flag removes the 2 stale files since they are absent from the canonical source). Acceptance:
       `diff -rq` of the gherkin `.feature`+README set between public and primer is empty.
-- [ ] [AI] Propagate the boundary/workflow/AGENTS edits (`CLAUDE.md` needs no separate edit — it inherits
+  - **Done 2026-07-04.** `diff -rq` empty.
+- [x] [AI] Propagate the boundary/workflow/AGENTS edits (`CLAUDE.md` needs no separate edit — it inherits
       automatically via its `@AGENTS.md` import) **and the pre-commit `repo-config validate`
       staged-gate step** from Phase 2 into primer; run `npm run generate:bindings`. Acceptance: bindings
       synced; primer's `.husky/pre-commit` step is byte-identical to public's.
-- [ ] [AI] Run `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in ose-primer. Acceptance: exit 0, `0 skipped`.
+  - **Done 2026-07-04.** Applied all Phase 2 edits to primer's own copies: `.husky/pre-commit` (Step 1b),
+    `.husky/pre-push` (removed repo-config line), `AGENTS.md`, `docs/reference/sdlc-gate-standard.md`
+    (boundary + both stale gate-placement lines), `.github/workflows/{main-ci,pr-quality-gate}.yml`
+    (new `repo-config-validate` job, `grep -c` returns 1 each, actionlint clean), and
+    `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md` (adapted the byte-identity-check
+    bullet to primer's own already-diverged Step 1 wording). `npm run generate:bindings` ran clean.
+    `diff .husky/pre-commit` between public and primer: identical.
+- [x] [AI] Run `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in ose-primer. Acceptance: exit 0, `0 skipped`.
+  - **Done 2026-07-04.** First run found 3 real, pre-existing failures in `tests/agents.rs`, exposed (not
+    caused) by syncing the byte-identical Gherkin: primer's `.claude/agents/repo-rules-checker.md` and
+    `repo-governance/workflows/repo/repo-rules-quality-gate.md` were still on a stale 3-category preflight
+    model, missing the `instruction-size` 4th category ose-public's docs already document. Per Iron Rule 3
+    (fix all failures including preexisting), synced the Step 0.5 preflight sections of both docs to the
+    current 4-category model (scoped edit, not a wholesale doc rewrite). Re-ran: exit 0, `0 skipped`,
+    `0 failed`.
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `md5` manifest of primer's gherkin tree == `audit/06-canonical-manifest.md`. Acceptance: identical.
-- [ ] [AI] `sh .husky/pre-push` (ose-primer root) — exits 0 with `0 skipped`.
+- [x] [AI] `md5` manifest of primer's gherkin tree == `audit/06-canonical-manifest.md`. Acceptance: identical.
+  - **Done 2026-07-04.** Filesystem-walk md5 comparison (71 entries each): identical.
+- [x] [AI] `sh .husky/pre-push` (ose-primer root) — exits 0 with `0 skipped`.
+  - **Done 2026-07-04.** First run surfaced 3 broken links from the rename (2 genuinely pre-existing,
+    unrelated staleness in `specs/apps/rhino/components/cli/component-cli.md` pointing at the old
+    `gherkin/docs/` path; 1 from `apps/rhino-cli/README.md`'s migration-history bullet referencing a
+    `plans/done/` doc that only exists in public — README.md is explicitly outside the strict
+    byte-identity boundary, so this is expected content divergence, not a boundary violation). Fixed
+    both link targets. Re-ran: exit 0. **Phase 3 Gate passes.**
 
 > **Pause Safety**: primer's rhino-cli + gherkin tree are byte-identical to public and fully enforcing;
 > primer passes its own pre-push. Safe to stop. To resume: `sh .husky/pre-push` (primer root).
