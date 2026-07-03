@@ -265,7 +265,7 @@ Within `apps/rhino-cli` itself, the only sanctioned divergence anywhere is:
    CI-workflow-YAML concern that lives outside `apps/rhino-cli` entirely, so it never affects source
    byte-identity.
 
-See [tech-docs.md §4 "rhino-cli Source-Identity Standard"](../../plans/in-progress/unify-rhino-cli-sdlc-parity/tech-docs.md#4-rhino-cli-source-identity-standard)
+See [tech-docs.md §4 "rhino-cli Source-Identity Standard"](../../plans/done/2026-07-03__unify-rhino-cli-sdlc-parity/tech-docs.md#4-rhino-cli-source-identity-standard)
 for the full synthesis approach and acceptance criteria.
 
 ### Allowed Divergence

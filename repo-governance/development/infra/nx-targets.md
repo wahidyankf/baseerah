@@ -763,7 +763,7 @@ the "Specs:Behavior:Coverage Projects" section for flags and project-by-project 
 
 See [SDLC Gate Standard §rhino-cli Byte-Identity Boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)
 for the divergence-policy boundary this standard establishes, and
-[tech-docs.md §4 "rhino-cli Source-Identity Standard"](../../../plans/in-progress/unify-rhino-cli-sdlc-parity/tech-docs.md#4-rhino-cli-source-identity-standard)
+[tech-docs.md §4 "rhino-cli Source-Identity Standard"](../../../plans/done/2026-07-03__unify-rhino-cli-sdlc-parity/tech-docs.md#4-rhino-cli-source-identity-standard)
 for the full synthesis approach.
 
 ## Codegen Dependency Chain
