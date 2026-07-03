@@ -103,6 +103,10 @@ harness = false
 name = "test_coverage"
 harness = false
 
+[[test]]
+name = "ddd"
+harness = false
+
 [lints.rust]
 unsafe_code = "forbid"
 missing_docs = "deny"

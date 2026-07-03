@@ -409,17 +409,35 @@ warnings` + `fmt --check` clean.
 
 #### 1e-i. Wire `ddd` (18 scenarios, 2 feature files)
 
-- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+- [x] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
       `apps/rhino-cli/tests/ddd.rs` bound to `gherkin/ddd/`, with an empty step scaffold. Command:
       `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test ddd`. Acceptance: scenarios execute and fail/undefined
       (proving the dir is now bound).
+  - **Done 2026-07-04.** New `[[test]] name = "ddd" harness = false` + `tests/ddd.rs` scaffold. All 18
+    scenarios confirmed skipped/undefined pre-GREEN (proving the dir is now bound, not absent).
   - **Gherkin (binds) →** — aggregate BDD binder for all 18 scenarios in `gherkin/ddd/**`:
     "All glossaries are valid — exits successfully with no findings"; "Glossary is missing a required frontmatter key"; "Terms table has a malformed header"; "A code identifier is stale (not found in BC code path)"; "A feature reference does not resolve to an existing .feature file"; "Same term appears in two glossaries without mutual Forbidden-synonyms cross-link"; "--severity=warn downgrades findings — exits successfully with warnings"; "Clean registry matches filesystem exactly — exits zero"; "Orphan code folder not in registry is flagged"; "Missing glossary file is flagged"; "Missing layer subfolder is flagged"; "Extra layer subfolder not in registry is flagged"; "Missing gherkin folder is flagged"; "Gherkin folder with no feature files is flagged"; "Relationship asymmetry is flagged"; "Severity warn flag downgrades findings to warnings and exits zero"; "OSE_RHINO_DDD_SEVERITY env var overrides default severity"; "Registry file not found for unknown app is an error"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement step defs against the real `ddd`/glossary/bounded-context validator
+- [x] [AI] **GREEN**: implement step defs against the real `ddd`/glossary/bounded-context validator
       commands. Command: same. Acceptance: all 18 scenarios in `ddd/` pass, `0 skipped`.
-- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `ddd.rs` step defs.
+  - **Done 2026-07-04.** Neither `ddd bc`/`ddd ul` nor `specs bc`/`specs ul` exist as invokable CLI
+    verbs — `cli.rs`'s own test suite (`specs_validate_bc_no_longer_parses`,
+    `specs_validate_ul_no_longer_parses`) documents they were deliberately folded into
+    `specs structure validate`, which drops the `--severity` override. Per the precedent already set
+    for `test-coverage diff`/`merge` in `test_coverage.rs` (verbs not wired to the CLI → call the
+    internal application function in-process instead of inventing a CLI verb), step defs call
+    `application::bcregistry::validate_all` and `application::glossary::validate_all` directly
+    in-process, replicating the dormant `commands::specs_bc`/`commands::specs_ul` wrapper logic
+    line-for-line (including `severity::resolve` for `--severity` and `OSE_RHINO_DDD_SEVERITY`). No
+    validator bug surfaced — every expected message substring (`"missing frontmatter key"`,
+    `"stale identifier"`, `"orphan"`, `"asymmetry"`, etc.) matched the real validator output verbatim
+    on the first GREEN pass. All 18 scenarios pass, `99 steps (99 passed)`. Full suite: all 16 cucumber
+    binaries pass, 0 skipped anywhere.
+- [x] [AI] **REFACTOR**: none needed unless duplication appears across the new `ddd.rs` step defs.
       Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** Extracted 3 shared assertion helpers (`assert_exit_fail`,
+    `assert_no_findings`, `assert_output_contains_warning`) reused by the bc/ul step-text pairs.
+    `clippy -D warnings` + `fmt --check` clean.
 
 #### 1e-ii. Wire `git` (5 scenarios, 1 feature file)
 
