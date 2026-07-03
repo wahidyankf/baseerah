@@ -814,9 +814,10 @@ apps/rhino-cli` invocation. Verified the full target chain: `nx run rhino-cli:sp
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` — exits 0 **with `0 skipped` in every binary**
+- [x] [AI] `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` — exits 0 **with `0 skipped` in every binary**
       (grep the output: `grep -c "skipped)"` returns 0). **This is the core acceptance of the whole plan.**
-- [ ] [AI] `nx run rhino-cli:test:unit` — runs
+  - **Done 2026-07-04.** Verified directly: exit 0, `grep -c "skipped)"` returns 0.
+- [x] [AI] `nx run rhino-cli:test:unit` — runs
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven`
       (mocked/in-process, per §1a's "Mocked-unit conversion") and exits 0: `--lib` suite green,
       `repo_governance` `26 scenarios (26 passed)` (corrected count, see §1a scope note), `env_contract` and `repo_config_data_driven` each green
@@ -827,13 +828,21 @@ rhino-cli:test:integration` also exits 0 — its blanket `--tests` flag runs all
       `golden_master.rs`, `mermaid_golden_corpus.rs`, `env_validate_integration.rs`), including the
       now-mocked `repo_governance`/`env_contract`/`repo_config_data_driven` and the four newly-wired §1e
       binaries (redundant re-execution, harmless since they still pass).
-- [ ] [AI] Cucumber `fail_on_skipped` is active (a bogus undefined step reddens the build).
-- [ ] [AI] `nx affected -t lint,typecheck --base=origin/main` — exits 0 (public's strict clippy/doc lints pass).
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate` + `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli`
+  - **Done 2026-07-04.** Both `nx run rhino-cli:test:unit` and `nx run rhino-cli:test:integration` verified
+    exit 0 directly.
+- [x] [AI] Cucumber `fail_on_skipped` is active (a bogus undefined step reddens the build).
+  - **Done 2026-07-04.** Proven live in §1g (exit 101 with a temporarily-bogus step, reverted to exit 0).
+- [x] [AI] `nx affected -t lint,typecheck --base=origin/main` — exits 0 (public's strict clippy/doc lints pass).
+  - **Done 2026-07-04.** Verified directly: exit 0 across 25 projects / 56 tasks (mostly cache-hit).
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate` + `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli`
       — both exit 0.
-- [ ] [AI] `nx run rhino-cli:specs:behavior:coverage` genuinely invokes the real `specs behavior-coverage
+  - **Done 2026-07-04.** Both verified directly: exit 0. `specs behavior-coverage validate` reports "57
+    specs, 312 scenarios, 1297 steps — all covered."
+- [x] [AI] `nx run rhino-cli:specs:behavior:coverage` genuinely invokes the real `specs behavior-coverage
 validate` command (output does not contain the string `stub`) — proving the pre-existing echo-stub
       Nx target (1h) is fixed and `nx run rhino-cli:test:quick` no longer silently no-ops this check.
+  - **Done 2026-07-04.** Verified directly: output shows the real cargo run invocation, no "stub" string,
+    exit 0. **Phase 1 Gate fully passes — the core acceptance of the whole plan is met.**
 
 > **Pause Safety**: the canonical tree is fully enforcing (0 skipped), golden-master regenerated, ose-public
 > green on its own gate. Safe to stop. To resume: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli`.
