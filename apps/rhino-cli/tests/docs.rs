@@ -2,7 +2,7 @@
 //! `docs validate-mermaid`, and `docs validate-heading-hierarchy` commands.
 //!
 //! Wires the behavior-contract feature files at
-//! `specs/apps/rhino/behavior/rhino-cli/gherkin/docs/` to step definitions that
+//! `specs/apps/rhino/behavior/rhino-cli/gherkin/md/` to step definitions that
 //! synthesize markdown fixtures inside a fresh git-rooted temp workspace and
 //! drive the compiled `rhino-cli` binary, asserting on output and exit code.
 
@@ -925,7 +925,7 @@ async fn main() {
 fn feature_dir() -> PathBuf {
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     manifest
-        .join("../../specs/apps/rhino/behavior/rhino-cli/gherkin/docs")
+        .join("../../specs/apps/rhino/behavior/rhino-cli/gherkin/md")
         .canonicalize()
         .expect("feature dir resolvable")
 }

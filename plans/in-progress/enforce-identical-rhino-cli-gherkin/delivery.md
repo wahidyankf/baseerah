@@ -112,7 +112,7 @@ opencode`); a CLI quirk where `<group> --help` exits 2 with a generic error inst
 
 ### 1·0. Rename feature dirs to match command groups (prerequisite — do first)
 
-- [ ] [AI] Apply the Phase-0 rename mapping (`audit/04-coverage-map.md`) with `git mv`: confirmed
+- [x] [AI] Apply the Phase-0 rename mapping (`audit/04-coverage-map.md`) with `git mv`: confirmed
       `specs/apps/rhino/behavior/rhino-cli/gherkin/docs/` → `…/gherkin/md/` and `…/gherkin/agents/` →
       `…/gherkin/harness/`, plus any other dir whose name mismatches its command group. Retarget the
       matching `feature_dir()` binding(s) in `apps/rhino-cli/tests/*.rs` (e.g. `tests/docs.rs`,
@@ -120,6 +120,18 @@ opencode`); a CLI quirk where `<group> --help` exits 2 with a generic error inst
       still builds and runs (skip counts unchanged — pure rename, no vocab change yet); no dir name
       mismatches its command group in `audit/04-coverage-map.md`.
   - _Suggested executor: `swe-rust-dev`_
+  - **Done 2026-07-03.** Files changed: `apps/rhino-cli/Cargo.toml` (new `convention` test binary),
+    `apps/rhino-cli/tests/{docs.rs,agents.rs}` (retargeted `feature_dir()`), new
+    `apps/rhino-cli/tests/convention.rs` (empty scaffold — see below), plus the
+    `specs/.../gherkin/{md,harness,convention,repo-governance}/` moves and README updates. `docs/`→`md/`
+    and `agents/`→`harness/` renamed as expected; `repo-governance/`'s discovered 5-group split resolved by
+    `git mv`-ing its 11 features across 4 destinations (2→`md/`, 4→`harness/`, 2→new `convention/`, 4 stay
+    in `repo-governance/`) plus a brand-new `tests/convention.rs` binary (empty step scaffold, `harness =
+false`) since `convention` has no pre-existing binary to inherit its 9 scenarios into. Verified: `cargo
+test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` exits 0, 228
+    total / 107 passed / 121 skipped — **identical to the Phase 0 baseline**, confirming a pure
+    rename/re-binding with zero behavior change. `contracts/`/`java/` left untouched (coverage map flags
+    stale vocab but doesn't call for a rename). `clippy -D warnings` and `fmt --check` both clean.
 
 > The de-hollow subsections below operate on the **renamed** dirs (e.g. `gherkin/md/`, `gherkin/harness/`).
 

@@ -9,11 +9,12 @@ Feature files are grouped into domain subdirectories, one per subcommand family:
 
 ```
 behavior/rhino-cli/gherkin/
-├── agents/           # agents subcommand family
+├── convention/       # convention subcommand family
 ├── ddd/              # ddd subcommand family
-├── docs/             # docs subcommand family
 ├── env/              # env subcommand family
 ├── git/              # git subcommand family
+├── harness/          # harness subcommand family (agent/binding machinery)
+├── md/               # md subcommand family
 ├── repo-governance/  # repo-governance subcommand family
 ├── spec-coverage/    # specs coverage command (folded from old spec-coverage subcommand)
 ├── specs/            # specs subcommand family
@@ -23,14 +24,12 @@ behavior/rhino-cli/gherkin/
 
 ## Feature Files by Domain
 
-### agents
+### convention
 
-| File                                | Command(s)                  | Scenarios |
-| ----------------------------------- | --------------------------- | --------- |
-| `agents-detect-duplication.feature` | `agents detect-duplication` | 4         |
-| `agents-sync.feature`               | `agents sync`               | 7         |
-| `agents-validate-claude.feature`    | `agents validate-claude`    | 5         |
-| `agents-validate-naming.feature`    | `agents validate-naming`    | 4         |
+| File                                    | Command(s)                    | Scenarios |
+| --------------------------------------- | ----------------------------- | --------- |
+| `repo-governance-emoji-audit.feature`   | `convention emoji validate`   | 5         |
+| `repo-governance-license-audit.feature` | `convention license validate` | 4         |
 
 ### ddd
 
@@ -38,16 +37,6 @@ behavior/rhino-cli/gherkin/
 | ---------------- | ---------- | --------- |
 | `ddd-bc.feature` | `ddd bc`   | 11        |
 | `ddd-ul.feature` | `ddd ul`   | 7         |
-
-### docs
-
-| File                                      | Command(s)                        | Scenarios |
-| ----------------------------------------- | --------------------------------- | --------- |
-| `docs-validate-frontmatter.feature`       | `docs validate-frontmatter`       | 5         |
-| `docs-validate-heading-hierarchy.feature` | `docs validate-heading-hierarchy` | 4         |
-| `docs-validate-links.feature`             | `docs validate-links`             | 4         |
-| `docs-validate-mermaid.feature`           | `docs validate-mermaid`           | 22        |
-| `docs-validate-naming.feature`            | `docs validate-naming`            | 3         |
 
 ### env
 
@@ -63,19 +52,40 @@ behavior/rhino-cli/gherkin/
 | ------------------------ | ---------------- | --------- |
 | `git-pre-commit.feature` | `git pre-commit` | 1         |
 
+### harness
+
+| File                                                  | Command(s)                             | Scenarios |
+| ----------------------------------------------------- | -------------------------------------- | --------- |
+| `agents-bindings.feature`                             | `harness bindings validate`/`generate` | 8         |
+| `agents-detect-duplication.feature`                   | `harness duplication validate`         | 4         |
+| `agents-sync.feature`                                 | `harness sync validate`                | 7         |
+| `agents-validate-claude.feature`                      | `harness claude validate`              | 5         |
+| `agents-validate-naming.feature`                      | `harness naming validate`              | 4         |
+| `repo-governance-agents-md-size.feature`              | `harness instruction-size validate`    | 3         |
+| `repo-governance-instruction-size-governance.feature` | `harness instruction-size validate`    | 5         |
+| `repo-governance-instruction-size-pre-push.feature`   | `harness instruction-size validate`    | 3         |
+| `repo-governance-instruction-size.feature`            | `harness instruction-size validate`    | 6         |
+
+### md
+
+| File                                         | Command(s)                      | Scenarios |
+| -------------------------------------------- | ------------------------------- | --------- |
+| `docs-validate-frontmatter.feature`          | `md frontmatter validate`       | 5         |
+| `docs-validate-heading-hierarchy.feature`    | `md heading-hierarchy validate` | 4         |
+| `docs-validate-links.feature`                | `md links validate`             | 4         |
+| `docs-validate-mermaid.feature`              | `md mermaid validate`           | 22        |
+| `docs-validate-naming.feature`               | `md naming validate`            | 3         |
+| `repo-governance-frontmatter-audit.feature`  | `md frontmatter-dates validate` | 5         |
+| `repo-governance-readme-index-audit.feature` | `md readme-index validate`      | 4         |
+
 ### repo-governance
 
 | File                                         | Command(s)                                 | Scenarios |
 | -------------------------------------------- | ------------------------------------------ | --------- |
-| `repo-governance-agents-md-size.feature`     | `convention validate agents-md-size`       | 3         |
 | `repo-governance-audit.feature`              | `repo-governance audit`                    | 5         |
-| `repo-governance-emoji-audit.feature`        | `convention validate emoji`                | 4         |
-| `repo-governance-frontmatter-audit.feature`  | `md validate frontmatter`                  | 5         |
-| `repo-governance-layer-coherence.feature`    | `repo-governance validate layer-coherence` | 3         |
-| `repo-governance-license-audit.feature`      | `convention validate license`              | 4         |
-| `repo-governance-readme-index-audit.feature` | `md readme-index`                          | 4         |
-| `repo-governance-traceability-audit.feature` | `repo-governance validate traceability`    | 5         |
-| `repo-governance-vendor-audit.feature`       | `repo-governance validate vendor`          | 7         |
+| `repo-governance-layer-coherence.feature`    | `repo-governance layer-coherence validate` | 3         |
+| `repo-governance-traceability-audit.feature` | `repo-governance traceability validate`    | 5         |
+| `repo-governance-vendor-audit.feature`       | `repo-governance vendor validate`          | 7         |
 
 ### spec-coverage
 

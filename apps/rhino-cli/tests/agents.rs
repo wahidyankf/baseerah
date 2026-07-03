@@ -5,7 +5,7 @@
 //! reasons — the underlying CLI subcommands live under the `harness` noun today).
 //!
 //! Wires the behavior-contract feature files at
-//! `specs/apps/rhino/behavior/rhino-cli/gherkin/agents/` to step definitions that
+//! `specs/apps/rhino/behavior/rhino-cli/gherkin/harness/` to step definitions that
 //! synthesize `.claude/` and `.opencode/` fixtures inside a fresh git-rooted
 //! temp workspace and drive the compiled `rhino-cli` binary, asserting on
 //! output and exit code.
@@ -721,7 +721,7 @@ async fn main() {
 fn feature_dir() -> PathBuf {
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     manifest
-        .join("../../specs/apps/rhino/behavior/rhino-cli/gherkin/agents")
+        .join("../../specs/apps/rhino/behavior/rhino-cli/gherkin/harness")
         .canonicalize()
         .expect("feature dir resolvable")
 }
