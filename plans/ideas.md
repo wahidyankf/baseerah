@@ -60,3 +60,18 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
 - Fixed 2026-07-03 (root-caused, not a runner flake — two distinct bugs, one per app):
   - `ayokoding-www-test-local-deploy-prod`: `ayokoding-www-be-e2e/playwright.config.ts` had `reuseExistingServer: !process.env.CI`, inverting the intent — it disabled server reuse specifically in CI, where `_reusable-www-test-local-deploy.yml` always pre-starts the app via `docker compose`. Playwright then tried to start a second server on the same port and failed with `Error: http://localhost:3101 is already used`, taking `fe-e2e` down with it. Fixed to `reuseExistingServer: true`, matching the already-correct sibling `fe-e2e` config.
   - `wahidyankf-www-test-local-deploy-prod`: unrelated `Turbopack build failed... Module not found: Can't resolve 'cmdk'` inside the Docker build. `libs/web-ui`'s barrel `index.ts` re-exports `command.tsx` (which imports `cmdk`), and `apps/wahidyankf-www/Dockerfile` manually mirrors `web-ui`'s non-workspace-hoisted dependencies but never added `cmdk` when the `command` primitive was introduced. Fixed by installing `cmdk@1.1.1` (exact version match to `libs/web-ui/package.json`, already CVE-clean, no new dependency introduced); verified with a local `docker build`.
+- **New finding, not yet fixed** (surfaced 2026-07-03 while verifying the `ayokoding-www-be-e2e`
+  fix above): `ayokoding-www-fe-e2e` fails with `Missing step definitions: 83`, all in
+  `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`
+  (country-filter interaction, ASEAN-region grouping, qualifying/non-qualifying divider rows,
+  minimum-role-rank threshold scenarios — e.g. no `When("the Country filter is set to {string}", ...)`
+  step exists at all in `cost-of-living-calculator.steps.ts`, only `Then` assertions reading its
+  state). `git blame` dates these scenarios to `86b1d2ae9e`/`49cca4d54` (2026-06-19 through 06-22) —
+  a genuine, ~2-week-old content gap, not new work-in-progress. It was invisible until now because
+  `ayokoding-www-be-e2e` always failed first on the port-conflict bug (fixed above), which ran before
+  `fe-e2e` in the same job and masked whether `fe-e2e` itself passed. This is a real, substantial
+  UI-interaction feature-implementation gap (83 Playwright steps for a complex calculator's
+  country/region filtering and savings-threshold logic) requiring live browser verification against
+  the running app — deliberately not attempted blind in the same pass as the port-conflict fix. Needs
+  a dedicated follow-up (ideally with `npx nx run ayokoding-www:serve` + browser automation to verify
+  each step against the real UI, not just written from reading the `.feature` file).
