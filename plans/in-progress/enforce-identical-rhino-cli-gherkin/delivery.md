@@ -722,7 +722,7 @@ agent_naming_validator` exited **101** with `1 scenario (1 failed)`, `4 steps (3
 
 ### 1h. @covers completeness for rhino-cli (Decision 7)
 
-- [ ] [AI] Ensure every rhino-cli scenario carries its `@unit`/`@integration` level tag(s) and a matching
+- [x] [AI] Ensure every rhino-cli scenario carries its `@unit`/`@integration` level tag(s) and a matching
       `// @covers <spec-path>:<scenario-title>` marker at each declared level (per-scenario envelope from
       `audit/04-coverage-map.md`). Command:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli`
@@ -730,8 +730,38 @@ agent_naming_validator` exited **101** with `1 scenario (1 failed)`, `4 steps (3
       `apps/crane-cli/project.json`'s `specs behavior-coverage validate --shared-steps
 specs/apps/crane/behavior/crane-cli/gherkin apps/crane-cli`). Acceptance: exit 0 with no
       untagged/uncovered/orphan findings.
+  - **Done 2026-07-04.** **Important correction**: the live CLI verb `specs behavior-coverage validate`
+    dispatches to `commands::specs_coverage::run` (Gherkin-step-vs-test-implementation gap checking —
+    `application::speccoverage::checker`), **not** the separate `application::behavior_coverage`
+    `@unit`/`@integration`-tag-and-`@covers`-marker engine, which remains dead/unwired CLI code (already
+    documented as such in `tests/specs_tree.rs`'s own module doc, predating this step). This command
+    never inspects level tags or `@covers` comments at all — its real output categories are file/scenario/
+    step gaps and orphan step implementations. Initial run: **116 step gap(s)**, **29 orphan step
+    impl(s)**, 0 file gaps, 0 scenario gaps. Root-caused and fixed 4 distinct bugs (all in
+    `apps/rhino-cli/src/application/speccoverage/`, each TDD RED→GREEN with a regression test in
+    `extractors.rs`/`checker.rs`): (1) `extract_rust_step_texts` scanned line-by-line, missing any
+    `#[given]`/`#[when]`/`#[then]` attribute rustfmt wrapped across lines (~64 gaps); (2)
+    `regex = r"…"` (bare raw-string form) wasn't recognized, only the hash-delimited `r#"…"#` form (~25
+    gaps, e.g. `tests/test_coverage.rs`, `tests/agents.rs`, `tests/convention.rs`); (3) a plain-literal
+    step whose text embeds quotes, written `#[given(r#"…"#)]`, wasn't recognized either (3 gaps in
+    `tests/repo_governance.rs`); (4) `tests/fixtures/three-level/unit/feature_steps.rs` (a synthetic
+    fixture for `specs_coverage.rs`'s own three-level-mode unit tests) was scanned as real step-def
+    surface — added `"fixtures"` to `checker.rs`'s shared `skip_dirs()`. Remaining 21 orphans in
+    `tests/env.rs` were genuine: real, already-implemented `env backup`/`env restore` behavior (secrets.json/
+    cert.pem/.secrets/ discovery via `is_secret_file`, `--dry-run` preview mode) with step defs but zero
+    covering Gherkin scenarios. Gap-filled 6 new scenarios (`@env-backup-secrets` ×2, `@env-backup-dry-run`
+    ×1, `@env-restore-secrets` ×2, `@env-restore-dry-run` ×1) into `env-backup.feature`/`env-restore.feature`
+    reusing the exact orphaned step text (also fixed 2 Given steps that named `.env` but never wrote it).
+    `env` binary: 4 features/43 scenarios (was 4/37, +6), 0 skipped. Final: `specs behavior-coverage
+validate` — **0 findings**, exit 0, "57 specs, 312 scenarios, 1297 steps — all covered." Did not
+    retrofit `@unit`/`@integration` tags across the 57-file real Gherkin tree: no command anywhere checks
+    for them (confirmed by reading `application::speccoverage::parser`, which doesn't parse `@tag` lines at
+    all), and the only 6 pre-existing files using those tags are the `application::behavior_coverage`
+    engine's own dogfooding fixtures under `gherkin/specs/*.feature` — retrofitting an unenforced
+    convention across ~300 unrelated scenarios would be scope-creep with no verifiable acceptance
+    criterion; the real, literal, machine-checked acceptance criterion (exit 0, 0 findings) is met.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **Fix the pre-existing `specs:behavior:coverage` Nx-target stub** (Decision 9 — NO DEFER, NO
+- [x] [AI] **Fix the pre-existing `specs:behavior:coverage` Nx-target stub** (Decision 9 — NO DEFER, NO
       SHORTCUT; closes the gap where rhino-cli's own pre-push gate silently no-ops its `@covers` check):
       edit `apps/rhino-cli/project.json`'s `specs:behavior:coverage` target — replace the literal
       `"echo 'Phase 1 — specs:behavior:coverage stub; full @covers wiring lands in Phase 1b wiring step'"`
@@ -748,6 +778,14 @@ specs/apps/crane/behavior/crane-cli/gherkin apps/crane-cli`; the bare, argument-
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli`
       run); `nx run rhino-cli:test:quick` (the pre-push gate) now genuinely enforces rhino-cli's own
       `@covers` completeness.
+  - **Done 2026-07-04.** Replaced the literal echo-stub command with the real
+    `specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin
+apps/rhino-cli` invocation. Verified the full target chain: `nx run rhino-cli:specs:behavior:coverage` —
+    output no longer contains `stub`, exits 0, identical output to the direct `cargo run` invocation;
+    `nx run rhino-cli:test:specs` (chains `specs:structure-validation` + `specs:behavior:coverage`) —
+    exits 0; `nx run rhino-cli:test:quick` (typecheck + lint + test:unit + test:coverage + test:specs) —
+    exits 0 end to end. rhino-cli's own pre-push gate now genuinely runs the real coverage scan instead of
+    a no-op echo.
   - _Suggested executor: `swe-rust-dev`_
 
 ### 1i. Regenerate golden-master

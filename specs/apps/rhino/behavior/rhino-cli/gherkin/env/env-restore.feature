@@ -107,3 +107,30 @@ Feature: Env file restore
     Then the command exits successfully
     And the .env file is restored to the repository
     And the .claude/settings.local.json is not restored to the repository
+
+  @env-restore-secrets
+  Scenario: Restore recovers common secret file patterns
+    Given a backup directory containing a secrets.json file
+    And a backup directory containing a cert.pem file
+    And a backup directory containing a .secrets/notes.md file
+    When the developer runs rhino-cli env restore
+    Then the command exits successfully
+    And secrets.json is copied back to the repository
+    And cert.pem is copied back to the repository
+    And .secrets/notes.md is copied back to the repository preserving its relative path
+
+  @env-restore-secrets
+  Scenario: Restore recovers a mix of .env and secret files together
+    Given a backup directory containing a .env file and a secrets.json file
+    When the developer runs rhino-cli env restore
+    Then the command exits successfully
+    And secrets.json is copied back to the repository
+
+  @env-restore-dry-run
+  Scenario: Dry-run restore previews without writing files
+    Given a backup directory containing a secrets.json file
+    And a backup directory containing a cert.pem file
+    And a backup directory containing a .secrets/notes.md file
+    When the developer runs rhino-cli env restore with --dry-run
+    Then no files are written to the repository
+    And the output lists the files that would be restored

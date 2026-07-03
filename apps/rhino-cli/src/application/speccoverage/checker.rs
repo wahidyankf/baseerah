@@ -68,8 +68,14 @@ fn go_scenario_comment_re() -> &'static Regex {
 
 /// Returns the set of directory names that the walker skips unconditionally.
 ///
-/// These directories are generated output or dependency caches that should
-/// never be scanned for step definitions.
+/// These directories are generated output, dependency caches, or synthetic
+/// test-fixture scaffolding that should never be scanned for step
+/// definitions. `fixtures` in particular holds throwaway step-def-shaped
+/// content authored purely to exercise the coverage-checker's own unit tests
+/// (e.g. `apps/rhino-cli/tests/fixtures/three-level/`) — no Gherkin scenario
+/// in a real spec tree ever references it, so leaving it unskipped produces
+/// false "orphan step implementation" findings when a project's own source
+/// tree is scanned as `app_dir`.
 fn skip_dirs() -> &'static HashSet<&'static str> {
     static SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
     SET.get_or_init(|| {
@@ -93,6 +99,7 @@ fn skip_dirs() -> &'static HashSet<&'static str> {
             "generated_contracts",
             ".dart_tool",
             ".features-gen",
+            "fixtures",
         ];
         arr.into_iter().collect()
     })
@@ -914,6 +921,35 @@ mod tests {
         let sm = extract_all_step_texts(tmp.path()).unwrap();
         assert!(sm.matches("user logs in"));
         assert!(sm.matches("a user"));
+    }
+
+    #[test]
+    fn extract_all_step_texts_skips_fixtures_dir() {
+        // `apps/rhino-cli/tests/fixtures/three-level/unit/feature_steps.rs` is a synthetic
+        // fixture used only by `specs_coverage.rs`'s own three-level-mode unit tests (passed
+        // explicitly as `app_dir`/`unit_dir`/etc. there, so the "fixtures" ancestor component
+        // is never itself walked in that call). When the real `apps/rhino-cli` tree is scanned
+        // as `app_dir` (the real `specs behavior-coverage validate --shared-steps` invocation),
+        // a step-def-shaped fixture file left under a directory literally named `fixtures`
+        // should not surface as a false "orphan step implementation" — no Gherkin scenario in
+        // the real spec tree will ever reference throwaway fixture step text.
+        let tmp = TempDir::new().unwrap();
+        std::fs::create_dir_all(tmp.path().join("fixtures/three-level/unit")).unwrap();
+        std::fs::write(
+            tmp.path()
+                .join("fixtures/three-level/unit/feature_steps.rs"),
+            "#[given(\"a condition\")]\nfn given_a_condition() {}\n",
+        )
+        .unwrap();
+        std::fs::create_dir_all(tmp.path().join("src")).unwrap();
+        std::fs::write(
+            tmp.path().join("src/real_steps.rs"),
+            "#[given(\"a real step\")]\nfn given_real() {}\n",
+        )
+        .unwrap();
+        let sm = extract_all_step_texts(tmp.path()).unwrap();
+        assert!(sm.matches("a real step"));
+        assert!(!sm.matches("a condition"));
     }
 
     #[test]

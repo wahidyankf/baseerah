@@ -27,8 +27,14 @@ use super::util::{first_non_empty, normalize_ws, unescape_string};
 // Regex registry — compiled lazily, mirrors Go package-level vars.
 // ============================================================
 
-/// Matches a Rust `#[given("…")]` / `#[when("…")]` / `#[then("…")]` literal
-/// step attribute.
+/// Matches a Rust `#[given(…)]` / `#[when(…)]` / `#[then(…)]` literal step
+/// attribute (string argument, no `expr =`/`regex =` prefix).
+///
+/// Deliberately omits a quote-wrapped example inline: illustrating the exact
+/// attribute-with-quoted-argument shape here would itself satisfy the
+/// pattern below when this file is scanned as Rust source (as every `.rs`
+/// file under `apps/rhino-cli` is by [`extract_rust_step_texts`]), producing
+/// a spurious self-referential orphan step-definition finding.
 fn rs_step_literal_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -37,7 +43,25 @@ fn rs_step_literal_re() -> &'static Regex {
     })
 }
 
-/// Matches a Rust `#[given(expr = "…")]` Cucumber-expression step attribute.
+/// Matches a Rust `#[given(…)]` / `#[when(…)]` / `#[then(…)]` literal step
+/// attribute whose argument is a hash-delimited raw string (`r#"…"#`) rather
+/// than an escaped-quote string. Authors reach for this form specifically
+/// when the step text itself embeds literal double quotes (e.g. a step
+/// asserting behavior for markdown containing `"Claude Code"`) to avoid
+/// `\"`-escaping every embedded quote — real precedent:
+/// `apps/rhino-cli/tests/repo_governance.rs`. Omitting this form silently
+/// dropped every step defined this way, producing false step-coverage gaps.
+/// (See [`rs_step_literal_re`] for why this doc comment omits a quote-wrapped
+/// example.)
+fn rs_step_literal_raw_re() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(r##"#\[(?:given|when|then)\s*\(\s*r#"(.*?)"#\s*\)\s*\]"##).expect("valid regex")
+    })
+}
+
+/// Matches a Rust `#[given(expr = …)]` Cucumber-expression step attribute.
+/// (See [`rs_step_literal_re`] for why the example omits quote marks.)
 fn rs_step_expr_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -46,11 +70,28 @@ fn rs_step_expr_re() -> &'static Regex {
     })
 }
 
-/// Matches a Rust `#[given(regex = r#"…"#)]` regex step attribute.
+/// Matches a Rust `#[given(regex = …)]` regex step attribute whose argument
+/// uses the hash-delimited raw-string form (`r#"…"#`). (See
+/// [`rs_step_literal_re`] for why the example omits quote marks.)
 fn rs_step_regex_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(r##"#\[(?:given|when|then)\s*\(\s*regex\s*=\s*r#"(.*?)"#\s*\)\s*\]"##)
+            .expect("valid regex")
+    })
+}
+
+/// Matches a Rust `#[given(regex = …)]` regex step attribute whose argument
+/// uses the bare raw-string form (no `#` delimiter). Just as valid Rust as
+/// the hash-delimited form handled by [`rs_step_regex_re`] whenever the
+/// pattern itself contains no literal `"`, and in fact the form most
+/// cucumber-rs step defs in this repo use — omitting this second form
+/// silently dropped every step defined this way, producing false
+/// step-coverage gaps.
+fn rs_step_regex_bare_re() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(r#"#\[(?:given|when|then)\s*\(\s*regex\s*=\s*r"(.*?)"\s*\)\s*\]"#)
             .expect("valid regex")
     })
 }
@@ -158,11 +199,28 @@ fn fs_let_backtick_re() -> &'static Regex {
 
 /// Extracts step definitions from a Rust source file.
 ///
-/// Recognises three forms in priority order:
+/// Recognises five forms in priority order:
 ///
-/// 1. `regex = r#"…"#` — raw regex (most specific).
-/// 2. `expr = "…"` — Cucumber expression.
-/// 3. `"literal"` — plain string (also accepts Cucumber expressions).
+/// 1. `regex = r#"…"#` — raw regex, hash-delimited raw string (most specific).
+/// 2. `regex = r"…"` — raw regex, bare raw string.
+/// 3. `expr = "…"` — Cucumber expression.
+/// 4. `"literal"` — plain string (also accepts Cucumber expressions).
+/// 5. `r#"literal"#` — plain string whose text embeds quotes, hash-delimited
+///    raw string.
+///
+/// Scans the whole file content rather than line-by-line: rustfmt routinely
+/// wraps a `#[given(…)]`/`#[when(…)]`/`#[then(…)]` attribute whose
+/// combined length exceeds `max_width` onto its own line(s) (attribute on one
+/// line, string argument and closing bracket on the next), and a per-line
+/// scan would never see the opening paren, string, and closing bracket in a
+/// single match — silently dropping the step definition and producing a
+/// false step-coverage gap even though cucumber-rs (which binds attributes
+/// from the token stream, not source lines) matches the step correctly at
+/// runtime. Same class of bug already fixed for the JVM/Kotlin and Dart
+/// extractors (see [`extract_jvm_step_texts`] and [`extract_dart_step_texts`]).
+/// None of the five regexes below need a dotall flag to support this: they
+/// have no `.` metacharacter, and `\s`/negated character classes already
+/// match `\n`.
 ///
 /// # Errors
 ///
@@ -178,37 +236,56 @@ pub fn extract_rust_step_texts(
 ) -> std::result::Result<(), Error> {
     let content = fs::read_to_string(path)?;
     let path_s = path.to_string_lossy();
-    for line in content.lines() {
-        // Regex form (most specific) first.
-        for caps in rs_step_regex_re().captures_iter(line) {
-            let pattern = caps
-                .get(1)
+
+    // Regex form (most specific) first — hash-delimited raw string, then bare
+    // raw string (see [`rs_step_regex_bare_re`] for why both are needed).
+    for caps in rs_step_regex_re().captures_iter(&content) {
+        let pattern = caps
+            .get(1)
+            .expect("capture group 1 always present")
+            .as_str();
+        if let Ok(re) = Regex::new(pattern) {
+            sm.add_pattern_with_origin(re, pattern, &path_s);
+        }
+    }
+    for caps in rs_step_regex_bare_re().captures_iter(&content) {
+        let pattern = caps
+            .get(1)
+            .expect("capture group 1 always present")
+            .as_str();
+        if let Ok(re) = Regex::new(pattern) {
+            sm.add_pattern_with_origin(re, pattern, &path_s);
+        }
+    }
+    // Expr form — Cucumber expressions.
+    for caps in rs_step_expr_re().captures_iter(&content) {
+        add_step_to_matcher_with_origin(
+            sm,
+            caps.get(1)
                 .expect("capture group 1 always present")
-                .as_str();
-            if let Ok(re) = Regex::new(pattern) {
-                sm.add_pattern_with_origin(re, pattern, &path_s);
-            }
-        }
-        // Expr form — Cucumber expressions.
-        for caps in rs_step_expr_re().captures_iter(line) {
-            add_step_to_matcher_with_origin(
-                sm,
-                caps.get(1)
-                    .expect("capture group 1 always present")
-                    .as_str(),
-                &path_s,
-            );
-        }
-        // Literal form — also may have Cucumber expressions.
-        for caps in rs_step_literal_re().captures_iter(line) {
-            add_step_to_matcher_with_origin(
-                sm,
-                caps.get(1)
-                    .expect("capture group 1 always present")
-                    .as_str(),
-                &path_s,
-            );
-        }
+                .as_str(),
+            &path_s,
+        );
+    }
+    // Literal form — also may have Cucumber expressions.
+    for caps in rs_step_literal_re().captures_iter(&content) {
+        add_step_to_matcher_with_origin(
+            sm,
+            caps.get(1)
+                .expect("capture group 1 always present")
+                .as_str(),
+            &path_s,
+        );
+    }
+    // Literal form, hash-delimited raw-string argument (text embeds quotes).
+    for caps in rs_step_literal_raw_re().captures_iter(&content) {
+        add_step_to_matcher_with_origin(
+            sm,
+            caps.get(1)
+                .expect("capture group 1 always present")
+                .as_str(),
+            &path_s,
+        );
     }
     Ok(())
 }
@@ -541,6 +618,81 @@ mod tests {
     }
 
     #[test]
+    fn rust_literal_step_uses_raw_string_form_when_text_embeds_quotes() {
+        // A plain literal step (no `regex =`/`expr =` prefix) whose text contains
+        // embedded double quotes is written using the hash-delimited raw-string
+        // attribute form rather than an escaped-quote string — real precedent:
+        // `apps/rhino-cli/tests/repo_governance.rs`'s step asserting behavior for
+        // a governance markdown file containing the literal text "Claude Code"
+        // inside a code fence. The previous extractor recognised only the
+        // escaped-quote form, silently dropping every step defined this way.
+        let tmp = TempDir::new().unwrap();
+        let p = write(
+            tmp.path(),
+            "x.rs",
+            "#[given(r#\"a governance markdown file containing \"Claude Code\" inside a code fence\"#)]\nfn step() {}\n",
+        );
+        let mut sm = StepMatcher::new();
+        extract_rust_step_texts(&p, &mut sm).unwrap();
+        assert!(
+            sm.matches("a governance markdown file containing \"Claude Code\" inside a code fence")
+        );
+    }
+
+    #[test]
+    fn rust_literal_step_attribute_split_across_lines_is_still_extracted() {
+        // rustfmt wraps a `#[given(…)]`/`#[when(…)]`/`#[then(…)]` attribute
+        // whose combined length exceeds `max_width` onto its own line(s):
+        //
+        //   #[given(
+        //       "a repository with a convention file that is missing the heading"
+        //   )]
+        //
+        // A line-by-line scan (the previous implementation) never sees the opening
+        // paren, string, and closing bracket in a single line, silently dropping
+        // the step definition and producing a false step-coverage gap even though
+        // cucumber-rs itself (which operates on the token stream, not source
+        // lines) binds the step correctly at runtime. Same class of bug already
+        // fixed for the JVM/Kotlin extractor (see
+        // `jvm_step_regex_matches_annotation_split_across_lines` above).
+        let tmp = TempDir::new().unwrap();
+        let p = write(
+            tmp.path(),
+            "x.rs",
+            "#[given(\n    \"a repository with a convention file that is missing the heading\"\n)]\nfn step() {}\n",
+        );
+        let mut sm = StepMatcher::new();
+        extract_rust_step_texts(&p, &mut sm).unwrap();
+        assert!(sm.matches("a repository with a convention file that is missing the heading"));
+    }
+
+    #[test]
+    fn rust_regex_step_attribute_split_across_lines_is_still_extracted() {
+        let tmp = TempDir::new().unwrap();
+        let p = write(
+            tmp.path(),
+            "x.rs",
+            "#[then(\n    regex = r#\"^result is (\\d+)$\"#\n)]\nfn step() {}\n",
+        );
+        let mut sm = StepMatcher::new();
+        extract_rust_step_texts(&p, &mut sm).unwrap();
+        assert!(sm.matches("result is 7"));
+    }
+
+    #[test]
+    fn rust_expr_step_attribute_split_across_lines_is_still_extracted() {
+        let tmp = TempDir::new().unwrap();
+        let p = write(
+            tmp.path(),
+            "x.rs",
+            "#[when(\n    expr = \"count is {int}\"\n)]\nfn step() {}\n",
+        );
+        let mut sm = StepMatcher::new();
+        extract_rust_step_texts(&p, &mut sm).unwrap();
+        assert!(sm.matches("count is 42"));
+    }
+
+    #[test]
     fn rust_expr_step_is_compiled_as_cucumber_pattern() {
         let tmp = TempDir::new().unwrap();
         let p = write(
@@ -564,6 +716,27 @@ mod tests {
         let mut sm = StepMatcher::new();
         extract_rust_step_texts(&p, &mut sm).unwrap();
         assert!(sm.matches("result is 7"));
+    }
+
+    #[test]
+    fn rust_regex_step_uses_bare_raw_string_form() {
+        // `regex = r"…"` (no `#` delimiter) is just as valid Rust as
+        // `regex = r#"…"#` and is in fact the form most cucumber-rs step defs
+        // in this very repo use (e.g. `apps/rhino-cli/tests/test_coverage.rs`,
+        // `tests/agents.rs`, `tests/convention.rs`) whenever the pattern itself
+        // contains no literal `"` needing the hash-delimited escape. The
+        // previous extractor recognised only the hash-delimited form, silently
+        // dropping every step defined this way and producing a false
+        // step-coverage gap.
+        let tmp = TempDir::new().unwrap();
+        let p = write(
+            tmp.path(),
+            "x.rs",
+            "#[given(regex = r\"^a Go coverage file recording (\\d+)% line coverage$\")]\nfn step(n: u32) {}\n",
+        );
+        let mut sm = StepMatcher::new();
+        extract_rust_step_texts(&p, &mut sm).unwrap();
+        assert!(sm.matches("a Go coverage file recording 90% line coverage"));
     }
 
     #[test]

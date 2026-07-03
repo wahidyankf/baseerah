@@ -904,6 +904,7 @@ fn given_repo_secrets_dir_file(w: &mut EnvWorld) {
 
 #[given("a git repository containing a .env file and a secrets.json file")]
 fn given_repo_env_and_secrets_json(w: &mut EnvWorld) {
+    w.write(".env", "A=1\n");
     w.write("secrets.json", "{}\n");
 }
 
@@ -984,6 +985,7 @@ fn given_backup_with_secrets_dir_file(w: &mut EnvWorld) {
 
 #[given("a backup directory containing a .env file and a secrets.json file")]
 fn given_backup_with_env_and_secrets_json(w: &mut EnvWorld) {
+    w.write_backup(".env", "A=1\n");
     w.write_backup("secrets.json", "{}\n");
 }
 
