@@ -69,8 +69,10 @@ dependency plan's boundary; golden-master regenerated).
 
 `@covers` + level tags are applied **per repo, to that repo's own apps/libs** (app sets differ across
 repos — only the engine is byte-identical). Batches follow the `coverage.projects` registry, one bounded
-group per phase, each a green gate. `@wip` (visible, exempt, inline reason) is the only sanctioned way to
-defer a genuinely-not-ready scenario — never a silent `.skip`.
+group per phase, each a green gate. **No defer, no shortcut** (Decision 4): every scenario in a batch is
+implemented (a real test that executes and passes) before that batch's gate — no `@wip`, no `.skip`, no
+marker-without-a-real-test, no partial batch. A scenario that cannot be made to pass has its behaviour
+built or is corrected/removed as an invalid spec (with rationale in the phase notes) — never parked.
 
 ## 5. File Impact (representative)
 

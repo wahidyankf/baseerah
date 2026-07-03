@@ -112,8 +112,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 For each project in the batch:
 
 - [ ] [AI] Level-tag every scenario in the project's `specs/**` features (`@unit`/`@integration`/`@e2e`)
-      per its `coverage.projects` envelope; use `@wip` (with an inline reason) only for genuinely-deferred
-      scenarios. Command: `rhino-cli specs behavior-coverage validate`. Acceptance: no untagged findings.
+      per its `coverage.projects` envelope. **No defer, no shortcut** (Decision 4): no scenario is
+      `@wip`-tagged, skipped, or parked — all are implemented in this batch. Command:
+      `rhino-cli specs behavior-coverage validate`. Acceptance: no untagged findings; zero `@wip`.
 - [ ] [AI] Add `// @covers <spec-path>:<scenario-title>` markers to the project's tests at each declared
       level; **write the real test** where the runtime cross-check reveals a scenario is unimplemented.
       Command: `nx run <project>:test:unit` (+`:test:integration`/`:test:e2e` as applicable) then
@@ -124,7 +125,9 @@ For each project in the batch:
 
 - [ ] [AI] `nx run <project>:specs:behavior:coverage` — exit 0, non-vacuous (markers present).
 - [ ] [AI] `nx affected -t test:quick,specs:coverage --base=origin/main` — exits 0.
-- [ ] [AI] `@wip` count for the project recorded with reasons (`audit/07-wip-ledger.md`).
+- [ ] [AI] **Zero deferrals**: the project has no `@wip`, no `.skip`/`.only`/`.todo`, no
+      marker-without-a-real-test — every scenario executed and passed (`grep`-proof recorded in
+      `audit/07-no-defer-proof.md`).
 
 > **Pause Safety**: the completed batches are fully enforced; remaining projects are untouched and still
 > pass their existing gates. Safe to stop between batches. To resume: pick the next batch.
@@ -168,7 +171,8 @@ For each project in the batch:
 ### Plan Archival
 
 - [ ] [AI] Verify ALL delivery items ticked and ALL gates pass (local + CI, all three repos).
-- [ ] [AI] Verify the `@wip` ledger has an inline reason per entry (no silent skips remain).
+- [ ] [AI] Verify **zero deferrals** repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no
+      marker-without-a-real-test anywhere (`audit/07-no-defer-proof.md` shows a clean grep).
 - [ ] [AI] Move plan: `git mv plans/in-progress/enforce-repo-wide-scenario-implementation plans/done/<completion-date>__enforce-repo-wide-scenario-implementation`.
 - [ ] [AI] Update `plans/in-progress/README.md` (remove entry) + `plans/done/README.md` (add entry).
 - [ ] [AI] Commit: `chore(plans): move enforce-repo-wide-scenario-implementation to done`.
@@ -180,4 +184,4 @@ For each project in the batch:
 - [ ] `behavior-coverage` runtime cross-check live and wired to pre-push + CI
 - [ ] `@covers` + level tags on every eligible app/lib; `behavior-coverage` non-vacuous
 - [ ] Engine byte-identical across the three repos; all three repos' CI green
-- [ ] `@wip` ledger complete (visible, reasoned; zero silent skips)
+- [ ] Zero deferrals repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no marker-without-a-real-test

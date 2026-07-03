@@ -90,8 +90,7 @@ byte-identical to the three repos.
 
 ## Product Risks
 
-| Risk                                                               | Mitigation                                                                                    |
-| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| A tool has no clean machine-readable reporter for the cross-check. | Prefer JSON reporters; fall back to that tool's fail-on-skip alone for that tier, documented. |
-| Large unimplemented-scenario backlog stalls the rollout.           | Batch per-project per-phase; `@wip` (visible, exempt) for genuinely-deferred scenarios.       |
-| `@wip` becomes a silent escape hatch.                              | Track `@wip` count as a non-zero-tolerated metric; each `@wip` needs an inline reason.        |
+| Risk                                                               | Mitigation                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A tool has no clean machine-readable reporter for the cross-check. | Prefer JSON reporters; fall back to that tool's fail-on-skip alone for that tier, documented.                                                                                                                                                                                           |
+| Large unimplemented-scenario backlog stalls the rollout.           | Batch per-project per-phase and work it down. **No defer, no shortcut** (Decision 4): each batch fully implements its scenarios before its gate — no `@wip`, no skip, no partial. A scenario that can't pass has its behaviour built or is removed as an invalid spec (with rationale). |

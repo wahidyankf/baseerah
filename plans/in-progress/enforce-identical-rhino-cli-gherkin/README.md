@@ -147,6 +147,13 @@ Resolved via structured pre-write grilling:
 8. **repo-config gate placement** = `repo-config validate` runs at **pre-commit** (staged-gated when
    `repo-config.yml` changes) + the **PR quality gate** + the **main quality gate**, and is **removed from
    pre-push**. Byte-identical across all three repos.
+9. **NO DEFER, NO SHORTCUT (hard rule)** = the hollow scenarios exist precisely because the prior plans
+   deferred work and took the skip-by-data shortcut. This plan forbids both. Every scenario in scope is
+   **fully implemented and passing** before its phase gate — no scenario is skipped, `@wip`-tagged,
+   marked-without-a-real-test, stubbed, "temporarily" left, or deferred to a follow-up. No `⚠️`
+   "functionally-equivalent" waivers. The **0-skipped** gate is absolute: a scenario that cannot be made
+   to pass means its behaviour is fixed or the scenario is corrected — never parked. If genuine new scope
+   is discovered, it is added to this plan and completed here, not deferred out.
 
 Standing decisions inherited from predecessors: `ose-public` is canonical; `apps/rhino-cli` keeps
 **zero carve-outs** (100% byte-identical); golden-master regenerated post-synthesis; each phase gate

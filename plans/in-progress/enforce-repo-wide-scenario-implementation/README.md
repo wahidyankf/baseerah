@@ -79,6 +79,12 @@ test ran and passed".**
 2. **Enforcement = BOTH** per-tier fail-on-skip (fast local) **and** a central `behavior-coverage` runtime
    cross-check (authoritative CI gate) — maximum enforcement.
 3. Scope = **all eligible apps/libs** in the coverage registry, for **unit/integration/e2e**.
+4. **NO DEFER, NO SHORTCUT (hard rule)** = the hollow scenarios exist precisely because prior work
+   deferred and shortcut. This plan forbids both. Every scenario in a batch is **fully implemented and
+   passing** before that batch's gate — no `@wip`, no `.skip`/`.only`/`.todo`, no marker-without-a-real-
+   test, no stub, no "temporarily deferred", no partial batch. A scenario that cannot be made to pass
+   means its behaviour is built or the scenario is corrected/removed as an invalid spec (with rationale)
+   — never parked. `@wip` is **not** an escape hatch in this plan.
 
 ## Navigation
 
