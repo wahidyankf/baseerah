@@ -6,10 +6,12 @@ Feature: Theme
   Background:
     Given the app is running
 
+  @unit @e2e
   Scenario: Default theme is light mode
     Given the site loads without a stored theme preference
     Then the theme is set to light mode
 
+  @unit @e2e
   Scenario: Theme toggle switches between modes
     Given the site is in light mode
     When the user clicks the theme toggle and selects dark mode

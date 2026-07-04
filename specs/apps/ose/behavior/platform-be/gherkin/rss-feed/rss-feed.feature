@@ -6,6 +6,7 @@ Feature: RSS Feed
   Background:
     Given the API is running
 
+  @unit @e2e
   Scenario: RSS feed contains valid structure
     Given the content repository contains update posts
     When the RSS feed is generated
@@ -13,6 +14,7 @@ Feature: RSS Feed
     And the feed has a channel link to the site URL
     And the feed contains item elements for each update
 
+  @unit @e2e
   Scenario: RSS feed entries contain required fields
     Given the content repository contains an update post with title "Phase 0 End" and date "2026-02-08"
     When the RSS feed is generated

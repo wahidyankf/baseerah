@@ -6,6 +6,7 @@ Feature: Navigation
   Background:
     Given the app is running
 
+  @unit @e2e
   Scenario: Header contains navigation links
     Given the header component is rendered
     Then the header contains a link to "Updates" at "/updates/"
@@ -13,6 +14,7 @@ Feature: Navigation
     And the header contains an external link to "Documentation"
     And the header contains an external link to "GitHub"
 
+  @unit @e2e
   Scenario: Breadcrumb shows ancestor hierarchy without current page
     Given the about page is rendered with breadcrumbs
     Then the breadcrumb shows "Home" linking to "/"
@@ -20,6 +22,7 @@ Feature: Navigation
     And all breadcrumb segments should be clickable links
     And breadcrumb text should wrap naturally without horizontal truncation
 
+  @unit @e2e
   Scenario: Previous and next navigation between updates
     Given an update detail page is rendered with adjacent updates
     Then a "Previous" link is displayed with the previous update title

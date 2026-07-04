@@ -100,6 +100,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       expect(link).toHaveAttribute("target", "_blank");
     });
 
+    // @covers specs/apps/ose/behavior/platform-web/gherkin/app-shell/navigation.feature:Header contains navigation links
     And('the header contains an external link to "GitHub"', () => {
       const link = screen.getByRole("link", { name: /GitHub/i });
       expect(link).toBeInTheDocument();
@@ -132,6 +133,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       expect(spans.length).toBe(0);
     });
 
+    // @covers specs/apps/ose/behavior/platform-web/gherkin/app-shell/navigation.feature:Breadcrumb shows ancestor hierarchy without current page
     And("breadcrumb text should wrap naturally without horizontal truncation", () => {
       const nav = screen.getByLabelText("Breadcrumb");
       const ol = nav.querySelector("ol");
@@ -158,6 +160,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       expect(screen.getByText("Previous Update Title")).toBeInTheDocument();
     });
 
+    // @covers specs/apps/ose/behavior/platform-web/gherkin/app-shell/navigation.feature:Previous and next navigation between updates
     And('a "Next" link is displayed with the next update title', () => {
       expect(screen.getByText("Next")).toBeInTheDocument();
       expect(screen.getByText("Next Update Title")).toBeInTheDocument();

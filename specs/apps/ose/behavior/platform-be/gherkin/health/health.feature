@@ -6,6 +6,7 @@ Feature: Health Check
   Background:
     Given the API is running
 
+  @unit @e2e
   Scenario: Health endpoint returns ok status
     When the health endpoint is called
     Then the response contains status "ok"

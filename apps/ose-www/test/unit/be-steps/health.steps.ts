@@ -21,6 +21,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       result = await testCaller.health.check();
     });
 
+    // @covers specs/apps/ose/behavior/platform-be/gherkin/health/health.feature:Health endpoint returns ok status
     Then('the response contains status "ok"', () => {
       expect(result.status).toBe("ok");
     });

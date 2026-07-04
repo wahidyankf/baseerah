@@ -85,6 +85,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(feedXml).toContain(`<link>${SITE_URL}/updates/</link>`);
     });
 
+    // @covers specs/apps/ose/behavior/platform-be/gherkin/rss-feed/rss-feed.feature:RSS feed contains valid structure
     And("the feed contains item elements for each update", () => {
       expect(feedXml).toContain("<item>");
       expect(feedXml).toContain("</item>");
@@ -135,6 +136,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(feedXml).toContain(`<link>${SITE_URL}/updates/2026-02-08-phase-0-end/</link>`);
     });
 
+    // @covers specs/apps/ose/behavior/platform-be/gherkin/rss-feed/rss-feed.feature:RSS feed entries contain required fields
     And("the feed entry has a description", () => {
       expect(feedXml).toContain("<description>");
     });

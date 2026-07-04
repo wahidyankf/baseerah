@@ -6,17 +6,20 @@ Feature: Search
   Background:
     Given the API is running
 
+  @unit @e2e
   Scenario: Search returns matching results
     Given the search index contains pages about "enterprise" and "compliance"
     When a search query "enterprise" is executed
     Then the results contain pages matching "enterprise"
     And each result contains a title, slug, and excerpt
 
+  @unit @e2e
   Scenario: Search with no matches returns empty results
     Given the search index contains pages about "enterprise" and "compliance"
     When a search query "nonexistent-term-xyz" is executed
     Then the results are empty
 
+  @unit @e2e
   Scenario: Search results respect the limit parameter
     Given the search index contains 5 pages matching "phase"
     When a search query "phase" is executed with limit 2

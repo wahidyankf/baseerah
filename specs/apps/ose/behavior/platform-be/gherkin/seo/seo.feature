@@ -6,6 +6,7 @@ Feature: SEO
   Background:
     Given the API is running
 
+  @unit @e2e
   Scenario: Sitemap contains all public pages
     Given the content repository contains public pages
     When the sitemap is generated
@@ -13,6 +14,7 @@ Feature: SEO
     And the sitemap contains a URL for the about page
     And the sitemap contains URLs for all update pages
 
+  @unit @e2e
   Scenario: Robots.txt allows all crawlers
     When the robots.txt is generated
     Then it allows all user agents

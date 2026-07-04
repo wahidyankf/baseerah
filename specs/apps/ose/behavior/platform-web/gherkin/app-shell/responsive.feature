@@ -6,12 +6,14 @@ Feature: Responsive Design
   Background:
     Given the app is running
 
+  @unit @e2e
   Scenario: Mobile viewport shows hamburger navigation
     Given the viewport width is less than 640 pixels
     When the header is rendered
     Then the hamburger menu button is visible
     And the desktop navigation links are hidden
 
+  @unit @e2e
   Scenario: Desktop viewport shows full navigation
     Given the viewport width is greater than 1024 pixels
     When the header is rendered

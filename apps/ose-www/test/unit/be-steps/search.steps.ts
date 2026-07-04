@@ -36,6 +36,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(results.length).toBeGreaterThan(0);
     });
 
+    // @covers specs/apps/ose/behavior/platform-be/gherkin/search/search.feature:Search returns matching results
     And("each result contains a title, slug, and excerpt", () => {
       for (const result of results) {
         expect(result.title).toBeTruthy();
@@ -57,6 +58,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       results = await caller.search.query({ query: "nonexistent-term-xyz", limit: 20 });
     });
 
+    // @covers specs/apps/ose/behavior/platform-be/gherkin/search/search.feature:Search with no matches returns empty results
     Then("the results are empty", () => {
       expect(results).toHaveLength(0);
     });
@@ -76,6 +78,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       results = await caller.search.query({ query: "phase", limit: 2 });
     });
 
+    // @covers specs/apps/ose/behavior/platform-be/gherkin/search/search.feature:Search results respect the limit parameter
     Then("at most 2 results are returned", () => {
       expect(results.length).toBeLessThanOrEqual(2);
     });
