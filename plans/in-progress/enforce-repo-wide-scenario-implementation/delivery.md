@@ -629,8 +629,22 @@ are logged here rather than instantiated as individual checkboxes, since most ba
   a domain-specific step file). All delegated to parallel background agents, each independently
   re-verified (test:unit + specs:behavior:coverage re-run directly, not just trusting the agent's report)
   before committing. **Done 2026-07-04.** Commits `badc01745`, `369342520`, `f272956ff`, `11e752ee6`,
-  `c5457c9c1`, `1b30517da` (ose-primer), pushed to origin/main. Remaining crud-be-\* batch: csharp-aspnetcore,
-  elixir-phoenix, fsharp-giraffe, kotlin-ktor, rust-axum, crud-be-e2e.
+  `c5457c9c1`, `1b30517da` (ose-primer), pushed to origin/main.
+- **`ose-primer`'s per-language `@covers` markers, batch 2 (final 6 of 11 `crud-be-*` variants +
+  `crud-be-e2e`) — ALL 12 crud-be-\* projects now have `@covers` markers.** `crud-be-fsharp-giraffe` (76
+  markers — one per scenario, not per-tier, since `UnitFeatureRunner.fs` reuses the same physical
+  TickSpec step functions for both tiers), `crud-be-rust-axum` (154 markers, 78/78 unit + 76/78
+  integration), `crud-be-kotlin-ktor` (156 markers, 78/78 both tiers — this project implements both
+  test-support scenarios, unlike some siblings), `crud-be-csharp-aspnetcore` (156 markers, 78/78 both
+  tiers; comment-only, didn't touch the `ReqnrollHooks.cs`/`CommonSteps.cs` tier-selection fix from
+  earlier this session), `crud-be-elixir-phoenix` (152 markers, 76/76; re-confirmed the path-based
+  tier-selection fix still holds — no regression to the tag-collision failure mode), and `crud-be-e2e`
+  (78 markers, single e2e tier; `bddgen` codegen + `tsc --noEmit` both clean, full Playwright run needs
+  the docker-compose backend stack not available in this pass). All delegated to parallel background
+  agents, each independently re-verified before committing (plus 2 credo `MaxLineLength` config fixes for
+  the Elixir batches, same pattern as `elixir-openapi-codegen`/`elixir-cabbage`/`elixir-gherkin`).
+  **Done 2026-07-04.** Commits `8b56c0630`, `b10317e66`, `f0b1e9f58`, `daa849d70`, `e4bd06d8d`,
+  `97e3c483d` (ose-primer), pushed to origin/main.
 - **3 of the 10 plain-test-runner libs partially addressed** (stale `@wip` removed + `@covers` markers
   added, but BDD-framework migration itself still pending): `elixir-cabbage` (feature-compilation.feature
   — dogfoods itself extensively already, no bootstrapping blocker; markers point at existing
