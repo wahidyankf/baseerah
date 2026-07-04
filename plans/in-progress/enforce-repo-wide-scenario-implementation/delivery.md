@@ -299,18 +299,39 @@ rhino-cli` runs) passes with zero corpus diff in all three.
 > and 2c (`ose-infra`) are independent — each lands as its own coherent green commit per
 > tech-docs.md §6 Rollback.
 
-- [ ] [AI] **2a.** Jest/Vitest: enable `--forbid-only` (or config) and a skip-guard so `.skip`/`.todo` fail
+- [x] [AI] **2a.** Jest/Vitest: enable `--forbid-only` (or config) and a skip-guard so `.skip`/`.todo` fail
       in CI, applied in `ose-public` (its own TS apps), `ose-infra` (`coralpolyp-fe`), and `ose-primer`
       (`crud-fe-ts-nextjs`, `crud-fe-ts-tanstack-start`, `crud-be-ts-effect` unit tier), per
       `audit/05-reporters.md`. Verify by planting a `.skip` and running the affected unit tier in one
       representative project per repo — it reddens; revert. Acceptance: skip fails the tier in all three
       repos.
-- [ ] [AI] **2a.** Playwright: `forbidOnly: !!process.env.CI` is already set in all 11
+      **Done 2026-07-04.** Grep-based `it|test|describe.(skip|only|todo)(` guards wired into every
+      TS app/lib `test:unit` target across all three repos (24 files in `ose-public`, 7 in `ose-infra`,
+      the TS subset of 16 in `ose-primer`); `crud-be-ts-effect`'s cucumber-js unit tier uses a
+      JSON-report `jq` guard instead (no native skip syntax) — see the cucumber-js row below. Evidence:
+      `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2a.** Playwright: `forbidOnly: !!process.env.CI` is already set in all 11
       `apps/*-e2e/playwright.config.ts` in `ose-public` — confirm the same in `ose-infra`'s and
       `ose-primer`'s own `-e2e` configs (add if missing), then add only the missing `test.skip`
       guard/reporter to each, in all three repos. Verify by planting a skip — e2e tier reddens in a
       representative project per repo; revert. Acceptance: skip fails the tier in all three repos.
-- [ ] [AI] **2a.** .NET xunit (F#/C#): all four `ose-public` F# test surfaces —
+      **Done 2026-07-04 (corrected).** `ose-infra`'s `coralpolyp-{be,fe}-e2e` are `playwright-bdd`-driven
+      (Gherkin, not raw `test.skip()`), so they use a JSON-reporter + node-script guard instead of grep;
+      all other `-e2e` projects in all three repos got a `test.skip(` grep guard alongside the existing
+      `forbidOnly`. Independent re-verification found `ose-primer`'s `crud-fe-e2e` was missed entirely (no
+      guard of any kind) and additionally had `npx bddgen` failing outright (`Missing step definitions: 5`)
+      because its `playwright.config.ts` globbed the **entire shared** `crud-web` Gherkin tree, including
+      `codegen/dart-codegen-fresh-checkout.feature` (about `crud-fe-dart-flutterweb`'s own codegen target,
+      not implementable here — same root-cause pattern as the cucumber-js/cucumber-rs/Kaocha fixes above).
+      Fixed: added `tags: "not @codegen"` to `defineBddConfig({...})` in `playwright.config.ts`
+      (playwright-bdd 8.5.0 supports this natively, confirmed via its `dist/config/types.d.ts`), plus the
+      standard grep guard for `test.skip(` in `project.json`'s `test:e2e`. `npx bddgen` now exits 0;
+      `playwright test --list` reports 92 tests / 15 files, zero missing-step errors. Guard confirmed to
+      redden on a planted `test.skip(` (before `bddgen`/`playwright test` even run) then revert cleanly. No
+      live browser run was attempted (needs a hand-started `crud-be-golang-gin` + `crud-fe-ts-nextjs` stack,
+      no `webServer` auto-start) — same documented exception as `coralpolyp-fe-e2e`. Evidence:
+      `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2a.** .NET xunit (F#/C#): all four `ose-public` F# test surfaces —
       `apps/organiclever-be/tests/{unit,integration}/*.fsproj`,
       `apps/ose-be/tests/{unit,integration}/*.fsproj`, `apps/crane-cli/tests/{unit,integration}/*.fsproj`,
       `libs/fsharp-crane-core/tests/unit/*.fsproj` — plus, in `ose-primer`,
@@ -323,49 +344,132 @@ apps/crud-be-csharp-aspnetcore/tests` (in `ose-primer`) must each return 0 match
       project's test target per `audit/05-reporters.md`. Verify by planting `[Fact(Skip = "temp")]` in one
       test file in each repo — the grep check catches it and fails the tier; revert. Acceptance: ignored
       test fails the tier in both repos.
-- [ ] [AI] **2a.** (cucumber-rs already fail-on-skip via the dependency plan, in all three repos — confirm
+      **Done 2026-07-04.** Grep guard for `Skip\s*=` wired into all four `ose-public` F# test targets and
+      both `ose-primer` F#/C# targets. Evidence: `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2a.** (cucumber-rs already fail-on-skip via the dependency plan, in all three repos — confirm
       still active.)
-- [ ] [AI] **2c.** Cargo `#[ignore]` (Rust, non-cucumber): `ose-infra`'s `coralpolyp-be` and
+      **Done 2026-07-04 (corrected).** The dependency plan's `.fail_on_skipped()` wiring only ever covered
+      `apps/rhino-cli`'s own suite — `ose-primer`'s OTHER cucumber-rs consumer, `crud-be-rust-axum`, used
+      the bare `AppWorld::run(path).await` entrypoint with no `.fail_on_skipped()` at all, silently passing
+      with `80 scenarios (76 passed, 4 skipped)`. Fixed: `tests/unit/main.rs` now uses
+      `AppWorld::cucumber().fail_on_skipped().filter_run_and_exit(path, |feature, _rule, scenario| { let
+is_codegen = |t: &[String]| t.iter().any(|x| x == "codegen"); !is_codegen(&feature.tags) &&
+!is_codegen(&scenario.tags) })` — the `filter_run_and_exit` predicate excludes `@codegen`-tagged
+      scenarios (tests OTHER languages' codegen targets by name, not implementable here), mirroring Go's
+      `~@codegen`/Kotlin's `not @codegen`. The 2 remaining `@test-support` scenarios were genuinely missing
+      step implementations (new `tests/unit/steps/test_api_steps.rs`, mirroring every sibling
+      `crud-be-*` language's own test-support implementation) — implemented for real (in-memory
+      reset/promote, no HTTP), not stubbed. `crud-be-rust-axum:test:unit` now: 14 features, 78 scenarios
+      (78 passed), 519 steps (519 passed), exit 0. `crud-be-rust-axum:test:quick` fully green. rhino-cli's
+      own suite (all 3 repos) independently reconfirmed unaffected.
+- [x] [AI] **2c.** Cargo `#[ignore]` (Rust, non-cucumber): `ose-infra`'s `coralpolyp-be` and
       `ose-primer`'s `crud-be-rust-axum` — add a grep-based guard (`grep -rn '#\[ignore\]'` returns 0
       matches in each project's `src`/`tests`), wired into each project's test target per
       `audit/05-reporters.md`. Verify by planting `#[ignore]` on one test in each project — the grep check
       catches it; revert. Acceptance: ignored test fails the tier in both projects.
-- [ ] [AI] **2b.** cucumber-js (TS): `ose-primer`'s `crud-be-ts-effect` BDD suite — confirm and wire the
+      **Done 2026-07-04.** Grep guard for `#\[ignore\]` wired into both projects' `test:unit` targets.
+      Evidence: `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2b.** cucumber-js (TS): `ose-primer`'s `crud-be-ts-effect` BDD suite — confirm and wire the
       flag/reporter identified in `audit/05-reporters.md` that turns undefined/skipped/pending steps into
       a non-zero exit. Verify by planting an undefined step — the suite reddens; revert. Acceptance:
       undefined/skipped step fails the tier.
-- [ ] [AI] **2b.** Kaocha (Clojure): `ose-primer`'s `crud-be-clojure-pedestal` — confirm and wire the
+      **Done 2026-07-04.** `--strict`'s own undefined-step detection is unreliable (see tech-docs.md); a
+      `jq` guard over the JSON reporter (`coverage/cucumber-unit-report.json`) checking for
+      `undefined`/`pending`/`skipped`/`ambiguous` step statuses is wired into `test:unit` and
+      `test:coverage`. This guard genuinely reddened on 4 real previously-silent undefined scenarios in
+      the shared `test-support/test-api.feature` (root-caused to a scoping bug: the cucumber-js runner
+      loaded the _entire_ shared `crud-be` Gherkin tree unlike every sibling language, which either
+      hand-select feature files (Java) or tag-exclude `@codegen` (Go/Kotlin)). Fixed at the root: (1)
+      implemented the 2 genuinely-missing `test-support` scenarios' step defs (mirroring every other
+      `crud-be-*` variant, which all implement `test-support` in their own unit tier) in
+      `tests/unit/bdd/steps/test-api.steps.ts` + supporting `hooks.ts`/`service-layer.ts` changes; (2)
+      added `--tags 'not @codegen'` to the unit-tier cucumber-js invocation (matching Go's `~@codegen`
+      and Kotlin's `not @codegen`) since the 2 remaining scenarios test _other_ languages' codegen
+      targets by name and cannot be implemented inside ts-effect; (3) removed the now-stale
+      `--exclude-dir test-support` flag from `specs:behavior:coverage`/`specs:domain:coverage` (10 orphan
+      step implementations resulted from excluding a dir ts-effect now genuinely covers).
+      `nx run crud-be-ts-effect:test:quick` green (78/78 cucumber scenarios, 519/519 steps, 273/273
+      vitest). Evidence: `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2b.** Kaocha (Clojure): `ose-primer`'s `crud-be-clojure-pedestal` — confirm and wire the
       config/flag identified in `audit/05-reporters.md` for pending/skipped test metadata. Verify by
       planting a `^:kaocha.testable/skip` (or equivalent) test — the suite reddens; revert. Acceptance:
       skipped test fails the tier.
-- [ ] [AI] **2b.** ExUnit (Elixir): `ose-primer`'s `crud-be-elixir-phoenix` — confirm and wire the
+      **Done 2026-07-04 (corrected).** Kaocha's `:kaocha/skip`/`:kaocha/pending` metadata keys don't affect
+      exit-code calculation (confirmed by decompiling the jar in Phase 0) — a grep guard for
+      `:kaocha/skip|:kaocha/pending` was wired into `test:unit`, but independent re-verification found
+      three deeper pre-existing gaps this guard alone couldn't catch: (1) `test/features` was a **broken
+      symlink** (`../../../specs/apps/crud/be/gherkin`, missing `behavior/` — should be
+      `../../../specs/apps/crud/behavior/crud-be/gherkin`), silently reducing the `:bdd` Kaocha suite to
+      zero scenarios while exiting 0; fixed the symlink. (2) That surfaced 76 identical
+      `CRUD_BE_CLOJURE_PEDESTAL_JWT_SECRET is required` errors — `project.json`'s `test:unit`/`test:coverage`
+      never set this env var (unlike sibling F#/C# projects); added the missing `env` block, which broke
+      one pre-existing unit test relying on ambient-env absence — fixed at the root by making
+      `config.clj`'s `getenv` use `contains?` to distinguish "explicitly nil" from "absent", letting the
+      test force absence explicitly. (3) With those fixed, 4 scenarios (2 `@codegen`, 2 `@test-support`)
+      were still silently "pending" (Kaocha's undefined-step term) with **exit 0** — kaocha-cucumber
+      0.11.100 has no native tag-filter (verified against its actual source, not guessed), so
+      `tests.edn`'s `:bdd` suite's `:test-paths` was narrowed to explicit non-`codegen` subdirectories, and
+      the 2 `@test-support` scenarios got real step implementations (mirroring every sibling `crud-be-*`
+      language). Also wired a "pending"-count guard (log-and-grep, since Kaocha's own exit code ignores
+      pending) into `test:unit`/`test:coverage`. Final: `107 tests, 309 assertions, 0 failures`, exit 0;
+      `test:quick` fully green; planted-regression check confirmed the new guard reddens. Evidence:
+      `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2b.** ExUnit (Elixir): `ose-primer`'s `crud-be-elixir-phoenix` — confirm and wire the
       config/flag identified in `audit/05-reporters.md` (e.g. `mix test --warnings-as-errors` or a
       skip-tag guard). Verify by planting `@tag :skip` on a test — the suite reddens; revert. Acceptance:
       skipped test fails the tier.
-- [ ] [AI] **2b.** Go `testing`: `ose-primer`'s `crud-be-golang-gin` — add a grep-based guard
+      **Done 2026-07-04.** Grep guard for `@tag :skip|@moduletag :skip` wired into `test:unit`. Evidence:
+      `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2b.** Go `testing`: `ose-primer`'s `crud-be-golang-gin` — add a grep-based guard
       (`grep -rn 't\.Skip('` returns 0 matches in scope) or the JSON-reporter approach identified in
       `audit/05-reporters.md`. Verify by planting `t.Skip("temp")` on a test — the guard catches it;
       revert. Acceptance: skipped test fails the tier.
-- [ ] [AI] **2b.** JUnit5: `ose-primer`'s `crud-be-java-springboot`, `crud-be-java-vertx`, and
+      **Done 2026-07-04.** Grep guard for unescaped `t\.Skip(` (POSIX BRE breaks on escaped parens —
+      caught during authoring) wired into `test:unit`. Evidence: `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2b.** JUnit5: `ose-primer`'s `crud-be-java-springboot`, `crud-be-java-vertx`, and
       `crud-be-kotlin-ktor` — add a grep-based guard (`grep -rn '@Disabled'` returns 0 matches per
       project) or the Surefire/Gradle-report approach identified in `audit/05-reporters.md`. Verify by
       planting `@Disabled` on one test per project — the guard catches it; revert. Acceptance: disabled
       test fails the tier in all three projects.
-- [ ] [AI] **2b.** pytest: `ose-primer`'s `crud-be-python-fastapi` — add `pytest --strict-markers` plus a
+      **Done 2026-07-04.** Grep guard for `@Disabled` wired into all three projects' `test:unit` targets;
+      Kotlin/Gradle's JUnit XML reporting is deliberately disabled (known Gradle bug workaround) so
+      grep-only is the only viable mechanism there. Evidence: `audit/06-fail-on-skip-proof.md`.
+- [x] [AI] **2b.** pytest: `ose-primer`'s `crud-be-python-fastapi` — add `pytest --strict-markers` plus a
       grep-based guard (`grep -rn '@pytest\.mark\.skip'` returns 0 matches) per `audit/05-reporters.md`.
       Verify by planting `@pytest.mark.skip` on a test — the guard catches it; revert. Acceptance: skipped
       test fails the tier.
-- [ ] [AI] **2b.** Dart/Flutter `test`: `ose-primer`'s `crud-fe-dart-flutterweb` — add a grep-based guard
+      **Done 2026-07-04.** This project was missed by both Phase 2 batch agents (neither covered
+      Python); caught during my independent Phase 2 re-verification pass since `crud-be-python-fastapi`
+      is registered in `repo-config.yml`'s `coverage.projects` but had no guard. Added
+      `! grep -rn '@pytest\.mark\.skip' tests` + `pytest -m unit --strict-markers` to `test:unit`.
+      Planted `@pytest.mark.skip(reason="phase2-guard-test")` on `test_config.py` — guard caught it
+      (`grep` exited non-zero, target failed); reverted, `git status --short` clean. `test:quick` green
+      (110 passed, 76 deselected).
+- [x] [AI] **2b.** Dart/Flutter `test`: `ose-primer`'s `crud-fe-dart-flutterweb` — add a grep-based guard
       (`grep -rn 'skip:\s*true'` returns 0 matches) or the JSON-reporter approach identified in
       `audit/05-reporters.md`. Verify by planting `skip: true` on a test — the guard catches it; revert.
       Acceptance: skipped test fails the tier.
+      **Done 2026-07-04.** `flutter test --run-skipped` plus a grep guard for `skip:\s*true` wired into
+      `test:unit`. Evidence: `audit/06-fail-on-skip-proof.md`.
 
 ### Phase 2 Gate
 
-- [ ] [AI] Each tier, in every one of the three repos, reddens on a planted skip (evidence in
+- [x] [AI] Each tier, in every one of the three repos, reddens on a planted skip (evidence in
       `audit/06-fail-on-skip-proof.md`, one row per tool per repo).
-- [ ] [AI] Per repo: `nx affected -t test:quick --base=origin/main` — exits 0 in `ose-public`,
+      **Done 2026-07-04.** See `audit/06-fail-on-skip-proof.md` for the full plant→verify→revert matrix.
+- [x] [AI] Per repo: `nx affected -t test:quick --base=origin/main` — exits 0 in `ose-public`,
       `ose-primer`, and `ose-infra` (no unexpected skips remain in-scope).
+      **Done 2026-07-04.** `ose-public`: 22 affected projects, all passed. `ose-infra`: 5 affected
+      projects, all passed. `ose-primer`: 19 affected projects, all passed — after independent
+      re-verification surfaced and root-cause-fixed 5 deeper pre-existing gaps beyond the batch agents'
+      original scope: `crud-be-ts-effect` (cucumber-js broad-glob + missing test-support steps),
+      `crud-be-python-fastapi` (guard missed entirely by both batches), `crud-be-rust-axum` (missing
+      `.fail_on_skipped()` + same broad-glob pattern), `crud-be-clojure-pedestal` (broken `test/features`
+      symlink zeroing its whole BDD suite + missing JWT env var + no pending-guard), and `crud-fe-e2e`
+      (no guard at all + `bddgen` failing outright on the same broad-glob pattern). All 5 detailed in their
+      respective checklist items above; all fixed at the root (no scenario stubbed/deferred), all verified
+      independently by re-running `test:quick`/`test:unit` after each fix, not just trusting the fixing
+      agent's own report.
 
 > **Pause Safety**: every tier, in all three repos, now fails on skip; `@covers` rollout not yet begun.
 > Safe to stop. To resume: re-run the planted-skip proofs.
