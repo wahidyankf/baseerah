@@ -191,7 +191,7 @@ test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-
 > "26 scenarios (26 passed)" as the corrected acceptance target throughout this section and
 > §1a-conversion.
 
-- [ ] [AI] **RED**: in `apps/rhino-cli/tests/repo_governance.rs`, align every `#[given]/#[when]/#[then]`
+- [x] [AI] **RED**: in `apps/rhino-cli/tests/repo_governance.rs`, align every `#[given]/#[when]/#[then]`
       string to the canonical feature step text in `specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/**`
       and ensure each `#[when]` body invokes the real current command (e.g. `repo-governance workflows naming validate`,
       `repo-governance vendor validate`, `repo-governance audit`) **via the existing `assert_cmd` subprocess-spawn
@@ -1118,21 +1118,30 @@ validate` command name — real command moved to the `harness` domain) and
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked.
-- [ ] [AI] Verify ALL quality gates pass (local + CI in all three repos).
-- [ ] [AI] Verify the byte-identity + `0 skipped` enforcement matrices are green across all three repos.
-- [ ] [AI] Move plan folder: `git mv plans/in-progress/enforce-identical-rhino-cli-gherkin plans/done/2026-07-03__enforce-identical-rhino-cli-gherkin` (use the actual completion date).
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
-- [ ] [AI] Commit: `chore(plans): move enforce-identical-rhino-cli-gherkin to done`.
+- [x] [AI] Verify ALL delivery checklist items are ticked.
+      **Done 2026-07-04.** Confirmed via `plan-execution-checker` (independent re-verification pass);
+      one tracking-only unticked checkbox (§1a RED substep) found and fixed — the underlying work was
+      already done and verified (`repo_governance` test: 26/26 scenarios pass, 0 skipped).
+- [x] [AI] Verify ALL quality gates pass (local + CI in all three repos).
+      **Done 2026-07-04.** All green: local suites (0 skipped, 1 pre-existing documented `#[ignore]`),
+      `nx` typecheck/lint/test:quick/test:specs, and CI (`main-ci`/`pr-quality-gate`) in all three repos.
+- [x] [AI] Verify the byte-identity + `0 skipped` enforcement matrices are green across all three repos.
+      **Done 2026-07-04.** `diff -rq` empty (excl. README.md, explicitly exempt); 629-entry md5 manifest
+      matches; 306 scenarios/1308 steps, 0 skipped, in all three repos.
+- [x] [AI] Move plan folder: `git mv plans/in-progress/enforce-identical-rhino-cli-gherkin plans/done/2026-07-03__enforce-identical-rhino-cli-gherkin` (use the actual completion date).
+      **Done 2026-07-04.** Moved to `plans/done/2026-07-04__enforce-identical-rhino-cli-gherkin/`
+      (actual completion date used).
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
+- [x] [AI] Commit: `chore(plans): move enforce-identical-rhino-cli-gherkin to done`.
 
 ## Validation Checklist
 
-- [ ] All TDD cycles complete (RED→GREEN→REFACTOR for every `tests/*.rs`/`src` change)
-- [ ] `0 skipped` scenarios in the rhino-cli suite in all three repos
-- [ ] Gherkin `.feature` + behaviour-`README.md` byte-identical across all three repos
-- [ ] `apps/rhino-cli` byte-identical across all three repos (zero carve-outs)
-- [ ] Every leaf command maps to ≥ 1 executing scenario (`audit/04-coverage-map.md`)
-- [ ] Anti-drift gate armed (SDLC boundary doc + parity workflow step)
-- [ ] `repo-config validate` wired at pre-commit (staged-gated) byte-identical in all three repos
-- [ ] All three repos' CI green
+- [x] All TDD cycles complete (RED→GREEN→REFACTOR for every `tests/*.rs`/`src` change)
+- [x] `0 skipped` scenarios in the rhino-cli suite in all three repos
+- [x] Gherkin `.feature` + behaviour-`README.md` byte-identical across all three repos
+- [x] `apps/rhino-cli` byte-identical across all three repos (zero carve-outs)
+- [x] Every leaf command maps to ≥ 1 executing scenario (`audit/04-coverage-map.md`)
+- [x] Anti-drift gate armed (SDLC boundary doc + parity workflow step)
+- [x] `repo-config validate` wired at pre-commit (staged-gated) byte-identical in all three repos
+- [x] All three repos' CI green
