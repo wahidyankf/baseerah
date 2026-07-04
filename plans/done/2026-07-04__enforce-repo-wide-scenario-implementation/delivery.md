@@ -26,6 +26,15 @@ rollout batches run in each repo for its own apps/libs.
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and
 [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
+**Worktree-gate evidence (Done 2026-07-04)**: work for this plan proceeded directly on `main` in all
+three repos rather than through `worktrees/enforce-repo-wide-scenario-implementation/` — the plan's
+scope spanned per-repo rollout batches across `ose-public`/`ose-primer`/`ose-infra` where each repo's
+own `main` tree was the natural unit of work, syncing with `origin/main` before each push per the
+standing commit+push discipline observed throughout every phase above. No
+`worktrees/enforce-repo-wide-scenario-implementation/` directory exists in any of the three repos as
+of archival (confirmed via `git status`/directory listing), so no cleanup-prompt/decline step was
+needed.
+
 ## Delivery Phase Flow
 
 ```mermaid
@@ -1004,9 +1013,20 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
       root in this same gate (see the Batch Progress Log entry above), not deferred. Every other hit
       (rhino-cli's own `@wip`-exemption dogfood spec, 9 paired-project e2e no-ops, 3
       `@local-fullstack`-tag-partitioned `$test.skip()` calls) confirmed a legitimate non-gap.
-- [ ] [AI] Move plan: `git mv plans/in-progress/enforce-repo-wide-scenario-implementation plans/done/<completion-date>__enforce-repo-wide-scenario-implementation`.
-- [ ] [AI] Update `plans/in-progress/README.md` (remove entry) + `plans/done/README.md` (add entry).
-- [ ] [AI] Commit: `chore(plans): move enforce-repo-wide-scenario-implementation to done`.
+- [x] [AI] Move plan: `git mv plans/in-progress/enforce-repo-wide-scenario-implementation plans/done/<completion-date>__enforce-repo-wide-scenario-implementation`.
+      **Done 2026-07-04**: `git mv plans/in-progress/enforce-repo-wide-scenario-implementation
+plans/done/2026-07-04__enforce-repo-wide-scenario-implementation` (24 files renamed, tracked as
+      git renames).
+- [x] [AI] Update `plans/in-progress/README.md` (remove entry) + `plans/done/README.md` (add entry).
+      **Done 2026-07-04**: `plans/in-progress/README.md`'s Active Plans section emptied to "_None
+      currently in progress._"; `plans/done/README.md` got a new top entry summarizing the plan's full
+      scope and the 13-lib BDD-migration finding.
+- [x] [AI] Commit: `chore(plans): move enforce-repo-wide-scenario-implementation to done`.
+      **Done 2026-07-04**: landed as `f35e675d5` — `docs(plans): move
+enforce-repo-wide-scenario-implementation to done` (`docs` scope used instead of `chore` since
+      the change is plan-documentation-only, consistent with this plan's own prior commits'
+      `docs(plans):` convention); pushed to `origin/main`, all 4 CI workflows (`pr-quality-gate`,
+      `validate-env`, `main-ci`, `publish-images`) green.
 
 ## Validation Checklist
 
