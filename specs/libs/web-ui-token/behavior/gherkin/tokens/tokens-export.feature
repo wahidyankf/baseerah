@@ -1,4 +1,3 @@
-@wip
 Feature: Structural design token exports
   As a frontend developer
   I want web-ui-token to export the structural design tokens

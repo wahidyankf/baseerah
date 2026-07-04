@@ -873,6 +873,30 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
   non-negotiable item above, ticked). Proceeding to the Final Phase: runtime cross-check verification,
   full `nx run-many` quality gate, cross-repo rhino-cli byte-identity re-verify, and CI monitoring across
   all 3 repos.
+- **Finding during the Plan Archival no-defer audit sweep — `libs/web-ui-token` (`ose-public`) was
+  missed**: a repo-wide grep for `@wip` and stubbed `specs:behavior:coverage` wording (`stub`/`phase 0`/
+  `placeholder`/`land in`) turned up one genuine 13th plain-test-runner lib that the earlier census had
+  not caught — `ose-public`'s `web-ui-token` (singular "token"; not to be confused with `ts-ui-tokens` in
+  `ose-primer`/`ose-infra`, or `ose-public`'s own `web-ui`), still carrying its original `@wip` tag and a
+  literal `"Phase 0 — specs:coverage stubbed; web-ui-token scenario @covers-tag gaps land in Phase 1"`
+  echo placeholder that was never revisited. Migrated identically to the `ts-ui-tokens` precedent:
+  `@amiceli/vitest-cucumber` + `vitest` (both pinned `X.Y.Z`, matching sibling `web-ui`'s exact versions,
+  no `@vitest/coverage-v8`), `tokens-export.steps.ts` wiring `colorTokens`/`radius`/`spacing`/`typography`,
+  `@wip` removed, `specs:behavior:coverage` wired to the real checker. Independently re-verified for
+  `ose-public`'s own dependency graph (not assumed from the sibling-repo finding): baseline typecheck on
+  every `vitest`-consuming project in this repo (`web-ui`, `ayokoding-www`, `ose-app-web`,
+  `organiclever-www`, `ose-www`, `organiclever-app-web`, `wahidyankf-www`) captured before the change,
+  `npm install` run, all 8 re-typechecked fresh (`--skip-nx-cache`) — all pass clean, `package-lock.json`
+  diff purely additive (+5 lines). `test:quick` fully green: 6/6 unit tests pass, "Spec coverage valid! 1
+  specs, 1 scenarios, 6 steps — all covered." The rest of the sweep found only expected non-gaps: the 9
+  `*-be-e2e`/`*-fe-e2e` `specs:behavior:coverage` no-ops in `ose-public` all correspond to a paired
+  non-e2e project that owns the real coverage check for the same shared spec tree (spot-checked
+  `ose-www-be-e2e` against `ose-www`'s own `--shared-steps` command covering `platform-be`); the 3
+  `$test.skip()` calls in `organiclever-app-web-e2e` are conditional guards on scenarios tagged
+  `@local-fullstack` and excluded from the CI run entirely via `PLAYWRIGHT_GREP_INVERT=@local-fullstack`
+  (never invoked in CI, so never actually skipped there); and every remaining `@wip` hit across all 3
+  repos is rhino-cli's own dogfood spec describing the `@wip`-exemption mechanism itself, not a deferred
+  scenario. `ose-primer` and `ose-infra` swept clean with zero non-dogfood hits.
 
 ---
 
@@ -882,7 +906,7 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes.
 
-- [ ] [AI] Verify the runtime cross-check runs for every affected project — **no file edit is needed**:
+- [x] [AI] Verify the runtime cross-check runs for every affected project — **no file edit is needed**:
       Phase 1's engine change lands inside `apps/rhino-cli/src/application/behavior_coverage/`, and every
       project's `specs:behavior:coverage` Nx target already invokes the rhino-cli binary directly, so the
       cross-check propagates automatically via the existing chain — pre-push:
@@ -893,20 +917,34 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
       `nx run-many`/`nx affected -t … specs:behavior:coverage` directly. Acceptance: plant a
       marked-but-skipped scenario in any eligible project, confirm it fails both
       `nx affected -t test:quick` and the CI `specs:behavior:coverage` step, then revert the plant.
-- [ ] [AI] Per repo: `nx run-many --all -t typecheck,lint,test:quick,specs:behavior:coverage` — exits 0,
-      non-vacuous, zero silent skips.
-- [ ] [AI] Cross-repo: `apps/rhino-cli` (engine) byte-identical across the three repos.
+      **Done 2026-07-04**: planted `PLANTED-SKIP-PROOF` scenario in `rust-commons`'s
+      `check-links.feature`; confirmed `nx run rust-commons:specs:behavior:coverage` fails ("1 scenario(s)
+      without matching test implementations") and `nx run rust-commons:test:quick` fails at the cucumber
+      step ("Step doesn't match any function"); reverted, re-confirmed green.
+- [x] [AI] Per repo: `nx run-many --all -t typecheck,lint,test:quick,specs:behavior:coverage` — exits 0,
+      non-vacuous, zero silent skips. **Done 2026-07-04**: ran all CI-lane splits locally in all 3 repos
+      (`ose-public`: TS/JVM, dotnet, rust; `ose-primer`: TS, golang, JVM, dotnet, python, rust, elixir,
+      clojure, dart; `ose-infra`: non-rust, rust) — every lane green, non-vacuous spec-coverage output
+      throughout, zero failures.
+- [x] [AI] Cross-repo: `apps/rhino-cli` (engine) byte-identical across the three repos. **Done 2026-07-04**:
+      diffed `src/`, `Cargo.toml`, `Cargo.lock`, `project.json`, `LICENSE`, and the
+      `specs/apps/rhino/behavior/rhino-cli/gherkin/**` tree pairwise across all 3 repos — zero diffs.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, explicit paths only (never `git add -A`). Split: engine
+- [x] [AI] Commit thematically, explicit paths only (never `git add -A`). Split: engine
       (`feat(rhino-cli): behavior-coverage runtime cross-check`), per-tier config
       (`test: fail-on-skip across tiers`), per-project rollout (`test(<project>): @covers + level tags`).
+      **Done incrementally throughout Phases 1-3..N**: every batch committed separately with an explicit
+      path list (never `git add -A`); see the Batch Progress Log above for the full commit trail.
 
 ### Post-Push Verification
 
-- [ ] [AI] Push each repo → `origin main`; monitor CI (poll every 2 min, one `gh run view` per wakeup);
-      verify green; fix any failure before proceeding.
+- [x] [AI] Push each repo → `origin main`; monitor CI (poll every 2 min, one `gh run view` per wakeup);
+      verify green; fix any failure before proceeding. **Done 2026-07-04**: all 3 repos pushed
+      incrementally throughout; final-state CI confirmed green — `ose-public` main-ci success, `ose-primer`
+      main-ci/pr-quality-gate/validate-env all success, `ose-infra` main-ci (`e852554e2`→infra `19bc1ff24`)
+      and pr-quality-gate both success.
 
 > Manual UI/API verification, Rule-15 web-triad, Rule-16 API retest: **conditionally applicable**. Most
 > batches only add `@covers` markers/level tags to already-passing tests (no behaviour change) and remain

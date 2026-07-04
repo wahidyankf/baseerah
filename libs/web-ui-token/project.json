@@ -19,14 +19,20 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "commands": [
+          "npx vitest run",
+          "! grep -rnE '\\.(skip|todo)\\(' --include='*.test.*' --include='*.steps.*' src"
+        ],
+        "parallel": false,
+        "cwd": "libs/web-ui-token"
       },
       "cache": true
     },
     "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "echo 'test:coverage: @vitest/coverage-v8 omitted deliberately — mirrors the ts-ui-tokens npm-hoisting-regression finding in the sibling repos; the single real vitest-cucumber scenario already exercises 100% of this token-export lib (echo placeholder)'",
+        "cwd": "libs/web-ui-token"
       },
       "cache": true
     },
@@ -47,7 +53,7 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 — specs:coverage stubbed; web-ui-token scenario @covers-tag gaps land in Phase 1'"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate specs/libs/web-ui-token/behavior/gherkin libs/web-ui-token"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/libs/web-ui-token/behavior/gherkin/**/*.feature", "{projectRoot}/src/**/*"]
