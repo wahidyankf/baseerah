@@ -4,10 +4,10 @@
 **Created**: 2026-07-03
 **Authored in**: `ose-public` (this repo)
 **Type**: Multi-file plan (5 documents)
-**Depends on**: [`enforce-identical-rhino-cli-gherkin`](../enforce-identical-rhino-cli-gherkin/README.md)
-— this plan **assumes that plan is DONE** (rhino-cli is fully enforcing, `fail_on_skipped` on, `@covers`
-complete for rhino-cli). rhino-cli is the **reference implementation** whose pattern this plan
-generalizes to every app and lib.
+**Depends on**: [`enforce-identical-rhino-cli-gherkin`](../../done/2026-07-04__enforce-identical-rhino-cli-gherkin/README.md)
+— **DONE and archived 2026-07-04** (rhino-cli is fully enforcing, `fail_on_skipped` on, `@covers`
+complete for rhino-cli, across all three repos). rhino-cli is the **reference implementation** whose
+pattern this plan generalizes to every app and lib.
 
 ## Context
 
@@ -26,7 +26,7 @@ Two holes make it toothless today (both found in the rhino-cli audit):
    app or lib**, even though non-rhino specs carry level tags and CI runs the target repo-wide (so it is
    either lenient/no-op for them or would fail — a Phase-0 item). [Repo-grounded]
 
-The [rhino-cli plan](../enforce-identical-rhino-cli-gherkin/README.md) fixes rhino-cli's
+The [rhino-cli plan](../../done/2026-07-04__enforce-identical-rhino-cli-gherkin/README.md) fixes rhino-cli's
 own slice (de-hollow + `fail_on_skipped` + `@covers` completeness). **This plan generalizes that to every
 eligible app and lib, for unit/integration/e2e, and upgrades the central gate so "covered" means "a real
 test ran and passed".**
@@ -38,17 +38,29 @@ test ran and passed".**
 - **`@covers` + level-tag rollout** — every eligible app/lib in the `coverage.projects` registry gets its
   scenarios level-tagged (`@unit`/`@integration`/`@e2e`) and its tests marked with matching `// @covers`
   markers, so `specs behavior-coverage validate` passes meaningfully (not vacuously).
-- **Per-tier fail-on-skip** — each test tool is configured so a skipped/absent/todo test **fails**:
-  cucumber `.fail_on_skipped()` (already done for rhino-cli), Jest/Vitest (forbid `.skip`/`.only`/`.todo`
-  in CI), Playwright (`forbidOnly` + no `test.skip` in CI), F# test runner (no ignored/pending). Fast
-  local feedback.
+- **Per-tier fail-on-skip** — each test tool, **across all twelve language/tool ecosystems this repo set
+  spans** (not just `ose-public`'s TS/F#/Rust/Playwright set), is configured so a skipped/absent/todo test
+  **fails**: cucumber-rs `.fail_on_skipped()` (already done for rhino-cli), Jest/Vitest, Playwright, .NET
+  xunit (F#/C#), plus — because `ose-primer`'s 11 `crud-be-*` language-showcase variants, its 4
+  `crud-fe-*`/`crud-fs-*` frontend/fullstack variants, and its polyglot lib set
+  (`golang-commons`, `clojure-openapi-codegen`, `elixir-{openapi-codegen,cabbage,gherkin}`) each bring
+  their own runner — Kaocha (Clojure), ExUnit (Elixir), Go `testing`, JUnit5 (Java ×2 + Kotlin), pytest
+  (Python), Cargo `#[ignore]` (Rust, also `ose-infra`'s `coralpolyp-be`), cucumber-js (the TS/Effect BDD
+  suite), and Dart/Flutter `test`. The exact skip/fail-on-skip flag or guard per tool is **confirmed in
+  Phase 0** (verified via `--help`/docs, never assumed) — see tech-docs.md §3.1 for the full per-tool
+  table. Fast local feedback.
 - **Central runtime cross-check** — upgrade `rhino-cli specs behavior-coverage` (or add a sibling
   command) to ingest each tier's **run results** and fail unless every `@covers` scenario actually
   **executed and passed** (not merely marked). Authoritative CI gate.
 - **Wiring** — the new runtime cross-check joins pre-push (`specs:behavior:coverage`) + CI, repo-wide.
-- **Per-repo application** — each of `ose-public`/`ose-primer`/`ose-infra` applies the rollout to **its
-  own** apps/libs (which differ per repo); the **engine change** (rhino-cli command) is byte-identical
-  and propagated to all three (rhino-cli parity, per the dependency plan's boundary).
+- **Per-repo application (comprehensive, all three repos)** — each of `ose-public` (26 registered
+  projects), `ose-primer` (25 — `rhino-cli` + 11 `crud-be-*` variants + `crud-be-e2e` + 3 `crud-fe-*`
+  variants + `crud-fe-e2e` + `crud-fs-ts-nextjs` + `golang-commons` + `ts-ui` + `ts-ui-tokens` +
+  `clojure-openapi-codegen` + `elixir-{openapi-codegen,cabbage,gherkin}`), and `ose-infra` (8 —
+  `rhino-cli`, `coralpolyp-{contracts,be,be-e2e,fe,fe-e2e}`, `ts-ui-tokens`, `ts-ui`) applies the rollout
+  to **its own** `coverage.projects` registry — **59 projects total, none left out**; the **engine change**
+  (rhino-cli command) is byte-identical and propagated to all three (rhino-cli parity, per the dependency
+  plan's boundary).
 
 **Out of scope:**
 
@@ -95,7 +107,7 @@ test ran and passed".**
 
 ## Related
 
-- [Dependency: enforce-identical-rhino-cli-gherkin](../enforce-identical-rhino-cli-gherkin/README.md)
+- [Dependency: enforce-identical-rhino-cli-gherkin](../../done/2026-07-04__enforce-identical-rhino-cli-gherkin/README.md)
 - `repo-config.yml` `coverage.projects` — the per-project tier registry this plan drives
 - [Feature Change Completeness](../../../repo-governance/development/quality/feature-change-completeness.md)
 - [nx-targets reference](../../../repo-governance/development/infra/nx-targets.md)

@@ -11,16 +11,20 @@ applicable, not blanket-exempt**: most batches touch no UI and remain exempt, bu
 no-defer TDD path (Decision 4) requires building a genuinely new user-facing screen or component (not
 merely new backend/CLI logic behind an existing screen) to satisfy a previously-unimplemented scenario in
 a UI-bearing project (`ose-www`, `ose-app-web`, `organiclever-www`, `organiclever-app-web`, or their
-`-e2e` counterparts), that batch runs a lightweight design-funnel pass (named low-fi alternatives, a hi-fi
+`-e2e` counterparts; `ose-primer`'s `crud-fe-dart-flutterweb`, `crud-fe-ts-nextjs`,
+`crud-fe-ts-tanstack-start`, `crud-fs-ts-nextjs`, or `crud-fe-e2e`; `ose-infra`'s `coralpolyp-fe` or
+`coralpolyp-fe-e2e`), that batch runs a lightweight design-funnel pass (named low-fi alternatives, a hi-fi
 finalist, a stated selection + rationale, and a responsive strategy) before its RED/GREEN cycle authors
 the new UI. **Rule-15/16 live-tester retests are conditionally applicable, not blanket-exempt**: most
 batches only add markers/level tags to already-passing tests (no behaviour change) and remain exempt, but
 if a Phase 3..N batch's no-defer TDD path (Decision 4) builds genuinely new user-facing behaviour to
 satisfy a previously-unimplemented scenario in a UI-bearing project (`ose-www`, `ose-app-web`,
-`organiclever-www`, `organiclever-app-web`, or their `-e2e` counterparts), that batch runs the Rule-15
+`organiclever-www`, `organiclever-app-web`, or their `-e2e` counterparts; `ose-primer`'s
+`crud-fe-dart-flutterweb`, `crud-fe-ts-nextjs`, `crud-fe-ts-tanstack-start`, `crud-fs-ts-nextjs`, or
+`crud-fe-e2e`; `ose-infra`'s `coralpolyp-fe` or `coralpolyp-fe-e2e`), that batch runs the Rule-15
 three-tester retest before its gate passes; if the built behaviour instead exposes/changes a REST or
-GraphQL endpoint (`ose-be`, `organiclever-be`), that batch runs the Rule-16 `api-exploratory-tester`
-retest instead.
+GraphQL endpoint (`ose-be`, `organiclever-be`, `ose-primer`'s eleven `crud-be-*` variants, or
+`ose-infra`'s `coralpolyp-be`), that batch runs the Rule-16 `api-exploratory-tester` retest instead.
 
 ## Personas
 
@@ -62,14 +66,15 @@ Scenario: A marked-but-unexecuted scenario fails the central gate
   And the gate passes only when every @covers scenario executed and passed at each declared level
 ```
 
-### AC-3 — @covers + level tags adopted repo-wide (US-3)
+### AC-3 — @covers + level tags adopted repo-wide, across all three repos (US-3)
 
 ```gherkin
-Scenario: Every eligible project carries level tags and @covers markers
-  Given the coverage.projects registry in repo-config.yml
+Scenario: Every eligible project in every repo carries level tags and @covers markers
+  Given the coverage.projects registry in ose-public's, ose-primer's, and ose-infra's own repo-config.yml
   When the rollout is complete
-  Then every eligible app and lib has its scenarios level-tagged and @covers-marked
-  And specs behavior-coverage validate passes non-vacuously for each of them
+  Then every eligible app and lib in all three repos (59 projects total) has its scenarios
+    level-tagged and @covers-marked
+  And specs behavior-coverage validate passes non-vacuously for each of them, in each repo
 ```
 
 ### AC-4 — Engine change is byte-identical across the three repos (US-4)
@@ -94,9 +99,12 @@ Scenario: The runtime cross-check runs in the standard gates
 
 ## Product Scope
 
-**In:** level-tag + `@covers` rollout across eligible apps/libs; per-tier fail-on-skip (cucumber/Jest/
-Vitest/Playwright/F#); `behavior-coverage` runtime cross-check; pre-push + CI wiring; engine propagated
-byte-identical to the three repos.
+**In:** level-tag + `@covers` rollout across **all 59 eligible apps/libs in all three repos**
+(`ose-public`'s 26, `ose-primer`'s 25, `ose-infra`'s 8 — each repo's own `coverage.projects` registry);
+per-tier fail-on-skip across every language ecosystem those repos span (cucumber-rs/Jest/Vitest/
+Playwright/.NET xunit/Kaocha/ExUnit/Go `testing`/JUnit5/pytest/Cargo `#[ignore]`/cucumber-js/Dart `test`);
+`behavior-coverage` runtime cross-check; pre-push + CI wiring; engine propagated byte-identical to the
+three repos.
 
 **Out:** authoring new behaviour; app/validator logic changes; UI changes; rhino-cli's own de-hollow
 (dependency plan).
