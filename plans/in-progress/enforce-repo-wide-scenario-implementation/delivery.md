@@ -792,6 +792,20 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
   calculator scenarios have no e2e implementation; all 37 have real unit-tier assertions, so tagged
   `@unit`-only (honest) rather than falsely claiming `@e2e`. Needs a dedicated TDD follow-up to add the
   missing Playwright steps. **Done 2026-07-04.** Commit `85392bc61` (ose-public), pushed to origin/main.
+- **`crane-cli`.** Tags all 37 scenarios `@unit`-only (`test:integration` executes nothing
+  scenario-relevant — same class of dead-TickSpec-Steps bug as `ose-be`/`organiclever-be`, root cause
+  here is a stale typo in `Suite.fs`'s `gherkinRoot` fallback path, `behavior/cli/gherkin` instead of
+  `behavior/crane-cli/gherkin`). Adds 12 new tests covering 3 previously-zero-coverage commands
+  (pdf-commands, check-all, `--version`) plus untested branches, and strengthens 5 existing tests whose
+  assertions didn't match their scenario's defining claim. **2 genuine gaps flagged, not fixed** (both
+  need production changes in `libs/fsharp-crane-core`, out of scope here): `ocr-quality.feature`'s
+  page-number clause has no real implementation, and `table-check.feature`'s JSON field naming doesn't
+  match its Gherkin wording. **Done 2026-07-04.** Commit `3939b1d13` (ose-public), pushed to origin/main.
+- **Milestone — all 14 of `ose-public`'s Phase 3..N app/lib batches are now done** (tasks #181, #185-199,
+  #227 in the tracked task list). Remaining Phase 3..N scope is entirely in the sibling repos:
+  `ose-primer`'s 7 remaining lib BDD migrations (`golang-commons`, `ts-ui`, `clojure-openapi-codegen`,
+  `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens`) and `ose-infra`'s 4
+  batches (`coralpolyp-be`+`-e2e`, `coralpolyp-fe`+`-e2e`, `ts-ui-tokens`, `ts-ui`).
 
 ---
 
