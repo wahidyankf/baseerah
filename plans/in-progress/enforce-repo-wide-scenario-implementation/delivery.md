@@ -573,6 +573,34 @@ For each project in the batch:
 > **Pause Safety**: the completed batches are fully enforced; remaining projects are untouched and still
 > pass their existing gates. Safe to stop between batches. To resume: pick the next batch.
 
+### Batch Progress Log
+
+Phase 3..N is a repeatable per-batch template (not a static per-project checklist); completed batches
+are logged here rather than instantiated as individual checkboxes, since most batches are marker-only
+(no new behaviour, no TDD cycle).
+
+- **`ose-cli`** (`ose-public`). Level-tagged `links-check.feature`'s 4 scenarios `@integration`; added
+  `@covers` markers to 3 existing tests in `tests/cli_smoke.rs`; added one new test
+  (`links_check_ignores_external_urls`) covering the previously-untested "External URLs are not
+  validated" scenario against existing, already-correct production code (marker-only path — no TDD
+  needed). **Done 2026-07-04.**
+- **`ose-primer`'s shared `crud-be-*` Gherkin tree** (`specs/apps/crud/behavior/crud-be/gherkin/`,
+  consumed identically by all 11 `crud-be-*` language variants plus `crud-be-e2e`). Level-tagged the 78
+  previously-untagged scenarios across 14 non-`codegen` feature files `@unit @integration @e2e`
+  (marker-only path — no behaviour change). This surfaced 3 frameworks that auto-translate Gherkin tags
+  into their own tier-selection mechanism, each fixed at its root cause (not reverted, per explicit
+  user direction): pytest-bdd (`crud-be-python-fastapi`, declared the `e2e` marker for
+  `--strict-markers`), Cabbage/ExUnit (`crud-be-elixir-phoenix`, switched `test:unit`/`test:coverage`
+  from tag-based `--only unit` to path-based selection since Cabbage now stamps every generated test
+  with the full tag set in both `test/unit` and `test/integration`), and Reqnroll
+  (`crud-be-csharp-aspnetcore`, guarded `CommonSteps.CleanDatabase()` to skip `@unit`-tagged scenarios
+  since `ReqnrollHooks` wires them onto `UnitTestHost`, which never registers `AppDbContext`).
+  Systematically re-verified all 12 `crud-be-*` projects (11 variants + e2e) pass `test:unit`/
+  `test:quick` with 0 failures against the new tagging; `crud-be-e2e`'s `bddgen` codegen also confirmed
+  clean (Playwright tags are inert metadata, no tier-selection risk). Per-language `@covers` markers on
+  each variant's own step-definition files are the next sub-batch (not yet done). **Done 2026-07-04.**
+  Commit `76245460c` (ose-primer), pushed to origin/main.
+
 ---
 
 ## Final Phase — Wire, Cross-Repo Verify & Archival
