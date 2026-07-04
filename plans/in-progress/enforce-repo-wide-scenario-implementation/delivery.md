@@ -666,6 +666,24 @@ are logged here rather than instantiated as individual checkboxes, since most ba
   Commits `916c91a68` (level-tag), `f97cd7dc4`, `9e192d797`, `5ca412eb4`, `a042a7254`, `2089dd407`
   (ose-primer), pushed to origin/main. Remaining Phase 3..N scope: `ose-public`'s 14 app/lib batches,
   `ose-infra`'s 4 batches, and the 10-lib BDD-framework migration (Final Gate blocker).
+- **First of the 10 plain-test-runner libs fully migrated — `rust-commons` (`ose-public`).** Added a
+  real cucumber-rs harness (`tests/check_links.rs`, `cucumber = "0.23.0"` dev-dependency, `[[test]]
+harness = false`) wiring both `check-links.feature` scenarios to the real
+  `rust_commons::links::check_links` function; removed `@wip`, tagged both scenarios `@unit`. Root
+  cause of an initial false "Missing scenarios (2)" gap: `checker.rs`'s one-to-one mode dispatches `.rs`
+  test files through the same `// Scenario: <title>` comment-marker convention Go/Java/Kotlin/C#/Dart
+  use (`extract_go_scenario_titles`) — cucumber-rs needs no such marker at runtime, so it was simply
+  missing from the new test file; added the two marker comments (no rhino-cli source change needed,
+  no `--shared-steps` workaround — this is a single-consumer 1:1 spec, so default mode is the correct,
+  stronger-guarantee mode). Wired `specs:behavior:coverage` to the real checker command (was a Phase-0
+  stub) and `test:unit` to also run the cucumber binary (`cargo test --lib --test check_links`). Two
+  `#[allow(clippy::needless_pass_by_value)]` added on step fns — cucumber-rs regex captures require an
+  owned `FromStr` type (`&str` has no std `FromStr` impl), so clippy's lint was a framework-imposed false
+  positive, not a real smell. Full `test:quick` gate green (typecheck/lint/unit+cucumber/coverage/specs).
+  **Done 2026-07-04.** Commit `6c81e0cd8` (ose-public), pushed to origin/main. Remaining of the 10:
+  `web-ui`, `fsharp-crane-core` (`ose-public`); `golang-commons`, `ts-ui`, `clojure-openapi-codegen`,
+  `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` (`ose-primer`); `ts-ui`,
+  `ts-ui-tokens` (`ose-infra`).
 
 ---
 
