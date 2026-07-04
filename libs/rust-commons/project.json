@@ -37,10 +37,15 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo test --manifest-path libs/rust-commons/Cargo.toml --lib"
+        "command": "cargo test --manifest-path libs/rust-commons/Cargo.toml --lib --test check_links"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
+      "inputs": [
+        "{projectRoot}/Cargo.toml",
+        "{projectRoot}/src/**/*.rs",
+        "{projectRoot}/tests/**/*.rs",
+        "{workspaceRoot}/specs/libs/rust-commons/behavior/gherkin/**/*.feature"
+      ]
     },
     "test:coverage": {
       "executor": "nx:run-commands",
@@ -69,10 +74,14 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 — specs:coverage stubbed; rust-commons scenario @covers-tag gaps land in Phase 1'"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate specs/libs/rust-commons/behavior/gherkin libs/rust-commons"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/libs/rust-commons/behavior/gherkin/**/*.feature", "{projectRoot}/src/**/*.rs"]
+      "inputs": [
+        "{workspaceRoot}/specs/libs/rust-commons/behavior/gherkin/**/*.feature",
+        "{projectRoot}/src/**/*.rs",
+        "{projectRoot}/tests/**/*.rs"
+      ]
     },
     "specs:structure-validation": {
       "executor": "nx:run-commands",
