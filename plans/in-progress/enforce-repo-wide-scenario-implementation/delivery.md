@@ -806,6 +806,42 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
   `ose-primer`'s 7 remaining lib BDD migrations (`golang-commons`, `ts-ui`, `clojure-openapi-codegen`,
   `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens`) and `ose-infra`'s 4
   batches (`coralpolyp-be`+`-e2e`, `coralpolyp-fe`+`-e2e`, `ts-ui-tokens`, `ts-ui`).
+- **`ose-primer`: `golang-commons` + `ts-ui`** — both already fully migrated (real BDD frameworks, real
+  `specs:behavior:coverage` commands already wired) from prior work; just confirmed full `test:quick`
+  green, no changes needed. **Done 2026-07-04.**
+- **`ose-primer`: `ts-ui-tokens`** — added a real `@amiceli/vitest-cucumber` harness
+  (`tokens-export.steps.ts`) wiring both scenarios to the real `colorTokens`/`radius`/`spacing`/
+  `typography` exports; removed stale `@wip`. Deliberately omitted `@vitest/coverage-v8`: bisected and
+  confirmed it destabilizes npm's dependency-hoisting decision for 4 unrelated workspace members
+  (`crud-fe-ts-nextjs`, `crud-be-ts-effect`, `crud-fe-ts-tanstack-start`, `crud-fs-ts-nextjs`), breaking
+  their `tsc` typecheck via a `rollup`/`rolldown` `PluginContextMeta` structural-type clash — verified via
+  `npm ci` against a clean HEAD baseline (passes) vs. with the addition (fails deterministically, not
+  incremental-lockfile noise); the 2 real scenarios already exercise 100% of this 4-file lib. **Done
+  2026-07-04.** Commit `55a24a3ea` (ose-primer), pushed to origin/main.
+- **`ose-primer`: `clojure-openapi-codegen`** — added a real `com.lambdaisland/kaocha-cucumber` harness
+  (`test/step_definitions/steps.clj` + `test/features` symlink, matching `crud-be-clojure-pedestal`'s
+  convention) wiring both scenarios (1 Scenario + 1 Scenario Outline, 4 examples) to the real
+  `openapi-codegen.core/generate` and `openapi-codegen.generator/openapi-type->malli`. Removed stale
+  `@wip`. **Done 2026-07-04.** Commit `365fab722` (ose-primer), pushed to origin/main.
+- **`ose-primer`: `elixir-openapi-codegen` + `elixir-cabbage` + `elixir-gherkin`** —
+  `elixir-openapi-codegen` and `elixir-cabbage` both got real `Cabbage.Feature` tests wiring their
+  scenarios to real production code (the latter dogfooding the framework's own compile-time behavior:
+  all-steps-matched success path and `MissingStepError` raise path). `elixir-gherkin` cannot take Cabbage
+  as a test dependency — empirically confirmed circular (`elixir-cabbage`'s own `mix.exs` hard-depends on
+  `elixir_gherkin` via a path dependency; adding Cabbage back would self-reference, confirmed via a live
+  `mix deps.get` failure) — so it instead uses a minimal, dependency-free step registry. **Root-cause
+  fix required after the first commit**: that registry's `defgiven`/`defwhen`/`defthen` were initially
+  plain private functions, and `mix format` unconditionally parenthesizes plain multi-arg calls (verified
+  directly), breaking rhino-cli's `ex_step_re()` extractor (`defgiven(\n  ~r/...` doesn't match) —
+  regressed `specs:behavior:coverage` from 0 gaps to 9 the moment the file was reformatted post-commit.
+  Fixed by making them real macros using the exact do-block call shape `Cabbage.Feature` itself uses
+  (`defgiven ~r/.../ do ... end`), verified directly that `mix format` never rewraps that shape. All 3
+  wired to the real `--shared-steps` checker command (Elixir is in rhino-cli's auto-bind-framework
+  dispatch bucket). **Done 2026-07-04.** Commits `a25e94495` (initial), `b16dd2465` (elixir-gherkin
+  format-stability fix) (ose-primer), pushed to origin/main.
+- **Milestone — all 7 of `ose-primer`'s Phase 3..N lib batches are now done** (tasks #216-222). Remaining
+  Phase 3..N scope is entirely `ose-infra`'s 4 batches (`coralpolyp-be`+`-e2e`, `coralpolyp-fe`+`-e2e`,
+  `ts-ui-tokens`, `ts-ui`).
 
 ---
 
