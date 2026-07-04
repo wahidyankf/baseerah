@@ -398,10 +398,14 @@ fn pattern_index_for_entry(sm: &StepMatcher, i: usize) -> usize {
 ///
 /// Returns an empty `Vec` if `dir` does not exist.
 ///
+/// `pub(crate)` so [`crate::commands::specs_coverage`]'s `@covers`
+/// runtime-cross-check wiring can reuse the same feature-file walk rather
+/// than duplicating it.
+///
 /// # Errors
 ///
 /// Returns an error if the directory walk encounters an I/O error.
-fn walk_feature_files(
+pub(crate) fn walk_feature_files(
     dir: &Path,
     exclude_dirs: &[String],
 ) -> std::result::Result<Vec<PathBuf>, Error> {

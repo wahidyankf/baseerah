@@ -1,9 +1,10 @@
 //! Data types for the per-level @covers behavior coverage engine.
 
 use std::collections::HashSet;
+use std::fmt;
 
 /// Test level: unit, integration, or e2e.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TestLevel {
     /// Isolated unit tests (cargo test / jest).
     Unit,
@@ -11,6 +12,19 @@ pub enum TestLevel {
     Integration,
     /// End-to-end tests (Playwright / Cypress).
     E2e,
+}
+
+impl fmt::Display for TestLevel {
+    /// Renders the lowercase level name used in diagnostic output
+    /// (`"unit"`, `"integration"`, `"e2e"`) and in `--<level>-report` flags.
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            TestLevel::Unit => "unit",
+            TestLevel::Integration => "integration",
+            TestLevel::E2e => "e2e",
+        };
+        f.write_str(s)
+    }
 }
 
 /// A Gherkin scenario extracted from a feature file.
@@ -95,5 +109,72 @@ pub enum BehaviorCoverageViolation {
         feature_path: String,
         /// Scenario title from the marker text that could not be resolved.
         scenario_title: String,
+    },
+}
+
+/// Execution status of a single scenario recorded in a tier's machine-readable
+/// run report (see [`RunReportEntry`]).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum RunStatus {
+    /// The test executed and its assertions succeeded.
+    Passed,
+    /// The test executed but at least one assertion failed.
+    Failed,
+    /// The test was skipped, `.only`'d away by another test, marked
+    /// `.todo`/pending, or otherwise never ran.
+    Skipped,
+}
+
+/// A single scenario execution result recorded in a tier's run report.
+///
+/// Each test-runner ecosystem is expected to normalise its own native report
+/// (Jest/Vitest JSON, Playwright JSON, cucumber-rs output, .NET TRX/JSON,
+/// etc.) into this flat shape before the runtime cross-check reads it —
+/// that per-ecosystem adapter is a per-project rollout concern, not part of
+/// the engine itself.
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct RunReportEntry {
+    /// Repo-relative path to the `.feature` file, matching a
+    /// [`CoversMarker::feature_path`].
+    pub feature_path: String,
+    /// Scenario title, matching a [`CoversMarker::scenario_title`].
+    pub scenario_title: String,
+    /// Whether the scenario's covering test executed and passed.
+    pub status: RunStatus,
+}
+
+/// A runtime cross-check violation: a `@covers` marker whose covering test
+/// did not execute-and-pass at its declared level, per the tier's run report.
+///
+/// This is the gap neither the legacy step-text traceability scan
+/// (`crate::application::speccoverage::checker::check_all`) nor the
+/// marker-existence engine ([`super::validator::validate`]) can see: both
+/// only prove a matching implementation *exists*, never that it *ran*.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RuntimeCoverageViolation {
+    /// No run-report entry names this marker's scenario — the covering test
+    /// never executed (skipped/`.only`'d-away/`.todo`/undefined at runtime).
+    NotExecuted {
+        /// Repo-relative path to the test source file carrying the marker.
+        source_file: String,
+        /// Repo-relative path to the feature file named in the marker.
+        feature_path: String,
+        /// Scenario title named in the marker.
+        scenario_title: String,
+        /// Test level the marker declares.
+        level: TestLevel,
+    },
+    /// A run-report entry exists for this marker's scenario but its status
+    /// is not [`RunStatus::Passed`].
+    Failed {
+        /// Repo-relative path to the test source file carrying the marker.
+        source_file: String,
+        /// Repo-relative path to the feature file named in the marker.
+        feature_path: String,
+        /// Scenario title named in the marker.
+        scenario_title: String,
+        /// Test level the marker declares.
+        level: TestLevel,
     },
 }

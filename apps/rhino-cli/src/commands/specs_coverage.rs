@@ -9,9 +9,16 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Error, anyhow};
 use clap::Args;
 
+use crate::application::behavior_coverage::extract::{
+    extract_covers_markers, extract_scenario_specs,
+};
+use crate::application::behavior_coverage::types::{
+    BehaviorCoverageViolation, ProjectEnvelope, RuntimeCoverageViolation, TestLevel,
+};
+use crate::application::behavior_coverage::validator;
 use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
-use crate::internal::speccoverage::{checker, reporter, types::ScanOptions};
+use crate::internal::speccoverage::{checker, reporter, runtime_check, types::ScanOptions};
 
 /// CLI arguments for `spec-coverage validate`.
 #[derive(Args, Debug)]
@@ -35,14 +42,32 @@ pub struct ValidateArgs {
     /// Directory containing e2e test implementations (three-level mode).
     #[arg(long = "e2e-dir", value_name = "DIR")]
     pub e2e_dir: Option<String>,
+    /// Machine-readable run-report JSON for the unit tier's `@covers` scenarios
+    /// (three-level mode only; runtime cross-check is skipped for a tier with
+    /// no report supplied).
+    #[arg(long = "unit-report", value_name = "PATH")]
+    pub unit_report: Option<String>,
+    /// Machine-readable run-report JSON for the integration tier's `@covers`
+    /// scenarios (three-level mode only; see `--unit-report`).
+    #[arg(long = "integration-report", value_name = "PATH")]
+    pub integration_report: Option<String>,
+    /// Machine-readable run-report JSON for the e2e tier's `@covers` scenarios
+    /// (three-level mode only; see `--unit-report`).
+    #[arg(long = "e2e-report", value_name = "PATH")]
+    pub e2e_report: Option<String>,
 }
 
 /// Level name paired with its absolute directory path.
 struct LevelDir {
     /// Short name used in diagnostic output (e.g. `"unit"`, `"integration"`, `"e2e"`).
     name: &'static str,
+    /// The [`TestLevel`] this level dir represents, for the `@covers`
+    /// runtime cross-check.
+    test_level: TestLevel,
     /// Absolute path to the directory that contains the level's test implementations.
     dir: PathBuf,
+    /// Absolute path to this level's machine-readable run-report JSON, if supplied.
+    report: Option<PathBuf>,
 }
 
 /// Determine whether all three level dirs are provided, none, or a partial set.
@@ -63,27 +88,36 @@ fn resolve_level_dirs(
         3 => Ok(Some(vec![
             LevelDir {
                 name: "unit",
+                test_level: TestLevel::Unit,
                 dir: repo_root.join(
                     args.unit_dir
                         .as_deref()
                         .expect("unit_dir is Some in count==3 arm"),
                 ),
+                report: args.unit_report.as_deref().map(|p| repo_root.join(p)),
             },
             LevelDir {
                 name: "integration",
+                test_level: TestLevel::Integration,
                 dir: repo_root.join(
                     args.integration_dir
                         .as_deref()
                         .expect("integration_dir is Some in count==3 arm"),
                 ),
+                report: args
+                    .integration_report
+                    .as_deref()
+                    .map(|p| repo_root.join(p)),
             },
             LevelDir {
                 name: "e2e",
+                test_level: TestLevel::E2e,
                 dir: repo_root.join(
                     args.e2e_dir
                         .as_deref()
                         .expect("e2e_dir is Some in count==3 arm"),
                 ),
+                report: args.e2e_report.as_deref().map(|p| repo_root.join(p)),
             },
         ])),
         _ => Err(anyhow!(
@@ -152,6 +186,15 @@ fn capitalize(s: &str) -> String {
 }
 
 /// Run three-level mode: one pass per level dir, fail if any level has gaps.
+///
+/// After the per-level step-text traceability pass, also runs the `@covers`
+/// marker-existence + level-envelope check
+/// ([`crate::application::behavior_coverage::validator::validate`]) and the
+/// runtime execution cross-check
+/// ([`crate::application::speccoverage::runtime_check::check_runtime`]) —
+/// the only mode where a per-scenario "level" has a concrete meaning (one
+/// directory per level), so these checks are scoped to three-level mode and
+/// leave every existing single-dir/shared-steps invocation unaffected.
 fn run_three_level(
     levels: &[LevelDir],
     specs_dirs: &[PathBuf],
@@ -168,13 +211,195 @@ fn run_three_level(
         }
     }
 
+    // The `@covers` marker-existence and runtime-execution checks are opt-in:
+    // they activate only when at least one `--<level>-report` is supplied.
+    // Without that gate, every pre-existing three-level-mode caller (none of
+    // which tag scenarios with `@unit`/`@integration`/`@e2e` today) would
+    // start failing on `UntaggedScenario` violations it never opted into.
+    let covers_enabled = levels.iter().any(|level| level.report.is_some());
+    let (marker_violations, runtime_violations) = if covers_enabled {
+        (
+            check_covers_markers(levels, specs_dirs, repo_root)?,
+            check_runtime_cross_check(levels, repo_root)?,
+        )
+    } else {
+        (Vec::new(), Vec::new())
+    };
+
+    if matches!(output_format, OutputFormat::Text) {
+        print_marker_violations(&marker_violations);
+        print_runtime_violations(&runtime_violations);
+    }
+
+    if failing_levels.is_empty() && marker_violations.is_empty() && runtime_violations.is_empty() {
+        return Ok(());
+    }
+
+    let mut parts = Vec::new();
     if !failing_levels.is_empty() {
-        return Err(anyhow!(
-            "spec coverage gaps found at level(s): {}",
-            failing_levels.join(", ")
+        parts.push(format!("level(s) {}", failing_levels.join(", ")));
+    }
+    if !marker_violations.is_empty() {
+        parts.push(format!(
+            "{} @covers marker violation(s)",
+            marker_violations.len()
         ));
     }
-    Ok(())
+    if !runtime_violations.is_empty() {
+        parts.push(format!(
+            "{} runtime cross-check violation(s)",
+            runtime_violations.len()
+        ));
+    }
+    Err(anyhow!("spec coverage gaps found: {}", parts.join("; ")))
+}
+
+/// Extracts every scenario in `specs_dirs` and every `@covers` marker across
+/// `levels`, then runs the marker-existence + level-envelope check.
+///
+/// The project envelope in three-level mode is exactly the three declared
+/// levels (`--unit-dir`/`--integration-dir`/`--e2e-dir` are required
+/// together, per [`resolve_level_dirs`]).
+///
+/// # Errors
+///
+/// Returns an error if a `.feature` file cannot be read or a level directory
+/// cannot be walked.
+fn check_covers_markers(
+    levels: &[LevelDir],
+    specs_dirs: &[PathBuf],
+    repo_root: &Path,
+) -> std::result::Result<Vec<BehaviorCoverageViolation>, Error> {
+    let mut scenarios = Vec::new();
+    for specs_dir in specs_dirs {
+        for feature_file in checker::walk_feature_files(specs_dir, &[])? {
+            let feature_path = feature_file.strip_prefix(repo_root).map_or_else(
+                |_| feature_file.to_string_lossy().to_string(),
+                |p| p.to_string_lossy().to_string(),
+            );
+            scenarios.extend(extract_scenario_specs(&feature_file, &feature_path)?);
+        }
+    }
+
+    let mut markers = Vec::new();
+    for level in levels {
+        markers.extend(extract_covers_markers(
+            &level.dir,
+            level.test_level,
+            repo_root,
+        )?);
+    }
+
+    let envelope = ProjectEnvelope {
+        levels: [TestLevel::Unit, TestLevel::Integration, TestLevel::E2e]
+            .into_iter()
+            .collect(),
+    };
+
+    Ok(validator::validate(&scenarios, &markers, &envelope))
+}
+
+/// Builds one [`runtime_check::TierInput`] per level and runs the runtime
+/// execution cross-check.
+///
+/// # Errors
+///
+/// Returns an error if a level directory cannot be walked or a supplied
+/// run-report cannot be read/parsed.
+fn check_runtime_cross_check(
+    levels: &[LevelDir],
+    repo_root: &Path,
+) -> std::result::Result<Vec<RuntimeCoverageViolation>, Error> {
+    let tiers: Vec<runtime_check::TierInput<'_>> = levels
+        .iter()
+        .map(|level| runtime_check::TierInput {
+            level: level.test_level,
+            source_dir: level.dir.as_path(),
+            run_report: level.report.as_deref(),
+            repo_root,
+        })
+        .collect();
+    runtime_check::check_runtime(&tiers)
+}
+
+/// Prints every `@covers` marker-existence violation to stdout, in the same
+/// detailed-listing style as [`crate::application::speccoverage::reporter::format_text`]'s
+/// gap sections (`print_marker_violations`) — the terse pass/fail summary
+/// still surfaces separately via the command's returned `Err` message.
+fn print_marker_violations(violations: &[BehaviorCoverageViolation]) {
+    use BehaviorCoverageViolation as V;
+    if violations.is_empty() {
+        return;
+    }
+    println!("\n@covers marker violations ({}):", violations.len());
+    for v in violations {
+        match v {
+            V::UntaggedScenario {
+                feature_path,
+                title,
+            } => println!(
+                "  - {feature_path}\n    → Scenario: \"{title}\" has no @unit/@integration/@e2e level tag"
+            ),
+            V::LevelOutsideEnvelope {
+                feature_path,
+                title,
+                required_level,
+            } => println!(
+                "  - {feature_path}\n    → Scenario: \"{title}\" requires level [{required_level}], which is outside the project envelope"
+            ),
+            V::MissingCoverage {
+                feature_path,
+                title,
+                missing_level,
+            } => println!(
+                "  - {feature_path}\n    → Scenario: \"{title}\" has no @covers marker at the [{missing_level}] level"
+            ),
+            V::CoverageAtUndeclaredLevel {
+                source_file,
+                feature_path,
+                title,
+                extra_level,
+            } => println!(
+                "  - {source_file}\n    → marks \"{title}\" ({feature_path}) covered at [{extra_level}], a level not declared on that scenario"
+            ),
+            V::OrphanMarker {
+                source_file,
+                feature_path,
+                scenario_title,
+            } => println!(
+                "  - {source_file}\n    → marks \"{scenario_title}\" ({feature_path}), which no feature file contains (orphan marker)"
+            ),
+        }
+    }
+}
+
+/// Prints every runtime cross-check violation to stdout, in the same
+/// detailed-listing style as [`print_marker_violations`].
+fn print_runtime_violations(violations: &[RuntimeCoverageViolation]) {
+    if violations.is_empty() {
+        return;
+    }
+    println!("\nRuntime cross-check violations ({}):", violations.len());
+    for v in violations {
+        match v {
+            RuntimeCoverageViolation::NotExecuted {
+                source_file,
+                feature_path,
+                scenario_title,
+                level,
+            } => println!(
+                "  - {feature_path}\n    → Scenario: \"{scenario_title}\" [{level}] marked-but-not-executed (marker: {source_file})"
+            ),
+            RuntimeCoverageViolation::Failed {
+                source_file,
+                feature_path,
+                scenario_title,
+                level,
+            } => println!(
+                "  - {feature_path}\n    → Scenario: \"{scenario_title}\" [{level}] marked-but-failed (marker: {source_file})"
+            ),
+        }
+    }
 }
 
 /// Run the `spec-coverage validate` command.
@@ -334,6 +559,9 @@ mod tests {
             unit_dir: None,
             integration_dir: None,
             e2e_dir: None,
+            unit_report: None,
+            integration_report: None,
+            e2e_report: None,
         }
     }
 
@@ -423,6 +651,9 @@ mod tests {
                 "apps/rhino-cli/tests/fixtures/three-level/integration".to_string(),
             ),
             e2e_dir: Some("apps/rhino-cli/tests/fixtures/three-level/e2e".to_string()),
+            unit_report: None,
+            integration_report: None,
+            e2e_report: None,
         };
         let result = run(&args, OutputFormat::Text);
         assert!(
@@ -449,6 +680,9 @@ mod tests {
             unit_dir: Some("apps/rhino-cli/tests/fixtures/three-level/unit".to_string()),
             integration_dir: Some("apps/rhino-cli/tests/fixtures/three-level/unit".to_string()),
             e2e_dir: Some("apps/rhino-cli/tests/fixtures/three-level/unit".to_string()),
+            unit_report: None,
+            integration_report: None,
+            e2e_report: None,
         };
         assert!(
             run(&args, OutputFormat::Text).is_ok(),
@@ -469,6 +703,9 @@ mod tests {
             unit_dir: Some("apps/rhino-cli/tests/fixtures/three-level/unit".to_string()),
             integration_dir: None,
             e2e_dir: None,
+            unit_report: None,
+            integration_report: None,
+            e2e_report: None,
         };
         let err = run(&args, OutputFormat::Text).unwrap_err();
         assert!(
@@ -497,6 +734,9 @@ mod tests {
             unit_dir: None,
             integration_dir: None,
             e2e_dir: None,
+            unit_report: None,
+            integration_report: None,
+            e2e_report: None,
         };
         assert!(run(&args, OutputFormat::Text).is_ok());
     }

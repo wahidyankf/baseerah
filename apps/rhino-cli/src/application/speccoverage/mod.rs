@@ -10,5 +10,6 @@ pub mod extractors;
 pub mod matcher;
 pub mod parser;
 pub mod reporter;
+pub mod runtime_check;
 pub mod types;
 pub mod util;

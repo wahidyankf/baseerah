@@ -5,6 +5,7 @@
 //! tests declare coverage via `// @covers <repo-path>:<scenario-title>` markers;
 //! coverage is correct when marker-levels == S exactly.
 
+pub mod extract;
 pub mod types;
 pub mod validator;
 

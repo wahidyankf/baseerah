@@ -163,6 +163,55 @@ fn given_shared_steps(w: &mut SpecWorld) {
     );
 }
 
+/// Writes a fixture shared by the three runtime-cross-check scenarios below:
+/// a single `@unit`-tagged scenario, plus a matching step definition dropped
+/// into all three level dirs (so the legacy step-text traceability pass is
+/// clean at every level) but a `// @covers` marker added *only* to the unit
+/// dir's copy — the scenario is genuinely unit-level-only.
+fn setup_runtime_cross_check_fixture(w: &SpecWorld) {
+    w.write(
+        "specs/covered.feature",
+        "Feature: Covered\n\n  @unit\n  Scenario: Runs at unit level\n    Given a condition\n",
+    );
+    let step_def = "#[given(\"a condition\")]\nfn given_a_condition() {}\n";
+    w.write(
+        "app/unit/covered_test.rs",
+        &format!("// @covers specs/covered.feature:Runs at unit level\n{step_def}"),
+    );
+    w.write("app/integration/covered_test.rs", step_def);
+    w.write("app/e2e/covered_test.rs", step_def);
+}
+
+// @covers specs/apps/rhino/behavior/rhino-cli/gherkin/spec-coverage/spec-coverage-validate.feature:A marked-but-unexecuted scenario fails the runtime cross-check
+// @covers specs/apps/rhino/behavior/rhino-cli/gherkin/spec-coverage/spec-coverage-validate.feature:A marked-but-failed scenario fails the runtime cross-check
+// @covers specs/apps/rhino/behavior/rhino-cli/gherkin/spec-coverage/spec-coverage-validate.feature:A marked-and-passed scenario passes the runtime cross-check
+#[given("a scenario with a valid @covers marker whose covering test is skipped at runtime")]
+fn given_marker_not_executed(w: &mut SpecWorld) {
+    setup_runtime_cross_check_fixture(w);
+    // An empty run report: the unit tier ran, but this scenario never appears
+    // in it — exactly what a `.skip`/`.only`'d-away/`.todo`/undefined-at-runtime
+    // covering test looks like from the report's point of view.
+    w.write("report/unit.json", "[]");
+}
+
+#[given("a scenario with a valid @covers marker whose covering test ran and failed at runtime")]
+fn given_marker_failed(w: &mut SpecWorld) {
+    setup_runtime_cross_check_fixture(w);
+    w.write(
+        "report/unit.json",
+        r#"[{"feature_path":"specs/covered.feature","scenario_title":"Runs at unit level","status":"failed"}]"#,
+    );
+}
+
+#[given("a scenario with a valid @covers marker whose covering test ran and passed at runtime")]
+fn given_marker_passed(w: &mut SpecWorld) {
+    setup_runtime_cross_check_fixture(w);
+    w.write(
+        "report/unit.json",
+        r#"[{"feature_path":"specs/covered.feature","scenario_title":"Runs at unit level","status":"passed"}]"#,
+    );
+}
+
 #[given("feature files with test implementations in multiple languages")]
 fn given_multilang(w: &mut SpecWorld) {
     // Three features, each matched by a DIFFERENT language's test-file naming
@@ -206,6 +255,21 @@ fn when_run(w: &mut SpecWorld) {
 #[when("the developer runs spec-coverage validate with shared-steps flag")]
 fn when_run_shared(w: &mut SpecWorld) {
     w.exec(&["--shared-steps"]);
+}
+
+#[when("the developer runs behavior-coverage validate with the runtime cross-check")]
+fn when_run_with_runtime_cross_check(w: &mut SpecWorld) {
+    w.exec(&[
+        "--shared-steps",
+        "--unit-dir",
+        "app/unit",
+        "--integration-dir",
+        "app/integration",
+        "--e2e-dir",
+        "app/e2e",
+        "--unit-report",
+        "report/unit.json",
+    ]);
 }
 
 // --- Then steps ---
@@ -265,6 +329,20 @@ fn then_shared_no_matching(w: &mut SpecWorld) {
 fn then_multilang_matched(w: &mut SpecWorld) {
     // All multi-language steps are recognized → no step gaps → success.
     assert_eq!(w.exit_code(), 0, "stdout: {}", w.stdout());
+}
+
+#[then("the output names the scenario as marked-but-not-executed")]
+fn then_marked_not_executed(w: &mut SpecWorld) {
+    let out = w.stdout();
+    assert!(out.contains("marked-but-not-executed"), "got: {out}");
+    assert!(out.contains("Runs at unit level"), "got: {out}");
+}
+
+#[then("the output names the scenario as marked-but-failed")]
+fn then_marked_failed(w: &mut SpecWorld) {
+    let out = w.stdout();
+    assert!(out.contains("marked-but-failed"), "got: {out}");
+    assert!(out.contains("Runs at unit level"), "got: {out}");
 }
 
 #[tokio::main]

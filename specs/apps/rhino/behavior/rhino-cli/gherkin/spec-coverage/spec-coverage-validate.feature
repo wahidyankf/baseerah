@@ -38,3 +38,21 @@ Feature: BDD Spec-to-Test Coverage Validation
     Given feature files with test implementations in multiple languages
     When the developer runs spec-coverage validate on the specs and app directories
     Then test files are matched using language-specific conventions
+
+  Scenario: A marked-but-unexecuted scenario fails the runtime cross-check
+    Given a scenario with a valid @covers marker whose covering test is skipped at runtime
+    When the developer runs behavior-coverage validate with the runtime cross-check
+    Then the command exits with a failure code
+    And the output names the scenario as marked-but-not-executed
+
+  Scenario: A marked-but-failed scenario fails the runtime cross-check
+    Given a scenario with a valid @covers marker whose covering test ran and failed at runtime
+    When the developer runs behavior-coverage validate with the runtime cross-check
+    Then the command exits with a failure code
+    And the output names the scenario as marked-but-failed
+
+  Scenario: A marked-and-passed scenario passes the runtime cross-check
+    Given a scenario with a valid @covers marker whose covering test ran and passed at runtime
+    When the developer runs behavior-coverage validate with the runtime cross-check
+    Then the command exits successfully
+    And the output reports all specs as covered

@@ -5,15 +5,18 @@
 //!
 //! - `behavior-coverage.feature` / `domain-coverage.feature`: the per-level
 //!   `@covers` engine at `application::behavior_coverage::validator::validate`
-//!   (plus `application::domain_coverage`'s allowlist gate). The live CLI verb
-//!   `specs behavior-coverage validate` (`commands::specs_coverage::run`) is a
-//!   *different* thing — Gherkin-step-vs-test-implementation gap checking, not
-//!   `@covers` level-tag validation. The real `@covers` engine is dead/unwired
-//!   CLI code (its own `mod.rs` doc comments already carry `@covers` markers
-//!   naming these exact scenario titles), so — per the precedent already set
-//!   for `ddd`/`test-coverage` — these scenarios call the internal engine
-//!   in-process instead of inventing a CLI verb that would collide with the
-//!   real (differently-scoped) `specs behavior-coverage validate` command.
+//!   (plus `application::domain_coverage`'s allowlist gate). **Historical
+//!   note, corrected**: this doc comment used to say the live CLI verb
+//!   `specs behavior-coverage validate` (`commands::specs_coverage::run`)
+//!   never called this engine — true when these scenarios were first wired,
+//!   no longer true. `commands::specs_coverage::run_three_level` now calls
+//!   `validator::validate` directly (see `spec_coverage.rs`'s own runtime
+//!   cross-check scenarios, which drive the real CLI subprocess end-to-end
+//!   in three-level mode). The scenarios below still call the engine
+//!   in-process rather than through the CLI, but now purely as a testing-style
+//!   choice — isolating `validate`'s pure matching logic against hand-built
+//!   `ScenarioSpec`/`CoversMarker` values, the same precedent already set for
+//!   `ddd`/`test-coverage` — not because the CLI path is unreachable.
 //! - `env-staged-guard.feature`: the real `env staged-guard validate` CLI verb,
 //!   driven as a subprocess against a synthetic git-rooted fixture.
 //! - `harness-bindings.feature` / `harness-registry-driven.feature`: harness

@@ -46,7 +46,7 @@ pub fn validate(
                 violations.push(BehaviorCoverageViolation::LevelOutsideEnvelope {
                     feature_path: scenario.feature_path.clone(),
                     title: scenario.title.clone(),
-                    required_level: level.clone(),
+                    required_level: *level,
                 });
             }
 
@@ -60,7 +60,7 @@ pub fn validate(
                 violations.push(BehaviorCoverageViolation::MissingCoverage {
                     feature_path: scenario.feature_path.clone(),
                     title: scenario.title.clone(),
-                    missing_level: level.clone(),
+                    missing_level: *level,
                 });
             }
         }
@@ -83,7 +83,7 @@ pub fn validate(
                         source_file: marker.source_file.clone(),
                         feature_path: marker.feature_path.clone(),
                         title: scenario.title.clone(),
-                        extra_level: marker.level.clone(),
+                        extra_level: marker.level,
                     });
                 }
             }
