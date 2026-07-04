@@ -7,23 +7,27 @@ Feature: Theme toggle
   Background:
     Given the app is running
 
+  @unit @e2e
   Scenario: Default theme is dark
     When a visitor opens the home page for the first time
     Then the html element has no "light-theme" class
     And the theme toggle aria-label is "Switch to light theme"
 
+  @unit @e2e
   Scenario: Clicking the toggle switches to light theme
     When a visitor opens the home page
     And the visitor clicks the theme toggle
     Then the html element has the "light-theme" class
     And the theme toggle aria-label is "Switch to dark theme"
 
+  @unit @e2e
   Scenario: Theme persists across navigation
     When a visitor opens the home page
     And the visitor clicks the theme toggle
     And the visitor navigates to the CV page
     Then the html element still has the "light-theme" class
 
+  @unit @e2e
   Scenario: Theme choice persists across reloads
     When a visitor opens the home page
     And the visitor clicks the theme toggle

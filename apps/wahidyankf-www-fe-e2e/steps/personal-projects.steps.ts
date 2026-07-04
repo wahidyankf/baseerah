@@ -8,19 +8,23 @@ When("a visitor opens the personal projects page", async ({ page }) => {
   await page.waitForLoadState("load");
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/personal-projects/personal-projects.feature:Personal projects page renders the heading
 Then('the H1 shows "Personal Projects"', async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: /Personal Projects/ })).toBeVisible();
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/personal-projects/personal-projects.feature:Personal projects page renders a search input
 Then('a search input with placeholder "Search projects..." is visible', async ({ page }) => {
   await expect(page.getByPlaceholder(/Search projects/i)).toBeVisible();
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/personal-projects/personal-projects.feature:Personal projects page lists at least one project card
 Then("at least one project card is visible", async ({ page }) => {
   const cardCount = await page.locator("h2, h3").count();
   expect(cardCount).toBeGreaterThan(0);
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/personal-projects/personal-projects.feature:Each project card exposes external links where applicable
 Then(
   "every project card exposes a Repository, Website, or YouTube link where the project has that resource",
   async ({ page }) => {

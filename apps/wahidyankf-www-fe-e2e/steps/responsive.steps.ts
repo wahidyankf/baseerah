@@ -27,6 +27,7 @@ Then("a left sidebar is visible with Home, CV, and Personal Projects links", asy
   }
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/responsive.feature:Desktop viewport shows a fixed left sidebar
 Then("no bottom tab bar is rendered", async ({ page }) => {
   await expect(page.locator('[data-testid="mobile-nav"]')).not.toBeVisible();
 });
@@ -36,6 +37,8 @@ Then("no left sidebar is visible", async ({ page }) => {
   expect(viewport && viewport.width).toBeLessThan(1024);
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/responsive.feature:Tablet viewport hides the sidebar and renders a bottom tab bar
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/responsive.feature:Mobile viewport hides the sidebar and renders a bottom tab bar
 Then("a bottom tab bar is visible with Home, CV, and Personal Projects items", async ({ page }) => {
   for (const name of [/^Home$/, /^CV$/, /^Personal Projects$/]) {
     await expect(page.getByRole("link", { name }).first()).toBeVisible();
@@ -47,6 +50,7 @@ When("a visitor opens the home page at any viewport", async ({ page }) => {
   await page.waitForLoadState("load");
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/responsive.feature:The theme toggle is always reachable
 Then("the theme toggle button is present in the DOM and clickable", async ({ page }) => {
   const toggle = page.getByRole("button", { name: /Switch to (light|dark) theme/ });
   await expect(toggle).toBeVisible();

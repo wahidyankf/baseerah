@@ -35,6 +35,7 @@ export default defineConfig({
         plugins: sharedPlugins,
         test: {
           name: "unit-fe",
+          include: ["src/**/*.unit.test.{ts,tsx}", "test/**/*.steps.{ts,tsx}"],
           exclude: ["node_modules"],
           environment: "jsdom",
           setupFiles: ["./src/test/setup.ts"],

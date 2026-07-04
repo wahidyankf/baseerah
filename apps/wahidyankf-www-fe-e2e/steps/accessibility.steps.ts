@@ -4,6 +4,8 @@ import AxeBuilder from "@axe-core/playwright";
 
 const { When, Then } = createBdd();
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/accessibility.feature:Home page has zero axe-core WCAG 2.1 AA violations
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/accessibility.feature:CV page has zero axe-core WCAG 2.1 AA violations
 Then("an axe-core scan against WCAG 2.1 AA reports zero violations", async ({ page }) => {
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
   expect(results.violations).toEqual([]);
@@ -14,6 +16,7 @@ When("a visitor opens any of the home, CV, or personal-projects pages", async ({
   await page.waitForLoadState("load");
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/accessibility.feature:Every page has exactly one H1
 Then("each of those pages has exactly one H1 element", async ({ page }) => {
   for (const path of ["/", "/cv", "/personal-projects"]) {
     await page.goto(path);
@@ -28,6 +31,7 @@ Then("the theme toggle button exposes an aria-label", async ({ page }) => {
   await expect(toggle).toBeVisible();
 });
 
+// @covers specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/app-shell/accessibility.feature:Interactive controls expose accessible names
 Then("every navigation link exposes link text or an aria-label", async ({ page }) => {
   const linkNames = ["Home", "CV", "Personal Projects"];
   for (const name of linkNames) {

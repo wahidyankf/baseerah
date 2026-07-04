@@ -7,18 +7,22 @@ Feature: Personal projects page
   Background:
     Given the app is running
 
+  @unit @e2e
   Scenario: Personal projects page renders the heading
     When a visitor opens the personal projects page
     Then the H1 shows "Personal Projects"
 
+  @unit @e2e
   Scenario: Personal projects page renders a search input
     When a visitor opens the personal projects page
     Then a search input with placeholder "Search projects..." is visible
 
+  @unit @e2e
   Scenario: Personal projects page lists at least one project card
     When a visitor opens the personal projects page
     Then at least one project card is visible
 
+  @unit @e2e
   Scenario: Each project card exposes external links where applicable
     When a visitor opens the personal projects page
     Then every project card exposes a Repository, Website, or YouTube link where the project has that resource
