@@ -1,6 +1,8 @@
 module CraneCli.Tests.Unit.Tests.ReportManagerTests
 
+open System
 open System.IO
+open System.Text.RegularExpressions
 open Xunit
 open CraneCore.Domain.PdfMetadata
 open CraneCore.Domain.Report
@@ -34,6 +36,7 @@ let ``utc7Timestamp returns a timestamp string`` () =
     let result = utc7Timestamp ()
     Assert.Matches(@"^\d{4}-\d{2}-\d{2}--\d{2}-\d{2}$", result)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/reporting/report-management.feature:New chain creates a 6-character UUID report
 [<Fact>]
 let ``initReport creates a report file in generated-reports`` () =
     let scope = sprintf "test-scope-%s" (System.Guid.NewGuid().ToString("N").[..5])
@@ -42,6 +45,13 @@ let ``initReport creates a report file in generated-reports`` () =
     | Ok path ->
         Assert.True(path.StartsWith("generated-reports/"))
         Assert.True(File.Exists(path))
+        // Filename matches "{scope}__{6-hex}__{YYYY-MM-DD--HH-MM}__audit.md"
+        let fileName = Path.GetFileName(path)
+
+        let pattern =
+            sprintf @"^%s__[0-9a-f]{6}__\d{4}-\d{2}-\d{2}--\d{2}-\d{2}__audit\.md$" (Regex.Escape scope)
+
+        Assert.Matches(pattern, fileName)
         // cleanup
         File.Delete(path)
         let chainFile = sprintf ".execution-chain-%s" scope
@@ -90,6 +100,23 @@ let ``getOrExtendChain returns same chain within window`` () =
         if File.Exists(chainFile) then
             File.Delete(chainFile)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/reporting/report-management.feature:Chain extends when chain file is fresh (< 30s)
+[<Fact>]
+let ``getOrExtendChain extends existing fresh chain with known id`` () =
+    let scope = sprintf "chain-fresh-%s" (System.Guid.NewGuid().ToString("N").[..5])
+    let chainFile = sprintf ".execution-chain-%s" scope
+
+    try
+        // Chain file created 5 seconds ago with a known UUID, well inside the 30s window.
+        let fiveSecondsAgo = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 5L
+        File.WriteAllText(chainFile, sprintf "%d abc123" fiveSecondsAgo)
+        let chain = getOrExtendChain scope
+        // Chain should extend "abc123" with a new 6-hex id, not replace it.
+        Assert.Matches(@"^abc123__[0-9a-f]{6}$", chain)
+    finally
+        if File.Exists(chainFile) then
+            File.Delete(chainFile)
+
 [<Fact>]
 let ``getOrExtendChain starts fresh chain when chain file has invalid format`` () =
     let scope = sprintf "chain-invalid-%s" (System.Guid.NewGuid().ToString("N").[..5])
@@ -105,6 +132,7 @@ let ``getOrExtendChain starts fresh chain when chain file has invalid format`` (
         if File.Exists(chainFile) then
             File.Delete(chainFile)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/reporting/report-management.feature:Chain resets when chain file is stale (>= 30s)
 [<Fact>]
 let ``getOrExtendChain starts fresh chain when chain file timestamp is too old`` () =
     let scope = sprintf "chain-expired-%s" (System.Guid.NewGuid().ToString("N").[..5])

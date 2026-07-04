@@ -3,12 +3,14 @@ Feature: Text completeness validation
   I want to verify that all PDF text exists in the Markdown
   So that no content is silently lost during conversion
 
+  @unit
   Scenario: Complete conversion produces no findings
     Given a PDF fixture and its complete Markdown pair
     When I run "crane text check" on the pair
     Then the JSON output is an empty array
     And the exit code is 0
 
+  @unit
   Scenario: Missing section produces a CRITICAL finding
     Given a PDF fixture and a Markdown missing one section
     When I run "crane text check" on the pair
@@ -17,12 +19,14 @@ Feature: Text completeness validation
     And the finding category is "text-completeness"
     And the exit code is 1
 
+  @unit
   Scenario: Whitespace normalization prevents false positives
     Given a PDF with multiple consecutive spaces and its normalized Markdown
     When I run "crane text check" on the pair
     Then the JSON output is an empty array
     And the exit code is 0
 
+  @unit
   Scenario: Fuzzy match accepts minor OCR spelling variation
     Given a PDF with "Organisation" and a Markdown with "Organization"
     When I run "crane text check" on the pair

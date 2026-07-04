@@ -19,6 +19,7 @@ let ``Finding type has category field`` () =
 
     Assert.Equal("text-completeness", f.Category)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/content/text-check.feature:Complete conversion produces no findings
 [<Fact>]
 let ``checkText returns empty list when all chunks present in MD`` () =
     let chunks = [ "hello world this is section one content" ]
@@ -26,12 +27,23 @@ let ``checkText returns empty list when all chunks present in MD`` () =
     let result = checkText chunks mdText
     Assert.Empty(result)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/content/text-check.feature:Missing section produces a CRITICAL finding
 [<Fact>]
 let ``checkText returns finding for missing chunk`` () =
     let chunks = [ "Missing section here" ]
     let mdText = "completely different content with no overlap"
     let result = checkText chunks mdText
     Assert.NotEmpty(result)
+    Assert.Equal("CRITICAL", result.[0].Criticality)
+    Assert.Equal("text-completeness", result.[0].Category)
+
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/content/text-check.feature:Whitespace normalization prevents false positives
+[<Fact>]
+let ``checkText treats multiple consecutive spaces as equivalent via normalization`` () =
+    let chunks = [ "hello    world   with  extra    spaces" ]
+    let mdText = "hello world with extra spaces"
+    let result = checkText chunks mdText
+    Assert.Empty(result)
 
 [<Fact>]
 let ``normalize collapses whitespace`` () =
@@ -43,6 +55,7 @@ let ``segmentIsPresent returns true for exact substring`` () =
     let found = segmentIsPresent "hello world" "hello world some more text"
     Assert.True(found)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/content/text-check.feature:Fuzzy match accepts minor OCR spelling variation
 [<Fact>]
 let ``segmentIsPresent handles fuzzy single-word match`` () =
     let found = segmentIsPresent "Organisation" "Organization some text"

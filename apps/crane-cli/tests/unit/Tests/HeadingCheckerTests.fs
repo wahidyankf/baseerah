@@ -18,6 +18,12 @@ let ``inferDepthFromNumbering returns depth 3 for second-level`` () =
     let result = inferDepthFromNumbering "1.1 Overview"
     Assert.Equal(Some(3, "HIGH"), result)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/content/heading-check.feature:Heading depth inference from section number
+[<Fact>]
+let ``inferDepthFromNumbering returns depth 4 for third-level numbering`` () =
+    let result = inferDepthFromNumbering "3.1.2 Details"
+    Assert.Equal(Some(4, "HIGH"), result)
+
 [<Fact>]
 let ``extractMdHeadings returns empty list for text without headings`` () =
     let result = extractMdHeadings "some plain text\nno headings here"
@@ -29,6 +35,7 @@ let ``extractMdHeadings extracts H2 heading`` () =
     Assert.Equal(1, result.Length)
     Assert.Equal(2, result.[0].Depth)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/content/heading-check.feature:Correct heading depth produces no finding
 [<Fact>]
 let ``checkHeadings returns empty for matching headings`` () =
     let pdfText = "1. Introduction"
@@ -43,6 +50,7 @@ let ``checkHeadings skips plain text lines in pdfText`` () =
     let result = checkHeadings pdfText mdText
     Assert.Empty(result)
 
+// @covers specs/apps/crane/behavior/crane-cli/gherkin/content/heading-check.feature:Section "2.3.1" expects H4 and MD has H3 — HIGH finding
 [<Fact>]
 let ``checkHeadings returns HIGH finding for depth mismatch`` () =
     let pdfText = "1. Introduction"
