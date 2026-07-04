@@ -35,6 +35,20 @@ let ``DbUp applies the journal schema on boot`` () =
     runMigrations connStr
     Assert.True(tableExists connStr "journal_entries", "journal_entries table should exist after migration")
 
+let private appliedMigrationCount (connStr: string) : int =
+    use conn = new NpgsqlConnection(connStr)
+    conn.Open()
+
+    use cmd = new NpgsqlCommand("SELECT COUNT(*) FROM schemaversions", conn)
+    cmd.ExecuteScalar() :?> int64 |> int
+
+// @covers specs/apps/organiclever/behavior/organiclever-be/gherkin/db/migrations.feature:Backend applies pending migrations on startup
+[<Fact>]
+let ``backend applies pending migrations on startup`` () =
+    let connStr = connectionString ()
+    runMigrations connStr
+    Assert.True(appliedMigrationCount connStr >= 1, "at least one migration should be recorded after boot")
+
 [<Fact>]
 let ``EF context boots against PostgreSQL after migration`` () =
     let connStr = connectionString ()

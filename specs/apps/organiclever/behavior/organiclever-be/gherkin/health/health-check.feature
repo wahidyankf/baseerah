@@ -7,11 +7,13 @@ Feature: Service Health Check
   Background:
     Given the API is running
 
+  @unit @e2e
   Scenario: Health endpoint reports the service as UP
     When an operations engineer sends GET /health
     Then the response status code should be 200
     And the health status should be "ok"
 
+  @unit @e2e
   Scenario: Anonymous health check does not expose component details
     When an unauthenticated engineer sends GET /health
     Then the response status code should be 200
