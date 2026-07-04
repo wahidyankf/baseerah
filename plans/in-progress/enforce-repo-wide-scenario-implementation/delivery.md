@@ -744,6 +744,31 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
   debt (this same gap exists identically in `organiclever-be`) worth a dedicated follow-up plan to wire
   real TickSpec `FeatureRunner`s for both. **Done 2026-07-04.** Commit `c5b6cac64` (ose-public), pushed to
   origin/main.
+- **`organiclever-be` + `organiclever-be-e2e`.** Tagged `health-check.feature` (2 scenarios) and
+  `journal-crud.feature` (6 scenarios) `@unit @e2e`, mirroring `ose-be`'s precedent for this identical
+  architecture. Added 19 `@covers` markers plus two genuinely-missing tests: "Anonymous health check does
+  not expose component details" and "Backend applies pending migrations on startup" (verified against a
+  live PostgreSQL container). Same two findings as `ose-be` (NATS fail-fast scenario unimplemented; dead
+  TickSpec Steps files with no `FeatureRunner`) confirmed identically present here, left unfixed for the
+  same out-of-scope reason. **Done 2026-07-04.** Commit `cde4d0c50` (ose-public), pushed to origin/main.
+- **`organiclever-app-web` + `organiclever-app-web-e2e`.** Tagged all 74 scenarios across 14 feature
+  files: 58 `@unit @e2e`, 16 `@e2e`-only for `journal-mechanism.feature` (its unit step file is a
+  documented stub-only catalog with no real assertions, working around an `@amiceli/vitest-cucumber` v6.x
+  duplicate-step-text limitation — tagging it `@unit` would have been vacuous). Added 132 `@covers`
+  markers; fixed 5 stale "Covers:" doc-comment paths in e2e steps as a drive-by. **Finding (tracked, not
+  fixed): the 16 journal-mechanism scenarios have no real unit-tier test** — a genuine coverage gap from
+  an upstream library limitation, not a shortcut taken here; candidate follow-up: refactor the feature
+  file to avoid the duplicate step text, or patch/replace the vitest-cucumber dependency. **Done
+  2026-07-04.** Commit `aed2a15fc` (ose-public), pushed to origin/main.
+- **`organiclever-www` + `organiclever-www-fe-e2e`.** Tagged `accessibility.feature` and `home.feature`
+  (all scenarios) `@unit @e2e`; added 26 `@covers` markers (marker-only, every scenario already
+  implemented at both tiers). Confirmed `organiclever-www-be-e2e` consumes an unrelated placeholder tree
+  (`organiclever-www-be/gherkin/placeholder/placeholder.feature`, a tolerated-absent stub for a
+  nonexistent backend) — correctly out of scope, untouched. **Done 2026-07-04.** Commit `6e6009c76`
+  (ose-public), pushed to origin/main.
+- **Milestone — all 3 `organiclever-*` app groups now done** (`organiclever-be`, `organiclever-app-web`,
+  `organiclever-www`), matching their `ose-*` siblings. Remaining `ose-public` app batches:
+  `ayokoding-www` trio, `ayokoding-cli`, `wahidyankf-www` + e2e, `crane-cli`.
 
 ---
 
