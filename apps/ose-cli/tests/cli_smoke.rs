@@ -26,6 +26,7 @@ fn invalid_output_format_exits_failure() {
 }
 
 #[test]
+// @covers specs/apps/ose/behavior/ose-cli/gherkin/links/links-check.feature:A content directory with all valid internal links passes validation
 fn links_check_passes_on_empty_dir() {
     let dir = TempDir::new().expect("tempdir");
     cmd()
@@ -40,6 +41,27 @@ fn links_check_passes_on_empty_dir() {
 }
 
 #[test]
+// @covers specs/apps/ose/behavior/ose-cli/gherkin/links/links-check.feature:External URLs are not validated
+fn links_check_ignores_external_urls() {
+    let dir = TempDir::new().expect("tempdir");
+    std::fs::write(
+        dir.path().join("index.md"),
+        "[external](https://example.com/page)\n[mail](mailto:user@example.com)\n",
+    )
+    .expect("write file");
+    cmd()
+        .args([
+            "links",
+            "check",
+            "--content",
+            dir.path().to_str().expect("valid path"),
+        ])
+        .assert()
+        .success();
+}
+
+#[test]
+// @covers specs/apps/ose/behavior/ose-cli/gherkin/links/links-check.feature:A broken internal link is detected and reported
 fn links_check_reports_broken_link() {
     let dir = TempDir::new().expect("tempdir");
     std::fs::write(dir.path().join("index.md"), "[broken](/does-not-exist)\n").expect("write file");
@@ -56,6 +78,7 @@ fn links_check_reports_broken_link() {
 }
 
 #[test]
+// @covers specs/apps/ose/behavior/ose-cli/gherkin/links/links-check.feature:JSON output produces structured results
 fn links_check_json_output_is_valid() {
     let dir = TempDir::new().expect("tempdir");
     let output = cmd()
