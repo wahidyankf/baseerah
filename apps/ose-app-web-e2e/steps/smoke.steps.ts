@@ -17,6 +17,7 @@ When("I navigate to {string}", async ({ page }, path: string) => {
   await page.goto(`${process.env["WEB_BASE_URL"] ?? "http://localhost:3300"}${path}`);
 });
 
+// @covers specs/apps/ose/behavior/app-web/gherkin/smoke/smoke.feature:Home page loads
 Then("I see the heading {string}", async ({ page }, heading: string) => {
   const h1 = page.getByRole("heading", { level: 1 });
   await expect(h1).toHaveText(heading);
