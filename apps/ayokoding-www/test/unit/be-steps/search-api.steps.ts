@@ -38,6 +38,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(first).toHaveProperty("slug");
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-be/gherkin/search/search-api.feature:Search returns matching results with title, slug, and excerpt
     And('each result should include an "excerpt" field', () => {
       const first = results[0]!;
       expect(first).toHaveProperty("excerpt");
@@ -55,6 +56,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       results = await testCaller.search.query({ query: "programming", locale: "en" });
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-be/gherkin/search/search-api.feature:Search results include locale information
     Then('each result should include a "locale" field matching "en"', () => {
       for (const result of results) {
         expect(result).toHaveProperty("locale");
@@ -78,6 +80,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       results = await testCaller.search.query({ query: "security", locale: "id" });
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-be/gherkin/search/search-api.feature:Search is scoped to the requested locale
     Then("the response should contain no results", () => {
       expect(results.length).toBe(0);
     });
@@ -94,6 +97,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       }
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-be/gherkin/search/search-api.feature:Empty query returns an error
     Then("the response should indicate an invalid input error", () => {
       expect(error).toBeTruthy();
     });

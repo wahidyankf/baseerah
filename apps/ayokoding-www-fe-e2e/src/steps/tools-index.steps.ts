@@ -14,6 +14,7 @@ When("the calculator entry renders", async ({ page }) => {
   await page.waitForLoadState("networkidle");
 });
 
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/tools-index.feature:The calculator entry shows a description distinct from its link text
 Then("the calculator entry shows a description distinct from its link text", async ({ page }) => {
   // Scope to the main content area to avoid matching the footer Tools column
   // which also links to the calculator (added in Phase 3 footer nav update).

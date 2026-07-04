@@ -6,10 +6,12 @@ Feature: Service Health and Metadata
   Background:
     Given the API is running
 
+  @unit @e2e
   Scenario: meta.health returns status ok
     When the client calls meta.health
     Then the response should contain "status" equal to "ok"
 
+  @unit @e2e
   Scenario: meta.languages returns the list of available locales
     When the client calls meta.languages
     Then the response should contain a non-null "languages" array

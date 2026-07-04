@@ -38,6 +38,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
       expect(link).toBeTruthy();
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/tools-index.feature:The calculator entry shows a description distinct from its link text
     Then("the calculator entry shows a description distinct from its link text", () => {
       const desc = screen.getByTestId("tool-desc-calculator");
       expect((desc.textContent ?? "").trim()).not.toBe("");

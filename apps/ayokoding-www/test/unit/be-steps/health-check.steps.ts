@@ -21,6 +21,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       result = await testCaller.meta.health();
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-be/gherkin/health/health-check.feature:meta.health returns status ok
     Then('the response should contain "status" equal to "ok"', () => {
       expect(result.status).toBe("ok");
     });
@@ -42,6 +43,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(result.some((l) => l.code === "en")).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-be/gherkin/health/health-check.feature:meta.languages returns the list of available locales
     And('the "languages" array should include "id"', () => {
       expect(result.some((l) => l.code === "id")).toBe(true);
     });

@@ -7,6 +7,7 @@ Feature: Learn-tree reorganization redirects
   Background:
     Given the app is running
 
+  @unit @e2e
   Scenario: platform-web redirects to platforms/web under the /c namespace
     When a visitor navigates to "/en/learn/software-engineering/platform-web"
     Then the current URL should contain "/en/c/learn/software-engineering/platforms/web"

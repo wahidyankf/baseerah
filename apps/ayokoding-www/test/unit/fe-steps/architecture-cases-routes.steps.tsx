@@ -24,6 +24,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/architecture-cases-routes.feature:In FP case route is reachable
     And('the page should contain a heading with text "In FP — F# / Clojure / TypeScript / Haskell"', () => {
       expect(true).toBe(true);
     });
@@ -41,6 +42,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/architecture-cases-routes.feature:In OOP case route is reachable
     And('the page should contain a heading with text "In OOP — Java / Spring Boot"', () => {
       expect(true).toBe(true);
     });
@@ -58,6 +60,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/architecture-cases-routes.feature:In Procedural case route is reachable
     And('the page should contain a heading with text "In Procedural — Go / Rust"', () => {
       expect(true).toBe(true);
     });

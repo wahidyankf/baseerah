@@ -44,6 +44,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/search/search.feature:Cmd+K keyboard shortcut opens the search dialog
     And("the search input should have focus", () => {
       // Focus management handled by Radix Dialog; verified at E2E level
       expect(true).toBe(true);
@@ -63,6 +64,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/search/search.feature:Typing in the search input shows debounced results
     And("results should update when the visitor changes the query", () => {
       // Previous timer cleared, new 200ms debounce started
       expect(true).toBe(true);
@@ -82,6 +84,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/search/search.feature:Clicking a search result navigates to that page
     And("the visitor should be navigated to the page for that result", () => {
       // router.push verified at E2E level
       expect(true).toBe(true);
@@ -100,6 +103,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/search/search.feature:Escape key closes the search dialog
     And("focus should return to the page behind the dialog", () => {
       // Radix Dialog restores focus to trigger element
       expect(true).toBe(true);
@@ -128,6 +132,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(formatSectionPath("learn/ai/security/basics")).toBe("Learn / Ai / Security");
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/search/search.feature:Search results show title, section path, and excerpt
     And("each result should display a text excerpt showing the matching content", () => {
       // result.excerpt rendered in <span className="text-xs text-muted-foreground">
       expect(true).toBe(true);

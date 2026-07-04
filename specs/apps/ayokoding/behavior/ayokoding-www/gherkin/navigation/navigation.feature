@@ -7,6 +7,7 @@ Feature: Site Navigation
   Background:
     Given the app is running
 
+  @unit @e2e
   Scenario: Sidebar shows section tree with collapsible nodes
     When a visitor opens a content page that has child sections
     Then the sidebar should display the section tree
@@ -14,6 +15,7 @@ Feature: Site Navigation
     And the visitor clicks a collapsed parent node
     And its child items should become visible
 
+  @unit @e2e
   Scenario: Breadcrumb shows ancestor path hierarchy without current page
     When a visitor opens a nested content page
     Then a breadcrumb trail should be displayed above the page title
@@ -22,12 +24,14 @@ Feature: Site Navigation
     And all breadcrumb segments should be clickable links
     And breadcrumb text should wrap naturally without horizontal truncation
 
+  @unit @e2e
   Scenario: Table of contents shows heading links for H2 to H4
     When a visitor opens a content page with multiple headings
     Then a table of contents should be visible on the page
     And the table of contents should list all H2, H3, and H4 headings as anchor links
     And H1 headings should not appear in the table of contents
 
+  @unit @e2e
   Scenario: Previous and Next links navigate between siblings
     When a visitor is on a content page that has sibling pages
     Then a previous link should point to the preceding sibling page
@@ -35,6 +39,7 @@ Feature: Site Navigation
     And the visitor clicks the next link
     And they should be taken to the next sibling page
 
+  @unit @e2e
   Scenario: Active page is highlighted in the sidebar
     When a visitor is on a specific content page
     Then the corresponding item in the sidebar should be visually highlighted as active

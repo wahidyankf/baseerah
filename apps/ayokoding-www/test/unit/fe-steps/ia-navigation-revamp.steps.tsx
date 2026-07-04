@@ -69,6 +69,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:English content resolves under the /c namespace
     And("a breadcrumb nav should be present", () => {
       expect(true).toBe(true);
     });
@@ -98,6 +99,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(nav).toBeTruthy();
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:The /c browse index lists all content sections
     And("the breadcrumb should start with a Home link", () => {
       const links = document.querySelectorAll("nav[aria-label] a");
       expect(links.length).toBeGreaterThan(0);
@@ -122,6 +124,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Header shows primary nav links on desktop
     And('the header primary nav should contain a link to "/en/tools" labelled "Tools"', () => {
       expect(true).toBe(true);
     });
@@ -146,6 +149,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Mobile navigation mirrors the header links
     And('the mobile nav should contain a link to "/en/tools" labelled "Tools"', () => {
       expect(true).toBe(true);
     });
@@ -187,6 +191,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(link).toBeTruthy();
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Footer shows grouped navigation with localized labels
     And('the footer "About" column should link to "/id/syarat-dan-ketentuan"', () => {
       const link = document.querySelector('a[href="/id/syarat-dan-ketentuan"]');
       expect(link).toBeTruthy();
@@ -223,6 +228,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(link).toBeTruthy();
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Landing homepage renders hero, sections, and tools teaser in English
     And('the tools teaser should link to "/en/tools/cost-of-living-calculator"', () => {
       const link = document.querySelector('a[href="/en/tools/cost-of-living-calculator"]');
       expect(link).toBeTruthy();
@@ -256,6 +262,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(link).toBeTruthy();
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Landing homepage renders hero, sections, and tools teaser in Indonesian
     And('the tools teaser should link to "/id/tools/cost-of-living-calculator"', () => {
       const link = document.querySelector('a[href="/id/tools/cost-of-living-calculator"]');
       expect(link).toBeTruthy();
@@ -285,6 +292,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       );
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Breadcrumb segments link to /c URLs
     Then('each ancestor crumb links to a "/c/" prefixed URL', () => {
       const learnLink = screen.getByRole("link", { name: "Learn" });
       expect(learnLink.getAttribute("href")).toBe("/en/c/learn");
@@ -317,6 +325,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
         expect(contentUrl("id", "belajar")).toBe("/id/c/belajar");
       });
 
+      // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Internal content links emit /c URLs directly without relying on redirects
       And("no internal content link resolves through a 308 redirect", () => {
         // Verified structurally: all link emitters call contentUrl directly,
         // which produces canonical /c/ paths — no redirect intermediaries.
@@ -341,6 +350,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(contentUrl("en", "learn/software-engineering")).toContain("/c/");
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Sitemap lists only the new /c content URLs
     But('top-level pages (about, terms, tools) are not prefixed with "/c/"', () => {
       // Loose pages bypass /c/ — asserted in sitemap.unit.test.ts
       expect(contentUrl("en", "about-ayokoding")).not.toContain("/c/");
@@ -358,6 +368,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:RSS feed item links use the new /c content URLs
     Then('every content item link uses a "/c/" prefixed URL', () => {
       // contentUrl drives feed URL generation — asserted in route.unit.test.ts
       expect(contentUrl("en", "rants/my-post")).toBe("/en/c/rants/my-post");
@@ -379,6 +390,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(contentUrl("en", "learn/software-engineering")).toBe("/en/c/learn/software-engineering");
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Canonical link for moved content points to the /c URL
     And("the language alternates include en and x-default", () => {
       // alternates.languages populated with en + x-default — asserted in page.unit.test.ts
       expect(true).toBe(true);

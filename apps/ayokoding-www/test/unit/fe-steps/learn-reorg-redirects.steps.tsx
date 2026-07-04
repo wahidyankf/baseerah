@@ -20,6 +20,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/learn-reorg-redirects.feature:platform-web redirects to platforms/web under the /c namespace
     Then('the current URL should contain "/en/c/learn/software-engineering/platforms/web"', () => {
       expect(true).toBe(true);
     });

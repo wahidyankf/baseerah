@@ -17,6 +17,7 @@ When("the breadcrumb renders its ancestor segments", async ({ page }) => {
   await expect(breadcrumb).toBeVisible();
 });
 
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Breadcrumb segments link to /c URLs
 Then("each ancestor crumb links to a {string} prefixed URL", async ({ page }, prefix: string) => {
   const breadcrumb = page.getByRole("navigation", { name: /breadcrumb/i });
   const links = breadcrumb.getByRole("link");
@@ -75,6 +76,7 @@ Then(
   },
 );
 
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Internal content links emit /c URLs directly without relying on redirects
 Then("no internal content link resolves through a 308 redirect", async ({ page }) => {
   const navLinks = page.locator("nav a[href]");
   const count = await navLinks.count();
@@ -117,6 +119,7 @@ Then("every moved-content entry uses a {string} prefixed URL", async ({ page }, 
   expect(body).toContain("/c/");
 });
 
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Sitemap lists only the new /c content URLs
 Then(/^top-level pages \(about, terms, tools\) are not prefixed with "([^"]+)"$/, async ({ page }, prefix: string) => {
   const body = await page.content();
   // about-ayokoding and terms-and-conditions must NOT contain the /c/ prefix.
@@ -150,6 +153,7 @@ When("the feed items are produced", async () => {
   expect(feedBody.length).toBeGreaterThan(0);
 });
 
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:RSS feed item links use the new /c content URLs
 Then("every content item link uses a {string} prefixed URL", async ({}, _prefix: string) => {
   // Each feed <item> <link> should point to a /c/ URL.
   expect(feedBody).toContain("/c/");
@@ -174,6 +178,7 @@ Then("the canonical alternate is {string}", async ({ page }, expectedCanonical: 
   expect(canonical).toContain(expectedCanonical);
 });
 
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature:Canonical link for moved content points to the /c URL
 Then("the language alternates include en and x-default", async ({ page }) => {
   const enAlternate = await page.locator("link[hreflang='en']").getAttribute("href");
   const xDefaultAlternate = await page.locator("link[hreflang='x-default']").getAttribute("href");

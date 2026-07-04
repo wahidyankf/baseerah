@@ -37,6 +37,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/navigation.feature:Sidebar shows section tree with collapsible nodes
     And("its child items should become visible", () => {
       // Interactive collapse/expand is tested at E2E level
       expect(true).toBe(true);
@@ -76,6 +77,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(links.length).toBe(2); // Learn and Software Engineering are both links
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/navigation.feature:Breadcrumb shows ancestor path hierarchy without current page
     And("breadcrumb text should wrap naturally without horizontal truncation", () => {
       const nav = screen.getByLabelText("Breadcrumb");
       const ol = nav.querySelector("ol");
@@ -112,6 +114,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(screen.getByText("Advanced")).toBeTruthy();
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/navigation.feature:Table of contents shows heading links for H2 to H4
     And("H1 headings should not appear in the table of contents", () => {
       // H1 is not in the headings prop — only H2-H4 are extracted by the parser
       expect(true).toBe(true);
@@ -141,6 +144,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       // Navigation click is tested at E2E level
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/navigation.feature:Previous and Next links navigate between siblings
     And("they should be taken to the next sibling page", () => {
       const links = screen.getAllByRole("link");
       const nextLink = links.find((l) => l.getAttribute("href")?.includes("advanced"));
@@ -159,6 +163,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/navigation.feature:Active page is highlighted in the sidebar
     And("no other sidebar item should be highlighted as active", () => {
       expect(true).toBe(true);
     });
