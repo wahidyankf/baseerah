@@ -600,6 +600,44 @@ are logged here rather than instantiated as individual checkboxes, since most ba
   clean (Playwright tags are inert metadata, no tier-selection risk). Per-language `@covers` markers on
   each variant's own step-definition files are the next sub-batch (not yet done). **Done 2026-07-04.**
   Commit `76245460c` (ose-primer), pushed to origin/main.
+- **Finding — 10 plain-test-runner libs cannot pass the live coverage gate today.** While working the
+  `elixir-openapi-codegen` lib batch, confirmed `elixir-openapi-codegen`'s `generate-schema-modules.feature`
+  is fully implemented (working `OpenApiCodegen.generate/3` + existing test suite) with a stale `@wip`
+  tag — removed it, added 2 new tests plus `@covers` markers for all 3 scenarios. But wiring
+  `specs:behavior:coverage` to the real command fails: `checker::check_all` requires step-TEXT matches
+  against a registered BDD step definition (`#[given(...)]`/`defgiven`/etc.), and this lib (like
+  `rust-commons`, `web-ui`, `fsharp-crane-core`, `golang-commons`, `ts-ui` ×2,
+  `clojure-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` ×2 — 10 projects total,
+  confirmed both are ALSO still-stubbed via their own `project.json`) uses a plain unit-test runner with
+  no BDD framework at all — there is no step syntax for the checker to match, regardless of correct
+  `@covers` markers. Grilled the user on the fix (2026-07-04): **decision is to migrate each of the 10
+  to a real BDD framework** (Cabbage/cucumber-rs/cucumber-js/godog, mirroring `crud-be-*`), not to
+  extend the checker or formally exempt these projects. Explicitly promoted to a **Final Gate /
+  Validation Checklist non-negotiable item** (see below) per the user's direction to not let this get
+  lost as a lower-visibility batch. Reverted `elixir-openapi-codegen`'s `specs:behavior:coverage` to an
+  honest stub (previous stub falsely claimed "no Gherkin behavior specs"; corrected wording names the
+  real blocker) pending its own BDD migration. Decision: continue unblocked batches now (crud-be-_,
+  ose-www, organiclever-_, ayokoding-_, crane-cli, crud-fe-_, coralpolyp-\* — all real-BDD-framework-based,
+  unaffected), circle back to these 10 lib migrations before Final Gate.
+- **`ose-primer`'s per-language `@covers` markers, batch 1 (5 of 11 `crud-be-*` variants)**.
+  `crud-be-golang-gin` (150 markers, 76/76 mappable scenarios, 2 test-support scenarios out of scope),
+  `crud-be-ts-effect` (154 markers, 78/78 unit + 76/78 integration), `crud-be-java-springboot` (152
+  markers, 76/76), `crud-be-java-vertx` (152 markers, 76/76), `crud-be-clojure-pedestal` (78 markers —
+  one consolidated step file serves both tiers so no per-tier duplication needed), and
+  `crud-be-python-fastapi` (152 markers, 76/76; widened ruff's E501 per-file-ignore to also cover
+  `conftest.py` since some scenarios' defining step is a truly-shared assertion helper living there, not
+  a domain-specific step file). All delegated to parallel background agents, each independently
+  re-verified (test:unit + specs:behavior:coverage re-run directly, not just trusting the agent's report)
+  before committing. **Done 2026-07-04.** Commits `badc01745`, `369342520`, `f272956ff`, `11e752ee6`,
+  `c5457c9c1`, `1b30517da` (ose-primer), pushed to origin/main. Remaining crud-be-\* batch: csharp-aspnetcore,
+  elixir-phoenix, fsharp-giraffe, kotlin-ktor, rust-axum, crud-be-e2e.
+- **3 of the 10 plain-test-runner libs partially addressed** (stale `@wip` removed + `@covers` markers
+  added, but BDD-framework migration itself still pending): `elixir-cabbage` (feature-compilation.feature
+  — dogfoods itself extensively already, no bootstrapping blocker; markers point at existing
+  `feature_suggestion_test.exs` tests), `elixir-gherkin` (feature-parsing.feature — 2 new precise tests
+  added since existing near-matches didn't exactly fit the spec wording). Both plus
+  `elixir-openapi-codegen` still have an honest `specs:behavior:coverage` stub pending real migration.
+  **Done (partial) 2026-07-04.** Commits `9e7d37e10`, `928f0ad84` (ose-primer), pushed to origin/main.
 
 ---
 
@@ -655,6 +693,18 @@ are logged here rather than instantiated as individual checkboxes, since most ba
 
 ### Final Gate
 
+- [ ] [AI] **Non-negotiable completion criterion — plain-test-runner lib BDD migration**: 10 lib batches
+      (`rust-commons`, `web-ui`, `fsharp-crane-core` in `ose-public`; `golang-commons`, `ts-ui`,
+      `clojure-openapi-codegen`, `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`,
+      `ts-ui-tokens` in `ose-primer`; `ts-ui`, `ts-ui-tokens` in `ose-infra`) use plain unit-test runners
+      with no BDD step-registration framework, so `checker::check_all`'s step-text matching structurally
+      cannot pass for them regardless of correct `@covers` markers (discovered while working
+      `elixir-openapi-codegen`; confirmed by direct grill with the user 2026-07-04 — decision: migrate,
+      not exempt or patch the checker). **This plan is NOT complete until every one of these 10 is
+      migrated to a real BDD framework** (Cabbage for Elixir, cucumber-rs for Rust, cucumber-js/
+      Vitest-cucumber for TS, godog for Go — mirroring the working `crud-be-*` pattern) with its
+      `specs:behavior:coverage` genuinely wired (no stub) and passing non-vacuously. Do not let this
+      item get silently dropped for being smaller/lower-visibility than the app-level batches.
 - [ ] [AI] Every eligible project: `specs:behavior:coverage` non-vacuous + runtime cross-check green;
       every tier fails on skip; all three repos' CI green.
 
@@ -663,7 +713,9 @@ are logged here rather than instantiated as individual checkboxes, since most ba
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery items ticked and ALL gates pass (local + CI, all three repos).
+- [ ] [AI] Verify ALL delivery items ticked and ALL gates pass (local + CI, all three repos), **including
+      the 10-lib BDD-framework migration above** — this plan may not be archived with any of them still
+      stubbed or plain-test-only.
 - [ ] [AI] Verify **zero deferrals** repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no
       marker-without-a-real-test anywhere (`audit/07-no-defer-proof.md` shows a clean grep).
 - [ ] [AI] Move plan: `git mv plans/in-progress/enforce-repo-wide-scenario-implementation plans/done/<completion-date>__enforce-repo-wide-scenario-implementation`.
@@ -676,5 +728,8 @@ are logged here rather than instantiated as individual checkboxes, since most ba
 - [ ] Every tier fails on skip/only/todo (proofs committed)
 - [ ] `behavior-coverage` runtime cross-check live and wired to pre-push + CI
 - [ ] `@covers` + level tags on every eligible app/lib; `behavior-coverage` non-vacuous
+- [ ] **All 10 plain-test-runner libs migrated to a real BDD framework** (`rust-commons`, `web-ui`,
+      `fsharp-crane-core`, `golang-commons`, `ts-ui` ×2, `clojure-openapi-codegen`,
+      `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` ×2) — no stubs remain
 - [ ] Engine byte-identical across the three repos; all three repos' CI green
 - [ ] Zero deferrals repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no marker-without-a-real-test
