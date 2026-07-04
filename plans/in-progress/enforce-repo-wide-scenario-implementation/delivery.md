@@ -711,6 +711,39 @@ harness = false`) wiring both `check-links.feature` scenarios to the real
   `fsharp-crane-core`). Remaining of the 10: `golang-commons`, `ts-ui`, `clojure-openapi-codegen`,
   `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` (`ose-primer`); `ts-ui`,
   `ts-ui-tokens` (`ose-infra`).
+- **`ose-app-web` + `ose-app-web-e2e`.** 1 scenario newly tagged `@e2e`, 1 `@covers` marker added
+  (`smoke.feature`'s "Home page loads", the only scenario in this tree). Confirmed `ose-app-web`'s own
+  `specs:behavior:coverage` correctly scans `ose-app-web-e2e` (not itself) because `ose-app-web` has zero
+  unit-tier step files for this browser-only scenario — verified against the identically-shaped
+  `organiclever-app-web`/`-e2e` pair, which has the roles reversed because it genuinely has unit-tier
+  steps. **Done 2026-07-04.** Commit `e277d8d72` (ose-public), pushed to origin/main.
+- **`ose-www` + `ose-www-be-e2e` + `ose-www-fe-e2e`.** Tagged all 26 previously-untagged
+  platform-web/platform-be scenarios `@unit @e2e` (verified consumption: ose-www's vitest-cucumber unit
+  tiers + both e2e projects' playwright-bdd tier; `test:integration` exists but is a no-op not wired into
+  `test:quick`, so left untagged per the -www-sites-have-no-integration-tier convention). Added 52
+  `@covers` markers total (26 in ose-www's own unit step files, 26 across the two e2e projects). Verified
+  by actually building+running ose-www's production server and executing both real e2e suites end-to-end
+  (12/12 + 42/42 passed), not just trusting the marker placement. **Done 2026-07-04.** Commits `9607a9603`
+  (tags+markers), `1368e1040` (bddgen regen) (ose-public), pushed to origin/main.
+- **`ose-be` + `ose-be-e2e`.** Tagged 5 previously-untagged scenarios (4 bounded-context declaration
+  stubs `@unit`-only since their e2e steps are pure no-op placeholders; `health` `@unit @e2e`), added 8
+  `@covers` markers, and added one genuinely-missing integration test (`db/migrations.feature`'s "Backend
+  applies pending migrations on startup" had no implementation at all — added one asserting DbUp actually
+  records applied migrations, verified against a live PostgreSQL container). **Finding, deliberately left
+  unfixed (out of scope for a marker-only pass):** `messaging/nats-config.feature`'s "ose-be fails fast
+  when its NATS URL is missing" has no real implementation anywhere —
+  `OseBe.Infrastructure.NatsClient.natsUrl()` defaults silently instead of failing fast, contradicting the
+  scenario; the e2e stub falsely claims "covered by Rust unit tests" (ose-be has no Rust at all). Needs a
+  product decision (fix `NatsClient` to fail fast, or rewrite the Gherkin to match actual best-effort
+  behavior) before it can be marked — not fabricating a passing test or vacuous marker for it.
+  **Secondary finding:** `apps/ose-be/tests/unit/Steps/*.fs` and `tests/integration/Steps/
+DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` wires them to the `.feature`
+  files (unlike `crud-be-fsharp-giraffe`, which has a real `Integration/FeatureRunner.fs` +
+  `Unit/UnitFeatureRunner.fs`), so `@covers` markers were placed on the plain `[<Fact>]` tests that
+  actually execute, not the inert Steps files. Coverage is non-vacuous today, but this is architectural
+  debt (this same gap exists identically in `organiclever-be`) worth a dedicated follow-up plan to wire
+  real TickSpec `FeatureRunner`s for both. **Done 2026-07-04.** Commit `c5b6cac64` (ose-public), pushed to
+  origin/main.
 
 ---
 
