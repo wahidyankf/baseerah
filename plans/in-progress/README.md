@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [enforce-repo-wide-scenario-implementation](./enforce-repo-wide-scenario-implementation/README.md) — roll out `@covers` + level tags + per-tier fail-on-skip across all 51 apps/libs in ose-public, ose-primer, and ose-infra, and upgrade `behavior-coverage` to a runtime cross-check so every Gherkin scenario is genuinely implemented. **Depends on** `enforce-identical-rhino-cli-gherkin` (done). Created 2026-07-03.
+_None currently in progress._
 
 ## Instructions
 
