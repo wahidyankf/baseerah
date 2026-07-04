@@ -71,6 +71,7 @@ describeFeature(feature, ({ Scenario }) => {
       ];
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/stats/history-screen.feature:History shows entries in reverse order
     Then("entries are shown newest first", () => {
       const sorted = sortNewestFirst(entries);
       expect(sorted.length).toBe(2);
@@ -84,6 +85,7 @@ describeFeature(feature, ({ Scenario }) => {
       entries = [];
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/stats/history-screen.feature:Empty history shows empty state
     Then("the empty state message is shown", () => {
       expect(entries.length).toBe(0);
     });
@@ -100,6 +102,7 @@ describeFeature(feature, ({ Scenario }) => {
       cardExpanded = !cardExpanded;
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/stats/history-screen.feature:Session card expands on click
     Then("the card expands showing details", () => {
       expect(cardExpanded).toBe(true);
       // Entry in list still valid

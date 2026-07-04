@@ -47,6 +47,8 @@ When(/a visitor requests GET "\/app\/does-not-exist"$/, async ({ page }) => {
   expect(response?.status()).toBe(404);
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/routing/disabled-routes.feature:Disabled routes return 404
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/routing/app-routes.feature:Unknown segment under /app returns 404
 Then("the response status is 404", async () => {
   // Status assertion is performed in the When step for inline access to response.
   // This Then step confirms the path was exercised.
@@ -54,6 +56,8 @@ Then("the response status is 404", async () => {
   expect(currentMethod).toBeTruthy();
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/routing/disabled-routes.feature:Old /app URL permanent-redirects to /app/home
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/routing/app-routes.feature:Old /app URL permanent-redirects to /app/home
 Then(/the response is a 308 redirect to "(\/app\/home)"$/, async ({}, target: string) => {
   expect(redirectStatus).toBe(308);
   expect(redirectLocation).toBeTruthy();

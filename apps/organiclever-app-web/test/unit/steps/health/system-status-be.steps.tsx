@@ -50,6 +50,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
       expect(document.body).toBeTruthy();
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows Not Configured when env unset
     And('the body contains "Not configured"', () => {
       expect(screen.getByText(/Not configured/i)).toBeInTheDocument();
     });
@@ -83,6 +84,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
       expect(screen.getByText(/UP\s*—/)).toBeInTheDocument();
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows UP when backend healthy
     And("the body contains the backend URL", () => {
       expect(screen.getByText(/http:\/\/be\.example\.test/)).toBeInTheDocument();
     });
@@ -114,6 +116,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
       expect(screen.getByText(/fetch failed/i)).toBeInTheDocument();
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows DOWN when backend unreachable
     And("no uncaught exception reaches the Next.js error boundary", () => {
       // Component rendered without throwing — no error boundary triggered
       expect(screen.getByRole("main")).toBeInTheDocument();
@@ -145,6 +148,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
       expect(screen.getByText(/DOWN/)).toBeInTheDocument();
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows DOWN when backend times out
     And('the body contains "timeout"', () => {
       expect(screen.getByText(/timeout/i)).toBeInTheDocument();
     });

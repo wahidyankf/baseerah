@@ -58,6 +58,7 @@ describeFeature(feature, ({ Scenario }) => {
       savedToast = false;
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/settings/settings-screen.feature:Settings screen loads user profile
     Then("the user name input is visible", () => {
       expect(nameInputVisible).toBe(true);
       expect(settings.name).toBe("Tester");
@@ -80,6 +81,7 @@ describeFeature(feature, ({ Scenario }) => {
       }, 1500);
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/settings/settings-screen.feature:Change rest setting
     Then("the 30s rest chip is active", () => {
       expect(settings.restSeconds).toBe(30);
       vi.useRealTimers();
@@ -96,6 +98,7 @@ describeFeature(feature, ({ Scenario }) => {
       savedToast = true;
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/settings/settings-screen.feature:Saved toast appears after save
     Then("the saved toast appears", () => {
       expect(savedToast).toBe(true);
     });

@@ -7,12 +7,14 @@ Feature: Generic journal entry mechanism on /app
     Given the app is running
     And I have opened "/app" in a fresh browser session
 
+  @e2e
   Scenario: Empty state on first visit
     Given PGlite database "ol_journal_v1" (IndexedDB) is empty
     Then I see a heading "Journal"
     And I see empty-state copy "No entries yet — press + to add one"
     And I see a focusable button labelled "Add entry"
 
+  @e2e
   Scenario: Adding a single entry
     When I press the "Add entry" button
     Then a form sheet opens with one draft containing a "Name" input and a "Payload" textarea
@@ -25,6 +27,7 @@ Feature: Generic journal entry mechanism on /app
     And the list entry does not show an "edited" line
     And PGlite database "ol_journal_v1" (IndexedDB) contains exactly one entry with name "workout"
 
+  @e2e
   Scenario: Adding a batch of three drafts
     When I press the "Add entry" button
     And I type "workout" into the "Name" input of draft 1
@@ -43,6 +46,7 @@ Feature: Generic journal entry mechanism on /app
     And every entry has "updatedAt" equal to its "createdAt"
     And PGlite database "ol_journal_v1" (IndexedDB) contains exactly three entries (no nested arrays)
 
+  @e2e
   Scenario: Batch timestamp + sort across batches
     Given the list shows three entries from a single earlier batch
     When I press the "Add entry" button
@@ -52,18 +56,21 @@ Feature: Generic journal entry mechanism on /app
     And the newest entry "focus" appears first in the list
     And the three earlier entries appear after, in their original within-batch order
 
+  @e2e
   Scenario: Removing a draft from the sheet before saving
     When I press the "Add entry" button
     And I press the "+ Add another" button
     And I press the "Remove draft" button on draft 2
     Then the sheet shows one draft
 
+  @e2e
   Scenario: Persisting entries across reload
     Given the list shows two entries with names "workout" and "reading"
     When I hard-reload the page
     Then the list still shows two entries with names "workout" and "reading"
     And the order is preserved (newest first)
 
+  @e2e
   Scenario: Cancelling the form discards every draft
     When I press the "Add entry" button
     And I type "workout" into the "Name" input of draft 1
@@ -74,6 +81,7 @@ Feature: Generic journal entry mechanism on /app
     And the list still shows zero entries
     And PGlite database "ol_journal_v1" (IndexedDB) remains empty
 
+  @e2e
   Scenario: Mixed-validity batch is rejected as a whole
     When I press the "Add entry" button
     And I type "workout" into the "Name" input of draft 1
@@ -85,6 +93,7 @@ Feature: Generic journal entry mechanism on /app
     And the form sheet remains open
     And PGlite database "ol_journal_v1" (IndexedDB) remains empty
 
+  @e2e
   Scenario: Submitting invalid JSON payload is rejected
     When I press the "Add entry" button
     And I type "workout" into the "Name" input of draft 1
@@ -93,6 +102,7 @@ Feature: Generic journal entry mechanism on /app
     Then I see an inline error on draft 1: "Payload must be valid JSON"
     And the form sheet remains open
 
+  @e2e
   Scenario: Storage unavailable surfaces a typed error banner
     Given the IndexedDB API is unavailable in this browser session
     When I open "/app"
@@ -100,16 +110,19 @@ Feature: Generic journal entry mechanism on /app
     And the banner is rendered because the React layer narrowed `state.status === "error"` and `state.cause._tag === "StorageUnavailable"`
     And no "Add entry" button is rendered while `state.status !== "ready"`
 
+  @e2e
   Scenario: Preset name chips fill the name input of the focused draft
     When I press the "Add entry" button
     And I click the "reading" preset chip on draft 1
     Then the "Name" input of draft 1 has the value "reading"
 
+  @e2e
   Scenario: Expanding payload preview shows the full JSON
     Given the list shows one entry with payload "{\"title\": \"Sapiens\", \"pages\": 320, \"notes\": \"Excellent\"}"
     When I click the "View payload" disclosure on that entry
     Then the row expands to show the full pretty-printed JSON payload
 
+  @e2e
   Scenario: Editing an entry refreshes updatedAt without reordering
     Given the list shows two entries:
       | name    | payload                |
@@ -126,6 +139,7 @@ Feature: Generic journal entry mechanism on /app
     And the "reading" entry's "createdAt" is unchanged
     And the "reading" entry's "updatedAt" is later than its "createdAt"
 
+  @e2e
   Scenario: Deleting an entry requires confirmation
     Given the list shows two entries with names "workout" and "reading"
     When I press the "Delete" button on the "reading" entry
@@ -137,6 +151,7 @@ Feature: Generic journal entry mechanism on /app
     And the list shows one entry with name "workout"
     And PGlite database "ol_journal_v1" (IndexedDB) contains exactly one entry with name "workout"
 
+  @e2e
   Scenario: Bumping (bring to top) mutates createdAt and reorders
     Given the list shows two entries:
       | name    | payload                |
@@ -151,6 +166,7 @@ Feature: Generic journal entry mechanism on /app
     And the "workout" entry's "updatedAt" equals its new "createdAt"
     And PGlite database "ol_journal_v1" (IndexedDB) reflects the new "createdAt" for the "workout" entry
 
+  @e2e
   Scenario: Bump persists across reload
     Given the list shows two entries with names "workout" and "reading"
     And I press the "Bring to top" button on the "workout" entry

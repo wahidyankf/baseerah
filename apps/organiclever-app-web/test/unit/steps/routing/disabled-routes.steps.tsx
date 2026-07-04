@@ -56,6 +56,7 @@ describeFeature(feature, ({ ScenarioOutline, Scenario }) => {
       // Assertion happens in Then to keep Given/When/Then structure clean.
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/routing/disabled-routes.feature:Disabled routes return 404
     Then("the response status is 404", () => {
       const candidates = routeFilePaths(method, routePath);
       const anyExists = candidates.some((p) => existsSync(p));
@@ -80,6 +81,7 @@ describeFeature(feature, ({ ScenarioOutline, Scenario }) => {
       // Static analysis only — confirmed below in Then.
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/routing/disabled-routes.feature:Old /app URL permanent-redirects to /app/home
     Then(`the response is a 308 redirect to "/app/home"`, () => {
       expect(configSource).toMatch(/source:\s*"\/app"/);
       expect(configSource).toMatch(/destination:\s*"\/app\/home"/);

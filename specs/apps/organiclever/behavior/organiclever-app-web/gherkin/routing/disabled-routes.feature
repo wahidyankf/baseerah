@@ -6,6 +6,7 @@ Feature: Disabled Routes
   I want authentication and profile routes to return 404 in local-first mode
   So that there is no accidental entry point to removed authentication UI
 
+  @unit @e2e
   Scenario Outline: Disabled routes return 404
     Given the application is running in local-first mode
     When a visitor requests <method> <path>
@@ -20,7 +21,7 @@ Feature: Disabled Routes
   # so the redirect contract is colocated with the 404 guard rows.
   # @local-fullstack — Verified in dev-workflow E2E against the real Docker stack.
   # See app-routes.feature for the rationale; staging E2E skips it.
-  @local-fullstack
+  @unit @e2e @local-fullstack
   Scenario: Old /app URL permanent-redirects to /app/home
     Given the application is running in local-first mode
     When a visitor requests GET "/app"

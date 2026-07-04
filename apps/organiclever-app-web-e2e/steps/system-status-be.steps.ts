@@ -1,7 +1,7 @@
 /**
  * Step definitions for the BE Status Page feature.
  *
- * Covers: specs/apps/organiclever/behavior/organiclever-app-web/gherkin/system/system-status-be.feature
+ * Covers: specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature
  *
  * In full-stack CI (docker-compose), ORGANICLEVER_BE_URL is always set to the
  * docker BE service. Only the "UP when backend healthy" scenario can run there.
@@ -53,10 +53,13 @@ Then("the response status is 200", async ({ page }) => {
   await expect(page.locator("main")).toBeVisible();
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows Not Configured when env unset
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows DOWN when backend times out
 Then("the body contains {string}", async ({ page }, text: string) => {
   await expect(page.locator("main")).toContainText(text);
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows UP when backend healthy
 Then("the body contains the backend URL", async ({ page }) => {
   // The FE server's ORGANICLEVER_BE_URL is rendered in the UP view. In CI the
   // test runner process doesn't inherit the docker container's env, so check
@@ -69,6 +72,7 @@ Then("the body contains the failure reason", async ({ page }) => {
   await expect(page.locator("main")).toContainText("Reason:");
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health/system-status-be.feature:BE status page shows DOWN when backend unreachable
 Then("no uncaught exception reaches the Next.js error boundary", async ({ page }) => {
   // The page rendered successfully at /system/status/be without an error overlay
   await expect(page.locator("main")).toBeVisible();

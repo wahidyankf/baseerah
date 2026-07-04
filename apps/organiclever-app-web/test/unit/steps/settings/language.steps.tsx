@@ -53,6 +53,7 @@ describeFeature(feature, ({ Scenario }) => {
       settings = applyLang(settings, "id");
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/settings/language.feature:Switch to Bahasa Indonesia
     Then("the language is set to Indonesian", () => {
       expect(settings.lang).toBe("id");
     });
@@ -68,6 +69,7 @@ describeFeature(feature, ({ Scenario }) => {
       settings = applyLang(settings, "en");
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/settings/language.feature:Switch back to English
     Then("the language is set to English", () => {
       expect(settings.lang).toBe("en");
     });

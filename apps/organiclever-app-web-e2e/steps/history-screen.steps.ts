@@ -27,6 +27,7 @@ Given("the history screen has entries", async ({ page }) => {
   }
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/stats/history-screen.feature:History shows entries in reverse order
 Then("entries are shown newest first", async ({ page }) => {
   // History screen always renders its <h1>History</h1> heading regardless of data.
   await expect(page.getByRole("heading", { name: "History" })).toBeVisible({ timeout: 10000 });
@@ -41,6 +42,7 @@ Given("the history screen has no entries", async ({ page }) => {
   }
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/stats/history-screen.feature:Empty history shows empty state
 Then("the empty state message is shown", async ({ page }) => {
   // Empty state shows "No sessions yet." — but if entries exist, the heading still confirms screen loaded
   await expect(page.getByRole("heading", { name: "History" })).toBeVisible({ timeout: 10000 });
@@ -69,6 +71,7 @@ When("the user taps the session card", async ({ page }) => {
   }
 });
 
+// @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/stats/history-screen.feature:Session card expands on click
 Then("the card expands showing details", async ({ page }) => {
   // After clicking a SessionCard button the expanded detail section appears.
   // The History heading always confirms the screen is still loaded.

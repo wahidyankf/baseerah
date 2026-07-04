@@ -49,6 +49,7 @@ describeFeature(feature, ({ Scenario }) => {
       actor.send({ type: "TOGGLE_DARK_MODE" });
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/settings/dark-mode.feature:Toggle dark mode on
     Then("dark mode is enabled", () => {
       expect(actor.getSnapshot().context.darkMode).toBe(true);
       actor.stop();
@@ -65,6 +66,7 @@ describeFeature(feature, ({ Scenario }) => {
       actor.send({ type: "TOGGLE_DARK_MODE" });
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/settings/dark-mode.feature:Toggle dark mode off
     Then("dark mode is disabled", () => {
       expect(actor.getSnapshot().context.darkMode).toBe(false);
       actor.stop();

@@ -8,12 +8,14 @@ Feature: App Routes URL Scheme
     Given the application is running
 
   # AC-1 — Default route shows Home (redirect)
+  @unit @e2e
   Scenario: Visiting /app redirects to /app/home
     Given the app is freshly loaded
     When the user navigates to "/app"
     Then the URL becomes "/app/home"
     And the Home screen is visible
 
+  @unit @e2e
   Scenario: Visiting /app/home renders the Home screen
     Given the app is freshly loaded
     When the user navigates to "/app/home"
@@ -21,6 +23,7 @@ Feature: App Routes URL Scheme
     And the Home tab is marked active in the navigation
 
   # AC-2 — Each tab has a route
+  @unit @e2e
   Scenario Outline: Each tab is reachable by URL
     Given the app shell is visible
     When the user navigates to "<path>"
@@ -35,6 +38,7 @@ Feature: App Routes URL Scheme
       | /app/settings  | Settings | Settings |
 
   # AC-4 — Refresh stays on current tab
+  @unit @e2e
   Scenario Outline: Refreshing a tab URL keeps the user on that tab
     Given the user is on "<path>"
     When the user refreshes the page
@@ -48,6 +52,7 @@ Feature: App Routes URL Scheme
       | /app/settings  | Settings |
 
   # AC-5 — Browser back returns to previous screen
+  @unit @e2e
   Scenario: Back from Progress returns to Home
     Given the user navigated from "/app/home" to "/app/progress"
     When the user presses the browser back button
@@ -59,12 +64,13 @@ Feature: App Routes URL Scheme
   # On Vercel staging the Deployment Protection auth wall and edge redirect handling
   # can intercept the request before Next.js runs, returning a non-308 status; the
   # contract itself (next.config.ts redirects()) is exercised by dev E2E.
-  @local-fullstack
+  @unit @e2e @local-fullstack
   Scenario: Old /app URL permanent-redirects to /app/home
     When a visitor requests GET "/app"
     Then the response is a 308 redirect to "/app/home"
 
   # AC-12 — Unknown sub-paths return 404
+  @unit @e2e
   Scenario: Unknown segment under /app returns 404
     When a visitor requests GET "/app/does-not-exist"
     Then the response status is 404

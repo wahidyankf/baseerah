@@ -64,6 +64,7 @@ describeFeature(feature, ({ Scenario }) => {
       activeFilter = null;
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/journal/home-screen.feature:Home screen shows entry list
     Then("the entry list is visible", () => {
       const visible = filterEntries(entries, activeFilter);
       expect(visible.length).toBeGreaterThan(0);
@@ -80,6 +81,7 @@ describeFeature(feature, ({ Scenario }) => {
       activeFilter = "workout";
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/journal/home-screen.feature:Filter entries by kind
     Then("only workout entries are shown", () => {
       const visible = filterEntries(entries, activeFilter);
       expect(visible.length).toBe(2);
@@ -110,6 +112,7 @@ describeFeature(feature, ({ Scenario }) => {
       selectedEntry = null;
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-app-web/gherkin/journal/home-screen.feature:Open entry detail sheet
     And("the entry detail sheet is closed", () => {
       expect(selectedEntry).toBeNull();
     });
