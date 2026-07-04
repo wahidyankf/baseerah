@@ -29,6 +29,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(h1Elements).toHaveLength(1);
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-www/gherkin/accessibility/accessibility.feature:Pages have proper heading hierarchy
     And("heading levels should not skip (no h1 followed by h3)", () => {
       const headings = screen.queryAllByRole("heading");
       const levels = headings.map((h) => parseInt(h.tagName.replace("H", ""), 10));
@@ -54,6 +55,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       });
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-www/gherkin/accessibility/accessibility.feature:Keyboard navigation works throughout the app
     And("focus indicators should be visible", () => {
       const buttons = screen.queryAllByRole("button");
       expect(buttons.length).toBeGreaterThan(0);
@@ -69,6 +71,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(document.body.textContent?.length).toBeGreaterThan(0);
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-www/gherkin/accessibility/accessibility.feature:Color contrast meets WCAG AA requirements
     And("all interactive elements should have sufficient contrast", () => {
       const buttons = screen.queryAllByRole("button");
       buttons.forEach((button) => {
@@ -89,6 +92,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       });
     });
 
+    // @covers specs/apps/organiclever/behavior/organiclever-www/gherkin/accessibility/accessibility.feature:ARIA attributes are properly used
     And("navigation landmarks should be properly labeled", () => {
       const main = screen.getByRole("main");
       expect(main).toBeInTheDocument();
