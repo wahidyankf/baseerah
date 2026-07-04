@@ -89,7 +89,7 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 — specs:coverage stubbed; web-ui scenario @covers-tag gaps land in Phase 1'"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate specs/libs/web-ui/behavior/gherkin libs/web-ui"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/libs/web-ui/behavior/gherkin/**/*.feature", "{projectRoot}/src/**/*.{ts,tsx}"]
