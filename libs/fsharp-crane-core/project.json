@@ -78,12 +78,13 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 — specs:coverage stubbed; fsharp-crane-core scenario @covers-tag gaps land in Phase 1'"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/libs/fsharp-crane-core/behavior/gherkin libs/fsharp-crane-core"
       },
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/libs/fsharp-crane-core/behavior/gherkin/**/*.feature",
-        "{projectRoot}/src/**/*.fs"
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/tests/**/*.fs"
       ]
     },
     "specs:structure-validation": {

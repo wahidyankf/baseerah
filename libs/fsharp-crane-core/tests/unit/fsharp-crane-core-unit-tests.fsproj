@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Tests/ConvertTests.fs" />
+    <Compile Include="Tests/PdfToMarkdownRoutingSteps.fs" />
+    <Compile Include="Tests/PdfToMarkdownRoutingFeatureRunner.fs" />
     <Compile Include="Tests/DomainTests.fs" />
     <Compile Include="Tests/TextCheckerTests.fs" />
     <Compile Include="Tests/HeadingCheckerTests.fs" />
@@ -25,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageReference Include="TickSpec" Version="2.0.4" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -49,4 +51,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="CopyGherkinSpecs" BeforeTargets="Build">
+    <ItemGroup>
+      <GherkinFiles Include="$(ProjectDir)..\..\..\..\specs\libs\fsharp-crane-core\behavior\gherkin\**\*.feature" />
+    </ItemGroup>
+    <Copy SourceFiles="@(GherkinFiles)" DestinationFolder="$(OutputPath)specs\%(RecursiveDir)" />
+  </Target>
 </Project>
