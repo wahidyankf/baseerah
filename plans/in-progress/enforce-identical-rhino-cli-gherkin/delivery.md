@@ -997,30 +997,48 @@ validate` command (output does not contain the string `stub`) — proving the pr
 
 ## Phase 4 — Propagate to ose-infra
 
-- [ ] [AI] Copy canonical `apps/rhino-cli/` from ose-public into
+- [x] [AI] Copy canonical `apps/rhino-cli/` from ose-public into
       `/Users/wkf/ose-projects/ose-infra/apps/rhino-cli/` (same exclusions). Command:
       `rsync -a --delete --exclude=target --exclude=dist --exclude=cover.out --exclude=lcov.info
 /Users/wkf/ose-projects/ose-public/apps/rhino-cli/ /Users/wkf/ose-projects/ose-infra/apps/rhino-cli/`.
       Acceptance: `diff -rq` shows only untracked-artifact/README differences.
-- [ ] [AI] Sync infra's gherkin tree to canonical (`.feature` + behaviour-`README.md`). Since infra's
+      **Done 2026-07-04.** Rsynced clean; infra's own README.md diverges intentionally (outside the
+      strict byte-identity boundary) — its one dangling link to a public-only migration plan doc was
+      removed.
+- [x] [AI] Sync infra's gherkin tree to canonical (`.feature` + behaviour-`README.md`). Since infra's
       `.feature` set was already identical to public pre-plan, this applies the de-hollow/gap-fill deltas.
       Command: `rsync -a --delete
 /Users/wkf/ose-projects/ose-public/specs/apps/rhino/behavior/rhino-cli/gherkin/
 /Users/wkf/ose-projects/ose-infra/specs/apps/rhino/behavior/rhino-cli/gherkin/`. Acceptance:
       `diff -rq` of the `.feature`+README set between public and infra is empty.
-- [ ] [AI] Propagate the boundary/workflow/AGENTS edits (`CLAUDE.md` needs no separate edit — it inherits
+      **Done 2026-07-04.** `diff -rq` empty; path-list diff empty.
+- [x] [AI] Propagate the boundary/workflow/AGENTS edits (`CLAUDE.md` needs no separate edit — it inherits
       automatically via its `@AGENTS.md` import) **and the pre-commit `repo-config validate`
       staged-gate step** into infra; run `npm run generate:bindings`. Acceptance: bindings synced; infra's
       `.husky/pre-commit` step is byte-identical to public's (accounting for infra's existing hook-mechanism
       divergence — the added step invokes the same `cargo run … repo-config validate`).
-- [ ] [AI] Run `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in ose-infra. Acceptance: exit 0, `0 skipped`.
+      **Done 2026-07-04.** AGENTS.md/sdlc-gate-standard.md gherkin-boundary clause, parity-planning
+      byte-identity-check bullet, pre-commit staged-gated step, pre-push line removal, and PR/main
+      `repo-config-validate` jobs (using infra's own `[self-hosted, linux, ose-infra-runner]` label,
+      not public's `ubuntu-latest`) all applied; `generate:bindings` ran clean.
+- [x] [AI] Run `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in ose-infra. Acceptance: exit 0, `0 skipped`.
+      **Done 2026-07-04.** Exit 0; 0 failed; 0 skipped; 1 pre-existing known-deferred `#[ignore]`
+      (same as public/primer — cucumber harness gap). Surfaced 2 genuine pre-existing governance-doc
+      drift bugs in `.claude/agents/repo-rules-checker.md` (stale `convention instruction-size
+  validate` command name — real command moved to the `harness` domain) and
+      `repo-governance/workflows/repo/repo-rules-quality-gate.md` (Step 0.5 preflight prose never
+      named "instruction-size" on the same line as "Step 0.5") — both fixed at the root cause.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `md5` manifest of infra's gherkin tree == `audit/06-canonical-manifest.md`. Acceptance: identical.
-- [ ] [AI] `sh .husky/pre-push` (ose-infra root) — exits 0 with `0 skipped`.
+- [x] [AI] `md5` manifest of infra's gherkin tree == `audit/06-canonical-manifest.md`. Acceptance: identical.
+      **Done 2026-07-04.** Path list + content diff both empty vs public.
+- [x] [AI] `sh .husky/pre-push` (ose-infra root) — exits 0 with `0 skipped`.
+      **Done 2026-07-04.** Exit 0; specs structure validate 0 findings; links valid; README index
+      passed; agents duplication 0 clusters. 3 commits pushed to `origin/main`
+      (a6332aae4, 47692f7e4, b264c5654).
 
 > **Pause Safety**: infra's rhino-cli + gherkin tree are byte-identical to public and fully enforcing;
 > infra passes its own pre-push. Safe to stop. To resume: `sh .husky/pre-push` (infra root).
