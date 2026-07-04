@@ -769,6 +769,29 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
 - **Milestone — all 3 `organiclever-*` app groups now done** (`organiclever-be`, `organiclever-app-web`,
   `organiclever-www`), matching their `ose-*` siblings. Remaining `ose-public` app batches:
   `ayokoding-www` trio, `ayokoding-cli`, `wahidyankf-www` + e2e, `crane-cli`.
+- **Finding — `ose-cli` and `ayokoding-cli` still had the Phase-0 "cucumber harness is future work"
+  stub.** Discovered while starting `ayokoding-cli`: an earlier batch (task #181) had added `@covers`
+  markers to `ose-cli`'s plain `assert_cmd` tests but never actually wired `specs:behavior:coverage` to
+  the real checker command. Migrated both to real cucumber-rs harnesses (`tests/links_check.rs`,
+  invoking the compiled binary via `assert_cmd` inside step functions), removed the now-redundant
+  duplicate plain tests, and wired both projects' `specs:behavior:coverage` to the real command.
+  `crane-cli` confirmed NOT affected (its coverage command was already real). **Done 2026-07-04.**
+  Commits `9c00661c0` (ose-cli), `fa492aaed` (ayokoding-cli) (ose-public), pushed to origin/main.
+- **`wahidyankf-www` + `wahidyankf-www-fe-e2e`.** **Root-cause fix, not just markers:**
+  `vitest.config.ts`'s `unit-fe` project had no `include` glob, silently falling back to vitest's
+  default (`**/*.{test,spec}.*`) which never matches `*.steps.ts` — all 7 BDD step files were pure
+  no-op stubs (`() => {}`) that vitest never even discovered or ran. Added the missing `include` glob
+  and wrote real render/assert implementations for all 29 scenarios against existing production code
+  (no production code touched). Tagged all 7 feature files' scenarios `@unit @e2e` and added 58
+  `@covers` markers. **Done 2026-07-04.** Commit `565bac667` (ose-public), pushed to origin/main.
+- **`ayokoding-www` + `ayokoding-www-be-e2e` + `ayokoding-www-fe-e2e`.** Tagged all 222 scenarios across
+  18 feature files spanning 3 Gherkin trees (`ayokoding-be` `@unit @e2e`, `ayokoding-build-tools`
+  `@unit`-only — no e2e consumer, `ayokoding-www` non-calculator `@unit @e2e`). Added 369 `@covers`
+  markers. **Finding (tracked, not fixed): `cost-of-living-calculator.feature` has a pre-existing e2e
+  gap** — `bddgen` in `ayokoding-www-fe-e2e` fails with 83 missing step definitions, meaning 37 of 127
+  calculator scenarios have no e2e implementation; all 37 have real unit-tier assertions, so tagged
+  `@unit`-only (honest) rather than falsely claiming `@e2e`. Needs a dedicated TDD follow-up to add the
+  missing Playwright steps. **Done 2026-07-04.** Commit `85392bc61` (ose-public), pushed to origin/main.
 
 ---
 
