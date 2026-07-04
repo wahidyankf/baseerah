@@ -144,9 +144,23 @@ that phase's commits — the prior commit is green (fail-on-skip + cross-check a
 is honest). The engine change (Phase 1) lands before any rollout batch, so rollout batches can be reverted
 independently of it.
 
-## 7. Open Questions
+## 7. Open Questions (resolved by Phase 0, 2026-07-04)
 
-- **Non-rhino behavior-coverage today** — does it pass vacuously or would it fail once markers are
-  required? Resolved in Phase 0. `[Unverified until Phase 0]`
-- **Per-tool JSON reporter availability** for the cross-check at each tool's pinned version — verified in
-  Phase 0 via `--help`/docs. `[Unverified until Phase 0]`
+- **Non-rhino behavior-coverage today** — **Resolved, identically in all three repos**: `specs:behavior:coverage`
+  passes genuinely, but via a legacy step-text pattern-matching scanner (`application::speccoverage`), never
+  touching the `@covers`-marker/per-level engine (`application::behavior_coverage::validator`) — which is
+  fully built and unit-tested but is dead code from the live command's perspective. Phase 1 wires this
+  engine into the live command rather than inventing it from scratch. See `audit/04-vacuity-*.md`.
+- **Per-tool JSON reporter availability** — **Resolved**: none of the 12 tier tools has a built-in
+  "fail-the-build-on-skip" flag; a custom guard (grep-based or JSON-reporter-parsing) is required for
+  every ecosystem. Surprises: cucumber-js's `--strict` flag does NOT catch undefined steps despite its own
+  `--help` text (empirically disproven); Kotlin/Gradle has JUnit XML reporting deliberately disabled
+  (a Gradle bug workaround); Cargo's JSON/JUnit test formats are nightly-only. See `audit/05-reporters-*.md`
+  for the full per-tool breakdown.
+- **New finding (not an original Open Question, but discovered during Phase 0)**: 18 of `ose-public`'s 26
+  `coverage.projects` registry entries have a `specs:` glob matching zero files on disk (stale/legacy
+  naming drift, e.g. `ose-www`'s glob assumes `behavior/www/` but the real directory is
+  `behavior/platform-web/`). Each mismatched project's real path was resolved via its own `project.json`
+  and documented in `audit/01-scenario-census-public.md`. This registry drift must be corrected (likely in
+  Phase 1, alongside the engine wiring) before the runtime cross-check can work correctly for those
+  18 projects.

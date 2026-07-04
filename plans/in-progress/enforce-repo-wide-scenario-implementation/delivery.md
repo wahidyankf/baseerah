@@ -60,42 +60,79 @@ flowchart TD
 > `0N-<name>-{public,primer,infra}.md` — either is acceptable as long as all three repos are covered and
 > the split is explicit).
 
-- [ ] [AI] Provision + toolchain in all three repos: `npm install && npm run doctor -- --fix` in
+- [x] [AI] Provision + toolchain in all three repos: `npm install && npm run doctor -- --fix` in
       `ose-public`, then the same in `ose-primer` and `ose-infra`. Acceptance: all tools OK in all three.
-- [ ] [AI] Confirm the dependency plan is archived: `test -d plans/done/*enforce-identical-rhino-cli-gherkin`
+      **Done 2026-07-04.** 13/13 tools OK in all three repos.
+- [x] [AI] Confirm the dependency plan is archived: `test -d plans/done/*enforce-identical-rhino-cli-gherkin`
       in `ose-public` (the dependency plan is `ose-public`-authored only). Acceptance: present; otherwise STOP.
-- [ ] [AI] **Scenario census (3 repos)**: per project in each repo's own `repo-config.yml`
+      **Done 2026-07-04.** Present at `plans/done/2026-07-04__enforce-identical-rhino-cli-gherkin/`.
+- [x] [AI] **Scenario census (3 repos)**: per project in each repo's own `repo-config.yml`
       `coverage.projects` (26 in `ose-public`, 25 in `ose-primer`, 8 in `ose-infra`), count scenarios +
       current level tags → `audit/01-scenario-census.md`. Acceptance: every eligible project in all three
       repos has a row (59 rows total).
-- [ ] [AI] **@covers adoption census (3 repos)**: `git grep -l "@covers " -- apps libs` grouped by project,
+      **Done 2026-07-04.** Delegated to 3 parallel agents (one per repo); written as
+      `audit/01-scenario-census-{public,primer,infra}.md`. All 59 rows present. Totals: 816 scenarios
+      (`ose-public`), 529 (`ose-primer`), 352 deduped (`ose-infra`). **Major finding**: literal per-scenario
+      level tags (`@unit`/`@integration`/`@e2e`) are nearly absent repo-wide (21/816 in public, 13/529 in
+      primer, 13/352 in infra — all inside rhino-cli's own meta-specs) — every other project relies
+      entirely on the `coverage.projects` registry's `levels:` field, not per-scenario tags. **Second major
+      finding**: 18 of `ose-public`'s 26 registry entries have a `specs:` glob that matches **zero files on
+      disk** (e.g. `ose-www`'s `specs/apps/ose/behavior/www/**` — the real directory is
+      `specs/apps/ose/behavior/platform-web/`) — a pre-existing `repo-config.yml` drift bug, independently
+      verified. Each mismatched project's real specs path was resolved via its own `project.json` and
+      documented in the census.
+- [x] [AI] **@covers adoption census (3 repos)**: `git grep -l "@covers " -- apps libs` grouped by project,
       run in each repo → `audit/02-covers-adoption.md`. Acceptance: reproduces the rhino-cli-only finding
       (or its correction) per repo.
-- [ ] [AI] **Per-tier skip inventory (3 repos)**: find `.skip`/`.only`/`.todo` (Jest/Vitest/Playwright), F#
+      **Done 2026-07-04.** Written as `audit/02-covers-adoption-{public,primer,infra}.md`. Confirmed in all
+      three: `@covers` markers exist only inside `apps/rhino-cli/` itself (self-testing its own coverage
+      engine's meta-specs), 0 adoption in any other project.
+- [x] [AI] **Per-tier skip inventory (3 repos)**: find `.skip`/`.only`/`.todo` (Jest/Vitest/Playwright), F#
       `Skip =`/ignored tests, undefined cucumber steps, and — in `ose-primer` — the language-specific skip
       markers from tech-docs.md §3.1 (Kaocha pending metadata, ExUnit `@tag :skip`, Go `t.Skip()`, JUnit5
       `@Disabled`, pytest `@pytest.mark.skip`, Cargo `#[ignore]`, Dart `skip:`, cucumber-js
       undefined/pending steps), across each repo → `audit/03-skip-inventory.md`. Acceptance: the backlog
       of currently-skipped tests is quantified per repo.
-- [ ] [AI] **behavior-coverage vacuity check (3 repos)**: in `ose-public`, run
+      **Done 2026-07-04.** Written as `audit/03-skip-inventory-{public,primer,infra}.md`. Backlog is nearly
+      empty across all 3 repos and all 12 ecosystems (0 skips/ignores/disables everywhere checked). One
+      real exception found: `ose-primer`'s `crud-be-ts-effect` cucumber-js suite has 20 undefined steps
+      across 4 scenarios (reproduced by direct execution).
+- [x] [AI] **behavior-coverage vacuity check (3 repos)**: in `ose-public`, run
       `nx run organiclever-be:specs:behavior:coverage` (a non-rhino sample); in `ose-primer`, run
       `nx run crud-be-rust-axum:specs:behavior:coverage` (or any other non-rhino project); in `ose-infra`,
       run `nx run coralpolyp-be:specs:behavior:coverage`; record whether each passes vacuously (no
       markers) or fails → `audit/04-vacuity.md`. Acceptance: Open Question in tech-docs §7 resolved for
       all three repos.
-- [ ] [AI] **Reporter availability (3 repos, all language ecosystems)**: for each tier tool in
+      **Done 2026-07-04.** Written as `audit/04-vacuity-{public,primer,infra}.md`. Open Question resolved
+      **identically in all three repos**: `specs:behavior:coverage` passes genuinely, but via a legacy
+      step-text pattern-matching scanner (`application::speccoverage`) — NOT via the `@covers`-marker/
+      per-level engine (`application::behavior_coverage::validator`), which is fully built and unit-tested
+      but is **dead code from the live command's perspective** (confirmed by tracing the call path and by
+      an in-repo doc-comment admission at `apps/rhino-cli/tests/specs_tree.rs:6-16`). This confirms Phase
+      1's premise precisely: the engine needs **wiring into the live command**, not invention from scratch.
+- [x] [AI] **Reporter availability (3 repos, all language ecosystems)**: for each tier tool in
       tech-docs.md §3.1's table (cucumber-rs, Jest/Vitest, Playwright, .NET xunit, Cargo `#[ignore]`,
       cucumber-js, Kaocha, ExUnit, Go `testing`, JUnit5, pytest, Dart/Flutter `test`), confirm a
       machine-readable (JSON/TRX) reporter + the fail-on-skip flag or grep-guard approach via
       `--help`/docs → `audit/05-reporters.md`. Acceptance: per-tool mechanism confirmed (verified, not
       assumed) for every ecosystem present in any of the three repos.
+      **Done 2026-07-04.** Written as `audit/05-reporters-{public,primer,infra}.md`. All 12 tools verified
+      via real `--help`/docs/empirical runs — **no tool has a built-in "fail the build on skip" flag**; a
+      custom guard (grep-based or JSON-reporter-based) is required for every ecosystem. Notable surprises:
+      cucumber-js's `--strict` flag does NOT catch undefined steps despite its own `--help` text claiming
+      otherwise (empirically proven 3 ways); Kotlin/Gradle has JUnit XML reporting **deliberately disabled**
+      (a Gradle bug workaround); Cargo's JSON/JUnit test output formats are nightly-only.
 
 ### Phase 0 Gate
 
-- [ ] [AI] Per repo: `nx affected -t test:quick,lint,typecheck --base=origin/main` — exits 0 in
+- [x] [AI] Per repo: `nx affected -t test:quick,lint,typecheck --base=origin/main` — exits 0 in
       `ose-public`, `ose-primer`, and `ose-infra`.
-- [ ] [AI] All five `audit/0*.md` committed (in `ose-public`, since this plan is authored there); each
+      **Done 2026-07-04.** All three: "No tasks were run" (exit 0) — Phase 0 is audit-only, no code
+      changed yet.
+- [x] [AI] All five `audit/0*.md` committed (in `ose-public`, since this plan is authored there); each
       covers all three repos explicitly; the rollout backlog is sized per repo.
+      **Done 2026-07-04.** 15 files committed (5 deliverables × 3 repos, split as
+      `0N-<name>-{public,primer,infra}.md` per the plan's own "either is acceptable" clause).
 
 > **Pause Safety**: audit-only, no behaviour change. Safe to stop. To resume: re-run the census commands
 > in all three repos.
