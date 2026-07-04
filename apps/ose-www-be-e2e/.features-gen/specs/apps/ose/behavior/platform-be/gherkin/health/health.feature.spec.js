@@ -7,7 +7,7 @@ test.describe('Health Check', () => {
     await Given('the API is running'); 
   });
   
-  test('Health endpoint returns ok status', async ({ When, Then, request }) => { 
+  test('Health endpoint returns ok status', { tag: ['@unit', '@e2e'] }, async ({ When, Then, request }) => { 
     await When('the health endpoint is called', null, { request }); 
     await Then('the response contains status "ok"'); 
   });
@@ -23,5 +23,5 @@ test.use({
 });
 
 const bddFileData = [ // bdd-data-start
-  {"pwTestLine":10,"pickleLine":9,"tags":[],"steps":[{"pwStepLine":7,"gherkinStepLine":7,"keywordType":"Context","textWithKeyword":"Given the API is running","isBg":true,"stepMatchArguments":[]},{"pwStepLine":11,"gherkinStepLine":10,"keywordType":"Action","textWithKeyword":"When the health endpoint is called","stepMatchArguments":[]},{"pwStepLine":12,"gherkinStepLine":11,"keywordType":"Outcome","textWithKeyword":"Then the response contains status \"ok\"","stepMatchArguments":[{"group":{"start":29,"value":"\"ok\"","children":[{"start":30,"value":"ok","children":[{"children":[]}]},{"children":[{"children":[]}]}]},"parameterTypeName":"string"}]}]},
+  {"pwTestLine":10,"pickleLine":10,"tags":["@unit","@e2e"],"steps":[{"pwStepLine":7,"gherkinStepLine":7,"keywordType":"Context","textWithKeyword":"Given the API is running","isBg":true,"stepMatchArguments":[]},{"pwStepLine":11,"gherkinStepLine":11,"keywordType":"Action","textWithKeyword":"When the health endpoint is called","stepMatchArguments":[]},{"pwStepLine":12,"gherkinStepLine":12,"keywordType":"Outcome","textWithKeyword":"Then the response contains status \"ok\"","stepMatchArguments":[{"group":{"start":29,"value":"\"ok\"","children":[{"start":30,"value":"ok","children":[{"children":[]}]},{"children":[{"children":[]}]}]},"parameterTypeName":"string"}]}]},
 ]; // bdd-data-end
