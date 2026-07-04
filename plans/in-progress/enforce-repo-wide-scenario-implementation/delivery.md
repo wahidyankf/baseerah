@@ -684,6 +684,33 @@ harness = false`) wiring both `check-links.feature` scenarios to the real
   `web-ui`, `fsharp-crane-core` (`ose-public`); `golang-commons`, `ts-ui`, `clojure-openapi-codegen`,
   `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` (`ose-primer`); `ts-ui`,
   `ts-ui-tokens` (`ose-infra`).
+- **`web-ui` (`ose-public`) — already migrated, just needed wiring.** Discovered all 18 components
+  already had a real `@amiceli/vitest-cucumber` harness (`*.steps.tsx`, `loadFeature`/`describeFeature`
+  loading each `.feature` file directly and binding literal Given/When/Then step text to real component
+  render/assert logic) from prior work — only `specs:behavior:coverage` was still a Phase-0 stub. Wired
+  it to the real checker command; confirmed default one-to-one mode passes cleanly (each component's
+  feature file has a correspondingly-named `.steps.tsx` file). Full `test:quick` green: 18 specs, 86
+  scenarios, 204 steps, all covered. **Done 2026-07-04.** Commit `90cbba5c8` (ose-public), pushed to
+  origin/main.
+- **`fsharp-crane-core` (`ose-public`) — migrated to TickSpec.** Added `PdfToMarkdownRoutingSteps.fs` +
+  `PdfToMarkdownRoutingFeatureRunner.fs` (TickSpec 2.0.4, same package already used by
+  `crud-be-fsharp-giraffe`) wiring both `pdf-to-markdown-routing.feature` scenarios to the real
+  `CraneCore.Convert.convertPdfToMarkdown` via a `RecordingPdfPort`/`RecordingOcrPort` that assert which
+  port method actually fired — stronger than the prior plain-xunit tests (return-value-only), which were
+  removed as redundant. Removed stale `@wip`, added `@unit`. Root cause of an initial file-name mismatch:
+  default one-to-one mode requires the test file's stem to match the feature file's stem, so the steps/
+  runner files were renamed to start with the PascalCase feature stem (`PdfToMarkdownRouting...`); this
+  then surfaced the REAL root cause — `checker.rs`'s `extract_scenario_titles` treats `.fs`/`.exs`/`.clj`
+  as "auto-bind frameworks" and always returns an empty title set for them (matching
+  `crud-be-fsharp-giraffe`/`crud-be-clojure-pedestal`/`crud-be-elixir-phoenix`, all of which use
+  `--shared-steps`), so one-to-one mode's scenario-gap check can never pass for these 3 languages
+  regardless of file naming — switched `specs:behavior:coverage` to `--shared-steps` (the correct mode
+  for this language, not a workaround). Full `test:quick` green. **Done 2026-07-04.** Commit `8f39aa2c5`
+  (ose-public), pushed to origin/main.
+- **Milestone — all 3 of `ose-public`'s plain-test-runner libs now migrated** (`rust-commons`, `web-ui`,
+  `fsharp-crane-core`). Remaining of the 10: `golang-commons`, `ts-ui`, `clojure-openapi-codegen`,
+  `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` (`ose-primer`); `ts-ui`,
+  `ts-ui-tokens` (`ose-infra`).
 
 ---
 
