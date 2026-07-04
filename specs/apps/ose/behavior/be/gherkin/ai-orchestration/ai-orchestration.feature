@@ -4,6 +4,7 @@ Feature: AI orchestration context
   So that the bounded context boundary is established for future feature plans
 
   # Stub — detailed scenarios added in ai-orchestration feature plan
+  @unit
   Scenario: AI orchestration context is declared
     Given the ose-be service is running
     When the ai-orchestration bounded context is initialized

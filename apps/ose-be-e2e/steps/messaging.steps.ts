@@ -35,6 +35,7 @@ Then("the NATS connection is established", async ({ request }) => {
   expect(resp.ok()).toBeTruthy();
 });
 
+// @covers specs/apps/ose/behavior/be/gherkin/messaging/nats-connect.feature:ose-be connects to its NATS server at startup
 Then("the backend reports healthy after connecting", async ({ request }) => {
   const resp = await request.get("/api/v1/health");
   expect(resp.ok()).toBeTruthy();
@@ -51,6 +52,7 @@ Then("the message is acknowledged", async ({ request }) => {
   expect(body["jetstream_demo"]).not.toBe("pending");
 });
 
+// @covers specs/apps/ose/behavior/be/gherkin/messaging/jetstream-demo.feature:ose-be publishes and durably consumes its demo subject with ack
 Then("the messaging status surface reports the demo delivered and acked", async ({ request }) => {
   const resp = await request.get("/api/v1/system/status/messaging");
   const body = (await resp.json()) as Record<string, string>;

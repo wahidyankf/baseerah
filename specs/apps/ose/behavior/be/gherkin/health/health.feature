@@ -3,6 +3,7 @@ Feature: BE health endpoint
   I want the BE to advertise liveness
   So that orchestrators can route traffic only to healthy instances
 
+  @unit @e2e
   Scenario: Health endpoint returns 200
     Given the ose-be service is running
     When I send GET /api/v1/health

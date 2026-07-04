@@ -4,6 +4,7 @@ Feature: Gap analysis context
   So that the bounded context boundary is established for future feature plans
 
   # Stub — detailed scenarios added in gap-analysis feature plan
+  @unit
   Scenario: Gap analysis context is declared
     Given the ose-be service is running
     When the gap-analysis bounded context is initialized

@@ -26,6 +26,7 @@ Then("the response status is {int}", async ({}, expectedStatus: number) => {
   expect(getResponse().status()).toBe(expectedStatus);
 });
 
+// @covers specs/apps/ose/behavior/be/gherkin/health/health.feature:Health endpoint returns 200
 Then(
   "the response body has a {string} field equal to {string}",
   // oxlint-disable-next-line no-empty-pattern

@@ -4,6 +4,7 @@ Feature: Regulatory source context
   So that the bounded context boundary is established for future feature plans
 
   # Stub — detailed scenarios added in regulatory-source feature plan
+  @unit
   Scenario: Regulatory source context is declared
     Given the ose-be service is running
     When the regulatory-source bounded context is initialized
