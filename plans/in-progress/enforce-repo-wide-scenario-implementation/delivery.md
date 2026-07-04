@@ -966,16 +966,18 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
 
 ### Final Gate
 
-- [x] [AI] **Non-negotiable completion criterion — plain-test-runner lib BDD migration**: 12 lib batches
-      (corrected from an initial miscount of 10 — `rust-commons`, `web-ui`, `fsharp-crane-core` in
-      `ose-public`; `golang-commons`, `ts-ui`, `clojure-openapi-codegen`, `elixir-openapi-codegen`,
-      `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` in `ose-primer`; `ts-ui`, `ts-ui-tokens` in
-      `ose-infra`) used plain unit-test runners with no BDD step-registration framework, so
-      `checker::check_all`'s step-text matching structurally could not pass for them regardless of correct
-      `@covers` markers (discovered while working `elixir-openapi-codegen`; confirmed by direct grill with
-      the user 2026-07-04 — decision: migrate, not exempt or patch the checker). **DONE 2026-07-04: all 12
+- [x] [AI] **Non-negotiable completion criterion — plain-test-runner lib BDD migration**: 13 lib batches
+      (corrected twice — first from an initial miscount of 10 to 12, then from 12 to 13 when the Plan
+      Archival no-defer audit found one more the census had missed — `rust-commons`, `web-ui`,
+      `web-ui-token`, `fsharp-crane-core` in `ose-public`; `golang-commons`, `ts-ui`,
+      `clojure-openapi-codegen`, `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`,
+      `ts-ui-tokens` in `ose-primer`; `ts-ui`, `ts-ui-tokens` in `ose-infra`) used plain unit-test runners
+      with no BDD step-registration framework, so `checker::check_all`'s step-text matching structurally
+      could not pass for them regardless of correct `@covers` markers (discovered while working
+      `elixir-openapi-codegen`; confirmed by direct grill with the user 2026-07-04 — decision: migrate,
+      not exempt or patch the checker). **DONE 2026-07-04: all 13
       migrated to a real BDD framework** (cucumber-rs for `rust-commons`; `@amiceli/vitest-cucumber` for
-      `web-ui`, `ts-ui` ×2, `ts-ui-tokens` ×2; TickSpec for `fsharp-crane-core`; godog for
+      `web-ui`, `web-ui-token`, `ts-ui` ×2, `ts-ui-tokens` ×2; TickSpec for `fsharp-crane-core`; godog for
       `golang-commons`; Kaocha-cucumber for `clojure-openapi-codegen`; Cabbage for
       `elixir-openapi-codegen`/`elixir-cabbage`; a hand-rolled macro-based registry mimicking Cabbage's
       call shape for `elixir-gherkin`, to avoid its circular-dependency-on-Cabbage problem) — every one
@@ -991,23 +993,31 @@ DbMigrationSteps.fs` are dead TickSpec step bindings — no `FeatureRunner.fs` w
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery items ticked and ALL gates pass (local + CI, all three repos), **including
-      the 12-lib BDD-framework migration above** — this plan may not be archived with any of them still
-      stubbed or plain-test-only.
-- [ ] [AI] Verify **zero deferrals** repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no
-      marker-without-a-real-test anywhere (`audit/07-no-defer-proof.md` shows a clean grep).
+- [x] [AI] Verify ALL delivery items ticked and ALL gates pass (local + CI, all three repos), **including
+      the 13-lib BDD-framework migration above** — this plan may not be archived with any of them still
+      stubbed or plain-test-only. **Done 2026-07-04**: all Final Phase items ticked above; all 3 repos'
+      CI confirmed green (see Final Phase entries).
+- [x] [AI] Verify **zero deferrals** repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no
+      marker-without-a-real-test anywhere (`audit/07-no-defer-proof.md` shows a clean grep). **Done
+      2026-07-04**: `audit/07-no-defer-proof.md` written. The sweep found one genuine 13th
+      plain-test-runner lib the earlier census had missed (`web-ui-token`, `ose-public`) — fixed at the
+      root in this same gate (see the Batch Progress Log entry above), not deferred. Every other hit
+      (rhino-cli's own `@wip`-exemption dogfood spec, 9 paired-project e2e no-ops, 3
+      `@local-fullstack`-tag-partitioned `$test.skip()` calls) confirmed a legitimate non-gap.
 - [ ] [AI] Move plan: `git mv plans/in-progress/enforce-repo-wide-scenario-implementation plans/done/<completion-date>__enforce-repo-wide-scenario-implementation`.
 - [ ] [AI] Update `plans/in-progress/README.md` (remove entry) + `plans/done/README.md` (add entry).
 - [ ] [AI] Commit: `chore(plans): move enforce-repo-wide-scenario-implementation to done`.
 
 ## Validation Checklist
 
-- [ ] All TDD cycles complete for the engine cross-check (RED→GREEN→REFACTOR)
-- [ ] Every tier fails on skip/only/todo (proofs committed)
-- [ ] `behavior-coverage` runtime cross-check live and wired to pre-push + CI
-- [ ] `@covers` + level tags on every eligible app/lib; `behavior-coverage` non-vacuous
-- [x] **All 12 plain-test-runner libs migrated to a real BDD framework** (`rust-commons`, `web-ui`,
-      `fsharp-crane-core`, `golang-commons`, `ts-ui` ×2, `clojure-openapi-codegen`,
+- [x] All TDD cycles complete for the engine cross-check (RED→GREEN→REFACTOR)
+- [x] Every tier fails on skip/only/todo (proofs committed — `audit/06-fail-on-skip-proof.md`)
+- [x] `behavior-coverage` runtime cross-check live and wired to pre-push + CI
+- [x] `@covers` + level tags on every eligible app/lib; `behavior-coverage` non-vacuous
+- [x] **All 13 plain-test-runner libs migrated to a real BDD framework** (corrected from 12 — the
+      Plan Archival no-defer audit found one more the census missed: `rust-commons`, `web-ui`,
+      `web-ui-token`, `fsharp-crane-core`, `golang-commons`, `ts-ui` ×2, `clojure-openapi-codegen`,
       `elixir-openapi-codegen`, `elixir-cabbage`, `elixir-gherkin`, `ts-ui-tokens` ×2) — no stubs remain
-- [ ] Engine byte-identical across the three repos; all three repos' CI green
-- [ ] Zero deferrals repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no marker-without-a-real-test
+- [x] Engine byte-identical across the three repos; all three repos' CI green
+- [x] Zero deferrals repo-wide: no `@wip`, no `.skip`/`.only`/`.todo`, no marker-without-a-real-test
+      (`audit/07-no-defer-proof.md`)
