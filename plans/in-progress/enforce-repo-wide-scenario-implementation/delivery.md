@@ -142,15 +142,26 @@ flowchart TD
 ## Phase 1 — behavior-coverage runtime cross-check (engine)
 
 > Suggested executor: `swe-rust-dev`. rhino-cli's own now-enforcing suite is the first consumer.
+>
+> **Corrected integration point (Phase 0 finding, `audit/04-vacuity-*.md`)**: the live
+> `specs behavior-coverage validate` command dispatches
+> `cli.rs`'s `SpecsBehaviorCoverageCommands::Validate` → `commands::specs_coverage::run` →
+> `application::speccoverage::checker::check_all` — it never calls
+> `application::behavior_coverage::validator`, which is fully built, unit-tested, and **dead code** from
+> the live command's perspective. The steps below wire the runtime cross-check into the LIVE path
+> (`commands::specs_coverage::run` / `application::speccoverage`), not the parallel dead module.
 
 - [ ] [AI] **RED**: add a new scenario to
       `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/behavior-coverage.feature` ("a scenario with a
       valid `@covers` marker whose covering test was skipped at runtime FAILS `behavior-coverage`") and a
-      matching failing `#[test]` in the `mod tests` block of
-      `apps/rhino-cli/src/application/behavior_coverage/validator.rs` (sibling to `mod.rs`/`types.rs`),
-      tagged `// @covers specs/apps/rhino/behavior/rhino-cli/gherkin/specs/behavior-coverage.feature:<scenario
-title>`. Command: `cargo test -p rhino-cli`. Acceptance: new test fails (cross-check not
-      implemented).
+      matching failing integration test in `apps/rhino-cli/tests/spec_coverage.rs` (the existing
+      cucumber-rs binary bound to this feature file — NOT a unit test inside
+      `application/behavior_coverage/validator.rs`, since that module is not on the live call path) that
+      invokes the real `rhino-cli specs behavior-coverage validate` CLI end-to-end against a fixture repo
+      containing a `@covers`-marked scenario whose test is skipped at runtime, tagged
+      `// @covers specs/apps/rhino/behavior/rhino-cli/gherkin/specs/behavior-coverage.feature:<scenario
+title>`. Command: `cargo test -p rhino-cli --test spec_coverage`. Acceptance: new scenario fails
+      (cross-check not implemented; command currently only checks step-text traceability).
   - **Gherkin (binds) →** "A marked-but-unexecuted scenario fails the central gate" (AC-2)
 
     ```gherkin
@@ -161,14 +172,23 @@ title>`. Command: `cargo test -p rhino-cli`. Acceptance: new test fails (cross-c
       And the gate passes only when every @covers scenario executed and passed at each declared level
     ```
 
-- [ ] [AI] **GREEN**: implement the runtime cross-check in a new sibling file
-      `apps/rhino-cli/src/application/behavior_coverage/runtime_check.rs` (declared via
-      `pub mod runtime_check;` in `apps/rhino-cli/src/application/behavior_coverage/mod.rs`) — ingest each
-      tier's JSON run report and assert each `@covers` scenario executed AND passed at its level. Command:
-      same. Acceptance: new test passes; existing suite green.
-- [ ] [AI] **REFACTOR**: factor the per-tier report parsers behind one trait in
-      `apps/rhino-cli/src/application/behavior_coverage/runtime_check.rs`. Command: same. Acceptance: all
-      green.
+- [ ] [AI] **GREEN**: implement the runtime cross-check as a new function in
+      `apps/rhino-cli/src/application/speccoverage/checker.rs` (or a new sibling file
+      `apps/rhino-cli/src/application/speccoverage/runtime_check.rs`, declared via
+      `pub mod runtime_check;` in `apps/rhino-cli/src/application/speccoverage/mod.rs` if kept separate),
+      invoked from `commands::specs_coverage::run` immediately after the existing
+      `checker::check_all` traceability check — ingest each tier's JSON run report and assert each
+      `@covers` scenario executed AND passed at its level, failing the command if not. The existing
+      per-level `@covers`-parsing types/logic already built in
+      `apps/rhino-cli/src/application/behavior_coverage/` MAY be reused/imported by this new code (it is
+      correct, just previously unreachable) — do not duplicate it from scratch. Command: same. Acceptance:
+      new scenario passes; existing suite green; `specs behavior-coverage validate` now genuinely fails on
+      a marked-but-skipped scenario (manually verify with a throwaway fixture, then revert the fixture).
+- [ ] [AI] **REFACTOR**: factor the per-tier report parsers behind one trait, and reconcile/merge the
+      `application::behavior_coverage` module's per-level matching logic with `application::speccoverage`'s
+      traceability logic — do not leave two structurally similar, uncoordinated coverage engines. Command:
+      same. Acceptance: all green; `cargo clippy` reports no new dead-code warnings for the reconciled
+      modules.
 - [ ] [AI] Regenerate the golden-master: `cargo test --release -p rhino-cli --test golden_master` (per
       `enforce-identical-rhino-cli-gherkin/delivery.md` §"1i. Regenerate golden-master"); review the diff
       for intent before freezing. Propagate the byte-identical `apps/rhino-cli/` to ose-primer and

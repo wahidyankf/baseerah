@@ -91,7 +91,22 @@ grep-based guard follows the same pattern already proven for `ose-public`'s F# `
 
 ### 3.2 Central runtime cross-check (CI, authoritative)
 
-Upgrade `rhino-cli specs behavior-coverage` (or add `specs behavior-coverage verify-run`) to:
+**Corrected integration point (found in Phase 0, `audit/04-vacuity-*.md`)**: the live
+`specs behavior-coverage validate` command (`SpecsBehaviorCoverageCommands::Validate` in `cli.rs`)
+dispatches to `commands::specs_coverage::run`, which calls `application::speccoverage::checker::check_all`
+— a step-text pattern-matching scanner that checks **traceability** (a matching step implementation
+exists) but never touches `application::behavior_coverage::validator` (the per-scenario `@covers`-marker/
+level engine this plan's README/prd describe). That module is fully built, unit-tested, and **dead code**
+from the live command's perspective (confirmed by tracing the call path and by an in-repo doc-comment
+admission at `apps/rhino-cli/tests/specs_tree.rs:6-16`). The original plan text below ("upgrade
+`rhino-cli specs behavior-coverage`") is still directionally correct, but the RED/GREEN/REFACTOR steps in
+`delivery.md` Phase 1 target the correct integration point: **wire the runtime cross-check into
+`commands::specs_coverage::run`'s call path** (either as a new step inside
+`application::speccoverage::checker::check_all`, or as a sibling pass invoked right after it — implementer's
+choice during Phase 1's REFACTOR, but it MUST be reachable from the live command, not left as a
+second, parallel, uninvoked module).
+
+Upgrade the live command to:
 
 1. Read each tier's **machine-readable run report** (prefer JSON: Jest/Vitest JSON reporter, Playwright
    JSON reporter, cucumber-rs output, F# TRX/JSON).
