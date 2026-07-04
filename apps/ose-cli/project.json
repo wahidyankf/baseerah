@@ -98,10 +98,14 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 — specs:coverage stubbed; cucumber harness is future work'"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/ose/behavior/ose-cli/gherkin apps/ose-cli"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{projectRoot}/tests/**/*.rs",
+        "{workspaceRoot}/specs/apps/ose/behavior/ose-cli/gherkin/**/*.feature"
+      ]
     },
     "test:e2e": {
       "executor": "nx:run-commands",
