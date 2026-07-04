@@ -151,7 +151,7 @@ flowchart TD
 > the live command's perspective. The steps below wire the runtime cross-check into the LIVE path
 > (`commands::specs_coverage::run` / `application::speccoverage`), not the parallel dead module.
 
-- [ ] [AI] **RED**: add a new scenario to
+- [x] [AI] **RED**: add a new scenario to
       `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/behavior-coverage.feature` ("a scenario with a
       valid `@covers` marker whose covering test was skipped at runtime FAILS `behavior-coverage`") and a
       matching failing integration test in `apps/rhino-cli/tests/spec_coverage.rs` (the existing
@@ -172,7 +172,26 @@ title>`. Command: `cargo test -p rhino-cli --test spec_coverage`. Acceptance: ne
       And the gate passes only when every @covers scenario executed and passed at each declared level
     ```
 
-- [ ] [AI] **GREEN**: implement the runtime cross-check as a new function in
+  - **Done 2026-07-04.** **Further integration-point correction found while implementing** (the kind
+    Phase 0's own note anticipated): `gherkin/specs/behavior-coverage.feature` is bound to
+    `tests/specs_tree.rs`, which drives `application::behavior_coverage::validator::validate` **in-process**
+    (never spawns the CLI) — not `tests/spec_coverage.rs`, which is bound instead to the sibling directory
+    `gherkin/spec-coverage/spec-coverage-validate.feature` and drives the compiled `rhino-cli` binary as a
+    real subprocess (`assert_cmd::cargo::cargo_bin`), asserting on stdout/exit code. Since the acceptance
+    criteria explicitly require driving the real CLI end-to-end (not the internal engine), the 3 new
+    scenarios below were added to `gherkin/spec-coverage/spec-coverage-validate.feature` instead, with
+    `tests/spec_coverage.rs`'s new step fns carrying `@covers` markers pointing at that corrected path.
+    Added 3 scenarios, not 1 (RED's minimum): "A marked-but-unexecuted scenario fails the runtime
+    cross-check" (the not-executed case), "A marked-but-failed scenario fails the runtime cross-check"
+    (executed-but-failed), and "A marked-and-passed scenario passes the runtime cross-check" (the positive
+    control, proving the check isn't vacuously always-fail). All 3 drive `rhino-cli specs behavior-coverage
+validate` in three-level mode (`--unit-dir`/`--integration-dir`/`--e2e-dir`) plus new
+    `--unit-report`/`--integration-report`/`--e2e-report` flags (didn't exist pre-GREEN) pointing at a
+    JSON run-report fixture. Verified genuine RED by `git stash`-ing every `src/` change (keeping the test
+    and feature-file additions) and re-running: all 3 new scenarios failed (`--unit-report` unrecognized by
+    clap, exit 2) while the 6 pre-existing scenarios stayed green; `git stash pop` restored GREEN.
+
+- [x] [AI] **GREEN**: implement the runtime cross-check as a new function in
       `apps/rhino-cli/src/application/speccoverage/checker.rs` (or a new sibling file
       `apps/rhino-cli/src/application/speccoverage/runtime_check.rs`, declared via
       `pub mod runtime_check;` in `apps/rhino-cli/src/application/speccoverage/mod.rs` if kept separate),
@@ -184,12 +203,45 @@ title>`. Command: `cargo test -p rhino-cli --test spec_coverage`. Acceptance: ne
       correct, just previously unreachable) — do not duplicate it from scratch. Command: same. Acceptance:
       new scenario passes; existing suite green; `specs behavior-coverage validate` now genuinely fails on
       a marked-but-skipped scenario (manually verify with a throwaway fixture, then revert the fixture).
-- [ ] [AI] **REFACTOR**: factor the per-tier report parsers behind one trait, and reconcile/merge the
+  - **Done 2026-07-04.** Implemented as the sibling file `application/speccoverage/runtime_check.rs`
+    (`TierInput`, `check_runtime`), wired into a new `commands::specs_coverage::run_three_level` pass
+    (`check_runtime_cross_check`) that runs immediately after the per-level step-text loop — reachable
+    only in three-level mode (the only mode where "level" has concrete per-scenario meaning; confirmed via
+    `project.json` grep that zero real Nx targets use three-level mode today, so this is additive). Also
+    added `application/behavior_coverage/extract.rs` (new: `extract_covers_markers` scans a dir for
+    `// @covers <path>:<title>`-shaped lines regardless of comment syntax; `extract_scenario_specs` parses
+    `@unit`/`@integration`/`@e2e`/`@wip` tags from `.feature` files) — neither extraction existed before;
+    the existing `behavior_coverage` module only had hand-built-struct unit tests, never real file
+    parsing. Reused (not duplicated): `TestLevel`/`CoversMarker`/`ScenarioSpec`/`ProjectEnvelope` types and
+    `validator::validate`'s matching logic verbatim. **Also wired `validator::validate` itself into the
+    live command** (`check_covers_markers` in `commands/specs_coverage.rs`) — de-hollowing it fully, not
+    just its types. Both new checks are gated behind supplying at least one `--<level>-report` flag
+    (`covers_enabled` in `run_three_level`) — without this gate, the pre-existing
+    `three_level_passes_when_all_levels_covered` unit test (an untagged fixture scenario) would have newly
+    failed on `UntaggedScenario`; this was caught by running the full test suite before finalizing, per
+    Iron Rule 3. Verified: all 9 `spec_coverage` scenarios green, full `cargo test -p rhino-cli` green
+    (1139 passed, 1 pre-existing ignored, 0 regressions), manually confirmed the 3-scenario fixture set
+    exercises skip/fail/pass without needing a separate throwaway.
+- [x] [AI] **REFACTOR**: factor the per-tier report parsers behind one trait, and reconcile/merge the
       `application::behavior_coverage` module's per-level matching logic with `application::speccoverage`'s
       traceability logic — do not leave two structurally similar, uncoordinated coverage engines. Command:
       same. Acceptance: all green; `cargo clippy` reports no new dead-code warnings for the reconciled
       modules.
-- [ ] [AI] Regenerate the golden-master: `cargo test --release -p rhino-cli --test golden_master` (per
+  - **Done 2026-07-04.** Added `RunReportParser` trait + `JsonRunReportParser` impl (the only parser the
+    engine ships with today; opens the seam for a future `.NET` TRX/etc. parser without touching
+    `check_runtime`) and `check_runtime_with` (pluggable variant), proven by a second, non-JSON
+    `AlwaysPassedParser` test impl. Reconciled the two engines by making `commands::specs_coverage::run`
+    the single call site for all three checks (legacy step-text traceability, `@covers` marker-existence
+    via `validator::validate`, and the new runtime cross-check) — `application::behavior_coverage` is no
+    longer dead code from the live command's perspective. Corrected the now-stale doc-comment admission at
+    `tests/specs_tree.rs:1-16` (it used to assert the `@covers` engine was permanently CLI-unreachable;
+    updated to note the CLI now reaches it too, and that `specs_tree.rs`'s own in-process style is a
+    deliberate testing choice, not a workaround for unreachability). Promoted `TestLevel` to `Copy`
+    (clippy's `needless_pass_by_value`/`clone_on_copy` flagged the alternative), removing several
+    redundant `.clone()` calls in the pre-existing `validator.rs` too. `cargo clippy --all-targets -- -D
+warnings`: 0 issues. `cargo fmt --check`: clean. `cargo test -p rhino-cli`: 1139 passed, 1 ignored,
+    0 failed (both debug and `--release`).
+- [x] [AI] Regenerate the golden-master: `cargo test --release -p rhino-cli --test golden_master` (per
       `enforce-identical-rhino-cli-gherkin/delivery.md` §"1i. Regenerate golden-master"); review the diff
       for intent before freezing. Propagate the byte-identical `apps/rhino-cli/` to ose-primer and
       ose-infra using the dependency plan's exact Phase 3/Phase 4 commands. Command (ose-primer):
@@ -201,11 +253,40 @@ title>`. Command: `cargo test -p rhino-cli --test spec_coverage`. Acceptance: ne
       Acceptance: `diff -rq --exclude=target --exclude=dist apps/rhino-cli
 ../ose-primer/apps/rhino-cli` and the equivalent comparison against `ose-infra` show only
       untracked-artifact/README diffs.
+  - **Done 2026-07-04.** `cargo test --release -p rhino-cli --test golden_master`: passed, **zero diff**
+    (`git status --porcelain apps/rhino-cli/tests/golden-master/` empty) — same root cause class as the
+    dependency plan's own regeneration: the 2 manifest entries exercising
+    `specs {behavior,domain}-coverage validate --help` actually freeze a pre-existing "missing required
+    `<PATHS>` positional" clap error (exit 2) that occurs _before_ per-arg help text would ever render, so
+    the 3 new optional `--<level>-report` flags don't change the frozen output at all. Ran both rsync
+    commands, **plus** the dependency plan's Phase 3/4 Gherkin-tree rsync
+    (`specs/apps/rhino/behavior/rhino-cli/gherkin/` → each sibling repo) since this Phase's RED step
+    modified that tree and `docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary` binds
+    it into the same byte-identity requirement. **Caught and fixed a propagation bug**: the plain
+    `apps/rhino-cli/` rsync also overwrote each sibling repo's own intentionally-diverged
+    `apps/rhino-cli/README.md` (outside the boundary per that same doc — it excludes README.md from the
+    `src/`/`Cargo.toml`/`Cargo.lock`/`project.json`/`LICENSE` list) with `ose-public`'s copy, re-introducing
+    a dangling link to a public-only migration-plan doc the dependency plan had deliberately removed in
+    both siblings; reverted via `git checkout -- apps/rhino-cli/README.md` in both repos. Final
+    `diff -rq --exclude=target --exclude=dist` against both siblings shows only `README.md` +
+    `cover.out`/`lcov.info` diffs (all sanctioned); `src/`, `tests/`, `Cargo.toml`, `Cargo.lock`,
+    `project.json`, `LICENSE` all byte-identical (explicit per-file `diff` + `diff -rq` on `src/`/`tests/`);
+    the Gherkin tree diff is fully empty in both siblings.
 
 ### Phase 1 Gate
 
-- [ ] [AI] `cargo test -p rhino-cli` green in all three repos; golden-master passes.
-- [ ] [AI] `apps/rhino-cli` byte-identical across the three repos.
+- [x] [AI] `cargo test -p rhino-cli` green in all three repos; golden-master passes.
+  - **Done 2026-07-04.** `ose-public`: 1139 passed, 1 ignored (debug and `--release`). `ose-primer`: 1139
+    passed, 1 ignored. `ose-infra`: 1139 passed, 1 ignored. `cargo clippy --all-targets -- -D warnings` and
+    `cargo fmt --check` clean in all three (rhino-cli source is byte-identical, so this reruns the exact
+    same checks against the exact same code). Golden-master (one of the 7 test suites `cargo test -p
+rhino-cli` runs) passes with zero corpus diff in all three.
+- [x] [AI] `apps/rhino-cli` byte-identical across the three repos.
+  - **Done 2026-07-04.** Confirmed via per-file `diff` (`Cargo.toml`, `Cargo.lock`, `project.json`,
+    `LICENSE`) and `diff -rq` (`src/`, `tests/`) against both siblings — all empty. Gherkin behavior tree
+    (`specs/apps/rhino/behavior/rhino-cli/gherkin/`) `diff -rq` also empty against both siblings. Only
+    sanctioned divergence remains: `README.md` (explicitly outside the boundary) and untracked coverage
+    artifacts (`cover.out`, `lcov.info`).
 
 > **Pause Safety**: engine landed + parity-verified; no per-project rollout yet. Safe to stop. To resume:
 > `cargo test -p rhino-cli`.
