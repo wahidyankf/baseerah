@@ -1025,7 +1025,7 @@ validate` command (output does not contain the string `stub`) — proving the pr
       **Done 2026-07-04.** Exit 0; 0 failed; 0 skipped; 1 pre-existing known-deferred `#[ignore]`
       (same as public/primer — cucumber harness gap). Surfaced 2 genuine pre-existing governance-doc
       drift bugs in `.claude/agents/repo-rules-checker.md` (stale `convention instruction-size
-  validate` command name — real command moved to the `harness` domain) and
+validate` command name — real command moved to the `harness` domain) and
       `repo-governance/workflows/repo/repo-rules-quality-gate.md` (Step 0.5 preflight prose never
       named "instruction-size" on the same line as "Step 0.5") — both fixed at the root cause.
 
@@ -1052,43 +1052,65 @@ validate` command (output does not contain the string `stub`) — proving the pr
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
 > (root cause orientation — proactively fix preexisting errors encountered).
 
-- [ ] [AI] **Cross-repo byte-identity matrix**: for all three repos, verify `apps/rhino-cli` (excl.
+- [x] [AI] **Cross-repo byte-identity matrix**: for all three repos, verify `apps/rhino-cli` (excl.
       artifacts) and the gherkin `.feature`+README set are byte-identical (`diff -rq` pairwise + md5
       manifests all equal `audit/06-canonical-manifest.md`). Acceptance: zero differences across all three.
-- [ ] [AI] **Enforcement matrix**: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in each repo reports
+      **Done 2026-07-04.** `diff -rq` pairwise (public↔primer, public↔infra) empty for the gherkin tree;
+      `apps/rhino-cli` identical except each repo's own `README.md` (explicitly exempt). 629-entry md5
+      manifest (558 + 71) confirmed byte-for-byte identical across all three repos, README.md excluded.
+- [x] [AI] **Enforcement matrix**: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in each repo reports
       `0 skipped` and exit 0. Acceptance: identical scenario counts, all passed, none skipped, in all three.
-- [ ] [AI] Per repo: `nx affected -t typecheck,lint,test:quick,test:specs --base=origin/main` — exits 0
+      **Done 2026-07-04.** All three: exit 0, 1109 unit tests passed, 1 known-deferred `#[ignore]`,
+      306 cucumber scenarios / 1308 steps, 0 `✘` failures, 0 skipped.
+- [x] [AI] Per repo: `nx affected -t typecheck,lint,test:quick,test:specs --base=origin/main` — exits 0
       (the real aggregate spec-coverage target is `test:specs`, not `specs:coverage` — see
       [nx-targets.md](../../../repo-governance/development/infra/nx-targets.md); verify the
       project-appropriate real target set per repo if `ose-primer`/`ose-infra` differ).
+      **Done 2026-07-04.** Since each repo had already been pushed to `origin/main` incrementally per
+      phase, `nx affected --base=origin/main` was a post-push no-op; ran
+      `nx run-many -t typecheck,lint,test:quick,test:specs -p rhino-cli` directly in all three instead —
+      all succeeded, with identical `specs:behavior:coverage` output (57 specs, 312 scenarios, 1297
+      steps) in all three.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically per repo (Conventional Commits), staging **explicit paths only** (never
+- [x] [AI] Commit thematically per repo (Conventional Commits), staging **explicit paths only** (never
       `git add -A` — sibling repos may carry unrelated WIP). Suggested split per repo:
       `test(rhino-cli): de-hollow + wire gherkin so all behaviour is enforced`,
       `test(specs): make rhino-cli gherkin tree byte-identical across repos`,
       `docs(governance): bring rhino-cli gherkin tree into the SDLC parity boundary`.
-- [ ] [AI] Verify each repo's staged set contains only rhino-cli + specs/gherkin + governance-doc paths.
+      **Done 2026-07-04.** ose-infra: 3 commits (a6332aae4 rhino-cli+gherkin propagation, 47692f7e4
+      Decision 8 gate re-placement + boundary extension, b264c5654 governance-doc drift fix).
+      ose-primer already committed in Phase 3 (5a4e8670a, 1fb7a8bdf, f0bb93df3).
+- [x] [AI] Verify each repo's staged set contains only rhino-cli + specs/gherkin + governance-doc paths.
       Command: `git diff --cached --name-only`. Acceptance: every listed path is under `apps/rhino-cli/`,
       `specs/apps/rhino/behavior/rhino-cli/`, or a governance doc named in this plan's file-impact table
       (`tech-docs.md §6`) — no unrelated paths.
+      **Done 2026-07-04.** Verified per-commit before each `git commit` in ose-infra; no unrelated paths.
 
 ### Post-Push Verification
 
-- [ ] [AI] Push `ose-public` → `origin main`. Monitor GitHub Actions; verify green (poll every 2 min, one
+- [x] [AI] Push `ose-public` → `origin main`. Monitor GitHub Actions; verify green (poll every 2 min, one
       `gh run view --json status,conclusion` per wakeup). If red, root-cause + fix before proceeding.
-- [ ] [AI] Push `ose-primer` → `origin main`. Verify CI green.
-- [ ] [AI] Push `ose-infra` → `origin main`. Verify CI green.
-- [ ] [AI] Do NOT mark the plan done until all three repos' CI is green.
+      **Done 2026-07-04.** `fb7f9014d` pushed; `main-ci` completed successfully.
+- [x] [AI] Push `ose-primer` → `origin main`. Verify CI green.
+      **Done 2026-07-04.** Pushed during Phase 3 (`f0bb93df3`); `main-ci` + `pr-quality-gate` both
+      completed successfully (re-confirmed in Phase 5).
+- [x] [AI] Push `ose-infra` → `origin main`. Verify CI green.
+      **Done 2026-07-04.** `b264c5654` pushed; `main-ci` + `pr-quality-gate` both completed
+      successfully (self-hosted 2-runner pool serialized ~34 jobs across both workflows, taking
+      longer wall-clock than public/primer's GitHub-hosted parallel runners, but converged green).
+- [x] [AI] Do NOT mark the plan done until all three repos' CI is green.
+      **Done 2026-07-04.** All three confirmed green before proceeding to archival.
 
 > Manual UI/API verification (Playwright/curl), Rule-15 web-triad, and Rule-16 API retest are **Not
 > applicable** — this plan touches only CLI/tooling source, specs, and governance docs (no web UI, no HTTP API).
 
 ### Phase 5 Gate
 
-- [ ] [AI] All three repos converged, byte-identity matrix all-green, every suite `0 skipped`, all three
+- [x] [AI] All three repos converged, byte-identity matrix all-green, every suite `0 skipped`, all three
       `main` CI runs green.
+      **Done 2026-07-04.** Confirmed via the matrices above.
 
 > **Pause Safety**: all three repos converged, parity-verified, fully enforcing, and CI-green; nothing
 > half-applied. Safe to stop. To resume: re-run the byte-identity + enforcement matrices (this phase's
