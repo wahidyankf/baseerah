@@ -5,6 +5,14 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+
+# Fail fast (before paying for docker-compose startup) on any xunit Skip= attribute
+# left in the integration suite.
+if grep -rn -E --include='*.fs' 'Skip\s*=' "${ROOT}/apps/ose-be/tests/integration"; then
+  echo "ERROR: xunit Skip= attribute found in test files above" >&2
+  exit 1
+fi
+
 COMPOSE_FILE="${ROOT}/apps/ose-be/docker-compose.integration.yml"
 PROJECT_NAME="ose-be-integration"
 

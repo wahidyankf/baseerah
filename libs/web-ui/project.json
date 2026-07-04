@@ -20,7 +20,7 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx vitest run --coverage",
+        "command": "if grep -rn -E --include='*.ts' --include='*.tsx' --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=dist --exclude-dir=coverage --exclude-dir=storybook-static '\\b(it|test|describe)\\.(skip|only|todo)\\(' .; then echo 'ERROR: .skip()/.only()/.todo() found in test files above - remove before merging'; exit 1; fi && npx vitest run --coverage",
         "cwd": "libs/web-ui"
       }
     },

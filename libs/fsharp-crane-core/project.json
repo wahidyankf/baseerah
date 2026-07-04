@@ -38,7 +38,7 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test libs/fsharp-crane-core/tests/unit/fsharp-crane-core-unit-tests.fsproj"
+        "command": "if grep -rn -E --include='*.fs' 'Skip\\s*=' libs/fsharp-crane-core/tests/unit; then echo 'ERROR: xunit Skip= attribute found in test files above'; exit 1; fi && dotnet test libs/fsharp-crane-core/tests/unit/fsharp-crane-core-unit-tests.fsproj"
       },
       "cache": true,
       "inputs": [

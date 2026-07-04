@@ -5,6 +5,15 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+
+# Fail fast (before paying for docker-compose/dotnet startup) on any unconditional
+# test.skip() left in the e2e suite. test.skip(condition, reason) - the documented
+# Playwright environment-guard form - is intentionally allowed through.
+if grep -rn -E --include='*.ts' --exclude-dir=node_modules --exclude-dir=.features-gen --exclude-dir=test-results --exclude-dir=playwright-report '\$?test\.skip\([^,)]*\)' "${ROOT}/apps/ose-be-e2e"; then
+  echo "ERROR: unconditional test.skip() found in test files above - use test.skip(condition, reason) for legitimate environment guards, or remove" >&2
+  exit 1
+fi
+
 COMPOSE_FILE="${ROOT}/apps/ose-be/docker-compose.e2e.yml"
 PROJECT_NAME="ose-be-e2e"
 PORT=8302

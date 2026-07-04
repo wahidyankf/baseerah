@@ -61,7 +61,7 @@
       "cache": true,
       "inputs": ["default", "{projectRoot}/src/generated-contracts/**/*"],
       "options": {
-        "command": "npx vitest run --project unit",
+        "command": "if grep -rn -E --include='*.ts' --include='*.tsx' --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=dist --exclude-dir=coverage --exclude-dir=storybook-static '\\b(it|test|describe)\\.(skip|only|todo)\\(' .; then echo 'ERROR: .skip()/.only()/.todo() found in test files above - remove before merging'; exit 1; fi && npx vitest run --project unit",
         "cwd": "{projectRoot}"
       },
       "dependsOn": []

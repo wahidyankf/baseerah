@@ -73,7 +73,7 @@
       "dependsOn": ["codegen", "typecheck"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/organiclever-be/tests/unit/OrganicleverBe.UnitTests.fsproj"
+        "command": "if grep -rn -E --include='*.fs' 'Skip\\s*=' apps/organiclever-be/tests/unit; then echo 'ERROR: xunit Skip= attribute found in test files above'; exit 1; fi && dotnet test apps/organiclever-be/tests/unit/OrganicleverBe.UnitTests.fsproj"
       },
       "cache": true,
       "inputs": [
