@@ -652,6 +652,20 @@ are logged here rather than instantiated as individual checkboxes, since most ba
   added since existing near-matches didn't exactly fit the spec wording). Both plus
   `elixir-openapi-codegen` still have an honest `specs:behavior:coverage` stub pending real migration.
   **Done (partial) 2026-07-04.** Commits `9e7d37e10`, `928f0ad84` (ose-primer), pushed to origin/main.
+- **Milestone — every `crud-be-*`/`crud-fe-*`/`crud-fs-*` project (16 total) now has `@covers`
+  markers.** Level-tagged the shared `crud-web` tree (92 previously-untagged scenarios across 15
+  non-`codegen` feature files, `@unit @e2e` — no `@integration`, since no `crud-web`-consuming project
+  declares that level) and rolled out `@covers` markers to all 5 consumers: `crud-fe-dart-flutterweb`
+  (92 markers), `crud-fe-ts-nextjs` (92), `crud-fe-ts-tanstack-start` (92), `crud-fe-e2e` (92, single
+  e2e tier; `bddgen` + `tsc --noEmit` clean, full Playwright run needs the app stack not available in
+  this pass), and `crud-fs-ts-nextjs` (170 total — this is a full-stack project consuming BOTH the
+  `crud-be` tree, 78 markers in `test/unit/be-steps/`, AND the `crud-web` tree, 92 markers in
+  `test/unit/fe-steps/`, at its single unit tier; confirmed via its own `specs:behavior:coverage`
+  command validating both trees together, `29 specs, 199 scenarios, 752 steps`). All delegated to
+  parallel background agents, each independently re-verified before committing. **Done 2026-07-04.**
+  Commits `916c91a68` (level-tag), `f97cd7dc4`, `9e192d797`, `5ca412eb4`, `a042a7254`, `2089dd407`
+  (ose-primer), pushed to origin/main. Remaining Phase 3..N scope: `ose-public`'s 14 app/lib batches,
+  `ose-infra`'s 4 batches, and the 10-lib BDD-framework migration (Final Gate blocker).
 
 ---
 
