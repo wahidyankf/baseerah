@@ -451,7 +451,7 @@ plan-maker}.md` mirrors changed (SKILL.md has no `.opencode` mirror per the Skil
       — acceptance: `test -f /Users/wkf/ose-projects/ose-infra/repo-governance/development/quality/knowledge-capture.md`; binding status clean
       — done: `knowledge-capture.md` created + doc cross-references updated (commit `a3273536a`); all
       five `plan-*` workflows reference knowledge-capture (commit `065be7a7d`); the 4 `.claude/agents/
-  plan-*.md` files + SKILL.md edited (commit `c1a7b7d25`); `generate:bindings` re-synced
+plan-*.md` files + SKILL.md edited (commit `c1a7b7d25`); `generate:bindings` re-synced
       `.opencode`/`.amazonq` mirrors (commit `9fb7c48c4`) — exited 0, no stale drift.
 - [x] [AI] In the infra copy of `knowledge-capture.md`, ensure the repo-relevance gate explicitly
       states that infra-specific learnings stay in `ose-infra` only and NEVER cross-route to the public
@@ -512,21 +512,30 @@ plan-maker}.md` mirrors changed (SKILL.md has no `.opencode` mirror per the Skil
 > knowledge-capture system itself, then triage each through the new rubric. `learnings.md` is transient
 > scaffolding — everything kept MUST be routed to a durable home before archival.
 
-- [ ] [AI] Confirm `plans/in-progress/plan-execution-knowledge-capture/learnings.md` exists and holds
+- [x] [AI] Confirm `plans/in-progress/plan-execution-knowledge-capture/learnings.md` exists and holds
       the running log accrued across Phases 0-5 (create it now if capture was deferred, reconstructing
       entries from the phase notes)
       — acceptance: `test -f plans/in-progress/plan-execution-knowledge-capture/learnings.md`
-- [ ] [AI] For EACH entry, apply the litmus ("would the system catch this next time?"); discard
+      — done: created, reconstructing 5 entries from Phase 0-5 execution notes.
+- [x] [AI] For EACH entry, apply the litmus ("would the system catch this next time?"); discard
       non-generalizable entries with a one-line reason
       — acceptance: every discarded entry has a reason recorded in `learnings.md`
-- [ ] [AI] For EACH surviving entry, run the **secret/sensitivity gate**: sanitize to `<placeholder>`
+      — done: 1 entry passed litmus (single-active-runner CI capacity constraint); 4 discarded with
+      reasons (multi-repo propagation pattern already codified in parity-planning workflows;
+      safety-gate pattern is self-referential validation; bindings-resync worked as documented;
+      own CI-polling tool-usage friction is not a repo-governance concern).
+- [x] [AI] For EACH surviving entry, run the **secret/sensitivity gate**: sanitize to `<placeholder>`
       tokens; discard any entry that cannot be sanitized without losing meaning
       — acceptance: `grep -Ei "(api[_-]?key|token|password|secret|BEGIN [A-Z ]*PRIVATE KEY)" plans/in-progress/plan-execution-knowledge-capture/learnings.md` returns no real secret (placeholders only)
-- [ ] [AI] For EACH surviving entry, run the **repo-relevance gate**: route infra-only learnings within
+      — done: the 1 surviving entry contains no secrets, credentials, tokens, or real hostnames — only
+      generic runner-online/offline state and public GitHub Actions job names.
+- [x] [AI] For EACH surviving entry, run the **repo-relevance gate**: route infra-only learnings within
       `ose-infra` only; route public-governance learnings in `ose-public` (and to `ose-primer` via
       parity); NEVER cross-route private-infra content into the public repos
       — acceptance: each entry records its target repo(s); zero private→public cross-routes
-- [ ] [AI] Route each surviving entry to EXACTLY ONE durable home that owns that kind of knowledge —
+      — done: the 1 surviving entry is `ose-infra`-only (private-repo CI/infrastructure operational
+      concern); recorded as never cross-routing to `ose-public`/`ose-primer`.
+- [x] [AI] Route each surviving entry to EXACTLY ONE durable home that owns that kind of knowledge —
       open-ended, including but not limited to `repo-governance/`, `docs/`, `.claude/agents/`,
       `.claude/skills/`, `apps/`/`libs/` code, tests, `post-mortems/`. **Timing (destination-aware):**
       NON-CODE home → small edit lands INLINE in this plan's commits, large work → `plans/backlog/`
@@ -536,24 +545,38 @@ plan-maker}.md` mirrors changed (SKILL.md has no `.opencode` mirror per the Skil
       — acceptance: every entry is terminal — routed-inline (non-code only), filed-as-backlog-plan (any
       home; mandatory for code), or discarded-with-reason; zero code changes landed inline in this plan;
       zero entries in an open state
-- [ ] [AI] If no generalizable learnings survive, record the explicit escape
+      — done: filed as `ose-infra`'s `plans/backlog/2026-07-06__ci-runner-health-monitoring/` (5-doc
+      plan: README.md, brd.md, prd.md, tech-docs.md, delivery.md), committed `aa0d15efd`
+      "docs(plans): add ci-runner-health-monitoring backlog plan" and pushed to `origin main`. All 5
+      entries terminal; zero code changes landed inline in this plan.
+- [x] [AI] If no generalizable learnings survive, record the explicit escape
       `No generalizable learnings — <one-line reason>` in `learnings.md` (never leave it silently empty)
       — acceptance: `learnings.md` is either fully triaged or carries the explicit "none" record
-- [ ] [AI] Land any inline routings + commit and push per-repo to each affected `origin main`; monitor
+      — done: N/A — one learning survived and was filed; escape hatch not needed.
+- [x] [AI] Land any inline routings + commit and push per-repo to each affected `origin main`; monitor
       CI to green
       — acceptance: routed edits are committed and CI-green in every affected repo
+      — done: no inline routings (the one surviving entry was code-homed, hence backlog-only per the
+      Code-Routing Downstream Rule). `ose-infra` backlog-plan commit `aa0d15efd` pushed to `origin main`.
 
 ### Phase 6 Gate
 
 > All checks below must pass before archival.
 
-- [ ] [AI] Every `learnings.md` entry is routed-inline (non-code), filed-as-backlog-plan, or
+- [x] [AI] Every `learnings.md` entry is routed-inline (non-code), filed-as-backlog-plan, or
       discarded-with-reason (zero open entries)
-- [ ] [AI] Zero code changes born from a learning landed inline in this plan's PR — every code-routed
+      — done: 1 filed-as-backlog-plan, 4 discarded-with-reason, 0 open.
+- [x] [AI] Zero code changes born from a learning landed inline in this plan's PR — every code-routed
       learning is a separate `plans/backlog/` plan
-- [ ] [AI] Both safety gates satisfied: no real secret in `learnings.md`; no private-infra content in
+      — done: confirmed — the runner-health-monitoring fix is entirely in the new `ose-infra` backlog
+      plan, not inline in this plan.
+- [x] [AI] Both safety gates satisfied: no real secret in `learnings.md`; no private-infra content in
       public-repo routings
-- [ ] [AI] All inline routings pushed and CI-green in each affected repo
+      — done: both gates verified clean (see above); the surviving entry stayed `ose-infra`-only.
+- [x] [AI] All inline routings pushed and CI-green in each affected repo
+      — done: N/A for inline (none); the backlog-plan commit `aa0d15efd` pushed cleanly to `ose-infra`
+      `origin main` with all local quality gates (lint:md:fix, links, mermaid, heading-hierarchy)
+      passing.
 
 > **Pause Safety**: every learning has reached a terminal state and durable routings have landed;
 > `learnings.md` now holds only staging residue safe to archive/delete. Safe to stop. To resume:
