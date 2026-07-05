@@ -68,6 +68,7 @@ Validate that completed plan implementation:
 3. Completes all delivery checklist items with implementation notes
 4. Satisfies all Gherkin acceptance criteria authored in `prd.md`
 5. Maintains code quality standards
+6. Verifies the plan's transient `learnings.md` was fully triaged — every entry routed, filed as a `plans/backlog/` plan, or discarded — and both safety gates satisfied, BLOCKING archival otherwise (Knowledge Capture Convention)
 
 ## Validation Scope
 
@@ -184,6 +185,7 @@ Update status to "Complete", add summary and recommendation (approve/revise).
 - [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Verify that the production visual sign-off (rule 1), the deploy-config smoke test (rule 11), and — on web-UI plans — the near-end three-tester retest round ran (rule 15) with every rule-15 EWT/UWT/DWT defect checkbox in `delivery.md` fixed (ticked) before archival — deferral of a defect finding requires explicit user permission and is allowed only when the fix is genuinely impossible; an unfixed defect checkbox at archival time is a HIGH finding; flag their absence as HIGH on UI-bearing plans; SG-### proposals and USS-### suggestions may be triaged or deferred
 - [Manual Behavioral Verification Convention](../../repo-governance/development/quality/manual-behavioral-verification.md) - Verify Playwright/curl manual assertions were performed and documented (Step 7)
 - [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) - Verify each ticked manual-verification step carries committed evidence (screenshots in the plan's `evidence/` subfolder referenced from `delivery.md`, inline curl output) and that multi-locale apps were verified across ALL locales; flag bare "verified manually", missing screenshots, and single-locale-only coverage as HIGH (Step 7 items 4 + 5)
+- [Knowledge Capture Convention](../../repo-governance/development/quality/knowledge-capture.md) - Blocking archival gate (Step 5h): every `learnings.md` entry must be routed-inline, filed as a `plans/backlog/` plan, or discarded-with-reason; no code-homed learning may have landed inline; both the secret/sensitivity gate and the repo-relevance gate must be satisfied
 
 **Remember**: This is the final quality gate. Be thorough, independent, and uncompromising on quality.
 
@@ -520,3 +522,65 @@ For every relative cross-link in plan files:
 - Library upgrades during execution may have outdated cited versions.
 
 Both gates exist for a reason; do not skip Step 5f under time pressure.
+
+### 12. Knowledge Capture Routing Verification (Step 5h — MANDATORY BLOCKING GATE)
+
+Enforces the [Knowledge Capture Convention](../../repo-governance/development/quality/knowledge-capture.md).
+This is a **blocking gate** — run it BEFORE the plan is allowed to archive to `plans/done/`. A plan
+MUST NOT be archived until every `learnings.md` entry is verified terminal and both safety gates are
+confirmed satisfied.
+
+#### What to Validate
+
+1. **Every entry reached a terminal state** — read `learnings.md` (or confirm the explicit
+   `No generalizable learnings — <reason>` escape if the file is absent or empty). Each surviving
+   entry MUST record exactly one of:
+   - **Routed inline** (non-code homes only — `docs/`, `repo-governance/`, `.claude/agents/`,
+     `.claude/skills/`, post-mortems, or any other non-code durable home) — confirm the referenced
+     commit or file edit actually landed in this plan's own history.
+   - **Filed as a `plans/backlog/<slug>/` plan** — **mandatory** whenever the home is `apps/`,
+     `libs/`, or a test (code); also an acceptable route for any non-code home. Confirm the backlog
+     folder actually exists: `Bash test -d plans/backlog/<slug>/`.
+   - **Discarded with a one-line reason** — confirm a concrete reason is present, not merely the
+     word "discarded".
+     An entry with no terminal state recorded, or left silently open: **CRITICAL** finding — archival
+     is BLOCKED until resolved.
+2. **No code-homed learning landed inline** — cross-check `learnings.md` against this plan's own
+   commit history/diff for any learning whose home is `apps/`, `libs/`, or a test file that was
+   implemented directly in this plan's commits/PR instead of filed to `plans/backlog/`. Any code
+   born from a learning that landed inline in the current plan — outside the narrow
+   current-plan-blocker carve-out (Root Cause Orientation: fixing a genuine blocker to finish this
+   plan's own scope) — is a **CRITICAL** finding — archival is BLOCKED.
+3. **Secret/sensitivity gate satisfied** — `Grep` `learnings.md` for credential-shaped strings
+   (connection strings, API keys, tokens, raw IPs/hostnames outside a `<placeholder>` token). Any
+   unsanitized secret found: **CRITICAL** finding — archival is BLOCKED. This inherits the
+   [No Secrets in Git Convention](../../repo-governance/conventions/security/no-secrets-in-committed-files.md)
+   hard iron rule in full.
+4. **Repo-relevance gate satisfied** — confirm no infra-private content (Terraform, k3s, Proxmox,
+   `coralpolyp`, real hostnames/inventories) was routed into this repo's public surfaces (`docs/`,
+   `repo-governance/`, `.claude/`) when this repo is `ose-public` or `ose-primer`. Any cross-routed
+   infra-private content: **CRITICAL** finding — archival is BLOCKED.
+5. **Mandatory phase presence carried through to archival** — if `plan-checker`'s Step 5l MEDIUM
+   finding (silent absence of the Knowledge Capture phase) was never resolved before this
+   archival check runs, treat as unresolved: **HIGH** finding, escalated to a blocking condition
+   until either a phase or an explicit "none" record exists.
+
+#### How to Audit
+
+1. Read `learnings.md` in full (or confirm its absence plus the explicit "none" record elsewhere).
+2. For each entry, resolve its recorded routing destination and verify it against the repo:
+   `Bash test -d` for backlog folders, `git log`/`git diff` for inline commits.
+3. Run `Grep` for secret-shaped patterns across `learnings.md`.
+4. Run `Grep` for infra-private terms (Terraform, k3s, Proxmox, `coralpolyp`, real hostnames) across
+   any non-`ose-infra` routed destination named in the entries.
+5. File findings per the severity table below; a single unresolved entry is sufficient to BLOCK
+   archival regardless of how many other entries passed.
+
+#### Finding Severity
+
+- Any `learnings.md` entry not in a terminal state at archival time: **CRITICAL** (BLOCKS archival)
+- Code-homed learning landed inline instead of filed to `plans/backlog/`: **CRITICAL** (BLOCKS archival)
+- Unsanitized secret in `learnings.md`: **CRITICAL** (BLOCKS archival)
+- Infra-private content cross-routed into a public repo: **CRITICAL** (BLOCKS archival)
+- Knowledge Capture phase entirely absent with no explicit "none" record carried through to
+  archival time: **HIGH** (escalated from `plan-checker`'s authoring-time MEDIUM if left unresolved)
