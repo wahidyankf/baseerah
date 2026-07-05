@@ -4,7 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_No plans currently in progress._
+- [plan-execution-knowledge-capture](./plan-execution-knowledge-capture/) — Capture generalizable learnings from every plan execution and route them into durable knowledge surfaces (docs/rules/agents/skills/code) across all 3 repos. **Executes first.**
+- [worktree-to-pr-default-delivery-mode](./worktree-to-pr-default-delivery-mode/) — Flip the default plan-delivery mode from worktree→main to worktree→PR (four named modes + precedence) across all 3 repos. **Executes second** (depends on knowledge-capture).
 
 ## Instructions
 
