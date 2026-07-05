@@ -15,7 +15,7 @@ created: 2026-04-03
 
 This document defines the standards for selecting the appropriate model tier when creating or updating AI agents. The governing principle is **match model capability to task complexity** -- use the most capable model only when the task demands it, and use lighter models for structured or mechanical work.
 
-> **Note on terminology**: "planning-grade", "execution-grade", and "fast" are **internal repo vocabulary**, not an externally-recognized cross-vendor standard. Web research (2026-05-03) found no community usage of these tier names outside this repository. They serve as a vendor-neutral capability axis used by `repo-governance/` prose; concrete vendor model IDs (e.g., `claude-opus-4-7`, `opencode-go/minimax-m2.7`) live in platform-binding agent frontmatter and in the [AI Model Benchmarks Reference](../../../docs/reference/ai-model-benchmarks.md).
+> **Note on terminology**: "planning-grade", "execution-grade", and "fast" are **internal repo vocabulary**, not an externally-recognized cross-vendor standard. Web research (2026-05-03) found no community usage of these tier names outside this repository. They serve as a vendor-neutral capability axis used by `repo-governance/` prose; concrete vendor model IDs (e.g., `claude-opus-4-7`, `opencode-go/glm-5.2`) live in platform-binding agent frontmatter and in the [AI Model Benchmarks Reference](../../../docs/reference/ai-model-benchmarks.md).
 
 ## Principles Implemented/Respected
 
@@ -278,30 +278,39 @@ secondary binding model IDs.
 
 ### Model ID Mapping
 
-| Primary binding               | Secondary binding          | Capability notes                                                                            |
-| ----------------------------- | -------------------------- | ------------------------------------------------------------------------------------------- |
-| omit (planning-grade inherit) | `opencode-go/minimax-m2.7` | MiniMax MoE; SWE-Pro 56.22% (M2.5 predecessor: 80.2% SWE-Bench Verified); highest available |
-| `model: sonnet`               | `opencode-go/minimax-m2.7` | Same model as planning-grade (no separate execution-grade tier in secondary binding)        |
-| `model: haiku`                | `opencode-go/glm-5`        | Zhipu GLM lighter variant; fast/cheap for mechanical work; no published SWE-Bench score     |
+| Primary binding                                | Secondary binding        | Capability notes                                                                                                                                    |
+| ------------------------------------------------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `model: opus` (thinking-grade)                  | `opencode-go/glm-5.2`    | Zhipu GLM; SWE-bench Pro 62.1%, ~7.1pp below Claude Opus 4.8 (69.2%) — closest available, does not clear the thinking-tier bar                        |
+| omit (execution-grade inherit) / `model: sonnet` | `opencode-go/glm-5.2`    | Same model as thinking-grade (intentional — see Tier Collapse below); SWE-bench Pro 62.1%, at/slightly above Claude Sonnet 5's 63.2% (within noise)   |
+| `model: haiku` (fast)                            | `opencode-go/minimax-m3` | SWE-bench Pro 59.0%, −4.2pp vs. Claude Sonnet 5 — closest available model to Sonnet-5 tier without exceeding it, cheaper per-token than glm-5.2       |
 
-### 3-to-2 Tier Collapse
+### Tier Collapse
 
-The primary binding has three tiers (planning-grade > execution-grade > fast). The secondary binding
-offers a curated set of models across multiple labs; the converter maintains the same 3-to-2 collapse:
-a single large model (`minimax-m2.7`) covers planning-grade and execution-grade tiers; a fast model
-(`glm-5`) covers the haiku tier.
+The primary binding has three tiers (planning-grade/thinking > execution-grade > fast). The secondary
+binding's `convert_model()` implements all three as explicit branches (`haiku` / `opus` / else), but
+the thinking and execution branches currently return the identical model ID: no model in the
+secondary binding's roster separately clears Claude Opus 4.8's benchmark tier, so thinking-grade
+collapses onto execution-grade's target rather than being held to a bar nothing in the roster meets.
+This is an accepted platform-level constraint, not an oversight — if a future roster model clears the
+Opus-4.8 bar without also being the execution-grade pick, only the `opus` branch's literal needs to
+change.
 
-This collapse is an acceptable platform-level constraint. Tier assignments govern behavior in primary
-binding sessions (the primary runtime). The secondary binding uses the highest-benchmark available
-model for all non-fast-tier work.
+Tier assignments govern behavior in primary binding sessions (the primary runtime, where `opus`
+genuinely resolves to a stronger model than `sonnet`). The secondary binding uses the strongest
+available roster model for both non-fast tiers, and the closest-without-exceeding model for fast.
 
-### Why MiniMax M2.7 as the Default
+### Why glm-5.2 and minimax-m3 as the Defaults
 
-MiniMax M2.7 is adopted based on lab trajectory and model recency. Its predecessor M2.5 led SWE-Bench
-Verified at 80.2%. M2.7's SWE-Pro score (56.22%) is on a harder suite and not directly comparable to
-GLM-5.1 (58.4% SWE-Bench Pro). Available via the flat-rate secondary binding subscription; no per-token
-billing. If a stronger model joins the secondary binding's model roster, update only `ConvertModel()` in
-`apps/rhino-cli/src/internal/agents/converter.rs` and re-run `npm run generate:bindings`.
+`opencode-go/glm-5.2` is the strongest model in the secondary binding's roster on every published
+benchmark checked (SWE-bench Pro 62.1%, Terminal-Bench 2.1 81.0%) — at/above Claude Sonnet 5's tier,
+though still below Claude Opus 4.8's. `opencode-go/minimax-m3` is the closest roster model to Sonnet-5
+tier without exceeding it (SWE-bench Pro 59.0%), chosen over collapsing every tier onto `glm-5.2` so
+the fast tier stays genuinely lighter and cheaper (see
+[AI Model Benchmarks Reference](../../../docs/reference/ai-model-benchmarks.md) for the full
+comparison, including a standard per-token pricing table and a frontier/big-brand model reference for
+context). Both are available via the flat-rate secondary binding subscription; no per-token billing
+for the subscriber. If the roster's rankings change, update only `convert_model()` in
+`apps/rhino-cli/src/application/agents/converter.rs` and re-run `npm run generate:bindings`.
 
 ## Special Considerations
 

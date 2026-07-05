@@ -72,7 +72,7 @@ Claude Code (.claude/agents/) — PRIMARY:
 OpenCode (.opencode/agents/) — SECONDARY:
   - Tool format: permission object { read: allow, write: allow }
     (boolean flags { read: true, write: true } are deprecated/legacy)
-  - Model selection: opencode-go/minimax-m2.7 or opencode-go/glm-5
+  - Model selection: opencode-go/glm-5.2 (thinking/execution) or opencode-go/minimax-m3 (fast)
 ```
 
 ## Principles Implemented/Respected
@@ -2574,8 +2574,8 @@ Claude Code:
   model:         # planning-grade (omit for budget-adaptive inheritance)
 
 OpenCode:
-  model: opencode-go/minimax-m2.7 # execution-grade/planning-grade equivalent
-  model: opencode-go/glm-5        # fast equivalent
+  model: opencode-go/glm-5.2  # thinking-grade/execution-grade equivalent (intentionally identical)
+  model: opencode-go/minimax-m3 # fast equivalent
 ```
 
 #### Agent skills Format

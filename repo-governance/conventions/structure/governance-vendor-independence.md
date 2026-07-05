@@ -165,7 +165,7 @@ The `.claude/agents/plan-maker.md` frontmatter sets `model: claude-sonnet-4-6`.
 
 ### OpenCode
 
-The `.opencode/agents/plan-maker.md` sets `model: opencode-go/minimax-m2.7`.
+The `.opencode/agents/plan-maker.md` sets `model: opencode-go/glm-5.2`.
 ```
 
 **Precedence**: the fence mechanism wins for any line inside both a fence and a heading scope.

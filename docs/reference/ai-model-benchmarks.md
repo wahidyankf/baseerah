@@ -11,7 +11,7 @@ created: 2026-04-19
 
 # AI Model Benchmarks Reference
 
-Canonical benchmark reference for all AI models used in this project. Last updated: 2026-05-07.
+Canonical benchmark reference for all AI models used in this project. Last updated: 2026-07-05.
 
 ## Purpose and Scope
 
@@ -122,85 +122,89 @@ All docs that cite benchmark numbers link to this file. This file links to prima
 
 ### Currently Active Models
 
-The following three models are Anthropic's current recommended API models as of 2026-05-07.
+The following three models are Anthropic's current recommended API models as of 2026-07-05. Claude
+Opus 4.8 and Claude Sonnet 5 superseded Opus 4.7/Sonnet 4.6 during this refresh (see
+`### Claude Opus 4.8`/`### Claude Sonnet 5` below); Claude Haiku 4.5 is unchanged.
 
-**Source**: [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview) (official API docs, accessed 2026-05-07)
+**Source**: [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview),
+[Introducing Claude Sonnet 5](https://www.anthropic.com/news/claude-sonnet-5),
+[VentureBeat on Claude Opus 4.8](https://venturebeat.com/technology/anthropics-claude-opus-4-8-is-here-with-3x-cheaper-fast-mode-and-near-mythos-level-alignment)
+(accessed 2026-07-05)
 
-| Feature                       | Claude Opus 4.7    | Claude Sonnet 4.6   | Claude Haiku 4.5            |
-| ----------------------------- | ------------------ | ------------------- | --------------------------- |
-| **API Model ID**              | `claude-opus-4-7`  | `claude-sonnet-4-6` | `claude-haiku-4-5-20251001` |
-| **Alias**                     | `claude-opus-4-7`  | `claude-sonnet-4-6` | `claude-haiku-4-5`          |
-| **Pricing (in/out MTok)**     | $5 / $25           | $3 / $15            | $1 / $5                     |
-| **Context window**            | 1M tokens          | 1M tokens (beta)    | 200k tokens                 |
-| **Max output**                | 128k tokens        | 64k tokens          | 64k tokens                  |
-| **Reliable knowledge cutoff** | Jan 2026           | Aug 2025            | Feb 2025                    |
-| **Training data cutoff**      | Jan 2026           | Jan 2026            | Jul 2025                    |
-| **Extended thinking**         | No (adaptive only) | Yes                 | Yes                         |
-| **Release date**              | 2026-04-16         | 2026-02-17          | 2025-10-15                  |
+| Feature                   | Claude Opus 4.8         | Claude Sonnet 5     | Claude Haiku 4.5            |
+| ------------------------- | ----------------------- | ------------------- | --------------------------- |
+| **API Model ID**          | `claude-opus-4-8`       | `claude-sonnet-5`   | `claude-haiku-4-5-20251001` |
+| **Alias**                 | `opus`                  | `sonnet`            | `haiku`                     |
+| **Pricing (in/out MTok)** | $5 / $25                | $2→$3 (a) / $10→$15 | $1 / $5                     |
+| **SWE-bench Verified**    | 88.6% `[Verified]`      | 85.2% `[Verified]`  | 73.3% `[Verified]`          |
+| **SWE-bench Pro**         | 69.2% `[Verified]`      | 63.2% `[Verified]`  | 39.5% `[Self-reported]`     |
+| **Terminal-Bench 2.1**    | not confirmed this pass | 80.4% `[Verified]`  | not confirmed this pass     |
+| **OSWorld-Verified**      | 83.4% `[Verified]`      | 81.2% `[Verified]`  | 50.7% `[Self-reported]`     |
+| **Release date**          | 2026-05-28              | 2026-06-30          | 2025-10-15                  |
 
----
+(a) introductory rate through 2026-08-31, then standard rate.
 
-### Claude Opus 4.7
-
-**Model ID**: `claude-opus-4-7` | **Alias**: `opus` (omit in agent frontmatter for budget-adaptive inherit)
-
-**Primary sources**:
-
-- [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview) (official API docs, accessed 2026-05-07)
-- [Introducing Claude Opus 4.7](https://www.anthropic.com/news/claude-opus-4-7) (Anthropic, 2026-04-16)
-- [Claude Opus 4.7 What's New](https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-7) (official API changelog)
-- [Claude Opus 4.7 System Card](https://www.anthropic.com/claude-opus-4-7-system-card) (PDF; inaccessible to automated text extraction at research time — scores corroborated via launch post and third-party outlets)
-
-| Benchmark                      | Score         | Vs Predecessor (Opus 4.6)   | Confidence        | Source                                                                       |
-| ------------------------------ | ------------- | --------------------------- | ----------------- | ---------------------------------------------------------------------------- |
-| SWE-bench Verified             | **87.6%**     | +6.8pp (vs 80.8%)           | `[Self-reported]` | Official launch post (2026-04-16); corroborated by VentureBeat, BenchLM.ai   |
-| SWE-bench Pro                  | **64.3%**     | +10.9pp (vs 53.4%)          | `[Self-reported]` | Official launch post; Opus 4.7 not yet submitted to Scale AI SEAL scaffold   |
-| GPQA Diamond                   | **94.2%**     | +2.9pp (vs 91.3%)           | `[Self-reported]` | Official launch post; multiple aggregators confirm                           |
-| Terminal-Bench 2.0             | **69.4%**     | +4.0pp (vs 65.4%)           | `[Self-reported]` | Official launch post                                                         |
-| OSWorld-Verified               | **78.0%**     | +5.3pp (vs 72.7%)           | `[Self-reported]` | Official launch post                                                         |
-| CursorBench                    | **70%**       | +12pp (vs 58% for Opus 4.6) | `[Self-reported]` | Official launch post (Cursor partner data)                                   |
-| Finance Agent v1.1             | **64.4%**     | +3.7pp (vs 60.7%)           | `[Self-reported]` | Official launch post                                                         |
-| MCP-Atlas                      | **77.3%**     | —                           | `[Self-reported]` | Official launch post                                                         |
-| BrowseComp                     | **79.3%**     | —                           | `[Self-reported]` | Official launch post                                                         |
-| HLE (no tools)                 | **46.9%**     | —                           | `[Self-reported]` | Official launch post                                                         |
-| HLE (with tools)               | **54.7%**     | —                           | `[Self-reported]` | Official launch post                                                         |
-| CharXiv Reasoning (no tools)   | **82.1%**     | —                           | `[Self-reported]` | Official launch post                                                         |
-| CharXiv Reasoning (with tools) | **91.0%**     | —                           | `[Self-reported]` | Official launch post                                                         |
-| MMMLU                          | **91.5%**     | —                           | `[Self-reported]` | Official launch post                                                         |
-| AIME 2025                      | Not published | —                           | —                 | Likely omitted due to contamination concerns (see Opus 4.5 system card §2.2) |
-
-**Notable changes in Opus 4.7**:
-
-- New tokenizer: up to 35% more tokens for same input vs prior models
-- Sampling parameters (`temperature`, `top_p`, `top_k`) removed — setting them returns HTTP 400
-- Extended thinking budgets removed — only `type: "adaptive"` supported
-- High-resolution image support up to 2576px / 3.75MP
+**Scope note (2026-07-05 refresh)**: this table's Opus 4.8/Sonnet 5 rows carry only the benchmarks
+independently re-verified for the `upgrade-opencode-go-models` plan (SWE-bench Verified/Pro,
+Terminal-Bench 2.1, OSWorld-Verified) — secondary benchmarks this doc previously tracked for Opus
+4.7/Sonnet 4.6 (GPQA Diamond, AIME 2025, HLE, CharXiv, MCP-Atlas, BrowseComp, Finance Agent,
+CursorBench) were not re-researched for the new models in this pass and are omitted rather than
+guessed; check Anthropic's own launch materials for the full current suite. Anthropic also shipped a
+tier **above** Opus on 2026-06-09 — **Claude Fable 5** (GA, SWE-bench Pro ~80.3% `[Verified]` via
+[Vellum](https://www.vellum.ai/blog/claude-fable-5-and-mythos-5-benchmarks-explained)) and **Claude
+Mythos 5** (gated to Project Glasswing, not generally available) — neither is what the `opus` alias
+resolves to; Fable 5/Mythos 5 are noted here for completeness only, not tracked as a tier in this
+document.
 
 ---
 
-### Claude Sonnet 4.6
+### Claude Opus 4.8
 
-**Model ID**: `claude-sonnet-4-6` | **Alias**: `sonnet`
+**Model ID**: `claude-opus-4-8` | **Alias**: `opus` (omit in agent frontmatter for budget-adaptive inherit)
 
 **Primary sources**:
 
-- [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview) (official API docs, accessed 2026-05-07)
-- [Introducing Claude Sonnet 4.6](https://www.anthropic.com/news/claude-sonnet-4-6) (Anthropic, 2026-02-17)
-- [Claude Sonnet 4.6 System Card](https://www.anthropic.com/claude-sonnet-4-6-system-card)
+- [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview) (official API docs, accessed 2026-07-05)
+- [VentureBeat: Claude Opus 4.8 is here](https://venturebeat.com/technology/anthropics-claude-opus-4-8-is-here-with-3x-cheaper-fast-mode-and-near-mythos-level-alignment) (2026-05-28)
 
-| Benchmark          | Score                                       | Conditions                                        | Confidence        | Source                                                 |
-| ------------------ | ------------------------------------------- | ------------------------------------------------- | ----------------- | ------------------------------------------------------ |
-| SWE-bench Verified | **79.6%** (80.2% with prompt mod)           | Official avg, adaptive thinking                   | `[Self-reported]` | Official launch post (2026-02-17)                      |
-| GPQA Diamond       | **89.9%** (adaptive) / **74.1%** (standard) | 10-trial avg, adaptive+max effort / standard mode | `[Self-reported]` | System card Table 2.1.A / Morph aggregator             |
-| AIME 2025          | **95.6%**                                   | 10-trial avg, adaptive thinking, max effort       | `[Self-reported]` | System card (confirmed via multiple secondary sources) |
-| OSWorld-Verified   | **72.5%**                                   | —                                                 | `[Self-reported]` | Official launch post                                   |
-| ARC-AGI-2          | **60.4%**                                   | —                                                 | `[Self-reported]` | NxCode citing official                                 |
-| MCP-Atlas          | **61.3%**                                   | —                                                 | `[Self-reported]` | Official launch post                                   |
-| Context window     | 1M tokens                                   | —                                                 | —                 | Official API docs (beta)                               |
+| Benchmark          | Score     | Confidence   | Source                      |
+| ------------------ | --------- | ------------ | --------------------------- |
+| SWE-bench Verified | **88.6%** | `[Verified]` | VentureBeat launch coverage |
+| SWE-bench Pro      | **69.2%** | `[Verified]` | VentureBeat launch coverage |
+| OSWorld-Verified   | **83.4%** | `[Verified]` | VentureBeat launch coverage |
 
-**GPQA disambiguation**: Two values circulate — 89.9% is the system card adaptive-thinking 10-trial average; 74.1% is the standard (non-adaptive) evaluation. Both are accurate in their respective conditions. The 89.9% is the number Anthropic foregrounds in system card reporting.
+**Pricing**: $5 / $25 per MTok (in/out) — unchanged from Opus 4.7.
 
-**Contamination note**: Anthropic flags that AIME 2025 scores may be partially inflated due to contamination (Opus 4.5 system card §2.2). The 95.6% score should be treated with awareness of this caveat.
+**Scope note**: only the benchmarks re-verified for the `upgrade-opencode-go-models` plan
+(2026-07-05) are listed above. GPQA Diamond, AIME 2025, Terminal-Bench, HLE, CharXiv, MCP-Atlas,
+BrowseComp, Finance Agent, and CursorBench scores were not re-researched for this model in this
+pass — check Anthropic's own launch materials for the full current suite rather than assuming
+continuity with Opus 4.7's figures above.
+
+---
+
+### Claude Sonnet 5
+
+**Model ID**: `claude-sonnet-5` | **Alias**: `sonnet`
+
+**Primary sources**:
+
+- [Introducing Claude Sonnet 5](https://www.anthropic.com/news/claude-sonnet-5) (Anthropic, 2026-06-30)
+- [MarkTechPost: Claude Sonnet 5 vs Sonnet 4.6 vs Opus 4.8](https://www.marktechpost.com/2026/06/30/anthropic-claude-sonnet-5-vs-sonnet-4-6-vs-opus-4-8-agentic-coding-benchmarks-api-pricing-and-cost-performance-tradeoffs-compared/) (2026-06-30)
+
+| Benchmark          | Score     | Confidence   | Source                                             |
+| ------------------ | --------- | ------------ | -------------------------------------------------- |
+| SWE-bench Verified | **85.2%** | `[Verified]` | Official launch post; corroborated by MarkTechPost |
+| SWE-bench Pro      | **63.2%** | `[Verified]` | Official launch post; corroborated by MarkTechPost |
+| Terminal-Bench 2.1 | **80.4%** | `[Verified]` | Official launch post; corroborated by MarkTechPost |
+| OSWorld-Verified   | **81.2%** | `[Verified]` | Official launch post; corroborated by MarkTechPost |
+
+**Pricing**: $2/$10 per MTok (in/out) introductory rate through 2026-08-31, then $3/$15 standard —
+per [Anthropic API Pricing](https://platform.claude.com/docs/en/about-claude/pricing).
+
+**Scope note**: only the benchmarks re-verified for the `upgrade-opencode-go-models` plan
+(2026-07-05) are listed above; other secondary benchmarks this doc tracked for Sonnet 4.6 (GPQA
+Diamond, AIME 2025, ARC-AGI-2, MCP-Atlas) were not re-researched for Sonnet 5 in this pass.
 
 ---
 
@@ -238,12 +242,14 @@ These models remain available via the Anthropic API but are no longer the recomm
 
 **Source**: [Anthropic Models Overview](https://platform.claude.com/docs/en/about-claude/models/overview) (legacy section, accessed 2026-05-07)
 
-| Model             | API ID                       | Pricing (in/out MTok) | Context | Max Out | Release    | SWE-bench Verified         | SWE-bench Pro (SEAL) | GPQA Diamond |
-| ----------------- | ---------------------------- | --------------------- | ------- | ------- | ---------- | -------------------------- | -------------------- | ------------ |
-| Claude Opus 4.6   | `claude-opus-4-6`            | $5 / $25              | 1M      | 128k    | 2026       | **80.8%**                  | **51.90%**           | **91.3%**    |
-| Claude Sonnet 4.5 | `claude-sonnet-4-5-20250929` | $3 / $15              | 200k    | 64k     | 2025-09-29 | **77.2%** (82.0% parallel) | **43.60%**           | —            |
-| Claude Opus 4.5   | `claude-opus-4-5-20251101`   | $5 / $25              | 200k    | 64k     | 2025-11-01 | **80.9%**                  | **45.89%**           | —            |
-| Claude Opus 4.1   | `claude-opus-4-1-20250805`   | $15 / $75             | 200k    | 32k     | 2025-08-05 | —                          | **23.1%**            | **80.9%**    |
+| Model             | API ID                       | Pricing (in/out MTok) | Context | Max Out | Release    | SWE-bench Verified         | SWE-bench Pro (SEAL) | GPQA Diamond                                |
+| ----------------- | ---------------------------- | --------------------- | ------- | ------- | ---------- | -------------------------- | -------------------- | ------------------------------------------- |
+| Claude Opus 4.7   | `claude-opus-4-7`            | $5 / $25              | 1M      | 128k    | 2026-04-16 | **87.6%**                  | **64.3%**            | **94.2%**                                   |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6`          | $3 / $15              | 1M      | 64k     | 2026-02-17 | **79.6%** (80.2% w/ mod)   | —                    | **89.9%** (adaptive) / **74.1%** (standard) |
+| Claude Opus 4.6   | `claude-opus-4-6`            | $5 / $25              | 1M      | 128k    | 2026       | **80.8%**                  | **51.90%**           | **91.3%**                                   |
+| Claude Sonnet 4.5 | `claude-sonnet-4-5-20250929` | $3 / $15              | 200k    | 64k     | 2025-09-29 | **77.2%** (82.0% parallel) | **43.60%**           | —                                           |
+| Claude Opus 4.5   | `claude-opus-4-5-20251101`   | $5 / $25              | 200k    | 64k     | 2025-11-01 | **80.9%**                  | **45.89%**           | —                                           |
+| Claude Opus 4.1   | `claude-opus-4-1-20250805`   | $15 / $75             | 200k    | 32k     | 2025-08-05 | —                          | **23.1%**            | **80.9%**                                   |
 
 All legacy model scores `[Self-reported]` from respective official Anthropic announcements and system cards. SWE-bench Pro (SEAL) scores from Scale AI public leaderboard.
 
@@ -282,35 +288,99 @@ All legacy model scores `[Self-reported]` from respective official Anthropic ann
 ## OpenCode Go Models (opencode-go/ provider)
 
 OpenCode Go is a flat-rate subscription ($5 first month, then $10/month) providing access to
-curated models from Chinese AI labs. All models use the `opencode-go/` provider prefix in
-OpenCode configuration. Claude Code agents use Claude models — the `opencode-go/` models are
-only active in the OpenCode runtime.
+curated models from six AI labs (Z.ai, MiniMax, Moonshot AI, Xiaomi, Alibaba, DeepSeek). All models
+use the `opencode-go/` provider prefix in OpenCode configuration. Claude Code agents use Claude
+models — the `opencode-go/` models are only active in the OpenCode runtime (and, per the
+`upgrade-opencode-go-models` plan, in Pi's `.pi/settings.json` model pin).
 
 **Subscription model**: No per-token billing for subscribers. Rate limits (requests per 5-hour
 window) serve as the effective capability signal — lower limit = heavier/more capable model,
 higher limit = lighter/faster model.
 
-**Current roster**: 12 models as of May 2026. The roster changes without a fixed cadence.
-Check the live model list in the OpenCode TUI or at [opencode.ai/docs/go](https://opencode.ai/docs/go/).
+**Current roster**: 13 models as of 2026-07-05 (independently re-confirmed via the `opencode models`
+CLI, v1.14.49 — a live client check, not docs-only). The roster changes without a fixed cadence —
+observed twice in the ~2 months between the prior `adopt-opencode-go` plan (2026-05-03) and this
+refresh. Check the live model list in the OpenCode TUI or at [opencode.ai/docs/go](https://opencode.ai/docs/go/).
 
-**Source**: [OpenCode Go Docs](https://opencode.ai/docs/go/) (official, accessed 2026-05-07)
+**Source**: [OpenCode Go Docs](https://opencode.ai/docs/go/), live `opencode models` CLI output
+(both accessed 2026-07-05)
+
+### Correcting "Opus 5" and the thinking/execution/fast tier design
+
+This repo's `convert_model()` (see [AI Agent Model Selection Convention](../../repo-governance/development/agents/model-selection.md))
+maps Claude Code's `opus`/`sonnet`/`haiku` aliases to three tiers — **thinking**, **execution**,
+**fast**. As of this 2026-07-05 refresh: thinking (`opus`) and execution (`sonnet`/omitted) both
+resolve to `opencode-go/glm-5.2`; fast (`haiku`) resolves to `opencode-go/minimax-m3`.
+
+**"Claude Opus 5" does not exist.** An earlier draft of the plan behind this refresh referenced
+"Opus 5" as the thinking-tier comparison bar; research confirmed no such model has been released —
+**Claude Opus 4.8** (shipped 2026-05-28) remains the current Opus generation. Anthropic's newest
+tier _above_ Opus, shipped 2026-06-09, is **Claude Fable 5** (GA) — a distinct model family, not
+what the `opus` alias resolves to (see the "Currently Active Models" scope note above). The
+thinking tier's actual comparison bar is Opus 4.8 (SWE-bench Pro 69.2%).
+
+**No `opencode-go` roster model clears Opus 4.8's 69.2% SWE-bench Pro bar** — `glm-5.2` at 62.1%
+(the strongest confirmed roster model) is closest, ~7.1pp below. The thinking tier therefore
+collapses onto the execution tier's target (`glm-5.2`) rather than being held to a bar nothing in
+the roster meets — an explicit, accepted tradeoff, not an oversight. See Decision 1 in the
+`upgrade-opencode-go-models` plan's `tech-docs.md` for the full rationale and decision-branch diagram.
 
 ### Roster Overview
 
-| opencode-go/ ID                 | Display Name      | Provider    | Req/5h | Capability Tier |
-| ------------------------------- | ----------------- | ----------- | ------ | --------------- |
-| `opencode-go/glm-5.1`           | GLM-5.1           | Z.ai        | 880    | Top             |
-| `opencode-go/kimi-k2.6`         | Kimi K2.6         | Moonshot AI | 1,150  | Top             |
-| `opencode-go/glm-5`             | GLM-5             | Z.ai        | 1,150  | High            |
-| `opencode-go/mimo-v2.5-pro`     | MiMo-V2.5-Pro     | Xiaomi      | 1,290  | High            |
-| `opencode-go/kimi-k2.5`         | Kimi K2.5         | Moonshot AI | 1,850  | High            |
-| `opencode-go/mimo-v2.5`         | MiMo-V2.5         | Xiaomi      | 2,150  | Mid-high        |
-| `opencode-go/deepseek-v4-pro`   | DeepSeek V4 Pro   | DeepSeek    | 3,450  | Mid-high        |
-| `opencode-go/qwen3.6-plus`      | Qwen3.6 Plus      | Alibaba     | 3,300  | Mid-high        |
-| `opencode-go/minimax-m2.7`      | MiniMax M2.7      | MiniMax     | 3,400  | Mid             |
-| `opencode-go/minimax-m2.5`      | MiniMax M2.5      | MiniMax     | 6,300  | Mid             |
-| `opencode-go/qwen3.5-plus`      | Qwen3.5 Plus      | Alibaba     | 10,200 | Mid             |
-| `opencode-go/deepseek-v4-flash` | DeepSeek V4 Flash | DeepSeek    | 31,650 | Speed           |
+| opencode-go/ ID                 | Display Name      | Provider    | Req/5h                    | SWE-bench Pro                    | Capability Tier                                             |
+| ------------------------------- | ----------------- | ----------- | ------------------------- | -------------------------------- | ----------------------------------------------------------- |
+| `opencode-go/glm-5.2`           | GLM-5.2           | Z.ai        | 880                       | **62.1%** `[Verified]`           | Thinking + execution tier target                            |
+| `opencode-go/glm-5.1`           | GLM-5.1           | Z.ai        | not reconfirmed this pass | 58.4% `[Self-reported]`          | Top                                                         |
+| `opencode-go/kimi-k2.6`         | Kimi K2.6         | Moonshot AI | not reconfirmed this pass | 58.6% `[Self-reported]`          | Top                                                         |
+| `opencode-go/kimi-k2.7-code`    | Kimi K2.7-code    | Moonshot AI | not reconfirmed this pass | 58.6% (a) `[Unverified]`         | Top                                                         |
+| `opencode-go/mimo-v2.5-pro`     | MiMo-V2.5-Pro     | Xiaomi      | not reconfirmed this pass | 57.2% `[Self-reported]`          | High                                                        |
+| `opencode-go/qwen3.7-max`       | Qwen3.7 Max       | Alibaba     | not reconfirmed this pass | ~60.6% (b) `[Unverified]`        | High (rejected as thinking-tier candidate)                  |
+| `opencode-go/mimo-v2.5`         | MiMo-V2.5         | Xiaomi      | not reconfirmed this pass | 56.1% `[Self-reported]`          | Mid-high                                                    |
+| `opencode-go/deepseek-v4-pro`   | DeepSeek V4 Pro   | DeepSeek    | not reconfirmed this pass | 55.4% `[Self-reported]`          | Mid-high                                                    |
+| `opencode-go/qwen3.6-plus`      | Qwen3.6 Plus      | Alibaba     | not reconfirmed this pass | not found                        | Mid-high                                                    |
+| `opencode-go/minimax-m3`        | MiniMax M3        | MiniMax     | not reconfirmed this pass | **59.0%** `[Self-reported]`      | Fast-tier target — closest to Sonnet 5 without exceeding it |
+| `opencode-go/minimax-m2.7`      | MiniMax M2.7      | MiniMax     | not reconfirmed this pass | 56.22% `[Self-reported]`         | Mid (superseded fast-tier target)                           |
+| `opencode-go/qwen3.7-plus`      | Qwen3.7 Plus      | Alibaba     | not reconfirmed this pass | not found `[Needs Verification]` | Mid                                                         |
+| `opencode-go/deepseek-v4-flash` | DeepSeek V4 Flash | DeepSeek    | not reconfirmed this pass | not published                    | Speed                                                       |
+
+(a) vs. older Opus 4.6, not Opus 4.8 — generation mismatch flagged in the original source. (b) no
+official Alibaba figure found; third-party estimate, still below `glm-5.2`'s confirmed 62.1% despite
+costing ~1.8x more per input token — rejected as a thinking-tier candidate (see
+`upgrade-opencode-go-models` plan's `tech-docs.md`, "Qwen3.7-Max/Plus re-checked" section).
+
+**Retired from the roster since the last refresh (2026-05-07)**: unsuffixed `opencode-go/glm-5`
+(retirement window narrowed to 2026-06-12–2026-07-05 by a third-party snapshot), `opencode-go/kimi-k2.5`,
+`opencode-go/minimax-m2.5`, `opencode-go/qwen3.5-plus`. Req/5h figures for the 8 unchanged roster
+models were not independently re-confirmed in this pass (only the two new tier-target models,
+`glm-5.2` and `minimax-m3`, were checked against their official/rate-limit sources) — treat the
+"not reconfirmed this pass" cells as carried over from the prior refresh, subject to the same
+without-fixed-cadence drift risk noted above.
+
+---
+
+### opencode-go/glm-5.2
+
+**Provider**: Z.ai (formerly Zhipu AI) | **Release**: 2026-06 (exact date not confirmed this pass)
+
+**Primary sources**:
+
+- [Z.ai GLM-5.2 Docs](https://docs.z.ai/guides/llm/glm-5.2)
+- [HuggingFace zai-org/GLM-5.2](https://huggingface.co/zai-org/GLM-5.2)
+
+| Benchmark          | Score     | vs. Sonnet 5 (63.2%) | vs. Opus 4.8 (69.2%) | Confidence        | Source                   |
+| ------------------ | --------- | -------------------- | -------------------- | ----------------- | ------------------------ |
+| SWE-bench Pro      | **62.1%** | −1.1pp (noise-level) | −7.1pp               | `[Self-reported]` | Z.ai docs; HF model card |
+| Terminal-Bench 2.1 | **81.0%** | +0.6pp               | —                    | `[Self-reported]` | Z.ai docs; HF model card |
+
+**Pricing**: $1.40 / $4.40 per 1M tokens (in/out) — [Z.ai Pricing](https://docs.z.ai/guides/overview/pricing), retrieved 2026-07-05.
+
+**Rate limit**: 880 req/5h — tied for the tightest in the 13-model roster, confirming it is priced
+and throttled as the flagship, not a light/fast option.
+
+**Role in this repo**: strongest model in the roster on every published benchmark checked — used as
+both the thinking-tier (`opus`) and execution-tier (`sonnet`/omitted) target in `convert_model()`,
+collapsed onto one literal per Decision 1 in the `upgrade-opencode-go-models` plan (does not clear
+Claude Opus 4.8's tier; at/slightly above Claude Sonnet 5's tier).
 
 ---
 
@@ -354,26 +424,22 @@ Check the live model list in the OpenCode TUI or at [opencode.ai/docs/go](https:
 
 ---
 
-### opencode-go/glm-5
+### opencode-go/kimi-k2.7-code
 
-**Provider**: Z.ai | **Release**: 2026-02-17
+**Provider**: Moonshot AI | **Release**: not confirmed this pass
 
 **Primary sources**:
 
-- [HuggingFace zai-org/GLM-5](https://huggingface.co/zai-org/GLM-5)
-- [GLM-5 technical paper (arXiv:2602.15763)](https://arxiv.org/html/2602.15763v1)
+- [Flowtivity: Kimi K2.7-code review](https://flowtivity.ai/blog/kimi-k2-7-code-review/)
 
-| Benchmark              | Score     | Confidence        | Source                                              |
-| ---------------------- | --------- | ----------------- | --------------------------------------------------- |
-| SWE-bench Verified     | **77.8%** | `[Self-reported]` | HF model card; highest open-source score at release |
-| GPQA Diamond           | **86.0%** | `[Self-reported]` | HF model card                                       |
-| AIME 2026 I            | **92.7%** | `[Self-reported]` | HF model card (note: AIME 2026, not 2025)           |
-| SWE-bench Multilingual | **73.3%** | `[Self-reported]` | HF model card                                       |
-| Terminal-Bench 2.0     | **56.2%** | `[Self-reported]` | HF model card                                       |
-| CyberGym               | **43.2%** | `[Self-reported]` | HF model card                                       |
-| HLE (no tools)         | **30.5%** | `[Self-reported]` | HF model card                                       |
+| Benchmark     | Score         | Confidence     | Source            |
+| ------------- | ------------- | -------------- | ----------------- |
+| SWE-bench Pro | **58.6%** (a) | `[Unverified]` | Flowtivity review |
 
-**Architecture**: 744B total / 40B active (MoE) | **Context**: 200K tokens | **License**: Open-weight
+(a) compared against older Opus 4.6 in the original source, not Opus 4.8 — generation mismatch,
+flagged rather than silently normalized.
+
+**Pricing**: $0.95 (cache miss) / $0.19 (cache hit) input, $4.00 output per 1M tokens — [Kimi Platform Pricing](https://platform.kimi.ai/docs/pricing/chat-k27-code), retrieved 2026-07-05.
 
 ---
 
@@ -395,26 +461,6 @@ Check the live model list in the OpenCode TUI or at [opencode.ai/docs/go](https:
 | Artificial Analysis Intelligence Index | **54** (composite) | `[Verified]`      | Artificial Analysis                                 |
 
 **Architecture**: 1.02T total / 42B active (MoE), multimodal | **Context**: 1M tokens | **License**: Open-weight | **Notable**: Supports 1,000+ sequential tool calls without coherence loss.
-
----
-
-### opencode-go/kimi-k2.5
-
-**Provider**: Moonshot AI | **Release**: Early 2026 (before April 20, 2026)
-
-**Primary sources**:
-
-- [Kimi K2.5 Tech Blog](https://www.kimi.com/blog/kimi-k2-5)
-- [GitHub MoonshotAI/Kimi-K2.5](https://github.com/MoonshotAI/Kimi-K2.5)
-
-| Benchmark          | Score     | Confidence        | Source                             |
-| ------------------ | --------- | ----------------- | ---------------------------------- |
-| SWE-bench Verified | **76.8%** | `[Self-reported]` | Official blog                      |
-| SWE-bench Pro      | **50.7%** | `[Self-reported]` | Official blog                      |
-| GPQA Diamond       | **87.6%** | `[Self-reported]` | Official blog                      |
-| AIME 2025          | **96.1%** | `[Self-reported]` | Official blog (with thinking mode) |
-
-**Context**: 256K tokens | **License**: Open-source
 
 ---
 
@@ -498,37 +544,64 @@ Check the live model list in the OpenCode TUI or at [opencode.ai/docs/go](https:
 
 ---
 
-### opencode-go/minimax-m2.5
+### opencode-go/minimax-m3
 
-**Provider**: MiniMax | **Release**: 2026-02-12
+**Provider**: MiniMax | **Release**: not confirmed this pass
 
 **Primary sources**:
 
-- [MiniMax M2.5 Official](https://www.minimax.io/news/minimax-m25)
-- [HuggingFace MiniMaxAI/MiniMax-M2.5](https://huggingface.co/MiniMaxAI/MiniMax-M2.5)
+- [MiniMax M3 blog](https://www.minimax.io/blog/minimax-m3)
 
-| Benchmark          | Score     | Confidence        | Source                                               |
-| ------------------ | --------- | ----------------- | ---------------------------------------------------- |
-| SWE-bench Verified | **80.2%** | `[Self-reported]` | Official announcement; corroborated by HN discussion |
-| Multi-SWE-Bench    | **51.3%** | `[Self-reported]` | Official announcement                                |
-| BrowseComp         | **76.3%** | `[Self-reported]` | Official announcement (with context management)      |
-| GPQA Diamond       | **85.2%** | `[Self-reported]` | HF Open LLM Leaderboard official submission          |
+| Benchmark          | Score     | vs. Sonnet 5 (63.2%) | vs. Opus 4.8 (69.2%) | Confidence        | Source        |
+| ------------------ | --------- | -------------------- | -------------------- | ----------------- | ------------- |
+| SWE-bench Pro      | **59.0%** | −4.2pp               | −10.2pp              | `[Self-reported]` | Official blog |
+| Terminal-Bench 2.1 | **66.0%** | −14.4pp              | —                    | `[Self-reported]` | Official blog |
 
-**Architecture**: 230B total / 10B active (MoE) | **Context**: 204,800 tokens | **License**: MIT (open-weight)
+**Pricing**: $0.30 (≤512K context) / $0.60 (>512K) input, $1.20 (≤512K) / $2.40 (>512K) output per
+1M tokens — [MiniMax Pay-as-you-go](https://platform.minimax.io/docs/guides/pricing-paygo), retrieved 2026-07-05.
+
+**Role in this repo**: fast-tier (`haiku`) target in `convert_model()` — the closest roster model to
+Claude Sonnet 5's tier without exceeding it, chosen over collapsing every tier onto `glm-5.2` so the
+fast tier stays genuinely lighter and cheaper (input $0.30 vs. glm-5.2's $1.40). Supersedes
+`opencode-go/minimax-m2.7` as the fast-tier target as of the `upgrade-opencode-go-models` plan
+(2026-07-05).
 
 ---
 
-### opencode-go/qwen3.5-plus
+### opencode-go/qwen3.7-max
 
-**Provider**: Alibaba (Qwen team) | **Release**: February 2026
+**Provider**: Alibaba (Qwen team) | **Release**: not confirmed this pass
 
-**Primary sources**: Third-party developer guides (official Qwen primary source not directly confirmed at research time)
+**Primary sources**: [amitray.com Qwen3.7-Max benchmark](https://amitray.com/qwen3-7-max-benchmark/),
+[Weights & Biases report](https://wandb.ai/byyoung3/ml-news/reports/Qwen3-7-Max-Benchmark-Scores---VmlldzoxNjk1MzA1MQ)
+— no official Alibaba-published SWE-bench score found; the official `qwen.ai` blog is
+client-side-rendered and could not be fetched at research time.
 
-| Benchmark          | Score     | Confidence     | Source                  |
-| ------------------ | --------- | -------------- | ----------------------- |
-| SWE-bench Verified | **76.4%** | `[Unverified]` | Third-party aggregators |
+| Benchmark     | Score  | Confidence     | Source                                                        |
+| ------------- | ------ | -------------- | ------------------------------------------------------------- |
+| SWE-bench Pro | ~60.6% | `[Unverified]` | Third-party estimate, consistent across 2 independent sources |
 
-**Context**: 262K tokens native; extensible to ~1M | **License**: Proprietary
+**Pricing**: $2.50 input / $7.50 output per 1M tokens (Singapore/International tier) — [Alibaba Cloud Model Studio Pricing](https://www.alibabacloud.com/help/en/model-studio/model-pricing), retrieved 2026-07-05 — notably above `glm-5.2`'s $1.40/$4.40 despite scoring lower.
+
+**Checked and rejected as a thinking-tier candidate** (2026-07-05, `upgrade-opencode-go-models`
+plan): even the unverified 60.6% figure doesn't clear `glm-5.2`'s confirmed 62.1%, despite costing
+~1.8x more per input token.
+
+---
+
+### opencode-go/qwen3.7-plus
+
+**Provider**: Alibaba (Qwen team) | **Release**: not confirmed this pass
+
+**Primary sources**: no primary source located as of 2026-07-05; described only as "within 2pp of
+Max on SWE-bench Pro" in secondary coverage, no standalone figure found.
+
+| Benchmark     | Score     | Confidence             | Source                                     |
+| ------------- | --------- | ---------------------- | ------------------------------------------ |
+| SWE-bench Pro | not found | `[Needs Verification]` | No primary source located as of 2026-07-05 |
+
+**Pricing**: $0.40 (0-256K context) / $1.20 (256K-1M) input, $1.60 (0-256K) / $4.80 (256K-1M) output
+per 1M tokens — [Alibaba Cloud Model Studio Pricing](https://www.alibabacloud.com/help/en/model-studio/model-pricing), retrieved 2026-07-05.
 
 ---
 
@@ -556,69 +629,147 @@ Cross-reference with [AI Agent Model Selection Convention](../../repo-governance
 tier assignments. The Claude-to-OpenCode mapping reflects what `npm run generate:bindings` produces
 for the current agent frontmatter aliases.
 
-| Claude Alias | Claude Model (2026)         | Pricing (in/out MTok) | SWE-bench Verified        | OpenCode Go ID             |
-| ------------ | --------------------------- | --------------------- | ------------------------- | -------------------------- |
-| `""` (omit)  | Inherits session model      | Inherits              | Inherits (87.6% or 79.6%) | `opencode-go/minimax-m2.7` |
-| `sonnet`     | `claude-sonnet-4-6`         | $3 / $15              | 79.6% `[Self-reported]`   | `opencode-go/minimax-m2.7` |
-| `haiku`      | `claude-haiku-4-5-20251001` | $1 / $5               | 73.3% `[Verified]`        | `opencode-go/glm-5`        |
+| Claude Alias              | Claude Model (2026)         | Pricing (in/out MTok) | SWE-bench Verified | OpenCode Go ID           |
+| ------------------------- | --------------------------- | --------------------- | ------------------ | ------------------------ |
+| `opus` (thinking)         | `claude-opus-4-8`           | $5 / $25              | 88.6% `[Verified]` | `opencode-go/glm-5.2`    |
+| `sonnet`/omit (execution) | `claude-sonnet-5`           | $2→$3 / $10→$15       | 85.2% `[Verified]` | `opencode-go/glm-5.2`    |
+| `haiku` (fast)            | `claude-haiku-4-5-20251001` | $1 / $5               | 73.3% `[Verified]` | `opencode-go/minimax-m3` |
 
-**Note on OpenCode Go mapping**: The full opencode-go roster has 12 models as of May 2026. The
-3-to-2 collapse (minimax-m2.7 for planning+execution, glm-5 for fast) reflects the mapping
-encoded in `apps/rhino-cli/src/internal/agents/converter.rs` at time of last sync. As the OpenCode
-Go roster evolves, the converter may be updated to point to higher-capability models. See
-`model-selection.md` for the authoritative mapping rationale.
+**Note on OpenCode Go mapping**: The full opencode-go roster has 13 models as of 2026-07-05. The
+thinking and execution tiers both map to `glm-5.2` — an explicit, intentional collapse (Decision 1,
+`upgrade-opencode-go-models` plan `tech-docs.md`): no roster model separately clears Claude Opus
+4.8's tier. The fast tier maps to `minimax-m3`, superseding the retired `glm-5` (unsuffixed) mapping.
+This reflects the 3-branch structure encoded in `apps/rhino-cli/src/application/agents/converter.rs`
+at time of last sync. As the OpenCode Go roster evolves, the converter may be updated to point to
+higher-capability models. See `model-selection.md` for the authoritative mapping rationale.
+
+---
+
+## Standard API Pricing (Non-Subscription, Per-Token)
+
+Retrieved 2026-07-05 for the `upgrade-opencode-go-models` plan. These are each model's own
+provider's direct pay-as-you-go rate — not the flat-rate `opencode-go` subscription price paid by
+this repo's actual subscribers.
+
+| Model             | Input $/1M                                  | Output $/1M                      | Source                                                                                                | Confidence       |
+| ----------------- | ------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------- |
+| `glm-5.2`         | $1.40                                       | $4.40                            | [Z.ai Pricing](https://docs.z.ai/guides/overview/pricing)                                             | `[Verified]`     |
+| `glm-5.1`         | $1.40                                       | $4.40                            | [Z.ai Pricing](https://docs.z.ai/guides/overview/pricing)                                             | `[Verified]` (a) |
+| `minimax-m3`      | $0.30 (≤512K) / $0.60 (>512K)               | $1.20 (≤512K) / $2.40 (>512K)    | [MiniMax Pay-as-you-go](https://platform.minimax.io/docs/guides/pricing-paygo)                        | `[Verified]`     |
+| `minimax-m2.7`    | $0.30                                       | $1.20                            | [MiniMax Pay-as-you-go](https://platform.minimax.io/docs/guides/pricing-paygo)                        | `[Verified]` (b) |
+| `kimi-k2.7-code`  | $0.95 (cache miss) / $0.19 (cache hit)      | $4.00                            | [Kimi Platform Pricing](https://platform.kimi.ai/docs/pricing/chat-k27-code)                          | `[Verified]`     |
+| `kimi-k2.6`       | $0.95 (cache miss) / $0.16 (cache hit)      | $4.00                            | [Kimi Platform Pricing](https://platform.kimi.ai/docs/pricing/chat-k26)                               | `[Verified]`     |
+| `deepseek-v4-pro` | $0.435 (cache miss) / $0.003625 (cache hit) | $0.87                            | [DeepSeek API Pricing](https://api-docs.deepseek.com/quick_start/pricing)                             | `[Verified]` (c) |
+| `mimo-v2.5-pro`   | ¥3 / ¥0.025 (cache) ≈ $0.44 / $0.004        | ¥6 ≈ $0.88                       | [Xiaomi MiMo Pay-as-you-go](https://mimo.mi.com/docs/price/pay-as-you-go)                             | `[Verified]` (d) |
+| `mimo-v2.5`       | ¥1 / ¥0.02 (cache) ≈ $0.15 / $0.003         | ¥2 ≈ $0.29                       | [Xiaomi MiMo Pay-as-you-go](https://mimo.mi.com/docs/price/pay-as-you-go)                             | `[Verified]` (d) |
+| `qwen3.7-max`     | $2.50 (Intl)                                | $7.50 (Intl)                     | [Alibaba Cloud Model Studio Pricing](https://www.alibabacloud.com/help/en/model-studio/model-pricing) | `[Verified]` (e) |
+| `qwen3.7-plus`    | $0.40 (0-256K) / $1.20 (256K-1M)            | $1.60 (0-256K) / $4.80 (256K-1M) | [Alibaba Cloud Model Studio Pricing](https://www.alibabacloud.com/help/en/model-studio/model-pricing) | `[Verified]` (e) |
+
+Notes: (a) GLM-5.1/5.2 show identical official rates on Z.ai's own pricing page — some aggregators
+list a lower third-party-hosted GLM-5.1 rate; that is reseller pricing, not Z.ai's. (b)
+MiniMax-M2.7/M3 show identical standard-tier rates on MiniMax's own pricing page — unusual for two
+model generations, worth a spot-check on next refresh. (c) DeepSeek's live official page shows no
+expiry note on this rate, but a secondary source claims it is a promotion that may revert to
+$1.74/$3.48 — re-verify before relying on it long-term. (d) Xiaomi MiMo publishes only CNY pricing;
+USD figures converted at the CNY/USD spot rate as of 2026-07-04, not an official USD list price. (e)
+Alibaba Cloud Model Studio prices by region; Singapore/International rates shown as the
+globally-reachable rate — China-mainland pricing is substantially lower.
+
+---
+
+## Frontier/Big-Brand Model Reference (Informational Only — Not Available via `opencode-go`)
+
+Current Anthropic/OpenAI/Google flagship pricing and benchmarks, retrieved 2026-07-05, purely for
+cost/capability contrast — **none of these are, or will be, routed to by this repo's `convert_model()`
+or Pi's model pin** (see Decision 0, `upgrade-opencode-go-models` plan `tech-docs.md`: BYOM harnesses
+in this repo must not route to Anthropic, OpenAI, Google, or other frontier/big-brand providers).
+
+| Provider  | Model                    | SWE-bench Pro                             | SWE-bench Verified    | Input $/1M                    | Output $/1M                     | Release date | Confidence                                             |
+| --------- | ------------------------ | ----------------------------------------- | --------------------- | ----------------------------- | ------------------------------- | ------------ | ------------------------------------------------------ |
+| Anthropic | Claude Opus 4.8          | 69.2%                                     | 88.6%                 | $5.00                         | $25.00                          | 2026-05-28   | `[Verified]`                                           |
+| Anthropic | Claude Sonnet 5          | 63.2%                                     | 85.2%                 | $2.00→$3.00 (a)               | $10.00→$15.00                   | 2026-06-30   | `[Verified]`                                           |
+| Anthropic | Claude Fable 5           | 80.3%                                     | ~95.0% (b)            | not confirmed                 | not confirmed                   | 2026-06-09   | Benchmark `[Verified]`; pricing `[Needs Verification]` |
+| OpenAI    | GPT-5.5 (flagship)       | 58.6% (c)                                 | not reported (d)      | $5.00                         | $30.00                          | 2026-04-24   | Pricing `[Verified]`; benchmark `[Unverified]`         |
+| OpenAI    | GPT-5.4 (prior flagship) | 59.10% ±3.56% (e)                         | not reported (d)      | $2.50                         | $15.00                          | 2026-03-05   | `[Verified]`                                           |
+| OpenAI    | GPT-5.4-mini             | not found                                 | not reported          | $0.75                         | $4.50                           | 2026-03-17   | Pricing `[Verified]`; benchmark `[Needs Verification]` |
+| OpenAI    | GPT-5.4-nano             | not found                                 | not reported          | $0.20                         | $1.25                           | 2026-03-17   | Pricing `[Verified]`; benchmark `[Needs Verification]` |
+| Google    | Gemini 3.1 Pro (Preview) | 54.2% (self-reported) / 46.10% ±3.60% (f) | 80.6%                 | $2.00 (≤200k) / $4.00 (>200k) | $12.00 (≤200k) / $18.00 (>200k) | 2026-02-19   | `[Verified]` (dual-sourced conflict noted)             |
+| Google    | Gemini 3.5 Flash         | 55.1%                                     | not on model card (g) | $1.50                         | $9.00                           | 2026-05-19   | `[Verified]`                                           |
+
+Notes: (a) introductory rate through 2026-08-31, then standard rate. (b) third-party transcription
+of an image-embedded table on Anthropic's own announcement page — treat as directionally correct,
+not exact. (c) quoted consistently across independent outlets citing OpenAI's own announcement; the
+primary page returned HTTP 403 on every direct fetch attempt. (d) OpenAI has publicly stopped
+reporting SWE-bench Verified for current-generation models (training-data contamination/reward-
+hacking concerns); recommends SWE-bench Pro instead. Last officially-reported Verified figure was
+GPT-5.2 Thinking at 80% (2026-12-11), two generations behind current. (e) Scale AI's independent
+SWE-bench Pro leaderboard, xHigh reasoning setting — not vendor-self-reported. (f) Google's own
+model card self-reports 54.2%; the independent Scale AI leaderboard scores the same model at
+46.10% ± 3.60% — a real self-reported-vs-independent gap, both cited rather than silently picking
+one. (g) a 78% figure circulates across secondary sources but could not be confirmed on Google's own
+model card.
+
+**Not shown**: Gemini 3.5 Pro (still limited enterprise preview, not GA/priced as of 2026-07-05).
+Claude Mythos 5 (gated to Project Glasswing, not generally accessible).
 
 ---
 
 ## Model Capability Summary (Coding-Agents Lens)
 
-| Model                 | SWE-bench Verified      | SWE-bench Pro            | Cost tier   | Notes                                                        |
-| --------------------- | ----------------------- | ------------------------ | ----------- | ------------------------------------------------------------ |
-| **Claude Opus 4.7**   | 87.6% `[Self-reported]` | 64.3% `[Self-reported]`  | Highest     | Budget-adaptive inherit — Max/Team Premium sessions          |
-| **Claude Sonnet 4.6** | 79.6% `[Self-reported]` | —                        | Mid         | Budget-adaptive inherit — Pro/Standard; explicit sonnet-tier |
-| **Claude Haiku 4.5**  | 73.3% `[Verified]`      | 39.5% `[Self-reported]`  | Lowest      | Explicit haiku-tier — deterministic/mechanical agents        |
-| **GLM-5.1**           | ~77.8% (GLM-5 baseline) | 58.4% `[Self-reported]`  | OC Top      | opencode-go; #1 SWE-bench Pro at Apr 2026 release            |
-| **Kimi K2.6**         | 80.2% `[Self-reported]` | 58.6% `[Self-reported]`  | OC Top      | opencode-go; strong coding and agent swarm support           |
-| **GLM-5**             | 77.8% `[Self-reported]` | —                        | OC High     | opencode-go; base model for GLM-5.1                          |
-| **MiMo-V2.5-Pro**     | ~82% `[Unverified]`     | 57.2% `[Self-reported]`  | OC High     | opencode-go; 1T+ param MoE, 1M context                       |
-| **DeepSeek V4 Pro**   | 80.6% `[Self-reported]` | 55.4% `[Self-reported]`  | OC Mid-high | opencode-go; strong GPQA Diamond 90.1%                       |
-| **Kimi K2.5**         | 76.8% `[Self-reported]` | 50.7% `[Self-reported]`  | OC High     | opencode-go; predecessor to K2.6                             |
-| **MiniMax M2.5**      | 80.2% `[Self-reported]` | —                        | OC Mid      | opencode-go; predecessor to M2.7                             |
-| **MiniMax M2.7**      | ~78% `[Unverified]`     | 56.22% `[Self-reported]` | OC Mid      | opencode-go; current sync target for claude opus+sonnet      |
-| **DeepSeek V4 Flash** | 79.0% `[Self-reported]` | —                        | OC Speed    | opencode-go; 31,650 req/5h — highest throughput              |
-| **Qwen3.6 Plus**      | 78.8% `[Unverified]`    | —                        | OC Mid-high | opencode-go; always-on CoT                                   |
-| **MiMo-V2.5**         | —                       | 56.1% `[Self-reported]`  | OC Mid-high | opencode-go; lighter MiMo variant                            |
-| **Qwen3.5 Plus**      | 76.4% `[Unverified]`    | —                        | OC Mid      | opencode-go; high-throughput option                          |
+| Model                 | SWE-bench Verified               | SWE-bench Pro            | Cost tier   | Notes                                                                        |
+| --------------------- | -------------------------------- | ------------------------ | ----------- | ---------------------------------------------------------------------------- |
+| **Claude Opus 4.8**   | 88.6% `[Verified]`               | 69.2% `[Verified]`       | Highest     | Thinking-tier (`opus`) comparison bar — no roster model clears it            |
+| **Claude Sonnet 5**   | 85.2% `[Verified]`               | 63.2% `[Verified]`       | Mid-high    | Execution-tier (`sonnet`/omit) comparison bar                                |
+| **Claude Haiku 4.5**  | 73.3% `[Verified]`               | 39.5% `[Self-reported]`  | Lowest      | Explicit haiku-tier — deterministic/mechanical agents                        |
+| **GLM-5.2**           | not reconfirmed this pass        | 62.1% `[Self-reported]`  | OC Top      | opencode-go; **thinking + execution tier target** — strongest in roster      |
+| **MiniMax M3**        | not reconfirmed this pass        | 59.0% `[Self-reported]`  | OC Mid      | opencode-go; **fast-tier target** — closest to Sonnet 5 without exceeding it |
+| **GLM-5.1**           | ~77.8% (GLM-5 baseline)          | 58.4% `[Self-reported]`  | OC Top      | opencode-go; predecessor to GLM-5.2                                          |
+| **Kimi K2.6**         | 80.2% `[Self-reported]`          | 58.6% `[Self-reported]`  | OC Top      | opencode-go; strong coding and agent swarm support                           |
+| **Kimi K2.7-code**    | not reconfirmed this pass        | 58.6% (a) `[Unverified]` | OC Top      | opencode-go; coding-specialized variant                                      |
+| **Qwen3.7 Max**       | not reconfirmed this pass        | ~60.6% `[Unverified]`    | OC High     | opencode-go; checked and rejected as thinking-tier candidate                 |
+| **MiMo-V2.5-Pro**     | ~82% `[Unverified]`              | 57.2% `[Self-reported]`  | OC High     | opencode-go; 1T+ param MoE, 1M context                                       |
+| **DeepSeek V4 Pro**   | 80.6% `[Self-reported]`          | 55.4% `[Self-reported]`  | OC Mid-high | opencode-go; strong GPQA Diamond 90.1%                                       |
+| **MiniMax M2.7**      | ~78% `[Unverified]`              | 56.22% `[Self-reported]` | OC Mid      | opencode-go; superseded fast-tier target (was mapped from `haiku`)           |
+| **DeepSeek V4 Flash** | 79.0% `[Self-reported]`          | —                        | OC Speed    | opencode-go; 31,650 req/5h — highest throughput                              |
+| **Qwen3.6 Plus**      | 78.8% `[Unverified]`             | —                        | OC Mid-high | opencode-go; always-on CoT                                                   |
+| **MiMo-V2.5**         | —                                | 56.1% `[Self-reported]`  | OC Mid-high | opencode-go; lighter MiMo variant                                            |
+| **Qwen3.7 Plus**      | not found `[Needs Verification]` | —                        | OC Mid      | opencode-go; no primary source located as of 2026-07-05                      |
 
-**OC = OpenCode Go subscription (flat-rate, no per-token billing)**
+(a) vs. older Opus 4.6, not Opus 4.8 — generation mismatch flagged in the original source.
+
+**OC = OpenCode Go subscription (flat-rate, no per-token billing)**. Retired since the 2026-05-07
+refresh (no longer in the live 13-model roster as of 2026-07-05): unsuffixed GLM-5, Kimi K2.5,
+MiniMax M2.5, Qwen3.5 Plus.
 
 ---
 
 ## Limitations and Caveats
 
-1. **Claude system card PDFs inaccessible to automated extraction**: All three active model system card PDFs are confirmed to exist but return compressed binary that tools cannot text-extract. Benchmark scores for Opus 4.7, Sonnet 4.6, and Haiku 4.5 are corroborated via official launch posts and credible third-party aggregators, not direct PDF extraction.
+1. **Claude Opus 4.8/Sonnet 5 secondary benchmarks not re-researched this pass**: only SWE-bench Verified/Pro, Terminal-Bench 2.1, and OSWorld-Verified were independently re-verified for the 2026-07-05 refresh. GPQA Diamond, AIME 2025, HLE, CharXiv, MCP-Atlas, BrowseComp, Finance Agent, and CursorBench scores were tracked for the superseded Opus 4.7/Sonnet 4.6 (now in the Legacy Models table) but not re-derived for the current models — check Anthropic's own launch materials for the current full suite.
 
 2. **Haiku 4.5 GPQA / AIME discrepancy is unresolved**: Two values circulate for each. 74.1% GPQA and 80.7% AIME are the more consistently cited across aggregators; 67.2% and 83.7% appear in fewer sources. Both tagged `[Needs Verification]` — update when system card PDF is confirmed.
 
-3. **Opus 4.7 AIME 2025 not published**: Anthropic did not include AIME 2025 in the Opus 4.7 launch post, likely due to contamination concerns documented in Opus 4.5 system card §2.2.
+3. **"Claude Opus 5" does not exist**: an earlier draft referenced it as the thinking-tier comparison bar; confirmed no such model has been released as of 2026-07-05. Claude Opus 4.8 is the actual current Opus generation and the correct thinking-tier bar. Claude Fable 5 (GA 2026-06-09) is a distinct, higher tier — not what the `opus` alias resolves to.
 
-4. **All OpenCode Go model scores are self-reported by their respective labs**: No independent third-party replication of GLM, Kimi, MiMo, MiniMax, Qwen, or DeepSeek scores has been identified. Treat with appropriate skepticism compared to Claude scores corroborated by multiple outlets.
+4. **All OpenCode Go model scores are self-reported by their respective labs unless tagged `[Verified]`/corroborated**: No independent third-party replication of most GLM, Kimi, MiMo, MiniMax, Qwen, or DeepSeek scores has been identified. Treat with appropriate skepticism compared to Claude scores corroborated by multiple outlets.
 
-5. **MiniMax M2.7 SWE-bench Verified not officially published**: The ~78% figure is a third-party estimate. Only SWE-bench Pro (56.22%) is from the official announcement.
+5. **MiniMax M2.7 SWE-bench Verified not officially published**: The ~78% figure is a third-party estimate. Only SWE-bench Pro (56.22%) is from the official announcement. (M2.7 is now superseded as the fast-tier target by MiniMax M3 — see the Model Selection Mapping section.)
 
-6. **GLM-5.1 SWE-bench Verified not separately published**: GLM-5.1 is a post-training upgrade to GLM-5. Only SWE-bench Pro (58.4%) is in the GLM-5.1 official benchmark table.
+6. **GLM-5.1 SWE-bench Verified not separately published**: GLM-5.1 is a post-training upgrade to GLM-5 (now retired from the live roster). Only SWE-bench Pro (58.4%) is in the GLM-5.1 official benchmark table.
 
-7. **Qwen3.5 Plus and Qwen3.6 Plus scores from third-party aggregators only**: Official Qwen primary source was not directly confirmed at research time. Scores tagged `[Unverified]`.
+7. **Qwen3.6 Plus, Qwen3.7 Max, and Qwen3.7 Plus scores from third-party aggregators only, or not found at all**: Official Qwen primary sources were not directly confirmed at research time (the official `qwen.ai` blog is client-side-rendered and could not be fetched). Qwen3.7 Max/Plus were specifically checked as possible thinking-tier candidates and rejected — see the Roster Overview notes.
 
-8. **CursorBench has no public leaderboard**: The 70% figure for Opus 4.7 is partner-reported via Anthropic's launch post. Cannot be independently reproduced.
+8. **CursorBench has no public leaderboard**: not re-researched for Opus 4.8/Sonnet 5 in this refresh; the historical 70% figure for Opus 4.7 (now in the Legacy Models table) was partner-reported via Anthropic's launch post and cannot be independently reproduced.
 
-9. **OpenCode Go roster changes without fixed cadence**: The 12-model roster above reflects May 7, 2026. New models may be added or retired without advance notice. Check the live list in the OpenCode TUI for the current roster.
+9. **OpenCode Go roster changes without fixed cadence**: The 13-model roster above reflects 2026-07-05, independently re-confirmed via the live `opencode models` CLI (not docs-only). The roster has changed twice in the ~2 months since the prior refresh (2026-05-07) — 4 models retired (unsuffixed GLM-5, Kimi K2.5, MiniMax M2.5, Qwen3.5 Plus), 5 added (GLM-5.2, Kimi K2.7-code, MiniMax M3, Qwen3.7 Max, Qwen3.7 Plus). Check the live list in the OpenCode TUI for the current roster before relying on this table.
 
-10. **AIME 2026 ≠ AIME 2025**: GLM-5, GLM-5.1, and Kimi models report AIME 2026 scores. These are NOT directly comparable to Claude Sonnet 4.6's AIME 2025 score of 95.6%.
+10. **AIME 2026 ≠ AIME 2025**: the retired GLM-5 and its GLM-5.1 successor reported AIME 2026 scores in the prior refresh. These are NOT directly comparable to Claude Sonnet 4.6's (now-legacy) AIME 2025 score of 95.6%.
 
 11. **Prices and context windows** are as of the access date shown. Check official API docs for current values before making cost comparisons.
 
-12. **Accuracy as of**: 2026-05-07. Model versions, scores, pricing, and OpenCode Go roster change frequently. Re-verify when making tier assignment decisions more than 3 months from this date.
+12. **Accuracy as of**: 2026-07-05. Model versions, scores, pricing, and OpenCode Go roster change frequently. Re-verify when making tier assignment decisions more than 3 months from this date.
+
+13. **Standard API pricing vs. `opencode-go` subscription pricing**: the "Standard API Pricing" table above reflects each model's own provider's direct pay-as-you-go rate, not the flat-rate `opencode-go` subscription price this repo's actual OpenCode/Pi configuration pays. The two are not interchangeable for cost planning.
 
 ---
 
@@ -675,3 +826,25 @@ These models are not current tier choices but are referenced in comparison or as
 38. Vellum Claude Opus 4.7 Benchmarks Explained — <https://www.vellum.ai/blog/claude-opus-4-7-benchmarks-explained>
 39. DataCamp Claude Haiku 4.5 — <https://www.datacamp.com/blog/anthropic-claude-haiku-4-5>
 40. NxCode Claude Sonnet 4.6 Complete Guide — <https://www.nxcode.io/resources/news/claude-sonnet-4-6-complete-guide-benchmarks-pricing-2026>
+41. Introducing Claude Sonnet 5 — <https://www.anthropic.com/news/claude-sonnet-5> (2026-06-30)
+42. VentureBeat: Claude Opus 4.8 is here — <https://venturebeat.com/technology/anthropics-claude-opus-4-8-is-here-with-3x-cheaper-fast-mode-and-near-mythos-level-alignment> (2026-05-28)
+43. MarkTechPost: Claude Sonnet 5 vs Sonnet 4.6 vs Opus 4.8 — <https://www.marktechpost.com/2026/06/30/anthropic-claude-sonnet-5-vs-sonnet-4-6-vs-opus-4-8-agentic-coding-benchmarks-api-pricing-and-cost-performance-tradeoffs-compared/>
+44. Vellum: Claude Fable 5 and Mythos 5 Benchmarks Explained — <https://www.vellum.ai/blog/claude-fable-5-and-mythos-5-benchmarks-explained>
+45. Anthropic API Pricing — <https://platform.claude.com/docs/en/about-claude/pricing>
+46. Z.ai GLM-5.2 Docs — <https://docs.z.ai/guides/llm/glm-5.2>
+47. HuggingFace zai-org/GLM-5.2 — <https://huggingface.co/zai-org/GLM-5.2>
+48. Z.ai Pricing — <https://docs.z.ai/guides/overview/pricing>
+49. MiniMax M3 blog — <https://www.minimax.io/blog/minimax-m3>
+50. MiniMax Pay-as-you-go Pricing — <https://platform.minimax.io/docs/guides/pricing-paygo>
+51. Flowtivity: Kimi K2.7-code review — <https://flowtivity.ai/blog/kimi-k2-7-code-review/>
+52. Kimi Platform Pricing — <https://platform.kimi.ai/docs/pricing/chat-k27-code>, <https://platform.kimi.ai/docs/pricing/chat-k26>
+53. amitray.com Qwen3.7-Max benchmark — <https://amitray.com/qwen3-7-max-benchmark/>
+54. Weights & Biases Qwen3.7-Max Benchmark Scores — <https://wandb.ai/byyoung3/ml-news/reports/Qwen3-7-Max-Benchmark-Scores---VmlldzoxNjk1MzA1MQ>
+55. Alibaba Cloud Model Studio Pricing — <https://www.alibabacloud.com/help/en/model-studio/model-pricing>
+56. DeepSeek API Pricing — <https://api-docs.deepseek.com/quick_start/pricing>
+57. Xiaomi MiMo Pay-as-you-go Pricing — <https://mimo.mi.com/docs/price/pay-as-you-go>
+58. OpenAI API Pricing — <https://developers.openai.com/api/docs/pricing>
+59. Scale AI SWE-bench Pro Public Leaderboard — <https://labs.scale.com/leaderboard/swe_bench_pro_public>
+60. Gemini API Pricing — <https://ai.google.dev/gemini-api/docs/pricing>
+61. Gemini 3.1 Pro model card — <https://deepmind.google/models/model-cards/gemini-3-1-pro/>
+62. Gemini 3.5 Flash model card — <https://deepmind.google/models/model-cards/gemini-3-5-flash/>
