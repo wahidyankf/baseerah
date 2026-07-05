@@ -406,6 +406,10 @@ The plan-checker validates:
   - **Fix-all-issues instruction**: Explicit instruction to fix ALL failures found during quality gates — including preexisting issues not caused by the current changes (root cause orientation principle)
   - **Thematic commit guidance**: Instruction to commit changes thematically with Conventional Commits format, splitting different domains/concerns into separate commits
   - **Manual behavioral assertions**: Steps to use Playwright MCP for web UI verification (navigate, snapshot, click, check console errors) and curl for API verification (hit endpoints, check responses, test error cases) — applicable when the plan touches UI or API code
+- **Knowledge Capture presence**: For substantive plans, `delivery.md` contains a Knowledge
+  Capture phase (or an explicit "none" record) and the plan folder carries a `learnings.md`
+  scaffold. Silent absence is flagged at MEDIUM. See the
+  [Knowledge Capture Convention](../../development/quality/knowledge-capture.md).
 
 ## Final Audit Report Structure
 

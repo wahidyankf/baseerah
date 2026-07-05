@@ -297,11 +297,19 @@ For each checklist item in reading order (phase by phase, item by item, includin
 4. **Execution-marker check (`[AI]`/`[HUMAN]`)** — read the checkbox's execution marker (per [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)). `[AI]` or unmarked → execute normally (next bullet). `[HUMAN]` (or the human portion of an `[AI+HUMAN]` item) → the orchestrator MUST NOT attempt it: surface the item to the user verbatim with its acceptance criterion and any context they need, then STOP and wait for the user to confirm it is done before ticking the checkbox and continuing. For `[AI+HUMAN]`, perform the agent-preparable portion first, then hand off the human portion. This is a sanctioned stop (see Stopping rules) — not a violation of "never stop between phases."
 5. **Execute the item** — delegate to that agent via the Agent tool, or perform the edit/command directly. Only for THIS one checkbox.
 6. **Verify the work succeeded** — read the produced file, run the command, check the agent's output. The verification MUST match the acceptance criterion stated in the checkbox (Execution-Grade Clarity rule from the plans convention).
-7. **Atomic Sync Ritual** — all three steps before any next-item work:
+7. **Knowledge Capture — running log (as-you-go)**: append a sanitized entry to `learnings.md`
+   whenever this item surfaces a generalizable learning.
+   - A workaround invented, a wrong assumption corrected, a tool/CLI quirk discovered, or any
+     insight passing the "would the system catch this next time?" litmus qualifies; skip silently
+     when no such learning surfaces from this item.
+   - Create `learnings.md` (sibling of `delivery.md`) on first use if it does not yet exist.
+   - See the [Knowledge Capture Convention](../../development/quality/knowledge-capture.md) for
+     entry shape and the secret/sensitivity sanitization rule.
+8. **Atomic Sync Ritual** — all three steps before any next-item work:
    a. `Edit` delivery.md to change `- [ ]` → `- [x]` for THIS one item (context-unique `old_string`; never `replace_all`; never tick multiple items in one Edit call).
    b. `Edit` delivery.md to add the implementation-notes block (Date, Status, Files Changed, brief notes) under the ticked checkbox. Notes MUST themselves be repo-grounded — only state files actually modified, only quote commands actually run.
    c. `TaskUpdate completed` on the matching task.
-8. Proceed IMMEDIATELY to the next item — no pausing, no waiting for approval, no deferring notes.
+9. Proceed IMMEDIATELY to the next item — no pausing, no waiting for approval, no deferring notes.
 
 Nested sub-checkboxes iterate the same loop. A parent `- [ ]` can only be ticked after all its sub-`- [ ]` items have each completed steps 1–6 of the loop.
 
@@ -617,6 +625,20 @@ sets of defect checkboxes must be fixed before archival.
 
 If defects surface after archival, use the reopen path (rule 14) — move the folder back from
 `done/` to `in-progress/`, strip the completion-date prefix, and note the defect in `README.md`.
+
+**Knowledge Capture pre-archival gate (mandatory, before any archival step)**: Archival MUST NOT
+proceed until the plan's Knowledge Capture phase is complete.
+
+- Every entry in `learnings.md` (or the explicit "none" escape) reaches a terminal state: routed
+  inline, filed as a `plans/backlog/` follow-up, or discarded with a one-line reason — zero entries
+  left in an open, undecided state.
+- Both the secret/sensitivity gate and the repo-relevance gate have been applied to every
+  surviving entry before it was routed.
+- See the [Knowledge Capture Convention](../../development/quality/knowledge-capture.md) for the
+  full triage rubric, the litmus test, and both safety gates — this gate references that
+  convention rather than repeating its rubric.
+- A plan with no Knowledge Capture phase and no explicit "none" record in `learnings.md` is
+  incomplete for archival purposes.
 
 **Logic**:
 

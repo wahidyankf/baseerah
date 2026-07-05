@@ -414,6 +414,13 @@ decision was taken — especially deviations. The exact path is the grilled valu
 (e.g., if a decision changes a CI gate threshold, the relevant convention doc must be updated
 as part of executing the plan).
 
+**(e) Knowledge Capture phase**: `plan-maker` emits the standard Knowledge Capture phase plus a
+`learnings.md` scaffold per repo plan, exactly as it does for single-repo plans. Any learning
+surfaced during THIS parity-planning process itself (survey, grilling, research) that is
+generalizable also flows through the triage rubric in the
+[Knowledge Capture Convention](../../development/quality/knowledge-capture.md) before the
+corresponding plan is archived.
+
 **Plans are plans only**. This workflow never implements the objective. The type `planning`
 means the terminal deliverable is a validated plan document in `plans/` — not code, not config
 changes, not convention edits. Execution of the objective is downstream work performed later by

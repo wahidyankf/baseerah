@@ -260,6 +260,10 @@ Delegate via the Agent tool. Provide a self-contained handoff prompt containing 
    `plans/backlog/<YYYY-MM-DD>__<identifier>/` (creation-date prefix). Do NOT place an
    `in-progress` plan under `backlog/` or vice versa.
 
+`plan-maker` emits the final Knowledge Capture phase in `delivery.md` plus a `learnings.md`
+scaffold in the plan folder as part of every generated plan, per the
+[Knowledge Capture Convention](../../development/quality/knowledge-capture.md).
+
 **Note on plan-maker's own grill protocol**: `plan-maker` mandates a pre-write grill (Step 1) and
 a post-write grill (Step 8). When invoked by `plan-establishment`, these become
 **validation passes** — macro-decisions are already resolved. Micro-decisions (exact Gherkin
