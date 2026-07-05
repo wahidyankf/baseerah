@@ -434,38 +434,71 @@ plan-maker}.md` mirrors changed (SKILL.md has no `.opencode` mirror per the Skil
 > _Private repo, outside the parity loop, own copies of the governance files. Emphasize the two safety
 > gates here — this is where private content (Terraform/k3s/Proxmox/coralpolyp/real hosts) lives._
 
-- [ ] [AI] Provision the infra worktree:
+- [x] [AI] Provision the infra worktree:
       `git -C /Users/wkf/ose-projects/ose-infra worktree add worktrees/plan-execution-knowledge-capture origin/main`
       — acceptance: worktree exists tracking `origin/main`
-- [ ] [AI] Initialize toolchain: `npm --prefix /Users/wkf/ose-projects/ose-infra install` and
+      — **N/A, mode override**: same `main-to-origin-main` override applied in Phases 0/4 — worked
+      directly in `ose-infra`'s existing clean `main` checkout instead of a dedicated worktree.
+- [x] [AI] Initialize toolchain: `npm --prefix /Users/wkf/ose-projects/ose-infra install` and
       `npm --prefix /Users/wkf/ose-projects/ose-infra run doctor -- --fix`
       — acceptance: both exit 0
-- [ ] [AI] Replicate the Phase 1-3 edits in `ose-infra` (convention + docs + five workflows + agents +
+      — **N/A: main-to-origin-main override**. `ose-infra` main checkout was already confirmed clean and
+      up to date from earlier Phase-0 sibling-repo reachability checks; no fresh install/doctor re-run
+      was needed since no new worktree was provisioned.
+- [x] [AI] Replicate the Phase 1-3 edits in `ose-infra` (convention + docs + five workflows + agents +
       skill), then re-sync bindings if `.claude/**` differs:
       `npm --prefix /Users/wkf/ose-projects/ose-infra run generate:bindings`
       — acceptance: `test -f /Users/wkf/ose-projects/ose-infra/repo-governance/development/quality/knowledge-capture.md`; binding status clean
-- [ ] [AI] In the infra copy of `knowledge-capture.md`, ensure the repo-relevance gate explicitly
+      — done: `knowledge-capture.md` created + doc cross-references updated (commit `a3273536a`); all
+      five `plan-*` workflows reference knowledge-capture (commit `065be7a7d`); the 4 `.claude/agents/
+  plan-*.md` files + SKILL.md edited (commit `c1a7b7d25`); `generate:bindings` re-synced
+      `.opencode`/`.amazonq` mirrors (commit `9fb7c48c4`) — exited 0, no stale drift.
+- [x] [AI] In the infra copy of `knowledge-capture.md`, ensure the repo-relevance gate explicitly
       states that infra-specific learnings stay in `ose-infra` only and NEVER cross-route to the public
       repos
       — acceptance: `grep -c "never\|only in ose-infra\|private" /Users/wkf/ose-projects/ose-infra/repo-governance/development/quality/knowledge-capture.md` ≥ 1
-- [ ] [AI] Verify NO private-infra content (real hostnames, inventories, secrets) was introduced into
+      — done: grep count = 30 (≥1 required); wording explicitly states infra-only learnings never
+      cross-route to `ose-public`/`ose-primer`.
+- [x] [AI] Verify NO private-infra content (real hostnames, inventories, secrets) was introduced into
       any file destined for `ose-public`/`ose-primer` during Phases 1-4
       — acceptance: manual scan recorded; zero cross-routed private content
+      — done: manual scan of all Phase 1-4 diffs (ose-public + ose-primer) confirmed zero references to
+      real hostnames, Terraform/Ansible inventories, Proxmox/k3s host details, or secrets — all content
+      is generic governance prose. Zero cross-routed private content.
 
 ### Local Quality Gates + Push (ose-infra)
 
-- [ ] [AI] In the infra worktree: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and
+- [x] [AI] In the infra worktree: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and
       `npm --prefix /Users/wkf/ose-projects/ose-infra run lint:md:fix` — all exit 0; fix ALL failures
-- [ ] [AI] Commit thematically and push to `ose-infra` `origin main`
-- [ ] [AI] Monitor `ose-infra` CI (poll every 2 minutes); fix at root cause until green
+      — done: `nx affected` → no `apps/`/`libs/` source affected (docs/governance-only change);
+      `lint:md:fix` → 0 errors; markdown link/mermaid/heading-hierarchy validators clean (no
+      Phase-5-touched file among any preexisting baseline violations) — matches the pattern already
+      established for `ose-public`/`ose-primer`. No regressions; nothing required fixing.
+- [x] [AI] Commit thematically and push to `ose-infra` `origin main`
+      — done: 4 thematic commits — `a3273536a` feat(governance): add knowledge-capture convention,
+      `065be7a7d` docs(workflows): reference knowledge-capture in plan-\* workflows, `c1a7b7d25`
+      feat(agents): emit + enforce Knowledge Capture phase, `9fb7c48c4` chore(bindings): re-sync
+      .opencode agent mirrors. Pushed to `origin main`.
+- [x] [AI] Monitor `ose-infra` CI (poll every 2 minutes); fix at root cause until green
+      — done: polled `gh run view` (never `gh run watch`, never tight-looped) across `main-ci`
+      (`28749973864`), `pr-quality-gate` (`28749973863`), `validate-env` (`28749973882`) for commit
+      `9fb7c48c4`. All three workflows reached `status: completed`, `conclusion: success` — zero
+      failures across the entire polling history. Progress was throttled by a real infra condition
+      (single active CI runner — `ose-ci-runner-1` offline, `ose-ci-runner-2` sole active runner
+      serializing jobs across all 3 concurrent workflow runs), not a code defect; this is captured as a
+      Phase 6 Knowledge Capture learning routed to an `ose-infra`-only backlog plan.
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `test -f /Users/wkf/ose-projects/ose-infra/repo-governance/development/quality/knowledge-capture.md` exits 0
-- [ ] [AI] `ose-infra` CI is fully green on the pushed commit(s)
-- [ ] [AI] Zero private-infra content leaked into public-repo files (repo-relevance gate satisfied)
+- [x] [AI] `test -f /Users/wkf/ose-projects/ose-infra/repo-governance/development/quality/knowledge-capture.md` exits 0
+      — done: file exists.
+- [x] [AI] `ose-infra` CI is fully green on the pushed commit(s)
+      — done: `main-ci`, `pr-quality-gate`, `validate-env` all `completed`/`success` on `9fb7c48c4`
+      (including each workflow's final "Quality gate" aggregator job).
+- [x] [AI] Zero private-infra content leaked into public-repo files (repo-relevance gate satisfied)
+      — done: manual scan confirmed zero cross-routed private content (see above).
 
 > **Pause Safety**: all three repos carry the identical change, pushed and CI-green. The governance
 > encoding is complete; only the dogfood Knowledge Capture triage and archival remain. Safe to stop.
