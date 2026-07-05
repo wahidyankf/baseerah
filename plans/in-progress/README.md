@@ -4,11 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [upgrade-opencode-go-models](./upgrade-opencode-go-models/README.md) — bump the OpenCode secondary
-  binding's model mapping off two stale/retired `opencode-go` model IDs onto a 3-tier mapping
-  (thinking + execution → `opencode-go/glm-5.2`, fast → `opencode-go/minimax-m3`) across all 3
-  repos' code, config, and governance docs; also pins Pi (`pi.dev`) to the same tiers in
-  `ose-public`.
+_No plans currently in progress._
 
 ## Instructions
 

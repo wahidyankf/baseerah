@@ -1,7 +1,8 @@
 # Upgrade OpenCode Go Model Mapping to a 3-Tier Thinking/Execution/Fast Design
 
-**Status**: In Progress
+**Status**: Done
 **Created**: 2026-07-05
+**Completed**: 2026-07-05
 **Authored in**: `ose-public` (this repo)
 **Type**: Multi-file plan (5 documents)
 **Depends on**: None
