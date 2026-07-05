@@ -586,32 +586,38 @@ plan-*.md` files + SKILL.md edited (commit `c1a7b7d25`); `generate:bindings` re-
 
 ## Phase 7: Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify ALL quality gates pass (local + CI) in all three repos
-- [ ] [AI] Verify the Knowledge Capture phase completed: every learning routed/backlogged/discarded;
-      both safety gates satisfied; nothing silently dropped
-- [ ] [AI] Verify the transient-log caveat is honored: nothing valuable depends on `learnings.md`
+- [x] [AI] Verify ALL delivery checklist items are ticked
+- [x] [AI] Verify ALL quality gates pass (local + CI) in all three repos — ose-public `0d02aa5d5`
+      and ose-infra `aa0d15efd` both confirmed fully `completed`/`success`; ose-primer had no
+      Phase-5/6 code changes requiring a separate push in this plan
+- [x] [AI] Verify the Knowledge Capture phase completed: every learning routed/backlogged/discarded;
+      both safety gates satisfied; nothing silently dropped — 4/4 entries terminal (1 filed to
+      `ose-infra` backlog, 3 discarded with stated reasons)
+- [x] [AI] Verify the transient-log caveat is honored: nothing valuable depends on `learnings.md`
       surviving (everything kept was routed to a durable home)
-- [ ] [AI] Move plan folder to `plans/done/`:
+- [x] [AI] Move plan folder to `plans/done/`:
       `git mv plans/in-progress/plan-execution-knowledge-capture plans/done/2026-07-05__plan-execution-knowledge-capture`
       (use the completion date, not the creation date)
       — acceptance: folder now under `plans/done/2026-07-05__plan-execution-knowledge-capture/`
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date `2026-07-05`
-- [ ] [AI] Update any other READMEs that reference this plan (e.g., `plans/README.md`)
-- [ ] [AI] Commit the archival (the `learnings.md` scaffold moves with the plan):
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date `2026-07-05`
+- [x] [AI] Update any other READMEs that reference this plan (e.g., `plans/README.md`) — grepped,
+      zero references found, no update needed
+- [x] [AI] Commit the archival (the `learnings.md` scaffold moves with the plan):
       `chore(plans): move plan-execution-knowledge-capture to done` and push to `origin main`
-- [ ] [AI] Replicate the archival move in `ose-primer` and `ose-infra` if those repos track this plan
-      folder; otherwise note that only `ose-public` carries the plan doc
+- [x] [AI] Replicate the archival move in `ose-primer` and `ose-infra` if those repos track this plan
+      folder; otherwise note that only `ose-public` carries the plan doc — verified neither sibling
+      repo has a `plans/in-progress/plan-execution-knowledge-capture/` folder; only `ose-public`
+      carries the plan doc, so no replication needed
       — acceptance: each repo that tracks the plan folder has it under `plans/done/`
 
 ### Phase 7 Gate
 
 > Terminal gate — the plan is complete when all checks pass.
 
-- [ ] [AI] `test -d plans/done/2026-07-05__plan-execution-knowledge-capture` exits 0
-- [ ] [AI] `plans/in-progress/README.md` no longer lists this plan; `plans/done/README.md` lists it
-- [ ] [AI] Archival commit pushed and CI-green
+- [x] [AI] `test -d plans/done/2026-07-05__plan-execution-knowledge-capture` exits 0
+- [x] [AI] `plans/in-progress/README.md` no longer lists this plan; `plans/done/README.md` lists it
+- [x] [AI] Archival commit pushed and CI-green
 
 > **Pause Safety**: the plan is archived, all three repos carry the change, and every learning reached
 > a durable home. Terminal state. To resume: nothing — the plan is done. Prompt the user to delete the
