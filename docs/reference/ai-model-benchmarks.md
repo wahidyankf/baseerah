@@ -253,6 +253,14 @@ These models remain available via the Anthropic API but are no longer the recomm
 
 All legacy model scores `[Self-reported]` from respective official Anthropic announcements and system cards. SWE-bench Pro (SEAL) scores from Scale AI public leaderboard.
 
+### Claude Opus 4.7
+
+Superseded by Claude Opus 4.8 (above). See the Legacy Models table above for its benchmark row.
+
+### Claude Sonnet 4.6
+
+Superseded by Claude Sonnet 5 (above). See the Legacy Models table above for its benchmark row.
+
 ---
 
 ### Deprecated Models (Retiring June 15, 2026)
