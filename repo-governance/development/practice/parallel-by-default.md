@@ -79,9 +79,11 @@ No more than **three** independent units of work run simultaneously at any point
 
 **Override rule**: The user may raise the cap for a named session or batch (e.g., "read all eight of these files at once"). The override applies for that session or batch only. The agent MUST NOT self-promote the cap based on its own assessment of available headroom.
 
-### Standard 3 — Subagent Specialization
+**Exception**: Delegated Agent-tool spawns running in background follow a stricter cap of 2, not 3 — see Standard 3 below.
 
-For delegated Agent-tool spawns, the same cap-3 norm applies, but the mechanics are different: background subagents require polling, stuck detection, and relaunch procedures. The [Subagent Orchestration Convention](../agents/subagent-orchestration.md) owns those mechanics. This practice sets the general norm; that convention is the concrete specialization for background agent spawning.
+### Standard 3 — Subagent Specialization (Stricter Cap)
+
+For delegated Agent-tool spawns running in background, a **stricter cap of 2** applies — not the general cap of three used for tool-call batching. Counting the main thread's own execution, this means at most **3** agents are concurrently active in total (the main thread plus up to 2 background subagents) — never more. This narrower cap exists because each background subagent independently burns tokens and API quota against the vendor's rate limit, unlike batched tool calls within a single turn. Background subagents also require polling, stuck detection, and relaunch procedures beyond the general norm. The [Subagent Orchestration Convention](../agents/subagent-orchestration.md) owns those mechanics and the concrete cap; this practice sets the general norm for other independent work (tool calls, reads, searches).
 
 ## Anti-Patterns
 
@@ -134,7 +136,7 @@ For delegated Agent-tool spawns, the same cap-3 norm applies, but the mechanics 
 
 **Related Practices:**
 
-- [Subagent Orchestration Convention](../agents/subagent-orchestration.md) - Concrete specialization of this norm for background Agent-tool spawns; owns polling, stuck detection, and relaunch mechanics
+- [Subagent Orchestration Convention](../agents/subagent-orchestration.md) - Concrete specialization of this norm for background Agent-tool spawns at a stricter cap of 2 (3 total including the main thread); owns polling, stuck detection, and relaunch mechanics
 - [Agent Workflow Orchestration Convention](../agents/agent-workflow-orchestration.md) - Broader agent task management strategy of which parallel-by-default is one component
 
 **Agents:**

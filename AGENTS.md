@@ -244,7 +244,8 @@ fast-track and EPSS ≥ 0.5 escalate to Path C.
 
 Plan mode for non-trivial tasks (3+ steps or architecture decisions). **Parallel-by-default**: run
 independent sub-units in parallel, capped at **3 concurrent**. Agents MUST NOT self-promote the cap.
-**Subagent concurrency**: cap 3; poll mtime every 3 min; if stale 30 min, `TaskStop` and relaunch.
+**Subagent concurrency**: background agents cap at **2** (never more), for **3 total including the
+main thread**; poll mtime every 3 min; if stale 30 min, `TaskStop` and relaunch.
 **Task-list discipline**: maintain live task list for non-trivial work; mark in-progress before starting,
 completed after verifying; add discovered tasks immediately.
 

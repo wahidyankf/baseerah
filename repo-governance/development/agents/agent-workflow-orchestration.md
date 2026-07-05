@@ -112,7 +112,7 @@ A rule that should hold everywhere is created with `repo-rules-maker` in one rep
 
 Parallelize aggressively — prefer running independent work concurrently over serially, and try to keep the parallel budget fully used whenever independent work is available.
 
-The budget is **two (2) concurrent background operations** — background delegated agents spawned via the Agent tool, and equivalent token-spending background tasks. The main thread's own work does not count toward this cap; only concurrent background operations do. Within the cap of two, run as much in parallel as possible to keep throughput high while holding the token burn rate in check.
+The budget is **two (2) concurrent background operations** — background delegated agents spawned via the Agent tool, and equivalent token-spending background tasks. The main thread's own work does not count toward this cap; only concurrent background operations do. Counting the always-active main thread as one agent, this yields **three (3) concurrently active agents in total** — the main thread plus up to two background agents — never more. Within the cap of two background operations, run as much in parallel as possible to keep throughput high while holding the token burn rate in check.
 
 Exceeding two concurrent background operations requires clear, explicit permission from the user for that session. Absent that permission, never run more than two background operations at once — queue the remainder and launch the next as a slot frees. The detailed background-batch mechanics (sequencing, stuck detection, relaunch) live in the [Subagent Orchestration Convention](./subagent-orchestration.md), which sets the same cap of two.
 
