@@ -444,7 +444,7 @@ mod tests {
         );
         write(
             &opencode.join("foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nBody\n",
+            "---\ndescription: desc\nmodel: opencode-go/glm-5.2\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nBody\n",
         );
         dir
     }
@@ -502,7 +502,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: NOPE\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nBody\n",
+            "---\ndescription: NOPE\nmodel: opencode-go/glm-5.2\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
@@ -532,7 +532,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\nskills:\n  - my-skill\n---\nBody\n",
+            "---\ndescription: desc\nmodel: opencode-go/glm-5.2\npermission:\n  read: allow\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
@@ -547,7 +547,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - other-skill\n---\nBody\n",
+            "---\ndescription: desc\nmodel: opencode-go/glm-5.2\npermission:\n  read: allow\n  write: allow\nskills:\n  - other-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
@@ -562,7 +562,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nDifferent Body\n",
+            "---\ndescription: desc\nmodel: opencode-go/glm-5.2\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nDifferent Body\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
