@@ -270,7 +270,7 @@ For a deployer agent:
 Aliases (`opus`, `sonnet`, `haiku`) automatically track future model versions within each
 tier. The model IDs above are current as of April 2026.
 
-## Platform Binding Equivalents
+## Platform Binding Examples
 
 Agents in the primary binding directory are auto-synced to the secondary binding directory by rhino-cli
 (`npm run generate:bindings`). The sync translates primary binding model aliases to

@@ -165,7 +165,7 @@ planning-grade inheritance. OpenCode uses Zhipu AI GLM model IDs.
 - **Transform**: `convert_model` in `apps/rhino-cli/src/internal/agents/converter.rs`
 - **Sink**: `.opencode/agents/<name>.md` frontmatter `model:` field
 - **Policy**: [Model Selection Convention](../../repo-governance/development/agents/model-selection.md)
-  ("Platform Binding Equivalents" section)
+  ("Platform Binding Examples" section)
 
 | Claude Code alias      | OpenCode model ID          | Capability tier                  |
 | ----------------------- | --------------------------- | ----------------------------------- |
