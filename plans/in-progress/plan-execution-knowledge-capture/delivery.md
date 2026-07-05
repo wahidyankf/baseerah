@@ -304,20 +304,30 @@ plan-maker}.md` mirrors changed (SKILL.md has no `.opencode` mirror per the Skil
 
 ### Push and Post-Push CI Verification (ose-public)
 
-- [ ] [AI] Commit and push to `origin main`
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 2 minutes via
+- [x] [AI] Commit and push to `origin main`
+  - done — 5 commits pushed `081aeabd9..c237aabc1`
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 2 minutes via
       `gh run view --json status,conclusion`; never tight-loop)
-- [ ] [AI] Verify ALL CI checks pass — if any fails, fix at root cause and push a follow-up commit;
+  - done — polled `gh run list --branch main` every ~60-120s until all 4 workflows for `c237aabc1`
+    reached `completed`
+- [x] [AI] Verify ALL CI checks pass — if any fails, fix at root cause and push a follow-up commit;
       repeat until green
-- [ ] [AI] Do NOT proceed to Phase 4 until CI is fully green
+  - done — `main-ci` (all 18 jobs incl. Quality gate), `pr-quality-gate`, `validate-env`,
+    `publish-images` all `completed`/`success` on commit `c237aabc1`; no failures, no follow-up
+    commit needed
+- [x] [AI] Do NOT proceed to Phase 4 until CI is fully green
+  - done — confirmed fully green before starting Phase 4
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `git status --short .opencode .amazonq` shows no stale drift after `npm run generate:bindings`
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` exits 0
-- [ ] [AI] `ose-public` CI is fully green on the pushed commit(s)
+- [x] [AI] `git status --short .opencode .amazonq` shows no stale drift after `npm run generate:bindings`
+  - done — clean after final push
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` exits 0
+  - done — `NX No tasks were run` (no `apps/`/`libs/` source affected)
+- [x] [AI] `ose-public` CI is fully green on the pushed commit(s)
+  - done — all 4 workflows green on `c237aabc1`
 
 > **Pause Safety**: `ose-public` is fully wired, bindings synced, pushed, and CI-green — a complete,
 > self-consistent single-repo delivery. Safe to stop here indefinitely (the public repo is done; only
@@ -332,38 +342,86 @@ plan-maker}.md` mirrors changed (SKILL.md has no `.opencode` mirror per the Skil
 > Apply the IDENTICAL public-governance change to `ose-primer`. `ose-primer` carries its own copies of
 > every file edited in Phases 1-3. Work in a dedicated worktree inside the primer repo.
 
-- [ ] [AI] Provision the primer worktree:
+- [x] [AI] Provision the primer worktree:
       `git -C /Users/wkf/ose-projects/ose-primer worktree add worktrees/plan-execution-knowledge-capture origin/main`
       — acceptance: worktree exists tracking `origin/main`
-- [ ] [AI] Initialize toolchain: `npm --prefix /Users/wkf/ose-projects/ose-primer install` and
+      — **N/A: main-to-origin-main override**. User specified this delivery mode for the whole plan
+      execution; per plan-execution Step 0 precedence (user-at-invocation mode wins over a plan's own
+      worktree instruction), worked directly in `ose-primer`'s existing clean `main` checkout instead
+      of a dedicated worktree — mirrors the same override already applied to `ose-public` in Phase 0.
+- [x] [AI] Initialize toolchain: `npm --prefix /Users/wkf/ose-projects/ose-primer install` and
       `npm --prefix /Users/wkf/ose-projects/ose-primer run doctor -- --fix`
       — acceptance: both exit 0
-- [ ] [AI] Replicate the Phase 1 convention + doc edits in `ose-primer` (create
+      — **N/A: main-to-origin-main override**. `ose-primer` main checkout was already confirmed clean
+      and up to date (top commit `9e6fc6b66`) from earlier Phase-0 sibling-repo reachability checks;
+      no fresh install/doctor re-run was needed since no new worktree was provisioned.
+- [x] [AI] Replicate the Phase 1 convention + doc edits in `ose-primer` (create
       `repo-governance/development/quality/knowledge-capture.md`; update `quality/README.md`,
       `conventions/structure/plans.md`, `conventions/structure/post-mortems.md`, `AGENTS.md`)
       — acceptance: `test -f /Users/wkf/ose-projects/ose-primer/repo-governance/development/quality/knowledge-capture.md`
-- [ ] [AI] Replicate the Phase 2 workflow references in `ose-primer` (all five `plan-*` workflows)
+      — Done via `repo-rules-maker` (bg agent), targeting ose-primer's own file content/structure
+      directly rather than porting an ose-public diff (files had already diverged in unrelated wording
+      — confirmed via direct `diff` against ose-public's pre-Phase-3 `plan-maker.md`/`plan-checker.md`).
+      Independently verified: `test -f .../knowledge-capture.md` → 291 lines; grep confirms
+      "Knowledge Capture" references added to all 4 downstream files. Committed `408879f10`.
+- [x] [AI] Replicate the Phase 2 workflow references in `ose-primer` (all five `plan-*` workflows)
       — acceptance: `grep -L knowledge-capture` across the five primer workflow files is empty
-- [ ] [AI] Replicate the Phase 3 agent + skill edits in `ose-primer`, then re-sync:
+      — Done via `repo-rules-maker` in the same pass. Independently verified: all 5 files
+      (plan-execution.md, plan-planning.md, plan-quality-gate.md,
+      plan-multi-repo-parity-planning.md, plan-multi-repo-parity-planning-and-execution.md) grep-match
+      "Knowledge Capture" with concrete step insertions. Committed `02acd3b1e`.
+- [x] [AI] Replicate the Phase 3 agent + skill edits in `ose-primer`, then re-sync:
       `npm --prefix /Users/wkf/ose-projects/ose-primer run generate:bindings`
       — acceptance: exits 0; `git -C /Users/wkf/ose-projects/ose-primer status --short .opencode .amazonq` shows no stale drift
-- [ ] [AI] Confirm public-governance parity between `ose-public` and `ose-primer` for the changed files
+      — Done via 2 parallel bg agents (`repo-rules-maker` for SKILL.md, `agent-maker` for the 4
+      `.claude/agents/plan-*.md` files — split to respect the 2-bg-agent cap and avoid file
+      collisions). All 4 agent-file diffs verified pure-additions (241 insertions, 0 deletions).
+      `generate:bindings` exited 0; `.opencode/agents/plan-{maker,checker,execution-checker,fixer}.md`
+      updated to match, zero stray drift. Committed `98c3a0cb2` (agents+skill), `fc37f6175` (bindings).
+- [x] [AI] Confirm public-governance parity between `ose-public` and `ose-primer` for the changed files
       (diff the `knowledge-capture.md` bodies and the shared agent/skill/workflow sections)
       — acceptance: intended content matches (repo-name-specific lines excepted)
+      — Verified: `knowledge-capture.md` section-header structure matches ose-public's near 1:1 (minor
+      structural variation: ose-primer folds "Candidate Durable Homes"/"Litmus Test" as prose under the
+      parent heading rather than as `###` subheads — same substance, no `###` nesting). All required
+      sections present in both. Intended content matches; repo-name/prose-style differences expected
+      and accepted per the plan's own acceptance wording.
 
 ### Local Quality Gates + Push (ose-primer)
 
-- [ ] [AI] In the primer worktree: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and
+- [x] [AI] In the primer worktree: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and
       `npm --prefix /Users/wkf/ose-projects/ose-primer run lint:md:fix` — all exit 0; fix ALL failures
-- [ ] [AI] Commit thematically and push to `ose-primer` `origin main`
-- [ ] [AI] Monitor `ose-primer` CI (poll every 2 minutes); fix at root cause until green
+      — `nx affected` → "No tasks were run" (docs-only change, no project affected). `lint:md:fix` →
+      "0 error(s)" across 898 files. `md mermaid validate` → 4 violations + 1 warning, ALL in
+      pre-existing `apps/rhino-cli/tests/fixtures/state/*.md` deliberate test fixtures (confirmed via
+      full-output grep: none in any Phase-4-touched file) — matches the known preexisting-baseline
+      pattern already established for `ose-public`. `md heading-hierarchy validate` → PASSED, zero
+      violations. `md links validate` → 24 broken links, ALL in `plans/done/**` (preexisting archived
+      content, confirmed via grep none in Phase-4-touched files) — same preexisting-baseline pattern as
+      `ose-public`'s 90-broken-link baseline. No regressions; nothing required fixing.
+- [x] [AI] Commit thematically and push to `ose-primer` `origin main`
+      — 4 thematic commits (staged via explicit paths, never `git add -A`):
+      `408879f10` feat(governance): add knowledge-capture convention (5 files, 331 insertions, 1
+      deletion), `02acd3b1e` docs(workflows): reference knowledge-capture in plan-\* workflows (5
+      files, 44 insertions, 2 deletions), `98c3a0cb2` feat(agents): emit + enforce Knowledge Capture
+      phase (5 files, 317 insertions), `fc37f6175` chore(bindings): re-sync .opencode/.amazonq (4
+      files, 241 insertions). Pushed `9e6fc6b66..fc37f6175` to `origin main`; pre-push hook ran 76
+      checks, all passed (agents/workflows naming, governance vendor audit, license audit, etc.).
+- [x] [AI] Monitor `ose-primer` CI (poll every 2 minutes); fix at root cause until green
+      — Polled via inline Bash loop (60s cadence, not `gh run watch`). All 3 triggered workflows on
+      `fc37f6175` confirmed `completed`/`success`: `validate-env`, `pr-quality-gate`, `main-ci`.
+      Cross-checked `main-ci`'s 24 constituent jobs individually via `gh run view --json jobs` — all
+      `completed`/`success`. No `publish-images` run triggered (docs-only change, expected).
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `test -f /Users/wkf/ose-projects/ose-primer/repo-governance/development/quality/knowledge-capture.md` exits 0
-- [ ] [AI] `ose-primer` CI is fully green on the pushed commit(s)
+- [x] [AI] `test -f /Users/wkf/ose-projects/ose-primer/repo-governance/development/quality/knowledge-capture.md` exits 0
+      — confirmed, file exists (291 lines), committed and pushed.
+- [x] [AI] `ose-primer` CI is fully green on the pushed commit(s)
+      — confirmed: `validate-env`/`pr-quality-gate`/`main-ci` all `completed`/`success` on `fc37f6175`;
+      all 24 `main-ci` jobs individually green.
 
 > **Pause Safety**: both public repos (`ose-public`, `ose-primer`) carry the identical change, pushed
 > and CI-green — the parity loop is satisfied. Safe to stop. To resume:
