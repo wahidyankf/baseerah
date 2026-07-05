@@ -216,6 +216,12 @@ blocking, no exemptions. Enforced by `swe-code-checker` (Step 6.7) and `plan-che
 
 **See**: [repo-governance/development/quality/regression-test-mandate.md](./repo-governance/development/quality/regression-test-mandate.md)
 
+### Knowledge Capture
+
+Every plan ends with a Knowledge Capture phase: `learnings.md` triaged to a home or discarded.
+
+**See**: [knowledge-capture.md](./repo-governance/development/quality/knowledge-capture.md)
+
 ### Reproducible Environments
 
 Volta for Node.js/npm pinning, package-lock.json, .env.example. **Hard iron rule — no secrets in

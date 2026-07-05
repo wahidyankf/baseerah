@@ -77,6 +77,11 @@ A post-mortem is not a punishment mechanism. It is a systems-thinking tool appli
 - On-call rotation or escalation policies
 - Post-mortem review meeting facilitation
 - Plan content structure (see [Plans Organization](./plans.md))
+- **The decision of WHEN a plan-execution learning becomes a post-mortem** — that routing decision
+  belongs to the [Knowledge Capture Convention](../../development/quality/knowledge-capture.md)'s
+  open-ended triage matrix, which routes a failure/incident learning here by cross-reference. This
+  convention remains the single source of truth for post-mortem structure and content once a learning
+  is routed; it does not duplicate the triage rubric.
 
 ## Standards
 
@@ -431,6 +436,9 @@ A post-mortem is complete when:
 - [Timestamp Format](../formatting/timestamp.md) — UTC+7 WIB standard used in timelines
 - [Diátaxis Framework](./diataxis-framework.md) — Why post-mortems belong in `docs/explanation/`
 - [Plans Organization](./plans.md) — How to create a `plans/` entry for action items
+- [Knowledge Capture Convention](../../development/quality/knowledge-capture.md) — The plan-execution
+  triage matrix that decides when a captured learning routes here as a post-mortem, versus a
+  convention, doc, agent, skill, code change, or discard
 
 **Industry sources**:
 

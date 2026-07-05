@@ -266,6 +266,7 @@ If the author cannot comfortably fit both the condensed BRD and condensed PRD se
 ├── prd.md                   # Product Requirements Document
 ├── tech-docs.md             # Technical documentation and architecture
 ├── delivery.md              # Step-by-step delivery checklist
+├── learnings.md             # (transient) running log of generalizable learnings
 └── evidence/                # (optional) committed testing evidence — screenshots, curl responses
     ├── phase-1-homepage-en-1280px.png
     └── phase-2-api-health.txt
@@ -277,8 +278,28 @@ If the author cannot comfortably fit both the condensed BRD and condensed PRD se
 - **brd.md** — **Business Requirements Document**: business goal and rationale ("why are we doing this"), business impact, affected roles, business-level success metrics, business-scope Non-Goals, business risks and mitigations. Content-placement container, not a sign-off artifact — code review is the only approval gate in this repo.
 - **prd.md** — **Product Requirements Document**: product overview, personas, user stories (`As a … I want … So that …`), acceptance criteria in Gherkin, product scope (in-scope + out-of-scope features), product-level risks. **For UI-bearing plans** (those that add or change user-facing screens or components under `apps/` or `libs/`), `prd.md` additionally contains the complete **UI-design-funnel record**: the inline low-fidelity ASCII wireframes (Diverge stage, ≥ 2 named alternatives, at least mobile + desktop where they differ), the high-fidelity mockup embeds via `![]()` image links referencing the plan's `assets/` folder (Narrow stage finalists), the named selection (Select stage), and the rationale table (Justify stage). See [UI Mockups in Plan Docs — Placement](../formatting/diagrams.md#placement--the-ui-lives-in-prdmd-hard-rule) for the full placement rule.
 - **tech-docs.md**: architecture, design decisions with rationale, file-impact analysis, mechanics, dependencies, risks, rollback. No step-by-step checklist.
-- **delivery.md**: sequential, ticked checklist of executable steps (`- [ ]`), organized by phase if needed. Plan-execution workflow reads this file to drive execution; `plan-execution-checker` reads it to verify completion. Opens with the `[AI]`/`[HUMAN]` executor legend; each phase ends with a `### Phase N Gate` (must-pass verification) followed by a Pause Safety note.
+- **delivery.md**: sequential, ticked checklist of executable steps (`- [ ]`), organized by phase if needed. Plan-execution workflow reads this file to drive execution; `plan-execution-checker` reads it to verify completion. Opens with the `[AI]`/`[HUMAN]` executor legend; each phase ends with a `### Phase N Gate` (must-pass verification) followed by a Pause Safety note. For substantive plans, the final phase before archival is the **Knowledge Capture** phase (see below).
+- **`learnings.md`** (transient): a running log of generalizable learnings accrued while executing `delivery.md` — appended to in the moment an executor notices something worth keeping, not reconstructed from memory afterward. It is committed and moves with the plan folder through the lifecycle, but it is **never the system of record** — it is drained by the Knowledge Capture phase before archival and MAY be deleted from `plans/done/` at any later date. See the [Knowledge Capture Convention](../../development/quality/knowledge-capture.md) for the full running-log format, the open-ended triage matrix, and the two mandatory safety gates.
 - **`evidence/`** (optional): committed folder for testing evidence produced during plan execution — screenshots (one per breakpoint per locale), saved curl responses, Lighthouse reports, and other file-based artifacts referenced from `delivery.md` implementation notes. Created when the plan's first manual verification step runs. Moves with the plan folder on archival to `done/`. Binary files (PNG/JPG) are committed alongside the text files. See [Evidence Capture Convention](../../development/quality/evidence-capture.md).
+
+### The Knowledge Capture Phase (Final Phase Before Archival)
+
+Every substantive plan's `delivery.md` MUST end with a **Knowledge Capture** phase, immediately
+before the Plan Archival phase. This phase triages every entry in `learnings.md` through the
+[Knowledge Capture Convention](../../development/quality/knowledge-capture.md)'s open-ended,
+principle-based routing matrix: each surviving learning is routed to exactly one durable home (a
+convention, a doc, an agent, a skill, code, a test, or a post-mortem) — small non-code routings land
+inline in the current plan's commits, large non-code routings and ALL code routings become a
+`plans/backlog/` follow-up plan, and non-generalizable entries are discarded with a one-line reason.
+Two safety gates (secret/sensitivity and repo-relevance) run on every surviving entry before routing.
+
+Archival is **BLOCKED** until every `learnings.md` entry reaches a terminal state — routed inline,
+filed as backlog, or discarded — or the plan carries the explicit
+`No generalizable learnings — <reason>` escape. `learnings.md` is transient: nothing durable may
+depend on it surviving past archival. Pure-docs and trivial plans are exempt from elaborate capture,
+mirroring the specs/Gherkin exemption. See the
+[Knowledge Capture Convention](../../development/quality/knowledge-capture.md) for the complete
+rubric, both safety gates, and the anti-theater guardrails.
 
 ### Content-Placement Rules (brd.md vs prd.md)
 
