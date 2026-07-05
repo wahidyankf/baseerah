@@ -55,6 +55,22 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
 - Future plan: Microsoft Defender / dotnet 10.0.300 brew bottle availability (currently install via dotnet-install.sh to ~/.dotnet).
 - Future plan: bump `vite` to 7.4+ across all consumers, then adopt `@vitejs/plugin-react 6.0.1` (this plan reverted plugin-react 6.0.1 → `^5.1.4` because plugin-react 6 requires vite's `./internal` subpath which is unavailable on the installed transitive vite 7.3.1). Caret retained pending the vite bump.
 
+### Behavior Coverage Engine (added 2026-07-05 by post-archival hollow-spec re-verification)
+
+- **Runtime cross-check flags never wired** — `rhino-cli specs behavior-coverage validate`'s
+  `--unit-report`/`--integration-report`/`--e2e-report` flags (the JSON-run-report ingestion engine
+  built in `plans/done/2026-07-04__enforce-repo-wide-scenario-implementation`'s Phase 1) exist and
+  work, but zero `project.json`/CI workflow file in any of the 3 repos (`ose-public`, `ose-primer`,
+  `ose-infra`) actually passes them — confirmed via repo-wide grep, all 3 repos, 2026-07-05. The
+  archived plan's Final Gate claims this mechanism is "wired to pre-push + CI," which is not
+  accurate as literally described; today's anti-hollow-spec guarantee instead comes from two
+  redundant mechanisms that ARE wired and verified working: static step-text matching (a `@covers`
+  marker must resolve to a real, registered step function) plus per-language fail-on-skip
+  grep-bans baked directly into each project's `test:unit`/`test:quick` command. No hollow spec
+  exists today as a result, but wiring the JSON-report mechanism for real (deciding which tier
+  emits which report format per language/tool, then threading it through 59 projects'
+  `specs:behavior:coverage` targets) is a genuine follow-up engineering slice, not a quick fix.
+
 ### CI Flakes (added 2026-07-02 by unify-rhino-cli-sdlc-parity after-action)
 
 - Fixed 2026-07-03 (root-caused, not a runner flake — two distinct bugs, one per app):
