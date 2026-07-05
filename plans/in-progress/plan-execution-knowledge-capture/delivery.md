@@ -49,7 +49,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `git -C /Users/wkf/ose-projects/ose-infra status --short`
       — acceptance: both commands exit 0; any pre-existing WIP is recorded (do NOT `git add -A` in siblings)
 - [ ] [AI] Record markdown/governance baseline in `ose-public`:
-      `npx nx affected -t typecheck lint test:quick specs:coverage` and `npm run lint:md:fix`
+      `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and `npm run lint:md:fix`
       — acceptance: baseline pass/fail recorded; all preexisting failures documented
 - [ ] [AI] Resolve all preexisting failures before proceeding
       — acceptance: no preexisting failures remain unresolved
@@ -59,13 +59,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > All checks below must pass before starting Phase 1.
 
 - [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` baseline recorded and every
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` baseline recorded and every
       preexisting failure resolved (zero unresolved)
 - [ ] [AI] `worktrees/plan-execution-knowledge-capture/` exists; sibling repos reachable and their WIP recorded
 
 > **Pause Safety**: only the toolchain was verified and the baseline recorded — no governance change
 > exists yet. Safe to stop indefinitely. To resume: re-run
-> `npx nx affected -t typecheck lint test:quick specs:coverage` and confirm it is still clean.
+> `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and confirm it is still clean.
 
 ---
 
@@ -109,8 +109,10 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 - [ ] [AI] `test -f repo-governance/development/quality/knowledge-capture.md` exits 0
 - [ ] [AI] `npm run lint:md:fix` exits 0 and the new + edited markdown files pass link/mermaid/heading
-      validation: `npx nx run rhino-cli:links:validation`, `npx nx run rhino-cli:mermaid:validation`,
-      `npx nx run rhino-cli:headings:hierarchy-validation` — all exit 0
+      validation: `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`,
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate`,
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
+      — all exit 0
 - [ ] [AI] `npx nx run rhino-cli:instruction-size:validation` exits 0 (AGENTS.md still within budget)
 
 > **Pause Safety**: the convention and its doc cross-references exist and lint clean; no agent/workflow
@@ -150,7 +152,11 @@ repo-governance/workflows/plan/plan-execution.md repo-governance/workflows/plan/
 repo-governance/workflows/plan/plan-multi-repo-parity-planning.md
 repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md`
       — expected: empty output (every workflow references the convention)
-- [ ] [AI] `npm run lint:md:fix` exits 0 and links/mermaid/headings validations exit 0
+- [ ] [AI] `npm run lint:md:fix` exits 0 and
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`,
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate`,
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
+      all exit 0
 
 > **Pause Safety**: all five workflows reference the convention; agents/skill not yet updated. The
 > convention is documented and referenced but not yet emitted/enforced — coherent, safe to stop. To
@@ -188,9 +194,11 @@ repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md`
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — exits 0
-- [ ] [AI] `npm run lint:md:fix` then `npx nx run rhino-cli:links:validation`,
-      `npx nx run rhino-cli:mermaid:validation`, `npx nx run rhino-cli:headings:hierarchy-validation`,
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — exits 0
+- [ ] [AI] `npm run lint:md:fix` then
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`,
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate`,
+      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`,
       `npx nx run rhino-cli:instruction-size:validation` — all exit 0
 - [ ] [AI] Fix ALL failures — including preexisting issues not caused by this change
 
@@ -220,7 +228,7 @@ repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md`
 > All checks below must pass before starting Phase 4.
 
 - [ ] [AI] `git status --short .opencode .amazonq` shows no stale drift after `npm run generate:bindings`
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` exits 0
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` exits 0
 - [ ] [AI] `ose-public` CI is fully green on the pushed commit(s)
 
 > **Pause Safety**: `ose-public` is fully wired, bindings synced, pushed, and CI-green — a complete,
@@ -257,7 +265,7 @@ repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md`
 
 ### Local Quality Gates + Push (ose-primer)
 
-- [ ] [AI] In the primer worktree: `npx nx affected -t typecheck lint test:quick specs:coverage` and
+- [ ] [AI] In the primer worktree: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and
       `npm --prefix /Users/wkf/ose-projects/ose-primer run lint:md:fix` — all exit 0; fix ALL failures
 - [ ] [AI] Commit thematically and push to `ose-primer` `origin main`
 - [ ] [AI] Monitor `ose-primer` CI (poll every 2 minutes); fix at root cause until green
@@ -300,7 +308,7 @@ repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md`
 
 ### Local Quality Gates + Push (ose-infra)
 
-- [ ] [AI] In the infra worktree: `npx nx affected -t typecheck lint test:quick specs:coverage` and
+- [ ] [AI] In the infra worktree: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` and
       `npm --prefix /Users/wkf/ose-projects/ose-infra run lint:md:fix` — all exit 0; fix ALL failures
 - [ ] [AI] Commit thematically and push to `ose-infra` `origin main`
 - [ ] [AI] Monitor `ose-infra` CI (poll every 2 minutes); fix at root cause until green

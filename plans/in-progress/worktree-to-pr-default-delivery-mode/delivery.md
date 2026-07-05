@@ -134,7 +134,7 @@ stateDiagram-v2
 - [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift.
 - [ ] [AI] Establish the docs/governance baseline in the worktree:
-      `npx nx affected -t typecheck lint test:quick specs:coverage` (and `npm run lint:md` if present)
+      `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` (and `npm run lint:md` if present)
       — acceptance: baseline pass/fail recorded; every preexisting failure documented.
 - [ ] [AI] Resolve all preexisting failures before proceeding
       — acceptance: no preexisting failures remain unresolved.
@@ -147,7 +147,7 @@ stateDiagram-v2
 > All checks below must pass before starting Phase 1.
 
 - [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` baseline recorded and every
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` baseline recorded and every
       preexisting failure resolved (zero unresolved).
 - [ ] [AI] `gh pr view --json number,state` returns an open draft PR for
       `worktree-to-pr-default-delivery-mode`.
@@ -181,9 +181,9 @@ stateDiagram-v2
 - [ ] [AI] Fix + verify markdown: `npm run lint:md:fix && npm run lint:md`
       — acceptance: exits 0, no violations.
 - [ ] [AI] Validate mermaid/links/headings on changed docs:
-      `npx nx run rhino-cli:mermaid:validation && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:headings:hierarchy-validation`
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       — acceptance: all three exit 0.
-- [ ] [AI] Run affected gates: `npx nx affected -t typecheck lint test:quick specs:coverage`
+- [ ] [AI] Run affected gates: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage`
       — acceptance: exits 0. **Fix ALL failures found — including preexisting issues not caused by
       these changes** (root-cause orientation).
 
@@ -277,9 +277,9 @@ stateDiagram-v2
 ### Local Quality Gates (Before Push)
 
 - [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] `npx nx run rhino-cli:mermaid:validation && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:headings:hierarchy-validation`
+- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       — acceptance: all exit 0.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — acceptance: exits 0.
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
       **Fix ALL failures, including preexisting.**
 
 ### Commit + Push to PR branch
@@ -388,7 +388,7 @@ stateDiagram-v2
 - [ ] [AI] Validate bindings sync is clean: `npm run validate:claude && npm run validate:opencode`
       (or the repo's binding-validation targets) — acceptance: exits 0, no sync drift reported (the
       two new agents appear in `.opencode`/`.amazonq`).
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — acceptance: exits 0.
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
       **Fix ALL failures, including preexisting.**
 
 ### Commit + Push to PR branch
@@ -456,10 +456,10 @@ stateDiagram-v2
 ### Local Quality Gates (Before Push)
 
 - [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] `npx nx run rhino-cli:mermaid:validation && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:headings:hierarchy-validation`
+- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       — acceptance: all exit 0.
 - [ ] [AI] `npm run validate:claude && npm run validate:opencode` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — acceptance: exits 0.
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
       **Fix ALL failures, including preexisting.**
 
 ### Commit + Push + CI (on the primer PR)
@@ -531,10 +531,10 @@ stateDiagram-v2
 ### Local Quality Gates (Before Push)
 
 - [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] `npx nx run rhino-cli:mermaid:validation && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:headings:hierarchy-validation`
+- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       — acceptance: all exit 0.
 - [ ] [AI] `npm run validate:claude && npm run validate:opencode` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — acceptance: exits 0.
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
       **Fix ALL failures, including preexisting.**
 
 ### Commit + Push + CI (on the infra PR)
@@ -672,10 +672,10 @@ stateDiagram-v2
 ### Local Quality Gates + CI (on the ose-public PR)
 
 - [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] `npx nx run rhino-cli:mermaid:validation && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:headings:hierarchy-validation`
+- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       — acceptance: all exit 0.
 - [ ] [AI] `npm run validate:claude && npm run validate:opencode` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — acceptance: exits 0.
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
       **Fix ALL failures, including preexisting.**
 - [ ] [AI] Monitor CI on the ose-public PR until green; fix at root + follow-up commit if red; repeat.
 
