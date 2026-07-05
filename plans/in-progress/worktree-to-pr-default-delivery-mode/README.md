@@ -36,18 +36,34 @@ plan-execution Step 0 (user-at-invocation > plan docs > default).
   framed as a valid TBD flavor (short-lived branches, frequent integration), not an abandonment of TBD.
 - Re-sync of `.opencode/` and `.amazonq/` bindings after any `.claude/**` edit.
 
+This plan also introduces a **PR-review maker→fixer cycle** for every `*-to-pr` mode: two new agents
+(`pr-review-maker` posts strict inline review comments; `pr-review-fixer` applies/answers them) run a
+sequential N-cycle loop (default 3) that drives each PR to a fully-reviewed, green, archival-included
+state before the human merges. A new workflow doc
+`repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` defines the loop.
+
 **Out of scope** — see [`prd.md`](./prd.md#product-scope). Notably: no new `rhino-cli` structural
 validator (enforcement is via agent-checker prose), no changes to environment/deploy branches, no
 retroactive rewrite of already-archived plans.
 
 ## Approach Summary
 
-1. Author all edits in `ose-public` first (the canonical scaffolding source), grouped by governance
-   layer: conventions → workflows → agents/skill/root-instructions.
-2. Deliver `ose-public` via the new `worktree-to-pr` mode: one worktree, one PR, AI drives all gates
-   green, a `[HUMAN]` merge gate closes it.
-3. Replicate the identical change to `ose-primer` (parity) and `ose-infra` (private), each in its own
-   worktree with its own PR and its own `[HUMAN]` merge gate — three worktrees, three PRs total.
+1. Author all `ose-public` content first (the canonical scaffolding source), grouped by governance
+   layer: conventions → workflows (incl. the new pr-review-cycle doc + loop wiring) → agents (incl. the
+   two new review agents + checker enforcement) / skill / root-instructions / bindings.
+2. Replicate the identical change to `ose-primer` (parity) then `ose-infra` (private), each in its own
+   worktree with its own PR; finalize each PR through the review loop, reaching the done-definition,
+   then hand off to a `[HUMAN]` merge that sits **outside** the AI done-boundary.
+3. Run Knowledge Capture across all repos, then **finalize the `ose-public` PR last** — it must carry
+   the Knowledge-Capture edits and the archival-in-PR move — through the review loop to done, then hand
+   off to the `[HUMAN]` merge. Three worktrees, three PRs total.
+
+### Done-definition for `*-to-pr` (this plan's terminal state)
+
+A `*-to-pr` delivery is **DONE** (for the AI) when: N review cycles complete AND every inline comment
+is answered (fix or reasoned-reject) AND all PR gates are GREEN AND the plan-to-done archival is
+committed **inside** the delivering PR (ose-public PR only; the plan folder lives only there). The
+`[HUMAN]` merge happens **after** done, whenever the human chooses — "done" ≠ "merged".
 
 ## Documents
 

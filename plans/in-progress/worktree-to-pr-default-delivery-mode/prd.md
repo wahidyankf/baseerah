@@ -13,6 +13,13 @@ target**, and **merge authority**. The vocabulary and precedence are documented 
 the plan-execution workflow, the plan agent definitions, the plan-authoring skill, and the root
 instruction files, and applied identically across all three repos.
 
+Every `*-to-pr` mode (`worktree-to-pr` and `main-to-pr`) additionally runs a **PR-review
+maker→fixer cycle** before the PR is done: two new agents (`pr-review-maker`, `pr-review-fixer`) run
+a sequential N-cycle loop (default 3) that posts strict inline review comments and applies/answers
+them, driving the PR to a fully-reviewed, green, archival-included state. The `[HUMAN]` merge sits
+**outside** the AI's done-boundary. See [`tech-docs.md` §PR-Review Maker→Fixer Cycle](./tech-docs.md#pr-review-makerfixer-cycle-design-spec)
+for the full design.
+
 ## Personas
 
 Solo-maintainer repo — personas are the maintainer's hats and the consuming agents.
@@ -20,9 +27,13 @@ Solo-maintainer repo — personas are the maintainer's hats and the consuming ag
 - **Plan author** (maintainer + `plan-maker`) — declares the plan's `## Delivery Mode`.
 - **Plan executor** (the plan-execution workflow) — resolves the active mode by precedence and drives
   the delivery accordingly.
-- **Merge authority** (maintainer, `[HUMAN]`) — performs the terminal PR merge for PR modes.
+- **PR reviewer** (`pr-review-maker`) — posts strict, deep, line-anchored inline review comments each cycle.
+- **PR fixer** (`pr-review-fixer`) — triages unresolved threads, applies fixes, pushes, and replies per thread.
+- **Merge authority** (maintainer, `[HUMAN]`) — performs the terminal PR merge for PR modes, **after**
+  the AI has reached the done-definition (outside the AI done-boundary).
 - **Plan validators** (`plan-checker`, `plan-execution-checker`, `plan-fixer`) — validate/scaffold the
-  field and verify delivery matched the declared mode.
+  field and verify delivery matched the declared mode (including that the review loop ran and archival
+  is in-PR for `*-to-pr`).
 
 ## The Four Delivery Modes (closed enum)
 
@@ -189,6 +200,68 @@ Scenario: The same vocabulary exists in all three repos
   Then each repo documents the identical four modes and the identical precedence
 ```
 
+### PR-review maker→fixer cycle (for `*-to-pr` modes)
+
+```gherkin
+Scenario: The review loop runs the default three sequential cycles
+  Given a plan whose resolved mode is a "*-to-pr" mode
+  When the PR-review loop runs during finalization
+  Then a fresh pr-review-maker followed by pr-review-fixer executes for exactly N cycles (default 3)
+  And the cycles run strictly sequentially with full CI green between each cycle
+  And no maker and fixer run in parallel
+```
+
+```gherkin
+Scenario: A fresh maker each cycle avoids repeating prior comments
+  Given a pr-review-maker starting a new review cycle
+  When it reviews the full PR
+  Then it is fed its own prior findings and their resolution state
+  And it does not repeat comments already posted
+  And it explicitly re-reviews the fixer's new commits from the previous cycle for fix-induced regressions
+```
+
+```gherkin
+Scenario: The maker posts only high-confidence, evidence-cited inline findings
+  Given a pr-review-maker reviewing a PR diff
+  When it emits findings
+  Then every posted finding has numeric confidence at or above 80 and cites a blob URL with full SHA and line range
+  And it posts line-anchored review comments via the GitHub Reviews API rather than a top-level PR comment
+  And it excludes pre-existing issues, linter/typechecker-caught issues, unmodified lines, and unwritten style nits
+```
+
+```gherkin
+Scenario: The fixer answers every unresolved thread with a fix or a cited rejection
+  Given unresolved review threads on the PR
+  When pr-review-fixer processes them
+  Then it applies sensible fixes and pushes to the PR branch
+  And it replies on each thread with either the fix made or a rejection carrying a cited justification
+  And it resolves each thread it has addressed and marks every reply AI-generated
+```
+
+```gherkin
+Scenario: A repeatedly-rejected finding is escalated to the human
+  Given a maker finding that the fixer has rejected across consecutive cycles
+  When the same finding recurs
+  Then it is surfaced to the human rather than silently auto-suppressed
+```
+
+```gherkin
+Scenario: A *-to-pr plan is done when reviewed, green, and archived-in-PR
+  Given a plan whose resolved mode is a "*-to-pr" mode
+  When the AI reaches its done-boundary
+  Then N review cycles are complete and every inline comment is answered and all PR gates are green
+  And the plan-to-done archival move is committed inside the delivering PR
+  And the [HUMAN] merge remains a separate action outside the AI done-boundary
+```
+
+```gherkin
+Scenario: Only the ose-public PR carries the archival move
+  Given the three-repo sweep delivers via three PRs
+  When each PR reaches its done-definition
+  Then the ose-public PR contains the plans/in-progress to plans/done archival move
+  And the ose-primer and ose-infra PRs are done on cycles-complete plus comments-answered plus gates-green without an archival move
+```
+
 ## Product Scope
 
 ### In scope
@@ -197,8 +270,13 @@ Scenario: The same vocabulary exists in all three repos
 - Editing the governance surfaces enumerated in [`tech-docs.md`](./tech-docs.md#surface-inventory)
   across all three repos.
 - Reconciling Trunk-Based-Development language (decision 6).
+- Two new agents (`pr-review-maker`, `pr-review-fixer`) created in all three repos, plus the new
+  `repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` workflow doc, plus wiring the loop +
+  done-definition + archival-in-PR into `plan-execution.md`, and enforcement updates to
+  `plan-checker` / `plan-execution-checker`.
 - Re-syncing `.opencode/` and `.amazonq/` bindings after `.claude/**` edits.
-- Delivering this plan itself via `worktree-to-pr` (dogfooding) with three worktrees + three PRs.
+- Delivering this plan itself via `worktree-to-pr` (dogfooding) with three worktrees + three PRs,
+  each finalized through the review loop.
 
 ### Out of scope
 
@@ -224,8 +302,11 @@ Scenario: The same vocabulary exists in all three repos
 
 ## Product Risks
 
-| Risk                                                                   | Impact | Mitigation                                                                                     |
-| ---------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------- |
-| Mode value typo escapes review                                         | Medium | `plan-checker` validates the value against the closed enum.                                    |
-| Ambiguity between "delivery mode" and "work branch" precedence         | Medium | Explicitly reuse the same three-tier language and cross-link the two in plan-execution Step 0. |
-| Bootstrapping: this plan edits the very workflow that defines the mode | Low    | Delivery follows the plan's own `delivery.md` manually; see `tech-docs.md` bootstrapping note. |
+| Risk                                                                   | Impact | Mitigation                                                                                                                        |
+| ---------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Mode value typo escapes review                                         | Medium | `plan-checker` validates the value against the closed enum.                                                                       |
+| Ambiguity between "delivery mode" and "work branch" precedence         | Medium | Explicitly reuse the same three-tier language and cross-link the two in plan-execution Step 0.                                    |
+| Bootstrapping: this plan edits the very workflow that defines the mode | Low    | Delivery follows the plan's own `delivery.md` manually; see `tech-docs.md` bootstrapping note.                                    |
+| Review loop posts noisy/low-value comments                             | Medium | Exclusion list + numeric-confidence ≥ 80 hard filter + evidence citation + scope guard (see `tech-docs.md`).                      |
+| Review agents act on prompt-injected PR/issue text (CI-privileged)     | High   | Maker filters PR body/comments/linked-issue text for injection before trusting it; minimal write scope (post/reply/resolve only). |
+| A valid finding is silently suppressed across cycles                   | Medium | Reject-path has a higher justification bar; a finding rejected across consecutive cycles escalates to the human.                  |
