@@ -1,6 +1,6 @@
 ---
 description: Deploys organiclever-www (OrganicLever marketing website) to production environment branch (prod-organiclever-www) after validation. Vercel listens to the production branch for automatic builds.
-model: opencode-go/glm-5
+model: opencode-go/minimax-m3
 permission:
   bash: allow
   grep: allow

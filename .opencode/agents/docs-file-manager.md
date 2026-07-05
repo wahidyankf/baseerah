@@ -1,6 +1,6 @@
 ---
 description: Expert at managing files and directories in docs/ directory. Use for renaming, moving, or deleting files/directories while maintaining kebab-case conventions, fixing links, and preserving git history.
-model: opencode-go/glm-5
+model: opencode-go/minimax-m3
 permission:
   bash: allow
   edit: allow

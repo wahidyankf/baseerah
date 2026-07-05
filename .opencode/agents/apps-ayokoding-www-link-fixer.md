@@ -1,6 +1,6 @@
 ---
 description: Applies validated fixes from link-checker audit reports. Re-validates link findings before applying changes.
-model: opencode-go/glm-5
+model: opencode-go/minimax-m3
 permission:
   bash: allow
   edit: allow

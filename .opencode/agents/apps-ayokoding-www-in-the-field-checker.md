@@ -1,6 +1,6 @@
 ---
 description: Validates In-the-Field production guide quality including annotation density (1.0-2.25 ratio), standard library first progression, guide count (20-40), and production code quality. Use when reviewing in-the-field content.
-model: opencode-go/minimax-m2.7
+model: opencode-go/glm-5.2
 permission:
   bash: allow
   glob: allow

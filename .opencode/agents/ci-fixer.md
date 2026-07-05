@@ -1,6 +1,6 @@
 ---
 description: Applies validated fixes from ci-checker audit reports. Re-validates findings before applying to prevent false positives.
-model: opencode-go/minimax-m2.7
+model: opencode-go/glm-5.2
 permission:
   bash: allow
   edit: allow

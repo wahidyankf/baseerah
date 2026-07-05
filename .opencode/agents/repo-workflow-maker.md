@@ -1,6 +1,6 @@
 ---
 description: Creates workflow documentation in repo-governance/workflows/ following workflow pattern convention.
-model: opencode-go/minimax-m2.7
+model: opencode-go/glm-5.2
 permission:
   edit: allow
   glob: allow

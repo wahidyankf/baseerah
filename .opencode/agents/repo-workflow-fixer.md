@@ -1,6 +1,6 @@
 ---
 description: Applies validated fixes from workflow-checker audit reports. Re-validates before applying changes.
-model: opencode-go/minimax-m2.7
+model: opencode-go/glm-5.2
 permission:
   bash: allow
   edit: allow

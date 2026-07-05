@@ -1,6 +1,6 @@
 ---
 description: Creates repository rules and conventions in repo-governance/ directories. Documents standards, patterns, and quality requirements.
-model: opencode-go/minimax-m2.7
+model: opencode-go/glm-5.2
 permission:
   edit: allow
   glob: allow

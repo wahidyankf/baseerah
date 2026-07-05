@@ -1,6 +1,6 @@
 ---
 description: Creates and updates tutorial documentation following Diátaxis framework and tutorial conventions
-model: opencode-go/minimax-m2.7
+model: opencode-go/glm-5.2
 permission:
   bash: allow
   edit: allow

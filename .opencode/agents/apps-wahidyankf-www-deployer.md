@@ -1,6 +1,6 @@
 ---
 description: Deploys wahidyankf-web to production environment branch (prod-wahidyankf-www) after validation. Vercel listens to production branch for automatic builds.
-model: opencode-go/glm-5
+model: opencode-go/minimax-m3
 permission:
   bash: allow
   grep: allow

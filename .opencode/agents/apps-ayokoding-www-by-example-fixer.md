@@ -1,6 +1,6 @@
 ---
 description: Applies validated fixes from apps-ayokoding-www-by-example-checker audit reports. Re-validates By Example findings before applying changes. Use after reviewing checker output.
-model: opencode-go/minimax-m2.7
+model: opencode-go/glm-5.2
 permission:
   bash: allow
   edit: allow

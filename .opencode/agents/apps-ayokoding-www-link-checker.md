@@ -1,6 +1,6 @@
 ---
 description: Validates links in ayokoding-web content. Checks internal and external links for correctness and accessibility.
-model: opencode-go/glm-5
+model: opencode-go/minimax-m3
 permission:
   bash: allow
   edit: allow
