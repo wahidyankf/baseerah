@@ -790,6 +790,82 @@ UI and its API carries both retest sections. See
 
 **Not applicable** for frontend-only, documentation, governance, CLI/text output, or non-code plans.
 
+## Knowledge Capture (Mandatory Final Phase)
+
+Every substantive plan's `delivery.md` MUST end with a **Knowledge Capture** phase — the final
+substantive phase, positioned immediately before the Plan Archival section below — that triages the
+plan's transient `learnings.md` running log to durable homes before archival. This Skill emits both
+the `learnings.md` scaffold file (created empty in the plan folder alongside `delivery.md`) and the
+Knowledge Capture phase itself into every new substantive plan by default.
+
+**`learnings.md` scaffold** — create in the plan folder during Environment Setup, sibling to
+`delivery.md`:
+
+```markdown
+<!-- Knowledge Capture running log — append entries during execution. -->
+<!-- Triage every entry (or record the explicit "none" escape) before archival. -->
+```
+
+**Entry shape** (append during execution, the moment something generalizable is noticed — not
+reconstructed from memory at the end):
+
+```markdown
+## Learning: <one-line summary>
+
+- **Context**: what was being done when this surfaced
+- **Observation**: what was noticed (sanitized)
+- **Why it might generalize**: the litmus reasoning
+```
+
+**Knowledge Capture phase template** (insert as the last substantive phase, immediately before
+Plan Archival):
+
+```markdown
+## Phase N: Knowledge Capture
+
+- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only entries where a durable
+      surface would catch this automatically next time; discard the rest with a one-line reason.
+- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize to
+      `<placeholder>` tokens or discard if the entry cannot be sanitized without losing its meaning.
+- [ ] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content stays
+      in `ose-infra` only; public-governance content may route to `ose-public`/`ose-primer`; never
+      cross-route private content into a public repo.
+- [ ] [AI] Route each surviving entry to exactly one durable home. The rubric is open-ended —
+      route to whichever surface owns that kind of knowledge (`repo-governance/`, `docs/`,
+      `.claude/agents/`, `.claude/skills/`, a post-mortem, or any other durable home), landing a
+      small non-code edit inline or filing a `plans/backlog/YYYY-MM-DD__<slug>/` follow-up plan for
+      larger non-code work.
+- [ ] [AI] **Code-routing rule**: if a learning's home is `apps/`, `libs/`, or tests, file it as a
+      separate `plans/backlog/` plan — NEVER land it inline in this plan's commits/PR. The sole
+      carve-out is a bug/lint/test failure that blocks THIS plan's own scope — that is fixed inline
+      as ordinary Root Cause Orientation work, not routed as a deferred learning.
+- [ ] [AI] Record the terminal state of every entry (routed inline / filed as backlog at `<path>` /
+      discarded with reason) directly in `learnings.md`.
+- [ ] [AI] If execution genuinely surfaced no generalizable learning, record the explicit escape
+      `No generalizable learnings — <one-line reason>` instead of individual entries.
+
+### Phase N Gate
+
+> All checks below must pass before starting Plan Archival.
+
+- [ ] [AI] Verify every `learnings.md` entry has reached a terminal state (routed / filed /
+      discarded) or the explicit "none" escape is present — no entry left open.
+- [ ] [AI] Verify no code-homed learning landed inline — every code-routed learning has a
+      corresponding `plans/backlog/` folder.
+
+> **Pause Safety**: all learnings are triaged to durable homes or explicitly discarded; nothing is
+> left dangling in `learnings.md`. Safe to stop. To resume: re-check `learnings.md` for any entry
+> without a terminal-state marker.
+```
+
+**Exemptions**: pure-docs and trivial plans (a one-line rename, a single broken-link fix) MAY skip a
+populated `learnings.md` — the explicit "none" escape (or an equivalent note in `delivery.md`)
+satisfies the requirement without inventing insight from a change that had none to offer.
+
+See [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)
+for the authoritative triage rubric, the full candidate-durable-homes table, the litmus test, both
+safety gates, and worked PASS/FAIL examples.
+
 ## Plan Archival (Mandatory Final Section)
 
 Every delivery plan MUST end with a plan archival section:
@@ -871,6 +947,7 @@ Every delivery plan MUST end with a plan archival section:
 - [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md) - Git workflow (default = direct push to main regardless of execution context; branch + draft PR is opt-in only when explicitly requested)
 - [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) - Explicit approval required, all quality gates must pass
 - [Feature Change Completeness](../../../repo-governance/development/quality/feature-change-completeness.md) - Specs, contracts, and tests must update with every feature change
+- [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md) - The mandatory final `learnings.md` triage phase: open-ended principle-based routing rubric, the code-routing rule (code-homed learnings always become a separate `plans/backlog/` plan), and the two safety gates (secret/sensitivity, repo-relevance)
 - [Manual Behavioral Verification](../../../repo-governance/development/quality/manual-behavioral-verification.md) - Playwright MCP for UI, curl for API; ALL locales for multi-locale apps
 - [Evidence Capture Convention](../../../repo-governance/development/quality/evidence-capture.md) - Screenshots to the plan's `evidence/` subfolder (named by phase/locale/breakpoint), curl responses inlined in `delivery.md`, ALL supported locales covered
 - [CI Blocker Resolution](../../../repo-governance/development/quality/ci-blocker-resolution.md) - Preexisting CI failures must be fixed, never bypassed
