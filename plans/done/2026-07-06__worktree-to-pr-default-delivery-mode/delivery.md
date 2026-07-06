@@ -66,7 +66,7 @@ done (archival-in-PR committed) → `[HUMAN]` merge.
 
 > Referenced by every `*-to-pr` delivery phase (Phases 4, 5, 7). Full design + agent specs live in
 > [`tech-docs.md` §PR-Review Maker→Fixer Cycle](./tech-docs.md#pr-review-makerfixer-cycle-design-spec)
-> and the new workflow doc `repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` (created in
+> and the new workflow doc `repo-governance/workflows/pr/pr-review-quality-gate.md` (created in
 > Phase 2). Run this loop against a PR AFTER its own local + CI gates are green and BEFORE the
 > `[HUMAN]` merge. `N` defaults to **3** and cycles run **strictly sequentially** (a fresh
 > `pr-review-maker` each cycle; `pr-review-fixer` answers every thread before the next cycle).
@@ -126,31 +126,31 @@ stateDiagram-v2
 > `ose-public` PR (per `worktree-to-pr` mechanics — one PR per plan, opened at execution start). The
 > ose-public PR stays **open** through Phase 6 and is finalized in Phase 7.
 
-- [ ] [AI] Provision the worktree from latest `origin/main` (from `ose-public` root):
+- [x] [AI] Provision the worktree from latest `origin/main` (from `ose-public` root):
       `git fetch origin && git worktree add -b worktree-to-pr-default-delivery-mode worktrees/worktree-to-pr-default-delivery-mode origin/main`
-      — acceptance: `git worktree list` shows `worktrees/worktree-to-pr-default-delivery-mode` on branch `worktree-to-pr-default-delivery-mode`.
-- [ ] [AI] Install dependencies in the root worktree: `npm install`
-      — acceptance: exits 0, `node_modules/` synchronized.
-- [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
-      — acceptance: exits 0 with no unresolved drift.
-- [ ] [AI] Establish the docs/governance baseline in the worktree:
+      — acceptance: `git worktree list` shows `worktrees/worktree-to-pr-default-delivery-mode` on branch `worktree-to-pr-default-delivery-mode`. Done: worktree created at HEAD `b3b6d18b7`.
+- [x] [AI] Install dependencies in the root worktree: `npm install`
+      — acceptance: exits 0, `node_modules/` synchronized. Done: 13/13 doctor tools OK, exit 0.
+- [x] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
+      — acceptance: exits 0 with no unresolved drift. Done: "Nothing to fix — all tools are installed."
+- [x] [AI] Establish the docs/governance baseline in the worktree:
       `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` (and `npm run lint:md` if present)
-      — acceptance: baseline pass/fail recorded; every preexisting failure documented.
-- [ ] [AI] Resolve all preexisting failures before proceeding
-      — acceptance: no preexisting failures remain unresolved.
-- [ ] [AI] Open the single draft PR for this plan (from the worktree):
+      — acceptance: baseline pass/fail recorded; every preexisting failure documented. Done: 0 projects affected vs. `origin/main` (worktree HEAD == main, no drift).
+- [x] [AI] Resolve all preexisting failures before proceeding
+      — acceptance: no preexisting failures remain unresolved. Done: zero failures (zero affected projects).
+- [x] [AI] Open the single draft PR for this plan (from the worktree):
       `gh pr create --draft --base main --head worktree-to-pr-default-delivery-mode --title "docs(governance): worktree-to-pr default delivery mode" --body "Establishes the worktree-to-pr default delivery mode, the four-mode vocabulary, and the pr-review maker→fixer cycle. Delivered via this PR (dogfooding). See plans/in-progress/worktree-to-pr-default-delivery-mode/."`
-      — acceptance: `gh pr view --json number,isDraft` shows a draft PR number for this branch.
+      — acceptance: `gh pr view --json number,isDraft` shows a draft PR number for this branch. Done: ose-public PR [#29](https://github.com/wahidyankf/ose-public/pull/29) (an empty marker commit was required first — GitHub refuses PR creation with zero commit diff).
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` baseline recorded and every
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` baseline recorded and every
       preexisting failure resolved (zero unresolved).
-- [ ] [AI] `gh pr view --json number,state` returns an open draft PR for
-      `worktree-to-pr-default-delivery-mode`.
+- [x] [AI] `gh pr view --json number,state` returns an open draft PR for
+      `worktree-to-pr-default-delivery-mode`. Confirmed: PR #29, `state: OPEN`, `isDraft: true`.
 
 > **Pause Safety**: only the toolchain was verified, the baseline recorded, and an empty draft PR
 > opened — no governance edits exist yet. Safe to stop indefinitely. To resume: re-run the baseline
@@ -162,7 +162,7 @@ stateDiagram-v2
 
 > All edits in the worktree; commits push to the PR branch, never to `main`.
 
-- [ ] [AI] Edit `repo-governance/conventions/structure/plans.md`: add a `## Delivery Mode` section
+- [x] [AI] Edit `repo-governance/conventions/structure/plans.md`: add a `## Delivery Mode` section
       (sibling to the existing `## Worktree` section) defining the four modes
       (`worktree-to-pr` [default], `worktree-to-origin-main`, `main-to-origin-main`, `main-to-pr`),
       each mode's three attributes (work location, integration target, merge authority), and the
@@ -170,45 +170,66 @@ stateDiagram-v2
       — acceptance: `grep -c "worktree-to-pr" repo-governance/conventions/structure/plans.md` ≥ 1 and
       all four mode names appear in the file.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Edit `repo-governance/conventions/structure/worktree-path.md`: cross-reference the delivery
+  - **Done**: added `### Delivery Mode` as an H3 sibling of `### Worktree Specification` under
+    `## Plan Contents` (the file has no literal H2 `## Worktree`, so this is the structurally
+    accurate placement). `grep -c "worktree-to-pr" plans.md` = 5; all four mode names present.
+- [x] [AI] Edit `repo-governance/conventions/structure/worktree-path.md`: cross-reference the delivery
       mode (a worktree is used by `worktree-to-pr` and `worktree-to-origin-main`); link to the new
       `## Delivery Mode` section in `plans.md`.
       — acceptance: `grep -c "Delivery Mode" repo-governance/conventions/structure/worktree-path.md` ≥ 1.
   - _Suggested executor: `repo-rules-maker`_
+  - **Done**: added `## Relationship to Delivery Mode` section after `## Purpose`. `grep -c
+"Delivery Mode" worktree-path.md` = 3.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] Fix + verify markdown: `npm run lint:md:fix && npm run lint:md`
+- [x] [AI] Fix + verify markdown: `npm run lint:md:fix && npm run lint:md`
       — acceptance: exits 0, no violations.
-- [ ] [AI] Validate mermaid/links/headings on changed docs:
+  - **Done**: exits 0, 2249 files linted, 0 errors.
+- [x] [AI] Validate mermaid/links/headings on changed docs:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       — acceptance: all three exit 0.
-- [ ] [AI] Run affected gates: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage`
+  - **Done**: mermaid validator's 4 reported failures are pre-existing negative-test fixtures under
+    `apps/rhino-cli/tests/fixtures/state/` (unrelated to this diff, confirmed via `git diff
+--name-only origin/main...HEAD`). Links validator caught one real regression (a forward
+    reference to a Phase-2-only file) — fixed by converting to backtick prose; re-run confirmed
+    zero broken links in both changed files. Heading-hierarchy clean.
+- [x] [AI] Run affected gates: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage`
       — acceptance: exits 0. **Fix ALL failures found — including preexisting issues not caused by
       these changes** (root-cause orientation).
+  - **Done**: `NX No tasks were run` — both changed files are docs under `repo-governance/`, not
+    owned by any Nx project, so the affected graph is empty. Exits 0.
 
 ### Commit + Push to PR branch
 
-- [ ] [AI] Commit thematically (Conventional Commits):
+- [x] [AI] Commit thematically (Conventional Commits):
       `git commit -m "docs(governance): define delivery-mode vocabulary in plans + worktree-path conventions"`
       — acceptance: commit created on branch `worktree-to-pr-default-delivery-mode`.
-- [ ] [AI] Push to the PR branch (NOT `main`): `git push origin worktree-to-pr-default-delivery-mode`
+  - **Done**: commit `9428548`.
+- [x] [AI] Push to the PR branch (NOT `main`): `git push origin worktree-to-pr-default-delivery-mode`
       — acceptance: `gh pr view --json commits` shows the new commit on the PR.
+  - **Done**: pushed `f31c7b074..9428548`; `gh pr view 29 --json headRefOid` confirms head =
+    `9428548e7662df003e924b22be1ed1fb143d558f`.
 
 ### Post-Push CI Verification (on the PR)
 
-- [ ] [AI] Monitor CI on the PR (poll every ~2 min): `gh pr checks --watch` or
+- [x] [AI] Monitor CI on the PR (poll every ~2 min): `gh pr checks --watch` or
       `gh run list --branch worktree-to-pr-default-delivery-mode`
       — acceptance: all PR checks green; if any fail, fix at root and push a follow-up commit; repeat
       until green. Do NOT proceed while any PR check is red.
+  - **Done**: all checks reached `pass` or `skipping` (expected for untouched .NET/Rust/TypeScript
+    stacks) on commit `9428548`. No failures — no follow-up commit needed.
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `grep -l "worktree-to-pr" repo-governance/conventions/structure/plans.md` returns the file
+- [x] [AI] `grep -l "worktree-to-pr" repo-governance/conventions/structure/plans.md` returns the file
       and all four mode names are present.
-- [ ] [AI] `gh pr checks` shows all checks passing for the PR after the Phase 1 push.
+  - **Done**: confirmed above.
+- [x] [AI] `gh pr checks` shows all checks passing for the PR after the Phase 1 push.
+  - **Done**: `gh pr checks 29 --repo wahidyankf/ose-public` on head `9428548` — every check `pass`
+    or `skipping`, none `pending`/`fail`.
 
 > **Pause Safety**: convention-layer edits are committed and pushed to a green (still-draft) PR; `main`
 > is untouched. Safe to stop. To resume: `git -C worktrees/worktree-to-pr-default-delivery-mode status`
@@ -218,7 +239,7 @@ stateDiagram-v2
 
 ## Phase 2: ose-public — Workflow Layer (incl. pr-review-cycle doc + loop wiring)
 
-- [ ] [AI] Edit `repo-governance/workflows/plan/plan-execution.md`:
+- [x] [AI] Edit `repo-governance/workflows/plan/plan-execution.md`:
       (a) Step 0 — add delivery-mode selection with the three-tier precedence alongside the existing
       work-branch precedence; (b) Steps 2b/2c — under `worktree-to-pr` the push target is the PR
       branch and CI is monitored on the PR; (c) Step 8 finalization — wire the **PR-Review
@@ -231,19 +252,19 @@ stateDiagram-v2
       the precedence phrase (invocation > plan > default) appears near Step 0, and Step 8 references
       both the review cycle and archival-in-PR.
   - _Suggested executor: `repo-workflow-maker`_
-- [ ] [AI] Create the new workflow doc
-      `repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` _(New file; new `pr/` workflow
+- [x] [AI] Create the new workflow doc
+      `repo-governance/workflows/pr/pr-review-quality-gate.md` _(New file; new `pr/` workflow
       subdir)_ documenting the loop: participants (`pr-review-maker`, `pr-review-fixer`), the strictly
       sequential N-cycle algorithm (default N=3), the GitHub Reviews API mechanics
       (`gh api` / `gh api graphql`, `reviewThreads(isResolved:false)`, `resolveReviewThread`,
       `gh pr view <PR> --json headRefOid`), the loop-exit + escalation rules, and the applicability
       (every `*-to-pr` mode). Link it from `plan-execution.md` Step 8 and from the workflows index
       `repo-governance/workflows/README.md`.
-      — acceptance: `test -f repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` and
-      `grep -c "pr-review-maker" repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` ≥ 1 and
+      — acceptance: `test -f repo-governance/workflows/pr/pr-review-quality-gate.md` and
+      `grep -c "pr-review-maker" repo-governance/workflows/pr/pr-review-quality-gate.md` ≥ 1 and
       the workflows index links the new doc.
   - _Suggested executor: `repo-workflow-maker`_
-- [ ] [AI] Edit `repo-governance/development/workflow/trunk-based-development.md`: reconcile the "all
+- [x] [AI] Edit `repo-governance/development/workflow/trunk-based-development.md`: reconcile the "all
       development on `main`" posture (decision 6) — frame worktree → PR via short-lived plan branches
       as a valid TBD flavor; update `## Default Push and Worktree Execution` so the default is
       short-lived-branch-via-PR while preserving TBD spirit. Honor the maintenance note listing the
@@ -251,20 +272,20 @@ stateDiagram-v2
       — acceptance: `grep -ci "short-lived" repo-governance/development/workflow/trunk-based-development.md` ≥ 1
       and the doc no longer states direct-push-to-main as the sole default.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Edit `repo-governance/development/workflow/git-push-default.md` and
+- [x] [AI] Edit `repo-governance/development/workflow/git-push-default.md` and
       `repo-governance/development/workflow/git-push-safety.md`: reconcile push semantics — default
       integration target is a PR branch; direct push remains available via `*-to-origin-main` modes;
       keep force-push/linear-history rules correct for plan branches.
       — acceptance: both files reference the PR-branch default and the `*-to-origin-main` modes.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Edit `repo-governance/development/workflow/pr-merge-protocol.md`: document the
+- [x] [AI] Edit `repo-governance/development/workflow/pr-merge-protocol.md`: document the
       `worktree-to-pr` terminal step — `[AI]` runs the PR-Review Maker→Fixer Cycle and ensures all
       gates (local + CI) are GREEN and the done-definition is met; `[HUMAN]` merge performs the trunk
       write, outside the AI done-boundary.
       — acceptance: `grep -ci "worktree-to-pr" repo-governance/development/workflow/pr-merge-protocol.md` ≥ 1
       and the doc references the review cycle + done-boundary.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Edit `repo-governance/workflows/plan/plan-planning.md`,
+- [x] [AI] Edit `repo-governance/workflows/plan/plan-planning.md`,
       `repo-governance/workflows/plan/plan-quality-gate.md`,
       `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`, and
       `repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md`: reference
@@ -276,36 +297,36 @@ stateDiagram-v2
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
+- [x] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       — acceptance: all exit 0.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
       **Fix ALL failures, including preexisting.**
 
 ### Commit + Push to PR branch
 
-- [ ] [AI] Commit thematically:
+- [x] [AI] Commit thematically:
       `git commit -m "docs(workflow): add delivery-mode selection + pr-review maker→fixer cycle to plan-execution; reconcile TBD/push semantics"`
       — acceptance: commit created on the plan branch.
-- [ ] [AI] Push to the PR branch: `git push origin worktree-to-pr-default-delivery-mode`
+- [x] [AI] Push to the PR branch: `git push origin worktree-to-pr-default-delivery-mode`
       — acceptance: PR shows the new commit.
 
 ### Post-Push CI Verification (on the PR)
 
-- [ ] [AI] Monitor CI on the PR until green (`gh pr checks --watch`); fix at root + follow-up commit
+- [x] [AI] Monitor CI on the PR until green (`gh pr checks --watch`); fix at root + follow-up commit
       if red; repeat until green.
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `grep -c "worktree-to-pr" repo-governance/workflows/plan/plan-execution.md` ≥ 1 and Step 0
+- [x] [AI] `grep -c "worktree-to-pr" repo-governance/workflows/plan/plan-execution.md` ≥ 1 and Step 0
       documents the three-tier delivery-mode precedence; Step 8 references the review cycle +
       archival-in-PR + done-definition.
-- [ ] [AI] `test -f repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` passes and the
+- [x] [AI] `test -f repo-governance/workflows/pr/pr-review-quality-gate.md` passes and the
       workflows index links it.
-- [ ] [AI] All four plan-workflow docs reference `Delivery Mode`; TBD doc reconciled.
-- [ ] [AI] `gh pr checks` all green after the Phase 2 push.
+- [x] [AI] All four plan-workflow docs reference `Delivery Mode`; TBD doc reconciled.
+- [x] [AI] `gh pr checks` all green after the Phase 2 push.
 
 > **Pause Safety**: workflow + development-workflow edits and the new pr-review-cycle doc are committed
 > to a green (still-draft) PR; `main` untouched. Safe to stop. To resume:
@@ -315,13 +336,13 @@ stateDiagram-v2
 
 ## Phase 3: ose-public — Agents (incl. two review agents), Skill, Root, Checkers, Bindings
 
-- [ ] [AI] Edit `.claude/skills/plan-creating-project-plans/SKILL.md`: add a `## Delivery Mode`
+- [x] [AI] Edit `.claude/skills/plan-creating-project-plans/SKILL.md`: add a `## Delivery Mode`
       requirement + vocabulary + precedence + template (default `worktree-to-pr`), sibling to the
       existing `## Worktree Specification` section; note that `*-to-pr` modes run the PR-Review
       Maker→Fixer Cycle before the `[HUMAN]` merge.
       — acceptance: `grep -c "Delivery Mode" .claude/skills/plan-creating-project-plans/SKILL.md` ≥ 1.
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Create `.claude/agents/pr-review-maker.md` _(New file)_ — a planning-grade (opus-tier,
+- [x] [AI] Create `.claude/agents/pr-review-maker.md` _(New file)_ — a planning-grade (opus-tier,
       omit/`opus` model) reviewer agent that: reads PR diff + plan context first; posts inline
       comments via the GitHub Reviews API (`gh api` / `gh api graphql`); assigns a numeric confidence
       0–100 and **hard-drops findings < 80**; tags severity CRITICAL/HIGH/MEDIUM/LOW; cites concrete
@@ -333,7 +354,7 @@ stateDiagram-v2
       — acceptance: `test -f .claude/agents/pr-review-maker.md` and
       `grep -ci "confidence" .claude/agents/pr-review-maker.md` ≥ 1.
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Create `.claude/agents/pr-review-fixer.md` _(New file)_ — an execution-grade (sonnet-tier)
+- [x] [AI] Create `.claude/agents/pr-review-fixer.md` _(New file)_ — an execution-grade (sonnet-tier)
       fixer agent that: enumerates unresolved maker threads
       (`gh api graphql` `reviewThreads(isResolved:false)`); applies a 4-way triage
       (fix / reject-with-reason / defer-with-reason / clarify); implements fixes, pushes to the PR
@@ -344,78 +365,78 @@ stateDiagram-v2
       — acceptance: `test -f .claude/agents/pr-review-fixer.md` and
       `grep -ci "reviewThreads" .claude/agents/pr-review-fixer.md` ≥ 1.
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Edit `.claude/agents/plan-maker.md`: instruct authoring of the `## Delivery Mode` section
+- [x] [AI] Edit `.claude/agents/plan-maker.md`: instruct authoring of the `## Delivery Mode` section
       (default `worktree-to-pr`) and, for `*-to-pr` plans, emitting the PR-Review Maker→Fixer Cycle
       steps before the `[HUMAN]` merge.
       — acceptance: `grep -c "Delivery Mode" .claude/agents/plan-maker.md` ≥ 1.
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Edit `.claude/agents/plan-checker.md`: validate `## Delivery Mode` presence + valid
+- [x] [AI] Edit `.claude/agents/plan-checker.md`: validate `## Delivery Mode` presence + valid
       vocabulary (closed enum); for `*-to-pr` plans, validate the plan emits the review-cycle steps +
       done-definition + archival-in-PR; flag missing/invalid as findings.
       — acceptance: `grep -c "Delivery Mode" .claude/agents/plan-checker.md` ≥ 1 and
       `grep -ci "pr-review" .claude/agents/plan-checker.md` ≥ 1.
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Edit `.claude/agents/plan-execution-checker.md`: validate delivery matched the declared
+- [x] [AI] Edit `.claude/agents/plan-execution-checker.md`: validate delivery matched the declared
       mode; for `worktree-to-pr`, validate the PR exists, its gates are green, the **review loop ran**
       (N cycles present, every maker thread answered/resolved), and **archival-in-PR** is present in
       the delivering PR (ose-public).
       — acceptance: `grep -c "Delivery Mode" .claude/agents/plan-execution-checker.md` ≥ 1 and
       `grep -ci "review loop\|reviewThreads\|archival-in-PR" .claude/agents/plan-execution-checker.md` ≥ 1.
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Edit `.claude/agents/plan-fixer.md`: scaffold a missing `## Delivery Mode` section and, for
+- [x] [AI] Edit `.claude/agents/plan-fixer.md`: scaffold a missing `## Delivery Mode` section and, for
       `*-to-pr` plans, scaffold the missing PR-Review Maker→Fixer Cycle steps.
       — acceptance: `grep -c "Delivery Mode" .claude/agents/plan-fixer.md` ≥ 1.
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Update the agent catalog `.claude/agents/README.md` and the `AGENTS.md` AI-Agents section
+- [x] [AI] Update the agent catalog `.claude/agents/README.md` and the `AGENTS.md` AI-Agents section
       to list `pr-review-maker` + `pr-review-fixer` under an appropriate role grouping.
       — acceptance: `grep -c "pr-review-maker" .claude/agents/README.md AGENTS.md` shows both files
       reference the new agents.
-- [ ] [AI] Edit `AGENTS.md` (Git Workflow section): update the delivery/TBD description to reflect the
+- [x] [AI] Edit `AGENTS.md` (Git Workflow section): update the delivery/TBD description to reflect the
       worktree → PR default, name the four modes, and mention the pr-review cycle for `*-to-pr` modes.
       — acceptance: `grep -c "worktree-to-pr" AGENTS.md` ≥ 1.
-- [ ] [AI] Edit `CLAUDE.md`: align the Claude-specific binding text with the worktree → PR default
+- [x] [AI] Edit `CLAUDE.md`: align the Claude-specific binding text with the worktree → PR default
       (note `CLAUDE.md` imports `AGENTS.md`).
       — acceptance: delivery description in `CLAUDE.md` is consistent with `AGENTS.md` (no stale
       "direct push to main is the default" wording remains).
-- [ ] [AI] Re-sync bindings after the `.claude/**` edits: `npm run generate:bindings`
+- [x] [AI] Re-sync bindings after the `.claude/**` edits: `npm run generate:bindings`
       — acceptance: exits 0 and `git status --porcelain .opencode .amazonq` shows only intended,
       staged regenerated changes (including the two new agents' `.opencode`/`.amazonq` mirrors; no
       unexplained drift).
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] Validate bindings sync is clean: `npm run validate:claude && npm run validate:opencode`
+- [x] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
+- [x] [AI] Validate bindings sync is clean: `npm run validate:claude && npm run validate:opencode`
       (or the repo's binding-validation targets) — acceptance: exits 0, no sync drift reported (the
       two new agents appear in `.opencode`/`.amazonq`).
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
       **Fix ALL failures, including preexisting.**
 
 ### Commit + Push to PR branch
 
-- [ ] [AI] Commit thematically (split agent/skill edits from generated bindings if cleaner):
+- [x] [AI] Commit thematically (split agent/skill edits from generated bindings if cleaner):
       `git commit -m "docs(agents): add pr-review maker/fixer agents + require Delivery Mode in plan agents/skill + root instructions"`
       then `git commit -m "chore(bindings): re-sync .opencode/.amazonq for delivery-mode + review agents"`
       — acceptance: commits created on the plan branch.
-- [ ] [AI] Push to the PR branch: `git push origin worktree-to-pr-default-delivery-mode`
+- [x] [AI] Push to the PR branch: `git push origin worktree-to-pr-default-delivery-mode`
       — acceptance: PR shows the new commits.
 
 ### Post-Push CI Verification (on the PR)
 
-- [ ] [AI] Monitor CI on the PR until green; fix at root + follow-up commit if red; repeat.
+- [x] [AI] Monitor CI on the PR until green; fix at root + follow-up commit if red; repeat.
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `test -f .claude/agents/pr-review-maker.md` and `test -f .claude/agents/pr-review-fixer.md`
+- [x] [AI] `test -f .claude/agents/pr-review-maker.md` and `test -f .claude/agents/pr-review-fixer.md`
       both pass; both are listed in `.claude/agents/README.md` + `AGENTS.md`.
-- [ ] [AI] All five `.claude/agents/plan-*.md` + the plan-creating SKILL reference `Delivery Mode`;
+- [x] [AI] All five `.claude/agents/plan-*.md` + the plan-creating SKILL reference `Delivery Mode`;
       plan-checker + plan-execution-checker reference the review loop + archival-in-PR;
       `AGENTS.md` references `worktree-to-pr`.
-- [ ] [AI] `npm run generate:bindings` leaves the tree clean (`git status --porcelain .opencode .amazonq`
+- [x] [AI] `npm run generate:bindings` leaves the tree clean (`git status --porcelain .opencode .amazonq`
       empty after staging) and binding validation passes (new agents mirrored).
-- [ ] [AI] `gh pr checks` all green after the Phase 3 push.
+- [x] [AI] `gh pr checks` all green after the Phase 3 push.
 
 > **Pause Safety**: all ose-public content edits — including the two review agents and checker
 > enforcement — are committed to a green (still-draft) PR with synced bindings; `main` untouched. The
@@ -433,70 +454,75 @@ stateDiagram-v2
 >
 > - comments answered + gates green.
 
-- [ ] [AI] Provision the primer worktree from latest `origin/main` (from the ose-primer root):
+- [x] [AI] Provision the primer worktree from latest `origin/main` (from the ose-primer root):
       `git -C /Users/wkf/ose-projects/ose-primer fetch origin && git -C /Users/wkf/ose-projects/ose-primer worktree add -b worktree-to-pr-default-delivery-mode worktrees/worktree-to-pr-default-delivery-mode origin/main`
-      — acceptance: `git -C /Users/wkf/ose-projects/ose-primer worktree list` shows the path.
-- [ ] [AI] Initialize toolchain: `npm install && npm run doctor -- --fix` in the ose-primer root
-      — acceptance: both exit 0.
-- [ ] [AI] Open the single draft PR for primer:
+      — acceptance: `git -C /Users/wkf/ose-projects/ose-primer worktree list` shows the path. Done.
+- [x] [AI] Initialize toolchain: `npm install && npm run doctor -- --fix` in the ose-primer root
+      — acceptance: both exit 0. Done.
+- [x] [AI] Open the single draft PR for primer:
       `gh pr create --draft --base main --head worktree-to-pr-default-delivery-mode --title "docs(governance): worktree-to-pr default delivery mode" --body "Parity port of the ose-public delivery-mode + pr-review-cycle change."`
-      (run from the primer worktree) — acceptance: `gh pr view --json number` returns a PR number.
-- [ ] [AI] Apply the identical edits to the primer copies of every file in
+      (run from the primer worktree) — acceptance: `gh pr view --json number` returns a PR number. Done:
+      ose-primer PR #3.
+- [x] [AI] Apply the identical edits to the primer copies of every file in
       [`tech-docs.md` §Surface Inventory](./tech-docs.md#surface-inventory): the two conventions, the
       four development-workflow docs, the plan workflow docs + the new
-      `repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md`, the five `.claude/agents/plan-*.md` + the two new `pr-review-*.md` agents + the plan-creating SKILL, and `AGENTS.md` + `CLAUDE.md` +
+      `repo-governance/workflows/pr/pr-review-quality-gate.md`, the five `.claude/agents/plan-*.md` + the two new `pr-review-*.md` agents + the plan-creating SKILL, and `AGENTS.md` + `CLAUDE.md` +
       `.claude/agents/README.md`.
       — acceptance: `grep -rc "worktree-to-pr" repo-governance AGENTS.md .claude` (from primer worktree)
       returns non-zero matches across the same surfaces as ose-public, and both `pr-review-*.md` agents
-      exist in the primer `.claude/agents/`.
+      exist in the primer `.claude/agents/`. Done: verified both agents present.
   - _Suggested executor: `repo-rules-maker` (conventions/dev-workflow) + `repo-workflow-maker` (workflows) + `agent-maker` (.claude)_
-- [ ] [AI] Re-sync bindings: `npm run generate:bindings`
-      — acceptance: exits 0; `git status --porcelain .opencode .amazonq` shows only intended staged drift.
+- [x] [AI] Re-sync bindings: `npm run generate:bindings`
+      — acceptance: exits 0; `git status --porcelain .opencode .amazonq` shows only intended staged drift. Done.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
-      — acceptance: all exit 0.
-- [ ] [AI] `npm run validate:claude && npm run validate:opencode` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
-      **Fix ALL failures, including preexisting.**
+- [x] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0. Done.
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
+      — acceptance: all exit 0. Done.
+- [x] [AI] `npm run validate:claude && npm run validate:opencode` — acceptance: exits 0. Done.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
+      **Fix ALL failures, including preexisting.** Done.
 
 ### Commit + Push + CI (on the primer PR)
 
-- [ ] [AI] Commit thematically and push to the PR branch:
+- [x] [AI] Commit thematically and push to the PR branch:
       `git commit -m "docs(governance): worktree-to-pr default delivery mode + pr-review cycle (parity port)"` then
       `git push origin worktree-to-pr-default-delivery-mode`
-      — acceptance: primer PR shows the commit.
-- [ ] [AI] Monitor CI on the primer PR until green; fix at root + follow-up commit if red; repeat.
+      — acceptance: primer PR shows the commit. Done.
+- [x] [AI] Monitor CI on the primer PR until green; fix at root + follow-up commit if red; repeat. Done.
 
 ### PR-Review Maker→Fixer Cycle (primer PR)
 
-- [ ] [AI] Run the **PR-Review Maker→Fixer Cycle** (reusable procedure above) against the primer PR
+- [x] [AI] Run the **PR-Review Maker→Fixer Cycle** (reusable procedure above) against the primer PR
       with `N=3` sequential cycles. — acceptance: cycle done-definition met (N cycles complete OR early
       zero-findings exit; every maker thread answered/resolved; `gh pr checks` green). No archival-in-PR
-      (N/A for primer).
+      (N/A for primer). Done: 3 cycles run, Cycle 3 caught one LOW link-label mismatch (see
+      `learnings.md`).
 
 ### Deliver + Cleanup
 
-- [ ] [AI] Flip to ready: `gh pr ready`; confirm `gh pr checks` all green and
-      `gh pr view --json mergeable` is `MERGEABLE`. — acceptance: PR ready + mergeable + review loop done.
-- [ ] [HUMAN] Review and click **Merge** on the primer PR (outside the AI done-boundary).
+- [x] [AI] Flip to ready: `gh pr ready`; confirm `gh pr checks` all green and
+      `gh pr view --json mergeable` is `MERGEABLE`. — acceptance: PR ready + mergeable + review loop done. Done.
+- [x] [HUMAN] Review and click **Merge** on the primer PR (outside the AI done-boundary).
       — handoff: `[AI]` reached the primer done-definition (cycles + comments answered + gates green)
-      and marked the PR ready. Resume signal: `gh pr view --json state` returns `MERGED`.
-- [ ] [AI] After merge, remove the primer worktree:
+      and marked the PR ready. Resume signal: `gh pr view --json state` returns `MERGED`. Done:
+      merged 2026-07-06T13:29:27Z.
+- [x] [AI] After merge, remove the primer worktree:
       `git -C /Users/wkf/ose-projects/ose-primer worktree remove worktrees/worktree-to-pr-default-delivery-mode`
-      — acceptance: the path is no longer listed.
+      — acceptance: the path is no longer listed. Done.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] Primer PR `state` is `MERGED`; the four-mode vocabulary + precedence + both `pr-review-*`
+- [x] [AI] Primer PR `state` is `MERGED`; the four-mode vocabulary + precedence + both `pr-review-*`
       agents are present in the primer surfaces (`grep` confirms parity with ose-public conceptually).
-- [ ] [AI] The primer review loop ran to its done-definition (cycles complete, all maker threads
+      Verified: PR #3 state MERGED; 22 file matches for `worktree-to-pr`; both `pr-review-*.md` present.
+- [x] [AI] The primer review loop ran to its done-definition (cycles complete, all maker threads
       answered) before the `[HUMAN]` merge.
-- [ ] [AI] Post-merge primer `main-ci` (if any) is green; primer worktree removed.
+- [x] [AI] Post-merge primer `main-ci` (if any) is green; primer worktree removed. Verified: worktree
+      list shows only the primary checkout.
 
 > **Pause Safety**: primer change delivered on primer `main` via merged, fully-reviewed PR; worktree
 > cleaned up. The ose-public PR remains open. Safe to stop before starting ose-infra. To resume: begin
@@ -511,65 +537,73 @@ stateDiagram-v2
 > vocabulary + both review agents land intact even if some prose phrasing differs (see `tech-docs.md`
 > open question 3). Infra's PR carries **no archival-in-PR** (plan folder lives only in ose-public).
 
-- [ ] [AI] Provision the infra worktree from latest `origin/main`:
+- [x] [AI] Provision the infra worktree from latest `origin/main`:
       `git -C /Users/wkf/ose-projects/ose-infra fetch origin && git -C /Users/wkf/ose-projects/ose-infra worktree add -b worktree-to-pr-default-delivery-mode worktrees/worktree-to-pr-default-delivery-mode origin/main`
-      — acceptance: `git -C /Users/wkf/ose-projects/ose-infra worktree list` shows the path.
-- [ ] [AI] Initialize toolchain: `npm install && npm run doctor -- --fix` in the ose-infra root
-      — acceptance: both exit 0.
-- [ ] [AI] Open the single draft PR for infra:
+      — acceptance: `git -C /Users/wkf/ose-projects/ose-infra worktree list` shows the path. Done.
+- [x] [AI] Initialize toolchain: `npm install && npm run doctor -- --fix` in the ose-infra root
+      — acceptance: both exit 0. Done.
+- [x] [AI] Open the single draft PR for infra:
       `gh pr create --draft --base main --head worktree-to-pr-default-delivery-mode --title "docs(governance): worktree-to-pr default delivery mode" --body "Port of the delivery-mode + pr-review-cycle change to the private infra repo."`
-      — acceptance: `gh pr view --json number` returns a PR number.
-- [ ] [AI] Apply the identical edits to the infra copies of every file in
+      — acceptance: `gh pr view --json number` returns a PR number. Done: ose-infra PR #6.
+- [x] [AI] Apply the identical edits to the infra copies of every file in
       [`tech-docs.md` §Surface Inventory](./tech-docs.md#surface-inventory), including the new
-      `repo-governance/workflows/pr/pr-review-maker-fixer-cycle.md` and the two `pr-review-*.md` agents.
+      `repo-governance/workflows/pr/pr-review-quality-gate.md` and the two `pr-review-*.md` agents.
       — acceptance: `grep -rc "worktree-to-pr" repo-governance AGENTS.md .claude` (from infra worktree)
-      returns non-zero matches across the same surfaces; both `pr-review-*.md` agents exist.
+      returns non-zero matches across the same surfaces; both `pr-review-*.md` agents exist. Done.
   - _Suggested executor: `repo-rules-maker` + `repo-workflow-maker` + `agent-maker`_
-- [ ] [AI] Re-sync bindings: `npm run generate:bindings`
-      — acceptance: exits 0; only intended staged drift under `.opencode`/`.amazonq`.
+- [x] [AI] Re-sync bindings: `npm run generate:bindings`
+      — acceptance: exits 0; only intended staged drift under `.opencode`/`.amazonq`. Done.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
-      — acceptance: all exit 0.
-- [ ] [AI] `npm run validate:claude && npm run validate:opencode` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
-      **Fix ALL failures, including preexisting.**
+- [x] [AI] `npm run lint:md:fix && npm run lint:md` — acceptance: exits 0. Done.
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --changed-only && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
+      — acceptance: all exit 0. Done.
+- [x] [AI] `npm run validate:claude && npm run validate:opencode` — acceptance: exits 0. Done.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — acceptance: exits 0.
+      **Fix ALL failures, including preexisting.** Done.
 
 ### Commit + Push + CI (on the infra PR)
 
-- [ ] [AI] Commit thematically and push to the PR branch:
+- [x] [AI] Commit thematically and push to the PR branch:
       `git commit -m "docs(governance): worktree-to-pr default delivery mode + pr-review cycle (infra port)"` then
       `git push origin worktree-to-pr-default-delivery-mode`
-      — acceptance: infra PR shows the commit.
-- [ ] [AI] Monitor CI on the infra PR until green; fix at root + follow-up commit if red; repeat.
+      — acceptance: infra PR shows the commit. Done (plus a follow-up Cycle-3 fixer commit
+      `cfbeda24f93863b9c79f0edd342a60c57690d57c`).
+- [x] [AI] Monitor CI on the infra PR until green; fix at root + follow-up commit if red; repeat.
+      Done: 19 pass / 0 fail on the final commit.
 
 ### PR-Review Maker→Fixer Cycle (infra PR)
 
-- [ ] [AI] Run the **PR-Review Maker→Fixer Cycle** (reusable procedure above) against the infra PR with
+- [x] [AI] Run the **PR-Review Maker→Fixer Cycle** (reusable procedure above) against the infra PR with
       `N=3` sequential cycles. — acceptance: cycle done-definition met (N cycles OR early zero-findings
       exit; every maker thread answered/resolved; `gh pr checks` green). No archival-in-PR (N/A).
+      Done: 3 cycles run (fix commits `bb8b9ce2`, `12250b2e`; Cycle 3 posted clean then its own LOW
+      finding was fixed via `cfbeda24f9`).
 
 ### Deliver + Cleanup
 
-- [ ] [AI] Flip to ready: `gh pr ready`; confirm `gh pr checks` all green and `mergeable` is `MERGEABLE`.
-      — acceptance: PR ready + mergeable + review loop done.
-- [ ] [HUMAN] Review and click **Merge** on the infra PR (outside the AI done-boundary).
+- [x] [AI] Flip to ready: `gh pr ready`; confirm `gh pr checks` all green and `mergeable` is `MERGEABLE`.
+      — acceptance: PR ready + mergeable + review loop done. Done: PR #6 flipped to ready, `isDraft:
+false`.
+- [x] [HUMAN] Review and click **Merge** on the infra PR (outside the AI done-boundary).
       — handoff: `[AI]` reached the infra done-definition and marked the PR ready. Resume signal:
-      `gh pr view --json state` returns `MERGED`.
-- [ ] [AI] After merge, remove the infra worktree:
+      `gh pr view --json state` returns `MERGED`. Done: merged 2026-07-06T13:29:22Z.
+- [x] [AI] After merge, remove the infra worktree:
       `git -C /Users/wkf/ose-projects/ose-infra worktree remove worktrees/worktree-to-pr-default-delivery-mode`
-      — acceptance: the path is no longer listed.
+      — acceptance: the path is no longer listed. Done.
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] Infra PR `state` is `MERGED`; the four-mode vocabulary + precedence + both `pr-review-*`
-      agents present in infra surfaces.
-- [ ] [AI] The infra review loop ran to its done-definition before the `[HUMAN]` merge.
-- [ ] [AI] Post-merge infra `main-ci` (if any) is green; infra worktree removed.
+- [x] [AI] Infra PR `state` is `MERGED`; the four-mode vocabulary + precedence + both `pr-review-*`
+      agents present in infra surfaces. Verified: PR #6 state MERGED; 24 file matches for
+      `worktree-to-pr`; both `pr-review-*.md` present.
+- [x] [AI] The infra review loop ran to its done-definition before the `[HUMAN]` merge.
+- [x] [AI] Post-merge infra `main-ci` (if any) is green; infra worktree removed. Verified: post-merge
+      `main-ci`/`pr-quality-gate`/`validate-env` all `completed`/`success` on headSha
+      `b59f616b56fbd484fb82eb84261d0df69335c877`; worktree list shows only the primary checkout.
 
 > **Pause Safety**: primer + infra changes delivered on their respective `main` via merged,
 > fully-reviewed PRs; both sibling worktrees cleaned up. The ose-public PR remains open (finalized in
@@ -601,33 +635,37 @@ stateDiagram-v2
 > a system secret or sensitive value into any git-tracked destination (hard iron rule); redact or
 > reference an env var instead.
 
-- [ ] [AI] Assemble the raw learnings log from Phases 0–5: preexisting failures fixed during baseline
+- [x] [AI] Assemble the raw learnings log from Phases 0–5: preexisting failures fixed during baseline
       or gates, any CI-on-PR surprises, per-repo prose-divergence notes (esp. ose-infra), any
       binding-sync drift observed, and any notable pr-review-cycle findings/escalations. — acceptance:
-      a bullet list of candidate learnings exists in the execution notes (not yet routed).
-- [ ] [AI] Apply the **repo-relevance gate** to each candidate — mark keep/drop with a one-line reason.
-      — acceptance: every candidate carries a keep/drop decision.
-- [ ] [AI] Apply the **secret/sensitivity gate** to each kept candidate — confirm no secret/sensitive
+      a bullet list of candidate learnings exists in the execution notes (not yet routed). Done: 6
+      entries assembled in `learnings.md`.
+- [x] [AI] Apply the **repo-relevance gate** to each candidate — mark keep/drop with a one-line reason.
+      — acceptance: every candidate carries a keep/drop decision. Done.
+- [x] [AI] Apply the **secret/sensitivity gate** to each kept candidate — confirm no secret/sensitive
       value is carried into any destination; redact or replace with an env-var reference where needed.
       — acceptance: no kept item contains a raw secret; `git diff` of any destination shows no secret.
-- [ ] [AI] Route each kept learning to the most fitting destination per the convention's triage
+      Done: no secrets involved in any of the 4 routed entries.
+- [x] [AI] Route each kept learning to the most fitting destination per the convention's triage
       rubric (open-ended — do not force-fit into a fixed list). For any ose-public-bound edit, apply it
       inside the still-open ose-public PR branch (it merges in Phase 7); for any backlog/idea item, add
       a `plans/ideas.md` entry (or open a backlog plan) rather than expanding this plan's scope; for a
       sibling-repo-only edit whose PR already merged, open a small follow-up `worktree-to-pr` delivery.
       — acceptance: each kept learning maps to a named destination; ose-public-bound edits are on the
-      PR branch; backlog items appear in `plans/ideas.md`.
+      PR branch; backlog items appear in `plans/ideas.md`. Done: 4 routed to
+      `repo-governance/development/agents/{ai-agents.md,subagent-orchestration.md}`; 2 discarded as
+      duplicates of already-tracked behavior (see `learnings.md` Summary table).
   - _Suggested executor: `repo-rules-maker` (governance destination) / `agent-maker` (agent-or-skill destination)_
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] Every candidate learning has a keep/drop decision and every kept learning has exactly one
+- [x] [AI] Every candidate learning has a keep/drop decision and every kept learning has exactly one
       routed destination (no unrouted learnings remain).
-- [ ] [AI] Both safety gates were applied and no secret/sensitive value was written to any git-tracked
+- [x] [AI] Both safety gates were applied and no secret/sensitive value was written to any git-tracked
       destination (`git log -p` spot-check on any Knowledge-Capture commit is clean).
-- [ ] [AI] Any ose-public-bound edits are staged/committed on the ose-public PR branch; any backlog
+- [x] [AI] Any ose-public-bound edits are staged/committed on the ose-public PR branch; any backlog
       items are recorded in `plans/ideas.md`.
 
 > **Pause Safety**: all Phase 0–5 learnings are triaged and routed; ose-public-bound edits sit on the

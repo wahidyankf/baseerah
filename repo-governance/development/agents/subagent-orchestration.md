@@ -211,6 +211,30 @@ Task-notification messages from the harness signal completion (or kill). These a
 
 **Fix**: Target 3–10 minute runtime per agent. Size chunks empirically for each agent type.
 
+### Delegating an Open-Ended Poll Loop Inside a Long Chunk
+
+**Problem**: A background agent's assigned chunk embeds an open-ended wait (e.g., "poll CI every 2
+minutes until all checks are terminal") as one step in a longer multi-step sequence (provision →
+edit → push → **poll** → review-cycle → flip-ready).
+
+**Why it fails**: The agent's turn can end mid-poll — reporting a task-notification with
+`status: completed` even though the wait, and every step after it, never ran. Treating that
+notification as "the whole chunk finished" silently skips the remaining steps.
+
+**Fix**: Read the agent's actual reported result, not just the `completed` label, before advancing
+downstream tasks. If the result shows an in-progress wait rather than a final outcome, resume the
+same agent via `SendMessage` (restating the remaining steps) rather than assuming completion or
+spawning a duplicate agent for the same chunk.
+
+**Debounce before resuming**: a single externally-observed "CI is green" snapshot is not proof the
+agent's own poll noticed it — the main thread's check and the agent's next poll cycle race each
+other, and one green reading can be a transient blip (flaky self-hosted-runner check, a check that
+briefly reports success then reruns). Require the terminal state to hold for **two consecutive**
+external poll cycles — CI still green, PR review count and `headRefOid` unchanged both times —
+before concluding the agent silently stopped and taking over its remaining step (e.g., running the
+mechanical `gh pr ready` yourself). Resuming on the first green reading risks duplicating or racing
+work the agent is about to do on its own next tick.
+
 ## Tooling Reference
 
 | Tool             | Purpose in This Convention                                     |
