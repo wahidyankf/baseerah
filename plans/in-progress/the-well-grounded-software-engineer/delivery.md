@@ -86,8 +86,12 @@ the concrete items (subtopics) and named worked examples the topic must cover.
 
 ### Phase 0 Gate
 
-`npx nx run ayokoding-www:build` exits 0 with the scaffold in place; `npm run lint:md` passes; the
-section root and both track landings render with correct weights.
+> All checks below must pass before starting Phase 1.
+
+- [ ] [AI] `npx nx run ayokoding-www:build` — exits 0 with the scaffold in place.
+- [ ] [AI] `npm run lint:md` — passes.
+- [ ] [AI] Section root and both track landings render with correct weights (`weight: 1750` section
+      root; `weight: 100` learning landing; `weight: 200` drilling landing).
 
 > **Pause Safety**: The section is additive scaffold only — no topic content yet, nav not wired into the
 > parent SE index. Safe to pause here; the site is unaffected because the section is not yet linked.
@@ -108,8 +112,14 @@ Apply the Per-Topic Step Template to each L1 row of the prd table, in weight ord
 
 ### Phase 1 Gate
 
-All 7 L1 learning subtrees + drill pages exist with correct weights (parity `Dwt = Lwt + 100`); each
-clears its format checker + facts-checker; `nx run ayokoding-www:build` exits 0; `npm run lint:md` passes.
+> All checks below must pass before starting Phase 2.
+
+- [ ] [AI] All 7 L1 learning subtrees + drill pages exist with correct weights (parity
+      `Dwt = Lwt + 100`).
+- [ ] [AI] Each L1 topic clears its format checker + `apps-ayokoding-www-facts-checker` with no
+      unresolved HIGH/CRITICAL findings.
+- [ ] [AI] `nx run ayokoding-www:build` — exits 0.
+- [ ] [AI] `npm run lint:md` — passes.
 
 > **Pause Safety**: L1 topics are self-contained and not yet nav-wired into the parent SE index. Safe to
 > pause; partial section is invisible to readers until Phase 8 wiring.
@@ -130,8 +140,12 @@ app domains are independent parallel tracks (cap 3 concurrent per repo policy).
 
 ### Phase 2 Gate
 
-All 6 L2 topics complete (learn + drill, correct weights/parity); checkers + facts-checker clean;
-`nx run ayokoding-www:build` exits 0; `npm run lint:md` passes.
+> All checks below must pass before starting Phase 3.
+
+- [ ] [AI] All 6 L2 topics complete (learn + drill, correct weights/parity).
+- [ ] [AI] Format checkers + facts-checker clean for all 6 topics.
+- [ ] [AI] `nx run ayokoding-www:build` — exits 0.
+- [ ] [AI] `npm run lint:md` — passes.
 
 > **Pause Safety**: L2 topics self-contained, not yet nav-wired. Safe to pause.
 
@@ -144,8 +158,12 @@ All 6 L2 topics complete (learn + drill, correct weights/parity); checkers + fac
 
 ### Phase 3 Gate
 
-Both L3 topics complete (learn + drill, correct weights/parity); checkers + facts-checker clean;
-build exits 0; markdown lint passes.
+> All checks below must pass before starting Phase 4.
+
+- [ ] [AI] Both L3 topics complete (learn + drill, correct weights/parity).
+- [ ] [AI] Format checkers + facts-checker clean for both topics.
+- [ ] [AI] `nx run ayokoding-www:build` — exits 0.
+- [ ] [AI] `npm run lint:md` — passes.
 
 > **Pause Safety**: L3 topics self-contained, not yet nav-wired. Safe to pause.
 
@@ -165,8 +183,12 @@ follows the template. May be authored in parallel (cap 3 concurrent per repo pol
 
 ### Phase 4 Gate
 
-All 6 L4 topics complete (learn + drill, correct weights/parity); checkers + facts-checker clean;
-build exits 0; markdown lint passes.
+> All checks below must pass before starting Phase 5.
+
+- [ ] [AI] All 6 L4 topics complete (learn + drill, correct weights/parity).
+- [ ] [AI] Format checkers + facts-checker clean for all 6 topics.
+- [ ] [AI] `nx run ayokoding-www:build` — exits 0.
+- [ ] [AI] `npm run lint:md` — passes.
 
 > **Pause Safety**: L4 topics self-contained, not yet nav-wired. Safe to pause; parallel authoring
 > leaves each finished topic independently valid.
@@ -187,8 +209,12 @@ the language-theory topics (Lisp, Hindley–Milner) plus compilers.
 
 ### Phase 5 Gate
 
-All 6 L5 topics complete (learn + drill, correct weights/parity); checkers + facts-checker clean;
-build exits 0; markdown lint passes.
+> All checks below must pass before starting Phase 6.
+
+- [ ] [AI] All 6 L5 topics complete (learn + drill, correct weights/parity).
+- [ ] [AI] Format checkers + facts-checker clean for all 6 topics.
+- [ ] [AI] `nx run ayokoding-www:build` — exits 0.
+- [ ] [AI] `npm run lint:md` — passes.
 
 > **Pause Safety**: L5 topics self-contained, not yet nav-wired. Safe to pause.
 
@@ -200,8 +226,12 @@ build exits 0; markdown lint passes.
 
 ### Phase 6 Gate
 
-The L6 topic complete (learn + drill, correct weights/parity); checkers + facts-checker clean;
-build exits 0; markdown lint passes.
+> All checks below must pass before starting Phase 7.
+
+- [ ] [AI] The L6 topic complete (learn + drill, correct weights/parity).
+- [ ] [AI] Format checker + facts-checker clean.
+- [ ] [AI] `nx run ayokoding-www:build` — exits 0.
+- [ ] [AI] `npm run lint:md` — passes.
 
 > **Pause Safety**: L6 topics self-contained, not yet nav-wired. Safe to pause.
 
@@ -219,8 +249,13 @@ short design/decision exercise.
 
 ### Phase 7 Gate
 
-All 4 L7 topics complete (learn + drill, correct weights/parity); checkers + facts-checker clean;
-build exits 0; markdown lint passes. **All 32 topics now authored in both tracks.**
+> All checks below must pass before starting Phase 8.
+
+- [ ] [AI] All 4 L7 topics complete (learn + drill, correct weights/parity).
+- [ ] [AI] Format checkers + facts-checker clean for all 4 topics.
+- [ ] [AI] `nx run ayokoding-www:build` — exits 0.
+- [ ] [AI] `npm run lint:md` — passes.
+- [ ] [AI] All 32 topics now authored in both tracks (learning + drilling).
 
 > **Pause Safety**: L7 topics self-contained, not yet nav-wired. Safe to pause; the whole section is
 > content-complete but still invisible to readers (nav wiring is Phase 8).
@@ -243,15 +278,54 @@ build exits 0; markdown lint passes. **All 32 topics now authored in both tracks
       no broken internal/external links.
 - [ ] **[AI]** Full lint + build: `npm run lint:md` and `npx nx run ayokoding-www:build`. **Acceptance**:
       both exit 0.
-- [ ] **[AI]** Playwright smoke (per repo manual-behavioral-verification): start the app, render the section
-      landing + one learning page + one drilling page; confirm a `<details>` block expands; confirm a nav
-      link resolves; check console. **Acceptance**: three pages render; `<details>` toggles; nav resolves;
-      zero console errors.
+- [ ] **[AI]** Affected quality gate: `nx affected -t typecheck lint test:quick specs:behavior:coverage`
+      (or the ayokoding-www-scoped equivalents: `nx run ayokoding-www:typecheck`,
+      `nx run ayokoding-www:lint`, `nx run ayokoding-www:test:quick`,
+      `nx run ayokoding-www:specs:behavior:coverage`). **Acceptance**: all targets exit 0.
+- [ ] **[AI]** Fix ALL issues surfaced by the quality gates above — including pre-existing/unrelated
+      failures, not just those caused by this plan's changes (Root Cause Orientation: proactively fix
+      preexisting errors encountered during work; do not defer or mention-and-skip). **Acceptance**: a
+      re-run of every gate above exits 0 with zero remaining failures.
+- [ ] **[AI]** Playwright smoke (per repo manual-behavioral-verification): start `npx nx dev ayokoding-www`,
+      then use `browser_navigate` to open the section landing + one learning page + one drilling page,
+      `browser_snapshot` to inspect each page's DOM, `browser_click` to expand a `<details>` block and
+      follow a nav link, and `browser_console_messages` to confirm zero errors. Capture one
+      `browser_take_screenshot` per page verified, save each to
+      `evidence/phase-8-<page-slug>-en-1280px.png` (per the
+      [Evidence Capture Convention](../../../repo-governance/development/quality/evidence-capture.md)),
+      and reference each screenshot inline in this checklist. **Acceptance**: three pages render;
+      `<details>` toggles; nav resolves; zero console errors; three screenshots exist under `evidence/`
+      and are referenced here.
+- [ ] **[AI]** Rule-15 three-tester retest (per
+      [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md)
+      Rule 15 — ~64 new browser-rendered pages + 2 nav entries is a user-facing feature change, not
+      exempt): with the app running, invoke `web-exploratory-tester`, `web-usability-tester`, and
+      `web-design-tester`, each with `output-mode: delivery` and this plan's `plan-path`, against the
+      newly published section landing, at least one learning page, and one drilling page. Append every
+      finding into the "Rule-15 three-tester retest follow-ups" section below as
+      `EWT-###`/`UWT-###`/`DWT-###` checkboxes. **Acceptance**: all three testers run; every reported
+      defect finding is fixed and ticked before archival (deferral requires explicit user permission,
+      only when genuinely impossible).
+
+### Rule-15 three-tester retest follow-ups
+
+_(populated by `web-exploratory-tester` / `web-usability-tester` / `web-design-tester` when the Phase 8
+retest step above runs; every `EWT-###`/`UWT-###`/`DWT-###` defect must be fixed and ticked before Plan
+Archival)_
 
 ### Phase 8 Gate
 
-Section is nav-reachable in ≤2 clicks from `learn/software-engineering/`; parity 32/32; link-checker,
-markdown lint, and build all green; Playwright smoke passes with zero console errors.
+> All checks below must pass before starting Phase 9.
+
+- [ ] [AI] Section is nav-reachable in ≤2 clicks from `learn/software-engineering/`.
+- [ ] [AI] Parity 32/32 (every topic has both `learning/<slug>/` and `drilling/<slug>.md`;
+      `Drill wt = Learn wt + 100`).
+- [ ] [AI] Link-checker, markdown lint, and build all green.
+- [ ] [AI] Affected quality gate (`typecheck`, `lint`, `test:quick`, `specs:behavior:coverage`) exits 0
+      with zero remaining failures (including any pre-existing ones fixed).
+- [ ] [AI] Playwright smoke passes with zero console errors; screenshots committed under `evidence/`.
+- [ ] [AI] Rule-15 three-tester retest follow-ups: every `EWT-###`/`UWT-###`/`DWT-###` defect finding is
+      fixed and ticked (no open defect findings remain).
 
 > **Pause Safety**: Section is now live in nav but purely additive — no existing content changed. Safe to
 > pause; if paused mid-verify, the nav links already resolve to valid pages.
@@ -267,14 +341,19 @@ markdown lint, and build all green; Playwright smoke passes with zero console er
       **Acceptance**: `git status` shows only intended paths staged; commit(s) created.
 - [ ] **[AI]** Push directly to `origin main`: `git push origin main`. **Acceptance**: push succeeds; local
       `main` and `origin/main` at the same commit.
-- [ ] **[AI]** CI post-push verification: trigger/observe CI and poll every 2 min per ci-monitoring policy
-      (`gh run view --json status,conclusion`; never `gh run watch`; on HTTP 403 wait ~35 min).
-      **Acceptance**: latest run `conclusion = success`.
+- [ ] **[AI]** CI post-push verification: observe the `main-ci` workflow
+      (`.github/workflows/main-ci.yml`, triggered automatically by the push to `main`) and poll every
+      2 min per ci-monitoring policy: `gh run list --workflow=main-ci.yml --branch=main --limit=1` to
+      find the run, then `gh run view <run-id> --json status,conclusion`; never `gh run watch`; on HTTP
+      403 wait ~35 min. **Acceptance**: the latest `main-ci` run on the pushed commit has
+      `conclusion = success`.
 
 ### Phase 9 Gate
 
-Content is on `origin main` with CI green on the pushed commit. "Done" = green on `origin main` (no PR,
-no human-merge gate under `main-to-origin-main`).
+> All checks below must pass before starting Phase 10.
+
+- [ ] [AI] Content is on `origin main` (local `main` and `origin/main` at the same commit).
+- [ ] [AI] The `main-ci` workflow run on the pushed commit is green (`conclusion = success`).
 
 > **Pause Safety**: Changes are additive content only; if paused after a partial push, `main` still builds
 > because every pushed commit passed its phase gate before the push.
@@ -283,13 +362,27 @@ no human-merge gate under `main-to-origin-main`).
 
 ## Phase 10 — Knowledge Capture
 
-- [ ] **[AI]** Triage [learnings.md](./learnings.md): route each captured learning to a durable home
-      (convention, agent, skill, or docs) or explicitly discard it. **Acceptance**: every learnings.md entry
-      is either linked to its new home or marked discarded with a reason. [Repo-grounded — Knowledge Capture]
+- [ ] **[AI]** Triage [learnings.md](./learnings.md) per the
+      [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md):
+      apply the secret/sensitivity gate (sanitize or discard anything containing a secret, credential,
+      token, or private hostname) and the repo-relevance gate (infra-private content never routes into
+      this public repo) to every surviving entry, then route each to a durable home (convention, agent,
+      skill, or docs) or explicitly discard it with a one-line reason. Any learning whose home is
+      `apps/`, `libs/`, or tests is **always** filed as a separate `plans/backlog/YYYY-MM-DD__<slug>/`
+      plan — **never** landed inline in this plan's own commits (the only carve-out is a genuine blocker
+      required to finish this plan's own scope, per Root Cause Orientation). If no generalizable
+      learning surfaced, record `No generalizable learnings — <reason>` instead.
+      **Acceptance**: every `learnings.md` entry is routed-inline (non-code only), filed as a backlog
+      plan (mandatory for code), or discarded with a reason — or the explicit "none" escape is recorded;
+      no code-homed learning landed inline. [Repo-grounded — Knowledge Capture Convention]
 
 ### Phase 10 Gate
 
-`learnings.md` fully triaged — no untriaged entries remain.
+> All checks below must pass before Plan Archival.
+
+- [ ] [AI] `learnings.md` fully triaged — every entry is routed-inline, filed-as-backlog, or
+      discarded-with-reason, or the explicit "none" escape is recorded.
+- [ ] [AI] No code-homed learning landed inline in this plan's own commits.
 
 > **Pause Safety**: Documentation-only step; safe to pause at any point.
 

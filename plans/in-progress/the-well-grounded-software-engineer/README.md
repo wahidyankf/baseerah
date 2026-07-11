@@ -36,8 +36,9 @@ learning track and a drilling track covering the same topics in the same order.
   [prd.md](./prd.md) for the per-topic format assignment and volume targets.
 - A **drilling** track: one active-recall page per topic (same topics, same order) with four drill
   forms (recall Q&A, applied scenarios, code katas, self-check checklist).
-- **32 topics** (topic set still **open** — more may be added before lock), identical ordering across
-  both tracks, sequenced as a **seven-level, interview/job-relevance-first journey** (what a SWE
+- **32 topics** (topic set is **frozen** — see [prd.md](./prd.md) for the canonical, locked table),
+  identical ordering across both tracks, sequenced as a **seven-level, interview/job-relevance-first
+  journey** (what a SWE
   interview most tests + what makes you job-ready first → deeper/specialized/niche later;
   app-building before OS-level depth). See [prd.md](./prd.md) for the canonical topic table with
   per-topic level, format, primary language, and weights, and [syllabus.md](./syllabus.md) for every

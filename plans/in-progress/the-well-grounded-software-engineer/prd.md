@@ -102,8 +102,8 @@ domains are independent of each other), not a second content layout.
 This table is the **single source of truth** for topics, level, slug, format, primary language, and
 weights. Other docs reference it rather than re-enumerating. Weights encode the journey order.
 
-**Topic set is still OPEN** — the user may add more topics before the plan is locked; the delivery
-checklist and full tech-docs tree are authored only after the list is frozen.
+**Topic set is FROZEN at 32 topics.** The delivery checklist ([delivery.md](./delivery.md)) and full
+tech-docs tree ([tech-docs.md](./tech-docs.md)) are authored against this locked table.
 
 | #   | Level                         | Topic                            | Slug                                | Learning format   | Primary language | Learn wt | Drill wt |
 | --- | ----------------------------- | -------------------------------- | ----------------------------------- | ----------------- | ---------------- | -------- | -------- |
@@ -234,8 +234,10 @@ needed. [Repo-grounded — `apps/ayokoding-www/content/en/learn/business/corpora
   domains) to be parallel tracks so I pick my path (e.g. backend or mobile) instead of reading all
   domains.
 - **US-5** — As a reader, I want every topic reachable from the section landing and from the
-  `learn/software-engineering/` nav.
-- **US-6** — As a gap-finder, I want a self-check checklist per topic to surface what I don't know.
+  `learn/software-engineering/` nav, so that I can find any topic in at most two clicks without
+  hunting through unrelated content.
+- **US-6** — As a gap-finder, I want a self-check checklist per topic, so that I can surface what I
+  don't know without waiting for an external quiz or interview to expose the gap.
 - **US-7** — As an AI-assisted engineer, I want fundamentals deep enough to judge and correct
   generated output rather than trust it blindly.
 

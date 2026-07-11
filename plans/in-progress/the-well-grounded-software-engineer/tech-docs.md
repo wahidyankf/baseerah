@@ -304,6 +304,14 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   worked examples are enumerated in [syllabus.md](./syllabus.md); each delivery per-topic step authors
   exactly its syllabus section, so "detail every item and example" is specified once and not scattered
   across the checklist. [User decision]
+- **DD-12: the `specs` Gherkin-_authoring_ requirement does not apply to this plan.** Per the
+  [Feature Change Completeness Convention](../../../repo-governance/development/quality/feature-change-completeness.md),
+  the Gherkin-companion requirement binds code changes under `apps/`/`libs/`; this plan touches zero
+  files under `apps/ayokoding-www/src/` and adds no `project.json` targets — it is pure markdown
+  content under `apps/ayokoding-www/content/`, so no new `.feature` files are authored. The
+  `specs:behavior:coverage` target is still _run_ in Phase 8's affected quality gate (it passes
+  trivially, since no new uncovered code exists) — the plan is exempt from writing new Gherkin, not
+  from executing the gate. [Repo-grounded — Feature Change Completeness Convention]
 
 ## Dependencies
 
@@ -328,5 +336,9 @@ the two `_index.md` nav edits. No data migration, no build-config change, no run
 - Content checkers (by-example / general / facts / link) report no unresolved findings.
 - Playwright smoke: section landing + one learning page + one drilling page render; `<details>`
   expands; nav link resolves; zero console errors.
-- **Not** a UI/component change → the rule-15 three-tester triad and the UI-design-funnel do not
-  apply (content-only). A light rendered-page smoke check is included instead.
+- **Not** a UI/component change: the UI-design-funnel does not apply (no new UI components; pure
+  markdown content). The **rule-15 three-tester retest DOES apply**: this plan adds ~64 new
+  browser-rendered pages plus 2 nav entries to the live ayokoding-www site, which is a user-facing
+  feature change under [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md)
+  Rule 15 — content-only is not itself an exemption from Rule 15. See the Phase 8 retest step in
+  [delivery.md](./delivery.md).
