@@ -1,7 +1,7 @@
 # Learnings — The Well-Grounded Software Engineer
 
 Running knowledge-capture log for this plan. Append an entry whenever something is discovered during
-execution that a future plan, agent, convention, skill, or doc should absorb. The **Phase 10 — Knowledge
+execution that a future plan, agent, convention, skill, or doc should absorb. The **Phase 76 — Knowledge
 Capture** step in [delivery.md](./delivery.md) triages every entry here to a durable home (convention /
 agent / skill / docs) or explicitly discards it with a reason. No entry leaves this file untriaged.
 

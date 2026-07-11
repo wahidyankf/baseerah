@@ -51,7 +51,7 @@ These are **observable signals**, not fabricated KPIs:
   sees "The Well-Grounded Software Engineer" in the nav and can reach any topic in ≤2 clicks.
 - [Judgment call] The section is _usable as a learn-then-drill loop_: for every topic, a reader can
   work the learning subtree and then immediately practise the matching drilling page.
-- **Coverage is complete and symmetric**: all 32 topics exist in BOTH tracks, in identical order
+- **Coverage is complete and symmetric**: all 61 topics exist in BOTH tracks, in identical order
   (observable: topic/weight parity between `learning/` and `drilling/`).
 - **By-example pace per topic**: each learning topic clears its applicable checker's density/format
   bands (`apps-ayokoding-www-by-example-checker` for code topics; `apps-ayokoding-www-general-checker`
@@ -71,9 +71,9 @@ These are **observable signals**, not fabricated KPIs:
 
 ## Business Risks
 
-| Risk                                                      | Likelihood | Mitigation                                                                                          |
-| --------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------- |
-| Content duplicates existing deep tutorials, diluting both | Medium     | Self-contained section; breadth-first framing; own by-example subtree distinct from existing trees. |
-| Breadth invites factual drift across 32 wide topics       | Medium     | `apps-ayokoding-www-facts-checker` pass on all pages before archival.                               |
-| Two tracks drift out of topic-order sync                  | Low        | Fixed weight scheme (learning 101..132 / drilling 201..232); parity check in delivery gate.         |
-| Breadth becomes shallow "grounded-in-name-only" coverage  | Medium     | Depth-to-mastery per topic is the done-bar (not length); checker quality floors; level-phased.      |
+| Risk                                                      | Likelihood | Mitigation                                                                                                                   |
+| --------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Content duplicates existing deep tutorials, diluting both | Medium     | Self-contained section; breadth-first framing; own by-example subtree distinct from existing trees.                          |
+| Breadth invites factual drift across 61 wide topics       | Medium     | `apps-ayokoding-www-facts-checker` pass on all pages before archival; pre-authoring `web-researcher` accuracy sweep (DD-28). |
+| Two tracks drift out of topic-order sync                  | Low        | Fixed weight scheme (learning 101..161 / drilling 201..261); parity check in delivery gate.                                  |
+| Breadth becomes shallow "grounded-in-name-only" coverage  | Medium     | Depth-to-mastery per topic is the done-bar (not length); checker quality floors; level-phased.                               |

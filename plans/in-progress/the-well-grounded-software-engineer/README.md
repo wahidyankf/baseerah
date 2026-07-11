@@ -36,45 +36,35 @@ learning track and a drilling track covering the same topics in the same order.
   [prd.md](./prd.md) for the per-topic format assignment and volume targets.
 - A **drilling** track: one active-recall page per topic (same topics, same order) with four drill
   forms (recall Q&A, applied scenarios, code katas, self-check checklist).
-- **32 topics** (topic set is **frozen** — see [prd.md](./prd.md) for the canonical, locked table),
-  identical ordering across both tracks, sequenced as a **seven-level, interview/job-relevance-first
-  journey** (what a SWE
-  interview most tests + what makes you job-ready first → deeper/specialized/niche later;
-  app-building before OS-level depth). See [prd.md](./prd.md) for the canonical topic table with
-  per-topic level, format, primary language, and weights, and [syllabus.md](./syllabus.md) for every
-  item and example inside each topic. In journey order:
-  1. Data Structures & Algorithms _(L1 · Interview Core)_
-  2. Computer Science Foundations _(L1)_
-  3. Computer Networking _(L1)_
-  4. Object-Oriented Programming _(L1)_
-  5. Programming Paradigms _(L1)_ — survey framing the paradigm topics
-  6. Functional Programming _(L1)_
-  7. Concurrency & Parallelism _(L1)_
-  8. Software Engineering Practices _(L2 · Build & Ship)_
-  9. Data Storage (Databases) _(L2)_
-  10. Backend Development _(L2)_
-  11. Frontend Development _(L2)_
-  12. Android App Development _(L2)_
-  13. iOS App Development _(L2)_
-  14. Software Architecture _(L3 · Design at Scale)_
-  15. System Design _(L3)_
-  16. Windows App Development _(L4 · Broaden Delivery)_
-  17. Linux App Development _(L4)_
-  18. Cloud, Containers & IaC _(L4)_
-  19. Data Engineering _(L4)_
-  20. Creating AI-Powered Apps _(L4)_
-  21. IT Security _(L4)_
-  22. Linux OS _(L5 · Systems & Language Depth)_
-  23. Windows OS _(L5)_
-  24. System Programming _(L5)_
-  25. Lisp _(L5)_
-  26. Type Systems (Hindley–Milner) _(L5)_
-  27. Compilers, Parsers & Transpilers _(L5)_
-  28. Site Reliability Engineering _(L6 · Advanced Ops)_
-  29. IT Governance (IT GRC) _(L7 · Leadership & Product)_
-  30. Project Management _(L7)_
-  31. Software Product Engineering _(L7)_
-  32. Engineering Management _(L7)_
+- **61 topics** (topic set is **frozen** — see [prd.md](./prd.md) for the canonical, locked table),
+  identical ordering across both tracks, sequenced as a **Pass 0 setup prologue followed by a
+  five-pass spiral** under an **immediately-effective** principle: after the reader sets up their
+  editor (Pass 0), the earliest learning topics get them building, storing, testing, and securing a
+  small end-to-end system fast, then each later pass revisits the same concern areas at greater depth
+  and breadth. The passes are **descriptive arcs, not gates**; big subjects are split into an
+  Essentials topic early and an Advanced topic later, interleaved across passes (DD-11). See
+  [prd.md](./prd.md) for the canonical 61-topic table (per-topic pass, slug, format, primary language,
+  weights, editor-readiness) and the [syllabus/ folder](./syllabus/README.md) for every item and
+  worked example inside each topic. The prologue and five passes:
+  1. **Pass 0 · Set Up Your Forge** (topics 1–3) — Just Enough Nvim, Just Enough Lua, Extending
+     Neovim. Outcome: fluent in the editor + terminal workflow every later topic assumes.
+  2. **Pass 1 · First Working Software** (topics 4–14) — Python, Bash, DS&A/OOP/SQL/Backend/Networking
+     Essentials, TypeScript, Frontend Essentials, Software Testing, Security Essentials. Outcome:
+     build + store + test + secure a small full-stack app, driven from the shell.
+  3. **Pass 2 · Solidify the Core** (topics 15–25) — CS foundations, OO design & patterns, paradigms,
+     functional programming, core concurrency, advanced algorithms/networking/SQL, engineering
+     practices, and the start-early Product & Delivery track (▲).
+  4. **Pass 3 · Build for the Real World** (topics 26–40) — NoSQL, graph databases, backend at scale,
+     advanced frontend, architecture, DDD, system design, event-driven architecture, containers,
+     cloud/IaC, data engineering, AI-powered apps, and the IT-security + red/blue-team split.
+  5. **Pass 4 · Concurrency & Systems** (topics 41–59) — CSP (Go) and actor (Elixir)
+     concurrency, the ◆ app domains (Android/iOS/Windows/Linux), OS internals, systems programming,
+     Lisp, type systems, compilers, SRE.
+  6. **Pass 5 · Lead at Altitude** (topics 60–61) — IT Governance & GRC, Engineering Management (‡
+     senior leadership depth, no-code).
+     Two **parallel tracks** run alongside the spiral as a reading-path affordance: the ◆ app-domain
+     topics (pick the domain(s) matching your path) and the ▲ Product & Delivery track (readable from
+     Pass 2 onward).
 - Wiring the new section into the `learn/software-engineering/_index.md` and `learn/_index.md`
   navigation.
 - English only.
@@ -92,14 +82,19 @@ learning track and a drilling track covering the same topics in the same order.
 
 ## Approach Summary
 
-Two parallel tracks under one section root, topics in identical order in both:
+**Topic-first** (DD-26): one folder per topic in journey order; each topic holds both its learning
+and drilling material side by side — there are no two top-level tracks.
 
 ```
 learn/software-engineering/the-well-grounded-software-engineer/
-  _index.md            # section landing (nav list)
-  overview.md          # what this is, how to use the two tracks
-  learning/            # by-example-depth per topic (subtree per topic, weights 101..132)
-  drilling/            # active-recall practice (one page per topic, same order, weights 201..232)
+  _index.md               # section landing (nav list)
+  overview.md             # what this is, how to use the journey
+  <NN-topic-slug>/        # one folder per topic (journey order; folder weight 100 + 10×index)
+    learning/             # by-example depth (learning/_index.md = "Learn wt" 101..161)
+      capstone/           # intra-topic capstone (_index.md weight 900)
+      code/               # runnable sources
+    drilling/             # active-recall practice (drilling/_index.md = "Drill wt" 201..261)
+  <inter-topic-capstone>/ # pass-boundary + cross-cutting junction folders
 ```
 
 Each learning topic is authored at **by-example pace** (annotation density 1.0–2.25 comments/line,
@@ -124,7 +119,7 @@ checker plus `apps-ayokoding-www-facts-checker` + `apps-ayokoding-www-link-check
 - [Business Requirements (brd.md)](./brd.md) — WHY this section exists, who it serves, success signals.
 - [Product Requirements (prd.md)](./prd.md) — WHAT the pages contain, personas, user stories, Gherkin
   acceptance criteria, page anatomies.
-- [Syllabus (syllabus.md)](./syllabus.md) — every item and worked example inside each of the 32 topics.
+- [Syllabus (syllabus/)](./syllabus/README.md) — every item and worked example inside each of the 61 topics.
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — HOW: content-tree layout, weights, frontmatter,
   drilling markup, file-impact, diagrams.
 - [Delivery Checklist (delivery.md)](./delivery.md) — DO: phased, executable checklist.

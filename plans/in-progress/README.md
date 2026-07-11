@@ -5,8 +5,8 @@ Active project plans currently being worked on.
 ## Active Plans
 
 - [the-well-grounded-software-engineer](./the-well-grounded-software-engineer/) — new breadth-first
-  relearn-and-drill tutorial section on ayokoding-www (32 topics, seven-level journey, learning +
-  drilling tracks, Python-primary). Delivery Mode: `main-to-origin-main`.
+  relearn-and-drill tutorial section on ayokoding-www (61 topics, Pass 0 forge prologue + five-pass
+  spiral, learning + drilling tracks, Python-primary). Delivery Mode: `main-to-origin-main`.
 
 ## Instructions
 
