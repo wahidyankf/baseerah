@@ -1,16 +1,26 @@
-# 02 · Just Enough Lua (Primer, Lua †)
+# 2 · Just Enough Lua (Primer, Lua †)
 
-**prd row**: Pass 0 · Set Up Your Forge · Primer · Lua † · Learn 102 / Drill 202 · Nvim-ready Yes ·
-VSCode-ready Yes. ([prd canonical table](../prd.md#the-61-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 0 · Editor Foundations · Primer · Lua † · Learn 102 / Drill 202 · Nvim-ready Yes ·
+VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: just enough Lua to be productive configuring and extending Neovim in
 [`03-extending-neovim`](./03-extending-neovim.md); **not** full mastery. Lua is the `†` language
 exception here because it is the config language of the editor the whole book is built around. All
 tooling is OSS (Lua is MIT-licensed) — Tier-1 per DD-21.
 
+## Why this exists · the big idea
+
+- **The problem before the solution**: [`03`](./03-extending-neovim.md) configures Neovim in Lua; learning
+  the config language and the editor-extension concept at once doubles the difficulty — so get just-enough
+  Lua first (DD-13).
+- **Keep-this-if-you-forget-everything**: in Lua a single structure — the **table** — is array, map,
+  object, and module at once; master the table and the rest of the language is small.
+- **Big ideas touched**: `abstraction-and-its-cost` — one universal abstraction (the table) buys a tiny,
+  learnable language and charges you the specialized types a bigger language would give.
+
 ## Prerequisites
 
-- **Prior topics**: [topic 01 Just Enough Nvim](./01-just-enough-nvim.md) (to edit and run files
+- **Prior topics**: [topic 1 Just Enough Nvim](./01-just-enough-nvim.md) (to edit and run files
   comfortably).
 - **Tools & environment**: a macOS/Linux terminal; the standalone **`lua`** interpreter installed
   (`lua -v`) for running scripts outside Neovim.
@@ -69,6 +79,18 @@ Colocated under `just-enough-lua/learning/code/`; each a complete runnable `.lua
   caught by `pcall` (no uncaught error); every listing on the page is complete and runnable as shown.
 - **Done bar**: runnable end-to-end + web-verified.
 
+## Read more
+
+**Books**
+
+- **Programming in Lua** — Roberto Ierusalimschy (4th ed., 2016; Lua 5.3). Official book by the language's chief architect; free first edition online. <https://www.lua.org/pil/>
+
+**Papers & articles**
+
+- **Lua 5.4 Reference Manual** — Ierusalimschy, de Figueiredo, Celes (Lua.org). Canonical spec of syntax, semantics, standard libraries. <https://www.lua.org/manual/5.4/manual.html>
+- **"Lua — An Extensible Extension Language"** — Ierusalimschy, de Figueiredo, Celes (1996, Software: Practice and Experience). Original paper on Lua's design as a small embeddable language. <https://www.lua.org/spe.html>
+- **"The Evolution of Lua"** — Ierusalimschy, de Figueiredo, Celes (2007, HOPL III). The authors' own design history; context for why Neovim adopted Lua. <https://www.lua.org/doc/hopl.pdf>
+
 ---
 
-← Previous: [01 · Just Enough Nvim](./01-just-enough-nvim.md) · Next: [03 · Extending Neovim](./03-extending-neovim.md) →
+← Previous: [1 · Just Enough Nvim](./01-just-enough-nvim.md) · Next: [3 · Extending Neovim](./03-extending-neovim.md) →

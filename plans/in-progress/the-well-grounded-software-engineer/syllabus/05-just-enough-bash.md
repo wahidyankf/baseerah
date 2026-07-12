@@ -1,15 +1,24 @@
-# 05 · Just Enough Bash (Primer, Bash/shell †)
+# 5 · Just Enough Bash (Primer, Bash/shell †)
 
-**prd row**: Pass 1 · First Working Software · Primer · Bash/shell † · Learn 105 / Drill 205 · Nvim-ready
-Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-61-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 1 · Core Foundations · Primer · Bash/shell † · Learn 105 / Drill 205 · Nvim-ready
+Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: just enough Bash to drive builds, tests, and tooling from the terminal in every later
-topic (the raw-form stance, DD-17); PowerShell is folded into [`54-windows-os`](./54-windows-os.md), not
+topic (the raw-form stance, DD-17); PowerShell is folded into [`76-windows-os`](./76-windows-os.md), not
 taught here. All tooling is OSS (Tier-1, DD-21).
+
+## Why this exists · the big idea
+
+- **The problem before the solution**: every later topic drives builds, tests, and tooling from the
+  terminal (DD-17); without shell fluency you cannot glue those tools together or automate the loop.
+- **Keep-this-if-you-forget-everything**: small single-purpose tools piped together beat one big program —
+  each command does one thing, and the pipe composes them.
+- **Big ideas touched**: `coupling-vs-cohesion` — the Unix pipeline is the idea in miniature: highly
+  cohesive tools (`grep`, `sort`, `awk`) loosely coupled through plain text streams.
 
 ## Prerequisites
 
-- **Prior topics**: [topic 01 Just Enough Nvim](./01-just-enough-nvim.md) (to edit scripts).
+- **Prior topics**: [topic 1 Just Enough Nvim](./01-just-enough-nvim.md) (to edit scripts).
 - **Tools & environment**: a macOS/Linux terminal with **Bash** (`bash --version`); the `shellcheck` and
   `shfmt` CLIs installed; standard Unix text tools (`grep`/`sed`/`awk`/`find`). (Windows readers use WSL2
   — DD-25.)
@@ -38,6 +47,8 @@ taught here. All tooling is OSS (Tier-1, DD-21).
 - **Arguments & options**: `$1`/`$@`/`$#`, `shift`, a `getopts` option parser, `--help`/usage.
 - **Robustness**: quoting for spaces/globs, `trap` for cleanup, `mktemp`, checking command success.
 - **Safety & quality**: `shellcheck` and `shfmt` from the CLI (the same gates this repo enforces).
+- **Regular expressions**: POSIX BRE/ERE via `grep -E`/`sed`, character classes, anchors, quantifiers,
+  and capture groups — the pattern language underlying the text-pipeline tools above.
 
 ## Worked examples
 
@@ -67,6 +78,18 @@ Colocated under `just-enough-bash/learning/code/`; each a complete executable sc
   cleanup on error.
 - **Done bar**: runnable end-to-end + web-verified.
 
+## Read more
+
+**Books**
+
+- **The Linux Command Line: A Complete Introduction** — William Shotts (5th internet ed., free). Comprehensive free intro from basics through real shell scripting. <https://linuxcommand.org/tlcl.php>
+
+**Papers & articles**
+
+- **GNU Bash Reference Manual** — FSF / Chet Ramey. Official canonical reference for Bash syntax, builtins, behavior. <https://www.gnu.org/software/bash/manual/bash.html>
+- **POSIX Shell & Utilities (IEEE Std 1003.1)** — The Open Group / IEEE. Formal standard defining portable `sh` that Bash supersets. <https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html>
+- **Google Shell Style Guide** — Google. Widely adopted pragmatic style guide for maintainable production Bash. <https://google.github.io/styleguide/shellguide.html>
+
 ---
 
-← Previous: [04 · Just Enough Python](./04-just-enough-python.md) · Next: [06 · Data Structures & Algorithms Essentials](./06-data-structures-and-algorithms-essentials.md) →
+← Previous: [4 · Just Enough Python](./04-just-enough-python.md) · Next: [6 · Version Control & Git](./06-version-control-and-git.md) →

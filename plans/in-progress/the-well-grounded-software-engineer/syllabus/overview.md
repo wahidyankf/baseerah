@@ -14,24 +14,32 @@ matching the prd journey index. The [README](./README.md) indexes all 61 files.
 
 ## How to read a topic file
 
-Topic order, slugs, format, and primary language come from the [prd table](../prd.md#the-61-topics--canonical-table-spiral-order-identical-in-both-tracks).
+Topic order, slugs, format, and primary language come from the [prd table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks).
 Each `NN-<slug>.md` file carries these sections in order:
 
 1. **Header** — title, prd row echo (pass, format, primary language), scope note.
-2. **Prerequisites** — what a reader must already have to follow the material successfully (see
+2. **Why this exists · the big idea** (universal) — the problem before the solution, the one keep-forever
+   mental model, and the `Cross-Cutting Big Ideas` spine tags this topic advances (see
+   [Scaled Intellectual Depth](#scaled-intellectual-depth-dd-33) below). This is the intellectual-journey
+   opener: **why** the topic earns its place, not just **what** it contains.
+3. **Prerequisites** — what a reader must already have to follow the material successfully (see
    [Prerequisites Clarity Rule](#prerequisites-clarity-rule-hard-rule-dd-31) below).
-3. **Accuracy notes (web-verified)** — dated `web-researcher` findings folded in **before** authoring
+4. **Accuracy notes (web-verified)** — dated `web-researcher` findings folded in **before** authoring
    (DD-28): current versions, current API/CLI syntax, license status, CVE status, best-practice deltas.
-4. **Items** — the concrete subtopics the learning subtree and drilling page must cover (a **floor**,
+5. **Items** — the concrete subtopics the learning subtree and drilling page must cover (a **floor**,
    not a cap — DD-8).
-5. **Worked examples** — the named examples the topic authors. For **By Example**/**Primer** topics they
+6. **Tensions & trade-offs + Lineage** (**judgment topics only** — see
+   [Scaled Intellectual Depth](#scaled-intellectual-depth-dd-33)) — when NOT to reach for the topic's
+   tools, and why the approach beat its historical alternative. Omitted for primers, Essentials, and
+   pure how-to tool topics, where it would be padding.
+7. **Worked examples** — the named examples the topic authors. For **By Example**/**Primer** topics they
    map to the `by-example/{beginner,intermediate,advanced}` progression; for **Annotated-concept** topics
    they map to per-theme worked-example pages (with WCAG-accessible Mermaid diagrams where code does not
    fit).
-6. **Capstone spec** — the full spec (see [Capstone Policy](#capstone-policy-dd-27) below) for this
+8. **Capstone spec** — the full spec (see [Capstone Policy](#capstone-policy-dd-27) below) for this
    topic's intra-topic capstone, and — where this topic is the anchor of a pass boundary or a
    cross-cutting junction — the inter-topic capstone spec too.
-7. **Navigation footer** — explicit **← Previous** / **Next →** links to the adjacent material in
+9. **Navigation footer** — explicit **← Previous** / **Next →** links to the adjacent material in
    reading order (see [Prev/Next Navigation Rule](#prevnext-navigation-rule-hard-rule-dd-32) below).
 
 Every `apps-ayokoding-www-*-maker` step in [delivery.md](../delivery.md) reads the matching
@@ -83,6 +91,46 @@ Snyk / the vendor page / CISA KEV. See
 and `<capstone-slug>/code/` for inter-topic capstones), excluded from the app's Nx build/test/lint gates
 but held to the runnable-example rule.
 
+## Scaled Intellectual Depth (DD-33)
+
+The section is **immediately effective _and_ an intellectual journey** (brd AI-age thesis: in the LLM era
+the durable edge is the **understanding** that lets an engineer judge, verify, and override generated
+output). Effectiveness without understanding produces someone who can paste but not judge; understanding
+is delivered by four intellectual layers woven into the material — but **weighted, not uniform**, because
+page attention is zero-sum and padding a primer with "trade-offs of Just Enough Bash" makes the section
+feel _less_ intellectual while taxing the working engineer re-grounding fast (the primary reader). The
+four layers and where each applies:
+
+- **Why-opener + big-idea tags (universal, all 90 topics)** — the `Why this exists · the big idea`
+  section. Cheap, high-leverage, and it reframes every topic from _what_ to _why_. On primers/Essentials
+  it is 2–3 tight lines; it never becomes padding because it is the reader's first orientation.
+- **The idea spine (universal, horizontal)** — every topic tags the **Cross-Cutting Big Ideas** it
+  advances (see [prd Cross-Cutting Big Ideas](../prd.md#cross-cutting-big-ideas-the-idea-spine-dd-33)), so
+  the section teaches a spine of **ideas**, not just a sequence of **topics**. The eight ideas recur and
+  compound; a reader can trace one idea (e.g. `taming-state`) across paradigms, concurrency, and
+  distributed systems.
+- **Tensions & trade-offs + Lineage (judgment topics only)** — the two REQUIRED depth blocks in the
+  template. Concentrated where judgment is the actual skill: paradigms & design (21–23), engineering
+  practice, product & leadership (09, 18, 30–33), data modelling & architecture (27, 36, 42–46), security
+  reasoning (55–57), retrieval/IA/analytics (38, 49, 59), and the systems/altitude topics (20, 79, 89, plus
+  SRE trade-offs at 90). **Omitted** for the 15 _Just Enough_ primers, the Essentials fluency topics, and
+  the hands-on how-to tool/app-domain topics — there the lesson is fluency, not judgment, and a trade-off
+  section is padding.
+- **Elaborative drilling (universal, drilling track)** — every drilling page carries a fifth drill form,
+  **elaborative interrogation / self-explanation** ("why does this hold? why not the alternative?"),
+  alongside the four existing forms. It lives in the opt-in drilling track, so it deepens without taxing
+  the learning-track reader. See [prd Drilling-track anatomy](../prd.md#drilling-track-anatomy).
+
+**Concentrate at altitude.** Pass 5 (60–61) and the `▲` Product & Delivery topics (24, 25) carry the
+fullest Tensions/Lineage treatment and the section's only synthesis/retrospective prompts (folded into the
+6 pass-boundary inter-topic capstones, not repeated per topic) — this is where the IC→CTO promise is
+actually paid, and it is currently the thinnest part of the arc.
+
+`apps-ayokoding-www-*-maker` authors the layer per this rubric; `apps-ayokoding-www-*-checker` verifies the
+universal layers are present on every topic and the depth blocks are present on judgment topics; the
+`plan-checker` flags a judgment-topic `syllabus/` file missing the Tensions/Lineage blocks or any topic
+file missing the `Why this exists` opener.
+
 ## Accuracy Verification (HARD RULE, DD-28)
 
 **Every topic is web-verified before it is authored.** The pre-authoring `web-researcher` sweep records
@@ -99,7 +147,7 @@ section, and the authored topic surfaces the same list in its `learning/_index.m
 are stated in four concrete kinds (omit a kind only when genuinely none apply):
 
 - **Prior topics** — the earlier topics in journey order whose knowledge this topic builds on, named and
-  linked (e.g. "topic 04 Just Enough Python", "topic 08 SQL Essentials"). This makes the spiral's
+  linked (e.g. "topic 04 Just Enough Python", "topic 10 SQL Essentials"). This makes the spiral's
   dependencies explicit rather than implied by order.
 - **Tools & environment** — the exact toolchain the reader must have installed and working, with pinned
   versions (e.g. "Python 3.x", "the `capstone-forge-ready` Neovim forge", "Docker"), plus the OS/platform
@@ -107,7 +155,7 @@ are stated in four concrete kinds (omit a kind only when genuinely none apply):
 - **Assumed knowledge/skills** — concepts the reader is expected to already be comfortable with (e.g.
   "reading and writing basic Python", "using the terminal and git"), distinct from what this topic
   teaches.
-- **First-topic exception** — [topic 01](./01-just-enough-nvim.md) is the true entry point: its only
+- **First-topic exception** — [topic 1](./01-just-enough-nvim.md) is the true entry point: its only
   prerequisites are a computer with a macOS/Linux-compatible terminal and the willingness to learn; it
   assumes **no** prior programming.
 
@@ -125,7 +173,7 @@ so a reader can walk the whole journey forward or backward without guessing what
 - **This plan's `syllabus/NN-<slug>.md` files** — each ends with a `---` rule then a navigation footer:
   `← Previous: [NN-1 · Title](./NN-1-<slug>.md) · Next: [NN+1 · Title](./NN+1-<slug>.md) →`. The first
   file ([01](./01-just-enough-nvim.md)) points **Previous** at [README](./README.md); the last file
-  ([61](./61-engineering-management.md)) points **Next** at [overview](./overview.md) (journey complete).
+  ([61](./33-engineering-management.md)) points **Next** at [overview](./overview.md) (journey complete).
   Order is the prd journey index (01 → 61); inter-topic capstone specs, being anchored inside a topic
   file, inherit that file's footer.
 - **The eventual `apps/ayokoding-www` content pages** — every authored page (`_index.md` for each
@@ -179,7 +227,7 @@ web-verified (DD-28). Size is uncapped; correctness, accuracy, detail, and clari
 **Intra-topic capstone — scaled by topic kind:**
 
 - **Subject topics** → a full runnable capstone (one cohesive project exercising the topic end-to-end).
-- **The 11 _Just Enough_ primers** → a light consolidation exercise (a short program using the
+- **The 15 _Just Enough_ primers** → a light consolidation exercise (a short program using the
   just-learned features together).
 - **Leadership/governance `‡` topics** → a design/decision capstone producing an artifact (decision
   record, governance matrix, runbook); no code.
@@ -215,6 +263,17 @@ Each `NN-<slug>.md` is authored to this skeleton:
 
 **Scope note**: <what this topic covers; what it defers to an Advanced/later topic>.
 
+## Why this exists · the big idea
+
+- **The problem before the solution**: <the pain this topic answers — what breaks, hurts, or can't be
+  reasoned about without it>.
+- **Keep-this-if-you-forget-everything**: <the one core mental model, in a sentence or two — the intuition
+  the reader should still hold in five years>.
+- **Big ideas touched**: <spine tags, e.g. `abstraction-and-its-cost` · `taming-state`> — see
+  [prd Cross-Cutting Big Ideas](../prd.md#cross-cutting-big-ideas-the-idea-spine-dd-33). Depth scales by
+  topic kind (see [Scaled Intellectual Depth](#scaled-intellectual-depth-dd-33) below): 2–3 tight lines
+  for primers/Essentials/how-to tool topics, richer for judgment topics.
+
 ## Prerequisites
 
 - **Prior topics**: <linked earlier topics this builds on, or "none — this is the entry point">.
@@ -228,6 +287,20 @@ Each `NN-<slug>.md` is authored to this skeleton:
 ## Items
 
 - <concrete subtopic> …
+
+<!-- JUDGMENT TOPICS ONLY (see Scaled Intellectual Depth, DD-33): the two blocks below are REQUIRED for the
+     ~20 judgment/altitude topics and OMITTED for primers, Essentials, and pure how-to tool topics, where they
+     would be padding that dilutes the page and slows the fast-reload reader. -->
+
+## Tensions & trade-offs — when NOT to reach for this
+
+- **<decision axis>**: <when this wins vs when the alternative wins; the cost you pay to adopt it>.
+- **When NOT to use it**: <the over-application / failure mode a well-grounded engineer recognises>.
+
+## Lineage — why it beat the alternative
+
+- <what came before, the pressure that produced this, why the alternative lost — the evolution is the
+  lesson, so the reader can judge the next shift rather than memorise the current winner>.
 
 ## Worked examples
 

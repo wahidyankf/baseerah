@@ -36,35 +36,43 @@ learning track and a drilling track covering the same topics in the same order.
   [prd.md](./prd.md) for the per-topic format assignment and volume targets.
 - A **drilling** track: one active-recall page per topic (same topics, same order) with four drill
   forms (recall Q&A, applied scenarios, code katas, self-check checklist).
-- **61 topics** (topic set is **frozen** — see [prd.md](./prd.md) for the canonical, locked table),
+- **90 topics** (topic set is **frozen** — see [prd.md](./prd.md) for the canonical, locked table),
   identical ordering across both tracks, sequenced as a **Pass 0 setup prologue followed by a
   five-pass spiral** under an **immediately-effective** principle: after the reader sets up their
   editor (Pass 0), the earliest learning topics get them building, storing, testing, and securing a
   small end-to-end system fast, then each later pass revisits the same concern areas at greater depth
   and breadth. The passes are **descriptive arcs, not gates**; big subjects are split into an
   Essentials topic early and an Advanced topic later, interleaved across passes (DD-11). See
-  [prd.md](./prd.md) for the canonical 61-topic table (per-topic pass, slug, format, primary language,
+  [prd.md](./prd.md) for the canonical 90-topic table (per-topic pass, slug, format, primary language,
   weights, editor-readiness) and the [syllabus/ folder](./syllabus/README.md) for every item and
   worked example inside each topic. The prologue and five passes:
-  1. **Pass 0 · Set Up Your Forge** (topics 1–3) — Just Enough Nvim, Just Enough Lua, Extending
+  1. **Pass 0 · Editor Foundations** (topics 1–3) — Just Enough Nvim, Just Enough Lua, Extending
      Neovim. Outcome: fluent in the editor + terminal workflow every later topic assumes.
-  2. **Pass 1 · First Working Software** (topics 4–14) — Python, Bash, DS&A/OOP/SQL/Backend/Networking
-     Essentials, TypeScript, Frontend Essentials, Software Testing, Security Essentials. Outcome:
-     build + store + test + secure a small full-stack app, driven from the shell.
-  3. **Pass 2 · Solidify the Core** (topics 15–25) — CS foundations, OO design & patterns, paradigms,
-     functional programming, core concurrency, advanced algorithms/networking/SQL, engineering
-     practices, and the start-early Product & Delivery track (▲).
-  4. **Pass 3 · Build for the Real World** (topics 26–40) — NoSQL, graph databases, backend at scale,
-     advanced frontend, architecture, DDD, system design, event-driven architecture, containers,
-     cloud/IaC, data engineering, AI-powered apps, and the IT-security + red/blue-team split.
-  5. **Pass 4 · Concurrency & Systems** (topics 41–59) — CSP (Go) and actor (Elixir)
-     concurrency, the ◆ app domains (Android/iOS/Windows/Linux), OS internals, systems programming,
-     Lisp, type systems, compilers, SRE.
-  6. **Pass 5 · Lead at Altitude** (topics 60–61) — IT Governance & GRC, Engineering Management (‡
-     senior leadership depth, no-code).
+  2. **Pass 1 · Core Foundations** (topics 4–18) — Python, Bash, Version Control & Git, DS&A/OOP
+     Essentials, Project Management (▲), SQL/Backend/Networking Essentials, TypeScript, Frontend
+     Essentials, Software Testing, Debugging & Profiling, Security Essentials, Technical Communication.
+     Outcome: build + store + test + secure + debug a small full-stack app, driven from the shell.
+  3. **Pass 2 · Depth, Design & Craft** (topics 19–33) — CS foundations, computer architecture, OO
+     design & patterns, paradigms, functional programming, concurrency & parallelism, advanced
+     algorithms/SQL, data access (ORMs + build-your-own), advanced networking, engineering practices,
+     agentic coding, and the start-early Product & Delivery track (▲: Software Product Engineering,
+     Engineering Management).
+  4. **Pass 3 · Build for the Real World** (topics 34–59) — NoSQL, graph databases, DB internals, data
+     engineering, search & IR, backend at scale, build-your-own web framework, API design,
+     architecture, DDD, system design, event-driven architecture, distributed systems, advanced
+     frontend, build-your-own reactive UI, information architecture & SEO, containers, cloud/IaC, CI/CD
+     & release engineering, AI-powered apps, agentic AI, the IT-security + red/blue-team split, IT
+     governance & GRC, and analytics & experimentation.
+  5. **Pass 4 · Concurrency & Systems** (topics 60–85) — CSP (Go) and actor (Elixir) concurrency, the
+     ◆ app domains (Android/iOS/Hybrid/Windows/Linux) with their language primers, building production
+     CLI tools, C + OS internals (Linux/Windows), systems programming, Rust + modern systems
+     programming, Java + the enterprise JVM, Lisp, F#, type systems, and compilers/transpilers.
+  6. **Pass 5 · Internals & Lead at Altitude** (topics 86–90) — Build Your Own Git, Build Your Own
+     Database, Build Your Own Raft, Platform Engineering & Developer Experience, and Site Reliability
+     Engineering (‡ senior leadership depth woven through the platform/SRE finale).
      Two **parallel tracks** run alongside the spiral as a reading-path affordance: the ◆ app-domain
      topics (pick the domain(s) matching your path) and the ▲ Product & Delivery track (readable from
-     Pass 2 onward).
+     Pass 1 onward).
 - Wiring the new section into the `learn/software-engineering/_index.md` and `learn/_index.md`
   navigation.
 - English only.
@@ -119,7 +127,7 @@ checker plus `apps-ayokoding-www-facts-checker` + `apps-ayokoding-www-link-check
 - [Business Requirements (brd.md)](./brd.md) — WHY this section exists, who it serves, success signals.
 - [Product Requirements (prd.md)](./prd.md) — WHAT the pages contain, personas, user stories, Gherkin
   acceptance criteria, page anatomies.
-- [Syllabus (syllabus/)](./syllabus/README.md) — every item and worked example inside each of the 61 topics.
+- [Syllabus (syllabus/)](./syllabus/README.md) — every item and worked example inside each of the 90 topics.
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — HOW: content-tree layout, weights, frontmatter,
   drilling markup, file-impact, diagrams.
 - [Delivery Checklist (delivery.md)](./delivery.md) — DO: phased, executable checklist.

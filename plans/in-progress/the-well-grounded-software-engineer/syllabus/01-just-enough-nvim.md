@@ -1,13 +1,23 @@
-# 01 · Just Enough Nvim (Primer, Neovim §)
+# 1 · Just Enough Nvim (Primer, Neovim §)
 
-**prd row**: Pass 0 · Set Up Your Forge · Primer · Neovim § · Learn 101 / Drill 201 · Nvim-ready Yes ·
-VSCode-ready Yes. ([prd canonical table](../prd.md#the-61-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 0 · Editor Foundations · Primer · Neovim § · Learn 101 / Drill 201 · Nvim-ready Yes ·
+VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: **vanilla latest Neovim with zero plugins/extensions** — editing fluency built entirely
 on what ships in the box. Plugin management, LSP, DAP, Treesitter, and completion are deliberately **out
 of scope here** and belong to [`03-extending-neovim`](./03-extending-neovim.md). Neovim is Apache-2.0
 (Tier-1, DD-21); this primer precedes [`02-just-enough-lua`](./02-just-enough-lua.md), so configuration
 is shown as `:set`/ex-commands, **not** Lua code.
+
+## Why this exists · the big idea
+
+- **The problem before the solution**: every later topic drives build/run/test/git from the terminal
+  (DD-17); without a modal editor under your fingers you fight your tools instead of the problem.
+- **Keep-this-if-you-forget-everything**: modal editing separates _moving and selecting_ from _inserting_,
+  so plain keystrokes become a composable editing language (operator + motion + text object).
+- **Big ideas touched**: `mechanism-vs-policy` — vanilla Neovim is pure **mechanism**; the **policy** (your
+  config, plugins, LSP) is deliberately deferred to [`02`](./02-just-enough-lua.md) and
+  [`03`](./03-extending-neovim.md).
 
 ## Prerequisites
 
@@ -91,6 +101,18 @@ before/after file pair plus the exact keystroke transcript (DD-30 follow-along).
 - **Done bar**: runnable end-to-end (a reader following the transcript reaches the identical `after/`
   tree) + web-verified.
 
+## Read more
+
+**Books**
+
+- **Practical Vim: Edit Text at the Speed of Thought** — Drew Neil (2nd ed., 2015). The classic guide to Vim's composable command grammar, still the most recommended path to editing fluency.
+- **Learning the vi and Vim Editors** — Arnold Robbins, Elbert Hannah, Linda Lamb (8th ed., O'Reilly). The long-running comprehensive vi/Vim reference, basics to power-user scripting.
+
+**Papers & articles**
+
+- **Neovim User Documentation (`:help`)** — Neovim core team. Authoritative version-matched reference for Neovim's modal model, commands, options. <https://neovim.io/doc/user/>
+- **Vim/Neovim built-in tutorial (`vimtutor` / `:Tutor`)** — Bram Moolenaar; Neovim team. Original hands-on modal-editing intro shipped with the editor.
+
 ---
 
-← Previous: [README (syllabus index)](./README.md) · Next: [02 · Just Enough Lua](./02-just-enough-lua.md) →
+← Previous: [README (syllabus index)](./README.md) · Next: [2 · Just Enough Lua](./02-just-enough-lua.md) →

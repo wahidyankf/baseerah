@@ -1,16 +1,26 @@
-# 04 · Just Enough Python (Primer, Python)
+# 4 · Just Enough Python (Primer, Python)
 
-**prd row**: Pass 1 · First Working Software · Primer · Python · Learn 104 / Drill 204 · Nvim-ready Yes ·
-VSCode-ready Yes. ([prd canonical table](../prd.md#the-61-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 1 · Core Foundations · Primer · Python · Learn 104 / Drill 204 · Nvim-ready Yes ·
+VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: just enough Python to be productive in the Pass 1–3 Python topics; **not** full mastery.
 OOP gets a preview here and full treatment in
-[`07-object-oriented-programming-essentials`](./07-object-oriented-programming-essentials.md). Python is
+[`08-object-oriented-programming-essentials`](./08-object-oriented-programming-essentials.md). Python is
 the book's primary language (CPython, PSF-license, Tier-1 DD-21).
+
+## Why this exists · the big idea
+
+- **The problem before the solution**: Pass 1–3 build real software, and they need one default language
+  you can read and run without ceremony — this primer makes Python that tool before the topics that lean
+  on it.
+- **Keep-this-if-you-forget-everything**: Python is executable pseudocode — optimize for the reader
+  first; clarity is the whole point, and speed is bought back later only where measured.
+- **Big ideas touched**: `abstraction-and-its-cost` — high-level built-ins (lists, dicts, comprehensions)
+  buy readable code and charge runtime overhead you spend deliberately, not by default.
 
 ## Prerequisites
 
-- **Prior topics**: [topic 01 Just Enough Nvim](./01-just-enough-nvim.md) (to edit/run files); the
+- **Prior topics**: [topic 1 Just Enough Nvim](./01-just-enough-nvim.md) (to edit/run files); the
   [`capstone-forge-ready`](./03-extending-neovim.md) forge is recommended but not required.
 - **Tools & environment**: a macOS/Linux terminal; **Python 3.x** installed (`python3 --version`) with
   `venv` + `pip`; the `black` and `ruff` CLIs (or installed via `pip`).
@@ -39,7 +49,7 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
 - **Modules & packages**: `import`, the standard library, `if __name__ == "__main__"`.
 - **Errors**: `try`/`except`/`finally`, raising, common built-in exceptions.
 - **Files & I/O**: `open` with `with`, reading/writing text, JSON via `json`.
-- **OOP preview**: a class at a glance (full treatment in topic 07).
+- **OOP preview**: a class at a glance (full treatment in topic 08).
 
 ## Worked examples
 
@@ -67,6 +77,18 @@ Colocated under `just-enough-python/learning/code/`; each runs with `python3 <fi
   cleanly; `ruff`/`black` clean.
 - **Done bar**: runnable end-to-end + web-verified.
 
+## Read more
+
+**Books**
+
+- **Fluent Python** — Luciano Ramalho (2nd ed., 2022). Definitive intermediate-to-advanced guide to idiomatic modern Python: data model, type hints, concurrency.
+- **Effective Python: 125 Specific Ways to Write Better Python** — Brett Slatkin (3rd ed., 2024). Item-based best-practices, updated through Python 3.13.
+
+**Papers & articles**
+
+- **PEP 8 — Style Guide for Python Code** — van Rossum, Warsaw, Coghlan (2001). Python's official style guide. <https://peps.python.org/pep-0008/>
+- **PEP 484 — Type Hints** — van Rossum, Lehtosalo, Langa (2014). Foundational spec of Python's optional static type system. <https://peps.python.org/pep-0484/>
+
 ---
 
-← Previous: [03 · Extending Neovim](./03-extending-neovim.md) · Next: [05 · Just Enough Bash](./05-just-enough-bash.md) →
+← Previous: [3 · Extending Neovim](./03-extending-neovim.md) · Next: [5 · Just Enough Bash](./05-just-enough-bash.md) →

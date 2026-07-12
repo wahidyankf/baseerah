@@ -1,17 +1,28 @@
-# 03 · Extending Neovim (By Example, Lua †)
+# 3 · Extending Neovim (By Example, Lua †)
 
-**prd row**: Pass 0 · Set Up Your Forge · By Example · Lua † · Learn 103 / Drill 203 · Nvim-ready Yes ·
-VSCode-ready Yes. ([prd canonical table](../prd.md#the-61-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 0 · Editor Foundations · By Example · Lua † · Learn 103 / Drill 203 · Nvim-ready Yes ·
+VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: turn vanilla Neovim ([topic 01](./01-just-enough-nvim.md)) into a real IDE-grade forge
-using the Lua learned in [topic 02](./02-just-enough-lua.md) — plugin management, LSP, Treesitter,
+**Scope note**: turn vanilla Neovim ([topic 1](./01-just-enough-nvim.md)) into a real IDE-grade forge
+using the Lua learned in [topic 2](./02-just-enough-lua.md) — plugin management, LSP, Treesitter,
 autocommands/user commands, and a tiny self-authored plugin. This is the payoff topic of Pass 0; every
 later topic assumes this forge exists (DD-17). Neovim and every plugin/LSP used are OSS (Tier-1, DD-21).
 
+## Why this exists · the big idea
+
+- **The problem before the solution**: vanilla Neovim edits text; real work also needs diagnostics,
+  syntax-awareness, and a config you can reproduce on a new machine — this topic turns the editor into a
+  versioned **forge** every later topic assumes (DD-17).
+- **Keep-this-if-you-forget-everything**: your editor is code — the config is a Lua program in git, so your
+  environment is reproducible and diffable, not a pile of clicked settings.
+- **Big ideas touched**: `mechanism-vs-policy` — you now add the **policy** (plugins, LSP, keymaps) onto
+  vanilla Neovim's **mechanism**; `abstraction-and-its-cost` — LSP and Treesitter are language-agnostic
+  abstractions that buy uniform tooling across languages.
+
 ## Prerequisites
 
-- **Prior topics**: [topic 01 Just Enough Nvim](./01-just-enough-nvim.md) (modal editing fluency) and
-  [topic 02 Just Enough Lua](./02-just-enough-lua.md) (config is written in Lua).
+- **Prior topics**: [topic 1 Just Enough Nvim](./01-just-enough-nvim.md) (modal editing fluency) and
+  [topic 2 Just Enough Lua](./02-just-enough-lua.md) (config is written in Lua).
 - **Tools & environment**: a macOS/Linux terminal; the latest **Neovim** (`nvim --version`); **git** (to
   clone/manage the config and plugins); network access to fetch plugins; a working
   `~/.config/nvim` location. A language runtime for the LSP demo (Python 3.x) installed.
@@ -116,6 +127,15 @@ Integrates topics 01–03: vanilla editing fluency + Lua + a real extended confi
   result — end to end, no hidden setup.
 - **Done bar**: runnable end-to-end (clean-machine reproduction) + web-verified.
 
+## Read more
+
+**Papers & articles**
+
+- **Neovim User Documentation (`:help lsp`, `:help treesitter`, `:help lua-guide`)** — Neovim core team. Authoritative reference for the built-in LSP client, Tree-sitter, and the Lua plugin API. <https://neovim.io/doc/user/>
+- **Language Server Protocol Specification** — Microsoft (3.17). The formal protocol Neovim's LSP client implements. <https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/>
+- **Tree-sitter Documentation** — Max Brunsfeld and maintainers. Official docs for the incremental-parsing library Neovim uses. <https://tree-sitter.github.io/tree-sitter/>
+- **nvim-lspconfig** — Neovim core team. Reference collection of default LSP client configs. <https://github.com/neovim/nvim-lspconfig>
+
 ---
 
-← Previous: [02 · Just Enough Lua](./02-just-enough-lua.md) · Next: [04 · Just Enough Python](./04-just-enough-python.md) →
+← Previous: [2 · Just Enough Lua](./02-just-enough-lua.md) · Next: [4 · Just Enough Python](./04-just-enough-python.md) →

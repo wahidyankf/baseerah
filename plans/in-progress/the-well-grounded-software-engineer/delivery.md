@@ -1,7 +1,7 @@
 # Delivery Checklist — The Well-Grounded Software Engineer
 
 This checklist is **table-referential**: the canonical topic set, per-topic pass, slug, learning
-format, primary language, and weights live in the [prd.md 61-topic table](./prd.md#the-61-topics--canonical-table-spiral-order-identical-in-both-tracks) —
+format, primary language, and weights live in the [prd.md 90-topic table](./prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks) —
 the single source of truth. Each per-topic phase below reads its row from that table and its concrete
 items + worked examples + capstone spec from that topic's [syllabus/ file](./syllabus/). When a topic
 is added/removed, edit the prd table + its syllabus file, then add or drop the matching phase here.
@@ -26,9 +26,16 @@ See [Plans Organization Convention §Delivery Mode](../../../repo-governance/con
 ## Delivery Mode: main-to-origin-main
 
 Work in the **primary checkout** on `main` (no worktree, no PR). The AI commits and **pushes directly
-to `origin main`** after the finalization phase gates pass. "Done" = the content is on `origin main`
-with CI green. Because there is no PR, the finalization phase runs **direct-push + CI post-push
-verification** instead of the PR-Review Maker→Fixer Cycle.
+to `origin main`**. "Done" = the content is on `origin main` with CI green. Because there is no PR, each
+push runs **direct-push + CI post-push verification** instead of the PR-Review Maker→Fixer Cycle.
+
+**Push cadence — commit + push after every completed topic (HARD RULE)**: this plan does **not** batch a
+single push at the end. The moment a topic (or inter-topic capstone) phase passes its gate, the AI
+**commits and pushes that deliverable to `origin main`** and confirms its `main-ci` run is green before
+starting the next phase — so each topic lands green on `main` as it completes. Content is additive and
+not yet nav-wired at this stage, so per-topic pushes are safe (nav wiring lands in Phase 101). The
+finalization push phase is therefore a **final catch-up + verify** (nav-wiring commit + confirm
+`origin/main` fully green), not the sole push.
 
 **Direct-to-main discipline** (per repo memory/policy): stage **explicit paths only** (the new content
 files and the two nav `_index.md` edits) — never `git add -A` in this repo. Do not touch git identity.
@@ -39,11 +46,11 @@ Commit per domain/concern with Conventional Commit messages.
 ```mermaid
 flowchart TD
     S["Phase 0<br/>setup and scaffold"]
-    T["Per-topic phase (x61)<br/>V-verify A-author<br/>D-drill G-gate"]
-    C["Inter-topic capstone (x10)<br/>pass-boundary +<br/>cross-cutting"]
+    T["Per-topic phase (x90)<br/>V-verify A-author<br/>D-drill G-gate<br/>commit+push origin main"]
+    C["Inter-topic capstone (x10)<br/>pass-boundary +<br/>cross-cutting<br/>commit+push origin main"]
     N["Nav wiring + quality gate"]
     R["Playwright + Rule-15 retest"]
-    P["Push origin main and CI verify"]
+    P["Catch-up push + CI verify"]
     D["Deploy ayokoding-www to prod"]
     K["Knowledge Capture"]
     A["Plan Archival"]
@@ -60,16 +67,16 @@ flowchart TD
 `CONTENT = apps/ayokoding-www/content/en/learn/software-engineering/the-well-grounded-software-engineer`.
 
 - **Topic-slug folder** `CONTENT/<slug>/_index.md` → weight `100 + 10 × journey-index` (topic 1 = 110,
-  topic 2 = 120, … topic 61 = 710). The ×10 spacing leaves integer gaps for inter-topic capstones.
-- **Learning subfolder** `CONTENT/<slug>/learning/_index.md` → weight = prd **"Learn wt"** (101..161).
-- **Drilling subfolder** `CONTENT/<slug>/drilling/_index.md` → weight = prd **"Drill wt"** (201..261),
+  topic 2 = 120, … topic 90 = 1000). The ×10 spacing leaves integer gaps for inter-topic capstones.
+- **Learning subfolder** `CONTENT/<slug>/learning/_index.md` → weight = prd **"Learn wt"** (101..190).
+- **Drilling subfolder** `CONTENT/<slug>/drilling/_index.md` → weight = prd **"Drill wt"** (201..290),
   with the parity invariant **`Drill wt = Learn wt + 100`**.
 - **Intra-topic capstone** `CONTENT/<slug>/learning/capstone/_index.md` → weight **900** (sorts last
   inside `learning/`).
 - **Inter-topic capstone** `CONTENT/<capstone-slug>/_index.md` → a weight in the ×10 gap after its
-  junction (Pass-0 cap = 135, Pass-1 cap = 245, full-stack-app = 246, Pass-2 cap = 355, Pass-3 cap =
-  505, secure-service = 506, data-pipeline = 507, Pass-4 cap = 695, concurrency-showdown = 696, Pass-5
-  cap = 715), each with colocated `code/`.
+  junction (Pass-0 cap = 135, Pass-1 cap = 275, full-stack-app = 276, Pass-2 cap = 435, Pass-3 cap =
+  575, secure-service = 576, data-pipeline = 577, Pass-4 cap = 955, concurrency-showdown = 956, Pass-5
+  cap = 1005), each with colocated `code/`.
 - **Section root** `CONTENT/_index.md` → weight **1750** (position in the parent SE nav);
   `CONTENT/overview.md` → weight **1** (sorts first inside the section).
 
@@ -93,13 +100,23 @@ invocation, and a concrete acceptance criterion (execution-grade clarity).
    (frontmatter `weight: <Lwt>`), `CONTENT/<slug>/learning/overview.md` (weight 1 — restating the syllabus
    file's **`## Prerequisites`** block verbatim at the top (DD-31: **Prior topics** cross-linked, **Tools &
    environment** tied to the Editor Setup matrix + exact pinned CVE-clean versions, **Assumed knowledge**),
-   then the install command + raw-form run command up front, DD-30), and example pages covering **every item
+   then the topic's **`Why this exists · the big idea`** opener (DD-33: the problem before the solution, the
+   keep-forever mental model, and its Cross-Cutting Big-Idea tags — 2–3 tight lines for primers/Essentials/
+   how-to tool topics, richer for judgment topics), then the install command + raw-form run command up
+   front, DD-30), and example pages covering **every item
    and worked example in `syllabus/<NN>-<slug>.md`**, with runnable files colocated under
-   `CONTENT/<slug>/learning/code/`. `<fmt>` = By Example → invoke `apps-ayokoding-www-by-example-maker`
+   `CONTENT/<slug>/learning/code/`. **For the ~26 judgment/altitude topics only** (DD-33 list: 9, 18, 20, 21, 22, 23, 27, 30, 31, 32, 33, 36, 38, 42, 43,
+   44, 45, 46, 49, 55, 56, 57, 59, 79, 89, 90), the learning content
+   additionally carries the **`Tensions & trade-offs`** and **`Lineage`** sections from
+   `syllabus/<NN>-<slug>.md`; primers, Essentials, and how-to tool topics **omit** them (padding avoidance).
+   `<fmt>` = By Example → invoke `apps-ayokoding-www-by-example-maker`
    (five-part examples in `<lang>`, density 1.0–2.25); `<fmt>` = Annotated-concept → invoke
    `apps-ayokoding-www-general-maker` (annotated worked examples + diagrams); `<fmt>` = Primer → invoke
    `apps-ayokoding-www-by-example-maker` scoped to "just enough". **Acceptance**: files exist with the
-   stated weights; `overview.md` carries the three-part Prerequisites block (DD-31); all code in `<lang>`
+   stated weights; `overview.md` carries the three-part Prerequisites block (DD-31); the `Why this exists ·
+the big idea` opener is present with ≥1 Cross-Cutting Big-Idea tag drawn from the eight-idea spine
+   (DD-33); a judgment/altitude topic carries the Tensions & trade-offs + Lineage sections and a
+   non-judgment topic omits them (DD-33); all code in `<lang>`
    (or the documented `†`/`*` exception); every syllabus item/example present; DD-30 follow-along holds
    (versions up front, no elided `...`-only listings, every command shown verbatim with expected output);
    DD-19 (no TODO/TBD/stub/placeholder).
@@ -116,12 +133,16 @@ invocation, and a concrete acceptance criterion (execution-grade clarity).
    Annotated-concept) across `CONTENT/<slug>/learning/`. **Acceptance**: no unresolved HIGH/CRITICAL
    findings; density/five-part/format floors met.
 5. **[AI] D — Author + check the drilling page.** Create `CONTENT/<slug>/drilling/_index.md` (frontmatter
-   `weight: <Dwt>`) via `apps-ayokoding-www-general-maker` using the fixed four-section anatomy (Recall
-   Q&A / Applied problems / Code katas / Self-check checklist), answers hidden in `<details>`, katas in
+   `weight: <Dwt>`) via `apps-ayokoding-www-general-maker` using the fixed **five-section** anatomy (Recall
+   Q&A / Applied problems / Code katas / Self-check checklist / **Elaborative interrogation &
+   self-explanation**, DD-33), answers and model explanations hidden in `<details>`, katas in
    `<lang>` with colocated files under `CONTENT/<slug>/drilling/code/`; then invoke
-   `apps-ayokoding-www-general-checker` on the page. **Acceptance**: `weight: <Dwt>` where `<Dwt> = <Lwt> +
-100`; four sections present in order; every answer inside a `<details>` block; checker reports no
-   unresolved HIGH/CRITICAL findings.
+   `apps-ayokoding-www-general-checker` on the page. The fifth section asks "**why** does this hold, and
+   **why not** the alternative?", links back to the topic's Cross-Cutting Big-Idea tags, and — for
+   judgment topics — references the topic's Tensions/Lineage material. **Acceptance**: `weight: <Dwt>`
+   where `<Dwt> = <Lwt> + 100`; **five** sections present in order (the elaborative section last); every
+   answer/explanation inside a `<details>` block; the elaborative section carries ≥1 why/why-not prompt
+   tied to a big-idea tag; checker reports no unresolved HIGH/CRITICAL findings.
 6. **[AI] F — Fact-check the topic.** Run `apps-ayokoding-www-facts-checker` (which delegates deep research
    to `web-researcher`) over `CONTENT/<slug>/`. **Acceptance**: no unresolved factual findings
    (commands/versions/APIs/licenses/CVEs verified).
@@ -146,10 +167,17 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
    unresolved version/license/CVE conflict.
 2. **[AI] Author the capstone bundle.** Create `CONTENT/<capstone-slug>/_index.md` (frontmatter
    `weight: <capstoneWt>`) + pages from the syllabus spec, with colocated code under
-   `CONTENT/<capstone-slug>/code/`, integrating `<junction>` end-to-end. **Acceptance**: goal, ordered
+   `CONTENT/<capstone-slug>/code/`, integrating `<junction>` end-to-end. **For the 6 pass-boundary
+   capstones only** (`capstone-forge-ready`, `capstone-first-working-software`, `capstone-solid-core`,
+   `capstone-real-world-delivery`, `capstone-concurrency-and-systems`, `capstone-lead-at-altitude`),
+   append a short **Pass retrospective / synthesis** section (DD-33): which Cross-Cutting Big Ideas
+   recurred across the pass, how they compounded, and 2–3 self-explanation prompts asking the reader to
+   articulate the pass's throughline in their own words. The 4 cross-cutting capstones omit it (they
+   integrate a slice, not a whole pass). **Acceptance**: goal, ordered
    steps (file + code + verify command each), and acceptance criteria present; runnable end-to-end via
-   the stated command; DD-30 follow-along holds; DD-19 no stubs; each page ends with a correctly-ordered
-   Prev/Next footer (DD-32).
+   the stated command; a pass-boundary capstone carries the Pass retrospective section naming ≥2 big-idea
+   tags and a cross-cutting capstone omits it (DD-33); DD-30 follow-along holds; DD-19 no stubs; each page
+   ends with a correctly-ordered Prev/Next footer (DD-32).
 3. **[AI] Check + fact-check.** Invoke `apps-ayokoding-www-general-checker` then
    `apps-ayokoding-www-facts-checker` on `CONTENT/<capstone-slug>/`. **Acceptance**: no unresolved
    HIGH/CRITICAL or factual findings.
@@ -171,7 +199,7 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
       exits 0 on the existing tree, or only auto-fixable issues that fix cleanly.
 - [ ] **[AI]** Scaffold the section root: create `CONTENT/_index.md` (frontmatter `weight: 1750`, title
       "The Well-Grounded Software Engineer", intro + link list to the journey map) and `CONTENT/overview.md`
-      (weight 1 — read-then-drill workflow, the Pass 0 + five-pass spiral Mermaid map and the 61-node skill
+      (weight 1 — read-then-drill workflow, the Pass 0 + five-pass spiral Mermaid map and the 90-node skill
       tree from [prd.md](./prd.md), accessible WCAG palette). **Acceptance**: both files exist;
       `npx nx run ayokoding-www:build` still exits 0.
 
@@ -189,79 +217,55 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
 
 ---
 
-## Pass 0 — Set Up Your Forge (Phases 1–3 + Pass-0 capstone)
+## Pass 0 — Editor Foundations (Phases 1-4 + Pass-0 capstone)
 
 ## Phase 1 — Topic 01 Just Enough Nvim (`just-enough-nvim`)
 
-Row: Primer · Neovim § · topic wt 110 · Learn 101 / Drill 201 · capstone kind **primer**. Apply the
-Per-Topic Phase Template (steps V, A1, A2, A3, D, F, G). **Detail source**:
-[`syllabus/01-just-enough-nvim.md`](./syllabus/01-just-enough-nvim.md) — the checkboxes below enumerate
-its Items, Worked examples, and Capstone spec (DD-8 floor: cover every one).
+Row: Primer · Neovim § · topic wt 110 · Learn 101 / Drill 201 · **primer**. Template →
+[`syllabus/01-just-enough-nvim.md`](./syllabus/01-just-enough-nvim.md).
 
-- [ ] **[AI] V** — Invoke `web-researcher` for `just-enough-nvim` and resolve every "to verify" line in
-      the syllabus **Accuracy notes** (current Neovim stable version; vanilla ships `:checkhealth` +
-      `:terminal` + `:help`; Apache-2.0/Tier-1; default keymaps `<C-v>`/`<C-w>`/`gt` unchanged). Fold
-      dated findings into `syllabus/01-just-enough-nvim.md`. **Acceptance**: no "to verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-nvim/learning/` (+ `code/`), a By-Example-style progression
-      covering **every** syllabus Item: install & launch (`:help`, `:checkhealth`); modes
-      (normal/insert/visual charwise+`V`+`<C-v>`/command-line/replace); motions & operators (grammar +
-      text objects + counts); editing (`i/a/o/O`, `p/P`, `.`, `u/<C-r>`, `J`, `>>`/`<<`); buffers/windows/
-      tabs; ex-commands (ranges, `:%s///`, `:g//`, `:normal`, `:!`); search & replace (`\zs`/`\ze`, capture
-      groups); registers; marks & jumps; macros; quickfix/location lists + `:terminal`. **Acceptance**:
-      each Item appears in the rendered learning subtree with a runnable/reproducible demonstration.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples under `learning/code/`
-      (before/after + keystroke transcript, DD-30): **beginner** (motions-only edit + `:%s///g` refactor +
-      undo/redo); **intermediate** (counted macro replay + `:g/…/normal` + split-window two-buffer edit);
-      **advanced** (`:vimgrep`→quickfix→`:cnext` multi-file edit + register-composed edit + `:terminal`
-      build/run loop). **Acceptance**: each transcript reproduces its `after/` from its `before/`.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-nvim/learning/capstone/` (primer consolidation)
-      per the syllabus Capstone spec: a mouse-free, plugin-free multi-file refactor driving
-      `:vimgrep`→`:copen`→`:cdo`, a counted macro, and a `:terminal` check, with the full keystroke
-      transcript at `capstone/code/transcript.md`. **Acceptance**: following the transcript reproduces the
-      identical `after/` tree; the concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3** — Run `apps-ayokoding-www-by-example-checker` (+ general/link) on the topic; resolve
-      findings via the matching fixer. **Acceptance**: checkers report zero unresolved HIGH/CRITICAL.
-- [ ] **[AI] D** — Author `CONTENT/just-enough-nvim/drilling/` (`_index.md` weight 201) — drills covering
-      the same Items with mocked/self-contained inputs (integration-tier is app-tier-only; this is
-      unit+e2e content). **Acceptance**: drilling subtree renders; parity `Drill 201 = Learn 101 + 100`.
-- [ ] **[AI] F** — Run `apps-ayokoding-www-facts-checker` on the topic. **Acceptance**: all commands/
-      versions/keymaps verified; zero unresolved factual findings.
-- [ ] **[AI] G** — `npx nx run ayokoding-www:build` and `npm run lint:md`. **Acceptance**: both exit 0.
+- [ ] **[AI] V** — `web-researcher` for `just-enough-nvim`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/01-just-enough-nvim.md`](./syllabus/01-just-enough-nvim.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-nvim/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/01-just-enough-nvim.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-nvim/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-nvim/drilling/_index.md` (wt 201) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 1 Gate
 
 - [ ] [AI] `just-enough-nvim/` complete: `_index.md` wt 110, `learning/_index.md` wt 101,
-      `drilling/_index.md` wt 201, `learning/capstone/_index.md` wt 900; every syllabus Item + all 3 worked
-      examples + the capstone present; all checkers + facts-checker clean; build + `lint:md` exit 0;
-      DD-19/DD-20/DD-30 satisfied.
+      `drilling/_index.md` wt 201, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
 ## Phase 2 — Topic 02 Just Enough Lua (`just-enough-lua`)
 
-Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. **Detail source**:
+Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. Template →
 [`syllabus/02-just-enough-lua.md`](./syllabus/02-just-enough-lua.md).
 
-- [ ] **[AI] V** — `web-researcher` for `just-enough-lua`; resolve the Accuracy-notes "to verify" lines
-      (current PUC-Lua stable + LuaJIT version Neovim embeds; Lua MIT/Tier-1; `vim` global + `require`
-      semantics). Fold into the syllabus file. **Acceptance**: no "to verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-lua/learning/` (+ `code/`, runnable `lua <file>` scripts,
-      DD-20) covering **every** Item: running Lua raw (`lua` REPL/script, LuaJIT-vs-PUC note, embedded
-      `vim` global); core syntax (`nil`/bool/number/string, operators, string lib); tables (arrays/maps/
-      nested, `ipairs`/`pairs`, `#`); functions (first-class, closures, multiple returns, varargs, `:`
-      sugar); control flow (`if`/`for`/`while`/`repeat`); modules (`require`, table-as-module, metatables
-      & `__index`); errors (`pcall`/`error`, `nil, err`). **Acceptance**: each Item rendered with a
-      complete runnable listing + expected output.
-- [ ] **[AI] A1 (worked examples)** — **beginner** (tables + `for` script; REPL metatable exploration);
-      **intermediate** (module returning a function table; closures as counters/config); **advanced**
-      (metatable `__index` "class" + `pcall` handling). **Acceptance**: each runs with `lua <file>` and
-      matches its documented output.
-- [ ] **[AI] A2 (capstone)** — Author `learning/capstone/` per the syllabus Capstone spec: a ~60–120-line
-      config-value store using tables + closures + a `require`d module + `__index` defaults + `pcall`;
-      `store.lua` + `main.lua`, run via `lua main.lua`. **Acceptance**: `lua main.lua` exits 0, prints the
-      expected block, failing path caught by `pcall`.
-- [ ] **[AI] A3/D/F/G** — checkers (by-example/general/link) + facts-checker clean; author
-      `drilling/_index.md` (wt 202); `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+- [ ] **[AI] V** — `web-researcher` for `just-enough-lua`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/02-just-enough-lua.md`](./syllabus/02-just-enough-lua.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-lua/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/02-just-enough-lua.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-lua/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-lua/drilling/_index.md` (wt 202) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 2 Gate
 
@@ -269,42 +273,36 @@ Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. *
       `drilling/_index.md` wt 202, capstone wt 900; every Item + 3 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
 ## Phase 3 — Topic 03 Extending Neovim (`extending-neovim`)
 
-Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject** (full runnable capstone).
-**Detail source**: [`syllabus/03-extending-neovim.md`](./syllabus/03-extending-neovim.md).
+Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject**. Template →
+[`syllabus/03-extending-neovim.md`](./syllabus/03-extending-neovim.md).
 
-- [ ] **[AI] V** — `web-researcher` for `extending-neovim`; resolve the Accuracy-notes "to verify" lines
-      — **critically** whether **Neovim 0.11+ native `vim.lsp.config()`/`vim.lsp.enable()`** is the
-      recommended path vs `nvim-lspconfig`, and pin CVE-clean versions of the plugin manager,
-      `nvim-lspconfig`, `nvim-treesitter`, one language server; confirm `vim.opt`/`vim.keymap.set`/
-      `nvim_create_autocmd`/`nvim_create_user_command` signatures + XDG layout. Fold into the syllabus
-      file. **Acceptance**: no "to verify" line remains; the LSP path is decided and pinned.
-- [ ] **[AI] A1** — Author `CONTENT/extending-neovim/learning/` (+ `code/`) covering **every** Item, each
-      ending in a complete runnable config listing (DD-20) + launch command + observable result (DD-30):
-      `init.lua` + `vim.opt`/`vim.g`/`vim.keymap` + `runtimepath`/XDG; a `lua/` module tree; plugin
-      management; LSP attach + diagnostics + code actions (native path per V); Treesitter highlight/text
-      objects; autocommands + user commands; a tiny self-authored plugin; DAP intro. **Acceptance**: each
-      Item rendered with a runnable config fragment assembled into a complete listing.
-- [ ] **[AI] A1 (worked examples)** — **beginner** (from-scratch `init.lua`, `nvim -u init.lua`);
-      **intermediate** (LSP+Treesitter for one language + a custom user command); **advanced**
-      (self-authored Lua plugin with autocommand+command on `runtimepath`, complete config listing).
-      **Acceptance**: each launches and behaves as documented.
-- [ ] **[AI] A2 (capstone)** — Author `learning/capstone/` per the syllabus Capstone spec: a from-scratch
-      IDE-grade Neovim config for Python (plugin manager bootstrap → `lua/` modules → LSP+Treesitter →
-      self-authored `:Greet` command + `BufWritePost` autocommand), reproducible from an empty
-      `~/.config/nvim`. **Acceptance**: `nvim --headless "+checkhealth" "+qa"` reports no missing required
-      dep; LSP diagnostics + Treesitter + `:Greet` all function.
-- [ ] **[AI] A3/D/F/G** — checkers + facts-checker clean; author `drilling/_index.md` (wt 203);
-      `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+- [ ] **[AI] V** — `web-researcher` for `extending-neovim`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/03-extending-neovim.md`](./syllabus/03-extending-neovim.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/extending-neovim/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/03-extending-neovim.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/extending-neovim/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/extending-neovim/drilling/_index.md` (wt 203) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 3 Gate
 
 - [ ] [AI] `extending-neovim/` complete: `_index.md` wt 130, `learning/_index.md` wt 103,
-      `drilling/_index.md` wt 203, capstone wt 900; every Item + 3 worked examples + full-runnable capstone
-      present; native-LSP path pinned; checkers + facts-checker clean; build + `lint:md` exit 0.
+      `drilling/_index.md` wt 203, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -332,2209 +330,2784 @@ Junction: Topics 01–03 (nvim + lua + extending). Apply the Inter-Topic Capston
       done bar met (clean-machine reproduction runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
 ---
 
-## Pass 1 — First Working Software (Phases 5–15 + Pass-1 + full-stack capstones)
+## Pass 1 — Core Foundations (Phases 5-21 + Pass-1 + full-stack capstones)
 
 ## Phase 5 — Topic 04 Just Enough Python (`just-enough-python`)
 
 Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Template →
-`syllabus/04-just-enough-python.md`.
+[`syllabus/04-just-enough-python.md`](./syllabus/04-just-enough-python.md).
 
-- [ ] **[AI] V** — `web-researcher` for `just-enough-python`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/04-just-enough-python.md`](./syllabus/04-just-enough-python.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-python/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/04-just-enough-python.md`](./syllabus/04-just-enough-python.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/04-just-enough-python.md`](./syllabus/04-just-enough-python.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-python/learning/capstone/` (`_index.md` weight 900) per [`syllabus/04-just-enough-python.md`](./syllabus/04-just-enough-python.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
+- [ ] **[AI] V** — `web-researcher` for `just-enough-python`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/04-just-enough-python.md`](./syllabus/04-just-enough-python.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-python/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/04-just-enough-python.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-python/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-python/drilling/_index.md` (wt 204) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 204 = Learn 104 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-python/drilling/_index.md` (wt 204) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 5 Gate
 
-- [ ] [AI] `just-enough-python/` complete: `_index.md` wt 140, learning wt 104, drilling wt 204, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `just-enough-python/` complete: `_index.md` wt 140, `learning/_index.md` wt 104,
+      `drilling/_index.md` wt 204, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
 ## Phase 6 — Topic 05 Just Enough Bash (`just-enough-bash`)
 
 Row: Primer · Bash/shell † · topic wt 150 · Learn 105 / Drill 205 · **primer**. Template →
-`syllabus/05-just-enough-bash.md`.
+[`syllabus/05-just-enough-bash.md`](./syllabus/05-just-enough-bash.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-bash`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/05-just-enough-bash.md`](./syllabus/05-just-enough-bash.md) and fold dated findings back
-      into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-bash/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/05-just-enough-bash.md`](./syllabus/05-just-enough-bash.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/05-just-enough-bash.md`](./syllabus/05-just-enough-bash.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-bash/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/05-just-enough-bash.md`](./syllabus/05-just-enough-bash.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
+      [`syllabus/05-just-enough-bash.md`](./syllabus/05-just-enough-bash.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-bash/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/05-just-enough-bash.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-bash/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-bash/drilling/_index.md` (wt 205) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 205 = Learn 105 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-bash/drilling/_index.md` (wt 205) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 6 Gate
 
-- [ ] [AI] `just-enough-bash/` complete: `_index.md` wt 150, learning wt 105, drilling wt 205, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `just-enough-bash/` complete: `_index.md` wt 150, `learning/_index.md` wt 105,
+      `drilling/_index.md` wt 205, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 7 — Topic 06 Data Structures & Algorithms Essentials (`data-structures-and-algorithms-essentials`)
+## Phase 7 — Topic 06 Version Control & Git (`version-control-and-git`)
 
-Row: By Example · Python · topic wt 160 · Learn 106 / Drill 206 · **subject**. Template →
-`syllabus/06-data-structures-and-algorithms-essentials.md`.
+Row: By Example · Git † · topic wt 160 · Learn 106 / Drill 206 · **subject**. Template →
+[`syllabus/06-version-control-and-git.md`](./syllabus/06-version-control-and-git.md).
 
-- [ ] **[AI] V** — `web-researcher` for `data-structures-and-algorithms-essentials`; resolve every
-      Accuracy-notes "to verify" line in
-      [`syllabus/06-data-structures-and-algorithms-essentials.md`](./syllabus/06-data-structures-and-algorithms-essentials.md)
-      and fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in
-      the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/` (+ `code/`,
-      runnable sources (DD-20)) covering **every** Item in
-      [`syllabus/06-data-structures-and-algorithms-essentials.md`](./syllabus/06-data-structures-and-algorithms-essentials.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/06-data-structures-and-algorithms-essentials.md`](./syllabus/06-data-structures-and-algorithms-essentials.md)
-      `## Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/capstone/`
-      (`_index.md` weight 900) per
-      [`syllabus/06-data-structures-and-algorithms-essentials.md`](./syllabus/06-data-structures-and-algorithms-essentials.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
+- [ ] **[AI] V** — `web-researcher` for `version-control-and-git`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/06-version-control-and-git.md`](./syllabus/06-version-control-and-git.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/version-control-and-git/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/06-version-control-and-git.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/version-control-and-git/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/data-structures-and-algorithms-essentials/drilling/_index.md` (wt 206) covering the same
-      Items with mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 206 = Learn 106 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/version-control-and-git/drilling/_index.md` (wt 206) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 7 Gate
 
-- [ ] [AI] `data-structures-and-algorithms-essentials/` complete: `_index.md` wt 160, learning wt 106,
-      drilling wt 206, capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `version-control-and-git/` complete: `_index.md` wt 160, `learning/_index.md` wt 106,
+      `drilling/_index.md` wt 206, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 8 — Topic 07 Object-Oriented Programming Essentials (`object-oriented-programming-essentials`)
+## Phase 8 — Topic 07 Data Structures & Algorithms Essentials (`data-structures-and-algorithms-essentials`)
 
 Row: By Example · Python · topic wt 170 · Learn 107 / Drill 207 · **subject**. Template →
-`syllabus/07-object-oriented-programming-essentials.md`.
+[`syllabus/07-data-structures-and-algorithms-essentials.md`](./syllabus/07-data-structures-and-algorithms-essentials.md).
 
-- [ ] **[AI] V** — `web-researcher` for `object-oriented-programming-essentials`; resolve every
-      Accuracy-notes "to verify" line in
-      [`syllabus/07-object-oriented-programming-essentials.md`](./syllabus/07-object-oriented-programming-essentials.md)
-      and fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in
-      the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/object-oriented-programming-essentials/learning/` (+ `code/`, runnable
-      sources (DD-20)) covering **every** Item in
-      [`syllabus/07-object-oriented-programming-essentials.md`](./syllabus/07-object-oriented-programming-essentials.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/07-object-oriented-programming-essentials.md`](./syllabus/07-object-oriented-programming-essentials.md)
-      `## Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/object-oriented-programming-essentials/learning/capstone/`
-      (`_index.md` weight 900) per
-      [`syllabus/07-object-oriented-programming-essentials.md`](./syllabus/07-object-oriented-programming-essentials.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
+- [ ] **[AI] V** — `web-researcher` for `data-structures-and-algorithms-essentials`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/07-data-structures-and-algorithms-essentials.md`](./syllabus/07-data-structures-and-algorithms-essentials.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/07-data-structures-and-algorithms-essentials.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/object-oriented-programming-essentials/drilling/_index.md` (wt 207) covering the same Items
-      with mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 207 = Learn 107 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/data-structures-and-algorithms-essentials/drilling/_index.md` (wt 207) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 8 Gate
 
-- [ ] [AI] `object-oriented-programming-essentials/` complete: `_index.md` wt 170, learning wt 107,
-      drilling wt 207, capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `data-structures-and-algorithms-essentials/` complete: `_index.md` wt 170, `learning/_index.md` wt 107,
+      `drilling/_index.md` wt 207, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 9 — Topic 08 SQL Essentials (`sql-essentials`)
+## Phase 9 — Topic 08 Object-Oriented Programming Essentials (`object-oriented-programming-essentials`)
 
-Row: By Example · SQL + Python † (SQLite) · topic wt 180 · Learn 108 / Drill 208 · **subject**. Template
-→ `syllabus/08-sql-essentials.md`.
+Row: By Example · Python · topic wt 180 · Learn 108 / Drill 208 · **subject**. Template →
+[`syllabus/08-object-oriented-programming-essentials.md`](./syllabus/08-object-oriented-programming-essentials.md).
 
-- [ ] **[AI] V** — `web-researcher` for `sql-essentials`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/08-sql-essentials.md`](./syllabus/08-sql-essentials.md) and fold dated findings back into
-      that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/sql-essentials/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/08-sql-essentials.md`](./syllabus/08-sql-essentials.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/08-sql-essentials.md`](./syllabus/08-sql-essentials.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/sql-essentials/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/08-sql-essentials.md`](./syllabus/08-sql-essentials.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
+- [ ] **[AI] V** — `web-researcher` for `object-oriented-programming-essentials`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/08-object-oriented-programming-essentials.md`](./syllabus/08-object-oriented-programming-essentials.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/object-oriented-programming-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/08-object-oriented-programming-essentials.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/object-oriented-programming-essentials/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/sql-essentials/drilling/_index.md` (wt 208) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 208 = Learn 108 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/object-oriented-programming-essentials/drilling/_index.md` (wt 208) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 9 Gate
 
-- [ ] [AI] `sql-essentials/` complete: `_index.md` wt 180, learning wt 108, drilling wt 208, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `object-oriented-programming-essentials/` complete: `_index.md` wt 180, `learning/_index.md` wt 108,
+      `drilling/_index.md` wt 208, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 10 — Topic 09 Backend Essentials (`backend-essentials`)
+## Phase 10 — Topic 09 Project Management ▲ (`project-management`)
 
-Row: By Example · Python (PostgreSQL) · topic wt 190 · Learn 109 / Drill 209 · **subject**. Template →
-`syllabus/09-backend-essentials.md`.
+Row: Annotated-concept · — ‡ · topic wt 190 · Learn 109 / Drill 209 · **leadership/design artifact (no code)**. Template →
+[`syllabus/09-project-management.md`](./syllabus/09-project-management.md).
 
-- [ ] **[AI] V** — `web-researcher` for `backend-essentials`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/09-backend-essentials.md`](./syllabus/09-backend-essentials.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/backend-essentials/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/09-backend-essentials.md`](./syllabus/09-backend-essentials.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/09-backend-essentials.md`](./syllabus/09-backend-essentials.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/backend-essentials/learning/capstone/` (`_index.md` weight 900) per [`syllabus/09-backend-essentials.md`](./syllabus/09-backend-essentials.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
+- [ ] **[AI] V** — `web-researcher` for `project-management`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/09-project-management.md`](./syllabus/09-project-management.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/project-management/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/09-project-management.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/project-management/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/backend-essentials/drilling/_index.md` (wt 209) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 209 = Learn 109 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/project-management/drilling/_index.md` (wt 209) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 10 Gate
 
-- [ ] [AI] `backend-essentials/` complete: `_index.md` wt 190, learning wt 109, drilling wt 209, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `project-management/` complete: `_index.md` wt 190, `learning/_index.md` wt 109,
+      `drilling/_index.md` wt 209, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 11 — Topic 10 Networking Essentials (`networking-essentials`)
+## Phase 11 — Topic 10 SQL Essentials (`sql-essentials`)
 
-Row: By Example · Python · topic wt 200 · Learn 110 / Drill 210 · **subject**. Template →
-`syllabus/10-networking-essentials.md`.
+Row: By Example · SQL + Python † (SQLite) · topic wt 200 · Learn 110 / Drill 210 · **subject**. Template →
+[`syllabus/10-sql-essentials.md`](./syllabus/10-sql-essentials.md).
 
-- [ ] **[AI] V** — `web-researcher` for `networking-essentials`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/10-networking-essentials.md`](./syllabus/10-networking-essentials.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/networking-essentials/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/10-networking-essentials.md`](./syllabus/10-networking-essentials.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/10-networking-essentials.md`](./syllabus/10-networking-essentials.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/networking-essentials/learning/capstone/` (`_index.md` weight 900) per [`syllabus/10-networking-essentials.md`](./syllabus/10-networking-essentials.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
+- [ ] **[AI] V** — `web-researcher` for `sql-essentials`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/10-sql-essentials.md`](./syllabus/10-sql-essentials.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/sql-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/10-sql-essentials.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/sql-essentials/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/networking-essentials/drilling/_index.md` (wt 210) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 210 = Learn 110 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/sql-essentials/drilling/_index.md` (wt 210) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 11 Gate
 
-- [ ] [AI] `networking-essentials/` complete: `_index.md` wt 200, learning wt 110, drilling wt 210,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `sql-essentials/` complete: `_index.md` wt 200, `learning/_index.md` wt 110,
+      `drilling/_index.md` wt 210, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 12 — Topic 11 Just Enough TypeScript (`just-enough-typescript`)
+## Phase 12 — Topic 11 Backend Essentials (`backend-essentials`)
 
-Row: Primer · TypeScript † · topic wt 210 · Learn 111 / Drill 211 · **primer**. Template →
-`syllabus/11-just-enough-typescript.md`.
+Row: By Example · Python (PostgreSQL) · topic wt 210 · Learn 111 / Drill 211 · **subject**. Template →
+[`syllabus/11-backend-essentials.md`](./syllabus/11-backend-essentials.md).
 
-- [ ] **[AI] V** — `web-researcher` for `just-enough-typescript`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/11-just-enough-typescript.md`](./syllabus/11-just-enough-typescript.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-typescript/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/11-just-enough-typescript.md`](./syllabus/11-just-enough-typescript.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/11-just-enough-typescript.md`](./syllabus/11-just-enough-typescript.md) `## Worked
-    examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-typescript/learning/capstone/` (`_index.md`
-      weight 900) per [`syllabus/11-just-enough-typescript.md`](./syllabus/11-just-enough-typescript.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
+- [ ] **[AI] V** — `web-researcher` for `backend-essentials`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/11-backend-essentials.md`](./syllabus/11-backend-essentials.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/backend-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/11-backend-essentials.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/backend-essentials/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-typescript/drilling/_index.md` (wt 211) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 211 = Learn 111 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/backend-essentials/drilling/_index.md` (wt 211) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 12 Gate
 
-- [ ] [AI] `just-enough-typescript/` complete: `_index.md` wt 210, learning wt 111, drilling wt 211,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `backend-essentials/` complete: `_index.md` wt 210, `learning/_index.md` wt 111,
+      `drilling/_index.md` wt 211, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 13 — Topic 12 Frontend Essentials (`frontend-essentials`)
+## Phase 13 — Topic 12 Networking Essentials (`networking-essentials`)
 
-Row: By Example · TypeScript † · topic wt 220 · Learn 112 / Drill 212 · **subject**. Template →
-`syllabus/12-frontend-essentials.md`.
+Row: By Example · Python · topic wt 220 · Learn 112 / Drill 212 · **subject**. Template →
+[`syllabus/12-networking-essentials.md`](./syllabus/12-networking-essentials.md).
 
-- [ ] **[AI] V** — `web-researcher` for `frontend-essentials`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/12-frontend-essentials.md`](./syllabus/12-frontend-essentials.md) and fold dated
-      findings back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus
-      file.
-- [ ] **[AI] A1** — Author `CONTENT/frontend-essentials/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/12-frontend-essentials.md`](./syllabus/12-frontend-essentials.md) `## Items`, each rendered
-      as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in
-      the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/12-frontend-essentials.md`](./syllabus/12-frontend-essentials.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/frontend-essentials/learning/capstone/` (`_index.md` weight 900) per [`syllabus/12-frontend-essentials.md`](./syllabus/12-frontend-essentials.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
+- [ ] **[AI] V** — `web-researcher` for `networking-essentials`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/12-networking-essentials.md`](./syllabus/12-networking-essentials.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/networking-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/12-networking-essentials.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/networking-essentials/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/frontend-essentials/drilling/_index.md` (wt 212) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 212 = Learn 112 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/networking-essentials/drilling/_index.md` (wt 212) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 13 Gate
 
-- [ ] [AI] `frontend-essentials/` complete: `_index.md` wt 220, learning wt 112, drilling wt 212, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `networking-essentials/` complete: `_index.md` wt 220, `learning/_index.md` wt 112,
+      `drilling/_index.md` wt 212, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 14 — Topic 13 Software Testing (`software-testing`)
+## Phase 14 — Topic 13 Just Enough TypeScript (`just-enough-typescript`)
 
-Row: By Example · Python + TS · topic wt 230 · Learn 113 / Drill 213 · **subject** (incl. TDD +
-property-based). Template → `syllabus/13-software-testing.md`.
+Row: Primer · TypeScript † · topic wt 230 · Learn 113 / Drill 213 · **primer**. Template →
+[`syllabus/13-just-enough-typescript.md`](./syllabus/13-just-enough-typescript.md).
 
-- [ ] **[AI] V** — `web-researcher` for `software-testing`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/13-software-testing.md`](./syllabus/13-software-testing.md) and fold dated findings back
-      into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/software-testing/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/13-software-testing.md`](./syllabus/13-software-testing.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/13-software-testing.md`](./syllabus/13-software-testing.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-testing/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/13-software-testing.md`](./syllabus/13-software-testing.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
+- [ ] **[AI] V** — `web-researcher` for `just-enough-typescript`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/13-just-enough-typescript.md`](./syllabus/13-just-enough-typescript.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-typescript/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/13-just-enough-typescript.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-typescript/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/software-testing/drilling/_index.md` (wt 213) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 213 = Learn 113 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-typescript/drilling/_index.md` (wt 213) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 14 Gate
 
-- [ ] [AI] `software-testing/` complete: `_index.md` wt 230, learning wt 113, drilling wt 213, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `just-enough-typescript/` complete: `_index.md` wt 230, `learning/_index.md` wt 113,
+      `drilling/_index.md` wt 213, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 15 — Topic 14 Security Essentials (`security-essentials`)
+## Phase 15 — Topic 14 Frontend Essentials (`frontend-essentials`)
 
-Row: By Example · Python · topic wt 240 · Learn 114 / Drill 214 · **subject**. Template →
-`syllabus/14-security-essentials.md`.
+Row: By Example · TypeScript † · topic wt 240 · Learn 114 / Drill 214 · **subject**. Template →
+[`syllabus/14-frontend-essentials.md`](./syllabus/14-frontend-essentials.md).
 
-- [ ] **[AI] V** — `web-researcher` for `security-essentials`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/14-security-essentials.md`](./syllabus/14-security-essentials.md) and fold dated
-      findings back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus
-      file.
-- [ ] **[AI] A1** — Author `CONTENT/security-essentials/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/14-security-essentials.md`](./syllabus/14-security-essentials.md) `## Items`, each rendered
-      as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in
-      the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/14-security-essentials.md`](./syllabus/14-security-essentials.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/security-essentials/learning/capstone/` (`_index.md` weight 900) per [`syllabus/14-security-essentials.md`](./syllabus/14-security-essentials.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
+- [ ] **[AI] V** — `web-researcher` for `frontend-essentials`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/14-frontend-essentials.md`](./syllabus/14-frontend-essentials.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/frontend-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/14-frontend-essentials.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/frontend-essentials/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/security-essentials/drilling/_index.md` (wt 214) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 214 = Learn 114 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/frontend-essentials/drilling/_index.md` (wt 214) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 15 Gate
 
-- [ ] [AI] `security-essentials/` complete: `_index.md` wt 240, learning wt 114, drilling wt 214, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `frontend-essentials/` complete: `_index.md` wt 240, `learning/_index.md` wt 114,
+      `drilling/_index.md` wt 214, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 16 — Inter-topic: Pass-1 Capstone (`capstone-first-working-software`)
+## Phase 16 — Topic 15 Software Testing (`software-testing`)
 
-Junction: Topics 04–14 (build → store → test → secure). Inter-Topic Capstone Phase Template; spec in
-`syllabus/14-security-essentials.md` (Pass-1 capstone section).
+Row: By Example · Python + TS · topic wt 250 · Learn 115 / Drill 215 · **subject**. Template →
+[`syllabus/15-software-testing.md`](./syllabus/15-software-testing.md).
 
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
-      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
-      in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-first-working-software/` (`_index.md` `weight: 245`, + `code/`)
-      per the cited capstone spec's ordered steps. **Acceptance**: the spec's done bar is met — a
-      clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
-      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
-      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
-      commands exit 0.
+- [ ] **[AI] V** — `web-researcher` for `software-testing`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/15-software-testing.md`](./syllabus/15-software-testing.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/software-testing/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/15-software-testing.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-testing/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/software-testing/drilling/_index.md` (wt 215) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 16 Gate
 
-- [ ] [AI] `capstone-first-working-software/` complete (wt 245, runnable end-to-end + web-verified);
-      checker + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `software-testing/` complete: `_index.md` wt 250, `learning/_index.md` wt 115,
+      `drilling/_index.md` wt 215, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
 
-> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
-## Phase 17 — Inter-topic: Full-Stack App Capstone (`capstone-full-stack-app`)
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-Junction: Frontend Essentials (12) + Backend Essentials (09) + SQL Essentials (08). Inter-Topic Capstone
-Phase Template; spec in `syllabus/14-security-essentials.md` (full-stack cross-cutting section).
+## Phase 17 — Topic 16 Debugging & Profiling (`debugging-and-profiling`)
 
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
-      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
-      in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-full-stack-app/` (`_index.md` `weight: 246`, + `code/`) per the
-      cited capstone spec's ordered steps (detail source:
-      [`syllabus/14-security-essentials.md`](./syllabus/14-security-essentials.md)). **Acceptance**: the
-      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
-      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
-      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
-      commands exit 0.
+Row: By Example · Python + native † · topic wt 260 · Learn 116 / Drill 216 · **subject**. Template →
+[`syllabus/16-debugging-and-profiling.md`](./syllabus/16-debugging-and-profiling.md).
+
+- [ ] **[AI] V** — `web-researcher` for `debugging-and-profiling`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/16-debugging-and-profiling.md`](./syllabus/16-debugging-and-profiling.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/debugging-and-profiling/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/16-debugging-and-profiling.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/debugging-and-profiling/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/debugging-and-profiling/drilling/_index.md` (wt 216) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 17 Gate
 
-- [ ] [AI] `capstone-full-stack-app/` complete (wt 246, runnable end-to-end + web-verified); checker +
-      facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `debugging-and-profiling/` complete: `_index.md` wt 260, `learning/_index.md` wt 116,
+      `drilling/_index.md` wt 216, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
 
-> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
----
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Pass 2 — Solidify the Core (Phases 18–28 + Pass-2 capstone)
+## Phase 18 — Topic 17 Security Essentials (`security-essentials`)
 
-## Phase 18 — Topic 15 Computer Science Foundations (`computer-science-foundations`)
+Row: By Example · Python · topic wt 270 · Learn 117 / Drill 217 · **subject**. Template →
+[`syllabus/17-security-essentials.md`](./syllabus/17-security-essentials.md).
 
-Row: Annotated-concept · Python \* · topic wt 250 · Learn 115 / Drill 215 · **subject**. Template →
-`syllabus/15-computer-science-foundations.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `computer-science-foundations`; resolve every Accuracy-notes "to
-      verify" line in
-      [`syllabus/15-computer-science-foundations.md`](./syllabus/15-computer-science-foundations.md) and
-      fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/computer-science-foundations/learning/` (+ `code/`, runnable sources
-      (DD-20)) covering **every** Item in
-      [`syllabus/15-computer-science-foundations.md`](./syllabus/15-computer-science-foundations.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/15-computer-science-foundations.md`](./syllabus/15-computer-science-foundations.md) `##
-    Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/computer-science-foundations/learning/capstone/` (`_index.md`
-      weight 900) per
-      [`syllabus/15-computer-science-foundations.md`](./syllabus/15-computer-science-foundations.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/computer-science-foundations/drilling/_index.md` (wt 215) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 215 = Learn 115 + 100`, both commands exit 0.
+- [ ] **[AI] V** — `web-researcher` for `security-essentials`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/17-security-essentials.md`](./syllabus/17-security-essentials.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/security-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/17-security-essentials.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/security-essentials/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/security-essentials/drilling/_index.md` (wt 217) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 18 Gate
 
-- [ ] [AI] `computer-science-foundations/` complete: `_index.md` wt 250, learning wt 115, drilling wt 215,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `security-essentials/` complete: `_index.md` wt 270, `learning/_index.md` wt 117,
+      `drilling/_index.md` wt 217, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 19 — Topic 16 Object-Oriented Design & Patterns (`object-oriented-design-and-patterns`)
+## Phase 19 — Inter-topic: Pass-1 Capstone (`capstone-first-working-software`)
 
-Row: By Example · Python · topic wt 260 · Learn 116 / Drill 216 · **subject**. Template →
-`syllabus/16-object-oriented-design-and-patterns.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `object-oriented-design-and-patterns`; resolve every Accuracy-notes
-      "to verify" line in
-      [`syllabus/16-object-oriented-design-and-patterns.md`](./syllabus/16-object-oriented-design-and-patterns.md)
-      and fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in
-      the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/object-oriented-design-and-patterns/learning/` (+ `code/`, runnable
-      sources (DD-20)) covering **every** Item in
-      [`syllabus/16-object-oriented-design-and-patterns.md`](./syllabus/16-object-oriented-design-and-patterns.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/16-object-oriented-design-and-patterns.md`](./syllabus/16-object-oriented-design-and-patterns.md)
-      `## Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/object-oriented-design-and-patterns/learning/capstone/`
-      (`_index.md` weight 900) per
-      [`syllabus/16-object-oriented-design-and-patterns.md`](./syllabus/16-object-oriented-design-and-patterns.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/object-oriented-design-and-patterns/drilling/_index.md` (wt 216) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 216 = Learn 116 + 100`, both commands exit 0.
-
-### Phase 19 Gate
-
-- [ ] [AI] `object-oriented-design-and-patterns/` complete: `_index.md` wt 260, learning wt 116, drilling
-      wt 216, capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 20 — Topic 17 Programming Paradigms (`programming-paradigms`)
-
-Row: By Example · Python \*\* (survey) · topic wt 270 · Learn 117 / Drill 217 · **subject**. Template →
-`syllabus/17-programming-paradigms.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `programming-paradigms`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/17-programming-paradigms.md`](./syllabus/17-programming-paradigms.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/programming-paradigms/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/17-programming-paradigms.md`](./syllabus/17-programming-paradigms.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/17-programming-paradigms.md`](./syllabus/17-programming-paradigms.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/programming-paradigms/learning/capstone/` (`_index.md` weight 900) per [`syllabus/17-programming-paradigms.md`](./syllabus/17-programming-paradigms.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/programming-paradigms/drilling/_index.md` (wt 217) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 217 = Learn 117 + 100`, both commands exit 0.
-
-### Phase 20 Gate
-
-- [ ] [AI] `programming-paradigms/` complete: `_index.md` wt 270, learning wt 117, drilling wt 217,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 21 — Topic 18 Functional Programming (`functional-programming`)
-
-Row: By Example · Python · topic wt 280 · Learn 118 / Drill 218 · **subject** (incl. applied CT).
-Template → `syllabus/18-functional-programming.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `functional-programming`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/18-functional-programming.md`](./syllabus/18-functional-programming.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/functional-programming/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/18-functional-programming.md`](./syllabus/18-functional-programming.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/18-functional-programming.md`](./syllabus/18-functional-programming.md) `## Worked
-    examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/functional-programming/learning/capstone/` (`_index.md`
-      weight 900) per [`syllabus/18-functional-programming.md`](./syllabus/18-functional-programming.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/functional-programming/drilling/_index.md` (wt 218) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 218 = Learn 118 + 100`, both commands exit 0.
-
-### Phase 21 Gate
-
-- [ ] [AI] `functional-programming/` complete: `_index.md` wt 280, learning wt 118, drilling wt 218,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 22 — Topic 19 Concurrency & Parallelism Core (`concurrency-and-parallelism`)
-
-Row: By Example · Python · topic wt 290 · Learn 119 / Drill 219 · **subject**. Template →
-`syllabus/19-concurrency-and-parallelism.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `concurrency-and-parallelism`; resolve every Accuracy-notes "to
-      verify" line in
-      [`syllabus/19-concurrency-and-parallelism.md`](./syllabus/19-concurrency-and-parallelism.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/concurrency-and-parallelism/learning/` (+ `code/`, runnable sources
-      (DD-20)) covering **every** Item in
-      [`syllabus/19-concurrency-and-parallelism.md`](./syllabus/19-concurrency-and-parallelism.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/19-concurrency-and-parallelism.md`](./syllabus/19-concurrency-and-parallelism.md) `##
-    Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/concurrency-and-parallelism/learning/capstone/` (`_index.md`
-      weight 900) per
-      [`syllabus/19-concurrency-and-parallelism.md`](./syllabus/19-concurrency-and-parallelism.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/concurrency-and-parallelism/drilling/_index.md` (wt 219) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 219 = Learn 119 + 100`, both commands exit 0.
-
-### Phase 22 Gate
-
-- [ ] [AI] `concurrency-and-parallelism/` complete: `_index.md` wt 290, learning wt 119, drilling wt 219,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 23 — Topic 20 Advanced Algorithms (`advanced-algorithms`)
-
-Row: By Example · Python · topic wt 300 · Learn 120 / Drill 220 · **subject**. Template →
-`syllabus/20-advanced-algorithms.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `advanced-algorithms`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/20-advanced-algorithms.md`](./syllabus/20-advanced-algorithms.md) and fold dated
-      findings back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus
-      file.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-algorithms/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/20-advanced-algorithms.md`](./syllabus/20-advanced-algorithms.md) `## Items`, each rendered
-      as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in
-      the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/20-advanced-algorithms.md`](./syllabus/20-advanced-algorithms.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-algorithms/learning/capstone/` (`_index.md` weight 900) per [`syllabus/20-advanced-algorithms.md`](./syllabus/20-advanced-algorithms.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/advanced-algorithms/drilling/_index.md` (wt 220) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 220 = Learn 120 + 100`, both commands exit 0.
-
-### Phase 23 Gate
-
-- [ ] [AI] `advanced-algorithms/` complete: `_index.md` wt 300, learning wt 120, drilling wt 220, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 24 — Topic 21 Advanced Networking (`advanced-networking`)
-
-Row: Annotated-concept · Python \* · topic wt 310 · Learn 121 / Drill 221 · **subject**. Template →
-`syllabus/21-advanced-networking.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `advanced-networking`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/21-advanced-networking.md`](./syllabus/21-advanced-networking.md) and fold dated
-      findings back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus
-      file.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-networking/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/21-advanced-networking.md`](./syllabus/21-advanced-networking.md) `## Items`, each rendered
-      as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in
-      the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/21-advanced-networking.md`](./syllabus/21-advanced-networking.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-networking/learning/capstone/` (`_index.md` weight 900) per [`syllabus/21-advanced-networking.md`](./syllabus/21-advanced-networking.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/advanced-networking/drilling/_index.md` (wt 221) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 221 = Learn 121 + 100`, both commands exit 0.
-
-### Phase 24 Gate
-
-- [ ] [AI] `advanced-networking/` complete: `_index.md` wt 310, learning wt 121, drilling wt 221, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 25 — Topic 22 Software Engineering Practices (`software-engineering-practices`)
-
-Row: Annotated-concept · Python \* · topic wt 320 · Learn 122 / Drill 222 · **subject**. Template →
-`syllabus/22-software-engineering-practices.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `software-engineering-practices`; resolve every Accuracy-notes "to
-      verify" line in
-      [`syllabus/22-software-engineering-practices.md`](./syllabus/22-software-engineering-practices.md) and
-      fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/software-engineering-practices/learning/` (+ `code/`, runnable sources
-      (DD-20)) covering **every** Item in
-      [`syllabus/22-software-engineering-practices.md`](./syllabus/22-software-engineering-practices.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/22-software-engineering-practices.md`](./syllabus/22-software-engineering-practices.md) `##
-    Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-engineering-practices/learning/capstone/`
-      (`_index.md` weight 900) per
-      [`syllabus/22-software-engineering-practices.md`](./syllabus/22-software-engineering-practices.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/software-engineering-practices/drilling/_index.md` (wt 222) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 222 = Learn 122 + 100`, both commands exit 0.
-
-### Phase 25 Gate
-
-- [ ] [AI] `software-engineering-practices/` complete: `_index.md` wt 320, learning wt 122, drilling wt
-      222, capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 26 — Topic 23 Advanced SQL & Query Performance (`advanced-sql-and-query-performance`)
-
-Row: By Example · SQL + Python † (PostgreSQL) · topic wt 330 · Learn 123 / Drill 223 · **subject**.
-Template → `syllabus/23-advanced-sql-and-query-performance.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `advanced-sql-and-query-performance`; resolve every Accuracy-notes
-      "to verify" line in
-      [`syllabus/23-advanced-sql-and-query-performance.md`](./syllabus/23-advanced-sql-and-query-performance.md)
-      and fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in
-      the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-sql-and-query-performance/learning/` (+ `code/`, runnable
-      sources (DD-20)) covering **every** Item in
-      [`syllabus/23-advanced-sql-and-query-performance.md`](./syllabus/23-advanced-sql-and-query-performance.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/23-advanced-sql-and-query-performance.md`](./syllabus/23-advanced-sql-and-query-performance.md)
-      `## Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-sql-and-query-performance/learning/capstone/`
-      (`_index.md` weight 900) per
-      [`syllabus/23-advanced-sql-and-query-performance.md`](./syllabus/23-advanced-sql-and-query-performance.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/advanced-sql-and-query-performance/drilling/_index.md` (wt 223) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 223 = Learn 123 + 100`, both commands exit 0.
-
-### Phase 26 Gate
-
-- [ ] [AI] `advanced-sql-and-query-performance/` complete: `_index.md` wt 330, learning wt 123, drilling
-      wt 223, capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 27 — Topic 24 Software Product Engineering ▲ (`software-product-engineering`)
-
-Row: Annotated-concept · — ‡ · topic wt 340 · Learn 124 / Drill 224 · **leadership** (design/decision
-capstone, no code). Template → `syllabus/24-software-product-engineering.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `software-product-engineering`; resolve every Accuracy-notes "to
-      verify" line in
-      [`syllabus/24-software-product-engineering.md`](./syllabus/24-software-product-engineering.md) and
-      fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/software-product-engineering/learning/` (artifacts under `learning/` —
-      no `code/`, leadership `‡` decision/governance deliverables (DD-27)) covering **every** Item in
-      [`syllabus/24-software-product-engineering.md`](./syllabus/24-software-product-engineering.md) `##
-    Items`, each rendered as a reproducible decision/governance artifact (DD-27/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated governance/decision artifacts
-      (beginner/intermediate/advanced depth) per
-      [`syllabus/24-software-product-engineering.md`](./syllabus/24-software-product-engineering.md) `##
-    Worked examples`. **Acceptance**: each artifact is concrete and reproducible.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-product-engineering/learning/capstone/` (`_index.md`
-      weight 900) per
-      [`syllabus/24-software-product-engineering.md`](./syllabus/24-software-product-engineering.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/software-product-engineering/drilling/_index.md` (wt 224) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 224 = Learn 124 + 100`, both commands exit 0.
-
-### Phase 27 Gate
-
-- [ ] [AI] `software-product-engineering/` complete: `_index.md` wt 340, learning wt 124, drilling wt 224,
-      capstone wt 900 (design artifact); checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 28 — Topic 25 Project Management ▲ (`project-management`)
-
-Row: Annotated-concept · — ‡ · topic wt 350 · Learn 125 / Drill 225 · **leadership**. Template →
-`syllabus/25-project-management.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `project-management`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/25-project-management.md`](./syllabus/25-project-management.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/project-management/learning/` (artifacts under `learning/` — no `code/`,
-      leadership `‡` decision/governance deliverables (DD-27)) covering **every** Item in
-      [`syllabus/25-project-management.md`](./syllabus/25-project-management.md) `## Items`, each rendered
-      as a reproducible decision/governance artifact (DD-27/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated governance/decision artifacts
-      (beginner/intermediate/advanced depth) per
-      [`syllabus/25-project-management.md`](./syllabus/25-project-management.md) `## Worked examples`.
-      **Acceptance**: each artifact is concrete and reproducible.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/project-management/learning/capstone/` (`_index.md` weight 900) per [`syllabus/25-project-management.md`](./syllabus/25-project-management.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/project-management/drilling/_index.md` (wt 225) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 225 = Learn 125 + 100`, both commands exit 0.
-
-### Phase 28 Gate
-
-- [ ] [AI] `project-management/` complete: `_index.md` wt 350, learning wt 125, drilling wt 225, capstone
-      wt 900 (design artifact); checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 29 — Inter-topic: Pass-2 Capstone (`capstone-solid-core`)
-
-Junction: Topics 15–25 (CS depth + OO design + FP + concurrency + advanced SQL + practices). Inter-Topic
-Capstone Phase Template; spec in `syllabus/25-project-management.md` (Pass-2 capstone section).
+Junction: Topics 04–17 (build → store → test → secure). Inter-Topic Capstone Phase Template; spec in
+`syllabus/17-security-essentials.md` (Pass-1 capstone section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-solid-core/` (`_index.md` `weight: 355`, + `code/`) per the
-      cited capstone spec's ordered steps (detail source:
-      [`syllabus/25-project-management.md`](./syllabus/25-project-management.md)). **Acceptance**: the
+- [ ] **[AI] A** — Author `CONTENT/capstone-first-working-software/` (`_index.md` `weight: 275`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/17-security-essentials.md`](./syllabus/17-security-essentials.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
+### Phase 19 Gate
+
+- [ ] [AI] `capstone-first-working-software/` complete (wt 275, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+
+## Phase 20 — Inter-topic: Full-Stack App Capstone (`capstone-full-stack-app`)
+
+Junction: Frontend Essentials (14) + Backend Essentials (11) + SQL Essentials (10). Inter-Topic Capstone Phase Template; spec in
+`syllabus/17-security-essentials.md` (full-stack cross-cutting section).
+
+- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
+      in the spec.
+- [ ] **[AI] A** — Author `CONTENT/capstone-full-stack-app/` (`_index.md` `weight: 276`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/17-security-essentials.md`](./syllabus/17-security-essentials.md)). **Acceptance**: the
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
+- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
+      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
+      commands exit 0.
+
+### Phase 20 Gate
+
+- [ ] [AI] `capstone-full-stack-app/` complete (wt 276, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+
+## Phase 21 — Topic 18 Technical Communication (`technical-communication`)
+
+Row: Annotated-concept · ‡ no-code · topic wt 280 · Learn 118 / Drill 218 · **leadership/design artifact (no code)**. Template →
+[`syllabus/18-technical-communication.md`](./syllabus/18-technical-communication.md).
+
+- [ ] **[AI] V** — `web-researcher` for `technical-communication`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/18-technical-communication.md`](./syllabus/18-technical-communication.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/technical-communication/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/18-technical-communication.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/technical-communication/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/technical-communication/drilling/_index.md` (wt 218) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 21 Gate
+
+- [ ] [AI] `technical-communication/` complete: `_index.md` wt 280, `learning/_index.md` wt 118,
+      `drilling/_index.md` wt 218, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+---
+
+## Pass 2 — Depth, Design & Craft (Phases 22-37 + Pass-2 capstone)
+
+## Phase 22 — Topic 19 Computer Science Foundations (`computer-science-foundations`)
+
+Row: Annotated-concept · Python \* · topic wt 290 · Learn 119 / Drill 219 · **subject**. Template →
+[`syllabus/19-computer-science-foundations.md`](./syllabus/19-computer-science-foundations.md).
+
+- [ ] **[AI] V** — `web-researcher` for `computer-science-foundations`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/19-computer-science-foundations.md`](./syllabus/19-computer-science-foundations.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/computer-science-foundations/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/19-computer-science-foundations.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/computer-science-foundations/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/computer-science-foundations/drilling/_index.md` (wt 219) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 22 Gate
+
+- [ ] [AI] `computer-science-foundations/` complete: `_index.md` wt 290, `learning/_index.md` wt 119,
+      `drilling/_index.md` wt 219, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 23 — Topic 20 Computer Architecture (`computer-architecture`)
+
+Row: By Example · C † · topic wt 300 · Learn 120 / Drill 220 · **subject**. Template →
+[`syllabus/20-computer-architecture.md`](./syllabus/20-computer-architecture.md).
+
+- [ ] **[AI] V** — `web-researcher` for `computer-architecture`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/20-computer-architecture.md`](./syllabus/20-computer-architecture.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/computer-architecture/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/20-computer-architecture.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/computer-architecture/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/computer-architecture/drilling/_index.md` (wt 220) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 23 Gate
+
+- [ ] [AI] `computer-architecture/` complete: `_index.md` wt 300, `learning/_index.md` wt 120,
+      `drilling/_index.md` wt 220, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 24 — Topic 21 Object-Oriented Design & Patterns (`object-oriented-design-and-patterns`)
+
+Row: By Example · Python · topic wt 310 · Learn 121 / Drill 221 · **subject**. Template →
+[`syllabus/21-object-oriented-design-and-patterns.md`](./syllabus/21-object-oriented-design-and-patterns.md).
+
+- [ ] **[AI] V** — `web-researcher` for `object-oriented-design-and-patterns`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/21-object-oriented-design-and-patterns.md`](./syllabus/21-object-oriented-design-and-patterns.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/object-oriented-design-and-patterns/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/21-object-oriented-design-and-patterns.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/object-oriented-design-and-patterns/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/object-oriented-design-and-patterns/drilling/_index.md` (wt 221) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 24 Gate
+
+- [ ] [AI] `object-oriented-design-and-patterns/` complete: `_index.md` wt 310, `learning/_index.md` wt 121,
+      `drilling/_index.md` wt 221, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 25 — Topic 22 Programming Paradigms (`programming-paradigms`)
+
+Row: By Example · Python \*\* · topic wt 320 · Learn 122 / Drill 222 · **subject**. Template →
+[`syllabus/22-programming-paradigms.md`](./syllabus/22-programming-paradigms.md).
+
+- [ ] **[AI] V** — `web-researcher` for `programming-paradigms`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/22-programming-paradigms.md`](./syllabus/22-programming-paradigms.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/programming-paradigms/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/22-programming-paradigms.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/programming-paradigms/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/programming-paradigms/drilling/_index.md` (wt 222) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 25 Gate
+
+- [ ] [AI] `programming-paradigms/` complete: `_index.md` wt 320, `learning/_index.md` wt 122,
+      `drilling/_index.md` wt 222, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 26 — Topic 23 Functional Programming (`functional-programming`)
+
+Row: By Example · Python · topic wt 330 · Learn 123 / Drill 223 · **subject**. Template →
+[`syllabus/23-functional-programming.md`](./syllabus/23-functional-programming.md).
+
+- [ ] **[AI] V** — `web-researcher` for `functional-programming`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/23-functional-programming.md`](./syllabus/23-functional-programming.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/functional-programming/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/23-functional-programming.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/functional-programming/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/functional-programming/drilling/_index.md` (wt 223) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 26 Gate
+
+- [ ] [AI] `functional-programming/` complete: `_index.md` wt 330, `learning/_index.md` wt 123,
+      `drilling/_index.md` wt 223, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 27 — Topic 24 Concurrency & Parallelism (`concurrency-and-parallelism`)
+
+Row: By Example · Python · topic wt 340 · Learn 124 / Drill 224 · **subject**. Template →
+[`syllabus/24-concurrency-and-parallelism.md`](./syllabus/24-concurrency-and-parallelism.md).
+
+- [ ] **[AI] V** — `web-researcher` for `concurrency-and-parallelism`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/24-concurrency-and-parallelism.md`](./syllabus/24-concurrency-and-parallelism.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/concurrency-and-parallelism/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/24-concurrency-and-parallelism.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/concurrency-and-parallelism/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/concurrency-and-parallelism/drilling/_index.md` (wt 224) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 27 Gate
+
+- [ ] [AI] `concurrency-and-parallelism/` complete: `_index.md` wt 340, `learning/_index.md` wt 124,
+      `drilling/_index.md` wt 224, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 28 — Topic 25 Advanced Algorithms (`advanced-algorithms`)
+
+Row: By Example · Python · topic wt 350 · Learn 125 / Drill 225 · **subject**. Template →
+[`syllabus/25-advanced-algorithms.md`](./syllabus/25-advanced-algorithms.md).
+
+- [ ] **[AI] V** — `web-researcher` for `advanced-algorithms`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/25-advanced-algorithms.md`](./syllabus/25-advanced-algorithms.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/advanced-algorithms/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/25-advanced-algorithms.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-algorithms/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/advanced-algorithms/drilling/_index.md` (wt 225) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 28 Gate
+
+- [ ] [AI] `advanced-algorithms/` complete: `_index.md` wt 350, `learning/_index.md` wt 125,
+      `drilling/_index.md` wt 225, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 29 — Topic 26 Advanced SQL & Query Performance (`advanced-sql-and-query-performance`)
+
+Row: By Example · SQL + Python † (PostgreSQL) · topic wt 360 · Learn 126 / Drill 226 · **subject**. Template →
+[`syllabus/26-advanced-sql-and-query-performance.md`](./syllabus/26-advanced-sql-and-query-performance.md).
+
+- [ ] **[AI] V** — `web-researcher` for `advanced-sql-and-query-performance`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/26-advanced-sql-and-query-performance.md`](./syllabus/26-advanced-sql-and-query-performance.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/advanced-sql-and-query-performance/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/26-advanced-sql-and-query-performance.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-sql-and-query-performance/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/advanced-sql-and-query-performance/drilling/_index.md` (wt 226) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
 ### Phase 29 Gate
 
-- [ ] [AI] `capstone-solid-core/` complete (wt 355, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `advanced-sql-and-query-performance/` complete: `_index.md` wt 360, `learning/_index.md` wt 126,
+      `drilling/_index.md` wt 226, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 30 — Topic 27 Data Access: ORMs & Query Builders (`data-access-orms-and-query-builders`)
+
+Row: By Example · Python † · topic wt 370 · Learn 127 / Drill 227 · **subject**. Template →
+[`syllabus/27-data-access-orms-and-query-builders.md`](./syllabus/27-data-access-orms-and-query-builders.md).
+
+- [ ] **[AI] V** — `web-researcher` for `data-access-orms-and-query-builders`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/27-data-access-orms-and-query-builders.md`](./syllabus/27-data-access-orms-and-query-builders.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/data-access-orms-and-query-builders/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/27-data-access-orms-and-query-builders.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-access-orms-and-query-builders/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/data-access-orms-and-query-builders/drilling/_index.md` (wt 227) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 30 Gate
+
+- [ ] [AI] `data-access-orms-and-query-builders/` complete: `_index.md` wt 370, `learning/_index.md` wt 127,
+      `drilling/_index.md` wt 227, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 31 — Topic 28 Build Your Own ORM & Query Builder (`build-your-own-orm-and-query-builder`)
+
+Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subject**. Template →
+[`syllabus/28-build-your-own-orm-and-query-builder.md`](./syllabus/28-build-your-own-orm-and-query-builder.md).
+
+- [ ] **[AI] V** — `web-researcher` for `build-your-own-orm-and-query-builder`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/28-build-your-own-orm-and-query-builder.md`](./syllabus/28-build-your-own-orm-and-query-builder.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/28-build-your-own-orm-and-query-builder.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/build-your-own-orm-and-query-builder/drilling/_index.md` (wt 228) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 31 Gate
+
+- [ ] [AI] `build-your-own-orm-and-query-builder/` complete: `_index.md` wt 380, `learning/_index.md` wt 128,
+      `drilling/_index.md` wt 228, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 32 — Topic 29 Advanced Networking (`advanced-networking`)
+
+Row: Annotated-concept · Python \* · topic wt 390 · Learn 129 / Drill 229 · **subject**. Template →
+[`syllabus/29-advanced-networking.md`](./syllabus/29-advanced-networking.md).
+
+- [ ] **[AI] V** — `web-researcher` for `advanced-networking`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/29-advanced-networking.md`](./syllabus/29-advanced-networking.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/advanced-networking/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/29-advanced-networking.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-networking/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/advanced-networking/drilling/_index.md` (wt 229) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 32 Gate
+
+- [ ] [AI] `advanced-networking/` complete: `_index.md` wt 390, `learning/_index.md` wt 129,
+      `drilling/_index.md` wt 229, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 33 — Topic 30 Software Engineering Practices (`software-engineering-practices`)
+
+Row: Annotated-concept · Python \* · topic wt 400 · Learn 130 / Drill 230 · **subject**. Template →
+[`syllabus/30-software-engineering-practices.md`](./syllabus/30-software-engineering-practices.md).
+
+- [ ] **[AI] V** — `web-researcher` for `software-engineering-practices`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/30-software-engineering-practices.md`](./syllabus/30-software-engineering-practices.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/software-engineering-practices/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/30-software-engineering-practices.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-engineering-practices/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/software-engineering-practices/drilling/_index.md` (wt 230) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 33 Gate
+
+- [ ] [AI] `software-engineering-practices/` complete: `_index.md` wt 400, `learning/_index.md` wt 130,
+      `drilling/_index.md` wt 230, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 34 — Topic 31 Agentic Coding (`agentic-coding`)
+
+Row: Annotated-concept · ‡ polyglot · topic wt 410 · Learn 131 / Drill 231 · **subject**. Template →
+[`syllabus/31-agentic-coding.md`](./syllabus/31-agentic-coding.md).
+
+- [ ] **[AI] V** — `web-researcher` for `agentic-coding`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/31-agentic-coding.md`](./syllabus/31-agentic-coding.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/agentic-coding/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/31-agentic-coding.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/agentic-coding/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/agentic-coding/drilling/_index.md` (wt 231) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 34 Gate
+
+- [ ] [AI] `agentic-coding/` complete: `_index.md` wt 410, `learning/_index.md` wt 131,
+      `drilling/_index.md` wt 231, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 35 — Topic 32 Software Product Engineering ▲ (`software-product-engineering`)
+
+Row: Annotated-concept · — ‡ · topic wt 420 · Learn 132 / Drill 232 · **leadership/design artifact (no code)**. Template →
+[`syllabus/32-software-product-engineering.md`](./syllabus/32-software-product-engineering.md).
+
+- [ ] **[AI] V** — `web-researcher` for `software-product-engineering`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/32-software-product-engineering.md`](./syllabus/32-software-product-engineering.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/software-product-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/32-software-product-engineering.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-product-engineering/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/software-product-engineering/drilling/_index.md` (wt 232) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 35 Gate
+
+- [ ] [AI] `software-product-engineering/` complete: `_index.md` wt 420, `learning/_index.md` wt 132,
+      `drilling/_index.md` wt 232, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 36 — Topic 33 Engineering Management (`engineering-management`)
+
+Row: Annotated-concept · ‡ no-code · topic wt 430 · Learn 133 / Drill 233 · **leadership/design artifact (no code)**. Template →
+[`syllabus/33-engineering-management.md`](./syllabus/33-engineering-management.md).
+
+- [ ] **[AI] V** — `web-researcher` for `engineering-management`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/33-engineering-management.md`](./syllabus/33-engineering-management.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/engineering-management/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/33-engineering-management.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/engineering-management/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/engineering-management/drilling/_index.md` (wt 233) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 36 Gate
+
+- [ ] [AI] `engineering-management/` complete: `_index.md` wt 430, `learning/_index.md` wt 133,
+      `drilling/_index.md` wt 233, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 37 — Inter-topic: Pass-2 Capstone (`capstone-solid-core`)
+
+Junction: Topics 19–33 (CS depth + OO design + FP + concurrency + advanced SQL + practices + management). Inter-Topic Capstone Phase Template; spec in
+`syllabus/33-engineering-management.md` (Pass-2 capstone section).
+
+- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
+      in the spec.
+- [ ] **[AI] A** — Author `CONTENT/capstone-solid-core/` (`_index.md` `weight: 435`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/33-engineering-management.md`](./syllabus/33-engineering-management.md)). **Acceptance**: the
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
+- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
+      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
+      commands exit 0.
+
+### Phase 37 Gate
+
+- [ ] [AI] `capstone-solid-core/` complete (wt 435, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
 ---
 
-## Pass 3 — Build for the Real World (Phases 30–44 + Pass-3 + secure-service + data-pipeline capstones)
+## Pass 3 — Build for the Real World (Phases 38-66 + Pass-3 + secure-service + data-pipeline capstones)
 
-## Phase 30 — Topic 26 NoSQL Databases (`nosql-databases`)
+## Phase 38 — Topic 34 NoSQL Databases (`nosql-databases`)
 
-Row: By Example · Python † (Valkey) · topic wt 360 · Learn 126 / Drill 226 · **subject**. Template →
-`syllabus/26-nosql-databases.md`.
+Row: By Example · Python † · topic wt 440 · Learn 134 / Drill 234 · **subject**. Template →
+[`syllabus/34-nosql-databases.md`](./syllabus/34-nosql-databases.md).
 
 - [ ] **[AI] V** — `web-researcher` for `nosql-databases`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/26-nosql-databases.md`](./syllabus/26-nosql-databases.md) and fold dated findings back into
-      that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/nosql-databases/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/26-nosql-databases.md`](./syllabus/26-nosql-databases.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/26-nosql-databases.md`](./syllabus/26-nosql-databases.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/nosql-databases/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/26-nosql-databases.md`](./syllabus/26-nosql-databases.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
+      [`syllabus/34-nosql-databases.md`](./syllabus/34-nosql-databases.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/nosql-databases/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/34-nosql-databases.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/nosql-databases/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/nosql-databases/drilling/_index.md` (wt 226) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 226 = Learn 126 + 100`, both commands exit 0.
-
-### Phase 30 Gate
-
-- [ ] [AI] `nosql-databases/` complete: `_index.md` wt 360, learning wt 126, drilling wt 226, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 31 — Topic 27 Graph Databases (`graph-databases`)
-
-Row: By Example · Cypher + Python † · topic wt 370 · Learn 127 / Drill 227 · **subject**. Template →
-`syllabus/27-graph-databases.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `graph-databases`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/27-graph-databases.md`](./syllabus/27-graph-databases.md) and fold dated findings back into
-      that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/graph-databases/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/27-graph-databases.md`](./syllabus/27-graph-databases.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/27-graph-databases.md`](./syllabus/27-graph-databases.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/graph-databases/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/27-graph-databases.md`](./syllabus/27-graph-databases.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/graph-databases/drilling/_index.md` (wt 227) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 227 = Learn 127 + 100`, both commands exit 0.
-
-### Phase 31 Gate
-
-- [ ] [AI] `graph-databases/` complete: `_index.md` wt 370, learning wt 127, drilling wt 227, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 32 — Topic 28 Backend at Scale (`backend-at-scale`)
-
-Row: By Example · Python · topic wt 380 · Learn 128 / Drill 228 · **subject** (incl. Valkey caching).
-Template → `syllabus/28-backend-at-scale.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `backend-at-scale`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/28-backend-at-scale.md`](./syllabus/28-backend-at-scale.md) and fold dated findings back
-      into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/backend-at-scale/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/28-backend-at-scale.md`](./syllabus/28-backend-at-scale.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/28-backend-at-scale.md`](./syllabus/28-backend-at-scale.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/backend-at-scale/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/28-backend-at-scale.md`](./syllabus/28-backend-at-scale.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/backend-at-scale/drilling/_index.md` (wt 228) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 228 = Learn 128 + 100`, both commands exit 0.
-
-### Phase 32 Gate
-
-- [ ] [AI] `backend-at-scale/` complete: `_index.md` wt 380, learning wt 128, drilling wt 228, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 33 — Topic 29 Advanced Frontend (`advanced-frontend`)
-
-Row: By Example · TypeScript † · topic wt 390 · Learn 129 / Drill 229 · **subject**. Template →
-`syllabus/29-advanced-frontend.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `advanced-frontend`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/29-advanced-frontend.md`](./syllabus/29-advanced-frontend.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-frontend/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/29-advanced-frontend.md`](./syllabus/29-advanced-frontend.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/29-advanced-frontend.md`](./syllabus/29-advanced-frontend.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-frontend/learning/capstone/` (`_index.md` weight 900) per [`syllabus/29-advanced-frontend.md`](./syllabus/29-advanced-frontend.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/advanced-frontend/drilling/_index.md` (wt 229) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 229 = Learn 129 + 100`, both commands exit 0.
-
-### Phase 33 Gate
-
-- [ ] [AI] `advanced-frontend/` complete: `_index.md` wt 390, learning wt 129, drilling wt 229, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 34 — Topic 30 Software Architecture (`software-architecture`)
-
-Row: Annotated-concept · Python \* · topic wt 400 · Learn 130 / Drill 230 · **subject** (incl.
-hexagonal). Template → `syllabus/30-software-architecture.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `software-architecture`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/30-software-architecture.md`](./syllabus/30-software-architecture.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/software-architecture/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/30-software-architecture.md`](./syllabus/30-software-architecture.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/30-software-architecture.md`](./syllabus/30-software-architecture.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-architecture/learning/capstone/` (`_index.md` weight 900) per [`syllabus/30-software-architecture.md`](./syllabus/30-software-architecture.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/software-architecture/drilling/_index.md` (wt 230) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 230 = Learn 130 + 100`, both commands exit 0.
-
-### Phase 34 Gate
-
-- [ ] [AI] `software-architecture/` complete: `_index.md` wt 400, learning wt 130, drilling wt 230,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 35 — Topic 31 Domain-Driven Design (`domain-driven-design`)
-
-Row: By Example · Python · topic wt 410 · Learn 131 / Drill 231 · **subject**. Template →
-`syllabus/31-domain-driven-design.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `domain-driven-design`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/31-domain-driven-design.md`](./syllabus/31-domain-driven-design.md) and fold dated
-      findings back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus
-      file.
-- [ ] **[AI] A1** — Author `CONTENT/domain-driven-design/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/31-domain-driven-design.md`](./syllabus/31-domain-driven-design.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/31-domain-driven-design.md`](./syllabus/31-domain-driven-design.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/domain-driven-design/learning/capstone/` (`_index.md` weight 900) per [`syllabus/31-domain-driven-design.md`](./syllabus/31-domain-driven-design.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/domain-driven-design/drilling/_index.md` (wt 231) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 231 = Learn 131 + 100`, both commands exit 0.
-
-### Phase 35 Gate
-
-- [ ] [AI] `domain-driven-design/` complete: `_index.md` wt 410, learning wt 131, drilling wt 231,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 36 — Topic 32 System Design (`system-design`)
-
-Row: Annotated-concept · Python \* · topic wt 420 · Learn 132 / Drill 232 · **subject**. Template →
-`syllabus/32-system-design.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `system-design`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/32-system-design.md`](./syllabus/32-system-design.md) and fold dated findings back into
-      that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/system-design/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/32-system-design.md`](./syllabus/32-system-design.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/32-system-design.md`](./syllabus/32-system-design.md) `## Worked examples`. **Acceptance**:
-      each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/system-design/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/32-system-design.md`](./syllabus/32-system-design.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/system-design/drilling/_index.md` (wt 232) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean,
-      `Drill 232 = Learn 132 + 100`, both commands exit 0.
-
-### Phase 36 Gate
-
-- [ ] [AI] `system-design/` complete: `_index.md` wt 420, learning wt 132, drilling wt 232, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 37 — Topic 33 Event-Driven Architecture (`event-driven-architecture`)
-
-Row: By Example · Python · topic wt 430 · Learn 133 / Drill 233 · **subject**. Template →
-`syllabus/33-event-driven-architecture.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `event-driven-architecture`; resolve every Accuracy-notes "to
-      verify" line in
-      [`syllabus/33-event-driven-architecture.md`](./syllabus/33-event-driven-architecture.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/event-driven-architecture/learning/` (+ `code/`, runnable sources
-      (DD-20)) covering **every** Item in
-      [`syllabus/33-event-driven-architecture.md`](./syllabus/33-event-driven-architecture.md) `## Items`,
-      each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus
-      Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/33-event-driven-architecture.md`](./syllabus/33-event-driven-architecture.md) `## Worked
-    examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/event-driven-architecture/learning/capstone/` (`_index.md`
-      weight 900) per
-      [`syllabus/33-event-driven-architecture.md`](./syllabus/33-event-driven-architecture.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/event-driven-architecture/drilling/_index.md` (wt 233) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 233 = Learn 133 + 100`, both commands exit 0.
-
-### Phase 37 Gate
-
-- [ ] [AI] `event-driven-architecture/` complete: `_index.md` wt 430, learning wt 133, drilling wt 233,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 38 — Topic 34 Containers & Orchestration (`containers-and-orchestration`)
-
-Row: By Example · YAML/CLI † · topic wt 440 · Learn 134 / Drill 234 · **subject**. Template →
-`syllabus/34-containers-and-orchestration.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `containers-and-orchestration`; resolve every Accuracy-notes "to
-      verify" line in
-      [`syllabus/34-containers-and-orchestration.md`](./syllabus/34-containers-and-orchestration.md) and
-      fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/containers-and-orchestration/learning/` (+ `code/`, runnable sources
-      (DD-20)) covering **every** Item in
-      [`syllabus/34-containers-and-orchestration.md`](./syllabus/34-containers-and-orchestration.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/34-containers-and-orchestration.md`](./syllabus/34-containers-and-orchestration.md) `##
-    Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/containers-and-orchestration/learning/capstone/` (`_index.md`
-      weight 900) per
-      [`syllabus/34-containers-and-orchestration.md`](./syllabus/34-containers-and-orchestration.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/containers-and-orchestration/drilling/_index.md` (wt 234) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 234 = Learn 134 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/nosql-databases/drilling/_index.md` (wt 234) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 38 Gate
 
-- [ ] [AI] `containers-and-orchestration/` complete: `_index.md` wt 440, learning wt 134, drilling wt 234,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `nosql-databases/` complete: `_index.md` wt 440, `learning/_index.md` wt 134,
+      `drilling/_index.md` wt 234, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 39 — Topic 35 Cloud & IaC (`cloud-and-iac`)
+## Phase 39 — Topic 35 Graph Databases (`graph-databases`)
 
-Row: Annotated-concept · HCL/YAML † · topic wt 450 · Learn 135 / Drill 235 · **subject**. Template →
-`syllabus/35-cloud-and-iac.md`.
+Row: By Example · Cypher + Python † · topic wt 450 · Learn 135 / Drill 235 · **subject**. Template →
+[`syllabus/35-graph-databases.md`](./syllabus/35-graph-databases.md).
 
-- [ ] **[AI] V** — `web-researcher` for `cloud-and-iac`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/35-cloud-and-iac.md`](./syllabus/35-cloud-and-iac.md) and fold dated findings back into
-      that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/cloud-and-iac/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/35-cloud-and-iac.md`](./syllabus/35-cloud-and-iac.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/35-cloud-and-iac.md`](./syllabus/35-cloud-and-iac.md) `## Worked examples`. **Acceptance**:
-      each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/cloud-and-iac/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/35-cloud-and-iac.md`](./syllabus/35-cloud-and-iac.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/cloud-and-iac/drilling/_index.md` (wt 235) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean,
-      `Drill 235 = Learn 135 + 100`, both commands exit 0.
+- [ ] **[AI] V** — `web-researcher` for `graph-databases`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/35-graph-databases.md`](./syllabus/35-graph-databases.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/graph-databases/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/35-graph-databases.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/graph-databases/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/graph-databases/drilling/_index.md` (wt 235) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 39 Gate
 
-- [ ] [AI] `cloud-and-iac/` complete: `_index.md` wt 450, learning wt 135, drilling wt 235, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `graph-databases/` complete: `_index.md` wt 450, `learning/_index.md` wt 135,
+      `drilling/_index.md` wt 235, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 40 — Topic 36 Data Engineering (`data-engineering`)
+## Phase 40 — Topic 36 Database Internals & Storage Engines (`database-internals-and-storage-engines`)
 
-Row: Annotated-concept · Python · topic wt 460 · Learn 136 / Drill 236 · **subject**. Template →
-`syllabus/36-data-engineering.md`.
+Row: By Example · Python † · topic wt 460 · Learn 136 / Drill 236 · **subject**. Template →
+[`syllabus/36-database-internals-and-storage-engines.md`](./syllabus/36-database-internals-and-storage-engines.md).
 
-- [ ] **[AI] V** — `web-researcher` for `data-engineering`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/36-data-engineering.md`](./syllabus/36-data-engineering.md) and fold dated findings back
-      into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/data-engineering/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/36-data-engineering.md`](./syllabus/36-data-engineering.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/36-data-engineering.md`](./syllabus/36-data-engineering.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-engineering/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/36-data-engineering.md`](./syllabus/36-data-engineering.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/data-engineering/drilling/_index.md` (wt 236) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 236 = Learn 136 + 100`, both commands exit 0.
+- [ ] **[AI] V** — `web-researcher` for `database-internals-and-storage-engines`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/36-database-internals-and-storage-engines.md`](./syllabus/36-database-internals-and-storage-engines.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/database-internals-and-storage-engines/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/36-database-internals-and-storage-engines.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/database-internals-and-storage-engines/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/database-internals-and-storage-engines/drilling/_index.md` (wt 236) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 40 Gate
 
-- [ ] [AI] `data-engineering/` complete: `_index.md` wt 460, learning wt 136, drilling wt 236, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `database-internals-and-storage-engines/` complete: `_index.md` wt 460, `learning/_index.md` wt 136,
+      `drilling/_index.md` wt 236, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 41 — Topic 37 Creating AI-Powered Apps (`creating-ai-powered-apps`)
+## Phase 41 — Topic 37 Data Engineering (`data-engineering`)
 
-Row: By Example · Python · topic wt 470 · Learn 137 / Drill 237 · **subject**. Template →
-`syllabus/37-creating-ai-powered-apps.md`.
+Row: Annotated-concept · Python · topic wt 470 · Learn 137 / Drill 237 · **subject**. Template →
+[`syllabus/37-data-engineering.md`](./syllabus/37-data-engineering.md).
 
-- [ ] **[AI] V** — `web-researcher` for `creating-ai-powered-apps`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/37-creating-ai-powered-apps.md`](./syllabus/37-creating-ai-powered-apps.md) and
-      fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/creating-ai-powered-apps/learning/` (+ `code/`, runnable sources
-      (DD-20)) covering **every** Item in
-      [`syllabus/37-creating-ai-powered-apps.md`](./syllabus/37-creating-ai-powered-apps.md) `## Items`,
-      each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus
-      Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/37-creating-ai-powered-apps.md`](./syllabus/37-creating-ai-powered-apps.md) `## Worked
-    examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/creating-ai-powered-apps/learning/capstone/` (`_index.md`
-      weight 900) per [`syllabus/37-creating-ai-powered-apps.md`](./syllabus/37-creating-ai-powered-apps.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
+- [ ] **[AI] V** — `web-researcher` for `data-engineering`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/37-data-engineering.md`](./syllabus/37-data-engineering.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/data-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/37-data-engineering.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-engineering/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/creating-ai-powered-apps/drilling/_index.md` (wt 237) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 237 = Learn 137 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/data-engineering/drilling/_index.md` (wt 237) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 41 Gate
 
-- [ ] [AI] `creating-ai-powered-apps/` complete: `_index.md` wt 470, learning wt 137, drilling wt 237,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `data-engineering/` complete: `_index.md` wt 470, `learning/_index.md` wt 137,
+      `drilling/_index.md` wt 237, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 42 — Topic 38 IT Security (`it-security`)
+## Phase 42 — Topic 38 Search & Information Retrieval (`search-and-information-retrieval`)
 
-Row: Annotated-concept · Python \* · topic wt 480 · Learn 138 / Drill 238 · **subject**
-(risk/asset/network). Template → `syllabus/38-it-security.md`.
+Row: By Example · Python † · topic wt 480 · Learn 138 / Drill 238 · **subject**. Template →
+[`syllabus/38-search-and-information-retrieval.md`](./syllabus/38-search-and-information-retrieval.md).
 
-- [ ] **[AI] V** — `web-researcher` for `it-security`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/38-it-security.md`](./syllabus/38-it-security.md) and fold dated findings back into that
-      file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/it-security/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/38-it-security.md`](./syllabus/38-it-security.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/38-it-security.md`](./syllabus/38-it-security.md) `## Worked examples`. **Acceptance**:
-      each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-security/learning/capstone/` (`_index.md` weight 900) per
-      [`syllabus/38-it-security.md`](./syllabus/38-it-security.md) `## Capstone spec`. **Acceptance**: the
-      capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/it-security/drilling/_index.md` (wt 238) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean,
-      `Drill 238 = Learn 138 + 100`, both commands exit 0.
+- [ ] **[AI] V** — `web-researcher` for `search-and-information-retrieval`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/38-search-and-information-retrieval.md`](./syllabus/38-search-and-information-retrieval.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/search-and-information-retrieval/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/38-search-and-information-retrieval.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/search-and-information-retrieval/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/search-and-information-retrieval/drilling/_index.md` (wt 238) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 42 Gate
 
-- [ ] [AI] `it-security/` complete: `_index.md` wt 480, learning wt 138, drilling wt 238, capstone wt 900;
+- [ ] [AI] `search-and-information-retrieval/` complete: `_index.md` wt 480, `learning/_index.md` wt 138,
+      `drilling/_index.md` wt 238, capstone wt 900; every Item + 3 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 43 — Topic 39 Offensive Security (`offensive-security`)
+## Phase 43 — Topic 39 Backend at Scale (`backend-at-scale`)
 
-Row: By Example · Python + shell † · topic wt 490 · Learn 139 / Drill 239 · **subject** (red team,
-Kali; OSS/local-VM targets only). Template → `syllabus/39-offensive-security.md`.
+Row: By Example · Python · topic wt 490 · Learn 139 / Drill 239 · **subject**. Template →
+[`syllabus/39-backend-at-scale.md`](./syllabus/39-backend-at-scale.md).
 
-- [ ] **[AI] V** — `web-researcher` for `offensive-security`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/39-offensive-security.md`](./syllabus/39-offensive-security.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/offensive-security/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/39-offensive-security.md`](./syllabus/39-offensive-security.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/39-offensive-security.md`](./syllabus/39-offensive-security.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/offensive-security/learning/capstone/` (`_index.md` weight 900) per [`syllabus/39-offensive-security.md`](./syllabus/39-offensive-security.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
+- [ ] **[AI] V** — `web-researcher` for `backend-at-scale`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/39-backend-at-scale.md`](./syllabus/39-backend-at-scale.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/backend-at-scale/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/39-backend-at-scale.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/backend-at-scale/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/offensive-security/drilling/_index.md` (wt 239) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 239 = Learn 139 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/backend-at-scale/drilling/_index.md` (wt 239) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 43 Gate
 
-- [ ] [AI] `offensive-security/` complete: `_index.md` wt 490, learning wt 139, drilling wt 239, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `backend-at-scale/` complete: `_index.md` wt 490, `learning/_index.md` wt 139,
+      `drilling/_index.md` wt 239, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 44 — Topic 40 Defensive Security (`defensive-security`)
+## Phase 44 — Topic 40 Build Your Own Web Framework (`build-your-own-web-framework`)
 
-Row: By Example · Python + shell † · topic wt 500 · Learn 140 / Drill 240 · **subject** (blue team,
-SOC/IR). Template → `syllabus/40-defensive-security.md`.
+Row: By Example · Python † · topic wt 500 · Learn 140 / Drill 240 · **subject**. Template →
+[`syllabus/40-build-your-own-web-framework.md`](./syllabus/40-build-your-own-web-framework.md).
 
-- [ ] **[AI] V** — `web-researcher` for `defensive-security`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/40-defensive-security.md`](./syllabus/40-defensive-security.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/defensive-security/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/40-defensive-security.md`](./syllabus/40-defensive-security.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/40-defensive-security.md`](./syllabus/40-defensive-security.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/defensive-security/learning/capstone/` (`_index.md` weight 900) per [`syllabus/40-defensive-security.md`](./syllabus/40-defensive-security.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
+- [ ] **[AI] V** — `web-researcher` for `build-your-own-web-framework`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/40-build-your-own-web-framework.md`](./syllabus/40-build-your-own-web-framework.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/build-your-own-web-framework/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/40-build-your-own-web-framework.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-web-framework/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/defensive-security/drilling/_index.md` (wt 240) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 240 = Learn 140 + 100`, both commands exit 0.
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/build-your-own-web-framework/drilling/_index.md` (wt 240) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 44 Gate
 
-- [ ] [AI] `defensive-security/` complete: `_index.md` wt 500, learning wt 140, drilling wt 240, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `build-your-own-web-framework/` complete: `_index.md` wt 500, `learning/_index.md` wt 140,
+      `drilling/_index.md` wt 240, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 45 — Inter-topic: Pass-3 Capstone (`capstone-real-world-delivery`)
+## Phase 45 — Topic 41 API Design (`api-design`)
 
-Junction: Topics 26–40 (data stores + scale + architecture + cloud + security). Inter-Topic Capstone
-Phase Template; spec in `syllabus/40-defensive-security.md` (Pass-3 capstone section).
+Row: By Example · Python † · topic wt 510 · Learn 141 / Drill 241 · **subject**. Template →
+[`syllabus/41-api-design.md`](./syllabus/41-api-design.md).
 
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
-      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
-      in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-real-world-delivery/` (`_index.md` `weight: 505`, + `code/`) per
-      the cited capstone spec's ordered steps (detail source:
-      [`syllabus/40-defensive-security.md`](./syllabus/40-defensive-security.md)). **Acceptance**: the
-      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
-      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
-      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
-      commands exit 0.
+- [ ] **[AI] V** — `web-researcher` for `api-design`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/41-api-design.md`](./syllabus/41-api-design.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/api-design/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/41-api-design.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/api-design/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/api-design/drilling/_index.md` (wt 241) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 45 Gate
 
-- [ ] [AI] `capstone-real-world-delivery/` complete (wt 505, runnable end-to-end + web-verified); checker +
-      facts-checker clean; build + `lint:md` exit 0.
+- [ ] [AI] `api-design/` complete: `_index.md` wt 510, `learning/_index.md` wt 141,
+      `drilling/_index.md` wt 241, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
 
-> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
-## Phase 46 — Inter-topic: Secure-Service Capstone (`capstone-secure-service`)
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-Junction: Backend Essentials (09) + Security Essentials (14) + IT Security (38). Inter-Topic Capstone
-Phase Template; spec in `syllabus/40-defensive-security.md` (secure-service cross-cutting section).
+## Phase 46 — Topic 42 Software Architecture (`software-architecture`)
+
+Row: Annotated-concept · Python \* · topic wt 520 · Learn 142 / Drill 242 · **subject**. Template →
+[`syllabus/42-software-architecture.md`](./syllabus/42-software-architecture.md).
+
+- [ ] **[AI] V** — `web-researcher` for `software-architecture`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/42-software-architecture.md`](./syllabus/42-software-architecture.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/software-architecture/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/42-software-architecture.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-architecture/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/software-architecture/drilling/_index.md` (wt 242) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 46 Gate
+
+- [ ] [AI] `software-architecture/` complete: `_index.md` wt 520, `learning/_index.md` wt 142,
+      `drilling/_index.md` wt 242, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 47 — Topic 43 Domain-Driven Design (`domain-driven-design`)
+
+Row: By Example · Python · topic wt 530 · Learn 143 / Drill 243 · **subject**. Template →
+[`syllabus/43-domain-driven-design.md`](./syllabus/43-domain-driven-design.md).
+
+- [ ] **[AI] V** — `web-researcher` for `domain-driven-design`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/43-domain-driven-design.md`](./syllabus/43-domain-driven-design.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/domain-driven-design/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/43-domain-driven-design.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/domain-driven-design/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/domain-driven-design/drilling/_index.md` (wt 243) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 47 Gate
+
+- [ ] [AI] `domain-driven-design/` complete: `_index.md` wt 530, `learning/_index.md` wt 143,
+      `drilling/_index.md` wt 243, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 48 — Topic 44 System Design (`system-design`)
+
+Row: Annotated-concept · Python \* · topic wt 540 · Learn 144 / Drill 244 · **subject**. Template →
+[`syllabus/44-system-design.md`](./syllabus/44-system-design.md).
+
+- [ ] **[AI] V** — `web-researcher` for `system-design`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/44-system-design.md`](./syllabus/44-system-design.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/system-design/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/44-system-design.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/system-design/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/system-design/drilling/_index.md` (wt 244) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 48 Gate
+
+- [ ] [AI] `system-design/` complete: `_index.md` wt 540, `learning/_index.md` wt 144,
+      `drilling/_index.md` wt 244, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 49 — Topic 45 Event-Driven Architecture (`event-driven-architecture`)
+
+Row: By Example · Python · topic wt 550 · Learn 145 / Drill 245 · **subject**. Template →
+[`syllabus/45-event-driven-architecture.md`](./syllabus/45-event-driven-architecture.md).
+
+- [ ] **[AI] V** — `web-researcher` for `event-driven-architecture`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/45-event-driven-architecture.md`](./syllabus/45-event-driven-architecture.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/event-driven-architecture/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/45-event-driven-architecture.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/event-driven-architecture/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/event-driven-architecture/drilling/_index.md` (wt 245) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 49 Gate
+
+- [ ] [AI] `event-driven-architecture/` complete: `_index.md` wt 550, `learning/_index.md` wt 145,
+      `drilling/_index.md` wt 245, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 50 — Topic 46 Distributed Systems (`distributed-systems`)
+
+Row: By Example · Python † · topic wt 560 · Learn 146 / Drill 246 · **subject**. Template →
+[`syllabus/46-distributed-systems.md`](./syllabus/46-distributed-systems.md).
+
+- [ ] **[AI] V** — `web-researcher` for `distributed-systems`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/46-distributed-systems.md`](./syllabus/46-distributed-systems.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/distributed-systems/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/46-distributed-systems.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/distributed-systems/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/distributed-systems/drilling/_index.md` (wt 246) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 50 Gate
+
+- [ ] [AI] `distributed-systems/` complete: `_index.md` wt 560, `learning/_index.md` wt 146,
+      `drilling/_index.md` wt 246, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 51 — Topic 47 Advanced Frontend (`advanced-frontend`)
+
+Row: By Example · TypeScript † · topic wt 570 · Learn 147 / Drill 247 · **subject**. Template →
+[`syllabus/47-advanced-frontend.md`](./syllabus/47-advanced-frontend.md).
+
+- [ ] **[AI] V** — `web-researcher` for `advanced-frontend`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/47-advanced-frontend.md`](./syllabus/47-advanced-frontend.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/advanced-frontend/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/47-advanced-frontend.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-frontend/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/advanced-frontend/drilling/_index.md` (wt 247) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 51 Gate
+
+- [ ] [AI] `advanced-frontend/` complete: `_index.md` wt 570, `learning/_index.md` wt 147,
+      `drilling/_index.md` wt 247, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 52 — Topic 48 Build Your Own Reactive UI (`build-your-own-reactive-ui`)
+
+Row: By Example · TypeScript † · topic wt 580 · Learn 148 / Drill 248 · **subject**. Template →
+[`syllabus/48-build-your-own-reactive-ui.md`](./syllabus/48-build-your-own-reactive-ui.md).
+
+- [ ] **[AI] V** — `web-researcher` for `build-your-own-reactive-ui`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/48-build-your-own-reactive-ui.md`](./syllabus/48-build-your-own-reactive-ui.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/build-your-own-reactive-ui/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/48-build-your-own-reactive-ui.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-reactive-ui/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/build-your-own-reactive-ui/drilling/_index.md` (wt 248) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 52 Gate
+
+- [ ] [AI] `build-your-own-reactive-ui/` complete: `_index.md` wt 580, `learning/_index.md` wt 148,
+      `drilling/_index.md` wt 248, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 53 — Topic 49 Information Architecture & SEO (`information-architecture-and-seo`)
+
+Row: Annotated-concept · ‡ HTML † · topic wt 590 · Learn 149 / Drill 249 · **subject**. Template →
+[`syllabus/49-information-architecture-and-seo.md`](./syllabus/49-information-architecture-and-seo.md).
+
+- [ ] **[AI] V** — `web-researcher` for `information-architecture-and-seo`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/49-information-architecture-and-seo.md`](./syllabus/49-information-architecture-and-seo.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/information-architecture-and-seo/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/49-information-architecture-and-seo.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/information-architecture-and-seo/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/information-architecture-and-seo/drilling/_index.md` (wt 249) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 53 Gate
+
+- [ ] [AI] `information-architecture-and-seo/` complete: `_index.md` wt 590, `learning/_index.md` wt 149,
+      `drilling/_index.md` wt 249, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 54 — Topic 50 Containers & Orchestration (`containers-and-orchestration`)
+
+Row: By Example · YAML/CLI † · topic wt 600 · Learn 150 / Drill 250 · **subject**. Template →
+[`syllabus/50-containers-and-orchestration.md`](./syllabus/50-containers-and-orchestration.md).
+
+- [ ] **[AI] V** — `web-researcher` for `containers-and-orchestration`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/50-containers-and-orchestration.md`](./syllabus/50-containers-and-orchestration.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/containers-and-orchestration/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/50-containers-and-orchestration.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/containers-and-orchestration/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/containers-and-orchestration/drilling/_index.md` (wt 250) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 54 Gate
+
+- [ ] [AI] `containers-and-orchestration/` complete: `_index.md` wt 600, `learning/_index.md` wt 150,
+      `drilling/_index.md` wt 250, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 55 — Topic 51 Cloud & IaC (`cloud-and-iac`)
+
+Row: Annotated-concept · HCL/YAML † · topic wt 610 · Learn 151 / Drill 251 · **subject**. Template →
+[`syllabus/51-cloud-and-iac.md`](./syllabus/51-cloud-and-iac.md).
+
+- [ ] **[AI] V** — `web-researcher` for `cloud-and-iac`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/51-cloud-and-iac.md`](./syllabus/51-cloud-and-iac.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/cloud-and-iac/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/51-cloud-and-iac.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/cloud-and-iac/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/cloud-and-iac/drilling/_index.md` (wt 251) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 55 Gate
+
+- [ ] [AI] `cloud-and-iac/` complete: `_index.md` wt 610, `learning/_index.md` wt 151,
+      `drilling/_index.md` wt 251, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 56 — Topic 52 CI/CD & Release Engineering (`cicd-and-release-engineering`)
+
+Row: By Example · YAML + Python † · topic wt 620 · Learn 152 / Drill 252 · **subject**. Template →
+[`syllabus/52-cicd-and-release-engineering.md`](./syllabus/52-cicd-and-release-engineering.md).
+
+- [ ] **[AI] V** — `web-researcher` for `cicd-and-release-engineering`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/52-cicd-and-release-engineering.md`](./syllabus/52-cicd-and-release-engineering.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/cicd-and-release-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/52-cicd-and-release-engineering.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/cicd-and-release-engineering/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/cicd-and-release-engineering/drilling/_index.md` (wt 252) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 56 Gate
+
+- [ ] [AI] `cicd-and-release-engineering/` complete: `_index.md` wt 620, `learning/_index.md` wt 152,
+      `drilling/_index.md` wt 252, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 57 — Topic 53 Creating AI-Powered Apps (`creating-ai-powered-apps`)
+
+Row: By Example · Python · topic wt 630 · Learn 153 / Drill 253 · **subject**. Template →
+[`syllabus/53-creating-ai-powered-apps.md`](./syllabus/53-creating-ai-powered-apps.md).
+
+- [ ] **[AI] V** — `web-researcher` for `creating-ai-powered-apps`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/53-creating-ai-powered-apps.md`](./syllabus/53-creating-ai-powered-apps.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/creating-ai-powered-apps/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/53-creating-ai-powered-apps.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/creating-ai-powered-apps/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/creating-ai-powered-apps/drilling/_index.md` (wt 253) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 57 Gate
+
+- [ ] [AI] `creating-ai-powered-apps/` complete: `_index.md` wt 630, `learning/_index.md` wt 153,
+      `drilling/_index.md` wt 253, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 58 — Topic 54 Agentic AI (`agentic-ai`)
+
+Row: By Example · Python † · topic wt 640 · Learn 154 / Drill 254 · **subject**. Template →
+[`syllabus/54-agentic-ai.md`](./syllabus/54-agentic-ai.md).
+
+- [ ] **[AI] V** — `web-researcher` for `agentic-ai`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/54-agentic-ai.md`](./syllabus/54-agentic-ai.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/agentic-ai/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/54-agentic-ai.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/agentic-ai/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/agentic-ai/drilling/_index.md` (wt 254) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 58 Gate
+
+- [ ] [AI] `agentic-ai/` complete: `_index.md` wt 640, `learning/_index.md` wt 154,
+      `drilling/_index.md` wt 254, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 59 — Topic 55 IT / Application Security (`it-and-application-security`)
+
+Row: Annotated-concept · Python \* · topic wt 650 · Learn 155 / Drill 255 · **subject**. Template →
+[`syllabus/55-it-and-application-security.md`](./syllabus/55-it-and-application-security.md).
+
+- [ ] **[AI] V** — `web-researcher` for `it-and-application-security`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/55-it-and-application-security.md`](./syllabus/55-it-and-application-security.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/it-and-application-security/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/55-it-and-application-security.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-and-application-security/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/it-and-application-security/drilling/_index.md` (wt 255) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 59 Gate
+
+- [ ] [AI] `it-and-application-security/` complete: `_index.md` wt 650, `learning/_index.md` wt 155,
+      `drilling/_index.md` wt 255, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 60 — Topic 56 Offensive Security (`offensive-security`)
+
+Row: By Example · Python + shell † · topic wt 660 · Learn 156 / Drill 256 · **subject**. Template →
+[`syllabus/56-offensive-security.md`](./syllabus/56-offensive-security.md).
+
+- [ ] **[AI] V** — `web-researcher` for `offensive-security`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/56-offensive-security.md`](./syllabus/56-offensive-security.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/offensive-security/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/56-offensive-security.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/offensive-security/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/offensive-security/drilling/_index.md` (wt 256) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 60 Gate
+
+- [ ] [AI] `offensive-security/` complete: `_index.md` wt 660, `learning/_index.md` wt 156,
+      `drilling/_index.md` wt 256, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 61 — Topic 57 Defensive Security (`defensive-security`)
+
+Row: By Example · Python + shell † · topic wt 670 · Learn 157 / Drill 257 · **subject**. Template →
+[`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md).
+
+- [ ] **[AI] V** — `web-researcher` for `defensive-security`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/defensive-security/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/57-defensive-security.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/defensive-security/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/defensive-security/drilling/_index.md` (wt 257) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 61 Gate
+
+- [ ] [AI] `defensive-security/` complete: `_index.md` wt 670, `learning/_index.md` wt 157,
+      `drilling/_index.md` wt 257, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 62 — Inter-topic: Pass-3 Capstone (`capstone-real-world-delivery`)
+
+Junction: Topics 34–57 (data stores + scale + architecture + cloud + security). Inter-Topic Capstone Phase Template; spec in
+`syllabus/57-defensive-security.md` (Pass-3 capstone section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-secure-service/` (`_index.md` `weight: 506`, + `code/`) per the
-      cited capstone spec's ordered steps (detail source:
-      [`syllabus/40-defensive-security.md`](./syllabus/40-defensive-security.md)). **Acceptance**: the
+- [ ] **[AI] A** — Author `CONTENT/capstone-real-world-delivery/` (`_index.md` `weight: 575`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 46 Gate
+### Phase 62 Gate
 
-- [ ] [AI] `capstone-secure-service/` complete (wt 506, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `capstone-real-world-delivery/` complete (wt 575, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
-## Phase 47 — Inter-topic: Data-Pipeline Capstone (`capstone-data-pipeline`)
+## Phase 63 — Inter-topic: Secure-Service Capstone (`capstone-secure-service`)
 
-Junction: Data Engineering (36) + SQL/NoSQL (08/26) + a queue. Inter-Topic Capstone Phase Template; spec
-in `syllabus/40-defensive-security.md` (data-pipeline cross-cutting section).
+Junction: Backend Essentials (11) + Security Essentials (17) + IT / Application Security (55). Inter-Topic Capstone Phase Template; spec in
+`syllabus/57-defensive-security.md` (secure-service cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-data-pipeline/` (`_index.md` `weight: 507`, + `code/`) per the
-      cited capstone spec's ordered steps. **Acceptance**: the spec's done bar is met — a clean-machine
+- [ ] **[AI] A** — Author `CONTENT/capstone-secure-service/` (`_index.md` `weight: 576`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md)). **Acceptance**: the
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
+- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
+      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
+      commands exit 0.
+
+### Phase 63 Gate
+
+- [ ] [AI] `capstone-secure-service/` complete (wt 576, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+
+## Phase 64 — Inter-topic: Data-Pipeline Capstone (`capstone-data-pipeline`)
+
+Junction: Data Engineering (37) + SQL/NoSQL (10/34) + a queue. Inter-Topic Capstone Phase Template; spec in
+`syllabus/57-defensive-security.md` (data-pipeline cross-cutting section).
+
+- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
+      in the spec.
+- [ ] **[AI] A** — Author `CONTENT/capstone-data-pipeline/` (`_index.md` `weight: 577`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md)). **Acceptance**: the
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
+- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
+      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
+      commands exit 0.
+
+### Phase 64 Gate
+
+- [ ] [AI] `capstone-data-pipeline/` complete (wt 577, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+
+## Phase 65 — Topic 58 IT Governance, Risk & Compliance (`it-governance-grc`)
+
+Row: Annotated-concept · ‡ no-code · topic wt 680 · Learn 158 / Drill 258 · **leadership/design artifact (no code)**. Template →
+[`syllabus/58-it-governance-grc.md`](./syllabus/58-it-governance-grc.md).
+
+- [ ] **[AI] V** — `web-researcher` for `it-governance-grc`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/58-it-governance-grc.md`](./syllabus/58-it-governance-grc.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/it-governance-grc/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/58-it-governance-grc.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-governance-grc/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/it-governance-grc/drilling/_index.md` (wt 258) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 65 Gate
+
+- [ ] [AI] `it-governance-grc/` complete: `_index.md` wt 680, `learning/_index.md` wt 158,
+      `drilling/_index.md` wt 258, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 66 — Topic 59 Analytics & Experimentation (`analytics-and-experimentation`)
+
+Row: By Example · Python † · topic wt 690 · Learn 159 / Drill 259 · **subject**. Template →
+[`syllabus/59-analytics-and-experimentation.md`](./syllabus/59-analytics-and-experimentation.md).
+
+- [ ] **[AI] V** — `web-researcher` for `analytics-and-experimentation`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/59-analytics-and-experimentation.md`](./syllabus/59-analytics-and-experimentation.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/analytics-and-experimentation/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/59-analytics-and-experimentation.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/analytics-and-experimentation/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/analytics-and-experimentation/drilling/_index.md` (wt 259) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 66 Gate
+
+- [ ] [AI] `analytics-and-experimentation/` complete: `_index.md` wt 690, `learning/_index.md` wt 159,
+      `drilling/_index.md` wt 259, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+---
+
+## Pass 4 — Concurrency & Systems (Phases 67-94 + Pass-4 + concurrency-showdown capstones)
+
+## Phase 67 — Topic 60 Just Enough Go (`just-enough-go`)
+
+Row: Primer § · Go † · topic wt 700 · Learn 160 / Drill 260 · **primer**. Template →
+[`syllabus/60-just-enough-go.md`](./syllabus/60-just-enough-go.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-go`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/60-just-enough-go.md`](./syllabus/60-just-enough-go.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-go/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/60-just-enough-go.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-go/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-go/drilling/_index.md` (wt 260) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 67 Gate
+
+- [ ] [AI] `just-enough-go/` complete: `_index.md` wt 700, `learning/_index.md` wt 160,
+      `drilling/_index.md` wt 260, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 68 — Topic 61 CSP-Style Concurrency (`csp-style-concurrency`)
+
+Row: By Example · Go † · topic wt 710 · Learn 161 / Drill 261 · **subject**. Template →
+[`syllabus/61-csp-style-concurrency.md`](./syllabus/61-csp-style-concurrency.md).
+
+- [ ] **[AI] V** — `web-researcher` for `csp-style-concurrency`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/61-csp-style-concurrency.md`](./syllabus/61-csp-style-concurrency.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/csp-style-concurrency/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/61-csp-style-concurrency.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/csp-style-concurrency/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/csp-style-concurrency/drilling/_index.md` (wt 261) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 68 Gate
+
+- [ ] [AI] `csp-style-concurrency/` complete: `_index.md` wt 710, `learning/_index.md` wt 161,
+      `drilling/_index.md` wt 261, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 69 — Topic 62 Just Enough Elixir (`just-enough-elixir`)
+
+Row: Primer § · Elixir † · topic wt 720 · Learn 162 / Drill 262 · **primer**. Template →
+[`syllabus/62-just-enough-elixir.md`](./syllabus/62-just-enough-elixir.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-elixir`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/62-just-enough-elixir.md`](./syllabus/62-just-enough-elixir.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-elixir/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/62-just-enough-elixir.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-elixir/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-elixir/drilling/_index.md` (wt 262) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 69 Gate
+
+- [ ] [AI] `just-enough-elixir/` complete: `_index.md` wt 720, `learning/_index.md` wt 162,
+      `drilling/_index.md` wt 262, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 70 — Topic 63 Actor-Model Concurrency (`actor-model-concurrency`)
+
+Row: By Example · Elixir † · topic wt 730 · Learn 163 / Drill 263 · **subject**. Template →
+[`syllabus/63-actor-model-concurrency.md`](./syllabus/63-actor-model-concurrency.md).
+
+- [ ] **[AI] V** — `web-researcher` for `actor-model-concurrency`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/63-actor-model-concurrency.md`](./syllabus/63-actor-model-concurrency.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/actor-model-concurrency/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/63-actor-model-concurrency.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/actor-model-concurrency/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/actor-model-concurrency/drilling/_index.md` (wt 263) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 70 Gate
+
+- [ ] [AI] `actor-model-concurrency/` complete: `_index.md` wt 730, `learning/_index.md` wt 163,
+      `drilling/_index.md` wt 263, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 71 — Topic 64 Just Enough Kotlin (`just-enough-kotlin`)
+
+Row: Primer § · Kotlin † · topic wt 740 · Learn 164 / Drill 264 · **primer**. Template →
+[`syllabus/64-just-enough-kotlin.md`](./syllabus/64-just-enough-kotlin.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-kotlin`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/64-just-enough-kotlin.md`](./syllabus/64-just-enough-kotlin.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-kotlin/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/64-just-enough-kotlin.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-kotlin/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-kotlin/drilling/_index.md` (wt 264) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 71 Gate
+
+- [ ] [AI] `just-enough-kotlin/` complete: `_index.md` wt 740, `learning/_index.md` wt 164,
+      `drilling/_index.md` wt 264, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 72 — Topic 65 Android App Development (`android-app-development`)
+
+Row: By Example · Kotlin † ◆ · topic wt 750 · Learn 165 / Drill 265 · **subject**. Template →
+[`syllabus/65-android-app-development.md`](./syllabus/65-android-app-development.md).
+
+- [ ] **[AI] V** — `web-researcher` for `android-app-development`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/65-android-app-development.md`](./syllabus/65-android-app-development.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/android-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/65-android-app-development.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/android-app-development/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/android-app-development/drilling/_index.md` (wt 265) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 72 Gate
+
+- [ ] [AI] `android-app-development/` complete: `_index.md` wt 750, `learning/_index.md` wt 165,
+      `drilling/_index.md` wt 265, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 73 — Topic 66 Just Enough Swift (`just-enough-swift`)
+
+Row: Primer § · Swift † · topic wt 760 · Learn 166 / Drill 266 · **primer**. Template →
+[`syllabus/66-just-enough-swift.md`](./syllabus/66-just-enough-swift.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-swift`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/66-just-enough-swift.md`](./syllabus/66-just-enough-swift.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-swift/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/66-just-enough-swift.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-swift/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-swift/drilling/_index.md` (wt 266) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 73 Gate
+
+- [ ] [AI] `just-enough-swift/` complete: `_index.md` wt 760, `learning/_index.md` wt 166,
+      `drilling/_index.md` wt 266, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 74 — Topic 67 iOS App Development (`ios-app-development`)
+
+Row: By Example · Swift † ◆ · topic wt 770 · Learn 167 / Drill 267 · **subject**. Template →
+[`syllabus/67-ios-app-development.md`](./syllabus/67-ios-app-development.md).
+
+- [ ] **[AI] V** — `web-researcher` for `ios-app-development`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/67-ios-app-development.md`](./syllabus/67-ios-app-development.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/ios-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/67-ios-app-development.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/ios-app-development/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/ios-app-development/drilling/_index.md` (wt 267) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 74 Gate
+
+- [ ] [AI] `ios-app-development/` complete: `_index.md` wt 770, `learning/_index.md` wt 167,
+      `drilling/_index.md` wt 267, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 75 — Topic 68 Just Enough Dart (`just-enough-dart`)
+
+Row: Primer § · Dart † · topic wt 780 · Learn 168 / Drill 268 · **primer**. Template →
+[`syllabus/68-just-enough-dart.md`](./syllabus/68-just-enough-dart.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-dart`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/68-just-enough-dart.md`](./syllabus/68-just-enough-dart.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-dart/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/68-just-enough-dart.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-dart/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-dart/drilling/_index.md` (wt 268) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 75 Gate
+
+- [ ] [AI] `just-enough-dart/` complete: `_index.md` wt 780, `learning/_index.md` wt 168,
+      `drilling/_index.md` wt 268, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 76 — Topic 69 Hybrid App Development (`hybrid-app-development`)
+
+Row: By Example · Dart † · topic wt 790 · Learn 169 / Drill 269 · **subject**. Template →
+[`syllabus/69-hybrid-app-development.md`](./syllabus/69-hybrid-app-development.md).
+
+- [ ] **[AI] V** — `web-researcher` for `hybrid-app-development`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/69-hybrid-app-development.md`](./syllabus/69-hybrid-app-development.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/hybrid-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/69-hybrid-app-development.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/hybrid-app-development/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/hybrid-app-development/drilling/_index.md` (wt 269) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 76 Gate
+
+- [ ] [AI] `hybrid-app-development/` complete: `_index.md` wt 790, `learning/_index.md` wt 169,
+      `drilling/_index.md` wt 269, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 77 — Topic 70 Just Enough C# (`just-enough-csharp`)
+
+Row: Primer § · C# † · topic wt 800 · Learn 170 / Drill 270 · **primer**. Template →
+[`syllabus/70-just-enough-csharp.md`](./syllabus/70-just-enough-csharp.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-csharp`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/70-just-enough-csharp.md`](./syllabus/70-just-enough-csharp.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-csharp/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/70-just-enough-csharp.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-csharp/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-csharp/drilling/_index.md` (wt 270) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 77 Gate
+
+- [ ] [AI] `just-enough-csharp/` complete: `_index.md` wt 800, `learning/_index.md` wt 170,
+      `drilling/_index.md` wt 270, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 78 — Topic 71 Windows App Development (`windows-app-development`)
+
+Row: By Example · C# † ◆ · topic wt 810 · Learn 171 / Drill 271 · **subject**. Template →
+[`syllabus/71-windows-app-development.md`](./syllabus/71-windows-app-development.md).
+
+- [ ] **[AI] V** — `web-researcher` for `windows-app-development`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/71-windows-app-development.md`](./syllabus/71-windows-app-development.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/windows-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/71-windows-app-development.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/windows-app-development/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/windows-app-development/drilling/_index.md` (wt 271) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 78 Gate
+
+- [ ] [AI] `windows-app-development/` complete: `_index.md` wt 810, `learning/_index.md` wt 171,
+      `drilling/_index.md` wt 271, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 79 — Topic 72 Linux App Development (`linux-app-development`)
+
+Row: By Example · Python ◆ · topic wt 820 · Learn 172 / Drill 272 · **subject**. Template →
+[`syllabus/72-linux-app-development.md`](./syllabus/72-linux-app-development.md).
+
+- [ ] **[AI] V** — `web-researcher` for `linux-app-development`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/72-linux-app-development.md`](./syllabus/72-linux-app-development.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/linux-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/72-linux-app-development.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/linux-app-development/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/linux-app-development/drilling/_index.md` (wt 272) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 79 Gate
+
+- [ ] [AI] `linux-app-development/` complete: `_index.md` wt 820, `learning/_index.md` wt 172,
+      `drilling/_index.md` wt 272, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 80 — Topic 73 Building Production CLI Tools (`building-production-cli-tools`)
+
+Row: By Example · Go + Rust † · topic wt 830 · Learn 173 / Drill 273 · **subject**. Template →
+[`syllabus/73-building-production-cli-tools.md`](./syllabus/73-building-production-cli-tools.md).
+
+- [ ] **[AI] V** — `web-researcher` for `building-production-cli-tools`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/73-building-production-cli-tools.md`](./syllabus/73-building-production-cli-tools.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/building-production-cli-tools/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/73-building-production-cli-tools.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/building-production-cli-tools/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/building-production-cli-tools/drilling/_index.md` (wt 273) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 80 Gate
+
+- [ ] [AI] `building-production-cli-tools/` complete: `_index.md` wt 830, `learning/_index.md` wt 173,
+      `drilling/_index.md` wt 273, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 81 — Topic 74 Just Enough C (`just-enough-c`)
+
+Row: Primer § · C † · topic wt 840 · Learn 174 / Drill 274 · **primer**. Template →
+[`syllabus/74-just-enough-c.md`](./syllabus/74-just-enough-c.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-c`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/74-just-enough-c.md`](./syllabus/74-just-enough-c.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-c/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/74-just-enough-c.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-c/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-c/drilling/_index.md` (wt 274) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 81 Gate
+
+- [ ] [AI] `just-enough-c/` complete: `_index.md` wt 840, `learning/_index.md` wt 174,
+      `drilling/_index.md` wt 274, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 82 — Topic 75 Linux OS (`linux-os`)
+
+Row: By Example · C + shell † · topic wt 850 · Learn 175 / Drill 275 · **subject**. Template →
+[`syllabus/75-linux-os.md`](./syllabus/75-linux-os.md).
+
+- [ ] **[AI] V** — `web-researcher` for `linux-os`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/75-linux-os.md`](./syllabus/75-linux-os.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/linux-os/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/75-linux-os.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/linux-os/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/linux-os/drilling/_index.md` (wt 275) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 82 Gate
+
+- [ ] [AI] `linux-os/` complete: `_index.md` wt 850, `learning/_index.md` wt 175,
+      `drilling/_index.md` wt 275, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 83 — Topic 76 Windows OS (`windows-os`)
+
+Row: By Example · C + PowerShell † · topic wt 860 · Learn 176 / Drill 276 · **subject**. Template →
+[`syllabus/76-windows-os.md`](./syllabus/76-windows-os.md).
+
+- [ ] **[AI] V** — `web-researcher` for `windows-os`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/76-windows-os.md`](./syllabus/76-windows-os.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/windows-os/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/76-windows-os.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/windows-os/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/windows-os/drilling/_index.md` (wt 276) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 83 Gate
+
+- [ ] [AI] `windows-os/` complete: `_index.md` wt 860, `learning/_index.md` wt 176,
+      `drilling/_index.md` wt 276, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 84 — Topic 77 System Programming (`system-programming`)
+
+Row: By Example · C † · topic wt 870 · Learn 177 / Drill 277 · **subject**. Template →
+[`syllabus/77-system-programming.md`](./syllabus/77-system-programming.md).
+
+- [ ] **[AI] V** — `web-researcher` for `system-programming`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/77-system-programming.md`](./syllabus/77-system-programming.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/system-programming/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/77-system-programming.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/system-programming/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/system-programming/drilling/_index.md` (wt 277) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 84 Gate
+
+- [ ] [AI] `system-programming/` complete: `_index.md` wt 870, `learning/_index.md` wt 177,
+      `drilling/_index.md` wt 277, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 85 — Topic 78 Just Enough Rust (`just-enough-rust`)
+
+Row: Primer § · Rust † · topic wt 880 · Learn 178 / Drill 278 · **primer**. Template →
+[`syllabus/78-just-enough-rust.md`](./syllabus/78-just-enough-rust.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-rust`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/78-just-enough-rust.md`](./syllabus/78-just-enough-rust.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-rust/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/78-just-enough-rust.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-rust/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-rust/drilling/_index.md` (wt 278) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 85 Gate
+
+- [ ] [AI] `just-enough-rust/` complete: `_index.md` wt 880, `learning/_index.md` wt 178,
+      `drilling/_index.md` wt 278, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 86 — Topic 79 Modern System Programming (`modern-system-programming`)
+
+Row: By Example · Rust † · topic wt 890 · Learn 179 / Drill 279 · **subject**. Template →
+[`syllabus/79-modern-system-programming.md`](./syllabus/79-modern-system-programming.md).
+
+- [ ] **[AI] V** — `web-researcher` for `modern-system-programming`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/79-modern-system-programming.md`](./syllabus/79-modern-system-programming.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/modern-system-programming/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/79-modern-system-programming.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/modern-system-programming/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/modern-system-programming/drilling/_index.md` (wt 279) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 86 Gate
+
+- [ ] [AI] `modern-system-programming/` complete: `_index.md` wt 890, `learning/_index.md` wt 179,
+      `drilling/_index.md` wt 279, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 87 — Topic 80 Just Enough Java (`just-enough-java`)
+
+Row: Primer § · Java † · topic wt 900 · Learn 180 / Drill 280 · **primer**. Template →
+[`syllabus/80-just-enough-java.md`](./syllabus/80-just-enough-java.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-java`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/80-just-enough-java.md`](./syllabus/80-just-enough-java.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-java/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/80-just-enough-java.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-java/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-java/drilling/_index.md` (wt 280) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 87 Gate
+
+- [ ] [AI] `just-enough-java/` complete: `_index.md` wt 900, `learning/_index.md` wt 180,
+      `drilling/_index.md` wt 280, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 88 — Topic 81 Enterprise Java & the JVM (`enterprise-java-and-the-jvm`)
+
+Row: By Example · Java † · topic wt 910 · Learn 181 / Drill 281 · **subject**. Template →
+[`syllabus/81-enterprise-java-and-the-jvm.md`](./syllabus/81-enterprise-java-and-the-jvm.md).
+
+- [ ] **[AI] V** — `web-researcher` for `enterprise-java-and-the-jvm`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/81-enterprise-java-and-the-jvm.md`](./syllabus/81-enterprise-java-and-the-jvm.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/enterprise-java-and-the-jvm/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/81-enterprise-java-and-the-jvm.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/enterprise-java-and-the-jvm/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/enterprise-java-and-the-jvm/drilling/_index.md` (wt 281) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 88 Gate
+
+- [ ] [AI] `enterprise-java-and-the-jvm/` complete: `_index.md` wt 910, `learning/_index.md` wt 181,
+      `drilling/_index.md` wt 281, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 89 — Topic 82 Lisp (`lisp`)
+
+Row: By Example · Scheme + Clojure † · topic wt 920 · Learn 182 / Drill 282 · **subject**. Template →
+[`syllabus/82-lisp.md`](./syllabus/82-lisp.md).
+
+- [ ] **[AI] V** — `web-researcher` for `lisp`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/82-lisp.md`](./syllabus/82-lisp.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/lisp/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/82-lisp.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/lisp/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/lisp/drilling/_index.md` (wt 282) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 89 Gate
+
+- [ ] [AI] `lisp/` complete: `_index.md` wt 920, `learning/_index.md` wt 182,
+      `drilling/_index.md` wt 282, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 90 — Topic 83 Just Enough F# (`just-enough-fsharp`)
+
+Row: Primer § · F# † · topic wt 930 · Learn 183 / Drill 283 · **primer**. Template →
+[`syllabus/83-just-enough-fsharp.md`](./syllabus/83-just-enough-fsharp.md).
+
+- [ ] **[AI] V** — `web-researcher` for `just-enough-fsharp`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/83-just-enough-fsharp.md`](./syllabus/83-just-enough-fsharp.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/just-enough-fsharp/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/83-just-enough-fsharp.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-fsharp/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/just-enough-fsharp/drilling/_index.md` (wt 283) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 90 Gate
+
+- [ ] [AI] `just-enough-fsharp/` complete: `_index.md` wt 930, `learning/_index.md` wt 183,
+      `drilling/_index.md` wt 283, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 91 — Topic 84 Type Systems (`type-systems`)
+
+Row: By Example · OCaml + Haskell + F# † · topic wt 940 · Learn 184 / Drill 284 · **subject**. Template →
+[`syllabus/84-type-systems.md`](./syllabus/84-type-systems.md).
+
+- [ ] **[AI] V** — `web-researcher` for `type-systems`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/84-type-systems.md`](./syllabus/84-type-systems.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/type-systems/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/84-type-systems.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/type-systems/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/type-systems/drilling/_index.md` (wt 284) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 91 Gate
+
+- [ ] [AI] `type-systems/` complete: `_index.md` wt 940, `learning/_index.md` wt 184,
+      `drilling/_index.md` wt 284, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 92 — Topic 85 Compilers, Parsers & Transpilers (`compilers-parsers-and-transpilers`)
+
+Row: By Example · F# † · topic wt 950 · Learn 185 / Drill 285 · **subject**. Template →
+[`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md).
+
+- [ ] **[AI] V** — `web-researcher` for `compilers-parsers-and-transpilers`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/compilers-parsers-and-transpilers/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/85-compilers-parsers-and-transpilers.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/compilers-parsers-and-transpilers/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/compilers-parsers-and-transpilers/drilling/_index.md` (wt 285) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 92 Gate
+
+- [ ] [AI] `compilers-parsers-and-transpilers/` complete: `_index.md` wt 950, `learning/_index.md` wt 185,
+      `drilling/_index.md` wt 285, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 93 — Inter-topic: Pass-4 Capstone (`capstone-concurrency-and-systems`)
+
+Junction: Topics 60–85 (Go/Elixir concurrency + native app domains + C/OS/systems + language theory). Inter-Topic Capstone Phase Template; spec in
+`syllabus/85-compilers-parsers-and-transpilers.md` (Pass-4 capstone section).
+
+- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
+      in the spec.
+- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-and-systems/` (`_index.md` `weight: 955`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md)). **Acceptance**: the
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
+- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
+      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
+      commands exit 0.
+
+### Phase 93 Gate
+
+- [ ] [AI] `capstone-concurrency-and-systems/` complete (wt 955, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+
+## Phase 94 — Inter-topic: Concurrency-Showdown Capstone (`capstone-concurrency-showdown`)
+
+Junction: Concurrency & Parallelism (24) + CSP/Go (61) + Actor/Elixir (63) — the same problem solved three ways. Inter-Topic Capstone Phase Template; spec in
+`syllabus/85-compilers-parsers-and-transpilers.md` (concurrency-showdown cross-cutting section).
+
+- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
+      in the spec.
+- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-showdown/` (`_index.md` `weight: 956`, + `code/`) per the cited capstone
+      spec's ordered steps (detail source: [`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md)). **Acceptance**: the
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
+- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
+      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
+      commands exit 0.
+
+### Phase 94 Gate
+
+- [ ] [AI] `capstone-concurrency-showdown/` complete (wt 956, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
+
+---
+
+## Pass 5 — Internals & Lead at Altitude (Phases 95-100 + Pass-5 capstone)
+
+## Phase 95 — Topic 86 Build Your Own Git (`build-your-own-git`)
+
+Row: By Example · Python † · topic wt 960 · Learn 186 / Drill 286 · **subject**. Template →
+[`syllabus/86-build-your-own-git.md`](./syllabus/86-build-your-own-git.md).
+
+- [ ] **[AI] V** — `web-researcher` for `build-your-own-git`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/86-build-your-own-git.md`](./syllabus/86-build-your-own-git.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/build-your-own-git/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/86-build-your-own-git.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-git/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/build-your-own-git/drilling/_index.md` (wt 286) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 95 Gate
+
+- [ ] [AI] `build-your-own-git/` complete: `_index.md` wt 960, `learning/_index.md` wt 186,
+      `drilling/_index.md` wt 286, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 96 — Topic 87 Build Your Own Database (`build-your-own-database`)
+
+Row: By Example · Python † · topic wt 970 · Learn 187 / Drill 287 · **subject**. Template →
+[`syllabus/87-build-your-own-database.md`](./syllabus/87-build-your-own-database.md).
+
+- [ ] **[AI] V** — `web-researcher` for `build-your-own-database`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/87-build-your-own-database.md`](./syllabus/87-build-your-own-database.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/build-your-own-database/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/87-build-your-own-database.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-database/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/build-your-own-database/drilling/_index.md` (wt 287) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 96 Gate
+
+- [ ] [AI] `build-your-own-database/` complete: `_index.md` wt 970, `learning/_index.md` wt 187,
+      `drilling/_index.md` wt 287, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 97 — Topic 88 Build Your Own Raft / Replicated KV (`build-your-own-raft`)
+
+Row: By Example · Go † · topic wt 980 · Learn 188 / Drill 288 · **subject**. Template →
+[`syllabus/88-build-your-own-raft.md`](./syllabus/88-build-your-own-raft.md).
+
+- [ ] **[AI] V** — `web-researcher` for `build-your-own-raft`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/88-build-your-own-raft.md`](./syllabus/88-build-your-own-raft.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/build-your-own-raft/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/88-build-your-own-raft.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-raft/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/build-your-own-raft/drilling/_index.md` (wt 288) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 97 Gate
+
+- [ ] [AI] `build-your-own-raft/` complete: `_index.md` wt 980, `learning/_index.md` wt 188,
+      `drilling/_index.md` wt 288, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 98 — Topic 89 Platform Engineering & Developer Experience (`platform-engineering-and-devex`)
+
+Row: Annotated-concept · ‡ no-code · topic wt 990 · Learn 189 / Drill 289 · **leadership/design artifact (no code)**. Template →
+[`syllabus/89-platform-engineering-and-devex.md`](./syllabus/89-platform-engineering-and-devex.md).
+
+- [ ] **[AI] V** — `web-researcher` for `platform-engineering-and-devex`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/89-platform-engineering-and-devex.md`](./syllabus/89-platform-engineering-and-devex.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/platform-engineering-and-devex/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/89-platform-engineering-and-devex.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/platform-engineering-and-devex/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/platform-engineering-and-devex/drilling/_index.md` (wt 289) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 98 Gate
+
+- [ ] [AI] `platform-engineering-and-devex/` complete: `_index.md` wt 990, `learning/_index.md` wt 189,
+      `drilling/_index.md` wt 289, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 99 — Topic 90 Site Reliability Engineering (`site-reliability-engineering`)
+
+Row: Annotated-concept · Python \* · topic wt 1000 · Learn 190 / Drill 290 · **subject**. Template →
+[`syllabus/90-site-reliability-engineering.md`](./syllabus/90-site-reliability-engineering.md).
+
+- [ ] **[AI] V** — `web-researcher` for `site-reliability-engineering`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/90-site-reliability-engineering.md`](./syllabus/90-site-reliability-engineering.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1** — Author `CONTENT/site-reliability-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
+      Item and all three Worked examples in `syllabus/90-site-reliability-engineering.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/site-reliability-engineering/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/site-reliability-engineering/drilling/_index.md` (wt 290) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 99 Gate
+
+- [ ] [AI] `site-reliability-engineering/` complete: `_index.md` wt 1000, `learning/_index.md` wt 190,
+      `drilling/_index.md` wt 290, capstone wt 900; every Item + 3 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 100 — Inter-topic: Pass-5 Capstone (`capstone-lead-at-altitude`)
+
+Junction: whole journey — Topics 86–90 (internals build-your-own + platform + SRE) synthesized against every prior pass. Inter-Topic Capstone Phase Template; spec in
+`syllabus/90-site-reliability-engineering.md` (whole-journey capstone section).
+
+- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
+      in the spec.
+- [ ] **[AI] A** — Author `CONTENT/capstone-lead-at-altitude/` (`_index.md` `weight: 1005`, artifacts only (no `code/`,
+      leadership `‡`)) per this phase's cited capstone spec's ordered steps (detail source:
+      [`syllabus/90-site-reliability-engineering.md`](./syllabus/90-site-reliability-engineering.md)). **Acceptance**: the spec's done bar is met — a clean-machine
       reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 47 Gate
+### Phase 100 Gate
 
-- [ ] [AI] `capstone-data-pipeline/` complete (wt 507, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `capstone-lead-at-altitude/` complete (wt 1005, produces the stated artifact + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
-
----
-
-## Pass 4 — Concurrency & Systems (Phases 48–66 + Pass-4 + concurrency-showdown capstones)
-
-## Phase 48 — Topic 41 Just Enough Go (`just-enough-go`)
-
-Row: Primer · Go † · topic wt 510 · Learn 141 / Drill 241 · **primer**. Template →
-`syllabus/41-just-enough-go.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `just-enough-go`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/41-just-enough-go.md`](./syllabus/41-just-enough-go.md) and fold dated findings back into
-      that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-go/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/41-just-enough-go.md`](./syllabus/41-just-enough-go.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/41-just-enough-go.md`](./syllabus/41-just-enough-go.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-go/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/41-just-enough-go.md`](./syllabus/41-just-enough-go.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-go/drilling/_index.md` (wt 241) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 241 = Learn 141 + 100`, both commands exit 0.
-
-### Phase 48 Gate
-
-- [ ] [AI] `just-enough-go/` complete: `_index.md` wt 510, learning wt 141, drilling wt 241, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 49 — Topic 42 CSP-Style Concurrency (`csp-style-concurrency`)
-
-Row: By Example · Go † · topic wt 520 · Learn 142 / Drill 242 · **subject**. Template →
-`syllabus/42-csp-style-concurrency.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `csp-style-concurrency`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/42-csp-style-concurrency.md`](./syllabus/42-csp-style-concurrency.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/csp-style-concurrency/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/42-csp-style-concurrency.md`](./syllabus/42-csp-style-concurrency.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/42-csp-style-concurrency.md`](./syllabus/42-csp-style-concurrency.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/csp-style-concurrency/learning/capstone/` (`_index.md` weight 900) per [`syllabus/42-csp-style-concurrency.md`](./syllabus/42-csp-style-concurrency.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/csp-style-concurrency/drilling/_index.md` (wt 242) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 242 = Learn 142 + 100`, both commands exit 0.
-
-### Phase 49 Gate
-
-- [ ] [AI] `csp-style-concurrency/` complete: `_index.md` wt 520, learning wt 142, drilling wt 242,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 50 — Topic 43 Just Enough Elixir (`just-enough-elixir`)
-
-Row: Primer · Elixir † · topic wt 530 · Learn 143 / Drill 243 · **primer**. Template →
-`syllabus/43-just-enough-elixir.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `just-enough-elixir`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/43-just-enough-elixir.md`](./syllabus/43-just-enough-elixir.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-elixir/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/43-just-enough-elixir.md`](./syllabus/43-just-enough-elixir.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/43-just-enough-elixir.md`](./syllabus/43-just-enough-elixir.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-elixir/learning/capstone/` (`_index.md` weight 900) per [`syllabus/43-just-enough-elixir.md`](./syllabus/43-just-enough-elixir.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-elixir/drilling/_index.md` (wt 243) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 243 = Learn 143 + 100`, both commands exit 0.
-
-### Phase 50 Gate
-
-- [ ] [AI] `just-enough-elixir/` complete: `_index.md` wt 530, learning wt 143, drilling wt 243, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 51 — Topic 44 Actor-Model Concurrency (`actor-model-concurrency`)
-
-Row: By Example · Elixir † · topic wt 540 · Learn 144 / Drill 244 · **subject**. Template →
-`syllabus/44-actor-model-concurrency.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `actor-model-concurrency`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/44-actor-model-concurrency.md`](./syllabus/44-actor-model-concurrency.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/actor-model-concurrency/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/44-actor-model-concurrency.md`](./syllabus/44-actor-model-concurrency.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/44-actor-model-concurrency.md`](./syllabus/44-actor-model-concurrency.md) `## Worked
-    examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/actor-model-concurrency/learning/capstone/` (`_index.md`
-      weight 900) per [`syllabus/44-actor-model-concurrency.md`](./syllabus/44-actor-model-concurrency.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/actor-model-concurrency/drilling/_index.md` (wt 244) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 244 = Learn 144 + 100`, both commands exit 0.
-
-### Phase 51 Gate
-
-- [ ] [AI] `actor-model-concurrency/` complete: `_index.md` wt 540, learning wt 144, drilling wt 244,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 52 — Topic 45 Just Enough Kotlin (`just-enough-kotlin`)
-
-Row: Primer · Kotlin † · topic wt 550 · Learn 145 / Drill 245 · **primer**. Template →
-`syllabus/45-just-enough-kotlin.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `just-enough-kotlin`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/45-just-enough-kotlin.md`](./syllabus/45-just-enough-kotlin.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-kotlin/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/45-just-enough-kotlin.md`](./syllabus/45-just-enough-kotlin.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/45-just-enough-kotlin.md`](./syllabus/45-just-enough-kotlin.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-kotlin/learning/capstone/` (`_index.md` weight 900) per [`syllabus/45-just-enough-kotlin.md`](./syllabus/45-just-enough-kotlin.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-kotlin/drilling/_index.md` (wt 245) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 245 = Learn 145 + 100`, both commands exit 0.
-
-### Phase 52 Gate
-
-- [ ] [AI] `just-enough-kotlin/` complete: `_index.md` wt 550, learning wt 145, drilling wt 245, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 53 — Topic 46 Android App Development ◆ (`android-app-development`)
-
-Row: By Example · Kotlin † · topic wt 560 · Learn 146 / Drill 246 · **subject** (Partial: Android
-SDK/emulator). Template → `syllabus/46-android-app-development.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `android-app-development`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/46-android-app-development.md`](./syllabus/46-android-app-development.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/android-app-development/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/46-android-app-development.md`](./syllabus/46-android-app-development.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/46-android-app-development.md`](./syllabus/46-android-app-development.md) `## Worked
-    examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/android-app-development/learning/capstone/` (`_index.md`
-      weight 900) per [`syllabus/46-android-app-development.md`](./syllabus/46-android-app-development.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/android-app-development/drilling/_index.md` (wt 246) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 246 = Learn 146 + 100`, both commands exit 0.
-
-### Phase 53 Gate
-
-- [ ] [AI] `android-app-development/` complete: `_index.md` wt 560, learning wt 146, drilling wt 246,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 54 — Topic 47 Just Enough Swift (`just-enough-swift`)
-
-Row: Primer · Swift † · topic wt 570 · Learn 147 / Drill 247 · **primer** (Partial: macOS/Xcode).
-Template → `syllabus/47-just-enough-swift.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `just-enough-swift`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/47-just-enough-swift.md`](./syllabus/47-just-enough-swift.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-swift/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/47-just-enough-swift.md`](./syllabus/47-just-enough-swift.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/47-just-enough-swift.md`](./syllabus/47-just-enough-swift.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-swift/learning/capstone/` (`_index.md` weight 900) per [`syllabus/47-just-enough-swift.md`](./syllabus/47-just-enough-swift.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-swift/drilling/_index.md` (wt 247) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 247 = Learn 147 + 100`, both commands exit 0.
-
-### Phase 54 Gate
-
-- [ ] [AI] `just-enough-swift/` complete: `_index.md` wt 570, learning wt 147, drilling wt 247, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 55 — Topic 48 iOS App Development ◆ (`ios-app-development`)
-
-Row: By Example · Swift † · topic wt 580 · Learn 148 / Drill 248 · **subject** (Partial: macOS/Xcode).
-Template → `syllabus/48-ios-app-development.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `ios-app-development`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/48-ios-app-development.md`](./syllabus/48-ios-app-development.md) and fold dated
-      findings back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus
-      file.
-- [ ] **[AI] A1** — Author `CONTENT/ios-app-development/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/48-ios-app-development.md`](./syllabus/48-ios-app-development.md) `## Items`, each rendered
-      as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in
-      the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/48-ios-app-development.md`](./syllabus/48-ios-app-development.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/ios-app-development/learning/capstone/` (`_index.md` weight 900) per [`syllabus/48-ios-app-development.md`](./syllabus/48-ios-app-development.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/ios-app-development/drilling/_index.md` (wt 248) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 248 = Learn 148 + 100`, both commands exit 0.
-
-### Phase 55 Gate
-
-- [ ] [AI] `ios-app-development/` complete: `_index.md` wt 580, learning wt 148, drilling wt 248, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 56 — Topic 49 Just Enough C# (`just-enough-csharp`)
-
-Row: Primer · C# † · topic wt 590 · Learn 149 / Drill 249 · **primer**. Template →
-`syllabus/49-just-enough-csharp.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `just-enough-csharp`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/49-just-enough-csharp.md`](./syllabus/49-just-enough-csharp.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-csharp/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/49-just-enough-csharp.md`](./syllabus/49-just-enough-csharp.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/49-just-enough-csharp.md`](./syllabus/49-just-enough-csharp.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-csharp/learning/capstone/` (`_index.md` weight 900) per [`syllabus/49-just-enough-csharp.md`](./syllabus/49-just-enough-csharp.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-csharp/drilling/_index.md` (wt 249) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 249 = Learn 149 + 100`, both commands exit 0.
-
-### Phase 56 Gate
-
-- [ ] [AI] `just-enough-csharp/` complete: `_index.md` wt 590, learning wt 149, drilling wt 249, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 57 — Topic 50 Windows App Development ◆ (`windows-app-development`)
-
-Row: By Example · C# † · topic wt 600 · Learn 150 / Drill 250 · **subject** (Partial: Windows host).
-Template → `syllabus/50-windows-app-development.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `windows-app-development`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/50-windows-app-development.md`](./syllabus/50-windows-app-development.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/windows-app-development/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/50-windows-app-development.md`](./syllabus/50-windows-app-development.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/50-windows-app-development.md`](./syllabus/50-windows-app-development.md) `## Worked
-    examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/windows-app-development/learning/capstone/` (`_index.md`
-      weight 900) per [`syllabus/50-windows-app-development.md`](./syllabus/50-windows-app-development.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/windows-app-development/drilling/_index.md` (wt 250) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 250 = Learn 150 + 100`, both commands exit 0.
-
-### Phase 57 Gate
-
-- [ ] [AI] `windows-app-development/` complete: `_index.md` wt 600, learning wt 150, drilling wt 250,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 58 — Topic 51 Linux App Development ◆ (`linux-app-development`)
-
-Row: By Example · Python · topic wt 610 · Learn 151 / Drill 251 · **subject**. Template →
-`syllabus/51-linux-app-development.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `linux-app-development`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/51-linux-app-development.md`](./syllabus/51-linux-app-development.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/linux-app-development/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in
-      [`syllabus/51-linux-app-development.md`](./syllabus/51-linux-app-development.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/51-linux-app-development.md`](./syllabus/51-linux-app-development.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/linux-app-development/learning/capstone/` (`_index.md` weight 900) per [`syllabus/51-linux-app-development.md`](./syllabus/51-linux-app-development.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/linux-app-development/drilling/_index.md` (wt 251) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 251 = Learn 151 + 100`, both commands exit 0.
-
-### Phase 58 Gate
-
-- [ ] [AI] `linux-app-development/` complete: `_index.md` wt 610, learning wt 151, drilling wt 251,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 59 — Topic 52 Just Enough C (`just-enough-c`)
-
-Row: Primer · C † · topic wt 620 · Learn 152 / Drill 252 · **primer**. Template →
-`syllabus/52-just-enough-c.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `just-enough-c`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/52-just-enough-c.md`](./syllabus/52-just-enough-c.md) and fold dated findings back into
-      that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-c/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/52-just-enough-c.md`](./syllabus/52-just-enough-c.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/52-just-enough-c.md`](./syllabus/52-just-enough-c.md) `## Worked examples`. **Acceptance**:
-      each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-c/learning/capstone/` (`_index.md` weight 900)
-      per [`syllabus/52-just-enough-c.md`](./syllabus/52-just-enough-c.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/just-enough-c/drilling/_index.md` (wt 252) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean,
-      `Drill 252 = Learn 152 + 100`, both commands exit 0.
-
-### Phase 59 Gate
-
-- [ ] [AI] `just-enough-c/` complete: `_index.md` wt 620, learning wt 152, drilling wt 252, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 60 — Topic 53 Linux OS (`linux-os`)
-
-Row: By Example · C + shell † · topic wt 630 · Learn 153 / Drill 253 · **subject**. Template →
-`syllabus/53-linux-os.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `linux-os`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/53-linux-os.md`](./syllabus/53-linux-os.md) and fold dated findings back into that file.
-      **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/linux-os/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/53-linux-os.md`](./syllabus/53-linux-os.md) `## Items`, each rendered as
-      a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in
-      the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/53-linux-os.md`](./syllabus/53-linux-os.md) `## Worked examples`. **Acceptance**: each
-      reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/linux-os/learning/capstone/` (`_index.md` weight 900) per
-      [`syllabus/53-linux-os.md`](./syllabus/53-linux-os.md) `## Capstone spec`. **Acceptance**: the
-      capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/linux-os/drilling/_index.md` (wt 253) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean,
-      `Drill 253 = Learn 153 + 100`, both commands exit 0.
-
-### Phase 60 Gate
-
-- [ ] [AI] `linux-os/` complete: `_index.md` wt 630, learning wt 153, drilling wt 253, capstone wt 900;
-      checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 61 — Topic 54 Windows OS (`windows-os`)
-
-Row: By Example · C + PowerShell † · topic wt 640 · Learn 154 / Drill 254 · **subject** (Partial: Windows
-host). Template → `syllabus/54-windows-os.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `windows-os`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/54-windows-os.md`](./syllabus/54-windows-os.md) and fold dated findings back into that
-      file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/windows-os/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/54-windows-os.md`](./syllabus/54-windows-os.md) `## Items`, each rendered
-      as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in
-      the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/54-windows-os.md`](./syllabus/54-windows-os.md) `## Worked examples`. **Acceptance**: each
-      reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/windows-os/learning/capstone/` (`_index.md` weight 900) per
-      [`syllabus/54-windows-os.md`](./syllabus/54-windows-os.md) `## Capstone spec`. **Acceptance**: the
-      capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/windows-os/drilling/_index.md` (wt 254) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean,
-      `Drill 254 = Learn 154 + 100`, both commands exit 0.
-
-### Phase 61 Gate
-
-- [ ] [AI] `windows-os/` complete: `_index.md` wt 640, learning wt 154, drilling wt 254, capstone wt 900;
-      checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 62 — Topic 55 System Programming (`system-programming`)
-
-Row: By Example · C † · topic wt 650 · Learn 155 / Drill 255 · **subject**. Template →
-`syllabus/55-system-programming.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `system-programming`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/55-system-programming.md`](./syllabus/55-system-programming.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/system-programming/learning/` (+ `code/`, runnable sources (DD-20))
-      covering **every** Item in [`syllabus/55-system-programming.md`](./syllabus/55-system-programming.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/55-system-programming.md`](./syllabus/55-system-programming.md) `## Worked examples`.
-      **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/system-programming/learning/capstone/` (`_index.md` weight 900) per [`syllabus/55-system-programming.md`](./syllabus/55-system-programming.md) `## Capstone
-    spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully
-      hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/system-programming/drilling/_index.md` (wt 255) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 255 = Learn 155 + 100`, both commands exit 0.
-
-### Phase 62 Gate
-
-- [ ] [AI] `system-programming/` complete: `_index.md` wt 650, learning wt 155, drilling wt 255, capstone
-      wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 63 — Topic 56 Lisp (`lisp`)
-
-Row: By Example · Scheme + Clojure † · topic wt 660 · Learn 156 / Drill 256 · **subject** (Scheme core +
-Clojure sidebar). Template → `syllabus/56-lisp.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `lisp`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/56-lisp.md`](./syllabus/56-lisp.md) and fold dated findings back into that file.
-      **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/lisp/learning/` (+ `code/`, runnable sources (DD-20)) covering **every**
-      Item in [`syllabus/56-lisp.md`](./syllabus/56-lisp.md) `## Items`, each rendered as a
-      runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item appears in the
-      rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per [`syllabus/56-lisp.md`](./syllabus/56-lisp.md) `##
-    Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/lisp/learning/capstone/` (`_index.md` weight 900) per
-      [`syllabus/56-lisp.md`](./syllabus/56-lisp.md) `## Capstone spec`. **Acceptance**: the capstone's done
-      bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/lisp/drilling/_index.md` (wt 256) covering the same Items with mocked/self-contained inputs;
-      `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean, `Drill
-    256 = Learn 156 + 100`, both commands exit 0.
-
-### Phase 63 Gate
-
-- [ ] [AI] `lisp/` complete: `_index.md` wt 660, learning wt 156, drilling wt 256, capstone wt 900;
-      checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 64 — Topic 57 Type Systems (`type-systems`)
-
-Row: By Example · OCaml-Haskell + F# † · topic wt 670 · Learn 157 / Drill 257 · **subject** (Hindley–Milner;
-F# sidebar). Template → `syllabus/57-type-systems.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `type-systems`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/57-type-systems.md`](./syllabus/57-type-systems.md) and fold dated findings back into that
-      file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/type-systems/learning/` (+ `code/`, runnable sources (DD-20)) covering
-      **every** Item in [`syllabus/57-type-systems.md`](./syllabus/57-type-systems.md) `## Items`, each
-      rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every syllabus Item
-      appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/57-type-systems.md`](./syllabus/57-type-systems.md) `## Worked examples`. **Acceptance**:
-      each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/type-systems/learning/capstone/` (`_index.md` weight 900) per
-      [`syllabus/57-type-systems.md`](./syllabus/57-type-systems.md) `## Capstone spec`. **Acceptance**: the
-      capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/type-systems/drilling/_index.md` (wt 257) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. **Acceptance**: checkers clean,
-      `Drill 257 = Learn 157 + 100`, both commands exit 0.
-
-### Phase 64 Gate
-
-- [ ] [AI] `type-systems/` complete: `_index.md` wt 670, learning wt 157, drilling wt 257, capstone wt
-      900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 65 — Topic 58 Compilers, Parsers & Transpilers (`compilers-parsers-and-transpilers`)
-
-Row: By Example · Python · topic wt 680 · Learn 158 / Drill 258 · **subject**. Template →
-`syllabus/58-compilers-parsers-and-transpilers.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `compilers-parsers-and-transpilers`; resolve every Accuracy-notes
-      "to verify" line in
-      [`syllabus/58-compilers-parsers-and-transpilers.md`](./syllabus/58-compilers-parsers-and-transpilers.md)
-      and fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in
-      the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/compilers-parsers-and-transpilers/learning/` (+ `code/`, runnable
-      sources (DD-20)) covering **every** Item in
-      [`syllabus/58-compilers-parsers-and-transpilers.md`](./syllabus/58-compilers-parsers-and-transpilers.md)
-      `## Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**:
-      every syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/58-compilers-parsers-and-transpilers.md`](./syllabus/58-compilers-parsers-and-transpilers.md)
-      `## Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/compilers-parsers-and-transpilers/learning/capstone/`
-      (`_index.md` weight 900) per
-      [`syllabus/58-compilers-parsers-and-transpilers.md`](./syllabus/58-compilers-parsers-and-transpilers.md)
-      `## Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised
-      checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/compilers-parsers-and-transpilers/drilling/_index.md` (wt 258) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 258 = Learn 158 + 100`, both commands exit 0.
-
-### Phase 65 Gate
-
-- [ ] [AI] `compilers-parsers-and-transpilers/` complete: `_index.md` wt 680, learning wt 158, drilling wt
-      258, capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 66 — Topic 59 Site Reliability Engineering (`site-reliability-engineering`)
-
-Row: Annotated-concept · Python \* · topic wt 690 · Learn 159 / Drill 259 · **subject**. Template →
-`syllabus/59-site-reliability-engineering.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `site-reliability-engineering`; resolve every Accuracy-notes "to
-      verify" line in
-      [`syllabus/59-site-reliability-engineering.md`](./syllabus/59-site-reliability-engineering.md) and
-      fold dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/site-reliability-engineering/learning/` (+ `code/`, runnable sources
-      (DD-20)) covering **every** Item in
-      [`syllabus/59-site-reliability-engineering.md`](./syllabus/59-site-reliability-engineering.md) `##
-    Items`, each rendered as a runnable/reproducible demonstration (DD-20/DD-30). **Acceptance**: every
-      syllabus Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated worked examples
-      (beginner/intermediate/advanced), each runnable per
-      [`syllabus/59-site-reliability-engineering.md`](./syllabus/59-site-reliability-engineering.md) `##
-    Worked examples`. **Acceptance**: each reproduces its documented output/result.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/site-reliability-engineering/learning/capstone/` (`_index.md`
-      weight 900) per
-      [`syllabus/59-site-reliability-engineering.md`](./syllabus/59-site-reliability-engineering.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/site-reliability-engineering/drilling/_index.md` (wt 259) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 259 = Learn 159 + 100`, both commands exit 0.
-
-### Phase 66 Gate
-
-- [ ] [AI] `site-reliability-engineering/` complete: `_index.md` wt 690, learning wt 159, drilling wt 259,
-      capstone wt 900; checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 67 — Inter-topic: Pass-4 Capstone (`capstone-concurrency-and-systems`)
-
-Junction: Topics 41–59 (Go/Elixir concurrency + native app domains + C/OS/systems + language theory).
-Inter-Topic Capstone Phase Template; spec in `syllabus/59-site-reliability-engineering.md` (Pass-4
-capstone section).
-
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
-      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
-      in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-and-systems/` (`_index.md` `weight: 695`, + `code/`)
-      per the cited capstone spec's ordered steps (detail source:
-      [`syllabus/59-site-reliability-engineering.md`](./syllabus/59-site-reliability-engineering.md)).
-      **Acceptance**: the spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
-      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
-      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
-      commands exit 0.
-
-### Phase 67 Gate
-
-- [ ] [AI] `capstone-concurrency-and-systems/` complete (wt 695, runnable end-to-end + web-verified);
-      checker + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
-
-## Phase 68 — Inter-topic: Concurrency-Showdown Capstone (`capstone-concurrency-showdown`)
-
-Junction: Concurrency Core (19) + CSP/Go (42) + Actor/Elixir (44) — the same problem solved three ways.
-Inter-Topic Capstone Phase Template; spec in `syllabus/59-site-reliability-engineering.md`
-(concurrency-showdown cross-cutting section).
-
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
-      CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
-      in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-showdown/` (`_index.md` `weight: 696`, + `code/`)
-      per the cited capstone spec's ordered steps (detail source:
-      [`syllabus/59-site-reliability-engineering.md`](./syllabus/59-site-reliability-engineering.md)).
-      **Acceptance**: the spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
-      `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
-      `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
-      commands exit 0.
-
-### Phase 68 Gate
-
-- [ ] [AI] `capstone-concurrency-showdown/` complete (wt 696, runnable end-to-end + web-verified); checker + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
-
----
-
-## Pass 5 — Lead at Altitude (Phases 69–70 + Pass-5 capstone)
-
-## Phase 69 — Topic 60 IT Governance & GRC (`it-governance-grc`)
-
-Row: Annotated-concept · — ‡ · topic wt 700 · Learn 160 / Drill 260 · **leadership** (GDPR + NIST;
-design/decision capstone, no code). Template → `syllabus/60-it-governance-grc.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `it-governance-grc`; resolve every Accuracy-notes "to verify" line
-      in [`syllabus/60-it-governance-grc.md`](./syllabus/60-it-governance-grc.md) and fold dated findings
-      back into that file. **Acceptance**: no unresolved "verify" line remains in the syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/it-governance-grc/learning/` (artifacts under `learning/` — no `code/`,
-      leadership `‡` decision/governance deliverables (DD-27)) covering **every** Item in
-      [`syllabus/60-it-governance-grc.md`](./syllabus/60-it-governance-grc.md) `## Items`, each rendered as
-      a reproducible decision/governance artifact (DD-27/DD-30). **Acceptance**: every syllabus Item appears
-      in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated governance/decision artifacts
-      (beginner/intermediate/advanced depth) per
-      [`syllabus/60-it-governance-grc.md`](./syllabus/60-it-governance-grc.md) `## Worked examples`.
-      **Acceptance**: each artifact is concrete and reproducible.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-governance-grc/learning/capstone/` (`_index.md` weight 900) per [`syllabus/60-it-governance-grc.md`](./syllabus/60-it-governance-grc.md) `## Capstone spec`.
-      **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/it-governance-grc/drilling/_index.md` (wt 260) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 260 = Learn 160 + 100`, both commands exit 0.
-
-### Phase 69 Gate
-
-- [ ] [AI] `it-governance-grc/` complete: `_index.md` wt 700, learning wt 160, drilling wt 260, capstone
-      wt 900 (governance artifact); checkers + facts-checker clean; build + `lint:md` exit 0.
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
-
-## Phase 70 — Topic 61 Engineering Management (`engineering-management`)
-
-Row: Annotated-concept · — ‡ · topic wt 710 · Learn 161 / Drill 261 · **leadership**. Template →
-`syllabus/61-engineering-management.md`.
-
-- [ ] **[AI] V** — `web-researcher` for `engineering-management`; resolve every Accuracy-notes "to verify"
-      line in [`syllabus/61-engineering-management.md`](./syllabus/61-engineering-management.md) and fold
-      dated findings back into that file. **Acceptance**: no unresolved "verify" line remains in the
-      syllabus file.
-- [ ] **[AI] A1** — Author `CONTENT/engineering-management/learning/` (artifacts under `learning/` — no
-      `code/`, leadership `‡` decision/governance deliverables (DD-27)) covering **every** Item in
-      [`syllabus/61-engineering-management.md`](./syllabus/61-engineering-management.md) `## Items`, each
-      rendered as a reproducible decision/governance artifact (DD-27/DD-30). **Acceptance**: every syllabus
-      Item appears in the rendered learning subtree with its expected output.
-- [ ] **[AI] A1 (worked examples)** — Author the three colocated governance/decision artifacts
-      (beginner/intermediate/advanced depth) per
-      [`syllabus/61-engineering-management.md`](./syllabus/61-engineering-management.md) `## Worked
-    examples`. **Acceptance**: each artifact is concrete and reproducible.
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/engineering-management/learning/capstone/` (`_index.md`
-      weight 900) per [`syllabus/61-engineering-management.md`](./syllabus/61-engineering-management.md) `##
-    Capstone spec`. **Acceptance**: the capstone's done bar is met and its concepts-exercised checklist is
-      fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-general-checker` + `apps-ayokoding-www-link-checker` +
-      `apps-ayokoding-www-facts-checker` clean (resolve via the matching fixer); author
-      `CONTENT/engineering-management/drilling/_index.md` (wt 261) covering the same Items with
-      mocked/self-contained inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-      **Acceptance**: checkers clean, `Drill 261 = Learn 161 + 100`, both commands exit 0.
-
-### Phase 70 Gate
-
-- [ ] [AI] `engineering-management/` complete: `_index.md` wt 710, learning wt 161, drilling wt 261,
-      capstone wt 900 (design artifact); checkers + facts-checker clean; build + `lint:md` exit 0.
-- [ ] [AI] All 61 topics now authored topic-first (each `<slug>/` has `learning/`, `learning/capstone/`,
-      and `drilling/`).
-
-> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause; the whole section is nearly
-> content-complete but still invisible to readers (nav wiring is Phase 72).
-
-## Phase 71 — Inter-topic: Pass-5 Capstone (`capstone-lead-at-altitude`)
-
-Junction: Topics 60–61 (governance + engineering management). Inter-Topic Capstone Phase Template; spec
-in `syllabus/61-engineering-management.md` (Pass-5 capstone section). Leadership ‡ → design/decision
-artifact, no code.
-
-- [ ] **[AI] V** — Invoke `web-researcher` to confirm any versions/APIs this capstone reuses are still
-      current and CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions
-      confirmed or updated in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-lead-at-altitude/` (`_index.md` `weight: 715`, artifacts only
-      (no `code/`, leadership `‡`)) per this phase's cited capstone spec's ordered steps (detail source:
-      [`syllabus/61-engineering-management.md`](./syllabus/61-engineering-management.md)). **Acceptance**:
-      the spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check + Fact** — Run the matching format checker + `apps-ayokoding-www-facts-checker` (+
-      `apps-ayokoding-www-link-checker`) on the capstone folder; resolve via the fixers. **Acceptance**:
-      zero unresolved HIGH/CRITICAL and zero factual findings.
-- [ ] **[AI] Build** — `npx nx run ayokoding-www:build` and `npm run lint:md`. **Acceptance**: both exit 0.
-
-### Phase 71 Gate
-
-- [ ] [AI] `capstone-lead-at-altitude/` complete (wt 715, produces the stated artifact + web-verified);
-      checker + facts-checker clean; build + `lint:md` exit 0.
 - [ ] [AI] All 10 inter-topic capstones authored — 6 pass-boundary (Pass 0–5) + 4 cross-cutting
       (full-stack-app, secure-service, data-pipeline, concurrency-showdown).
 
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
 ---
 
-## Phase 72 — Nav wiring, parity, and full quality gate
+## Phase 101 — Nav wiring, parity, and full quality gate
 
 - [ ] **[AI]** Wire the section into the SE nav: edit
       `apps/ayokoding-www/content/en/learn/software-engineering/_index.md`, adding a
@@ -2544,10 +3117,10 @@ artifact, no code.
 - [ ] **[AI]** Wire the sub-entry into the learn index: edit
       `apps/ayokoding-www/content/en/learn/_index.md`, adding the section as a sub-entry under Software
       Engineering. **Acceptance**: entry present; build exits 0.
-- [ ] **[AI]** Topic-first parity check: verify every one of the 61 topics has
+- [ ] **[AI]** Topic-first parity check: verify every one of the 90 topics has
       `CONTENT/<slug>/learning/_index.md`, `CONTENT/<slug>/learning/capstone/_index.md`, and
       `CONTENT/<slug>/drilling/_index.md`, that the topic-folder weight = `100 + 10 × index`, and that
-      `drilling weight = learning weight + 100` for every topic. **Acceptance**: 61/61 topics complete; all
+      `drilling weight = learning weight + 100` for every topic. **Acceptance**: 90/90 topics complete; all
       10 inter-topic capstone folders present; no orphaned or mismatched weights.
 - [ ] **[AI]** Link check: run `apps-ayokoding-www-link-checker` across the new section. **Acceptance**: no
       broken internal/external links.
@@ -2561,12 +3134,12 @@ artifact, no code.
       failures (Root Cause Orientation: proactively fix preexisting errors; do not defer or
       mention-and-skip). **Acceptance**: a re-run of every gate above exits 0 with zero remaining failures.
 
-### Phase 72 Gate
+### Phase 101 Gate
 
-> All checks below must pass before starting Phase 73.
+> All checks below must pass before starting Phase 102.
 
 - [ ] [AI] Section is nav-reachable in ≤2 clicks from `learn/software-engineering/`.
-- [ ] [AI] Topic-first parity 61/61 (each topic has `learning/`, `learning/capstone/`, `drilling/`;
+- [ ] [AI] Topic-first parity 90/90 (each topic has `learning/`, `learning/capstone/`, `drilling/`;
       topic wt `100 + 10 × index`; drill wt = learn wt + 100) and all 10 inter-topic capstones present.
 - [ ] [AI] Link-checker, markdown lint, and build all green.
 - [ ] [AI] Affected quality gate (`typecheck`, `lint`, `test:quick`, `specs:behavior:coverage`) exits 0
@@ -2577,13 +3150,13 @@ artifact, no code.
 
 ---
 
-## Phase 73 — Manual verification: Playwright smoke + Rule-15 three-tester retest
+## Phase 102 — Manual verification: Playwright smoke + Rule-15 three-tester retest
 
 - [ ] **[AI]** Playwright smoke (per repo manual-behavioral-verification): start `npx nx dev ayokoding-www`,
       then use `browser_navigate` to open the section landing + one learning page + one intra-topic capstone + one drilling page, `browser_snapshot` to inspect each page's DOM, `browser_click` to expand a
       `<details>` block and follow a nav link, and `browser_console_messages` to confirm zero errors.
       Capture one `browser_take_screenshot` per page verified, save each to
-      `evidence/phase-73-<page-slug>-en-1280px.png` (per the
+      `evidence/phase-102-<page-slug>-en-1280px.png` (per the
       [Evidence Capture Convention](../../../repo-governance/development/quality/evidence-capture.md)), and
       reference each screenshot inline here. **Acceptance**: four pages render; `<details>` toggles; nav
       resolves; zero console errors; four screenshots exist under `evidence/` and are referenced here.
@@ -2600,13 +3173,13 @@ artifact, no code.
 
 ### Rule-15 three-tester retest follow-ups
 
-_(populated by `web-exploratory-tester` / `web-usability-tester` / `web-design-tester` when the Phase 73
+_(populated by `web-exploratory-tester` / `web-usability-tester` / `web-design-tester` when the Phase 102
 retest step above runs; every `EWT-###`/`UWT-###`/`DWT-###` defect must be fixed and ticked before Plan
 Archival)_
 
-### Phase 73 Gate
+### Phase 102 Gate
 
-> All checks below must pass before starting Phase 74.
+> All checks below must pass before starting Phase 103.
 
 - [ ] [AI] Playwright smoke passes with zero console errors; screenshots committed under `evidence/`.
 - [ ] [AI] Rule-15 three-tester retest follow-ups: every `EWT-###`/`UWT-###`/`DWT-###` defect finding is
@@ -2616,13 +3189,17 @@ Archival)_
 
 ---
 
-## Phase 74 — Direct push to origin main + CI post-push verification (main-to-origin-main)
+## Phase 103 — Final catch-up push to origin main + CI post-push verification (main-to-origin-main)
 
-- [ ] **[AI]** Stage **explicit paths only** (the new section under
-      `apps/ayokoding-www/content/en/learn/software-engineering/the-well-grounded-software-engineer/` plus
-      the two nav `_index.md` edits and the `evidence/` screenshots) — never `git add -A`. Commit per
-      domain/concern with Conventional Commit messages (e.g.
-      `docs(ayokoding-www): add well-grounded-software-engineer section`). **Acceptance**: `git status`
+> Each topic/capstone phase already committed + pushed its own deliverable to `origin main` as it
+> completed (per the per-topic push HARD RULE in the Delivery Mode section). This phase is the **final
+> catch-up + verify**: it lands the nav-wiring commit and confirms `origin/main` is fully green — it is
+> **not** the sole push.
+
+- [ ] **[AI]** Stage **explicit paths only** — anything not yet pushed by a per-topic phase: the two nav
+      `_index.md` edits and the `evidence/` screenshots (the topic content subtrees are already on `main`)
+      — never `git add -A`. Commit per domain/concern with Conventional Commit messages (e.g.
+      `docs(ayokoding-www): wire well-grounded-software-engineer nav`). **Acceptance**: `git status`
       shows only intended paths staged; commit(s) created.
 - [ ] **[AI]** Push directly to `origin main`: `git push origin main`. **Acceptance**: push succeeds; local
       `main` and `origin/main` at the same commit.
@@ -2632,9 +3209,9 @@ Archival)_
       run, then `gh run view <run-id> --json status,conclusion`; never `gh run watch`; on HTTP 403 wait
       ~35 min. **Acceptance**: the latest `main-ci` run on the pushed commit has `conclusion = success`.
 
-### Phase 74 Gate
+### Phase 103 Gate
 
-> All checks below must pass before starting Phase 75.
+> All checks below must pass before starting Phase 104.
 
 - [ ] [AI] Content is on `origin main` (local `main` and `origin/main` at the same commit).
 - [ ] [AI] The `main-ci` workflow run on the pushed commit is green (`conclusion = success`).
@@ -2644,11 +3221,11 @@ Archival)_
 
 ---
 
-## Phase 75 — Deploy ayokoding-www to production
+## Phase 104 — Deploy ayokoding-www to production
 
 The section content lives in `apps/ayokoding-www`; deployment ships it to the live site
 ([ayokoding.com](https://ayokoding.com)) by force-pushing `main` → the `prod-ayokoding-www` environment
-branch, which Vercel watches for automatic production builds. Runs only after Phase 74 (content on
+branch, which Vercel watches for automatic production builds. Runs only after Phase 103 (content on
 `origin main`, `main-ci` green).
 
 - [ ] **[AI]** Invoke the `apps-ayokoding-www-deployer` agent to deploy `apps/ayokoding-www` to
@@ -2662,9 +3239,9 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
       the section title renders. **Acceptance**: both URLs return 200 and show the newly published
       content (not a 404 or a stale page).
 
-### Phase 75 Gate
+### Phase 104 Gate
 
-> All checks below must pass before starting Phase 76.
+> All checks below must pass before starting Phase 105.
 
 - [ ] [AI] `origin/main` has been force-pushed to `prod-ayokoding-www` by the deployer.
 - [ ] [AI] The Vercel production build succeeded and the live section root + one topic page return 200
@@ -2676,7 +3253,7 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
 
 ---
 
-## Phase 76 — Knowledge Capture
+## Phase 105 — Knowledge Capture
 
 - [ ] **[AI]** Triage [learnings.md](./learnings.md) per the
       [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md):
@@ -2691,7 +3268,7 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
       routed-inline (non-code only), filed as a backlog plan (mandatory for code), or discarded with a
       reason — or the explicit "none" escape is recorded; no code-homed learning landed inline.
 
-### Phase 76 Gate
+### Phase 105 Gate
 
 > All checks below must pass before Plan Archival.
 

@@ -13,15 +13,15 @@ removing a topic is a one-row edit in prd.md plus the mechanical per-row work de
 `apps/ayokoding-www/src/` code changes. English only. [Repo-grounded — nx project `ayokoding-www`,
 `apps/ayokoding-www/project.json`]
 
-At authoring time the canonical table holds **61 topics** (50 subject topics + 11 _Just Enough_
-primers) sequenced as a **six-pass journey**: a new **Pass 0 · Set Up Your Forge** (Just Enough Nvim →
+At authoring time the canonical table holds **90 topics** (75 subject topics + 15 _Just Enough_
+primers) sequenced as a **six-pass journey**: a new **Pass 0 · Editor Foundations** (Just Enough Nvim →
 Just Enough Lua → Extending Neovim — the editor prologue, DD-17) followed by a **five-pass spiral**
-(Pass 1 First Working Software → Pass 5 Lead at Altitude) under an **immediately-effective-first**
+(Pass 1 Core Foundations → Pass 5 Internals & Lead at Altitude) under an **immediately-effective-first**
 principle (build/store/test/secure a small system early, then revisit each concern deeper on later
-passes). The ◆ app-domain topics (Android/iOS/Windows/Linux app) and the ▲ Product & Delivery track
-(Software Product Engineering + Project Management) are **parallel reading-path affordances**, not
+passes). The ◆ app-domain topics (Android/iOS/Hybrid/Windows/Linux app) and the ▲ Product & Delivery
+track (Software Product Engineering + Project Management) are **parallel reading-path affordances**, not
 gates. Each topic also carries an **Nvim-ready** and a **VSCode-ready** flag (Yes / Partial) in the prd
-table. See prd.md for the authoritative list, the six-pass journey map, the 61-node skill tree, and the
+table. See prd.md for the authoritative list, the six-pass journey map, the 90-node skill tree, and the
 Editor Setup matrix; all counts below are derived from it, not independently maintained. Every topic's
 concrete items, worked examples, and capstone specs are enumerated in the
 [syllabus/ folder](./syllabus/) — one `NN-<slug>.md` file per topic (DD-29).
@@ -185,7 +185,7 @@ reproducibility contract:
   the code to add, and the command to verify — such that a reader following top-to-bottom ends with the
   stated runnable, web-verified artifact.
 
-Enforced per topic and re-checked at each phase gate; the final gate asserts it for all 61 topics and
+Enforced per topic and re-checked at each phase gate; the final gate asserts it for all 90 topics and
 every capstone.
 
 ## Accuracy Verification Rule (HARD RULE, DD-28)
@@ -239,7 +239,7 @@ Size is not capped; correctness, accuracy, detail, and clarity are the bar.
 
 - **Subject topics** (By-Example or Annotated-concept that teach a buildable skill): a **full runnable
   capstone** — a single cohesive project exercising the topic's core items end-to-end.
-- **The 11 _Just Enough_ primers** (`§`/language primers): a **light consolidation exercise** — a short
+- **The 15 _Just Enough_ primers** (`§`/language primers): a **light consolidation exercise** — a short
   program that uses the just-learned language/tool features together, not a full project.
 - **Leadership/governance topics** (`‡`): a **design/decision capstone** — a worked scenario producing
   an artifact (decision record, governance matrix, runbook), no code.
@@ -393,8 +393,8 @@ capstone phases run at their journey position (pass boundaries + cross-cutting j
 | Path                                                                 | Change | Notes                                                                      |
 | -------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
 | `.../the-well-grounded-software-engineer/_index.md`                  | New    | Section landing, weight 1750                                               |
-| `.../the-well-grounded-software-engineer/overview.md`                | New    | Read-then-drill workflow + six-pass journey map + 61-node skill tree       |
-| `.../<topic-slug>/_index.md` × N                                     | New    | Topic folder nav, weight 110..710 (journey order)                          |
+| `.../the-well-grounded-software-engineer/overview.md`                | New    | Read-then-drill workflow + six-pass journey map + 90-node skill tree       |
+| `.../<topic-slug>/_index.md` × N                                     | New    | Topic folder nav, weight 110..1000 (journey order)                         |
 | `.../<topic-slug>/overview.md` × N                                   | New    | Per-topic what/why + primary language + prerequisites                      |
 | `.../<topic-slug>/learning/…` × N                                    | New    | By-Example / Annotated-concept subtree + `capstone/` + `code/` per prd row |
 | `.../<topic-slug>/drilling/…` × N                                    | New    | One four-section drill page per prd row (Drill wt = Learn wt + 100)        |
@@ -428,8 +428,8 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
 - **DD-9: Journey ordering as a five-pass spiral, immediately-effective-first; ◆ and ▲ parallel.**
   Topics sequenced so the earliest get the reader **building, persisting, testing, and securing a small
   end-to-end system fast** (Pass 1), then each later pass revisits the same concern areas at greater
-  depth (Pass 2 Solidify the Core → Pass 3 Build for the Real World → Pass 4 Concurrency & Systems →
-  Pass 5 Lead at Altitude). The passes are **descriptive arcs, not gates**; big subjects split into an
+  depth (Pass 2 Depth, Design & Craft → Pass 3 Build for the Real World → Pass 4 Concurrency & Systems →
+  Pass 5 Internals & Lead at Altitude). The passes are **descriptive arcs, not gates**; big subjects split into an
   Essentials topic early and an Advanced topic later (DD-11). The ◆ app domains and the ▲ Product &
   Delivery track are independent parallel reading paths. This replaces the earlier seven-level gated
   ordering. [User decision]
@@ -445,9 +445,9 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   architecture adds standalone `domain-driven-design` + `event-driven-architecture` (hexagonal folds
   into `software-architecture`); security splits into `security-essentials` + `it-security` +
   `offensive-security` (red/Kali) + `defensive-security` (blue/SOC-IR); the editor branch adds
-  `just-enough-nvim` + `just-enough-lua` + `extending-neovim`. **61 topics total.** [User decision]
-- **DD-13: Language + tool primers.** Eleven _Just Enough_ primer topics (Nvim, Python, Bash,
-  TypeScript, Lua, Go, Elixir, Kotlin, Swift, C#, C), each placed immediately before that
+  `just-enough-nvim` + `just-enough-lua` + `extending-neovim`. **90 topics total.** [User decision]
+- **DD-13: Language + tool primers.** Fifteen _Just Enough_ primer topics (Nvim, Python, Bash,
+  TypeScript, Lua, Go, Elixir, Kotlin, Swift, Dart, C#, C, Rust, Java, F#), each placed immediately before that
   language's/tool's first use, so a reader never learns a new language and a new concept at once.
   Languages a topic teaches from scratch (Scheme→Lisp, OCaml→Type Systems, SQL→SQL Essentials,
   Cypher→Graph DB) fold the primer in. The Nvim primer (`§`) is a vanilla-Neovim tool primer (no
@@ -470,7 +470,7 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   This drives the Nvim-ready column. [User decision]
 - **DD-18: Per-topic syllabus in a companion folder.** Every topic's concrete items (subtopics), named
   worked examples, and capstone specs are enumerated in the [syllabus/ folder](./syllabus/) — one
-  `NN-<slug>.md` file per topic (NN = order of appearance, 01..61) plus `README.md` + `overview.md`;
+  `NN-<slug>.md` file per topic (NN = order of appearance, 01..90) plus `README.md` + `overview.md`;
   each delivery per-topic step authors exactly its syllabus file, so "detail every item and example" is
   specified once and not scattered across the checklist. Layout detailed in DD-29. [User decision]
 - **DD-19: No deferred items (HARD RULE).** Every in-scope topic — all 61, both tracks, plus every
@@ -550,6 +550,29 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   `overview`); the authored learning/drilling pages carry the equivalent footer in content order. The
   footer target order is the prd canonical table order (DD-10 table-referential). Enforced per file and
   at each phase gate. [User decision]
+- **DD-33: Intellectual journey as a scaled layer (HARD RULE).** The section is immediately effective
+  **and** an intellectual journey, per the brd AI-age thesis that the durable edge is the understanding
+  that lets an engineer judge, verify, and override generated output. Understanding is delivered by four
+  intellectual layers — **not uniformly**, because page attention is zero-sum and padding a primer with a
+  "trade-offs of Just Enough Bash" section makes the material feel _less_ intellectual while taxing the
+  primary reader (a working engineer re-grounding fast). The layers and their weighting: (1) a universal
+  `Why this exists · the big idea` opener on all 90 topics — the problem before the solution + the
+  keep-forever mental model + big-idea tags; (2) a universal horizontal **idea spine** of eight
+  Cross-Cutting Big Ideas (`abstraction-and-its-cost`, `taming-state`, `coupling-vs-cohesion`,
+  `consistency-latency-throughput`, `mechanism-vs-policy`, `determinism-vs-emergence`,
+  `correctness-vs-pragmatism`, `layering-and-leaks`) that each topic tags, so the section teaches ideas,
+  not just topics; (3) **Tensions & trade-offs + Lineage** depth blocks on the ~20 judgment/altitude
+  topics only (16, 17, 18, 22, 24, 25, 28, 30, 31, 32, 33, 35, 38, 39, 40, 42, 44, 57, 58, 59, 60, 61),
+  omitted for primers, Essentials, and how-to tool topics where they would be padding; (4) a universal
+  fifth **elaborative-interrogation / self-explanation** drill form in the opt-in drilling track, so
+  depth never taxes the learning-track reader. Depth concentrates at altitude (Pass 5 + `▲`), where the
+  IC→CTO promise is actually paid. Rationale: a competency curriculum without an intellectual spine
+  produces engineers who can paste but not judge — the opposite of the section's stated purpose.
+  Grounded in retrieval practice (Roediger & Karpicke), spiral curriculum (Bruner), cognitive-load theory
+  (Sweller), and the elaborative-interrogation / self-explanation finding (Dunlosky et al. 2013).
+  Full rubric: [syllabus/overview.md §Scaled Intellectual Depth](./syllabus/overview.md#scaled-intellectual-depth-dd-33);
+  idea spine: [prd.md §Cross-Cutting Big Ideas](./prd.md#cross-cutting-big-ideas-the-idea-spine-dd-33).
+  Enforced per topic and at each phase gate. [User decision]
 
 ## Dependencies
 
@@ -580,7 +603,7 @@ the two `_index.md` nav edits. No data migration, no build-config change, no run
   `<details>` expands; nav link resolves; zero console errors.
 - **Not** a UI/component change: the UI-design-funnel does not apply (no new UI components; pure
   markdown content). The **rule-15 three-tester retest DOES apply**: this plan adds well over 100 new
-  browser-rendered pages (61 topic folders × learning subtree + drill page + intra-topic capstone,
+  browser-rendered pages (90 topic folders × learning subtree + drill page + intra-topic capstone,
   ~9–11 inter-topic capstones, plus section landing/overview) plus 2 nav entries to the live
   ayokoding-www site, which is a user-facing feature change under
   [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md)
