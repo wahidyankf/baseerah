@@ -1,7 +1,7 @@
 # 9 · Project Management ▲ (Annotated-concept, — ‡)
 
 **prd row**: Pass 1 · Core Foundations · Annotated-concept · — ‡ · Learn 109 / Drill 209 · Nvim-ready
-Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
+Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: the **Product & Delivery** track (`▲`) — delivery execution: methodologies, the triple
 constraint, planning/estimation, execution mechanics, metrics, and risk/change management. Leadership
@@ -37,15 +37,65 @@ later at [`33-engineering-management`](./33-engineering-management.md), where pe
   (13 pages, softened prescriptive language). Critical-path method, burndown/cycle-time/lead-time metrics,
   and story-point/velocity estimation remain standard unchanged PM vocabulary. (scrumguides.org)
 
-## Items
+### DD-35 primary-source citations (fetched-and-read)
 
-- Delivery methodologies: waterfall vs agile (Scrum/Kanban), hybrid; when each fits.
-- Scope, schedule, cost — the triple constraint; trade-offs.
-- Planning: work breakdown, estimation (story points/velocity, planning-poker pitfalls), dependencies,
-  critical path.
-- Execution: backlog, sprints, standups, risk/issue tracking, stakeholder communication.
-- Metrics: burndown/burnup, cycle time, lead time, throughput.
-- Risk & change management; retrospectives & continuous improvement.
+> Every claim below traces to a primary/authoritative source fetched and read in the retroactive
+> grounding sweep (2026-07-12, `web-researcher`). All 9 checkable claims verified; no corrections.
+
+- **Scrum Guide (co-scrum, Lineage)** — current official guide is the **November 18, 2020** revision
+  (Schwaber & Sutherland), per [scrumguides.org](https://scrumguides.org/) +
+  [revisions](https://scrumguides.org/revisions.html); no 2021–2026 official revision exists ("Scrum Guide
+  Expanded" v2026.1 is an unofficial community derivative, not superseding). The file never mis-cites
+  legacy "ceremonies"/"three roles"/"Development Team" vocabulary to the Guide (the one "ceremonies" use
+  is generic PM prose).
+- **Agile Manifesto (Lineage, Read more)** — [agilemanifesto.org](https://agilemanifesto.org/): title
+  exact, **17 signatories** (Kent Beck + 16, [authors](https://agilemanifesto.org/authors.html)), Snowbird
+  Utah Feb 11–13 2001, four values + [twelve principles](https://agilemanifesto.org/principles.html) — all
+  confirmed.
+- **CPM / PERT lineage** — CPM 1956–59 (Kelley/Walker, DuPont + Remington Rand); PERT 1958 (US Navy Special
+  Projects Office / Polaris), per [PMI history](https://www.pmi.org/learning/library/origins-cpm-personal-history-3762)
+  - [Mosaic Projects](https://mosaicprojects.com.au/PMKI-ZSY-030.php). File's "(1950s, US Navy / DuPont)"
+    shorthand accurate. Kanban = lean-manufacturing flow (Toyota/Ohno), uncontested.
+- **Read more books** — _The Mythical Man-Month_, Brooks, Anniversary ed. 1995 (orig. 1975), Brooks's Law
+  ([ACM](https://dl.acm.org/doi/book/10.5555/207583)); _Peopleware_, DeMarco & Lister, 3rd ed. 2013 (orig.
+  1987); _Software Estimation: Demystifying the Black Art_, McConnell, 2006
+  ([Microsoft Press](https://www.microsoftpressstore.com/store/software-estimation-demystifying-the-black-art-9780735690851)) —
+  author/edition/year all confirmed.
+
+## Concepts
+
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 8 (Annotated-concept ‡). Each example below cites the co-NN it exercises. -->
+
+- **co-01 · triple-constraint** — Scope, schedule, and cost form one triangle: you can fix any two, and
+  pretending to fix all three is how projects fail — the trade-off must be made explicit and chosen.
+- **co-02 · delivery-methodologies** — Waterfall, agile (Scrum, Kanban), and hybrid each fit a different
+  context; the methodology follows the shape of the work, not fashion.
+- **co-03 · work-breakdown-structure** — Decompose deliverables into a WBS of work packages small enough to
+  be independently estimated and assigned.
+- **co-04 · dependency-graph-and-critical-path** — Task dependencies form a directed graph; the critical
+  path is the longest cumulative-duration chain and it, not any single task, bounds the schedule.
+- **co-05 · estimation-points-velocity** — Story points plus velocity estimate work under uncertainty and
+  forecast completion; raw hour-estimates fake a precision that does not exist.
+- **co-06 · planning-poker-pitfalls** — Relative estimation is distorted by anchoring and authority bias;
+  facilitation rules (blind reveal, discuss outliers) counter each named bias.
+- **co-07 · sprint-and-backlog-planning** — An ordered backlog plus per-sprint commitment must respect team
+  capacity and task dependencies, so no sprint over-commits or violates ordering.
+- **co-08 · execution-mechanics** — Standups, WIP limits, and issue/blocker tracking keep in-flight work
+  visible day to day so problems surface early rather than at the deadline.
+- **co-09 · metrics** — Burndown/burnup, cycle time, lead time, and throughput each inform a specific
+  decision; a metric that names no decision is decoration.
+- **co-10 · risk-management** — A living risk register identifies risks, rates them by likelihood×impact,
+  assigns an owner, and pairs each with a concrete mitigation.
+- **co-11 · change-management** — Scope change runs through a controlled decision (accept/defer/trade) against
+  the triple constraint, so the triangle stays honest instead of silently overloaded.
+- **co-12 · retrospectives** — Structured reflection on delivered work turns raw observations into owned,
+  tracked improvement actions — continuous improvement, not blame.
+- **co-13 · stakeholder-communication** — Tailoring cadence, audience, and format keeps expectations and
+  decisions aligned; each update should drive a decision, not merely report status.
+- **co-14 · goodhart-metric-abuse** — A measure used as a target stops measuring: velocity-as-productivity
+  invites point inflation and destroys the signal it was meant to provide.
+- **co-15 · process-weight-fit** — Coordination cost scales with communication paths (`n(n-1)/2`), so
+  ceremony must be right-sized to team size — process that exceeds the coordination it saves is waste.
 
 ## Tensions & trade-offs — when NOT to reach for this
 
@@ -71,12 +121,73 @@ later at [`33-engineering-management`](./33-engineering-management.md), where pe
 
 ## Worked examples
 
-Design/decision exercises under `project-management/learning/` (prose + diagrams; no `code/` runtime —
-DD-27 leadership kind).
+Worked scenarios / decision artifacts under `project-management/learning/artifacts/` (prose + diagrams; no
+`code/` runtime — DD-27 leadership kind). Each is a decision document or chart a team could act on, and each
+cites the `co-NN` it exercises. Contiguous `ex-01..ex-25`.
 
-- **wbs-critical-path** — break a sample feature into a WBS + dependency graph; identify the critical path.
-- **estimation** — run an estimation worked example and show why velocity beats hours.
-- **burndown-diagnosis** — interpret a burndown chart to diagnose a slipping sprint + corrective action.
+### Beginner
+
+- **ex-01 · triple-constraint-tradeoff** — given a fixed deadline plus a fixed-scope request, write the
+  trade-off memo choosing which constraint gives — verify the artifact names which two are fixed and what the
+  third absorbs. (co-01)
+- **ex-02 · pick-methodology** — map three contexts (regulated hardware, evolving product, ops queue) to
+  waterfall/Scrum/Kanban with a one-line rationale each — verify every mapping cites the context property that
+  drives it. (co-02)
+- **ex-03 · wbs-decompose** — decompose a sample feature into a two-level WBS of work packages — verify every
+  leaf is independently estimable and assignable. (co-03)
+- **ex-04 · dependency-graph** — draw a Mermaid dependency graph over the WBS tasks — verify every edge
+  encodes a real "must finish before" relation. (co-04)
+- **ex-05 · identify-critical-path** — mark the critical path on that graph — verify it is the longest
+  cumulative-duration chain and has zero slack. (co-04)
+- **ex-06 · story-point-estimate** — assign story points to a small backlog against a reference story —
+  verify estimates are relative to the reference, not hour-based. (co-05)
+- **ex-07 · velocity-forecast** — from three sprints of past velocity, forecast a backlog's completion —
+  verify the forecast uses average velocity, not a single sprint's number. (co-05)
+- **ex-08 · metric-decision-map** — for burndown, cycle time, and lead time, name the decision each informs —
+  verify every metric row states a concrete decision, not just a definition. (co-09)
+
+### Intermediate
+
+- **ex-09 · sprint-backlog-plan** — split an estimated backlog into two sprints respecting capacity and
+  dependencies — verify no sprint exceeds velocity and no task precedes its dependency. (co-07)
+- **ex-10 · planning-poker-debias** — write facilitation rules that counter anchoring and authority bias —
+  verify each rule maps to a named bias it neutralizes. (co-06)
+- **ex-11 · burndown-diagnosis** — interpret a burndown that flatlines mid-sprint — verify the artifact names
+  a plausible cause plus one corrective action. (co-09)
+- **ex-12 · burnup-vs-burndown** — choose burnup when scope is changing and justify it — verify the rationale
+  ties scope-change visibility to burnup's separate scope line. (co-09, co-11)
+- **ex-13 · cycle-time-bottleneck** — read an aging/cumulative-flow diagram to locate a WIP bottleneck —
+  verify the artifact identifies the stage with growing WIP. (co-09, co-08)
+- **ex-14 · risk-register** — build a risk register (likelihood, impact, mitigation, owner) for five risks —
+  verify each top risk has a concrete, assigned mitigation. (co-10)
+- **ex-15 · risk-prioritization** — rank the risks by likelihood×impact and pick the top three to act on —
+  verify the ranking is consistent with the computed scores. (co-10)
+- **ex-16 · change-request-decision** — given a mid-sprint scope-add, write the accept/defer/trade decision
+  against the triple constraint — verify it states what is dropped or extended to absorb the change. (co-11,
+  co-01)
+- **ex-17 · standup-redesign** — redesign a status-theater standup into a blocker-focused one — verify the new
+  format surfaces blockers and WIP rather than status recitation. (co-08)
+- **ex-18 · stakeholder-comm-plan** — build a stakeholder communication matrix (audience, cadence, format,
+  decision) — verify each audience row names the decision the update drives. (co-13)
+
+### Advanced
+
+- **ex-19 · velocity-goodhart-memo** — write a memo on why making velocity a productivity target backfires,
+  with an alternative — verify it explains point inflation and proposes an outcome metric. (co-14, co-05)
+- **ex-20 · process-weight-right-size** — for a two-person vs an eight-person team, right-size ceremonies from
+  communication-path count — verify the recommendation cites `n(n-1)/2` paths. (co-15)
+- **ex-21 · methodology-antipattern** — diagnose cargo-culted Scrum installed on fixed-scope regulated work —
+  verify the artifact names the mismatch and proposes a better fit. (co-02, co-15)
+- **ex-22 · crashing-vs-fast-tracking** — for a late critical path, compare crashing (spend cost) vs
+  fast-tracking (spend risk) — verify each option is tied to the constraint it spends. (co-04, co-01)
+- **ex-23 · retrospective-to-action** — turn a retro's raw notes into tracked, owned improvement actions —
+  verify each action has an owner and a measurable done-signal. (co-12)
+- **ex-24 · risk-register-over-time** — plan how the risk register evolves across sprints — verify the
+  artifact shows risks retired as mitigations land and new risks added as they emerge. (co-10, co-12)
+- **ex-25 · full-delivery-plan** — assemble WBS + critical path, velocity estimate, sprint plan, risk
+  register, and metrics plan into one internally consistent delivery plan — verify the critical path drives
+  the schedule, estimates align with sprints, and every metric names its decision. (co-01, co-03, co-04,
+  co-05, co-07, co-09, co-10)
 
 ## Capstone spec — intra-topic (leadership ‡ → design/decision artifact)
 

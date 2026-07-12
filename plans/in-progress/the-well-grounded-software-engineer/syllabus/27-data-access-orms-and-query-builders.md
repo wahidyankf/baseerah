@@ -1,6 +1,6 @@
 # 27 · Data Access: ORMs & Query Builders (By Example, Python †)
 
-**prd row**: Pass 2 · Depth, Design & Craft · By Example · Python † · Learn 127 / Drill 227 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 2 · Depth, Design & Craft · By Example · Python † · Learn 127 / Drill 227 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: the three-tier spectrum from raw SQL → query builder → full ORM, the trade-offs each
 tier buys, the N+1 problem, the identity-map and unit-of-work patterns, migrations, and when each tier
@@ -43,21 +43,43 @@ tier — reconstructing a minimal ORM so it stops being magic — is
   the shipped text pattern-first and library-agnostic, and re-verify any named library at authoring
   time.
 
-## Items
+## Concepts
 
-- The data-access spectrum: raw SQL/driver → query builder → full ORM, and what each tier buys and
-  hides.
-- **Tier 1 — raw SQL** over the DB-API driver (PEP 249): full control, manual row→object mapping, no
-  magic; fully type-annotated (DD-34).
-- **Tier 2 — a query builder**: composable, parameterized queries as data — no hand-concatenated
-  strings and no full object graph.
-- **Tier 3 — a full ORM**: Active Record vs Data Mapper, the identity map, the unit of work, and lazy
-  loading.
-- The N+1 query problem: how an ORM invisibly fans one query out into hundreds, and how eager loading
-  fixes it.
-- Migrations: evolving a schema under version control, forward and rollback, and zero-downtime
-  patterns.
-- Choosing a tier per use case: reporting/analytics vs CRUD vs hot paths.
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
+
+This topic sits on [topic 10 SQL Essentials](./10-sql-essentials.md) and
+[topic 26 Advanced SQL](./26-advanced-sql-and-query-performance.md): it does not re-teach SQL — it teaches
+the abstraction layers built over it (query builders, ORMs) and the trade-off each tier buys. SQLAlchemy
+2.0.x is the Data-Mapper teaching engine; peewee is the Active-Record contrast; PyPika is the query-builder
+contrast; Alembic drives migrations. All Python is fully type-annotated (DD-34).
+
+- **co-01 · data-access-spectrum** — the raw-SQL → query-builder → ORM spectrum, and what each tier buys and hides.
+- **co-02 · raw-sql-dbapi** — the PEP 249 DB-API: connection, cursor, execute, fetch, and manual row→object mapping.
+- **co-03 · query-builder-core** — building queries as composable data structures rather than concatenated strings.
+- **co-04 · query-builder-library-contrast** — how a standalone builder (PyPika) and SQLAlchemy Core differ in style and scope.
+- **co-05 · parameterized-queries-and-emitted-sql** — placeholders keep values out of the SQL text; inspecting the emitted SQL + params.
+- **co-06 · declarative-orm-mapping** — SQLAlchemy 2.0 `DeclarativeBase` + `Mapped[...]` typed column mapping.
+- **co-07 · active-record-vs-data-mapper** — the object persists itself (peewee) vs a session/mapper persists it (SQLAlchemy).
+- **co-08 · relationship-mapping** — one-to-many/foreign-key relationships and bidirectional `back_populates`.
+- **co-09 · many-to-many-association** — association tables and association objects for M:N links.
+- **co-10 · identity-map** — one Python object per primary key within a session, deduplicated across queries.
+- **co-11 · session-object-states** — transient → pending → persistent → detached, plus expire/refresh.
+- **co-12 · unit-of-work** — the session batches, orders, and flushes changes as one coordinated write.
+- **co-13 · lazy-loading** — relationships fetched on first access, and the `DetachedInstanceError` when the session is gone.
+- **co-14 · eager-loading-strategies** — `selectinload`, `joinedload`, and `subqueryload` and how each shapes the SQL.
+- **co-15 · n-plus-1-problem** — one query fanning out into hundreds, diagnosed by query count and fixed by eager loading.
+- **co-16 · raiseload-guard** — `raiseload()` turning an accidental lazy load into a loud error instead of a silent query.
+- **co-17 · orm-transactions** — session commit/rollback, `begin()` scope, and nested savepoints.
+- **co-18 · connection-pooling** — `pool_size`/`max_overflow`, pool exhaustion, and `pool_pre_ping` recovery.
+- **co-19 · migrations-alembic-workflow** — versioned schema evolution with Alembic (`init`, revision, `upgrade`).
+- **co-20 · autogenerate-migrations** — deriving a migration from a model↔schema diff, and why you still review it.
+- **co-21 · migration-reversibility** — writing real `downgrade` paths and the expand-contract zero-downtime pattern.
+- **co-22 · cascade-delete-orm** — ORM `cascade="all, delete-orphan"` vs database `ON DELETE CASCADE`.
+- **co-23 · bulk-operations** — set-oriented bulk insert/update instead of per-object round trips.
+- **co-24 · async-orm-session** — `create_async_engine` + `AsyncSession` and why lazy loading is forbidden there.
+- **co-25 · orm-vs-raw-sql-tradeoff** — where the ORM's leverage helps (CRUD) and where raw SQL wins (reporting, bulk).
+- **co-26 · query-builder-vs-orm-tradeoff** — composition + injection safety without the identity-map/change-tracking machinery.
+- **co-27 · choosing-tier-per-workload** — matching CRUD / analytics / hot-path workloads to the right tier.
 
 ## Tensions & trade-offs — when NOT to reach for this
 
@@ -84,23 +106,105 @@ tier — reconstructing a minimal ORM so it stops being magic — is
 
 ## Worked examples
 
-Colocated under `data-access/learning/code/`; the same "list orders with their customer" query
-implemented at each tier, runnable against a local DB, fully type-annotated Python (DD-20/DD-30/DD-34).
+Colocated under `data-access/learning/code/`; runnable against a local DB, fully type-annotated Python
+(DD-20/DD-30/DD-34). Contiguous `ex-01..ex-78`. Every example cites the `co-NN` it exercises; every concept
+above is exercised by ≥1 example.
 
-- **beginner** — Tier 1: the query in raw parameterized SQL over the DB-API driver, with manual typed
-  row→object mapping.
-- **intermediate** — Tier 2 then Tier 3: the same query via a query builder and then via an ORM;
-  trigger an N+1 and then fix it with eager loading.
-- **advanced** — an identity-map/unit-of-work write path plus a forward + rollback migration.
+### Beginner
+
+- **ex-01 · spectrum-same-query-three-ways** — stub "list orders with customer" at all three tiers — verify each returns the same rows. (co-01)
+- **ex-02 · dbapi-connect-cursor** — `sqlite3` connect/cursor/execute/fetchall — verify rows returned. (co-02)
+- **ex-03 · dbapi-parameterized** — a parameterized query with placeholders — verify no string interpolation. (co-02, co-05)
+- **ex-04 · dbapi-row-to-dataclass** — map cursor rows to a typed dataclass — verify typed objects. (co-02)
+- **ex-05 · dbapi-executemany** — batch insert via `executemany` — verify N rows inserted. (co-02)
+- **ex-06 · dbapi-transaction-commit** — commit/rollback around writes — verify rollback undoes. (co-02, co-17)
+- **ex-07 · querybuilder-select** — PyPika builds a `SELECT` — verify the emitted SQL. (co-03, co-05)
+- **ex-08 · querybuilder-where-compose** — compose `WHERE` conditions programmatically — verify parameterized SQL. (co-03, co-05)
+- **ex-09 · querybuilder-join** — build a two-table join — verify the `JOIN` SQL emitted. (co-03)
+- **ex-10 · querybuilder-execute** — run a built query via the DB-API — verify results. (co-03)
+- **ex-11 · querybuilder-vs-string-safety** — builder vs f-string concatenation — verify the builder escapes input. (co-05)
+- **ex-12 · sqlalchemy-core-table** — define a Core `Table` + metadata — verify the schema is created. (co-04, co-03)
+- **ex-13 · sqlalchemy-core-select** — a Core `select()` construct — verify emitted SQL + rows. (co-03, co-05)
+- **ex-14 · declarative-model-basic** — `DeclarativeBase` + `Mapped[]` columns — verify the table maps. (co-06)
+- **ex-15 · declarative-typed-columns** — `Mapped[int]`/`Mapped[str]` typed mapping — verify types on load. (co-06)
+- **ex-16 · orm-insert-object** — add an object, commit — verify the row persisted. (co-06, co-17)
+- **ex-17 · orm-query-select** — `session.execute(select(Model))` — verify objects returned. (co-06)
+- **ex-18 · orm-update-object** — mutate + commit — verify `UPDATE` emitted. (co-06, co-12)
+- **ex-19 · orm-delete-object** — `session.delete` + commit — verify `DELETE` emitted. (co-06)
+- **ex-20 · activerecord-peewee-model** — peewee `Model.create`/`save` (Active Record) — verify the row persisted. (co-07)
+- **ex-21 · activerecord-vs-datamapper** — the same write in peewee (AR) vs SQLAlchemy (DM) — verify the object-saves-itself vs session contrast. (co-07)
+- **ex-22 · relationship-one-to-many** — `relationship()` customer→orders — verify navigation loads children. (co-08)
+- **ex-23 · relationship-back-populates** — bidirectional `back_populates` — verify both sides linked. (co-08)
+- **ex-24 · foreign-key-mapping** — `ForeignKey` + `mapped_column` — verify the FK constraint. (co-08)
+- **ex-25 · many-to-many-assoc-table** — an association `Table` for M:N — verify link rows. (co-09)
+- **ex-26 · many-to-many-navigate** — navigate both sides of an M:N — verify related collections. (co-09)
+- **ex-27 · identity-map-same-object** — query the same PK twice in a session — verify the same Python object (`is`). (co-10)
+- **ex-28 · session-lifecycle-begin** — open session, add, commit, close — verify the basic lifecycle. (co-11, co-17)
+
+### Intermediate
+
+- **ex-29 · session-states-transient-pending** — observe transient→pending→persistent — verify via `inspect()`. (co-11)
+- **ex-30 · session-expire-refresh** — `expire` + `refresh` reloads from the DB — verify fresh values. (co-11)
+- **ex-31 · unit-of-work-flush-order** — add several, flush, observe ordered `INSERT`s — verify UoW orders by dependency. (co-12)
+- **ex-32 · unit-of-work-dirty-tracking** — mutate a persistent object, flush — verify only changed columns in the `UPDATE`. (co-12)
+- **ex-33 · unit-of-work-autoflush** — a query triggers autoflush of pending — verify pending written before the select. (co-12)
+- **ex-34 · lazy-loading-default** — access a relationship, observe the extra `SELECT` — verify the lazy query fires. (co-13)
+- **ex-35 · lazy-loading-detached-error** — access a lazy attr after the session closes — verify `DetachedInstanceError`. (co-13, co-11)
+- **ex-36 · n-plus-1-reproduce** — loop over parents accessing children — verify N+1 queries emitted. (co-15, co-13)
+- **ex-37 · eager-selectinload** — `selectinload()` — verify two queries, not N+1. (co-14, co-15)
+- **ex-38 · eager-joinedload** — `joinedload()` single-query join — verify one query. (co-14, co-15)
+- **ex-39 · eager-subqueryload** — the `subqueryload` strategy — verify a batched load. (co-14)
+- **ex-40 · eager-strategy-contrast** — contrast selectin vs joined vs subquery — verify query-count/shape differ. (co-14)
+- **ex-41 · raiseload-guard** — `raiseload()` forbidding lazy loads — verify it raises on accidental lazy access. (co-16)
+- **ex-42 · n-plus-1-count-assert** — assert the query count with an event listener — verify count before/after the fix. (co-15)
+- **ex-43 · orm-transaction-commit-rollback** — `session.begin()` context, rollback on error — verify atomicity. (co-17)
+- **ex-44 · orm-nested-savepoint** — `begin_nested()` savepoint — verify partial rollback. (co-17)
+- **ex-45 · connection-pool-basics** — engine `pool_size`/`max_overflow` — verify connections reused. (co-18)
+- **ex-46 · pool-exhaustion** — exhaust the pool, observe the timeout — verify `QueuePool` timeout. (co-18)
+- **ex-47 · pool-pre-ping** — `pool_pre_ping` recovers stale connections — verify recovery. (co-18)
+- **ex-48 · alembic-init** — `alembic init` + configure — verify `env.py` + versions dir. (co-19)
+- **ex-49 · alembic-first-migration** — hand-write a create-table migration — verify `upgrade` creates the table. (co-19)
+- **ex-50 · alembic-upgrade-downgrade** — upgrade then downgrade — verify the schema round-trips. (co-19, co-21)
+- **ex-51 · alembic-autogenerate** — autogenerate from a model diff — verify generated ops match the models. (co-20)
+- **ex-52 · alembic-autogen-review** — review + edit an autogen migration — verify a manual correction of a missed change. (co-20)
+- **ex-53 · migration-reversible-data** — a data migration with a real `downgrade` — verify reversibility. (co-21)
+- **ex-54 · migration-irreversible-guard** — a drop-column migration that raises in `downgrade` — verify the explicit non-reversible marker. (co-21)
+- **ex-55 · cascade-delete-orm** — `cascade="all, delete-orphan"` — verify children deleted with the parent. (co-22)
+- **ex-56 · cascade-vs-db-fk** — ORM cascade vs DB `ON DELETE CASCADE` — verify the behavioral contrast. (co-22)
+
+### Advanced
+
+- **ex-57 · bulk-insert-orm** — `insert().values()` / bulk mappings — verify a fast bulk write. (co-23)
+- **ex-58 · bulk-update-core** — Core `update()` vs per-object — verify a single `UPDATE` for many rows. (co-23)
+- **ex-59 · bulk-vs-orm-perf** — measure bulk Core vs an ORM loop — verify bulk is far faster. (co-23, co-25)
+- **ex-60 · async-engine-session** — `create_async_engine` + `AsyncSession` — verify an async query round-trips. (co-24)
+- **ex-61 · async-eager-loading** — async with `selectinload` (no lazy) — verify eager avoids the async lazy pitfall. (co-24, co-14)
+- **ex-62 · async-lazy-forbidden** — a lazy access under async — verify it raises (must eager-load). (co-24, co-16)
+- **ex-63 · async-concurrent-sessions** — `asyncio.gather` over multiple sessions — verify concurrency. (co-24)
+- **ex-64 · orm-vs-raw-crud** — the same CRUD in ORM vs raw SQL — verify the ORM is shorter, raw more explicit. (co-25)
+- **ex-65 · orm-vs-raw-reporting** — a reporting query: ORM awkward vs raw SQL clean — verify raw wins for set ops. (co-25, co-27)
+- **ex-66 · querybuilder-vs-orm-dynamic** — a dynamic-filter query: builder vs ORM — verify the builder composes without the object graph. (co-26)
+- **ex-67 · querybuilder-vs-orm-tradeoff** — contrast builder (no identity map) vs ORM (change tracking) — verify a feature/cost table. (co-26)
+- **ex-68 · choosing-tier-crud** — a CRUD workload → ORM recommendation — verify the decision + rationale. (co-27)
+- **ex-69 · choosing-tier-analytics** — an analytics workload → raw-SQL recommendation — verify the decision. (co-27)
+- **ex-70 · choosing-tier-hot-path** — a hot path → query-builder/raw recommendation — verify the decision. (co-27)
+- **ex-71 · hybrid-orm-plus-raw** — ORM for CRUD + a raw-SQL escape hatch (`session.execute(text())`) — verify both in one app. (co-25, co-27)
+- **ex-72 · identity-map-across-queries** — the identity map dedups across two queries — verify one instance. (co-10)
+- **ex-73 · relationship-lazy-strategies-config** — configure the default lazy strategy per relationship — verify the configured behavior. (co-13, co-14)
+- **ex-74 · self-referential-relationship** — an adjacency-list self-FK tree — verify parent/child navigation. (co-08)
+- **ex-75 · association-object-m2m** — an association object with extra columns on an M:N — verify the extra attribute persists. (co-09)
+- **ex-76 · migration-zero-downtime** — an expand-contract migration — verify the additive step then the cleanup. (co-21, co-19)
+- **ex-77 · connection-pool-tuning** — tune the pool for a concurrency target, measure — verify throughput at target. (co-18)
+- **ex-78 · capstone-preview-three-tier** — thread all three tiers + N+1 fix + migration — verify end-to-end. (co-01, co-15, co-19, co-25)
 
 ## Capstone spec — intra-topic (subject → full runnable)
 
 - **Goal**: implement the same small domain (customers/orders) across all three tiers — raw SQL, query
   builder, ORM — expose and fix an N+1, and ship a reversible migration, so each tier's trade-off is
   demonstrated rather than asserted.
-- **Concepts exercised**: [ ] raw SQL via the DB-API (PEP 249) [ ] a query builder [ ] an ORM with
-  identity map + unit of work [ ] an N+1 reproduced then fixed with eager loading [ ] a forward +
-  rollback migration [ ] fully type-annotated Python.
+- **Concepts exercised**: [ ] raw SQL via the DB-API (co-02) [ ] a query builder (co-03) [ ] an ORM with
+  identity map + unit of work (co-06, co-10, co-12) [ ] an N+1 reproduced then fixed with eager loading
+  (co-15, co-14) [ ] a forward + rollback migration (co-19, co-21) [ ] fully type-annotated Python.
 - **Ordered steps**:
   1. `.../learning/capstone/code/tier1_sql.py` — the query in raw parameterized SQL with typed row
      mapping. Verify results match a known fixture and no string interpolation is used.

@@ -51,7 +51,7 @@ These are **observable signals**, not fabricated KPIs:
   sees "The Well-Grounded Software Engineer" in the nav and can reach any topic in ≤2 clicks.
 - [Judgment call] The section is _usable as a learn-then-drill loop_: for every topic, a reader can
   work the learning subtree and then immediately practise the matching drilling page.
-- **Coverage is complete and symmetric**: all 90 topics exist in BOTH tracks, in identical order
+- **Coverage is complete and symmetric**: all 94 topics exist in BOTH tracks, in identical order
   (observable: topic/weight parity between `learning/` and `drilling/`).
 - **By-example pace per topic**: each learning topic clears its applicable checker's density/format
   bands (`apps-ayokoding-www-by-example-checker` for code topics; `apps-ayokoding-www-general-checker`

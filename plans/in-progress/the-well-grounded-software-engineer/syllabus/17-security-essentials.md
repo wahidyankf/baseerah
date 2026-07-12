@@ -1,12 +1,12 @@
 # 17 · Security Essentials (By Example, Python)
 
 **prd row**: Pass 1 · Core Foundations · By Example · Python · Learn 117 / Drill 217 · Nvim-ready
-Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks))
+Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: the **usable slice** — the everyday security a developer applies to the software they just
 learned to build: the OWASP-style top risks, safe input handling, auth done right, secret hygiene, and
 dependency safety. Threat modeling, cryptographic depth, and org-scale controls go to
-[`55-it-and-application-security`](./55-it-and-application-security.md) and [`57-defensive-security`](./57-defensive-security.md) (DD-11).
+[`58-it-and-application-security`](./58-it-and-application-security.md) and [`60-defensive-security`](./60-defensive-security.md) (DD-11).
 This topic closes Pass 1 and anchors two inter-topic capstones.
 
 ## Why this exists · the big idea
@@ -42,32 +42,129 @@ This topic closes Pass 1 and anchors two inter-topic capstones.
   **Mishandling of Exceptional Conditions (new, replaces SSRF)**. Author against 2025 wording/order.
   (owasp.org Top10/2025)
 - 2026-07-12 — verified: Argon2id min-tier params `m=19456 (19 MiB), t=2, p=1`; bcrypt work factor min 10
-  (as high as perf allows), hard 72-byte input limit. `pip-audit` **2.10.0** (reads requirements/
+  (as high as perf allows), hard 72-byte input limit. `pip-audit` **2.10.1** (latest; reads requirements/
   pyproject/venv against PyPA Advisory DB + OSV, needs Python ≥3.10). Parameterized-query guidance
   unchanged. (cheatsheetseries.owasp.org / pypi.org)
 
-## Items
+## Concepts
 
-- **Threat basics**: the OWASP-style top risks at a working-developer level; thinking like an attacker.
-- **Injection**: SQL injection shown live against a naive query, then fixed with parameterized queries;
-  command injection.
-- **Input validation & output encoding**: XSS intro; trust boundaries; allow-list validation.
-- **Authentication done right**: password hashing (argon2/bcrypt, never plaintext/MD5), session vs token,
-  secure cookie flags.
-- **Authorization**: least privilege; the difference from authentication.
-- **Secret hygiene**: env vars over hardcoding, never commit secrets, rotation intro (ties to repo policy).
-- **Transport & headers**: HTTPS/TLS in practice; key security headers.
-- **Dependency safety**: `pip-audit`; pinning; the CVE-clean supply-chain stance (DD-23) applied.
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (subject By-Example). Each example below cites the co-NN it exercises. -->
+
+- **co-01 · trust-boundaries-never-trust-input** — every place untrusted data crosses into your code (query, form, header, cookie, upstream response) is a boundary where it must be validated; the default posture is distrust.
+- **co-02 · owasp-top-10-as-risk-map** — the OWASP Top 10:2025 is a shared risk vocabulary that maps a concrete bug to a named category, prioritizing what to defend first.
+- **co-03 · sql-injection-and-parameterized-queries** — concatenating untrusted input into SQL lets an attacker rewrite the query; bound parameters send data and code separately so input can never become SQL.
+- **co-04 · command-injection** — passing untrusted input to a shell (`os.system`, `shell=True`) lets it inject commands; `subprocess.run([...], shell=False)` with an argv list removes the shell.
+- **co-05 · path-traversal** — `../` sequences in a filename escape the intended directory; canonicalizing (`realpath`) and enforcing a root prefix contains it.
+- **co-06 · xss-and-output-encoding** — untrusted data rendered into a page executes as script unless encoded for its exact output context (HTML body, attribute, JS string, URL).
+- **co-07 · allow-list-vs-deny-list-validation** — validating against a list of known-good values is robust; blocklists of known-bad inputs always miss the case you didn't foresee.
+- **co-08 · mass-assignment-and-over-posting** — binding a whole request body onto a model (`Model(**json)`) lets a client set fields it shouldn't (e.g. `is_admin`); an explicit field allow-list stops it.
+- **co-09 · password-hashing-argon2id-bcrypt** — store passwords only as slow, salted one-way hashes (argon2id or bcrypt) — never plaintext, MD5, or SHA-1.
+- **co-10 · salting-and-why** — a unique per-hash salt makes identical passwords hash differently and defeats precomputed (rainbow-table) attacks; modern hashers salt automatically.
+- **co-11 · timing-safe-comparison** — comparing secrets with `==` leaks length/prefix via timing; `hmac.compare_digest` compares in constant time.
+- **co-12 · session-vs-token-auth** — server-side sessions (revocable, stateful) versus stateless tokens (scalable, hard to revoke) are a deliberate trade-off, not interchangeable defaults.
+- **co-13 · secure-cookie-flags** — `Secure`, `HttpOnly`, and `SameSite` on session cookies stop transport leakage, JS theft, and cross-site sending respectively.
+- **co-14 · jwt-specific-pitfalls** — JWTs fail open on `alg:none`, algorithm confusion (HS256/RS256), and unvalidated `exp`/`aud`/`iss`; pin the algorithm and validate every claim.
+- **co-15 · authentication-vs-authorization** — authentication proves _who_ you are; authorization decides _what_ you may do — they are separate checks and both are required.
+- **co-16 · least-privilege-access-control** — every user, process, and DB account gets only the access it needs, so a compromise's blast radius is bounded (IDOR/function-level checks, restricted DB roles).
+- **co-17 · secret-hygiene** — secrets live in the environment or a manager, never in code or git history; leaked secrets are rotated, and `.env` is gitignored while `.env.example` holds placeholders.
+- **co-18 · https-tls-in-practice** — TLS protects data in transit only when certificates are actually verified; disabling verification (`verify=False`) reopens MITM.
+- **co-19 · security-headers** — `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, and `X-Frame-Options`/`frame-ancestors` are cheap, high-leverage browser-enforced defenses.
+- **co-20 · cors-configuration** — CORS relaxes the same-origin policy; reflecting the request Origin with credentials lets any site read responses — allow-list origins instead.
+- **co-21 · dependency-safety-supply-chain** — third-party code is attack surface; pin exact versions, audit with `pip-audit`, watch for typosquats, and keep the tree CVE-clean (DD-23).
+- **co-22 · security-logging-and-alerting** — log authn/authz decisions (who, what, outcome — never secrets) and alert on anomalies like brute-force bursts so attacks are visible.
+- **co-23 · safe-error-handling** — error responses reveal nothing internal (no stack traces, no SQL); the detail goes to a server-side log, the client gets a generic message.
+- **co-24 · security-misconfiguration** — insecure defaults (debug mode, directory listing, default creds, verbose errors) are vulnerabilities; hardening the configuration closes them.
+- **co-25 · insecure-design** — some flaws are in the design, not the code: a correctly-implemented flow (unlimited coupon reuse, missing SSRF guard) can still be exploitable — threat-model the feature.
+- **co-26 · csrf-protection** — a state-changing request riding the victim's ambient cookie is forgeable cross-site; anti-CSRF tokens and `SameSite` cookies bind the request to your site.
+- **co-27 · rate-limiting-and-brute-force-protection** — throttling and backoff on auth endpoints defeat credential-stuffing/brute-force, weighed against lockout-as-DoS.
+- **co-28 · open-redirect** — following a user-supplied `next=`/redirect target blindly sends victims to attacker sites; validate against an allow-list or accept relative paths only.
 
 ## Worked examples
 
-Colocated under `security-essentials/learning/code/`; each attack + fix runnable against the
-Backend-Essentials app with `curl` (DD-20/DD-30).
+Colocated under `security-essentials/learning/code/`; each attack + fix is runnable against the
+Backend-Essentials app with `curl` (DD-20/DD-30), fully type-annotated Python (DD-34). Contiguous
+`ex-01..ex-80`; every example cites the `co-NN` it exercises.
 
-- **beginner** — SQL injection against a naive endpoint, then the parameterized fix; show both requests.
-- **intermediate** — password storage: crack a plaintext/MD5 store, then argon2/bcrypt with correct params.
-- **advanced** — an allow-list validation + output-encoding pass on a form; `pip-audit` a dependency set
-  and remediate a flagged CVE.
+- **ex-01 · trust-boundary-map-tainted-input** — map where untrusted data enters a handler (query, form, header, cookie) and mark each as tainted — verify the reader lists every entry point and which are attacker-controlled. (co-01)
+- **ex-02 · owasp-top-10-mapping-exercise** — map 5 seeded bugs in a sample app to their OWASP 2025 categories — verify each bug is tagged with the correct A0N id. (co-02)
+- **ex-03 · sql-injection-live-exploit** — `' OR '1'='1` against a naive f-string login query — verify the attacker logs in with no valid password. (co-03, co-01)
+- **ex-04 · sql-injection-parameterized-fix** — replace the f-string with bound placeholders (`?`/`%s`) — verify the same payload is now treated as a literal and fails. (co-03)
+- **ex-05 · sql-injection-union-data-exfil** — `UNION SELECT` through a search endpoint to read another table — verify it leaks rows, then parameterization blocks it. (co-03)
+- **ex-06 · command-injection-live** — a `;`-chained payload through `os.system("ping " + host)` — verify the injected command runs, then `subprocess.run([...], shell=False)` blocks it. (co-04, co-01)
+- **ex-07 · path-traversal-file-read** — `../../etc/passwd` through a naive download handler — verify it reads an out-of-root file, then `realpath` + prefix check blocks it. (co-05, co-01)
+- **ex-08 · reflected-xss-live** — a `<script>` echoed into an unescaped response — verify it executes, then autoescaping/`markupsafe.escape` neutralizes it. (co-06, co-01)
+- **ex-09 · stored-xss-live** — a persisted comment with a script rendered to other users — verify it fires on view, then output-encoding on render stops it. (co-06)
+- **ex-10 · output-encoding-by-context** — encode the same value for HTML-body, HTML-attribute, and JS-string contexts — verify each uses the correct encoder and a context mismatch still leaks. (co-06)
+- **ex-11 · allow-list-vs-deny-list** — validate a country code against an allow-list vs a bad-char blocklist — verify the allow-list rejects an input the blocklist misses. (co-07)
+- **ex-12 · input-validation-at-the-boundary** — a pydantic model validating type/range/format at the edge — verify malformed JSON yields a structured 422 before business logic runs. (co-07, co-01)
+- **ex-13 · plaintext-password-store-is-broken** — a login table storing plaintext, dumped via a read — verify every password is visible in the dump. (co-09)
+- **ex-14 · md5-password-store-is-broken** — unsalted MD5 hashes cracked with a small dictionary — verify common passwords are recovered in seconds. (co-09, co-10)
+- **ex-15 · argon2id-hash-and-verify** — hash with argon2id (m=19456,t=2,p=1) and verify — verify the stored value is a `$argon2id$` PHC string, verify() accepts the right password and rejects a wrong one. (co-09)
+- **ex-16 · bcrypt-hash-and-verify** — bcrypt at work-factor 12, noting the 72-byte limit — verify the hash embeds the cost and a truncation demo shows the 72-byte cap. (co-09)
+- **ex-17 · salt-makes-identical-passwords-differ** — hash the same password twice with argon2id — verify the two stored hashes differ (per-hash salt). (co-10)
+- **ex-18 · timing-safe-token-compare** — compare an API token with `==` vs `hmac.compare_digest` — verify the reader explains the timing side-channel `==` leaks. (co-11)
+- **ex-19 · secure-cookie-flags** — set a session cookie `Secure; HttpOnly; SameSite=Lax` — verify `curl -I` shows all three flags and JS `document.cookie` cannot read it. (co-13)
+- **ex-20 · secret-in-env-not-code** — move a hardcoded API key to `os.environ` — verify no secret in the source and the app still authenticates. (co-17)
+- **ex-21 · gitignore-and-env-example** — `.env` gitignored, `.env.example` committed with placeholders — verify `git status` never lists `.env` and the example holds no real value. (co-17)
+- **ex-22 · security-headers-baseline** — add CSP, `X-Content-Type-Options`, `Strict-Transport-Security` — verify `curl -I` shows each header present. (co-19)
+- **ex-23 · pip-audit-first-run** — `pip-audit` on a requirements set with one known-vuln pin — verify it reports the CVE and the fixed version. (co-21)
+- **ex-24 · pin-and-remediate-a-cve** — bump the flagged dependency to the CVE-clean version, re-audit — verify `pip-audit` exits clean. (co-21)
+- **ex-25 · safe-error-message** — replace a stack-trace-leaking 500 with a generic message + server-side log — verify the client sees no internal detail and the log has the trace. (co-23, co-22)
+- **ex-26 · second-order-sql-injection** — a payload stored then later concatenated into a query — verify it fires on the second use, then parameterizing both paths blocks it. (co-03)
+- **ex-27 · orm-raw-fragment-injection** — an ORM `text()`/`.raw()` fragment built by concatenation — verify it injects, then bound parameters via the ORM fix it. (co-03, co-21)
+- **ex-28 · blind-boolean-sql-injection** — infer a value from true/false response differences — verify the reader extracts one character, then the fix removes the oracle. (co-03)
+- **ex-29 · argument-injection-not-just-shell** — `--`-style flag injection into a CLI call even with `shell=False` — verify an unexpected flag changes behavior, then an arg allow-list blocks it. (co-04, co-07)
+- **ex-30 · dom-based-xss** — a client sink `innerHTML = location.hash` — verify the payload executes purely client-side, then `textContent`/a sanitizer fixes it. (co-06)
+- **ex-31 · csp-blocks-inline-script** — a strict nonce-based CSP vs an inline `<script>` — verify the inline script is blocked and the nonce'd one runs. (co-19, co-06)
+- **ex-32 · mass-assignment-privilege-escalation** — a `User(**request.json)` bind lets a client set `is_admin=true` — verify the escalation, then a field allow-list blocks it. (co-08, co-07)
+- **ex-33 · idor-broken-object-access** — `GET /orders/{id}` returns another user's order — verify the cross-user read, then an ownership check fixes it. (co-15, co-16)
+- **ex-34 · missing-function-level-authorization** — an admin endpoint reachable by a normal user — verify access, then a role check returns 403. (co-15, co-16)
+- **ex-35 · authn-vs-authz-separation** — a logged-in but unauthorized user hitting a resource — verify the code checks identity and permission separately. (co-15)
+- **ex-36 · session-fixation** — reuse a pre-login session id — verify the fixation works, then regenerating the session id on login fixes it. (co-12)
+- **ex-37 · session-vs-token-tradeoffs** — implement both a server session and a stateless token for one login — verify each authenticates and the reader states one trade-off (revocation vs scale). (co-12, co-14)
+- **ex-38 · jwt-alg-none-attack** — a verifier accepting `alg:none` — verify a forged unsigned token is accepted, then pinning the algorithm rejects it. (co-14)
+- **ex-39 · jwt-hs256-rs256-confusion** — signing with the RSA public key as an HMAC secret — verify the confusion forges a token, then binding alg + key type blocks it. (co-14)
+- **ex-40 · jwt-expiry-and-claims-validation** — enforce `exp`, `aud`, `iss` on verify — verify an expired or wrong-audience token is rejected. (co-14)
+- **ex-41 · csrf-live-exploit** — a cross-site form POST riding the victim's cookie — verify the state-changing request succeeds, then a CSRF token blocks it. (co-26)
+- **ex-42 · samesite-cookie-mitigates-csrf** — `SameSite=Strict/Lax` on the session cookie — verify the cross-site POST no longer carries the cookie. (co-26, co-13)
+- **ex-43 · cors-misconfig-reflects-origin** — a server echoing `Access-Control-Allow-Origin: <Origin>` with credentials — verify any origin reads the response, then an origin allow-list fixes it. (co-20)
+- **ex-44 · cors-preflight-correctness** — a proper preflight for a credentialed cross-origin request — verify the browser allows only the declared methods/headers/origin. (co-20)
+- **ex-45 · open-redirect** — `?next=//evil.com` followed blindly after login — verify the redirect leaves the site, then an allow-list/relative-only check fixes it. (co-28)
+- **ex-46 · rate-limiting-login** — a per-IP/per-account limiter on login — verify the Nth rapid attempt is throttled (429). (co-27)
+- **ex-47 · account-lockout-vs-throttle** — exponential backoff vs hard lockout, with the lockout-as-DoS trade-off — verify brute force slows and the reader names the DoS risk. (co-27)
+- **ex-48 · constant-time-login-response** — equal timing/response for unknown-user vs wrong-password — verify a timing/response diff no longer reveals which accounts exist. (co-11, co-27)
+- **ex-49 · security-misconfig-debug-mode** — Flask `debug=True` exposing the interactive debugger in prod — verify the console is reachable, then disabling debug closes it. (co-24)
+- **ex-50 · directory-listing-and-default-creds** — an exposed listing / default admin password — verify both are reachable, then config hardening closes them. (co-24)
+- **ex-51 · tls-verify-not-disabled** — a client with `verify=False` accepting any cert — verify a MITM cert is accepted, then enabling verification rejects it. (co-18)
+- **ex-52 · hsts-and-redirect-to-https** — force HTTP→HTTPS + `Strict-Transport-Security` — verify an http request upgrades and repeat visits skip http. (co-18, co-19)
+- **ex-53 · secret-scanning-pre-commit** — a `detect-secrets`/pre-commit hook catching a staged key — verify the commit is blocked when a secret is present. (co-17, co-21)
+- **ex-54 · secret-rotation-drill** — rotate a leaked key and invalidate the old — verify the old key stops working and the new one authenticates. (co-17)
+- **ex-55 · dependency-pinning-and-lockfile** — exact pins + a lockfile hash reproduced on a clean install — verify resolved versions are identical and audit-clean. (co-21)
+- **ex-56 · supply-chain-typosquat-check** — flag a typosquatted package name before install — verify the reader identifies the malicious lookalike. (co-21, co-25)
+- **ex-57 · structured-security-logging** — log authn/authz decisions with user, action, outcome (no secrets) — verify a failed-login event is queryable and contains no password. (co-22)
+- **ex-58 · alert-on-brute-force-pattern** — detect N failures in a window and emit an alert — verify the burst triggers exactly one alert. (co-22, co-27)
+- **ex-59 · insecure-design-vs-bug** — a business flow exploitable even when coded correctly (unlimited coupon reuse) — verify the reader distinguishes a design flaw from an implementation bug. (co-25)
+- **ex-60 · threat-model-a-feature** — a STRIDE-lite pass over one endpoint listing threats + mitigations — verify each threat maps to a concrete control. (co-25, co-02)
+- **ex-61 · end-to-end-injection-audit** — sweep an app for every injection sink (SQL, OS, template) and fix each — verify no concatenated-untrusted-input sink remains. (co-03, co-04, co-01)
+- **ex-62 · ssti-server-side-template-injection** — user input into a Jinja template string executes — verify code execution, then rendering data as context (not template) blocks it. (co-06, co-25)
+- **ex-63 · argon2-parameter-tuning** — measure hash time and tune m/t/p to a ~250ms target on the box — verify the chosen params hit the budget and beat a weaker baseline. (co-09)
+- **ex-64 · password-upgrade-on-login** — transparently rehash legacy bcrypt logins to argon2id at next login — verify a legacy user's stored hash upgrades after one successful login. (co-09, co-10)
+- **ex-65 · token-revocation-strategy** — a short-lived access token + refresh + revocation list — verify a revoked refresh token can no longer mint access tokens. (co-12, co-14)
+- **ex-66 · rbac-vs-abac-authorization** — role-based then attribute-based checks for the same resource — verify an ownership+role rule allows/denies correctly across cases. (co-16, co-15)
+- **ex-67 · least-privilege-db-account** — the app connects with a role lacking DDL/DROP — verify a destructive query is denied by the DB even when injected. (co-16, co-03)
+- **ex-68 · defense-in-depth-xss** — combine input validation + output encoding + CSP + HttpOnly cookies — verify removing any one layer still leaves the others catching the payload. (co-06, co-19, co-13, co-07)
+- **ex-69 · csrf-for-json-and-spa** — a double-submit-token / custom-header strategy for a token-auth SPA — verify a forged cross-site request lacks the header and is rejected. (co-26, co-20)
+- **ex-70 · clickjacking-frame-protection** — `X-Frame-Options`/CSP `frame-ancestors` blocking an iframe overlay — verify the page refuses to render in a foreign frame. (co-19, co-25)
+- **ex-71 · secure-file-upload** — validate type/size, store outside webroot, randomize names — verify a disguised executable upload is rejected and stored files are non-executable. (co-05, co-07, co-24)
+- **ex-72 · ssrf-safe-outbound-fetch** — block an outbound fetch to internal/metadata IPs (169.254.169.254) — verify a request to a private range is denied. (co-01, co-25)
+- **ex-73 · rate-limit-distributed** — a Redis-backed limiter correct across multiple app instances — verify the global limit holds when two workers serve the same client. (co-27)
+- **ex-74 · audit-log-integrity** — an append-only / hash-chained security log — verify tampering with a past entry is detectable. (co-22)
+- **ex-75 · dependency-cve-triage-workflow** — `pip-audit` → assess exploitability → pin or waiver per the CVE-clean policy — verify each finding ends resolved or documented-waived. (co-21, co-25)
+- **ex-76 · sbom-and-provenance** — generate a CycloneDX SBOM and check it against advisories — verify every component is enumerated and audit-clean. (co-21)
+- **ex-77 · secrets-manager-integration** — fetch a secret at runtime from a vault/manager instead of env — verify the secret never lands in the image/tree and rotates without redeploy. (co-17)
+- **ex-78 · harden-the-full-app-transcript** — apply every control to the Backend-Essentials app with a before/after attack transcript — verify each seeded attack flips from success to blocked. (co-01, co-24, co-02)
+- **ex-79 · security-regression-test-suite** — encode each fixed vuln as a failing→passing security test — verify every attack has a red-before/green-after test guarding regressions. (co-02, co-23)
+- **ex-80 · secure-error-and-logging-review** — a final pass: no stack traces to clients, no secrets in logs, alerts on auth anomalies — verify a fuzz of error paths leaks nothing and logs stay secret-free. (co-23, co-22)
 
 ## Capstone spec — intra-topic (subject → full runnable)
 

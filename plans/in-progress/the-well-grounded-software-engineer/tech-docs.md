@@ -13,7 +13,7 @@ removing a topic is a one-row edit in prd.md plus the mechanical per-row work de
 `apps/ayokoding-www/src/` code changes. English only. [Repo-grounded — nx project `ayokoding-www`,
 `apps/ayokoding-www/project.json`]
 
-At authoring time the canonical table holds **90 topics** (75 subject topics + 15 _Just Enough_
+At authoring time the canonical table holds **94 topics** (79 subject topics + 15 _Just Enough_
 primers) sequenced as a **six-pass journey**: a new **Pass 0 · Editor Foundations** (Just Enough Nvim →
 Just Enough Lua → Extending Neovim — the editor prologue, DD-17) followed by a **five-pass spiral**
 (Pass 1 Core Foundations → Pass 5 Internals & Lead at Altitude) under an **immediately-effective-first**
@@ -21,7 +21,7 @@ principle (build/store/test/secure a small system early, then revisit each conce
 passes). The ◆ app-domain topics (Android/iOS/Hybrid/Windows/Linux app) and the ▲ Product & Delivery
 track (Software Product Engineering + Project Management) are **parallel reading-path affordances**, not
 gates. Each topic also carries an **Nvim-ready** and a **VSCode-ready** flag (Yes / Partial) in the prd
-table. See prd.md for the authoritative list, the six-pass journey map, the 90-node skill tree, and the
+table. See prd.md for the authoritative list, the six-pass journey map, the 94-node skill tree, and the
 Editor Setup matrix; all counts below are derived from it, not independently maintained. Every topic's
 concrete items, worked examples, and capstone specs are enumerated in the
 [syllabus/ folder](./syllabus/) — one `NN-<slug>.md` file per topic (DD-29).
@@ -185,7 +185,7 @@ reproducibility contract:
   the code to add, and the command to verify — such that a reader following top-to-bottom ends with the
   stated runnable, web-verified artifact.
 
-Enforced per topic and re-checked at each phase gate; the final gate asserts it for all 90 topics and
+Enforced per topic and re-checked at each phase gate; the final gate asserts it for all 94 topics and
 every capstone.
 
 ## Accuracy Verification Rule (HARD RULE, DD-28)
@@ -388,12 +388,12 @@ subtree + intra-topic `capstone/` + colocated `code/` then author `drilling/` pa
 `ayokoding-web-general-quality-gate` to double-zero then Phase Gate + Pause Safety. Inter-topic
 capstone phases run at their journey position (pass boundaries + cross-cutting junctions).
 
-## File Impact (derived from the prd table; N = current topic count = 61)
+## File Impact (derived from the prd table; N = current topic count = 94)
 
 | Path                                                                 | Change | Notes                                                                      |
 | -------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
 | `.../the-well-grounded-software-engineer/_index.md`                  | New    | Section landing, weight 1750                                               |
-| `.../the-well-grounded-software-engineer/overview.md`                | New    | Read-then-drill workflow + six-pass journey map + 90-node skill tree       |
+| `.../the-well-grounded-software-engineer/overview.md`                | New    | Read-then-drill workflow + six-pass journey map + 94-node skill tree       |
 | `.../<topic-slug>/_index.md` × N                                     | New    | Topic folder nav, weight 110..1000 (journey order)                         |
 | `.../<topic-slug>/overview.md` × N                                   | New    | Per-topic what/why + primary language + prerequisites                      |
 | `.../<topic-slug>/learning/…` × N                                    | New    | By-Example / Annotated-concept subtree + `capstone/` + `code/` per prd row |
@@ -445,7 +445,7 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   architecture adds standalone `domain-driven-design` + `event-driven-architecture` (hexagonal folds
   into `software-architecture`); security splits into `security-essentials` + `it-security` +
   `offensive-security` (red/Kali) + `defensive-security` (blue/SOC-IR); the editor branch adds
-  `just-enough-nvim` + `just-enough-lua` + `extending-neovim`. **90 topics total.** [User decision]
+  `just-enough-nvim` + `just-enough-lua` + `extending-neovim`. **94 topics total.** [User decision]
 - **DD-13: Language + tool primers.** Fifteen _Just Enough_ primer topics (Nvim, Python, Bash,
   TypeScript, Lua, Go, Elixir, Kotlin, Swift, Dart, C#, C, Rust, Java, F#), each placed immediately before that
   language's/tool's first use, so a reader never learns a new language and a new concept at once.
@@ -480,8 +480,14 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   this; the final gate asserts it for all 61 + all capstones. [User decision]
 - **DD-20: Runnable-example rule (HARD RULE).** Every code example is runnable — standalone blocks run
   in isolation via the stated raw-form command (DD-17); long/fragmented examples end in a complete
-  runnable full listing. No elided-body "assume the rest" snippets presented as runnable. Enforced per
-  topic and re-checked at each phase gate. Strengthened by DD-30 (follow-along completeness). [User decision]
+  runnable full listing. No elided-body "assume the rest" snippets presented as runnable. Two sharpening
+  contracts (per user): **no implicit dependencies** — every identifier a snippet uses is defined or
+  imported within that same snippet (or its fragment chain ending in the page's full listing), never
+  relying on unshown state / auto-imports / ambient globals ("as complete as possible" is the bar); and
+  **expected output shown inline as a comment** — each block annotates its result inside the code in the
+  language's idiomatic comment syntax (`# => …`, `// prints: …`, `-- …`), composing with the DD-8
+  annotation density. Enforced per topic and re-checked at each phase gate. Strengthened by DD-30
+  (follow-along completeness). See [prd.md §Runnable-Example Rule](./prd.md#runnable-example-rule-hard-rule-dd-20). [User decision]
 - **DD-21: Free-to-use-and-teachable-first materials (HARD RULE).** Every material used passes two
   tests — free to obtain/use, and legal to author training content on. Tier-1 OSS/public-domain is the
   default (Python…C, SQLite/PostgreSQL/Valkey/Redis, Neovim, Kali, GDPR, NIST); Tier-2
@@ -556,7 +562,7 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   intellectual layers — **not uniformly**, because page attention is zero-sum and padding a primer with a
   "trade-offs of Just Enough Bash" section makes the material feel _less_ intellectual while taxing the
   primary reader (a working engineer re-grounding fast). The layers and their weighting: (1) a universal
-  `Why this exists · the big idea` opener on all 90 topics — the problem before the solution + the
+  `Why this exists · the big idea` opener on all 94 topics — the problem before the solution + the
   keep-forever mental model + big-idea tags; (2) a universal horizontal **idea spine** of eight
   Cross-Cutting Big Ideas (`abstraction-and-its-cost`, `taming-state`, `coupling-vs-cohesion`,
   `consistency-latency-throughput`, `mechanism-vs-policy`, `determinism-vs-emergence`,
@@ -574,16 +580,130 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   idea spine: [prd.md §Cross-Cutting Big Ideas](./prd.md#cross-cutting-big-ideas-the-idea-spine-dd-33).
   Enforced per topic and at each phase gate. [User decision]
 
+### DD-36 — Formatter coverage for code samples (lint-staged)
+
+Every code-sample file type the section commits under `CONTENT/**/code/` must have a canonical
+auto-formatter wired into the repo-root [`package.json`](../../../package.json) `lint-staged` block, so
+polyglot samples stay consistently formatted at commit time. Formatters are grouped by install cost
+(from a `web-researcher` survey, verified 2026-07):
+
+- **Tier 1 — npm-installable, no extra runtime (wire directly into lint-staged):** Prettier (`*.md`,
+  `*.yaml`/`*.yml`, `*.json`, `*.html`, `*.ts`/`*.tsx`/`*.js`), **StyLua** (`*.lua`),
+  `prettier-plugin-sql` (`*.sql`), **`clang-format`** npm wrapper (`*.c`/`*.h`), **`@bazel/buildifier`**
+  (`BUILD`/`*.bzl`). Dockerfiles have **no canonical formatter** — keep **hadolint** as the existing
+  lint gate.
+- **Tier 2 — single lightweight binary (install via `npm run doctor -- --fix`, invoke from a wrapper):**
+  **Ruff** `ruff format` (`*.py`), **shfmt** (`*.sh`), **gofmt** (`*.go`), **rustfmt** (`*.rs`),
+  **`tofu fmt`** (`*.tf`) — OpenTofu's MPL-2.0 formatter is preferred over `terraform fmt`, whose CLI is
+  **BUSL-1.1** (not OSI-approved) and would trip this repo's license-clean dependency policy.
+- **Tier 3 — heavy toolchain (deferred to CI / existing per-language lint gates, NOT pre-commit):**
+  Elixir (`mix format`), Kotlin (ktlint), Swift (swift-format), Dart (`dart format`), C#
+  (`dotnet format`/CSharpier), Java (google-java-format), F# (Fantomas), OCaml (ocamlformat), Haskell
+  (Ormolu/Fourmolu), Clojure (cljfmt). Requiring a JDK + .NET SDK + GHC + opam + Erlang/OTP + Dart SDK +
+  Xcode on every contributor's pre-commit is impractical; these are gated in CI where the toolchain
+  already exists.
+- **No canonical formatter (style enforced by review only, documented as out of pre-commit scope):**
+  Makefile, Gradle Groovy DSL (`*.gradle`), Scheme/Common Lisp.
+
+Rationale: pre-commit formatting must be fast and universally installable; the tiering keeps the hook
+light while still guaranteeing every committed sample is formatted somewhere (hook or CI). Phase 0 wires
+this before any topic content lands. [User decision]
+
+### DD-37 — Dedicated maker/checker/fixer trio + quality gate per learning format
+
+Each of the section's three learning formats gets its **own** `maker`/`checker`/`fixer` agent trio and
+quality-gate workflow, mirroring the existing By Example set — rather than routing concept/primer topics
+through the generic `general` agents. Formats and their trios: **By Example** (pre-existing:
+`apps-ayokoding-www-by-example-{maker,checker,fixer}` +
+[`ayokoding-web-swe-by-example-quality-gate`](../../../repo-governance/workflows/ayokoding-web/ayokoding-web-swe-by-example-quality-gate.md));
+**Annotated-concept** (new trio + `ayokoding-web-annotated-concept-quality-gate`) — the **leadership
+no-code `‡`** variant is a validated **sub-mode** of this trio (20-30 scenarios, zero code), not a
+separate fourth trio (3-format decision); **Primer** (new trio + `ayokoding-web-primer-quality-gate`) for
+the "Just Enough X" on-ramps. The six new agents register in the agent catalog + `AGENTS.md` and sync to
+`.opencode/`/`.amazonq/` via `npm run generate:bindings`. Rationale: each format has a distinct anatomy
+and volume target (75-85 heavily-annotated examples vs 45-60 concept-centric worked examples + diagrams vs
+a fast language on-ramp), so a format-specific checker validates far more precisely than one generic
+checker. Created in Phase 0. [User decision]
+
+### DD-38 — Post-v3 gap-fold ADDs + format / progression / capstone re-validation
+
+After the 94-topic set locked, eight grounded **concept/example folds** were added into existing host
+topics (each decided by a grill; each mirrored 1:1 into `delivery.md` and gate-count-corrected). Folds
+add rungs **within** a topic — they do **not** add topics, change the 94-count, alter Learn/Drill weights,
+or move pass boundaries. The folds:
+
+| Fold (rung)                                     | Host topic                     | Δconcepts | Δexamples | Grounding                                                  |
+| ----------------------------------------------- | ------------------------------ | --------- | --------- | ---------------------------------------------------------- |
+| Podman (daemonless/rootless/Quadlet)            | 50 Containers & Orchestration  | +3 (35)   | +3 (83)   | inline, established                                        |
+| Reactive streams (Rx/Reactor/backpressure)      | 24 Concurrency & Parallelism   | +5 (33)   | +6 (87)   | web-researcher, primary-sourced                            |
+| OLAP-columnar (ClickHouse/DuckDB/Parquet/Arrow) | 34 NoSQL Databases             | +5 (36)   | +6 (91)   | web-researcher, primary-sourced                            |
+| VPN / overlay (WireGuard/mesh)                  | 29 Advanced Networking         | +5 (29)   | +7 (62)   | web-researcher, primary-sourced                            |
+| Coordination services (ZooKeeper/etcd/Consul)   | 46 Distributed Systems         | +5 (39)   | +5 (85)   | established; `[Needs Verification]` (grounding agent died) |
+| State machines / statecharts (FSM/Harel/XState) | 21 OO Design & Patterns        | +3 (37)   | +4 (84)   | established; deepens the existing GoF State pattern        |
+| Progressive delivery (Argo Rollouts/Flagger)    | 55 CI/CD & Release Engineering | +2 (34)   | +3 (83)   | established; `[Needs Verification]` on tool CRDs           |
+| BDD / executable specs (Gherkin/pytest-bdd)     | 15 Software Testing            | +5 (32)   | +6 (86)   | established; `[Needs Verification]` on pkg versions + API  |
+
+Each fold's new material is cited in its host topic's Accuracy-notes DD-35 block, with `[Needs
+Verification]` markers where a primary source was not fetched-and-read at authoring time.
+
+**Learning-format re-validation (all 94).** Re-checked that every topic's format (By Example / Annotated-
+concept / Primer / leadership `‡`) remains the most optimal for its subject. **Verdict: no format change.**
+All eight fold-host topics are By-Example subject topics; the folded rungs are worked-example-first, matching
+the host format exactly. The prior format-optimality sweep (scheme sound; only the topic-37 borderline noted)
+still holds. Three host topics now modestly exceed the 75–85 By-Example example band (24 → 87, 34 → 91,
+15 → 86): this is
+an **accepted** consequence — the folds are cohesive sub-rungs of a coherent topic, and the band is a
+depth-to-mastery guideline (DD-8), not a hard cap; splitting them out would fragment the spiral and duplicate
+prerequisites for a marginal count win.
+
+**Merge / split / rearrange analysis.** Re-examined whether any topic should merge, split, or move for a more
+optimal reader journey, using the series' own arrangement principles (spiral order; primer-before-use; pass
+boundaries at natural competence thresholds; big-ideas spine). **Verdict: no re-sequencing.** The gaps the
+user surfaced were all correctly resolved as folds into their canonical home topic rather than new topics or
+reorderings, so the existing spiral order and pass boundaries (P0 01–03, P1 04–18, P2 19–33, P3 34–63,
+P4 64–89, P5 90–94) remain optimal and unchanged.
+
+**Capstone re-examination.** Intra-topic capstones of the fold hosts still pass their done-bar with the new
+rungs available as optional enrichment (the concepts-exercised checklist is representative, not exhaustive, so
+no capstone spec required editing). The ten inter-topic capstones are cross-topic integrations unaffected by
+intra-topic folds. One placement note surfaced and is made explicit: the **Pass-3 boundary capstone**
+`capstone-real-world-delivery` is anchored after the security **core** (topic 60) and integrates topics
+**34–60**; the Pass-3 tail — 61 vulnerability management, 62 GRC, 63 analytics & experimentation — is a
+deliberate **assurance-and-measurement coda** taught _after_ the build-and-ship integration capstone, not a
+gap in its coverage. Kept as-is (no capstone move) to avoid destabilizing re-sequencing this late; documented
+so the placement reads as intentional.
+
+**Gap questions evaluated as already-covered (no fold).** Two surfaced gap questions resolved to
+_already a first-class topic_ rather than a fold, and are recorded here so the "we checked, and it's
+covered" decision is explicit and auditable:
+
+- **A/B testing** — already taught in topic **63 Analytics & Experimentation** (experiment design,
+  significance). The related _canary / blue-green / feature-flag_ deploy strategies live in topic **55
+  CI/CD & Release Engineering**; the only ADD there was the progressive-delivery rung above (Argo
+  Rollouts/Flagger), not a new A/B topic.
+- **Terraform + Ansible** — already a _dedicated_ topic **51 Cloud & IaC** (32 concepts / 53 examples:
+  full `plan → apply → destroy` lifecycle, state + remote locking, modules, dependency DAG, drift, and
+  `co-25 config-management-vs-provisioning` + `ex-37`/`ex-38` `idempotent-ansible`). License posture is
+  settled in **DD-15** (Terraform is BUSL-1.1; the series prefers **OpenTofu**, MPL-2.0). Terraform +
+  Ansible are additionally exercised against real infra in topic **52 Bare-Metal Virtualization**
+  (`bpg/proxmox` provider, `community.proxmox` collection, Packer golden images) and GitOps in topic
+  **53 Self-Managed Kubernetes & On-Prem GitOps**. No fold needed — coverage is deeper as a standalone
+  topic than any single folded rung would be.
+
 ## Dependencies
 
-- Content-authoring agents: `apps-ayokoding-www-by-example-maker`, `apps-ayokoding-www-general-maker`.
+- Content-authoring agents: `apps-ayokoding-www-by-example-maker`, `apps-ayokoding-www-general-maker`,
+  plus the new per-format trios (DD-37): `apps-ayokoding-www-annotated-concept-{maker,checker,fixer}` and
+  `apps-ayokoding-www-primer-{maker,checker,fixer}` (created in Phase 0).
 - Validators: `apps-ayokoding-www-by-example-checker`, `apps-ayokoding-www-general-checker`,
   `apps-ayokoding-www-facts-checker`, `apps-ayokoding-www-link-checker`.
 - Research: `web-researcher` (accuracy sweep, DD-28; also the facts-checker's delegate).
 - Skills: `docs-creating-by-example-tutorials`, `docs-creating-accessible-diagrams`,
   `apps-ayokoding-www-developing-content`.
 - Workflow: [`ayokoding-web-general-quality-gate`](../../../repo-governance/workflows/ayokoding-web/ayokoding-web-general-quality-gate.md)
-  (per-topic + final, double-zero, strict).
+  (per-topic + final, double-zero, strict), plus the per-format quality gates (DD-37):
+  `ayokoding-web-swe-by-example-quality-gate` (existing), and the new
+  `ayokoding-web-annotated-concept-quality-gate` + `ayokoding-web-primer-quality-gate` (created in Phase 0).
 - No new npm packages, no `project.json` target changes.
 
 ## Rollback
@@ -603,7 +723,7 @@ the two `_index.md` nav edits. No data migration, no build-config change, no run
   `<details>` expands; nav link resolves; zero console errors.
 - **Not** a UI/component change: the UI-design-funnel does not apply (no new UI components; pure
   markdown content). The **rule-15 three-tester retest DOES apply**: this plan adds well over 100 new
-  browser-rendered pages (90 topic folders × learning subtree + drill page + intra-topic capstone,
+  browser-rendered pages (91 topic folders × learning subtree + drill page + intra-topic capstone,
   ~9–11 inter-topic capstones, plus section landing/overview) plus 2 nav entries to the live
   ayokoding-www site, which is a user-facing feature change under
   [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md)

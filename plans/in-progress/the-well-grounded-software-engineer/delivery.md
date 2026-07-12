@@ -33,7 +33,7 @@ push runs **direct-push + CI post-push verification** instead of the PR-Review M
 single push at the end. The moment a topic (or inter-topic capstone) phase passes its gate, the AI
 **commits and pushes that deliverable to `origin main`** and confirms its `main-ci` run is green before
 starting the next phase — so each topic lands green on `main` as it completes. Content is additive and
-not yet nav-wired at this stage, so per-topic pushes are safe (nav wiring lands in Phase 101). The
+not yet nav-wired at this stage, so per-topic pushes are safe (nav wiring lands in Phase 102). The
 finalization push phase is therefore a **final catch-up + verify** (nav-wiring commit + confirm
 `origin/main` fully green), not the sole push.
 
@@ -62,14 +62,32 @@ flowchart TD
     class N,R,P,D,K,A done
 ```
 
+## Per-topic phase anatomy — one checkbox per concept and per worked example (DD-34)
+
+Each per-topic phase below expands its authoring step into **two mirrored checkbox runs**, per the
+[Worked-Example & Concept Enumeration rule (DD-34)](./prd.md#worked-example--concept-enumeration--exhaustive-per-topic-hard-rule-dd-34):
+
+1. **Concepts first** — **one `[AI]` checkbox per enumerated concept** from that topic's
+   [syllabus/ file](./syllabus/) `## Concepts` section, mirroring the syllabus `co-NN · <slug>` list
+   **1:1** (same count, same slugs). Concepts are authored/verified before the examples that
+   demonstrate them.
+2. **Then examples** — **one `[AI]` checkbox per enumerated worked example** from the topic's
+   `## Worked examples` section, grouped by the same tiers (Beginner/Intermediate/Advanced, or
+   per-theme clusters for Annotated-concept / `‡` topics). Every checkbox names its colocated `code/`
+   (or `artifacts/`) file and its verify command, and mirrors the syllabus `ex-NN · <slug>` list
+   **1:1** (same count, same slugs). Each example checkbox cites the `co-NN` it exercises.
+
+The phase then keeps its capstone step, checker/drill/build step (`A3/D/F/G`), `### Phase N Gate`,
+per-topic commit+push block, and Pause Safety note.
+
 ## Weight Scheme (topic-first, DD-26)
 
 `CONTENT = apps/ayokoding-www/content/en/learn/software-engineering/the-well-grounded-software-engineer`.
 
 - **Topic-slug folder** `CONTENT/<slug>/_index.md` → weight `100 + 10 × journey-index` (topic 1 = 110,
-  topic 2 = 120, … topic 90 = 1000). The ×10 spacing leaves integer gaps for inter-topic capstones.
-- **Learning subfolder** `CONTENT/<slug>/learning/_index.md` → weight = prd **"Learn wt"** (101..190).
-- **Drilling subfolder** `CONTENT/<slug>/drilling/_index.md` → weight = prd **"Drill wt"** (201..290),
+  topic 2 = 120, … topic 94 = 1040). The ×10 spacing leaves integer gaps for inter-topic capstones.
+- **Learning subfolder** `CONTENT/<slug>/learning/_index.md` → weight = prd **"Learn wt"** (101..191).
+- **Drilling subfolder** `CONTENT/<slug>/drilling/_index.md` → weight = prd **"Drill wt"** (201..291),
   with the parity invariant **`Drill wt = Learn wt + 100`**.
 - **Intra-topic capstone** `CONTENT/<slug>/learning/capstone/_index.md` → weight **900** (sorts last
   inside `learning/`).
@@ -88,13 +106,27 @@ its row variables `<slug>` / `<idx>` / `<topicWt>=100+10×idx` / `<Lwt>` / `<Dwt
 design/decision artifact, no code). Every step names an explicit path, a verbatim command or agent
 invocation, and a concrete acceptance criterion (execution-grade clarity).
 
+> **HARD RULE — No-hallucination citation verification (DD-35).** Every command, code API, library
+> method, CLI flag, operator, procedure name, config key, version string, RFC/standard number, and
+> factual claim an author writes into any authored page MUST be verified against a **real primary
+> source (official docs / the RFC or ISO text / the project's own repo) that the author actually
+> fetched and read** — never recalled from memory or invented. Do not cite an API, flag, command,
+> operator, or version that you have not confirmed exists in a source you read. When a fact cannot be
+> verified, state the uncertainty in-text rather than presenting a guess as fact. This binds every A1 /
+> A2 / D authoring step below and is enforced at step **F** by `apps-ayokoding-www-facts-checker`
+> (delegating to `web-researcher`): a page citing a non-existent API/flag/command/version, or any claim
+> with no readable authoritative source, is an unresolved factual finding that **blocks the phase
+> gate**. See [prd.md §No-Hallucination Citation Verification (DD-35)](./prd.md#no-hallucination-citation-verification--every-cited-fact-traces-to-a-read-primary-source-hard-rule-dd-35).
+
 1. **[AI] V — Web-verify before authoring (DD-28).** Invoke `web-researcher` for `<slug>`: current
    stable versions, current API/CLI syntax, license status (DD-21), CVE status (DD-23), and current
    best practice for `<lang>`/the subject. Fold the dated findings into the topic's
    `plans/in-progress/the-well-grounded-software-engineer/syllabus/<NN>-<slug>.md` **before** authoring.
-   Runs **sequentially, one topic at a time** (token-bounded). **Acceptance**: the syllabus file's
-   "Accuracy notes (web-verified)" block is updated with dated findings; no unresolved version/license/CVE
-   conflict remains.
+   Runs **sequentially, one topic at a time** (token-bounded). Each dated finding carries the **primary
+   source URL the researcher fetched and read** (DD-35); anything unconfirmed is flagged
+   `[Needs Verification]` rather than asserted. **Acceptance**: the syllabus file's "Accuracy notes
+   (web-verified)" block is updated with dated, source-cited findings; no unresolved
+   version/license/CVE conflict and no unsourced factual claim remains.
 2. **[AI] A1 — Author the learning subtree (DD-24, DD-30, DD-31).** Create `CONTENT/<slug>/_index.md`
    (frontmatter `weight: <topicWt>`, links to `learning/` + `drilling/`), `CONTENT/<slug>/learning/_index.md`
    (frontmatter `weight: <Lwt>`), `CONTENT/<slug>/learning/overview.md` (weight 1 — restating the syllabus
@@ -119,6 +151,8 @@ the big idea` opener is present with ≥1 Cross-Cutting Big-Idea tag drawn from 
    non-judgment topic omits them (DD-33); all code in `<lang>`
    (or the documented `†`/`*` exception); every syllabus item/example present; DD-30 follow-along holds
    (versions up front, no elided `...`-only listings, every command shown verbatim with expected output);
+   DD-20 sharpening holds (no implicit dependencies — every identifier defined/imported in-snippet; and
+   expected output shown inline as a comment in idiomatic syntax, e.g. `# => …` / `// prints: …`);
    DD-19 (no TODO/TBD/stub/placeholder).
 3. **[AI] A2 — Author the intra-topic capstone (DD-27).** Create `CONTENT/<slug>/learning/capstone/_index.md`
    (frontmatter `weight: 900`) and capstone pages built strictly from the capstone spec in
@@ -143,9 +177,13 @@ the big idea` opener is present with ≥1 Cross-Cutting Big-Idea tag drawn from 
    where `<Dwt> = <Lwt> + 100`; **five** sections present in order (the elaborative section last); every
    answer/explanation inside a `<details>` block; the elaborative section carries ≥1 why/why-not prompt
    tied to a big-idea tag; checker reports no unresolved HIGH/CRITICAL findings.
-6. **[AI] F — Fact-check the topic.** Run `apps-ayokoding-www-facts-checker` (which delegates deep research
-   to `web-researcher`) over `CONTENT/<slug>/`. **Acceptance**: no unresolved factual findings
-   (commands/versions/APIs/licenses/CVEs verified).
+6. **[AI] F — Fact-check the topic (DD-35 anti-hallucination gate).** Run `apps-ayokoding-www-facts-checker`
+   (which delegates deep research to `web-researcher`) over `CONTENT/<slug>/`. Every cited command, code
+   API, library method, CLI flag, operator, procedure name, config key, version string, and RFC/standard
+   number is confirmed against a real primary source that was read; any citation of a non-existent
+   API/flag/command/version, or any claim with no readable authoritative source, is a blocking finding.
+   **Acceptance**: no unresolved factual findings (commands/versions/APIs/flags/operators/licenses/CVEs
+   verified against read primary sources; no fabricated or unverifiable citation remains).
 7. **[AI] G — Build + lint gate.** Run `npx nx run ayokoding-www:build` and `npm run lint:md`.
    **Acceptance**: both exit 0 with the new topic subtree in place.
 
@@ -199,9 +237,39 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
       exits 0 on the existing tree, or only auto-fixable issues that fix cleanly.
 - [ ] **[AI]** Scaffold the section root: create `CONTENT/_index.md` (frontmatter `weight: 1750`, title
       "The Well-Grounded Software Engineer", intro + link list to the journey map) and `CONTENT/overview.md`
-      (weight 1 — read-then-drill workflow, the Pass 0 + five-pass spiral Mermaid map and the 90-node skill
+      (weight 1 — read-then-drill workflow, the Pass 0 + five-pass spiral Mermaid map and the 94-node skill
       tree from [prd.md](./prd.md), accessible WCAG palette). **Acceptance**: both files exist;
       `npx nx run ayokoding-www:build` still exits 0.
+- [ ] **[AI] Formatter coverage (lint-staged)** — Update the repo-root
+      [`package.json`](../../../package.json) `lint-staged` block so every code-sample file type this section
+      commits (under `CONTENT/**/code/`) has a canonical auto-formatter, per the formatter matrix in
+      [tech-docs.md §DD-36](./tech-docs.md#dd-36--formatter-coverage-for-code-samples-lint-staged). Wire
+      **Tier-1** (npm-installable, no extra runtime) formatters directly: Prettier (`*.md`, `*.yaml`, `*.yml`,
+      `*.json`, `*.html`, `*.ts`, `*.tsx`, `*.js`), StyLua (`*.lua`), `prettier-plugin-sql` (`*.sql`),
+      `clang-format` npm wrapper (`*.c`, `*.h`), `@bazel/buildifier` (`BUILD`, `*.bzl`); keep **hadolint** as
+      the Dockerfile lint gate (no canonical Dockerfile formatter exists). Ensure **Tier-2** single-binary
+      formatters are installed by `npm run doctor -- --fix` and invoked from lint-staged via a thin wrapper:
+      `ruff format` (`*.py`), `shfmt -w` (`*.sh`), `gofmt -w` (`*.go`), `rustfmt` (`*.rs`), `tofu fmt`
+      (license-clean MPL-2.0 alternative to the BUSL-1.1 `terraform fmt`) (`*.tf`). **Tier-3** heavy-toolchain
+      languages (Elixir, Kotlin, Swift, Dart, C#, Java, F#, OCaml, Haskell, Clojure) and the
+      **no-canonical-formatter** types (Makefile, Gradle Groovy DSL, Scheme/Common Lisp) are **explicitly
+      deferred** to CI / existing per-language lint gates — not pre-commit — and listed with rationale in the
+      DD. **Acceptance**: `npx lint-staged` on a staged sample of each Tier-1/Tier-2 type formats it in place
+      and exits 0; the deferred set is enumerated in tech-docs §DD-36.
+- [ ] **[AI] Per-format agent trios + quality gates** — For each learning format this section uses that lacks
+      a dedicated trio, create a `maker`/`checker`/`fixer` agent set plus a quality-gate workflow, mirroring
+      the existing `apps-ayokoding-www-by-example-{maker,checker,fixer}` +
+      [`ayokoding-web-swe-by-example-quality-gate.md`](../../../repo-governance/workflows/ayokoding-web/ayokoding-web-swe-by-example-quality-gate.md).
+      Create under `.claude/agents/`: `apps-ayokoding-www-annotated-concept-{maker,checker,fixer}`
+      (concept-centric, 45-60 worked examples + accessible Mermaid diagrams; the **leadership no-code ‡**
+      variant is a validated **sub-mode** — 20-30 scenarios, zero code — not a separate trio, per the
+      3-format decision) and `apps-ayokoding-www-primer-{maker,checker,fixer}` ("Just Enough X" language/tool
+      on-ramps). Add workflows `ayokoding-web-annotated-concept-quality-gate.md` and
+      `ayokoding-web-primer-quality-gate.md` under `repo-governance/workflows/ayokoding-web/`. Register all six
+      agents in the [agent catalog](../../../.claude/agents/README.md) + `AGENTS.md`, then run
+      `npm run generate:bindings` to sync `.opencode/` + `.amazonq/`. **Acceptance**: `git status` shows the 6
+      new agent files + 2 new workflow files; `npm run generate:bindings` exits 0 and
+      `nx run rhino-cli:validate:sync` passes; By Example keeps its existing trio unchanged.
 
 ### Phase 0 Gate
 
@@ -227,9 +295,122 @@ Row: Primer · Neovim § · topic wt 110 · Learn 101 / Drill 201 · **primer**.
 - [ ] **[AI] V** — `web-researcher` for `just-enough-nvim`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/01-just-enough-nvim.md`](./syllabus/01-just-enough-nvim.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-nvim/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/01-just-enough-nvim.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-nvim/learning/` teaching **every** concept in
+      `syllabus/01-just-enough-nvim.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · modal-editing
+  - [ ] co-02 · mode-taxonomy
+  - [ ] co-03 · motions
+  - [ ] co-04 · operator-motion-grammar
+  - [ ] co-05 · counts
+  - [ ] co-06 · text-objects
+  - [ ] co-07 · registers
+  - [ ] co-08 · marks-and-jumplist
+  - [ ] co-09 · the-dot-repeat
+  - [ ] co-10 · search-and-substitution
+  - [ ] co-11 · ex-command-ranges
+  - [ ] co-12 · the-global-command
+  - [ ] co-13 · undo-tree
+  - [ ] co-14 · macros
+  - [ ] co-15 · buffers-windows-tabs
+  - [ ] co-16 · folding
+  - [ ] co-17 · quickfix-list
+  - [ ] co-18 · netrw-file-explorer
+  - [ ] co-19 · visual-mode-variants
+  - [ ] co-20 · terminal-mode-and-jobs
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-nvim/learning/code/` — one runnable before/after +
+      keystroke transcript per worked example in `syllabus/01-just-enough-nvim.md` §Worked examples (DD-20/DD-30).
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · launch-nvim-on-file — verify Normal mode shows file contents
+  - [ ] ex-02 · quit-unmodified-buffer — verify `:q` exits, no prompt
+  - [ ] ex-03 · quit-discard-changes — verify `:q!` exits, file unchanged
+  - [ ] ex-04 · reload-discard-with-e-bang — verify `:e!` drops edit
+  - [ ] ex-05 · save-file — verify `:w` writes buffer to disk
+  - [ ] ex-06 · save-and-quit — verify `:wq` writes and exits
+  - [ ] ex-07 · save-and-quit-shortcut — verify `ZZ` writes-if-modified and quits
+  - [ ] ex-08 · enter-insert-before-cursor — verify `i` inserts before column
+  - [ ] ex-09 · enter-insert-after-cursor — verify `a` inserts after column
+  - [ ] ex-10 · append-end-of-line — verify `A` appends at EOL
+  - [ ] ex-11 · insert-start-of-line — verify `I` inserts at first non-blank
+  - [ ] ex-12 · open-line-below — verify `o` opens line below
+  - [ ] ex-13 · open-line-above — verify `O` opens line above
+  - [ ] ex-14 · escape-to-normal — verify `<Esc>` returns to Normal
+  - [ ] ex-15 · move-with-hjkl — verify one-cell moves
+  - [ ] ex-16 · move-by-word — verify `w`/`b` land on word starts
+  - [ ] ex-17 · move-to-word-end — verify `e` lands on word end
+  - [ ] ex-18 · move-line-boundaries — verify `0`/`^`/`$`
+  - [ ] ex-19 · move-file-boundaries — verify `gg`/`G`
+  - [ ] ex-20 · move-by-paragraph — verify `}`/`{`
+  - [ ] ex-21 · delete-char — verify `x` removes one char
+  - [ ] ex-22 · delete-word — verify `dw` removes word+trailing ws
+  - [ ] ex-23 · delete-line — verify `dd` removes line
+  - [ ] ex-24 · delete-to-eol — verify `D` deletes to EOL
+  - [ ] ex-25 · change-word — verify `cw` deletes word, opens Insert
+  - [ ] ex-26 · yank-and-paste-line — verify `yy`+`p` duplicates line
+  - [ ] ex-27 · undo-last-change — verify `u` reverts
+  - [ ] ex-28 · redo-change — verify `<C-r>` reapplies
+  - [ ] ex-29 · basic-search-forward — verify `/needle` jumps to match
+  - [ ] ex-30 · repeat-search — verify `n`/`N`
+  - [ ] ex-31 · basic-substitute-line — verify `:s/old/new/` first hit
+  - [ ] ex-32 · substitute-whole-file — verify `:%s/old/new/g`
+  - [ ] ex-33 · count-prefixed-motion — verify `3w` advances 3 words
+  - [ ] ex-34 · count-prefixed-delete — verify `3dd` deletes 3 lines
+  - [ ] ex-35 · replace-single-char — verify `r` changes one char
+  - [ ] ex-36 · replace-mode-typing — verify `R` overwrites
+  - [ ] ex-37 · visual-char-select-delete — verify `v`+`d`
+  - [ ] ex-38 · visual-line-select-indent — verify `V`+`>`
+  - [ ] ex-39 · visual-block-insert — verify `<C-v>`+`I` on every line
+  - [ ] ex-40 · text-object-inner-word — verify `diw`
+  - [ ] ex-41 · text-object-a-word — verify `daw`
+  - [ ] ex-42 · text-object-inner-paren — verify `ci(`
+  - [ ] ex-43 · text-object-inner-quote — verify `di"`
+  - [ ] ex-44 · text-object-inner-tag — verify `cit`
+  - [ ] ex-45 · text-object-a-paragraph — verify `dap`
+  - [ ] ex-46 · dot-repeat-edit — verify `.` reapplies change
+  - [ ] ex-47 · named-register-yank-paste — verify `"ayy`/`"ap`
+  - [ ] ex-48 · named-register-append — verify `"Ayy` appends
+  - [ ] ex-49 · numbered-register-recall — verify `"2p`
+  - [ ] ex-50 · set-mark-and-jump — verify `ma`/`'a`
+  - [ ] ex-51 · exact-mark-jump — verify `` `b `` exact column
+  - [ ] ex-52 · jumplist-navigation — verify `<C-o>`/`<C-i>`
+  - [ ] ex-53 · open-second-file-buffer — verify `:e other.txt`
+  - [ ] ex-54 · list-and-switch-buffers — verify `:ls`/`:b 2`
+  - [ ] ex-55 · cycle-buffers — verify `:bnext`/`:bprevious`
+  - [ ] ex-56 · horizontal-split-navigate — verify `:split`+`<C-w>j/k`
+  - [ ] ex-57 · vertical-split-navigate — verify `:vsplit`+`<C-w>l/h`
+  - [ ] ex-58 · open-new-tab — verify `:tabnew`+`gt`/`gT`
+  - [ ] ex-59 · write-all-buffers — verify `:wa`
+  - [ ] ex-60 · join-lines — verify `J`
+  - [ ] ex-61 · join-lines-no-space — verify `gJ`
+  - [ ] ex-62 · decrease-indent — verify `<<`
+  - [ ] ex-63 · indent-shift-multiple-lines — verify `V`+`3>`
+  - [ ] ex-64 · case-toggle-tilde — verify `~`
+  - [ ] ex-65 · case-lower-motion — verify `guiw`
+  - [ ] ex-66 · case-upper-motion — verify `gUiw`
+  - [ ] ex-67 · increment-number — verify `<C-a>`
+  - [ ] ex-68 · decrement-number — verify `<C-x>`
+  - [ ] ex-69 · sequential-increment-visual-block — verify `g<C-a>` sequential
+  - [ ] ex-70 · substitute-with-confirm-flag — verify `:%s///gc` prompts
+  - [ ] ex-71 · substitute-with-line-range — verify `:10,20s///g`
+  - [ ] ex-72 · substitute-visual-range — verify `'<,'>s///g`
+  - [ ] ex-73 · substitute-with-capture-group — verify `\1` reuse
+  - [ ] ex-74 · record-and-play-macro — verify `qa…q`/`@a`
+  - [ ] ex-75 · repeat-macro-with-count — verify `5@a`
+  - [ ] ex-76 · repeat-last-macro — verify `@@`
+  - [ ] ex-77 · undo-tree-time-travel — verify `g-`/`g+` reach branch
+  - [ ] ex-78 · inspect-undo-tree — verify `:undolist`
+  - [ ] ex-79 · global-delete-matching-lines — verify `:g/TODO/d`
+  - [ ] ex-80 · global-inverse-keep-matching — verify `:v/KEEP/d`
+  - [ ] ex-81 · global-normal-command — verify `:g/^-/normal A;`
+  - [ ] ex-82 · create-and-toggle-fold — verify `zf`/`za`
+  - [ ] ex-83 · close-open-all-folds — verify `zM`/`zR`
+  - [ ] ex-84 · populate-quickfix-vimgrep — verify `:vimgrep`
+  - [ ] ex-85 · navigate-quickfix-list — verify `:copen`/`:cnext`
+  - [ ] ex-86 · netrw-open-explorer — verify `:Explore`
+  - [ ] ex-87 · netrw-create-file — verify netrw `%`
+  - [ ] ex-88 · netrw-delete-file — verify netrw `D`
+  - [ ] ex-89 · black-hole-register-delete — verify `"_dd` preserves unnamed
+  - [ ] ex-90 · saveas-new-filename — verify `:saveas copy.txt`
+  - [ ] ex-91 · terminal-run-and-escape — verify `:terminal ls` + `<C-\><C-n>` output navigable
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-nvim/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -241,7 +422,7 @@ Row: Primer · Neovim § · topic wt 110 · Learn 101 / Drill 201 · **primer**.
 ### Phase 1 Gate
 
 - [ ] [AI] `just-enough-nvim/` complete: `_index.md` wt 110, `learning/_index.md` wt 101,
-      `drilling/_index.md` wt 201, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 201, capstone wt 900; all 20 concepts + 91 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -256,9 +437,113 @@ Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. T
 - [ ] **[AI] V** — `web-researcher` for `just-enough-lua`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/02-just-enough-lua.md`](./syllabus/02-just-enough-lua.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-lua/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/02-just-enough-lua.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-lua/learning/` teaching **every** concept in
+      `syllabus/02-just-enough-lua.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · dynamic-typing-eight-types
+  - [ ] co-02 · nil-and-false-are-falsy
+  - [ ] co-03 · tables-are-the-only-data-structure
+  - [ ] co-04 · array-part-vs-hash-part
+  - [ ] co-05 · functions-are-first-class-values
+  - [ ] co-06 · lexical-scope-and-local
+  - [ ] co-07 · closures-and-upvalues
+  - [ ] co-08 · multiple-return-values
+  - [ ] co-09 · varargs-and-select
+  - [ ] co-10 · metatables-and-metamethods
+  - [ ] co-11 · index-metamethod-prototype-oop
+  - [ ] co-12 · colon-syntax-for-methods
+  - [ ] co-13 · error-handling-with-pcall
+  - [ ] co-14 · modules-and-require
+  - [ ] co-15 · coroutines-cooperative-multitasking
+  - [ ] co-16 · string-library-and-patterns
+  - [ ] co-17 · standard-libraries-overview
+  - [ ] co-18 · luajit-and-lua51-in-neovim
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-lua/learning/code/` — one runnable `.lua` script +
+      expected output per worked example in `syllabus/02-just-enough-lua.md` §Worked examples (DD-20/DD-30).
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · hello-world-print — verify `Hello, world!`
+  - [ ] ex-02 · type-function-eight-types — verify type names printed
+  - [ ] ex-03 · nil-vs-false-truthiness — verify `0`/`""` truthy
+  - [ ] ex-04 · local-vs-global-shadowing — verify `20` then `10`
+  - [ ] ex-05 · multiple-assignment-swap — verify `2 1`
+  - [ ] ex-06 · arithmetic-operators-modulo-power — verify `1 1024 -5`
+  - [ ] ex-07 · math-library-floor-random — verify `3 true`
+  - [ ] ex-08 · string-concatenation-coercion — verify `Value: 42`
+  - [ ] ex-09 · string-length-operator — verify `5`
+  - [ ] ex-10 · comparison-operators — verify `true true true`
+  - [ ] ex-11 · logical-or-default-idiom — verify `default`
+  - [ ] ex-12 · logical-and-or-ternary-idiom — verify `yes`
+  - [ ] ex-13 · not-operator-truthiness — verify `true true false`
+  - [ ] ex-14 · if-elseif-else-branching — verify correct branch prints
+  - [ ] ex-15 · numeric-for-loop-ascending — verify `1 2 3 4 5`
+  - [ ] ex-16 · numeric-for-loop-descending-step — verify `10 8 6 4 2`
+  - [ ] ex-17 · while-loop-counter — verify `3`
+  - [ ] ex-18 · repeat-until-loop — verify body runs once
+  - [ ] ex-19 · table-array-literal-and-length — verify `10 30 3`
+  - [ ] ex-20 · table-map-literal-and-field-access — verify `Ada 36`
+  - [ ] ex-21 · table-nested-field-access — verify `42`
+  - [ ] ex-22 · ipairs-iteration-array — verify ordered `1 x`/`2 y`/`3 z`
+  - [ ] ex-23 · pairs-iteration-map — verify both pairs printed
+  - [ ] ex-24 · function-basic-definition-call — verify `5`
+  - [ ] ex-25 · function-default-parameter-idiom — verify `Hello world`
+  - [ ] ex-26 · function-multiple-return-values — verify `2 5`
+  - [ ] ex-27 · varargs-basic-sum — verify `6`
+  - [ ] ex-28 · varargs-select-count — verify `3` counts nil
+  - [ ] ex-29 · table-insert-append — verify `3`
+  - [ ] ex-30 · table-insert-at-position — verify `0` shifted
+  - [ ] ex-31 · table-remove-last — verify returned last, `#t`−1
+  - [ ] ex-32 · table-remove-at-position — verify prior-second
+  - [ ] ex-33 · table-concat-join — verify `a, b, c`
+  - [ ] ex-34 · table-sort-default-order — verify `1,2,3`
+  - [ ] ex-35 · table-sort-custom-comparator — verify `3,2,1`
+  - [ ] ex-36 · string-format-basic-placeholders — verify `age is 36`
+  - [ ] ex-37 · string-format-float-width-precision — verify `3.14` right-aligned in width 5 (one leading space)
+  - [ ] ex-38 · string-sub-substring-range — verify `hello`
+  - [ ] ex-39 · string-sub-negative-index-colon-syntax — verify `llo`
+  - [ ] ex-40 · string-upper-lower-colon-syntax — verify `NEOVIM neovim`
+  - [ ] ex-41 · string-rep-repeat — verify `ababab`
+  - [ ] ex-42 · string-find-plain-search — verify `7 11`
+  - [ ] ex-43 · string-match-pattern-captures — verify `key value`
+  - [ ] ex-44 · string-gmatch-word-iteration — verify `one|two|three|`
+  - [ ] ex-45 · string-gsub-substitution-count — verify `hell0 w0rld 2`
+  - [ ] ex-46 · generic-for-stateless-iterator — verify `1`/`2`/`3`
+  - [ ] ex-47 · closures-counter-factory — verify `1 2 3`
+  - [ ] ex-48 · closures-independent-instances — verify separate counts
+  - [ ] ex-49 · function-recursion-factorial — verify `120`
+  - [ ] ex-50 · function-as-callback-argument — verify `25`
+  - [ ] ex-51 · function-returning-function-adder — verify `15`
+  - [ ] ex-52 · table-mixed-array-and-map — verify `3 mix`
+  - [ ] ex-53 · metatable-index-function-default — verify `N/A`
+  - [ ] ex-54 · metatable-index-table-inheritance — verify fallthrough
+  - [ ] ex-55 · metatable-tostring-custom-print — verify `Point(1,2)`
+  - [ ] ex-56 · metatable-add-operator-overload — verify summed `x`
+  - [ ] ex-57 · modules-require-return-table-and-caching — verify `hi true`
+  - [ ] ex-58 · error-raise-with-message-and-pcall — verify `false`+msg
+  - [ ] ex-59 · error-raise-table-object — verify `42`
+  - [ ] ex-60 · assert-custom-message — verify `custom failure`
+  - [ ] ex-61 · xpcall-with-traceback-handler — verify `stack traceback`
+  - [ ] ex-62 · error-level-suppress-position — verify bare `raw`
+  - [ ] ex-63 · metatable-eq-operator — verify `true` on shared id
+  - [ ] ex-64 · metatable-call-operator — verify `called`
+  - [ ] ex-65 · oop-class-with-index-metatable — verify `Rex makes a sound`
+  - [ ] ex-66 · oop-inheritance-chain-setmetatable — verify inherited msg
+  - [ ] ex-67 · oop-method-override — verify `barks` vs base
+  - [ ] ex-68 · coroutine-create-and-resume — verify `a` then `b`
+  - [ ] ex-69 · coroutine-yield-value-exchange — verify bidirectional value
+  - [ ] ex-70 · coroutine-wrap-as-iterator — verify `1 2 3`
+  - [ ] ex-71 · coroutine-status-transitions — verify suspended/running/dead
+  - [ ] ex-72 · unpack-global-function-51 — verify `1 2 3`
+  - [ ] ex-73 · string-format-q-escape-quote — verify reloadable literal
+  - [ ] ex-74 · pattern-capture-anchored-date — verify `2026 07 12`
+  - [ ] ex-75 · memoized-closure-fibonacci — verify `832040` cached
+  - [ ] ex-76 · rawget-rawequal-bypass-metamethods — verify metamethods bypassed
+  - [ ] ex-77 · varargs-table-constructor — verify `3 1 3`
+  - [ ] ex-78 · neovim-vim-tbl-deep-extend-merge — verify `b.c`→3, `a`=1
+  - [ ] ex-79 · neovim-vim-tbl-map-filter — verify `2, 4, 6`
+  - [ ] ex-80 · neovim-vim-keymap-set-callback — verify `mapped` in `:messages`
+  - [ ] ex-81 · neovim-vim-opt-scalar-option — verify `2`
+  - [ ] ex-82 · neovim-vim-api-buf-set-lines — verify `hello|world`
+  - [ ] ex-83 · neovim-vim-inspect-pretty-print — verify nested `x = 3`
+  - [ ] ex-84 · neovim-vim-split-string-utility — verify 4 elements w/ empty
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-lua/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -270,7 +555,7 @@ Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. T
 ### Phase 2 Gate
 
 - [ ] [AI] `just-enough-lua/` complete: `_index.md` wt 120, `learning/_index.md` wt 102,
-      `drilling/_index.md` wt 202, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 202, capstone wt 900; all 18 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -285,9 +570,109 @@ Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject
 - [ ] **[AI] V** — `web-researcher` for `extending-neovim`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/03-extending-neovim.md`](./syllabus/03-extending-neovim.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/extending-neovim/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/03-extending-neovim.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/extending-neovim/learning/` teaching **every** concept in
+      `syllabus/03-extending-neovim.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · init-lua-entrypoint
+  - [ ] co-02 · options-vim-o-vs-opt
+  - [ ] co-03 · global-and-scoped-variables
+  - [ ] co-04 · keymap-set
+  - [ ] co-05 · autocommands
+  - [ ] co-06 · user-commands
+  - [ ] co-07 · lua-module-system
+  - [ ] co-08 · plugin-management-vim-pack
+  - [ ] co-09 · plugin-management-lazy-nvim
+  - [ ] co-10 · native-lsp-config
+  - [ ] co-11 · lsp-server-configs-and-lspconfig
+  - [ ] co-12 · lsp-attach-and-keymaps
+  - [ ] co-13 · default-lsp-keymaps
+  - [ ] co-14 · diagnostics-config
+  - [ ] co-15 · native-lsp-completion
+  - [ ] co-16 · treesitter-highlighting
+  - [ ] co-17 · treesitter-textobjects-and-queries
+  - [ ] co-18 · writing-a-custom-plugin-module
+- [ ] **[AI] A1-examples** — Author `CONTENT/extending-neovim/learning/code/` — one runnable source +
+      expected output per worked example in `syllabus/03-extending-neovim.md` §Worked examples (DD-20/DD-30).
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · locate-init-lua — verify `:echo $MYVIMRC` reports the path
+  - [ ] ex-02 · set-boolean-option-vim-o — verify `:set number?`
+  - [ ] ex-03 · set-relativenumber — verify relative line numbers
+  - [ ] ex-04 · set-tab-options — verify `<Tab>` inserts two spaces
+  - [ ] ex-05 · append-list-option-vim-opt — verify `:set wildignore?`
+  - [ ] ex-06 · ignorecase-smartcase — verify `/Foo` vs `/foo` matching
+  - [ ] ex-07 · set-mapleader — verify `<leader>` resolves to space
+  - [ ] ex-08 · basic-normal-keymap — verify `<leader>w` saves + `desc`
+  - [ ] ex-09 · keymap-with-lua-function — verify `<leader>q` closes silently
+  - [ ] ex-10 · keymap-multiple-modes — verify yank to system clipboard both modes
+  - [ ] ex-11 · buffer-local-keymap — verify `q` maps only in that filetype
+  - [ ] ex-12 · remove-a-keymap — verify no mapping remains
+  - [ ] ex-13 · set-colorscheme — verify `:colorscheme` echoes `habamax`
+  - [ ] ex-14 · autocmd-command-string — verify trailing whitespace stripped on save
+  - [ ] ex-15 · autocmd-yank-highlight — verify yanked text flashes
+  - [ ] ex-16 · augroup-scoped-autocmds — verify `:au MyConfig` lists two
+  - [ ] ex-17 · filetype-local-option — verify `.md` wraps, others don't
+  - [ ] ex-18 · simple-user-command — verify `:Reload` re-sources
+  - [ ] ex-19 · user-command-with-arg — verify `:Greet World` prints `Hello World`
+  - [ ] ex-20 · split-config-into-module — verify module loaded + options apply
+  - [ ] ex-21 · reload-a-module — verify edited value without restart
+  - [ ] ex-22 · run-checkhealth — verify per-component OK/ERROR report
+  - [ ] ex-23 · inspect-a-lua-value — verify `shiftwidth` echoed
+  - [ ] ex-24 · scoped-variable-independence — verify `1 2` then `1 nil`
+  - [ ] ex-25 · window-local-option — verify one split numbered, other not
+  - [ ] ex-26 · custom-statusline-format — verify filename/flag/line:col update
+  - [ ] ex-27 · termguicolors — verify truecolor rendering
+  - [ ] ex-28 · install-plugin-vim-pack-add — verify clone under `site/pack/core/opt/` + applies
+  - [ ] ex-29 · pack-add-with-version-pin — verify `v2.0.0` rev reported
+  - [ ] ex-30 · pack-update-plugins — verify diff buffer + lockfile update
+  - [ ] ex-31 · pack-remove-plugin — verify dir removed + drops from lockfile
+  - [ ] ex-32 · lazy-nvim-bootstrap — verify `:Lazy` opens manager UI
+  - [ ] ex-33 · lazy-plugin-spec-opts — verify loaded without manual `setup()`
+  - [ ] ex-34 · lazy-loading-by-event — verify loads only after InsertEnter
+  - [ ] ex-35 · lazy-loading-by-command — verify unloaded until `:Telescope`
+  - [ ] ex-36 · enable-lsp-server — verify `lua_ls` attaches on `.lua`
+  - [ ] ex-37 · customize-lsp-config — verify "undefined global `vim`" gone
+  - [ ] ex-38 · lsp-config-from-lsp-directory — verify auto-discovery of `pyright`
+  - [ ] ex-39 · lspattach-buffer-keymap — verify `K` hover only in LSP buffers
+  - [ ] ex-40 · verify-default-lsp-keymap — verify `grn` rename prompt (0.11+ default)
+  - [ ] ex-41 · diagnostic-virtual-text-off — verify inline text gone, signs remain
+  - [ ] ex-42 · diagnostic-float-on-cursorhold — verify float on error line
+  - [ ] ex-43 · diagnostic-severity-sort — verify error priority over warning
+  - [ ] ex-44 · lsp-format-on-save — verify auto-reformat before write
+  - [ ] ex-45 · native-completion-enable — verify native completion, no nvim-cmp
+  - [ ] ex-46 · native-completion-manual-trigger — verify Ctrl-Space menu
+  - [ ] ex-47 · confirm-builtin-treesitter-highlight — verify highlighter active non-nil
+  - [ ] ex-48 · treesitter-install-missing-parser — verify parser compiles + highlights
+  - [ ] ex-49 · treesitter-manual-start — verify highlighting turns on
+  - [ ] ex-50 · treesitter-inspect-parser-lang — verify active parser lang echoed
+  - [ ] ex-51 · treesitter-node-at-cursor — verify node type printed
+  - [ ] ex-52 · user-command-with-complete — verify `:SetColor <Tab>` completes colors
+  - [ ] ex-53 · user-command-with-range — verify `:'<,'>Upper` uppercases selection
+  - [ ] ex-54 · module-with-local-state — verify `1` then `2` persists
+  - [ ] ex-55 · module-setup-merge-pattern — verify merged defaults + override
+  - [ ] ex-56 · opt-local-vs-global — verify spell on there, off in second buffer
+  - [ ] ex-57 · keymap-expr-mapping — verify `<Tab>` cycles popup or inserts tab
+  - [ ] ex-58 · augroup-clear-idempotence — verify `:au` still lists originals after 3× source
+  - [ ] ex-59 · lsp-capabilities-merge — verify `snippetSupport = true` all servers
+  - [ ] ex-60 · lsp-wildcard-shared-defaults — verify root resolves at `.git`
+  - [ ] ex-61 · lsp-multiple-clients-one-buffer — verify two clients on one buffer
+  - [ ] ex-62 · lsp-stop-and-reattach — verify detach then reattach
+  - [ ] ex-63 · lsp-codelens-refresh-and-run — verify lenses render + `grx` runs
+  - [ ] ex-64 · lsp-workspace-symbol-search — verify project-wide symbol picker
+  - [ ] ex-65 · lsp-inlay-hints-toggle — verify inlay hints render inline
+  - [ ] ex-66 · treesitter-iter-captures — verify capture loop completes
+  - [ ] ex-67 · treesitter-custom-query-override — verify highlighting reflects override
+  - [ ] ex-68 · treesitter-select-parent-node — verify `an` selects enclosing node
+  - [ ] ex-69 · treesitter-sibling-navigation — verify `]n` jumps to next sibling
+  - [ ] ex-70 · treesitter-fold-expr — verify `zc` folds function body by syntax
+  - [ ] ex-71 · plugin-health-check — verify `:checkhealth myplugin` reports pass/fail
+  - [ ] ex-72 · plugin-command-registered-in-setup — verify cmd absent until `setup()`
+  - [ ] ex-73 · plugin-autoload-via-plugin-dir — verify commands available at startup
+  - [ ] ex-74 · plugin-async-job-with-uv — verify editor responsive + output on exit
+  - [ ] ex-75 · plugin-schedule-safety — verify wrapped succeeds, unwrapped errors
+  - [ ] ex-76 · custom-statusline-lua-component — verify statusline shows server name
+  - [ ] ex-77 · distribute-own-plugin-via-pack — verify module require-able + `plugin/` runs
+  - [ ] ex-78 · lsp-handler-override-to-quickfix — verify `grr` opens quickfix
+  - [ ] ex-79 · diagnostic-setloclist — verify location list populated
+  - [ ] ex-80 · full-config-healthcheck — verify `:checkhealth all` no unresolved ERROR
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/extending-neovim/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -299,7 +684,7 @@ Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject
 ### Phase 3 Gate
 
 - [ ] [AI] `extending-neovim/` complete: `_index.md` wt 130, `learning/_index.md` wt 103,
-      `drilling/_index.md` wt 203, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 203, capstone wt 900; all 18 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -346,9 +731,117 @@ Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Te
 - [ ] **[AI] V** — `web-researcher` for `just-enough-python`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/04-just-enough-python.md`](./syllabus/04-just-enough-python.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-python/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/04-just-enough-python.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-python/learning/` teaching **every** concept in
+      `syllabus/04-just-enough-python.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · running-python
+  - [ ] co-02 · virtual-environments
+  - [ ] co-03 · formatting-and-linting
+  - [ ] co-04 · variables-and-binding
+  - [ ] co-05 · primitive-types
+  - [ ] co-06 · type-hints
+  - [ ] co-07 · operators
+  - [ ] co-08 · strings-and-fstrings
+  - [ ] co-09 · lists
+  - [ ] co-10 · tuples
+  - [ ] co-11 · dictionaries
+  - [ ] co-12 · sets
+  - [ ] co-13 · slicing
+  - [ ] co-14 · comprehensions
+  - [ ] co-15 · conditionals
+  - [ ] co-16 · loops
+  - [ ] co-17 · functions
+  - [ ] co-18 · variadic-args
+  - [ ] co-19 · lambdas-and-scope
+  - [ ] co-20 · modules-and-imports
+  - [ ] co-21 · exceptions
+  - [ ] co-22 · files-and-io
+  - [ ] co-23 · json-serialization
+  - [ ] co-24 · classes
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-python/learning/code/` — one runnable `.py` script +
+      expected output per worked example in `syllabus/04-just-enough-python.md` §Worked examples (DD-20/DD-30).
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · hello-script — verify `Hello, world!`
+  - [ ] ex-02 · run-inline-code — verify `42`
+  - [ ] ex-03 · create-venv-install — verify pip show prints version
+  - [ ] ex-04 · format-with-black — verify `1 file reformatted` then `unchanged`
+  - [ ] ex-05 · lint-with-ruff — verify `F401` finding, non-zero exit
+  - [ ] ex-06 · int-and-float — verify `3 1.5`
+  - [ ] ex-07 · bool-and-none — verify `True None`
+  - [ ] ex-08 · arithmetic-operators — verify `3`/`1`/`32`
+  - [ ] ex-09 · comparison-operators — verify `True True False`
+  - [ ] ex-10 · boolean-operators — verify `False True False`
+  - [ ] ex-11 · fstring-interpolation — verify `Ada is 36`
+  - [ ] ex-12 · fstring-formatting — verify `3.14`
+  - [ ] ex-13 · string-methods — verify `A B C`/`a b c`/`['a','b','c']`
+  - [ ] ex-14 · list-basics — verify `[1, 2, 3, 4]`
+  - [ ] ex-15 · list-index-mutate — verify `[9, 2, 3]`
+  - [ ] ex-16 · tuple-unpacking — verify `10 20`
+  - [ ] ex-17 · tuple-immutable — verify catches TypeError prints `immutable`
+  - [ ] ex-18 · dict-basics — verify `36`
+  - [ ] ex-19 · dict-iterate-items — verify `a=1` then `b=2`
+  - [ ] ex-20 · set-dedup — verify `3`
+  - [ ] ex-21 · set-operations — verify `[1,2,3,4]` then `[2,3]`
+  - [ ] ex-22 · slice-list — verify `[1,2,3]` then reversed
+  - [ ] ex-23 · slice-string — verify `pyt`
+  - [ ] ex-24 · if-elif-else — verify negative/zero/positive
+  - [ ] ex-25 · truthiness — verify `empty`
+  - [ ] ex-26 · for-range — verify `15`
+  - [ ] ex-27 · while-loop — verify `3 2 1 0`
+  - [ ] ex-28 · enumerate-zip — verify indexed + paired output
+  - [ ] ex-29 · list-comprehension — verify `[0, 1, 4, 9, 16]`
+  - [ ] ex-30 · comprehension-filter — verify `[0, 2, 4]`
+  - [ ] ex-31 · dict-comprehension — verify `{0: 0, 1: 1, 2: 4}`
+  - [ ] ex-32 · set-comprehension — verify sorted `[1, 2]`
+  - [ ] ex-33 · generator-expression — verify `14`
+  - [ ] ex-34 · nested-comprehension — verify `[1, 2, 3, 4]`
+  - [ ] ex-35 · define-typed-function — verify `5`
+  - [ ] ex-36 · default-args — verify `Hello, world` then `Hello, Ada`
+  - [ ] ex-37 · keyword-args — verify positional-order match
+  - [ ] ex-38 · args-kwargs — verify correct counts
+  - [ ] ex-39 · return-tuple — verify `3 1`
+  - [ ] ex-40 · lambda-sort — verify `[('a', 1), ('b', 2)]`
+  - [ ] ex-41 · closure-counter — verify `1 2 3`
+  - [ ] ex-42 · scope-global-local — verify outer value changed
+  - [ ] ex-43 · map-filter — verify `[0, 4, 8]`
+  - [ ] ex-44 · import-stdlib-math — verify `4.0`
+  - [ ] ex-45 · from-import — verify `2`
+  - [ ] ex-46 · name-main-guard — verify prints on run, silent on import
+  - [ ] ex-47 · custom-module-import — verify imported output prints
+  - [ ] ex-48 · try-except — verify `cannot divide`
+  - [ ] ex-49 · try-except-else-finally — verify `try`/`else`/`finally`
+  - [ ] ex-50 · raise-valueerror — verify non-zero exit + traceback message
+  - [ ] ex-51 · catch-specific-exceptions — verify correct branch per trigger
+  - [ ] ex-52 · read-text-file — verify stdout matches file
+  - [ ] ex-53 · write-text-file — verify `line1\nline2\n`
+  - [ ] ex-54 · append-file — verify grows by one line
+  - [ ] ex-55 · json-dumps — verify `{"a": 1}`
+  - [ ] ex-56 · json-loads — verify `1`
+  - [ ] ex-57 · json-dump-file — verify roundtrip parses back
+  - [ ] ex-58 · json-load-file — verify expected value prints
+  - [ ] ex-59 · class-basics — verify updated coordinates print
+  - [ ] ex-60 · class-repr — verify `Point(x=1, y=2)`
+  - [ ] ex-61 · argparse-cli — verify `Hello, Ada`
+  - [ ] ex-62 · argparse-optional-flag — verify `HELLO, ADA`
+  - [ ] ex-63 · argparse-help — verify usage block, exit 0
+  - [ ] ex-64 · multi-module-package — verify `python3 -m app` output
+  - [ ] ex-65 · custom-exception-class — verify custom message printed
+  - [ ] ex-66 · reraise-with-context — verify chained traceback
+  - [ ] ex-67 · dataclass — verify `Point(x=1, y=2)`
+  - [ ] ex-68 · typed-signatures-ruff-clean — verify ruff exits 0
+  - [ ] ex-69 · comprehension-json-transform — verify uppercased names in output JSON
+  - [ ] ex-70 · generator-function-yield — verify `[0, 1, 2]`
+  - [ ] ex-71 · context-manager-custom — verify `enter`/`body`/`exit`
+  - [ ] ex-72 · json-file-roundtrip-pipeline — verify only kept records
+  - [ ] ex-73 · exception-exit-code — verify non-zero `$?`
+  - [ ] ex-74 · pytest-unit-test — verify `1 passed`
+  - [ ] ex-75 · pytest-raises — verify test passes
+  - [ ] ex-76 · nested-dict-access — verify default returned on missing path
+  - [ ] ex-77 · sort-dicts-by-key — verify ascending age order
+  - [ ] ex-78 · counter-frequency — verify most frequent word + count
+  - [ ] ex-79 · enumerate-file-lines — verify 1-based line prefixes
+  - [ ] ex-80 · fstring-debug — verify `value=42`
+  - [ ] ex-81 · typed-cli-json-roundtrip — verify roundtrip + ruff clean
+  - [ ] ex-82 · module-docstring-and-main — verify prints + docstring accessible
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-python/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -360,7 +853,7 @@ Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Te
 ### Phase 5 Gate
 
 - [ ] [AI] `just-enough-python/` complete: `_index.md` wt 140, `learning/_index.md` wt 104,
-      `drilling/_index.md` wt 204, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 204, capstone wt 900; all 24 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -375,9 +868,120 @@ Row: Primer · Bash/shell † · topic wt 150 · Learn 105 / Drill 205 · **prim
 - [ ] **[AI] V** — `web-researcher` for `just-enough-bash`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/05-just-enough-bash.md`](./syllabus/05-just-enough-bash.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-bash/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/05-just-enough-bash.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-bash/learning/` teaching **every** concept in
+      `syllabus/05-just-enough-bash.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · shebang-and-execution
+  - [ ] co-02 · interactive-vs-script
+  - [ ] co-03 · strict-mode
+  - [ ] co-04 · bash-vs-posix
+  - [ ] co-05 · variables-and-expansion
+  - [ ] co-06 · quoting
+  - [ ] co-07 · command-substitution
+  - [ ] co-08 · arithmetic-expansion
+  - [ ] co-09 · exit-codes
+  - [ ] co-10 · conditionals
+  - [ ] co-11 · case-statement
+  - [ ] co-12 · loops
+  - [ ] co-13 · functions
+  - [ ] co-14 · io-redirection
+  - [ ] co-15 · pipes
+  - [ ] co-16 · here-docs-and-strings
+  - [ ] co-17 · read-input
+  - [ ] co-18 · text-pipeline-tools
+  - [ ] co-19 · positional-parameters
+  - [ ] co-20 · getopts
+  - [ ] co-21 · trap-and-cleanup
+  - [ ] co-22 · mktemp
+  - [ ] co-23 · globbing
+  - [ ] co-24 · regular-expressions
+  - [ ] co-25 · shellcheck-and-shfmt
+  - [ ] co-26 · process-substitution
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-bash/learning/code/` — one runnable `.sh` script +
+      expected output per worked example in `syllabus/05-just-enough-bash.md` §Worked examples (DD-20/DD-30),
+      `shellcheck`-clean. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · shebang-script — verify `Hello, world!`
+  - [ ] ex-02 · make-executable — verify runs without explicit `bash`
+  - [ ] ex-03 · strict-mode-header — verify `echo $?` prints `0`
+  - [ ] ex-04 · unset-var-fails — verify non-zero + `unbound variable`
+  - [ ] ex-05 · assign-and-echo — verify `Ada`
+  - [ ] ex-06 · brace-var-expansion — verify `Hi Ada`
+  - [ ] ex-07 · single-vs-double-quote — verify literal `$name` then `Ada`
+  - [ ] ex-08 · quoting-spaces — verify quoted one word, unquoted splits
+  - [ ] ex-09 · command-substitution — verify 4-digit year
+  - [ ] ex-10 · arithmetic — verify `42`
+  - [ ] ex-11 · arithmetic-increment — verify final = loop count
+  - [ ] ex-12 · exit-code-success — verify `0`
+  - [ ] ex-13 · exit-code-failure — verify `1`
+  - [ ] ex-14 · explicit-exit — verify `3`
+  - [ ] ex-15 · if-string-test — verify `equal`
+  - [ ] ex-16 · if-numeric-test — verify `big`
+  - [ ] ex-17 · if-file-test — verify `exists`
+  - [ ] ex-18 · test-vs-bracket — verify both branches same result
+  - [ ] ex-19 · for-loop-list — verify `a`/`b`/`c`
+  - [ ] ex-20 · for-loop-range — verify `1 2 3 4 5`
+  - [ ] ex-21 · while-loop — verify `1`/`2`/`3`
+  - [ ] ex-22 · until-loop — verify `0`/`1`/`2`
+  - [ ] ex-23 · break-continue — verify expected odds before 5
+  - [ ] ex-24 · echo-to-stdout — verify matches argument
+  - [ ] ex-25 · redirect-to-file — verify `out.txt` contains `hi`
+  - [ ] ex-26 · append-to-file — verify two lines
+  - [ ] ex-27 · redirect-stderr — verify `err.txt` non-empty, stdout clean
+  - [ ] ex-28 · simple-pipe — verify `a` then `b`
+  - [ ] ex-29 · case-statement — verify each input routes correctly
+  - [ ] ex-30 · function-define-call — verify `Hi Ada`
+  - [ ] ex-31 · function-local-var — verify outer var unchanged
+  - [ ] ex-32 · function-return-status — verify failure branch runs
+  - [ ] ex-33 · positional-params — verify counts + values
+  - [ ] ex-34 · all-args-quoted — verify each arg intact on own line
+  - [ ] ex-35 · shift-args — verify each processed once
+  - [ ] ex-36 · read-from-stdin — verify echoes piped line
+  - [ ] ex-37 · read-loop-file — verify each line in order
+  - [ ] ex-38 · heredoc — verify variable expanded
+  - [ ] ex-39 · heredoc-quoted — verify `$name` literal
+  - [ ] ex-40 · here-string — verify matches when text contains `foo`
+  - [ ] ex-41 · pipe-grep — verify only matching lines
+  - [ ] ex-42 · grep-count — verify exact match count
+  - [ ] ex-43 · sed-substitute — verify every `old` → `new`
+  - [ ] ex-44 · sed-delete-lines — verify `DROP` lines removed
+  - [ ] ex-45 · awk-field — verify second column
+  - [ ] ex-46 · awk-sum — verify correct total
+  - [ ] ex-47 · cut-columns — verify second field
+  - [ ] ex-48 · sort-uniq-count — verify each line with count
+  - [ ] ex-49 · tr-translate — verify uppercased
+  - [ ] ex-50 · find-files — verify lists matching paths
+  - [ ] ex-51 · find-exec-delete — verify `.tmp` files gone
+  - [ ] ex-52 · xargs-pipeline — verify lists files with `TODO`
+  - [ ] ex-53 · pipeline-chore — verify final aggregated output
+  - [ ] ex-54 · stderr-to-stdout — verify error line captured
+  - [ ] ex-55 · devnull-discard — verify no output, status preserved
+  - [ ] ex-56 · getopts-flags — verify parsed flag + value
+  - [ ] ex-57 · getopts-usage — verify `-h` exits 0, bad opt non-zero
+  - [ ] ex-58 · default-value-param — verify default used when unset
+  - [ ] ex-59 · check-command-success — verify correct branch on exit status
+  - [ ] ex-60 · pipefail-catches-failure — verify non-zero pipeline status
+  - [ ] ex-61 · trap-exit-cleanup — verify temp file gone after finish
+  - [ ] ex-62 · mktemp-file — verify unique temp created + removed
+  - [ ] ex-63 · mktemp-dir — verify scratch dir created + removed
+  - [ ] ex-64 · trap-signal-int — verify handler message on SIGINT
+  - [ ] ex-65 · regex-grep-ere — verify only phone-shaped lines match
+  - [ ] ex-66 · regex-char-class — verify digit lines match
+  - [ ] ex-67 · regex-anchors — verify only `^ERROR` lines
+  - [ ] ex-68 · regex-capture-sed — verify `foobar` → `foobaz`
+  - [ ] ex-69 · regex-quantifiers — verify `abc`/`abbc` match, `ac` not
+  - [ ] ex-70 · safe-glob-loop — verify skips when no `.txt`
+  - [ ] ex-71 · array-iteration — verify each element on own line
+  - [ ] ex-72 · array-length — verify `3`
+  - [ ] ex-73 · param-expansion-required — verify non-zero + `input required`
+  - [ ] ex-74 · string-manipulation — verify basename + extension strip
+  - [ ] ex-75 · shellcheck-clean — verify no findings, exit 0
+  - [ ] ex-76 · shellcheck-catches-bug — verify `SC2086`
+  - [ ] ex-77 · shfmt-format — verify re-run `-d` no diff
+  - [ ] ex-78 · robust-arg-parser — verify non-zero + message when required opt missing
+  - [ ] ex-79 · temp-pipeline-atomic — verify no partial file after failure
+  - [ ] ex-80 · trap-err-report — verify prints offending line number
+  - [ ] ex-81 · full-report-tool — verify correct output + cleanup + non-zero on error
+  - [ ] ex-82 · posix-portable-script — verify identical under `sh` and `bash`
+  - [ ] ex-83 · process-substitution-diff — verify `diff <(sort a) <(sort b)` matches temp-file staging
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-bash/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -389,7 +993,7 @@ Row: Primer · Bash/shell † · topic wt 150 · Learn 105 / Drill 205 · **prim
 ### Phase 6 Gate
 
 - [ ] [AI] `just-enough-bash/` complete: `_index.md` wt 150, `learning/_index.md` wt 105,
-      `drilling/_index.md` wt 205, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 205, capstone wt 900; all 26 concepts + 83 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -404,9 +1008,119 @@ Row: By Example · Git † · topic wt 160 · Learn 106 / Drill 206 · **subject
 - [ ] **[AI] V** — `web-researcher` for `version-control-and-git`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/06-version-control-and-git.md`](./syllabus/06-version-control-and-git.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/version-control-and-git/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/06-version-control-and-git.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/version-control-and-git/learning/` teaching **every** concept in `syllabus/06-version-control-and-git.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · repository-init-and-clone
+  - [ ] co-02 · three-states-model
+  - [ ] co-03 · object-model
+  - [ ] co-04 · refs-branches-head
+  - [ ] co-05 · staging-and-status
+  - [ ] co-06 · hunk-staging
+  - [ ] co-07 · committing-and-messages
+  - [ ] co-08 · amending-commits
+  - [ ] co-09 · diffing
+  - [ ] co-10 · history-inspection
+  - [ ] co-11 · branching
+  - [ ] co-12 · fast-forward-merge
+  - [ ] co-13 · three-way-merge
+  - [ ] co-14 · conflict-resolution
+  - [ ] co-15 · rebase
+  - [ ] co-16 · interactive-rebase
+  - [ ] co-17 · rebase-vs-merge-policy
+  - [ ] co-18 · reset-modes
+  - [ ] co-19 · revert
+  - [ ] co-20 · restore-files
+  - [ ] co-21 · stash
+  - [ ] co-22 · reflog
+  - [ ] co-23 · remotes-fetch-push-pull
+  - [ ] co-24 · tracking-branches
+  - [ ] co-25 · tagging
+  - [ ] co-26 · gitignore
+  - [ ] co-27 · commit-hooks
+  - [ ] co-28 · pull-request-trunk-flow
+  - [ ] co-29 · cherry-pick
+- [ ] **[AI] A1-examples** — Author `CONTENT/version-control-and-git/learning/code/` — one runnable repo/recipe per worked example in `syllabus/06-version-control-and-git.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · init-repository — verify `.git/` exists, status "No commits yet"
+  - [ ] ex-02 · check-status-clean — verify branch named, "nothing to commit"
+  - [ ] ex-03 · create-untracked-file — verify file under "Untracked files"
+  - [ ] ex-04 · stage-a-file — verify moved to "Changes to be committed"
+  - [ ] ex-05 · first-commit — verify `git log --oneline` shows one commit
+  - [ ] ex-06 · commit-shows-snapshot — verify `git show HEAD` prints metadata + diff
+  - [ ] ex-07 · stage-all-changes — verify both files staged
+  - [ ] ex-08 · unstage-file — verify returns to unstaged
+  - [ ] ex-09 · diff-working-tree — verify unstaged change appears
+  - [ ] ex-10 · diff-staged — verify staged change shows, plain diff empty
+  - [ ] ex-11 · view-log-oneline — verify one line per commit, abbreviated hashes
+  - [ ] ex-12 · view-log-graph — verify ASCII commit graph renders
+  - [ ] ex-13 · inspect-blob-cat-file — verify prints committed file contents
+  - [ ] ex-14 · inspect-commit-object — verify tree hash, parent, author, message
+  - [ ] ex-15 · inspect-tree-object — verify lists blob/tree entries with modes/names
+  - [ ] ex-16 · object-type — verify prints "commit"
+  - [ ] ex-17 · amend-last-commit — verify updated message and new hash
+  - [ ] ex-18 · amend-add-forgotten-file — verify file in HEAD's tree
+  - [ ] ex-19 · gitignore-basics — verify `x.log` not listed
+  - [ ] ex-20 · force-add-ignored — verify ignored file stages
+  - [ ] ex-21 · create-branch — verify `feature` listed
+  - [ ] ex-22 · switch-branch — verify "On branch feature"
+  - [ ] ex-23 · create-and-switch — verify branch created + checked out in one step
+  - [ ] ex-24 · head-tracks-branch — verify HEAD and branch hashes identical
+  - [ ] ex-25 · list-refs — verify each branch maps to a commit hash
+  - [ ] ex-26 · delete-merged-branch — verify branch no longer listed
+  - [ ] ex-27 · rename-branch — verify new name shown
+  - [ ] ex-28 · tag-lightweight — verify `v1` listed and rev-parse matches HEAD
+  - [ ] ex-29 · stage-hunks-interactively — verify only chosen hunk staged
+  - [ ] ex-30 · split-a-hunk — verify only chosen sub-hunk staged
+  - [ ] ex-31 · commit-with-body — verify subject + body both print
+  - [ ] ex-32 · diff-two-commits — verify combined change across last two commits
+  - [ ] ex-33 · diff-branches — verify only feature's divergent changes
+  - [ ] ex-34 · log-limit-and-format — verify exactly three commits, custom format
+  - [ ] ex-35 · log-by-path — verify only commits touching `file.txt`
+  - [ ] ex-36 · fast-forward-merge — verify main advances, no merge commit, linear
+  - [ ] ex-37 · no-ff-merge — verify merge commit created despite ff possible
+  - [ ] ex-38 · three-way-merge-clean — verify HEAD shows two parent lines
+  - [ ] ex-39 · create-merge-conflict — verify conflict, file "both modified"
+  - [ ] ex-40 · resolve-conflict — verify merge completes, shown in `log --graph`
+  - [ ] ex-41 · abort-merge — verify working tree returns to pre-merge, status clean
+  - [ ] ex-42 · inspect-conflict-diff — verify combined conflict diff with both sides
+  - [ ] ex-43 · rebase-onto-main — verify commits replay with new hashes, linear
+  - [ ] ex-44 · rebase-conflict-continue — verify rebase finishes
+  - [ ] ex-45 · rebase-abort — verify branch returns to pre-rebase tip
+  - [ ] ex-46 · interactive-rebase-squash — verify two commits combined into one
+  - [ ] ex-47 · interactive-rebase-reword — verify target message changed, others stay
+  - [ ] ex-48 · interactive-rebase-reorder — verify new commit order
+  - [ ] ex-49 · interactive-rebase-drop — verify dropped commit gone from log
+  - [ ] ex-50 · compare-merge-vs-rebase-history — verify one has merge commit, other linear
+  - [ ] ex-51 · reset-soft — verify HEAD back one, changes remain staged
+  - [ ] ex-52 · reset-mixed — verify HEAD back, changes unstaged but present
+  - [ ] ex-53 · reset-hard — verify HEAD back, working tree matches (change gone)
+  - [ ] ex-54 · unstage-with-reset — verify file becomes unstaged
+  - [ ] ex-55 · revert-commit — verify inverse commit, change undone, history preserved
+  - [ ] ex-56 · restore-file-from-head — verify file reverts to HEAD's version
+  - [ ] ex-57 · restore-file-from-commit — verify content matches older commit
+  - [ ] ex-58 · stash-changes — verify status clean, one stash entry
+  - [ ] ex-59 · stash-pop — verify changes return, stash entry removed
+  - [ ] ex-60 · stash-named-and-list — verify labeled entry appears
+  - [ ] ex-61 · reflog-inspect — verify lists `HEAD@{n}` entries
+  - [ ] ex-62 · recover-after-hard-reset — verify lost commits restored via reflog
+  - [ ] ex-63 · recover-deleted-branch — verify branch and commits reappear
+  - [ ] ex-64 · add-remote — verify `git remote -v` lists origin URLs
+  - [ ] ex-65 · clone-repository — verify `dest/.git` exists, source history present
+  - [ ] ex-66 · push-to-remote — verify bare remote log shows pushed commit
+  - [ ] ex-67 · set-upstream-tracking — verify `branch -vv` shows tracking ref
+  - [ ] ex-68 · fetch-updates — verify `origin/main` advances, local does not
+  - [ ] ex-69 · pull-fast-forward — verify local fast-forwards to origin
+  - [ ] ex-70 · pull-rebase — verify local commits replay atop fetched, linear
+  - [ ] ex-71 · push-rejected-non-fast-forward — verify non-fast-forward error
+  - [ ] ex-72 · checkout-remote-tracking-branch — verify local tracking branch created
+  - [ ] ex-73 · annotated-tag — verify object type "tag", tagger shown
+  - [ ] ex-74 · push-tags — verify tag appears in remote
+  - [ ] ex-75 · cherry-pick-commit — verify single commit's change applied, new hash
+  - [ ] ex-76 · cherry-pick-conflict — verify cherry-pick completes after resolve
+  - [ ] ex-77 · install-pre-commit-hook — verify commit blocked with hook message
+  - [ ] ex-78 · hook-allows-clean-commit — verify clean commit succeeds
+  - [ ] ex-79 · pr-branch-flow — verify trunk has change and a merge commit
+  - [ ] ex-80 · trunk-based-short-branch — verify main advanced, branch gone
+  - [ ] ex-81 · revert-a-merge — verify merge changes undone, history intact
+  - [ ] ex-82 · verify-history-intact-after-recovery — verify no dangling/lost commits
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/version-control-and-git/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -418,7 +1132,7 @@ Row: By Example · Git † · topic wt 160 · Learn 106 / Drill 206 · **subject
 ### Phase 7 Gate
 
 - [ ] [AI] `version-control-and-git/` complete: `_index.md` wt 160, `learning/_index.md` wt 106,
-      `drilling/_index.md` wt 206, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 206, capstone wt 900; all 29 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -433,9 +1147,112 @@ Row: By Example · Python · topic wt 170 · Learn 107 / Drill 207 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `data-structures-and-algorithms-essentials`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/07-data-structures-and-algorithms-essentials.md`](./syllabus/07-data-structures-and-algorithms-essentials.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/07-data-structures-and-algorithms-essentials.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/` teaching **every** concept in `syllabus/07-data-structures-and-algorithms-essentials.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · big-o-notation
+  - [ ] co-02 · amortized-analysis
+  - [ ] co-03 · dynamic-array
+  - [ ] co-04 · stack
+  - [ ] co-05 · queue
+  - [ ] co-06 · deque
+  - [ ] co-07 · singly-linked-list
+  - [ ] co-08 · hash-map
+  - [ ] co-09 · hash-set
+  - [ ] co-10 · binary-tree
+  - [ ] co-11 · binary-search-tree
+  - [ ] co-12 · heap-priority-queue
+  - [ ] co-13 · linear-search
+  - [ ] co-14 · binary-search
+  - [ ] co-15 · builtin-sort
+  - [ ] co-16 · comparison-sorts
+  - [ ] co-17 · recursion
+  - [ ] co-18 · iterate-vs-recurse
+  - [ ] co-19 · memoization
+  - [ ] co-20 · two-pointer-and-sliding-window
+  - [ ] co-21 · graph-adjacency
+  - [ ] co-22 · static-type-hints
+- [ ] **[AI] A1-examples** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/code/` — one runnable Python module per worked example in `syllabus/07-data-structures-and-algorithms-essentials.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · list-append-index — verify printed length + element match
+  - [ ] ex-02 · list-slicing — verify sub-list equals expected slice
+  - [ ] ex-03 · list-reverse-inplace — verify equals expected order
+  - [ ] ex-04 · list-reverse-slice — verify new reversed list, original unchanged
+  - [ ] ex-05 · stack-push-pop — verify LIFO order
+  - [ ] ex-06 · balanced-parentheses — verify `"(())"` True, `"(()"` False
+  - [ ] ex-07 · queue-with-deque — verify FIFO order
+  - [ ] ex-08 · deque-both-ends — verify resulting order
+  - [ ] ex-09 · list-front-pop-is-slow — verify identical order, note O(n) vs O(1)
+  - [ ] ex-10 · dict-lookup — verify value and default
+  - [ ] ex-11 · dict-count-frequencies — verify frequency map
+  - [ ] ex-12 · set-membership — verify True/False results
+  - [ ] ex-13 · set-dedup — verify unique count
+  - [ ] ex-14 · two-sum-with-dict — verify indices
+  - [ ] ex-15 · linear-search-found — verify correct index
+  - [ ] ex-16 · linear-search-not-found — verify returns -1
+  - [ ] ex-17 · builtin-sorted — verify ascending order
+  - [ ] ex-18 · sort-with-key — verify order by length
+  - [ ] ex-19 · sort-reverse — verify descending order
+  - [ ] ex-20 · sort-tuples-by-field — verify order by second field
+  - [ ] ex-21 · factorial-recursive — verify `factorial(5) == 120`
+  - [ ] ex-22 · sum-list-recursive — verify total
+  - [ ] ex-23 · countdown-iterative-vs-recursive — verify identical results
+  - [ ] ex-24 · big-o-constant-vs-linear — verify lookup stays 1 step, scan grows
+  - [ ] ex-25 · type-hints-on-function — verify runs, annotations print
+  - [ ] ex-26 · type-hints-on-collections — verify runs on typed inputs
+  - [ ] ex-27 · singly-linked-list-build — verify traversal prints values in order
+  - [ ] ex-28 · linked-list-length — verify length
+  - [ ] ex-29 · linked-list-reverse — verify new order
+  - [ ] ex-30 · linked-list-middle — verify middle value (slow/fast)
+  - [ ] ex-31 · binary-search-iterative — verify index of target
+  - [ ] ex-32 · binary-search-not-found — verify returns -1
+  - [ ] ex-33 · binary-search-first-occurrence — verify leftmost index
+  - [ ] ex-34 · binary-search-last-occurrence — verify rightmost index
+  - [ ] ex-35 · bisect-insertion-point — verify insertion point
+  - [ ] ex-36 · bisect-insort — verify list stays sorted
+  - [ ] ex-37 · min-heap-push-pop — verify ascending pop order
+  - [ ] ex-38 · heapify-list — verify `heap[0]` is minimum
+  - [ ] ex-39 · top-k-largest — verify result set
+  - [ ] ex-40 · priority-queue-tuples — verify pop order by priority
+  - [ ] ex-41 · max-heap-via-negation — verify largest pops first
+  - [ ] ex-42 · merge-sorted-with-heapq — verify merged order
+  - [ ] ex-43 · insertion-sort — verify output equals `sorted()`
+  - [ ] ex-44 · selection-sort — verify sorted output
+  - [ ] ex-45 · bubble-sort — verify sorted output
+  - [ ] ex-46 · merge-sort — verify sorted output
+  - [ ] ex-47 · quicksort — verify sorted output
+  - [ ] ex-48 · binary-tree-build — verify structure via level-order print
+  - [ ] ex-49 · tree-inorder-traversal — verify visited order
+  - [ ] ex-50 · tree-pre-and-post-order — verify both orders
+  - [ ] ex-51 · tree-level-order-bfs — verify per-level lists
+  - [ ] ex-52 · tree-height — verify height
+  - [ ] ex-53 · bst-insert — verify inorder yields sorted values
+  - [ ] ex-54 · bst-search — verify found and not-found
+  - [ ] ex-55 · bst-min-max — verify min (leftmost) and max (rightmost)
+  - [ ] ex-56 · graph-adjacency-build — verify each node's neighbors print
+  - [ ] ex-57 · graph-bfs — verify visit order
+  - [ ] ex-58 · graph-dfs — verify visit order
+  - [ ] ex-59 · graph-bfs-shortest-path — verify distance
+  - [ ] ex-60 · sliding-window-max-sum — verify result
+  - [ ] ex-61 · fibonacci-naive-recursive — verify `fib(10) == 55`, print call count
+  - [ ] ex-62 · fibonacci-memoized-dict — verify same result, fewer calls
+  - [ ] ex-63 · fibonacci-lru-cache — verify result, print `cache_info()` hits
+  - [ ] ex-64 · fibonacci-iterative — verify result, O(1) space
+  - [ ] ex-65 · coin-change-memoized — verify answer
+  - [ ] ex-66 · grid-paths-memoized — verify count
+  - [ ] ex-67 · bst-delete — verify inorder stays sorted (all 3 cases)
+  - [ ] ex-68 · bst-inorder-iterative — verify equals recursive order
+  - [ ] ex-69 · tree-is-balanced — verify True/False on fixtures
+  - [ ] ex-70 · bst-lowest-common-ancestor — verify ancestor
+  - [ ] ex-71 · dijkstra-with-heap — verify distances
+  - [ ] ex-72 · topological-sort-kahn — verify valid order
+  - [ ] ex-73 · detect-cycle-directed — verify True cyclic / False acyclic
+  - [ ] ex-74 · merge-k-sorted-lists — verify merged order
+  - [ ] ex-75 · quickselect-kth-smallest — verify value
+  - [ ] ex-76 · two-pointer-pair-sum — verify indices
+  - [ ] ex-77 · sliding-window-longest-unique — verify length
+  - [ ] ex-78 · lru-cache-from-scratch — verify eviction order
+  - [ ] ex-79 · trie-insert-search — verify insert, search, prefix queries
+  - [ ] ex-80 · big-o-empirical-doubling — verify binary ~log n, linear ~n
+  - [ ] ex-81 · stable-multi-key-sort — verify stable multi-key order
+  - [ ] ex-82 · deep-recursion-to-iteration — verify large input succeeds iteratively
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-structures-and-algorithms-essentials/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -447,7 +1264,7 @@ Row: By Example · Python · topic wt 170 · Learn 107 / Drill 207 · **subject*
 ### Phase 8 Gate
 
 - [ ] [AI] `data-structures-and-algorithms-essentials/` complete: `_index.md` wt 170, `learning/_index.md` wt 107,
-      `drilling/_index.md` wt 207, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 207, capstone wt 900; all 22 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -462,9 +1279,105 @@ Row: By Example · Python · topic wt 180 · Learn 108 / Drill 208 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `object-oriented-programming-essentials`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/08-object-oriented-programming-essentials.md`](./syllabus/08-object-oriented-programming-essentials.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/object-oriented-programming-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/08-object-oriented-programming-essentials.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/object-oriented-programming-essentials/learning/` teaching **every** concept in `syllabus/08-object-oriented-programming-essentials.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · class-and-instance
+  - [ ] co-02 · encapsulation
+  - [ ] co-03 · identity-vs-equality
+  - [ ] co-04 · repr-and-str
+  - [ ] co-05 · eq-and-hash
+  - [ ] co-06 · dataclass-value-object
+  - [ ] co-07 · properties
+  - [ ] co-08 · inheritance
+  - [ ] co-09 · method-overriding
+  - [ ] co-10 · polymorphism
+  - [ ] co-11 · abstraction-abc
+  - [ ] co-12 · duck-typing
+  - [ ] co-13 · composition-over-inheritance
+  - [ ] co-14 · class-vs-instance-attributes
+  - [ ] co-15 · classmethod-and-staticmethod
+  - [ ] co-16 · encapsulation-conventions
+  - [ ] co-17 · invariant-enforcement
+- [ ] **[AI] A1-examples** — Author `CONTENT/object-oriented-programming-essentials/learning/code/` — one runnable Python module per worked example in `syllabus/08-object-oriented-programming-essentials.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · define-minimal-class — verify `type(d) is Dog`
+  - [ ] ex-02 · init-with-fields — verify `Dog("Rex").name == "Rex"`
+  - [ ] ex-03 · instance-method — verify `d.bark() == "woof"`
+  - [ ] ex-04 · method-reads-state — verify returned string contains name
+  - [ ] ex-05 · multiple-instances-independent — verify each keeps own name
+  - [ ] ex-06 · method-mutates-state — verify name reflects new value
+  - [ ] ex-07 · default-init-argument — verify default applies when omitted
+  - [ ] ex-08 · repr-for-debugging — verify `repr(d)` matches expected
+  - [ ] ex-09 · str-vs-repr — verify `str` and `repr` differ
+  - [ ] ex-10 · identity-with-is — verify `a is b` True
+  - [ ] ex-11 · default-equality-is-identity — verify `==` False without `__eq__`
+  - [ ] ex-12 · define-eq — verify same-name dogs compare equal
+  - [ ] ex-13 · class-attribute-shared — verify both read shared value
+  - [ ] ex-14 · instance-shadows-class-attr — verify only one instance changes
+  - [ ] ex-15 · encapsulate-balance — verify deposit raises balance
+  - [ ] ex-16 · reject-negative-deposit — verify `ValueError` fires
+  - [ ] ex-17 · withdraw-guard-overdraft — verify overdraw rejected, balance unchanged
+  - [ ] ex-18 · protected-attr-convention — verify `_balance` signals internal
+  - [ ] ex-19 · name-mangled-attr — verify `obj.__pin` raises `AttributeError`
+  - [ ] ex-20 · dataclass-basic — verify auto `__init__` builds `Point(1, 2)`
+  - [ ] ex-21 · dataclass-auto-repr — verify prints `Point(x=1, y=2)`
+  - [ ] ex-22 · dataclass-auto-eq — verify `Point(1,2) == Point(1,2)` by value
+  - [ ] ex-23 · dataclass-default-field — verify omitting uses default
+  - [ ] ex-24 · dataclass-default-factory — verify each instance own list
+  - [ ] ex-25 · post-init-validation — verify invalid construction raises
+  - [ ] ex-26 · duck-typed-area-preview — verify both accepted
+  - [ ] ex-27 · objects-in-collection — verify iteration yields each in order
+  - [ ] ex-28 · self-is-explicit — verify `Dog.bark(d)` equals `d.bark()`
+  - [ ] ex-29 · property-read-only — verify `r.area` read without parens
+  - [ ] ex-30 · property-setter-validation — verify `r.width = -1` raises
+  - [ ] ex-31 · property-backed-by-private — verify external uses `.width`
+  - [ ] ex-32 · computed-property-derived — verify updates after width changes
+  - [ ] ex-33 · eq-value-object — verify equal amount+currency compare equal
+  - [ ] ex-34 · hash-consistent-with-eq — verify dedup in `set[Money]`
+  - [ ] ex-35 · eq-without-hash-unhashable — verify `TypeError` in set
+  - [ ] ex-36 · frozen-dataclass-immutable — verify `FrozenInstanceError`
+  - [ ] ex-37 · frozen-dataclass-hashable — verify works as dict key / set member
+  - [ ] ex-38 · dataclass-eq-false — verify equality falls back to identity
+  - [ ] ex-39 · dataclass-slots — verify undeclared attr raises, no `__dict__`
+  - [ ] ex-40 · dataclass-order — verify instances sort by field tuple
+  - [ ] ex-41 · inherit-fields-methods — verify `Cat` inherits base `__init__`
+  - [ ] ex-42 · super-init-chain — verify base + subclass fields set
+  - [ ] ex-43 · override-method — verify subclass version runs
+  - [ ] ex-44 · super-call-in-override — verify combined result
+  - [ ] ex-45 · polymorphic-list-dispatch — verify each dispatches to own override
+  - [ ] ex-46 · isinstance-check — verify `isinstance(cat, Animal)` True
+  - [ ] ex-47 · classmethod-alt-constructor — verify builds from parsed text
+  - [ ] ex-48 · staticmethod-namespaced — verify callable without instance
+  - [ ] ex-49 · classmethod-uses-cls — verify subclass factory returns subclass
+  - [ ] ex-50 · class-attr-instance-counter — verify counter equals instances
+  - [ ] ex-51 · mutable-class-attr-pitfall — verify fix isolates per-instance state
+  - [ ] ex-52 · invariant-in-init-and-setter — verify neither path admits invalid
+  - [ ] ex-53 · repr-round-trip — verify `eval(repr(obj)) == obj`
+  - [ ] ex-54 · encapsulated-collection — verify caller mutation leaves internals untouched
+  - [ ] ex-55 · duck-typed-function — verify mix of unrelated types sums correctly
+  - [ ] ex-56 · protocol-structural-type — verify satisfies without inheriting
+  - [ ] ex-57 · equality-across-subclass — verify type-strict contract holds
+  - [ ] ex-58 · dataclass-inheritance — verify combined `__init__` field order
+  - [ ] ex-59 · define-abc-interface — verify `Shape()` cannot instantiate
+  - [ ] ex-60 · abc-subclass-must-implement — verify incomplete subclass cannot instantiate
+  - [ ] ex-61 · abc-concrete-implementations — verify both instantiate + compute
+  - [ ] ex-62 · abc-polymorphic-callsite — verify one call-site handles all
+  - [ ] ex-63 · abstract-with-shared-helper — verify subclass inherits shared logic
+  - [ ] ex-64 · register-virtual-subclass — verify `isinstance` True without inheritance
+  - [ ] ex-65 · naive-inheritance-smell — verify `Stack(list)` leaks interface
+  - [ ] ex-66 · refactor-to-composition — verify only push/pop/peek public, tests green
+  - [ ] ex-67 · composition-delegates — verify swapping collaborator changes behavior
+  - [ ] ex-68 · dependency-injection-constructor — verify fake substitutes cleanly
+  - [ ] ex-69 · strategy-via-composition — verify swapping strategy changes price
+  - [ ] ex-70 · favor-interface-over-concrete — verify any conforming impl accepted
+  - [ ] ex-71 · encapsulated-state-machine — verify illegal transition raises
+  - [ ] ex-72 · immutable-value-object-full — verify operands unchanged
+  - [ ] ex-73 · value-objects-set-dedup — verify duplicates collapse
+  - [ ] ex-74 · polymorphism-without-inheritance — verify single pipeline handles all
+  - [ ] ex-75 · template-method-pattern — verify fixed flow, varying hooks
+  - [ ] ex-76 · refactor-god-class — verify each collaborator one responsibility
+  - [ ] ex-77 · invariant-survives-refactor — verify invariant still unviolable
+  - [ ] ex-78 · subclass-registry — verify each subclass appears in registry
+  - [ ] ex-79 · full-domain-model — verify `pytest` green end-to-end
+  - [ ] ex-80 · property-based-invariant-test — verify no random input reaches invalid state
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/object-oriented-programming-essentials/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -476,7 +1389,7 @@ Row: By Example · Python · topic wt 180 · Learn 108 / Drill 208 · **subject*
 ### Phase 9 Gate
 
 - [ ] [AI] `object-oriented-programming-essentials/` complete: `_index.md` wt 180, `learning/_index.md` wt 108,
-      `drilling/_index.md` wt 208, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 208, capstone wt 900; all 17 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -491,9 +1404,48 @@ Row: Annotated-concept · — ‡ · topic wt 190 · Learn 109 / Drill 209 · **
 - [ ] **[AI] V** — `web-researcher` for `project-management`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/09-project-management.md`](./syllabus/09-project-management.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/project-management/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/09-project-management.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/project-management/learning/` teaching **every** concept in `syllabus/09-project-management.md` §Concepts (DD-34 1:1 mirror; concepts before scenarios). One checkbox per `co-NN`:
+  - [ ] co-01 · triple-constraint
+  - [ ] co-02 · delivery-methodologies
+  - [ ] co-03 · work-breakdown-structure
+  - [ ] co-04 · dependency-graph-and-critical-path
+  - [ ] co-05 · estimation-points-velocity
+  - [ ] co-06 · planning-poker-pitfalls
+  - [ ] co-07 · sprint-and-backlog-planning
+  - [ ] co-08 · execution-mechanics
+  - [ ] co-09 · metrics
+  - [ ] co-10 · risk-management
+  - [ ] co-11 · change-management
+  - [ ] co-12 · retrospectives
+  - [ ] co-13 · stakeholder-communication
+  - [ ] co-14 · goodhart-metric-abuse
+  - [ ] co-15 · process-weight-fit
+- [ ] **[AI] A1-examples** — Author `CONTENT/project-management/learning/artifacts/` — one worked scenario / decision artifact (prose + diagrams, no `code/` runtime; ‡ leadership DD-27) per worked example in `syllabus/09-project-management.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · triple-constraint-tradeoff — verify memo names two fixed, what third absorbs
+  - [ ] ex-02 · pick-methodology — verify each mapping cites driving context property
+  - [ ] ex-03 · wbs-decompose — verify every leaf independently estimable/assignable
+  - [ ] ex-04 · dependency-graph — verify every edge encodes a real precedence
+  - [ ] ex-05 · identify-critical-path — verify longest chain, zero slack
+  - [ ] ex-06 · story-point-estimate — verify estimates relative to reference
+  - [ ] ex-07 · velocity-forecast — verify forecast uses average velocity
+  - [ ] ex-08 · metric-decision-map — verify each metric states a concrete decision
+  - [ ] ex-09 · sprint-backlog-plan — verify no sprint exceeds velocity, deps respected
+  - [ ] ex-10 · planning-poker-debias — verify each rule maps to a named bias
+  - [ ] ex-11 · burndown-diagnosis — verify names cause + corrective action
+  - [ ] ex-12 · burnup-vs-burndown — verify rationale ties scope-change to burnup line
+  - [ ] ex-13 · cycle-time-bottleneck — verify identifies stage with growing WIP
+  - [ ] ex-14 · risk-register — verify each top risk has assigned mitigation
+  - [ ] ex-15 · risk-prioritization — verify ranking consistent with likelihood×impact
+  - [ ] ex-16 · change-request-decision — verify states what is dropped/extended
+  - [ ] ex-17 · standup-redesign — verify format surfaces blockers/WIP not status
+  - [ ] ex-18 · stakeholder-comm-plan — verify each audience row names driven decision
+  - [ ] ex-19 · velocity-goodhart-memo — verify explains point inflation + outcome metric
+  - [ ] ex-20 · process-weight-right-size — verify cites `n(n-1)/2` paths
+  - [ ] ex-21 · methodology-antipattern — verify names mismatch + better fit
+  - [ ] ex-22 · crashing-vs-fast-tracking — verify each option tied to constraint spent
+  - [ ] ex-23 · retrospective-to-action — verify each action has owner + done-signal
+  - [ ] ex-24 · risk-register-over-time — verify risks retired/added across sprints
+  - [ ] ex-25 · full-delivery-plan — verify critical path drives schedule, metrics name decisions
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/project-management/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -505,7 +1457,7 @@ Row: Annotated-concept · — ‡ · topic wt 190 · Learn 109 / Drill 209 · **
 ### Phase 10 Gate
 
 - [ ] [AI] `project-management/` complete: `_index.md` wt 190, `learning/_index.md` wt 109,
-      `drilling/_index.md` wt 209, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 209, capstone wt 900; all 15 concepts + 25 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -520,9 +1472,112 @@ Row: By Example · SQL + Python † (SQLite) · topic wt 200 · Learn 110 / Dril
 - [ ] **[AI] V** — `web-researcher` for `sql-essentials`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/10-sql-essentials.md`](./syllabus/10-sql-essentials.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/sql-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/10-sql-essentials.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/sql-essentials/learning/` teaching **every** concept in `syllabus/10-sql-essentials.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · relational-model
+  - [ ] co-02 · primary-keys
+  - [ ] co-03 · foreign-keys
+  - [ ] co-04 · constraints
+  - [ ] co-05 · normalization
+  - [ ] co-06 · column-types
+  - [ ] co-07 · ddl-create-table
+  - [ ] co-08 · select-projection-filtering
+  - [ ] co-09 · ordering-and-limiting
+  - [ ] co-10 · insert
+  - [ ] co-11 · update
+  - [ ] co-12 · delete
+  - [ ] co-13 · inner-join
+  - [ ] co-14 · outer-join
+  - [ ] co-15 · aggregation
+  - [ ] co-16 · having-filter
+  - [ ] co-17 · null-semantics
+  - [ ] co-18 · transactions
+  - [ ] co-19 · python-sqlite3-connection
+  - [ ] co-20 · parameterized-queries
+  - [ ] co-21 · cursor-and-results
+  - [ ] co-22 · schema-migration
+  - [ ] co-23 · n-plus-1-avoidance
+  - [ ] co-24 · cli-usage
+- [ ] **[AI] A1-examples** — Author `CONTENT/sql-essentials/learning/code/` — one runnable `.sql`/`python3` example per worked example in `syllabus/10-sql-essentials.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · create-author-table — verify `.schema` lists column + PK
+  - [ ] ex-02 · open-database-cli — verify prompt opens, no tables yet
+  - [ ] ex-03 · insert-single-row — verify exactly one row returns
+  - [ ] ex-04 · insert-multiple-rows — verify `count(*)` returns 3
+  - [ ] ex-05 · select-all-columns — verify every column and row returned
+  - [ ] ex-06 · select-projection — verify only `title` appears
+  - [ ] ex-07 · where-equality — verify single matching row
+  - [ ] ex-08 · where-comparison — verify only rows above threshold
+  - [ ] ex-09 · where-and-or — verify combined boolean filtering
+  - [ ] ex-10 · where-like-prefix — verify prefix pattern matches
+  - [ ] ex-11 · where-in-set — verify set-membership filtering
+  - [ ] ex-12 · order-by-ascending — verify alphabetical ordering
+  - [ ] ex-13 · order-by-descending — verify most-expensive-first
+  - [ ] ex-14 · limit-rows — verify at most two rows
+  - [ ] ex-15 · limit-offset-paging — verify second page of two rows
+  - [ ] ex-16 · select-distinct — verify duplicate values collapse
+  - [ ] ex-17 · type-affinity — verify `'42'` stored as integer
+  - [ ] ex-18 · not-null-constraint — verify NOT NULL error
+  - [ ] ex-19 · unique-constraint — verify UNIQUE error
+  - [ ] ex-20 · default-value — verify default applied
+  - [ ] ex-21 · check-constraint — verify negative price rejected
+  - [ ] ex-22 · autoincrement-rowid — verify ids auto-assign 1, 2
+  - [ ] ex-23 · update-one-row — verify only that row changed
+  - [ ] ex-24 · update-all-rows — verify every row changed
+  - [ ] ex-25 · delete-row — verify row gone, count drops by one
+  - [ ] ex-26 · declare-foreign-key — verify FK clause in `.schema`
+  - [ ] ex-27 · enforce-foreign-key — verify orphan rejected
+  - [ ] ex-28 · inner-join-two-tables — verify each book pairs with author
+  - [ ] ex-29 · python-connect-and-query — verify script prints rows
+  - [ ] ex-30 · python-parameterized-insert — verify inserts without interpolation
+  - [ ] ex-31 · left-join-unmatched — verify authors with no books show NULL title
+  - [ ] ex-32 · join-with-aliases — verify same result more readably
+  - [ ] ex-33 · three-table-join — verify combined columns across three relations
+  - [ ] ex-34 · group-by-count — verify per-author book counts
+  - [ ] ex-35 · group-by-sum — verify per-group totals
+  - [ ] ex-36 · group-by-avg — verify per-group averages
+  - [ ] ex-37 · min-max-aggregate — verify cheapest and dearest
+  - [ ] ex-38 · having-filter-groups — verify only authors with >1 book
+  - [ ] ex-39 · where-plus-having — verify row filter before, group filter after
+  - [ ] ex-40 · count-star-vs-column — verify column count excludes NULLs
+  - [ ] ex-41 · null-is-null — verify rows with unknown year match
+  - [ ] ex-42 · null-coalesce — verify NULLs substituted with 0
+  - [ ] ex-43 · null-three-valued — verify `= NULL` returns no rows
+  - [ ] ex-44 · aggregate-over-join — verify per-author total across join
+  - [ ] ex-45 · normalize-repeating-group — verify 1NF/2NF removes repeating group
+  - [ ] ex-46 · normalize-transitive-dep — verify 3NF holds one fact per place
+  - [ ] ex-47 · python-named-params — verify named binding
+  - [ ] ex-48 · python-executemany — verify bulk insert of all rows
+  - [ ] ex-49 · python-fetchone-loop — verify streamed row-by-row consumption
+  - [ ] ex-50 · python-row-factory — verify column-name access
+  - [ ] ex-51 · transaction-commit — verify write persists in new connection
+  - [ ] ex-52 · transaction-rollback — verify DB unchanged
+  - [ ] ex-53 · transaction-context-manager — verify auto-rollback on raise
+  - [ ] ex-54 · injection-safe-vs-unsafe — verify only parameterized form safe
+  - [ ] ex-55 · upsert-on-conflict — verify second insert updates
+  - [ ] ex-56 · subquery-in-where — verify filtering by subquery result
+  - [ ] ex-57 · self-join — verify each employee pairs with manager
+  - [ ] ex-58 · case-expression — verify conditional derived column
+  - [ ] ex-59 · migration-add-column — verify existing rows gain default
+  - [ ] ex-60 · migration-backfill — verify all rows populated
+  - [ ] ex-61 · migration-version-tracking — verify `user_version` bumps
+  - [ ] ex-62 · n-plus-1-demonstrated — verify N+1 round-trips occur
+  - [ ] ex-63 · n-plus-1-fixed-join — verify one query returns same data
+  - [ ] ex-64 · n-plus-1-fixed-in — verify single round-trip
+  - [ ] ex-65 · composite-primary-key — verify duplicate pair rejected
+  - [ ] ex-66 · cascade-delete — verify author's books removed too
+  - [ ] ex-67 · restrict-delete — verify delete blocked
+  - [ ] ex-68 · savepoint-partial-rollback — verify only inner work undone
+  - [ ] ex-69 · python-report-function — verify returned rows match expected
+  - [ ] ex-70 · group-concat — verify titles concatenate per group
+  - [ ] ex-71 · anti-join-missing — verify authors with zero books isolated
+  - [ ] ex-72 · atomic-transfer — verify all-or-nothing transfer
+  - [ ] ex-73 · python-dal-module — verify pytest suite green
+  - [ ] ex-74 · seed-from-sql-file — verify seeded row count
+  - [ ] ex-75 · export-query-to-csv — verify CSV contains result rows
+  - [ ] ex-76 · integrity-checks — verify both PRAGMA checks report no problems
+  - [ ] ex-77 · design-3nf-schema — verify no transitive dependency remains
+  - [ ] ex-78 · correlated-subquery — verify per-row computed count
+  - [ ] ex-79 · report-join-group-having — verify matches expected values
+  - [ ] ex-80 · pytest-rollback-integration — verify green (row count unchanged)
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/sql-essentials/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -534,7 +1589,7 @@ Row: By Example · SQL + Python † (SQLite) · topic wt 200 · Learn 110 / Dril
 ### Phase 11 Gate
 
 - [ ] [AI] `sql-essentials/` complete: `_index.md` wt 200, `learning/_index.md` wt 110,
-      `drilling/_index.md` wt 210, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 210, capstone wt 900; all 24 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -549,9 +1604,115 @@ Row: By Example · Python (PostgreSQL) · topic wt 210 · Learn 111 / Drill 211 
 - [ ] **[AI] V** — `web-researcher` for `backend-essentials`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/11-backend-essentials.md`](./syllabus/11-backend-essentials.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/backend-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/11-backend-essentials.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/backend-essentials/learning/` teaching **every** concept in
+      `syllabus/11-backend-essentials.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · http-request-response
+  - [ ] co-02 · http-methods
+  - [ ] co-03 · http-status-codes
+  - [ ] co-04 · http-headers
+  - [ ] co-05 · statelessness
+  - [ ] co-06 · raw-stdlib-server
+  - [ ] co-07 · routing
+  - [ ] co-08 · request-handlers
+  - [ ] co-09 · json-serialization
+  - [ ] co-10 · request-validation
+  - [ ] co-11 · structured-errors
+  - [ ] co-12 · path-and-query-params
+  - [ ] co-13 · request-body-parsing
+  - [ ] co-14 · persistence-repository
+  - [ ] co-15 · migrations
+  - [ ] co-16 · middleware
+  - [ ] co-17 · authn-sessions-vs-tokens
+  - [ ] co-18 · token-check
+  - [ ] co-19 · pagination
+  - [ ] co-20 · filtering
+  - [ ] co-21 · content-negotiation
+  - [ ] co-22 · local-dev-loop
+  - [ ] co-23 · dependency-injection
+  - [ ] co-24 · layering
+- [ ] **[AI] A1-examples** — Author `CONTENT/backend-essentials/learning/code/` — one runnable HTTP service / endpoint
+      per worked example, served via `uvicorn`/stdlib and exercised with `curl`+`pytest` (DD-20/DD-30), covering **every**
+      example in `syllabus/11-backend-essentials.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · raw-server-hello — verify `curl localhost:8000/` returns `hello`
+  - [ ] ex-02 · raw-status-line — verify `curl -i` shows `HTTP/1.0 200`
+  - [ ] ex-03 · raw-set-header — verify header appears in `curl -i`
+  - [ ] ex-04 · raw-read-path — verify `/a` and `/b` return different bodies
+  - [ ] ex-05 · raw-json-response — verify `curl` receives parseable JSON
+  - [ ] ex-06 · raw-404 — verify `%{http_code}` prints 404
+  - [ ] ex-07 · wsgiref-app — verify `curl` returns 200
+  - [ ] ex-08 · handle-get-only — verify GET succeeds
+  - [ ] ex-09 · method-405-raw — verify 405 + `Allow` header via `curl -i -X POST`
+  - [ ] ex-10 · install-framework — verify pinned CVE-clean version
+  - [ ] ex-11 · fastapi-hello — verify `uvicorn` serves JSON `{"msg":...}`
+  - [ ] ex-12 · run-via-uvicorn — verify `curl localhost:8000/` responds
+  - [ ] ex-13 · health-endpoint — verify `curl` returns `{"status":"ok"}` 200
+  - [ ] ex-14 · typed-path-param — verify `curl /items/5` echoes 5
+  - [ ] ex-15 · typed-query-param — verify `?q=hi` is parsed
+  - [ ] ex-16 · optional-query-default — verify omitting uses default
+  - [ ] ex-17 · json-request-body — verify fields echo back
+  - [ ] ex-18 · response-model — verify response shape matches model
+  - [ ] ex-19 · status-201-created — verify `curl -i` shows 201
+  - [ ] ex-20 · status-204-no-content — verify no body in `curl -i`
+  - [ ] ex-21 · read-request-header — verify `X-Request-Id` echoed
+  - [ ] ex-22 · set-response-header — verify `X-App-Version` in `curl -i`
+  - [ ] ex-23 · flask-hello — verify `curl` returns 200 (framework-agnostic)
+  - [ ] ex-24 · put-idempotent — verify two identical PUTs yield same state
+  - [ ] ex-25 · patch-partial — verify only that field changed
+  - [ ] ex-26 · statelessness-demo — verify each request independent
+  - [ ] ex-27 · require-json-content-type — verify 415/422 rejection
+  - [ ] ex-28 · curl-post-json — verify JSON round-trips
+  - [ ] ex-29 · validation-required-field — verify 422 with structured detail
+  - [ ] ex-30 · validation-wrong-type — verify 422 type error
+  - [ ] ex-31 · validation-constraints — verify out-of-range rejected
+  - [ ] ex-32 · error-envelope — verify envelope shape on failure
+  - [ ] ex-33 · exception-handler — verify mapped 4xx response
+  - [ ] ex-34 · not-found-404-json — verify status + body
+  - [ ] ex-35 · repository-connect — verify repo returns rows
+  - [ ] ex-36 · repository-parameterized — verify injection neutralized
+  - [ ] ex-37 · crud-create — verify 201 and row persists
+  - [ ] ex-38 · crud-read-one — verify row returned
+  - [ ] ex-39 · crud-read-list — verify JSON array
+  - [ ] ex-40 · crud-update — verify change persists
+  - [ ] ex-41 · crud-delete — verify 204 and row gone
+  - [ ] ex-42 · crud-missing-404 — verify 404 envelope
+  - [ ] ex-43 · migration-apply-schema — verify table exists before serving
+  - [ ] ex-44 · migration-add-column — verify existing rows stay valid
+  - [ ] ex-45 · repository-typed-return — verify handler consumes typed rows
+  - [ ] ex-46 · layering-no-sql-in-handler — verify clean layering
+  - [ ] ex-47 · dependency-injection-db — verify injected connection used
+  - [ ] ex-48 · request-id-middleware — verify header present
+  - [ ] ex-49 · logging-middleware — verify log line appears
+  - [ ] ex-50 · timing-middleware — verify `X-Process-Time` header
+  - [ ] ex-51 · cors-header — verify `Access-Control-Allow-Origin`
+  - [ ] ex-52 · error-500-envelope — verify sanitized body (no stack trace)
+  - [ ] ex-53 · validation-error-detail — verify detail array
+  - [ ] ex-54 · accept-json-negotiation — verify negotiation (else 406)
+  - [ ] ex-55 · create-then-read-roundtrip — verify persisted round-trip
+  - [ ] ex-56 · pytest-testclient — verify assertions pass
+  - [ ] ex-57 · sessions-vs-tokens — verify both identify caller
+  - [ ] ex-58 · issue-token — verify response contains token string
+  - [ ] ex-59 · token-check-middleware — verify valid token reaches handler
+  - [ ] ex-60 · missing-token-401 — verify 401 envelope
+  - [ ] ex-61 · invalid-token-401 — verify 401
+  - [ ] ex-62 · valid-token-200 — verify 200
+  - [ ] ex-63 · protect-writes-only — verify read/write split
+  - [ ] ex-64 · session-cookie-auth — verify session persists
+  - [ ] ex-65 · pagination-limit-offset — verify page window
+  - [ ] ex-66 · pagination-default — verify bounded page
+  - [ ] ex-67 · pagination-metadata — verify `total`/`next` envelope
+  - [ ] ex-68 · pagination-bounds — verify limit clamped or 422'd
+  - [ ] ex-69 · filter-by-field — verify subset
+  - [ ] ex-70 · filter-multiple — verify AND semantics
+  - [ ] ex-71 · filter-parameterized-sql — verify injection safety
+  - [ ] ex-72 · sort-param — verify ordering
+  - [ ] ex-73 · combined-list-query — verify pagination+filter+sort compose
+  - [ ] ex-74 · idempotent-put-verified — verify second PUT idempotent
+  - [ ] ex-75 · method-not-allowed-405 — verify 405 + `Allow` header
+  - [ ] ex-76 · health-vs-readiness — verify readiness fails when DB down
+  - [ ] ex-77 · error-envelope-consistency — verify uniformity across 400/401/404/422/500
+  - [ ] ex-78 · curl-crud-auth-script — verify every step passes
+  - [ ] ex-79 · pytest-full-integration — verify green (CRUD+token+pagination)
+  - [ ] ex-80 · stateless-two-workers — verify consistent responses across workers
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/backend-essentials/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -563,7 +1724,7 @@ Row: By Example · Python (PostgreSQL) · topic wt 210 · Learn 111 / Drill 211 
 ### Phase 12 Gate
 
 - [ ] [AI] `backend-essentials/` complete: `_index.md` wt 210, `learning/_index.md` wt 111,
-      `drilling/_index.md` wt 211, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 211, capstone wt 900; all 24 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -578,9 +1739,116 @@ Row: By Example · Python · topic wt 220 · Learn 112 / Drill 212 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `networking-essentials`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/12-networking-essentials.md`](./syllabus/12-networking-essentials.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/networking-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/12-networking-essentials.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/networking-essentials/learning/` teaching **every** concept in
+      `syllabus/12-networking-essentials.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · client-server-model
+  - [ ] co-02 · url-anatomy
+  - [ ] co-03 · dns-resolution
+  - [ ] co-04 · dns-record-types
+  - [ ] co-05 · ip-and-ports
+  - [ ] co-06 · icmp-ping
+  - [ ] co-07 · tcp-connection
+  - [ ] co-08 · udp-datagram
+  - [ ] co-09 · tcp-vs-udp
+  - [ ] co-10 · sockets-api
+  - [ ] co-11 · request-response-framing
+  - [ ] co-12 · http-request-structure
+  - [ ] co-13 · http-response-structure
+  - [ ] co-14 · http-methods
+  - [ ] co-15 · http-status-codes
+  - [ ] co-16 · http-headers
+  - [ ] co-17 · http-vs-https-tls
+  - [ ] co-18 · redirects
+  - [ ] co-19 · curl-tooling
+  - [ ] co-20 · dns-tooling
+  - [ ] co-21 · connection-inspection
+  - [ ] co-22 · content-negotiation
+  - [ ] co-23 · stdlib-http-client
+- [ ] **[AI] A1-examples** — Author `CONTENT/networking-essentials/learning/code/` — one runnable CLI/socket recipe
+      (Python + `curl`/`dig`/`nc` transcript) per worked example (DD-20/DD-30), covering **every** example in
+      `syllabus/12-networking-essentials.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · curl-a-url — verify HTML body prints
+  - [ ] ex-02 · curl-verbose — verify `>` request + `<` response lines print
+  - [ ] ex-03 · curl-headers-only — verify only status + response headers (no body)
+  - [ ] ex-04 · read-status-line — verify a `2xx` status
+  - [ ] ex-05 · identify-request-line — verify method + path + version
+  - [ ] ex-06 · inspect-response-headers — verify `Content-Type`/`Content-Length`
+  - [ ] ex-07 · url-anatomy-breakdown — verify each component
+  - [ ] ex-08 · default-ports — verify HTTP→80, HTTPS→443
+  - [ ] ex-09 · ping-host — verify three ICMP replies with RTT
+  - [ ] ex-10 · ping-shows-ip — verify resolved IP printed
+  - [ ] ex-11 · dig-a-record — verify ANSWER shows A-record IP
+  - [ ] ex-12 · dig-short — verify only IP prints
+  - [ ] ex-13 · dig-aaaa — verify IPv6 (or empty ANSWER)
+  - [ ] ex-14 · dig-mx — verify MX records with priorities
+  - [ ] ex-15 · dig-ns — verify authoritative nameservers
+  - [ ] ex-16 · dig-cname — verify CNAME alias resolves
+  - [ ] ex-17 · dig-txt — verify TXT records print
+  - [ ] ex-18 · nslookup-basic — verify server + resolved address
+  - [ ] ex-19 · host-command — verify A/AAAA/MX summary
+  - [ ] ex-20 · dig-trace — verify iterative root→authoritative resolution
+  - [ ] ex-21 · curl-follow-redirect — verify `3xx` then final `200`
+  - [ ] ex-22 · curl-status-404 — verify prints `404`
+  - [ ] ex-23 · curl-user-agent — verify `User-Agent` request header sent
+  - [ ] ex-24 · curl-custom-header — verify custom header in request
+  - [ ] ex-25 · curl-timing — verify total-time figure prints
+  - [ ] ex-26 · curl-head-method — verify headers, no body
+  - [ ] ex-27 · well-known-ports — verify 80/443/22/53 associations
+  - [ ] ex-28 · resolve-then-curl-by-ip — verify page loads by IP
+  - [ ] ex-29 · tcp-echo-server — verify starts + accepts connection
+  - [ ] ex-30 · tcp-echo-client — verify receives echoed line
+  - [ ] ex-31 · socket-bind-listen-accept — verify `accept` blocks until connect
+  - [ ] ex-32 · socket-connect-send-recv — verify full round-trip
+  - [ ] ex-33 · line-framing — verify partial reads reassemble into lines
+  - [ ] ex-34 · handle-partial-recv — verify large message intact
+  - [ ] ex-35 · multi-message-session — verify each line responds in order
+  - [ ] ex-36 · command-protocol — verify `PING`→`PONG`/`TIME` replies
+  - [ ] ex-37 · graceful-close — verify server loop ends cleanly
+  - [ ] ex-38 · reuseaddr-option — verify immediate restart, no bind error
+  - [ ] ex-39 · one-client-at-a-time — verify second client waits then served
+  - [ ] ex-40 · concurrent-clients-threads — verify two clients served at once
+  - [ ] ex-41 · raw-http-with-nc — verify raw HTTP response prints
+  - [ ] ex-42 · nc-listen-server — verify raw request bytes in listener
+  - [ ] ex-43 · handcraft-http-request — verify `200` response returns
+  - [ ] ex-44 · read-http-response-parts — verify status/headers/body identifiable
+  - [ ] ex-45 · http-get-method — verify body returned
+  - [ ] ex-46 · http-post-form — verify server receives POST body
+  - [ ] ex-47 · http-post-json — verify JSON posted with content-type
+  - [ ] ex-48 · http-put-delete — verify each method reaches endpoint
+  - [ ] ex-49 · status-class-tour — verify 200/301/404/500 classes
+  - [ ] ex-50 · content-length-header — verify matches body byte size
+  - [ ] ex-51 · accept-header-negotiation — verify server returns JSON
+  - [ ] ex-52 · gzip-encoding — verify `Accept-Encoding: gzip` + compressed response
+  - [ ] ex-53 · chunked-transfer — verify `Transfer-Encoding: chunked`, no Content-Length
+  - [ ] ex-54 · udp-echo-server — verify echoes a datagram
+  - [ ] ex-55 · udp-echo-client — verify echo returns
+  - [ ] ex-56 · udp-no-handshake — verify no handshake, possibly no reply
+  - [ ] ex-57 · tcp-vs-udp-contrast — verify TCP ordered, UDP may drop/reorder
+  - [ ] ex-58 · measure-latency-socket — verify millisecond figure prints
+  - [ ] ex-59 · port-scan-connect — verify open success vs `ConnectionRefusedError`
+  - [ ] ex-60 · resolve-in-python — verify host resolves to IP in code
+  - [ ] ex-61 · stdlib-http-client-get — verify status + body
+  - [ ] ex-62 · urllib-request — verify response code + read body
+  - [ ] ex-63 · parse-status-and-headers — verify status code + header list
+  - [ ] ex-64 · https-with-tls — verify TLS-encrypted `200`
+  - [ ] ex-65 · inspect-tls-handshake — verify negotiated `TLSv1.3` protocol/cipher
+  - [ ] ex-66 · view-server-certificate — verify certificate chain prints
+  - [ ] ex-67 · http-vs-https-contrast — verify 443 encrypted, 80 plaintext
+  - [ ] ex-68 · follow-redirect-manually — verify final resource via `Location`
+  - [ ] ex-69 · minimal-http-client-from-socket — verify real HTTP status line
+  - [ ] ex-70 · narrate-dns-tcp-http — verify each stage prints
+  - [ ] ex-71 · keepalive-reuse-connection — verify both responses, no reconnect
+  - [ ] ex-72 · handle-http-errors — verify 404/500 handled by class
+  - [ ] ex-73 · post-json-stdlib — verify server accepts posted JSON
+  - [ ] ex-74 · timeout-on-connect — verify `timeout` raised
+  - [ ] ex-75 · udp-packet-loss — verify some dropped, no retransmission
+  - [ ] ex-76 · concurrent-command-server — verify concurrent sessions
+  - [ ] ex-77 · protocol-error-handling — verify error line, no crash
+  - [ ] ex-78 · content-type-router — verify negotiation both ways
+  - [ ] ex-79 · measure-dns-vs-connect-time — verify separate DNS + TCP timings
+  - [ ] ex-80 · trace-layers-on-failure — verify error surfaces at right layer
+  - [ ] ex-81 · full-echo-command-protocol — verify end-to-end localhost round-trips
+  - [ ] ex-82 · full-dns-to-http-explorer — verify real status line + UDP contrast
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/networking-essentials/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -592,7 +1860,7 @@ Row: By Example · Python · topic wt 220 · Learn 112 / Drill 212 · **subject*
 ### Phase 13 Gate
 
 - [ ] [AI] `networking-essentials/` complete: `_index.md` wt 220, `learning/_index.md` wt 112,
-      `drilling/_index.md` wt 212, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 212, capstone wt 900; all 23 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -607,9 +1875,119 @@ Row: Primer · TypeScript † · topic wt 230 · Learn 113 / Drill 213 · **prim
 - [ ] **[AI] V** — `web-researcher` for `just-enough-typescript`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/13-just-enough-typescript.md`](./syllabus/13-just-enough-typescript.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-typescript/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/13-just-enough-typescript.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-typescript/learning/` teaching **every** concept in
+      `syllabus/13-just-enough-typescript.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · running-ts
+  - [ ] co-02 · minimal-tsconfig
+  - [ ] co-03 · primitive-types
+  - [ ] co-04 · type-inference
+  - [ ] co-05 · arrays-and-tuples
+  - [ ] co-06 · object-types
+  - [ ] co-07 · type-vs-interface
+  - [ ] co-08 · union-types
+  - [ ] co-09 · literal-types
+  - [ ] co-10 · intersection-types
+  - [ ] co-11 · function-typing
+  - [ ] co-12 · optional-default-rest-params
+  - [ ] co-13 · arrow-and-function-type-expressions
+  - [ ] co-14 · narrowing
+  - [ ] co-15 · type-guards-user-defined
+  - [ ] co-16 · discriminated-unions
+  - [ ] co-17 · generics
+  - [ ] co-18 · unknown-any-never
+  - [ ] co-19 · structural-typing
+  - [ ] co-20 · type-assertions
+  - [ ] co-21 · enums-and-const-assertions
+  - [ ] co-22 · modules-esm
+  - [ ] co-23 · promises-async-await
+  - [ ] co-24 · utility-types
+  - [ ] co-25 · keyof-and-index-signatures
+  - [ ] co-26 · tooling-eslint-prettier
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-typescript/learning/code/` — one runnable file per worked
+      example (run via `tsx` or checked with `tsc --noEmit`, DD-20/DD-30), covering **every** example in
+      `syllabus/13-just-enough-typescript.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · hello-tsx — verify string prints
+  - [ ] ex-02 · compile-with-tsc — verify emitted `hello.js` runs under node
+  - [ ] ex-03 · minimal-tsconfig — verify `tsc --noEmit` clean
+  - [ ] ex-04 · annotate-primitives — verify matching assignments accepted
+  - [ ] ex-05 · type-error-on-mismatch — verify `tsc` reports the error
+  - [ ] ex-06 · null-under-strict — verify union allows null, bare string rejects
+  - [ ] ex-07 · inference-no-annotation — verify inferred number, string reassign errors
+  - [ ] ex-08 · const-literal-inference — verify literal `"on"` not wide string
+  - [ ] ex-09 · array-type — verify pushing string errors
+  - [ ] ex-10 · readonly-array — verify `push` is compile error
+  - [ ] ex-11 · tuple-type — verify third element errors
+  - [ ] ex-12 · named-tuple — verify labels + arity enforced
+  - [ ] ex-13 · object-type-inline — verify missing field errors at call-site
+  - [ ] ex-14 · optional-property — verify omitting `age` type-checks
+  - [ ] ex-15 · type-alias — verify matching literal satisfies
+  - [ ] ex-16 · interface-declaration — verify conforming object satisfies
+  - [ ] ex-17 · interface-extends — verify Admin requires all three fields
+  - [ ] ex-18 · union-type — verify number + string both assign
+  - [ ] ex-19 · literal-union — verify `"north"` errors
+  - [ ] ex-20 · function-typed — verify non-number arg errors
+  - [ ] ex-21 · void-return — verify returning a value errors
+  - [ ] ex-22 · optional-param — verify one-arg call type-checks
+  - [ ] ex-23 · default-param — verify omitting `exp` uses default
+  - [ ] ex-24 · rest-params — verify variadic OK, string arg errors
+  - [ ] ex-25 · arrow-function-typed — verify returns a number
+  - [ ] ex-26 · function-type-expression — verify mismatch arrow errors
+  - [ ] ex-27 · typed-callback-param — verify element param inferred
+  - [ ] ex-28 · run-typed-script-tsx — verify expected console output
+  - [ ] ex-29 · narrow-with-typeof — verify each branch narrowed
+  - [ ] ex-30 · narrow-truthiness — verify branch is string
+  - [ ] ex-31 · narrow-in-operator — verify branch typed to variant
+  - [ ] ex-32 · narrow-instanceof — verify branch typed Date
+  - [ ] ex-33 · narrow-equality — verify branch narrows to matched literal
+  - [ ] ex-34 · user-defined-type-guard — verify callers narrow after call
+  - [ ] ex-35 · assertion-function — verify code after call treats x as string
+  - [ ] ex-36 · discriminated-union-shape — verify each variant type-checks
+  - [ ] ex-37 · discriminated-switch — verify branch accesses only own fields
+  - [ ] ex-38 · exhaustiveness-never — verify unhandled new variant errors
+  - [ ] ex-39 · state-machine-union — verify accessing data on loading errors
+  - [ ] ex-40 · generic-identity — verify return type matches argument
+  - [ ] ex-41 · generic-array-first — verify `number | undefined` return
+  - [ ] ex-42 · generic-constraint — verify no-`length` argument errors
+  - [ ] ex-43 · generic-default-param — verify omitting type arg uses default
+  - [ ] ex-44 · generic-two-params — verify tuple element types preserved
+  - [ ] ex-45 · generic-interface — verify `Box<number>` requires numeric value
+  - [ ] ex-46 · unknown-requires-narrowing — verify method call errors until narrowed
+  - [ ] ex-47 · any-escapes-checking — verify no compile error (contrast unknown)
+  - [ ] ex-48 · never-from-throw — verify inferred return `never`
+  - [ ] ex-49 · structural-compatibility — verify shape-based compatibility
+  - [ ] ex-50 · excess-property-check — verify excess-property error fires
+  - [ ] ex-51 · structural-interface-match — verify type-checks by shape
+  - [ ] ex-52 · intersection-type — verify Staff requires all fields of both
+  - [ ] ex-53 · intersection-config-merge — verify combined object requires both sets
+  - [ ] ex-54 · as-assertion — verify compiles (noting runtime risk)
+  - [ ] ex-55 · non-null-assertion — verify null asserted away
+  - [ ] ex-56 · const-assertion — verify literal `"dark"` + readonly
+  - [ ] ex-57 · numeric-enum — verify `Color.Red === 0` + reverse mapping
+  - [ ] ex-58 · const-object-union — verify derived literal-union type
+  - [ ] ex-59 · keyof-operator — verify `K` is `"x" | "y"`
+  - [ ] ex-60 · index-signature — verify string keys hold numbers, string value errors
+  - [ ] ex-61 · esm-named-export-import — verify executes via tsx
+  - [ ] ex-62 · esm-default-export — verify default binding resolves
+  - [ ] ex-63 · type-only-import — verify imports with no runtime emit
+  - [ ] ex-64 · re-export-barrel — verify single import path resolves all
+  - [ ] ex-65 · typed-promise — verify `.then` receives number
+  - [ ] ex-66 · async-await-typed — verify awaited value is number
+  - [ ] ex-67 · async-error-typed — verify narrowing caught unknown error
+  - [ ] ex-68 · promise-all-tuple — verify resolved tuple types preserved
+  - [ ] ex-69 · async-discriminated-state — verify each state narrowed at call-site
+  - [ ] ex-70 · utility-partial — verify every field optional
+  - [ ] ex-71 · utility-pick-omit — verify resulting shapes
+  - [ ] ex-72 · utility-record — verify behaves like string index signature
+  - [ ] ex-73 · utility-readonly-required — verify both effects
+  - [ ] ex-74 · utility-returntype — verify extracts return type
+  - [ ] ex-75 · mapped-type — verify transforms every property
+  - [ ] ex-76 · generic-constrained-getter — verify return is indexed property type
+  - [ ] ex-77 · eslint-clean — verify flags unused var, then clean
+  - [ ] ex-78 · prettier-format — verify formatting applied
+  - [ ] ex-79 · tsc-noemit-catches-error — verify fails then fixed
+  - [ ] ex-80 · typed-argv-parsing — verify echoes a passed argument
+  - [ ] ex-81 · end-to-end-typed-fetch — verify valid payload narrows, invalid rejected
+  - [ ] ex-82 · full-typed-module — verify clean compile + expected tsx output
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-typescript/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -621,7 +1999,7 @@ Row: Primer · TypeScript † · topic wt 230 · Learn 113 / Drill 213 · **prim
 ### Phase 14 Gate
 
 - [ ] [AI] `just-enough-typescript/` complete: `_index.md` wt 230, `learning/_index.md` wt 113,
-      `drilling/_index.md` wt 213, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 213, capstone wt 900; all 26 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -636,9 +2014,119 @@ Row: By Example · TypeScript † · topic wt 240 · Learn 114 / Drill 214 · **
 - [ ] **[AI] V** — `web-researcher` for `frontend-essentials`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/14-frontend-essentials.md`](./syllabus/14-frontend-essentials.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/frontend-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/14-frontend-essentials.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/frontend-essentials/learning/` teaching **every** concept in
+      `syllabus/14-frontend-essentials.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · html-document-structure
+  - [ ] co-02 · html-semantics
+  - [ ] co-03 · text-and-links
+  - [ ] co-04 · css-selectors
+  - [ ] co-05 · css-specificity-cascade
+  - [ ] co-06 · css-custom-properties
+  - [ ] co-07 · box-model
+  - [ ] co-08 · normal-flow-display
+  - [ ] co-09 · flexbox
+  - [ ] co-10 · grid
+  - [ ] co-11 · responsive-media-queries
+  - [ ] co-12 · dom-selection
+  - [ ] co-13 · dom-manipulation
+  - [ ] co-14 · event-handling
+  - [ ] co-15 · event-propagation
+  - [ ] co-16 · default-action-control
+  - [ ] co-17 · event-loop
+  - [ ] co-18 · ui-as-function-of-state
+  - [ ] co-19 · component-props
+  - [ ] co-20 · component-state
+  - [ ] co-21 · list-rendering
+  - [ ] co-22 · forms-controlled-input
+  - [ ] co-23 · form-validation
+  - [ ] co-24 · accessible-forms
+  - [ ] co-25 · aria-roles-semantics
+  - [ ] co-26 · keyboard-navigation
+  - [ ] co-27 · discriminated-union-states
+  - [ ] co-28 · typing-props-state
+- [ ] **[AI] A1-examples** — Author `CONTENT/frontend-essentials/learning/code/` — one runnable HTML/CSS/JS snippet
+      (browser or DOM harness, `getComputedStyle`/`tsc`-asserted) per worked example (DD-20/DD-30), covering **every**
+      example in `syllabus/14-frontend-essentials.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · minimal-html-document — verify renders + tab shows title
+  - [ ] ex-02 · semantic-page-landmarks — verify four landmark roles in a11y tree
+  - [ ] ex-03 · headings-and-paragraphs — verify one h1 + nested outline
+  - [ ] ex-04 · lists-and-links — verify each `a` has href + text
+  - [ ] ex-05 · image-with-alt — verify alt surfaces on load failure
+  - [ ] ex-06 · class-selector-style — verify `getComputedStyle` reports color
+  - [ ] ex-07 · id-and-descendant-selector — verify only `#nav a` styled
+  - [ ] ex-08 · attribute-and-pseudo-selector — verify focused email input styled
+  - [ ] ex-09 · specificity-conflict — verify id rule wins
+  - [ ] ex-10 · cascade-source-order — verify later declaration applies
+  - [ ] ex-11 · custom-property-reuse — verify both resolve same computed color
+  - [ ] ex-12 · box-model-padding-border-margin — verify offsetWidth = content+pad+border
+  - [ ] ex-13 · box-sizing-border-box — verify rendered width = declared width
+  - [ ] ex-14 · block-vs-inline — verify block full-width, span wraps content
+  - [ ] ex-15 · inline-block-sizing — verify inline yet honors size
+  - [ ] ex-16 · display-none-removes-layout — verify offsetParent null
+  - [ ] ex-17 · select-single-node — verify returns matching element
+  - [ ] ex-18 · select-all-nodes — verify NodeList length = item count
+  - [ ] ex-19 · set-textcontent — verify rendered text updates
+  - [ ] ex-20 · toggle-classlist — verify class added then removed
+  - [ ] ex-21 · create-and-append-node — verify list grows by one
+  - [ ] ex-22 · remove-node — verify querySelector no longer finds it
+  - [ ] ex-23 · click-handler-counter — verify count rises per click
+  - [ ] ex-24 · input-event-mirror — verify span mirrors typed text
+  - [ ] ex-25 · event-object-target — verify identifies clicked element
+  - [ ] ex-26 · multiple-listeners-order — verify both fire in order
+  - [ ] ex-27 · flex-row-distribution — verify children spread to edges
+  - [ ] ex-28 · flex-align-center — verify vertical centering
+  - [ ] ex-29 · flex-grow-absorbs-space — verify child absorbs free space
+  - [ ] ex-30 · grid-two-column — verify two children in separate columns
+  - [ ] ex-31 · grid-named-areas — verify each element in named region
+  - [ ] ex-32 · grid-gap — verify measured spacing between tracks
+  - [ ] ex-33 · responsive-breakpoint — verify layout changes below 600px
+  - [ ] ex-34 · responsive-fluid-image — verify never overflows container
+  - [ ] ex-35 · custom-property-theming — verify descendants recompute color
+  - [ ] ex-36 · event-bubbling — verify parent handler sees event
+  - [ ] ex-37 · event-delegation-list — verify any li fires with correct target
+  - [ ] ex-38 · prevent-default-link — verify navigation does not occur
+  - [ ] ex-39 · stop-propagation — verify parent listener does not fire
+  - [ ] ex-40 · settimeout-defers-work — verify runs after synchronous code
+  - [ ] ex-41 · microtask-before-timeout — verify microtask before timeout
+  - [ ] ex-42 · debounce-input — verify only final value processed
+  - [ ] ex-43 · render-from-state — verify rendered DOM matches state
+  - [ ] ex-44 · state-change-triggers-render — verify only derived DOM changes
+  - [ ] ex-45 · counter-component — verify clicking increments number
+  - [ ] ex-46 · props-driven-component — verify different props → different output
+  - [ ] ex-47 · one-way-data-flow — verify child reflects parent, cannot write up
+  - [ ] ex-48 · render-list-from-array — verify count = array length
+  - [ ] ex-49 · keyed-list-update — verify only changed node updates
+  - [ ] ex-50 · controlled-text-input — verify state + input in sync
+  - [ ] ex-51 · controlled-checkbox — verify toggling updates state + checked
+  - [ ] ex-52 · controlled-select — verify choosing option updates state
+  - [ ] ex-53 · required-field-validation — verify empty field invalid
+  - [ ] ex-54 · pattern-validation — verify non-matching input fails
+  - [ ] ex-55 · custom-validity-message — verify reported message
+  - [ ] ex-56 · label-input-association — verify clicking label focuses input
+  - [ ] ex-57 · aria-describedby-error — verify accessible description includes error
+  - [ ] ex-58 · form-submit-handler — verify collected data matches inputs
+  - [ ] ex-59 · aria-role-button — verify a11y tree exposes button role
+  - [ ] ex-60 · aria-live-region — verify region content updates
+  - [ ] ex-61 · keyboard-tab-order — verify Tab moves focus in sequence
+  - [ ] ex-62 · keyboard-activate-custom-button — verify Enter/Space fires action
+  - [ ] ex-63 · focus-trap-modal — verify Tab cycles within modal
+  - [ ] ex-64 · roving-tabindex-menu — verify arrow keys move focus
+  - [ ] ex-65 · discriminated-union-loading — verify loading branch renders spinner
+  - [ ] ex-66 · discriminated-union-error — verify error branch shows text
+  - [ ] ex-67 · discriminated-union-empty — verify empty view on zero results
+  - [ ] ex-68 · discriminated-union-exhaustive — verify tsc flags missing case
+  - [ ] ex-69 · typed-props — verify tsc rejects wrong-typed prop
+  - [ ] ex-70 · typed-state — verify tsc catches invalid state assignment
+  - [ ] ex-71 · data-list-component — verify each state renders correctly
+  - [ ] ex-72 · validated-form-component — verify invalid submit blocked + errors show
+  - [ ] ex-73 · filterable-list — verify only matching items in DOM
+  - [ ] ex-74 · derived-value-render — verify updates when state changes
+  - [ ] ex-75 · fix-missing-label — verify accessible name present
+  - [ ] ex-76 · fix-div-button-to-semantic — verify keyboard-operable + button role
+  - [ ] ex-77 · fix-color-contrast — verify contrast ratio ≥ 4.5:1
+  - [ ] ex-78 · delegated-dynamic-list — verify new items work without rebinding
+  - [ ] ex-79 · responsive-grid-component — verify column count changes with viewport
+  - [ ] ex-80 · accessible-interactive-widget — verify toggles + fully keyboard/AT-operable
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/frontend-essentials/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -650,7 +2138,7 @@ Row: By Example · TypeScript † · topic wt 240 · Learn 114 / Drill 214 · **
 ### Phase 15 Gate
 
 - [ ] [AI] `frontend-essentials/` complete: `_index.md` wt 240, `learning/_index.md` wt 114,
-      `drilling/_index.md` wt 214, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 214, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -665,9 +2153,129 @@ Row: By Example · Python + TS · topic wt 250 · Learn 115 / Drill 215 · **sub
 - [ ] **[AI] V** — `web-researcher` for `software-testing`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/15-software-testing.md`](./syllabus/15-software-testing.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/software-testing/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/15-software-testing.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/software-testing/learning/` teaching **every** concept in
+      `syllabus/15-software-testing.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · why-test-and-aaa
+  - [ ] co-02 · test-discovery-and-run
+  - [ ] co-03 · assertions
+  - [ ] co-04 · exception-testing
+  - [ ] co-05 · fixtures
+  - [ ] co-06 · parametrization
+  - [ ] co-07 · approx-and-floats
+  - [ ] co-08 · markers-and-selection
+  - [ ] co-09 · test-organization
+  - [ ] co-10 · test-pyramid-vs-trophy
+  - [ ] co-11 · test-doubles-taxonomy
+  - [ ] co-12 · stubbing
+  - [ ] co-13 · mocking-and-verification
+  - [ ] co-14 · patching
+  - [ ] co-15 · spies
+  - [ ] co-16 · fakes
+  - [ ] co-17 · tdd-red-green-refactor
+  - [ ] co-18 · property-based-testing
+  - [ ] co-19 · shrinking
+  - [ ] co-20 · strategies
+  - [ ] co-21 · coverage
+  - [ ] co-22 · mutation-testing
+  - [ ] co-23 · integration-testing
+  - [ ] co-24 · contract-testing
+  - [ ] co-25 · e2e-and-test-containers
+  - [ ] co-26 · test-isolation-and-determinism
+  - [ ] co-27 · reading-reports
+  - [ ] co-28 · bdd-given-when-then
+  - [ ] co-29 · gherkin-feature-scenario
+  - [ ] co-30 · step-definitions
+  - [ ] co-31 · scenario-outline-examples
+  - [ ] co-32 · bdd-vs-tdd-and-atdd
+- [ ] **[AI] A1-examples** — Author `CONTENT/software-testing/learning/code/` — one runnable pytest (primary; TS/Vitest
+      cross-refs where noted) per worked example (DD-20/DD-30), covering **every** example in
+      `syllabus/15-software-testing.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · first-passing-test — verify pytest reports 1 passed
+  - [ ] ex-02 · run-and-read-output — verify dot/summary line matches
+  - [ ] ex-03 · assert-equality — verify passes on equal values
+  - [ ] ex-04 · assert-failure-diff — verify failure shows expected vs actual
+  - [ ] ex-05 · assert-truthiness — verify bool assertion passes
+  - [ ] ex-06 · assert-in-collection — verify membership assertion
+  - [ ] ex-07 · assert-raises — verify exception captured
+  - [ ] ex-08 · assert-raises-match — verify message pattern matched
+  - [ ] ex-09 · function-fixture — verify fixture value injected
+  - [ ] ex-10 · fixture-teardown — verify teardown runs after test
+  - [ ] ex-11 · fixture-scope-module — verify setup runs once per module
+  - [ ] ex-12 · tmp-path-fixture — verify file created under tmp dir
+  - [ ] ex-13 · parametrize-cases — verify one run per param row
+  - [ ] ex-14 · parametrize-ids — verify readable case ids in output
+  - [ ] ex-15 · approx-float — verify near-equal floats pass
+  - [ ] ex-16 · marker-skip — verify test reported skipped
+  - [ ] ex-17 · marker-xfail — verify xfail counted separately
+  - [ ] ex-18 · marker-custom-select — verify -m selects only marked
+  - [ ] ex-19 · arrange-act-assert-shape — verify three sections readable
+  - [ ] ex-20 · test-file-discovery — verify test\_\*.py auto-collected
+  - [ ] ex-21 · stub-return-value — verify stub returns canned value
+  - [ ] ex-22 · stub-sequence — verify successive calls return sequence
+  - [ ] ex-23 · mock-call-assert — verify called once with args
+  - [ ] ex-24 · mock-call-count — verify call_count matches
+  - [ ] ex-25 · patch-object — verify dependency patched in scope
+  - [ ] ex-26 · patch-context-manager — verify patch reverts after block
+  - [ ] ex-27 · spy-wraps-real — verify real runs + call recorded
+  - [ ] ex-28 · fake-in-memory-repo — verify fake behaves like real
+  - [ ] ex-29 · mock-side-effect-raise — verify side_effect raises
+  - [ ] ex-30 · autospec-signature — verify wrong-arg call rejected
+  - [ ] ex-31 · verify-no-interaction — verify assert_not_called passes
+  - [ ] ex-32 · tdd-red — verify test fails before code
+  - [ ] ex-33 · tdd-green — verify minimal code passes
+  - [ ] ex-34 · tdd-refactor — verify test stays green post-refactor
+  - [ ] ex-35 · property-roundtrip — verify encode∘decode == identity
+  - [ ] ex-36 · property-invariant — verify sorted output ordered
+  - [ ] ex-37 · property-shrink-report — verify minimal counterexample shown
+  - [ ] ex-38 · strategy-integers — verify generated ints in range
+  - [ ] ex-39 · strategy-composite — verify built model instances valid
+  - [ ] ex-40 · strategy-filter-assume — verify filtered inputs honored
+  - [ ] ex-41 · coverage-run — verify coverage % reported
+  - [ ] ex-42 · coverage-missing-lines — verify uncovered lines listed
+  - [ ] ex-43 · coverage-branch — verify branch coverage counted
+  - [ ] ex-44 · coverage-fail-under — verify exits non-zero below threshold
+  - [ ] ex-45 · integration-db-fixture — verify real DB round-trip
+  - [ ] ex-46 · integration-http-client — verify endpoint returns 200
+  - [ ] ex-47 · integration-rollback-isolation — verify each test starts clean
+  - [ ] ex-48 · contract-consumer — verify consumer pact recorded
+  - [ ] ex-49 · contract-provider-verify — verify provider satisfies pact
+  - [ ] ex-50 · schema-contract-check — verify response matches schema
+  - [ ] ex-51 · vitest-first-test — verify TS test passes
+  - [ ] ex-52 · vitest-mock-fn — verify vi.fn spy recorded
+  - [ ] ex-53 · fast-check-property — verify fc property holds
+  - [ ] ex-54 · fast-check-shrink — verify minimal TS counterexample
+  - [ ] ex-55 · flaky-test-diagnose — verify nondeterminism reproduced
+  - [ ] ex-56 · fix-flaky-with-freeze-time — verify time frozen, test stable
+  - [ ] ex-57 · fix-flaky-with-seed — verify seeded RNG deterministic
+  - [ ] ex-58 · parallel-safe-tmpdir — verify no cross-test file clash
+  - [ ] ex-59 · fixture-factory — verify factory builds distinct objects
+  - [ ] ex-60 · parametrize-matrix — verify cartesian cases all run
+  - [ ] ex-61 · mutation-run — verify surviving mutants reported
+  - [ ] ex-62 · mutation-kill-with-test — verify new test kills mutant
+  - [ ] ex-63 · e2e-testcontainer-db — verify container DB reachable
+  - [ ] ex-64 · e2e-api-flow — verify create→read round-trip
+  - [ ] ex-65 · e2e-browser-smoke — verify page renders expected text
+  - [ ] ex-66 · test-double-choice-rationale — verify right double per seam
+  - [ ] ex-67 · patch-where-used — verify patch target = import site
+  - [ ] ex-68 · avoid-over-mocking — verify test survives internal refactor
+  - [ ] ex-69 · characterization-test — verify legacy behavior pinned
+  - [ ] ex-70 · golden-file-test — verify output matches snapshot
+  - [ ] ex-71 · update-golden-file — verify approved change updates snapshot
+  - [ ] ex-72 · property-vs-example-tradeoff — verify both catch the bug
+  - [ ] ex-73 · coverage-gap-to-test — verify new test closes gap
+  - [ ] ex-74 · read-junit-report — verify failing case located in XML
+  - [ ] ex-75 · read-html-coverage — verify hotspot identified
+  - [ ] ex-76 · test-naming-clarity — verify name states behavior
+  - [ ] ex-77 · one-assert-per-behavior — verify focused failure message
+  - [ ] ex-78 · isolate-external-service — verify no network in unit run
+  - [ ] ex-79 · deterministic-clock-injection — verify time-dependent code tested
+  - [ ] ex-80 · full-verification-suite — verify unit+integration+property+coverage all green
+  - [ ] ex-81 · pytest-bdd-first-scenario — verify pytest runs the Given/When/Then scenario green
+  - [ ] ex-82 · gherkin-feature-grammar — verify the runner parses Feature/Scenario/Given/When/Then/And
+  - [ ] ex-83 · step-definition-shared-context — verify a Given value is asserted in Then via shared context
+  - [ ] ex-84 · scenario-outline-examples-table — verify each Examples row runs as its own case
+  - [ ] ex-85 · behave-vs-pytest-bdd-same-feature — verify both runners execute the identical feature
+  - [ ] ex-86 · bdd-vs-tdd-decision — verify the TDD-vs-BDD choice matches risk and audience
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-testing/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -679,7 +2287,7 @@ Row: By Example · Python + TS · topic wt 250 · Learn 115 / Drill 215 · **sub
 ### Phase 16 Gate
 
 - [ ] [AI] `software-testing/` complete: `_index.md` wt 250, `learning/_index.md` wt 115,
-      `drilling/_index.md` wt 215, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 215, capstone wt 900; all 32 concepts + 86 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -694,9 +2302,114 @@ Row: By Example · Python + native † · topic wt 260 · Learn 116 / Drill 216 
 - [ ] **[AI] V** — `web-researcher` for `debugging-and-profiling`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/16-debugging-and-profiling.md`](./syllabus/16-debugging-and-profiling.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/debugging-and-profiling/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/16-debugging-and-profiling.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/debugging-and-profiling/learning/` teaching **every** concept in
+      `syllabus/16-debugging-and-profiling.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · interactive-breakpoints-and-stepping
+  - [ ] co-02 · conditional-and-watch-breakpoints
+  - [ ] co-03 · call-stack-frame-and-variable-inspection
+  - [ ] co-04 · post-mortem-debugging
+  - [ ] co-05 · print-and-logging-vs-interactive-debugging
+  - [ ] co-06 · remote-and-dap-debugging
+  - [ ] co-07 · scientific-method-debugging-loop
+  - [ ] co-08 · bisection-search-as-a-general-strategy
+  - [ ] co-09 · git-bisect-manual
+  - [ ] co-10 · git-bisect-automated
+  - [ ] co-11 · delta-debugging-input-minimization
+  - [ ] co-12 · sampling-vs-instrumenting-profilers
+  - [ ] co-13 · cpu-profiling-with-cprofile
+  - [ ] co-14 · cpu-profiling-with-py-spy
+  - [ ] co-15 · wall-clock-vs-cpu-time
+  - [ ] co-16 · tottime-vs-cumtime
+  - [ ] co-17 · memory-profiling-with-tracemalloc
+  - [ ] co-18 · line-level-profiling
+  - [ ] co-19 · flame-graph-reading
+  - [ ] co-20 · race-and-heisenbug-reproduction
+  - [ ] co-21 · load-representative-vs-toy-profiling
+  - [ ] co-22 · native-layer-costs-and-native-debugging
+  - [ ] co-23 · before-after-measurement-discipline
+- [ ] **[AI] A1-examples** — Author `CONTENT/debugging-and-profiling/learning/code/` — one runnable, fully type-annotated
+      Python (+ one native pass) per worked example (DD-20/DD-30/DD-34), covering **every** example in
+      `syllabus/16-debugging-and-profiling.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · first-breakpoint-with-breakpoint — verify reader names the line the total first goes wrong
+  - [ ] ex-02 · step-into-vs-step-over — verify `s` enters helper, `n` skips the call
+  - [ ] ex-03 · step-out-of-a-deep-call — verify `r` prints the function's return value
+  - [ ] ex-04 · reading-the-call-stack-with-w — verify reader names the frame owning the bad var
+  - [ ] ex-05 · navigating-frames-with-up-down — verify two different values at two frames
+  - [ ] ex-06 · inspecting-locals-with-p-and-pp — verify reader identifies the reused/shadowed key
+  - [ ] ex-07 · mutating-a-variable-to-confirm-hypothesis — verify post-mutation output matches expected
+  - [ ] ex-08 · conditional-breakpoint-in-a-loop — verify pdb halts exactly once at i==47
+  - [ ] ex-09 · condition-command-on-existing-breakpoint — verify only negative x stops
+  - [ ] ex-10 · watching-a-variable-with-display — verify `[old → new]` prints only on change
+  - [ ] ex-11 · display-in-place-mutation-caveat — verify `display lst[:]` fixes the silence
+  - [ ] ex-12 · print-debugging-a-one-off-script — verify bug found, rerun cost noted
+  - [ ] ex-13 · logging-vs-print-in-long-lived-process — verify bug found from log output, no pause
+  - [ ] ex-14 · breakpoint-builtin-and-pythonbreakpoint — verify unset stops, `PYTHONBREAKPOINT=0` skips
+  - [ ] ex-15 · first-post-mortem-with-pdb — verify debugger lands on the raising frame
+  - [ ] ex-16 · pdb-pm-in-a-repl-session — verify `pdb.pm()` reaches same state, no restart
+  - [ ] ex-17 · first-cprofile-run-command-line — verify reader names top-cumulative function
+  - [ ] ex-18 · cprofile-programmatic-with-pstats — verify top tottime ≠ top cumtime, explained
+  - [ ] ex-19 · wall-time-vs-cpu-time — verify wall ≫ CPU for sleep, ≈ for busy loop
+  - [ ] ex-20 · first-tracemalloc-snapshot — verify top line matches the list-building line
+  - [ ] ex-21 · reading-a-pregenerated-flame-graph — verify widest frame named as hot spot
+  - [ ] ex-22 · git-bisect-by-hand — verify git names the exact bad commit
+  - [ ] ex-23 · rubber-duck-hypothesis-writing — verify confirmed/refuted in exactly one stop
+  - [ ] ex-24 · minimizing-a-failing-input-by-hand — verify failing region under 50 chars in ≤4 steps
+  - [ ] ex-25 · sticky-mode-and-list-command — verify reader spots a nearby line to fix
+  - [ ] ex-26 · tbreak-one-shot-breakpoint — verify stops once, runs on afterward
+  - [ ] ex-27 · before-after-timing-a-one-line-fix — verify "after" consistently faster
+  - [ ] ex-28 · profiling-two-ways-sampling-and-instrumenting — verify both agree on top function
+  - [ ] ex-29 · py-spy-top-live-view — verify predicted hot function tops the live view
+  - [ ] ex-30 · py-spy-record-flamegraph-svg — verify widest SVG frame matches cProfile
+  - [ ] ex-31 · py-spy-record-speedscope — verify "left heavy" view surfaces same hot function
+  - [ ] ex-32 · py-spy-dump-on-a-hung-process — verify dumped stack shows the stuck line
+  - [ ] ex-33 · sorting-pstats-tottime-vs-cumtime — verify both rankings labelled
+  - [ ] ex-34 · line-profiler-kernprof — verify hot line matches seeded redundant re-sort
+  - [ ] ex-35 · line-profiler-vs-function-level — verify reader states the exact hot line
+  - [ ] ex-36 · tracemalloc-snapshot-diff-for-a-leak — verify top diff = append line, grows with N
+  - [ ] ex-37 · tracemalloc-nframe-traceback — verify only one path is the real leak
+  - [ ] ex-38 · conditional-breakpoint-on-object-identity — verify stops only on that instance
+  - [ ] ex-39 · commands-attached-to-a-breakpoint — verify runs unattended through hits
+  - [ ] ex-40 · debugpy-attach-to-a-running-server — verify client stops, local var inspectable
+  - [ ] ex-41 · debugpy-wait-for-client-vs-attach-later — verify only wait-for-client catches import-time bug
+  - [ ] ex-42 · pdb-remote-attach-by-pid — verify live stack shown without restart (3.14+)
+  - [ ] ex-43 · git-bisect-run-automated — verify names same commit unattended
+  - [ ] ex-44 · git-bisect-run-skip-125 — verify final result still names true culprit
+  - [ ] ex-45 · delta-debugging-a-json-payload — verify minimized payload crashes, under 5 keys
+  - [ ] ex-46 · delta-debugging-a-long-string — verify removing any remaining char clears the bug
+  - [ ] ex-47 · hypothesis-shrinking-as-delta-debugging — verify shrunk example comparably minimal
+  - [ ] ex-48 · profiling-toy-vs-realistic-input — verify toy hot spot ≠ realistic hot spot
+  - [ ] ex-49 · profiling-under-concurrent-load — verify contention shows only under load
+  - [ ] ex-50 · pdb-interact-mode — verify corrected value copied into the real fix
+  - [ ] ex-51 · pdb-exceptions-command-chained — verify reader identifies root-cause exception
+  - [ ] ex-52 · logging-config-multi-module-bug — verify cause found from correlated logs, no breakpoints
+  - [ ] ex-53 · cprofile-to-flame-graph — verify both point at same widest frame
+  - [ ] ex-54 · neovim-dap-breakpoint — verify DAP UI stops at same line/value as CLI pdb
+  - [ ] ex-55 · before-after-with-cprofile — verify percent-of-total tottime drop measurable
+  - [ ] ex-56 · reproducing-a-threading-race — verify ≥1 run shows count below expected
+  - [ ] ex-57 · fixing-the-race-with-a-lock — verify 100+ runs all exact
+  - [ ] ex-58 · asyncio-interleaving-bug — verify reliable failure under forced yield
+  - [ ] ex-59 · pdb-set-trace-async — verify `$_asynctask` identifies paused coroutine
+  - [ ] ex-60 · multiprocessing-vs-threading-profiling — verify threaded wall ≈ single-CPU (GIL), mp drops
+  - [ ] ex-61 · git-bisect-run-perf-regression — verify benchmark confirms crossing at named commit
+  - [ ] ex-62 · delta-debugging-10000-line-crash — verify reduced input under 10 lines, same exception
+  - [ ] ex-63 · gdb-attach-to-cpython — verify `py-bt` frame names match py-spy dump
+  - [ ] ex-64 · gdb-py-locals-py-print — verify value matches logging
+  - [ ] ex-65 · lldb-with-cpython-lldb — verify `py-bt` shows Python stack, matching gdb
+  - [ ] ex-66 · lldb-core-dump-postmortem — verify backtrace shows the seeded fault's function
+  - [ ] ex-67 · perf-record-with-python-perf-support — verify `perf report` shows Python names
+  - [ ] ex-68 · perf-script-to-flamegraph-pl — verify SVG's widest frame is a Python name
+  - [ ] ex-69 · perf-script-to-inferno — verify same widest frame, tool-independent
+  - [ ] ex-70 · native-cost-hidden-from-cprofile — verify native profiling reveals C hot functions
+  - [ ] ex-71 · py-spy-native-flag-mixed-stacks — verify native frames shown under Python caller
+  - [ ] ex-72 · correctness-and-performance-bug — verify bisect correct, test red→green, fix measured
+  - [ ] ex-73 · recursive-tottime-vs-cumtime-trap — verify fix targets leaf names by tottime
+  - [ ] ex-74 · cache-that-never-evicts-leak — verify third snapshot shows near-zero net growth
+  - [ ] ex-75 · import-time-startup-profiling — verify deferring module reduces startup wall time
+  - [ ] ex-76 · lock-contention-under-load — verify wall-vs-CPU gap only under load
+  - [ ] ex-77 · flame-graph-diff-before-after — verify wide frame shrinks, nothing else grew
+  - [ ] ex-78 · deterministic-seeding-for-a-flaky-bug — verify 1-in-20 failure reproduces every run
+  - [ ] ex-79 · bisecting-with-a-flaky-test-guard — verify guarded runs converge on same commit
+  - [ ] ex-80 · sys-monitoring-low-overhead-tracer — verify `sys.monitoring` overhead measurably lower
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/debugging-and-profiling/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -708,7 +2421,7 @@ Row: By Example · Python + native † · topic wt 260 · Learn 116 / Drill 216 
 ### Phase 17 Gate
 
 - [ ] [AI] `debugging-and-profiling/` complete: `_index.md` wt 260, `learning/_index.md` wt 116,
-      `drilling/_index.md` wt 216, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 216, capstone wt 900; all 23 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -723,9 +2436,118 @@ Row: By Example · Python · topic wt 270 · Learn 117 / Drill 217 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `security-essentials`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/17-security-essentials.md`](./syllabus/17-security-essentials.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/security-essentials/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/17-security-essentials.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/security-essentials/learning/` teaching **every** concept in
+      `syllabus/17-security-essentials.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · trust-boundaries-never-trust-input
+  - [ ] co-02 · owasp-top-10-as-risk-map
+  - [ ] co-03 · sql-injection-and-parameterized-queries
+  - [ ] co-04 · command-injection
+  - [ ] co-05 · path-traversal
+  - [ ] co-06 · xss-and-output-encoding
+  - [ ] co-07 · allow-list-vs-deny-list-validation
+  - [ ] co-08 · mass-assignment-and-over-posting
+  - [ ] co-09 · password-hashing-argon2id-bcrypt
+  - [ ] co-10 · salting-and-why
+  - [ ] co-11 · timing-safe-comparison
+  - [ ] co-12 · session-vs-token-auth
+  - [ ] co-13 · secure-cookie-flags
+  - [ ] co-14 · jwt-specific-pitfalls
+  - [ ] co-15 · authentication-vs-authorization
+  - [ ] co-16 · least-privilege-access-control
+  - [ ] co-17 · secret-hygiene
+  - [ ] co-18 · https-tls-in-practice
+  - [ ] co-19 · security-headers
+  - [ ] co-20 · cors-configuration
+  - [ ] co-21 · dependency-safety-supply-chain
+  - [ ] co-22 · security-logging-and-alerting
+  - [ ] co-23 · safe-error-handling
+  - [ ] co-24 · security-misconfiguration
+  - [ ] co-25 · insecure-design
+  - [ ] co-26 · csrf-protection
+  - [ ] co-27 · rate-limiting-and-brute-force-protection
+  - [ ] co-28 · open-redirect
+- [ ] **[AI] A1-examples** — Author `CONTENT/security-essentials/learning/code/` — runnable, type-annotated sources
+      (DD-20/DD-30) for **every** worked example in `syllabus/17-security-essentials.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · trust-boundary-map-tainted-input — verify every entry point listed + attacker-controlled marked
+  - [ ] ex-02 · owasp-top-10-mapping-exercise — verify each bug tagged with correct A0N id
+  - [ ] ex-03 · sql-injection-live-exploit — verify attacker logs in with no valid password
+  - [ ] ex-04 · sql-injection-parameterized-fix — verify payload treated as literal and fails
+  - [ ] ex-05 · sql-injection-union-data-exfil — verify UNION leaks rows, then parameterization blocks it
+  - [ ] ex-06 · command-injection-live — verify injected command runs, then shell=False blocks it
+  - [ ] ex-07 · path-traversal-file-read — verify out-of-root read, then realpath+prefix blocks it
+  - [ ] ex-08 · reflected-xss-live — verify script executes, then autoescape neutralizes it
+  - [ ] ex-09 · stored-xss-live — verify script fires on view, then output-encoding stops it
+  - [ ] ex-10 · output-encoding-by-context — verify each context uses correct encoder; mismatch leaks
+  - [ ] ex-11 · allow-list-vs-deny-list — verify allow-list rejects input the blocklist misses
+  - [ ] ex-12 · input-validation-at-the-boundary — verify malformed JSON yields 422 before logic runs
+  - [ ] ex-13 · plaintext-password-store-is-broken — verify every password visible in dump
+  - [ ] ex-14 · md5-password-store-is-broken — verify common passwords recovered in seconds
+  - [ ] ex-15 · argon2id-hash-and-verify — verify `$argon2id$` PHC string, verify() accepts/rejects correctly
+  - [ ] ex-16 · bcrypt-hash-and-verify — verify hash embeds cost; 72-byte truncation demo
+  - [ ] ex-17 · salt-makes-identical-passwords-differ — verify two stored hashes differ
+  - [ ] ex-18 · timing-safe-token-compare — verify reader explains timing side-channel `==` leaks
+  - [ ] ex-19 · secure-cookie-flags — verify `curl -I` shows Secure/HttpOnly/SameSite; JS can't read
+  - [ ] ex-20 · secret-in-env-not-code — verify no secret in source, app still authenticates
+  - [ ] ex-21 · gitignore-and-env-example — verify `git status` never lists `.env`; example holds no real value
+  - [ ] ex-22 · security-headers-baseline — verify `curl -I` shows CSP, X-Content-Type-Options, HSTS
+  - [ ] ex-23 · pip-audit-first-run — verify it reports the CVE and the fixed version
+  - [ ] ex-24 · pin-and-remediate-a-cve — verify `pip-audit` exits clean
+  - [ ] ex-25 · safe-error-message — verify client sees no internal detail; log has the trace
+  - [ ] ex-26 · second-order-sql-injection — verify it fires on second use, then parameterizing blocks it
+  - [ ] ex-27 · orm-raw-fragment-injection — verify it injects, then bound params via ORM fix it
+  - [ ] ex-28 · blind-boolean-sql-injection — verify one char extracted, then fix removes the oracle
+  - [ ] ex-29 · argument-injection-not-just-shell — verify unexpected flag changes behavior, then allow-list blocks
+  - [ ] ex-30 · dom-based-xss — verify payload executes client-side, then textContent/sanitizer fixes
+  - [ ] ex-31 · csp-blocks-inline-script — verify inline script blocked, nonce'd one runs
+  - [ ] ex-32 · mass-assignment-privilege-escalation — verify escalation, then field allow-list blocks it
+  - [ ] ex-33 · idor-broken-object-access — verify cross-user read, then ownership check fixes it
+  - [ ] ex-34 · missing-function-level-authorization — verify access, then role check returns 403
+  - [ ] ex-35 · authn-vs-authz-separation — verify code checks identity and permission separately
+  - [ ] ex-36 · session-fixation — verify fixation works, then session-id regeneration fixes it
+  - [ ] ex-37 · session-vs-token-tradeoffs — verify each authenticates; reader states one trade-off
+  - [ ] ex-38 · jwt-alg-none-attack — verify forged unsigned token accepted, then pinning alg rejects it
+  - [ ] ex-39 · jwt-hs256-rs256-confusion — verify confusion forges token, then binding alg+key blocks it
+  - [ ] ex-40 · jwt-expiry-and-claims-validation — verify expired/wrong-audience token rejected
+  - [ ] ex-41 · csrf-live-exploit — verify state-changing request succeeds, then CSRF token blocks it
+  - [ ] ex-42 · samesite-cookie-mitigates-csrf — verify cross-site POST no longer carries the cookie
+  - [ ] ex-43 · cors-misconfig-reflects-origin — verify any origin reads response, then allow-list fixes it
+  - [ ] ex-44 · cors-preflight-correctness — verify browser allows only declared methods/headers/origin
+  - [ ] ex-45 · open-redirect — verify redirect leaves site, then allow-list/relative-only fixes it
+  - [ ] ex-46 · rate-limiting-login — verify the Nth rapid attempt is throttled (429)
+  - [ ] ex-47 · account-lockout-vs-throttle — verify brute force slows; reader names the DoS risk
+  - [ ] ex-48 · constant-time-login-response — verify timing/response diff no longer reveals accounts
+  - [ ] ex-49 · security-misconfig-debug-mode — verify console reachable, then disabling debug closes it
+  - [ ] ex-50 · directory-listing-and-default-creds — verify both reachable, then hardening closes them
+  - [ ] ex-51 · tls-verify-not-disabled — verify MITM cert accepted, then verification rejects it
+  - [ ] ex-52 · hsts-and-redirect-to-https — verify http upgrades; repeat visits skip http
+  - [ ] ex-53 · secret-scanning-pre-commit — verify commit blocked when a secret is present
+  - [ ] ex-54 · secret-rotation-drill — verify old key stops working, new one authenticates
+  - [ ] ex-55 · dependency-pinning-and-lockfile — verify resolved versions identical and audit-clean
+  - [ ] ex-56 · supply-chain-typosquat-check — verify reader identifies the malicious lookalike
+  - [ ] ex-57 · structured-security-logging — verify failed-login event queryable, contains no password
+  - [ ] ex-58 · alert-on-brute-force-pattern — verify the burst triggers exactly one alert
+  - [ ] ex-59 · insecure-design-vs-bug — verify reader distinguishes design flaw from implementation bug
+  - [ ] ex-60 · threat-model-a-feature — verify each threat maps to a concrete control
+  - [ ] ex-61 · end-to-end-injection-audit — verify no concatenated-untrusted-input sink remains
+  - [ ] ex-62 · ssti-server-side-template-injection — verify code execution, then data-as-context blocks it
+  - [ ] ex-63 · argon2-parameter-tuning — verify chosen params hit budget and beat weaker baseline
+  - [ ] ex-64 · password-upgrade-on-login — verify legacy hash upgrades after one successful login
+  - [ ] ex-65 · token-revocation-strategy — verify revoked refresh token can't mint access tokens
+  - [ ] ex-66 · rbac-vs-abac-authorization — verify ownership+role rule allows/denies correctly
+  - [ ] ex-67 · least-privilege-db-account — verify destructive query denied by DB even when injected
+  - [ ] ex-68 · defense-in-depth-xss — verify removing any one layer still leaves others catching payload
+  - [ ] ex-69 · csrf-for-json-and-spa — verify forged cross-site request lacks the header, rejected
+  - [ ] ex-70 · clickjacking-frame-protection — verify page refuses to render in a foreign frame
+  - [ ] ex-71 · secure-file-upload — verify disguised executable rejected; stored files non-executable
+  - [ ] ex-72 · ssrf-safe-outbound-fetch — verify request to a private range is denied
+  - [ ] ex-73 · rate-limit-distributed — verify global limit holds across two workers
+  - [ ] ex-74 · audit-log-integrity — verify tampering with a past entry is detectable
+  - [ ] ex-75 · dependency-cve-triage-workflow — verify each finding ends resolved or documented-waived
+  - [ ] ex-76 · sbom-and-provenance — verify every component enumerated and audit-clean
+  - [ ] ex-77 · secrets-manager-integration — verify secret never in image/tree; rotates without redeploy
+  - [ ] ex-78 · harden-the-full-app-transcript — verify each seeded attack flips from success to blocked
+  - [ ] ex-79 · security-regression-test-suite — verify every attack has red-before/green-after test
+  - [ ] ex-80 · secure-error-and-logging-review — verify fuzz of error paths leaks nothing; logs secret-free
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/security-essentials/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -737,7 +2559,7 @@ Row: By Example · Python · topic wt 270 · Learn 117 / Drill 217 · **subject*
 ### Phase 18 Gate
 
 - [ ] [AI] `security-essentials/` complete: `_index.md` wt 270, `learning/_index.md` wt 117,
-      `drilling/_index.md` wt 217, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 217, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -802,9 +2624,51 @@ Row: Annotated-concept · ‡ no-code · topic wt 280 · Learn 118 / Drill 218 �
 - [ ] **[AI] V** — `web-researcher` for `technical-communication`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/18-technical-communication.md`](./syllabus/18-technical-communication.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/technical-communication/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/18-technical-communication.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/technical-communication/learning/` teaching **every** concept in
+      `syllabus/18-technical-communication.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · reader-first-bluf
+  - [ ] co-02 · inverted-pyramid
+  - [ ] co-03 · thirty-second-skim-test
+  - [ ] co-04 · design-doc-rfc-structure
+  - [ ] co-05 · rfc-review-process
+  - [ ] co-06 · adr-one-decision-format
+  - [ ] co-07 · adr-lifecycle-status
+  - [ ] co-08 · adr-colocation-immutability
+  - [ ] co-09 · pr-description-structure
+  - [ ] co-10 · blameless-postmortem-structure
+  - [ ] co-11 · diagrams-as-communication
+  - [ ] co-12 · c4-model-levels
+  - [ ] co-13 · rfc2119-keyword-precision
+  - [ ] co-14 · editing-cut-hedging-filler
+  - [ ] co-15 · audience-register-match
+  - [ ] co-16 · doc-proportionality
+  - [ ] co-17 · doc-rot-close-to-code
+- [ ] **[AI] A1-examples** — Author `CONTENT/technical-communication/learning/artifacts/` — one worked scenario / communication artifact (prose + diagrams, no `code/` runtime; ‡ leadership DD-27) per worked example in `syllabus/18-technical-communication.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · bluf-rewrite — verify decision + ask in first sentence
+  - [ ] ex-02 · inverted-pyramid-restructure — verify reader stopping after 2 paragraphs still has answer
+  - [ ] ex-03 · thirty-second-skim-test — verify skimmed-only path yields decision + next action
+  - [ ] ex-04 · pr-description-what-why-verify — verify a reviewer knows where to start
+  - [ ] ex-05 · cut-hedging-and-filler — verify word count drops, every claim stands unhedged
+  - [ ] ex-06 · rfc2119-keyword-precision — verify each requirement's strength is unambiguous
+  - [ ] ex-07 · audience-register-match — verify each version matches its audience's vocabulary/detail
+  - [ ] ex-08 · title-and-tldr-first — verify the TL;DR alone conveys the outcome
+  - [ ] ex-09 · adr-one-decision — verify it records exactly one decision, not a treatise
+  - [ ] ex-10 · adr-status-lifecycle — verify old ADR marked superseded and links forward
+  - [ ] ex-11 · adr-colocated-immutable — verify decision record immutable + colocated in-repo, dated
+  - [ ] ex-12 · rfc-options-and-tradeoff — verify each option lists pros/cons; decision cites the trade-off
+  - [ ] ex-13 · rfc-review-process — verify every open question answered or deferred before "accepted"
+  - [ ] ex-14 · design-doc-open-questions — verify no undecided item stated as a decision
+  - [ ] ex-15 · doc-proportionality — verify low-stakes reversible decision gets a lightweight artifact
+  - [ ] ex-16 · pr-description-review-guidance — verify reviewer's attention directed to the risky diff
+  - [ ] ex-17 · c4-context-diagram — verify every external actor + system boundary appears
+  - [ ] ex-18 · c4-container-diagram — verify each container names its tech + how it talks to neighbors
+  - [ ] ex-19 · blameless-postmortem-timeline — verify every entry timestamped and actor-neutral
+  - [ ] ex-20 · postmortem-root-cause-and-followups — verify every follow-up owned; root cause systemic
+  - [ ] ex-21 · diagram-beats-prose — verify diagram conveys the flow faster than replaced paragraph
+  - [ ] ex-22 · diagram-prose-consistency — verify no component named in prose is missing from diagram
+  - [ ] ex-23 · doc-rot-close-to-code — verify doc now lives with the code it governs and is dated
+  - [ ] ex-24 · rfc-to-adr-distillation — verify ADR captures decision + consequence without deliberation
+  - [ ] ex-25 · reader-review-rubric-pass — verify a peer restates the decision from the doc alone
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/technical-communication/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -816,7 +2680,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 280 · Learn 118 / Drill 218 �
 ### Phase 21 Gate
 
 - [ ] [AI] `technical-communication/` complete: `_index.md` wt 280, `learning/_index.md` wt 118,
-      `drilling/_index.md` wt 218, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 218, capstone wt 900; all 17 concepts + 25 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -835,9 +2699,93 @@ Row: Annotated-concept · Python \* · topic wt 290 · Learn 119 / Drill 219 · 
 - [ ] **[AI] V** — `web-researcher` for `computer-science-foundations`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/19-computer-science-foundations.md`](./syllabus/19-computer-science-foundations.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/computer-science-foundations/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/19-computer-science-foundations.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/computer-science-foundations/learning/` teaching **every** concept in
+      `syllabus/19-computer-science-foundations.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · positional-number-systems
+  - [ ] co-02 · twos-complement
+  - [ ] co-03 · ieee-754-floats
+  - [ ] co-04 · endianness
+  - [ ] co-05 · unicode-utf8
+  - [ ] co-06 · boolean-algebra
+  - [ ] co-07 · truth-tables-and-gates
+  - [ ] co-08 · combinational-vs-sequential
+  - [ ] co-09 · sets-and-relations
+  - [ ] co-10 · propositional-logic
+  - [ ] co-11 · predicate-logic
+  - [ ] co-12 · combinatorics-and-counting
+  - [ ] co-13 · graph-theory-basics
+  - [ ] co-14 · proof-by-induction
+  - [ ] co-15 · cpu-registers-alu
+  - [ ] co-16 · memory-hierarchy-intuition
+  - [ ] co-17 · stack-and-heap
+  - [ ] co-18 · finite-automata
+  - [ ] co-19 · regex-to-fa-equivalence
+  - [ ] co-20 · context-free-grammars-and-pushdown-automata
+  - [ ] co-21 · chomsky-hierarchy
+  - [ ] co-22 · turing-machines
+  - [ ] co-23 · halting-problem
+  - [ ] co-24 · p-vs-np
+  - [ ] co-25 · np-completeness-and-reductions
+  - [ ] co-26 · shannon-entropy
+  - [ ] co-27 · lossless-vs-lossy-compression
+  - [ ] co-28 · checksums-and-hashing
+- [ ] **[AI] A1-examples** — Author `CONTENT/computer-science-foundations/learning/code/` — runnable Python per worked example
+      in `syllabus/19-computer-science-foundations.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · dec-to-binary-by-division — verify prints `10011100` matching `bin(156)`
+  - [ ] ex-02 · base-roundtrip — verify bin/hex/int equality across bases
+  - [ ] ex-03 · twos-complement-8bit — verify pattern `11010110`, `(-42 & 0xFF)+42 == 256`
+  - [ ] ex-04 · subtraction-as-addition — verify low byte equals 2
+  - [ ] ex-05 · float-rounding-error — verify `0.30000000000000004`
+  - [ ] ex-06 · float-bit-inspector — verify IEEE-754 fields decode to 1.0
+  - [ ] ex-07 · endianness-struct-pack — verify `01 00 00 00` vs `00 00 00 01`
+  - [ ] ex-08 · byteorder-roundtrip — verify to_bytes/from_bytes identity
+  - [ ] ex-09 · utf8-encode-multibyte — verify é=2 bytes, 文=3 bytes
+  - [ ] ex-10 · codepoint-vs-byte-len — verify counts differ for non-ASCII
+  - [ ] ex-11 · truth-tables-generate — verify each row matches operator
+  - [ ] ex-12 · de-morgan-verify — verify all four rows True
+  - [ ] ex-13 · nand-completeness — verify equivalence to builtins
+  - [ ] ex-14 · half-adder — verify truth table
+  - [ ] ex-15 · sequential-counter — verify state persists and increments
+  - [ ] ex-16 · set-operations — verify against hand-computed results
+  - [ ] ex-17 · relation-properties — verify each property flag
+  - [ ] ex-18 · implication-truth-table — verify only `(True, False)` is False
+  - [ ] ex-19 · quantifiers-all-any — verify all/any against hand check
+  - [ ] ex-20 · permutations-count — verify count `== n!/(n-r)!`
+  - [ ] ex-21 · birthday-collision — verify exceeds 0.5 at 23 people
+  - [ ] ex-22 · graph-adjacency-degrees — verify degrees against edge list
+  - [ ] ex-23 · cycle-detection-dfs — verify flags a known cyclic graph
+  - [ ] ex-24 · induction-sum-check — verify `sum(1..n) == n(n+1)/2` up to 1000
+  - [ ] ex-25 · register-machine-sim — verify accumulator result
+  - [ ] ex-26 · alu-op-model — verify flag/result pair
+  - [ ] ex-27 · latency-hierarchy-table — verify strictly increasing ordering
+  - [ ] ex-28 · cache-friendly-traversal — verify row-major measurably faster
+  - [ ] ex-29 · stack-frame-trace — verify frames push then pop in order
+  - [ ] ex-30 · stack-vs-heap-ids — verify heap object outlives frame
+  - [ ] ex-31 · recursion-limit — verify `RecursionError` raised near limit
+  - [ ] ex-32 · dfa-even-zeros — verify accept/reject on test set
+  - [ ] ex-33 · dfa-simulator — verify runs any supplied machine
+  - [ ] ex-34 · nfa-nondeterminism — verify accepts where naive DFA would not
+  - [ ] ex-35 · regex-to-dfa — verify strings classify identically
+  - [ ] ex-36 · kleene-equivalence — verify agreement on all inputs
+  - [ ] ex-37 · cfg-balanced-parens — verify balanced vs unbalanced strings
+  - [ ] ex-38 · pda-anbn — verify accept/reject for `aⁿbⁿ`
+  - [ ] ex-39 · anbn-not-regular — verify counterexample breaks fixed-state machine
+  - [ ] ex-40 · chomsky-hierarchy-map — verify each against matching automaton
+  - [ ] ex-41 · turing-machine-increment — verify final tape
+  - [ ] ex-42 · tm-unary-add — verify tape result equals sum
+  - [ ] ex-43 · halting-diagonalization — verify self-reference contradiction
+  - [ ] ex-44 · busy-beaver-intuition — verify halting known only by running
+  - [ ] ex-45 · p-class-sorting — verify O(n log n) scaling
+  - [ ] ex-46 · np-verify-subset-sum — verify accepts valid witness, rejects invalid
+  - [ ] ex-47 · sat-brute-force — verify runtime grows ~2ⁿ
+  - [ ] ex-48 · reduction-3sat-to-clique — verify mapping preserves satisfiability
+  - [ ] ex-49 · tsp-factorial-demo — verify tour count `== (n-1)!`
+  - [ ] ex-50 · shannon-entropy-coin — verify H(0.5)=1 bit, H(0.9)<0.5 bit
+  - [ ] ex-51 · entropy-english-text — verify near 4 bits/char
+  - [ ] ex-52 · huffman-lossless — verify exact reconstruction + size reduction
+  - [ ] ex-53 · lossy-vs-lossless — verify only lossless reconstructs exactly
+  - [ ] ex-54 · crc32-corruption-detect — verify checksum mismatch flags corruption
+  - [ ] ex-55 · sha256-avalanche — verify ~50% of digest bits differ
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/computer-science-foundations/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -849,7 +2797,7 @@ Row: Annotated-concept · Python \* · topic wt 290 · Learn 119 / Drill 219 · 
 ### Phase 22 Gate
 
 - [ ] [AI] `computer-science-foundations/` complete: `_index.md` wt 290, `learning/_index.md` wt 119,
-      `drilling/_index.md` wt 219, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 219, capstone wt 900; all 28 concepts + 55 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -864,9 +2812,115 @@ Row: By Example · C † · topic wt 300 · Learn 120 / Drill 220 · **subject**
 - [ ] **[AI] V** — `web-researcher` for `computer-architecture`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/20-computer-architecture.md`](./syllabus/20-computer-architecture.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/computer-architecture/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/20-computer-architecture.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/computer-architecture/learning/` teaching **every** concept in
+      `syllabus/20-computer-architecture.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · memory-hierarchy
+  - [ ] co-02 · cache-lines-and-blocks
+  - [ ] co-03 · spatial-locality
+  - [ ] co-04 · temporal-locality
+  - [ ] co-05 · cache-miss-cost
+  - [ ] co-06 · cache-associativity
+  - [ ] co-07 · write-policies
+  - [ ] co-08 · virtual-memory-and-pages
+  - [ ] co-09 · tlb
+  - [ ] co-10 · page-faults-and-swapping
+  - [ ] co-11 · twos-complement-integers
+  - [ ] co-12 · integer-overflow-and-wraparound
+  - [ ] co-13 · ieee-754-in-c
+  - [ ] co-14 · float-comparison-hazards
+  - [ ] co-15 · endianness
+  - [ ] co-16 · struct-padding-and-alignment
+  - [ ] co-17 · data-layout-aos-vs-soa
+  - [ ] co-18 · instruction-set-architecture
+  - [ ] co-19 · assembly-basics
+  - [ ] co-20 · pipelining
+  - [ ] co-21 · branch-prediction
+  - [ ] co-22 · superscalar-and-out-of-order
+  - [ ] co-23 · simd-vectorization
+  - [ ] co-24 · memory-ordering-and-atomics
+  - [ ] co-25 · mechanical-sympathy-and-profiling
+- [ ] **[AI] A1-examples** — Author `CONTENT/computer-architecture/learning/code/` — runnable C per worked example
+      in `syllabus/20-computer-architecture.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · print-int-bytes — verify bytes match two's-complement encoding
+  - [ ] ex-02 · hex-dump-value — verify nibbles match `%x`
+  - [ ] ex-03 · signed-vs-unsigned-print — verify `-1` as `%u` shows `4294967295`
+  - [ ] ex-04 · signed-overflow-wrap — verify `INT_MAX+1` wraps to `INT_MIN` under `-fwrapv`
+  - [ ] ex-05 · unsigned-wraparound — verify `0u-1u == UINT_MAX`
+  - [ ] ex-06 · unsigned-underflow-loop-bug — verify fixed guard terminates
+  - [ ] ex-07 · float-bits-inspect — verify IEEE-754 fields of `1.0`
+  - [ ] ex-08 · float-not-equal — verify `0.1+0.2 != 0.3`
+  - [ ] ex-09 · float-epsilon-compare — verify epsilon test passes
+  - [ ] ex-10 · float-precision-loss — verify tiny addend lost
+  - [ ] ex-11 · endianness-detect — verify little-endian on x86/ARM
+  - [ ] ex-12 · htonl-roundtrip — verify identity
+  - [ ] ex-13 · manual-byteswap — verify matches `htonl`
+  - [ ] ex-14 · struct-sizeof-padding — verify sizeof exceeds field sum
+  - [ ] ex-15 · struct-reorder-shrink — verify smaller sizeof
+  - [ ] ex-16 · packed-struct — verify sizeof equals field sum
+  - [ ] ex-17 · alignof-types — verify increasing alignment
+  - [ ] ex-18 · misaligned-access-cost — verify misaligned slower/faults
+  - [ ] ex-19 · pointer-arithmetic-stride — verify address advances by `sizeof(T)`
+  - [ ] ex-20 · array-row-major-layout — verify matches `&a[i][j]`
+  - [ ] ex-21 · latency-hierarchy-table — verify strictly increasing ordering
+  - [ ] ex-22 · cache-line-size-probe — verify jump at ~64 B (128 B Apple Silicon)
+  - [ ] ex-23 · sequential-vs-random-sum — verify sequential much faster
+  - [ ] ex-24 · temporal-locality-working-set — verify small set faster
+  - [ ] ex-25 · read-disassembly — verify load/store present
+  - [ ] ex-26 · registers-in-asm — verify args in argument registers
+  - [ ] ex-27 · isa-compare-riscv-x86 — verify instruction counts differ
+  - [ ] ex-28 · cache-miss-stride-sweep — verify cliff at line stride
+  - [ ] ex-29 · matrix-traversal-ij-vs-ji — verify `[i][j]` faster
+  - [ ] ex-30 · aos-vs-soa-hot-loop — verify SoA faster
+  - [ ] ex-31 · working-set-cache-cliffs — verify cliff at each cache level
+  - [ ] ex-32 · cache-blocking-matmul — verify tiled faster for large matrices
+  - [ ] ex-33 · false-sharing-demo — verify slowdown vs independent lines
+  - [ ] ex-34 · padding-fixes-false-sharing — verify slowdown disappears
+  - [ ] ex-35 · prefetch-hint — verify measurable improvement
+  - [ ] ex-36 · branch-predictable-vs-random — verify sorted faster
+  - [ ] ex-37 · branchless-max — verify identical output, faster on random
+  - [ ] ex-38 · pipeline-dependency-chain — verify independent adds faster
+  - [ ] ex-39 · loop-unrolling — verify higher throughput
+  - [ ] ex-40 · ilp-multiple-accumulators — verify 4 accumulators faster
+  - [ ] ex-41 · tlb-pressure-random-pages — verify TLB misses dominate
+  - [ ] ex-42 · page-fault-mmap — verify minor faults on first touch
+  - [ ] ex-43 · virtual-address-print — verify two processes reuse same address
+  - [ ] ex-44 · swapping-slowdown — verify major-fault swapping slows access
+  - [ ] ex-45 · write-heavy-cost — verify store-traffic cost
+  - [ ] ex-46 · associativity-conflict-stride — verify conflict-miss spike at critical stride
+  - [ ] ex-47 · simd-auto-vectorize — verify vector regs in asm + speedup
+  - [ ] ex-48 · simd-intrinsics-add — verify matches scalar, faster
+  - [ ] ex-49 · simd-dot-product — verify correct + speedup
+  - [ ] ex-50 · aligned-alloc-for-simd — verify no fault, faster
+  - [ ] ex-51 · atomic-increment — verify no lost updates
+  - [ ] ex-52 · non-atomic-race — verify total undercounts
+  - [ ] ex-53 · memory-barrier-ordering — verify barrier restores order
+  - [ ] ex-54 · div-vs-shift-asm — verify division lowered to shift
+  - [ ] ex-55 · hot-cold-struct-split — verify hot-loop speedup
+  - [ ] ex-56 · perf-cache-miss-count — verify miss count drops after fix
+  - [ ] ex-57 · cpi-ipc-measure — verify CPI differs between loops
+  - [ ] ex-58 · optimize-kernel-end-to-end — verify documented reproducible speedup
+  - [ ] ex-59 · blocked-transpose — verify blocked faster + correct
+  - [ ] ex-60 · particle-sim-soa-simd — verify SoA+SIMD fastest
+  - [ ] ex-61 · parallel-histogram-scaling — verify per-thread bins scale
+  - [ ] ex-62 · mispredict-cost-measure — verify penalty near known depth
+  - [ ] ex-63 · branch-to-lookup-table — verify faster on random input
+  - [ ] ex-64 · numa-local-allocation — verify lower latency than remote node
+  - [ ] ex-65 · hugepages-tlb — verify hugepages cut TLB misses
+  - [ ] ex-66 · integer-overflow-security-bug — verify overflow, then checked-multiply fix
+  - [ ] ex-67 · kahan-summation — verify Kahan more accurate
+  - [ ] ex-68 · fast-inverse-sqrt-bits — verify approximates `1/sqrt(x)`
+  - [ ] ex-69 · portable-serialization — verify round-trip on both byte orders
+  - [ ] ex-70 · soa-enables-vectorization — verify vector regs only for SoA
+  - [ ] ex-71 · loop-interchange — verify interchanged loop faster
+  - [ ] ex-72 · roofline-bandwidth-vs-compute — verify each sits where roofline predicts
+  - [ ] ex-73 · prefetch-distance-tuning — verify optimal distance exists
+  - [ ] ex-74 · pipeline-hazard-diagram — verify diagram stall matches latency
+  - [ ] ex-75 · superscalar-port-contention — verify throughput caps below independent rate
+  - [ ] ex-76 · atomic-vs-mutex-throughput — verify atomic faster under low contention
+  - [ ] ex-77 · cache-friendly-hashmap — verify open-addressing faster
+  - [ ] ex-78 · vectorized-byte-search — verify beats scalar byte loop
+  - [ ] ex-79 · profile-guided-layout-record — verify every claim cites a measured number
+  - [ ] ex-80 · mechanical-sympathy-recap — verify all N assertions hold
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/computer-architecture/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -878,7 +2932,7 @@ Row: By Example · C † · topic wt 300 · Learn 120 / Drill 220 · **subject**
 ### Phase 23 Gate
 
 - [ ] [AI] `computer-architecture/` complete: `_index.md` wt 300, `learning/_index.md` wt 120,
-      `drilling/_index.md` wt 220, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 220, capstone wt 900; all 25 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -893,9 +2947,132 @@ Row: By Example · Python · topic wt 310 · Learn 121 / Drill 221 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `object-oriented-design-and-patterns`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/21-object-oriented-design-and-patterns.md`](./syllabus/21-object-oriented-design-and-patterns.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/object-oriented-design-and-patterns/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/21-object-oriented-design-and-patterns.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/object-oriented-design-and-patterns/learning/` teaching **every** concept in
+      `syllabus/21-object-oriented-design-and-patterns.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · single-responsibility-principle
+  - [ ] co-02 · open-closed-principle
+  - [ ] co-03 · liskov-substitution-principle
+  - [ ] co-04 · interface-segregation-principle
+  - [ ] co-05 · dependency-inversion-principle
+  - [ ] co-06 · grasp-information-expert
+  - [ ] co-07 · grasp-creator
+  - [ ] co-08 · grasp-controller
+  - [ ] co-09 · grasp-low-coupling
+  - [ ] co-10 · grasp-high-cohesion
+  - [ ] co-11 · grasp-polymorphism
+  - [ ] co-12 · grasp-pure-fabrication
+  - [ ] co-13 · grasp-indirection
+  - [ ] co-14 · grasp-protected-variations
+  - [ ] co-15 · law-of-demeter
+  - [ ] co-16 · factory-method
+  - [ ] co-17 · abstract-factory
+  - [ ] co-18 · builder
+  - [ ] co-19 · singleton-and-its-costs
+  - [ ] co-20 · adapter
+  - [ ] co-21 · decorator
+  - [ ] co-22 · facade
+  - [ ] co-23 · composite
+  - [ ] co-24 · proxy
+  - [ ] co-25 · strategy
+  - [ ] co-26 · observer
+  - [ ] co-27 · command
+  - [ ] co-28 · template-method
+  - [ ] co-29 · state
+  - [ ] co-30 · iterator
+  - [ ] co-31 · chain-of-responsibility
+  - [ ] co-32 · gof-pattern-gallery
+  - [ ] co-33 · refactor-to-pattern
+  - [ ] co-34 · anti-pattern-recognition
+  - [ ] co-35 · finite-state-machine-modeling
+  - [ ] co-36 · statecharts-and-hierarchical-states
+  - [ ] co-37 · guards-and-entry-exit-actions
+- [ ] **[AI] A1-examples** — Author `CONTENT/object-oriented-design-and-patterns/learning/code/` — every worked example in
+      `syllabus/21-object-oriented-design-and-patterns.md` §Worked examples, each runnable + `pytest` (DD-20/DD-30), static-typed (DD-34).
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · srp-split-god-class — verify each class has one reason to change
+  - [ ] ex-02 · srp-extract-report-writer — verify calculator module imports no IO
+  - [ ] ex-03 · ocp-strategy-for-discount — verify new discount added without editing dispatcher
+  - [ ] ex-04 · ocp-plugin-registry — verify new handler needs zero edits
+  - [ ] ex-05 · lsp-rectangle-square — verify test fails then fix via separate types
+  - [ ] ex-06 · lsp-bird-fly — verify no NotImplementedError reachable
+  - [ ] ex-07 · isp-split-fat-interface — verify robot implements only Workable
+  - [ ] ex-08 · isp-role-interfaces — verify plain printer depends on one protocol
+  - [ ] ex-09 · dip-inject-repository — verify service takes a Repository protocol
+  - [ ] ex-10 · dip-notifier-abstraction — verify swapping to SMS needs no service edit
+  - [ ] ex-11 · lod-avoid-train-wreck — verify caller uses one dot
+  - [ ] ex-12 · lod-wallet-payment — verify caller never touches Wallet
+  - [ ] ex-13 · grasp-information-expert-total — verify no external total loop
+  - [ ] ex-14 · grasp-creator-order-line — verify creation method lives on Order
+  - [ ] ex-15 · grasp-controller-session — verify UI never calls domain directly
+  - [ ] ex-16 · grasp-high-cohesion-split — verify each unit's methods share its state
+  - [ ] ex-17 · grasp-low-coupling-event — verify neither module imports the other
+  - [ ] ex-18 · factory-method-shape — verify caller obtains a Circle without importing Circle
+  - [ ] ex-19 · simple-factory-parser — verify unknown extension raises a clean error
+  - [ ] ex-20 · strategy-sort-key — verify a new sort key is added as a function
+  - [ ] ex-21 · observer-newsletter — verify adding a subscriber needs no publisher edit
+  - [ ] ex-22 · adapter-celsius-fahrenheit — verify the client reads Celsius
+  - [ ] ex-23 · decorator-logging — verify call logged without editing the service
+  - [ ] ex-24 · facade-checkout — verify the caller makes one call
+  - [ ] ex-25 · template-method-report — verify shared flow is not duplicated
+  - [ ] ex-26 · composition-over-inheritance-badge — verify no subclass explosion
+  - [ ] ex-27 · value-object-money — verify two equal Money instances compare equal
+  - [ ] ex-28 · abstract-factory-ui-theme — verify swapping theme swaps whole widget family
+  - [ ] ex-29 · builder-http-request — verify request built without a telescoping constructor
+  - [ ] ex-30 · singleton-config-and-cost — verify one instance and the isolation pain
+  - [ ] ex-31 · singleton-to-injection — verify a test isolates it without global reset
+  - [ ] ex-32 · proxy-lazy-load — verify loading happens on first access only
+  - [ ] ex-33 · proxy-access-control — verify an unauthorized call is blocked
+  - [ ] ex-34 · composite-file-tree — verify a recursive total via one interface
+  - [ ] ex-35 · composite-menu — verify leaf and group share render()
+  - [ ] ex-36 · command-undo — verify undo reverses the last command
+  - [ ] ex-37 · command-queue — verify execution order is preserved
+  - [ ] ex-38 · state-vending-machine — verify an illegal transition is rejected
+  - [ ] ex-39 · state-traffic-light — verify next() moves red→green→yellow
+  - [ ] ex-40 · iterator-custom-tree — verify a for loop yields sorted values
+  - [ ] ex-41 · iterator-paged-api — verify pages fetched on demand
+  - [ ] ex-42 · chain-of-responsibility-support — verify unhandled ticket falls to next handler
+  - [ ] ex-43 · chain-validation — verify first failure stops the chain
+  - [ ] ex-44 · observer-typed-events — verify an unsubscribed handler is not called
+  - [ ] ex-45 · strategy-with-protocol — verify a plain function satisfies the protocol
+  - [ ] ex-46 · grasp-polymorphism-dispatch — verify adding a type edits no switch
+  - [ ] ex-47 · grasp-pure-fabrication-repo — verify the domain stays IO-free
+  - [ ] ex-48 · grasp-indirection-mediator — verify neither collaborator references the other
+  - [ ] ex-49 · grasp-protected-variations-interface — verify a vendor swap needs no client edit
+  - [ ] ex-50 · adapter-two-way — verify both directions work
+  - [ ] ex-51 · decorator-stacking — verify the composition order is correct
+  - [ ] ex-52 · decorator-vs-inheritance — verify N add-ons need no 2^N classes
+  - [ ] ex-53 · factory-method-vs-abstract-factory — verify each solves its own axis
+  - [ ] ex-54 · template-method-vs-strategy — verify strategy swaps behavior at runtime
+  - [ ] ex-55 · observer-vs-pubsub — verify the added decoupling of the broker version
+  - [ ] ex-56 · dip-with-abc — verify a concrete subtype must implement all abstract methods
+  - [ ] ex-57 · srp-cohesion-metric — verify the methods-share-fields ratio improves
+  - [ ] ex-58 · refactor-inheritance-to-composition — verify behavior identical, depth reduced to 1
+  - [ ] ex-59 · refactor-to-strategy — verify green throughout
+  - [ ] ex-60 · refactor-to-state — verify invalid state combos become impossible
+  - [ ] ex-61 · refactor-god-object — verify responsibilities are distributed
+  - [ ] ex-62 · anti-pattern-god-object — verify the smell is named and a fix sketched
+  - [ ] ex-63 · anti-pattern-anemic-domain — verify behavior is moved onto the entity
+  - [ ] ex-64 · anti-pattern-yo-yo — verify it is flattened
+  - [ ] ex-65 · anti-pattern-singleton-abuse — verify the test pain is demonstrated
+  - [ ] ex-66 · anti-pattern-premature-abstraction — verify the code is simpler
+  - [ ] ex-67 · gof-gallery-creational — verify each constructs correctly
+  - [ ] ex-68 · gof-gallery-structural — verify each wraps correctly
+  - [ ] ex-69 · gof-gallery-behavioral — verify each dispatches correctly
+  - [ ] ex-70 · solid-full-order-engine — verify each principle's seam
+  - [ ] ex-71 · grasp-full-assignment — verify each of the nine GRASP patterns is placed
+  - [ ] ex-72 · lsp-contract-test — verify a violating subtype fails it
+  - [ ] ex-73 · isp-protocol-decomposition — verify mypy passes minimal implementations
+  - [ ] ex-74 · dip-hexagonal-ports — verify the domain imports no infra module
+  - [ ] ex-75 · observer-memory-leak — verify unsubscribed observers are garbage-collected
+  - [ ] ex-76 · command-macro-undo — verify the group undoes atomically
+  - [ ] ex-77 · strategy-registry-plugin — verify a third-party strategy loads without a core edit
+  - [ ] ex-78 · pattern-vs-yagni-judgment — verify each choice is justified in prose
+  - [ ] ex-79 · decorator-python-native — verify both work and note the trade-off
+  - [ ] ex-80 · clean-design-preview — verify the system extends without editing closed classes
+  - [ ] ex-81 · transition-table-order-lifecycle — verify illegal event in a state rejected by the table
+  - [ ] ex-82 · statechart-hierarchical-media-player — verify nested-state event handled + parent transition applies
+  - [ ] ex-83 · guards-and-entry-exit-actions — verify guard blocks transition; actions fire once per crossing
+  - [ ] ex-84 · fsm-vs-boolean-flags-contrast — verify FSM makes illegal state combo unrepresentable
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/object-oriented-design-and-patterns/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -907,7 +3084,7 @@ Row: By Example · Python · topic wt 310 · Learn 121 / Drill 221 · **subject*
 ### Phase 24 Gate
 
 - [ ] [AI] `object-oriented-design-and-patterns/` complete: `_index.md` wt 310, `learning/_index.md` wt 121,
-      `drilling/_index.md` wt 221, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 221, capstone wt 900; all 37 concepts + 84 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -922,9 +3099,115 @@ Row: By Example · Python \*\* · topic wt 320 · Learn 122 / Drill 222 · **sub
 - [ ] **[AI] V** — `web-researcher` for `programming-paradigms`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/22-programming-paradigms.md`](./syllabus/22-programming-paradigms.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/programming-paradigms/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/22-programming-paradigms.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/programming-paradigms/learning/` teaching **every** concept in
+      `syllabus/22-programming-paradigms.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · imperative-programming
+  - [ ] co-02 · procedural-abstraction
+  - [ ] co-03 · structured-programming
+  - [ ] co-04 · mutable-state-and-assignment
+  - [ ] co-05 · object-oriented-paradigm
+  - [ ] co-06 · encapsulation-as-state-containment
+  - [ ] co-07 · message-passing-vs-method-call
+  - [ ] co-08 · declarative-vs-imperative
+  - [ ] co-09 · functional-paradigm-overview
+  - [ ] co-10 · expressions-vs-statements
+  - [ ] co-11 · pure-vs-impure
+  - [ ] co-12 · first-class-and-higher-order-functions
+  - [ ] co-13 · logic-programming
+  - [ ] co-14 · unification-and-backtracking
+  - [ ] co-15 · constraint-programming
+  - [ ] co-16 · event-driven-paradigm
+  - [ ] co-17 · reactive-programming
+  - [ ] co-18 · dataflow-programming
+  - [ ] co-19 · relational-set-based-thinking
+  - [ ] co-20 · multi-paradigm-languages
+  - [ ] co-21 · paradigm-as-constraint-buys-property
+  - [ ] co-22 · state-as-the-fault-line
+  - [ ] co-23 · matching-paradigm-to-problem
+  - [ ] co-24 · paradigm-cost-and-tradeoff
+  - [ ] co-25 · mixing-paradigms-at-boundaries
+- [ ] **[AI] A1-examples** — Author `CONTENT/programming-paradigms/learning/code/` (runnable sources, DD-20/DD-30) rendering
+      **every** Worked example in `syllabus/22-programming-paradigms.md`. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · imperative-word-count — verify counts match a known text
+  - [ ] ex-02 · procedural-decompose — verify identical output, smaller main
+  - [ ] ex-03 · structured-three-constructs — verify no boolean goto flag remains
+  - [ ] ex-04 · mutable-variable-box — verify original sees the aliased change
+  - [ ] ex-05 · goto-free-loop — verify equivalent output
+  - [ ] ex-06 · oo-word-count — verify count via the method
+  - [ ] ex-07 · encapsulation-private-state — verify invariant held
+  - [ ] ex-08 · method-call-as-message — verify dispatch picks the right message
+  - [ ] ex-09 · declarative-comprehension — verify identical list
+  - [ ] ex-10 · imperative-vs-declarative-sum — verify same integer
+  - [ ] ex-11 · functional-word-count — verify same counts
+  - [ ] ex-12 · expression-vs-statement — verify both compute the same value
+  - [ ] ex-13 · pure-vs-impure-pair — verify the pure one is referentially transparent
+  - [ ] ex-14 · higher-order-map — verify function-as-value transforms each item
+  - [ ] ex-15 · sql-declarative-query — verify rows match the functional version
+  - [ ] ex-16 · event-driven-callback — verify the handler ran with the payload
+  - [ ] ex-17 · reactive-counter — verify a subscriber saw the new value
+  - [ ] ex-18 · dataflow-two-cells — verify B updates
+  - [ ] ex-19 · logic-family-facts — verify the grandparent is inferred
+  - [ ] ex-20 · multi-paradigm-one-file — verify all three run and agree
+  - [ ] ex-21 · constraint-buys-property — verify neither function can mutate it
+  - [ ] ex-22 · state-fault-line-demo — verify both count, contrast where state lives
+  - [ ] ex-23 · match-case-dispatch — verify each branch fires
+  - [ ] ex-24 · imperative-fizzbuzz — verify the 1..20 output
+  - [ ] ex-25 · declarative-fizzbuzz — verify identical output to ex-24
+  - [ ] ex-26 · structured-guard-clauses — verify same behavior, lower nesting
+  - [ ] ex-27 · oo-vs-procedural-area — verify equal areas
+  - [ ] ex-28 · paradigm-is-noise-tiny-script — verify it runs
+  - [ ] ex-29 · four-ways-imperative — verify counts
+  - [ ] ex-30 · four-ways-oo — verify same counts
+  - [ ] ex-31 · four-ways-functional — verify same counts
+  - [ ] ex-32 · four-ways-declarative — verify same counts across all four
+  - [ ] ex-33 · state-machine-imperative — verify locked→unlocked→locked sequence
+  - [ ] ex-34 · state-machine-oo — verify same sequence
+  - [ ] ex-35 · state-machine-functional — verify same sequence, no mutation
+  - [ ] ex-36 · prolog-in-python — verify a grandparent query resolves via search
+  - [ ] ex-37 · backtracking-n-queens — verify no two queens attack
+  - [ ] ex-38 · constraint-map-coloring — verify no adjacent regions share a color
+  - [ ] ex-39 · constraint-mini-sudoku — verify rows/cols/boxes valid
+  - [ ] ex-40 · event-driven-loop — verify events processed in order
+  - [ ] ex-41 · reactive-derived-value — verify c after two updates
+  - [ ] ex-42 · reactive-vs-manual-recompute — verify both consistent, one forgets on a new path
+  - [ ] ex-43 · dataflow-topo-execute — verify order respects deps and the result
+  - [ ] ex-44 · generator-pull-pipeline — verify laziness
+  - [ ] ex-45 · inversion-of-control — verify the handler is invoked by the framework
+  - [ ] ex-46 · declarative-config-vs-setup — verify equal objects
+  - [ ] ex-47 · relational-vs-nested-loop-join — verify identical rows
+  - [ ] ex-48 · pure-core-imperative-shell — verify the core is tested with no I/O
+  - [ ] ex-49 · multi-paradigm-boundary — verify the boundary passes only immutable data
+  - [ ] ex-50 · paradigm-soup-antipattern — verify the aliasing bug reproduces
+  - [ ] ex-51 · logic-vs-imperative-reachability — verify identical reachable set
+  - [ ] ex-52 · match-case-adt-dispatch — verify each variant handled
+  - [ ] ex-53 · enum-state-tags — verify a full transition cycle
+  - [ ] ex-54 · declarative-validation-rules — verify a bad input is flagged with the failing rule
+  - [ ] ex-55 · event-bus-pubsub — verify all subscribers notified once each
+  - [ ] ex-56 · reactive-debounce — verify only the final value is delivered
+  - [ ] ex-57 · dataflow-memoized-nodes — verify an unchanged subtree isn't recomputed
+  - [ ] ex-58 · paradigm-cost-table — verify a comparison table with concrete numbers
+  - [ ] ex-59 · four-paradigms-shared-test — verify all four pass it
+  - [ ] ex-60 · mini-logic-engine — verify a transitive-closure query resolves
+  - [ ] ex-61 · generic-csp-solver — verify it solves both map-coloring and mini-sudoku
+  - [ ] ex-62 · reactive-graph-diamond — verify d recomputes exactly once per a update
+  - [ ] ex-63 · dataflow-scheduler — verify correct order under a dependency chain
+  - [ ] ex-64 · event-sourcing-fold — verify replay reproduces the live state
+  - [ ] ex-65 · actor-mailbox — verify messages handled in arrival order
+  - [ ] ex-66 · paradigm-decision-record — verify each row cites a concrete selection criterion
+  - [ ] ex-67 · imperative-to-functional-refactor — verify identical output and no mutation of inputs
+  - [ ] ex-68 · oo-behind-functional-facade — verify the facade exposes no mutable state
+  - [ ] ex-69 · declarative-mini-dsl — verify a composed rule runs
+  - [ ] ex-70 · logic-type-inference-toy — verify the inferred type
+  - [ ] ex-71 · constraint-scheduling — verify a returned schedule is feasible
+  - [ ] ex-72 · reactive-spreadsheet — verify a multi-level cascade updates
+  - [ ] ex-73 · multi-paradigm-request-handler — verify a request is handled end to end
+  - [ ] ex-74 · state-fault-line-case-study — verify a race in one design and none in the other
+  - [ ] ex-75 · paradigm-mismatch-cost — verify both correct, contrast effort/lines
+  - [ ] ex-76 · dataflow-vs-callback — verify identical output, contrast readability
+  - [ ] ex-77 · relational-algebra-engine — verify a composed query's result
+  - [ ] ex-78 · paradigm-portfolio-readme — verify the matrix covers all solutions with a criterion each
+  - [ ] ex-79 · immutable-vs-mutable-perf — verify both correct, note the trade-off numerically
+  - [ ] ex-80 · choose-and-defend — verify the defense references concrete functions
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/programming-paradigms/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -936,7 +3219,7 @@ Row: By Example · Python \*\* · topic wt 320 · Learn 122 / Drill 222 · **sub
 ### Phase 25 Gate
 
 - [ ] [AI] `programming-paradigms/` complete: `_index.md` wt 320, `learning/_index.md` wt 122,
-      `drilling/_index.md` wt 222, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 222, capstone wt 900; all 25 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -951,9 +3234,118 @@ Row: By Example · Python · topic wt 330 · Learn 123 / Drill 223 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `functional-programming`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/23-functional-programming.md`](./syllabus/23-functional-programming.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/functional-programming/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/23-functional-programming.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/functional-programming/learning/` teaching **every** concept in
+      `syllabus/23-functional-programming.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · pure-functions
+  - [ ] co-02 · side-effects-and-purity
+  - [ ] co-03 · referential-transparency
+  - [ ] co-04 · immutability
+  - [ ] co-05 · persistent-data-and-structural-sharing
+  - [ ] co-06 · first-class-functions
+  - [ ] co-07 · higher-order-functions
+  - [ ] co-08 · closures-for-configuration
+  - [ ] co-09 · currying
+  - [ ] co-10 · partial-application
+  - [ ] co-11 · function-composition
+  - [ ] co-12 · pipe-utilities
+  - [ ] co-13 · map-filter-reduce
+  - [ ] co-14 · recursion-and-pythons-missing-tco
+  - [ ] co-15 · lazy-evaluation-and-generators
+  - [ ] co-16 · itertools-toolkit
+  - [ ] co-17 · memoization
+  - [ ] co-18 · decorators-as-higher-order-functions
+  - [ ] co-19 · point-free-style
+  - [ ] co-20 · algebraic-data-types-in-python
+  - [ ] co-21 · structural-pattern-matching
+  - [ ] co-22 · option-maybe-type
+  - [ ] co-23 · result-either-type
+  - [ ] co-24 · railway-oriented-error-handling
+  - [ ] co-25 · functor-intuition
+  - [ ] co-26 · applicative-intuition
+  - [ ] co-27 · monad-intuition
+  - [ ] co-28 · functional-core-imperative-shell
+- [ ] **[AI] A1-examples** — Author `CONTENT/functional-programming/learning/code/` (runnable sources, DD-20/DD-30) rendering
+      **every** Worked example in `syllabus/23-functional-programming.md`. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · pure-vs-impure-pair — verify the pure one gives the same result on repeat calls
+  - [ ] ex-02 · referential-transparency-substitution — verify output unchanged after substitution
+  - [ ] ex-03 · detect-side-effect — verify only the pure one is flagged pure
+  - [ ] ex-04 · immutable-tuple-vs-list — verify TypeError on tuple mutation
+  - [ ] ex-05 · frozen-dataclass — verify FrozenInstanceError
+  - [ ] ex-06 · dataclasses-replace-copy — verify original unchanged, copy differs
+  - [ ] ex-07 · structural-sharing-cons — verify old version intact after update
+  - [ ] ex-08 · function-as-value — verify same result via the variable
+  - [ ] ex-09 · functions-in-a-list — verify all invoked with the right output
+  - [ ] ex-10 · higher-order-apply — verify apply(fn, x) works for two functions
+  - [ ] ex-11 · return-a-function — verify multiplier(3)(4) == 12
+  - [ ] ex-12 · closure-captures-config — verify behavior varies with captured config
+  - [ ] ex-13 · map-basic — verify every word uppercased
+  - [ ] ex-14 · filter-basic — verify only evens remain
+  - [ ] ex-15 · reduce-sum — verify the total
+  - [ ] ex-16 · comprehension-vs-map — verify identical list
+  - [ ] ex-17 · curry-manual — verify curried result matches uncurried
+  - [ ] ex-18 · partial-application — verify it computes 2\*\*n
+  - [ ] ex-19 · compose-two — verify f(g(x))
+  - [ ] ex-20 · pipe-left-to-right — verify equals nested calls
+  - [ ] ex-21 · generator-lazy-count — verify only pulled values computed
+  - [ ] ex-22 · generator-vs-list-memory — verify generator doesn't materialize eagerly
+  - [ ] ex-23 · itertools-islice-infinite — verify first N values taken
+  - [ ] ex-24 · itertools-chain-groupby — verify grouped output
+  - [ ] ex-25 · memoize-lru-cache — verify cache_info() shows hits
+  - [ ] ex-26 · decorator-log-wrap — verify wrapped result unchanged
+  - [ ] ex-27 · recursion-factorial — verify value; note no TCO
+  - [ ] ex-28 · optional-none-guard — verify the miss is handled
+  - [ ] ex-29 · pure-core-extract — verify core tested with no I/O
+  - [ ] ex-30 · persistent-list-prepend — verify O(1) sharing and old list intact
+  - [ ] ex-31 · mappingproxy-readonly — verify writes through the view raise
+  - [ ] ex-32 · closure-counter-vs-pure-fold — verify both count, contrast state
+  - [ ] ex-33 · currying-with-partial — verify the composed transform
+  - [ ] ex-34 · compose-n-functions — verify application order
+  - [ ] ex-35 · point-free-transform — verify identical output
+  - [ ] ex-36 · reduce-histogram — verify the counts
+  - [ ] ex-37 · map-filter-reduce-pipeline — verify the result
+  - [ ] ex-38 · lazy-pipeline-generators — verify laziness end to end
+  - [ ] ex-39 · itertools-accumulate — verify prefix sums
+  - [ ] ex-40 · itertools-pairwise-tee — verify adjacent pairs
+  - [ ] ex-41 · memoize-manual-dict — verify second call cached
+  - [ ] ex-42 · decorator-with-args — verify retries counted
+  - [ ] ex-43 · decorator-preserves-metadata — verify **name** preserved
+  - [ ] ex-44 · recursion-to-iteration — verify same result on RecursionError-scale input
+  - [ ] ex-45 · adt-sum-type-dataclasses — verify each variant
+  - [ ] ex-46 · match-case-over-adt — verify each branch; note no exhaustiveness check
+  - [ ] ex-47 · match-guards — verify guard selects the right branch
+  - [ ] ex-48 · option-some-nothing — verify map is skipped on Nothing
+  - [ ] ex-49 · option-chaining — verify short-circuit on first miss
+  - [ ] ex-50 · result-ok-err — verify error carried as a value
+  - [ ] ex-51 · result-map-and-then — verify pipeline stops at first Err
+  - [ ] ex-52 · railway-parse-pipeline — verify one bad field short-circuits
+  - [ ] ex-53 · functor-law-identity — verify identity law holds by example
+  - [ ] ex-54 · functor-over-list-and-option — verify both mapped
+  - [ ] ex-55 · applicative-combine-options — verify both-present combines, any-absent short-circuits
+  - [ ] ex-56 · monad-bind-chain — verify monadic sequencing
+  - [ ] ex-57 · functional-core-imperative-shell-tool — verify core pure-tested, shell holds all I/O
+  - [ ] ex-58 · property-test-purity — verify the property holds across generated inputs
+  - [ ] ex-59 · persistent-tree-update — verify old root intact
+  - [ ] ex-60 · immutable-state-reducer — verify replay reproduces state
+  - [ ] ex-61 · compose-with-result — verify error propagation through composition
+  - [ ] ex-62 · curry-decorator — verify partial calls accumulate arguments
+  - [ ] ex-63 · lazy-infinite-sieve — verify first N primes
+  - [ ] ex-64 · generator-coroutine-pipeline — verify the streaming result
+  - [ ] ex-65 · memoize-bounded-lru — verify eviction of the oldest entry
+  - [ ] ex-66 · tail-recursion-trampoline — verify deep recursion completes without RecursionError
+  - [ ] ex-67 · adt-expression-evaluator — verify an arithmetic result
+  - [ ] ex-68 · option-do-style-sequence — verify short-circuit on absence
+  - [ ] ex-69 · result-form-validation — verify the failing rule is reported
+  - [ ] ex-70 · functor-laws-property-checked — verify identity + composition laws hold
+  - [ ] ex-71 · applicative-validation-accumulate — verify every error is collected
+  - [ ] ex-72 · monad-laws-intuition — verify the three laws hold
+  - [ ] ex-73 · point-free-combinator-lib — verify a composed transform
+  - [ ] ex-74 · pipe-vs-nested-readability — verify identical output, note readability
+  - [ ] ex-75 · immutability-perf-cost — verify both correct, note allocation cost
+  - [ ] ex-76 · reduce-shared-state-refactor — verify no globals remain, output unchanged
+  - [ ] ex-77 · decorator-stack-composition — verify order-dependent behavior
+  - [ ] ex-78 · lazy-vs-eager-tradeoff — verify both behaviors
+  - [ ] ex-79 · monad-option-vs-result — verify each carries its own error model
+  - [ ] ex-80 · capstone-preview-log-analyzer — verify the end-to-end report
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/functional-programming/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -965,7 +3357,7 @@ Row: By Example · Python · topic wt 330 · Learn 123 / Drill 223 · **subject*
 ### Phase 26 Gate
 
 - [ ] [AI] `functional-programming/` complete: `_index.md` wt 330, `learning/_index.md` wt 123,
-      `drilling/_index.md` wt 223, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 223, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -980,9 +3372,130 @@ Row: By Example · Python · topic wt 340 · Learn 124 / Drill 224 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `concurrency-and-parallelism`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/24-concurrency-and-parallelism.md`](./syllabus/24-concurrency-and-parallelism.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/concurrency-and-parallelism/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/24-concurrency-and-parallelism.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/concurrency-and-parallelism/learning/` teaching **every** concept in
+      `syllabus/24-concurrency-and-parallelism.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · concurrency-vs-parallelism
+  - [ ] co-02 · processes-vs-threads
+  - [ ] co-03 · the-gil
+  - [ ] co-04 · free-threaded-cpython
+  - [ ] co-05 · io-bound-vs-cpu-bound
+  - [ ] co-06 · thread-creation-and-join
+  - [ ] co-07 · shared-mutable-state-hazard
+  - [ ] co-08 · race-condition
+  - [ ] co-09 · data-race-vs-race-condition
+  - [ ] co-10 · atomicity
+  - [ ] co-11 · locks-and-mutexes
+  - [ ] co-12 · reentrant-locks
+  - [ ] co-13 · semaphores
+  - [ ] co-14 · condition-variables
+  - [ ] co-15 · events-and-barriers
+  - [ ] co-16 · deadlock
+  - [ ] co-17 · livelock-and-starvation
+  - [ ] co-18 · lock-ordering-discipline
+  - [ ] co-19 · memory-visibility
+  - [ ] co-20 · message-passing-over-shared-state
+  - [ ] co-21 · thread-safe-queues
+  - [ ] co-22 · producer-consumer-pattern
+  - [ ] co-23 · thread-pools
+  - [ ] co-24 · process-pools
+  - [ ] co-25 · futures-and-async-results
+  - [ ] co-26 · async-await-and-the-event-loop
+  - [ ] co-27 · cooperative-vs-preemptive-scheduling
+  - [ ] co-28 · parallel-decomposition-and-amdahls-law
+  - [ ] co-29 · reactive-streams-and-backpressure
+  - [ ] co-30 · observables-and-operators
+  - [ ] co-31 · hot-vs-cold-streams
+  - [ ] co-32 · backpressure-strategies
+  - [ ] co-33 · reactive-manifesto-vs-frp
+- [ ] **[AI] A1-examples** — Author `CONTENT/concurrency-and-parallelism/learning/code/` (runnable sources, DD-20/DD-30) rendering
+      **every** Worked example in `syllabus/24-concurrency-and-parallelism.md`. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · concurrency-vs-parallelism-illustration — verify interleaving vs simultaneous execution
+  - [ ] ex-02 · process-vs-thread-address-space — verify the isolation (thread sees the change, process doesn't)
+  - [ ] ex-03 · gil-serializes-cpu-threads — verify wall-time ≈ serial
+  - [ ] ex-04 · free-threaded-build-check — verify GIL reported disabled on the t-build
+  - [ ] ex-05 · io-bound-threads-help — verify wall-time < the serial sum
+  - [ ] ex-06 · first-thread-start-join — verify the worker ran
+  - [ ] ex-07 · many-threads-join-all — verify every one completed
+  - [ ] ex-08 · shared-counter-no-lock — verify the total is wrong (lost updates)
+  - [ ] ex-09 · plus-equals-not-atomic — verify three bytecodes, not one
+  - [ ] ex-10 · race-nondeterministic-output — verify different totals across runs
+  - [ ] ex-11 · lock-fixes-counter — verify the total is exactly right
+  - [ ] ex-12 · lock-context-manager — verify equivalence and release-on-exception
+  - [ ] ex-13 · rlock-reentrant — verify no self-deadlock
+  - [ ] ex-14 · plain-lock-self-deadlocks — verify it blocks (with a timeout)
+  - [ ] ex-15 · semaphore-limits-concurrency — verify at most 2 in the section at once
+  - [ ] ex-16 · bounded-semaphore-guard — verify ValueError on over-release
+  - [ ] ex-17 · event-signal — verify the waiter proceeds
+  - [ ] ex-18 · barrier-rendezvous — verify none passes until all arrive
+  - [ ] ex-19 · condition-wait-notify — verify the consumer wakes
+  - [ ] ex-20 · queue-put-get — verify FIFO delivery
+  - [ ] ex-21 · producer-consumer-basic — verify all items consumed
+  - [ ] ex-22 · queue-sentinel-shutdown — verify clean termination
+  - [ ] ex-23 · threadpool-map — verify all results returned in order
+  - [ ] ex-24 · threadpool-submit-future — verify the value via .result()
+  - [ ] ex-25 · processpool-cpu — verify faster wall-time than threads
+  - [ ] ex-26 · future-done-callback — verify the callback ran
+  - [ ] ex-27 · asyncio-hello — verify a coroutine runs to completion
+  - [ ] ex-28 · asyncio-gather-sleep — verify concurrent overlap
+  - [ ] ex-29 · deadlock-two-locks — verify the reproduced hang
+  - [ ] ex-30 · deadlock-fix-lock-ordering — verify no hang
+  - [ ] ex-31 · deadlock-fix-timeout — verify progress instead of a hang
+  - [ ] ex-32 · livelock-demo — verify no progress
+  - [ ] ex-33 · starvation-demo — verify it rarely runs
+  - [ ] ex-34 · coffman-conditions — verify breaking one condition prevents the deadlock
+  - [ ] ex-35 · memory-visibility-flag — verify a lock/Event fixes visibility
+  - [ ] ex-36 · atomic-via-lock — verify no lost updates under load
+  - [ ] ex-37 · data-race-vs-logic-race — verify each fails differently
+  - [ ] ex-38 · bounded-queue-backpressure — verify the producer waits
+  - [ ] ex-39 · multi-producer-multi-consumer — verify the totals balance
+  - [ ] ex-40 · queue-task-done-join — verify the main thread waits for completion
+  - [ ] ex-41 · condition-bounded-buffer — verify wait/notify correctness
+  - [ ] ex-42 · threadpool-as-completed — verify out-of-order arrival
+  - [ ] ex-43 · threadpool-exception-propagates — verify the exception surfaces
+  - [ ] ex-44 · processpool-map-chunksize — verify the correct aggregate
+  - [ ] ex-45 · process-shared-state-fails — verify the isolation
+  - [ ] ex-46 · multiprocessing-queue-ipc — verify cross-process delivery
+  - [ ] ex-47 · multiprocessing-value-lock — verify the correct total
+  - [ ] ex-48 · pool-vs-serial-io — verify the pool wins
+  - [ ] ex-49 · pool-vs-serial-cpu-threads — verify time ≈ serial
+  - [ ] ex-50 · asyncio-tasks-create — verify overlap vs sequential await
+  - [ ] ex-51 · asyncio-timeout — verify TimeoutError
+  - [ ] ex-52 · asyncio-queue-producer-consumer — verify all items consumed cooperatively
+  - [ ] ex-53 · asyncio-semaphore-rate-limit — verify ≤N concurrent
+  - [ ] ex-54 · cooperative-blocking-hazard — verify starvation, fixed with asyncio.sleep
+  - [ ] ex-55 · run-in-executor — verify the loop stays responsive
+  - [ ] ex-56 · amdahl-speedup-estimate — verify measured ≈ the predicted ceiling
+  - [ ] ex-57 · map-reduce-decomposition — verify the combined result matches serial
+  - [ ] ex-58 · free-threaded-parallel-cpu — verify near-linear speedup vs the GIL build
+  - [ ] ex-59 · gil-vs-nogil-benchmark — verify only the t-build parallelizes
+  - [ ] ex-60 · thread-safe-singleton-double-checked — verify one instance under contention
+  - [ ] ex-61 · reader-writer-lock — verify the many-readers-or-one-writer invariant
+  - [ ] ex-62 · deadlock-detector-wait-for-graph — verify the cycle is found
+  - [ ] ex-63 · lock-free-counter-via-queue — verify correctness without a lock
+  - [ ] ex-64 · thread-local-storage — verify no cross-thread bleed
+  - [ ] ex-65 · future-cancellation — verify it never executes
+  - [ ] ex-66 · timeout-on-gather — verify the pending set is returned
+  - [ ] ex-67 · async-cancellation-cleanup — verify resources released
+  - [ ] ex-68 · async-taskgroup-vs-gather — verify one failure cancels siblings
+  - [ ] ex-69 · concurrent-fetch-aggregate-async — verify aggregate correct, ≤N concurrent
+  - [ ] ex-70 · pipeline-three-stages — verify throughput and ordering
+  - [ ] ex-71 · work-stealing-intuition — verify load balances
+  - [ ] ex-72 · process-pool-shared-memory — verify no copy, correct result
+  - [ ] ex-73 · async-to-thread — verify the loop stays responsive
+  - [ ] ex-74 · condition-predicate-loop — verify spurious-wakeup correctness
+  - [ ] ex-75 · barrier-parallel-phases — verify phase ordering
+  - [ ] ex-76 · benchmark-io-three-ways — verify both concurrent forms beat serial
+  - [ ] ex-77 · benchmark-cpu-three-ways — verify only processes beat serial (GIL build)
+  - [ ] ex-78 · graceful-shutdown-signal — verify all in-flight work completes
+  - [ ] ex-79 · deadlock-free-dining-philosophers — verify no deadlock, all eat
+  - [ ] ex-80 · race-detector-stress-test — verify it fails pre-fix, passes post-lock
+  - [ ] ex-81 · capstone-preview-concurrent-processor — verify all match serial + the expected speedup pattern
+  - [ ] ex-82 · observable-map-filter-rxpy — verify only transformed matching items reach the observer
+  - [ ] ex-83 · hot-vs-cold-subscription — verify late subscriber sees all items (cold) vs only later (hot)
+  - [ ] ex-84 · backpressure-buffer-vs-latest — verify buffer preserves all items, latest keeps only most recent
+  - [ ] ex-85 · reactive-pull-request-n — verify no item emitted beyond outstanding demand
+  - [ ] ex-86 · flow-publisher-subscriber-contract — verify demand accounting drives emission
+  - [ ] ex-87 · marble-diagram-operator-annotate — verify each operator's timing/value effect is labelled
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/concurrency-and-parallelism/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -994,7 +3507,7 @@ Row: By Example · Python · topic wt 340 · Learn 124 / Drill 224 · **subject*
 ### Phase 27 Gate
 
 - [ ] [AI] `concurrency-and-parallelism/` complete: `_index.md` wt 340, `learning/_index.md` wt 124,
-      `drilling/_index.md` wt 224, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 224, capstone wt 900; all 33 concepts + 87 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1009,9 +3522,118 @@ Row: By Example · Python · topic wt 350 · Learn 125 / Drill 225 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `advanced-algorithms`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/25-advanced-algorithms.md`](./syllabus/25-advanced-algorithms.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-algorithms/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/25-advanced-algorithms.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/advanced-algorithms/learning/` teaching **every** concept in
+      `syllabus/25-advanced-algorithms.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · asymptotic-notation-theta-omega
+  - [ ] co-02 · amortized-analysis
+  - [ ] co-03 · recurrence-relations
+  - [ ] co-04 · master-theorem
+  - [ ] co-05 · space-time-tradeoff
+  - [ ] co-06 · divide-and-conquer
+  - [ ] co-07 · merge-sort-invariants
+  - [ ] co-08 · quicksort-partitioning
+  - [ ] co-09 · heapsort-and-binary-heaps
+  - [ ] co-10 · non-comparison-sorts
+  - [ ] co-11 · sort-stability
+  - [ ] co-12 · balanced-bst
+  - [ ] co-13 · tries
+  - [ ] co-14 · fenwick-tree
+  - [ ] co-15 · segment-tree
+  - [ ] co-16 · union-find
+  - [ ] co-17 · graph-traversal-deep
+  - [ ] co-18 · topological-sort
+  - [ ] co-19 · dijkstra-shortest-path
+  - [ ] co-20 · bellman-ford
+  - [ ] co-21 · minimum-spanning-tree
+  - [ ] co-22 · greedy-paradigm
+  - [ ] co-23 · dynamic-programming-1d
+  - [ ] co-24 · dynamic-programming-2d
+  - [ ] co-25 · backtracking
+  - [ ] co-26 · two-pointers-and-sliding-window
+  - [ ] co-27 · binary-search-on-answer
+  - [ ] co-28 · np-hardness-intuition
+- [ ] **[AI] A1-examples** — Author `CONTENT/advanced-algorithms/learning/code/` (runnable sources, DD-20/DD-30) rendering
+      **every** Worked example in `syllabus/25-advanced-algorithms.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · big-o-empirical-timing — verify ratio tracks predicted growth
+  - [ ] ex-02 · theta-vs-o-classification — verify each assertion via doubling test
+  - [ ] ex-03 · recurrence-for-merge-sort — verify closed form is n log n
+  - [ ] ex-04 · master-theorem-cases — verify each stated bound
+  - [ ] ex-05 · merge-sort-implement — verify matches sorted()
+  - [ ] ex-06 · merge-invariant-check — verify invariant holds every merge
+  - [ ] ex-07 · quicksort-lomuto — verify correctness on random + sorted
+  - [ ] ex-08 · quicksort-worst-case — verify O(n²) blow-up empirically
+  - [ ] ex-09 · heap-push-pop — verify smallest emerges first
+  - [ ] ex-10 · heapsort-in-place — verify sorted + O(1) extra space
+  - [ ] ex-11 · counting-sort — verify O(n+k) and correct order
+  - [ ] ex-12 · radix-sort — verify against sorted()
+  - [ ] ex-13 · stable-vs-unstable — verify stability preserves equal-key order
+  - [ ] ex-14 · bst-insert-search — verify in-order traversal sorted
+  - [ ] ex-15 · bst-degenerates — verify degenerates to O(n) chain
+  - [ ] ex-16 · trie-insert-lookup — verify hit/miss + O(key-length)
+  - [ ] ex-17 · trie-prefix-count — verify counts on small dictionary
+  - [ ] ex-18 · adjacency-list-build — verify neighbor sets
+  - [ ] ex-19 · bfs-shortest-unweighted — verify distances on hand example
+  - [ ] ex-20 · dfs-recursive — verify reaches every reachable node
+  - [ ] ex-21 · dfs-discovery-finish-times — verify parenthesis nesting of intervals
+  - [ ] ex-22 · union-find-basic — verify connectivity queries
+  - [ ] ex-23 · two-pointer-pair-sum — verify O(n)
+  - [ ] ex-24 · sliding-window-max-sum — verify against brute force
+  - [ ] ex-25 · amortized-dynamic-array — verify amortized O(1) append
+  - [ ] ex-26 · amortized-accounting-method — verify credits never negative
+  - [ ] ex-27 · quicksort-random-pivot — verify sorted input no longer degrades
+  - [ ] ex-28 · quickselect-kth — verify against sorted()[k]
+  - [ ] ex-29 · closest-pair-divide-conquer — verify against brute force
+  - [ ] ex-30 · fenwick-prefix-sum — verify against running array
+  - [ ] ex-31 · segment-tree-range-min — verify against brute-force slices
+  - [ ] ex-32 · segment-tree-range-update — verify point reads after range updates
+  - [ ] ex-33 · union-find-optimized — verify near-constant amortized at scale
+  - [ ] ex-34 · connected-components — verify on graph with known components
+  - [ ] ex-35 · topological-sort-kahn — verify valid order on DAG
+  - [ ] ex-36 · topological-sort-dfs — verify equals valid order
+  - [ ] ex-37 · cycle-detection-directed — verify cyclic graph rejected
+  - [ ] ex-38 · dijkstra-heap — verify shortest paths on weighted graph
+  - [ ] ex-39 · dijkstra-unreachable — verify reports infinity, not crash
+  - [ ] ex-40 · bellman-ford-negative-edges — verify correct distances
+  - [ ] ex-41 · bellman-ford-negative-cycle — verify flags the cycle
+  - [ ] ex-42 · mst-kruskal — verify total weight matches known minimum
+  - [ ] ex-43 · mst-prim — verify same total weight as Kruskal
+  - [ ] ex-44 · greedy-interval-scheduling — verify optimality on hand example
+  - [ ] ex-45 · greedy-coin-change-fails — verify suboptimal answer
+  - [ ] ex-46 · dp-fib-memo-vs-tab — verify equal results, both O(n)
+  - [ ] ex-47 · dp-climbing-stairs — verify against a recurrence
+  - [ ] ex-48 · dp-coin-change-min — verify beats ex-45's answer
+  - [ ] ex-49 · dp-edit-distance — verify against known string pairs
+  - [ ] ex-50 · dp-lcs — verify length + reconstruction
+  - [ ] ex-51 · dp-knapsack-01 — verify optimal value on small instance
+  - [ ] ex-52 · binary-search-boundary — verify boundaries incl. absent target
+  - [ ] ex-53 · backtracking-n-queens — verify solution counts N=4..8
+  - [ ] ex-54 · backtracking-subsets — verify count 2ⁿ, no dups
+  - [ ] ex-55 · backtracking-permutations — verify count n!, all distinct
+  - [ ] ex-56 · backtracking-word-search — verify found/not-found cases
+  - [ ] ex-57 · backtracking-sudoku — verify solved board valid
+  - [ ] ex-58 · greedy-vs-dp-contrast — verify where greedy diverges from optimal
+  - [ ] ex-59 · dp-2d-grid-paths — verify against enumeration on small grids
+  - [ ] ex-60 · dp-longest-increasing-subsequence — verify equal lengths both methods
+  - [ ] ex-61 · dp-matrix-chain — verify minimal cost on known chain
+  - [ ] ex-62 · dp-space-optimized — verify same result as full table
+  - [ ] ex-63 · dijkstra-vs-bellman-tradeoff — verify speed/generality trade
+  - [ ] ex-64 · a-star-heuristic — verify matches Dijkstra cost, fewer nodes
+  - [ ] ex-65 · topo-sort-critical-path — verify on hand-computed schedule
+  - [ ] ex-66 · strongly-connected-components — verify components on known digraph
+  - [ ] ex-67 · segment-tree-vs-fenwick — verify equal answers, contrast cost
+  - [ ] ex-68 · avl-rotations — verify height stays O(log n)
+  - [ ] ex-69 · red-black-invariants — verify no red-red, equal black-heights
+  - [ ] ex-70 · two-pointer-three-sum — verify unique triplets vs brute force
+  - [ ] ex-71 · sliding-window-longest-substring — verify against brute force
+  - [ ] ex-72 · sliding-window-min-window — verify on known cases
+  - [ ] ex-73 · binary-search-on-answer — verify the boundary
+  - [ ] ex-74 · quickselect-median-of-medians — verify worst-case linearity
+  - [ ] ex-75 · np-hard-tsp-brute-vs-heuristic — verify heuristic fast but not optimal
+  - [ ] ex-76 · np-reduction-sketch — verify mapping preserves yes-instances
+  - [ ] ex-77 · amortized-potential-method — verify amortized O(1)
+  - [ ] ex-78 · complexity-stated-and-tested — verify claims hold via doubling tests
+  - [ ] ex-79 · benchmark-paradigm-shootout — verify paradigm crossover as n grows
+  - [ ] ex-80 · capstone-preview-scheduler — verify end-to-end on sample DAG
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-algorithms/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1023,7 +3645,7 @@ Row: By Example · Python · topic wt 350 · Learn 125 / Drill 225 · **subject*
 ### Phase 28 Gate
 
 - [ ] [AI] `advanced-algorithms/` complete: `_index.md` wt 350, `learning/_index.md` wt 125,
-      `drilling/_index.md` wt 225, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 225, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1038,9 +3660,123 @@ Row: By Example · SQL + Python † (PostgreSQL) · topic wt 360 · Learn 126 / 
 - [ ] **[AI] V** — `web-researcher` for `advanced-sql-and-query-performance`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/26-advanced-sql-and-query-performance.md`](./syllabus/26-advanced-sql-and-query-performance.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-sql-and-query-performance/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/26-advanced-sql-and-query-performance.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/advanced-sql-and-query-performance/learning/` teaching **every** concept in
+      `syllabus/26-advanced-sql-and-query-performance.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · subqueries-and-derived-tables
+  - [ ] co-02 · common-table-expressions
+  - [ ] co-03 · recursive-ctes
+  - [ ] co-04 · window-functions
+  - [ ] co-05 · window-frames-and-partitions
+  - [ ] co-06 · ranking-and-analytic-functions
+  - [ ] co-07 · set-operations
+  - [ ] co-08 · grouping-sets-rollup-cube
+  - [ ] co-09 · lateral-joins
+  - [ ] co-10 · conditional-aggregation
+  - [ ] co-11 · acid-properties
+  - [ ] co-12 · mvcc
+  - [ ] co-13 · isolation-levels
+  - [ ] co-14 · read-phenomena
+  - [ ] co-15 · serializable-snapshot-isolation
+  - [ ] co-16 · explicit-locking
+  - [ ] co-17 · database-deadlocks
+  - [ ] co-18 · btree-index-mechanics
+  - [ ] co-19 · composite-and-covering-indexes
+  - [ ] co-20 · specialized-indexes
+  - [ ] co-21 · partial-and-expression-indexes
+  - [ ] co-22 · index-cost-tradeoff
+  - [ ] co-23 · explain-and-explain-analyze
+  - [ ] co-24 · reading-a-query-plan
+  - [ ] co-25 · table-statistics-and-analyze
+  - [ ] co-26 · n-plus-1-diagnosis-and-fix
+  - [ ] co-27 · denormalization-and-materialized-views
+  - [ ] co-28 · partitioning-pooling-and-oltp-vs-olap
+- [ ] **[AI] A1-examples** — Author `CONTENT/advanced-sql-and-query-performance/learning/code/` (runnable against seeded PostgreSQL, DD-20/DD-30)
+      rendering **every** Worked example in `syllabus/26-advanced-sql-and-query-performance.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · uncorrelated-subquery — verify equals join rewrite
+  - [ ] ex-02 · correlated-subquery — verify rows filtered
+  - [ ] ex-03 · derived-table-in-from — verify the summary
+  - [ ] ex-04 · simple-cte — verify equals inline
+  - [ ] ex-05 · multi-step-cte — verify final output
+  - [ ] ex-06 · recursive-cte-counter — verify series length
+  - [ ] ex-07 · recursive-cte-tree — verify all descendants
+  - [ ] ex-08 · window-running-total — verify cumulative
+  - [ ] ex-09 · window-partition-avg — verify per-group average
+  - [ ] ex-10 · row-number-rank — verify tie handling differs
+  - [ ] ex-11 · lag-lead-delta — verify delta column
+  - [ ] ex-12 · ntile-quartiles — verify four buckets
+  - [ ] ex-13 · union-vs-union-all — verify counts differ
+  - [ ] ex-14 · intersect-except — verify expected sets
+  - [ ] ex-15 · group-by-rollup — verify subtotal rows
+  - [ ] ex-16 · grouping-sets — verify each grouping present
+  - [ ] ex-17 · filter-aggregate — verify conditional count
+  - [ ] ex-18 · conditional-sum-case — verify pivoted columns
+  - [ ] ex-19 · begin-commit-rollback — verify rollback undoes both
+  - [ ] ex-20 · atomicity-failure — verify no partial write
+  - [ ] ex-21 · create-btree-index — verify exists via \d
+  - [ ] ex-22 · explain-basic — verify plan node prints
+  - [ ] ex-23 · explain-analyze-basic — verify actual vs estimate
+  - [ ] ex-24 · seq-scan-vs-index-scan — verify node becomes Index Scan
+  - [ ] ex-25 · analyze-refresh-stats — verify estimates improve
+  - [ ] ex-26 · for-update-row-lock — verify second session blocks
+  - [ ] ex-27 · read-committed-default — verify reread changes
+  - [ ] ex-28 · psql-timing — verify duration prints
+  - [ ] ex-29 · correlated-subquery-to-join — verify same result, better plan
+  - [ ] ex-30 · recursive-cte-graph-cycle — verify no infinite loop
+  - [ ] ex-31 · recursive-cte-bom — verify component counts
+  - [ ] ex-32 · window-moving-average — verify sliding window
+  - [ ] ex-33 · window-range-frame — verify RANGE vs ROWS differ
+  - [ ] ex-34 · window-first-last-value — verify edge values
+  - [ ] ex-35 · window-percent-rank — verify distribution stats
+  - [ ] ex-36 · top-n-per-group — verify N rows per group
+  - [ ] ex-37 · lateral-join-topn — verify per-parent limit
+  - [ ] ex-38 · lateral-vs-subquery — verify equivalence + plan diff
+  - [ ] ex-39 · cube-crosstab — verify all combinations
+  - [ ] ex-40 · composite-index-order — verify leading-column rule
+  - [ ] ex-41 · covering-index-only-scan — verify heap not touched
+  - [ ] ex-42 · partial-index — verify smaller index used
+  - [ ] ex-43 · expression-index — verify case-insensitive lookup
+  - [ ] ex-44 · hash-index — verify equality lookup uses it
+  - [ ] ex-45 · gin-index-jsonb — verify containment query uses it
+  - [ ] ex-46 · brin-index-timeseries — verify small size + range scan
+  - [ ] ex-47 · index-hurts-writes — verify write slowdown
+  - [ ] ex-48 · index-bloat-observe — verify size shrinks after REINDEX
+  - [ ] ex-49 · explain-nested-loop — verify node + when chosen
+  - [ ] ex-50 · explain-hash-join — verify build/probe phases
+  - [ ] ex-51 · explain-merge-join — verify node + sort children
+  - [ ] ex-52 · buffers-in-plan — verify cache behavior
+  - [ ] ex-53 · stale-stats-bad-plan — verify misjudge then fix after ANALYZE
+  - [ ] ex-54 · n-plus-1-reproduce — verify query count is N+1
+  - [ ] ex-55 · n-plus-1-fix-join — verify one query, same data
+  - [ ] ex-56 · n-plus-1-fix-in-clause — verify two queries total
+  - [ ] ex-57 · repeatable-read-anomaly — verify reread becomes stable
+  - [ ] ex-58 · phantom-read — verify appears then blocked
+  - [ ] ex-59 · write-skew — verify anomaly then SSI abort
+  - [ ] ex-60 · serialization-failure-retry — verify retry succeeds
+  - [ ] ex-61 · deadlock-reproduce — verify one killed with deadlock error
+  - [ ] ex-62 · deadlock-avoid-ordering — verify no deadlock
+  - [ ] ex-63 · advisory-lock — verify mutual exclusion
+  - [ ] ex-64 · materialized-view-refresh — verify fast reads + staleness
+  - [ ] ex-65 · recursive-cte-shortest-path — verify shortest cost
+  - [ ] ex-66 · window-sessionization — verify session boundaries
+  - [ ] ex-67 · window-vs-self-join-perf — verify same result, plan/timing diff
+  - [ ] ex-68 · lateral-cross-apply-report — verify correctness + plan
+  - [ ] ex-69 · covering-index-design — verify Index Only Scan + timing drop
+  - [ ] ex-70 · multicolumn-stats — verify estimate improves
+  - [ ] ex-71 · partition-by-range — verify partition pruning
+  - [ ] ex-72 · partition-pruning-explain — verify pruned partitions
+  - [ ] ex-73 · partition-vs-index-tradeoff — verify measured difference
+  - [ ] ex-74 · denormalization-measured — verify reads faster, writes costlier
+  - [ ] ex-75 · materialized-view-concurrent — verify reads not blocked
+  - [ ] ex-76 · connection-pooling-benchmark — verify throughput/latency gain
+  - [ ] ex-77 · isolation-level-matrix — verify anomalies each permits
+  - [ ] ex-78 · serializable-throughput-cost — verify correctness/throughput trade
+  - [ ] ex-79 · explain-buffers-io-tuning — verify shared reads drop
+  - [ ] ex-80 · planner-cost-constants — verify plan flips
+  - [ ] ex-81 · slow-query-log-triage — verify offender identified
+  - [ ] ex-82 · pg-stat-statements-topn — verify hottest queries surface
+  - [ ] ex-83 · olap-vs-oltp-schema — verify each fits its workload
+  - [ ] ex-84 · bulk-load-copy-vs-insert — verify COPY far faster
+  - [ ] ex-85 · capstone-preview-tuning — verify end-to-end on seed
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-sql-and-query-performance/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1052,7 +3788,7 @@ Row: By Example · SQL + Python † (PostgreSQL) · topic wt 360 · Learn 126 / 
 ### Phase 29 Gate
 
 - [ ] [AI] `advanced-sql-and-query-performance/` complete: `_index.md` wt 360, `learning/_index.md` wt 126,
-      `drilling/_index.md` wt 226, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 226, capstone wt 900; all 28 concepts + 85 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1067,9 +3803,115 @@ Row: By Example · Python † · topic wt 370 · Learn 127 / Drill 227 · **subj
 - [ ] **[AI] V** — `web-researcher` for `data-access-orms-and-query-builders`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/27-data-access-orms-and-query-builders.md`](./syllabus/27-data-access-orms-and-query-builders.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/data-access-orms-and-query-builders/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/27-data-access-orms-and-query-builders.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/data-access-orms-and-query-builders/learning/` teaching **every** concept in
+      `syllabus/27-data-access-orms-and-query-builders.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · data-access-spectrum
+  - [ ] co-02 · raw-sql-dbapi
+  - [ ] co-03 · query-builder-core
+  - [ ] co-04 · query-builder-library-contrast
+  - [ ] co-05 · parameterized-queries-and-emitted-sql
+  - [ ] co-06 · declarative-orm-mapping
+  - [ ] co-07 · active-record-vs-data-mapper
+  - [ ] co-08 · relationship-mapping
+  - [ ] co-09 · many-to-many-association
+  - [ ] co-10 · identity-map
+  - [ ] co-11 · session-object-states
+  - [ ] co-12 · unit-of-work
+  - [ ] co-13 · lazy-loading
+  - [ ] co-14 · eager-loading-strategies
+  - [ ] co-15 · n-plus-1-problem
+  - [ ] co-16 · raiseload-guard
+  - [ ] co-17 · orm-transactions
+  - [ ] co-18 · connection-pooling
+  - [ ] co-19 · migrations-alembic-workflow
+  - [ ] co-20 · autogenerate-migrations
+  - [ ] co-21 · migration-reversibility
+  - [ ] co-22 · cascade-delete-orm
+  - [ ] co-23 · bulk-operations
+  - [ ] co-24 · async-orm-session
+  - [ ] co-25 · orm-vs-raw-sql-tradeoff
+  - [ ] co-26 · query-builder-vs-orm-tradeoff
+  - [ ] co-27 · choosing-tier-per-workload
+- [ ] **[AI] A1-examples** — Author `CONTENT/data-access-orms-and-query-builders/learning/code/` (runnable Python sources over SQLAlchemy 2.0 / peewee / PyPika / Alembic, DD-20/DD-30)
+      rendering **every** Worked example in `syllabus/27-data-access-orms-and-query-builders.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · spectrum-same-query-three-ways — verify identical rows via dbapi/builder/orm
+  - [ ] ex-02 · dbapi-connect-cursor — verify cursor yields rows
+  - [ ] ex-03 · dbapi-parameterized — verify placeholder binds, no interpolation
+  - [ ] ex-04 · dbapi-row-to-dataclass — verify typed dataclass instances
+  - [ ] ex-05 · dbapi-executemany — verify batch insert count
+  - [ ] ex-06 · dbapi-transaction-commit — verify commit persists, rollback discards
+  - [ ] ex-07 · querybuilder-select — verify emitted SQL matches
+  - [ ] ex-08 · querybuilder-where-compose — verify composed predicates
+  - [ ] ex-09 · querybuilder-join — verify join SQL
+  - [ ] ex-10 · querybuilder-execute — verify rows returned
+  - [ ] ex-11 · querybuilder-vs-string-safety — verify params not interpolated
+  - [ ] ex-12 · sqlalchemy-core-table — verify table metadata registered
+  - [ ] ex-13 · sqlalchemy-core-select — verify select compiles + params
+  - [ ] ex-14 · declarative-model-basic — verify mapped class
+  - [ ] ex-15 · declarative-typed-columns — verify Mapped[] types
+  - [ ] ex-16 · orm-insert-object — verify row persisted after flush
+  - [ ] ex-17 · orm-query-select — verify object loaded
+  - [ ] ex-18 · orm-update-object — verify dirty flushed as UPDATE
+  - [ ] ex-19 · orm-delete-object — verify row deleted
+  - [ ] ex-20 · activerecord-peewee-model — verify .save() persists
+  - [ ] ex-21 · activerecord-vs-datamapper — verify persistence-API contrast
+  - [ ] ex-22 · relationship-one-to-many — verify parent.children populated
+  - [ ] ex-23 · relationship-back-populates — verify both sides sync
+  - [ ] ex-24 · foreign-key-mapping — verify FK column + relationship
+  - [ ] ex-25 · many-to-many-assoc-table — verify association rows
+  - [ ] ex-26 · many-to-many-navigate — verify both collections
+  - [ ] ex-27 · identity-map-same-object — verify same PK yields identical object
+  - [ ] ex-28 · session-lifecycle-begin — verify begin/commit boundary
+  - [ ] ex-29 · session-states-transient-pending — verify state transitions
+  - [ ] ex-30 · session-expire-refresh — verify reloaded attributes
+  - [ ] ex-31 · unit-of-work-flush-order — verify insert order by dependency
+  - [ ] ex-32 · unit-of-work-dirty-tracking — verify only changed cols in UPDATE
+  - [ ] ex-33 · unit-of-work-autoflush — verify query triggers flush
+  - [ ] ex-34 · lazy-loading-default — verify relationship SQL on access
+  - [ ] ex-35 · lazy-loading-detached-error — verify DetachedInstanceError
+  - [ ] ex-36 · n-plus-1-reproduce — verify N+1 query count
+  - [ ] ex-37 · eager-selectinload — verify 2 queries not N+1
+  - [ ] ex-38 · eager-joinedload — verify single joined query
+  - [ ] ex-39 · eager-subqueryload — verify subquery strategy
+  - [ ] ex-40 · eager-strategy-contrast — verify query counts differ
+  - [ ] ex-41 · raiseload-guard — verify raiseload raises on lazy access
+  - [ ] ex-42 · n-plus-1-count-assert — verify asserted query count
+  - [ ] ex-43 · orm-transaction-commit-rollback — verify rollback discards
+  - [ ] ex-44 · orm-nested-savepoint — verify savepoint partial rollback
+  - [ ] ex-45 · connection-pool-basics — verify pool reuse
+  - [ ] ex-46 · pool-exhaustion — verify timeout when exhausted
+  - [ ] ex-47 · pool-pre-ping — verify stale connection recycled
+  - [ ] ex-48 · alembic-init — verify env scaffolded
+  - [ ] ex-49 · alembic-first-migration — verify revision file emitted
+  - [ ] ex-50 · alembic-upgrade-downgrade — verify schema up then down
+  - [ ] ex-51 · alembic-autogenerate — verify diff-derived migration
+  - [ ] ex-52 · alembic-autogen-review — verify hand-edit needed
+  - [ ] ex-53 · migration-reversible-data — verify downgrade restores data
+  - [ ] ex-54 · migration-irreversible-guard — verify downgrade raises
+  - [ ] ex-55 · cascade-delete-orm — verify children deleted
+  - [ ] ex-56 · cascade-vs-db-fk — verify ORM cascade vs FK ondelete
+  - [ ] ex-57 · bulk-insert-orm — verify batch insert
+  - [ ] ex-58 · bulk-update-core — verify single UPDATE statement
+  - [ ] ex-59 · bulk-vs-orm-perf — verify timing delta
+  - [ ] ex-60 · async-engine-session — verify async session yields rows
+  - [ ] ex-61 · async-eager-loading — verify eager under async
+  - [ ] ex-62 · async-lazy-forbidden — verify lazy raises under async
+  - [ ] ex-63 · async-concurrent-sessions — verify concurrent queries
+  - [ ] ex-64 · orm-vs-raw-crud — verify equivalent CRUD both tiers
+  - [ ] ex-65 · orm-vs-raw-reporting — verify raw wins reporting
+  - [ ] ex-66 · querybuilder-vs-orm-dynamic — verify dynamic query build
+  - [ ] ex-67 · querybuilder-vs-orm-tradeoff — verify tradeoff articulated
+  - [ ] ex-68 · choosing-tier-crud — verify tier choice for CRUD
+  - [ ] ex-69 · choosing-tier-analytics — verify tier choice for analytics
+  - [ ] ex-70 · choosing-tier-hot-path — verify tier choice for hot path
+  - [ ] ex-71 · hybrid-orm-plus-raw — verify ORM + raw escape hatch
+  - [ ] ex-72 · identity-map-across-queries — verify same object across queries
+  - [ ] ex-73 · relationship-lazy-strategies-config — verify per-relationship strategy
+  - [ ] ex-74 · self-referential-relationship — verify tree self-join
+  - [ ] ex-75 · association-object-m2m — verify extra columns on association
+  - [ ] ex-76 · migration-zero-downtime — verify expand/contract steps
+  - [ ] ex-77 · connection-pool-tuning — verify pool-size params
+  - [ ] ex-78 · capstone-preview-three-tier — verify three-tier stack runs
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-access-orms-and-query-builders/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1081,7 +3923,7 @@ Row: By Example · Python † · topic wt 370 · Learn 127 / Drill 227 · **subj
 ### Phase 30 Gate
 
 - [ ] [AI] `data-access-orms-and-query-builders/` complete: `_index.md` wt 370, `learning/_index.md` wt 127,
-      `drilling/_index.md` wt 227, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 227, capstone wt 900; all 27 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1096,9 +3938,113 @@ Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subj
 - [ ] **[AI] V** — `web-researcher` for `build-your-own-orm-and-query-builder`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/28-build-your-own-orm-and-query-builder.md`](./syllabus/28-build-your-own-orm-and-query-builder.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/28-build-your-own-orm-and-query-builder.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/` teaching **every** concept in
+      `syllabus/28-build-your-own-orm-and-query-builder.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · sql-as-data
+  - [ ] co-02 · parameterized-sql
+  - [ ] co-03 · immutable-fluent-builder
+  - [ ] co-04 · select-clause-composition
+  - [ ] co-05 · where-clause-composition
+  - [ ] co-06 · order-limit-composition
+  - [ ] co-07 · insert-update-delete-builders
+  - [ ] co-08 · compile-to-sql-and-params
+  - [ ] co-09 · table-metadata-registration
+  - [ ] co-10 · row-to-object-mapping
+  - [ ] co-11 · object-to-row-mapping
+  - [ ] co-12 · type-coercion-on-load
+  - [ ] co-13 · identity-map
+  - [ ] co-14 · weak-reference-identity-map
+  - [ ] co-15 · session-as-transaction-boundary
+  - [ ] co-16 · unit-of-work-new-tracking
+  - [ ] co-17 · unit-of-work-dirty-tracking
+  - [ ] co-18 · unit-of-work-deleted-tracking
+  - [ ] co-19 · flush-ordering
+  - [ ] co-20 · atomic-transaction-flush
+  - [ ] co-21 · descriptor-protocol-lazy-load
+  - [ ] co-22 · n-plus-1-from-lazy-loading
+  - [ ] co-23 · connection-cursor-wiring
+  - [ ] co-24 · schema-migration-runner
+  - [ ] co-25 · fully-typed-builder-api
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/code/` (runnable type-annotated Python built + unit-tested against local SQLite, DD-20/DD-30/DD-34)
+      rendering **every** Worked example in `syllabus/28-build-your-own-orm-and-query-builder.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · clause-as-data-node — verify node stores name, renders lazily
+  - [ ] ex-02 · render-column-node — verify emits `users.id` fragment
+  - [ ] ex-03 · placeholder-not-interpolation — verify `?` + value in params
+  - [ ] ex-04 · params-collected-in-order — verify params ordered left-to-right
+  - [ ] ex-05 · builder-returns-new-instance — verify original unchanged
+  - [ ] ex-06 · branch-a-partial-query — verify each variant independent
+  - [ ] ex-07 · select-columns — verify SELECT lists both columns
+  - [ ] ex-08 · select-from-table — verify FROM clause
+  - [ ] ex-09 · select-star-default — verify emits `SELECT *`
+  - [ ] ex-10 · select-with-join — verify JOIN fragment + ON predicate
+  - [ ] ex-11 · where-equals — verify `WHERE age = ?` + param 30
+  - [ ] ex-12 · where-and — verify `a = ? AND b = ?`
+  - [ ] ex-13 · where-or — verify `(a = ? OR b = ?)`
+  - [ ] ex-14 · where-comparison-operators — verify each operator + params
+  - [ ] ex-15 · where-nested-boolean-tree — verify parenthesized compile + param order
+  - [ ] ex-16 · order-by-clause — verify trailing `ORDER BY name`
+  - [ ] ex-17 · order-by-desc — verify `ORDER BY name DESC`
+  - [ ] ex-18 · limit-offset — verify `LIMIT ? OFFSET ?` + params 10,20
+  - [ ] ex-19 · insert-builder — verify `INSERT INTO users (...) VALUES (?, ?)`
+  - [ ] ex-20 · update-builder — verify `UPDATE ... SET ... WHERE ...` + params
+  - [ ] ex-21 · delete-builder — verify `DELETE FROM users WHERE ...`
+  - [ ] ex-22 · compile-returns-sql-and-params — verify `(sql, params)` tuple
+  - [ ] ex-23 · compile-is-pure — verify identical output, no side effects
+  - [ ] ex-24 · execute-over-cursor — verify rows returned
+  - [ ] ex-25 · connect-cursor-lifecycle — verify PEP 249 flow
+  - [ ] ex-26 · builder-typed-api — verify mypy passes on a query chain
+  - [ ] ex-27 · register-table-metadata — verify registry returns column list
+  - [ ] ex-28 · metadata-drives-select — verify column order matches registration
+  - [ ] ex-29 · primary-key-from-metadata — verify identifies `id`
+  - [ ] ex-30 · row-tuple-to-object — verify attributes assigned by column order
+  - [ ] ex-31 · row-dict-to-object — verify assignment by column name
+  - [ ] ex-32 · map-multiple-rows — verify count + field values
+  - [ ] ex-33 · object-to-insert-values — verify dict matches columns
+  - [ ] ex-34 · object-to-update-set — verify only column values present
+  - [ ] ex-35 · roundtrip-object-row-object — verify result equals original
+  - [ ] ex-36 · type-coerce-bool-on-load — verify attribute is `True`/`False`
+  - [ ] ex-37 · type-coerce-date-on-load — verify `date` instance
+  - [ ] ex-38 · type-coerce-on-store — verify stored value is `0/1`/string
+  - [ ] ex-39 · custom-type-converter — verify dict ⇄ json text
+  - [ ] ex-40 · identity-map-same-instance — verify `a is b`
+  - [ ] ex-41 · identity-map-different-keys — verify distinct instances
+  - [ ] ex-42 · identity-map-miss-then-hit — verify second issues no query
+  - [ ] ex-43 · identity-map-key-shape — verify same pk across tables not conflated
+  - [ ] ex-44 · weak-value-identity-map — verify entry drops after GC
+  - [ ] ex-45 · weak-map-no-leak — verify map shrinks under GC
+  - [ ] ex-46 · session-owns-connection — verify all queries share it
+  - [ ] ex-47 · session-begin-commit — verify row persists after commit
+  - [ ] ex-48 · session-rollback — verify row absent
+  - [ ] ex-49 · session-scope-context-manager — verify commit on exit, rollback on exception
+  - [ ] ex-50 · load-snapshot-for-dirty — verify snapshot stored per object
+  - [ ] ex-51 · identity-map-feeds-mapper — verify cached object reused
+  - [ ] ex-52 · metadata-typed-columns — verify type drives coercer
+  - [ ] ex-53 · builder-plus-mapper-select — verify list of typed objects
+  - [ ] ex-54 · typed-session-api — verify mypy infers return type
+  - [ ] ex-55 · uow-track-new — verify object recorded in new-set
+  - [ ] ex-56 · uow-new-becomes-insert — verify INSERT emitted
+  - [ ] ex-57 · uow-track-dirty — verify dirty detection vs snapshot
+  - [ ] ex-58 · uow-dirty-only-changed-cols — verify UPDATE sets only changed column
+  - [ ] ex-59 · uow-clean-object-no-write — verify no UPDATE emitted
+  - [ ] ex-60 · uow-track-deleted — verify recorded in deleted-set
+  - [ ] ex-61 · uow-deleted-becomes-delete — verify DELETE emitted
+  - [ ] ex-62 · flush-order-insert-before-child — verify parent INSERT precedes child
+  - [ ] ex-63 · flush-order-delete-child-before-parent — verify order respects FK
+  - [ ] ex-64 · flush-atomic-commit — verify one transaction commits all
+  - [ ] ex-65 · flush-atomic-rollback — verify entire flush rolls back, no partial write
+  - [ ] ex-66 · flush-clears-tracking — verify new/dirty/deleted sets reset
+  - [ ] ex-67 · lazy-descriptor-defers — verify child query not issued until access
+  - [ ] ex-68 · lazy-descriptor-set-name — verify descriptor knows its field
+  - [ ] ex-69 · lazy-loads-once — verify only one query, cached after first
+  - [ ] ex-70 · n-plus-1-observable — verify N+1 queries in the log
+  - [ ] ex-71 · n-plus-1-fix-eager — verify collapses to 2 queries
+  - [ ] ex-72 · migration-runner-apply — verify schema changed
+  - [ ] ex-73 · migration-runner-version-table — verify re-run skips applied
+  - [ ] ex-74 · migration-runner-order — verify runs in version order
+  - [ ] ex-75 · wire-full-stack-select — verify typed objects from a real query
+  - [ ] ex-76 · wire-full-stack-write — verify atomic persist
+  - [ ] ex-77 · typed-end-to-end — verify zero mypy type errors
+  - [ ] ex-78 · capstone-preview-mini-orm — verify same result as topic 27 ORM tier
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1110,7 +4056,7 @@ Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subj
 ### Phase 31 Gate
 
 - [ ] [AI] `build-your-own-orm-and-query-builder/` complete: `_index.md` wt 380, `learning/_index.md` wt 128,
-      `drilling/_index.md` wt 228, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 228, capstone wt 900; all 25 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1125,9 +4071,99 @@ Row: Annotated-concept · Python \* · topic wt 390 · Learn 129 / Drill 229 · 
 - [ ] **[AI] V** — `web-researcher` for `advanced-networking`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/29-advanced-networking.md`](./syllabus/29-advanced-networking.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-networking/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/29-advanced-networking.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/advanced-networking/learning/` teaching **every** concept in `syllabus/29-advanced-networking.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · osi-tcpip-layering-and-encapsulation
+  - [ ] co-02 · link-layer-addressing-and-arp
+  - [ ] co-03 · ipv4-ipv6-addressing
+  - [ ] co-04 · cidr-and-subnetting
+  - [ ] co-05 · routing-basics
+  - [ ] co-06 · nat
+  - [ ] co-07 · tcp-handshake-and-teardown-internals
+  - [ ] co-08 · tcp-flow-control
+  - [ ] co-09 · tcp-congestion-control
+  - [ ] co-10 · nagle-and-delayed-ack
+  - [ ] co-11 · socket-options-and-nonblocking-io
+  - [ ] co-12 · dns-resolution-internals
+  - [ ] co-13 · dnssec
+  - [ ] co-14 · tls13-handshake-internals
+  - [ ] co-15 · http2-multiplexing
+  - [ ] co-16 · http3-and-quic
+  - [ ] co-17 · websockets-vs-sse
+  - [ ] co-18 · webtransport-and-webrtc
+  - [ ] co-19 · load-balancing-l4-vs-l7
+  - [ ] co-20 · reverse-proxies-and-cdns
+  - [ ] co-21 · network-namespaces
+  - [ ] co-22 · packet-capture-and-bpf-filters
+  - [ ] co-23 · latency-jitter-and-percentiles
+  - [ ] co-24 · firewalls-and-mtls
+  - [ ] co-25 · vpn-tunnels-and-overlays
+  - [ ] co-26 · wireguard
+  - [ ] co-27 · ipsec-vs-openvpn-vs-wireguard
+  - [ ] co-28 · nat-traversal-and-keepalive
+  - [ ] co-29 · mesh-overlay-vpns
+- [ ] **[AI] A1-examples** — Author `CONTENT/advanced-networking/learning/code/` — one runnable source/recipe per worked example in `syllabus/29-advanced-networking.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · osi-layer-mapping-curl-trace — verify `curl -v` transcript lines labeled by OSI layer
+  - [ ] ex-02 · encapsulation-headers-diagram — verify Mermaid encapsulation diagram renders
+  - [ ] ex-03 · view-local-mac — verify `ip link show` prints `link/ether` MAC
+  - [ ] ex-04 · arp-cache-inspect — verify `ip neigh show` lists IP→MAC entries
+  - [ ] ex-05 · ipv4-binary-anatomy — verify 4 binary octets correct
+  - [ ] ex-06 · ipv6-address-expand-compress — verify 8 full hextets then re-compressed form
+  - [ ] ex-07 · cidr-prefix-to-netmask — verify `/24`, `/26`, `/30` dotted-decimal netmasks correct
+  - [ ] ex-08 · subnet-calculator-script — verify `subnet.py` prints network/broadcast/host range
+  - [ ] ex-09 · view-routing-table — verify `ip route` shows `default via` line
+  - [ ] ex-10 · traceroute-hop-list — verify numbered hop list with per-hop latency
+  - [ ] ex-11 · private-vs-public-address-classify — verify each IP classified vs RFC 1918
+  - [ ] ex-12 · nat-translation-diagram — verify NAT translation diagram renders
+  - [ ] ex-13 · tcp-handshake-tcpdump-capture — verify `[S]`/`[S.]`/`[.]` handshake flags in trace
+  - [ ] ex-14 · tcp-teardown-tcpdump-capture — verify `[F.]`/`[.]` teardown flags in trace
+  - [ ] ex-15 · ss-show-tcp-states — verify ESTAB while open, TIME-WAIT/absent after close
+  - [ ] ex-16 · well-known-ports-review — verify ports table (DNS/53, HTTP/80, HTTPS/443…) complete
+  - [ ] ex-17 · tcp-window-scaling-tcpdump — verify `wscale` option located in SYN
+  - [ ] ex-18 · tcp-flow-control-window-shrink — verify receive window shrinks under slow reader
+  - [ ] ex-19 · congestion-window-slow-start-diagram — verify CUBIC slow-start diagram renders
+  - [ ] ex-20 · view-active-congestion-control — verify `sysctl`/`ss -tin` prints active cc algorithm
+  - [ ] ex-21 · bbr-vs-cubic-tradeoff-note — verify CUBIC-vs-BBR comparison note
+  - [ ] ex-22 · nagle-delayed-ack-stall-diagram — verify Nagle/delayed-ACK stall sequence diagram
+  - [ ] ex-23 · tcp-nodelay-socket-option — verify `TCP_NODELAY` set, small writes sent immediately
+  - [ ] ex-24 · so-reuseaddr-restart — verify immediate rebind, no "Address already in use"
+  - [ ] ex-25 · nonblocking-socket-select — verify nonblocking socket polled via `select`
+  - [ ] ex-26 · dns-resolution-chain-trace — verify `dig +trace` root→TLD→authoritative chain annotated
+  - [ ] ex-27 · dns-caching-ttl-observe — verify second-query TTL lower than first
+  - [ ] ex-28 · dnssec-validate-with-dig — verify `RRSIG` records present in `dig +dnssec`
+  - [ ] ex-29 · dnssec-chain-of-trust-diagram — verify DNSSEC trust-chain diagram renders
+  - [ ] ex-30 · tls13-handshake-curl-verbose — verify `* TLSv1.3` lines annotated
+  - [ ] ex-31 · tls13-1rtt-handshake-diagram — verify 1-RTT handshake sequence diagram renders
+  - [ ] ex-32 · tls13-session-resumption-0rtt — verify 0-RTT PSK resumption annotated
+  - [ ] ex-33 · http2-frame-inspect — verify `curl -v --http2` shows HTTP/2 frames
+  - [ ] ex-34 · http2-multiplexed-streams-diagram — verify multiplexed-streams diagram renders
+  - [ ] ex-35 · http2-vs-http11-connection-count — verify HTTP/2 one connection vs HTTP/1.1 multiple
+  - [ ] ex-36 · http3-quic-curl-attempt — verify `* using HTTP/3` (or `[Needs Verification]` fallback)
+  - [ ] ex-37 · quic-udp-vs-tcp-hol-blocking-diagram — verify HOL-blocking contrast diagram renders
+  - [ ] ex-38 · quic-connection-migration-note — verify connection-migration note
+  - [ ] ex-39 · websocket-handshake-upgrade — verify `Upgrade: websocket` + `101` status
+  - [ ] ex-40 · websocket-full-duplex-demo — verify concurrent send/receive
+  - [ ] ex-41 · sse-one-way-stream — verify `data:` SSE lines streamed and consumed
+  - [ ] ex-42 · websocket-vs-sse-decision-table — verify decision table maps use-cases
+  - [ ] ex-43 · webtransport-overview-diagram — verify WebTransport session diagram renders
+  - [ ] ex-44 · webrtc-peer-connection-diagram — verify WebRTC peer-connection diagram renders
+  - [ ] ex-45 · l4-load-balancer-diagram — verify L4 load-balancer diagram renders
+  - [ ] ex-46 · l7-load-balancer-diagram — verify L7 load-balancer diagram renders
+  - [ ] ex-47 · reverse-proxy-request-flow — verify local reverse-proxy forwards request
+  - [ ] ex-48 · cdn-cache-hit-miss-headers — verify `curl -I` cache-status header (HIT/MISS) shown
+  - [ ] ex-49 · network-namespace-isolated-stack — verify isolated netns has its own loopback
+  - [ ] ex-50 · bpf-filter-tcpdump-host-port — verify only host+port 443 packets captured
+  - [ ] ex-51 · bpf-filter-tcpdump-flags — verify only SYN packets shown
+  - [ ] ex-52 · latency-jitter-percentiles-measure — verify p50/p95/p99 computed
+  - [ ] ex-53 · bandwidth-vs-throughput-vs-latency-diagram — verify distinguishing diagram renders
+  - [ ] ex-54 · firewall-stateful-rule-diagram — verify stateful firewall reply-allow diagram renders
+  - [ ] ex-55 · mtls-mutual-auth-diagram — verify mutual-TLS handshake sequence diagram renders
+  - [ ] ex-56 · wireguard-two-peer-tunnel — verify peers reach each other over the encrypted link
+  - [ ] ex-57 · allowedips-crypto-routing — verify AllowedIPs acts as the crypto-routing table
+  - [ ] ex-58 · split-tunnel-vs-full-tunnel — verify which destinations egress the tunnel in each case
+  - [ ] ex-59 · persistentkeepalive-nat — verify NAT mapping stays open, NATed peer keeps receiving
+  - [ ] ex-60 · site-to-site-vs-remote-access-diagram — verify each topology's routed ranges are labelled
+  - [ ] ex-61 · mesh-overlay-tailscale-nebula-contrast — verify control-plane + trust model + license labelled
+  - [ ] ex-62 · wireguard-vs-openvpn-vs-ipsec-decision — verify each option's trade-off + license recorded
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-networking/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1139,7 +4175,7 @@ Row: Annotated-concept · Python \* · topic wt 390 · Learn 129 / Drill 229 · 
 ### Phase 32 Gate
 
 - [ ] [AI] `advanced-networking/` complete: `_index.md` wt 390, `learning/_index.md` wt 129,
-      `drilling/_index.md` wt 229, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 229, capstone wt 900; all 29 concepts + 62 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1154,9 +4190,85 @@ Row: Annotated-concept · Python \* · topic wt 400 · Learn 130 / Drill 230 · 
 - [ ] **[AI] V** — `web-researcher` for `software-engineering-practices`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/30-software-engineering-practices.md`](./syllabus/30-software-engineering-practices.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/software-engineering-practices/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/30-software-engineering-practices.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/software-engineering-practices/learning/` teaching **every** concept in `syllabus/30-software-engineering-practices.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · trunk-based-vs-feature-branch
+  - [ ] co-02 · conventional-commits
+  - [ ] co-03 · semantic-versioning
+  - [ ] co-04 · changelog-discipline
+  - [ ] co-05 · code-review-etiquette
+  - [ ] co-06 · pr-hygiene-and-size
+  - [ ] co-07 · pr-workflow-with-gh-cli
+  - [ ] co-08 · ci-pipeline-stages
+  - [ ] co-09 · quality-gates
+  - [ ] co-10 · pre-commit-hooks
+  - [ ] co-11 · test-pyramid-as-practice
+  - [ ] co-12 · coverage-as-signal-not-target
+  - [ ] co-13 · systematic-debugging-practice
+  - [ ] co-14 · refactoring-cadence
+  - [ ] co-15 · boy-scout-rule
+  - [ ] co-16 · technical-debt-tracking
+  - [ ] co-17 · documentation-as-code
+  - [ ] co-18 · adr-as-engineering-practice
+  - [ ] co-19 · estimation-pitfalls-and-noestimates
+  - [ ] co-20 · pairing-and-mobbing
+  - [ ] co-21 · definition-of-done
+  - [ ] co-22 · feature-flags-as-a-release-decoupler
+  - [ ] co-23 · incident-hygiene-and-blameless-response
+- [ ] **[AI] A1-examples** — Author `CONTENT/software-engineering-practices/learning/code/` (runnable command sequences + CI/hook config) and `.../learning/artifacts/` (changelogs, ADRs, postmortems, memos) — one per worked example in `syllabus/30-software-engineering-practices.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · conventional-commit-fix — verify `git log -1 --pretty=%s` matches `type(scope): description`
+  - [ ] ex-02 · conventional-commit-feat-with-scope — verify `feat` maps to a MINOR bump
+  - [ ] ex-03 · conventional-commit-breaking-bang — verify `!` and `BREAKING CHANGE:` both signal MAJOR
+  - [ ] ex-04 · semver-bump-decision-table — verify each change assigned the correct SemVer bump
+  - [ ] ex-05 · changelog-entry-keepachangelog — verify entry uses one of the six categories under `[Unreleased]`
+  - [ ] ex-06 · changelog-vs-raw-commit-dump — verify changelog reads as intent, not raw history
+  - [ ] ex-07 · trunk-vs-feature-branch-decision — verify each pick cites cadence/team-size
+  - [ ] ex-08 · self-review-before-request — verify opened PR no longer contains the self-caught issue
+  - [ ] ex-09 · pr-create-with-gh — verify `gh pr view` shows title + base branch
+  - [ ] ex-10 · pr-size-under-100-lines — verify each split PR near the ~100-line bar
+  - [ ] ex-11 · pr-description-one-concern — verify single purpose stateable in one sentence
+  - [ ] ex-12 · request-review-with-gh — verify `gh pr view --comments` lists request-changes comment
+  - [ ] ex-13 · approve-with-gh — verify `gh pr view --comments` lists approval comment
+  - [ ] ex-14 · minimal-ci-pipeline-lint-test-build — verify diagram order matches pipeline job order
+  - [ ] ex-15 · required-check-blocks-merge — verify failing commit blocked from merge
+  - [ ] ex-16 · lint-warning-vs-blocking-gate — verify blocking gate reserved for production-protecting check
+  - [ ] ex-17 · install-pre-commit-framework — verify `git commit` triggers configured hooks
+  - [ ] ex-18 · pre-commit-run-all-files — verify per-hook pass/fail across whole repo
+  - [ ] ex-19 · pyramid-shape-check-in-review — verify comment names the violated pyramid shape
+  - [ ] ex-20 · coverage-number-without-assertions — verify high coverage, unverified behavior
+  - [ ] ex-21 · goodhart-coverage-target-memo — verify memo names assertion-free-test failure mode
+  - [ ] ex-22 · rubber-duck-explain-the-bug — verify narration surfaces wrong assumption pre-change
+  - [ ] ex-23 · hypothesis-before-fix — verify hypothesis confirmed/refuted by exactly one check
+  - [ ] ex-24 · bisect-as-workflow-decision — verify choice justified by logarithmic step count
+  - [ ] ex-25 · refactor-during-a-feature-pr — verify refactor commit separate from feature commit
+  - [ ] ex-26 · boy-scout-rule-applied — verify cleanup stays a tiny incidental diff
+  - [ ] ex-27 · refactoring-cadence-vs-big-bang — verify continuous option chosen with risk rationale
+  - [ ] ex-28 · tech-debt-log-entry — verify entry names its Fowler quadrant
+  - [ ] ex-29 · tech-debt-prioritization — verify ranking picks highest-friction, not newest
+  - [ ] ex-30 · docstring-to-api-doc — verify generated doc matches signature, no hand-duplication
+  - [ ] ex-31 · doc-in-same-pr-as-code — verify PR diff contains both code and doc update
+  - [ ] ex-32 · adr-trigger-decision — verify only the hard-to-reverse choice earns an ADR
+  - [ ] ex-33 · adr-cross-referenced-from-code — verify ADR and code point at each other
+  - [ ] ex-34 · estimation-pitfall-single-point — verify raw-hour estimate reads overconfident vs relative
+  - [ ] ex-35 · noestimates-alternative — verify alternative removes estimate step, keeps forecast
+  - [ ] ex-36 · pairing-driver-navigator — verify roles swap at interval, both explain diff
+  - [ ] ex-37 · mob-programming-session — verify every participant can explain the solution
+  - [ ] ex-38 · definition-of-done-checklist — verify PR done only once every item checked
+  - [ ] ex-39 · done-vs-done-done — verify DoD distinguishes merged vs deployed-and-monitored
+  - [ ] ex-40 · feature-flag-release-toggle — verify trunk build green with flag off
+  - [ ] ex-41 · feature-flag-kill-switch — verify feature off without redeploy, system up
+  - [ ] ex-42 · incident-detection-to-mitigation — verify timeline names mitigation before root-cause fix
+  - [ ] ex-43 · blameless-language-check — verify no sentence attributes incident to a person
+  - [ ] ex-44 · capstone-preview-commit-history-cleanup — verify `git log --oneline` shows typed+scoped commits
+  - [ ] ex-45 · semver-changelog-from-commits — verify derived bump matches highest-severity commit type
+  - [ ] ex-46 · quality-gate-pipeline-with-pre-commit — verify local hook failure fails pipeline identically
+  - [ ] ex-47 · coverage-plus-review-double-gate — verify unreviewed risky diff still blocked
+  - [ ] ex-48 · full-pr-review-cycle — verify request-changes comment then approval comment, in order
+  - [ ] ex-49 · debt-driven-refactor-with-flag — verify old+new paths coexist behind flag until verified
+  - [ ] ex-50 · postmortem-to-tracked-debt — verify follow-up item traces to the postmortem line
+  - [ ] ex-51 · adr-plus-definition-of-done — verify PR lacking a linked ADR fails the checklist
+  - [ ] ex-52 · review-etiquette-severity-labels — verify author can tell blocking from nit
+  - [ ] ex-53 · pairing-vs-solo-tradeoff-memo — verify memo cites risk/familiarity per choice
+  - [ ] ex-54 · systematic-debug-in-review — verify located commit matches a full `git bisect` result
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-engineering-practices/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1168,7 +4280,7 @@ Row: Annotated-concept · Python \* · topic wt 400 · Learn 130 / Drill 230 · 
 ### Phase 33 Gate
 
 - [ ] [AI] `software-engineering-practices/` complete: `_index.md` wt 400, `learning/_index.md` wt 130,
-      `drilling/_index.md` wt 230, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 230, capstone wt 900; all 23 concepts + 54 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1183,9 +4295,90 @@ Row: Annotated-concept · ‡ polyglot · topic wt 410 · Learn 131 / Drill 231 
 - [ ] **[AI] V** — `web-researcher` for `agentic-coding`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/31-agentic-coding.md`](./syllabus/31-agentic-coding.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/agentic-coding/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/31-agentic-coding.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/agentic-coding/learning/` teaching **every** concept in
+      `syllabus/31-agentic-coding.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · what-is-agentic-coding
+  - [ ] co-02 · the-perceive-plan-act-observe-loop
+  - [ ] co-03 · context-window-fundamentals
+  - [ ] co-04 · context-management
+  - [ ] co-05 · prompting-for-code
+  - [ ] co-06 · instruction-files
+  - [ ] co-07 · tool-use-and-function-calling
+  - [ ] co-08 · mcp-model-context-protocol
+  - [ ] co-09 · plan-mode-vs-act-mode
+  - [ ] co-10 · subagents-and-orchestration
+  - [ ] co-11 · permissions-and-guardrails
+  - [ ] co-12 · sandboxing-and-reversibility
+  - [ ] co-13 · verification-discipline
+  - [ ] co-14 · test-driven-agent-workflows
+  - [ ] co-15 · diff-review
+  - [ ] co-16 · hallucination-awareness
+  - [ ] co-17 · trust-vs-verify-calibration
+  - [ ] co-18 · cost-and-token-budgeting
+  - [ ] co-19 · prompt-injection-risk
+  - [ ] co-20 · agent-skills
+  - [ ] co-21 · spec-driven-development
+  - [ ] co-22 · when-not-to-use-agents
+  - [ ] co-23 · iterative-refinement
+  - [ ] co-24 · human-in-the-loop
+- [ ] **[AI] A1-examples** — Author `CONTENT/agentic-coding/learning/code/` (runnable sources, DD-20) +
+      `artifacts/` (prompt/session/config artifacts with no runnable code) — one per worked example in
+      `syllabus/31-agentic-coding.md` §Worked examples, each rendered runnable/verifiable (DD-20/DD-30).
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · what-agentic-coding-is-not — verify session log shows multiple tool invocations autocomplete lacks
+  - [ ] ex-02 · trace-the-agent-loop — verify all four phases labeled in order across ≥2 iterations
+  - [ ] ex-03 · context-window-budget-check — verify reported count against documented context limit
+  - [ ] ex-04 · prune-irrelevant-context — verify pruned run stays on-topic where unpruned cites irrelevant file
+  - [ ] ex-05 · minimal-well-specified-prompt — verify first diff satisfies every acceptance-criteria bullet
+  - [ ] ex-06 · vague-vs-specific-prompt-contrast — verify specific prompt's first diff passes where vague fails
+  - [ ] ex-07 · author-a-project-instruction-file — verify agent runs declared test command unprompted
+  - [ ] ex-08 · instruction-file-precedence — verify which rule wins + cite documented precedence order
+  - [ ] ex-09 · first-tool-call-is-a-read — verify read precedes any write in the tool-call log
+  - [ ] ex-10 · tool-call-log-inspection — verify every entry records a tool name and its parameters
+  - [ ] ex-11 · plan-mode-first-pass — verify no file modified during the planning pass
+  - [ ] ex-12 · act-mode-after-plan-approval — verify edits appear only after the explicit approval step
+  - [ ] ex-13 · run-the-suite-before-accepting — verify a failing test blocks acceptance, logged as rejection
+  - [ ] ex-14 · reject-a-diff-on-inspection — verify rejection written with reason tied to the unrelated hunk
+  - [ ] ex-15 · spot-a-hallucinated-api — verify mismatch against real API reference before acceptance
+  - [ ] ex-16 · delegate-boilerplate-safely — verify review log shows a skim + why that was sufficient
+  - [ ] ex-17 · require-close-review-for-sensitive-code — verify line-by-line review precedes acceptance
+  - [ ] ex-18 · token-usage-per-turn-log — verify running total against a stated budget ceiling
+  - [ ] ex-19 · configure-an-mcp-server — verify agent's tool list includes new server's tools after restart
+  - [ ] ex-20 · call-a-tool-via-mcp — verify tool call + JSON-RPC result both appear in the transcript
+  - [ ] ex-21 · delegate-to-a-subagent — verify only a summary returns, not the raw exploration transcript
+  - [ ] ex-22 · parallel-subagent-fan-out — verify both complete + merge without cross-contaminating context
+  - [ ] ex-23 · deny-rule-permission-config — verify out-of-scope write is blocked and logged as denied
+  - [ ] ex-24 · allow-list-tool-scoping-for-review — verify no write/edit tool is invocable in the session
+  - [ ] ex-25 · sandboxed-shell-command — verify effect stays isolated from host outside the sandbox
+  - [ ] ex-26 · small-reversible-commit-steps — verify each commit independently revertible
+  - [ ] ex-27 · failing-test-as-tripwire — verify session log shows explicit red-to-green transition
+  - [ ] ex-28 · red-green-refactor-with-agent — verify three distinct diffs, one per phase
+  - [ ] ex-29 · diff-review-checklist — verify every checklist item explicitly checked before merge
+  - [ ] ex-30 · catch-silent-scope-creep — verify reviewer flags + trims out-of-scope hunk before acceptance
+  - [ ] ex-31 · budget-a-multi-turn-session — verify session halts or escalates when budget reached
+  - [ ] ex-32 · compare-cost-of-scoped-vs-open-prompt — verify scoped prompt's total cost is lower
+  - [ ] ex-33 · untrusted-content-injection-probe — verify guardrail blocks the injected instruction
+  - [ ] ex-34 · sanitize-tool-output-before-reuse — verify flagged suspicious payload is not acted on
+  - [ ] ex-35 · load-an-agent-skill — verify agent follows skill's documented steps, not improvised ones
+  - [ ] ex-36 · skill-vs-ad-hoc-instruction — verify skill run is repeatable where ad hoc varies
+  - [ ] ex-37 · write-a-spec-before-prompting — verify review maps each spec bullet to a diff line
+  - [ ] ex-38 · gherkin-spec-driving-agent-implementation — verify scenario steps pass against implementation
+  - [ ] ex-39 · iterate-on-a-failed-first-attempt — verify second diff passes where first did not
+  - [ ] ex-40 · multi-round-correction-loop — verify diff converges toward passing across rounds
+  - [ ] ex-41 · escalate-a-security-critical-change — verify documented human approval exists before merge
+  - [ ] ex-42 · when-not-to-delegate-a-novel-algorithm — verify written rationale records why delegation declined
+  - [ ] ex-43 · unverifiable-output-refusal — verify no diff merges without an accompanying verification path
+  - [ ] ex-44 · human-decision-gate-mid-session — verify session log shows a pause + explicit recorded approval
+  - [ ] ex-45 · context-managed-feature-loop — verify agent's diffs touch no file outside the scoped set
+  - [ ] ex-46 · mechanical-refactor-across-files — verify each file's diff carries a separate logged approval
+  - [ ] ex-47 · reject-a-confidently-wrong-refactor — verify behavior change caught via test regression + rejected
+  - [ ] ex-48 · trust-verify-decision-log — verify every risky change has a matching verify entry
+  - [ ] ex-49 · mcp-plus-subagent-research-task — verify main session receives only a cited summary
+  - [ ] ex-50 · prompt-injection-guardrail-config — verify rule fires against a crafted injection test case
+  - [ ] ex-51 · spec-driven-tdd-agent-session — verify spec bullets + red run + green run all present
+  - [ ] ex-52 · full-verify-first-feature-session — verify no diff reached final state unrun/unreviewed
+  - [ ] ex-53 · cost-bounded-iterative-refinement — verify session halts at budget + flags unresolved item
+  - [ ] ex-54 · post-mortem-a-bad-agent-merge — verify the fix closes the specific verification-loop gap
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/agentic-coding/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1197,7 +4390,7 @@ Row: Annotated-concept · ‡ polyglot · topic wt 410 · Learn 131 / Drill 231 
 ### Phase 34 Gate
 
 - [ ] [AI] `agentic-coding/` complete: `_index.md` wt 410, `learning/_index.md` wt 131,
-      `drilling/_index.md` wt 231, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 231, capstone wt 900; all 24 concepts + 54 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1212,9 +4405,67 @@ Row: Annotated-concept · — ‡ · topic wt 420 · Learn 132 / Drill 232 · **
 - [ ] **[AI] V** — `web-researcher` for `software-product-engineering`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/32-software-product-engineering.md`](./syllabus/32-software-product-engineering.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/software-product-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/32-software-product-engineering.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/software-product-engineering/learning/` teaching **every** concept in
+      `syllabus/32-software-product-engineering.md` §Concepts (DD-34 1:1 mirror; concepts before scenarios). One checkbox per `co-NN`:
+  - [ ] co-01 · outcome-vs-output
+  - [ ] co-02 · problem-before-solution
+  - [ ] co-03 · jobs-to-be-done
+  - [ ] co-04 · customer-discovery-interviewing
+  - [ ] co-05 · continuous-discovery-opportunity-solution-tree
+  - [ ] co-06 · riskiest-assumption-and-four-big-risks
+  - [ ] co-07 · rice-prioritization
+  - [ ] co-08 · moscow-prioritization
+  - [ ] co-09 · impact-effort-matrix
+  - [ ] co-10 · kano-model
+  - [ ] co-11 · cost-of-delay-and-wsjf
+  - [ ] co-12 · mvp-as-hypothesis-test
+  - [ ] co-13 · build-measure-learn-pivot-or-persevere
+  - [ ] co-14 · iterative-incremental-delivery
+  - [ ] co-15 · ab-experimentation-hypothesis-and-guardrail
+  - [ ] co-16 · feature-flag-toggle-taxonomy
+  - [ ] co-17 · north-star-and-input-metrics
+  - [ ] co-18 · aarrr-funnel
+  - [ ] co-19 · heart-framework
+  - [ ] co-20 · activation-and-retention
+  - [ ] co-21 · vanity-vs-actionable-metrics
+  - [ ] co-22 · goodhart-metric-gaming
+  - [ ] co-23 · writing-specs-and-pr-faq
+  - [ ] co-24 · dual-track-discovery-and-delivery
+  - [ ] co-25 · shaping-and-appetite
+  - [ ] co-26 · engineer-product-design-collaboration
+- [ ] **[AI] A1-scenarios** — Author `CONTENT/software-product-engineering/learning/artifacts/` (‡ no-code decision
+      scenarios/artifacts, DD-27/DD-30) covering **every** Worked scenario in `syllabus/32-software-product-engineering.md`.
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · outcome-vs-output-rewrite — verify each names a user behaviour change, not a feature
+  - [ ] ex-02 · problem-statement-from-request — verify names user + circumstance + outcome, withholds solution
+  - [ ] ex-03 · jtbd-job-story — verify names circumstance + motivation + expected progress
+  - [ ] ex-04 · mom-test-interview-script — verify every question asks past behaviour/specifics, none pitches
+  - [ ] ex-05 · mom-test-red-flag-audit — verify each flagged question asks opinion/hypothetical/future
+  - [ ] ex-06 · rice-score-single-feature — verify arithmetic = (R×I×C)÷E and units named
+  - [ ] ex-07 · moscow-bucketing — verify each "Won't" is scoped to this release, not rejected
+  - [ ] ex-08 · impact-effort-quadrant — verify quick wins sit high-impact/low-effort
+  - [ ] ex-09 · aarrr-funnel-map — verify each stage has ≥1 concrete event in correct order
+  - [ ] ex-10 · vanity-metric-audit — verify each flagged metric lacks a cause→effect decision tie
+  - [ ] ex-11 · rice-backlog-ranking — verify each score justified + ordering follows scores
+  - [ ] ex-12 · rice-vs-moscow-reconciliation — verify names why business necessity overrides the score
+  - [ ] ex-13 · kano-classification — verify each cites its presence-vs-satisfaction shape
+  - [ ] ex-14 · wsjf-sequencing — verify ordering matches computed Cost-of-Delay ÷ Duration ratios
+  - [ ] ex-15 · riskiest-assumption-triage — verify names the four risks + cheapest test of the chosen one
+  - [ ] ex-16 · mvp-scope-cut-with-engineering-input — verify MVP tests riskiest assumption + names cheaper feasible alternative
+  - [ ] ex-17 · build-measure-learn-pivot-or-persevere — verify states hypothesis, measurement, and pivot/persevere with reason
+  - [ ] ex-18 · release-slicing-increments — verify each slice ships value alone and returns a distinct signal
+  - [ ] ex-19 · opportunity-solution-tree — verify each solution traces up to an opportunity and the outcome
+  - [ ] ex-20 · ab-experiment-design — verify names exactly one hypothesis, one primary (OEC), ≥1 guardrail
+  - [ ] ex-21 · guardrail-metric-selection — verify each guardrail is a must-not-regress metric, not the primary
+  - [ ] ex-22 · feature-flag-toggle-classification — verify each classification cites the category's lifespan
+  - [ ] ex-23 · north-star-and-inputs — verify NSM measures delivered value + each input is a controllable lever, differs from OMTM
+  - [ ] ex-24 · heart-goals-signals-metrics — verify goal, signal, and metric all present and consistent
+  - [ ] ex-25 · activation-metric-definition — verify names the first genuine value moment, testable
+  - [ ] ex-26 · goodhart-guardrail-memo — verify names the gaming path + a concrete countermeasure
+  - [ ] ex-27 · discovery-vs-delivery-balance — verify names the riskiest-assumption-validated stop rule
+  - [ ] ex-28 · pr-faq-working-backwards — verify press release states customer problem + FAQ answers top risks
+  - [ ] ex-29 · shape-up-pitch — verify appetite is a fixed budget + circuit-breaker named
+  - [ ] ex-30 · full-product-brief-consistency — verify scope serves problem, metrics measure outcome, experiment tests hypothesis
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-product-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1226,7 +4477,7 @@ Row: Annotated-concept · — ‡ · topic wt 420 · Learn 132 / Drill 232 · **
 ### Phase 35 Gate
 
 - [ ] [AI] `software-product-engineering/` complete: `_index.md` wt 420, `learning/_index.md` wt 132,
-      `drilling/_index.md` wt 232, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 232, capstone wt 900; all 26 concepts + 30 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1241,9 +4492,58 @@ Row: Annotated-concept · ‡ no-code · topic wt 430 · Learn 133 / Drill 233 �
 - [ ] **[AI] V** — `web-researcher` for `engineering-management`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/33-engineering-management.md`](./syllabus/33-engineering-management.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/engineering-management/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/33-engineering-management.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/engineering-management/learning/` teaching **every** concept in
+      `syllabus/33-engineering-management.md` §Concepts (DD-34 1:1 mirror; concepts before scenarios). One checkbox per `co-NN`:
+  - [ ] co-01 · ic-to-manager-transition
+  - [ ] co-02 · one-on-ones
+  - [ ] co-03 · feedback-sbi
+  - [ ] co-04 · coaching-vs-directing
+  - [ ] co-05 · growth-plans
+  - [ ] co-06 · competency-ladders
+  - [ ] co-07 · performance-management-and-calibration
+  - [ ] co-08 · delegation-and-context-setting
+  - [ ] co-09 · team-delivery-stewardship
+  - [ ] co-10 · prioritization-under-competing-demands
+  - [ ] co-11 · dora-metrics-as-outcome-lens
+  - [ ] co-12 · technical-strategy
+  - [ ] co-13 · roadmap-partnership-with-product
+  - [ ] co-14 · communicating-tradeoffs
+  - [ ] co-15 · culture-and-psychological-safety
+  - [ ] co-16 · hiring-intuition
+  - [ ] co-17 · influence-without-authority
+  - [ ] co-18 · org-design-and-team-topology
+  - [ ] co-19 · learning-as-a-team-norm
+  - [ ] co-20 · manager-vs-maker-tension
+- [ ] **[AI] A1-scenarios** — Author `CONTENT/engineering-management/learning/artifacts/` (‡ no-code decision
+      scenarios/artifacts, DD-27/DD-30) covering **every** Worked scenario in `syllabus/33-engineering-management.md`.
+      One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · first-1-1-agenda — verify report's items lead, manager's last
+  - [ ] ex-02 · sbi-feedback-positive — verify names situation, behavior, impact (not "great job")
+  - [ ] ex-03 · sbi-feedback-corrective — verify behavior-focused + states the wanted "instead"
+  - [ ] ex-04 · coaching-question-vs-answer — verify coaching version supplies only questions
+  - [ ] ex-05 · growth-plan-artifact — verify every gap maps to an observable behavior
+  - [ ] ex-06 · ladder-behavior-mapping — verify each mapping cites the ladder's behavior text
+  - [ ] ex-07 · delegation-context-brief — verify a stranger could make the same call from it
+  - [ ] ex-08 · ic-to-manager-mindset-memo — verify names concrete IC habits given up
+  - [ ] ex-09 · manager-vs-maker-catch — verify names the bottleneck + one corrective habit
+  - [ ] ex-10 · prioritization-decision-record — verify states options, trade-off, decision, comms plan
+  - [ ] ex-11 · dora-diagnostic-memo — verify recommendation ties to the specific weak metric
+  - [ ] ex-12 · wip-unblock-triage — verify every item has a named owner + reason
+  - [ ] ex-13 · performance-calibration-note — verify cites ladder-level evidence for each
+  - [ ] ex-14 · difficult-feedback-conversation-script — verify opens with the pattern, ends with one next step
+  - [ ] ex-15 · roadmap-tradeoff-memo — verify states the specific trade-off product must accept
+  - [ ] ex-16 · psychological-safety-incident — verify names the safety failure + one norm change
+  - [ ] ex-17 · hiring-debrief-structured — verify every score cites observed interview evidence
+  - [ ] ex-18 · influence-without-authority-plan — verify names the shared incentive appealed to
+  - [ ] ex-19 · team-culture-norm-change — verify the mechanism outlasts the announcement
+  - [ ] ex-20 · technical-strategy-doc — verify every bet traces to a product outcome + explicit trade-off
+  - [ ] ex-21 · conways-law-reorg-memo — verify names Conway's Law + predicted new boundary
+  - [ ] ex-22 · dora-goodhart-guardrail — verify names the specific gaming risk guarded against
+  - [ ] ex-23 · autonomy-vs-alignment-calibration — verify each cites a specific readiness signal
+  - [ ] ex-24 · delivery-vs-growth-tradeoff-memo — verify states what is traded: speed vs capability
+  - [ ] ex-25 · learning-norm-institutionalization — verify names the mechanism that survives its owner
+  - [ ] ex-26 · succession-and-delegation-plan — verify names which decisions transfer first + the trigger signal
+  - [ ] ex-27 · full-leadership-decision-set — verify all three artifacts share one team context, no contradiction
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/engineering-management/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1255,7 +4555,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 430 · Learn 133 / Drill 233 �
 ### Phase 36 Gate
 
 - [ ] [AI] `engineering-management/` complete: `_index.md` wt 430, `learning/_index.md` wt 133,
-      `drilling/_index.md` wt 233, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 233, capstone wt 900; all 20 concepts + 27 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1299,9 +4599,138 @@ Row: By Example · Python † · topic wt 440 · Learn 134 / Drill 234 · **subj
 - [ ] **[AI] V** — `web-researcher` for `nosql-databases`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/34-nosql-databases.md`](./syllabus/34-nosql-databases.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/nosql-databases/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/34-nosql-databases.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/nosql-databases/learning/` teaching **every** concept in
+      `syllabus/34-nosql-databases.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · nosql-family-taxonomy
+  - [ ] co-02 · when-nosql-vs-relational
+  - [ ] co-03 · cap-theorem
+  - [ ] co-04 · pacelc-extension
+  - [ ] co-05 · base-vs-acid
+  - [ ] co-06 · eventual-consistency
+  - [ ] co-07 · tunable-consistency-quorum
+  - [ ] co-08 · access-pattern-first-modeling
+  - [ ] co-09 · denormalization-and-aggregates
+  - [ ] co-10 · partition-sharding-keys
+  - [ ] co-11 · consistent-hashing
+  - [ ] co-12 · replication-leader-follower
+  - [ ] co-13 · replication-leaderless
+  - [ ] co-14 · conflict-resolution-lww
+  - [ ] co-15 · conflict-resolution-vector-clocks
+  - [ ] co-16 · crdts
+  - [ ] co-17 · secondary-indexes-in-nosql
+  - [ ] co-18 · mongodb-document-model-and-schema-on-read
+  - [ ] co-19 · mongodb-aggregation-pipeline
+  - [ ] co-20 · redis-data-structures
+  - [ ] co-21 · redis-cache-vs-store
+  - [ ] co-22 · wide-column-partition-clustering-keys
+  - [ ] co-23 · dynamodb-single-table-design
+  - [ ] co-24 · time-to-live
+  - [ ] co-25 · lsm-tree-vs-btree-and-amplification
+  - [ ] co-26 · polyglot-persistence
+  - [ ] co-27 · multi-item-transactions
+  - [ ] co-28 · license-awareness-nosql
+  - [ ] co-29 · time-series-data-model
+  - [ ] co-30 · retention-and-downsampling
+  - [ ] co-31 · continuous-aggregates
+  - [ ] co-32 · olap-vs-oltp
+  - [ ] co-33 · columnar-storage-and-compression
+  - [ ] co-34 · vectorized-execution
+  - [ ] co-35 · columnar-formats-parquet-arrow
+  - [ ] co-36 · wide-column-vs-columnar-olap
+- [ ] **[AI] A1-examples** — Author `CONTENT/nosql-databases/learning/code/` (runnable typed-Python /
+      store-shell sources, DD-20) — one per worked example in `syllabus/34-nosql-databases.md` §Worked
+      examples, each rendered runnable (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · key-value-set-get — verify value round-trips
+  - [ ] ex-02 · key-value-crud-python — verify full CRUD round trip from Python
+  - [ ] ex-03 · redis-hash-basics — verify all fields returned
+  - [ ] ex-04 · redis-list-basics — verify FIFO order
+  - [ ] ex-05 · redis-set-basics — verify uniqueness (duplicate SADD no-op)
+  - [ ] ex-06 · redis-sorted-set-leaderboard — verify score-order retrieval
+  - [ ] ex-07 · redis-expire-ttl — verify countdown + eventual miss after expiry
+  - [ ] ex-08 · redis-persist-cancel-ttl — verify TTL returns -1 afterward
+  - [ ] ex-09 · redis-as-cache-vs-store — verify cache-only loses data, persisted does not
+  - [ ] ex-10 · mongo-insert-one — verify document stored with generated \_id
+  - [ ] ex-11 · mongo-find-query — verify only matching documents return
+  - [ ] ex-12 · mongo-embedded-vs-referenced — verify both queryable; contrast size + read count
+  - [ ] ex-13 · mongo-create-index — verify explain() shows IXSCAN not COLLSCAN
+  - [ ] ex-14 · mongo-schema-on-read — verify both shapes accepted; reader checks presence
+  - [ ] ex-15 · nosql-family-classify — verify against reference answer key
+  - [ ] ex-16 · when-to-pick-nosql-checklist — verify checklist recommends correctly for each
+  - [ ] ex-17 · cap-theorem-classify — verify against documented guarantee per config
+  - [ ] ex-18 · pacelc-classify — verify PA/EL vs PC/EC labeling
+  - [ ] ex-19 · base-vs-acid-table — verify each property correctly attributed
+  - [ ] ex-20 · eventual-consistency-simulate — verify stale read then convergence
+  - [ ] ex-21 · partition-key-hash-distribute — verify roughly even distribution
+  - [ ] ex-22 · consistent-hashing-ring — verify only ~1/N keys move
+  - [ ] ex-23 · replication-leader-follower-sim — verify followers converge to leader order
+  - [ ] ex-24 · access-pattern-first-sketch — verify shape answers both with one fetch each
+  - [ ] ex-25 · license-check-redis-valkey — verify citation matches official page
+  - [ ] ex-26 · license-check-mongodb — verify citation matches official page
+  - [ ] ex-27 · license-check-cassandra — verify citation matches official page
+  - [ ] ex-28 · redis-transaction-multi-exec — verify both updates apply together (no rollback nuance)
+  - [ ] ex-29 · redis-watch-optimistic-lock — verify abort (nil) when watched key changes
+  - [ ] ex-30 · redis-pipeline-vs-transaction — verify only pipelined case shows partial-apply race
+  - [ ] ex-31 · mongo-aggregation-match-group — verify aggregated counts
+  - [ ] ex-32 · mongo-aggregation-lookup-join — verify joined array field (5.0+ syntax)
+  - [ ] ex-33 · mongo-aggregation-pipeline-stages — verify intermediate + final stage output
+  - [ ] ex-34 · mongo-multi-document-transaction — verify atomic commit or full rollback
+  - [ ] ex-35 · mongo-transaction-abort — verify no partial write visible outside transaction
+  - [ ] ex-36 · mongo-compound-index — verify explain() shows compound index selected
+  - [ ] ex-37 · mongo-covered-query — verify explain() shows totalDocsExamined: 0
+  - [ ] ex-38 · quorum-read-write-math — verify which (N,W,R) guarantee strong consistency
+  - [ ] ex-39 · cassandra-quorum-tuning — verify consistency/latency contrast
+  - [ ] ex-40 · leaderless-replication-sim — verify latest write observed once quorums overlap
+  - [ ] ex-41 · lww-conflict-resolution — verify later timestamp wins, earlier dropped
+  - [ ] ex-42 · vector-clock-detect-conflict — verify conflict flagged concurrent, not auto-resolved
+  - [ ] ex-43 · crdt-g-counter — verify commutative merge yields correct total any order
+  - [ ] ex-44 · crdt-lww-register — verify deterministic convergence on both replicas
+  - [ ] ex-45 · cassandra-table-partition-clustering — verify rows ordered within partition
+  - [ ] ex-46 · cassandra-partition-query — verify fast single-partition read
+  - [ ] ex-47 · cassandra-query-without-partition-key — verify rejected unless ALLOW FILTERING
+  - [ ] ex-48 · cassandra-ttl-row — verify row expires after TTL elapses
+  - [ ] ex-49 · dynamodb-put-get-item — verify round-trip on partition key (dynamodb-local)
+  - [ ] ex-50 · dynamodb-composite-key-query — verify ordered items within partition
+  - [ ] ex-51 · dynamodb-single-table-two-entities — verify both entity types under same PK
+  - [ ] ex-52 · dynamodb-gsi-access-pattern — verify query the base table alone couldn't answer
+  - [ ] ex-53 · dynamodb-ttl-attribute — verify auto-purge after expiry (best-effort caveat stated)
+  - [ ] ex-54 · dynamodb-consistent-read-toggle — verify eventual can be stale, strong cannot
+  - [ ] ex-55 · lsm-tree-write-path-sim — verify writes land in immutable SSTable only after flush
+  - [ ] ex-56 · btree-vs-lsm-write-amplification — verify LSM higher write amp, higher throughput
+  - [ ] ex-57 · lsm-read-amplification — verify read cost drops after compaction
+  - [ ] ex-58 · cassandra-lightweight-transaction — verify second insert rejected ([applied]=false)
+  - [ ] ex-59 · cassandra-secondary-index-cost — verify query works; note cross-node fan-out
+  - [ ] ex-60 · polyglot-persistence-three-stores — verify each store exercised for its fit
+  - [ ] ex-61 · denormalize-vs-normalize-tradeoff — verify denormalized 1 query vs referenced N+1
+  - [ ] ex-62 · access-pattern-driven-schema-redesign — verify both patterns single-query-served
+  - [ ] ex-63 · secondary-index-vs-denormalization — verify identical result, different cost profile
+  - [ ] ex-64 · redis-durability-rdb-aof — verify data survives restart under each; note recovery window
+  - [ ] ex-65 · mongo-write-concern-tuning — verify difference in when write acknowledged
+  - [ ] ex-66 · mongo-read-concern-tuning — verify local can observe rollback-discardable data
+  - [ ] ex-67 · cap-tradeoff-written-rationale — verify rationale matches observed behavior
+  - [ ] ex-68 · schema-on-read-migration — verify old + new documents read correctly, no migration
+  - [ ] ex-69 · dynamodb-conditional-write — verify conflicting write raises ConditionalCheckFailedException
+  - [ ] ex-70 · dynamodb-hot-partition-diagnose — verify composite key spreads load evenly
+  - [ ] ex-71 · wide-column-vs-document-tradeoff — verify both serve read; contrast unbounded update cost
+  - [ ] ex-72 · nosql-transactions-cost-comparison — verify each transaction path adds measurable overhead
+  - [ ] ex-73 · crdt-vs-vector-clock-tradeoff — verify CRDT no merge code, vector-clock needs one
+  - [ ] ex-74 · replication-leader-follower-failover — verify writes resume after election; note gap
+  - [ ] ex-75 · tunable-consistency-latency-tradeoff-measured — verify latency rises as W increases
+  - [ ] ex-76 · secondary-indexes-cross-store-contrast — verify each index-served, built differently
+  - [ ] ex-77 · capstone-preview-kv-session-store — verify sessions round-trip and auto-expire
+  - [ ] ex-78 · capstone-preview-document-access-pattern — verify each pattern index-served
+  - [ ] ex-79 · capstone-preview-wide-column-feed — verify partition query returns ordered rows
+  - [ ] ex-80 · capstone-preview-license-and-cap-rationale — verify each choice cites pattern + license
+  - [ ] ex-81 · timescale-hypertable-create — verify time-range select returns time-ordered points across chunks
+  - [ ] ex-82 · time-bucket-downsample-query — verify hourly bucketed average matches hand-computed rollup
+  - [ ] ex-83 · retention-policy-drop-old — verify old-partition data purged, recent retained
+  - [ ] ex-84 · continuous-aggregate-rollup — verify range query reads pre-aggregated view, not raw hypertable
+  - [ ] ex-85 · time-series-vs-wide-column-feed — verify both serve range read; contrast built-in vs hand-rolled retention
+  - [ ] ex-86 · duckdb-columnar-scan — verify correct aggregate; query projects only referenced columns
+  - [ ] ex-87 · row-vs-column-scan-contrast — verify identical aggregate; columnar reads far less data
+  - [ ] ex-88 · parquet-roundtrip-projection — verify projected read touches only those column chunks
+  - [ ] ex-89 · arrow-zero-copy-interop — verify same buffer backs both engines (zero-copy)
+  - [ ] ex-90 · clickhouse-mergetree-aggregate — verify correct aggregate; scan prunes unmatched partitions
+  - [ ] ex-91 · wide-column-vs-columnar-same-query — verify columnar wins analytical scan, wide-column wins point-read
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/nosql-databases/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1313,7 +4742,7 @@ Row: By Example · Python † · topic wt 440 · Learn 134 / Drill 234 · **subj
 ### Phase 38 Gate
 
 - [ ] [AI] `nosql-databases/` complete: `_index.md` wt 440, `learning/_index.md` wt 134,
-      `drilling/_index.md` wt 234, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 234, capstone wt 900; all 36 concepts + 91 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1328,9 +4757,114 @@ Row: By Example · Cypher + Python † · topic wt 450 · Learn 135 / Drill 235 
 - [ ] **[AI] V** — `web-researcher` for `graph-databases`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/35-graph-databases.md`](./syllabus/35-graph-databases.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/graph-databases/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/35-graph-databases.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/graph-databases/learning/` teaching **every** concept in `syllabus/35-graph-databases.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · property-graph-model
+  - [ ] co-02 · labeled-property-graph-vs-rdf
+  - [ ] co-03 · when-graph-beats-relational
+  - [ ] co-04 · index-free-adjacency
+  - [ ] co-05 · cypher-read-clauses
+  - [ ] co-06 · cypher-write-clauses
+  - [ ] co-07 · relationship-direction-and-type
+  - [ ] co-08 · pattern-matching
+  - [ ] co-09 · variable-length-and-quantified-paths
+  - [ ] co-10 · shortest-path-queries
+  - [ ] co-11 · graph-modeling-nodes-vs-properties-vs-relationships
+  - [ ] co-12 · many-to-many-modeling
+  - [ ] co-13 · hierarchical-tree-modeling
+  - [ ] co-14 · bill-of-materials-modeling
+  - [ ] co-15 · recommendation-queries
+  - [ ] co-16 · fraud-pattern-detection
+  - [ ] co-17 · supernodes-and-dense-node-problem
+  - [ ] co-18 · graph-sharding-challenges
+  - [ ] co-19 · acid-transactions-in-graph-dbs
+  - [ ] co-20 · bulk-import-and-loading
+  - [ ] co-21 · neo4j-versioning-and-editions
+  - [ ] co-22 · constraints-and-indexes
+  - [ ] co-23 · aggregation-and-pipelining
+  - [ ] co-24 · rdf-triples-and-sparql
+  - [ ] co-25 · gremlin-traversal-language
+  - [ ] co-26 · graph-data-science-procedures
+- [ ] **[AI] A1-examples** — Author `CONTENT/graph-databases/learning/code/` — one runnable Cypher/SPARQL/Gremlin + Python-driver example per worked example in `syllabus/35-graph-databases.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · create-single-node — verify a `MATCH` returns exactly one row
+  - [ ] ex-02 · create-node-with-multiple-labels — verify both-label match finds it
+  - [ ] ex-03 · create-directed-relationship — verify pattern round-trips endpoints + direction
+  - [ ] ex-04 · match-return-all-nodes — verify count matches fixture size
+  - [ ] ex-05 · match-where-filter — verify only pre-1900 people returned
+  - [ ] ex-06 · match-relationship-pattern — verify every pair has a real `KNOWS` edge
+  - [ ] ex-07 · match-relationship-type-filter — verify only `ACTED_IN` edges matched
+  - [ ] ex-08 · match-multiple-relationship-types — verify either-way connections appear
+  - [ ] ex-09 · undirected-pattern-match — verify both directions included
+  - [ ] ex-10 · merge-idempotent-create — verify only one node after two runs
+  - [ ] ex-11 · merge-on-create-on-match — verify branch matches pre-existence
+  - [ ] ex-12 · property-vs-node-decision — verify property choice keeps query one hop
+  - [ ] ex-13 · relationship-with-properties — verify property reads off the relationship
+  - [ ] ex-14 · variable-length-path-classic — verify 3-hop friends match a hand count
+  - [ ] ex-15 · quantified-relationship-path — verify same result set as ex-14's `*1..3`
+  - [ ] ex-16 · shortest-path-legacy-function — verify hop count matches hand-traced path
+  - [ ] ex-17 · all-shortest-paths-legacy — verify every returned path has minimal length
+  - [ ] ex-18 · index-free-adjacency-timing — verify 1-hop latency stays flat with graph size
+  - [ ] ex-19 · graph-vs-relational-join-explosion — verify SQL join count grows, Cypher stays one pattern
+  - [ ] ex-20 · create-unique-constraint — verify duplicate-name insert is rejected
+  - [ ] ex-21 · create-property-index — verify `EXPLAIN` shows the index in the plan
+  - [ ] ex-22 · acid-transaction-rollback — verify first write rolled back on second's error
+  - [ ] ex-23 · load-csv-basic — verify node count equals CSV row count
+  - [ ] ex-24 · neo4j-admin-bulk-import — verify imported counts match source files
+  - [ ] ex-25 · rdf-triple-basic — verify each is a valid subject-predicate-object statement
+  - [ ] ex-26 · sparql-select-basic — verify same answer as the Cypher version in ex-06
+  - [ ] ex-27 · optional-match-nulls — verify no-edge people return `null`, not dropped
+  - [ ] ex-28 · with-clause-pipeline — verify only prolific actors pass the `WITH` filter
+  - [ ] ex-29 · unwind-list-to-rows — verify three separate nodes created
+  - [ ] ex-30 · aggregation-count-collect — verify each actor's movie list matches
+  - [ ] ex-31 · order-limit-skip — verify 5 most-recently-born returned in order
+  - [ ] ex-32 · call-subquery — verify per-team player lists correctly scoped
+  - [ ] ex-33 · many-to-many-join-table-vs-relationship — verify both return same enrollment answer
+  - [ ] ex-34 · relationship-property-many-to-many — verify grade queryable per enrollment
+  - [ ] ex-35 · hierarchical-tree-parent-child — verify IC-to-CEO chain
+  - [ ] ex-36 · hierarchical-tree-downward — verify all reports match a hand-built tree
+  - [ ] ex-37 · bill-of-materials-parts-explosion — verify full parts list matches hand-built BOM
+  - [ ] ex-38 · bom-relational-contrast — verify identical results vs recursive SQL CTE
+  - [ ] ex-39 · recommendation-co-occurrence — verify recommendations exclude already-bought
+  - [ ] ex-40 · recommendation-collaborative-filter — verify low-overlap users excluded
+  - [ ] ex-41 · fraud-shared-attribute-ring — verify planted ring surfaces, unrelated pair does not
+  - [ ] ex-42 · fraud-cycle-detection — verify planted circular-payment ring detected
+  - [ ] ex-43 · supernode-identification — verify top-degree node matches known supernode
+  - [ ] ex-44 · supernode-traversal-cost — verify supernode expansion measurably slower
+  - [ ] ex-45 · graph-sharding-edge-cut — verify crossing-relationship count is nonzero + costly
+  - [ ] ex-46 · gremlin-add-vertex-edge — verify both vertices + edge exist
+  - [ ] ex-47 · gremlin-has-out — verify returns `'Charles'`, matching ex-06
+  - [ ] ex-48 · gremlin-path-step — verify path length matches hand-traced 2-hop walk
+  - [ ] ex-49 · gremlin-valuemap — verify every vertex's properties + id returned
+  - [ ] ex-50 · sparql-filter-optional — verify no-email person appears with unbound `?mbox`
+  - [ ] ex-51 · sparql-vs-cypher-same-question — verify identical answer sets
+  - [ ] ex-52 · cypher-version-pin-cypher5 — verify executes under frozen Cypher 5
+  - [ ] ex-53 · cypher-version-pin-cypher25 — verify executes under Cypher 25, identical result
+  - [ ] ex-54 · graph-modeling-refactor-property-to-node — verify city-attribute queries now work
+  - [ ] ex-55 · gds-graph-projection — verify projected counts match source graph
+  - [ ] ex-56 · gds-pagerank-stream — verify highest-scoring node is most-connected
+  - [ ] ex-57 · gds-betweenness-centrality — verify known bridge node scores highest
+  - [ ] ex-58 · gds-louvain-community-detection — verify two clusters resolve to two IDs
+  - [ ] ex-59 · gds-node-similarity — verify overlapping-purchase users score high
+  - [ ] ex-60 · gds-dijkstra-source-target — verify weighted cost matches hand-computed
+  - [ ] ex-61 · gds-dijkstra-single-source — verify distances match per-node shortest paths
+  - [ ] ex-62 · recommendation-with-gds-similarity — verify top recommendation matches expectation
+  - [ ] ex-63 · fraud-ring-with-community-detection — verify planted ring flagged, normal not
+  - [ ] ex-64 · knowledge-graph-modeling — verify 2-hop query matches hand-built answer
+  - [ ] ex-65 · knowledge-graph-vs-relational-contrast — verify identical results, join-count documented
+  - [ ] ex-66 · capstone-load-domain — verify node/relationship counts match dataset
+  - [ ] ex-67 · capstone-neighborhood-query — verify results match hand-checked small case
+  - [ ] ex-68 · capstone-friends-of-friends — verify result set matches hand-traced subgraph
+  - [ ] ex-69 · capstone-shortest-path — verify path length matches hand-traced minimum
+  - [ ] ex-70 · capstone-recommendation — verify top recommendation sensible + reproducible
+  - [ ] ex-71 · capstone-relational-contrast — verify contrast names exact join count + query text
+  - [ ] ex-72 · dense-node-mitigation-pattern — verify refactored traversal measurably cheaper
+  - [ ] ex-73 · sharding-strategy-comparison — verify community-aware shard cuts fewer relationships
+  - [ ] ex-74 · acid-concurrent-write-conflict — verify one txn fails/retries, no corruption
+  - [ ] ex-75 · constraint-enforced-on-bulk-import — verify import reports the violation
+  - [ ] ex-76 · sparql-construct-derived-graph — verify derived triples match expected inferred facts
+  - [ ] ex-77 · gremlin-repeat-until-cycle-safe — verify traversal terminates, avoids revisits
+  - [ ] ex-78 · property-graph-vs-rdf-modeling-tradeoff — verify both represent same facts
+  - [ ] ex-79 · gql-conformant-shortest-path — verify identical length to ex-16's legacy query
+  - [ ] ex-80 · capstone-preview-multi-model-report — verify each model answers the same question
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/graph-databases/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1342,7 +4876,7 @@ Row: By Example · Cypher + Python † · topic wt 450 · Learn 135 / Drill 235 
 ### Phase 39 Gate
 
 - [ ] [AI] `graph-databases/` complete: `_index.md` wt 450, `learning/_index.md` wt 135,
-      `drilling/_index.md` wt 235, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 235, capstone wt 900; all 26 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1357,9 +4891,116 @@ Row: By Example · Python † · topic wt 460 · Learn 136 / Drill 236 · **subj
 - [ ] **[AI] V** — `web-researcher` for `database-internals-and-storage-engines`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/36-database-internals-and-storage-engines.md`](./syllabus/36-database-internals-and-storage-engines.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/database-internals-and-storage-engines/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/36-database-internals-and-storage-engines.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/database-internals-and-storage-engines/learning/` teaching **every** concept in `syllabus/36-database-internals-and-storage-engines.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · fixed-size-pages
+  - [ ] co-02 · slotted-page-layout
+  - [ ] co-03 · variable-length-record-addressing
+  - [ ] co-04 · buffer-pool
+  - [ ] co-05 · page-eviction-policies
+  - [ ] co-06 · read-path-buffer-hit-miss
+  - [ ] co-07 · btree-vs-bplustree
+  - [ ] co-08 · btree-search-and-fanout
+  - [ ] co-09 · btree-insert-and-split
+  - [ ] co-10 · btree-range-scan
+  - [ ] co-11 · lsm-memtable-and-sstable
+  - [ ] co-12 · lsm-read-path
+  - [ ] co-13 · lsm-compaction
+  - [ ] co-14 · amplification-rum
+  - [ ] co-15 · bloom-filter
+  - [ ] co-16 · write-ahead-log-rule
+  - [ ] co-17 · lsn-and-pagelsn
+  - [ ] co-18 · aries-recovery-phases
+  - [ ] co-19 · redo-vs-undo
+  - [ ] co-20 · checkpointing
+  - [ ] co-21 · mvcc-versions-xmin-xmax
+  - [ ] co-22 · snapshot-read-non-blocking
+  - [ ] co-23 · version-bloat-and-vacuum
+  - [ ] co-24 · isolation-levels-and-anomalies
+  - [ ] co-25 · concurrency-control-2pl-occ
+  - [ ] co-26 · durability-fsync-torn-page
+  - [ ] co-27 · clustered-vs-heap
+  - [ ] co-28 · column-vs-row-store
+- [ ] **[AI] A1-examples** — Author `CONTENT/database-internals-and-storage-engines/learning/code/` (runnable, fully type-annotated Python, DD-20/DD-30) rendering **every** `ex-NN` in `syllabus/36-database-internals-and-storage-engines.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · fixed-size-page-alloc — verify `len(page)` equals the page-size constant
+  - [ ] ex-02 · page-header-pack-unpack — verify unpack round-trips
+  - [ ] ex-03 · slot-array-append — verify slot count increments and `pd_lower` advances
+  - [ ] ex-04 · insert-fixed-record — verify `pd_upper` decreases by record size
+  - [ ] ex-05 · read-record-by-slot — verify bytes equal what was inserted
+  - [ ] ex-06 · free-space-guard — verify insert raises when free space < record
+  - [ ] ex-07 · variable-length-records — verify each string reads back at its length
+  - [ ] ex-08 · in-page-compaction — verify a surviving slot still resolves after compaction
+  - [ ] ex-09 · page-checksum-detect — verify a flipped byte changes the checksum
+  - [ ] ex-10 · page-table-lookup — verify a lookup returns the resident frame
+  - [ ] ex-11 · buffer-fetch-miss — verify the miss counter increments and the page loads
+  - [ ] ex-12 · buffer-fetch-hit — verify no disk read (hit counter increments)
+  - [ ] ex-13 · pin-count-guard — verify a pinned page is never the victim
+  - [ ] ex-14 · dirty-flush-on-evict — verify a dirty page is written before frame reuse
+  - [ ] ex-15 · lru-eviction — verify the least-recently-used frame is chosen
+  - [ ] ex-16 · clock-second-chance — verify a referenced page survives one hand sweep
+  - [ ] ex-17 · btree-leaf-sorted-insert — verify keys stay sorted after each insert
+  - [ ] ex-18 · btree-point-lookup — verify present found, absent returns `None`
+  - [ ] ex-19 · btree-height-fanout — verify height equals `ceil(log_f(N))`
+  - [ ] ex-20 · btree-leaf-split — verify a split yields two leaves + a promoted key
+  - [ ] ex-21 · btree-range-scan — verify contiguous sorted keys returned
+  - [ ] ex-22 · bplus-values-in-leaves — verify internal nodes carry keys only
+  - [ ] ex-23 · memtable-sorted-insert — verify iteration yields sorted keys
+  - [ ] ex-24 · memtable-flush-to-sstable — verify segment is sorted and memtable cleared
+  - [ ] ex-25 · lsm-read-newest-first — verify the newest write shadows older
+  - [ ] ex-26 · lsm-tombstone-delete — verify a read after tombstone returns not-found
+  - [ ] ex-27 · bloom-filter-membership — verify a present key always reports positive
+  - [ ] ex-28 · bloom-no-false-negative — verify no added key is ever reported absent
+  - [ ] ex-29 · append-only-log-replay — verify records replay in append order
+  - [ ] ex-30 · wal-before-page-guard — verify the ordering guard raises
+  - [ ] ex-31 · lsn-monotonic-assign — verify each new LSN > previous
+  - [ ] ex-32 · pagelsn-skip-applied — verify an already-applied record is skipped
+  - [ ] ex-33 · wal-redo-committed — verify committed writes are re-applied
+  - [ ] ex-34 · wal-undo-uncommitted — verify uncommitted writes are undone
+  - [ ] ex-35 · checkpoint-bounds-replay — verify redo scans only from the checkpoint forward
+  - [ ] ex-36 · row-version-xmin-xmax — verify update sets xmax on old, xmin on new
+  - [ ] ex-37 · snapshot-visibility-rule — verify a snapshot before a commit can't see it
+  - [ ] ex-38 · update-creates-new-version — verify a new version is appended, not overwritten
+  - [ ] ex-39 · readers-dont-block-writers — verify the reader completes without waiting
+  - [ ] ex-40 · dead-version-gc-vacuum — verify reclaimed slots drop from the live set
+  - [ ] ex-41 · lru-k-vs-lru — verify LRU-K keeps the hot page LRU evicts
+  - [ ] ex-42 · buffer-pool-hit-ratio — verify hit ratio equals hits ÷ (hits + misses)
+  - [ ] ex-43 · btree-bulk-load — verify bulk-load answers the same lookups
+  - [ ] ex-44 · btree-internal-split-propagate — verify height +1 and root has two children
+  - [ ] ex-45 · btree-delete-underflow — verify a merge/borrow keeps the tree valid
+  - [ ] ex-46 · clustered-index-leaf-holds-row — verify a PK lookup returns the row directly
+  - [ ] ex-47 · heap-secondary-index-pointer — verify the secondary index resolves to the heap row
+  - [ ] ex-48 · lsm-size-tiered-compaction — verify merged segment count drops, keys survive
+  - [ ] ex-49 · lsm-leveled-compaction — verify no key overlap remains within the level
+  - [ ] ex-50 · write-amplification-count — verify write amplification > 1 for an ingest
+  - [ ] ex-51 · read-amplification-count — verify read amplification grows with segment count
+  - [ ] ex-52 · space-amplification-measure — verify space amplification > 1 with stale versions
+  - [ ] ex-53 · bloom-reduces-read-amp — verify fewer SSTables opened for absent keys
+  - [ ] ex-54 · row-store-tuple-contiguous — verify one row's fields are byte-adjacent
+  - [ ] ex-55 · column-store-column-contiguous — verify one column's values are byte-adjacent
+  - [ ] ex-56 · column-scan-fewer-bytes — verify column store reads fewer bytes for a single-column aggregate
+  - [ ] ex-57 · dictionary-encoding — verify decode round-trips and size shrinks
+  - [ ] ex-58 · run-length-encoding — verify decode round-trips and runs collapse
+  - [ ] ex-59 · delta-encoding-timestamps — verify decode round-trips and deltas are small
+  - [ ] ex-60 · fsync-simulated-durability — verify pre-fsync data survives, post-fsync does not
+  - [ ] ex-61 · group-commit-batch-fsync — verify all N commits durable after one barrier
+  - [ ] ex-62 · torn-page-simulation — verify a torn page is detected by checksum
+  - [ ] ex-63 · full-page-write-recovery — verify a torn page is repaired from the log image
+  - [ ] ex-64 · aries-analysis-phase — verify transaction + dirty-page tables reconstructed
+  - [ ] ex-65 · aries-redo-repeat-history — verify pages reach their pre-crash state
+  - [ ] ex-66 · aries-undo-with-clr — verify a re-crash during undo resumes correctly
+  - [ ] ex-67 · crash-recovery-end-to-end — verify committed survives, uncommitted gone
+  - [ ] ex-68 · two-phase-locking — verify no lock acquired after the first release
+  - [ ] ex-69 · strict-2pl-no-cascade — verify no dirty read of an uncommitted write
+  - [ ] ex-70 · occ-read-validate-write — verify a conflicting commit fails validation and retries
+  - [ ] ex-71 · deadlock-detection-waitfor — verify a cycle is detected and a victim chosen
+  - [ ] ex-72 · dirty-read-demo — verify the anomaly appears then vanishes under read-committed
+  - [ ] ex-73 · non-repeatable-read-demo — verify value changes under read-committed, stable under repeatable-read
+  - [ ] ex-74 · phantom-read-demo — verify a phantom row appears under repeatable-read
+  - [ ] ex-75 · write-skew-under-snapshot — verify snapshot isolation permits the skew
+  - [ ] ex-76 · serializable-prevents-write-skew — verify one transaction aborts
+  - [ ] ex-77 · btree-vs-lsm-write-throughput — verify the LSM sustains higher write throughput
+  - [ ] ex-78 · btree-vs-lsm-read-latency — verify the B-tree answers in fewer page reads
+  - [ ] ex-79 · workload-picks-engine — verify it selects LSM then B-tree respectively
+  - [ ] ex-80 · mini-storage-engine-integration — verify a keyed write survives a crash and a snapshot read stays consistent
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/database-internals-and-storage-engines/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1371,7 +5012,7 @@ Row: By Example · Python † · topic wt 460 · Learn 136 / Drill 236 · **subj
 ### Phase 40 Gate
 
 - [ ] [AI] `database-internals-and-storage-engines/` complete: `_index.md` wt 460, `learning/_index.md` wt 136,
-      `drilling/_index.md` wt 236, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 236, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1386,9 +5027,81 @@ Row: Annotated-concept · Python · topic wt 470 · Learn 137 / Drill 237 · **s
 - [ ] **[AI] V** — `web-researcher` for `data-engineering`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/37-data-engineering.md`](./syllabus/37-data-engineering.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/data-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/37-data-engineering.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/data-engineering/learning/` teaching **every** concept in `syllabus/37-data-engineering.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · batch-vs-streaming
+  - [ ] co-02 · etl-vs-elt
+  - [ ] co-03 · modern-data-stack-shape
+  - [ ] co-04 · medallion-bronze-silver-gold
+  - [ ] co-05 · idempotent-transforms
+  - [ ] co-06 · incremental-and-backfill
+  - [ ] co-07 · partitioning
+  - [ ] co-08 · dimensional-modeling-facts-dims
+  - [ ] co-09 · star-schema-and-grain
+  - [ ] co-10 · additive-semi-non-additive
+  - [ ] co-11 · slowly-changing-dimensions
+  - [ ] co-12 · log-based-streaming
+  - [ ] co-13 · ordering-and-delivery-semantics
+  - [ ] co-14 · stream-windows
+  - [ ] co-15 · event-time-vs-processing-time
+  - [ ] co-16 · data-quality-dimensions
+  - [ ] co-17 · data-contracts
+  - [ ] co-18 · orchestration-dag
+  - [ ] co-19 · data-lineage
+  - [ ] co-20 · change-data-capture
+  - [ ] co-21 · exactly-once-sink-idempotent-write
+- [ ] **[AI] A1-examples** — Author `CONTENT/data-engineering/learning/code/` (runnable, annotated Python, DD-20/DD-30) rendering **every** `ex-NN` in `syllabus/37-data-engineering.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · batch-vs-streaming-contrast — verify both yield the same total
+  - [ ] ex-02 · etl-order — verify the loaded table is already typed and deduped
+  - [ ] ex-03 · elt-order — verify the raw landing table is left untouched
+  - [ ] ex-04 · modern-stack-shape — verify a record flows through all four stages
+  - [ ] ex-05 · bronze-land-raw — verify row count equals source + metadata column present
+  - [ ] ex-06 · silver-clean-conform — verify types cast, duplicate/null rows gone
+  - [ ] ex-07 · gold-serve-aggregate — verify served total matches hand-computed
+  - [ ] ex-08 · idempotent-rerun — verify the second run adds zero duplicates
+  - [ ] ex-09 · upsert-merge-key — verify a changed row updates in place
+  - [ ] ex-10 · incremental-filter — verify only new rows are transformed
+  - [ ] ex-11 · full-refresh-backfill — verify the result equals a from-scratch build
+  - [ ] ex-12 · hive-style-partition-write — verify `key=value/` directory layout
+  - [ ] ex-13 · partition-pruning-read — verify only the queried partition's file is read
+  - [ ] ex-14 · fact-vs-dimension — verify every fact FK resolves to a dimension row
+  - [ ] ex-15 · star-schema-grain — verify no row is finer/coarser than the grain
+  - [ ] ex-16 · additive-measure-sum — verify total consistent across groupings
+  - [ ] ex-17 · semi-additive-balance — verify a time-sum is flagged invalid
+  - [ ] ex-18 · non-additive-ratio — verify averaging ratios ≠ ratio-of-sums
+  - [ ] ex-19 · scd-type1-overwrite — verify no prior value retained
+  - [ ] ex-20 · scd-type2-new-row — verify two versions, disjoint dates, one current
+  - [ ] ex-21 · scd-type3-alt-field — verify current + one prior value readable
+  - [ ] ex-22 · scd-type6-hybrid — verify group-by-current vs group-by-at-event differ
+  - [ ] ex-23 · kafka-topic-partition-offset — verify monotonic offset per partition
+  - [ ] ex-24 · consumer-group-assignment — verify each partition to exactly one member
+  - [ ] ex-25 · per-partition-ordering — verify order within partition, not across
+  - [ ] ex-26 · at-least-once-redelivery — verify a message is redelivered
+  - [ ] ex-27 · exactly-once-idempotent-producer — verify a retried message lands once
+  - [ ] ex-28 · tumbling-window — verify each event in exactly one window
+  - [ ] ex-29 · hopping-window — verify one event appears in multiple windows
+  - [ ] ex-30 · session-window — verify a new session starts after the gap
+  - [ ] ex-31 · event-time-vs-processing-time — verify a late event lands in its event-time window
+  - [ ] ex-32 · watermark-progress — verify a window emits only once the watermark passes
+  - [ ] ex-33 · late-data-side-output — verify late events captured, not dropped
+  - [ ] ex-34 · dq-completeness-null-check — verify a null row fails
+  - [ ] ex-35 · dq-uniqueness-dup-check — verify a duplicate key fails
+  - [ ] ex-36 · dq-validity-range-check — verify an out-of-range row fails
+  - [ ] ex-37 · dq-timeliness-freshness — verify a stale batch fails
+  - [ ] ex-38 · dq-consistency-cross-source — verify a mismatch fails
+  - [ ] ex-39 · data-contract-schema-enforce — verify a drifting build fails, not silently drifts
+  - [ ] ex-40 · contract-close-to-producer — verify the check runs at produce time
+  - [ ] ex-41 · dag-task-dependencies — verify tasks run in topological order
+  - [ ] ex-42 · dag-retry-on-failure — verify success after N retries
+  - [ ] ex-43 · dag-schedule-and-catchup — verify one run per missed interval
+  - [ ] ex-44 · dag-quality-gate-blocks — verify a bad batch fails the gate, downstream skipped
+  - [ ] ex-45 · dag-backfill-range — verify only the specified partitions reprocess
+  - [ ] ex-46 · table-level-lineage — verify downstream of a changed table is discoverable
+  - [ ] ex-47 · column-level-lineage — verify which input column feeds a given output
+  - [ ] ex-48 · cdc-query-based-poll — verify the poll misses a deleted row
+  - [ ] ex-49 · cdc-log-based-capture — verify inserts/updates/deletes all captured
+  - [ ] ex-50 · exactly-once-inside-not-sink — verify a retry double-writes at the sink
+  - [ ] ex-51 · idempotent-sink-merge — verify exactly one row lands at the sink
+  - [ ] ex-52 · log-as-source-of-truth — verify replay reconstructs current state idempotently
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1400,7 +5113,7 @@ Row: Annotated-concept · Python · topic wt 470 · Learn 137 / Drill 237 · **s
 ### Phase 41 Gate
 
 - [ ] [AI] `data-engineering/` complete: `_index.md` wt 470, `learning/_index.md` wt 137,
-      `drilling/_index.md` wt 237, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 237, capstone wt 900; all 21 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1415,9 +5128,124 @@ Row: By Example · Python † · topic wt 480 · Learn 138 / Drill 238 · **subj
 - [ ] **[AI] V** — `web-researcher` for `search-and-information-retrieval`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/38-search-and-information-retrieval.md`](./syllabus/38-search-and-information-retrieval.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/search-and-information-retrieval/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/38-search-and-information-retrieval.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/search-and-information-retrieval/learning/` teaching **every** concept in `syllabus/38-search-and-information-retrieval.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · inverted-index
+  - [ ] co-02 · posting-list
+  - [ ] co-03 · boolean-retrieval
+  - [ ] co-04 · posting-list-merge
+  - [ ] co-05 · skip-pointers
+  - [ ] co-06 · tokenization
+  - [ ] co-07 · case-folding
+  - [ ] co-08 · stop-words
+  - [ ] co-09 · stemming
+  - [ ] co-10 · lemmatization
+  - [ ] co-11 · normalization-recall-tradeoff
+  - [ ] co-12 · term-frequency
+  - [ ] co-13 · inverse-document-frequency
+  - [ ] co-14 · tf-idf
+  - [ ] co-15 · vector-space-cosine
+  - [ ] co-16 · bm25
+  - [ ] co-17 · bm25-saturation
+  - [ ] co-18 · bm25-length-normalization
+  - [ ] co-19 · bm25-defaults
+  - [ ] co-20 · top-k-ranking
+  - [ ] co-21 · precision-recall
+  - [ ] co-22 · precision-at-k
+  - [ ] co-23 · relevance-judgments
+  - [ ] co-24 · evaluation-map-ndcg
+  - [ ] co-25 · analyzer-pipeline
+  - [ ] co-26 · query-dsl
+  - [ ] co-27 · segments-and-merge
+  - [ ] co-28 · positional-and-phrase
+  - [ ] co-29 · incremental-indexing
+  - [ ] co-30 · postings-persistence
+  - [ ] co-31 · field-weighting-bm25f
+  - [ ] co-32 · fuzzy-edit-distance
+  - [ ] co-33 · ngram-autocomplete
+  - [ ] co-34 · query-expansion-synonyms
+  - [ ] co-35 · semantic-vector-search
+  - [ ] co-36 · pagerank-link-analysis
+- [ ] **[AI] A1-examples** — Author `CONTENT/search-and-information-retrieval/learning/code/` (runnable, type-annotated `mypy`-clean Python, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/38-search-and-information-retrieval.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · tokenize-whitespace — verify token count equals space-separated word count
+  - [ ] ex-02 · tokenize-regex — verify `"end."` and `"end"` yield the same token
+  - [ ] ex-03 · case-fold — verify `"The"` and `"the"` collapse to one term
+  - [ ] ex-04 · build-term-doc-map — verify each term maps to exactly its containing docs
+  - [ ] ex-05 · posting-list-sorted — verify doc-ids strictly ascending
+  - [ ] ex-06 · boolean-and — verify result equals `set &`
+  - [ ] ex-07 · boolean-or — verify result equals `set |`
+  - [ ] ex-08 · boolean-not — verify excluded docs absent
+  - [ ] ex-09 · merge-two-pointer — verify matches `set &`, single-pass
+  - [ ] ex-10 · scan-vs-index-timing — verify index lookup flat as N grows, scan rises
+  - [ ] ex-11 · term-frequency-count — verify a repeated term's count > 1
+  - [ ] ex-12 · document-frequency — verify a term in all docs has `df == N`
+  - [ ] ex-13 · idf-formula — verify rare term's idf exceeds common term's
+  - [ ] ex-14 · tf-idf-weight — verify weight matrix matches hand computation
+  - [ ] ex-15 · stop-word-drop — verify `"the"` absent, term count drops
+  - [ ] ex-16 · stop-word-recall-risk — verify stop-word-only query returns nothing
+  - [ ] ex-17 · porter-stem — verify `running`/`runs`/`runner` share one stem
+  - [ ] ex-18 · stem-index-shrink — verify distinct-term count falls, `"run"` finds `"running"`
+  - [ ] ex-19 · lemmatize-vs-stem — verify lemma differs from stem
+  - [ ] ex-20 · normalization-recall-delta — verify hit count rises with stemming
+  - [ ] ex-21 · posting-with-freq — verify each tuple's tf matches raw count
+  - [ ] ex-22 · multi-term-and — verify equals intersection of all three sets
+  - [ ] ex-23 · skip-pointer-build — verify each skip target ahead of its source
+  - [ ] ex-24 · skip-pointer-merge — verify correct result, fewer comparisons than plain merge
+  - [ ] ex-25 · rank-by-tfidf — verify top doc has highest hand-computed sum
+  - [ ] ex-26 · vector-space-vectors — verify shared terms appear in both vectors
+  - [ ] ex-27 · cosine-similarity — verify ranking matches hand-computed cosine
+  - [ ] ex-28 · analyzer-order — verify final term set matches fixture
+  - [ ] ex-29 · bm25-idf-term — verify differs from `log(N/df)`, finite for all-doc term
+  - [ ] ex-30 · bm25-score-one-term — verify matches hand computation
+  - [ ] ex-31 · bm25-saturation-curve — verify each increment adds less, asymptote
+  - [ ] ex-32 · tfidf-vs-bm25-saturation — verify tf-idf unbounded, BM25 flattens
+  - [ ] ex-33 · bm25-length-norm — verify `B` penalizes the long doc
+  - [ ] ex-34 · bm25-b-sweep — verify short/long ranking flips as `b` rises
+  - [ ] ex-35 · bm25-k1-sweep — verify saturation point moves with `k1`
+  - [ ] ex-36 · bm25-defaults — verify values match Lucene defaults, differ from paper range
+  - [ ] ex-37 · bm25-full-ranker — verify top result matches reference impl on fixture
+  - [ ] ex-38 · topk-heap — verify same top-k as full sort
+  - [ ] ex-39 · topk-vs-fullsort-timing — verify identical results, lower heap time for small k
+  - [ ] ex-40 · precision-recall-compute — verify against hand values
+  - [ ] ex-41 · precision-recall-direction — verify each denominator drives the right metric
+  - [ ] ex-42 · f1-harmonic — verify F1 between P and R, nears the smaller
+  - [ ] ex-43 · precision-at-k — verify against hand count in each prefix
+  - [ ] ex-44 · qrels-load — verify each query maps to its labeled relevant docs
+  - [ ] ex-45 · evaluate-two-configs — verify reported winner matches hand tally
+  - [ ] ex-46 · average-precision — verify equals mean of precisions at relevant hits
+  - [ ] ex-47 · map-multi-query — verify equals mean of per-query APs
+  - [ ] ex-48 · ndcg-compute — verify perfect ranking scores 1.0, shuffled less
+  - [ ] ex-49 · analyzer-pipeline-model — verify staged output matches hand trace
+  - [ ] ex-50 · analyzer-swap-filter — verify emitted index terms change
+  - [ ] ex-51 · query-dsl-parse — verify tree shape matches query
+  - [ ] ex-52 · query-dsl-execute — verify results equal hand-written boolean merge
+  - [ ] ex-53 · positional-index-build — verify position list matches offsets
+  - [ ] ex-54 · phrase-query — verify hits only consecutive-word docs
+  - [ ] ex-55 · proximity-query — verify doc with terms N+1 apart excluded
+  - [ ] ex-56 · segment-merge-model — verify merged index answers query identically
+  - [ ] ex-57 · nrt-refresh-model — verify pre-refresh doc invisible until refresh
+  - [ ] ex-58 · typed-index-class — verify `mypy` clean, queries correct
+  - [ ] ex-59 · incremental-add — verify added doc findable immediately
+  - [ ] ex-60 · incremental-equals-rebuild — verify identical postings for every term
+  - [ ] ex-61 · persist-json — verify reloaded results match in-memory
+  - [ ] ex-62 · persist-binary — verify smaller than JSON, round-trips
+  - [ ] ex-63 · delta-encode-postings — verify decode reconstructs exact list, smaller
+  - [ ] ex-64 · avgdl-incremental — verify running `avgdl` matches recomputed
+  - [ ] ex-65 · bm25f-fields — verify title match outranks equal body match
+  - [ ] ex-66 · bm25f-vs-naive — verify naive per-field-sum breaks saturation
+  - [ ] ex-67 · fuzzy-levenshtein — verify `"colour"` matches `"color"`
+  - [ ] ex-68 · fuzzy-damerau — verify `"teh"` matches `"the"` at distance 1
+  - [ ] ex-69 · spelling-correct — verify suggestion is min-edit-distance term
+  - [ ] ex-70 · edge-ngram-autocomplete — verify `"sea"` retrieves `"search"`
+  - [ ] ex-71 · char-ngram-substring — verify interior substring query finds doc
+  - [ ] ex-72 · synonym-expand — verify `"automobile"`-only doc retrieved for `"car"`
+  - [ ] ex-73 · semantic-embedding-cosine — verify nearest-meaning doc ranks first
+  - [ ] ex-74 · ann-vs-exact-knn — verify recall/speed trade-off, note HNSW
+  - [ ] ex-75 · hybrid-lexical-vector — verify hybrid order differs from pure BM25
+  - [ ] ex-76 · lexical-miss-semantic-win — verify vector finds the `"automobile"` doc
+  - [ ] ex-77 · pagerank-toy — verify scores sum to 1, most-linked node highest
+  - [ ] ex-78 · pagerank-plus-bm25 — verify well-linked doc outranks marginal orphan
+  - [ ] ex-79 · evaluate-hybrid — verify hybrid scores higher where synonyms matter
+  - [ ] ex-80 · mini-search-engine — verify end-to-end query correct after reload
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/search-and-information-retrieval/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1429,7 +5257,7 @@ Row: By Example · Python † · topic wt 480 · Learn 138 / Drill 238 · **subj
 ### Phase 42 Gate
 
 - [ ] [AI] `search-and-information-retrieval/` complete: `_index.md` wt 480, `learning/_index.md` wt 138,
-      `drilling/_index.md` wt 238, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 238, capstone wt 900; all 36 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1444,9 +5272,128 @@ Row: By Example · Python · topic wt 490 · Learn 139 / Drill 239 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `backend-at-scale`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/39-backend-at-scale.md`](./syllabus/39-backend-at-scale.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/backend-at-scale/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/39-backend-at-scale.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/backend-at-scale/learning/` teaching **every** concept in `syllabus/39-backend-at-scale.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · rest-method-semantics
+  - [ ] co-02 · http-status-codes
+  - [ ] co-03 · api-versioning
+  - [ ] co-04 · offset-pagination
+  - [ ] co-05 · cursor-pagination
+  - [ ] co-06 · idempotency-key
+  - [ ] co-07 · graphql-vs-rest
+  - [ ] co-08 · grpc-protobuf-http2
+  - [ ] co-09 · repository-pattern
+  - [ ] co-10 · unit-of-work
+  - [ ] co-11 · transactions-acid
+  - [ ] co-12 · dual-write-problem
+  - [ ] co-13 · transactional-outbox
+  - [ ] co-14 · jwt
+  - [ ] co-15 · oauth2-vs-oidc
+  - [ ] co-16 · pkce
+  - [ ] co-17 · rbac-vs-abac
+  - [ ] co-18 · refresh-token-rotation
+  - [ ] co-19 · rate-limit-algorithms
+  - [ ] co-20 · rate-limit-429-retry-after
+  - [ ] co-21 · cache-aside
+  - [ ] co-22 · write-through-cache
+  - [ ] co-23 · cache-ttl-invalidation
+  - [ ] co-24 · http-caching-etag
+  - [ ] co-25 · structured-logging-correlation
+  - [ ] co-26 · distributed-tracing-otel
+  - [ ] co-27 · health-checks-liveness-readiness
+  - [ ] co-28 · at-least-once-delivery
+  - [ ] co-29 · idempotent-consumer
+  - [ ] co-30 · dead-letter-queue
+  - [ ] co-31 · backpressure
+  - [ ] co-32 · webhook-hmac
+  - [ ] co-33 · websocket-vs-sse
+  - [ ] co-34 · broker-backplane
+  - [ ] co-35 · contract-testing-pact
+  - [ ] co-36 · test-containers
+  - [ ] co-37 · circuit-breaker
+  - [ ] co-38 · retry-backoff-jitter
+  - [ ] co-39 · timeout-bulkhead
+  - [ ] co-40 · connection-pool-n-plus-1
+- [ ] **[AI] A1-examples** — Author `CONTENT/backend-at-scale/learning/code/` (runnable, type-annotated `mypy`-clean Python exercised from the CLI, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/39-backend-at-scale.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · rest-crud-endpoints — verify each verb takes its path
+  - [ ] ex-02 · safe-vs-idempotent — verify GET/PUT repeatable, POST duplicates
+  - [ ] ex-03 · status-201-created — verify 201 + `Location`
+  - [ ] ex-04 · status-204-delete — verify empty body
+  - [ ] ex-05 · status-400-validation — verify the error
+  - [ ] ex-06 · status-401-vs-403 — verify the distinction
+  - [ ] ex-07 · status-409-conflict — verify the conflict
+  - [ ] ex-08 · status-422-unprocessable — verify the code
+  - [ ] ex-09 · version-uri-path — verify each version resolves
+  - [ ] ex-10 · version-header — verify header-based routing
+  - [ ] ex-11 · offset-limit-page — verify the correct slice
+  - [ ] ex-12 · offset-cost-demo — verify it touches all preceding rows
+  - [ ] ex-13 · cursor-page — verify the next page follows the last id
+  - [ ] ex-14 · cursor-stable-under-insert — verify cursor unaffected while offset drifts
+  - [ ] ex-15 · idempotency-key-store — verify the same response returns
+  - [ ] ex-16 · idempotency-key-no-double-apply — verify it applies once
+  - [ ] ex-17 · idempotency-key-mismatch — verify rejected on differing body
+  - [ ] ex-18 · repository-crud — verify CRUD through the collection interface
+  - [ ] ex-19 · repository-swap-backend — verify callers unchanged
+  - [ ] ex-20 · unit-of-work-commit — verify all writes land together
+  - [ ] ex-21 · unit-of-work-rollback — verify no tracked change persists
+  - [ ] ex-22 · transaction-atomic — verify both commit or both roll back
+  - [ ] ex-23 · jwt-encode-decode — verify round-trip and signature
+  - [ ] ex-24 · jwt-expiry — verify expired token rejected
+  - [ ] ex-25 · rbac-role-gate — verify 200 right role, 403 wrong
+  - [ ] ex-26 · abac-attribute-gate — verify non-owner denied
+  - [ ] ex-27 · structured-log-json — verify it parses
+  - [ ] ex-28 · correlation-id — verify every line carries it
+  - [ ] ex-29 · oauth2-authcode-flow — verify code exchanges for a token
+  - [ ] ex-30 · oidc-id-token — verify the subject claim
+  - [ ] ex-31 · pkce-challenge — verify a wrong verifier fails
+  - [ ] ex-32 · refresh-rotate — verify a new pair issues
+  - [ ] ex-33 · refresh-reuse-detect — verify reuse detected, family revoked
+  - [ ] ex-34 · token-bucket — verify tokens refill over time
+  - [ ] ex-35 · leaky-bucket — verify smoothed output
+  - [ ] ex-36 · fixed-window — verify the boundary-burst flaw
+  - [ ] ex-37 · sliding-window — verify it avoids the boundary burst
+  - [ ] ex-38 · rate-limit-429-retry-after — verify 429 + `Retry-After`
+  - [ ] ex-39 · cache-aside-read — verify second read from cache
+  - [ ] ex-40 · cache-aside-hit-no-db — verify a cached read issues no query
+  - [ ] ex-41 · write-through — verify cache and DB both updated
+  - [ ] ex-42 · cache-ttl-expiry — verify the entry expires and re-loads
+  - [ ] ex-43 · cache-explicit-invalidate — verify the next read is fresh
+  - [ ] ex-44 · cache-stale-bug — verify the bug, then the fix
+  - [ ] ex-45 · etag-304 — verify a 304
+  - [ ] ex-46 · cache-control-maxage — verify the header is honoured
+  - [ ] ex-47 · otel-span — verify the span is recorded
+  - [ ] ex-48 · traceparent-propagate — verify the trace id is preserved
+  - [ ] ex-49 · health-liveness — verify it reports healthy
+  - [ ] ex-50 · health-readiness — verify unready while a dependency is down
+  - [ ] ex-51 · graphql-query — verify only requested fields return
+  - [ ] ex-52 · graphql-overfetch-contrast — verify REST over-fetches, GraphQL does not
+  - [ ] ex-53 · graphql-n-plus-1 — verify the query count drops with a dataloader
+  - [ ] ex-54 · grpc-unary — verify request/response round-trip
+  - [ ] ex-55 · grpc-streaming — verify multiple messages stream back
+  - [ ] ex-56 · rest-vs-graphql-vs-grpc — verify each works; note when each fits
+  - [ ] ex-57 · queue-produce-consume — verify the job runs once
+  - [ ] ex-58 · at-least-once-redeliver — verify the message is redelivered
+  - [ ] ex-59 · idempotent-consumer-dedup — verify a duplicate delivery is skipped
+  - [ ] ex-60 · idempotent-consumer-effect-once — verify the effect happens once
+  - [ ] ex-61 · dead-letter-queue — verify a poison message lands in the DLQ
+  - [ ] ex-62 · backpressure-bounded-queue — verify the producer blocks when full
+  - [ ] ex-63 · dual-write-problem-demo — verify the message is lost on crash
+  - [ ] ex-64 · transactional-outbox — verify sent iff the transaction commits
+  - [ ] ex-65 · outbox-relay-idempotent — verify effects kept once
+  - [ ] ex-66 · webhook-send-hmac — verify the signature matches the payload
+  - [ ] ex-67 · webhook-verify-signature — verify a tampered body is rejected
+  - [ ] ex-68 · webhook-retry — verify successive attempts space out
+  - [ ] ex-69 · websocket-echo — verify a bidirectional round-trip
+  - [ ] ex-70 · sse-stream — verify successive server events arrive
+  - [ ] ex-71 · broker-backplane-fanout — verify a message reaches clients on both nodes
+  - [ ] ex-72 · circuit-breaker — verify calls fail fast while open
+  - [ ] ex-73 · retry-exponential-backoff — verify the delays double
+  - [ ] ex-74 · retry-full-jitter — verify retries de-synchronize
+  - [ ] ex-75 · timeout-guard — verify it aborts at the deadline
+  - [ ] ex-76 · bulkhead-isolation — verify one pool's saturation doesn't starve the other
+  - [ ] ex-77 · connection-pool — verify connections are reused
+  - [ ] ex-78 · pact-contract — verify the provider honours the contract
+  - [ ] ex-79 · testcontainers-integration — verify the suite runs against a real engine
+  - [ ] ex-80 · scale-ready-service — verify the end-to-end service passes
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/backend-at-scale/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1458,7 +5405,7 @@ Row: By Example · Python · topic wt 490 · Learn 139 / Drill 239 · **subject*
 ### Phase 43 Gate
 
 - [ ] [AI] `backend-at-scale/` complete: `_index.md` wt 490, `learning/_index.md` wt 139,
-      `drilling/_index.md` wt 239, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 239, capstone wt 900; all 40 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1473,9 +5420,118 @@ Row: By Example · Python † · topic wt 500 · Learn 140 / Drill 240 · **subj
 - [ ] **[AI] V** — `web-researcher` for `build-your-own-web-framework`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/40-build-your-own-web-framework.md`](./syllabus/40-build-your-own-web-framework.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/build-your-own-web-framework/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/40-build-your-own-web-framework.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/build-your-own-web-framework/learning/` teaching **every** concept in `syllabus/40-build-your-own-web-framework.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · wsgi-callable
+  - [ ] co-02 · wsgi-environ
+  - [ ] co-03 · wsgi-start-response
+  - [ ] co-04 · wsgi-return-iterable
+  - [ ] co-05 · asgi-callable
+  - [ ] co-06 · asgi-scope
+  - [ ] co-07 · asgi-receive-send
+  - [ ] co-08 · asgi-http-events
+  - [ ] co-09 · wsgi-vs-asgi
+  - [ ] co-10 · native-str-vs-bytes
+  - [ ] co-11 · router
+  - [ ] co-12 · path-parameters
+  - [ ] co-13 · route-decorator
+  - [ ] co-14 · route-not-found
+  - [ ] co-15 · request-object
+  - [ ] co-16 · response-object
+  - [ ] co-17 · json-codec
+  - [ ] co-18 · middleware-onion
+  - [ ] co-19 · middleware-ordering
+  - [ ] co-20 · middleware-short-circuit
+  - [ ] co-21 · error-to-response
+  - [ ] co-22 · exception-handler-registry
+  - [ ] co-23 · dependency-injection
+  - [ ] co-24 · di-per-request
+  - [ ] co-25 · lifespan-events
+  - [ ] co-26 · query-string-parsing
+  - [ ] co-27 · header-parsing
+  - [ ] co-28 · streaming-response
+  - [ ] co-29 · server-invocation
+  - [ ] co-30 · framework-as-transformation
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-web-framework/learning/code/` (runnable, type-annotated `mypy`-clean Python behind a real WSGI/ASGI server, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/40-build-your-own-web-framework.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · hello-wsgi — verify server serves it, `curl` gets 200
+  - [ ] ex-02 · environ-dump — verify each field matches the request
+  - [ ] ex-03 · start-response-status — verify the status line
+  - [ ] ex-04 · headers-list-tuples — verify the header reaches the client
+  - [ ] ex-05 · return-bytes — verify `str` body raises, `bytes` works
+  - [ ] ex-06 · method-branch — verify each method takes its path
+  - [ ] ex-07 · read-wsgi-input — verify echoed length matches `CONTENT_LENGTH`
+  - [ ] ex-08 · query-string-parse — verify `?a=1&a=2` yields both values
+  - [ ] ex-09 · http-header-read — verify the sent `Accept` header appears
+  - [ ] ex-10 · request-object-build — verify `mypy` clean, fields populated
+  - [ ] ex-11 · response-object-build — verify it holds the expected values
+  - [ ] ex-12 · response-to-wsgi — verify the served bytes match
+  - [ ] ex-13 · not-found-404 — verify status and body
+  - [ ] ex-14 · json-response-write — verify `curl` parses the JSON
+  - [ ] ex-15 · json-request-read — verify a bad body yields 400
+  - [ ] ex-16 · status-string-format — verify the reason phrase renders
+  - [ ] ex-17 · content-length-header — verify it equals the byte length
+  - [ ] ex-18 · native-str-headers — verify a `bytes` header is rejected
+  - [ ] ex-19 · wsgi-app-class — verify it serves identically to a function app
+  - [ ] ex-20 · serve-with-waitress — verify `curl` gets the expected 200
+  - [ ] ex-21 · routes-dict-dispatch — verify each path hits its handler
+  - [ ] ex-22 · method-not-allowed — verify GET-only route rejects POST (405)
+  - [ ] ex-23 · request-method-property — verify uppercased method
+  - [ ] ex-24 · request-json-body — verify it returns the parsed dict
+  - [ ] ex-25 · echo-endpoint — verify round-trip equality
+  - [ ] ex-26 · empty-body-204 — verify no body is sent
+  - [ ] ex-27 · redirect-302 — verify `curl -I` shows the redirect
+  - [ ] ex-28 · framework-as-function — verify it composes without hidden state
+  - [ ] ex-29 · hello-asgi — verify `uvicorn` serves it, `curl` gets 200
+  - [ ] ex-30 · asgi-scope-read — verify each field matches the request
+  - [ ] ex-31 · asgi-receive-body — verify a chunked body reassembles
+  - [ ] ex-32 · asgi-send-response — verify the two-event sequence
+  - [ ] ex-33 · asgi-bytes-headers — verify a `str` header is rejected
+  - [ ] ex-34 · asgi-serve-uvicorn — verify `curl` gets the expected body
+  - [ ] ex-35 · wsgi-vs-asgi-contrast — verify identical responses; note sync vs async
+  - [ ] ex-36 · router-table — verify registration and lookup
+  - [ ] ex-37 · route-decorator-impl — verify the route resolves after decoration
+  - [ ] ex-38 · route-returns-function — verify the decorator returns the original function
+  - [ ] ex-39 · path-param-extract — verify the handler receives `id`
+  - [ ] ex-40 · path-param-typed — verify a non-int segment 404s
+  - [ ] ex-41 · multiple-params — verify both params are passed
+  - [ ] ex-42 · route-precedence — verify static beats param
+  - [ ] ex-43 · unknown-path-404 — verify the fallback fires
+  - [ ] ex-44 · method-dispatch-router — verify each method routes correctly
+  - [ ] ex-45 · middleware-single — verify the log brackets the call
+  - [ ] ex-46 · middleware-before-after — verify both fire in order
+  - [ ] ex-47 · middleware-chain-two — verify the before/after nesting order
+  - [ ] ex-48 · middleware-order-flip — verify the observed sequence changes
+  - [ ] ex-49 · middleware-short-circuit — verify the handler never runs
+  - [ ] ex-50 · middleware-mutate-request — verify the handler sees the request-id
+  - [ ] ex-51 · middleware-mutate-response — verify the header reaches the client
+  - [ ] ex-52 · error-middleware — verify a raised error becomes a clean 500
+  - [ ] ex-53 · exception-handler-map — verify it maps to its response
+  - [ ] ex-54 · http-exception-raise — verify the detail body
+  - [ ] ex-55 · leaked-trace-vs-clean — verify no traceback in the body
+  - [ ] ex-56 · query-parse-asgi — verify decoded values
+  - [ ] ex-57 · di-registry — verify a registered provider resolves
+  - [ ] ex-58 · di-inject-handler — verify the handler receives it
+  - [ ] ex-59 · di-per-request — verify two requests get distinct instances
+  - [ ] ex-60 · di-singleton — verify the same instance returns
+  - [ ] ex-61 · di-db-connection — verify it is the request-scoped one
+  - [ ] ex-62 · lifespan-startup — verify the resource exists before the first request
+  - [ ] ex-63 · lifespan-shutdown — verify cleanup runs on shutdown
+  - [ ] ex-64 · streaming-response-asgi — verify the client receives the full stream
+  - [ ] ex-65 · streaming-response-wsgi — verify chunked delivery
+  - [ ] ex-66 · sse-endpoint — verify `curl` receives successive events
+  - [ ] ex-67 · middleware-stack-three — verify the full nesting order
+  - [ ] ex-68 · full-request-lifecycle — verify each stage runs once in order
+  - [ ] ex-69 · typed-request-response-full — verify `mypy --strict` is clean
+  - [ ] ex-70 · content-negotiation — verify the right `Content-Type` returns
+  - [ ] ex-71 · header-case-insensitive — verify `content-type`/`Content-Type` match
+  - [ ] ex-72 · port-flask-handler — verify identical response bytes
+  - [ ] ex-73 · port-fastapi-handler — verify the injected value
+  - [ ] ex-74 · wsgi-middleware-wrap — verify it intercepts every request
+  - [ ] ex-75 · asgi-middleware-wrap — verify it wraps the event pump
+  - [ ] ex-76 · error-in-middleware — verify the outer handler catches it
+  - [ ] ex-77 · mount-subapp — verify prefixed routes resolve to the sub-app
+  - [ ] ex-78 · static-file-handler — verify bytes and header
+  - [ ] ex-79 · integration-test-suite — verify the suite passes
+  - [ ] ex-80 · mini-framework — verify an end-to-end request returns the expected response
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-web-framework/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1487,7 +5543,7 @@ Row: By Example · Python † · topic wt 500 · Learn 140 / Drill 240 · **subj
 ### Phase 44 Gate
 
 - [ ] [AI] `build-your-own-web-framework/` complete: `_index.md` wt 500, `learning/_index.md` wt 140,
-      `drilling/_index.md` wt 240, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 240, capstone wt 900; all 30 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1502,9 +5558,122 @@ Row: By Example · Python † · topic wt 510 · Learn 141 / Drill 241 · **subj
 - [ ] **[AI] V** — `web-researcher` for `api-design`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/41-api-design.md`](./syllabus/41-api-design.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/api-design/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/41-api-design.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/api-design/learning/` teaching **every** concept in `syllabus/41-api-design.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · api-as-contract
+  - [ ] co-02 · consumer-driven-design
+  - [ ] co-03 · rest-constraints
+  - [ ] co-04 · richardson-maturity
+  - [ ] co-05 · resource-modeling
+  - [ ] co-06 · http-method-semantics
+  - [ ] co-07 · status-code-design
+  - [ ] co-08 · problem-details
+  - [ ] co-09 · openapi-contract
+  - [ ] co-10 · openapi-json-schema
+  - [ ] co-11 · openapi-codegen-mock
+  - [ ] co-12 · request-validation
+  - [ ] co-13 · versioning-strategies
+  - [ ] co-14 · backward-compatible-change
+  - [ ] co-15 · deprecation-sunset
+  - [ ] co-16 · offset-pagination
+  - [ ] co-17 · cursor-pagination
+  - [ ] co-18 · idempotency-key
+  - [ ] co-19 · rate-limit-429
+  - [ ] co-20 · ratelimit-headers
+  - [ ] co-21 · content-negotiation
+  - [ ] co-22 · http-caching-etag
+  - [ ] co-23 · auth-bearer-token
+  - [ ] co-24 · graphql-schema
+  - [ ] co-25 · graphql-resolver-n1
+  - [ ] co-26 · grpc-protobuf
+  - [ ] co-27 · style-selection
+  - [ ] co-28 · hateoas-hypermedia
+  - [ ] co-29 · pagination-envelope
+  - [ ] co-30 · error-envelope-consistency
+  - [ ] co-31 · partial-response-field-selection
+  - [ ] co-32 · bulk-batch-endpoints
+  - [ ] co-33 · webhook-api-surface
+  - [ ] co-34 · openapi-security-schemes
+- [ ] **[AI] A1-examples** — Author `CONTENT/api-design/learning/code/` (runnable, type-annotated `mypy`-clean Python exercised with `curl`/a client, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/41-api-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · resource-noun-uri — verify URIs name nouns
+  - [ ] ex-02 · rpc-vs-resource-contrast — verify the resource form is verb-free
+  - [ ] ex-03 · method-semantics-map — verify each verb's intent
+  - [ ] ex-04 · idempotent-put-vs-post — verify PUT repeatable, POST not
+  - [ ] ex-05 · status-201-location — verify 201 + `Location`
+  - [ ] ex-06 · status-202-async — verify the async contract
+  - [ ] ex-07 · status-204-delete — verify empty body
+  - [ ] ex-08 · status-409-vs-422 — verify the distinction
+  - [ ] ex-09 · richardson-level-classify — verify each classification
+  - [ ] ex-10 · rest-constraint-stateless — verify no server session is needed
+  - [ ] ex-11 · hateoas-links — verify a client can follow `_links`
+  - [ ] ex-12 · problem-details-envelope — verify the problem+json shape
+  - [ ] ex-13 · error-envelope-consistency — verify uniformity across endpoints
+  - [ ] ex-14 · validation-error-422 — verify the 422 field errors
+  - [ ] ex-15 · openapi-skeleton — verify it validates
+  - [ ] ex-16 · openapi-schema-component — verify the `$ref` resolves
+  - [ ] ex-17 · openapi-json-schema-2020 — verify 2020-12 keywords apply
+  - [ ] ex-18 · openapi-operation-responses — verify each response is documented
+  - [ ] ex-19 · openapi-validate-request — verify a bad body is rejected
+  - [ ] ex-20 · openapi-validate-response — verify conformance
+  - [ ] ex-21 · openapi-mock-server — verify spec-shaped mock data
+  - [ ] ex-22 · openapi-client-codegen — verify a generated call type-checks
+  - [ ] ex-23 · offset-page-endpoint — verify the correct slice
+  - [ ] ex-24 · cursor-page-endpoint — verify the next page follows the cursor
+  - [ ] ex-25 · pagination-envelope — verify the `{data, has_more, next_cursor}` shape
+  - [ ] ex-26 · content-type-json — verify the client parses it
+  - [ ] ex-27 · accept-negotiation — verify the right representation returns
+  - [ ] ex-28 · accept-language — verify the language
+  - [ ] ex-29 · version-uri-path — verify each version resolves
+  - [ ] ex-30 · version-header — verify header-based routing
+  - [ ] ex-31 · version-query — verify query-based routing
+  - [ ] ex-32 · additive-change-compatible — verify old clients keep working
+  - [ ] ex-33 · tolerant-reader — verify it survives a server addition
+  - [ ] ex-34 · breaking-change-detect — verify a consumer test fails
+  - [ ] ex-35 · deprecation-header — verify the client sees the notice
+  - [ ] ex-36 · sunset-header — verify the retirement date is communicated
+  - [ ] ex-37 · idempotency-key-write — verify the key is recorded
+  - [ ] ex-38 · idempotency-replay — verify the stored response returns
+  - [ ] ex-39 · idempotency-key-mismatch — verify rejection on differing body
+  - [ ] ex-40 · rate-limit-429 — verify 429 + `Retry-After`
+  - [ ] ex-41 · ratelimit-headers — verify the structured headers parse
+  - [ ] ex-42 · quota-remaining — verify the counter reaches zero
+  - [ ] ex-43 · etag-304 — verify a 304
+  - [ ] ex-44 · cache-control-header — verify the directive
+  - [ ] ex-45 · conditional-put-if-match — verify a stale write returns 412
+  - [ ] ex-46 · bearer-token-auth — verify a missing token returns 401
+  - [ ] ex-47 · api-key-auth — verify an invalid key is rejected
+  - [ ] ex-48 · scope-check — verify an out-of-scope call returns 403
+  - [ ] ex-49 · openapi-security-scheme — verify the scheme is documented
+  - [ ] ex-50 · partial-response-fields — verify only selected fields return
+  - [ ] ex-51 · sparse-fieldset-jsonapi — verify the sparse representation
+  - [ ] ex-52 · batch-endpoint — verify each sub-result
+  - [ ] ex-53 · bulk-create — verify all are created
+  - [ ] ex-54 · webhook-subscribe — verify the subscription is stored
+  - [ ] ex-55 · webhook-hmac-sign — verify the signature matches
+  - [ ] ex-56 · hal-links — verify the hypermedia shape
+  - [ ] ex-57 · graphql-schema-def — verify the SDL parses
+  - [ ] ex-58 · graphql-query-fields — verify only selected fields return
+  - [ ] ex-59 · graphql-overfetch-contrast — verify REST over-fetches, GraphQL does not
+  - [ ] ex-60 · graphql-resolver — verify the resolved value
+  - [ ] ex-61 · graphql-n1-dataloader — verify the query count drops
+  - [ ] ex-62 · graphql-mutation — verify the write and its return
+  - [ ] ex-63 · grpc-proto-define — verify it compiles
+  - [ ] ex-64 · grpc-unary — verify the round-trip
+  - [ ] ex-65 · grpc-server-streaming — verify multiple messages stream back
+  - [ ] ex-66 · grpc-bidi-streaming — verify interleaved read/write
+  - [ ] ex-67 · style-caching-contrast — verify the caching observation
+  - [ ] ex-68 · style-evolution-contrast — verify each evolution path
+  - [ ] ex-69 · style-selection-matrix — verify each choice is justified
+  - [ ] ex-70 · contract-first-openapi — verify the spec drives the design
+  - [ ] ex-71 · spec-driven-server — verify responses match the schema
+  - [ ] ex-72 · spec-conformance-test — verify the contract holds
+  - [ ] ex-73 · versioned-migration — verify both versions serve during the window
+  - [ ] ex-74 · idempotent-rate-limited-write — verify both behave
+  - [ ] ex-75 · error-envelope-graphql — verify each error model
+  - [ ] ex-76 · pagination-graphql-connections — verify the `edges`/`pageInfo` shape
+  - [ ] ex-77 · hateoas-driven-client — verify it navigates by hypermedia
+  - [ ] ex-78 · grpc-vs-rest-latency — verify the latency contrast
+  - [ ] ex-79 · openapi-full-docs — verify the docs render the operations
+  - [ ] ex-80 · contract-first-api — verify end-to-end conformance
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/api-design/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1516,7 +5685,7 @@ Row: By Example · Python † · topic wt 510 · Learn 141 / Drill 241 · **subj
 ### Phase 45 Gate
 
 - [ ] [AI] `api-design/` complete: `_index.md` wt 510, `learning/_index.md` wt 141,
-      `drilling/_index.md` wt 241, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 241, capstone wt 900; all 34 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1531,9 +5700,87 @@ Row: Annotated-concept · Python \* · topic wt 520 · Learn 142 / Drill 242 · 
 - [ ] **[AI] V** — `web-researcher` for `software-architecture`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/42-software-architecture.md`](./syllabus/42-software-architecture.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/software-architecture/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/42-software-architecture.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/software-architecture/learning/` teaching **every** concept in `syllabus/42-software-architecture.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · architecture-definition
+  - [ ] co-02 · coupling-cohesion
+  - [ ] co-03 · dependency-direction-dip
+  - [ ] co-04 · stable-dependencies
+  - [ ] co-05 · architectural-styles
+  - [ ] co-06 · layered-architecture
+  - [ ] co-07 · layered-sinkhole
+  - [ ] co-08 · hexagonal-ports-adapters
+  - [ ] co-09 · functional-core-imperative-shell
+  - [ ] co-10 · clean-onion-architecture
+  - [ ] co-11 · quality-attributes
+  - [ ] co-12 · tradeoff-first-law
+  - [ ] co-13 · atam
+  - [ ] co-14 · monolith-vs-microservices
+  - [ ] co-15 · modular-monolith
+  - [ ] co-16 · bounded-context-boundary
+  - [ ] co-17 · conways-law
+  - [ ] co-18 · c4-model
+  - [ ] co-19 · 4plus1-views
+  - [ ] co-20 · adr
+  - [ ] co-21 · evolutionary-architecture-fitness-functions
+  - [ ] co-22 · strangler-fig
+  - [ ] co-23 · cap-pacelc
+  - [ ] co-24 · twelve-factor
+  - [ ] co-25 · big-ball-of-mud
+  - [ ] co-26 · essential-vs-accidental-complexity
+  - [ ] co-27 · cross-cutting-concerns
+- [ ] **[AI] A1-examples** — Author `CONTENT/software-architecture/learning/` (each example a runnable, type-annotated `mypy`-clean Python snippet **or** an annotated C4/ADR/table artifact per the `*` designation, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/42-software-architecture.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · coupling-count — verify counts match its imports
+  - [ ] ex-02 · instability-metric — verify the more-depended-on module is more stable
+  - [ ] ex-03 · cohesion-smell — verify the split raises cohesion
+  - [ ] ex-04 · dip-invert-dependency — verify the high-level module no longer imports the low-level one
+  - [ ] ex-05 · architecture-definition-note — verify both definitions attributed correctly
+  - [ ] ex-06 · styles-catalogue-diagram — verify each style's shape is distinct
+  - [ ] ex-07 · layered-diagram — verify the layer stack and allowed dependencies
+  - [ ] ex-08 · layered-isolation — verify presentation code is unedited
+  - [ ] ex-09 · sinkhole-antipattern — verify the layer adds no logic
+  - [ ] ex-10 · hexagonal-port-define — verify the core depends only on the port
+  - [ ] ex-11 · hexagonal-adapter — verify it satisfies the port's contract
+  - [ ] ex-12 · hexagonal-diagram — verify the core sits inside the ports
+  - [ ] ex-13 · functional-core-pure — verify it is deterministic and side-effect-free
+  - [ ] ex-14 · imperative-shell — verify all effects live in the shell
+  - [ ] ex-15 · quality-attribute-table — verify each attribute has a concrete measure
+  - [ ] ex-16 · asr-identify — verify non-significant requirements are excluded
+  - [ ] ex-17 · conways-law-note — verify the mirrored boundaries
+  - [ ] ex-18 · c4-context-diagram — verify external actors and system boundary
+  - [ ] ex-19 · c4-container-diagram — verify each deployable unit and its tech
+  - [ ] ex-20 · c4-component-diagram — verify components within one container
+  - [ ] ex-21 · 4plus1-views — verify each view answers its own question
+  - [ ] ex-22 · adr-template — verify all five sections present
+  - [ ] ex-23 · adr-tradeoff-sync-async — verify consequences name upsides and downsides
+  - [ ] ex-24 · tradeoff-first-law-note — verify the hidden trade-off is named
+  - [ ] ex-25 · atam-scenario — verify the risk is identified
+  - [ ] ex-26 · monolith-diagram — verify one deployable, internal modules
+  - [ ] ex-27 · microservices-diagram — verify service boundaries and network hops
+  - [ ] ex-28 · distributed-monolith-smell — verify the shared-release anti-pattern
+  - [ ] ex-29 · modular-monolith — verify modules communicate only through public interfaces
+  - [ ] ex-30 · module-boundary-enforce — verify the check fails on a violation
+  - [ ] ex-31 · bounded-context-map — verify the relationship between contexts
+  - [ ] ex-32 · clean-architecture-layers — verify the concentric layering
+  - [ ] ex-33 · dependency-rule-check — verify a violation is caught
+  - [ ] ex-34 · cross-cutting-logging — verify it wraps handlers uniformly
+  - [ ] ex-35 · cross-cutting-transaction — verify commit/rollback is atomic across the seam
+  - [ ] ex-36 · config-as-concern — verify config comes from the environment
+  - [ ] ex-37 · twelve-factor-audit — verify each factor is pass/fail with evidence
+  - [ ] ex-38 · cap-tradeoff-note — verify the chosen behaviour during a partition
+  - [ ] ex-39 · pacelc-note — verify the no-partition trade-off is stated
+  - [ ] ex-40 · fitness-function-code — verify it fails on a rule violation
+  - [ ] ex-41 · fitness-function-cycle-check — verify it flags an introduced cycle
+  - [ ] ex-42 · strangler-fig-plan — verify the incremental cutover steps
+  - [ ] ex-43 · strangler-fig-facade — verify traffic shifts without a big-bang switch
+  - [ ] ex-44 · big-ball-of-mud-diagnose — verify the mud symptoms and the remedy
+  - [ ] ex-45 · essential-vs-accidental — verify each is labelled with a reason
+  - [ ] ex-46 · ports-adapters-swap — verify the core code is unedited and both pass
+  - [ ] ex-47 · hexagonal-test-in-isolation — verify the test needs no real infrastructure
+  - [ ] ex-48 · stable-abstractions — verify the stable-abstractions alignment
+  - [ ] ex-49 · style-selection-tradeoff — verify the choice names its trade-off
+  - [ ] ex-50 · quality-attribute-tradeoff — verify the tension is measured
+  - [ ] ex-51 · architecture-review-adr-set — verify each decision is traceable
+  - [ ] ex-52 · rearchitect-capstone — verify the core is infrastructure-free and adapters interchangeable
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-architecture/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1545,7 +5792,7 @@ Row: Annotated-concept · Python \* · topic wt 520 · Learn 142 / Drill 242 · 
 ### Phase 46 Gate
 
 - [ ] [AI] `software-architecture/` complete: `_index.md` wt 520, `learning/_index.md` wt 142,
-      `drilling/_index.md` wt 242, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 242, capstone wt 900; all 27 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1560,9 +5807,120 @@ Row: By Example · Python · topic wt 530 · Learn 143 / Drill 243 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `domain-driven-design`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/43-domain-driven-design.md`](./syllabus/43-domain-driven-design.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/domain-driven-design/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/43-domain-driven-design.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/domain-driven-design/learning/` teaching **every** concept in `syllabus/43-domain-driven-design.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · ubiquitous-language
+  - [ ] co-02 · domain-model
+  - [ ] co-03 · entity
+  - [ ] co-04 · value-object
+  - [ ] co-05 · side-effect-free-behaviour
+  - [ ] co-06 · aggregate
+  - [ ] co-07 · aggregate-root
+  - [ ] co-08 · consistency-boundary
+  - [ ] co-09 · invariant
+  - [ ] co-10 · small-aggregates
+  - [ ] co-11 · reference-by-identity
+  - [ ] co-12 · one-aggregate-per-transaction
+  - [ ] co-13 · eventual-consistency
+  - [ ] co-14 · repository
+  - [ ] co-15 · port-and-adapter-persistence
+  - [ ] co-16 · factory
+  - [ ] co-17 · domain-service
+  - [ ] co-18 · domain-event
+  - [ ] co-19 · event-decoupling
+  - [ ] co-20 · application-service
+  - [ ] co-21 · layered-architecture
+  - [ ] co-22 · bounded-context
+  - [ ] co-23 · context-map
+  - [ ] co-24 · anticorruption-layer
+  - [ ] co-25 · shared-kernel
+  - [ ] co-26 · customer-supplier-conformist
+  - [ ] co-27 · subdomains
+  - [ ] co-28 · specification
+  - [ ] co-29 · anemic-domain-model
+  - [ ] co-30 · cqrs
+  - [ ] co-31 · event-sourcing
+  - [ ] co-32 · when-ddd-pays-off
+- [ ] **[AI] A1-examples** — Author `CONTENT/domain-driven-design/learning/code/` (each example a runnable, type-annotated `mypy`-clean Python source, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/43-domain-driven-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · ubiquitous-language-rename — verify tests read as domain sentences
+  - [ ] ex-02 · model-vs-table — verify a method enforces a rule a table could not
+  - [ ] ex-03 · value-object-equality — verify equality by value
+  - [ ] ex-04 · value-object-immutable — verify `FrozenInstanceError`
+  - [ ] ex-05 · value-object-behaviour — verify no mutation
+  - [ ] ex-06 · entity-identity — verify identity equality
+  - [ ] ex-07 · entity-mutable-state — verify id stable across change
+  - [ ] ex-08 · entity-vs-value-choice — verify the equality semantics of each
+  - [ ] ex-09 · invariant-in-constructor — verify `ValueError` on invalid
+  - [ ] ex-10 · invariant-guard-method — verify the balance invariant holds
+  - [ ] ex-11 · money-value-object — verify mixed-currency add raises
+  - [ ] ex-12 · email-value-object — verify malformed input rejected
+  - [ ] ex-13 · quantity-value-object — verify `Quantity(-1)` raises
+  - [ ] ex-14 · daterange-value-object — verify inverted range rejected
+  - [ ] ex-15 · value-object-composition — verify line total computed from VOs
+  - [ ] ex-16 · entity-lifecycle — verify only legal transitions allowed
+  - [ ] ex-17 · self-validating-entity — verify illegal transition raises
+  - [ ] ex-18 · ubiquitous-language-test — verify names mirror domain rules
+  - [ ] ex-19 · no-primitive-obsession — verify type errors caught at construction
+  - [ ] ex-20 · factory-simple — verify it returns a ready-to-use `Customer`
+  - [ ] ex-21 · factory-aggregate — verify the aggregate is valid on return
+  - [ ] ex-22 · domain-service-transfer — verify both balances update atomically
+  - [ ] ex-23 · domain-service-vs-method — verify neither account owns the operation
+  - [ ] ex-24 · anemic-vs-rich — verify the rich model localizes the rule
+  - [ ] ex-25 · anemic-antipattern-fix — verify the service now only orchestrates
+  - [ ] ex-26 · specification-predicate — verify true/false on sample customers
+  - [ ] ex-27 · specification-compose — verify the composite matches expected members
+  - [ ] ex-28 · specification-select — verify only satisfying elements returned
+  - [ ] ex-29 · aggregate-boundary — verify lines reachable only via the order
+  - [ ] ex-30 · aggregate-root-access — verify direct list mutation is blocked
+  - [ ] ex-31 · aggregate-invariant-across-children — verify over-limit line raises
+  - [ ] ex-32 · consistency-boundary — verify partial state never stored
+  - [ ] ex-33 · small-aggregate — verify each protects its own invariant
+  - [ ] ex-34 · reference-by-identity — verify the order needs no customer instance
+  - [ ] ex-35 · one-aggregate-per-transaction — verify the second update is queued
+  - [ ] ex-36 · eventual-consistency-across-aggregates — verify inventory converges after handling
+  - [ ] ex-37 · repository-port — verify the domain depends only on the protocol
+  - [ ] ex-38 · repository-in-memory-adapter — verify round-trip add/get
+  - [ ] ex-39 · repository-one-per-root — verify each keys on its own root
+  - [ ] ex-40 · repository-collection-illusion — verify the collection semantics
+  - [ ] ex-41 · repository-swap-adapter — verify the domain code is unchanged
+  - [ ] ex-42 · aggregate-reconstitution — verify reconstituted invariants hold
+  - [ ] ex-43 · domain-event-define — verify it carries `order_id` + `occurred_at`
+  - [ ] ex-44 · domain-event-raise — verify the event appears in `pending_events`
+  - [ ] ex-45 · domain-event-payload — verify payload matches the transition
+  - [ ] ex-46 · domain-event-dispatch — verify the handler side effect fires
+  - [ ] ex-47 · domain-event-decouple — verify producer has no handler reference
+  - [ ] ex-48 · domain-event-cross-aggregate — verify the second aggregate updates through the event
+  - [ ] ex-49 · application-service-orchestrate — verify end-to-end flow
+  - [ ] ex-50 · application-vs-domain-service — verify moving a rule into the service is a smell
+  - [ ] ex-51 · layered-architecture — verify an import-lint forbids domain→infra
+  - [ ] ex-52 · domain-core-no-infra — verify via an AST/import test
+  - [ ] ex-53 · aggregate-root-invariant-guard — verify tampering raises or is impossible
+  - [ ] ex-54 · aggregate-collection-encapsulation — verify callers cannot append
+  - [ ] ex-55 · factory-vs-constructor — verify the split matches complexity
+  - [ ] ex-56 · specification-in-repository — verify only matching aggregates returned
+  - [ ] ex-57 · bounded-context-define — verify each has only its context's fields
+  - [ ] ex-58 · bounded-context-model-drift — verify the two models don't share a class
+  - [ ] ex-59 · context-map-relationships — verify it lists the relationship kind per edge
+  - [ ] ex-60 · anticorruption-layer — verify the domain never sees the DTO
+  - [ ] ex-61 · acl-isolation — verify via an import test
+  - [ ] ex-62 · acl-translation-map — verify a field-by-field translation table
+  - [ ] ex-63 · shared-kernel — verify both import the one shared type
+  - [ ] ex-64 · customer-supplier — verify downstream consumes the agreed contract
+  - [ ] ex-65 · conformist — verify no translation layer exists
+  - [ ] ex-66 · open-host-published-language — verify external callers bind to the DTO
+  - [ ] ex-67 · subdomain-core — verify it gets the richest model
+  - [ ] ex-68 · subdomain-supporting-generic — verify the generic one is a thin wrapper
+  - [ ] ex-69 · core-domain-focus — verify effort concentrated on the core aggregate
+  - [ ] ex-70 · when-ddd-overkill — verify a plain data class suffices
+  - [ ] ex-71 · cqrs-read-write-split — verify writes through the aggregate, reads through the summary
+  - [ ] ex-72 · cqrs-read-model — verify it answers a query with no aggregate load
+  - [ ] ex-73 · event-sourcing-append — verify no state overwrite occurs
+  - [ ] ex-74 · event-sourcing-replay — verify replayed state matches the live aggregate
+  - [ ] ex-75 · event-sourcing-audit — verify the history is reconstructable from events
+  - [ ] ex-76 · domain-to-integration-event — verify the integration event drops internal fields
+  - [ ] ex-77 · aggregate-across-contexts — verify no cross-context object reference
+  - [ ] ex-78 · ubiquitous-language-per-context — verify each context's tests use its own meaning
+  - [ ] ex-79 · specification-business-rule — verify it matches only qualifying customers
+  - [ ] ex-80 · ddd-domain-model — verify invariants hold through the root, core imports no infra, events fire, ACL isolates contexts
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/domain-driven-design/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1574,7 +5932,7 @@ Row: By Example · Python · topic wt 530 · Learn 143 / Drill 243 · **subject*
 ### Phase 47 Gate
 
 - [ ] [AI] `domain-driven-design/` complete: `_index.md` wt 530, `learning/_index.md` wt 143,
-      `drilling/_index.md` wt 243, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 243, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1589,9 +5947,91 @@ Row: Annotated-concept · Python \* · topic wt 540 · Learn 144 / Drill 244 · 
 - [ ] **[AI] V** — `web-researcher` for `system-design`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/44-system-design.md`](./syllabus/44-system-design.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/system-design/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/44-system-design.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/system-design/learning/` teaching **every** concept in `syllabus/44-system-design.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · design-method
+  - [ ] co-02 · functional-vs-nonfunctional
+  - [ ] co-03 · back-of-envelope-estimation
+  - [ ] co-04 · powers-of-two
+  - [ ] co-05 · latency-ladder
+  - [ ] co-06 · load-balancing
+  - [ ] co-07 · consistent-hashing
+  - [ ] co-08 · caching-strategies
+  - [ ] co-09 · cache-stampede
+  - [ ] co-10 · cdn
+  - [ ] co-11 · replication
+  - [ ] co-12 · sharding-partitioning
+  - [ ] co-13 · hotspot-problem
+  - [ ] co-14 · federation
+  - [ ] co-15 · cap-theorem
+  - [ ] co-16 · pacelc
+  - [ ] co-17 · consistency-models
+  - [ ] co-18 · quorum
+  - [ ] co-19 · availability-nines
+  - [ ] co-20 · message-queue
+  - [ ] co-21 · event-streaming
+  - [ ] co-22 · rate-limiting
+  - [ ] co-23 · idempotency
+  - [ ] co-24 · designing-for-failure
+  - [ ] co-25 · backpressure
+  - [ ] co-26 · sql-vs-nosql-at-scale
+  - [ ] co-27 · microservices-vs-monolith
+  - [ ] co-28 · blob-object-storage
+  - [ ] co-29 · case-study-method
+  - [ ] co-30 · communicating-a-design
+- [ ] **[AI] A1-examples** — Author `CONTENT/system-design/learning/` (each example a runnable, type-annotated `mypy`-clean Python component **or** an annotated Mermaid/capacity/decision-table artifact per the `*` designation, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/44-system-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · requirements-split — verify each requirement is labelled and testable
+  - [ ] ex-02 · latency-ladder-table — verify each row's relative multiplier
+  - [ ] ex-03 · powers-of-two-table — verify each identity arithmetically
+  - [ ] ex-04 · qps-estimate — verify the arithmetic
+  - [ ] ex-05 · storage-estimate — verify the total is arithmetic-checked
+  - [ ] ex-06 · bandwidth-estimate — verify units cancel to MB/s
+  - [ ] ex-07 · read-write-ratio — verify the cache-hit target follows
+  - [ ] ex-08 · design-method-checklist — verify each step names its output artifact
+  - [ ] ex-09 · api-sketch — verify each endpoint's contract
+  - [ ] ex-10 · data-model-sketch — verify the lookup key is indexed
+  - [ ] ex-11 · latency-budget — verify the sum fits the budget
+  - [ ] ex-12 · availability-nines-table — verify each figure against the SRE table
+  - [ ] ex-13 · availability-composition — verify the product
+  - [ ] ex-14 · single-postgres-first — verify the measured-limit trigger is named
+  - [ ] ex-15 · estimate-as-bet — verify each number is tied to a decision
+  - [ ] ex-16 · cap-choose — verify each choice names its partition behaviour
+  - [ ] ex-17 · pacelc-annotate — verify the Else branch is stated
+  - [ ] ex-18 · consistency-model-pick — verify why eventual would confuse the user
+  - [ ] ex-19 · round-robin-lb — verify requests cycle evenly across backends
+  - [ ] ex-20 · weighted-lb — verify the ratio matches weights
+  - [ ] ex-21 · consistent-hashing-ring — verify only a bounded fraction of keys move
+  - [ ] ex-22 · consistent-hashing-vnodes — verify per-node load variance drops
+  - [ ] ex-23 · cache-aside — verify the second read hits the cache
+  - [ ] ex-24 · lru-cache — verify the least-recently-used entry is evicted
+  - [ ] ex-25 · ttl-cache — verify an expired key misses
+  - [ ] ex-26 · cache-stampede-jitter — verify expiries spread instead of clustering
+  - [ ] ex-27 · token-bucket-limiter — verify it admits up to the limit and rejects beyond
+  - [ ] ex-28 · sliding-window-limiter — verify boundary requests are counted correctly
+  - [ ] ex-29 · leader-follower-replication — verify a follower read can be stale
+  - [ ] ex-30 · read-replica-routing — verify writes never hit a replica
+  - [ ] ex-31 · range-partition — verify the skew appears
+  - [ ] ex-32 · hash-partition — verify per-shard counts are near-equal
+  - [ ] ex-33 · hotspot-salting — verify load spreads
+  - [ ] ex-34 · quorum-rw — verify a read always sees the latest committed write
+  - [ ] ex-35 · message-queue-decouple — verify the producer does not block on the consumer
+  - [ ] ex-36 · queue-competing-consumers — verify each processes a fair share
+  - [ ] ex-37 · idempotent-consumer — verify a redelivered message is a no-op
+  - [ ] ex-38 · cdn-cache-annotate — verify the cache-hit path skips the origin
+  - [ ] ex-39 · url-shortener-design — verify the diagram matches the API and the numbers are checked
+  - [ ] ex-40 · url-shortener-id-generation — verify generated codes are unique and short
+  - [ ] ex-41 · news-feed-design — verify each approach names its cost
+  - [ ] ex-42 · feed-celebrity-problem — verify the celebrity path avoids write amplification
+  - [ ] ex-43 · rate-limiter-design — verify it enforces a shared limit across nodes
+  - [ ] ex-44 · circuit-breaker — verify it trips after the failure threshold
+  - [ ] ex-45 · graceful-degradation — verify the core path still responds
+  - [ ] ex-46 · backpressure — verify producers get a fast rejection, not OOM
+  - [ ] ex-47 · failover-annotate — verify the fencing mechanism is named
+  - [ ] ex-48 · sql-vs-nosql-decision — verify each row justifies its pick
+  - [ ] ex-49 · microservices-gateway — verify one client call fans out to several services
+  - [ ] ex-50 · event-streaming-partition — verify ordering is claimed only within a partition
+  - [ ] ex-51 · blob-storage-design — verify the large asset never transits the app server
+  - [ ] ex-52 · system-design-capstone — verify checked numbers, a coherent diagram, passing components, and explicit trade-offs
+  - [ ] ex-53 · federation-split — verify each service owns its own store and cross-service joins become API calls
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/system-design/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1603,7 +6043,7 @@ Row: Annotated-concept · Python \* · topic wt 540 · Learn 144 / Drill 244 · 
 ### Phase 48 Gate
 
 - [ ] [AI] `system-design/` complete: `_index.md` wt 540, `learning/_index.md` wt 144,
-      `drilling/_index.md` wt 244, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 244, capstone wt 900; all 30 concepts + 53 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1618,9 +6058,121 @@ Row: By Example · Python · topic wt 550 · Learn 145 / Drill 245 · **subject*
 - [ ] **[AI] V** — `web-researcher` for `event-driven-architecture`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/45-event-driven-architecture.md`](./syllabus/45-event-driven-architecture.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/event-driven-architecture/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/45-event-driven-architecture.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/event-driven-architecture/learning/` teaching **every** concept in `syllabus/45-event-driven-architecture.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · event-definition
+  - [ ] co-02 · event-vs-command-vs-query
+  - [ ] co-03 · event-notification
+  - [ ] co-04 · event-carried-state-transfer
+  - [ ] co-05 · pub-sub
+  - [ ] co-06 · point-to-point-queue
+  - [ ] co-07 · broker-topology
+  - [ ] co-08 · mediator-topology
+  - [ ] co-09 · log-vs-queue-broker
+  - [ ] co-10 · topic-partition-offset
+  - [ ] co-11 · partition-ordering
+  - [ ] co-12 · partition-by-key
+  - [ ] co-13 · consumer-group
+  - [ ] co-14 · retention
+  - [ ] co-15 · at-most-once
+  - [ ] co-16 · at-least-once
+  - [ ] co-17 · exactly-once
+  - [ ] co-18 · idempotent-consumer
+  - [ ] co-19 · event-sourcing
+  - [ ] co-20 · event-replay
+  - [ ] co-21 · snapshot
+  - [ ] co-22 · cqrs
+  - [ ] co-23 · read-model-projection
+  - [ ] co-24 · dual-write-problem
+  - [ ] co-25 · outbox-pattern
+  - [ ] co-26 · saga
+  - [ ] co-27 · choreography-vs-orchestration
+  - [ ] co-28 · compensating-action
+  - [ ] co-29 · dead-letter-queue
+  - [ ] co-30 · poison-message-retry
+  - [ ] co-31 · eventual-consistency
+  - [ ] co-32 · schema-evolution
+  - [ ] co-33 · when-not-eda
+- [ ] **[AI] A1-examples** — Author `CONTENT/event-driven-architecture/learning/code/` (each example a runnable, type-annotated `mypy`-clean Python source against a local in-process bus/broker fake, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/45-event-driven-architecture.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · event-as-fact — verify the class is frozen and named as a fact
+  - [ ] ex-02 · event-vs-command — verify each is typed by intent
+  - [ ] ex-03 · event-vs-query — verify no state mutation occurs
+  - [ ] ex-04 · passive-aggressive-command — verify the intent is now explicit
+  - [ ] ex-05 · pub-sub-basic — verify both handlers fire
+  - [ ] ex-06 · pub-sub-decouple — verify adding a subscriber needs no publisher change
+  - [ ] ex-07 · point-to-point-queue — verify a single consumer handles it
+  - [ ] ex-08 · competing-consumers — verify each gets a fair share
+  - [ ] ex-09 · queue-vs-pubsub — verify the two delivery counts
+  - [ ] ex-10 · event-notification — verify the payload is minimal
+  - [ ] ex-11 · event-notification-callback — verify the callback fetches the rest
+  - [ ] ex-12 · event-carried-state — verify the receiver needs no callback
+  - [ ] ex-13 · local-replica — verify the replica matches after handling
+  - [ ] ex-14 · notification-vs-state-transfer — verify each approach's cost is named
+  - [ ] ex-15 · in-process-event-bus — verify publish reaches all handlers
+  - [ ] ex-16 · handler-registration — verify an unsubscribed handler stops firing
+  - [ ] ex-17 · event-payload-schema — verify the version is carried
+  - [ ] ex-18 · event-immutability — verify `FrozenInstanceError`
+  - [ ] ex-19 · multiple-handlers — verify all run
+  - [ ] ex-20 · handler-failure-isolation — verify the rest still run
+  - [ ] ex-21 · at-most-once — verify no redelivery
+  - [ ] ex-22 · at-least-once — verify a redelivery occurs
+  - [ ] ex-23 · duplicate-delivery-demo — verify the double effect appears
+  - [ ] ex-24 · idempotent-consumer — verify a redelivery is a no-op
+  - [ ] ex-25 · idempotent-upsert — verify repeated apply yields one row
+  - [ ] ex-26 · idempotency-key — verify a duplicate key is skipped
+  - [ ] ex-27 · dead-letter-basic — verify it lands in the dead-letter store
+  - [ ] ex-28 · poison-retry-limit — verify it dead-letters after the limit
+  - [ ] ex-29 · event-store-append — verify order is preserved
+  - [ ] ex-30 · event-sourced-aggregate — verify each command emits its event
+  - [ ] ex-31 · rebuild-by-replay — verify replayed state matches
+  - [ ] ex-32 · replay-determinism — verify two replays are equal
+  - [ ] ex-33 · snapshot — verify the snapshot equals folded state
+  - [ ] ex-34 · snapshot-plus-tail — verify the tail-replay result matches full replay
+  - [ ] ex-35 · append-only-no-overwrite — verify the log only grows
+  - [ ] ex-36 · event-versioning — verify the old event loads under the new schema
+  - [ ] ex-37 · schema-backward-compat — verify no field is missing
+  - [ ] ex-38 · schema-forward-compat — verify it ignores unknown fields
+  - [ ] ex-39 · cqrs-write-model — verify reads never mutate it
+  - [ ] ex-40 · cqrs-read-model — verify it answers a query directly
+  - [ ] ex-41 · read-model-projection — verify each event updates the projection
+  - [ ] ex-42 · read-model-rebuild — verify it matches the incremental one
+  - [ ] ex-43 · read-model-lag — verify a just-written value isn't visible yet
+  - [ ] ex-44 · eventual-consistency-window — verify it converges after processing
+  - [ ] ex-45 · topic-partition — verify a key maps to one partition
+  - [ ] ex-46 · partition-ordering — verify per-partition order holds
+  - [ ] ex-47 · cross-partition-no-order — verify interleaving is possible
+  - [ ] ex-48 · partition-by-key-locality — verify their order is preserved
+  - [ ] ex-49 · consumer-group-queue — verify each message goes to one member
+  - [ ] ex-50 · consumer-group-pubsub — verify every group gets every message
+  - [ ] ex-51 · offset-commit — verify a restart resumes past it
+  - [ ] ex-52 · offset-rewind-replay — verify old messages are re-read
+  - [ ] ex-53 · retention-not-delete-on-consume — verify a second consumer still reads it
+  - [ ] ex-54 · log-vs-queue-broker — verify the log allows re-read, the queue does not
+  - [ ] ex-55 · exchange-binding — verify each bound queue receives a copy
+  - [ ] ex-56 · ack-nack — verify a nacked message reappears
+  - [ ] ex-57 · dual-write-problem — verify the event can be lost
+  - [ ] ex-58 · dual-write-lost-event — verify the downstream never sees it
+  - [ ] ex-59 · outbox-write — verify it commits atomically with the state
+  - [ ] ex-60 · outbox-relay — verify pending rows are published
+  - [ ] ex-61 · outbox-crash-safe — verify the relay recovers and publishes
+  - [ ] ex-62 · outbox-idempotent-relay — verify a re-run does not double-publish
+  - [ ] ex-63 · saga-choreography — verify the workflow advances without an orchestrator
+  - [ ] ex-64 · saga-orchestration — verify it directs each participant
+  - [ ] ex-65 · saga-compensation — verify the prior step is undone
+  - [ ] ex-66 · saga-compensation-order — verify the undo sequence
+  - [ ] ex-67 · saga-partial-failure — verify uncompleted steps aren't compensated
+  - [ ] ex-68 · mediator-topology — verify it sequences the sub-events
+  - [ ] ex-69 · broker-topology — verify the chain advances with no central control
+  - [ ] ex-70 · broker-vs-mediator — verify each topology's cost is named
+  - [ ] ex-71 · dlq-poison — verify it stops retrying
+  - [ ] ex-72 · dlq-inspect-replay — verify it processes on replay
+  - [ ] ex-73 · exactly-once-illusion — verify duplicates have no net effect
+  - [ ] ex-74 · transactional-producer — verify a rollback publishes nothing
+  - [ ] ex-75 · state-transfer-rebuild — verify the replica reconstructs
+  - [ ] ex-76 · ordering-with-key — verify one entity's events stay ordered
+  - [ ] ex-77 · retry-with-backoff — verify delays grow between retries
+  - [ ] ex-78 · event-sourcing-audit — verify past changes are reconstructable
+  - [ ] ex-79 · when-not-eda — verify the sync version is shorter and correct-now
+  - [ ] ex-80 · eda-slice — verify replay is deterministic, the read model stays consistent, redelivery applies once, the saga compensates, and poison messages reach the DLQ
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/event-driven-architecture/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1632,7 +6184,7 @@ Row: By Example · Python · topic wt 550 · Learn 145 / Drill 245 · **subject*
 ### Phase 49 Gate
 
 - [ ] [AI] `event-driven-architecture/` complete: `_index.md` wt 550, `learning/_index.md` wt 145,
-      `drilling/_index.md` wt 245, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 245, capstone wt 900; all 33 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1647,9 +6199,132 @@ Row: By Example · Python † · topic wt 560 · Learn 146 / Drill 246 · **subj
 - [ ] **[AI] V** — `web-researcher` for `distributed-systems`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/46-distributed-systems.md`](./syllabus/46-distributed-systems.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/distributed-systems/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/46-distributed-systems.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/distributed-systems/learning/` teaching **every** concept in `syllabus/46-distributed-systems.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · fallacies-of-distributed-computing
+  - [ ] co-02 · network-unreliable
+  - [ ] co-03 · no-global-clock
+  - [ ] co-04 · happens-before
+  - [ ] co-05 · lamport-clock
+  - [ ] co-06 · vector-clock
+  - [ ] co-07 · concurrent-events
+  - [ ] co-08 · cap-theorem
+  - [ ] co-09 · pacelc
+  - [ ] co-10 · consistency-models
+  - [ ] co-11 · leader-based-replication
+  - [ ] co-12 · leaderless-replication
+  - [ ] co-13 · quorum-intersection
+  - [ ] co-14 · read-repair
+  - [ ] co-15 · replicated-state-machine
+  - [ ] co-16 · log-abstraction
+  - [ ] co-17 · consensus
+  - [ ] co-18 · paxos
+  - [ ] co-19 · raft
+  - [ ] co-20 · leader-election
+  - [ ] co-21 · term-as-logical-clock
+  - [ ] co-22 · log-matching
+  - [ ] co-23 · flp-impossibility
+  - [ ] co-24 · failure-detector
+  - [ ] co-25 · two-phase-commit
+  - [ ] co-26 · three-phase-commit
+  - [ ] co-27 · byzantine-fault-tolerance
+  - [ ] co-28 · gossip-epidemic
+  - [ ] co-29 · crdt
+  - [ ] co-30 · saga
+  - [ ] co-31 · distributed-lock-fencing
+  - [ ] co-32 · split-brain-stonith
+  - [ ] co-33 · delivery-semantics
+  - [ ] co-34 · clock-sync-truetime
+  - [ ] co-35 · coordination-service
+  - [ ] co-36 · zookeeper-znodes-and-watches
+  - [ ] co-37 · etcd-raft-kv
+  - [ ] co-38 · coordination-recipes
+  - [ ] co-39 · service-discovery-and-membership
+- [ ] **[AI] A1-examples** — Author `CONTENT/distributed-systems/learning/code/` (each example a runnable, type-annotated `mypy`-clean Python source over injectable delay/loss, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/46-distributed-systems.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · fallacies-checklist — verify each fallacy names a concrete failure
+  - [ ] ex-02 · network-loss-inject — verify some sends never arrive
+  - [ ] ex-03 · network-delay-inject — verify arrival order can differ from send order
+  - [ ] ex-04 · no-global-clock-demo — verify a timestamp comparison misorders events
+  - [ ] ex-05 · lamport-clock-basic — verify monotonic growth
+  - [ ] ex-06 · lamport-clock-message — verify the receiver's clock jumps past the sender's
+  - [ ] ex-07 · lamport-total-order — verify a deterministic total order
+  - [ ] ex-08 · happens-before-relation — verify transitive causal edges
+  - [ ] ex-09 · lamport-cannot-detect-concurrency — verify the false ordering
+  - [ ] ex-10 · vector-clock-basic — verify each index tracks its process
+  - [ ] ex-11 · vector-clock-message — verify the merged vector dominates both
+  - [ ] ex-12 · vector-clock-causal — verify one vector strictly dominates
+  - [ ] ex-13 · vector-clock-concurrent — verify neither vector dominates
+  - [ ] ex-14 · vector-clock-vs-lamport — verify on the same history
+  - [ ] ex-15 · causal-delivery — verify out-of-order messages are buffered
+  - [ ] ex-16 · consistency-strong — verify a read always returns the last write
+  - [ ] ex-17 · consistency-eventual — verify divergence then convergence
+  - [ ] ex-18 · consistency-causal — verify causal reads are consistent
+  - [ ] ex-19 · cap-partition-choose — verify the choice is enforced
+  - [ ] ex-20 · cap-cp-behaviour — verify unavailability
+  - [ ] ex-21 · cap-ap-behaviour — verify availability + divergence
+  - [ ] ex-22 · pacelc-else-latency — verify a fast read can be stale
+  - [ ] ex-23 · delivery-at-most-once — verify a lost message is not retried
+  - [ ] ex-24 · delivery-at-least-once — verify duplicates can occur
+  - [ ] ex-25 · idempotent-receiver — verify a duplicate is ignored
+  - [ ] ex-26 · effectively-once — verify the net effect is once
+  - [ ] ex-27 · leader-follower-replicate — verify followers apply the write
+  - [ ] ex-28 · follower-read-stale — verify the stale value
+  - [ ] ex-29 · leaderless-write — verify all reachable replicas store it
+  - [ ] ex-30 · quorum-write — verify it fails below W
+  - [ ] ex-31 · quorum-read — verify it fails below R
+  - [ ] ex-32 · quorum-intersection — verify a read sees the latest write
+  - [ ] ex-33 · sub-quorum-stale — verify a stale read appears
+  - [ ] ex-34 · read-repair — verify the lagging replica is updated
+  - [ ] ex-35 · last-writer-wins — verify the newest wins
+  - [ ] ex-36 · version-vector-conflict — verify concurrent writes are flagged
+  - [ ] ex-37 · heartbeat-detector — verify detection after the threshold
+  - [ ] ex-38 · timeout-tuning — verify the false suspicion
+  - [ ] ex-39 · phi-accrual — verify φ rises as heartbeats lapse
+  - [ ] ex-40 · replicated-state-machine — verify identical resulting state
+  - [ ] ex-41 · rsm-determinism — verify two applications match
+  - [ ] ex-42 · command-log — verify entries are never overwritten
+  - [ ] ex-43 · log-replication — verify follower logs match
+  - [ ] ex-44 · log-matching — verify a mismatch is detected
+  - [ ] ex-45 · flp-impossibility-demo — verify non-termination
+  - [ ] ex-46 · failure-detector-circumvents-flp — verify a decision is reached
+  - [ ] ex-47 · two-phase-commit — verify all-or-nothing
+  - [ ] ex-48 · 2pc-blocking — verify they block
+  - [ ] ex-49 · three-phase-commit — verify progress after coordinator loss
+  - [ ] ex-50 · bully-election — verify the winner
+  - [ ] ex-51 · ring-election — verify all agree on it
+  - [ ] ex-52 · gossip-anti-entropy — verify two nodes converge after exchange
+  - [ ] ex-53 · gossip-rumor-spread — verify all nodes receive it
+  - [ ] ex-54 · distributed-lock-lease — verify it auto-expires
+  - [ ] ex-55 · raft-election — verify one leader emerges
+  - [ ] ex-56 · raft-term-increment — verify the term advances
+  - [ ] ex-57 · raft-vote-majority — verify a minority cannot win
+  - [ ] ex-58 · raft-heartbeat — verify followers stay followers
+  - [ ] ex-59 · raft-log-append — verify followers store them
+  - [ ] ex-60 · raft-commit-majority — verify the commit index advances
+  - [ ] ex-61 · raft-log-matching — verify a conflicting entry is rejected
+  - [ ] ex-62 · raft-stale-leader-steps-down — verify the demotion
+  - [ ] ex-63 · raft-partition-reelection — verify a new leader on the majority side
+  - [ ] ex-64 · raft-log-convergence — verify logs reconcile
+  - [ ] ex-65 · paxos-prepare-promise — verify an acceptor promises not to accept lower
+  - [ ] ex-66 · paxos-accept — verify the chosen value
+  - [ ] ex-67 · paxos-single-value-chosen — verify no two proposers succeed with different values
+  - [ ] ex-68 · consensus-safety — verify the safety invariant under contention
+  - [ ] ex-69 · crdt-g-counter — verify commutative merge
+  - [ ] ex-70 · crdt-pn-counter — verify the net value converges
+  - [ ] ex-71 · crdt-g-set — verify order-independent convergence
+  - [ ] ex-72 · crdt-lww-register — verify the latest timestamp wins
+  - [ ] ex-73 · crdt-strong-eventual-consistency — verify all orders agree
+  - [ ] ex-74 · byzantine-fault — verify agreement despite the liar
+  - [ ] ex-75 · pbft-phases — verify a request commits after two rounds of votes
+  - [ ] ex-76 · saga-compensation — verify compensation runs
+  - [ ] ex-77 · split-brain-demo — verify the conflicting-leader state
+  - [ ] ex-78 · fencing-token — verify the resource server refuses it
+  - [ ] ex-79 · truetime-commit-wait — verify commit order respects real time
+  - [ ] ex-80 · replicated-kv-capstone — verify the CP mode blocks while the AP mode stays available and later converges
+  - [ ] ex-81 · zookeeper-ephemeral-lock — verify one holder at a time; crashed holder's ephemeral node auto-releases
+  - [ ] ex-82 · leader-election-ephemeral-sequential — verify exactly one leader; watching predecessor avoids herd effect
+  - [ ] ex-83 · etcd-lease-service-registry — verify key auto-expires on lease lapse; watchers see the change
+  - [ ] ex-84 · etcd-cas-config — verify stale-revision write rejected by MVCC (no lost update)
+  - [ ] ex-85 · coordination-service-vs-diy-consensus — verify trade-off + each product's license recorded
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/distributed-systems/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1661,7 +6336,7 @@ Row: By Example · Python † · topic wt 560 · Learn 146 / Drill 246 · **subj
 ### Phase 50 Gate
 
 - [ ] [AI] `distributed-systems/` complete: `_index.md` wt 560, `learning/_index.md` wt 146,
-      `drilling/_index.md` wt 246, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 246, capstone wt 900; all 39 concepts + 85 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1676,9 +6351,125 @@ Row: By Example · TypeScript † · topic wt 570 · Learn 147 / Drill 247 · **
 - [ ] **[AI] V** — `web-researcher` for `advanced-frontend`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/47-advanced-frontend.md`](./syllabus/47-advanced-frontend.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/advanced-frontend/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/47-advanced-frontend.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/advanced-frontend/learning/` teaching **every** concept in `syllabus/47-advanced-frontend.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · rendering-csr
+  - [ ] co-02 · rendering-ssr
+  - [ ] co-03 · rendering-ssg
+  - [ ] co-04 · streaming-ssr
+  - [ ] co-05 · hydration
+  - [ ] co-06 · islands-architecture
+  - [ ] co-07 · react-server-components
+  - [ ] co-08 · core-web-vitals
+  - [ ] co-09 · lcp
+  - [ ] co-10 · inp
+  - [ ] co-11 · cls
+  - [ ] co-12 · critical-rendering-path
+  - [ ] co-13 · code-splitting
+  - [ ] co-14 · tree-shaking
+  - [ ] co-15 · client-vs-server-state
+  - [ ] co-16 · when-redux
+  - [ ] co-17 · rules-of-hooks
+  - [ ] co-18 · useeffect-semantics
+  - [ ] co-19 · usememo-usecallback
+  - [ ] co-20 · reconciliation-keys
+  - [ ] co-21 · virtual-dom
+  - [ ] co-22 · signals-fine-grained
+  - [ ] co-23 · wcag-accessibility
+  - [ ] co-24 · focus-management
+  - [ ] co-25 · controlled-vs-uncontrolled
+  - [ ] co-26 · accessible-forms
+  - [ ] co-27 · performance-budget
+  - [ ] co-28 · http-caching-swr
+  - [ ] co-29 · css-at-scale
+  - [ ] co-30 · data-fetching-patterns
+  - [ ] co-31 · image-optimization
+  - [ ] co-32 · edge-rendering
+  - [ ] co-33 · typescript-frontend
+  - [ ] co-34 · pwa-service-worker
+  - [ ] co-35 · i18n
+  - [ ] co-36 · testing-behaviour
+  - [ ] co-37 · error-boundary
+- [ ] **[AI] A1-examples** — Author `CONTENT/advanced-frontend/learning/code/` (each example a runnable, typed TypeScript source measured from the CLI, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/47-advanced-frontend.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · csr-render — verify the shell has no content pre-JS
+  - [ ] ex-02 · ssr-render — verify the markup is complete pre-JS
+  - [ ] ex-03 · ssg-build — verify the built HTML is static
+  - [ ] ex-04 · streaming-ssr-suspense — verify the fallback streams before the resolved content
+  - [ ] ex-05 · hydration-attach — verify interactivity works after hydration
+  - [ ] ex-06 · hydration-mismatch — verify the mismatch warning appears
+  - [ ] ex-07 · islands-astro — verify only the island ships JS
+  - [ ] ex-08 · use-client-boundary — verify it becomes interactive
+  - [ ] ex-09 · server-component-default — verify no bundle is shipped for it
+  - [ ] ex-10 · lcp-measure — verify the reported element
+  - [ ] ex-11 · inp-measure — verify the reported latency
+  - [ ] ex-12 · cls-fix — verify CLS drops toward 0
+  - [ ] ex-13 · cwv-thresholds-table — verify each against web.dev
+  - [ ] ex-14 · render-blocking-css — verify the delayed paint
+  - [ ] ex-15 · critical-css-inline — verify faster first paint
+  - [ ] ex-16 · code-split-dynamic — verify a separate chunk loads on demand
+  - [ ] ex-17 · route-based-splitting — verify each route loads its own chunk
+  - [ ] ex-18 · tree-shaking — verify the dead code is absent
+  - [ ] ex-19 · rules-of-hooks-violation — verify the rule flags it
+  - [ ] ex-20 · usestate-basic — verify the UI updates
+  - [ ] ex-21 · useeffect-after-paint — verify ordering
+  - [ ] ex-22 · useeffect-cleanup — verify the cleanup fires
+  - [ ] ex-23 · useeffect-deps — verify a stable dep skips the effect
+  - [ ] ex-24 · usememo-cache — verify it recomputes only on dep change
+  - [ ] ex-25 · usecallback-stable — verify referential equality
+  - [ ] ex-26 · keys-list — verify state stays with the right item on reorder
+  - [ ] ex-27 · keys-unstable-bug — verify the lost input state
+  - [ ] ex-28 · controlled-input — verify React owns the value
+  - [ ] ex-29 · uncontrolled-input — verify the DOM owns the value
+  - [ ] ex-30 · controlled-vs-uncontrolled — verify the warning
+  - [ ] ex-31 · server-cache-state — verify a cached read skips the network
+  - [ ] ex-32 · client-state-separate — verify they update independently
+  - [ ] ex-33 · query-invalidation — verify the stale query refetches
+  - [ ] ex-34 · optimistic-update — verify rollback on a simulated error
+  - [ ] ex-35 · when-redux — verify a slice + selector
+  - [ ] ex-36 · derived-selector — verify it recomputes only on input change
+  - [ ] ex-37 · virtual-dom-diff — verify only changed nodes update
+  - [ ] ex-38 · reconciliation-same-type — verify the node is preserved
+  - [ ] ex-39 · reconciliation-different-type — verify the teardown
+  - [ ] ex-40 · signal-basic — verify the update
+  - [ ] ex-41 · signal-computed — verify it recomputes on dep change
+  - [ ] ex-42 · signal-vs-rerender — verify no parent re-render
+  - [ ] ex-43 · semantic-html — verify the landmark structure
+  - [ ] ex-44 · aria-widget — verify the correct roles
+  - [ ] ex-45 · focus-management-roving — verify arrow-key focus movement
+  - [ ] ex-46 · focus-trap-modal — verify focus cannot escape
+  - [ ] ex-47 · live-region — verify the region announces updates
+  - [ ] ex-48 · accessible-form-validation — verify the error is programmatically associated
+  - [ ] ex-49 · form-error-summary — verify focus lands on the summary
+  - [ ] ex-50 · css-modules-scope — verify no global collision
+  - [ ] ex-51 · tailwind-utility — verify the rendered styles
+  - [ ] ex-52 · specificity-conflict — verify the winning rule
+  - [ ] ex-53 · http-cache-headers — verify a stale response serves while revalidating
+  - [ ] ex-54 · service-worker-cache — verify an offline load succeeds
+  - [ ] ex-55 · performance-budget-check — verify the failing threshold
+  - [ ] ex-56 · bundle-analysis — verify the dependency is identified
+  - [ ] ex-57 · data-waterfall — verify the sequential timing
+  - [ ] ex-58 · prefetch-parallel — verify the reduced total latency
+  - [ ] ex-59 · suspense-for-data — verify the fallback then the data
+  - [ ] ex-60 · suspense-not-useeffect — verify the fallback never shows
+  - [ ] ex-61 · image-srcset — verify the right source is chosen per viewport
+  - [ ] ex-62 · image-lazy-default — verify off-screen images defer
+  - [ ] ex-63 · image-cls-prevent — verify CLS stays low
+  - [ ] ex-64 · edge-runtime — verify it runs in the edge runtime
+  - [ ] ex-65 · edge-vs-node — verify a Node-only API is unavailable
+  - [ ] ex-66 · discriminated-union-state — verify exhaustive handling
+  - [ ] ex-67 · exhaustive-switch — verify a missing case is a type error
+  - [ ] ex-68 · generic-component — verify type inference on items
+  - [ ] ex-69 · prop-typing — verify a missing required prop is a type error
+  - [ ] ex-70 · pwa-app-shell — verify the shell loads instantly on repeat visits
+  - [ ] ex-71 · pwa-installable — verify the install prompt criteria
+  - [ ] ex-72 · offline-fallback — verify it serves when the network is down
+  - [ ] ex-73 · i18n-format — verify per-locale output
+  - [ ] ex-74 · i18n-messages — verify the interpolated translation
+  - [ ] ex-75 · i18n-rtl — verify the mirrored direction
+  - [ ] ex-76 · rtl-testing-behaviour — verify it tests behaviour, not internals
+  - [ ] ex-77 · rtl-interaction — verify the user flow
+  - [ ] ex-78 · playwright-e2e — verify the critical path in a real browser
+  - [ ] ex-79 · error-boundary — verify the fallback renders instead of a crash
+  - [ ] ex-80 · advanced-frontend-capstone — verify measured Core Web Vitals improve, the optimistic update rolls back, the widget is keyboard-operable, and all tests pass
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-frontend/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1690,7 +6481,7 @@ Row: By Example · TypeScript † · topic wt 570 · Learn 147 / Drill 247 · **
 ### Phase 51 Gate
 
 - [ ] [AI] `advanced-frontend/` complete: `_index.md` wt 570, `learning/_index.md` wt 147,
-      `drilling/_index.md` wt 247, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 247, capstone wt 900; all 37 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1705,9 +6496,120 @@ Row: By Example · TypeScript † · topic wt 580 · Learn 148 / Drill 248 · **
 - [ ] **[AI] V** — `web-researcher` for `build-your-own-reactive-ui`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/48-build-your-own-reactive-ui.md`](./syllabus/48-build-your-own-reactive-ui.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/build-your-own-reactive-ui/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/48-build-your-own-reactive-ui.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/build-your-own-reactive-ui/learning/` teaching **every** concept in `syllabus/48-build-your-own-reactive-ui.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · view-as-function-of-state
+  - [ ] co-02 · hyperscript
+  - [ ] co-03 · jsx-to-h
+  - [ ] co-04 · virtual-node-tree
+  - [ ] co-05 · mount-render
+  - [ ] co-06 · diff-algorithm
+  - [ ] co-07 · patch-apply
+  - [ ] co-08 · reconciliation-heuristic
+  - [ ] co-09 · same-type-reuse
+  - [ ] co-10 · different-type-rebuild
+  - [ ] co-11 · keys-list-diffing
+  - [ ] co-12 · keys-identity-bug
+  - [ ] co-13 · signal-primitive
+  - [ ] co-14 · computed
+  - [ ] co-15 · effect
+  - [ ] co-16 · automatic-dependency-tracking
+  - [ ] co-17 · reactive-graph
+  - [ ] co-18 · observer-pattern
+  - [ ] co-19 · fine-grained-update
+  - [ ] co-20 · component-model
+  - [ ] co-21 · state-hook
+  - [ ] co-22 · hooks-call-order
+  - [ ] co-23 · effect-hook
+  - [ ] co-24 · event-delegation
+  - [ ] co-25 · batching-scheduling
+  - [ ] co-26 · proxy-reactivity
+  - [ ] co-27 · compiled-reactivity
+  - [ ] co-28 · memoization
+  - [ ] co-29 · template-literal-dom
+  - [ ] co-30 · reconciler-renderer-split
+  - [ ] co-31 · diamond-problem
+  - [ ] co-32 · disposal-cleanup
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-reactive-ui/learning/code/` (each example a runnable, TypeScript strict-mode source in a browser/jsdom harness with no `any`, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/48-build-your-own-reactive-ui.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · h-function — verify it returns a well-formed VNode
+  - [ ] ex-02 · h-nested — verify the child structure
+  - [ ] ex-03 · vnode-shape — verify the type discriminates element vs text
+  - [ ] ex-04 · jsx-desugar — verify the desugared output matches manual `h()`
+  - [ ] ex-05 · text-vnode — verify it renders a text node
+  - [ ] ex-06 · mount-element — verify the tag matches
+  - [ ] ex-07 · mount-props — verify the attributes appear
+  - [ ] ex-08 · mount-children — verify nesting in the DOM
+  - [ ] ex-09 · mount-text — verify the text content
+  - [ ] ex-10 · view-as-function — verify the tree reflects the state
+  - [ ] ex-11 · rerender-naive — verify the DOM updates (but loses identity)
+  - [ ] ex-12 · diff-text-change — verify the delta names it
+  - [ ] ex-13 · patch-text — verify siblings are untouched
+  - [ ] ex-14 · diff-prop-change — verify the delta
+  - [ ] ex-15 · patch-prop — verify the node is reused
+  - [ ] ex-16 · diff-add-child — verify the delta
+  - [ ] ex-17 · patch-add-child — verify insertion
+  - [ ] ex-18 · diff-remove-child — verify the delta
+  - [ ] ex-19 · patch-remove-child — verify removal
+  - [ ] ex-20 · same-type-reuse — verify node identity preserved
+  - [ ] ex-21 · different-type-replace — verify the old node is gone
+  - [ ] ex-22 · node-identity-preserved — verify `===`
+  - [ ] ex-23 · event-listener-bind — verify the click fires
+  - [ ] ex-24 · event-update — verify the new handler fires
+  - [ ] ex-25 · signal-value — verify the read
+  - [ ] ex-26 · signal-set — verify the next read
+  - [ ] ex-27 · keyed-list-diff — verify matched nodes
+  - [ ] ex-28 · keyed-reorder-moves — verify node identity preserved
+  - [ ] ex-29 · unkeyed-list-bug — verify the wrong reuse
+  - [ ] ex-30 · unstable-key-loses-state — verify the reset
+  - [ ] ex-31 · keyed-insert — verify existing nodes survive
+  - [ ] ex-32 · keyed-remove — verify the right node is removed
+  - [ ] ex-33 · signal-effect — verify the re-run
+  - [ ] ex-34 · effect-dependency-track — verify only-read signals are tracked
+  - [ ] ex-35 · computed-derive — verify the derived value
+  - [ ] ex-36 · computed-lazy — verify laziness
+  - [ ] ex-37 · computed-cache — verify no recompute without change
+  - [ ] ex-38 · reactive-graph-build — verify the edges
+  - [ ] ex-39 · fine-grained-update — verify unrelated computations don't re-run
+  - [ ] ex-40 · observer-subscribe — verify all are called
+  - [ ] ex-41 · observer-unsubscribe — verify it stops being called
+  - [ ] ex-42 · effect-cleanup — verify order
+  - [ ] ex-43 · dispose-effect — verify no further runs
+  - [ ] ex-44 · dispose-avoids-leak — verify the graph edge is gone
+  - [ ] ex-45 · component-function — verify the rendered output
+  - [ ] ex-46 · component-props — verify a child can't mutate props
+  - [ ] ex-47 · usestate-closure — verify state persists across renders
+  - [ ] ex-48 · usestate-rerender — verify the DOM updates
+  - [ ] ex-49 · hooks-call-order — verify state maps to the right hook
+  - [ ] ex-50 · hooks-conditional-bug — verify the mismatch
+  - [ ] ex-51 · useeffect-after-render — verify ordering
+  - [ ] ex-52 · useeffect-deps — verify a stable dep skips it
+  - [ ] ex-53 · memoize-computed — verify one computation per change
+  - [ ] ex-54 · signal-vs-vdom-update — verify no tree walk occurs
+  - [ ] ex-55 · batching-multiple-sets — verify a single re-render
+  - [ ] ex-56 · microtask-schedule — verify it runs after the current task
+  - [ ] ex-57 · raf-schedule — verify it runs before paint
+  - [ ] ex-58 · proxy-reactive — verify reads/writes are intercepted
+  - [ ] ex-59 · proxy-track — verify the subscription
+  - [ ] ex-60 · proxy-trigger — verify they re-run
+  - [ ] ex-61 · ref-getter-setter — verify `.value` semantics
+  - [ ] ex-62 · compiled-updates — verify no diff runs
+  - [ ] ex-63 · compiled-vs-vdom — verify the work difference
+  - [ ] ex-64 · template-literal-html — verify it produces DOM
+  - [ ] ex-65 · template-static-dynamic — verify the parts array
+  - [ ] ex-66 · template-update-holes — verify static parts are untouched
+  - [ ] ex-67 · reconciler-host-config — verify it drives a target
+  - [ ] ex-68 · custom-renderer — verify the output
+  - [ ] ex-69 · fiber-unit-of-work — verify incremental processing
+  - [ ] ex-70 · diamond-problem — verify the shared node's two paths
+  - [ ] ex-71 · diamond-glitch — verify the double run
+  - [ ] ex-72 · topological-order — verify the order
+  - [ ] ex-73 · diamond-single-recompute — verify a single run
+  - [ ] ex-74 · cleanup-on-unmount — verify the teardown
+  - [ ] ex-75 · effect-scope-dispose — verify all stop
+  - [ ] ex-76 · nested-effects — verify each has its own deps
+  - [ ] ex-77 · signal-batch-consistency — verify no intermediate glitch is observed
+  - [ ] ex-78 · event-delegation-root — verify a single `addEventListener`
+  - [ ] ex-79 · view-function-full — verify state changes flow to the DOM
+  - [ ] ex-80 · reactive-ui-capstone — verify both render/update correctly, keyed diffing preserves node identity, signal updates are fine-grained, and the comparison reports where each does more/less work
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-reactive-ui/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1719,7 +6621,7 @@ Row: By Example · TypeScript † · topic wt 580 · Learn 148 / Drill 248 · **
 ### Phase 52 Gate
 
 - [ ] [AI] `build-your-own-reactive-ui/` complete: `_index.md` wt 580, `learning/_index.md` wt 148,
-      `drilling/_index.md` wt 248, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 248, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1734,9 +6636,92 @@ Row: Annotated-concept · ‡ HTML † · topic wt 590 · Learn 149 / Drill 249 
 - [ ] **[AI] V** — `web-researcher` for `information-architecture-and-seo`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/49-information-architecture-and-seo.md`](./syllabus/49-information-architecture-and-seo.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/information-architecture-and-seo/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/49-information-architecture-and-seo.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/information-architecture-and-seo/learning/` teaching **every** concept in
+      `syllabus/49-information-architecture-and-seo.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · information-architecture
+  - [ ] co-02 · findability-information-scent
+  - [ ] co-03 · card-sorting
+  - [ ] co-04 · tree-testing
+  - [ ] co-05 · taxonomy-hierarchy
+  - [ ] co-06 · url-structure
+  - [ ] co-07 · url-as-contract
+  - [ ] co-08 · semantic-html
+  - [ ] co-09 · heading-hierarchy
+  - [ ] co-10 · document-outline
+  - [ ] co-11 · xml-sitemap
+  - [ ] co-12 · sitemap-index
+  - [ ] co-13 · robots-txt
+  - [ ] co-14 · meta-robots-noindex
+  - [ ] co-15 · canonical-url
+  - [ ] co-16 · crawling-vs-indexing
+  - [ ] co-17 · crawl-budget
+  - [ ] co-18 · mobile-first-indexing
+  - [ ] co-19 · title-meta-description
+  - [ ] co-20 · structured-data-jsonld
+  - [ ] co-21 · open-graph
+  - [ ] co-22 · twitter-cards
+  - [ ] co-23 · hreflang
+  - [ ] co-24 · redirects-301-302-308
+  - [ ] co-25 · core-web-vitals-seo
+  - [ ] co-26 · internal-linking-pagerank
+  - [ ] co-27 · accessibility-seo-overlap
+  - [ ] co-28 · measuring-search-console
+- [ ] **[AI] A1-examples** — Author `CONTENT/information-architecture-and-seo/learning/code/` with **every** worked example in
+      `syllabus/49-information-architecture-and-seo.md` §Worked examples as served markup **or** an annotated IA/decision artifact per the
+      `‡ HTML †` designation (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · ia-four-systems — verify all four systems named
+  - [ ] ex-02 · information-scent — verify strong-scent label predicts destination
+  - [ ] ex-03 · card-sort-open — verify categories emerge from participants
+  - [ ] ex-04 · card-sort-closed — verify every card lands in a predefined bucket
+  - [ ] ex-05 · tree-test — verify each item's success/fail path recorded
+  - [ ] ex-06 · taxonomy-design — verify related content groups, shallow depth
+  - [ ] ex-07 · url-hyphens — verify hyphenated form
+  - [ ] ex-08 · url-readable — verify slug is human-legible
+  - [ ] ex-09 · url-hierarchical — verify path mirrors taxonomy
+  - [ ] ex-10 · url-stability — verify old URL still resolves
+  - [ ] ex-11 · divsoup-to-semantic — verify landmarks replace generic divs
+  - [ ] ex-12 · landmarks — verify each region has a landmark role
+  - [ ] ex-13 · heading-outline — verify document outline nests cleanly
+  - [ ] ex-14 · heading-skip-bug — verify skipped h2 reported
+  - [ ] ex-15 · single-h1 — verify exactly one h1
+  - [ ] ex-16 · alt-text — verify each image's alt matches its role
+  - [ ] ex-17 · nav-landmark-role — verify AT exposes navigation role
+  - [ ] ex-18 · document-outline-devtools — verify rendered outline matches markup
+  - [ ] ex-19 · xml-sitemap — verify validates against sitemaps.org schema
+  - [ ] ex-20 · sitemap-limits — verify 50,000 / 50MB stated correctly
+  - [ ] ex-21 · sitemap-index — verify each child is a valid sitemap entry
+  - [ ] ex-22 · robots-txt-basic — verify crawler honors disallow
+  - [ ] ex-23 · robots-txt-allow — verify allowed path stays crawlable
+  - [ ] ex-24 · robots-unreachable-disallow — verify RFC 9309 rule stated
+  - [ ] ex-25 · meta-robots-noindex — verify page excluded from index
+  - [ ] ex-26 · x-robots-tag — verify header applies to a non-HTML resource
+  - [ ] ex-27 · canonical-tag — verify points to representative URL
+  - [ ] ex-28 · canonical-duplicate — verify both declare same canonical
+  - [ ] ex-29 · canonical-hint-not-rule — verify "hint not rule" caveat
+  - [ ] ex-30 · title-tag — verify title summarizes the page
+  - [ ] ex-31 · meta-description — verify description matches content
+  - [ ] ex-32 · serp-snippet-annotate — verify mapping labeled; no fixed char limit
+  - [ ] ex-33 · open-graph-tags — verify all four required properties present
+  - [ ] ex-34 · twitter-card — verify card type set
+  - [ ] ex-35 · crawling-vs-indexing — verify crawled-but-unindexed case shown
+  - [ ] ex-36 · crawl-budget-large-site — verify 1M-page threshold noted
+  - [ ] ex-37 · mobile-first-parity — verify parity of a key element
+  - [ ] ex-38 · url-canonical-consistency — verify sitemap/canonical/links match
+  - [ ] ex-39 · jsonld-article — verify parses and type recognized
+  - [ ] ex-40 · jsonld-breadcrumb — verify trail matches URL hierarchy
+  - [ ] ex-41 · jsonld-product — verify required properties present
+  - [ ] ex-42 · jsonld-matches-page — verify no markup-vs-page drift
+  - [ ] ex-43 · rich-results-validate — verify zero validator errors
+  - [ ] ex-44 · hreflang-bidirectional — verify links are bidirectional
+  - [ ] ex-45 · hreflang-x-default — verify default declared
+  - [ ] ex-46 · redirect-301 — verify passes signals to target
+  - [ ] ex-47 · redirect-302-vs-301 — verify semantic difference from 301
+  - [ ] ex-48 · redirect-308-method — verify POST stays POST
+  - [ ] ex-49 · cwv-measure-seo — verify metrics captured, framed as one input
+  - [ ] ex-50 · internal-linking-anchor — verify anchors describe targets
+  - [ ] ex-51 · pagerank-annotate — verify link-graph idea explained
+  - [ ] ex-52 · search-console-lighthouse — verify both surfaces report same status
+  - [ ] ex-53 · seo-capstone — verify all layers validate together
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/information-architecture-and-seo/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1748,7 +6733,7 @@ Row: Annotated-concept · ‡ HTML † · topic wt 590 · Learn 149 / Drill 249 
 ### Phase 53 Gate
 
 - [ ] [AI] `information-architecture-and-seo/` complete: `_index.md` wt 590, `learning/_index.md` wt 149,
-      `drilling/_index.md` wt 249, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 249, capstone wt 900; all 28 concepts + 53 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1763,9 +6748,129 @@ Row: By Example · YAML/CLI † · topic wt 600 · Learn 150 / Drill 250 · **su
 - [ ] **[AI] V** — `web-researcher` for `containers-and-orchestration`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/50-containers-and-orchestration.md`](./syllabus/50-containers-and-orchestration.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/containers-and-orchestration/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/50-containers-and-orchestration.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/containers-and-orchestration/learning/` teaching **every** concept in
+      `syllabus/50-containers-and-orchestration.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · containers-vs-vms
+  - [ ] co-02 · namespaces
+  - [ ] co-03 · cgroups
+  - [ ] co-04 · image-vs-container
+  - [ ] co-05 · image-layers
+  - [ ] co-06 · dockerfile-instructions
+  - [ ] co-07 · cmd-vs-entrypoint
+  - [ ] co-08 · build-cache
+  - [ ] co-09 · multi-stage-build
+  - [ ] co-10 · dockerignore
+  - [ ] co-11 · image-optimization
+  - [ ] co-12 · oci-specs
+  - [ ] co-13 · registries-tags-digests
+  - [ ] co-14 · digest-pinning
+  - [ ] co-15 · container-networking
+  - [ ] co-16 · volumes-bind-mounts
+  - [ ] co-17 · docker-compose
+  - [ ] co-18 · k8s-architecture
+  - [ ] co-19 · pods
+  - [ ] co-20 · deployments-replicasets
+  - [ ] co-21 · services
+  - [ ] co-22 · configmaps-secrets
+  - [ ] co-23 · namespaces-labels-selectors
+  - [ ] co-24 · ingress
+  - [ ] co-25 · probes
+  - [ ] co-26 · resources-qos
+  - [ ] co-27 · hpa
+  - [ ] co-28 · statefulsets
+  - [ ] co-29 · daemonsets
+  - [ ] co-30 · jobs-cronjobs
+  - [ ] co-31 · reconciliation-loop
+  - [ ] co-32 · kubectl-apply-declarative
+  - [ ] co-33 · podman-daemonless
+  - [ ] co-34 · rootless-containers
+  - [ ] co-35 · podman-compose-and-quadlet
+- [ ] **[AI] A1-examples** — Author `CONTENT/containers-and-orchestration/learning/code/` with **every** worked example in
+      `syllabus/50-containers-and-orchestration.md` §Worked examples as a real Dockerfile/Compose/K8s manifest applied from
+      the CLI **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · containers-vs-vms — verify the kernel-sharing distinction
+  - [ ] ex-02 · namespaces-isolation — verify each gives an isolated view
+  - [ ] ex-03 · cgroups-limits — verify usage is capped
+  - [ ] ex-04 · image-vs-container — verify the relationship
+  - [ ] ex-05 · docker-run — verify the container starts
+  - [ ] ex-06 · image-layers — verify layers stack
+  - [ ] ex-07 · copy-on-write — verify a write copies the file up
+  - [ ] ex-08 · dockerfile-from-run — verify it builds
+  - [ ] ex-09 · dockerfile-copy — verify the file appears in the image
+  - [ ] ex-10 · dockerfile-cmd — verify it runs on docker run
+  - [ ] ex-11 · entrypoint-cmd-interaction — verify args override CMD, append to ENTRYPOINT
+  - [ ] ex-12 · build-cache-order — verify a source change reuses the deps layer
+  - [ ] ex-13 · cache-invalidation — verify the cascade
+  - [ ] ex-14 · multi-stage-build — verify the final image omits build tools
+  - [ ] ex-15 · multi-stage-named — verify the stage name resolves
+  - [ ] ex-16 · dockerignore — verify excluded files leave the context
+  - [ ] ex-17 · non-root-user — verify the process runs unprivileged
+  - [ ] ex-18 · distroless-base — verify no shell/package manager
+  - [ ] ex-19 · small-image-layers — verify the cache isn't persisted
+  - [ ] ex-20 · oci-specs — verify each spec's role
+  - [ ] ex-21 · docker-build-tag — verify the tag is applied
+  - [ ] ex-22 · registry-push-pull — verify a round-trip
+  - [ ] ex-23 · tag-vs-digest — verify the addressing difference
+  - [ ] ex-24 · digest-pin — verify the exact content is pinned
+  - [ ] ex-25 · bridge-network — verify container connectivity
+  - [ ] ex-26 · port-publish — verify the host reaches the container
+  - [ ] ex-27 · host-none-network — verify their isolation levels
+  - [ ] ex-28 · named-volume — verify data survives container removal
+  - [ ] ex-29 · bind-mount — verify host edits appear in the container
+  - [ ] ex-30 · volume-vs-bind — verify when to use each
+  - [ ] ex-31 · compose-two-services — verify both start
+  - [ ] ex-32 · compose-up — verify all services run
+  - [ ] ex-33 · compose-networks-depends — verify start ordering
+  - [ ] ex-34 · compose-app-db-cache — verify the app reaches both
+  - [ ] ex-35 · k8s-architecture — verify each component's role
+  - [ ] ex-36 · pod-manifest — verify it schedules and runs
+  - [ ] ex-37 · multi-container-pod — verify both share the network
+  - [ ] ex-38 · deployment-manifest — verify N Pods run
+  - [ ] ex-39 · rolling-update — verify zero-downtime rollout
+  - [ ] ex-40 · replicaset-owned — verify ownership
+  - [ ] ex-41 · kubectl-apply — verify the object is created
+  - [ ] ex-42 · clusterip-service — verify in-cluster reachability
+  - [ ] ex-43 · nodeport-service — verify the node port routes in
+  - [ ] ex-44 · loadbalancer-service — verify an external address is provisioned
+  - [ ] ex-45 · service-dns-discovery — verify a service name resolves
+  - [ ] ex-46 · configmap — verify the value reaches the container
+  - [ ] ex-47 · secret — verify the sensitive value is available
+  - [ ] ex-48 · secret-not-encryption — verify the etcd-plaintext warning
+  - [ ] ex-49 · namespace — verify same-name objects coexist across namespaces
+  - [ ] ex-50 · labels-selectors — verify the selector matches
+  - [ ] ex-51 · set-based-selector — verify the set match
+  - [ ] ex-52 · ingress-manifest — verify the route reaches a Service
+  - [ ] ex-53 · ingress-controller-required — verify no effect without one
+  - [ ] ex-54 · ingress-frozen-gateway — verify the successor status
+  - [ ] ex-55 · liveness-probe — verify a dead container restarts
+  - [ ] ex-56 · readiness-probe — verify an unready Pod leaves the endpoints
+  - [ ] ex-57 · startup-probe — verify liveness waits for it
+  - [ ] ex-58 · probe-defaults — verify the shared defaults
+  - [ ] ex-59 · resource-requests — verify the scheduler reserves them
+  - [ ] ex-60 · resource-limits — verify over-limit is capped
+  - [ ] ex-61 · qos-classes — verify each class's criteria
+  - [ ] ex-62 · oomkilled — verify the status
+  - [ ] ex-63 · hpa-manifest — verify it scales under load
+  - [ ] ex-64 · hpa-formula — verify the target-replica math
+  - [ ] ex-65 · statefulset — verify name-0/name-1 hostnames
+  - [ ] ex-66 · statefulset-storage — verify each Pod keeps its volume
+  - [ ] ex-67 · daemonset — verify one Pod per node
+  - [ ] ex-68 · job — verify it completes then stops
+  - [ ] ex-69 · job-parallelism — verify parallel completions
+  - [ ] ex-70 · cronjob — verify a Job is created per tick
+  - [ ] ex-71 · cronjob-at-least-once — verify the caveat
+  - [ ] ex-72 · reconciliation-loop — verify the thermostat analogy
+  - [ ] ex-73 · self-heal-pod-kill — verify auto-recovery
+  - [ ] ex-74 · declarative-vs-imperative — verify the reconciliation difference
+  - [ ] ex-75 · scale-deployment — verify the Pod count changes
+  - [ ] ex-76 · rollback-deployment — verify the prior ReplicaSet is restored
+  - [ ] ex-77 · configmap-volume-mount — verify the file appears in the container
+  - [ ] ex-78 · env-injection — verify the env is set
+  - [ ] ex-79 · build-ship-run — verify Dockerfile → running container
+  - [ ] ex-80 · podman-rootless-run — verify a container runs with no daemon and as non-root
+  - [ ] ex-81 · docker-podman-oci-parity — verify the same image runs under both runtimes
+  - [ ] ex-82 · quadlet-systemd-unit — verify a Quadlet-generated systemd unit starts the container
+  - [ ] ex-83 · containers-capstone — verify reachability, injected config, pod-kill recovery
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/containers-and-orchestration/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1777,7 +6882,7 @@ Row: By Example · YAML/CLI † · topic wt 600 · Learn 150 / Drill 250 · **su
 ### Phase 54 Gate
 
 - [ ] [AI] `containers-and-orchestration/` complete: `_index.md` wt 600, `learning/_index.md` wt 150,
-      `drilling/_index.md` wt 250, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 250, capstone wt 900; all 35 concepts + 83 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1792,9 +6897,96 @@ Row: Annotated-concept · HCL/YAML † · topic wt 610 · Learn 151 / Drill 251 
 - [ ] **[AI] V** — `web-researcher` for `cloud-and-iac`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/51-cloud-and-iac.md`](./syllabus/51-cloud-and-iac.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/cloud-and-iac/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/51-cloud-and-iac.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/cloud-and-iac/learning/` teaching **every** concept in
+      `syllabus/51-cloud-and-iac.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · cloud-computing-nist
+  - [ ] co-02 · service-models-iaas-paas-saas
+  - [ ] co-03 · deployment-models
+  - [ ] co-04 · shared-responsibility
+  - [ ] co-05 · compute-vm
+  - [ ] co-06 · object-storage
+  - [ ] co-07 · block-storage
+  - [ ] co-08 · regions-availability-zones
+  - [ ] co-09 · cloud-networking-vpc
+  - [ ] co-10 · security-groups
+  - [ ] co-11 · nat-load-balancer
+  - [ ] co-12 · iac-declarative
+  - [ ] co-13 · idempotency
+  - [ ] co-14 · terraform-providers-resources
+  - [ ] co-15 · hcl-syntax
+  - [ ] co-16 · terraform-lifecycle
+  - [ ] co-17 · terraform-state
+  - [ ] co-18 · state-locking-remote
+  - [ ] co-19 · terraform-modules
+  - [ ] co-20 · dependency-graph
+  - [ ] co-21 · drift-detection
+  - [ ] co-22 · terraform-import
+  - [ ] co-23 · immutable-infrastructure
+  - [ ] co-24 · cattle-not-pets
+  - [ ] co-25 · config-management-vs-provisioning
+  - [ ] co-26 · serverless-faas
+  - [ ] co-27 · managed-services
+  - [ ] co-28 · iam-least-privilege
+  - [ ] co-29 · secrets-management
+  - [ ] co-30 · cost-management-finops
+  - [ ] co-31 · gitops
+  - [ ] co-32 · infra-observability
+- [ ] **[AI] A1-examples** — Author `CONTENT/cloud-and-iac/learning/code/` with **every** worked example in
+      `syllabus/51-cloud-and-iac.md` §Worked examples as HCL/YAML against a local provider **or** an annotated
+      cloud/decision artifact per the annotated-concept designation (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · nist-five-characteristics — verify all five named
+  - [ ] ex-02 · iaas-paas-saas-table — verify control boundary shifts per model
+  - [ ] ex-03 · deployment-models — verify all four distinguished
+  - [ ] ex-04 · shared-responsibility-matrix — verify split shifts IaaS→SaaS
+  - [ ] ex-05 · compute-vm — verify on-demand property
+  - [ ] ex-06 · object-storage-bucket — verify objects live in a bucket
+  - [ ] ex-07 · block-storage-volume — verify attaches to one instance
+  - [ ] ex-08 · regions-azs — verify AZs nest under a region
+  - [ ] ex-09 · ha-across-azs — verify single-AZ failure survived
+  - [ ] ex-10 · iac-declarative-vs-imperative — verify declarative states end-state
+  - [ ] ex-11 · idempotency — verify second apply is a no-op
+  - [ ] ex-12 · tf-provider-block — verify it initializes
+  - [ ] ex-13 · tf-resource-block — verify resource type is provider-implemented
+  - [ ] ex-14 · hcl-arguments-blocks — verify each construct labeled
+  - [ ] ex-15 · tf-init — verify providers installed
+  - [ ] ex-16 · tf-plan — verify no change applied yet
+  - [ ] ex-17 · tf-apply — verify resource created
+  - [ ] ex-18 · tf-destroy — verify all managed objects removed
+  - [ ] ex-19 · tf-variables-outputs — verify variable changes plan, output emitted
+  - [ ] ex-20 · tf-module-reuse — verify both instances share one definition
+  - [ ] ex-21 · tf-registry-module — verify it resolves
+  - [ ] ex-22 · tf-state-file — verify a resource maps to state
+  - [ ] ex-23 · state-sensitive — verify the sensitivity caveat
+  - [ ] ex-24 · remote-backend — verify state moves off local disk
+  - [ ] ex-25 · state-locking — verify second apply blocked while locked
+  - [ ] ex-26 · dependency-graph — verify dependency order respected
+  - [ ] ex-27 · drift-replan — verify plan shows the drift
+  - [ ] ex-28 · refresh-only-plan — verify state updates without config change
+  - [ ] ex-29 · tf-import — verify it enters state
+  - [ ] ex-30 · dev-vs-stage — verify environments differ only by variable values
+  - [ ] ex-31 · vpc-subnet — verify subnet resides in one AZ
+  - [ ] ex-32 · security-group-stateful — verify return traffic auto-allowed
+  - [ ] ex-33 · nat-gateway — verify inbound can't initiate
+  - [ ] ex-34 · load-balancer — verify unhealthy targets skipped
+  - [ ] ex-35 · immutable-server — verify changes go via a new image
+  - [ ] ex-36 · cattle-not-pets — verify servers numbered and replaceable
+  - [ ] ex-37 · provisioning-vs-config-mgmt — verify each tool's category
+  - [ ] ex-38 · idempotent-ansible — verify re-run makes no change
+  - [ ] ex-39 · lambda-faas — verify runs without a provisioned server
+  - [ ] ex-40 · cold-start — verify first invocation pays setup cost
+  - [ ] ex-41 · managed-rds — verify provider owns operations
+  - [ ] ex-42 · managed-k8s — verify provider runs the control plane
+  - [ ] ex-43 · iam-least-privilege — verify no wildcard grant
+  - [ ] ex-44 · iam-role-workload — verify no long-lived key embedded
+  - [ ] ex-45 · secrets-manager — verify no hard-coded credential
+  - [ ] ex-46 · no-secrets-in-state — verify state holds no plaintext secret
+  - [ ] ex-47 · tagging-strategy — verify resources carry required tags
+  - [ ] ex-48 · right-sizing — verify over-provisioned resource flagged
+  - [ ] ex-49 · finops-crawl-walk-run — verify the phases named
+  - [ ] ex-50 · gitops-principles — verify all four stated
+  - [ ] ex-51 · gitops-reconcile — verify drift auto-corrected
+  - [ ] ex-52 · otel-signals — verify each signal's role
+  - [ ] ex-53 · iac-capstone — verify lifecycle runs and re-plan shows no drift
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/cloud-and-iac/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1806,24 +6998,576 @@ Row: Annotated-concept · HCL/YAML † · topic wt 610 · Learn 151 / Drill 251 
 ### Phase 55 Gate
 
 - [ ] [AI] `cloud-and-iac/` complete: `_index.md` wt 610, `learning/_index.md` wt 151,
-      `drilling/_index.md` wt 251, capstone wt 900; every Item + 3 worked examples + capstone present;
+      `drilling/_index.md` wt 251, capstone wt 900; all 32 concepts + 53 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 56 — Topic 52 CI/CD & Release Engineering (`cicd-and-release-engineering`)
+## Phase 56 — Topic 52 Bare-Metal Virtualization (`bare-metal-virtualization`)
 
-Row: By Example · YAML + Python † · topic wt 620 · Learn 152 / Drill 252 · **subject**. Template →
-[`syllabus/52-cicd-and-release-engineering.md`](./syllabus/52-cicd-and-release-engineering.md).
+Row: By Example · HCL/YAML/shell † · topic wt 620 · Learn 152 / Drill 252 · **subject**. Template →
+[`syllabus/52-bare-metal-virtualization.md`](./syllabus/52-bare-metal-virtualization.md).
+
+- [ ] **[AI] V** — `web-researcher` for `bare-metal-virtualization`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/52-bare-metal-virtualization.md`](./syllabus/52-bare-metal-virtualization.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/bare-metal-virtualization/learning/` teaching **every** concept in
+      `syllabus/52-bare-metal-virtualization.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · why-bare-metal-virtualization
+  - [ ] co-02 · hypervisor-type1-type2
+  - [ ] co-03 · kvm-qemu
+  - [ ] co-04 · vm-vs-container-lxc
+  - [ ] co-05 · proxmox-ve
+  - [ ] co-06 · proxmox-api
+  - [ ] co-07 · proxmox-cluster-quorum
+  - [ ] co-08 · proxmox-ha
+  - [ ] co-09 · live-migration
+  - [ ] co-10 · libvirt-virsh
+  - [ ] co-11 · storage-redundancy-models
+  - [ ] co-12 · no-hardware-raid
+  - [ ] co-13 · zfs-pools-vdevs
+  - [ ] co-14 · zfs-snapshots
+  - [ ] co-15 · zfs-send-receive
+  - [ ] co-16 · zfs-scrub
+  - [ ] co-17 · ceph-rados
+  - [ ] co-18 · ceph-daemons
+  - [ ] co-19 · ceph-crush
+  - [ ] co-20 · ceph-rbd-cephfs
+  - [ ] co-21 · hyperconverged
+  - [ ] co-22 · cloud-init
+  - [ ] co-23 · cloud-init-userdata
+  - [ ] co-24 · golden-images-packer
+  - [ ] co-25 · immutable-image-pipeline
+  - [ ] co-26 · iac-proxmox-terraform
+  - [ ] co-27 · terraform-plan-apply-state
+  - [ ] co-28 · provider-choice-bpg-vs-telmate
+  - [ ] co-29 · terraform-license-opentofu
+  - [ ] co-30 · ansible-proxmox
+  - [ ] co-31 · declarative-vs-imperative-provisioning
+  - [ ] co-32 · pxe-netboot
+  - [ ] co-33 · backup-restore-pbs
+  - [ ] co-34 · failure-domain-reasoning
+- [ ] **[AI] A1-examples** — Author `CONTENT/bare-metal-virtualization/learning/code/` with **every** worked example in
+      `syllabus/52-bare-metal-virtualization.md` §Worked examples as a real `*.tf` / `cloud-init.yaml` / Ansible playbook / shell script **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · why-own-substrate
+  - [ ] ex-02 · type1-vs-type2
+  - [ ] ex-03 · kvm-capability-check
+  - [ ] ex-04 · kvm-qemu-split
+  - [ ] ex-05 · vm-vs-lxc-table
+  - [ ] ex-06 · proxmox-stack
+  - [ ] ex-07 · pveversion
+  - [ ] ex-08 · proxmox-api-token
+  - [ ] ex-09 · api-underlies-all
+  - [ ] ex-10 · qm-create-vm
+  - [ ] ex-11 · qm-pct-list
+  - [ ] ex-12 · pct-create-lxc
+  - [ ] ex-13 · vm-lifecycle-cli
+  - [ ] ex-14 · virsh-list
+  - [ ] ex-15 · virsh-vs-proxmox
+  - [ ] ex-16 · libvirt-hypervisor-scope
+  - [ ] ex-17 · storage-models-table
+  - [ ] ex-18 · no-hardware-raid
+  - [ ] ex-19 · zpool-create-raidz
+  - [ ] ex-20 · raidz-parity-table
+  - [ ] ex-21 · zfs-dataset
+  - [ ] ex-22 · zfs-snapshot-cli
+  - [ ] ex-23 · zfs-rollback
+  - [ ] ex-24 · cloud-init-first-boot
+  - [ ] ex-25 · cloud-init-userdata-yaml
+  - [ ] ex-26 · proxmox-ci-drive
+  - [ ] ex-27 · pvecm-status
+  - [ ] ex-28 · quorum-majority-annotate
+  - [ ] ex-29 · pvecm-create-join
+  - [ ] ex-30 · corosync-annotate
+  - [ ] ex-31 · three-node-quorum
+  - [ ] ex-32 · live-migrate-online
+  - [ ] ex-33 · migration-cpu-constraint
+  - [ ] ex-34 · ha-add-service
+  - [ ] ex-35 · ha-failover-annotate
+  - [ ] ex-36 · ha-requirements-table
+  - [ ] ex-37 · zfs-send-receive
+  - [ ] ex-38 · zfs-incremental-send
+  - [ ] ex-39 · zfs-scrub
+  - [ ] ex-40 · proxmox-pvesr
+  - [ ] ex-41 · ceph-hyperconverged-annotate
+  - [ ] ex-42 · pveceph-init-mon
+  - [ ] ex-43 · pveceph-osd-create
+  - [ ] ex-44 · ceph-daemons-table
+  - [ ] ex-45 · ceph-crush-annotate
+  - [ ] ex-46 · ceph-failure-domain
+  - [ ] ex-47 · ceph-rbd-pool
+  - [ ] ex-48 · cephfs-annotate
+  - [ ] ex-49 · ceph-three-node
+  - [ ] ex-50 · tf-proxmox-provider
+  - [ ] ex-51 · tf-proxmox-endpoint
+  - [ ] ex-52 · tf-vm-resource
+  - [ ] ex-53 · tf-plan-apply
+  - [ ] ex-54 · tf-idempotent-apply
+  - [ ] ex-55 · tf-cloud-init-inject
+  - [ ] ex-56 · provider-choice-table
+  - [ ] ex-57 · packer-annotate
+  - [ ] ex-58 · packer-proxmox-template
+  - [ ] ex-59 · packer-cloud-init-bake
+  - [ ] ex-60 · image-pipeline-annotate
+  - [ ] ex-61 · immutable-vs-mutable-table
+  - [ ] ex-62 · tf-golden-clone
+  - [ ] ex-63 · ansible-proxmox-kvm
+  - [ ] ex-64 · ansible-idempotent
+  - [ ] ex-65 · ansible-collection-note
+  - [ ] ex-66 · declarative-vs-imperative-table
+  - [ ] ex-67 · terraform-plus-ansible
+  - [ ] ex-68 · pxe-boot-chain
+  - [ ] ex-69 · pxe-autoinstall
+  - [ ] ex-70 · pbs-annotate
+  - [ ] ex-71 · pbs-backup
+  - [ ] ex-72 · pbs-restore
+  - [ ] ex-73 · backup-tiers-table
+  - [ ] ex-74 · terraform-license-table
+  - [ ] ex-75 · opentofu-swap
+  - [ ] ex-76 · failure-domain-reasoning
+  - [ ] ex-77 · quorum-vs-crush-table
+  - [ ] ex-78 · secrets-out-of-state
+  - [ ] ex-79 · substrate-stack-annotate
+  - [ ] ex-80 · bare-metal-capstone
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/bare-metal-virtualization/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/bare-metal-virtualization/drilling/_index.md` (wt 252) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 56 Gate
+
+- [ ] [AI] `bare-metal-virtualization/` complete: `_index.md` wt 620, `learning/_index.md` wt 152,
+      `drilling/_index.md` wt 252, capstone wt 900; all 34 concepts + 80 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 57 — Topic 53 Self-Managed Kubernetes & On-Prem GitOps (`self-managed-kubernetes-and-gitops`)
+
+Row: By Example · YAML/CLI † · topic wt 630 · Learn 153 / Drill 253 · **subject**. Template →
+[`syllabus/53-self-managed-kubernetes-and-gitops.md`](./syllabus/53-self-managed-kubernetes-and-gitops.md).
+
+- [ ] **[AI] V** — `web-researcher` for `self-managed-kubernetes-and-gitops`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/53-self-managed-kubernetes-and-gitops.md`](./syllabus/53-self-managed-kubernetes-and-gitops.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/self-managed-kubernetes-and-gitops/learning/` teaching **every** concept in
+      `syllabus/53-self-managed-kubernetes-and-gitops.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · why-self-managed-k8s
+  - [ ] co-02 · cluster-topology
+  - [ ] co-03 · control-plane-components
+  - [ ] co-04 · declarative-reconciliation
+  - [ ] co-05 · etcd-raft-quorum
+  - [ ] co-06 · k3s-single-binary
+  - [ ] co-07 · k3s-datastore-options
+  - [ ] co-08 · ha-odd-servers
+  - [ ] co-09 · kubeadm-bootstrap
+  - [ ] co-10 · k0s-distro
+  - [ ] co-11 · talos-immutable-api
+  - [ ] co-12 · distro-selection
+  - [ ] co-13 · node-lifecycle
+  - [ ] co-14 · etcd-backup-restore
+  - [ ] co-15 · upgrade-sequencing
+  - [ ] co-16 · cni-network-model
+  - [ ] co-17 · cni-selection
+  - [ ] co-18 · network-policy
+  - [ ] co-19 · metallb-bare-metal-lb
+  - [ ] co-20 · metallb-l2-vs-bgp
+  - [ ] co-21 · on-prem-storage
+  - [ ] co-22 · storageclass-pvc
+  - [ ] co-23 · ingress-controller
+  - [ ] co-24 · cert-manager-acme
+  - [ ] co-25 · gitops-model
+  - [ ] co-26 · argocd-application
+  - [ ] co-27 · flux-kustomization-helmrelease
+  - [ ] co-28 · argo-vs-flux
+  - [ ] co-29 · env-overlays
+  - [ ] co-30 · build-once-promote
+  - [ ] co-31 · secrets-not-in-git
+  - [ ] co-32 · velero-backup-dr
+  - [ ] co-33 · restore-drill
+  - [ ] co-34 · immutable-nodes
+- [ ] **[AI] A1-examples** — Author `CONTENT/self-managed-kubernetes-and-gitops/learning/code/` with **every** worked example in
+      `syllabus/53-self-managed-kubernetes-and-gitops.md` §Worked examples as a real k3s / `kubectl` / Helm / Argo CD / Flux YAML manifest set run from the CLI **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · why-self-managed
+  - [ ] ex-02 · control-plane-vs-workers
+  - [ ] ex-03 · control-plane-components
+  - [ ] ex-04 · reconciliation-loop
+  - [ ] ex-05 · etcd-raft
+  - [ ] ex-06 · quorum-math
+  - [ ] ex-07 · k3s-install-server
+  - [ ] ex-08 · k3s-single-binary
+  - [ ] ex-09 · k3s-kubeconfig
+  - [ ] ex-10 · k3s-datastore-sqlite
+  - [ ] ex-11 · k3s-embedded-etcd
+  - [ ] ex-12 · ha-odd-servers
+  - [ ] ex-13 · k3s-ha-three-servers
+  - [ ] ex-14 · kubeadm-init
+  - [ ] ex-15 · kubeadm-join
+  - [ ] ex-16 · kubeadm-scope
+  - [ ] ex-17 · k0s-single-binary
+  - [ ] ex-18 · talos-immutable
+  - [ ] ex-19 · talos-machineconfig
+  - [ ] ex-20 · distro-decision
+  - [ ] ex-21 · immutable-nodes
+  - [ ] ex-22 · kubectl-get-nodes
+  - [ ] ex-23 · add-worker-join
+  - [ ] ex-24 · node-cordon
+  - [ ] ex-25 · node-drain
+  - [ ] ex-26 · node-uncordon
+  - [ ] ex-27 · etcd-snapshot-save
+  - [ ] ex-28 · etcd-snapshot-restore
+  - [ ] ex-29 · upgrade-sequencing
+  - [ ] ex-30 · k3s-upgrade
+  - [ ] ex-31 · cni-required
+  - [ ] ex-32 · k8s-network-model
+  - [ ] ex-33 · install-cilium
+  - [ ] ex-34 · cni-decision
+  - [ ] ex-35 · flannel-vxlan
+  - [ ] ex-36 · netpol-default-open
+  - [ ] ex-37 · netpol-deny-ingress
+  - [ ] ex-38 · netpol-allow-frontend
+  - [ ] ex-39 · metallb-install
+  - [ ] ex-40 · metallb-ipaddresspool
+  - [ ] ex-41 · loadbalancer-gets-ip
+  - [ ] ex-42 · metallb-l2advertisement
+  - [ ] ex-43 · metallb-l2-vs-bgp
+  - [ ] ex-44 · metallb-bgp
+  - [ ] ex-45 · longhorn-install
+  - [ ] ex-46 · longhorn-replicated
+  - [ ] ex-47 · local-path-provisioner
+  - [ ] ex-48 · storageclass-pvc
+  - [ ] ex-49 · storage-decision
+  - [ ] ex-50 · ingress-controller-choice
+  - [ ] ex-51 · traefik-default
+  - [ ] ex-52 · ingress-manifest
+  - [ ] ex-53 · cert-manager-install
+  - [ ] ex-54 · clusterissuer-acme
+  - [ ] ex-55 · certificate-resource
+  - [ ] ex-56 · ingress-tls-auto
+  - [ ] ex-57 · acme-http01
+  - [ ] ex-58 · gitops-model
+  - [ ] ex-59 · argocd-install
+  - [ ] ex-60 · argocd-application
+  - [ ] ex-61 · argocd-sync-status
+  - [ ] ex-62 · argocd-applicationset
+  - [ ] ex-63 · argocd-auto-sync
+  - [ ] ex-64 · flux-bootstrap
+  - [ ] ex-65 · flux-kustomization
+  - [ ] ex-66 · flux-helmrelease
+  - [ ] ex-67 · argo-vs-flux
+  - [ ] ex-68 · kustomize-base-overlay
+  - [ ] ex-69 · overlay-patch
+  - [ ] ex-70 · helm-values-per-env
+  - [ ] ex-71 · build-once-promote
+  - [ ] ex-72 · promotion-via-git
+  - [ ] ex-73 · secrets-not-in-git
+  - [ ] ex-74 · sealed-secret
+  - [ ] ex-75 · external-secrets
+  - [ ] ex-76 · secrets-decision
+  - [ ] ex-77 · velero-install
+  - [ ] ex-78 · velero-backup
+  - [ ] ex-79 · velero-schedule
+  - [ ] ex-80 · rpo-rto
+  - [ ] ex-81 · restore-drill
+  - [ ] ex-82 · self-managed-capstone
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/self-managed-kubernetes-and-gitops/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/self-managed-kubernetes-and-gitops/drilling/_index.md` (wt 253) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 57 Gate
+
+- [ ] [AI] `self-managed-kubernetes-and-gitops/` complete: `_index.md` wt 630, `learning/_index.md` wt 153,
+      `drilling/_index.md` wt 253, capstone wt 900; all 34 concepts + 82 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 58 — Topic 54 Build Automation & Task Runners (`build-automation-and-task-runners`)
+
+Row: By Example · multi-tool † · topic wt 640 · Learn 154 / Drill 254 · **subject**. Template →
+[`syllabus/54-build-automation-and-task-runners.md`](./syllabus/54-build-automation-and-task-runners.md).
+
+- [ ] **[AI] V** — `web-researcher` for `build-automation-and-task-runners`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/54-build-automation-and-task-runners.md`](./syllabus/54-build-automation-and-task-runners.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/build-automation-and-task-runners/learning/` teaching **every** concept in
+      `syllabus/54-build-automation-and-task-runners.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · why-build-automation
+  - [ ] co-02 · task-runner-vs-build-system
+  - [ ] co-03 · make-rules
+  - [ ] co-04 · dependency-graph-dag
+  - [ ] co-05 · incremental-rebuild-timestamps
+  - [ ] co-06 · phony-targets
+  - [ ] co-07 · automatic-variables
+  - [ ] co-08 · pattern-rules
+  - [ ] co-09 · variable-assignment
+  - [ ] co-10 · builtin-implicit-rules
+  - [ ] co-11 · make-functions
+  - [ ] co-12 · parallel-make
+  - [ ] co-13 · posix-make-portability
+  - [ ] co-14 · command-runner-just
+  - [ ] co-15 · just-recipes-parameters
+  - [ ] co-16 · just-vs-make
+  - [ ] co-17 · npm-scripts
+  - [ ] co-18 · npm-pre-post-hooks
+  - [ ] co-19 · npm-lifecycle-scripts
+  - [ ] co-20 · task-composition
+  - [ ] co-21 · hermetic-builds
+  - [ ] co-22 · content-hash-caching
+  - [ ] co-23 · bazel-build-files
+  - [ ] co-24 · bazel-target-patterns
+  - [ ] co-25 · bazel-remote-cache
+  - [ ] co-26 · gradle-task-graph
+  - [ ] co-27 · gradle-incremental-build
+  - [ ] co-28 · gradle-build-cache
+  - [ ] co-29 · gradle-kotlin-groovy-dsl
+  - [ ] co-30 · timestamp-vs-hash-freshness
+  - [ ] co-31 · reproducible-builds
+  - [ ] co-32 · ci-integration
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-automation-and-task-runners/learning/code/` with **every** worked example in
+      `syllabus/54-build-automation-and-task-runners.md` §Worked examples as a real `Makefile`/`justfile`/`package.json`/`BUILD`/`build.gradle(.kts)`
+      run from the CLI **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · why-build-automation — a decision table ad-hoc shell vs an automated build (repeatable,
+  - [ ] ex-02 · runner-vs-build-system — a decision table command runner (names recipes) vs build system
+  - [ ] ex-03 · first-makefile-rule — verify
+  - [ ] ex-04 · make-run-target — verify the target file appears
+  - [ ] ex-05 · target-prereq-recipe — verify each part's role
+  - [ ] ex-06 · dependency-graph — verify the build
+  - [ ] ex-07 · make-default-goal — verify bare `make` builds it
+  - [ ] ex-08 · incremental-rebuild — verify only the dependent
+  - [ ] ex-09 · up-to-date-skip — verify "Nothing to be done"
+  - [ ] ex-10 · timestamp-comparison — verify the
+  - [ ] ex-11 · phony-clean — verify `make clean` always runs
+  - [ ] ex-12 · phony-file-collision — verify
+  - [ ] ex-13 · phony-aggregate — verify it builds each
+  - [ ] ex-14 · autovar-target — verify it expands to the target name
+  - [ ] ex-15 · autovar-first-prereq — verify it expands to the first prerequisite
+  - [ ] ex-16 · autovar-all-prereqs — verify it expands to all prerequisites
+  - [ ] ex-17 · pattern-rule — verify one rule compiles many files
+  - [ ] ex-18 · pattern-stem-match — verify `foo.c`→`foo.o`
+  - [ ] ex-19 · recursive-assignment — verify it expands at
+  - [ ] ex-20 · simple-assignment — verify it expands once at definition
+  - [ ] ex-21 · assignment-difference — verify when each
+  - [ ] ex-22 · implicit-rule — verify Make's built-in rule fires
+  - [ ] ex-23 · builtin-variables — verify the built-in variables
+  - [ ] ex-24 · make-wildcard — verify it lists the source files
+  - [ ] ex-25 · make-patsubst — verify the name transform
+  - [ ] ex-26 · first-justfile — verify `just <recipe>` runs it
+  - [ ] ex-27 · just-run — verify it executes
+  - [ ] ex-28 · just-list — verify it prints the available recipes
+  - [ ] ex-29 · just-recipe-dependency — verify the dep
+  - [ ] ex-30 · just-always-runs — verify no
+  - [ ] ex-31 · just-parameter — verify the argument is passed
+  - [ ] ex-32 · just-default-param — verify the default when omitted
+  - [ ] ex-33 · just-variadic — verify multiple args collect
+  - [ ] ex-34 · just-vs-make — verify when
+  - [ ] ex-35 · npm-script — verify the command runs
+  - [ ] ex-36 · npm-run-list — verify it lists the scripts
+  - [ ] ex-37 · npm-test-shortcut — verify the shortcut
+  - [ ] ex-38 · npm-start — verify the lifecycle shortcut
+  - [ ] ex-39 · npm-pre-hook — verify it runs before `build`
+  - [ ] ex-40 · npm-post-hook — verify it runs after `build`
+  - [ ] ex-41 · npm-pre-post-order — verify the sequence
+  - [ ] ex-42 · npm-compose-scripts — verify both run
+  - [ ] ex-43 · make-calls-npm — verify cross-tool
+  - [ ] ex-44 · composition-graph — verify the composed order
+  - [ ] ex-45 · parallel-make — verify concurrent execution
+  - [ ] ex-46 · parallel-correctness — verify a
+  - [ ] ex-47 · posix-make — verify the portable-subset behavior
+  - [ ] ex-48 · posix-portability — verify the
+  - [ ] ex-49 · clean-rebuild — verify a full from-scratch rebuild
+  - [ ] ex-50 · hermetic-build — verify
+  - [ ] ex-51 · non-hermetic-pitfall — verify the
+  - [ ] ex-52 · content-hash-cache — verify why it beats mtime
+  - [ ] ex-53 · cache-hit-reuse — verify no recompute
+  - [ ] ex-54 · timestamp-vs-hash — verify each's failure
+  - [ ] ex-55 · freshness-three-way — verify
+  - [ ] ex-56 · bazel-build-file — verify the target is defined
+  - [ ] ex-57 · bazel-build-cmd — verify the single target builds
+  - [ ] ex-58 · bazel-all-targets — verify all main-repo targets build
+  - [ ] ex-59 · bazel-label-syntax — verify the addressing
+  - [ ] ex-60 · bazel-incremental — verify unchanged actions are reused
+  - [ ] ex-61 · bazel-remote-cache — verify shared-output reuse
+  - [ ] ex-62 · bazel-hermetic-hash — verify
+  - [ ] ex-63 · gradle-task — verify it is registered
+  - [ ] ex-64 · gradle-task-graph — verify
+  - [ ] ex-65 · gradle-run-task — verify the task executes
+  - [ ] ex-66 · gradle-up-to-date — verify the `UP-TO-DATE` skip via input
+  - [ ] ex-67 · gradle-incremental-change — verify only the affected task reruns
+  - [ ] ex-68 · gradle-build-cache — verify a cache-restored output
+  - [ ] ex-69 · gradle-groovy-dsl — verify it configures the build
+  - [ ] ex-70 · gradle-kotlin-dsl — verify the typed equivalent
+  - [ ] ex-71 · dsl-comparison — verify each's trade-off
+  - [ ] ex-72 · reproducible-build — verify
+  - [ ] ex-73 · reproducible-vs-incremental — annotate reproducibility (same output) vs incrementality (skip
+  - [ ] ex-74 · tool-selection — a decision table runner vs make vs bazel/gradle by scale + language —
+  - [ ] ex-75 · monorepo-scaling — verify the caching
+  - [ ] ex-76 · ci-invokes-build — annotate CI calling `make ci` / `bazel test //...` / `gradle build` —
+  - [ ] ex-77 · cache-in-ci — verify the CI cache
+  - [ ] ex-78 · npm-lifecycle-install — verify they
+  - [ ] ex-79 · build-graph-end-to-end — the full source → object → binary incremental loop with Make —
+  - [ ] ex-80 · build-automation-capstone — a top-level `Makefile` orchestrating an `npm run build`, a
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-automation-and-task-runners/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/build-automation-and-task-runners/drilling/_index.md` (wt 252) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 58 Gate
+
+- [ ] [AI] `build-automation-and-task-runners/` complete: `_index.md` wt 640, `learning/_index.md` wt 154,
+      `drilling/_index.md` wt 254, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 59 — Topic 55 CI/CD & Release Engineering (`cicd-and-release-engineering`)
+
+Row: By Example · YAML + Python † · topic wt 650 · Learn 155 / Drill 255 · **subject**. Template →
+[`syllabus/55-cicd-and-release-engineering.md`](./syllabus/55-cicd-and-release-engineering.md).
 
 - [ ] **[AI] V** — `web-researcher` for `cicd-and-release-engineering`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/52-cicd-and-release-engineering.md`](./syllabus/52-cicd-and-release-engineering.md) and fold dated findings back into that file.
+      [`syllabus/55-cicd-and-release-engineering.md`](./syllabus/55-cicd-and-release-engineering.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/cicd-and-release-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/52-cicd-and-release-engineering.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/cicd-and-release-engineering/learning/` teaching **every** concept in
+      `syllabus/55-cicd-and-release-engineering.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · continuous-integration
+  - [ ] co-02 · continuous-delivery
+  - [ ] co-03 · continuous-deployment
+  - [ ] co-04 · deployment-pipeline
+  - [ ] co-05 · commit-stage-fail-fast
+  - [ ] co-06 · acceptance-test-gate
+  - [ ] co-07 · trunk-based-development
+  - [ ] co-08 · gitflow-and-caveat
+  - [ ] co-09 · github-actions-workflow
+  - [ ] co-10 · matrix-builds
+  - [ ] co-11 · job-dependencies
+  - [ ] co-12 · caching
+  - [ ] co-13 · artifacts
+  - [ ] co-14 · required-status-checks
+  - [ ] co-15 · environments-approvals
+  - [ ] co-16 · secrets-in-ci
+  - [ ] co-17 · oidc-cloud-auth
+  - [ ] co-18 · reusable-composite-workflows
+  - [ ] co-19 · semantic-versioning
+  - [ ] co-20 · conventional-commits
+  - [ ] co-21 · release-automation
+  - [ ] co-22 · package-publishing
+  - [ ] co-23 · blue-green-deployment
+  - [ ] co-24 · canary-release
+  - [ ] co-25 · feature-toggles
+  - [ ] co-26 · rollback-forward-fix
+  - [ ] co-27 · pipeline-as-code
+  - [ ] co-28 · quality-gates
+  - [ ] co-29 · supply-chain-provenance
+  - [ ] co-30 · dora-metrics
+  - [ ] co-31 · self-hosted-vs-hosted-runners
+  - [ ] co-32 · monorepo-affected-ci
+  - [ ] co-33 · progressive-delivery
+  - [ ] co-34 · automated-canary-analysis
+- [ ] **[AI] A1-examples** — Author `CONTENT/cicd-and-release-engineering/learning/code/` with **every** worked example in
+      `syllabus/55-cicd-and-release-engineering.md` §Worked examples as a runnable GitHub Actions workflow **or** typed
+      `mypy`-clean Python automation (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · ci-daily-merge — verify both halves named
+  - [ ] ex-02 · ci-broken-build-fix — verify merges pause while red
+  - [ ] ex-03 · cd-always-releasable — verify releasability is continuous
+  - [ ] ex-04 · cd-vs-continuous-deployment — verify the distinction
+  - [ ] ex-05 · continuous-deployment-auto — verify no manual gate
+  - [ ] ex-06 · deployment-pipeline-stages — verify the order
+  - [ ] ex-07 · commit-stage-fail-fast — verify slow tests run later
+  - [ ] ex-08 · acceptance-gate — verify a failing candidate can't progress
+  - [ ] ex-09 · tbd-single-trunk — verify no long-lived branch
+  - [ ] ex-10 · gitflow-branches — verify each branch's role
+  - [ ] ex-11 · gitflow-cd-caveat — verify the caveat is quoted
+  - [ ] ex-12 · gha-hello-workflow — verify it runs
+  - [ ] ex-13 · gha-on-triggers — verify both events fire it
+  - [ ] ex-14 · gha-run-vs-uses — verify each step type
+  - [ ] ex-15 · gha-runs-on — verify the runner OS
+  - [ ] ex-16 · gha-python-setup — verify tests execute
+  - [ ] ex-17 · matrix-python-versions — verify one job per version
+  - [ ] ex-18 · matrix-fail-fast — verify their effect
+  - [ ] ex-19 · job-needs — verify it waits for test
+  - [ ] ex-20 · cache-deps — verify a cache hit skips install
+  - [ ] ex-21 · cache-hit-output — verify conditional restore
+  - [ ] ex-22 · upload-artifact — verify the artifact is stored
+  - [ ] ex-23 · download-artifact — verify it consumes the upload
+  - [ ] ex-24 · required-check — verify a red check blocks
+  - [ ] ex-25 · semver-increment — verify each maps to a change kind
+  - [ ] ex-26 · semver-precedence — verify pre-release ordering
+  - [ ] ex-27 · conventional-commit — verify the type/scope form
+  - [ ] ex-28 · conventional-commit-breaking — verify the breaking marker
+  - [ ] ex-29 · conventional-to-semver — verify each correlation
+  - [ ] ex-30 · protected-environment — verify the gate exists
+  - [ ] ex-31 · approval-wait — verify it blocks pre-approval
+  - [ ] ex-32 · secret-injection — verify the value is injected
+  - [ ] ex-33 · secret-masking — verify masking behavior
+  - [ ] ex-34 · oidc-cloud-token — verify the token is per-job
+  - [ ] ex-35 · reusable-workflow — verify a caller invokes it
+  - [ ] ex-36 · composite-action — verify reuse with no duplication
+  - [ ] ex-37 · reusable-secrets — verify the callee receives them
+  - [ ] ex-38 · release-tag — verify the release is published
+  - [ ] ex-39 · changelog-gen — verify entries group by type
+  - [ ] ex-40 · semantic-release — verify the automation chain
+  - [ ] ex-41 · npm-publish — verify the package is installable by name
+  - [ ] ex-42 · docker-push — verify the image is pushed
+  - [ ] ex-43 · lint-gate — verify a lint failure blocks
+  - [ ] ex-44 · typecheck-gate — verify a type error blocks
+  - [ ] ex-45 · coverage-gate — verify below-threshold blocks
+  - [ ] ex-46 · sast-codeql — verify it reports findings
+  - [ ] ex-47 · dependency-scan — verify the three update kinds
+  - [ ] ex-48 · pipeline-as-code — verify it is reviewed/diffed
+  - [ ] ex-49 · jenkinsfile-compare — verify the common idea
+  - [ ] ex-50 · self-hosted-runner — verify control-vs-upkeep
+  - [ ] ex-51 · self-hosted-public-repo-risk — verify the fork-PR risk
+  - [ ] ex-52 · monorepo-affected — verify only touched projects run
+  - [ ] ex-53 · affected-base-head — verify the diff source
+  - [ ] ex-54 · required-checks-script — verify it gates on the check status
+  - [ ] ex-55 · fail-fast-ordering — verify the ordering
+  - [ ] ex-56 · blue-green-switch — verify one-shot cutover
+  - [ ] ex-57 · blue-green-rollback — verify recovery is immediate
+  - [ ] ex-58 · canary-gradual — verify a small subset first
+  - [ ] ex-59 · canary-cohort — verify targeted rollout
+  - [ ] ex-60 · canary-auto-rollback — verify a bad metric triggers rollback
+  - [ ] ex-61 · progressive-delivery — verify staged promotion
+  - [ ] ex-62 · rollback-vs-fix-forward — verify when each applies
+  - [ ] ex-63 · feature-toggle-release — verify unfinished code ships dark
+  - [ ] ex-64 · feature-toggle-experiment — verify consistent cohort routing
+  - [ ] ex-65 · feature-toggle-ops — verify runtime disable
+  - [ ] ex-66 · feature-toggle-permission — verify per-user gating
+  - [ ] ex-67 · toggle-router-python — verify it selects a codepath by toggle
+  - [ ] ex-68 · slsa-provenance — verify build metadata is attested
+  - [ ] ex-69 · cosign-sign — verify the signature is produced
+  - [ ] ex-70 · cosign-verify — verify an unsigned image is rejected
+  - [ ] ex-71 · provenance-verify-gate — verify it blocks an unverifiable artifact
+  - [ ] ex-72 · dora-deploy-frequency — verify the metric definition
+  - [ ] ex-73 · dora-lead-time — verify the definition
+  - [ ] ex-74 · dora-change-failure-rate — verify the ratio definition
+  - [ ] ex-75 · dora-mttr — verify the definition
+  - [ ] ex-76 · dora-python-report — verify the four values are produced
+  - [ ] ex-77 · promotable-artifact — verify one artifact flows through stages
+  - [ ] ex-78 · commit-to-prod-pipeline — verify each stage is wired
+  - [ ] ex-79 · gates-cost-tradeoff — verify the tax-vs-catch reasoning
+  - [ ] ex-80 · cicd-capstone — verify end-to-end green and bad-canary auto-rollback
+  - [ ] ex-81 · argo-rollouts-canary-analysis — verify failing metric auto-aborts+rolls back, passing auto-promotes
+  - [ ] ex-82 · flagger-progressive-delivery — verify traffic advances only while metrics pass, rolls back on breach
+  - [ ] ex-83 · progressive-delivery-strategy-decision — verify each strategy's trade-off recorded
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/cicd-and-release-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1832,27 +7576,139 @@ Row: By Example · YAML + Python † · topic wt 620 · Learn 152 / Drill 252 ·
       `CONTENT/cicd-and-release-engineering/drilling/_index.md` (wt 252) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 56 Gate
+### Phase 59 Gate
 
-- [ ] [AI] `cicd-and-release-engineering/` complete: `_index.md` wt 620, `learning/_index.md` wt 152,
-      `drilling/_index.md` wt 252, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `cicd-and-release-engineering/` complete: `_index.md` wt 650, `learning/_index.md` wt 155,
+      `drilling/_index.md` wt 255, capstone wt 900; all 34 concepts + 83 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 57 — Topic 53 Creating AI-Powered Apps (`creating-ai-powered-apps`)
+## Phase 60 — Topic 56 Creating AI-Powered Apps (`creating-ai-powered-apps`)
 
-Row: By Example · Python · topic wt 630 · Learn 153 / Drill 253 · **subject**. Template →
-[`syllabus/53-creating-ai-powered-apps.md`](./syllabus/53-creating-ai-powered-apps.md).
+Row: By Example · Python · topic wt 660 · Learn 156 / Drill 256 · **subject**. Template →
+[`syllabus/56-creating-ai-powered-apps.md`](./syllabus/56-creating-ai-powered-apps.md).
 
 - [ ] **[AI] V** — `web-researcher` for `creating-ai-powered-apps`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/53-creating-ai-powered-apps.md`](./syllabus/53-creating-ai-powered-apps.md) and fold dated findings back into that file.
+      [`syllabus/56-creating-ai-powered-apps.md`](./syllabus/56-creating-ai-powered-apps.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/creating-ai-powered-apps/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/53-creating-ai-powered-apps.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/creating-ai-powered-apps/learning/` teaching **every** concept in
+      `syllabus/56-creating-ai-powered-apps.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · llm-api-request
+  - [ ] co-02 · system-prompt
+  - [ ] co-03 · prompt-engineering
+  - [ ] co-04 · tokens-tokenization
+  - [ ] co-05 · sampling-parameters
+  - [ ] co-06 · streaming
+  - [ ] co-07 · structured-output
+  - [ ] co-08 · tool-calling
+  - [ ] co-09 · embeddings
+  - [ ] co-10 · vector-store
+  - [ ] co-11 · rag-pipeline
+  - [ ] co-12 · chunking
+  - [ ] co-13 · hybrid-retrieval
+  - [ ] co-14 · context-window-limits
+  - [ ] co-15 · multimodal-vision
+  - [ ] co-16 · hallucination-grounding
+  - [ ] co-17 · agentic-loop
+  - [ ] co-18 · mcp
+  - [ ] co-19 · evaluation
+  - [ ] co-20 · cost-latency
+  - [ ] co-21 · prompt-caching
+  - [ ] co-22 · batching
+  - [ ] co-23 · rate-limits-retries
+  - [ ] co-24 · content-moderation
+  - [ ] co-25 · prompt-injection
+  - [ ] co-26 · pii-output-validation
+  - [ ] co-27 · frameworks
+  - [ ] co-28 · provider-abstraction
+  - [ ] co-29 · observability-tracing
+  - [ ] co-30 · secrets-no-committed-keys
+- [ ] **[AI] A1-examples** — Author `CONTENT/creating-ai-powered-apps/learning/code/` with **every** worked example in
+      `syllabus/56-creating-ai-powered-apps.md` §Worked examples as typed `mypy`-clean Python runnable against a
+      local/mockable model (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · messages-request — verify a response is returned
+  - [ ] ex-02 · roles-user-assistant — verify roles alternate
+  - [ ] ex-03 · system-prompt — verify it shapes the answer
+  - [ ] ex-04 · few-shot — verify the pattern is followed
+  - [ ] ex-05 · instruction-ordering — verify the placement
+  - [ ] ex-06 · xml-structured-prompt — verify reduced misinterpretation
+  - [ ] ex-07 · token-count — verify the count
+  - [ ] ex-08 · tokenizer-model-specific — verify the non-portability
+  - [ ] ex-09 · context-window-check — verify the budgeting step
+  - [ ] ex-10 · temperature — verify output variance
+  - [ ] ex-11 · top-p-nucleus — verify the cumulative-probability cutoff
+  - [ ] ex-12 · temperature-zero — verify the caveat
+  - [ ] ex-13 · stop-sequences — verify the response stops there
+  - [ ] ex-14 · json-schema-output — verify it validates
+  - [ ] ex-15 · structured-required-fields — verify the schema constraints
+  - [ ] ex-16 · tool-for-structured — verify the forced shape
+  - [ ] ex-17 · parse-validate-output — verify invalid JSON is rejected
+  - [ ] ex-18 · streaming-deltas — verify incremental output
+  - [ ] ex-19 · streaming-events — verify the event order
+  - [ ] ex-20 · embedding-vector — verify the dimension
+  - [ ] ex-21 · cosine-similarity — verify similar texts score higher
+  - [ ] ex-22 · normalized-dot-product — verify the equivalence
+  - [ ] ex-23 · embedding-provider-note — verify the fact
+  - [ ] ex-24 · chunk-fixed — verify chunk boundaries + overlap
+  - [ ] ex-25 · chunk-recursive — verify it splits on natural boundaries
+  - [ ] ex-26 · chunk-size-tradeoff — verify the precision/context balance
+  - [ ] ex-27 · vector-store-index — verify the index is queryable
+  - [ ] ex-28 · nearest-neighbor-search — verify the closest chunks return
+  - [ ] ex-29 · hnsw-index — verify the speed/recall tradeoff
+  - [ ] ex-30 · rag-retrieve-augment-generate — verify the answer uses retrieved context
+  - [ ] ex-31 · rag-citations — verify each claim cites a chunk
+  - [ ] ex-32 · rag-grounding — verify the grounding link
+  - [ ] ex-33 · hallucination-annotate — verify the failure mode
+  - [ ] ex-34 · hybrid-dense-sparse — verify both contribute results
+  - [ ] ex-35 · reranking — verify the top result improves
+  - [ ] ex-36 · contextual-retrieval — verify the recall gain
+  - [ ] ex-37 · tool-definition — verify the tool is offered
+  - [ ] ex-38 · tool-use-round-trip — verify the result is incorporated
+  - [ ] ex-39 · tool-argument-validation — verify invalid args are rejected
+  - [ ] ex-40 · tool-choice-forced — verify that tool is called
+  - [ ] ex-41 · openai-vs-anthropic-tools — verify the difference
+  - [ ] ex-42 · mcp-server — verify the server contract
+  - [ ] ex-43 · mcp-standard — verify its cross-client role
+  - [ ] ex-44 · agentic-loop-bounded — verify it iterates on tool results
+  - [ ] ex-45 · loop-stop-condition — verify the loop terminates
+  - [ ] ex-46 · loop-budget-cap — verify the cap halts a runaway
+  - [ ] ex-47 · vision-image-input — verify the model describes the image
+  - [ ] ex-48 · vision-token-cost — verify the patch-token math
+  - [ ] ex-49 · eval-golden-set — verify pass/fail per case
+  - [ ] ex-50 · eval-llm-as-judge — verify the judge-model separation
+  - [ ] ex-51 · eval-schema-assert — verify a malformed output fails
+  - [ ] ex-52 · cost-per-token — verify the price math
+  - [ ] ex-53 · latency-budget — verify a slow call breaches it
+  - [ ] ex-54 · prompt-cache — verify the discount
+  - [ ] ex-55 · cache-usage-math — verify the sum
+  - [ ] ex-56 · batch-processing — verify the cost tradeoff
+  - [ ] ex-57 · rate-limit-headers — verify remaining quota is parsed
+  - [ ] ex-58 · exponential-backoff — verify it backs off on 429
+  - [ ] ex-59 · token-bucket — verify continuous replenishment
+  - [ ] ex-60 · moderation-endpoint — verify unsafe input is flagged
+  - [ ] ex-61 · moderation-categories — verify per-category output
+  - [ ] ex-62 · prompt-injection-direct — verify the attack shape
+  - [ ] ex-63 · prompt-injection-indirect — verify the untrusted-source vector
+  - [ ] ex-64 · injection-guard — verify instructions in data are ignored
+  - [ ] ex-65 · injection-corpus-test — verify the loop resists it
+  - [ ] ex-66 · owasp-llm01 — verify the direct/indirect distinction
+  - [ ] ex-67 · pii-redaction — verify PII is removed
+  - [ ] ex-68 · output-validation — verify a bad output is rejected
+  - [ ] ex-69 · output-encoding-downstream — verify no raw injection
+  - [ ] ex-70 · langchain-abstraction — verify the composition
+  - [ ] ex-71 · llamaindex-abstraction — verify the index/query-engine role
+  - [ ] ex-72 · vercel-ai-sdk — verify the provider-agnostic call
+  - [ ] ex-73 · provider-swap — verify the app runs on either
+  - [ ] ex-74 · model-id-pinned — verify the versioning caveat
+  - [ ] ex-75 · tracing-spans — verify each call is a span
+  - [ ] ex-76 · observability-eval-loop — verify traces feed evals
+  - [ ] ex-77 · api-key-env — verify no key in source
+  - [ ] ex-78 · no-key-required-mock — verify the example runs offline
+  - [ ] ex-79 · responses-vs-chat — verify the output-array difference
+  - [ ] ex-80 · aiapp-capstone — verify grounded cited answers, validated tool args, terminating injection-resistant loop, reproducible eval scores
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/creating-ai-powered-apps/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1861,27 +7717,140 @@ Row: By Example · Python · topic wt 630 · Learn 153 / Drill 253 · **subject*
       `CONTENT/creating-ai-powered-apps/drilling/_index.md` (wt 253) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 57 Gate
+### Phase 60 Gate
 
-- [ ] [AI] `creating-ai-powered-apps/` complete: `_index.md` wt 630, `learning/_index.md` wt 153,
-      `drilling/_index.md` wt 253, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `creating-ai-powered-apps/` complete: `_index.md` wt 660, `learning/_index.md` wt 156,
+      `drilling/_index.md` wt 256, capstone wt 900; all 30 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 58 — Topic 54 Agentic AI (`agentic-ai`)
+## Phase 61 — Topic 57 Agentic AI (`agentic-ai`)
 
-Row: By Example · Python † · topic wt 640 · Learn 154 / Drill 254 · **subject**. Template →
-[`syllabus/54-agentic-ai.md`](./syllabus/54-agentic-ai.md).
+Row: By Example · Python † · topic wt 670 · Learn 157 / Drill 257 · **subject**. Template →
+[`syllabus/57-agentic-ai.md`](./syllabus/57-agentic-ai.md).
 
 - [ ] **[AI] V** — `web-researcher` for `agentic-ai`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/54-agentic-ai.md`](./syllabus/54-agentic-ai.md) and fold dated findings back into that file.
+      [`syllabus/57-agentic-ai.md`](./syllabus/57-agentic-ai.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/agentic-ai/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/54-agentic-ai.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/agentic-ai/learning/` teaching **every** concept in
+      `syllabus/57-agentic-ai.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · agent-vs-workflow
+  - [ ] co-02 · agentic-loop
+  - [ ] co-03 · augmented-llm
+  - [ ] co-04 · tool-calling
+  - [ ] co-05 · client-vs-server-tools
+  - [ ] co-06 · react-pattern
+  - [ ] co-07 · chain-of-thought
+  - [ ] co-08 · planning-decomposition
+  - [ ] co-09 · reflection-self-critique
+  - [ ] co-10 · short-term-memory
+  - [ ] co-11 · long-term-memory
+  - [ ] co-12 · prompt-chaining
+  - [ ] co-13 · routing
+  - [ ] co-14 · parallelization
+  - [ ] co-15 · orchestrator-workers
+  - [ ] co-16 · evaluator-optimizer
+  - [ ] co-17 · multi-agent-orchestration
+  - [ ] co-18 · agent-handoffs
+  - [ ] co-19 · mcp
+  - [ ] co-20 · human-in-the-loop
+  - [ ] co-21 · guardrails
+  - [ ] co-22 · tool-permissioning
+  - [ ] co-23 · loop-control
+  - [ ] co-24 · cost-control
+  - [ ] co-25 · agent-evaluation
+  - [ ] co-26 · evals-in-ci
+  - [ ] co-27 · observability-tracing
+  - [ ] co-28 · prompt-injection-agents
+  - [ ] co-29 · excessive-agency
+  - [ ] co-30 · lethal-trifecta
+  - [ ] co-31 · agent-frameworks
+  - [ ] co-32 · simplest-solution-first
+- [ ] **[AI] A1-examples** — Author `CONTENT/agentic-ai/learning/code/` as typed `mypy`-clean Python, each example
+      runnable and citing the `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · agent-vs-workflow — verify the dynamic-vs-predefined distinction
+  - [ ] ex-02 · workflow-predefined-path — verify the fixed pipeline path
+  - [ ] ex-03 · augmented-llm — verify all four building blocks
+  - [ ] ex-04 · tool-definition — verify the schema is offered
+  - [ ] ex-05 · tool-choose-invoke — verify the correct tool fires
+  - [ ] ex-06 · parse-tool-call — verify the dispatch maps to a handler
+  - [ ] ex-07 · two-tools-choose — verify the appropriate choice
+  - [ ] ex-08 · agentic-loop-steps — verify the request → tool_use → tool_result → repeat loop
+  - [ ] ex-09 · loop-stop-reason — verify termination on `end_turn`
+  - [ ] ex-10 · client-vs-server-tools — verify who executes each
+  - [ ] ex-11 · react-interleave — verify the interleaving
+  - [ ] ex-12 · react-trace — verify a thought precedes an action
+  - [ ] ex-13 · chain-of-thought — verify the reasoning steps appear
+  - [ ] ex-14 · cot-exemplars — verify the model mimics the reasoning
+  - [ ] ex-15 · plan-and-execute — verify the plan lists steps
+  - [ ] ex-16 · executor-step — verify a single step completes
+  - [ ] ex-17 · planner-vs-react — verify the call-count difference
+  - [ ] ex-18 · reflection-loop — verify the critique changes the retry
+  - [ ] ex-19 · reflexion-memory — verify the memory holds the reflection
+  - [ ] ex-20 · short-term-memory — verify multi-turn recall
+  - [ ] ex-21 · thread-id — verify separate threads don't mix
+  - [ ] ex-22 · long-term-memory — verify data persists across runs
+  - [ ] ex-23 · memory-retrieval — verify the recalled fact is used
+  - [ ] ex-24 · context-relevance — verify pruning
+  - [ ] ex-25 · prompt-chaining — verify each call consumes the prior
+  - [ ] ex-26 · routing — verify the right route fires
+  - [ ] ex-27 · parallelization-sectioning — verify concurrent execution
+  - [ ] ex-28 · parallelization-voting — verify the majority vote
+  - [ ] ex-29 · orchestrator-workers — verify delegation
+  - [ ] ex-30 · orchestrator-synthesize — verify the merge
+  - [ ] ex-31 · evaluator-optimizer — verify the score drives a revision
+  - [ ] ex-32 · multi-agent-lead-subagents — verify parallel context
+  - [ ] ex-33 · multi-agent-token-cost — verify the ~15× cost
+  - [ ] ex-34 · agent-handoff — verify the handoff transfers control
+  - [ ] ex-35 · mcp-host-client-server — verify each role
+  - [ ] ex-36 · mcp-usb-c — verify the standardization analogy
+  - [ ] ex-37 · mcp-connect-tool — verify the agent calls it
+  - [ ] ex-38 · mcp-json-rpc — verify the transport
+  - [ ] ex-39 · human-in-the-loop-interrupt — verify the loop halts
+  - [ ] ex-40 · approval-gate — verify it can't fire without approval
+  - [ ] ex-41 · input-guardrail — verify an unsafe input is caught
+  - [ ] ex-42 · output-guardrail — verify a bad output is caught
+  - [ ] ex-43 · tool-input-guardrail — verify a secret is rejected
+  - [ ] ex-44 · tool-permissioning — verify scoped access
+  - [ ] ex-45 · tool-sandbox — verify the containment
+  - [ ] ex-46 · max-turns — verify `MaxTurnsExceeded` is raised
+  - [ ] ex-47 · recursion-limit — verify the limit halts it
+  - [ ] ex-48 · loop-terminates — verify termination
+  - [ ] ex-49 · budget-cap — verify a runaway is stopped
+  - [ ] ex-50 · when-not-agent — verify the simpler choice wins
+  - [ ] ex-51 · pause-turn — verify the caller resumes
+  - [ ] ex-52 · trajectory-eval — verify it matches a reference trajectory
+  - [ ] ex-53 · task-success-rate — verify the pass rate
+  - [ ] ex-54 · llm-as-judge — verify a different model judges
+  - [ ] ex-55 · exact-match-scoring — verify the match count
+  - [ ] ex-56 · eval-dataset — verify each case has an expected outcome
+  - [ ] ex-57 · evals-in-ci — verify the eval runs in the pipeline
+  - [ ] ex-58 · regression-bar — verify a drop blocks the merge
+  - [ ] ex-59 · agent-span — verify the `invoke_agent` operation name
+  - [ ] ex-60 · tracing-attributes — verify the recorded `gen_ai.*` fields
+  - [ ] ex-61 · otel-development-status — verify the pre-stable status note
+  - [ ] ex-62 · prompt-injection-direct — verify the attack overrides instructions
+  - [ ] ex-63 · prompt-injection-indirect — verify the injection via a tool result
+  - [ ] ex-64 · owasp-llm01 — verify the direct/indirect distinction
+  - [ ] ex-65 · untrusted-tool-results — verify data isn't obeyed as instructions
+  - [ ] ex-66 · excessive-agency — verify the OWASP LLM06 risk category
+  - [ ] ex-67 · excessive-functionality — verify the root cause
+  - [ ] ex-68 · excessive-permissions — verify the root cause
+  - [ ] ex-69 · lethal-trifecta — verify the three legs
+  - [ ] ex-70 · trifecta-mitigation — verify the exfiltration path is broken
+  - [ ] ex-71 · langgraph-stateful — verify the graph/state model
+  - [ ] ex-72 · openai-agents-sdk — verify the agents/handoffs/guardrails primitives
+  - [ ] ex-73 · crewai-crews-flows — verify the two constructs
+  - [ ] ex-74 · autogen-maintenance — verify the maintenance-mode → Microsoft Agent Framework migration
+  - [ ] ex-75 · simplest-solution — verify agency added only when it helps
+  - [ ] ex-76 · not-agentic-at-all — verify the no-agent option
+  - [ ] ex-77 · reason-act-observe — verify the full cycle on a multi-step task
+  - [ ] ex-78 · tool-dispatch-typed — verify the type-checked dispatch
+  - [ ] ex-79 · memory-plus-loop — verify prior steps inform later ones
+  - [ ] ex-80 · agentic-capstone — verify the full agent: typed tools over MCP + bounded loop + memory + guardrails/human
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/agentic-ai/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1890,27 +7859,111 @@ Row: By Example · Python † · topic wt 640 · Learn 154 / Drill 254 · **subj
       `CONTENT/agentic-ai/drilling/_index.md` (wt 254) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 58 Gate
+### Phase 61 Gate
 
-- [ ] [AI] `agentic-ai/` complete: `_index.md` wt 640, `learning/_index.md` wt 154,
-      `drilling/_index.md` wt 254, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `agentic-ai/` complete: `_index.md` wt 670, `learning/_index.md` wt 157,
+      `drilling/_index.md` wt 257, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 59 — Topic 55 IT / Application Security (`it-and-application-security`)
+## Phase 62 — Topic 58 IT / Application Security (`it-and-application-security`)
 
-Row: Annotated-concept · Python \* · topic wt 650 · Learn 155 / Drill 255 · **subject**. Template →
-[`syllabus/55-it-and-application-security.md`](./syllabus/55-it-and-application-security.md).
+Row: Annotated-concept · Python \* · topic wt 680 · Learn 158 / Drill 258 · **subject**. Template →
+[`syllabus/58-it-and-application-security.md`](./syllabus/58-it-and-application-security.md).
 
 - [ ] **[AI] V** — `web-researcher` for `it-and-application-security`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/55-it-and-application-security.md`](./syllabus/55-it-and-application-security.md) and fold dated findings back into that file.
+      [`syllabus/58-it-and-application-security.md`](./syllabus/58-it-and-application-security.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/it-and-application-security/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/55-it-and-application-security.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/it-and-application-security/learning/` teaching **every** concept in
+      `syllabus/58-it-and-application-security.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · cia-triad
+  - [ ] co-02 · defense-in-depth
+  - [ ] co-03 · least-privilege
+  - [ ] co-04 · threat-modeling-stride
+  - [ ] co-05 · attack-surface-trust-boundary
+  - [ ] co-06 · risk-likelihood-impact
+  - [ ] co-07 · owasp-top-10
+  - [ ] co-08 · broken-access-control
+  - [ ] co-09 · injection
+  - [ ] co-10 · cryptographic-failures
+  - [ ] co-11 · security-misconfiguration
+  - [ ] co-12 · supply-chain-failures
+  - [ ] co-13 · xss
+  - [ ] co-14 · csrf
+  - [ ] co-15 · input-validation
+  - [ ] co-16 · hashing-vs-encryption
+  - [ ] co-17 · symmetric-vs-asymmetric
+  - [ ] co-18 · password-hashing
+  - [ ] co-19 · digital-signatures
+  - [ ] co-20 · tls-https
+  - [ ] co-21 · dont-roll-your-own-crypto
+  - [ ] co-22 · authentication-vs-authorization
+  - [ ] co-23 · oauth2-oidc
+  - [ ] co-24 · jwt
+  - [ ] co-25 · session-security
+  - [ ] co-26 · secrets-management
+  - [ ] co-27 · security-headers
+  - [ ] co-28 · secure-sdlc
+  - [ ] co-29 · cve-cvss-nvd
+  - [ ] co-30 · data-protection-privacy
+- [ ] **[AI] A1-examples** — Author `CONTENT/it-and-application-security/learning/` as an Annotated-concept mix
+      (annotated threat models + tables/diagrams + typed `mypy`-clean runnable Python mechanisms in `code/`), each
+      example citing the `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · cia-triad-table — verify each dimension has a concrete loss scenario
+  - [ ] ex-02 · cia-tradeoff — verify the tension is named
+  - [ ] ex-03 · defense-in-depth-layers — verify each layer is assumed to leak
+  - [ ] ex-04 · least-privilege-grant — verify the minimized scope
+  - [ ] ex-05 · stride-categories — verify all six categories appear
+  - [ ] ex-06 · stride-threat-model — verify each entry point has a threat + mitigation
+  - [ ] ex-07 · trust-boundary-diagram — verify each boundary crossing
+  - [ ] ex-08 · attack-surface-enum — verify inputs/outputs are listed
+  - [ ] ex-09 · risk-prioritization — verify high-risk items rank first
+  - [ ] ex-10 · owasp-top10-map — verify all ten categories present
+  - [ ] ex-11 · broken-access-idor — verify the missing authorization check
+  - [ ] ex-12 · vertical-vs-horizontal-privesc — verify the distinction
+  - [ ] ex-13 · sql-injection-anatomy — verify the injected clause
+  - [ ] ex-14 · parameterized-query-fix — verify data stays separate from command
+  - [ ] ex-15 · command-injection — verify untrusted input reaching the shell
+  - [ ] ex-16 · security-misconfig — verify the hardening fix
+  - [ ] ex-17 · input-validation-allowlist — verify unauthorized input is rejected
+  - [ ] ex-18 · denylist-bypass — verify a bypass case
+  - [ ] ex-19 · hashing-vs-encryption — verify the irreversibility of the hash
+  - [ ] ex-20 · symmetric-encrypt — verify the plaintext is recovered
+  - [ ] ex-21 · asymmetric-keypair — verify which key encrypts vs decrypts
+  - [ ] ex-22 · argon2id-hash — verify the parameters
+  - [ ] ex-23 · argon2id-verify — verify accept/reject
+  - [ ] ex-24 · salting — verify the unique salt
+  - [ ] ex-25 · digital-signature-verify — verify a tampered message fails
+  - [ ] ex-26 · non-repudiation — verify the property
+  - [ ] ex-27 · tls-handshake — verify version + cipher + key agreement
+  - [ ] ex-28 · certificate-chain — verify the trust anchor
+  - [ ] ex-29 · dont-roll-crypto — verify the failure
+  - [ ] ex-30 · authn-vs-authz — verify the two distinct checks
+  - [ ] ex-31 · oauth2-roles — verify each role
+  - [ ] ex-32 · oauth2-grant-types — verify when each applies
+  - [ ] ex-33 · jwt-structure — verify the three parts
+  - [ ] ex-34 · jwt-tamper-detect — verify tamper detection
+  - [ ] ex-35 · jwt-alg-none-pitfall — verify the rejection
+  - [ ] ex-36 · session-cookie-flags — verify each flag's effect
+  - [ ] ex-37 · session-entropy — verify unpredictability
+  - [ ] ex-38 · xss-reflected-vs-stored — verify the three types
+  - [ ] ex-39 · xss-output-encoding — verify the encoded context
+  - [ ] ex-40 · csp-header — verify the XSS defense
+  - [ ] ex-41 · csrf-token — verify a per-session unpredictable token
+  - [ ] ex-42 · samesite-cookie — verify cross-site suppression
+  - [ ] ex-43 · crypto-failure-at-rest — verify the exposed data
+  - [ ] ex-44 · security-headers-set — verify each header's effect
+  - [ ] ex-45 · secrets-no-hardcode — verify no secret remains in code
+  - [ ] ex-46 · secret-rotation — verify the old secret is invalidated
+  - [ ] ex-47 · supply-chain-sca — verify the CVE match
+  - [ ] ex-48 · secure-sdlc-shift-left — verify each gate's stage
+  - [ ] ex-49 · cve-read — verify the affected component
+  - [ ] ex-50 · cvss-score — verify the metric group
+  - [ ] ex-51 · pii-gdpr — verify the personal-data scope
+  - [ ] ex-52 · secure-assessment-capstone — verify each part is present
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-and-application-security/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1919,27 +7972,139 @@ Row: Annotated-concept · Python \* · topic wt 650 · Learn 155 / Drill 255 · 
       `CONTENT/it-and-application-security/drilling/_index.md` (wt 255) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 59 Gate
+### Phase 62 Gate
 
-- [ ] [AI] `it-and-application-security/` complete: `_index.md` wt 650, `learning/_index.md` wt 155,
-      `drilling/_index.md` wt 255, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `it-and-application-security/` complete: `_index.md` wt 680, `learning/_index.md` wt 158,
+      `drilling/_index.md` wt 258, capstone wt 900; all 30 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 60 — Topic 56 Offensive Security (`offensive-security`)
+## Phase 63 — Topic 59 Offensive Security (`offensive-security`)
 
-Row: By Example · Python + shell † · topic wt 660 · Learn 156 / Drill 256 · **subject**. Template →
-[`syllabus/56-offensive-security.md`](./syllabus/56-offensive-security.md).
+Row: By Example · Python + shell † · topic wt 690 · Learn 159 / Drill 259 · **subject**. Template →
+[`syllabus/59-offensive-security.md`](./syllabus/59-offensive-security.md).
 
 - [ ] **[AI] V** — `web-researcher` for `offensive-security`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/56-offensive-security.md`](./syllabus/56-offensive-security.md) and fold dated findings back into that file.
+      [`syllabus/59-offensive-security.md`](./syllabus/59-offensive-security.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/offensive-security/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/56-offensive-security.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/offensive-security/learning/` teaching **every** concept in
+      `syllabus/59-offensive-security.md` §Concepts (DD-34 1:1 mirror; concepts before examples; authorized
+      lab-local only). One checkbox per `co-NN`:
+  - [ ] co-01 · ethics-authorization-scope
+  - [ ] co-02 · rules-of-engagement
+  - [ ] co-03 · responsible-disclosure
+  - [ ] co-04 · attack-lifecycle
+  - [ ] co-05 · ptes-phases
+  - [ ] co-06 · cyber-kill-chain
+  - [ ] co-07 · mitre-attack
+  - [ ] co-08 · reconnaissance-passive-active
+  - [ ] co-09 · osint
+  - [ ] co-10 · network-scanning-nmap
+  - [ ] co-11 · port-scan-types
+  - [ ] co-12 · service-version-detection
+  - [ ] co-13 · enumeration
+  - [ ] co-14 · web-app-attacks
+  - [ ] co-15 · sql-injection-exploit
+  - [ ] co-16 · xss-exploit
+  - [ ] co-17 · broken-auth-attacks
+  - [ ] co-18 · broken-access-control-exploit
+  - [ ] co-19 · intercepting-proxy
+  - [ ] co-20 · request-tampering
+  - [ ] co-21 · exploitation-frameworks
+  - [ ] co-22 · payloads-shells
+  - [ ] co-23 · privilege-escalation
+  - [ ] co-24 · password-cracking
+  - [ ] co-25 · buffer-overflow
+  - [ ] co-26 · network-attacks-mitm
+  - [ ] co-27 · social-engineering-phishing
+  - [ ] co-28 · cve-exploit-db
+  - [ ] co-29 · cvss-severity
+  - [ ] co-30 · finding-report
+  - [ ] co-31 · lab-isolation
+- [ ] **[AI] A1-examples** — Author `CONTENT/offensive-security/learning/code/` as Python + shell driving
+      tooling against the local lab only, each example restating "authorized lab target only" and citing the
+      `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · ethics-authorization — verify scope + authorized-target-only
+  - [ ] ex-02 · scope-boundaries — verify out-of-scope is explicit
+  - [ ] ex-03 · roe-document — verify it precedes testing
+  - [ ] ex-04 · responsible-disclosure — verify the vendor-first flow
+  - [ ] ex-05 · lab-isolation-setup — verify no route to external systems
+  - [ ] ex-06 · lab-target-juiceshop — verify it responds on localhost
+  - [ ] ex-07 · attack-lifecycle-phases — verify all four phases appear
+  - [ ] ex-08 · ptes-phases — verify all seven are named
+  - [ ] ex-09 · cyber-kill-chain — verify all seven stages
+  - [ ] ex-10 · killchain-break — verify the defender principle
+  - [ ] ex-11 · mitre-attack-tactic-technique — verify the why-vs-how distinction
+  - [ ] ex-12 · attack-reconnaissance-tactic — verify its goal
+  - [ ] ex-13 · passive-recon — verify no packets are sent
+  - [ ] ex-14 · active-recon — verify direct contact
+  - [ ] ex-15 · osint-gather — verify only public sources are used
+  - [ ] ex-16 · nmap-host-discovery — verify live hosts found
+  - [ ] ex-17 · nmap-port-scan — verify open ports listed
+  - [ ] ex-18 · nmap-syn-scan — verify the SYN-vs-connect difference
+  - [ ] ex-19 · nmap-udp-scan — verify UDP services
+  - [ ] ex-20 · nmap-version-detect — verify service versions
+  - [ ] ex-21 · nmap-parse-python — verify structured host/port data
+  - [ ] ex-22 · service-enumeration — verify enumerated detail
+  - [ ] ex-23 · directory-enum — verify discovered paths
+  - [ ] ex-24 · attack-surface-map — verify inputs catalogued
+  - [ ] ex-25 · web-attack-classes — verify the categories
+  - [ ] ex-26 · http-request-python — verify the response captured
+  - [ ] ex-27 · sqli-manual — verify the injected clause returns data
+  - [ ] ex-28 · sqli-sqlmap — verify the vulnerable parameter
+  - [ ] ex-29 · sqli-dump — verify extracted rows (lab data only)
+  - [ ] ex-30 · sqli-blind — verify the inference technique
+  - [ ] ex-31 · xss-reflected-exploit — verify script execution
+  - [ ] ex-32 · xss-stored-exploit — verify persistence
+  - [ ] ex-33 · xss-payload — verify it fires in the lab
+  - [ ] ex-34 · brute-force-login — verify a hit
+  - [ ] ex-35 · credential-stuffing — verify the distinction
+  - [ ] ex-36 · password-spraying — verify the pattern
+  - [ ] ex-37 · rate-limit-bypass — verify the gap
+  - [ ] ex-38 · idor-exploit — verify unauthorized access
+  - [ ] ex-39 · vertical-privesc-web — verify admin access
+  - [ ] ex-40 · horizontal-privesc-web — verify same-tier data access
+  - [ ] ex-41 · proxy-intercept — verify the request is captured
+  - [ ] ex-42 · proxy-inspect — verify headers/body visible
+  - [ ] ex-43 · request-tamper — verify the modified value takes effect
+  - [ ] ex-44 · proxy-repeater — verify the altered response
+  - [ ] ex-45 · metasploit-module — verify exploit/payload/options
+  - [ ] ex-46 · metasploit-exploit-lab — verify a session opens
+  - [ ] ex-47 · payload-reverse-shell — verify who connects to whom
+  - [ ] ex-48 · meterpreter-session — verify the capabilities
+  - [ ] ex-49 · privesc-local — verify the escalation
+  - [ ] ex-50 · privesc-enum — verify misconfigs found
+  - [ ] ex-51 · hash-capture — verify the hash format
+  - [ ] ex-52 · hashcat-dictionary — verify the recovered password
+  - [ ] ex-53 · brute-vs-dictionary — verify the trade-off
+  - [ ] ex-54 · salt-defeats-rainbow — verify the effect
+  - [ ] ex-55 · buffer-overflow-anatomy — verify the overwritten memory
+  - [ ] ex-56 · overflow-controlled — verify instruction-pointer control
+  - [ ] ex-57 · packet-capture — verify packets displayed
+  - [ ] ex-58 · arp-spoof — verify the poisoned mapping
+  - [ ] ex-59 · mitm-intercept — verify captured plaintext
+  - [ ] ex-60 · phishing-annotate — verify the social-engineering vector
+  - [ ] ex-61 · social-eng-pretext — verify the human-layer manipulation
+  - [ ] ex-62 · cve-lookup — verify the affected component
+  - [ ] ex-63 · exploit-db-search — verify the matching exploit
+  - [ ] ex-64 · cve-to-exploit — verify the version match
+  - [ ] ex-65 · cvss-rate — verify the metric group
+  - [ ] ex-66 · cvss-vector — verify the parsed metrics
+  - [ ] ex-67 · finding-reproduction — verify they reproduce
+  - [ ] ex-68 · finding-impact — verify it ties to a concrete risk
+  - [ ] ex-69 · finding-remediation — verify a concrete fix
+  - [ ] ex-70 · finding-report-full — verify all parts present
+  - [ ] ex-71 · attack-chain — verify the chained access
+  - [ ] ex-72 · killchain-map-engagement — verify each stage present
+  - [ ] ex-73 · attack-map-mitre — verify the technique IDs
+  - [ ] ex-74 · post-exploit-loot — verify confined to the lab
+  - [ ] ex-75 · scope-reconfirm — verify the authorized-only gate
+  - [ ] ex-76 · disclosure-writeup — verify vendor-first framing
+  - [ ] ex-77 · engagement-cleanup — verify the target is restored
+  - [ ] ex-78 · pentest-capstone — verify each part present + lab-only
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/offensive-security/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1948,27 +8113,142 @@ Row: By Example · Python + shell † · topic wt 660 · Learn 156 / Drill 256 �
       `CONTENT/offensive-security/drilling/_index.md` (wt 256) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 60 Gate
+### Phase 63 Gate
 
-- [ ] [AI] `offensive-security/` complete: `_index.md` wt 660, `learning/_index.md` wt 156,
-      `drilling/_index.md` wt 256, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `offensive-security/` complete: `_index.md` wt 690, `learning/_index.md` wt 159,
+      `drilling/_index.md` wt 259, capstone wt 900; all 31 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 61 — Topic 57 Defensive Security (`defensive-security`)
+## Phase 64 — Topic 60 Defensive Security (`defensive-security`)
 
-Row: By Example · Python + shell † · topic wt 670 · Learn 157 / Drill 257 · **subject**. Template →
-[`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md).
+Row: By Example · Python + shell † · topic wt 700 · Learn 160 / Drill 260 · **subject**. Template →
+[`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md).
 
 - [ ] **[AI] V** — `web-researcher` for `defensive-security`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md) and fold dated findings back into that file.
+      [`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/defensive-security/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/57-defensive-security.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/defensive-security/learning/` teaching **every** concept in
+      `syllabus/60-defensive-security.md` §Concepts (DD-34 1:1 mirror; concepts before examples; lab-local).
+      One checkbox per `co-NN`:
+  - [ ] co-01 · blue-vs-red-vs-purple
+  - [ ] co-02 · logging-what-to-log
+  - [ ] co-03 · centralized-logging
+  - [ ] co-04 · siem
+  - [ ] co-05 · siem-dashboard
+  - [ ] co-06 · log-parsing
+  - [ ] co-07 · detection-engineering
+  - [ ] co-08 · sigma-rules
+  - [ ] co-09 · sigma-logsource-detection-condition
+  - [ ] co-10 · mitre-attack-mapping
+  - [ ] co-11 · attack-tactic-vs-technique
+  - [ ] co-12 · false-positive-negative-tuning
+  - [ ] co-13 · ids-ips
+  - [ ] co-14 · edr-xdr
+  - [ ] co-15 · ir-lifecycle
+  - [ ] co-16 · ir-preparation
+  - [ ] co-17 · ir-detection-analysis
+  - [ ] co-18 · ir-containment-eradication-recovery
+  - [ ] co-19 · ir-post-incident
+  - [ ] co-20 · threat-hunting
+  - [ ] co-21 · ioc
+  - [ ] co-22 · threat-intelligence
+  - [ ] co-23 · pyramid-of-pain
+  - [ ] co-24 · yara-rules
+  - [ ] co-25 · malware-analysis-static-dynamic
+  - [ ] co-26 · zero-trust
+  - [ ] co-27 · network-defense
+  - [ ] co-28 · hardening-cis-benchmarks
+  - [ ] co-29 · vuln-patch-management
+  - [ ] co-30 · honeypot-deception
+  - [ ] co-31 · csf-functions
+  - [ ] co-32 · purple-team-loop
+  - [ ] co-33 · alert-fatigue
+  - [ ] co-34 · soar
+- [ ] **[AI] A1-examples** — Author `CONTENT/defensive-security/learning/code/` as Python + shell over
+      lab-generated telemetry, each example citing the `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox
+      per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · blue-red-purple-roles — verify the defend-vs-attack distinction
+  - [ ] ex-02 · what-to-log — verify auditable events listed
+  - [ ] ex-03 · log-format-parse — verify extracted fields
+  - [ ] ex-04 · centralized-logging — verify one aggregation point
+  - [ ] ex-05 · siem-concept — verify the three stages
+  - [ ] ex-06 · siem-ingest — verify events queryable
+  - [ ] ex-07 · siem-dashboard — verify the scan is visible
+  - [ ] ex-08 · log-normalize — verify a common field set
+  - [ ] ex-09 · ids-signature — verify the pattern match
+  - [ ] ex-10 · ids-anomaly — verify the difference
+  - [ ] ex-11 · suricata-rule-structure — verify the three parts
+  - [ ] ex-12 · edr-concept — verify continuous endpoint telemetry
+  - [ ] ex-13 · xdr-extend — verify the extra data sources
+  - [ ] ex-14 · detection-engineering-intro — verify detections-as-code
+  - [ ] ex-15 · sigma-rule-first — verify it matches the log
+  - [ ] ex-16 · sigma-structure — verify each field
+  - [ ] ex-17 · sigma-portable — verify portability
+  - [ ] ex-18 · attack-tactic-technique — verify the why-vs-how
+  - [ ] ex-19 · attack-15-tactics — verify Stealth + Defense Impairment present
+  - [ ] ex-20 · attack-map-detection — verify the technique ID
+  - [ ] ex-21 · ioc-types — verify the artifact examples
+  - [ ] ex-22 · ioc-match — verify a hit
+  - [ ] ex-23 · threat-intel-feed — verify IOCs ingested
+  - [ ] ex-24 · ttp-vs-ioc — verify the durability difference
+  - [ ] ex-25 · csf-functions — verify all six named
+  - [ ] ex-26 · csf-govern-center — verify it informs the others
+  - [ ] ex-27 · sigma-sqli — verify it fires on the attack log
+  - [ ] ex-28 · sigma-no-false-positive — verify low false positives
+  - [ ] ex-29 · fp-fn-tradeoff — verify the tuning knob
+  - [ ] ex-30 · tune-threshold — verify the reduced noise
+  - [ ] ex-31 · sigma-xss — verify it fires + maps to a technique
+  - [ ] ex-32 · sigma-bruteforce — verify a threshold match
+  - [ ] ex-33 · pyramid-of-pain — verify the six levels ordered
+  - [ ] ex-34 · pyramid-ttp-hardest — verify the top-of-pyramid reasoning
+  - [ ] ex-35 · threat-hunt-hypothesis — verify a testable statement
+  - [ ] ex-36 · threat-hunt-query — verify it surfaces the activity
+  - [ ] ex-37 · threat-hunt-pivot — verify the expanded scope
+  - [ ] ex-38 · yara-rule-first — verify it matches
+  - [ ] ex-39 · yara-strings-condition — verify the match logic
+  - [ ] ex-40 · malware-static — verify the extracted strings/hashes
+  - [ ] ex-41 · malware-dynamic — verify the observed behavior
+  - [ ] ex-42 · ir-lifecycle-phases — verify the phase sequence + Rev. 3 note
+  - [ ] ex-43 · ir-preparation — verify the readiness artifacts
+  - [ ] ex-44 · ir-detection-analysis — verify the incident scoped
+  - [ ] ex-45 · ir-triage — verify the classification
+  - [ ] ex-46 · ir-containment — verify the spread is stopped
+  - [ ] ex-47 · ir-eradication — verify the artifact removed
+  - [ ] ex-48 · ir-recovery — verify service restored
+  - [ ] ex-49 · ir-evidence-handling — verify integrity preserved
+  - [ ] ex-50 · ir-post-incident — verify improvements captured
+  - [ ] ex-51 · zero-trust-tenets — verify per-session dynamic access
+  - [ ] ex-52 · zero-trust-pdp-pep — verify the decision-vs-enforcement split
+  - [ ] ex-53 · network-segmentation — verify the contained zone
+  - [ ] ex-54 · firewall-rule — verify the allowed exceptions
+  - [ ] ex-55 · cis-benchmark — verify a control applied
+  - [ ] ex-56 · attack-surface-reduction — verify the closed surface
+  - [ ] ex-57 · vuln-scan — verify findings enumerated
+  - [ ] ex-58 · patch-management-lifecycle — verify the phases
+  - [ ] ex-59 · patch-prioritize — verify high-risk first
+  - [ ] ex-60 · honeypot-deploy — verify it lures + logs
+  - [ ] ex-61 · honeypot-alert — verify a high-fidelity signal
+  - [ ] ex-62 · soar-playbook — verify the automated action
+  - [ ] ex-63 · soar-enrich — verify the added context
+  - [ ] ex-64 · alert-fatigue — verify the noise problem
+  - [ ] ex-65 · alert-tuning — verify the signal-to-noise gain
+  - [ ] ex-66 · purple-team-loop — verify each attack has a detection
+  - [ ] ex-67 · purple-coverage-gap — verify the coverage gap surfaced
+  - [ ] ex-68 · detection-coverage-matrix — verify covered vs gaps
+  - [ ] ex-69 · ids-deploy-lab — verify it alerts on the scan
+  - [ ] ex-70 · correlation-rule — verify the joined signal
+  - [ ] ex-71 · dashboard-attack-timeline — verify the ordered kill-chain view
+  - [ ] ex-72 · detection-as-code-ci — verify the rule test gate
+  - [ ] ex-73 · sigma-to-siem-query — verify the translated query runs
+  - [ ] ex-74 · ioc-sweep — verify affected hosts identified
+  - [ ] ex-75 · hunt-to-detection — verify the new rule
+  - [ ] ex-76 · ir-tabletop — verify each phase executed
+  - [ ] ex-77 · recovery-backup-restore — verify the clean restore
+  - [ ] ex-78 · blue-team-capstone — verify each part present + purple loop closed
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/defensive-security/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -1977,33 +8257,179 @@ Row: By Example · Python + shell † · topic wt 670 · Learn 157 / Drill 257 �
       `CONTENT/defensive-security/drilling/_index.md` (wt 257) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 61 Gate
+### Phase 64 Gate
 
-- [ ] [AI] `defensive-security/` complete: `_index.md` wt 670, `learning/_index.md` wt 157,
-      `drilling/_index.md` wt 257, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `defensive-security/` complete: `_index.md` wt 700, `learning/_index.md` wt 160,
+      `drilling/_index.md` wt 260, capstone wt 900; all 34 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 62 — Inter-topic: Pass-3 Capstone (`capstone-real-world-delivery`)
+## Phase 65 — Topic 61 Vulnerability Management & Assessment (`vulnerability-management-and-assessment`)
 
-Junction: Topics 34–57 (data stores + scale + architecture + cloud + security). Inter-Topic Capstone Phase Template; spec in
-`syllabus/57-defensive-security.md` (Pass-3 capstone section).
+Row: By Example · Python † · topic wt 710 · Learn 161 / Drill 261 · **subject**. Template →
+[`syllabus/61-vulnerability-management-and-assessment.md`](./syllabus/61-vulnerability-management-and-assessment.md).
+
+- [ ] **[AI] V** — `web-researcher` for `vulnerability-management-and-assessment`; resolve every Accuracy-notes "to verify" line in
+      [`syllabus/61-vulnerability-management-and-assessment.md`](./syllabus/61-vulnerability-management-and-assessment.md) and fold dated findings back into that file.
+      **Acceptance**: no unresolved "verify" line remains.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/vulnerability-management-and-assessment/learning/` teaching **every** concept in
+      `syllabus/61-vulnerability-management-and-assessment.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · vuln-management-lifecycle
+  - [ ] co-02 · weakness-vuln-exploit
+  - [ ] co-03 · cve-and-cve-id
+  - [ ] co-04 · nvd-enrichment
+  - [ ] co-05 · cwe-weakness-taxonomy
+  - [ ] co-06 · cpe-product-identity
+  - [ ] co-07 · cvss-base-metrics
+  - [ ] co-08 · cvss-metric-groups
+  - [ ] co-09 · cvss-severity-scale
+  - [ ] co-10 · severity-is-not-risk
+  - [ ] co-11 · epss
+  - [ ] co-12 · cisa-kev
+  - [ ] co-13 · prioritization-policy
+  - [ ] co-14 · remediation-sla-risk-acceptance
+  - [ ] co-15 · sast
+  - [ ] co-16 · dast
+  - [ ] co-17 · sca-dependency-scanning
+  - [ ] co-18 · container-image-scanning
+  - [ ] co-19 · iac-scanning
+  - [ ] co-20 · secret-scanning
+  - [ ] co-21 · scanner-tradeoffs
+  - [ ] co-22 · sbom
+  - [ ] co-23 · sbom-minimum-elements
+  - [ ] co-24 · spdx
+  - [ ] co-25 · cyclonedx
+  - [ ] co-26 · vex
+  - [ ] co-27 · purl-package-identity
+  - [ ] co-28 · osv-feed
+  - [ ] co-29 · scanner-output-parsing
+  - [ ] co-30 · correlation-dedup
+  - [ ] co-31 · reachability-analysis
+  - [ ] co-32 · network-vuln-scanning
+  - [ ] co-33 · nice-vuln-analysis-role
+  - [ ] co-34 · program-reporting
+- [ ] **[AI] A1-examples** — Author `CONTENT/vulnerability-management-and-assessment/learning/code/` with **every** worked example in
+      `syllabus/61-vulnerability-management-and-assessment.md` §Worked examples as a real fully type-hinted (`mypy`-clean) Python module run from the CLI **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · vuln-lifecycle-map
+  - [ ] ex-02 · weakness-vuln-exploit-chain
+  - [ ] ex-03 · anatomy-of-a-cve
+  - [ ] ex-04 · cna-issuance
+  - [ ] ex-05 · nvd-enrichment-fields
+  - [ ] ex-06 · query-nvd-api
+  - [ ] ex-07 · cwe-lookup
+  - [ ] ex-08 · cve-to-cwe-map
+  - [ ] ex-09 · cpe-match
+  - [ ] ex-10 · parse-cvss-vector
+  - [ ] ex-11 · exploitability-vs-impact
+  - [ ] ex-12 · cvss-severity-band
+  - [ ] ex-13 · cvss-four-groups
+  - [ ] ex-14 · cvss-nomenclature
+  - [ ] ex-15 · severity-not-risk
+  - [ ] ex-16 · sbom-what-it-is
+  - [ ] ex-17 · sbom-minimum-elements
+  - [ ] ex-18 · read-spdx
+  - [ ] ex-19 · read-cyclonedx
+  - [ ] ex-20 · parse-sbom-python
+  - [ ] ex-21 · parse-purl
+  - [ ] ex-22 · generate-sbom-syft
+  - [ ] ex-23 · scan-sbom-grype
+  - [ ] ex-24 · trivy-fs-scan
+  - [ ] ex-25 · sast-concept
+  - [ ] ex-26 · dast-concept
+  - [ ] ex-27 · sast-vs-dast
+  - [ ] ex-28 · sca-concept
+  - [ ] ex-29 · semgrep-run
+  - [ ] ex-30 · semgrep-rule-shape
+  - [ ] ex-31 · dast-baseline
+  - [ ] ex-32 · container-image-scan
+  - [ ] ex-33 · iac-scan
+  - [ ] ex-34 · secret-scan
+  - [ ] ex-35 · scanner-false-positive
+  - [ ] ex-36 · modality-coverage-matrix
+  - [ ] ex-37 · epss-concept
+  - [ ] ex-38 · query-epss-api
+  - [ ] ex-39 · kev-concept
+  - [ ] ex-40 · load-kev-catalog
+  - [ ] ex-41 · cvss-alone-over-alerts
+  - [ ] ex-42 · combine-cvss-epss-kev
+  - [ ] ex-43 · asset-context-weight
+  - [ ] ex-44 · prioritization-policy-table
+  - [ ] ex-45 · remediation-sla
+  - [ ] ex-46 · risk-acceptance-record
+  - [ ] ex-47 · osv-schema
+  - [ ] ex-48 · query-osv-api
+  - [ ] ex-49 · osv-scanner-run
+  - [ ] ex-50 · parse-grype-json
+  - [ ] ex-51 · parse-trivy-json
+  - [ ] ex-52 · common-finding-schema
+  - [ ] ex-53 · vex-concept
+  - [ ] ex-54 · vex-suppress
+  - [ ] ex-55 · reachability-concept
+  - [ ] ex-56 · reachability-downgrade
+  - [ ] ex-57 · correlate-across-scanners
+  - [ ] ex-58 · dedup-findings
+  - [ ] ex-59 · enrich-with-epss-kev
+  - [ ] ex-60 · score-and-rank
+  - [ ] ex-61 · network-scan-concept
+  - [ ] ex-62 · openvas-scan
+  - [ ] ex-63 · scan-cadence
+  - [ ] ex-64 · sbom-diff
+  - [ ] ex-65 · new-cve-recheck
+  - [ ] ex-66 · triage-report-json
+  - [ ] ex-67 · triage-report-markdown
+  - [ ] ex-68 · metric-mttr
+  - [ ] ex-69 · metric-coverage
+  - [ ] ex-70 · exposure-trend
+  - [ ] ex-71 · sla-breach-report
+  - [ ] ex-72 · nice-work-role
+  - [ ] ex-73 · ci-gate-scan
+  - [ ] ex-74 · verify-remediation
+  - [ ] ex-75 · false-positive-triage
+  - [ ] ex-76 · advisory-source-reconcile
+  - [ ] ex-77 · cpe-vs-purl-matching
+  - [ ] ex-78 · policy-end-to-end
+  - [ ] ex-79 · program-dashboard
+  - [ ] ex-80 · vuln-triage-preview
+- [ ] **[AI] A2 (capstone)** — Author `CONTENT/vulnerability-management-and-assessment/learning/capstone/` (`_index.md` weight 900) per the
+      syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
+      is fully hit.
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
+      `CONTENT/vulnerability-management-and-assessment/drilling/_index.md` (wt 261) covering the same Items with mocked/self-contained
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+
+### Phase 65 Gate
+
+- [ ] [AI] `vulnerability-management-and-assessment/` complete: `_index.md` wt 710, `learning/_index.md` wt 161,
+      `drilling/_index.md` wt 261, capstone wt 900; all 34 concepts + 80 worked examples + capstone present;
+      checkers + facts-checker clean; build + `lint:md` exit 0.
+
+- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+
+> **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
+
+## Phase 66 — Inter-topic: Pass-3 Capstone (`capstone-real-world-delivery`)
+
+Junction: Topics 34–60 (data stores + scale + architecture + cloud/on-prem + CI/CD + security core). Inter-Topic Capstone Phase Template; spec in
+`syllabus/60-defensive-security.md` (Pass-3 capstone section). Note: it is anchored after the security **core** (topic 60);
+the Pass-3 tail — 61 vulnerability management, 62 GRC, 63 analytics & experimentation — is a deliberate assurance-and-measurement
+coda taught after this build-and-ship integration capstone (see tech-docs DD-38).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
 - [ ] **[AI] A** — Author `CONTENT/capstone-real-world-delivery/` (`_index.md` `weight: 575`, + `code/`) per the cited capstone
-      spec's ordered steps (detail source: [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md)). **Acceptance**: the
+      spec's ordered steps (detail source: [`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 62 Gate
+### Phase 66 Gate
 
 - [ ] [AI] `capstone-real-world-delivery/` complete (wt 575, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
@@ -2012,23 +8438,23 @@ Junction: Topics 34–57 (data stores + scale + architecture + cloud + security)
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
-## Phase 63 — Inter-topic: Secure-Service Capstone (`capstone-secure-service`)
+## Phase 67 — Inter-topic: Secure-Service Capstone (`capstone-secure-service`)
 
 Junction: Backend Essentials (11) + Security Essentials (17) + IT / Application Security (55). Inter-Topic Capstone Phase Template; spec in
-`syllabus/57-defensive-security.md` (secure-service cross-cutting section).
+`syllabus/60-defensive-security.md` (secure-service cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
 - [ ] **[AI] A** — Author `CONTENT/capstone-secure-service/` (`_index.md` `weight: 576`, + `code/`) per the cited capstone
-      spec's ordered steps (detail source: [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md)). **Acceptance**: the
+      spec's ordered steps (detail source: [`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 63 Gate
+### Phase 67 Gate
 
 - [ ] [AI] `capstone-secure-service/` complete (wt 576, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
@@ -2037,23 +8463,23 @@ Junction: Backend Essentials (11) + Security Essentials (17) + IT / Application 
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
-## Phase 64 — Inter-topic: Data-Pipeline Capstone (`capstone-data-pipeline`)
+## Phase 68 — Inter-topic: Data-Pipeline Capstone (`capstone-data-pipeline`)
 
 Junction: Data Engineering (37) + SQL/NoSQL (10/34) + a queue. Inter-Topic Capstone Phase Template; spec in
-`syllabus/57-defensive-security.md` (data-pipeline cross-cutting section).
+`syllabus/60-defensive-security.md` (data-pipeline cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
 - [ ] **[AI] A** — Author `CONTENT/capstone-data-pipeline/` (`_index.md` `weight: 577`, + `code/`) per the cited capstone
-      spec's ordered steps (detail source: [`syllabus/57-defensive-security.md`](./syllabus/57-defensive-security.md)). **Acceptance**: the
+      spec's ordered steps (detail source: [`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 64 Gate
+### Phase 68 Gate
 
 - [ ] [AI] `capstone-data-pipeline/` complete (wt 577, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
@@ -2062,17 +8488,76 @@ Junction: Data Engineering (37) + SQL/NoSQL (10/34) + a queue. Inter-Topic Capst
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
-## Phase 65 — Topic 58 IT Governance, Risk & Compliance (`it-governance-grc`)
+## Phase 69 — Topic 62 IT Governance, Risk & Compliance (`it-governance-grc`)
 
-Row: Annotated-concept · ‡ no-code · topic wt 680 · Learn 158 / Drill 258 · **leadership/design artifact (no code)**. Template →
-[`syllabus/58-it-governance-grc.md`](./syllabus/58-it-governance-grc.md).
+Row: Annotated-concept · ‡ no-code · topic wt 720 · Learn 162 / Drill 262 · **leadership/design artifact (no code)**. Template →
+[`syllabus/62-it-governance-grc.md`](./syllabus/62-it-governance-grc.md).
 
 - [ ] **[AI] V** — `web-researcher` for `it-governance-grc`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/58-it-governance-grc.md`](./syllabus/58-it-governance-grc.md) and fold dated findings back into that file.
+      [`syllabus/62-it-governance-grc.md`](./syllabus/62-it-governance-grc.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/it-governance-grc/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/58-it-governance-grc.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/it-governance-grc/learning/` teaching **every** concept in
+      `syllabus/62-it-governance-grc.md` §Concepts (DD-34 1:1 mirror; concepts before scenarios). One checkbox per `co-NN`:
+  - [ ] co-01 · it-governance-definition
+  - [ ] co-02 · cobit-framework
+  - [ ] co-03 · iso-27001-isms
+  - [ ] co-04 · nist-csf
+  - [ ] co-05 · risk-management-lifecycle
+  - [ ] co-06 · risk-assessment
+  - [ ] co-07 · risk-register
+  - [ ] co-08 · risk-treatment
+  - [ ] co-09 · grc-integrated
+  - [ ] co-10 · three-lines-model
+  - [ ] co-11 · soc-2
+  - [ ] co-12 · pci-dss
+  - [ ] co-13 · gdpr-principles
+  - [ ] co-14 · hipaa
+  - [ ] co-15 · compliance-vs-security
+  - [ ] co-16 · policy-hierarchy
+  - [ ] co-17 · control-types-function
+  - [ ] co-18 · control-types-nature
+  - [ ] co-19 · control-mapping
+  - [ ] co-20 · audit
+  - [ ] co-21 · business-continuity-dr
+  - [ ] co-22 · vendor-third-party-risk
+  - [ ] co-23 · security-awareness
+  - [ ] co-24 · maturity-raci
+  - [ ] co-25 · assurance-rollup
+  - [ ] co-26 · software-licensing-ip
+  - [ ] co-27 · privacy-by-design
+- [ ] **[AI] A1-scenarios** — Author `CONTENT/it-governance-grc/learning/artifacts/` as governance decision
+      scenarios (no `code/` per the `‡` shape), each citing the `co-NN` it exercises (DD-27/DD-30/DD-34). One
+      checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · governance-vs-management — verify the evaluate/direct/monitor vs plan/build/run split
+  - [ ] ex-02 · cobit-domain-map — verify the domain fit
+  - [ ] ex-03 · risk-identify — verify each risk names an asset + threat
+  - [ ] ex-04 · risk-assess-likelihood-impact — verify the score placement
+  - [ ] ex-05 · risk-treatment-choice — verify the rationale
+  - [ ] ex-06 · risk-register-entry — verify all fields present
+  - [ ] ex-07 · policy-vs-procedure — verify the hierarchy level
+  - [ ] ex-08 · control-function-type — verify the timing relative to the event
+  - [ ] ex-09 · control-nature-type — verify the nature
+  - [ ] ex-10 · nist-csf-functions — verify all six covered or justified
+  - [ ] ex-11 · iso-27001-annex-a — verify the theme (org/people/physical/tech)
+  - [ ] ex-12 · control-mapping-traceability — verify each control traces both ways
+  - [ ] ex-13 · soc-2-criteria — verify the category selection
+  - [ ] ex-14 · pci-dss-scope — verify the requirement mapping
+  - [ ] ex-15 · gdpr-principles — verify each principle addressed
+  - [ ] ex-16 · gdpr-controller-processor — verify the 72h rule
+  - [ ] ex-17 · hipaa-safeguards — verify the safeguard categories
+  - [ ] ex-18 · compliance-vs-security — verify the gap
+  - [ ] ex-19 · three-lines-roles — verify the line placement
+  - [ ] ex-20 · risk-appetite — verify the accountable owner
+  - [ ] ex-21 · audit-evidence — verify the evidence is concrete + auditable
+  - [ ] ex-22 · internal-vs-external-audit — verify the assurance role
+  - [ ] ex-23 · bcp-rto-rpo — verify the recovery targets
+  - [ ] ex-24 · vendor-risk-assessment — verify the tiered controls
+  - [ ] ex-25 · security-awareness-program — verify the role-based coverage
+  - [ ] ex-26 · maturity-model — verify the level rationale
+  - [ ] ex-27 · raci-matrix — verify one accountable per row
+  - [ ] ex-28 · privacy-by-design — verify the built-in privacy
+  - [ ] ex-29 · licensing-ip-sbom — verify the compatibility + dependency risk
+  - [ ] ex-30 · grc-capstone — verify each part present + traceable
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-governance-grc/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2081,27 +8566,132 @@ Row: Annotated-concept · ‡ no-code · topic wt 680 · Learn 158 / Drill 258 �
       `CONTENT/it-governance-grc/drilling/_index.md` (wt 258) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 65 Gate
+### Phase 69 Gate
 
-- [ ] [AI] `it-governance-grc/` complete: `_index.md` wt 680, `learning/_index.md` wt 158,
-      `drilling/_index.md` wt 258, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `it-governance-grc/` complete: `_index.md` wt 720, `learning/_index.md` wt 162,
+      `drilling/_index.md` wt 262, capstone wt 900; all 27 concepts + 30 scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 66 — Topic 59 Analytics & Experimentation (`analytics-and-experimentation`)
+## Phase 70 — Topic 63 Analytics & Experimentation (`analytics-and-experimentation`)
 
-Row: By Example · Python † · topic wt 690 · Learn 159 / Drill 259 · **subject**. Template →
-[`syllabus/59-analytics-and-experimentation.md`](./syllabus/59-analytics-and-experimentation.md).
+Row: By Example · Python † · topic wt 730 · Learn 163 / Drill 263 · **subject**. Template →
+[`syllabus/63-analytics-and-experimentation.md`](./syllabus/63-analytics-and-experimentation.md).
 
 - [ ] **[AI] V** — `web-researcher` for `analytics-and-experimentation`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/59-analytics-and-experimentation.md`](./syllabus/59-analytics-and-experimentation.md) and fold dated findings back into that file.
+      [`syllabus/63-analytics-and-experimentation.md`](./syllabus/63-analytics-and-experimentation.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/analytics-and-experimentation/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/59-analytics-and-experimentation.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/analytics-and-experimentation/learning/` teaching **every** concept in
+      `syllabus/63-analytics-and-experimentation.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · event-instrumentation
+  - [ ] co-02 · idempotent-events
+  - [ ] co-03 · conversion-funnel
+  - [ ] co-04 · retention-cohort
+  - [ ] co-05 · segmentation
+  - [ ] co-06 · north-star-metric
+  - [ ] co-07 · guardrail-metrics
+  - [ ] co-08 · ratio-metrics-treachery
+  - [ ] co-09 · hypothesis-and-oec
+  - [ ] co-10 · randomized-assignment
+  - [ ] co-11 · statistical-power
+  - [ ] co-12 · sample-size-and-mde
+  - [ ] co-13 · p-value
+  - [ ] co-14 · confidence-interval
+  - [ ] co-15 · peeking-optional-stopping
+  - [ ] co-16 · multiple-comparisons
+  - [ ] co-17 · simpsons-paradox
+  - [ ] co-18 · srm-sample-ratio-mismatch
+  - [ ] co-19 · cuped-variance-reduction
+  - [ ] co-20 · novelty-primacy-effects
+  - [ ] co-21 · seasonality-and-ramp
+  - [ ] co-22 · survivorship-bias
+  - [ ] co-23 · correlation-vs-causation
+  - [ ] co-24 · goodhart-metrics-theater
+  - [ ] co-25 · frequentist-vs-bayesian
+  - [ ] co-26 · feature-flags-as-delivery
+- [ ] **[AI] A1-examples** — Author `CONTENT/analytics-and-experimentation/learning/code/` (runnable typed-Python sources, DD-20/DD-30)
+      exercising **every** worked example in `syllabus/63-analytics-and-experimentation.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · tracking-plan-doc — verify every emitted event validates against the plan
+  - [ ] ex-02 · event-schema-typed — verify mypy rejects a mistyped property
+  - [ ] ex-03 · emit-events-to-table — verify rows land with correct columns
+  - [ ] ex-04 · idempotency-key-dedup — verify an upsert keyed on event_id leaves one row
+  - [ ] ex-05 · client-vs-server-event — verify dedup keeps the server-authoritative row
+  - [ ] ex-06 · avoid-double-count — verify the keyed count matches the true user total
+  - [ ] ex-07 · count-distinct-users — verify DISTINCT vs \* differ when users repeat
+  - [ ] ex-08 · conversion-funnel-sql — verify each step ⊆ the previous
+  - [ ] ex-09 · funnel-step-dropoff — verify drop-offs + survivors sum to 100%
+  - [ ] ex-10 · funnel-overall-conversion — verify it equals the product of per-step rates
+  - [ ] ex-11 · cohort-by-signup-week — verify each user lands in exactly one cohort
+  - [ ] ex-12 · retention-curve — verify the curve is monotone non-increasing
+  - [ ] ex-13 · n-day-retention — verify classic vs bounded give different numbers
+  - [ ] ex-14 · segment-by-property — verify weighted segments recombine to overall
+  - [ ] ex-15 · segment-funnel — verify a low-volume segment is flagged too small
+  - [ ] ex-16 · north-star-definition — verify it returns a single number for a period
+  - [ ] ex-17 · north-star-input-tree — verify the inputs reconstruct the north star
+  - [ ] ex-18 · guardrail-metric-list — verify each returns a value + pass/fail vs threshold
+  - [ ] ex-19 · ratio-metric-trap — verify ratio-of-averages ≠ average-of-ratios
+  - [ ] ex-20 · sample-mean-and-variance — verify SE shrinks as √n
+  - [ ] ex-21 · mean-ci-normal — verify ~95% of CIs cover the true mean
+  - [ ] ex-22 · proportion-ci — verify Wilson behaves near p=0/1 where Wald fails
+  - [ ] ex-23 · effect-size-abs-rel — verify relative lift = abs ÷ control rate
+  - [ ] ex-24 · minimum-detectable-diff — verify a larger N lowers the MDE
+  - [ ] ex-25 · hypothesis-statement — verify the analysis reads the direction from config
+  - [ ] ex-26 · oec-definition — verify a proxy-gaming scenario scores worse on the OEC
+  - [ ] ex-27 · randomized-assignment-hash — verify the split is ~50/50 over many ids
+  - [ ] ex-28 · deterministic-bucketing — verify identical bucket on re-run (persistence)
+  - [ ] ex-29 · assignment-independence — verify no correlation between bucket and platform
+  - [ ] ex-30 · type-i-and-ii-errors — verify ~5% false positives at α=0.05
+  - [ ] ex-31 · power-definition — verify power rises with N and effect
+  - [ ] ex-32 · sample-size-formula — verify it matches a power simulation
+  - [ ] ex-33 · mde-tradeoff — verify halving MDE ≈ quadruples N
+  - [ ] ex-34 · power-curve — verify the curve crosses 0.8 at the MDE
+  - [ ] ex-35 · two-proportion-z-test — verify z-stat + p-value vs hand computation
+  - [ ] ex-36 · welch-t-test — verify it handles unequal variances
+  - [ ] ex-37 · p-value-compute — verify a null run is uniform on [0,1]
+  - [ ] ex-38 · p-value-misinterpretation — verify a worked counterexample
+  - [ ] ex-39 · ci-p-value-agreement — verify CI excludes 0 exactly when p<0.05
+  - [ ] ex-40 · bootstrap-ci — verify it tracks the analytic CI on normal data
+  - [ ] ex-41 · ship-no-ship-decision — verify a guardrail breach flips a win to no-ship
+  - [ ] ex-42 · guardrail-check-in-analysis — verify a latency regression is surfaced
+  - [ ] ex-43 · srm-chi-square — verify 50/50 passes and 52/48 on large N fails
+  - [ ] ex-44 · srm-guardrail-abort — verify a failing SRM aborts before any effect report
+  - [ ] ex-45 · cuped-adjustment — verify adjusted means are unbiased vs raw
+  - [ ] ex-46 · cuped-variance-reduction — verify reduction ≈ (1−ρ²)
+  - [ ] ex-47 · delta-method-ratio-metric — verify it matches a bootstrap
+  - [ ] ex-48 · sequential-vs-fixed-preview — verify both control α when used as designed
+  - [ ] ex-49 · bonferroni-correction — verify FWER drops to ~α and power drops
+  - [ ] ex-50 · benjamini-hochberg-fdr — verify it rejects more than Bonferroni, controls FDR
+  - [ ] ex-51 · multiple-metrics-family — verify naive "any significant" inflates false positives
+  - [ ] ex-52 · frequentist-vs-bayesian-intro — verify the two answer different questions
+  - [ ] ex-53 · bayesian-beta-posterior — verify Monte Carlo matches a grid computation
+  - [ ] ex-54 · feature-flag-assignment — verify flag state and arm are the same mapping
+  - [ ] ex-55 · peeking-simulation — verify the false-positive rate blows past 5%
+  - [ ] ex-56 · peeking-false-positive-rate — verify inflation grows with peek count
+  - [ ] ex-57 · fixed-sample-fixes-peeking — verify the FP rate returns to ~5%
+  - [ ] ex-58 · always-valid-sequential — verify continuous monitoring keeps type-I control
+  - [ ] ex-59 · alpha-spending — verify cumulative α stays ≤ target
+  - [ ] ex-60 · simpsons-paradox-demo — verify both within-segment and aggregate facts
+  - [ ] ex-61 · simpsons-segment-weighting — verify reweighting restores the direction
+  - [ ] ex-62 · novelty-effect-decay — verify a day-1 read overstates steady state
+  - [ ] ex-63 · primacy-effect — verify an early stop would wrongly reject
+  - [ ] ex-64 · seasonality-weekly — verify a sub-week test misreads, full-week recovers
+  - [ ] ex-65 · ramp-up-exposure — verify pooling ramp data biases, excluding fixes
+  - [ ] ex-66 · survivorship-bias-demo — verify survivors flatter vs the full cohort
+  - [ ] ex-67 · correlation-not-causation — verify a naive regression finds a spurious effect
+  - [ ] ex-68 · confounder-randomization — verify the spurious effect disappears under randomization
+  - [ ] ex-69 · goodhart-proxy-harm — verify the real goal degrades while the proxy climbs
+  - [ ] ex-70 · metrics-theater-dashboard — verify the OEC/guardrail pairing catches the hidden fall
+  - [ ] ex-71 · guardrail-catches-regression — verify the guardrail gate blocks the ship
+  - [ ] ex-72 · underpowered-test-noise — verify the CI is too wide and reads are unstable
+  - [ ] ex-73 · when-not-to-ab-test — verify the tool recommends judgment over an underpowered test
+  - [ ] ex-74 · bayesian-decision-rule — verify the two rules can disagree, document each stop rule
+  - [ ] ex-75 · feature-flag-ramp-experiment — verify ramp % and assignment stay consistent
+  - [ ] ex-76 · holdout-group — verify the holdout measures cumulative effect
+  - [ ] ex-77 · end-to-end-honest-experiment — verify a known-null dataset does not read significant
+  - [ ] ex-78 · decision-memo-reconcile — verify every memo figure matches the computed result
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/analytics-and-experimentation/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2110,10 +8700,10 @@ Row: By Example · Python † · topic wt 690 · Learn 159 / Drill 259 · **subj
       `CONTENT/analytics-and-experimentation/drilling/_index.md` (wt 259) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 66 Gate
+### Phase 70 Gate
 
-- [ ] [AI] `analytics-and-experimentation/` complete: `_index.md` wt 690, `learning/_index.md` wt 159,
-      `drilling/_index.md` wt 259, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `analytics-and-experimentation/` complete: `_index.md` wt 730, `learning/_index.md` wt 163,
+      `drilling/_index.md` wt 263, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -2124,17 +8714,122 @@ Row: By Example · Python † · topic wt 690 · Learn 159 / Drill 259 · **subj
 
 ## Pass 4 — Concurrency & Systems (Phases 67-94 + Pass-4 + concurrency-showdown capstones)
 
-## Phase 67 — Topic 60 Just Enough Go (`just-enough-go`)
+## Phase 71 — Topic 64 Just Enough Go (`just-enough-go`)
 
-Row: Primer § · Go † · topic wt 700 · Learn 160 / Drill 260 · **primer**. Template →
-[`syllabus/60-just-enough-go.md`](./syllabus/60-just-enough-go.md).
+Row: Primer § · Go † · topic wt 740 · Learn 164 / Drill 264 · **primer**. Template →
+[`syllabus/64-just-enough-go.md`](./syllabus/64-just-enough-go.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-go`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/60-just-enough-go.md`](./syllabus/60-just-enough-go.md) and fold dated findings back into that file.
+      [`syllabus/64-just-enough-go.md`](./syllabus/64-just-enough-go.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-go/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/60-just-enough-go.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-go/learning/` teaching **every** concept in
+      `syllabus/64-just-enough-go.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · go-toolchain
+  - [ ] co-02 · package-and-main
+  - [ ] co-03 · modules
+  - [ ] co-04 · variables-zero-values
+  - [ ] co-05 · constants-iota
+  - [ ] co-06 · basic-types
+  - [ ] co-07 · functions-multiret
+  - [ ] co-08 · control-flow
+  - [ ] co-09 · defer
+  - [ ] co-10 · arrays-slices
+  - [ ] co-11 · maps
+  - [ ] co-12 · pointers
+  - [ ] co-13 · structs
+  - [ ] co-14 · methods-receivers
+  - [ ] co-15 · interfaces
+  - [ ] co-16 · error-values
+  - [ ] co-17 · error-wrapping
+  - [ ] co-18 · struct-tags-json
+  - [ ] co-19 · generics
+  - [ ] co-20 · goroutines-preview
+  - [ ] co-21 · channels-preview
+  - [ ] co-22 · select-preview
+  - [ ] co-23 · sync-preview
+  - [ ] co-24 · testing
+  - [ ] co-25 · gofmt-idiom
+  - [ ] co-26 · context-basics
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-go/learning/code/` (runnable Go sources, DD-20/DD-30)
+      exercising **every** worked example in `syllabus/64-just-enough-go.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · hello-world-run — verify `go run .` prints the line
+  - [ ] ex-02 · go-mod-init — verify a go.mod with the module path appears
+  - [ ] ex-03 · go-build-binary — verify the binary exists and runs standalone
+  - [ ] ex-04 · go-run-vs-build — verify only build leaves a binary
+  - [ ] ex-05 · package-and-import — verify an unused import is a compile error
+  - [ ] ex-06 · var-declaration — verify the printed values
+  - [ ] ex-07 · short-var-decl — verify it infers the type
+  - [ ] ex-08 · zero-values — verify 0/empty/false/<nil>
+  - [ ] ex-09 · const-block — verify assignment fails to compile
+  - [ ] ex-10 · iota-enum — verify successive values 0,1,2
+  - [ ] ex-11 · int-float-types — verify a direct mix fails, conversion fixes
+  - [ ] ex-12 · string-rune-byte — verify a multi-byte char spans bytes but one rune
+  - [ ] ex-13 · type-conversion — verify no implicit coercion is allowed
+  - [ ] ex-14 · bool-and-comparison — verify short-circuit of &&/||
+  - [ ] ex-15 · func-basic — verify the returned value
+  - [ ] ex-16 · func-multiple-return — verify both values received
+  - [ ] ex-17 · named-return-values — verify a naked return returns named values
+  - [ ] ex-18 · variadic-func — verify sum(1,2,3) and sum(s...) both work
+  - [ ] ex-19 · if-with-init — verify v is scoped to the if
+  - [ ] ex-20 · for-c-style — verify the loop count
+  - [ ] ex-21 · for-while-style — verify it exits when cond is false
+  - [ ] ex-22 · for-range — verify index/value and key/value
+  - [ ] ex-23 · switch-statement — verify no implicit fallthrough
+  - [ ] ex-24 · switch-no-condition — verify the matching branch runs
+  - [ ] ex-25 · defer-basic — verify it runs at function return
+  - [ ] ex-26 · defer-lifo-order — verify reverse (LIFO) order
+  - [ ] ex-27 · array-vs-slice — verify the array length is part of its type
+  - [ ] ex-28 · slice-append — verify new elements and returned slice
+  - [ ] ex-29 · slice-len-cap — verify cap jumps on reallocation
+  - [ ] ex-30 · make-slice-capacity — verify len 0, cap 10
+  - [ ] ex-31 · slice-shares-backing — verify a write through one view is visible in the other
+  - [ ] ex-32 · map-basic — verify inserted values
+  - [ ] ex-33 · map-comma-ok — verify ok distinguishes absent from zero
+  - [ ] ex-34 · map-delete-iterate — verify the key is gone
+  - [ ] ex-35 · pointer-basics — verify the pointer sees the same value
+  - [ ] ex-36 · pointer-modify — verify the caller's value changes
+  - [ ] ex-37 · nil-pointer-panic — verify it panics (under recover)
+  - [ ] ex-38 · struct-definition — verify field access
+  - [ ] ex-39 · struct-literal — verify unset fields take zero values
+  - [ ] ex-40 · embedded-struct — verify promoted field access
+  - [ ] ex-41 · method-value-receiver — verify it does NOT mutate the original
+  - [ ] ex-42 · method-pointer-receiver — verify it mutates the original
+  - [ ] ex-43 · receiver-choice — verify a pointer method needs an addressable value
+  - [ ] ex-44 · interface-implicit — verify it is accepted where the interface is required
+  - [ ] ex-45 · interface-two-impls — verify a slice of the interface holds both
+  - [ ] ex-46 · empty-interface-any — verify each element round-trips
+  - [ ] ex-47 · type-assertion — verify a wrong assertion sets ok false, not panic
+  - [ ] ex-48 · type-switch — verify each concrete branch
+  - [ ] ex-49 · error-value-check — verify the error path
+  - [ ] ex-50 · errors-new — verify the message
+  - [ ] ex-51 · custom-error-type — verify it satisfies the interface
+  - [ ] ex-52 · error-wrap-w — verify errors.Unwrap returns the inner error
+  - [ ] ex-53 · errors-is-as — verify both match through the wrap
+  - [ ] ex-54 · struct-tags-json — verify the marshalled key names
+  - [ ] ex-55 · json-marshal-unmarshal — verify a round-trip is equal
+  - [ ] ex-56 · json-omitempty — verify it disappears when zero
+  - [ ] ex-57 · generic-function — verify it works on int and string slices
+  - [ ] ex-58 · generic-constraint — verify a string arg fails to compile
+  - [ ] ex-59 · comparable-constraint — verify it uses ==
+  - [ ] ex-60 · goroutine-preview — verify it ran concurrently
+  - [ ] ex-61 · goroutine-anonymous — verify the closure runs in a goroutine
+  - [ ] ex-62 · unbuffered-channel — verify sender blocks until received
+  - [ ] ex-63 · buffered-channel — verify two sends do not block
+  - [ ] ex-64 · channel-handoff — verify the value crosses
+  - [ ] ex-65 · channel-close-range — verify the loop ends on close
+  - [ ] ex-66 · channel-comma-ok — verify ok is false on a closed channel
+  - [ ] ex-67 · select-basic — verify one case runs
+  - [ ] ex-68 · select-default-nonblock — verify default runs (non-blocking)
+  - [ ] ex-69 · select-timeout — verify the timeout fires
+  - [ ] ex-70 · waitgroup — verify all finish before Wait returns
+  - [ ] ex-71 · mutex — verify no lost updates (clean under -race)
+  - [ ] ex-72 · test-basic — verify go test passes
+  - [ ] ex-73 · table-driven-test — verify each case asserts
+  - [ ] ex-74 · subtests-run — verify each named subtest reports separately
+  - [ ] ex-75 · gofmt-format — verify it rewrites to canonical layout
+  - [ ] ex-76 · effective-go-naming — verify an unexported name is not visible from another package
+  - [ ] ex-77 · context-cancel — verify ctx.Err() returns context.Canceled
+  - [ ] ex-78 · context-timeout — verify ctx.Err() returns context.DeadlineExceeded
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-go/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2143,27 +8838,132 @@ Row: Primer § · Go † · topic wt 700 · Learn 160 / Drill 260 · **primer**.
       `CONTENT/just-enough-go/drilling/_index.md` (wt 260) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 67 Gate
+### Phase 71 Gate
 
-- [ ] [AI] `just-enough-go/` complete: `_index.md` wt 700, `learning/_index.md` wt 160,
-      `drilling/_index.md` wt 260, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-go/` complete: `_index.md` wt 740, `learning/_index.md` wt 164,
+      `drilling/_index.md` wt 264, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 68 — Topic 61 CSP-Style Concurrency (`csp-style-concurrency`)
+## Phase 72 — Topic 65 CSP-Style Concurrency (`csp-style-concurrency`)
 
-Row: By Example · Go † · topic wt 710 · Learn 161 / Drill 261 · **subject**. Template →
-[`syllabus/61-csp-style-concurrency.md`](./syllabus/61-csp-style-concurrency.md).
+Row: By Example · Go † · topic wt 750 · Learn 165 / Drill 265 · **subject**. Template →
+[`syllabus/65-csp-style-concurrency.md`](./syllabus/65-csp-style-concurrency.md).
 
 - [ ] **[AI] V** — `web-researcher` for `csp-style-concurrency`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/61-csp-style-concurrency.md`](./syllabus/61-csp-style-concurrency.md) and fold dated findings back into that file.
+      [`syllabus/65-csp-style-concurrency.md`](./syllabus/65-csp-style-concurrency.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/csp-style-concurrency/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/61-csp-style-concurrency.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/csp-style-concurrency/learning/` teaching **every** concept in
+      `syllabus/65-csp-style-concurrency.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · csp-model
+  - [ ] co-02 · goroutines
+  - [ ] co-03 · scheduler-gomaxprocs
+  - [ ] co-04 · unbuffered-channels
+  - [ ] co-05 · buffered-channels
+  - [ ] co-06 · channel-directions
+  - [ ] co-07 · channel-close
+  - [ ] co-08 · nil-channel
+  - [ ] co-09 · select
+  - [ ] co-10 · select-timeout
+  - [ ] co-11 · mutex
+  - [ ] co-12 · rwmutex
+  - [ ] co-13 · waitgroup
+  - [ ] co-14 · once
+  - [ ] co-15 · atomic-and-syncmap
+  - [ ] co-16 · context-cancellation
+  - [ ] co-17 · pipeline
+  - [ ] co-18 · fan-out
+  - [ ] co-19 · fan-in
+  - [ ] co-20 · worker-pool
+  - [ ] co-21 · done-channel-cancellation
+  - [ ] co-22 · memory-model
+  - [ ] co-23 · race-detector
+  - [ ] co-24 · goroutine-leak
+  - [ ] co-25 · deadlock
+  - [ ] co-26 · csp-vs-actor
+- [ ] **[AI] A1-examples** — Author `CONTENT/csp-style-concurrency/learning/code/` (runnable + race-checked Go sources, DD-20/DD-30)
+      exercising **every** worked example in `syllabus/65-csp-style-concurrency.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · goroutine-basic — verify it ran
+  - [ ] ex-02 · goroutine-waitgroup — verify all ran before Wait returned
+  - [ ] ex-03 · share-by-communicating — verify only the receiver mutates (race-clean)
+  - [ ] ex-04 · unbuffered-rendezvous — verify send unblocks only on receive
+  - [ ] ex-05 · unbuffered-blocks — verify a send with no receiver blocks
+  - [ ] ex-06 · buffered-capacity — verify three sends proceed without a receiver
+  - [ ] ex-07 · buffered-nonblock — verify no block until full
+  - [ ] ex-08 · buffered-full-blocks — verify the fourth send blocks
+  - [ ] ex-09 · send-only-channel — verify a receive on it fails to compile
+  - [ ] ex-10 · receive-only-channel — verify a send on it fails to compile
+  - [ ] ex-11 · close-channel — verify a post-close receive returns the zero value
+  - [ ] ex-12 · range-over-channel — verify the loop ends on close
+  - [ ] ex-13 · comma-ok-closed — verify ok is false
+  - [ ] ex-14 · send-on-closed-panics — verify it panics
+  - [ ] ex-15 · close-closed-panics — verify it panics
+  - [ ] ex-16 · nil-channel-blocks — verify it never becomes ready
+  - [ ] ex-17 · nil-disables-select-case — verify that case is skipped
+  - [ ] ex-18 · select-two-ready — verify exactly one case runs
+  - [ ] ex-19 · select-pseudo-random — verify the choice is roughly uniform
+  - [ ] ex-20 · select-default-nonblock — verify default runs immediately
+  - [ ] ex-21 · select-timeout-after — verify the timeout fires
+  - [ ] ex-22 · mutex-guard-counter — verify no lost updates under -race
+  - [ ] ex-23 · mutex-no-copy — verify go vet flags a copy
+  - [ ] ex-24 · rwmutex-readers — verify readers concurrent, writer exclusive
+  - [ ] ex-25 · waitgroup-add-done-wait — verify Wait blocks until counter zero
+  - [ ] ex-26 · waitgroup-go — verify wg.Go launches+counts equivalently
+  - [ ] ex-27 · once-init — verify it runs exactly once
+  - [ ] ex-28 · sync-map — verify race-clean under -race
+  - [ ] ex-29 · atomic-counter — verify the final total is exact
+  - [ ] ex-30 · context-withcancel — verify the goroutine returns
+  - [ ] ex-31 · context-cancel-propagation — verify all children see Done
+  - [ ] ex-32 · context-withtimeout — verify ctx.Err() is DeadlineExceeded
+  - [ ] ex-33 · context-withdeadline — verify it fires at the deadline
+  - [ ] ex-34 · context-err-canceled — verify ctx.Err() is context.Canceled
+  - [ ] ex-35 · context-done-in-select — verify cancellation wins over a slow input
+  - [ ] ex-36 · pipeline-two-stage — verify the output sequence
+  - [ ] ex-37 · pipeline-three-stage — verify each stage closes its outbound channel
+  - [ ] ex-38 · pipeline-generator — verify it emits then closes
+  - [ ] ex-39 · fan-out-workers — verify work is distributed across them
+  - [ ] ex-40 · fan-out-parallel-speedup — verify counts per worker > 0
+  - [ ] ex-41 · fan-in-merge — verify all values arrive
+  - [ ] ex-42 · fan-in-waitgroup-close — verify the consumer's range ends
+  - [ ] ex-43 · worker-pool-bounded — verify at most N run at once
+  - [ ] ex-44 · worker-pool-results — verify every job produced one result
+  - [ ] ex-45 · worker-pool-jobs-channel — verify workers exit on close
+  - [ ] ex-46 · done-channel-cancel — verify all stages return
+  - [ ] ex-47 · done-channel-defer-close — verify upstream senders unblock
+  - [ ] ex-48 · pipeline-cancel-early — verify no stage blocks forever
+  - [ ] ex-49 · select-send-or-done — verify a stage exits on cancel
+  - [ ] ex-50 · context-vs-done — verify equivalent cancellation
+  - [ ] ex-51 · timeout-per-job — verify a slow job is abandoned
+  - [ ] ex-52 · graceful-shutdown — verify in-flight jobs finish, no new ones start
+  - [ ] ex-53 · rate-limit-ticker — verify the emit rate is bounded
+  - [ ] ex-54 · semaphore-buffered-channel — verify concurrency capped at buffer size
+  - [ ] ex-55 · happens-before-channel — verify the read sees the write
+  - [ ] ex-56 · memory-visibility-unsync — verify -race flags it
+  - [ ] ex-57 · race-on-shared-var — verify -race reports a data race
+  - [ ] ex-58 · race-detector-output — verify it names the conflicting accesses
+  - [ ] ex-59 · race-fixed-mutex — verify -race is clean
+  - [ ] ex-60 · race-fixed-channel — verify -race is clean
+  - [ ] ex-61 · race-cost-note — verify it runs slower (documents the cost)
+  - [ ] ex-62 · goroutine-leak-blocked-send — verify it leaks (count stays up)
+  - [ ] ex-63 · goroutine-leak-fix-done — verify the count returns to baseline
+  - [ ] ex-64 · goroutine-leak-detect — verify the leak is observable
+  - [ ] ex-65 · deadlock-all-asleep — verify the deadlock fatal error
+  - [ ] ex-66 · deadlock-unbuffered-selfsend — verify the deadlock
+  - [ ] ex-67 · deadlock-fix — verify it completes
+  - [ ] ex-68 · deadlock-circular-wait — verify the circular deadlock
+  - [ ] ex-69 · pipeline-error-propagation — verify the first error stops the run
+  - [ ] ex-70 · bounded-parallelism — verify in-flight count never exceeds the bound
+  - [ ] ex-71 · context-value-request-scoped — verify a worker reads the request id
+  - [ ] ex-72 · select-fairness — verify neither channel starves
+  - [ ] ex-73 · mutex-vs-channel-choice — verify both are correct
+  - [ ] ex-74 · csp-vs-actor-contrast — verify it names rendezvous vs mailbox
+  - [ ] ex-75 · csp-synchronous-handoff — verify the sender waits for the receiver
+  - [ ] ex-76 · mini-worker-pool — verify counts reconcile
+  - [ ] ex-77 · clean-shutdown-race-clean — verify clean shutdown and zero races
+  - [ ] ex-78 · concurrency-not-parallelism — verify correctness independent of parallelism
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/csp-style-concurrency/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2172,27 +8972,132 @@ Row: By Example · Go † · topic wt 710 · Learn 161 / Drill 261 · **subject*
       `CONTENT/csp-style-concurrency/drilling/_index.md` (wt 261) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 68 Gate
+### Phase 72 Gate
 
-- [ ] [AI] `csp-style-concurrency/` complete: `_index.md` wt 710, `learning/_index.md` wt 161,
-      `drilling/_index.md` wt 261, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `csp-style-concurrency/` complete: `_index.md` wt 750, `learning/_index.md` wt 165,
+      `drilling/_index.md` wt 265, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 69 — Topic 62 Just Enough Elixir (`just-enough-elixir`)
+## Phase 73 — Topic 66 Just Enough Elixir (`just-enough-elixir`)
 
-Row: Primer § · Elixir † · topic wt 720 · Learn 162 / Drill 262 · **primer**. Template →
-[`syllabus/62-just-enough-elixir.md`](./syllabus/62-just-enough-elixir.md).
+Row: Primer § · Elixir † · topic wt 760 · Learn 166 / Drill 266 · **primer**. Template →
+[`syllabus/66-just-enough-elixir.md`](./syllabus/66-just-enough-elixir.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-elixir`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/62-just-enough-elixir.md`](./syllabus/62-just-enough-elixir.md) and fold dated findings back into that file.
+      [`syllabus/66-just-enough-elixir.md`](./syllabus/66-just-enough-elixir.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-elixir/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/62-just-enough-elixir.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-elixir/learning/` teaching **every** concept in
+      `syllabus/66-just-enough-elixir.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · iex-repl
+  - [ ] co-02 · mix-project
+  - [ ] co-03 · ex-vs-exs
+  - [ ] co-04 · immutability
+  - [ ] co-05 · basic-types
+  - [ ] co-06 · atoms
+  - [ ] co-07 · match-operator
+  - [ ] co-08 · pattern-matching-destructure
+  - [ ] co-09 · list-head-tail
+  - [ ] co-10 · pin-operator
+  - [ ] co-11 · wildcard-underscore
+  - [ ] co-12 · pipe-operator
+  - [ ] co-13 · modules-def-defp
+  - [ ] co-14 · anonymous-functions
+  - [ ] co-15 · arity
+  - [ ] co-16 · default-args
+  - [ ] co-17 · guards
+  - [ ] co-18 · multiple-clauses
+  - [ ] co-19 · recursion
+  - [ ] co-20 · tail-call
+  - [ ] co-21 · enum-higher-order
+  - [ ] co-22 · string-processing
+  - [ ] co-23 · process-spawn-preview
+  - [ ] co-24 · send-receive-preview
+  - [ ] co-25 · self-and-mailbox
+  - [ ] co-26 · process-isolation
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-elixir/learning/code/` (runnable Elixir sources via iex/mix, DD-20/DD-30)
+      exercising **every** worked example in `syllabus/66-just-enough-elixir.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · iex-start-eval — verify the results
+  - [ ] ex-02 · iex-helpers — verify docs/type info print
+  - [ ] ex-03 · mix-new-project — verify mix.exs + lib/greeter.ex appear
+  - [ ] ex-04 · mix-run-script — verify it prints
+  - [ ] ex-05 · ex-vs-exs — verify both work, note the intent difference
+  - [ ] ex-06 · immutable-rebind — verify rebinding works, old value untouched
+  - [ ] ex-07 · immutable-list-transform — verify the original is unchanged
+  - [ ] ex-08 · integer-float — verify the types
+  - [ ] ex-09 · boolean-and-atom — verify a boolean is an atom
+  - [ ] ex-10 · string-binary — verify a multi-byte char differs (length vs byte_size)
+  - [ ] ex-11 · list-literal — verify head and tail
+  - [ ] ex-12 · tuple-literal — verify indexed access
+  - [ ] ex-13 · is-type-checks — verify each predicate
+  - [ ] ex-14 · atom-as-tag — verify pattern-matching the tag
+  - [ ] ex-15 · match-operator-basic — verify 1 = x succeeds
+  - [ ] ex-16 · match-mismatch-error — verify a MatchError
+  - [ ] ex-17 · destructure-tuple — verify the bindings
+  - [ ] ex-18 · destructure-list — verify the bindings
+  - [ ] ex-19 · head-tail-match — verify head=1, tail=[2,3]
+  - [ ] ex-20 · prepend-list — verify it prepends
+  - [ ] ex-21 · pin-operator — verify it raises (matches existing value)
+  - [ ] ex-22 · wildcard-underscore — verify b binds and \_ discards
+  - [ ] ex-23 · pipe-single — verify the output
+  - [ ] ex-24 · pipe-chain — verify the result
+  - [ ] ex-25 · pipe-first-arg — verify vs the explicit call
+  - [ ] ex-26 · pipe-vs-nested — verify identical result
+  - [ ] ex-27 · defmodule-def — verify calling it from iex
+  - [ ] ex-28 · private-defp — verify it is NOT callable from outside
+  - [ ] ex-29 · call-cross-module — verify it resolves
+  - [ ] ex-30 · anonymous-fn — verify add.(1, 2)
+  - [ ] ex-31 · anonymous-fn-dot-call — verify the dot is required for the variable form
+  - [ ] ex-32 · capture-operator — verify they equal the fn form
+  - [ ] ex-33 · arity-notation — verify sum/2 and sum/3 are distinct
+  - [ ] ex-34 · same-name-diff-arity — verify both dispatch by arity
+  - [ ] ex-35 · default-args — verify both call forms work
+  - [ ] ex-36 · guard-when — verify the negative branch
+  - [ ] ex-37 · guard-allowed-exprs — verify it filters
+  - [ ] ex-38 · guard-fail-skips — verify it just fails the clause
+  - [ ] ex-39 · function-clauses-pattern — verify each routes correctly
+  - [ ] ex-40 · clause-order-matters — verify the specific never fires, then reorder
+  - [ ] ex-41 · recursion-sum-list — verify it totals a list
+  - [ ] ex-42 · recursion-accumulator — verify the same result
+  - [ ] ex-43 · recursion-map-manual — verify vs Enum.map
+  - [ ] ex-44 · recursion-base-case — verify 0! = 1
+  - [ ] ex-45 · tail-call-recursion — verify no stack blowup
+  - [ ] ex-46 · tail-vs-body-recursion — verify identical output
+  - [ ] ex-47 · enum-map — verify the squared list
+  - [ ] ex-48 · enum-filter — verify it drops non-positives
+  - [ ] ex-49 · enum-reduce — verify the sum
+  - [ ] ex-50 · enum-vs-recursion — verify same result
+  - [ ] ex-51 · string-split — verify the parts
+  - [ ] ex-52 · string-upcase-trim — verify "HI"
+  - [ ] ex-53 · pipe-enum-string — verify the transformed list
+  - [ ] ex-54 · keyword-list-opts — verify keyword access
+  - [ ] ex-55 · spawn-basic — verify the process runs
+  - [ ] ex-56 · spawn-returns-pid — verify it returns a PID
+  - [ ] ex-57 · self-pid — verify it returns the current PID
+  - [ ] ex-58 · send-message — verify the message is delivered
+  - [ ] ex-59 · receive-block — verify it matches
+  - [ ] ex-60 · send-receive-roundtrip — verify the round-trip
+  - [ ] ex-61 · receive-pattern-match — verify each message routes
+  - [ ] ex-62 · mailbox-fifo — verify FIFO order
+  - [ ] ex-63 · process-isolation — verify the parent is unaffected
+  - [ ] ex-64 · process-lightweight — verify they start cheaply
+  - [ ] ex-65 · ping-pong-processes — verify the ping/pong sequence
+  - [ ] ex-66 · spawn-closure-capture — verify it sees the captured value
+  - [ ] ex-67 · receive-timeout — verify the timeout branch fires
+  - [ ] ex-68 · stateful-loop-process — verify state updates across messages
+  - [ ] ex-69 · pattern-match-messages — verify the handler dispatch
+  - [ ] ex-70 · pipe-transform-pipeline — verify the final value
+  - [ ] ex-71 · immutable-transform-chain — verify the original is unchanged
+  - [ ] ex-72 · fold-with-pattern — verify the aggregate
+  - [ ] ex-73 · map-reduce-pipeline — verify the reduction
+  - [ ] ex-74 · string-word-count — verify the counts
+  - [ ] ex-75 · spawn-worker-compute — verify the reply
+  - [ ] ex-76 · process-vs-shared-state — verify isolation
+  - [ ] ex-77 · mix-module-end-to-end — verify mix test passes
+  - [ ] ex-78 · capstone-preview-roundtrip — verify the round-trip + pipeline result
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-elixir/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2201,27 +9106,132 @@ Row: Primer § · Elixir † · topic wt 720 · Learn 162 / Drill 262 · **prime
       `CONTENT/just-enough-elixir/drilling/_index.md` (wt 262) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 69 Gate
+### Phase 73 Gate
 
-- [ ] [AI] `just-enough-elixir/` complete: `_index.md` wt 720, `learning/_index.md` wt 162,
-      `drilling/_index.md` wt 262, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-elixir/` complete: `_index.md` wt 760, `learning/_index.md` wt 166,
+      `drilling/_index.md` wt 266, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 70 — Topic 63 Actor-Model Concurrency (`actor-model-concurrency`)
+## Phase 74 — Topic 67 Actor-Model Concurrency (`actor-model-concurrency`)
 
-Row: By Example · Elixir † · topic wt 730 · Learn 163 / Drill 263 · **subject**. Template →
-[`syllabus/63-actor-model-concurrency.md`](./syllabus/63-actor-model-concurrency.md).
+Row: By Example · Elixir † · topic wt 770 · Learn 167 / Drill 267 · **subject**. Template →
+[`syllabus/67-actor-model-concurrency.md`](./syllabus/67-actor-model-concurrency.md).
 
 - [ ] **[AI] V** — `web-researcher` for `actor-model-concurrency`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/63-actor-model-concurrency.md`](./syllabus/63-actor-model-concurrency.md) and fold dated findings back into that file.
+      [`syllabus/67-actor-model-concurrency.md`](./syllabus/67-actor-model-concurrency.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/actor-model-concurrency/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/63-actor-model-concurrency.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/actor-model-concurrency/learning/` teaching **every** concept in
+      `syllabus/67-actor-model-concurrency.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · actor-model
+  - [ ] co-02 · spawn-link
+  - [ ] co-03 · send-receive
+  - [ ] co-04 · links
+  - [ ] co-05 · monitors
+  - [ ] co-06 · process-state-loop
+  - [ ] co-07 · genserver-behaviour
+  - [ ] co-08 · genserver-start-link
+  - [ ] co-09 · handle-call
+  - [ ] co-10 · handle-cast
+  - [ ] co-11 · handle-info
+  - [ ] co-12 · genserver-client-api
+  - [ ] co-13 · supervisor
+  - [ ] co-14 · restart-strategies
+  - [ ] co-15 · restart-types
+  - [ ] co-16 · restart-limits
+  - [ ] co-17 · let-it-crash
+  - [ ] co-18 · supervision-tree
+  - [ ] co-19 · dynamic-supervisor
+  - [ ] co-20 · agent
+  - [ ] co-21 · task
+  - [ ] co-22 · registry
+  - [ ] co-23 · otp-application
+  - [ ] co-24 · process-registration
+  - [ ] co-25 · genserver-pitfalls
+  - [ ] co-26 · actor-vs-csp
+- [ ] **[AI] A1-examples** — Author `CONTENT/actor-model-concurrency/learning/code/` (runnable Elixir sources via mix/iex, DD-20/DD-30)
+      exercising **every** worked example in `syllabus/67-actor-model-concurrency.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · spawn-process — verify the function runs in another process
+  - [ ] ex-02 · spawn-pid — verify it returns a live PID
+  - [ ] ex-03 · spawn-link — verify the crash propagates to the parent
+  - [ ] ex-04 · send-message — verify delivery to the mailbox
+  - [ ] ex-05 · receive-match — verify it matches
+  - [ ] ex-06 · send-receive-roundtrip — verify the round-trip
+  - [ ] ex-07 · receive-multiple-patterns — verify each message routes
+  - [ ] ex-08 · receive-timeout — verify the timeout branch
+  - [ ] ex-09 · mailbox-fifo — verify FIFO order
+  - [ ] ex-10 · link-crash-propagates — verify both processes die
+  - [ ] ex-11 · spawn-link-exit-signal — verify the signal
+  - [ ] ex-12 · trap-exit — verify the parent survives and gets :EXIT
+  - [ ] ex-13 · monitor-down-message — verify a {:DOWN, ...} arrives
+  - [ ] ex-14 · monitor-vs-link — verify the monitor process is unaffected
+  - [ ] ex-15 · demonitor — verify no :DOWN arrives
+  - [ ] ex-16 · stateful-loop-basic — verify state persists across messages
+  - [ ] ex-17 · stateful-loop-counter — verify the running total
+  - [ ] ex-18 · stateful-loop-get-set — verify reads and writes
+  - [ ] ex-19 · process-isolation — verify the parent's state is intact
+  - [ ] ex-20 · lightweight-many — verify they start cheaply
+  - [ ] ex-21 · self-reply-address — verify the reply
+  - [ ] ex-22 · stateful-loop-immutable — verify no mutation
+  - [ ] ex-23 · spawn-monitor — verify it returns {pid, ref} and a :DOWN
+  - [ ] ex-24 · named-register — verify :worker resolves to the PID
+  - [ ] ex-25 · whereis-lookup — verify it returns the registered PID
+  - [ ] ex-26 · send-to-named — verify delivery by name
+  - [ ] ex-27 · genserver-minimal — verify it starts and replies
+  - [ ] ex-28 · genserver-state-map — verify updates round-trip
+  - [ ] ex-29 · genserver-start-link — verify {:ok, pid}
+  - [ ] ex-30 · genserver-init — verify the initial state
+  - [ ] ex-31 · handle-call-sync — verify the client waits for the reply
+  - [ ] ex-32 · handle-call-reply — verify the reply and the state change
+  - [ ] ex-33 · handle-call-backpressure — verify concurrent callers queue
+  - [ ] ex-34 · handle-cast-async — verify it returns :ok immediately
+  - [ ] ex-35 · handle-cast-noreply — verify the state changes with no reply
+  - [ ] ex-36 · handle-info-message — verify handle_info/2 receives it
+  - [ ] ex-37 · handle-info-timeout — verify the timeout fires
+  - [ ] ex-38 · client-api-wrapper — verify callers never see a PID
+  - [ ] ex-39 · genserver-stop — verify the process terminates
+  - [ ] ex-40 · genserver-continue — verify handle_continue/2 runs post-init
+  - [ ] ex-41 · agent-simple-state — verify it holds state
+  - [ ] ex-42 · agent-get-update — verify read and write
+  - [ ] ex-43 · agent-vs-genserver — verify equivalence
+  - [ ] ex-44 · task-async-await — verify the result
+  - [ ] ex-45 · task-multiple-parallel — verify parallel results
+  - [ ] ex-46 · task-supervisor — verify a supervised task runs
+  - [ ] ex-47 · registry-start — verify it starts
+  - [ ] ex-48 · registry-via-tuple — verify it is addressable by name
+  - [ ] ex-49 · registry-unique-keys — verify {:error, {:already_registered, pid}}
+  - [ ] ex-50 · registry-duplicate-keys — verify a lookup returns all
+  - [ ] ex-51 · genserver-registered-name — verify calls by name
+  - [ ] ex-52 · genserver-timeout-call — verify it times out
+  - [ ] ex-53 · genserver-multi-clause-handle — verify dispatch
+  - [ ] ex-54 · genserver-call-cast-choice — verify reply vs no-reply
+  - [ ] ex-55 · supervisor-basic — verify it starts the child
+  - [ ] ex-56 · child-spec — verify the supervisor uses it
+  - [ ] ex-57 · supervisor-starts-children — verify all start
+  - [ ] ex-58 · one-for-one — verify only the failed child restarts
+  - [ ] ex-59 · one-for-all — verify all restart
+  - [ ] ex-60 · rest-for-one — verify it and later ones restart
+  - [ ] ex-61 · restart-permanent — verify it still restarts on normal exit
+  - [ ] ex-62 · restart-temporary — verify it does NOT restart
+  - [ ] ex-63 · restart-transient — verify it restarts only on crash
+  - [ ] ex-64 · max-restarts-limit — verify the supervisor terminates
+  - [ ] ex-65 · let-it-crash-demo — verify it crashes cleanly
+  - [ ] ex-66 · supervisor-restarts-worker — verify it comes back with fresh state
+  - [ ] ex-67 · supervision-tree-nested — verify the tree starts
+  - [ ] ex-68 · dynamic-supervisor-start-child — verify a child is added at runtime
+  - [ ] ex-69 · dynamic-supervisor-many — verify each is supervised
+  - [ ] ex-70 · otp-application-mod — verify mix run starts the tree
+  - [ ] ex-71 · application-supervision-root — verify the whole tree boots
+  - [ ] ex-72 · registry-in-supervision-tree — verify named workers resolve after start
+  - [ ] ex-73 · crash-recovery-service-available — verify the service stays available
+  - [ ] ex-74 · genserver-bottleneck-pitfall — verify it serialises and bottlenecks
+  - [ ] ex-75 · blocking-handle-call-pitfall — verify it stalls callers; fix async
+  - [ ] ex-76 · unbounded-mailbox-pitfall — verify the mailbox grows unbounded
+  - [ ] ex-77 · actor-vs-csp-contrast — verify it names a concrete trade-off each way
+  - [ ] ex-78 · capstone-fault-tolerant-otp — verify the service recovers with no loss
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/actor-model-concurrency/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2230,27 +9240,132 @@ Row: By Example · Elixir † · topic wt 730 · Learn 163 / Drill 263 · **subj
       `CONTENT/actor-model-concurrency/drilling/_index.md` (wt 263) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 70 Gate
+### Phase 74 Gate
 
-- [ ] [AI] `actor-model-concurrency/` complete: `_index.md` wt 730, `learning/_index.md` wt 163,
-      `drilling/_index.md` wt 263, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `actor-model-concurrency/` complete: `_index.md` wt 770, `learning/_index.md` wt 167,
+      `drilling/_index.md` wt 267, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 71 — Topic 64 Just Enough Kotlin (`just-enough-kotlin`)
+## Phase 75 — Topic 68 Just Enough Kotlin (`just-enough-kotlin`)
 
-Row: Primer § · Kotlin † · topic wt 740 · Learn 164 / Drill 264 · **primer**. Template →
-[`syllabus/64-just-enough-kotlin.md`](./syllabus/64-just-enough-kotlin.md).
+Row: Primer § · Kotlin † · topic wt 780 · Learn 168 / Drill 268 · **primer**. Template →
+[`syllabus/68-just-enough-kotlin.md`](./syllabus/68-just-enough-kotlin.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-kotlin`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/64-just-enough-kotlin.md`](./syllabus/64-just-enough-kotlin.md) and fold dated findings back into that file.
+      [`syllabus/68-just-enough-kotlin.md`](./syllabus/68-just-enough-kotlin.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-kotlin/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/64-just-enough-kotlin.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-kotlin/learning/` teaching **every** concept in
+      `syllabus/68-just-enough-kotlin.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · kotlin-toolchain
+  - [ ] co-02 · val-var
+  - [ ] co-03 · type-inference
+  - [ ] co-04 · basic-types
+  - [ ] co-05 · string-templates
+  - [ ] co-06 · null-safety
+  - [ ] co-07 · safe-call
+  - [ ] co-08 · elvis
+  - [ ] co-09 · not-null-assertion
+  - [ ] co-10 · safe-let
+  - [ ] co-11 · functions
+  - [ ] co-12 · default-named-args
+  - [ ] co-13 · single-expression-fn
+  - [ ] co-14 · lambdas
+  - [ ] co-15 · higher-order-functions
+  - [ ] co-16 · collections
+  - [ ] co-17 · collection-ops
+  - [ ] co-18 · extension-functions
+  - [ ] co-19 · classes-constructors
+  - [ ] co-20 · data-classes
+  - [ ] co-21 · interfaces
+  - [ ] co-22 · objects-companion
+  - [ ] co-23 · when-expression
+  - [ ] co-24 · if-expression
+  - [ ] co-25 · sealed-classes
+  - [ ] co-26 · coroutines-preview
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-kotlin/learning/code/` (runnable Kotlin sources via CLI/Gradle, DD-20/DD-30)
+      exercising **every** worked example in `syllabus/68-just-enough-kotlin.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · hello-kotlinc — verify java -jar hello.jar prints
+  - [ ] ex-02 · main-println — verify the output
+  - [ ] ex-03 · gradle-run — verify it prints
+  - [ ] ex-04 · val-immutable — verify reassign fails to compile
+  - [ ] ex-05 · var-mutable — verify the reassignment
+  - [ ] ex-06 · type-inference — verify the inferred Int
+  - [ ] ex-07 · type-annotation — verify the explicit type
+  - [ ] ex-08 · int-double-num — verify explicit conversion
+  - [ ] ex-09 · boolean-char — verify their values
+  - [ ] ex-10 · string-template — verify the interpolation
+  - [ ] ex-11 · string-multiline — verify it spans lines
+  - [ ] ex-12 · nullable-type — verify it holds null
+  - [ ] ex-13 · non-null-default — verify a compile error
+  - [ ] ex-14 · safe-call — verify it returns null, not NPE
+  - [ ] ex-15 · safe-call-chain — verify it short-circuits on first null
+  - [ ] ex-16 · elvis-default — verify the default on null
+  - [ ] ex-17 · elvis-return — verify the early return path
+  - [ ] ex-18 · not-null-assertion — verify it throws NPE
+  - [ ] ex-19 · safe-let — verify the block runs only when non-null
+  - [ ] ex-20 · fun-basic — verify the returned sum
+  - [ ] ex-21 · unit-return — verify its type is Unit
+  - [ ] ex-22 · default-args — verify both call forms
+  - [ ] ex-23 · named-args — verify order-independence
+  - [ ] ex-24 · single-expression-fn — verify the result + inferred type
+  - [ ] ex-25 · fun-vararg — verify it accepts multiple args
+  - [ ] ex-26 · if-expression — verify the assigned value
+  - [ ] ex-27 · lambda-basic — verify sq(3)
+  - [ ] ex-28 · trailing-lambda — verify the result
+  - [ ] ex-29 · it-implicit — verify it works without a named param
+  - [ ] ex-30 · higher-order-fn — verify it applies the passed fn
+  - [ ] ex-31 · fn-as-param — verify it filters
+  - [ ] ex-32 · fn-return-fn — verify the returned closure
+  - [ ] ex-33 · listof — verify an add method is unavailable
+  - [ ] ex-34 · mutable-list — verify mutation, even in a val
+  - [ ] ex-35 · map-literal — verify keyed access
+  - [ ] ex-36 · set-literal — verify duplicates collapse
+  - [ ] ex-37 · collection-map — verify the transformed list
+  - [ ] ex-38 · collection-filter — verify it drops non-positives
+  - [ ] ex-39 · collection-reduce-fold — verify the sum
+  - [ ] ex-40 · collection-foreach — verify each element prints
+  - [ ] ex-41 · collection-chain — verify the chained result
+  - [ ] ex-42 · extension-function — verify "hi".shout()
+  - [ ] ex-43 · extension-property — verify it reads
+  - [ ] ex-44 · class-primary-constructor — verify field access
+  - [ ] ex-45 · class-init-block — verify it runs at construction
+  - [ ] ex-46 · class-method — verify it uses instance properties
+  - [ ] ex-47 · data-class — verify the generated toString
+  - [ ] ex-48 · data-class-copy — verify a new instance with one field changed
+  - [ ] ex-49 · data-class-destructure — verify componentN destructuring
+  - [ ] ex-50 · data-class-equals — verify structural == equality
+  - [ ] ex-51 · interface-impl — verify the overridden method
+  - [ ] ex-52 · interface-default-method — verify it is inherited
+  - [ ] ex-53 · object-singleton — verify a single shared instance
+  - [ ] ex-54 · companion-object — verify Type.create() by class name
+  - [ ] ex-55 · when-value — verify the matched branch
+  - [ ] ex-56 · when-condition — verify the if-else-chain form
+  - [ ] ex-57 · when-expression-return — verify the returned value
+  - [ ] ex-58 · when-multiple-cases — verify both match the branch
+  - [ ] ex-59 · if-else-expression — verify the value
+  - [ ] ex-60 · sealed-class — verify each constructs
+  - [ ] ex-61 · sealed-when-exhaustive — verify it compiles (all cases covered)
+  - [ ] ex-62 · sealed-when-missing-case — verify the compiler flags non-exhaustiveness
+  - [ ] ex-63 · suspend-function — verify it can only be called from a coroutine/suspend
+  - [ ] ex-64 · launch-coroutine — verify it runs concurrently
+  - [ ] ex-65 · runblocking — verify it blocks to completion
+  - [ ] ex-66 · coroutine-delay — verify it suspends without blocking a thread
+  - [ ] ex-67 · coroutine-return-value — verify the awaited result
+  - [ ] ex-68 · structured-concurrency-preview — verify it finishes after children
+  - [ ] ex-69 · null-safe-collection — verify nulls are dropped
+  - [ ] ex-70 · data-class-in-collection — verify contains uses structural equality
+  - [ ] ex-71 · lambda-over-data-class — verify the projected list
+  - [ ] ex-72 · interface-polymorphism — verify dynamic dispatch
+  - [ ] ex-73 · extension-on-nullable — verify it runs on null
+  - [ ] ex-74 · when-with-sealed-result — verify each maps correctly
+  - [ ] ex-75 · higher-order-with-lambda — verify the callback
+  - [ ] ex-76 · filter-map-chain — verify the final number
+  - [ ] ex-77 · gradle-multi-file — verify it compiles and runs
+  - [ ] ex-78 · capstone-preview-cli — verify it builds and produces the expected output
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-kotlin/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2259,27 +9374,136 @@ Row: Primer § · Kotlin † · topic wt 740 · Learn 164 / Drill 264 · **prime
       `CONTENT/just-enough-kotlin/drilling/_index.md` (wt 264) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 71 Gate
+### Phase 75 Gate
 
-- [ ] [AI] `just-enough-kotlin/` complete: `_index.md` wt 740, `learning/_index.md` wt 164,
-      `drilling/_index.md` wt 264, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-kotlin/` complete: `_index.md` wt 780, `learning/_index.md` wt 168,
+      `drilling/_index.md` wt 268, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 72 — Topic 65 Android App Development (`android-app-development`)
+## Phase 76 — Topic 69 Android App Development (`android-app-development`)
 
-Row: By Example · Kotlin † ◆ · topic wt 750 · Learn 165 / Drill 265 · **subject**. Template →
-[`syllabus/65-android-app-development.md`](./syllabus/65-android-app-development.md).
+Row: By Example · Kotlin † ◆ · topic wt 790 · Learn 169 / Drill 269 · **subject**. Template →
+[`syllabus/69-android-app-development.md`](./syllabus/69-android-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `android-app-development`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/65-android-app-development.md`](./syllabus/65-android-app-development.md) and fold dated findings back into that file.
+      [`syllabus/69-android-app-development.md`](./syllabus/69-android-app-development.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/android-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/65-android-app-development.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/android-app-development/learning/` teaching **every** concept in
+      `syllabus/69-android-app-development.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · project-and-gradle
+  - [ ] co-02 · manifest
+  - [ ] co-03 · activity-lifecycle
+  - [ ] co-04 · intents
+  - [ ] co-05 · composable-functions
+  - [ ] co-06 · recomposition
+  - [ ] co-07 · compose-state
+  - [ ] co-08 · state-hoisting
+  - [ ] co-09 · modifiers
+  - [ ] co-10 · preview
+  - [ ] co-11 · layout-composables
+  - [ ] co-12 · material-components
+  - [ ] co-13 · lazy-lists
+  - [ ] co-14 · viewmodel
+  - [ ] co-15 · unidirectional-data-flow
+  - [ ] co-16 · stateflow
+  - [ ] co-17 · ui-state-modeling
+  - [ ] co-18 · repository-pattern
+  - [ ] co-19 · room-entities-dao
+  - [ ] co-20 · room-suspend-flow
+  - [ ] co-21 · datastore
+  - [ ] co-22 · retrofit
+  - [ ] co-23 · json-parsing
+  - [ ] co-24 · coroutines-on-android
+  - [ ] co-25 · flows-on-android
+  - [ ] co-26 · navigation
+  - [ ] co-27 · runtime-permissions
+  - [ ] co-28 · config-change-survival
+  - [ ] co-29 · dependency-injection
+  - [ ] co-30 · applied-testing
+- [ ] **[AI] A1-examples** — Author `CONTENT/android-app-development/learning/code/` (runnable sources, DD-20/DD-30) rendering **every**
+      worked example in `syllabus/69-android-app-development.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · scaffold-project — verify an APK lands under `build/outputs/apk/`
+  - [ ] ex-02 · manifest-declare-activity — verify the app launches to that screen
+  - [ ] ex-03 · manifest-permission — verify a network call is permitted
+  - [ ] ex-04 · activity-oncreate — verify the screen renders on launch
+  - [ ] ex-05 · lifecycle-logging — verify Logcat prints the callbacks in order
+  - [ ] ex-06 · explicit-intent — verify navigation lands on the detail screen
+  - [ ] ex-07 · implicit-intent — verify a browser opens the URL
+  - [ ] ex-08 · composable-hello — verify the text shows
+  - [ ] ex-09 · setcontent-tree — verify no XML layout is needed
+  - [ ] ex-10 · text-composable — verify the passed value displays
+  - [ ] ex-11 · recomposition-on-state — verify tapping updates the text
+  - [ ] ex-12 · remember-mutablestateof — verify state persists across recompositions
+  - [ ] ex-13 · state-counter — verify each tap increments
+  - [ ] ex-14 · hoisted-state — verify the child is stateless
+  - [ ] ex-15 · stateless-reuse — verify each instance counts separately
+  - [ ] ex-16 · modifier-padding — verify visible spacing
+  - [ ] ex-17 · modifier-chain — verify all three take effect
+  - [ ] ex-18 · preview-annotation — verify it renders in the IDE preview pane
+  - [ ] ex-19 · column-layout — verify vertical order
+  - [ ] ex-20 · row-layout — verify horizontal spread
+  - [ ] ex-21 · box-overlay — verify the badge sits on top
+  - [ ] ex-22 · scaffold-topbar — verify the bar renders above content
+  - [ ] ex-23 · button-onclick — verify the click fires
+  - [ ] ex-24 · textfield-input — verify typed text updates state
+  - [ ] ex-25 · lazycolumn-list — verify smooth scroll
+  - [ ] ex-26 · lazycolumn-items — verify each element renders once
+  - [ ] ex-27 · viewmodel-basic — verify the composable reads it
+  - [ ] ex-28 · viewmodelscope-coroutine — verify it cancels when the ViewModel clears
+  - [ ] ex-29 · viewmodel-survives-rotation — verify rotating keeps the data
+  - [ ] ex-30 · udf-events-up — verify the ViewModel mutates state
+  - [ ] ex-31 · udf-single-source — verify no UI-local state duplicates it
+  - [ ] ex-32 · stateflow-expose — verify the initial value emits
+  - [ ] ex-33 · collect-lifecycle — verify collection pauses when backgrounded
+  - [ ] ex-34 · ui-state-sealed — verify an exhaustive `when` renders each
+  - [ ] ex-35 · loading-success-error — verify each renders its branch
+  - [ ] ex-36 · repository-interface — verify the ViewModel depends only on the interface
+  - [ ] ex-37 · repository-single-truth — verify the UI never touches a data source directly
+  - [ ] ex-38 · room-entity — verify Room generates the table
+  - [ ] ex-39 · room-dao — verify insert-then-query round-trips
+  - [ ] ex-40 · room-database — verify `Room.databaseBuilder` opens it
+  - [ ] ex-41 · room-suspend-insert — verify it runs off the main thread
+  - [ ] ex-42 · room-flow-query — verify inserting a row re-emits the list
+  - [ ] ex-43 · datastore-write — verify it persists across relaunch
+  - [ ] ex-44 · datastore-read-flow — verify a write re-emits the new value
+  - [ ] ex-45 · retrofit-interface — verify Retrofit builds the client
+  - [ ] ex-46 · retrofit-call — verify a real response deserializes
+  - [ ] ex-47 · json-decode — verify JSON maps to the data class fields
+  - [ ] ex-48 · coroutine-network-call — verify success and error both surface as state
+  - [ ] ex-49 · viewmodelscope-launch — verify both complete before combining
+  - [ ] ex-50 · structured-concurrency — verify the in-flight coroutine is cancelled
+  - [ ] ex-51 · flow-map-transform — verify the count re-emits on change
+  - [ ] ex-52 · flow-collect-ui — verify the screen reacts
+  - [ ] ex-53 · repo-room-plus-retrofit — verify it serves cache on the second call
+  - [ ] ex-54 · network-error-state — verify the error UI shows and a retry re-fetches
+  - [ ] ex-55 · navigation-navhost — verify the start destination renders
+  - [ ] ex-56 · navigation-route — verify the detail destination shows
+  - [ ] ex-57 · navigation-args — verify the detail reads the argument
+  - [ ] ex-58 · navigation-back — verify it returns to the list
+  - [ ] ex-59 · permissions-request — verify the system dialog appears
+  - [ ] ex-60 · permissions-denied — verify the app degrades gracefully
+  - [ ] ex-61 · remembersaveable — verify it survives rotation
+  - [ ] ex-62 · viewmodel-config-survival — verify rotation does not re-fetch
+  - [ ] ex-63 · rotation-state-preserved — verify both UI and data survive
+  - [ ] ex-64 · manual-di — verify no `new` inside the ViewModel
+  - [ ] ex-65 · hilt-intuition — verify the graph supplies the repository
+  - [ ] ex-66 · junit-unit-test — verify `./gradlew test` runs it
+  - [ ] ex-67 · viewmodel-unit-test — verify state transitions loading→success
+  - [ ] ex-68 · compose-ui-test-rule — verify `onNodeWithText(...).assertIsDisplayed()`
+  - [ ] ex-69 · compose-ui-test-click — verify interaction adds the item
+  - [ ] ex-70 · instrumented-test — verify it executes on an emulator
+  - [ ] ex-71 · gradlew-test — verify the HTML report under `build/reports/tests/`
+  - [ ] ex-72 · list-from-viewmodel — verify items render from state
+  - [ ] ex-73 · loading-error-ui — verify each state's composable
+  - [ ] ex-74 · flow-driven-reactive-ui — verify an insert appears without a refresh
+  - [ ] ex-75 · offline-first-cache — verify the UI shows cached data instantly
+  - [ ] ex-76 · navigation-saved-state — verify the back-stack and screen state survive
+  - [ ] ex-77 · screen-vm-repo-slice — verify the full data path
+  - [ ] ex-78 · capstone-full-app — verify `./gradlew test` is green and the flow works on an emulator
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/android-app-development/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2288,27 +9512,134 @@ Row: By Example · Kotlin † ◆ · topic wt 750 · Learn 165 / Drill 265 · **
       `CONTENT/android-app-development/drilling/_index.md` (wt 265) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 72 Gate
+### Phase 76 Gate
 
-- [ ] [AI] `android-app-development/` complete: `_index.md` wt 750, `learning/_index.md` wt 165,
-      `drilling/_index.md` wt 265, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `android-app-development/` complete: `_index.md` wt 790, `learning/_index.md` wt 169,
+      `drilling/_index.md` wt 269, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 73 — Topic 66 Just Enough Swift (`just-enough-swift`)
+## Phase 77 — Topic 70 Just Enough Swift (`just-enough-swift`)
 
-Row: Primer § · Swift † · topic wt 760 · Learn 166 / Drill 266 · **primer**. Template →
-[`syllabus/66-just-enough-swift.md`](./syllabus/66-just-enough-swift.md).
+Row: Primer § · Swift † · topic wt 800 · Learn 170 / Drill 270 · **primer**. Template →
+[`syllabus/70-just-enough-swift.md`](./syllabus/70-just-enough-swift.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-swift`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/66-just-enough-swift.md`](./syllabus/66-just-enough-swift.md) and fold dated findings back into that file.
+      [`syllabus/70-just-enough-swift.md`](./syllabus/70-just-enough-swift.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-swift/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/66-just-enough-swift.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-swift/learning/` teaching **every** concept in
+      `syllabus/70-just-enough-swift.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · repl-and-swiftc
+  - [ ] co-02 · var-and-let
+  - [ ] co-03 · type-inference-and-annotations
+  - [ ] co-04 · basic-types
+  - [ ] co-05 · string-interpolation
+  - [ ] co-06 · optionals
+  - [ ] co-07 · optional-binding
+  - [ ] co-08 · optional-chaining
+  - [ ] co-09 · nil-coalescing
+  - [ ] co-10 · force-unwrap
+  - [ ] co-11 · functions
+  - [ ] co-12 · argument-labels
+  - [ ] co-13 · closures
+  - [ ] co-14 · higher-order-functions
+  - [ ] co-15 · structs
+  - [ ] co-16 · classes
+  - [ ] co-17 · value-vs-reference-semantics
+  - [ ] co-18 · properties
+  - [ ] co-19 · mutating-methods
+  - [ ] co-20 · enums
+  - [ ] co-21 · enums-with-associated-values
+  - [ ] co-22 · pattern-matching-switch
+  - [ ] co-23 · protocols
+  - [ ] co-24 · protocol-extensions
+  - [ ] co-25 · generics
+  - [ ] co-26 · error-handling
+  - [ ] co-27 · collections
+  - [ ] co-28 · async-await-preview
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-swift/learning/code/` (runnable via `swift`/`swiftc`, DD-20/DD-30) rendering **every**
+      worked example in `syllabus/70-just-enough-swift.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · swiftc-compile — verify it prints
+  - [ ] ex-02 · swift-repl — verify it echoes `3`
+  - [ ] ex-03 · let-constant — verify the compiler rejects the mutation
+  - [ ] ex-04 · var-mutable — verify the new value prints
+  - [ ] ex-05 · type-inference — verify inferred type is `String`
+  - [ ] ex-06 · type-annotation — verify the explicit annotation compiles
+  - [ ] ex-07 · int-double — verify the result type
+  - [ ] ex-08 · bool-logic — verify the truth table
+  - [ ] ex-09 · string-interpolation — verify the interpolated output
+  - [ ] ex-10 · optional-declare — verify it holds `nil` without error
+  - [ ] ex-11 · optional-assign — verify the wrapped value
+  - [ ] ex-12 · if-let-binding — verify the present branch runs
+  - [ ] ex-13 · guard-let — verify the nil path exits
+  - [ ] ex-14 · optional-chaining — verify `nil` when a link is `nil`
+  - [ ] ex-15 · nil-coalescing — verify the fallback on `nil`
+  - [ ] ex-16 · force-unwrap-danger — verify the runtime trap message
+  - [ ] ex-17 · func-basic — verify it prints the greeting
+  - [ ] ex-18 · func-return — verify the returned value
+  - [ ] ex-19 · argument-labels — verify labels are required
+  - [ ] ex-20 · default-params — verify the default applies
+  - [ ] ex-21 · array-literal — verify `xs.count == 3`
+  - [ ] ex-22 · dictionary-literal — verify keyed lookup
+  - [ ] ex-23 · set-literal — verify dedup to two elements
+  - [ ] ex-24 · array-iterate — verify each element visits once
+  - [ ] ex-25 · closure-basic — verify it computes
+  - [ ] ex-26 · trailing-closure — verify the block runs
+  - [ ] ex-27 · struct-define — verify the memberwise initializer
+  - [ ] ex-28 · struct-init — verify field access
+  - [ ] ex-29 · class-define — verify instantiation
+  - [ ] ex-30 · class-reference — verify the caller sees the change
+  - [ ] ex-31 · value-copy — verify the original is unchanged
+  - [ ] ex-32 · reference-alias — verify both see the change
+  - [ ] ex-33 · stored-property — verify read/write
+  - [ ] ex-34 · computed-property — verify it recomputes
+  - [ ] ex-35 · lazy-property — verify it defers computation
+  - [ ] ex-36 · mutating-method — verify it changes `self`
+  - [ ] ex-37 · struct-method — verify it computes without mutation
+  - [ ] ex-38 · enum-basic — verify a `switch` over it
+  - [ ] ex-39 · enum-raw-value — verify `.ok.rawValue == 200`
+  - [ ] ex-40 · enum-associated — verify each case carries its payload
+  - [ ] ex-41 · enum-associated-multiple — verify extraction
+  - [ ] ex-42 · switch-enum — verify the compiler requires all cases
+  - [ ] ex-43 · switch-case-let — verify the associated value binds
+  - [ ] ex-44 · switch-where — verify the guarded branch
+  - [ ] ex-45 · map-transform — verify `[2,4,6]`
+  - [ ] ex-46 · filter — verify only evens remain
+  - [ ] ex-47 · reduce — verify the sum
+  - [ ] ex-48 · closure-capture — verify it reads the updated value
+  - [ ] ex-49 · sorted-closure — verify descending order
+  - [ ] ex-50 · protocol-declare — verify it compiles as a contract
+  - [ ] ex-51 · protocol-conform — verify conformance
+  - [ ] ex-52 · protocol-polymorphism — verify dynamic dispatch of `area`
+  - [ ] ex-53 · protocol-extension-default — verify conformers inherit it
+  - [ ] ex-54 · protocol-as-type — verify it accepts any conformer
+  - [ ] ex-55 · generic-function — verify it works for `Int` and `String`
+  - [ ] ex-56 · generic-type-stack — verify push/pop over any element type
+  - [ ] ex-57 · generic-constraint — verify the constraint is enforced
+  - [ ] ex-58 · generic-protocol-constraint — verify only conformers compile
+  - [ ] ex-59 · throws-function — verify it can throw
+  - [ ] ex-60 · do-catch — verify the catch runs on error
+  - [ ] ex-61 · try-optional — verify it yields `nil` on error
+  - [ ] ex-62 · custom-error-enum — verify the specific case matches
+  - [ ] ex-63 · result-type — verify success/failure branches
+  - [ ] ex-64 · protocol-extension-shared — verify both reuse it
+  - [ ] ex-65 · protocol-composition — verify only types meeting both compile
+  - [ ] ex-66 · equatable-conformance — verify `==` works
+  - [ ] ex-67 · computed-getter-setter — verify the setter updates backing state
+  - [ ] ex-68 · enum-methods — verify dispatch
+  - [ ] ex-69 · optional-chaining-deep — verify the whole chain short-circuits
+  - [ ] ex-70 · higher-order-pipeline — verify the composed result
+  - [ ] ex-71 · closure-escaping — verify deferred execution
+  - [ ] ex-72 · async-func — verify it compiles as async
+  - [ ] ex-73 · await-call — verify it returns the value
+  - [ ] ex-74 · task-run — verify it runs to completion
+  - [ ] ex-75 · async-let-concurrent — verify both run concurrently
+  - [ ] ex-76 · async-error — verify the error path
+  - [ ] ex-77 · protocol-generic-combined — verify it dispatches correctly
+  - [ ] ex-78 · capstone-cli — verify `swiftc` builds it and it runs end-to-end
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-swift/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2317,27 +9648,136 @@ Row: Primer § · Swift † · topic wt 760 · Learn 166 / Drill 266 · **primer
       `CONTENT/just-enough-swift/drilling/_index.md` (wt 266) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 73 Gate
+### Phase 77 Gate
 
-- [ ] [AI] `just-enough-swift/` complete: `_index.md` wt 760, `learning/_index.md` wt 166,
-      `drilling/_index.md` wt 266, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-swift/` complete: `_index.md` wt 800, `learning/_index.md` wt 170,
+      `drilling/_index.md` wt 270, capstone wt 900; all 28 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 74 — Topic 67 iOS App Development (`ios-app-development`)
+## Phase 78 — Topic 71 iOS App Development (`ios-app-development`)
 
-Row: By Example · Swift † ◆ · topic wt 770 · Learn 167 / Drill 267 · **subject**. Template →
-[`syllabus/67-ios-app-development.md`](./syllabus/67-ios-app-development.md).
+Row: By Example · Swift † ◆ · topic wt 810 · Learn 171 / Drill 271 · **subject**. Template →
+[`syllabus/71-ios-app-development.md`](./syllabus/71-ios-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `ios-app-development`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/67-ios-app-development.md`](./syllabus/67-ios-app-development.md) and fold dated findings back into that file.
+      [`syllabus/71-ios-app-development.md`](./syllabus/71-ios-app-development.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/ios-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/67-ios-app-development.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/ios-app-development/learning/` teaching **every** concept in
+      `syllabus/71-ios-app-development.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · xcode-project
+  - [ ] co-02 · app-scene-lifecycle
+  - [ ] co-03 · swiftui-view
+  - [ ] co-04 · view-composition
+  - [ ] co-05 · state
+  - [ ] co-06 · binding
+  - [ ] co-07 · observable-macro
+  - [ ] co-08 · bindable
+  - [ ] co-09 · environment
+  - [ ] co-10 · layout-stacks
+  - [ ] co-11 · view-modifiers
+  - [ ] co-12 · controls
+  - [ ] co-13 · lists
+  - [ ] co-14 · forms
+  - [ ] co-15 · preview
+  - [ ] co-16 · navigation-stack
+  - [ ] co-17 · sheets-and-alerts
+  - [ ] co-18 · mvvm
+  - [ ] co-19 · ui-state-modeling
+  - [ ] co-20 · codable
+  - [ ] co-21 · urlsession
+  - [ ] co-22 · async-await-ios
+  - [ ] co-23 · actors
+  - [ ] co-24 · main-actor
+  - [ ] co-25 · structured-concurrency
+  - [ ] co-26 · persistence
+  - [ ] co-27 · dependency-injection
+  - [ ] co-28 · permissions
+  - [ ] co-29 · unit-testing
+  - [ ] co-30 · ui-testing
+- [ ] **[AI] A1-examples** — Author `CONTENT/ios-app-development/learning/code/` (runnable via Xcode/`xcodebuild`, DD-20/DD-30) rendering **every**
+      worked example in `syllabus/71-ios-app-development.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · xcode-new-project — verify the launch screen appears
+  - [ ] ex-02 · app-protocol-main — verify the app builds from the SwiftUI lifecycle
+  - [ ] ex-03 · windowgroup-scene — verify it displays
+  - [ ] ex-04 · swiftui-hello-view — verify the text renders
+  - [ ] ex-05 · view-body — verify the view reflects the property
+  - [ ] ex-06 · compose-subview — verify composition renders
+  - [ ] ex-07 · state-counter — verify the label updates
+  - [ ] ex-08 · state-toggle — verify toggling shows/hides
+  - [ ] ex-09 · binding-textfield — verify typing updates state
+  - [ ] ex-10 · binding-parent-child — verify the child mutates the parent's state
+  - [ ] ex-11 · environment-value — verify the view adapts to light/dark
+  - [ ] ex-12 · vstack — verify vertical order
+  - [ ] ex-13 · hstack — verify horizontal spread
+  - [ ] ex-14 · zstack-overlay — verify layering
+  - [ ] ex-15 · modifier-padding-frame — verify sizing/spacing
+  - [ ] ex-16 · modifier-chain — verify all apply
+  - [ ] ex-17 · text-view — verify the value displays
+  - [ ] ex-18 · button-action — verify the action fires
+  - [ ] ex-19 · textfield-input — verify entered text is captured
+  - [ ] ex-20 · toggle-control — verify flipping updates state
+  - [ ] ex-21 · list-static — verify they render scrollably
+  - [ ] ex-22 · list-foreach — verify each element renders once
+  - [ ] ex-23 · form-section — verify grouped layout
+  - [ ] ex-24 · form-binding — verify edits propagate
+  - [ ] ex-25 · preview-macro — verify the canvas renders
+  - [ ] ex-26 · preview-multiple — verify both render
+  - [ ] ex-27 · observable-model — verify a view re-renders on change
+  - [ ] ex-28 · observable-tracking — verify only the dependent view updates
+  - [ ] ex-29 · bindable-in-view — verify two-way binding
+  - [ ] ex-30 · mvvm-viewmodel — verify the view only renders state
+  - [ ] ex-31 · mvvm-view-dumb — verify no business logic in the view
+  - [ ] ex-32 · ui-state-enum — verify an exhaustive switch renders each
+  - [ ] ex-33 · loading-success-error — verify each branch renders
+  - [ ] ex-34 · codable-decode — verify JSON maps to fields
+  - [ ] ex-35 · codable-encode — verify the round-trip
+  - [ ] ex-36 · codable-nested — verify structure maps
+  - [ ] ex-37 · urlsession-async — verify a fetch completes
+  - [ ] ex-38 · urlsession-decode — verify typed values
+  - [ ] ex-39 · task-modifier — verify it runs on appear
+  - [ ] ex-40 · async-button-action — verify async work runs
+  - [ ] ex-41 · network-error-state — verify the error UI and retry
+  - [ ] ex-42 · navigationstack-basic — verify the bar renders
+  - [ ] ex-43 · navigationlink — verify the push
+  - [ ] ex-44 · navigation-path — verify appending navigates
+  - [ ] ex-45 · navigation-value-destination — verify value-based routing
+  - [ ] ex-46 · sheet-present — verify the modal presents/dismisses
+  - [ ] ex-47 · alert-present — verify the alert shows
+  - [ ] ex-48 · list-from-model — verify rows reflect state
+  - [ ] ex-49 · observable-list-update — verify the list adds a row live
+  - [ ] ex-50 · environment-inject — verify a deep child reads it
+  - [ ] ex-51 · di-protocol-service — verify the view-model depends on the protocol
+  - [ ] ex-52 · di-inject-viewmodel — verify no `URLSession` inside the model
+  - [ ] ex-53 · permission-request — verify the system prompt appears
+  - [ ] ex-54 · permission-denied — verify graceful degradation
+  - [ ] ex-55 · actor-define — verify it compiles as an isolated type
+  - [ ] ex-56 · actor-isolated-cache — verify concurrent access is serialized
+  - [ ] ex-57 · actor-await-access — verify cross-actor access requires `await`
+  - [ ] ex-58 · mainactor-viewmodel — verify UI updates stay on the main thread
+  - [ ] ex-59 · mainactor-ui-update — verify the compiler enforces isolation
+  - [ ] ex-60 · async-let-concurrent — verify both run concurrently
+  - [ ] ex-61 · task-group — verify all complete before aggregation
+  - [ ] ex-62 · task-cancellation — verify a cancelled task stops
+  - [ ] ex-63 · cancel-on-disappear — verify the in-flight fetch is cancelled
+  - [ ] ex-64 · swiftdata-model — verify SwiftData tracks it
+  - [ ] ex-65 · swiftdata-insert-query — verify the row appears
+  - [ ] ex-66 · persistence-roundtrip — verify data survives relaunch
+  - [ ] ex-67 · xctest-unit — verify `xcodebuild test` runs it
+  - [ ] ex-68 · swift-testing-expect — verify the Swift Testing case passes
+  - [ ] ex-69 · viewmodel-test — verify state transitions loading→loaded
+  - [ ] ex-70 · async-test — verify the awaited result
+  - [ ] ex-71 · xcuitest-launch — verify a labeled element exists
+  - [ ] ex-72 · xcuitest-interaction — verify the UI flow
+  - [ ] ex-73 · xcodebuild-test-cli — verify the suite runs headless
+  - [ ] ex-74 · actor-cache-integration — verify cache-first behavior
+  - [ ] ex-75 · observable-driven-ui — verify no manual refresh
+  - [ ] ex-76 · navigation-passed-state — verify the detail shows it
+  - [ ] ex-77 · screen-vm-service-slice — verify the full path
+  - [ ] ex-78 · capstone-full-app — verify `xcodebuild test` is green and the flow works on a simulator
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/ios-app-development/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2346,27 +9786,132 @@ Row: By Example · Swift † ◆ · topic wt 770 · Learn 167 / Drill 267 · **s
       `CONTENT/ios-app-development/drilling/_index.md` (wt 267) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 74 Gate
+### Phase 78 Gate
 
-- [ ] [AI] `ios-app-development/` complete: `_index.md` wt 770, `learning/_index.md` wt 167,
-      `drilling/_index.md` wt 267, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `ios-app-development/` complete: `_index.md` wt 810, `learning/_index.md` wt 171,
+      `drilling/_index.md` wt 271, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 75 — Topic 68 Just Enough Dart (`just-enough-dart`)
+## Phase 79 — Topic 72 Just Enough Dart (`just-enough-dart`)
 
-Row: Primer § · Dart † · topic wt 780 · Learn 168 / Drill 268 · **primer**. Template →
-[`syllabus/68-just-enough-dart.md`](./syllabus/68-just-enough-dart.md).
+Row: Primer § · Dart † · topic wt 820 · Learn 172 / Drill 272 · **primer**. Template →
+[`syllabus/72-just-enough-dart.md`](./syllabus/72-just-enough-dart.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-dart`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/68-just-enough-dart.md`](./syllabus/68-just-enough-dart.md) and fold dated findings back into that file.
+      [`syllabus/72-just-enough-dart.md`](./syllabus/72-just-enough-dart.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-dart/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/68-just-enough-dart.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-dart/learning/` teaching **every** concept in
+      `syllabus/72-just-enough-dart.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · dart-cli
+  - [ ] co-02 · pub
+  - [ ] co-03 · variables
+  - [ ] co-04 · built-in-types
+  - [ ] co-05 · string-interpolation
+  - [ ] co-06 · sound-null-safety
+  - [ ] co-07 · late
+  - [ ] co-08 · null-aware-operators
+  - [ ] co-09 · functions
+  - [ ] co-10 · named-parameters
+  - [ ] co-11 · optional-positional-parameters
+  - [ ] co-12 · first-class-functions
+  - [ ] co-13 · collections
+  - [ ] co-14 · collection-control-flow
+  - [ ] co-15 · generics
+  - [ ] co-16 · classes
+  - [ ] co-17 · named-constructors
+  - [ ] co-18 · factory-constructors
+  - [ ] co-19 · initializer-lists
+  - [ ] co-20 · getters-setters
+  - [ ] co-21 · mixins
+  - [ ] co-22 · records
+  - [ ] co-23 · patterns
+  - [ ] co-24 · future-async-await
+  - [ ] co-25 · streams
+  - [ ] co-26 · error-handling
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-dart/learning/code/` (runnable via `dart`, DD-20/DD-30) rendering **every**
+      worked example in `syllabus/72-just-enough-dart.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · dart-create — verify `bin/hello.dart` runs
+  - [ ] ex-02 · dart-run — verify it prints
+  - [ ] ex-03 · dart-test-cmd — verify a passing test reports green
+  - [ ] ex-04 · pubspec-add-package — verify `pubspec.lock` pins it
+  - [ ] ex-05 · var-infer — verify the inferred `int` type
+  - [ ] ex-06 · final-const — verify `const` compile-time constant and `final` set-once
+  - [ ] ex-07 · dynamic-type — verify no static error
+  - [ ] ex-08 · int-double-num — verify arithmetic
+  - [ ] ex-09 · string-bool — verify explicit boolean check
+  - [ ] ex-10 · string-interpolation — verify the interpolated output
+  - [ ] ex-11 · non-nullable-default — verify the compiler rejects null
+  - [ ] ex-12 · nullable-type — verify it holds null legally
+  - [ ] ex-13 · late-init — verify runtime enforcement
+  - [ ] ex-14 · null-aware-access — verify null when receiver is null
+  - [ ] ex-15 · null-coalescing — verify the fallback
+  - [ ] ex-16 · null-coalescing-assign — verify it assigns only when null
+  - [ ] ex-17 · bang-operator — verify the runtime throw
+  - [ ] ex-18 · function-basic — verify the sum
+  - [ ] ex-19 · arrow-function — verify the shorthand
+  - [ ] ex-20 · named-params — verify by-name passing
+  - [ ] ex-21 · required-named — verify omitting is a compile error
+  - [ ] ex-22 · optional-positional — verify the default
+  - [ ] ex-23 · closure — verify it reads the updated value
+  - [ ] ex-24 · list-literal — verify `xs.length == 3`
+  - [ ] ex-25 · map-literal — verify keyed lookup
+  - [ ] ex-26 · set-literal — verify dedup to two
+  - [ ] ex-27 · collection-if — verify the conditional element
+  - [ ] ex-28 · collection-for — verify the generated list
+  - [ ] ex-29 · spread-operator — verify inlined elements
+  - [ ] ex-30 · null-aware-spread — verify no error on null
+  - [ ] ex-31 · generic-list — verify a type-mismatched add is rejected
+  - [ ] ex-32 · generic-function — verify it works for two types
+  - [ ] ex-33 · generic-class — verify parameterized construction
+  - [ ] ex-34 · class-fields — verify default access
+  - [ ] ex-35 · class-constructor — verify instantiation
+  - [ ] ex-36 · this-in-constructor — verify field assignment
+  - [ ] ex-37 · initializing-formals — verify it compiles
+  - [ ] ex-38 · named-constructor — verify the named path
+  - [ ] ex-39 · factory-constructor — verify identical instances
+  - [ ] ex-40 · initializer-list — verify pre-body init
+  - [ ] ex-41 · getter — verify it recomputes
+  - [ ] ex-42 · setter — verify it rejects bad input
+  - [ ] ex-43 · computed-getter — verify the derived value
+  - [ ] ex-44 · mixin-define — verify it compiles
+  - [ ] ex-45 · mixin-with — verify the mixed-in method is callable
+  - [ ] ex-46 · mixin-on — verify only `Base` subtypes may use it
+  - [ ] ex-47 · first-class-function-arg — verify it's invoked
+  - [ ] ex-48 · higher-order-map — verify the transformed iterable
+  - [ ] ex-49 · list-iterate — verify each element visits once
+  - [ ] ex-50 · map-iterate — verify key/value access
+  - [ ] ex-51 · try-catch — verify the catch runs on error
+  - [ ] ex-52 · throw-exception — verify it propagates
+  - [ ] ex-53 · custom-exception — verify the type matches
+  - [ ] ex-54 · finally — verify it runs on success and error
+  - [ ] ex-55 · record-positional — verify `p.$1`/`p.$2`
+  - [ ] ex-56 · record-named — verify `p.x`
+  - [ ] ex-57 · record-destructure — verify both bind
+  - [ ] ex-58 · record-return-multiple — verify multiple values return
+  - [ ] ex-59 · pattern-variable-declaration — verify list destructuring
+  - [ ] ex-60 · pattern-switch — verify the matched branch
+  - [ ] ex-61 · pattern-if-case — verify the guarded bind
+  - [ ] ex-62 · pattern-map-destructure — verify the map pattern binds
+  - [ ] ex-63 · future-basic — verify it completes
+  - [ ] ex-64 · async-await — verify the awaited value
+  - [ ] ex-65 · future-then — verify the callback fires
+  - [ ] ex-66 · future-error — verify the error path
+  - [ ] ex-67 · multiple-await — verify order
+  - [ ] ex-68 · stream-listen — verify each event delivers
+  - [ ] ex-69 · await-for — verify in-order consumption
+  - [ ] ex-70 · async-generator — verify emitted values
+  - [ ] ex-71 · stream-transform — verify the transformed stream
+  - [ ] ex-72 · generic-constraint — verify the bound is enforced
+  - [ ] ex-73 · mixin-multiple — verify both behaviors compose
+  - [ ] ex-74 · factory-cache — verify repeated names return the same object
+  - [ ] ex-75 · null-safe-chain — verify the chain short-circuits to the default
+  - [ ] ex-76 · async-stream-combined — verify combined async
+  - [ ] ex-77 · class-mixin-generic — verify all three compose
+  - [ ] ex-78 · capstone-cli — verify `dart run` output and `dart test` pass
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-dart/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2375,27 +9920,136 @@ Row: Primer § · Dart † · topic wt 780 · Learn 168 / Drill 268 · **primer*
       `CONTENT/just-enough-dart/drilling/_index.md` (wt 268) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 75 Gate
+### Phase 79 Gate
 
-- [ ] [AI] `just-enough-dart/` complete: `_index.md` wt 780, `learning/_index.md` wt 168,
-      `drilling/_index.md` wt 268, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-dart/` complete: `_index.md` wt 820, `learning/_index.md` wt 172,
+      `drilling/_index.md` wt 272, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 76 — Topic 69 Hybrid App Development (`hybrid-app-development`)
+## Phase 80 — Topic 73 Hybrid App Development (`hybrid-app-development`)
 
-Row: By Example · Dart † · topic wt 790 · Learn 169 / Drill 269 · **subject**. Template →
-[`syllabus/69-hybrid-app-development.md`](./syllabus/69-hybrid-app-development.md).
+Row: By Example · Dart † · topic wt 830 · Learn 173 / Drill 273 · **subject**. Template →
+[`syllabus/73-hybrid-app-development.md`](./syllabus/73-hybrid-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `hybrid-app-development`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/69-hybrid-app-development.md`](./syllabus/69-hybrid-app-development.md) and fold dated findings back into that file.
+      [`syllabus/73-hybrid-app-development.md`](./syllabus/73-hybrid-app-development.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/hybrid-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/69-hybrid-app-development.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/hybrid-app-development/learning/` teaching **every** concept in
+      `syllabus/73-hybrid-app-development.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [ ] co-01 · flutter-cli
+  - [ ] co-02 · everything-is-a-widget
+  - [ ] co-03 · stateless-widget
+  - [ ] co-04 · stateful-widget
+  - [ ] co-05 · build-context
+  - [ ] co-06 · widget-composition
+  - [ ] co-07 · state-lifecycle
+  - [ ] co-08 · setstate
+  - [ ] co-09 · layout-widgets
+  - [ ] co-10 · flex-layout
+  - [ ] co-11 · constraints-model
+  - [ ] co-12 · material-widgets
+  - [ ] co-13 · cupertino-widgets
+  - [ ] co-14 · lists
+  - [ ] co-15 · inherited-widget
+  - [ ] co-16 · provider
+  - [ ] co-17 · reactive-store
+  - [ ] co-18 · ephemeral-vs-app-state
+  - [ ] co-19 · navigation-imperative
+  - [ ] co-20 · named-routes
+  - [ ] co-21 · go-router
+  - [ ] co-22 · async-ui
+  - [ ] co-23 · networking
+  - [ ] co-24 · local-persistence
+  - [ ] co-25 · platform-channels
+  - [ ] co-26 · plugins
+  - [ ] co-27 · multi-target-build
+  - [ ] co-28 · adaptive-responsive-layout
+  - [ ] co-29 · testing
+  - [ ] co-30 · cross-platform-tradeoffs
+- [ ] **[AI] A1-examples** — Author `CONTENT/hybrid-app-development/learning/code/` (runnable via the `flutter` CLI, DD-20/DD-30) rendering **every**
+      worked example in `syllabus/73-hybrid-app-development.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · flutter-create — verify it runs on a target
+  - [ ] ex-02 · flutter-run — verify hot reload works
+  - [ ] ex-03 · flutter-test-cmd — verify it passes
+  - [ ] ex-04 · everything-widget — verify no non-widget UI
+  - [ ] ex-05 · stateless-widget — verify it displays
+  - [ ] ex-06 · build-method — verify the value renders
+  - [ ] ex-07 · compose-widgets — verify composition
+  - [ ] ex-08 · stateful-widget — verify state persists across rebuilds
+  - [ ] ex-09 · setstate-counter — verify the label updates
+  - [ ] ex-10 · state-initstate — verify it runs once on creation
+  - [ ] ex-11 · state-dispose — verify cleanup on removal
+  - [ ] ex-12 · buildcontext-use — verify theme access
+  - [ ] ex-13 · column-layout — verify vertical order
+  - [ ] ex-14 · row-layout — verify horizontal order
+  - [ ] ex-15 · container-decoration — verify styling
+  - [ ] ex-16 · stack-overlay — verify layering
+  - [ ] ex-17 · expanded-flex — verify proportional sizing
+  - [ ] ex-18 · mainaxis-alignment — verify spacing
+  - [ ] ex-19 · crossaxis-alignment — verify cross-axis position
+  - [ ] ex-20 · materialapp-scaffold — verify structure
+  - [ ] ex-21 · appbar — verify the bar renders
+  - [ ] ex-22 · elevatedbutton — verify the tap fires
+  - [ ] ex-23 · text-widget — verify the string displays
+  - [ ] ex-24 · cupertino-survey — verify the iOS-styled widget renders
+  - [ ] ex-25 · listview-static — verify scrolling
+  - [ ] ex-26 · listview-builder — verify lazy row building
+  - [ ] ex-27 · constraints-model — verify constraints-down/sizes-up behavior
+  - [ ] ex-28 · own-pixels-render — verify pixel consistency
+  - [ ] ex-29 · inherited-widget — verify descendants read it
+  - [ ] ex-30 · inherited-of-context — verify the lookup returns the value
+  - [ ] ex-31 · provider-changenotifier — verify it's provided
+  - [ ] ex-32 · provider-consumer — verify it rebuilds on `notifyListeners`
+  - [ ] ex-33 · provider-across-screens — verify both reflect updates
+  - [ ] ex-34 · ephemeral-state — verify local-only state
+  - [ ] ex-35 · app-state-shared — verify it survives screen changes
+  - [ ] ex-36 · reactive-store-intuition — verify the scaling rationale
+  - [ ] ex-37 · navigator-push — verify the push
+  - [ ] ex-38 · navigator-pop — verify return to the list
+  - [ ] ex-39 · materialpageroute — verify the transition
+  - [ ] ex-40 · named-route — verify route names resolve
+  - [ ] ex-41 · pushnamed — verify navigation
+  - [ ] ex-42 · go-router-declarative — verify declarative routing
+  - [ ] ex-43 · go-router-params — verify the id passes
+  - [ ] ex-44 · futurebuilder — verify loading/done states
+  - [ ] ex-45 · streambuilder — verify live updates
+  - [ ] ex-46 · http-get — verify a response returns
+  - [ ] ex-47 · json-decode — verify typed fields
+  - [ ] ex-48 · http-to-widget — verify the list shows
+  - [ ] ex-49 · shared-preferences — verify it persists across relaunch
+  - [ ] ex-50 · sqflite-crud — verify the round-trip
+  - [ ] ex-51 · persistence-roundtrip — verify survival
+  - [ ] ex-52 · listview-from-network — verify rows reflect the response
+  - [ ] ex-53 · loading-error-state — verify each state
+  - [ ] ex-54 · provider-list-update — verify the list rebuilds
+  - [ ] ex-55 · platform-channel-method — verify the call reaches native
+  - [ ] ex-56 · platform-channel-native-side — verify it returns a value
+  - [ ] ex-57 · plugin-use — verify it works via its Dart API
+  - [ ] ex-58 · platform-fallback — verify the documented fallback
+  - [ ] ex-59 · flutter-build-android — verify an Android artifact is produced
+  - [ ] ex-60 · flutter-build-desktop — verify a desktop artifact
+  - [ ] ex-61 · single-codebase-two-targets — verify one codebase, two binaries
+  - [ ] ex-62 · layoutbuilder-adaptive — verify the branch
+  - [ ] ex-63 · mediaquery-breakpoint — verify the responsive choice
+  - [ ] ex-64 · phone-desktop-reflow — verify the reflow
+  - [ ] ex-65 · responsive-master-detail — verify both form factors
+  - [ ] ex-66 · widget-test-testwidgets — verify a `find` locates it
+  - [ ] ex-67 · widget-test-tap — verify interaction
+  - [ ] ex-68 · unit-test-logic — verify the assertion
+  - [ ] ex-69 · integration-test — verify the flow on a device/emulator
+  - [ ] ex-70 · flutter-test-run — verify all pass
+  - [ ] ex-71 · tradeoff-fidelity — verify the fidelity gap is understood
+  - [ ] ex-72 · tradeoff-binary-size — verify the overhead
+  - [ ] ex-73 · leak-at-edges — verify the leak is contained in channel code
+  - [ ] ex-74 · provider-navigation-combined — verify the detail reads it
+  - [ ] ex-75 · adaptive-with-state — verify both reflow and state work
+  - [ ] ex-76 · network-list-persisted — verify cached data appears
+  - [ ] ex-77 · screen-widget-state-slice — verify the slice
+  - [ ] ex-78 · capstone-multiplatform — verify `flutter run` on phone + desktop and `flutter build` for both
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/hybrid-app-development/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2404,27 +10058,132 @@ Row: By Example · Dart † · topic wt 790 · Learn 169 / Drill 269 · **subjec
       `CONTENT/hybrid-app-development/drilling/_index.md` (wt 269) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 76 Gate
+### Phase 80 Gate
 
-- [ ] [AI] `hybrid-app-development/` complete: `_index.md` wt 790, `learning/_index.md` wt 169,
-      `drilling/_index.md` wt 269, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `hybrid-app-development/` complete: `_index.md` wt 830, `learning/_index.md` wt 173,
+      `drilling/_index.md` wt 273, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 77 — Topic 70 Just Enough C# (`just-enough-csharp`)
+## Phase 81 — Topic 74 Just Enough C# (`just-enough-csharp`)
 
-Row: Primer § · C# † · topic wt 800 · Learn 170 / Drill 270 · **primer**. Template →
-[`syllabus/70-just-enough-csharp.md`](./syllabus/70-just-enough-csharp.md).
+Row: Primer § · C# † · topic wt 840 · Learn 174 / Drill 274 · **primer**. Template →
+[`syllabus/74-just-enough-csharp.md`](./syllabus/74-just-enough-csharp.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-csharp`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/70-just-enough-csharp.md`](./syllabus/70-just-enough-csharp.md) and fold dated findings back into that file.
+      [`syllabus/74-just-enough-csharp.md`](./syllabus/74-just-enough-csharp.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-csharp/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/70-just-enough-csharp.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-csharp/learning/` prose covering **every** `co-NN` concept in
+      [`syllabus/74-just-enough-csharp.md`](./syllabus/74-just-enough-csharp.md) §Concepts (26 concepts, 1:1). **Acceptance**: each concept below is taught.
+  - [ ] co-01 · dotnet-cli
+  - [ ] co-02 · top-level-statements
+  - [ ] co-03 · value-vs-reference-types
+  - [ ] co-04 · var-and-types
+  - [ ] co-05 · nullable-reference-types
+  - [ ] co-06 · null-forgiving
+  - [ ] co-07 · classes
+  - [ ] co-08 · interfaces
+  - [ ] co-09 · inheritance
+  - [ ] co-10 · properties
+  - [ ] co-11 · expression-bodied-members
+  - [ ] co-12 · records
+  - [ ] co-13 · enums
+  - [ ] co-14 · collections
+  - [ ] co-15 · generics
+  - [ ] co-16 · linq-query-syntax
+  - [ ] co-17 · linq-method-syntax
+  - [ ] co-18 · deferred-execution
+  - [ ] co-19 · lambdas-delegates
+  - [ ] co-20 · pattern-matching
+  - [ ] co-21 · exception-handling
+  - [ ] co-22 · async-await
+  - [ ] co-23 · string-handling
+  - [ ] co-24 · namespaces-using
+  - [ ] co-25 · nuget
+  - [ ] co-26 · struct-vs-class
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-csharp/learning/code/` (runnable sources, DD-20/DD-30) covering
+      **every** `ex-NN` worked example in `syllabus/74-just-enough-csharp.md` §Worked examples (78 examples, 1:1). **Acceptance**: each example below appears with its expected output.
+  - [ ] ex-01 · dotnet-new-console — verify a `Program.cs` is created
+  - [ ] ex-02 · dotnet-run — verify it prints
+  - [ ] ex-03 · dotnet-test-cmd — verify a passing test reports green
+  - [ ] ex-04 · top-level-statements — verify it runs without an explicit `Main`
+  - [ ] ex-05 · var-inference — verify the inferred `int`
+  - [ ] ex-06 · int-string-bool — verify usage
+  - [ ] ex-07 · value-type-copy — verify the original is unchanged
+  - [ ] ex-08 · reference-type-alias — verify both see the change
+  - [ ] ex-09 · nullable-enable — verify null-state warnings appear
+  - [ ] ex-10 · nullable-annotation — verify it compiles
+  - [ ] ex-11 · null-analysis-warning — verify the compiler warns
+  - [ ] ex-12 · null-forgiving — verify the warning is suppressed
+  - [ ] ex-13 · string-interpolation — verify the interpolated output
+  - [ ] ex-14 · string-methods — verify the results
+  - [ ] ex-15 · namespace-declare — verify the type is scoped
+  - [ ] ex-16 · using-directive — verify the imported members resolve
+  - [ ] ex-17 · class-define — verify instantiation
+  - [ ] ex-18 · class-constructor — verify construction
+  - [ ] ex-19 · class-method — verify the call
+  - [ ] ex-20 · auto-property — verify get/set
+  - [ ] ex-21 · init-property — verify it's set only at construction
+  - [ ] ex-22 · expression-bodied — verify it recomputes
+  - [ ] ex-23 · enum-define — verify a switch over it
+  - [ ] ex-24 · array — verify indexing
+  - [ ] ex-25 · list-generic — verify contents
+  - [ ] ex-26 · dictionary — verify keyed lookup
+  - [ ] ex-27 · interface-define — verify it compiles as a contract
+  - [ ] ex-28 · interface-implement — verify conformance
+  - [ ] ex-29 · default-interface-member — verify implementers inherit it
+  - [ ] ex-30 · inheritance-base — verify base access
+  - [ ] ex-31 · override-virtual — verify polymorphic dispatch
+  - [ ] ex-32 · record-define — verify construction
+  - [ ] ex-33 · record-value-equality — verify value equality
+  - [ ] ex-34 · record-with — verify a non-destructive copy
+  - [ ] ex-35 · record-positional — verify the members bind
+  - [ ] ex-36 · struct-value — verify value-copy semantics
+  - [ ] ex-37 · struct-vs-class — verify the aliasing difference
+  - [ ] ex-38 · generic-method — verify it works for two types
+  - [ ] ex-39 · generic-class — verify parameterized construction
+  - [ ] ex-40 · generic-constraint — verify the constraint is enforced
+  - [ ] ex-41 · linq-query-where — verify filtering
+  - [ ] ex-42 · linq-query-select — verify the shape
+  - [ ] ex-43 · linq-method-where — verify filtering
+  - [ ] ex-44 · linq-method-orderby — verify ordering
+  - [ ] ex-45 · linq-chain — verify the composed result
+  - [ ] ex-46 · deferred-execution — verify it re-evaluates
+  - [ ] ex-47 · immediate-execution — verify eager evaluation
+  - [ ] ex-48 · lambda-expression — verify the computation
+  - [ ] ex-49 · func-delegate — verify invocation
+  - [ ] ex-50 · action-delegate — verify the side effect
+  - [ ] ex-51 · lambda-in-linq — verify the transform
+  - [ ] ex-52 · list-of-records — verify results
+  - [ ] ex-53 · interface-polymorphism — verify dynamic dispatch
+  - [ ] ex-54 · nuget-add-package — verify it resolves and imports
+  - [ ] ex-55 · switch-expression — verify the matched arm
+  - [ ] ex-56 · is-pattern — verify the type-pattern bind
+  - [ ] ex-57 · property-pattern — verify the property match
+  - [ ] ex-58 · tuple-pattern — verify the tuple arm
+  - [ ] ex-59 · try-catch — verify the catch runs on error
+  - [ ] ex-60 · catch-specific-exception — verify the specific catch
+  - [ ] ex-61 · finally-block — verify it runs on both paths
+  - [ ] ex-62 · throw-custom — verify it propagates
+  - [ ] ex-63 · throw-expression — verify the throw expression
+  - [ ] ex-64 · async-method — verify it compiles as async
+  - [ ] ex-65 · await-task — verify it resumes after completion
+  - [ ] ex-66 · async-return-value — verify the awaited value
+  - [ ] ex-67 · async-non-blocking — verify concurrency
+  - [ ] ex-68 · multiple-await — verify order
+  - [ ] ex-69 · task-whenall — verify all complete
+  - [ ] ex-70 · async-exception — verify the error path
+  - [ ] ex-71 · linq-aggregate — verify the reduction
+  - [ ] ex-72 · generic-linq-combined — verify it works over types
+  - [ ] ex-73 · record-pattern-match — verify the arms
+  - [ ] ex-74 · nullable-linq — verify no NRE
+  - [ ] ex-75 · interface-generic — verify a typed implementation
+  - [ ] ex-76 · async-linq-pipeline — verify the pipeline
+  - [ ] ex-77 · domain-model-slice — verify they compose
+  - [ ] ex-78 · capstone-cli — verify `dotnet run` output and `dotnet test` pass
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-csharp/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2433,27 +10192,136 @@ Row: Primer § · C# † · topic wt 800 · Learn 170 / Drill 270 · **primer**.
       `CONTENT/just-enough-csharp/drilling/_index.md` (wt 270) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 77 Gate
+### Phase 81 Gate
 
-- [ ] [AI] `just-enough-csharp/` complete: `_index.md` wt 800, `learning/_index.md` wt 170,
-      `drilling/_index.md` wt 270, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-csharp/` complete: `_index.md` wt 840, `learning/_index.md` wt 174,
+      `drilling/_index.md` wt 274, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 78 — Topic 71 Windows App Development (`windows-app-development`)
+## Phase 82 — Topic 75 Windows App Development (`windows-app-development`)
 
-Row: By Example · C# † ◆ · topic wt 810 · Learn 171 / Drill 271 · **subject**. Template →
-[`syllabus/71-windows-app-development.md`](./syllabus/71-windows-app-development.md).
+Row: By Example · C# † ◆ · topic wt 850 · Learn 175 / Drill 275 · **subject**. Template →
+[`syllabus/75-windows-app-development.md`](./syllabus/75-windows-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `windows-app-development`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/71-windows-app-development.md`](./syllabus/71-windows-app-development.md) and fold dated findings back into that file.
+      [`syllabus/75-windows-app-development.md`](./syllabus/75-windows-app-development.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/windows-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/71-windows-app-development.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/windows-app-development/learning/` prose covering **every** `co-NN` concept in
+      [`syllabus/75-windows-app-development.md`](./syllabus/75-windows-app-development.md) §Concepts (30 concepts, 1:1). **Acceptance**: each concept below is taught.
+  - [ ] co-01 · dotnet-project-model
+  - [ ] co-02 · nuget-packages
+  - [ ] co-03 · ui-stack-choice
+  - [ ] co-04 · windows-app-sdk
+  - [ ] co-05 · xaml-markup
+  - [ ] co-06 · layout-panels
+  - [ ] co-07 · controls
+  - [ ] co-08 · data-binding
+  - [ ] co-09 · inotifypropertychanged
+  - [ ] co-10 · mvvm-pattern
+  - [ ] co-11 · commands
+  - [ ] co-12 · observable-collection
+  - [ ] co-13 · ui-thread-dispatcher
+  - [ ] co-14 · async-await-ui
+  - [ ] co-15 · dispatcher-marshalling
+  - [ ] co-16 · cancellation
+  - [ ] co-17 · progress-reporting
+  - [ ] co-18 · file-io
+  - [ ] co-19 · app-settings
+  - [ ] co-20 · sqlite-persistence
+  - [ ] co-21 · app-lifecycle
+  - [ ] co-22 · window-management
+  - [ ] co-23 · resources-styles
+  - [ ] co-24 · dependency-injection
+  - [ ] co-25 · msix-packaging
+  - [ ] co-26 · unit-testing-viewmodel
+  - [ ] co-27 · ui-testing
+  - [ ] co-28 · error-handling-ui
+  - [ ] co-29 · winforms-survey
+  - [ ] co-30 · deployment
+- [ ] **[AI] A1-examples** — Author `CONTENT/windows-app-development/learning/code/` (runnable/testable sources, DD-20/DD-30)
+      covering **every** `ex-NN` worked example in `syllabus/75-windows-app-development.md` §Worked examples (78 examples, 1:1). **Acceptance**: each example below appears with its expected output.
+  - [ ] ex-01 · dotnet-new-winui — verify it builds
+  - [ ] ex-02 · project-file — verify the Windows TFM
+  - [ ] ex-03 · dotnet-run-window — verify a window appears
+  - [ ] ex-04 · add-nuget — verify it restores
+  - [ ] ex-05 · stack-choice — verify each builds
+  - [ ] ex-06 · windows-app-sdk-ref — verify the package resolves
+  - [ ] ex-07 · xaml-window — verify the text renders
+  - [ ] ex-08 · xaml-hierarchy — verify the visual tree
+  - [ ] ex-09 · stackpanel — verify vertical layout
+  - [ ] ex-10 · grid-layout — verify placement
+  - [ ] ex-11 · button-click — verify it fires
+  - [ ] ex-12 · textbox — verify input
+  - [ ] ex-13 · listview — verify rendering
+  - [ ] ex-14 · oneway-binding — verify display
+  - [ ] ex-15 · twoway-binding — verify the round-trip
+  - [ ] ex-16 · xbind — verify it resolves
+  - [ ] ex-17 · datacontext — verify bindings pick it up
+  - [ ] ex-18 · static-resource — verify reuse
+  - [ ] ex-19 · style — verify it applies
+  - [ ] ex-20 · read-file — verify the contents
+  - [ ] ex-21 · write-file — verify persistence
+  - [ ] ex-22 · app-startup — verify startup runs
+  - [ ] ex-23 · window-title — verify it shows
+  - [ ] ex-24 · winforms-form — verify it runs
+  - [ ] ex-25 · error-dialog — verify it appears
+  - [ ] ex-26 · test-project — verify `dotnet test` green
+  - [ ] ex-27 · inpc-model — verify `PropertyChanged` fires
+  - [ ] ex-28 · bind-inpc — verify the UI updates
+  - [ ] ex-29 · viewmodel — verify it's separable from the View
+  - [ ] ex-30 · mvvm-wiring — verify binding
+  - [ ] ex-31 · relaycommand — verify `Execute` fires
+  - [ ] ex-32 · command-canexecute — verify it enables/disables
+  - [ ] ex-33 · button-command-bind — verify the command runs
+  - [ ] ex-34 · observable-collection — verify an add updates the UI
+  - [ ] ex-35 · collection-mutation — verify the live UI
+  - [ ] ex-36 · async-load — verify it awaits
+  - [ ] ex-37 · async-command — verify the UI stays responsive
+  - [ ] ex-38 · dispatcher-enqueue — verify marshalling
+  - [ ] ex-39 · ui-thread-violation — verify it throws
+  - [ ] ex-40 · background-to-ui — verify the UI reflects it
+  - [ ] ex-41 · settings-write — verify persistence
+  - [ ] ex-42 · settings-read — verify the round-trip
+  - [ ] ex-43 · sqlite-open — verify it connects
+  - [ ] ex-44 · sqlite-insert — verify it's stored
+  - [ ] ex-45 · sqlite-query — verify results
+  - [ ] ex-46 · di-register — verify resolution
+  - [ ] ex-47 · di-viewmodel — verify it's used
+  - [ ] ex-48 · resource-dictionary — verify shared styles
+  - [ ] ex-49 · control-template — verify custom visuals
+  - [ ] ex-50 · vm-unit-test — verify no window is needed
+  - [ ] ex-51 · command-unit-test — verify the logic
+  - [ ] ex-52 · error-surface — verify the UI binds it
+  - [ ] ex-53 · activation-args — verify the lifecycle path
+  - [ ] ex-54 · winforms-async — verify it's non-blocking
+  - [ ] ex-55 · cancellation-token — verify it plumbs through
+  - [ ] ex-56 · cancel-button — verify the work stops
+  - [ ] ex-57 · cancellation-exception — verify a graceful stop
+  - [ ] ex-58 · iprogress — verify updates arrive
+  - [ ] ex-59 · progress-bar — verify it advances
+  - [ ] ex-60 · progress-plus-cancel — verify both work
+  - [ ] ex-61 · dispatcher-progress — verify safe updates
+  - [ ] ex-62 · non-blocking-proof — verify responsiveness
+  - [ ] ex-63 · sqlite-round-trip — verify persistence survives
+  - [ ] ex-64 · settings-plus-db — verify both survive relaunch
+  - [ ] ex-65 · lifecycle-suspend — verify state is saved
+  - [ ] ex-66 · msix-manifest — verify app identity
+  - [ ] ex-67 · msix-package — verify the packaged identity
+  - [ ] ex-68 · deploy-self-contained — verify the output runs standalone
+  - [ ] ex-69 · deploy-framework-dependent — verify the smaller output
+  - [ ] ex-70 · winforms-vs-winui — verify both run
+  - [ ] ex-71 · di-full-app — verify composition
+  - [ ] ex-72 · vm-async-test — verify the awaited result
+  - [ ] ex-73 · ui-test-intuition — verify the flow
+  - [ ] ex-74 · error-recovery — verify a graceful UI
+  - [ ] ex-75 · templated-list — verify per-item visuals
+  - [ ] ex-76 · full-mvvm-slice — verify they compose
+  - [ ] ex-77 · integration-persistence-slice — verify end-to-end
+  - [ ] ex-78 · capstone-desktop-app — verify build/run on Windows + tests pass
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/windows-app-development/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2462,27 +10330,136 @@ Row: By Example · C# † ◆ · topic wt 810 · Learn 171 / Drill 271 · **subj
       `CONTENT/windows-app-development/drilling/_index.md` (wt 271) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 78 Gate
+### Phase 82 Gate
 
-- [ ] [AI] `windows-app-development/` complete: `_index.md` wt 810, `learning/_index.md` wt 171,
-      `drilling/_index.md` wt 271, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `windows-app-development/` complete: `_index.md` wt 850, `learning/_index.md` wt 175,
+      `drilling/_index.md` wt 275, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 79 — Topic 72 Linux App Development (`linux-app-development`)
+## Phase 83 — Topic 76 Linux App Development (`linux-app-development`)
 
-Row: By Example · Python ◆ · topic wt 820 · Learn 172 / Drill 272 · **subject**. Template →
-[`syllabus/72-linux-app-development.md`](./syllabus/72-linux-app-development.md).
+Row: By Example · Python ◆ · topic wt 860 · Learn 176 / Drill 276 · **subject**. Template →
+[`syllabus/76-linux-app-development.md`](./syllabus/76-linux-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `linux-app-development`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/72-linux-app-development.md`](./syllabus/72-linux-app-development.md) and fold dated findings back into that file.
+      [`syllabus/76-linux-app-development.md`](./syllabus/76-linux-app-development.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/linux-app-development/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/72-linux-app-development.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/linux-app-development/learning/` prose covering **every** `co-NN` concept in
+      [`syllabus/76-linux-app-development.md`](./syllabus/76-linux-app-development.md) §Concepts (30 concepts, 1:1). **Acceptance**: each concept below is taught.
+  - [ ] co-01 · process-model
+  - [ ] co-02 · argv
+  - [ ] co-03 · argparse
+  - [ ] co-04 · exit-codes
+  - [ ] co-05 · stdout-stderr
+  - [ ] co-06 · environment-variables
+  - [ ] co-07 · config-files
+  - [ ] co-08 · logging
+  - [ ] co-09 · file-io
+  - [ ] co-10 · file-permissions
+  - [ ] co-11 · file-descriptors
+  - [ ] co-12 · temp-files
+  - [ ] co-13 · subprocess
+  - [ ] co-14 · subprocess-errors
+  - [ ] co-15 · pipes
+  - [ ] co-16 · signals
+  - [ ] co-17 · graceful-shutdown
+  - [ ] co-18 · daemon-basics
+  - [ ] co-19 · systemd-unit
+  - [ ] co-20 · cron-scheduling
+  - [ ] co-21 · venv
+  - [ ] co-22 · pyproject-packaging
+  - [ ] co-23 · dependencies
+  - [ ] co-24 · entry-points
+  - [ ] co-25 · sockets-ipc
+  - [ ] co-26 · gui-survey
+  - [ ] co-27 · containers-survey
+  - [ ] co-28 · pytest
+  - [ ] co-29 · testing-subprocess
+  - [ ] co-30 · testing-signals
+- [ ] **[AI] A1-examples** — Author `CONTENT/linux-app-development/learning/code/` (runnable + tested sources, DD-20/DD-30)
+      covering **every** `ex-NN` worked example in `syllabus/76-linux-app-development.md` §Worked examples (78 examples, 1:1). **Acceptance**: each example below appears with its expected output.
+  - [ ] ex-01 · sys-argv — verify args print
+  - [ ] ex-02 · argparse-basic — verify it parses
+  - [ ] ex-03 · argparse-help — verify the usage text
+  - [ ] ex-04 · argparse-optional — verify default + set
+  - [ ] ex-05 · argparse-subcommand — verify subcommand dispatch
+  - [ ] ex-06 · exit-zero — verify `$?` is 0
+  - [ ] ex-07 · exit-nonzero — verify `$?` is non-zero
+  - [ ] ex-08 · stderr-write — verify stream separation
+  - [ ] ex-09 · stdout-vs-stderr — verify a pipe keeps them apart
+  - [ ] ex-10 · read-env — verify the env value is read
+  - [ ] ex-11 · env-default — verify the fallback
+  - [ ] ex-12 · read-file — verify the contents
+  - [ ] ex-13 · write-file — verify persistence
+  - [ ] ex-14 · pathlib — verify path joins
+  - [ ] ex-15 · file-mode — verify the permission bits
+  - [ ] ex-16 · temp-file — verify it's created + cleaned
+  - [ ] ex-17 · logging-basic — verify a log line
+  - [ ] ex-18 · logging-levels — verify filtering
+  - [ ] ex-19 · config-file — verify the values
+  - [ ] ex-20 · xdg-config — verify the config path
+  - [ ] ex-21 · fd-stdin — verify piped input
+  - [ ] ex-22 · fd-redirect — verify redirection
+  - [ ] ex-23 · subprocess-run — verify output
+  - [ ] ex-24 · subprocess-output — verify the captured text
+  - [ ] ex-25 · venv-create — verify an isolated env
+  - [ ] ex-26 · pytest-first — verify green
+  - [ ] ex-27 · subprocess-check — verify `CalledProcessError`
+  - [ ] ex-28 · subprocess-returncode — verify the error branch
+  - [ ] ex-29 · subprocess-stderr — verify the error is surfaced
+  - [ ] ex-30 · pipe-processes — verify the piped result
+  - [ ] ex-31 · popen-stdin — verify the child reads it
+  - [ ] ex-32 · signal-sigint — verify a clean exit on Ctrl-C
+  - [ ] ex-33 · signal-sigterm — verify the handler runs
+  - [ ] ex-34 · graceful-flag — verify graceful exit
+  - [ ] ex-35 · cleanup-on-signal — verify cleanup ran
+  - [ ] ex-36 · daemon-loop — verify it stays up
+  - [ ] ex-37 · daemon-log — verify the log output
+  - [ ] ex-38 · daemon-signal-stop — verify a clean shutdown
+  - [ ] ex-39 · systemd-unit — verify the unit fields
+  - [ ] ex-40 · systemd-lifecycle — verify the lifecycle intuition
+  - [ ] ex-41 · cron-entry — verify the schedule syntax
+  - [ ] ex-42 · pyproject-min — verify it's valid
+  - [ ] ex-43 · pyproject-metadata — verify the metadata
+  - [ ] ex-44 · declare-dependency — verify pip installs it
+  - [ ] ex-45 · install-editable — verify it's importable
+  - [ ] ex-46 · console-script — verify the command runs
+  - [ ] ex-47 · entry-point-invoke — verify it dispatches
+  - [ ] ex-48 · config-plus-logging — verify the wiring
+  - [ ] ex-49 · unix-socket — verify a message round-trip
+  - [ ] ex-50 · tcp-socket — verify connect/send
+  - [ ] ex-51 · pytest-cli — verify exit code + output
+  - [ ] ex-52 · pytest-capsys — verify separation
+  - [ ] ex-53 · mock-subprocess — verify no real call
+  - [ ] ex-54 · test-exit-code — verify the discipline
+  - [ ] ex-55 · full-cli — verify a well-behaved CLI
+  - [ ] ex-56 · cli-bad-input — verify the OS process contract
+  - [ ] ex-57 · subprocess-timeout — verify `TimeoutExpired` is handled
+  - [ ] ex-58 · pipe-error-handling — verify graceful failure
+  - [ ] ex-59 · daemon-systemd — verify a managed lifecycle
+  - [ ] ex-60 · daemon-restart — verify the restart intuition
+  - [ ] ex-61 · cron-vs-daemon — verify the tradeoff
+  - [ ] ex-62 · signal-during-work — verify no corruption
+  - [ ] ex-63 · tempfile-atomic — verify no partial file
+  - [ ] ex-64 · permissions-enforce — verify the mode
+  - [ ] ex-65 · socket-ipc-daemon — verify a command round-trip
+  - [ ] ex-66 · gui-gtk-survey — verify it opens
+  - [ ] ex-67 · gui-qt-survey — verify it opens
+  - [ ] ex-68 · container-package — verify it builds
+  - [ ] ex-69 · container-run — verify output
+  - [ ] ex-70 · package-distribute — verify the artifact
+  - [ ] ex-71 · install-clean-venv — verify it runs
+  - [ ] ex-72 · test-signal-handling — verify graceful shutdown
+  - [ ] ex-73 · test-daemon-lifecycle — verify a clean lifecycle
+  - [ ] ex-74 · test-subprocess-error — verify the error path
+  - [ ] ex-75 · structured-logging — verify machine-readable output
+  - [ ] ex-76 · cli-daemon-shared-core — verify cohesion
+  - [ ] ex-77 · integration-ipc-slice — verify end-to-end
+  - [ ] ex-78 · capstone-cli-and-daemon — verify install into a clean venv + tests pass
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/linux-app-development/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2491,27 +10468,136 @@ Row: By Example · Python ◆ · topic wt 820 · Learn 172 / Drill 272 · **subj
       `CONTENT/linux-app-development/drilling/_index.md` (wt 272) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 79 Gate
+### Phase 83 Gate
 
-- [ ] [AI] `linux-app-development/` complete: `_index.md` wt 820, `learning/_index.md` wt 172,
-      `drilling/_index.md` wt 272, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `linux-app-development/` complete: `_index.md` wt 860, `learning/_index.md` wt 176,
+      `drilling/_index.md` wt 276, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 80 — Topic 73 Building Production CLI Tools (`building-production-cli-tools`)
+## Phase 84 — Topic 77 Building Production CLI Tools (`building-production-cli-tools`)
 
-Row: By Example · Go + Rust † · topic wt 830 · Learn 173 / Drill 273 · **subject**. Template →
-[`syllabus/73-building-production-cli-tools.md`](./syllabus/73-building-production-cli-tools.md).
+Row: By Example · Go + Rust † · topic wt 870 · Learn 177 / Drill 277 · **subject**. Template →
+[`syllabus/77-building-production-cli-tools.md`](./syllabus/77-building-production-cli-tools.md).
 
 - [ ] **[AI] V** — `web-researcher` for `building-production-cli-tools`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/73-building-production-cli-tools.md`](./syllabus/73-building-production-cli-tools.md) and fold dated findings back into that file.
+      [`syllabus/77-building-production-cli-tools.md`](./syllabus/77-building-production-cli-tools.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/building-production-cli-tools/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/73-building-production-cli-tools.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/building-production-cli-tools/learning/` prose covering **every** `co-NN` concept in
+      [`syllabus/77-building-production-cli-tools.md`](./syllabus/77-building-production-cli-tools.md) §Concepts (30 concepts, 1:1). **Acceptance**: each concept below is taught.
+  - [ ] co-01 · arg-parsing
+  - [ ] co-02 · subcommands
+  - [ ] co-03 · flag-types
+  - [ ] co-04 · double-dash
+  - [ ] co-05 · generated-help
+  - [ ] co-06 · version-flag
+  - [ ] co-07 · config-precedence
+  - [ ] co-08 · env-config
+  - [ ] co-09 · config-file
+  - [ ] co-10 · defaults
+  - [ ] co-11 · exit-codes
+  - [ ] co-12 · stdout-data
+  - [ ] co-13 · stderr-diagnostics
+  - [ ] co-14 · error-messages
+  - [ ] co-15 · tty-detection
+  - [ ] co-16 · color-output
+  - [ ] co-17 · progress-bars
+  - [ ] co-18 · prompts
+  - [ ] co-19 · quiet-verbose
+  - [ ] co-20 · shell-completion
+  - [ ] co-21 · machine-output
+  - [ ] co-22 · single-binary
+  - [ ] co-23 · cross-compilation
+  - [ ] co-24 · packaging-install
+  - [ ] co-25 · go-cobra
+  - [ ] co-26 · rust-clap
+  - [ ] co-27 · core-cli-boundary
+  - [ ] co-28 · signal-handling
+  - [ ] co-29 · testing-cli
+  - [ ] co-30 · posix-gnu-convention
+- [ ] **[AI] A1-examples** — Author `CONTENT/building-production-cli-tools/learning/code/` (runnable Go/Rust sources, DD-20/DD-30)
+      covering **every** `ex-NN` worked example in `syllabus/77-building-production-cli-tools.md` §Worked examples (78 examples, 1:1). **Acceptance**: each example below appears with its expected output.
+  - [ ] ex-01 · go-hello-cli — verify `go run` output
+  - [ ] ex-02 · rust-hello-cli — verify `cargo run` output
+  - [ ] ex-03 · bool-flag — verify it toggles
+  - [ ] ex-04 · string-flag — verify the value
+  - [ ] ex-05 · int-flag — verify parsing
+  - [ ] ex-06 · positional-arg — verify it's read
+  - [ ] ex-07 · short-long-flag — verify both work
+  - [ ] ex-08 · double-dash — verify trailing args pass through
+  - [ ] ex-09 · go-help — verify the usage text
+  - [ ] ex-10 · rust-help — verify the usage text
+  - [ ] ex-11 · version-flag — verify output
+  - [ ] ex-12 · exit-zero — verify `$?` is 0
+  - [ ] ex-13 · exit-nonzero — verify `$?` is non-zero
+  - [ ] ex-14 · stdout-data — verify capture
+  - [ ] ex-15 · stderr-error — verify separation
+  - [ ] ex-16 · error-message — verify it names the fix
+  - [ ] ex-17 · unknown-flag — verify the error
+  - [ ] ex-18 · default-value — verify the default runs
+  - [ ] ex-19 · env-read — verify it's used
+  - [ ] ex-20 · go-subcommand — verify dispatch
+  - [ ] ex-21 · rust-subcommand — verify dispatch
+  - [ ] ex-22 · subcommand-help — verify each renders
+  - [ ] ex-23 · required-flag — verify the error
+  - [ ] ex-24 · repeated-flag — verify the count
+  - [ ] ex-25 · posix-cluster — verify it parses
+  - [ ] ex-26 · go-build-binary — verify it runs
+  - [ ] ex-27 · config-file-load — verify values
+  - [ ] ex-28 · flag-over-env — verify the flag wins
+  - [ ] ex-29 · env-over-config — verify env wins
+  - [ ] ex-30 · config-over-default — verify config wins
+  - [ ] ex-31 · full-precedence — verify the winner
+  - [ ] ex-32 · subcommand-tree — verify deep dispatch
+  - [ ] ex-33 · subcommand-flags — verify scoping
+  - [ ] ex-34 · persistent-flags — verify inheritance
+  - [ ] ex-35 · tty-detect — verify the TTY-vs-pipe branch
+  - [ ] ex-36 · color-on-tty — verify no codes when piped
+  - [ ] ex-37 · color-force-flag — verify the override
+  - [ ] ex-38 · progress-on-tty — verify none when piped
+  - [ ] ex-39 · machine-json — verify parseable JSON
+  - [ ] ex-40 · pipe-clean-output — verify clean data
+  - [ ] ex-41 · quiet-mode — verify only errors show
+  - [ ] ex-42 · verbose-mode — verify extra logs
+  - [ ] ex-43 · prompt-on-tty — verify it's skipped when piped
+  - [ ] ex-44 · go-completion — verify a completion script
+  - [ ] ex-45 · rust-completion — verify a completion script
+  - [ ] ex-46 · exit-code-map — verify the mapping
+  - [ ] ex-47 · stderr-vs-stdout-pipe — verify separation under a pipe
+  - [ ] ex-48 · core-function — verify it's callable headless
+  - [ ] ex-49 · cli-calls-core — verify the boundary
+  - [ ] ex-50 · sigint-handling — verify graceful exit
+  - [ ] ex-51 · go-test-cli — verify green
+  - [ ] ex-52 · rust-test-cli — verify green
+  - [ ] ex-53 · golden-output-test — verify stable output
+  - [ ] ex-54 · help-snapshot-test — verify it matches
+  - [ ] ex-55 · cross-compile-go — verify a foreign-target binary
+  - [ ] ex-56 · cross-compile-rust — verify a foreign-target binary
+  - [ ] ex-57 · static-binary — verify it runs standalone
+  - [ ] ex-58 · two-platform-build — verify both artifacts
+  - [ ] ex-59 · install-path — verify the command resolves
+  - [ ] ex-60 · package-release — verify the contents
+  - [ ] ex-61 · config-precedence-full — verify resolution
+  - [ ] ex-62 · tty-color-progress — verify both modes
+  - [ ] ex-63 · json-and-human — verify each
+  - [ ] ex-64 · actionable-errors — verify the message
+  - [ ] ex-65 · exit-code-discipline — verify branching
+  - [ ] ex-66 · completion-both-shells — verify both scripts
+  - [ ] ex-67 · signal-cleanup — verify no leftovers
+  - [ ] ex-68 · verbose-quiet-combo — verify the resolved level
+  - [ ] ex-69 · posix-gnu-parity — verify both syntaxes
+  - [ ] ex-70 · go-vs-rust-same-cli — verify identical behaviour
+  - [ ] ex-71 · core-cli-test-split — verify both
+  - [ ] ex-72 · env-prefix — verify only prefixed vars apply
+  - [ ] ex-73 · machine-pipe-integration — verify the pipeline
+  - [ ] ex-74 · completion-install — verify tab-complete
+  - [ ] ex-75 · error-to-stderr-code — verify both
+  - [ ] ex-76 · subcommand-plus-precedence — verify the whole
+  - [ ] ex-77 · integration-tty-slice — verify all modes
+  - [ ] ex-78 · capstone-production-cli — verify subcommands/help, precedence order, pipe-clean output, both binaries run
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/building-production-cli-tools/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2520,27 +10606,132 @@ Row: By Example · Go + Rust † · topic wt 830 · Learn 173 / Drill 273 · **s
       `CONTENT/building-production-cli-tools/drilling/_index.md` (wt 273) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 80 Gate
+### Phase 84 Gate
 
-- [ ] [AI] `building-production-cli-tools/` complete: `_index.md` wt 830, `learning/_index.md` wt 173,
-      `drilling/_index.md` wt 273, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `building-production-cli-tools/` complete: `_index.md` wt 870, `learning/_index.md` wt 177,
+      `drilling/_index.md` wt 277, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 81 — Topic 74 Just Enough C (`just-enough-c`)
+## Phase 85 — Topic 78 Just Enough C (`just-enough-c`)
 
-Row: Primer § · C † · topic wt 840 · Learn 174 / Drill 274 · **primer**. Template →
-[`syllabus/74-just-enough-c.md`](./syllabus/74-just-enough-c.md).
+Row: Primer § · C † · topic wt 880 · Learn 178 / Drill 278 · **primer**. Template →
+[`syllabus/78-just-enough-c.md`](./syllabus/78-just-enough-c.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-c`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/74-just-enough-c.md`](./syllabus/74-just-enough-c.md) and fold dated findings back into that file.
+      [`syllabus/78-just-enough-c.md`](./syllabus/78-just-enough-c.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-c/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/74-just-enough-c.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-c/learning/` prose covering **every** `co-NN` concept in
+      [`syllabus/78-just-enough-c.md`](./syllabus/78-just-enough-c.md) §Concepts (26 concepts, 1:1). **Acceptance**: each concept below is taught.
+  - [ ] co-01 · gcc-clang
+  - [ ] co-02 · compile-link
+  - [ ] co-03 · make-makefile
+  - [ ] co-04 · main-and-return
+  - [ ] co-05 · types
+  - [ ] co-06 · variables-scope
+  - [ ] co-07 · operators
+  - [ ] co-08 · control-flow
+  - [ ] co-09 · functions
+  - [ ] co-10 · pointers-intro
+  - [ ] co-11 · pointer-deref
+  - [ ] co-12 · arrays
+  - [ ] co-13 · array-pointer-decay
+  - [ ] co-14 · strings
+  - [ ] co-15 · structs
+  - [ ] co-16 · struct-pointers
+  - [ ] co-17 · stdio-printf
+  - [ ] co-18 · stdio-scanf
+  - [ ] co-19 · file-io
+  - [ ] co-20 · preprocessor-include
+  - [ ] co-21 · preprocessor-define
+  - [ ] co-22 · header-guards
+  - [ ] co-23 · multi-file
+  - [ ] co-24 · malloc-free
+  - [ ] co-25 · const-sizeof
+  - [ ] co-26 · compiler-warnings
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-c/learning/code/` (runnable gcc/clang+make sources, DD-20/DD-30)
+      covering **every** `ex-NN` worked example in `syllabus/78-just-enough-c.md` §Worked examples (78 examples, 1:1). **Acceptance**: each example below appears with its expected output.
+  - [ ] ex-01 · gcc-compile — verify a binary is produced
+  - [ ] ex-02 · run-binary — verify output
+  - [ ] ex-03 · clang-compile — verify it also compiles
+  - [ ] ex-04 · main-return — verify the exit code
+  - [ ] ex-05 · int-var — verify the value
+  - [ ] ex-06 · char-var — verify the value
+  - [ ] ex-07 · float-double — verify precision
+  - [ ] ex-08 · arithmetic — verify results
+  - [ ] ex-09 · comparison-logical — verify booleans
+  - [ ] ex-10 · bitwise — verify results
+  - [ ] ex-11 · if-else — verify selection
+  - [ ] ex-12 · switch — verify case dispatch
+  - [ ] ex-13 · for-loop — verify iteration
+  - [ ] ex-14 · while-loop — verify iteration
+  - [ ] ex-15 · function-def — verify the return
+  - [ ] ex-16 · function-prototype — verify it compiles
+  - [ ] ex-17 · printf-format — verify formatting
+  - [ ] ex-18 · scanf-input — verify the value
+  - [ ] ex-19 · scope-block — verify scope
+  - [ ] ex-20 · sizeof — verify sizes
+  - [ ] ex-21 · const — verify it can't be reassigned
+  - [ ] ex-22 · array-declare — verify elements
+  - [ ] ex-23 · array-loop — verify traversal
+  - [ ] ex-24 · string-literal — verify output
+  - [ ] ex-25 · include-stdio — verify `printf` resolves
+  - [ ] ex-26 · define-const — verify substitution
+  - [ ] ex-27 · pointer-address — verify the address prints
+  - [ ] ex-28 · pointer-declare — verify it holds the address
+  - [ ] ex-29 · deref-read — verify it equals `x`
+  - [ ] ex-30 · deref-write — verify `x` changes
+  - [ ] ex-31 · pointer-function — verify the caller sees the change
+  - [ ] ex-32 · null-pointer — verify guarded access
+  - [ ] ex-33 · array-decay — verify element access
+  - [ ] ex-34 · pointer-arithmetic — verify equivalence
+  - [ ] ex-35 · string-length — verify the length
+  - [ ] ex-36 · string-h — verify results
+  - [ ] ex-37 · struct-define — verify fields
+  - [ ] ex-38 · struct-init — verify values
+  - [ ] ex-39 · struct-function — verify it's copied
+  - [ ] ex-40 · struct-pointer — verify member access
+  - [ ] ex-41 · struct-pointer-mutate — verify the caller sees it
+  - [ ] ex-42 · array-of-structs — verify iteration
+  - [ ] ex-43 · fopen-write — verify contents
+  - [ ] ex-44 · fopen-read — verify parsed values
+  - [ ] ex-45 · fclose — verify the file is flushed
+  - [ ] ex-46 · printf-specifiers — verify formatting
+  - [ ] ex-47 · multiple-args — verify the computation
+  - [ ] ex-48 · recursion — verify the result
+  - [ ] ex-49 · define-macro — verify expansion
+  - [ ] ex-50 · header-file — verify it links
+  - [ ] ex-51 · header-guard — verify no double-include error
+  - [ ] ex-52 · pragma-once — verify single inclusion
+  - [ ] ex-53 · two-file-compile — verify one binary
+  - [ ] ex-54 · warnings-clean — verify no warnings
+  - [ ] ex-55 · malloc-basic — verify the value
+  - [ ] ex-56 · malloc-array — verify indexing
+  - [ ] ex-57 · free-memory — verify no leak
+  - [ ] ex-58 · malloc-struct — verify fields
+  - [ ] ex-59 · pointer-to-pointer — verify double dereference
+  - [ ] ex-60 · array-of-pointers — verify iteration
+  - [ ] ex-61 · struct-linked — verify traversal
+  - [ ] ex-62 · makefile-basic — verify `make` builds
+  - [ ] ex-63 · makefile-clean — verify `make clean` removes artifacts
+  - [ ] ex-64 · makefile-vars — verify they apply
+  - [ ] ex-65 · makefile-multi — verify an incremental build
+  - [ ] ex-66 · object-files — verify the two-step build
+  - [ ] ex-67 · extern-declaration — verify linkage
+  - [ ] ex-68 · conditional-compile — verify conditional inclusion
+  - [ ] ex-69 · sizeof-struct-layout — verify the size
+  - [ ] ex-70 · stdin-loop — verify processing
+  - [ ] ex-71 · file-round-trip — verify the round-trip
+  - [ ] ex-72 · string-parse — verify the tokens
+  - [ ] ex-73 · warning-fix — verify a clean build
+  - [ ] ex-74 · const-pointer — verify immutability
+  - [ ] ex-75 · multi-file-struct — verify it links + runs
+  - [ ] ex-76 · makefile-warnings — verify warning-clean
+  - [ ] ex-77 · integration-pointer-struct-slice — verify end-to-end
+  - [ ] ex-78 · capstone-multifile-c — verify `make` builds, `make clean` cleans, output is correct
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-c/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2549,27 +10740,136 @@ Row: Primer § · C † · topic wt 840 · Learn 174 / Drill 274 · **primer**. 
       `CONTENT/just-enough-c/drilling/_index.md` (wt 274) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 81 Gate
+### Phase 85 Gate
 
-- [ ] [AI] `just-enough-c/` complete: `_index.md` wt 840, `learning/_index.md` wt 174,
-      `drilling/_index.md` wt 274, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-c/` complete: `_index.md` wt 880, `learning/_index.md` wt 178,
+      `drilling/_index.md` wt 278, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 82 — Topic 75 Linux OS (`linux-os`)
+## Phase 86 — Topic 79 Linux OS (`linux-os`)
 
-Row: By Example · C + shell † · topic wt 850 · Learn 175 / Drill 275 · **subject**. Template →
-[`syllabus/75-linux-os.md`](./syllabus/75-linux-os.md).
+Row: By Example · C + shell † · topic wt 890 · Learn 179 / Drill 279 · **subject**. Template →
+[`syllabus/79-linux-os.md`](./syllabus/79-linux-os.md).
 
 - [ ] **[AI] V** — `web-researcher` for `linux-os`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/75-linux-os.md`](./syllabus/75-linux-os.md) and fold dated findings back into that file.
+      [`syllabus/79-linux-os.md`](./syllabus/79-linux-os.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/linux-os/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/75-linux-os.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/linux-os/learning/` prose covering **every** `co-NN` concept in
+      [`syllabus/79-linux-os.md`](./syllabus/79-linux-os.md) §Concepts (30 concepts, 1:1). **Acceptance**: each concept below is taught.
+  - [ ] co-01 · kernel-vs-user
+  - [ ] co-02 · syscalls
+  - [ ] co-03 · syscall-observe
+  - [ ] co-04 · process-model
+  - [ ] co-05 · fork
+  - [ ] co-06 · exec
+  - [ ] co-07 · wait
+  - [ ] co-08 · fork-exec-wait
+  - [ ] co-09 · signals
+  - [ ] co-10 · signal-delivery
+  - [ ] co-11 · process-states
+  - [ ] co-12 · virtual-memory
+  - [ ] co-13 · paging
+  - [ ] co-14 · address-space-layout
+  - [ ] co-15 · mmap
+  - [ ] co-16 · brk-heap
+  - [ ] co-17 · file-descriptors
+  - [ ] co-18 · inodes
+  - [ ] co-19 · vfs
+  - [ ] co-20 · permissions
+  - [ ] co-21 · mounts
+  - [ ] co-22 · pipes
+  - [ ] co-23 · shared-memory
+  - [ ] co-24 · sockets-ipc
+  - [ ] co-25 · scheduling
+  - [ ] co-26 · threads-vs-processes
+  - [ ] co-27 · priorities
+  - [ ] co-28 · proc-filesystem
+  - [ ] co-29 · process-tools
+  - [ ] co-30 · os-theory
+- [ ] **[AI] A1-examples** — Author `CONTENT/linux-os/learning/code/` (runnable C + shell sources on a live Linux system, DD-20/DD-30)
+      covering **every** `ex-NN` worked example in `syllabus/79-linux-os.md` §Worked examples (78 examples, 1:1). **Acceptance**: each example below appears with its expected output.
+  - [ ] ex-01 · hello-syscall — verify output crosses the user/kernel boundary
+  - [ ] ex-02 · strace-hello — verify the syscalls shown
+  - [ ] ex-03 · getpid — verify it matches `ps`
+  - [ ] ex-04 · fork-basic — verify two processes print
+  - [ ] ex-05 · fork-return — verify the branch
+  - [ ] ex-06 · exec-basic — verify the new program runs
+  - [ ] ex-07 · exec-ls — verify `ls` output
+  - [ ] ex-08 · wait-child — verify the parent gets the exit status
+  - [ ] ex-09 · fork-exec-wait — verify orchestration
+  - [ ] ex-10 · exit-status — verify the code
+  - [ ] ex-11 · zombie — verify `ps` shows `Z`
+  - [ ] ex-12 · signal-handler — verify Ctrl-C is caught
+  - [ ] ex-13 · kill-signal — verify the target reacts
+  - [ ] ex-14 · sigterm — verify clean shutdown
+  - [ ] ex-15 · sigkill — verify the process dies
+  - [ ] ex-16 · ps-inspect — verify the target appears
+  - [ ] ex-17 · top-inspect — verify live stats
+  - [ ] ex-18 · proc-status — verify process fields
+  - [ ] ex-19 · proc-fd — verify open descriptors
+  - [ ] ex-20 · proc-maps — verify the memory map
+  - [ ] ex-21 · fd-open — verify the fd number
+  - [ ] ex-22 · fd-inheritance — verify shared access
+  - [ ] ex-23 · permissions-check — verify the permissions
+  - [ ] ex-24 · chmod — verify the new mode
+  - [ ] ex-25 · stat-inode — verify it
+  - [ ] ex-26 · mount-list — verify a filesystem
+  - [ ] ex-27 · pipe-basic — verify a byte crosses
+  - [ ] ex-28 · pipe-dup2 — verify redirection
+  - [ ] ex-29 · pipe-shell-emulate — verify the pipeline
+  - [ ] ex-30 · signal-between-processes — verify coordination
+  - [ ] ex-31 · sigaction — verify the handler
+  - [ ] ex-32 · signal-mask — verify deferral
+  - [ ] ex-33 · mmap-anon — verify read/write
+  - [ ] ex-34 · mmap-file — verify the mapping reflects the file
+  - [ ] ex-35 · mmap-shared — verify shared writes
+  - [ ] ex-36 · shm-open — verify it's created
+  - [ ] ex-37 · shm-ipc — verify the value crosses
+  - [ ] ex-38 · unix-socket — verify a message
+  - [ ] ex-39 · socketpair — verify both directions
+  - [ ] ex-40 · vfs-same-api — verify the VFS uniformity
+  - [ ] ex-41 · heap-brk — verify the new break
+  - [ ] ex-42 · malloc-strace — verify the syscalls
+  - [ ] ex-43 · address-space-segments — verify the virtual-memory layout order
+  - [ ] ex-44 · page-fault — verify demand paging
+  - [ ] ex-45 · strace-openfile — verify open/read/close
+  - [ ] ex-46 · strace-count — verify the counts
+  - [ ] ex-47 · ps-tree — verify the process tree
+  - [ ] ex-48 · nice-priority — verify the priority
+  - [ ] ex-49 · thread-vs-process — verify threads share, processes don't
+  - [ ] ex-50 · context-switch-count — verify it
+  - [ ] ex-51 · zombie-reap — verify it disappears
+  - [ ] ex-52 · orphan-reparent — verify PPID becomes 1
+  - [ ] ex-53 · proc-cmdline — verify the args
+  - [ ] ex-54 · signalfd — verify the integration
+  - [ ] ex-55 · shell-mini — verify command execution
+  - [ ] ex-56 · shell-pipe — verify the pipeline
+  - [ ] ex-57 · shell-signal — verify the handler
+  - [ ] ex-58 · producer-consumer-shm — verify sync
+  - [ ] ex-59 · mmap-large-file — verify paging
+  - [ ] ex-60 · copy-on-write — verify separate pages
+  - [ ] ex-61 · fd-leak-detect — verify the growing count
+  - [ ] ex-62 · strace-network — verify connect/send syscalls
+  - [ ] ex-63 · signal-race — verify correctness
+  - [ ] ex-64 · waitpid-nonblock — verify non-blocking reaping
+  - [ ] ex-65 · process-group — verify group delivery
+  - [ ] ex-66 · daemon-double-fork — verify detachment
+  - [ ] ex-67 · mount-namespace — verify isolation
+  - [ ] ex-68 · vfs-proc-vs-disk — verify the same syscalls
+  - [ ] ex-69 · scheduler-observe — verify fairness (EEVDF)
+  - [ ] ex-70 · top-threads — verify the per-thread view
+  - [ ] ex-71 · mmap-shared-counter — verify the total
+  - [ ] ex-72 · pipe-deadlock — verify the corrected flow
+  - [ ] ex-73 · inode-hardlink — verify the same inode number
+  - [ ] ex-74 · permission-denied — verify errno
+  - [ ] ex-75 · strace-signal — verify the trace
+  - [ ] ex-76 · full-ipc-slice — verify the whole
+  - [ ] ex-77 · integration-observe-slice — verify tooling reflects state
+  - [ ] ex-78 · capstone-process-tour — verify process control, IPC, and tooling reflect the expected syscalls/state
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/linux-os/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2578,27 +10878,138 @@ Row: By Example · C + shell † · topic wt 850 · Learn 175 / Drill 275 · **s
       `CONTENT/linux-os/drilling/_index.md` (wt 275) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 82 Gate
+### Phase 86 Gate
 
-- [ ] [AI] `linux-os/` complete: `_index.md` wt 850, `learning/_index.md` wt 175,
-      `drilling/_index.md` wt 275, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `linux-os/` complete: `_index.md` wt 890, `learning/_index.md` wt 179,
+      `drilling/_index.md` wt 279, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 83 — Topic 76 Windows OS (`windows-os`)
+## Phase 87 — Topic 80 Windows OS (`windows-os`)
 
-Row: By Example · C + PowerShell † · topic wt 860 · Learn 176 / Drill 276 · **subject**. Template →
-[`syllabus/76-windows-os.md`](./syllabus/76-windows-os.md).
+Row: By Example · C + PowerShell † · topic wt 900 · Learn 180 / Drill 280 · **subject**. Template →
+[`syllabus/80-windows-os.md`](./syllabus/80-windows-os.md).
 
 - [ ] **[AI] V** — `web-researcher` for `windows-os`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/76-windows-os.md`](./syllabus/76-windows-os.md) and fold dated findings back into that file.
+      [`syllabus/80-windows-os.md`](./syllabus/80-windows-os.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/windows-os/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/76-windows-os.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/windows-os/learning/` prose covering **every** concept (`co-01..co-30`)
+      enumerated in `syllabus/80-windows-os.md` §Concepts. **Acceptance**: all 30 concepts below are taught, each
+      1:1-mirrored to its `co-NN`.
+  - [ ] co-01 · user-kernel-mode
+  - [ ] co-02 · win32-api
+  - [ ] co-03 · subsystems
+  - [ ] co-04 · object-handle-model
+  - [ ] co-05 · handle-lifecycle
+  - [ ] co-06 · createprocess
+  - [ ] co-07 · process-primary-thread
+  - [ ] co-08 · createthread
+  - [ ] co-09 · thread-scheduling
+  - [ ] co-10 · virtualalloc
+  - [ ] co-11 · reserve-commit
+  - [ ] co-12 · heaps
+  - [ ] co-13 · working-set
+  - [ ] co-14 · mutex
+  - [ ] co-15 · event
+  - [ ] co-16 · critical-section
+  - [ ] co-17 · wait-functions
+  - [ ] co-18 · createfile
+  - [ ] co-19 · sync-async-io
+  - [ ] co-20 · ntfs
+  - [ ] co-21 · registry
+  - [ ] co-22 · registry-api
+  - [ ] co-23 · powershell-getprocess
+  - [ ] co-24 · powershell-getservice
+  - [ ] co-25 · process-explorer
+  - [ ] co-26 · task-manager
+  - [ ] co-27 · handle-vs-fd
+  - [ ] co-28 · createprocess-vs-fork
+  - [ ] co-29 · object-manager-vs-vfs
+  - [ ] co-30 · os-theory
+- [ ] **[AI] A1-examples** — Author `CONTENT/windows-os/learning/` (+ `code/`, runnable sources, DD-20) covering
+      **every** worked example (`ex-01..ex-78`) in `syllabus/80-windows-os.md`, each rendered runnable (DD-20/DD-30).
+      **Acceptance**: all 78 worked examples below appear with expected output, each 1:1-mirrored to its `ex-NN`.
+  - [ ] ex-01 · win32-hello — verify it runs in user mode via the Win32 subsystem
+  - [ ] ex-02 · getcurrentprocessid — verify it matches Task Manager
+  - [ ] ex-03 · createprocess-basic — verify the child starts
+  - [ ] ex-04 · createprocess-wait — verify the parent waits
+  - [ ] ex-05 · primary-thread — verify via inspection
+  - [ ] ex-06 · handle-return — verify the handles
+  - [ ] ex-07 · closehandle — verify no leak
+  - [ ] ex-08 · handle-count — verify it drops on close
+  - [ ] ex-09 · createthread-basic — verify the thread runs
+  - [ ] ex-10 · thread-wait — verify it joins
+  - [ ] ex-11 · multiple-threads — verify concurrent execution
+  - [ ] ex-12 · getprocess-ps — verify the target appears
+  - [ ] ex-13 · getprocess-filter — verify filtering
+  - [ ] ex-14 · getservice-ps — verify a service is listed
+  - [ ] ex-15 · task-manager — verify CPU/memory
+  - [ ] ex-16 · process-explorer-handles — verify open handles
+  - [ ] ex-17 · createfile-open — verify the handle
+  - [ ] ex-18 · createfile-fail — verify the error
+  - [ ] ex-19 · readfile — verify contents
+  - [ ] ex-20 · writefile — verify persistence
+  - [ ] ex-21 · virtualalloc-basic — verify it's zeroed
+  - [ ] ex-22 · virtualalloc-write — verify read-back
+  - [ ] ex-23 · reg-open — verify it opens
+  - [ ] ex-24 · reg-query — verify the data
+  - [ ] ex-25 · registry-tree — verify a subkey
+  - [ ] ex-26 · reg-ps — verify a value
+  - [ ] ex-27 · mutex-create — verify it's created
+  - [ ] ex-28 · mutex-lock — verify mutual exclusion
+  - [ ] ex-29 · mutex-two-threads — verify no data race
+  - [ ] ex-30 · named-mutex-crossprocess — verify cross-process sync
+  - [ ] ex-31 · critical-section — verify mutual exclusion
+  - [ ] ex-32 · critical-section-vs-mutex — verify the distinction
+  - [ ] ex-33 · event-create — verify it's created
+  - [ ] ex-34 · event-signal — verify signaling
+  - [ ] ex-35 · event-manual-reset — verify it stays signaled
+  - [ ] ex-36 · wait-multiple — verify waiting on several
+  - [ ] ex-37 · reserve-commit — verify two-step allocation
+  - [ ] ex-38 · heap-create — verify allocation
+  - [ ] ex-39 · heap-on-virtualalloc — verify the layering
+  - [ ] ex-40 · working-set — verify it reflects usage
+  - [ ] ex-41 · overlapped-io — verify async I/O
+  - [ ] ex-42 · sync-vs-async-io — verify the difference
+  - [ ] ex-43 · ntfs-stream — verify it's written
+  - [ ] ex-44 · ntfs-attributes — verify it's set
+  - [ ] ex-45 · createprocess-cmdline — verify the child gets them
+  - [ ] ex-46 · process-tree-ps — verify parent/child
+  - [ ] ex-47 · handle-inspect-ps — verify the open file handle
+  - [ ] ex-48 · thread-priority — verify the scheduling bias
+  - [ ] ex-49 · memory-inspect-ps — verify the memory view
+  - [ ] ex-50 · reg-write — verify it persists
+  - [ ] ex-51 · service-query — verify running/stopped
+  - [ ] ex-52 · duplicate-handle — verify shared access
+  - [ ] ex-53 · wait-timeout — verify the timeout path
+  - [ ] ex-54 · close-all-handles — verify no leak in Process Explorer
+  - [ ] ex-55 · process-plus-threads — verify orchestration
+  - [ ] ex-56 · producer-consumer-event — verify sync
+  - [ ] ex-57 · shared-memory-mapping — verify IPC
+  - [ ] ex-58 · overlapped-completion — verify async completion
+  - [ ] ex-59 · handle-leak-demo — verify the count stabilizes
+  - [ ] ex-60 · race-then-fix — verify correctness
+  - [ ] ex-61 · named-sync-two-procs — verify cross-process
+  - [ ] ex-62 · virtualalloc-guard — verify the fault
+  - [ ] ex-63 · registry-round-trip — verify the round-trip
+  - [ ] ex-64 · file-round-trip-handle — verify the round-trip
+  - [ ] ex-65 · ntfs-stream-round-trip — verify the hidden stream
+  - [ ] ex-66 · process-explorer-dll — verify loaded modules
+  - [ ] ex-67 · powershell-cim — verify richer detail
+  - [ ] ex-68 · handle-vs-fd-contrast — verify the model contrast
+  - [ ] ex-69 · createprocess-vs-fork-contrast — verify the contrast
+  - [ ] ex-70 · objectmanager-vs-vfs-contrast — verify the contrast
+  - [ ] ex-71 · wait-object-uniformity — verify the uniform handle model
+  - [ ] ex-72 · thread-pool-intuition — verify work distribution
+  - [ ] ex-73 · async-io-scale — verify concurrent I/O
+  - [ ] ex-74 · memory-protection — verify the new access
+  - [ ] ex-75 · inspect-matches-code — verify consistency
+  - [ ] ex-76 · full-win32-slice — verify the whole
+  - [ ] ex-77 · integration-contrast-slice — verify the contrast is concrete
+  - [ ] ex-78 · capstone-windows-tour — verify process/sync/IO work with no leak/race, inspection matches, contrast concrete
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/windows-os/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2607,27 +11018,139 @@ Row: By Example · C + PowerShell † · topic wt 860 · Learn 176 / Drill 276 �
       `CONTENT/windows-os/drilling/_index.md` (wt 276) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 83 Gate
+### Phase 87 Gate
 
-- [ ] [AI] `windows-os/` complete: `_index.md` wt 860, `learning/_index.md` wt 176,
-      `drilling/_index.md` wt 276, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `windows-os/` complete: `_index.md` wt 900, `learning/_index.md` wt 180,
+      `drilling/_index.md` wt 280, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 84 — Topic 77 System Programming (`system-programming`)
+## Phase 88 — Topic 81 System Programming (`system-programming`)
 
-Row: By Example · C † · topic wt 870 · Learn 177 / Drill 277 · **subject**. Template →
-[`syllabus/77-system-programming.md`](./syllabus/77-system-programming.md).
+Row: By Example · C † · topic wt 910 · Learn 181 / Drill 281 · **subject**. Template →
+[`syllabus/81-system-programming.md`](./syllabus/81-system-programming.md).
 
 - [ ] **[AI] V** — `web-researcher` for `system-programming`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/77-system-programming.md`](./syllabus/77-system-programming.md) and fold dated findings back into that file.
+      [`syllabus/81-system-programming.md`](./syllabus/81-system-programming.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/system-programming/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/77-system-programming.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/system-programming/learning/` prose covering **every** concept
+      (`co-01..co-30`) enumerated in `syllabus/81-system-programming.md` §Concepts. **Acceptance**: all 30 concepts
+      below are taught, each 1:1-mirrored to its `co-NN`.
+  - [ ] co-01 · stack-vs-heap
+  - [ ] co-02 · pointers
+  - [ ] co-03 · malloc-free
+  - [ ] co-04 · realloc
+  - [ ] co-05 · calloc
+  - [ ] co-06 · alignment
+  - [ ] co-07 · ownership-discipline
+  - [ ] co-08 · dangling-pointer
+  - [ ] co-09 · undefined-behavior
+  - [ ] co-10 · buffer-overflow
+  - [ ] co-11 · use-after-free
+  - [ ] co-12 · double-free
+  - [ ] co-13 · integer-overflow
+  - [ ] co-14 · fd-ownership
+  - [ ] co-15 · goto-cleanup
+  - [ ] co-16 · attribute-cleanup
+  - [ ] co-17 · errno
+  - [ ] co-18 · bit-manipulation
+  - [ ] co-19 · structs
+  - [ ] co-20 · unions
+  - [ ] co-21 · endianness
+  - [ ] co-22 · serialization
+  - [ ] co-23 · compilation-units
+  - [ ] co-24 · headers
+  - [ ] co-25 · static-linking
+  - [ ] co-26 · dynamic-linking
+  - [ ] co-27 · abi
+  - [ ] co-28 · syscalls
+  - [ ] co-29 · signals
+  - [ ] co-30 · sockets
+- [ ] **[AI] A1-examples** — Author `CONTENT/system-programming/learning/` (+ `code/`, runnable sources, DD-20)
+      covering **every** worked example (`ex-01..ex-78`) in `syllabus/81-system-programming.md`, each rendered
+      runnable + memory-checked (DD-20/DD-30). **Acceptance**: all 78 worked examples below appear with expected
+      output, each 1:1-mirrored to its `ex-NN`.
+  - [ ] ex-01 · malloc-basic — verify the value round-trips
+  - [ ] ex-02 · malloc-array — verify indexed access
+  - [ ] ex-03 · free-basic — verify no leak under ASan
+  - [ ] ex-04 · calloc-zeroed — verify every element is zero
+  - [ ] ex-05 · realloc-grow — verify old contents preserved
+  - [ ] ex-06 · realloc-shrink — verify the retained prefix
+  - [ ] ex-07 · pointer-deref — verify the pointed-to value
+  - [ ] ex-08 · pointer-arith — verify element addresses step by sizeof
+  - [ ] ex-09 · null-check — verify the failure path is handled
+  - [ ] ex-10 · stack-vs-heap — verify lifetimes differ
+  - [ ] ex-11 · sizeof — verify the reported sizes
+  - [ ] ex-12 · alignment-alignof — verify the alignment requirement
+  - [ ] ex-13 · bit-set — verify the bit is set
+  - [ ] ex-14 · bit-clear — verify the bit is cleared
+  - [ ] ex-15 · bit-toggle — verify it flips
+  - [ ] ex-16 · bit-test — verify the result
+  - [ ] ex-17 · bit-flags — verify several flags coexist
+  - [ ] ex-18 · shift-ops — verify multiply/divide by powers of two
+  - [ ] ex-19 · struct-basic — verify field access
+  - [ ] ex-20 · struct-padding — verify the compiler-inserted gaps
+  - [ ] ex-21 · struct-pointer — verify access via ->
+  - [ ] ex-22 · array-of-structs — verify iteration
+  - [ ] ex-23 · union-basic — verify members share storage
+  - [ ] ex-24 · union-type-pun — verify the bit pattern
+  - [ ] ex-25 · dynamic-array-append — verify it grows
+  - [ ] ex-26 · dynamic-array-free — verify leak-free under ASan
+  - [ ] ex-27 · double-free-detect — verify the diagnostic
+  - [ ] ex-28 · use-after-free-detect — verify the diagnostic
+  - [ ] ex-29 · buffer-overflow-detect — verify the diagnostic
+  - [ ] ex-30 · dangling-pointer — verify the hazard
+  - [ ] ex-31 · null-deref-guard — verify the safe path
+  - [ ] ex-32 · integer-overflow-signed — verify under -fsanitize=undefined
+  - [ ] ex-33 · unsigned-wraparound — verify the modular result
+  - [ ] ex-34 · size-overflow-check — verify the guard
+  - [ ] ex-35 · goto-cleanup-single — verify every path frees
+  - [ ] ex-36 · goto-cleanup-multi — verify ordered release
+  - [ ] ex-37 · attribute-cleanup — verify auto-free (GCC/Clang only)
+  - [ ] ex-38 · attribute-cleanup-fd — verify the fd is closed
+  - [ ] ex-39 · errno-open-fail — verify ENOENT
+  - [ ] ex-40 · perror-strerror — verify the message
+  - [ ] ex-41 · errno-save — verify it's preserved
+  - [ ] ex-42 · fd-open-close — verify the fd lifecycle
+  - [ ] ex-43 · fd-leak-detect — verify the descriptor is released
+  - [ ] ex-44 · read-syscall — verify the bytes read
+  - [ ] ex-45 · write-syscall — verify the bytes written
+  - [ ] ex-46 · endianness-detect — verify little vs big
+  - [ ] ex-47 · htonl-ntohl — verify network byte order
+  - [ ] ex-48 · serialize-int — verify the byte order
+  - [ ] ex-49 · deserialize-int — verify the value
+  - [ ] ex-50 · serialize-struct — verify it's layout-independent
+  - [ ] ex-51 · serialize-roundtrip — verify the round-trip
+  - [ ] ex-52 · linked-list-owned — verify leak-free
+  - [ ] ex-53 · compilation-units — verify it links
+  - [ ] ex-54 · include-guard — verify no double-inclusion
+  - [ ] ex-55 · static-library — verify the symbol resolves
+  - [ ] ex-56 · dynamic-library — verify runtime loading
+  - [ ] ex-57 · abi-struct-layout — verify binary compatibility
+  - [ ] ex-58 · memory-pool — verify alloc/free from the pool
+  - [ ] ex-59 · arena-allocator — verify bulk free
+  - [ ] ex-60 · pool-reuse — verify recycling
+  - [ ] ex-61 · aligned-alloc — verify the alignment
+  - [ ] ex-62 · signal-handler — verify it fires
+  - [ ] ex-63 · signal-safe-flag — verify async-safety
+  - [ ] ex-64 · sigaction — verify reliable handling
+  - [ ] ex-65 · socket-create — verify an fd is returned
+  - [ ] ex-66 · socket-bind-listen — verify it's listening
+  - [ ] ex-67 · socket-accept — verify a client fd
+  - [ ] ex-68 · socket-connect — verify the connection
+  - [ ] ex-69 · socket-send-recv — verify the data transfer
+  - [ ] ex-70 · socket-serialized — verify the round-trip
+  - [ ] ex-71 · client-server-echo — verify the message is echoed
+  - [ ] ex-72 · overflow-then-fix — verify ASan-clean after
+  - [ ] ex-73 · uaf-then-fix — verify ASan-clean after
+  - [ ] ex-74 · valgrind-clean — verify no leaks reported
+  - [ ] ex-75 · asan-clean — verify a clean run
+  - [ ] ex-76 · full-systems-slice — verify the whole
+  - [ ] ex-77 · integration-memclean — verify no leak or UB
+  - [ ] ex-78 · capstone-systems-component — verify ownership disciplined, serialization endianness-correct, socket exchange works, whole program memory-clean
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/system-programming/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2636,27 +11159,135 @@ Row: By Example · C † · topic wt 870 · Learn 177 / Drill 277 · **subject**
       `CONTENT/system-programming/drilling/_index.md` (wt 277) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 84 Gate
+### Phase 88 Gate
 
-- [ ] [AI] `system-programming/` complete: `_index.md` wt 870, `learning/_index.md` wt 177,
-      `drilling/_index.md` wt 277, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `system-programming/` complete: `_index.md` wt 910, `learning/_index.md` wt 181,
+      `drilling/_index.md` wt 281, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 85 — Topic 78 Just Enough Rust (`just-enough-rust`)
+## Phase 89 — Topic 82 Just Enough Rust (`just-enough-rust`)
 
-Row: Primer § · Rust † · topic wt 880 · Learn 178 / Drill 278 · **primer**. Template →
-[`syllabus/78-just-enough-rust.md`](./syllabus/78-just-enough-rust.md).
+Row: Primer § · Rust † · topic wt 920 · Learn 182 / Drill 282 · **primer**. Template →
+[`syllabus/82-just-enough-rust.md`](./syllabus/82-just-enough-rust.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-rust`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/78-just-enough-rust.md`](./syllabus/78-just-enough-rust.md) and fold dated findings back into that file.
+      [`syllabus/82-just-enough-rust.md`](./syllabus/82-just-enough-rust.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-rust/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/78-just-enough-rust.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-rust/learning/` prose covering **every** concept
+      (`co-01..co-26`) enumerated in `syllabus/82-just-enough-rust.md` §Concepts. **Acceptance**: all 26 concepts
+      below are taught, each 1:1-mirrored to its `co-NN`.
+  - [ ] co-01 · cargo-new
+  - [ ] co-02 · cargo-run
+  - [ ] co-03 · cargo-build
+  - [ ] co-04 · cargo-test
+  - [ ] co-05 · cargo-add-dep
+  - [ ] co-06 · variables-mut
+  - [ ] co-07 · scalar-types
+  - [ ] co-08 · ownership
+  - [ ] co-09 · move-semantics
+  - [ ] co-10 · borrowing-shared
+  - [ ] co-11 · borrowing-mut
+  - [ ] co-12 · borrow-rules
+  - [ ] co-13 · lifetimes
+  - [ ] co-14 · structs
+  - [ ] co-15 · enums
+  - [ ] co-16 · pattern-match
+  - [ ] co-17 · if-let
+  - [ ] co-18 · option
+  - [ ] co-19 · result
+  - [ ] co-20 · question-mark
+  - [ ] co-21 · traits
+  - [ ] co-22 · trait-bounds
+  - [ ] co-23 · generics
+  - [ ] co-24 · collections
+  - [ ] co-25 · iterators
+  - [ ] co-26 · closures
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-rust/learning/` (+ `code/`, runnable sources, DD-20)
+      covering **every** worked example (`ex-01..ex-78`) in `syllabus/82-just-enough-rust.md`, each runnable via
+      `cargo` (DD-20/DD-30). **Acceptance**: all 78 worked examples below appear with expected output, each
+      1:1-mirrored to its `ex-NN`.
+  - [ ] ex-01 · cargo-new — verify the Cargo.toml + src/main.rs structure
+  - [ ] ex-02 · cargo-run-hello — verify the output
+  - [ ] ex-03 · cargo-build — verify a binary in target/
+  - [ ] ex-04 · let-binding — verify its value
+  - [ ] ex-05 · mutability — verify the change
+  - [ ] ex-06 · immutable-error — verify the error
+  - [ ] ex-07 · scalar-int — verify the result
+  - [ ] ex-08 · scalar-float — verify the result
+  - [ ] ex-09 · bool-char — verify the values
+  - [ ] ex-10 · function-def — verify the result
+  - [ ] ex-11 · struct-def — verify field access
+  - [ ] ex-12 · struct-methods — verify the call
+  - [ ] ex-13 · enum-basic — verify a variant
+  - [ ] ex-14 · enum-data — verify the payload
+  - [ ] ex-15 · match-enum — verify each arm
+  - [ ] ex-16 · match-guard — verify the conditional arm
+  - [ ] ex-17 · match-binding — verify the capture
+  - [ ] ex-18 · if-let — verify the Some path
+  - [ ] ex-19 · while-let — verify the loop
+  - [ ] ex-20 · option-some-none — verify both
+  - [ ] ex-21 · vec-basic — verify the elements
+  - [ ] ex-22 · string-basic — verify the content
+  - [ ] ex-23 · vec-iterate — verify the traversal
+  - [ ] ex-24 · tuple — verify the parts
+  - [ ] ex-25 · array-slice — verify the slicing
+  - [ ] ex-26 · shadowing — verify the rebinding
+  - [ ] ex-27 · ownership-move — verify the source is invalidated
+  - [ ] ex-28 · move-on-call — verify a later use is a compile error
+  - [ ] ex-29 · clone — verify both are usable
+  - [ ] ex-30 · borrow-shared — verify a read without moving
+  - [ ] ex-31 · borrow-mut — verify the change
+  - [ ] ex-32 · borrow-rules — verify the conflict is rejected
+  - [ ] ex-33 · borrow-in-function — verify no move
+  - [ ] ex-34 · dangling-ref-error — verify the rejection
+  - [ ] ex-35 · lifetime-annotation — verify it compiles
+  - [ ] ex-36 · result-ok-err — verify Ok and Err
+  - [ ] ex-37 · question-mark-propagate — verify the short-circuit
+  - [ ] ex-38 · parse-result — verify success and failure
+  - [ ] ex-39 · option-map — verify the transform
+  - [ ] ex-40 · option-unwrap-or — verify the fallback
+  - [ ] ex-41 · result-match — verify both arms
+  - [ ] ex-42 · trait-define — verify the contract
+  - [ ] ex-43 · trait-impl — verify dispatch
+  - [ ] ex-44 · trait-default-method — verify inherited behavior
+  - [ ] ex-45 · generic-function — verify it works for two types
+  - [ ] ex-46 · generic-struct — verify it holds different types
+  - [ ] ex-47 · trait-bound — verify the bound is enforced
+  - [ ] ex-48 · iterator-map — verify the transformed collection
+  - [ ] ex-49 · iterator-filter — verify the selection
+  - [ ] ex-50 · iterator-collect — verify materialization
+  - [ ] ex-51 · closure-basic — verify the capture
+  - [ ] ex-52 · closure-as-arg — verify the invocation
+  - [ ] ex-53 · hashmap — verify the lookup
+  - [ ] ex-54 · hashmap-entry — verify insert-or-update
+  - [ ] ex-55 · iterator-chain — verify the pipeline
+  - [ ] ex-56 · iterator-fold — verify the accumulation
+  - [ ] ex-57 · enum-with-methods — verify the behavior
+  - [ ] ex-58 · option-in-struct — verify present/absent
+  - [ ] ex-59 · result-custom-error — verify the variants
+  - [ ] ex-60 · question-mark-chain — verify propagation
+  - [ ] ex-61 · trait-object — verify dynamic dispatch
+  - [ ] ex-62 · generic-trait-bound-multi — verify the combined constraints
+  - [ ] ex-63 · derive-debug — verify the formatting
+  - [ ] ex-64 · derive-clone-eq — verify equality
+  - [ ] ex-65 · struct-borrow-method — verify the distinction
+  - [ ] ex-66 · vec-of-structs — verify the traversal
+  - [ ] ex-67 · match-option-result — verify each case
+  - [ ] ex-68 · ownership-return — verify the transfer
+  - [ ] ex-69 · borrow-then-return — verify the borrow doesn't escape
+  - [ ] ex-70 · generic-with-result — verify success/failure
+  - [ ] ex-71 · cargo-test-unit — verify cargo test passes
+  - [ ] ex-72 · cargo-test-assert — verify the assertion
+  - [ ] ex-73 · cargo-add-dependency — verify it builds
+  - [ ] ex-74 · borrow-checker-fix — verify it compiles after
+  - [ ] ex-75 · move-vs-borrow — verify the difference
+  - [ ] ex-76 · full-primer-slice — verify the whole
+  - [ ] ex-77 · integration-cargo-test — verify it
+  - [ ] ex-78 · capstone-rust-primer — verify structs/enums+match, trait+generic dispatch, Result/Option+? success/failure, borrow-checker-clean, cargo test passes
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-rust/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2665,27 +11296,139 @@ Row: Primer § · Rust † · topic wt 880 · Learn 178 / Drill 278 · **primer*
       `CONTENT/just-enough-rust/drilling/_index.md` (wt 278) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 85 Gate
+### Phase 89 Gate
 
-- [ ] [AI] `just-enough-rust/` complete: `_index.md` wt 880, `learning/_index.md` wt 178,
-      `drilling/_index.md` wt 278, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-rust/` complete: `_index.md` wt 920, `learning/_index.md` wt 182,
+      `drilling/_index.md` wt 282, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 86 — Topic 79 Modern System Programming (`modern-system-programming`)
+## Phase 90 — Topic 83 Modern System Programming (`modern-system-programming`)
 
-Row: By Example · Rust † · topic wt 890 · Learn 179 / Drill 279 · **subject**. Template →
-[`syllabus/79-modern-system-programming.md`](./syllabus/79-modern-system-programming.md).
+Row: By Example · Rust † · topic wt 930 · Learn 183 / Drill 283 · **subject**. Template →
+[`syllabus/83-modern-system-programming.md`](./syllabus/83-modern-system-programming.md).
 
 - [ ] **[AI] V** — `web-researcher` for `modern-system-programming`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/79-modern-system-programming.md`](./syllabus/79-modern-system-programming.md) and fold dated findings back into that file.
+      [`syllabus/83-modern-system-programming.md`](./syllabus/83-modern-system-programming.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/modern-system-programming/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/79-modern-system-programming.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/modern-system-programming/learning/` prose covering **every** concept
+      (`co-01..co-30`) enumerated in `syllabus/83-modern-system-programming.md` §Concepts. **Acceptance**: all 30
+      concepts below are taught, each 1:1-mirrored to its `co-NN`.
+  - [ ] co-01 · ownership-memory
+  - [ ] co-02 · move-semantics
+  - [ ] co-03 · borrow-shared
+  - [ ] co-04 · borrow-mut
+  - [ ] co-05 · borrow-rules
+  - [ ] co-06 · lifetimes
+  - [ ] co-07 · drop
+  - [ ] co-08 · box
+  - [ ] co-09 · rc-refcell
+  - [ ] co-10 · threads
+  - [ ] co-11 · channels
+  - [ ] co-12 · arc
+  - [ ] co-13 · mutex
+  - [ ] co-14 · send-sync
+  - [ ] co-15 · data-race-compile-error
+  - [ ] co-16 · zero-cost-iterators
+  - [ ] co-17 · traits-generics
+  - [ ] co-18 · trait-objects
+  - [ ] co-19 · result-error
+  - [ ] co-20 · question-mark
+  - [ ] co-21 · custom-errors
+  - [ ] co-22 · anyhow
+  - [ ] co-23 · unsafe-block
+  - [ ] co-24 · raw-pointers
+  - [ ] co-25 · unsafe-contract
+  - [ ] co-26 · ffi-extern
+  - [ ] co-27 · ffi-call-c
+  - [ ] co-28 · ffi-expose-rust
+  - [ ] co-29 · ffi-ownership
+  - [ ] co-30 · async-runtime
+- [ ] **[AI] A1-examples** — Author `CONTENT/modern-system-programming/learning/` (+ `code/`, runnable sources,
+      DD-20) covering **every** worked example (`ex-01..ex-78`) in `syllabus/83-modern-system-programming.md`,
+      each runnable via `cargo` (DD-20/DD-30). **Acceptance**: all 78 worked examples below appear with expected
+      output, each 1:1-mirrored to its `ex-NN`.
+  - [ ] ex-01 · move-basic — verify the source is invalidated
+  - [ ] ex-02 · move-compile-error — verify the diagnostic
+  - [ ] ex-03 · borrow-shared — verify no move
+  - [ ] ex-04 · borrow-mut — verify the change
+  - [ ] ex-05 · borrow-conflict — verify the error
+  - [ ] ex-06 · two-mut-borrows — verify the error
+  - [ ] ex-07 · borrow-checker-fix — verify it compiles after
+  - [ ] ex-08 · lifetime-elision — verify it compiles
+  - [ ] ex-09 · lifetime-explicit — verify it compiles
+  - [ ] ex-10 · dangling-rejected — verify the error
+  - [ ] ex-11 · drop-order — verify the drop fires
+  - [ ] ex-12 · box-heap — verify the deref
+  - [ ] ex-13 · box-recursive — verify it compiles
+  - [ ] ex-14 · clone-vs-move — verify both are usable
+  - [ ] ex-15 · ownership-in-fn — verify the transfer
+  - [ ] ex-16 · borrow-in-fn — verify no move
+  - [ ] ex-17 · return-owned — verify the transfer
+  - [ ] ex-18 · slice-borrow — verify the view
+  - [ ] ex-19 · string-vs-str — verify the borrow
+  - [ ] ex-20 · vec-ownership — verify drop-all
+  - [ ] ex-21 · iterator-map-loop — verify it matches a hand loop
+  - [ ] ex-22 · iterator-filter — verify the selection
+  - [ ] ex-23 · iterator-sum — verify the accumulation
+  - [ ] ex-24 · result-basic — verify Ok/Err
+  - [ ] ex-25 · question-mark — verify the short-circuit
+  - [ ] ex-26 · result-match — verify the arms
+  - [ ] ex-27 · thread-spawn — verify it runs
+  - [ ] ex-28 · thread-move-closure — verify the capture
+  - [ ] ex-29 · channel-send-recv — verify a message
+  - [ ] ex-30 · channel-multiple — verify all received
+  - [ ] ex-31 · worker-pipeline — verify throughput
+  - [ ] ex-32 · arc-shared — verify a shared read
+  - [ ] ex-33 · arc-mutex — verify safe mutation
+  - [ ] ex-34 · mutex-lock — verify exclusion
+  - [ ] ex-35 · data-race-rejected — verify the error
+  - [ ] ex-36 · send-sync-bound — verify enforcement
+  - [ ] ex-37 · rc-single-thread — verify the count
+  - [ ] ex-38 · refcell-interior — verify the runtime borrow check
+  - [ ] ex-39 · rc-not-send — verify the error
+  - [ ] ex-40 · trait-bound-generic — verify monomorphization
+  - [ ] ex-41 · trait-static-dispatch — verify the inlining
+  - [ ] ex-42 · trait-object-dyn — verify polymorphism
+  - [ ] ex-43 · iterator-chain-zero-cost — verify it's zero-cost
+  - [ ] ex-44 · custom-error-enum — verify the variants
+  - [ ] ex-45 · thiserror-derive — verify Display
+  - [ ] ex-46 · error-propagate-chain — verify propagation
+  - [ ] ex-47 · anyhow-context — verify the error message
+  - [ ] ex-48 · result-from-conversion — verify the auto-convert
+  - [ ] ex-49 · scoped-threads — verify a safe borrow
+  - [ ] ex-50 · atomic-counter — verify no race
+  - [ ] ex-51 · channel-shutdown — verify a graceful stop
+  - [ ] ex-52 · producer-consumer — verify correctness
+  - [ ] ex-53 · unsafe-block — verify controlled access
+  - [ ] ex-54 · raw-pointer-cast — verify the cast
+  - [ ] ex-55 · unsafe-deref — verify the value
+  - [ ] ex-56 · unsafe-wrapped-safe — verify the safe surface
+  - [ ] ex-57 · env-set-var-unsafe — verify the unsafe requirement
+  - [ ] ex-58 · extern-c-declare — verify it links
+  - [ ] ex-59 · ffi-call-libc — verify the result
+  - [ ] ex-60 · ffi-call-c-fn — verify the return value
+  - [ ] ex-61 · ffi-pass-primitive — verify the round-trip
+  - [ ] ex-62 · ffi-pass-pointer — verify ownership handling
+  - [ ] ex-63 · ffi-expose-rust — verify the symbol
+  - [ ] ex-64 · ffi-string-boundary — verify the conversion
+  - [ ] ex-65 · ffi-ownership-free — verify no double-free
+  - [ ] ex-66 · async-await-basic — verify it completes
+  - [ ] ex-67 · tokio-runtime — verify a task runs
+  - [ ] ex-68 · async-concurrent-tasks — verify the overlap
+  - [ ] ex-69 · async-channel — verify a message
+  - [ ] ex-70 · threads-vs-async — verify the trade-off
+  - [ ] ex-71 · zero-cost-verify — verify the equivalence
+  - [ ] ex-72 · safe-wrapper-over-unsafe — verify the invariant holds
+  - [ ] ex-73 · concurrent-race-free-run — verify no race
+  - [ ] ex-74 · error-path-systems — verify clean failure
+  - [ ] ex-75 · cargo-test-suite — verify it passes
+  - [ ] ex-76 · full-safety-slice — verify the whole
+  - [ ] ex-77 · integration-borrow-clean — verify it
+  - [ ] ex-78 · capstone-systems-tool — verify core borrow-checker-clean, concurrent component race-free, abstraction zero-cost, FFI works with ownership handled and unsafe confined
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/modern-system-programming/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2694,27 +11437,139 @@ Row: By Example · Rust † · topic wt 890 · Learn 179 / Drill 279 · **subjec
       `CONTENT/modern-system-programming/drilling/_index.md` (wt 279) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 86 Gate
+### Phase 90 Gate
 
-- [ ] [AI] `modern-system-programming/` complete: `_index.md` wt 890, `learning/_index.md` wt 179,
-      `drilling/_index.md` wt 279, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `modern-system-programming/` complete: `_index.md` wt 930, `learning/_index.md` wt 183,
+      `drilling/_index.md` wt 283, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 87 — Topic 80 Just Enough Java (`just-enough-java`)
+## Phase 91 — Topic 84 Just Enough Java (`just-enough-java`)
 
-Row: Primer § · Java † · topic wt 900 · Learn 180 / Drill 280 · **primer**. Template →
-[`syllabus/80-just-enough-java.md`](./syllabus/80-just-enough-java.md).
+Row: Primer § · Java † · topic wt 940 · Learn 184 / Drill 284 · **primer**. Template →
+[`syllabus/84-just-enough-java.md`](./syllabus/84-just-enough-java.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-java`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/80-just-enough-java.md`](./syllabus/80-just-enough-java.md) and fold dated findings back into that file.
+      [`syllabus/84-just-enough-java.md`](./syllabus/84-just-enough-java.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-java/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/80-just-enough-java.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-java/learning/` prose covering **every** concept
+      (`co-01..co-28`) enumerated in `syllabus/84-just-enough-java.md` §Concepts. **Acceptance**: all 28 concepts
+      below are taught, each 1:1-mirrored to its `co-NN`.
+  - [ ] co-01 · jdk-build-tool
+  - [ ] co-02 · main-method
+  - [ ] co-03 · primitives
+  - [ ] co-04 · classes-objects
+  - [ ] co-05 · interfaces
+  - [ ] co-06 · inheritance
+  - [ ] co-07 · records
+  - [ ] co-08 · sealed-types
+  - [ ] co-09 · enums
+  - [ ] co-10 · instanceof-pattern
+  - [ ] co-11 · switch-pattern
+  - [ ] co-12 · exhaustive-switch
+  - [ ] co-13 · generics
+  - [ ] co-14 · bounded-generics
+  - [ ] co-15 · collections-list
+  - [ ] co-16 · collections-map
+  - [ ] co-17 · collections-set
+  - [ ] co-18 · streams-map-filter
+  - [ ] co-19 · streams-collect
+  - [ ] co-20 · streams-reduce
+  - [ ] co-21 · lambdas
+  - [ ] co-22 · method-references
+  - [ ] co-23 · optional
+  - [ ] co-24 · exceptions
+  - [ ] co-25 · jvm-memory
+  - [ ] co-26 · junit-test
+  - [ ] co-27 · single-file-source-run
+  - [ ] co-28 · compact-source-and-instance-main
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-java/learning/` (+ `code/`, runnable sources, DD-20)
+      covering **every** worked example (`ex-01..ex-80`) in `syllabus/84-just-enough-java.md`, each runnable via
+      the build tool (DD-20/DD-30). **Acceptance**: all 78 worked examples below appear with expected output, each
+      1:1-mirrored to its `ex-NN`.
+  - [ ] ex-01 · maven-project — verify the build
+  - [ ] ex-02 · hello-main — verify the output
+  - [ ] ex-03 · run-build-tool — verify execution
+  - [ ] ex-04 · primitives — verify the result
+  - [ ] ex-05 · boolean-char — verify the values
+  - [ ] ex-06 · wrapper-boxing — verify the conversion
+  - [ ] ex-07 · class-def — verify instantiation
+  - [ ] ex-08 · class-methods — verify the call
+  - [ ] ex-09 · constructor — verify initialization
+  - [ ] ex-10 · interface — verify polymorphism
+  - [ ] ex-11 · inheritance — verify dispatch
+  - [ ] ex-12 · record-basic — verify the accessors
+  - [ ] ex-13 · record-equals — verify equality
+  - [ ] ex-14 · enum-basic — verify a constant
+  - [ ] ex-15 · enum-switch — verify each case
+  - [ ] ex-16 · list-basic — verify the elements
+  - [ ] ex-17 · list-iterate — verify the traversal
+  - [ ] ex-18 · map-basic — verify the lookup
+  - [ ] ex-19 · set-basic — verify dedup
+  - [ ] ex-20 · generic-list — verify type safety
+  - [ ] ex-21 · for-each — verify iteration
+  - [ ] ex-22 · string-methods — verify the results
+  - [ ] ex-23 · try-catch — verify the exception is caught
+  - [ ] ex-24 · checked-exception — verify handling
+  - [ ] ex-25 · null-handling — verify the safe path
+  - [ ] ex-26 · equals-vs-identity — verify the difference
+  - [ ] ex-27 · record-compact-ctor — verify the validation
+  - [ ] ex-28 · sealed-interface — verify the closed hierarchy
+  - [ ] ex-29 · sealed-record-hierarchy — verify the variants
+  - [ ] ex-30 · instanceof-pattern — verify the bound variable
+  - [ ] ex-31 · switch-pattern — verify each arm
+  - [ ] ex-32 · switch-exhaustive — verify it compiles
+  - [ ] ex-33 · switch-guard — verify the conditional arm
+  - [ ] ex-34 · switch-record-deconstruct — verify the destructure
+  - [ ] ex-35 · generic-method — verify it works for two types
+  - [ ] ex-36 · generic-class — verify it holds a type
+  - [ ] ex-37 · bounded-type — verify the bound
+  - [ ] ex-38 · wildcard — verify the variance
+  - [ ] ex-39 · map-iterate — verify the traversal
+  - [ ] ex-40 · map-compute — verify insert-or-get
+  - [ ] ex-41 · stream-map — verify the transform
+  - [ ] ex-42 · stream-filter — verify the selection
+  - [ ] ex-43 · stream-collect-list — verify materialization
+  - [ ] ex-44 · stream-collect-map — verify the mapping
+  - [ ] ex-45 · stream-reduce — verify the accumulation
+  - [ ] ex-46 · stream-count — verify the aggregate
+  - [ ] ex-47 · lambda-basic — verify the invocation
+  - [ ] ex-48 · lambda-comparator — verify the order
+  - [ ] ex-49 · method-reference — verify it equals the lambda form
+  - [ ] ex-50 · optional-basic — verify both
+  - [ ] ex-51 · optional-map — verify the chaining
+  - [ ] ex-52 · stream-of-records — verify the pipeline
+  - [ ] ex-53 · grouping-collector — verify the grouping
+  - [ ] ex-54 · stream-flatmap — verify the flattening
+  - [ ] ex-55 · stream-sorted — verify the order
+  - [ ] ex-56 · stream-distinct — verify the dedup
+  - [ ] ex-57 · sealed-visitor — verify each variant
+  - [ ] ex-58 · nested-record-pattern — verify the deep destructure
+  - [ ] ex-59 · generic-bounded-method — verify the constraint
+  - [ ] ex-60 · optional-in-stream — verify absence handling
+  - [ ] ex-61 · exception-in-stream — verify clean failure
+  - [ ] ex-62 · custom-exception — verify it propagates
+  - [ ] ex-63 · immutable-record-collection — verify no mutation
+  - [ ] ex-64 · record-as-map-key — verify lookup by value
+  - [ ] ex-65 · enum-with-fields — verify the behavior
+  - [ ] ex-66 · interface-default-method — verify inherited behavior
+  - [ ] ex-67 · gc-object-lifecycle — verify identity
+  - [ ] ex-68 · heap-vs-stack — verify the distinction
+  - [ ] ex-69 · junit-test-basic — verify it passes
+  - [ ] ex-70 · junit-assertions — verify the assertions
+  - [ ] ex-71 · junit-parameterized — verify multiple cases
+  - [ ] ex-72 · build-run-test — verify green
+  - [ ] ex-73 · streams-pipeline-full — verify the result
+  - [ ] ex-74 · sealed-plus-pattern-full — verify exhaustiveness
+  - [ ] ex-75 · generics-collections-streams — verify a type-safe pipeline
+  - [ ] ex-76 · full-primer-slice — verify the whole
+  - [ ] ex-77 · integration-build-test — verify green
+  - [ ] ex-78 · capstone-java-primer — verify record+generic collection work, sealed matched exhaustively, streams pipeline correct, build + test pass
+  - [ ] ex-79 · single-file-source-run — verify `java Hello.java` prints with no separate javac step and no `.class` produced
+  - [ ] ex-80 · compact-source-instance-main — verify compact source (no class, instance `void main()`) runs under `java`; contrast size with ex-02
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-java/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2723,27 +11578,139 @@ Row: Primer § · Java † · topic wt 900 · Learn 180 / Drill 280 · **primer*
       `CONTENT/just-enough-java/drilling/_index.md` (wt 280) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 87 Gate
+### Phase 91 Gate
 
-- [ ] [AI] `just-enough-java/` complete: `_index.md` wt 900, `learning/_index.md` wt 180,
-      `drilling/_index.md` wt 280, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-java/` complete: `_index.md` wt 940, `learning/_index.md` wt 184,
+      `drilling/_index.md` wt 284, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 88 — Topic 81 Enterprise Java & the JVM (`enterprise-java-and-the-jvm`)
+## Phase 92 — Topic 85 Enterprise Java & the JVM (`enterprise-java-and-the-jvm`)
 
-Row: By Example · Java † · topic wt 910 · Learn 181 / Drill 281 · **subject**. Template →
-[`syllabus/81-enterprise-java-and-the-jvm.md`](./syllabus/81-enterprise-java-and-the-jvm.md).
+Row: By Example · Java † · topic wt 950 · Learn 185 / Drill 285 · **subject**. Template →
+[`syllabus/85-enterprise-java-and-the-jvm.md`](./syllabus/85-enterprise-java-and-the-jvm.md).
 
 - [ ] **[AI] V** — `web-researcher` for `enterprise-java-and-the-jvm`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/81-enterprise-java-and-the-jvm.md`](./syllabus/81-enterprise-java-and-the-jvm.md) and fold dated findings back into that file.
+      [`syllabus/85-enterprise-java-and-the-jvm.md`](./syllabus/85-enterprise-java-and-the-jvm.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/enterprise-java-and-the-jvm/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/81-enterprise-java-and-the-jvm.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/enterprise-java-and-the-jvm/learning/` prose covering **every** concept
+      (`co-01..co-30`) enumerated in `syllabus/85-enterprise-java-and-the-jvm.md` §Concepts. **Acceptance**: all 30
+      concepts below are taught, each 1:1-mirrored to its `co-NN`.
+  - [ ] co-01 · dependency-injection
+  - [ ] co-02 · inversion-of-control
+  - [ ] co-03 · constructor-injection
+  - [ ] co-04 · beans
+  - [ ] co-05 · bean-lifecycle
+  - [ ] co-06 · configuration
+  - [ ] co-07 · autoconfiguration
+  - [ ] co-08 · starters
+  - [ ] co-09 · application-properties
+  - [ ] co-10 · profiles
+  - [ ] co-11 · rest-controller
+  - [ ] co-12 · request-mapping
+  - [ ] co-13 · service-layer
+  - [ ] co-14 · repository-layer
+  - [ ] co-15 · validation
+  - [ ] co-16 · error-handling
+  - [ ] co-17 · jpa-entity
+  - [ ] co-18 · jpa-repository
+  - [ ] co-19 · transactions
+  - [ ] co-20 · n-plus-one
+  - [ ] co-21 · json-serialization
+  - [ ] co-22 · actuator
+  - [ ] co-23 · testing-spring
+  - [ ] co-24 · mock-bean
+  - [ ] co-25 · jvm-classloading
+  - [ ] co-26 · jit
+  - [ ] co-27 · gc-generational
+  - [ ] co-28 · gc-collectors
+  - [ ] co-29 · memory-model
+  - [ ] co-30 · packaging
+- [ ] **[AI] A1-examples** — Author `CONTENT/enterprise-java-and-the-jvm/learning/` (+ `code/`, runnable sources,
+      DD-20) covering **every** worked example (`ex-01..ex-78`) in `syllabus/85-enterprise-java-and-the-jvm.md`,
+      each runnable via Maven/Gradle + exercised with `curl` (DD-20/DD-30). **Acceptance**: all 78 worked examples
+      below appear with expected output, each 1:1-mirrored to its `ex-NN`.
+  - [ ] ex-01 · spring-boot-app — verify startup
+  - [ ] ex-02 · component-bean — verify it's in the context
+  - [ ] ex-03 · constructor-inject — verify the wiring
+  - [ ] ex-04 · service-annotation — verify it's injectable
+  - [ ] ex-05 · ioc-container — verify no manual wiring
+  - [ ] ex-06 · bean-singleton — verify one instance
+  - [ ] ex-07 · configuration-bean — verify a manually declared bean
+  - [ ] ex-08 · starter-dependency — verify it builds
+  - [ ] ex-09 · application-yml — verify injection
+  - [ ] ex-10 · profile-dev — verify profile activation
+  - [ ] ex-11 · rest-controller — verify a JSON response via curl
+  - [ ] ex-12 · get-mapping — verify routing
+  - [ ] ex-13 · post-mapping — verify it accepts JSON
+  - [ ] ex-14 · request-param — verify query binding
+  - [ ] ex-15 · json-response — verify the shape
+  - [ ] ex-16 · json-request — verify the binding
+  - [ ] ex-17 · service-called-by-controller — verify the layering
+  - [ ] ex-18 · actuator-health — verify UP via curl
+  - [ ] ex-19 · actuator-metrics — verify a metric
+  - [ ] ex-20 · package-jar — verify java -jar runs it
+  - [ ] ex-21 · run-jar — verify it serves
+  - [ ] ex-22 · prototype-scope — verify a new instance per request
+  - [ ] ex-23 · qualifier — verify the right one is injected
+  - [ ] ex-24 · property-override — verify the value
+  - [ ] ex-25 · component-scan — verify auto-registration
+  - [ ] ex-26 · injected-list — verify all are collected
+  - [ ] ex-27 · controller-service-repo — verify the flow
+  - [ ] ex-28 · jpa-entity — verify persistence
+  - [ ] ex-29 · jpa-repository-crud — verify CRUD
+  - [ ] ex-30 · jpa-derived-query — verify the query
+  - [ ] ex-31 · save-via-curl — verify it's stored
+  - [ ] ex-32 · read-via-curl — verify the JSON
+  - [ ] ex-33 · update-delete — verify the state change
+  - [ ] ex-34 · validation-valid — verify it passes
+  - [ ] ex-35 · validation-invalid — verify the rejection
+  - [ ] ex-36 · constraint-annotations — verify enforcement
+  - [ ] ex-37 · error-envelope — verify no stack trace
+  - [ ] ex-38 · exception-handler — verify the mapped status
+  - [ ] ex-39 · not-found-404 — verify the response
+  - [ ] ex-40 · transaction-commit — verify persistence
+  - [ ] ex-41 · transaction-rollback — verify no partial write
+  - [ ] ex-42 · n-plus-one-observe — verify the query count
+  - [ ] ex-43 · n-plus-one-fix — verify the count drops
+  - [ ] ex-44 · dto-mapping — verify the API shape
+  - [ ] ex-45 · pagination — verify a page
+  - [ ] ex-46 · springboot-test — verify it starts
+  - [ ] ex-47 · web-mvc-test — verify a controller in isolation
+  - [ ] ex-48 · data-jpa-test — verify the repository
+  - [ ] ex-49 · mockito-bean — verify the mock
+  - [ ] ex-50 · mock-return-stub — verify the stubbed value
+  - [ ] ex-51 · mockmvc-request — verify status + body
+  - [ ] ex-52 · integration-persist-test — verify the round-trip
+  - [ ] ex-53 · classloading — verify it's loaded
+  - [ ] ex-54 · jit-warmup — verify the post-warm-up speedup
+  - [ ] ex-55 · jit-tiered — verify the progression
+  - [ ] ex-56 · gc-generational — verify the GC logs
+  - [ ] ex-57 · gc-g1-default — verify it's active
+  - [ ] ex-58 · gc-zgc-lowpause — verify pause behaviour
+  - [ ] ex-59 · gc-throughput-vs-pause — verify the trade-off
+  - [ ] ex-60 · heap-under-load — verify the allocation behaviour
+  - [ ] ex-61 · gc-log-reading — verify pause times
+  - [ ] ex-62 · load-warmup-curve — verify it flattens
+  - [ ] ex-63 · profile-prod-config — verify the config
+  - [ ] ex-64 · actuator-under-load — verify the live metrics
+  - [ ] ex-65 · transaction-isolation — verify the behaviour
+  - [ ] ex-66 · lazy-vs-eager-fetch — verify the difference
+  - [ ] ex-67 · validation-group — verify conditional validation
+  - [ ] ex-68 · global-error-model — verify uniformity
+  - [ ] ex-69 · full-crud-service — verify all paths
+  - [ ] ex-70 · di-graph-inspect — verify the wiring
+  - [ ] ex-71 · packaged-runnable — verify java -jar
+  - [ ] ex-72 · test-suite-green — verify green
+  - [ ] ex-73 · service-under-load-clean — verify no leak
+  - [ ] ex-74 · n-plus-one-then-fix — verify the query count drops
+  - [ ] ex-75 · jit-gc-observed — verify both
+  - [ ] ex-76 · full-spring-slice — verify the whole
+  - [ ] ex-77 · integration-runtime-observed — verify it
+  - [ ] ex-78 · capstone-spring-service — verify app starts+serves, DI explicit, persistence+transaction+validation correct, N+1 resolved, JIT/GC + collector trade-off observed
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/enterprise-java-and-the-jvm/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2752,27 +11719,139 @@ Row: By Example · Java † · topic wt 910 · Learn 181 / Drill 281 · **subjec
       `CONTENT/enterprise-java-and-the-jvm/drilling/_index.md` (wt 281) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 88 Gate
+### Phase 92 Gate
 
-- [ ] [AI] `enterprise-java-and-the-jvm/` complete: `_index.md` wt 910, `learning/_index.md` wt 181,
-      `drilling/_index.md` wt 281, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `enterprise-java-and-the-jvm/` complete: `_index.md` wt 950, `learning/_index.md` wt 185,
+      `drilling/_index.md` wt 285, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 89 — Topic 82 Lisp (`lisp`)
+## Phase 93 — Topic 86 Lisp (`lisp`)
 
-Row: By Example · Scheme + Clojure † · topic wt 920 · Learn 182 / Drill 282 · **subject**. Template →
-[`syllabus/82-lisp.md`](./syllabus/82-lisp.md).
+Row: By Example · Scheme + Clojure † · topic wt 960 · Learn 186 / Drill 286 · **subject**. Template →
+[`syllabus/86-lisp.md`](./syllabus/86-lisp.md).
 
 - [ ] **[AI] V** — `web-researcher` for `lisp`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/82-lisp.md`](./syllabus/82-lisp.md) and fold dated findings back into that file.
+      [`syllabus/86-lisp.md`](./syllabus/86-lisp.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/lisp/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/82-lisp.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/lisp/learning/` prose covering **every** concept (`co-01..co-30`)
+      enumerated in `syllabus/86-lisp.md` §Concepts. **Acceptance**: all 30 concepts below are taught, each
+      1:1-mirrored to its `co-NN`.
+  - [ ] co-01 · s-expressions
+  - [ ] co-02 · homoiconicity
+  - [ ] co-03 · reader
+  - [ ] co-04 · quote
+  - [ ] co-05 · eval
+  - [ ] co-06 · atoms-lists
+  - [ ] co-07 · cons
+  - [ ] co-08 · car-cdr
+  - [ ] co-09 · define
+  - [ ] co-10 · lambda
+  - [ ] co-11 · closures
+  - [ ] co-12 · recursion
+  - [ ] co-13 · tail-calls
+  - [ ] co-14 · higher-order-functions
+  - [ ] co-15 · conditionals
+  - [ ] co-16 · let-binding
+  - [ ] co-17 · repl
+  - [ ] co-18 · quasiquote
+  - [ ] co-19 · syntax-rules
+  - [ ] co-20 · macro-hygiene
+  - [ ] co-21 · macro-new-form
+  - [ ] co-22 · macroexpand
+  - [ ] co-23 · continuations
+  - [ ] co-24 · vectors
+  - [ ] co-25 · clojure-data-structures
+  - [ ] co-26 · clojure-homoiconicity
+  - [ ] co-27 · clojure-defmacro
+  - [ ] co-28 · clojure-jvm-interop
+  - [ ] co-29 · clojure-seq
+  - [ ] co-30 · lisp-lineage
+- [ ] **[AI] A1-examples** — Author `CONTENT/lisp/learning/` (+ `code/`, runnable sources, DD-20) covering
+      **every** worked example (`ex-01..ex-78`) in `syllabus/86-lisp.md` — Scheme (Racket) primary + Clojure
+      sidebar, each rendered runnable (DD-20/DD-30). **Acceptance**: all 78 worked examples below appear with
+      expected output, each 1:1-mirrored to its `ex-NN`.
+  - [ ] ex-01 · s-expr-eval — verify the value
+  - [ ] ex-02 · atom-vs-list — verify the distinction
+  - [ ] ex-03 · cons-pair — verify the pair
+  - [ ] ex-04 · car-cdr — verify first/rest
+  - [ ] ex-05 · list-construct — verify the contents
+  - [ ] ex-06 · quote-list — verify it isn't evaluated
+  - [ ] ex-07 · define-var — verify the value
+  - [ ] ex-08 · define-fn — verify a call
+  - [ ] ex-09 · lambda-basic — verify the result
+  - [ ] ex-10 · closure-capture — verify the capture
+  - [ ] ex-11 · if-cond — verify the branches
+  - [ ] ex-12 · let-binding — verify the locals
+  - [ ] ex-13 · let-star — verify visibility
+  - [ ] ex-14 · recursion-factorial — verify the value
+  - [ ] ex-15 · recursion-list-length — verify the count
+  - [ ] ex-16 · recursion-list-sum — verify the total
+  - [ ] ex-17 · map-example — verify the transform
+  - [ ] ex-18 · filter-example — verify the selection
+  - [ ] ex-19 · fold-example — verify the accumulation
+  - [ ] ex-20 · repl-workflow — verify incremental development
+  - [ ] ex-21 · vector-basic — verify indexing
+  - [ ] ex-22 · clojure-hello — verify the output
+  - [ ] ex-23 · clojure-list-vector — verify the literals
+  - [ ] ex-24 · clojure-map — verify the lookup
+  - [ ] ex-25 · clojure-first-rest — verify decomposition
+  - [ ] ex-26 · clojure-recursion — verify the value
+  - [ ] ex-27 · tail-recursion — verify unbounded iteration
+  - [ ] ex-28 · non-tail-vs-tail — verify the stack difference
+  - [ ] ex-29 · hof-compose — verify the composition
+  - [ ] ex-30 · hof-return-fn — verify currying
+  - [ ] ex-31 · named-let — verify iteration
+  - [ ] ex-32 · assoc-list — verify retrieval
+  - [ ] ex-33 · quasiquote-template — verify substitution
+  - [ ] ex-34 · unquote-splicing — verify the splice
+  - [ ] ex-35 · eval-data-as-code — verify code-as-data
+  - [ ] ex-36 · build-expr-then-eval — verify the result
+  - [ ] ex-37 · homoiconicity-inspect — verify it's data
+  - [ ] ex-38 · repl-define-redefine — verify the hot update
+  - [ ] ex-39 · syntax-rules-swap — verify it swaps
+  - [ ] ex-40 · syntax-rules-unless — verify the new form
+  - [ ] ex-41 · macro-pattern-ellipsis — verify variadic expansion
+  - [ ] ex-42 · macro-hygiene-demo — verify no capture
+  - [ ] ex-43 · macroexpand-inspect — verify the expansion
+  - [ ] ex-44 · clojure-hof — verify the pipeline
+  - [ ] ex-45 · clojure-immutable — verify immutability
+  - [ ] ex-46 · clojure-set — verify dedup
+  - [ ] ex-47 · clojure-code-as-data — verify homoiconicity
+  - [ ] ex-48 · clojure-defmacro-basic — verify the expansion
+  - [ ] ex-49 · clojure-macroexpand — verify the expansion
+  - [ ] ex-50 · clojure-gensym — verify safety
+  - [ ] ex-51 · clojure-java-interop — verify interop
+  - [ ] ex-52 · scheme-vs-clojure-macro — verify parity
+  - [ ] ex-53 · syntax-rules-binding-form — verify scoping
+  - [ ] ex-54 · macro-recursive-expansion — verify nested expansion
+  - [ ] ex-55 · macro-with-guard — verify matching
+  - [ ] ex-56 · hygiene-vs-capture — verify the contrast
+  - [ ] ex-57 · continuation-callcc — verify the escape
+  - [ ] ex-58 · callcc-early-exit — verify the jump
+  - [ ] ex-59 · callcc-generator — verify resumption
+  - [ ] ex-60 · mini-interpreter — verify evaluation
+  - [ ] ex-61 · mini-interpreter-env — verify variable lookup
+  - [ ] ex-62 · dsl-via-macros — verify a new syntax
+  - [ ] ex-63 · fold-based-eval — verify traversal
+  - [ ] ex-64 · recursion-tree-walk — verify traversal
+  - [ ] ex-65 · clojure-structural-sharing — verify no copy
+  - [ ] ex-66 · clojure-seq-lazy — verify laziness
+  - [ ] ex-67 · clojure-threading-macro — verify pipeline readability
+  - [ ] ex-68 · clojure-dsl-macro — verify the new form
+  - [ ] ex-69 · scheme-clojure-parity — verify equivalent behaviour
+  - [ ] ex-70 · lisp-family-contrast — verify the contrast
+  - [ ] ex-71 · repl-driven-macro-dev — verify the iteration
+  - [ ] ex-72 · quote-eval-roundtrip — verify metaprogramming
+  - [ ] ex-73 · hygienic-macro-verified — verify hygiene holds
+  - [ ] ex-74 · macro-adds-control-form — verify it works
+  - [ ] ex-75 · both-lisps-run — verify parity
+  - [ ] ex-76 · full-lisp-slice — verify the whole
+  - [ ] ex-77 · integration-scheme-clojure — verify both
+  - [ ] ex-78 · capstone-lisp-macro — verify recursion+HOF+list processing, macro adds a genuinely new form + expands hygienically, Clojure sidebar mirrors it, both run
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/lisp/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2781,27 +11860,133 @@ Row: By Example · Scheme + Clojure † · topic wt 920 · Learn 182 / Drill 282
       `CONTENT/lisp/drilling/_index.md` (wt 282) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 89 Gate
+### Phase 93 Gate
 
-- [ ] [AI] `lisp/` complete: `_index.md` wt 920, `learning/_index.md` wt 182,
-      `drilling/_index.md` wt 282, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `lisp/` complete: `_index.md` wt 960, `learning/_index.md` wt 186,
+      `drilling/_index.md` wt 286, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 90 — Topic 83 Just Enough F# (`just-enough-fsharp`)
+## Phase 94 — Topic 87 Just Enough F# (`just-enough-fsharp`)
 
-Row: Primer § · F# † · topic wt 930 · Learn 183 / Drill 283 · **primer**. Template →
-[`syllabus/83-just-enough-fsharp.md`](./syllabus/83-just-enough-fsharp.md).
+Row: Primer § · F# † · topic wt 970 · Learn 187 / Drill 287 · **primer**. Template →
+[`syllabus/87-just-enough-fsharp.md`](./syllabus/87-just-enough-fsharp.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-fsharp`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/83-just-enough-fsharp.md`](./syllabus/83-just-enough-fsharp.md) and fold dated findings back into that file.
+      [`syllabus/87-just-enough-fsharp.md`](./syllabus/87-just-enough-fsharp.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/just-enough-fsharp/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/83-just-enough-fsharp.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-fsharp/learning/` covering **every** concept `co-01..co-26`
+      in `syllabus/87-just-enough-fsharp.md` §Concepts. **Acceptance**: all 26 concepts below are taught.
+  - [ ] co-01 · dotnet-new
+  - [ ] co-02 · dotnet-run
+  - [ ] co-03 · dotnet-build
+  - [ ] co-04 · dotnet-test
+  - [ ] co-05 · dotnet-fsi
+  - [ ] co-06 · let-binding
+  - [ ] co-07 · mutable-binding
+  - [ ] co-08 · function-definition
+  - [ ] co-09 · significant-whitespace
+  - [ ] co-10 · type-inference
+  - [ ] co-11 · tuples
+  - [ ] co-12 · lists
+  - [ ] co-13 · records
+  - [ ] co-14 · discriminated-unions
+  - [ ] co-15 · pattern-matching
+  - [ ] co-16 · exhaustiveness-warning
+  - [ ] co-17 · active-patterns
+  - [ ] co-18 · option-type
+  - [ ] co-19 · result-type
+  - [ ] co-20 · pipeline-operator
+  - [ ] co-21 · function-composition
+  - [ ] co-22 · higher-order-functions
+  - [ ] co-23 · recursion
+  - [ ] co-24 · recursive-du
+  - [ ] co-25 · dotnet-interop
+  - [ ] co-26 · modules-namespaces
+- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-fsharp/learning/code/` (runnable sources, DD-20/DD-30) with
+      **every** worked example `ex-01..ex-78` in `syllabus/87-just-enough-fsharp.md` §Worked examples, each with its expected output.
+      **Acceptance**: all 78 examples below appear runnable with the stated observable.
+  - [ ] ex-01 · hello-console — verify greeting prints
+  - [ ] ex-02 · fsi-eval — verify FSI echoes `val it : int = 2`
+  - [ ] ex-03 · let-immutable — verify `5` prints, reassign rejected
+  - [ ] ex-04 · let-shadowing — verify shadowing, original untouched
+  - [ ] ex-05 · mutable-counter — verify `n` is `1`
+  - [ ] ex-06 · function-add — verify `add 2 3` is `5`
+  - [ ] ex-07 · function-typed — verify annotated version behaves identically
+  - [ ] ex-08 · type-inference-infer — verify inference fixes `x : int`
+  - [ ] ex-09 · indentation-block — verify de-indent breaks compilation
+  - [ ] ex-10 · tuple-pair — verify `fst`/`snd`
+  - [ ] ex-11 · tuple-destructure — verify `a`/`b` bind
+  - [ ] ex-12 · list-literal — verify length `3`
+  - [ ] ex-13 · list-cons — verify `[0; 1; 2]`
+  - [ ] ex-14 · list-range — verify `[1..5]`
+  - [ ] ex-15 · record-define — verify value constructs
+  - [ ] ex-16 · record-construct — verify `p.Name` is `"Ada"`
+  - [ ] ex-17 · record-copy — verify copy changed, original intact
+  - [ ] ex-18 · du-define — verify both cases compile
+  - [ ] ex-19 · du-construct — verify each has type `Shape`
+  - [ ] ex-20 · match-literal — verify `0` maps to `"zero"`
+  - [ ] ex-21 · match-wildcard — verify fall-through
+  - [ ] ex-22 · option-some — verify `Some v` binds `5`
+  - [ ] ex-23 · option-none — verify `None` arm runs
+  - [ ] ex-24 · pipeline-simple — verify `5 |> square` equals `square 5`
+  - [ ] ex-25 · hof-map — verify `[1; 4; 9]`
+  - [ ] ex-26 · rec-factorial — verify `fact 5` is `120`
+  - [ ] ex-27 · pipeline-chain — verify chain sums evens
+  - [ ] ex-28 · compose-operator — verify `f 3` is `"9"`
+  - [ ] ex-29 · filter-list — verify `[3; 4]`
+  - [ ] ex-30 · fold-sum — verify `6`
+  - [ ] ex-31 · map-filter-pipe — verify ordered transform
+  - [ ] ex-32 · record-pattern — verify field patterns bind
+  - [ ] ex-33 · du-match-exhaustive — verify both cases, no warning
+  - [ ] ex-34 · du-missing-case-warning — verify FS0025 emitted
+  - [ ] ex-35 · option-match — verify both arms
+  - [ ] ex-36 · option-map — verify `Some 16`
+  - [ ] ex-37 · option-defaultValue — verify `0`
+  - [ ] ex-38 · result-ok — verify `Ok v` binds `42`
+  - [ ] ex-39 · result-error — verify `Error` carries message
+  - [ ] ex-40 · result-match — verify both paths
+  - [ ] ex-41 · result-bind — verify mid-chain `Error` short-circuits
+  - [ ] ex-42 · active-pattern-parse — verify `Some`/`None`
+  - [ ] ex-43 · active-pattern-match — verify numeric strings take `Int` arm
+  - [ ] ex-44 · tuple-return — verify both components
+  - [ ] ex-45 · list-map-record — verify names extracted
+  - [ ] ex-46 · nested-du — verify construct + match
+  - [ ] ex-47 · guard-clause — verify `when` gates arm
+  - [ ] ex-48 · list-pattern — verify head/tail decomposition
+  - [ ] ex-49 · rec-list-sum — verify `sum [1;2;3]` is `6`
+  - [ ] ex-50 · mutual-recursion — verify pair terminates
+  - [ ] ex-51 · module-define — verify `Math.pi` resolves
+  - [ ] ex-52 · namespace-open — verify `.NET` call runs
+  - [ ] ex-53 · expr-tree-define — verify recursive DU compiles
+  - [ ] ex-54 · expr-tree-construct — verify type `Expr`
+  - [ ] ex-55 · expr-eval-recursive — verify `eval` returns `7`
+  - [ ] ex-56 · expr-eval-nested — verify nested total
+  - [ ] ex-57 · expr-fold — verify node count
+  - [ ] ex-58 · exhaustive-eval-warning — verify FS0025 flags gap
+  - [ ] ex-59 · option-in-eval — verify unbound var yields `None`
+  - [ ] ex-60 · result-in-eval — verify div-by-zero returns `Error`
+  - [ ] ex-61 · pipeline-eval — verify pipeline threads to result
+  - [ ] ex-62 · active-pattern-token — verify tokens tagged
+  - [ ] ex-63 · record-with-du-field — verify construct + match
+  - [ ] ex-64 · generic-function — verify works on any pair
+  - [ ] ex-65 · hof-compose-pipeline — verify composed pipeline
+  - [ ] ex-66 · fold-build-string — verify rendered string matches
+  - [ ] ex-67 · list-of-du — verify each shape handled
+  - [ ] ex-68 · area-dispatch — verify each area correct
+  - [ ] ex-69 · option-sequence — verify one `None` collapses
+  - [ ] ex-70 · result-collect — verify first `Error` wins
+  - [ ] ex-71 · interop-datetime — verify current year
+  - [ ] ex-72 · interop-string-method — verify `"ABC"`
+  - [ ] ex-73 · module-organize — verify qualified access compiles
+  - [ ] ex-74 · dotnet-test-expecto — verify `dotnet test` passes
+  - [ ] ex-75 · dotnet-test-assert — verify assertion passes
+  - [ ] ex-76 · property-immutability — verify source untouched
+  - [ ] ex-77 · railway-pipeline — verify success + error paths
+  - [ ] ex-78 · capstone-fsharp-evaluator — verify end-to-end run + passing test
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-fsharp/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2810,27 +11995,137 @@ Row: Primer § · F# † · topic wt 930 · Learn 183 / Drill 283 · **primer**.
       `CONTENT/just-enough-fsharp/drilling/_index.md` (wt 283) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 90 Gate
+### Phase 94 Gate
 
-- [ ] [AI] `just-enough-fsharp/` complete: `_index.md` wt 930, `learning/_index.md` wt 183,
-      `drilling/_index.md` wt 283, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `just-enough-fsharp/` complete: `_index.md` wt 970, `learning/_index.md` wt 187,
+      `drilling/_index.md` wt 287, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 91 — Topic 84 Type Systems (`type-systems`)
+## Phase 95 — Topic 88 Type Systems (`type-systems`)
 
-Row: By Example · OCaml + Haskell + F# † · topic wt 940 · Learn 184 / Drill 284 · **subject**. Template →
-[`syllabus/84-type-systems.md`](./syllabus/84-type-systems.md).
+Row: By Example · OCaml + Haskell + F# † · topic wt 980 · Learn 188 / Drill 288 · **subject**. Template →
+[`syllabus/88-type-systems.md`](./syllabus/88-type-systems.md).
 
 - [ ] **[AI] V** — `web-researcher` for `type-systems`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/84-type-systems.md`](./syllabus/84-type-systems.md) and fold dated findings back into that file.
+      [`syllabus/88-type-systems.md`](./syllabus/88-type-systems.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/type-systems/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/84-type-systems.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/type-systems/learning/` covering **every** concept `co-01..co-30`
+      in `syllabus/88-type-systems.md` §Concepts. **Acceptance**: all 30 concepts below are taught.
+  - [ ] co-01 · static-vs-dynamic
+  - [ ] co-02 · sum-types
+  - [ ] co-03 · product-types
+  - [ ] co-04 · algebraic-data-types
+  - [ ] co-05 · illegal-states-unrepresentable
+  - [ ] co-06 · pattern-matching
+  - [ ] co-07 · exhaustiveness-checking
+  - [ ] co-08 · parametric-polymorphism
+  - [ ] co-09 · hindley-milner-inference
+  - [ ] co-10 · type-annotations
+  - [ ] co-11 · unit-and-bottom
+  - [ ] co-12 · option-type
+  - [ ] co-13 · result-type
+  - [ ] co-14 · recursive-types
+  - [ ] co-15 · type-aliases
+  - [ ] co-16 · typeclasses
+  - [ ] co-17 · typeclass-instances
+  - [ ] co-18 · modules-functors
+  - [ ] co-19 · signatures
+  - [ ] co-20 · higher-kinded-types
+  - [ ] co-21 · functor
+  - [ ] co-22 · applicative
+  - [ ] co-23 · monad
+  - [ ] co-24 · monad-laws
+  - [ ] co-25 · map-bind-pipeline
+  - [ ] co-26 · fsharp-adts
+  - [ ] co-27 · soundness
+  - [ ] co-28 · type-variance
+  - [ ] co-29 · phantom-types
+  - [ ] co-30 · newtype-wrapper
+- [ ] **[AI] A1-examples** — Author `CONTENT/type-systems/learning/code/` (runnable sources, DD-20/DD-30) with
+      **every** worked example `ex-01..ex-78` in `syllabus/88-type-systems.md` §Worked examples, each with its expected output.
+      **Acceptance**: all 78 examples below appear runnable with the stated observable.
+  - [ ] ex-01 · ocaml-variant-define — verify each constructor type-checks
+  - [ ] ex-02 · ocaml-record-define — verify field access works
+  - [ ] ex-03 · ocaml-adt-combine — verify the ADT compiles
+  - [ ] ex-04 · illegal-state-model — verify the bad state won't compile
+  - [ ] ex-05 · ocaml-match-variant — verify each arm runs
+  - [ ] ex-06 · ocaml-exhaustive-warn — verify non-exhaustive warning
+  - [ ] ex-07 · ocaml-poly-list — verify both element types work
+  - [ ] ex-08 · ocaml-inference — verify inferred `'a -> 'a`
+  - [ ] ex-09 · ocaml-annotation — verify annotation accepted
+  - [ ] ex-10 · ocaml-unit — verify type is `unit`
+  - [ ] ex-11 · ocaml-option-some — verify `int option`
+  - [ ] ex-12 · ocaml-option-none — verify `None` branch
+  - [ ] ex-13 · ocaml-option-match — verify both arms
+  - [ ] ex-14 · ocaml-result-ok — verify each constructor
+  - [ ] ex-15 · ocaml-recursive-type — verify tree compiles
+  - [ ] ex-16 · ocaml-type-alias — verify interchangeable with `string`
+  - [ ] ex-17 · haskell-data-define — verify type-checks
+  - [ ] ex-18 · haskell-record — verify field accessors
+  - [ ] ex-19 · haskell-maybe — verify `Maybe Int`
+  - [ ] ex-20 · haskell-either — verify `Either`
+  - [ ] ex-21 · haskell-pattern-match — verify each branch
+  - [ ] ex-22 · haskell-exhaustive-warn — verify `-Wincomplete-patterns`
+  - [ ] ex-23 · haskell-poly-id — verify works at two types
+  - [ ] ex-24 · haskell-inference — verify GHC infers general type
+  - [ ] ex-25 · fsharp-du — verify compiles on .NET
+  - [ ] ex-26 · fsharp-match — verify FS0025 on missing case
+  - [ ] ex-27 · ocaml-map-function — verify mapped result
+  - [ ] ex-28 · ocaml-fold — verify the sum
+  - [ ] ex-29 · ocaml-option-map — verify shape preserved
+  - [ ] ex-30 · ocaml-option-bind — verify `None` short-circuits
+  - [ ] ex-31 · ocaml-module-define — verify member resolves
+  - [ ] ex-32 · ocaml-signature — verify it constrains the module
+  - [ ] ex-33 · ocaml-functor — verify functor compiles
+  - [ ] ex-34 · ocaml-functor-apply — verify produced module works
+  - [ ] ex-35 · haskell-typeclass-define — verify class compiles
+  - [ ] ex-36 · haskell-typeclass-instance — verify `eq Red Red`
+  - [ ] ex-37 · haskell-show-instance — verify `show Red`
+  - [ ] ex-38 · haskell-functor-instance — verify `fmap` over it
+  - [ ] ex-39 · haskell-fmap — verify `Just 5`
+  - [ ] ex-40 · haskell-applicative — verify `Just 5`
+  - [ ] ex-41 · haskell-monad-bind — verify `Just 5`
+  - [ ] ex-42 · haskell-do-notation — verify desugars to `>>=`
+  - [ ] ex-43 · option-pipeline — verify total pipeline
+  - [ ] ex-44 · result-pipeline — verify first `Left` wins
+  - [ ] ex-45 · hkt-example — verify compiles
+  - [ ] ex-46 · newtype-haskell — verify distinct from `Int`
+  - [ ] ex-47 · phantom-type — verify phantom carries no runtime data
+  - [ ] ex-48 · type-alias-vs-newtype — verify only `newtype` blocks mixing
+  - [ ] ex-49 · fsharp-record-copy — verify copy-update
+  - [ ] ex-50 · fsharp-option-map — verify maps `Some`
+  - [ ] ex-51 · recursive-eval — verify the result
+  - [ ] ex-52 · variance-intuition — verify with compiled example
+  - [ ] ex-53 · functor-law-check — verify `fmap id = id`
+  - [ ] ex-54 · monad-law-left-id — verify equality
+  - [ ] ex-55 · monad-law-right-id — verify equality
+  - [ ] ex-56 · monad-law-assoc — verify associativity
+  - [ ] ex-57 · state-monad — verify threaded state
+  - [ ] ex-58 · reader-monad — verify injected environment
+  - [ ] ex-59 · maybe-monad-chain — verify divide-by-zero yields `Nothing`
+  - [ ] ex-60 · either-error-chain — verify error path carries message
+  - [ ] ex-61 · applicative-validation — verify all errors collected
+  - [ ] ex-62 · ocaml-result-bind-chain — verify short-circuit on `Error`
+  - [ ] ex-63 · functor-over-tree — verify structure preserved
+  - [ ] ex-64 · traversable — verify one `None` collapses it
+  - [ ] ex-65 · gadt-taste — verify types rule out ill-typed terms
+  - [ ] ex-66 · typeclass-constraint — verify constraint required
+  - [ ] ex-67 · multiparam-intuition — verify both dispatch
+  - [ ] ex-68 · module-functor-set — verify produced set works
+  - [ ] ex-69 · phantom-units — verify mixing won't compile
+  - [ ] ex-70 · newtype-smart-constructor — verify invalid input rejected
+  - [ ] ex-71 · illegal-state-refactor — verify bad statuses uncompilable
+  - [ ] ex-72 · exhaustive-refactor — verify all sites flagged
+  - [ ] ex-73 · soundness-demo — verify the contrast
+  - [ ] ex-74 · inference-limits — verify why inference stops
+  - [ ] ex-75 · fsharp-monad-ce — verify sequences like `bind`
+  - [ ] ex-76 · cross-lang-adt — verify all three compile and agree
+  - [ ] ex-77 · category-intuition-writeup — verify write-up references code
+  - [ ] ex-78 · capstone-type-safe-domain — verify end-to-end compile + run
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/type-systems/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2839,27 +12134,137 @@ Row: By Example · OCaml + Haskell + F# † · topic wt 940 · Learn 184 / Drill
       `CONTENT/type-systems/drilling/_index.md` (wt 284) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 91 Gate
+### Phase 95 Gate
 
-- [ ] [AI] `type-systems/` complete: `_index.md` wt 940, `learning/_index.md` wt 184,
-      `drilling/_index.md` wt 284, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `type-systems/` complete: `_index.md` wt 980, `learning/_index.md` wt 188,
+      `drilling/_index.md` wt 288, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 92 — Topic 85 Compilers, Parsers & Transpilers (`compilers-parsers-and-transpilers`)
+## Phase 96 — Topic 89 Compilers, Parsers & Transpilers (`compilers-parsers-and-transpilers`)
 
-Row: By Example · F# † · topic wt 950 · Learn 185 / Drill 285 · **subject**. Template →
-[`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md).
+Row: By Example · F# † · topic wt 990 · Learn 189 / Drill 289 · **subject**. Template →
+[`syllabus/89-compilers-parsers-and-transpilers.md`](./syllabus/89-compilers-parsers-and-transpilers.md).
 
 - [ ] **[AI] V** — `web-researcher` for `compilers-parsers-and-transpilers`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md) and fold dated findings back into that file.
+      [`syllabus/89-compilers-parsers-and-transpilers.md`](./syllabus/89-compilers-parsers-and-transpilers.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/compilers-parsers-and-transpilers/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/85-compilers-parsers-and-transpilers.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/compilers-parsers-and-transpilers/learning/` covering **every** concept `co-01..co-30`
+      in `syllabus/89-compilers-parsers-and-transpilers.md` §Concepts. **Acceptance**: all 30 concepts below are taught.
+  - [ ] co-01 · compiler-pipeline
+  - [ ] co-02 · lexer-tokenizer
+  - [ ] co-03 · token-du
+  - [ ] co-04 · whitespace-comments
+  - [ ] co-05 · lexer-errors
+  - [ ] co-06 · grammar
+  - [ ] co-07 · recursive-descent
+  - [ ] co-08 · ast-du
+  - [ ] co-09 · operator-precedence
+  - [ ] co-10 · pratt-parsing
+  - [ ] co-11 · associativity
+  - [ ] co-12 · parser-combinators
+  - [ ] co-13 · fparsec-primitives
+  - [ ] co-14 · fparsec-sepby
+  - [ ] co-15 · parser-equivalence
+  - [ ] co-16 · parse-errors
+  - [ ] co-17 · tree-walking-interpreter
+  - [ ] co-18 · exhaustive-eval
+  - [ ] co-19 · environments-scopes
+  - [ ] co-20 · lexical-scope
+  - [ ] co-21 · semantic-analysis
+  - [ ] co-22 · name-resolution
+  - [ ] co-23 · type-checking-pass
+  - [ ] co-24 · transpilation
+  - [ ] co-25 · code-generation
+  - [ ] co-26 · transpiler-vs-interpreter
+  - [ ] co-27 · active-patterns-parsing
+  - [ ] co-28 · error-messages
+  - [ ] co-29 · guardrail-lens
+  - [ ] co-30 · testing-stages
+- [ ] **[AI] A1-examples** — Author `CONTENT/compilers-parsers-and-transpilers/learning/code/` (runnable sources, DD-20/DD-30) with
+      **every** worked example `ex-01..ex-78` in `syllabus/89-compilers-parsers-and-transpilers.md` §Worked examples, each with its expected output.
+      **Acceptance**: all 78 examples below appear runnable with the stated observable.
+  - [ ] ex-01 · token-du-define — verify the DU compiles
+  - [ ] ex-02 · lex-single-number — verify `[Num 42]`
+  - [ ] ex-03 · lex-operators — verify each operator token
+  - [ ] ex-04 · lex-whitespace — verify spaces skipped
+  - [ ] ex-05 · lex-comments — verify comment dropped
+  - [ ] ex-06 · lex-multi-token — verify `[Num 1; Plus; Num 2]`
+  - [ ] ex-07 · lex-error-badchar — verify lexer error reported
+  - [ ] ex-08 · lex-identifier — verify `Ident "foo"`
+  - [ ] ex-09 · lex-keyword — verify keyword token
+  - [ ] ex-10 · lex-paren — verify `LParen`/`RParen`
+  - [ ] ex-11 · active-pattern-digit — verify digits match
+  - [ ] ex-12 · active-pattern-token — verify the tag
+  - [ ] ex-13 · lex-test-tokens — verify test passes
+  - [ ] ex-14 · lex-test-error — verify test passes
+  - [ ] ex-15 · grammar-write — verify covers operators
+  - [ ] ex-16 · ast-du-define — verify DU compiles
+  - [ ] ex-17 · ast-construct — verify type `Expr`
+  - [ ] ex-18 · rd-parse-number — verify `Num 42`
+  - [ ] ex-19 · rd-parse-addition — verify `BinOp (Add, Num 1, Num 2)`
+  - [ ] ex-20 · rd-parse-nested — verify grouping respected
+  - [ ] ex-21 · precedence-mul-over-add — verify `*` binds tighter
+  - [ ] ex-22 · left-assoc-subtraction — verify `((1-2)-3)`
+  - [ ] ex-23 · paren-grouping — verify parens override
+  - [ ] ex-24 · rd-parse-error — verify unexpected-EOF error
+  - [ ] ex-25 · fparsec-pchar — verify parses `+`
+  - [ ] ex-26 · fparsec-pint — verify parses `42`
+  - [ ] ex-27 · fparsec-many — verify parses digit run
+  - [ ] ex-28 · fparsec-sepby — verify comma-separated list
+  - [ ] ex-29 · fparsec-choice — verify either operator parses
+  - [ ] ex-30 · fparsec-expr-parser — verify builds the AST
+  - [ ] ex-31 · fparsec-opp — verify precedence declaratively
+  - [ ] ex-32 · pratt-parser-core — verify parses operators
+  - [ ] ex-33 · pratt-binding-power — verify `*` outbinds `+`
+  - [ ] ex-34 · pratt-right-assoc — verify `^` groups right
+  - [ ] ex-35 · parser-equivalence-test — verify RD and FParsec agree
+  - [ ] ex-36 · parse-error-message — verify message is specific
+  - [ ] ex-37 · ast-print — verify round-trip readability
+  - [ ] ex-38 · eval-number — verify returns `42`
+  - [ ] ex-39 · eval-binop — verify `3`
+  - [ ] ex-40 · eval-precedence — verify `7`
+  - [ ] ex-41 · eval-exhaustive — verify no warning
+  - [ ] ex-42 · eval-missing-case-warn — verify FS0025
+  - [ ] ex-43 · env-define — verify a binding stores
+  - [ ] ex-44 · env-lookup — verify it resolves
+  - [ ] ex-45 · eval-let-binding — verify `3`
+  - [ ] ex-46 · lexical-scope-nested — verify inner value wins
+  - [ ] ex-47 · name-resolution — verify each name resolves
+  - [ ] ex-48 · undefined-var-error — verify unbound-variable error
+  - [ ] ex-49 · semantic-check-arity — verify wrong arity rejected
+  - [ ] ex-50 · eval-test — verify it passes
+  - [ ] ex-51 · eval-conditional — verify chosen branch
+  - [ ] ex-52 · eval-comparison — verify `true`
+  - [ ] ex-53 · tree-walk-full — verify the total
+  - [ ] ex-54 · function-call-eval — verify returned value
+  - [ ] ex-55 · closure-eval — verify captured binding used
+  - [ ] ex-56 · recursion-eval — verify `fact 5 = 120`
+  - [ ] ex-57 · transpile-number — verify emitted text
+  - [ ] ex-58 · transpile-binop — verify the string
+  - [ ] ex-59 · transpile-precedence — verify precedence preserved
+  - [ ] ex-60 · transpile-run-match — verify equals interpreter
+  - [ ] ex-61 · transpiler-vs-interpreter-contrast — verify they agree
+  - [ ] ex-62 · codegen-emit-string — verify valid target code
+  - [ ] ex-63 · type-check-pass — verify well-typed passes
+  - [ ] ex-64 · type-error-report — verify clear diagnostic
+  - [ ] ex-65 · linter-lint-rule — verify it fires
+  - [ ] ex-66 · guardrail-writeup — verify ties to code
+  - [ ] ex-67 · error-recovery — verify second error found
+  - [ ] ex-68 · multi-error-report — verify all listed
+  - [ ] ex-69 · semantic-analysis-full — verify gates bad programs
+  - [ ] ex-70 · scope-stack — verify shadowing + pop restore
+  - [ ] ex-71 · ast-visitor — verify visits every node
+  - [ ] ex-72 · constant-folding — verify optimized AST
+  - [ ] ex-73 · parser-combinator-recursive — verify nested expressions parse
+  - [ ] ex-74 · dotnet-test-parser — verify it passes
+  - [ ] ex-75 · dotnet-test-transpiler — verify it passes
+  - [ ] ex-76 · pipeline-end-to-end — verify whole pipeline yields value
+  - [ ] ex-77 · two-parser-fuzz — verify they always agree
+  - [ ] ex-78 · capstone-language-processor — verify end-to-end run + green tests
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/compilers-parsers-and-transpilers/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2868,33 +12273,33 @@ Row: By Example · F# † · topic wt 950 · Learn 185 / Drill 285 · **subject*
       `CONTENT/compilers-parsers-and-transpilers/drilling/_index.md` (wt 285) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 92 Gate
+### Phase 96 Gate
 
-- [ ] [AI] `compilers-parsers-and-transpilers/` complete: `_index.md` wt 950, `learning/_index.md` wt 185,
-      `drilling/_index.md` wt 285, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `compilers-parsers-and-transpilers/` complete: `_index.md` wt 990, `learning/_index.md` wt 189,
+      `drilling/_index.md` wt 289, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 93 — Inter-topic: Pass-4 Capstone (`capstone-concurrency-and-systems`)
+## Phase 97 — Inter-topic: Pass-4 Capstone (`capstone-concurrency-and-systems`)
 
-Junction: Topics 60–85 (Go/Elixir concurrency + native app domains + C/OS/systems + language theory). Inter-Topic Capstone Phase Template; spec in
-`syllabus/85-compilers-parsers-and-transpilers.md` (Pass-4 capstone section).
+Junction: Topics 61–85 (Go/Elixir concurrency + native app domains + C/OS/systems + language theory). Inter-Topic Capstone Phase Template; spec in
+`syllabus/89-compilers-parsers-and-transpilers.md` (Pass-4 capstone section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
 - [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-and-systems/` (`_index.md` `weight: 955`, + `code/`) per the cited capstone
-      spec's ordered steps (detail source: [`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md)). **Acceptance**: the
+      spec's ordered steps (detail source: [`syllabus/89-compilers-parsers-and-transpilers.md`](./syllabus/89-compilers-parsers-and-transpilers.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 93 Gate
+### Phase 97 Gate
 
 - [ ] [AI] `capstone-concurrency-and-systems/` complete (wt 955, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
@@ -2903,23 +12308,23 @@ Junction: Topics 60–85 (Go/Elixir concurrency + native app domains + C/OS/syst
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
-## Phase 94 — Inter-topic: Concurrency-Showdown Capstone (`capstone-concurrency-showdown`)
+## Phase 98 — Inter-topic: Concurrency-Showdown Capstone (`capstone-concurrency-showdown`)
 
 Junction: Concurrency & Parallelism (24) + CSP/Go (61) + Actor/Elixir (63) — the same problem solved three ways. Inter-Topic Capstone Phase Template; spec in
-`syllabus/85-compilers-parsers-and-transpilers.md` (concurrency-showdown cross-cutting section).
+`syllabus/89-compilers-parsers-and-transpilers.md` (concurrency-showdown cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
 - [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-showdown/` (`_index.md` `weight: 956`, + `code/`) per the cited capstone
-      spec's ordered steps (detail source: [`syllabus/85-compilers-parsers-and-transpilers.md`](./syllabus/85-compilers-parsers-and-transpilers.md)). **Acceptance**: the
+      spec's ordered steps (detail source: [`syllabus/89-compilers-parsers-and-transpilers.md`](./syllabus/89-compilers-parsers-and-transpilers.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 94 Gate
+### Phase 98 Gate
 
 - [ ] [AI] `capstone-concurrency-showdown/` complete (wt 956, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
@@ -2932,17 +12337,127 @@ Junction: Concurrency & Parallelism (24) + CSP/Go (61) + Actor/Elixir (63) — t
 
 ## Pass 5 — Internals & Lead at Altitude (Phases 95-100 + Pass-5 capstone)
 
-## Phase 95 — Topic 86 Build Your Own Git (`build-your-own-git`)
+## Phase 99 — Topic 90 Build Your Own Git (`build-your-own-git`)
 
-Row: By Example · Python † · topic wt 960 · Learn 186 / Drill 286 · **subject**. Template →
-[`syllabus/86-build-your-own-git.md`](./syllabus/86-build-your-own-git.md).
+Row: By Example · Python † · topic wt 1000 · Learn 190 / Drill 290 · **subject**. Template →
+[`syllabus/90-build-your-own-git.md`](./syllabus/90-build-your-own-git.md).
 
 - [ ] **[AI] V** — `web-researcher` for `build-your-own-git`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/86-build-your-own-git.md`](./syllabus/86-build-your-own-git.md) and fold dated findings back into that file.
+      [`syllabus/90-build-your-own-git.md`](./syllabus/90-build-your-own-git.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/build-your-own-git/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/86-build-your-own-git.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/build-your-own-git/learning/` covering **every** concept `co-01..co-30`
+      in `syllabus/90-build-your-own-git.md` §Concepts. **Acceptance**: all 30 concepts below are taught.
+  - [ ] co-01 · content-addressing
+  - [ ] co-02 · sha-hashing
+  - [ ] co-03 · blob-object
+  - [ ] co-04 · tree-object
+  - [ ] co-05 · commit-object
+  - [ ] co-06 · tag-object
+  - [ ] co-07 · object-header
+  - [ ] co-08 · zlib-compression
+  - [ ] co-09 · loose-object-path
+  - [ ] co-10 · hash-object
+  - [ ] co-11 · cat-file
+  - [ ] co-12 · tree-serialization
+  - [ ] co-13 · tree-parse
+  - [ ] co-14 · commit-serialization
+  - [ ] co-15 · commit-parent
+  - [ ] co-16 · refs
+  - [ ] co-17 · head
+  - [ ] co-18 · symbolic-ref
+  - [ ] co-19 · branch
+  - [ ] co-20 · index-format
+  - [ ] co-21 · staging
+  - [ ] co-22 · index-to-tree
+  - [ ] co-23 · commit-porcelain
+  - [ ] co-24 · log-walk
+  - [ ] co-25 · checkout
+  - [ ] co-26 · git-interop
+  - [ ] co-27 · detached-head
+  - [ ] co-28 · dangling-objects
+  - [ ] co-29 · hash-algo-parameter
+  - [ ] co-30 · pytest-stages
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-git/learning/code/` (runnable sources, DD-20/DD-30) with
+      **every** worked example `ex-01..ex-78` in `syllabus/90-build-your-own-git.md` §Worked examples, each with its expected output.
+      **Acceptance**: all 78 examples below appear runnable with the stated observable.
+  - [ ] ex-01 · init-git-dir — verify stock `git status` accepts it
+  - [ ] ex-02 · blob-header-format — verify the header bytes
+  - [ ] ex-03 · sha1-of-blob — verify matches `git hash-object`
+  - [ ] ex-04 · zlib-compress-object — verify inflate round-trips
+  - [ ] ex-05 · write-loose-object — verify path lands correctly
+  - [ ] ex-06 · hash-object-cmd — verify the hash
+  - [ ] ex-07 · cross-check-real-git — verify hashes match
+  - [ ] ex-08 · read-loose-object — verify the payload
+  - [ ] ex-09 · cat-file-p — verify content prints
+  - [ ] ex-10 · cat-file-t — verify `blob`
+  - [ ] ex-11 · cat-file-s — verify byte count
+  - [ ] ex-12 · real-git-cat-file — verify real git reads yours
+  - [ ] ex-13 · content-address-dedup — verify same hash
+  - [ ] ex-14 · blob-roundtrip — verify content survives
+  - [ ] ex-15 · object-path-split — verify directory sharding
+  - [ ] ex-16 · hash-algo-param-sha1 — verify default behaviour
+  - [ ] ex-17 · hash-algo-param-sha256 — verify 64-hex name
+  - [ ] ex-18 · empty-blob — verify equals git's empty-blob hash
+  - [ ] ex-19 · pytest-blob — verify it passes
+  - [ ] ex-20 · pytest-hash-match — verify it passes
+  - [ ] ex-21 · tree-entry-format — verify the entry bytes
+  - [ ] ex-22 · tree-object-header — verify the header
+  - [ ] ex-23 · write-tree-single — verify it writes and hashes
+  - [ ] ex-24 · tree-sha — verify matches `git write-tree`
+  - [ ] ex-25 · real-git-ls-tree — verify real git lists entries
+  - [ ] ex-26 · typed-object-model — verify `mypy`-clean typing
+  - [ ] ex-27 · tree-multiple-blobs — verify all entries present + sorted
+  - [ ] ex-28 · nested-tree — verify nested hash resolves
+  - [ ] ex-29 · parse-tree-bytes — verify the parse
+  - [ ] ex-30 · tree-mode-file — verify `100644`
+  - [ ] ex-31 · tree-mode-dir — verify `040000`
+  - [ ] ex-32 · tree-mode-exec — verify `100755`
+  - [ ] ex-33 · commit-object-format — verify the bytes
+  - [ ] ex-34 · write-commit-no-parent — verify it writes
+  - [ ] ex-35 · commit-with-parent — verify parent linkage
+  - [ ] ex-36 · commit-sha — verify matches `git commit-tree`
+  - [ ] ex-37 · real-git-log-shows-commit — verify it appears
+  - [ ] ex-38 · commit-multi-parent — verify both parent lines
+  - [ ] ex-39 · ref-write — verify file holds object name
+  - [ ] ex-40 · ref-read — verify the hash
+  - [ ] ex-41 · head-symbolic — verify it resolves through
+  - [ ] ex-42 · head-update-on-commit — verify ref advanced
+  - [ ] ex-43 · branch-create — verify the branch
+  - [ ] ex-44 · resolve-ref — verify the chain
+  - [ ] ex-45 · detached-head — verify detached state
+  - [ ] ex-46 · commit-author-timestamp — verify the format
+  - [ ] ex-47 · tag-object-format — verify it points at a commit
+  - [ ] ex-48 · lightweight-tag — verify it resolves
+  - [ ] ex-49 · dangling-object — verify `git fsck` reports dangling
+  - [ ] ex-50 · pytest-commit — verify it passes
+  - [ ] ex-51 · pytest-ref — verify it passes
+  - [ ] ex-52 · pytest-tree-parse — verify it passes
+  - [ ] ex-53 · index-format-header — verify the header
+  - [ ] ex-54 · index-entry — verify entry fields
+  - [ ] ex-55 · add-file-to-index — verify it appears staged
+  - [ ] ex-56 · index-read — verify the entry list
+  - [ ] ex-57 · index-write — verify byte round-trip
+  - [ ] ex-58 · real-git-status-reads-index — verify staged file shown
+  - [ ] ex-59 · write-tree-from-index — verify matches `git write-tree`
+  - [ ] ex-60 · staged-multiple — verify all in index
+  - [ ] ex-61 · update-staged-file — verify index entry updates
+  - [ ] ex-62 · commit-porcelain — verify commit object produced
+  - [ ] ex-63 · commit-updates-head — verify the ref moved
+  - [ ] ex-64 · log-walk-linear — verify newest-first order
+  - [ ] ex-65 · log-walk-merge — verify both ancestries reached
+  - [ ] ex-66 · log-format — verify the output
+  - [ ] ex-67 · checkout-tree — verify files written
+  - [ ] ex-68 · checkout-updates-working — verify contents match tree
+  - [ ] ex-69 · checkout-updates-head — verify `HEAD` at target
+  - [ ] ex-70 · full-cycle-add-commit-checkout — verify round-trip
+  - [ ] ex-71 · interop-git-reads-full-history — verify identical history
+  - [ ] ex-72 · interop-you-read-git-commit — verify your parser agrees
+  - [ ] ex-73 · sha256-repo — verify 64-hex names interop
+  - [ ] ex-74 · gc-find-dangling — verify the dangling set
+  - [ ] ex-75 · detached-head-commit — verify `HEAD` advanced
+  - [ ] ex-76 · pytest-full-cycle — verify it passes
+  - [ ] ex-77 · pytest-interop — verify it passes
+  - [ ] ex-78 · capstone-mini-git — verify end-to-end + interop + green tests
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-git/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2951,27 +12466,137 @@ Row: By Example · Python † · topic wt 960 · Learn 186 / Drill 286 · **subj
       `CONTENT/build-your-own-git/drilling/_index.md` (wt 286) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 95 Gate
+### Phase 99 Gate
 
-- [ ] [AI] `build-your-own-git/` complete: `_index.md` wt 960, `learning/_index.md` wt 186,
-      `drilling/_index.md` wt 286, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `build-your-own-git/` complete: `_index.md` wt 1000, `learning/_index.md` wt 190,
+      `drilling/_index.md` wt 290, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 96 — Topic 87 Build Your Own Database (`build-your-own-database`)
+## Phase 100 — Topic 91 Build Your Own Database (`build-your-own-database`)
 
-Row: By Example · Python † · topic wt 970 · Learn 187 / Drill 287 · **subject**. Template →
-[`syllabus/87-build-your-own-database.md`](./syllabus/87-build-your-own-database.md).
+Row: By Example · Python † · topic wt 1010 · Learn 191 / Drill 291 · **subject**. Template →
+[`syllabus/91-build-your-own-database.md`](./syllabus/91-build-your-own-database.md).
 
 - [ ] **[AI] V** — `web-researcher` for `build-your-own-database`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/87-build-your-own-database.md`](./syllabus/87-build-your-own-database.md) and fold dated findings back into that file.
+      [`syllabus/91-build-your-own-database.md`](./syllabus/91-build-your-own-database.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/build-your-own-database/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/87-build-your-own-database.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/build-your-own-database/learning/` covering **every** concept `co-01..co-30`
+      in `syllabus/91-build-your-own-database.md` §Concepts. **Acceptance**: all 30 concepts below are taught.
+  - [ ] co-01 · pages
+  - [ ] co-02 · pager
+  - [ ] co-03 · page-cache
+  - [ ] co-04 · cache-eviction
+  - [ ] co-05 · page-layout
+  - [ ] co-06 · btree-structure
+  - [ ] co-07 · btree-search
+  - [ ] co-08 · btree-insert
+  - [ ] co-09 · node-split
+  - [ ] co-10 · btree-ordered
+  - [ ] co-11 · lsm-alternative
+  - [ ] co-12 · sstable
+  - [ ] co-13 · compaction
+  - [ ] co-14 · wal
+  - [ ] co-15 · fsync
+  - [ ] co-16 · intent-before-data
+  - [ ] co-17 · crash-recovery
+  - [ ] co-18 · aries-intuition
+  - [ ] co-19 · checkpoint
+  - [ ] co-20 · torn-writes
+  - [ ] co-21 · durability-tradeoff
+  - [ ] co-22 · sql-parse
+  - [ ] co-23 · insert-exec
+  - [ ] co-24 · select-exec
+  - [ ] co-25 · where-filter
+  - [ ] co-26 · row-serialization
+  - [ ] co-27 · transaction-single-writer
+  - [ ] co-28 · mvcc-forward
+  - [ ] co-29 · free-list
+  - [ ] co-30 · pytest-durability
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-database/learning/code/` (runnable sources, DD-20/DD-30) with
+      **every** worked example `ex-01..ex-78` in `syllabus/91-build-your-own-database.md` §Worked examples, each with its expected output.
+      **Acceptance**: all 78 examples below appear runnable with the stated observable.
+  - [ ] ex-01 · define-page-size — verify the constant used everywhere
+  - [ ] ex-02 · pager-open-file — verify it opens/creates
+  - [ ] ex-03 · pager-write-page — verify bytes at offset `N * page_size`
+  - [ ] ex-04 · pager-read-page — verify the bytes returned
+  - [ ] ex-05 · page-roundtrip — verify content survives
+  - [ ] ex-06 · page-out-of-range — verify clean zero page / error
+  - [ ] ex-07 · page-header-layout — verify the fields
+  - [ ] ex-08 · slotted-row — verify slot offsets
+  - [ ] ex-09 · page-cache-hit — verify no read occurs
+  - [ ] ex-10 · page-cache-miss — verify it populates the cache
+  - [ ] ex-11 · cache-lru-evict — verify LRU page evicted
+  - [ ] ex-12 · dirty-page-flush — verify it persists to disk
+  - [ ] ex-13 · free-list-alloc — verify a page number
+  - [ ] ex-14 · free-list-reuse — verify freed page reused
+  - [ ] ex-15 · row-serialize — verify the byte layout
+  - [ ] ex-16 · row-deserialize — verify the fields
+  - [ ] ex-17 · multiple-rows-page — verify all read back
+  - [ ] ex-18 · page-full — verify overflow handling
+  - [ ] ex-19 · pytest-pager — verify it passes
+  - [ ] ex-20 · pytest-cache-evict — verify it passes
+  - [ ] ex-21 · typed-page-model — verify `mypy`-clean typing
+  - [ ] ex-22 · pager-file-header — verify it identifies the file
+  - [ ] ex-23 · page-count-grow — verify the page count
+  - [ ] ex-24 · sync-to-disk — verify data on disk after
+  - [ ] ex-25 · reopen-file — verify data persists
+  - [ ] ex-26 · pytest-row-serde — verify it passes
+  - [ ] ex-27 · btree-leaf-node — verify the encoding
+  - [ ] ex-28 · btree-internal-node — verify the encoding
+  - [ ] ex-29 · btree-insert-leaf — verify placed in order
+  - [ ] ex-30 · btree-search-key — verify the value found
+  - [ ] ex-31 · btree-search-missing — verify not-found result
+  - [ ] ex-32 · btree-ordered-scan — verify keys sorted
+  - [ ] ex-33 · leaf-split — verify it splits into two
+  - [ ] ex-34 · internal-split — verify separator promotes
+  - [ ] ex-35 · root-split-grow — verify height increases by one
+  - [ ] ex-36 · btree-many-inserts — verify order preserved
+  - [ ] ex-37 · btree-over-pager — verify nodes persist
+  - [ ] ex-38 · btree-delete — verify gone and order holds
+  - [ ] ex-39 · range-scan — verify only in-range keys
+  - [ ] ex-40 · memtable-insert — verify in-memory sorted order
+  - [ ] ex-41 · memtable-flush-sstable — verify on-disk run
+  - [ ] ex-42 · sstable-read — verify the value
+  - [ ] ex-43 · sstable-sorted — verify entries sorted
+  - [ ] ex-44 · lsm-lookup-order — verify newest value wins
+  - [ ] ex-45 · compaction-merge — verify merged run sorted + deduped
+  - [ ] ex-46 · compaction-tombstone — verify key dropped
+  - [ ] ex-47 · lsm-vs-btree-writeup — verify cites both engines
+  - [ ] ex-48 · bloom-filter-taste — verify it avoids a read
+  - [ ] ex-49 · pytest-btree-splits — verify it passes
+  - [ ] ex-50 · pytest-lsm-compaction — verify it passes
+  - [ ] ex-51 · btree-height-log — verify stays logarithmic
+  - [ ] ex-52 · pager-btree-persist — verify survives reopen
+  - [ ] ex-53 · wal-append — verify it is on disk
+  - [ ] ex-54 · wal-record-format — verify the layout
+  - [ ] ex-55 · wal-before-page — verify ordering
+  - [ ] ex-56 · fsync-on-commit — verify the flush is forced
+  - [ ] ex-57 · crash-mid-write-sim — verify partial state on disk
+  - [ ] ex-58 · recovery-replay — verify state restored
+  - [ ] ex-59 · recovery-truncate — verify a clean tail
+  - [ ] ex-60 · recovery-consistent-state — verify a consistent state
+  - [ ] ex-61 · lose-uncommitted — verify only uncommitted lost
+  - [ ] ex-62 · redo-recovery — verify it reappears
+  - [ ] ex-63 · undo-recovery — verify it is rolled back
+  - [ ] ex-64 · checkpoint-write — verify it marks a safe point
+  - [ ] ex-65 · checkpoint-bounds-replay — verify replay starts there
+  - [ ] ex-66 · torn-write-detection — verify torn page caught
+  - [ ] ex-67 · durability-latency-measure — verify tradeoff visible
+  - [ ] ex-68 · single-writer-txn — verify grouped durability
+  - [ ] ex-69 · sql-tokenize — verify the token stream
+  - [ ] ex-70 · sql-parse-insert — verify the parsed form
+  - [ ] ex-71 · sql-parse-select — verify the parsed form
+  - [ ] ex-72 · exec-insert — verify the row persists
+  - [ ] ex-73 · exec-select-all — verify all rows return
+  - [ ] ex-74 · where-equality — verify only matching rows
+  - [ ] ex-75 · where-comparison — verify the comparison filter
+  - [ ] ex-76 · full-crash-cycle — verify committed rows survive
+  - [ ] ex-77 · pytest-recovery — verify it passes
+  - [ ] ex-78 · capstone-mini-db — verify end-to-end + survives crash + green tests
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-database/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2980,27 +12605,137 @@ Row: By Example · Python † · topic wt 970 · Learn 187 / Drill 287 · **subj
       `CONTENT/build-your-own-database/drilling/_index.md` (wt 287) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 96 Gate
+### Phase 100 Gate
 
-- [ ] [AI] `build-your-own-database/` complete: `_index.md` wt 970, `learning/_index.md` wt 187,
-      `drilling/_index.md` wt 287, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `build-your-own-database/` complete: `_index.md` wt 1010, `learning/_index.md` wt 191,
+      `drilling/_index.md` wt 291, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 97 — Topic 88 Build Your Own Raft / Replicated KV (`build-your-own-raft`)
+## Phase 101 — Topic 92 Build Your Own Raft / Replicated KV (`build-your-own-raft`)
 
-Row: By Example · Go † · topic wt 980 · Learn 188 / Drill 288 · **subject**. Template →
-[`syllabus/88-build-your-own-raft.md`](./syllabus/88-build-your-own-raft.md).
+Row: By Example · Go † · topic wt 1020 · Learn 192 / Drill 292 · **subject**. Template →
+[`syllabus/92-build-your-own-raft.md`](./syllabus/92-build-your-own-raft.md).
 
 - [ ] **[AI] V** — `web-researcher` for `build-your-own-raft`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/88-build-your-own-raft.md`](./syllabus/88-build-your-own-raft.md) and fold dated findings back into that file.
+      [`syllabus/92-build-your-own-raft.md`](./syllabus/92-build-your-own-raft.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/build-your-own-raft/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/88-build-your-own-raft.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/build-your-own-raft/learning/` covering **every** concept `co-01..co-30`
+      in `syllabus/92-build-your-own-raft.md` §Concepts. **Acceptance**: all 30 concepts below are taught.
+  - [ ] co-01 · consensus-problem
+  - [ ] co-02 · raft-roles
+  - [ ] co-03 · terms
+  - [ ] co-04 · per-peer-state
+  - [ ] co-05 · election-timeout
+  - [ ] co-06 · request-vote
+  - [ ] co-07 · vote-granting
+  - [ ] co-08 · leader-election
+  - [ ] co-09 · split-vote
+  - [ ] co-10 · heartbeat
+  - [ ] co-11 · append-entries
+  - [ ] co-12 · log-entry
+  - [ ] co-13 · log-matching
+  - [ ] co-14 · consistency-check
+  - [ ] co-15 · log-repair
+  - [ ] co-16 · commit-index
+  - [ ] co-17 · apply-to-state-machine
+  - [ ] co-18 · replicated-kv
+  - [ ] co-19 · leader-completeness
+  - [ ] co-20 · election-restriction
+  - [ ] co-21 · state-machine-safety
+  - [ ] co-22 · persistence
+  - [ ] co-23 · crash-restart
+  - [ ] co-24 · partition-tolerance
+  - [ ] co-25 · network-drop
+  - [ ] co-26 · linearizability
+  - [ ] co-27 · failure-injection
+  - [ ] co-28 · liveness
+  - [ ] co-29 · snapshot-stretch
+  - [ ] co-30 · membership-stretch
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-raft/learning/code/` (runnable sources, DD-20/DD-30) with
+      **every** worked example `ex-01..ex-78` in `syllabus/92-build-your-own-raft.md` §Worked examples, each with its expected output.
+      **Acceptance**: all 78 examples below appear runnable with the stated observable.
+  - [ ] ex-01 · node-roles-enum — verify transitions compile
+  - [ ] ex-02 · term-counter — verify increments on new election
+  - [ ] ex-03 · election-timer — verify timeouts in `[T, 2T]`
+  - [ ] ex-04 · timer-reset-on-heartbeat — verify no election while heartbeats arrive
+  - [ ] ex-05 · become-candidate — verify the transition
+  - [ ] ex-06 · request-vote-rpc — verify a vote reply
+  - [ ] ex-07 · vote-once-per-term — verify second request denied
+  - [ ] ex-08 · vote-deny-lower-term — verify the denial
+  - [ ] ex-09 · count-votes-majority — verify the threshold
+  - [ ] ex-10 · become-leader — verify the transition
+  - [ ] ex-11 · three-node-election — verify exactly one leader
+  - [ ] ex-12 · five-node-election — verify exactly one leader
+  - [ ] ex-13 · one-leader-per-term — verify Election Safety
+  - [ ] ex-14 · term-increment-on-election — verify monotonic terms
+  - [ ] ex-15 · higher-term-steps-down — verify the step-down
+  - [ ] ex-16 · split-vote-retry — verify a later term elects
+  - [ ] ex-17 · randomized-timeout-range — verify randomized, not fixed
+  - [ ] ex-18 · heartbeat-suppresses-election — verify no follower times out
+  - [ ] ex-19 · leader-crash-reelection — verify a new leader elected
+  - [ ] ex-20 · candidate-loses-to-higher-term — verify it steps down
+  - [ ] ex-21 · go-test-election — verify it passes
+  - [ ] ex-22 · rpc-over-net — verify a round-trip
+  - [ ] ex-23 · concurrent-timers — verify independent timing
+  - [ ] ex-24 · vote-request-parallel — verify all peers asked
+  - [ ] ex-25 · election-under-drop — verify a leader still emerges
+  - [ ] ex-26 · go-test-reelection — verify it passes
+  - [ ] ex-27 · log-entry-struct — verify the encoding
+  - [ ] ex-28 · append-entries-rpc — verify a reply
+  - [ ] ex-29 · leader-appends-local — verify the entry
+  - [ ] ex-30 · replicate-to-followers — verify they receive them
+  - [ ] ex-31 · prev-log-check — verify matched append succeeds
+  - [ ] ex-32 · consistency-check-reject — verify follower says false
+  - [ ] ex-33 · next-index-decrement — verify the retry
+  - [ ] ex-34 · log-backfill — verify its log fills in
+  - [ ] ex-35 · log-matching-property — verify Log Matching
+  - [ ] ex-36 · conflict-truncate — verify truncation
+  - [ ] ex-37 · match-index-track — verify it advances
+  - [ ] ex-38 · commit-on-majority — verify the commit
+  - [ ] ex-39 · commit-current-term-only — verify the rule
+  - [ ] ex-40 · apply-committed — verify application
+  - [ ] ex-41 · apply-order — verify no reordering
+  - [ ] ex-42 · lagging-follower-catchup — verify its log matches leader
+  - [ ] ex-43 · leader-append-only — verify Leader Append-Only
+  - [ ] ex-44 · election-restriction-uptodate — verify the restriction
+  - [ ] ex-45 · deny-vote-stale-log — verify the denial
+  - [ ] ex-46 · logs-converge — verify convergence
+  - [ ] ex-47 · heartbeat-carries-commit — verify followers advance
+  - [ ] ex-48 · client-write-commits — verify the ack
+  - [ ] ex-49 · go-test-replication — verify it passes
+  - [ ] ex-50 · go-test-catchup — verify it passes
+  - [ ] ex-51 · concurrent-appends — verify all converge
+  - [ ] ex-52 · no-op-on-election — verify indirect commit
+  - [ ] ex-53 · kv-state-machine — verify `put` mutates the store
+  - [ ] ex-54 · kv-put-get — verify value read back
+  - [ ] ex-55 · kv-linearizable-read — verify reads reflect committed writes
+  - [ ] ex-56 · persist-term-vote — verify they survive restart
+  - [ ] ex-57 · persist-log — verify entries survive restart
+  - [ ] ex-58 · restart-recover-state — verify node resumes correctly
+  - [ ] ex-59 · restart-no-double-vote — verify no double vote in a term
+  - [ ] ex-60 · partition-minority-blocks — verify no commit there
+  - [ ] ex-61 · partition-majority-progresses — verify progress
+  - [ ] ex-62 · partition-heal-converge — verify one consistent log
+  - [ ] ex-63 · stale-leader-steps-down — verify it steps down
+  - [ ] ex-64 · no-committed-loss — verify it is never lost
+  - [ ] ex-65 · drop-messages-retry — verify eventual delivery
+  - [ ] ex-66 · delayed-messages — verify correctness holds
+  - [ ] ex-67 · crash-restart-cycle — verify the cluster recovers
+  - [ ] ex-68 · failure-harness — verify it can sever links
+  - [ ] ex-69 · safety-under-failure — verify Election Safety
+  - [ ] ex-70 · state-machine-safety-test — verify State Machine Safety
+  - [ ] ex-71 · leader-completeness-test — verify Leader Completeness
+  - [ ] ex-72 · liveness-under-heal — verify liveness resumes
+  - [ ] ex-73 · snapshot-stretch — verify a snapshot restores state
+  - [ ] ex-74 · install-snapshot-stretch — verify lagging follower snapshotted
+  - [ ] ex-75 · membership-change-stretch — verify cluster reconfigures safely
+  - [ ] ex-76 · full-cluster-kv-cycle — verify a consistent value
+  - [ ] ex-77 · go-test-safety-liveness — verify it passes
+  - [ ] ex-78 · capstone-raft-kv — verify end-to-end + correct under failure + green tests
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-raft/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -3009,27 +12744,75 @@ Row: By Example · Go † · topic wt 980 · Learn 188 / Drill 288 · **subject*
       `CONTENT/build-your-own-raft/drilling/_index.md` (wt 288) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 97 Gate
+### Phase 101 Gate
 
-- [ ] [AI] `build-your-own-raft/` complete: `_index.md` wt 980, `learning/_index.md` wt 188,
-      `drilling/_index.md` wt 288, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `build-your-own-raft/` complete: `_index.md` wt 1020, `learning/_index.md` wt 192,
+      `drilling/_index.md` wt 292, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 98 — Topic 89 Platform Engineering & Developer Experience (`platform-engineering-and-devex`)
+## Phase 102 — Topic 93 Platform Engineering & Developer Experience (`platform-engineering-and-devex`)
 
-Row: Annotated-concept · ‡ no-code · topic wt 990 · Learn 189 / Drill 289 · **leadership/design artifact (no code)**. Template →
-[`syllabus/89-platform-engineering-and-devex.md`](./syllabus/89-platform-engineering-and-devex.md).
+Row: Annotated-concept · ‡ no-code · topic wt 1030 · Learn 193 / Drill 293 · **leadership/design artifact (no code)**. Template →
+[`syllabus/93-platform-engineering-and-devex.md`](./syllabus/93-platform-engineering-and-devex.md).
 
 - [ ] **[AI] V** — `web-researcher` for `platform-engineering-and-devex`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/89-platform-engineering-and-devex.md`](./syllabus/89-platform-engineering-and-devex.md) and fold dated findings back into that file.
+      [`syllabus/93-platform-engineering-and-devex.md`](./syllabus/93-platform-engineering-and-devex.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/platform-engineering-and-devex/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/89-platform-engineering-and-devex.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/platform-engineering-and-devex/learning/` covering **every** concept `co-01..co-20`
+      in `syllabus/93-platform-engineering-and-devex.md` §Concepts. **Acceptance**: all 20 concepts below are taught.
+  - [ ] co-01 · platform-as-product
+  - [ ] co-02 · internal-customer
+  - [ ] co-03 · team-topologies
+  - [ ] co-04 · interaction-modes
+  - [ ] co-05 · cognitive-load
+  - [ ] co-06 · golden-path
+  - [ ] co-07 · golden-path-escapable
+  - [ ] co-08 · idp
+  - [ ] co-09 · software-catalog
+  - [ ] co-10 · scaffolder-template
+  - [ ] co-11 · self-service
+  - [ ] co-12 · guard-rails
+  - [ ] co-13 · platform-contract
+  - [ ] co-14 · mechanism-vs-policy
+  - [ ] co-15 · dora-metrics
+  - [ ] co-16 · space-framework
+  - [ ] co-17 · leading-vs-lagging
+  - [ ] co-18 · metrics-anti-weaponization
+  - [ ] co-19 · devex
+  - [ ] co-20 · platform-maturity
+- [ ] **[AI] A1-scenarios** — Author `CONTENT/platform-engineering-and-devex/learning/` covering **every** decision scenario
+      `ex-01..ex-26` in `syllabus/93-platform-engineering-and-devex.md` §Worked examples (‡ no-code decision scenarios).
+      **Acceptance**: all 26 scenarios below appear with the right platform-leadership call.
+  - [ ] ex-01 · platform-before-pain — not yet; wait for measurable org-wide friction
+  - [ ] ex-02 · cognitive-load-audit — factor shared work into the platform
+  - [ ] ex-03 · platform-as-product-framing — reframe as a product, teams as customers
+  - [ ] ex-04 · team-topologies-split — apply platform vs stream-aligned split
+  - [ ] ex-05 · interaction-mode-collaboration — collaboration mode temporarily
+  - [ ] ex-06 · interaction-mode-xaas — shift to X-as-a-service
+  - [ ] ex-07 · platform-team-charter — charter as a product team
+  - [ ] ex-08 · platform-vs-ops-silo — keep self-service, not a toll booth
+  - [ ] ex-09 · golden-path-ci-wiring — golden path pre-wires CI/container/deploy
+  - [ ] ex-10 · scaffolder-adoption — offer scaffolder templates
+  - [ ] ex-11 · golden-cage-mandate — refuse the mandate; keep it opt-in
+  - [ ] ex-12 · paved-road-worse-than-diy — must win on merit; fix it
+  - [ ] ex-13 · escape-hatch-design — design an explicit escape hatch
+  - [ ] ex-14 · self-service-db-request — guard-railed ticket-free self-service
+  - [ ] ex-15 · guard-rail-unsafe-request — guard-rails block unsafe request
+  - [ ] ex-16 · platform-contract-define — write the platform contract
+  - [ ] ex-17 · mechanism-not-policy — mechanism, leave policy to teams
+  - [ ] ex-18 · idp-portal-decision — tool-agnostic IDP with catalog + scaffolder
+  - [ ] ex-19 · catalog-ownership — software catalog with ownership
+  - [ ] ex-20 · internal-customer-feedback — gather feedback, iterate the product
+  - [ ] ex-21 · dora-baseline — establish DORA four keys + reliability
+  - [ ] ex-22 · space-beyond-dora — add SPACE dimensions
+  - [ ] ex-23 · leading-signal-choice — add leading signals
+  - [ ] ex-24 · metrics-as-stack-rank — refuse; measure the system
+  - [ ] ex-25 · goodhart-target — restore as a system signal
+  - [ ] ex-26 · devex-friction-survey — DevEx survey + signals
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/platform-engineering-and-devex/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -3038,27 +12821,111 @@ Row: Annotated-concept · ‡ no-code · topic wt 990 · Learn 189 / Drill 289 �
       `CONTENT/platform-engineering-and-devex/drilling/_index.md` (wt 289) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 98 Gate
+### Phase 102 Gate
 
-- [ ] [AI] `platform-engineering-and-devex/` complete: `_index.md` wt 990, `learning/_index.md` wt 189,
-      `drilling/_index.md` wt 289, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `platform-engineering-and-devex/` complete: `_index.md` wt 1030, `learning/_index.md` wt 193,
+      `drilling/_index.md` wt 293, capstone wt 900; all 20 concepts + 26 decision scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 99 — Topic 90 Site Reliability Engineering (`site-reliability-engineering`)
+## Phase 103 — Topic 94 Site Reliability Engineering (`site-reliability-engineering`)
 
-Row: Annotated-concept · Python \* · topic wt 1000 · Learn 190 / Drill 290 · **subject**. Template →
-[`syllabus/90-site-reliability-engineering.md`](./syllabus/90-site-reliability-engineering.md).
+Row: Annotated-concept · Python \* · topic wt 1040 · Learn 194 / Drill 294 · **subject**. Template →
+[`syllabus/94-site-reliability-engineering.md`](./syllabus/94-site-reliability-engineering.md).
 
 - [ ] **[AI] V** — `web-researcher` for `site-reliability-engineering`; resolve every Accuracy-notes "to verify" line in
-      [`syllabus/90-site-reliability-engineering.md`](./syllabus/90-site-reliability-engineering.md) and fold dated findings back into that file.
+      [`syllabus/94-site-reliability-engineering.md`](./syllabus/94-site-reliability-engineering.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1** — Author `CONTENT/site-reliability-engineering/learning/` (+ `code/`, runnable sources, DD-20) covering **every**
-      Item and all three Worked examples in `syllabus/90-site-reliability-engineering.md`, each rendered runnable (DD-20/DD-30).
-      **Acceptance**: every syllabus Item + worked example appears with its expected output.
+- [ ] **[AI] A1-concepts** — Author `CONTENT/site-reliability-engineering/learning/` covering **every** concept `co-01..co-30`
+      in `syllabus/94-site-reliability-engineering.md` §Concepts. **Acceptance**: all 30 concepts below are taught.
+  - [ ] co-01 · reliability-as-feature
+  - [ ] co-02 · sli
+  - [ ] co-03 · slo
+  - [ ] co-04 · sla
+  - [ ] co-05 · error-budget
+  - [ ] co-06 · budget-velocity-tradeoff
+  - [ ] co-07 · nines
+  - [ ] co-08 · golden-signal-latency
+  - [ ] co-09 · golden-signal-traffic
+  - [ ] co-10 · golden-signal-errors
+  - [ ] co-11 · golden-signal-saturation
+  - [ ] co-12 · metrics
+  - [ ] co-13 · logs
+  - [ ] co-14 · traces
+  - [ ] co-15 · observability
+  - [ ] co-16 · instrumentation
+  - [ ] co-17 · opentelemetry
+  - [ ] co-18 · prometheus-scrape
+  - [ ] co-19 · dashboard
+  - [ ] co-20 · symptom-based-alerting
+  - [ ] co-21 · slo-burn-alert
+  - [ ] co-22 · alert-fatigue
+  - [ ] co-23 · on-call
+  - [ ] co-24 · incident-severity
+  - [ ] co-25 · incident-command
+  - [ ] co-26 · blameless-postmortem
+  - [ ] co-27 · action-items
+  - [ ] co-28 · toil
+  - [ ] co-29 · toil-automation
+  - [ ] co-30 · capacity-planning
+- [ ] **[AI] A1-examples** — Author `CONTENT/site-reliability-engineering/learning/code/` (runnable sources, DD-20/DD-30) with
+      **every** worked example `ex-01..ex-52` in `syllabus/94-site-reliability-engineering.md` §Worked examples, each with its expected output.
+      **Acceptance**: all 52 examples below appear runnable with the stated observable.
+  - [ ] ex-01 · instrument-latency — verify a latency metric recorded
+  - [ ] ex-02 · instrument-traffic — verify a traffic counter increments
+  - [ ] ex-03 · instrument-errors — verify error metric rises on 5xx
+  - [ ] ex-04 · instrument-saturation — verify saturation gauge reflects load
+  - [ ] ex-05 · metrics-endpoint — verify it serves the metrics
+  - [ ] ex-06 · prometheus-scrape — verify metrics ingest
+  - [ ] ex-07 · counter-metric — verify it only increases
+  - [ ] ex-08 · gauge-metric — verify it rises and falls
+  - [ ] ex-09 · histogram-latency — verify buckets + p99 derivable
+  - [ ] ex-10 · structured-log — verify the fields parse
+  - [ ] ex-11 · log-correlation-id — verify logs correlate by id
+  - [ ] ex-12 · trace-span — verify start/end + duration
+  - [ ] ex-13 · trace-propagation — verify one trace spans both services
+  - [ ] ex-14 · otel-sdk-setup — verify it emits telemetry
+  - [ ] ex-15 · otel-collector — verify collector receives it
+  - [ ] ex-16 · three-pillars — verify all three link up
+  - [ ] ex-17 · nines-table — verify 43.8 min vs 4.38 min per month
+  - [ ] ex-18 · availability-calc — verify the ratio
+  - [ ] ex-19 · define-sli — verify the computed ratio
+  - [ ] ex-20 · sli-availability — verify it drops when errors rise
+  - [ ] ex-21 · sli-latency — verify it reflects slow requests
+  - [ ] ex-22 · define-slo — verify target encoded
+  - [ ] ex-23 · error-budget-calc — verify 99.9% SLO → 0.1% budget
+  - [ ] ex-24 · budget-consumed — verify it decrements with errors
+  - [ ] ex-25 · budget-velocity — verify the freeze gate trips
+  - [ ] ex-26 · sla-vs-slo — verify the distinction documented
+  - [ ] ex-27 · burn-rate — verify a spike raises it
+  - [ ] ex-28 · multiwindow-burn-alert — verify fast burn pages, slow burn tickets
+  - [ ] ex-29 · symptom-alert-rule — verify fires on symptom
+  - [ ] ex-30 · cause-alert-antipattern — verify why it is noise
+  - [ ] ex-31 · page-vs-ticket — verify the routing
+  - [ ] ex-32 · alert-fatigue-prune — verify page volume drops
+  - [ ] ex-33 · slo-based-page — verify it pages
+  - [ ] ex-34 · quiet-under-normal — verify no alert fires
+  - [ ] ex-35 · alert-runbook-link — verify link resolves to steps
+  - [ ] ex-36 · budget-policy — verify it states the freeze rule
+  - [ ] ex-37 · golden-signals-dashboard — verify each panel renders live data
+  - [ ] ex-38 · dashboard-slo-panel — verify it shows remaining budget
+  - [ ] ex-39 · seeded-incident — verify the signals move
+  - [ ] ex-40 · incident-detection — verify it fires promptly
+  - [ ] ex-41 · incident-severity-classify — verify the classification rubric
+  - [ ] ex-42 · incident-command-roles — verify roles assigned
+  - [ ] ex-43 · incident-timeline — verify events ordered with timestamps
+  - [ ] ex-44 · blameless-postmortem — verify it explains the system, not a person
+  - [ ] ex-45 · postmortem-action-items — verify each has an owner
+  - [ ] ex-46 · postmortem-no-blame — verify no individual blamed
+  - [ ] ex-47 · identify-toil — verify it meets the toil criteria
+  - [ ] ex-48 · toil-budget — verify the cap is tracked
+  - [ ] ex-49 · automate-toil — verify manual step eliminated
+  - [ ] ex-50 · automation-failure-mode — verify a guard/rollback exists
+  - [ ] ex-51 · capacity-load-test — verify saturation observed at the ceiling
+  - [ ] ex-52 · capstone-sre-loop — verify the full loop runs end-to-end
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/site-reliability-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -3067,34 +12934,34 @@ Row: Annotated-concept · Python \* · topic wt 1000 · Learn 190 / Drill 290 ·
       `CONTENT/site-reliability-engineering/drilling/_index.md` (wt 290) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
-### Phase 99 Gate
+### Phase 103 Gate
 
-- [ ] [AI] `site-reliability-engineering/` complete: `_index.md` wt 1000, `learning/_index.md` wt 190,
-      `drilling/_index.md` wt 290, capstone wt 900; every Item + 3 worked examples + capstone present;
+- [ ] [AI] `site-reliability-engineering/` complete: `_index.md` wt 1040, `learning/_index.md` wt 194,
+      `drilling/_index.md` wt 294, capstone wt 900; all 30 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 100 — Inter-topic: Pass-5 Capstone (`capstone-lead-at-altitude`)
+## Phase 104 — Inter-topic: Pass-5 Capstone (`capstone-lead-at-altitude`)
 
-Junction: whole journey — Topics 86–90 (internals build-your-own + platform + SRE) synthesized against every prior pass. Inter-Topic Capstone Phase Template; spec in
-`syllabus/90-site-reliability-engineering.md` (whole-journey capstone section).
+Junction: whole journey — Topics 87–90 (internals build-your-own + platform + SRE) synthesized against every prior pass. Inter-Topic Capstone Phase Template; spec in
+`syllabus/94-site-reliability-engineering.md` (whole-journey capstone section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
 - [ ] **[AI] A** — Author `CONTENT/capstone-lead-at-altitude/` (`_index.md` `weight: 1005`, artifacts only (no `code/`,
       leadership `‡`)) per this phase's cited capstone spec's ordered steps (detail source:
-      [`syllabus/90-site-reliability-engineering.md`](./syllabus/90-site-reliability-engineering.md)). **Acceptance**: the spec's done bar is met — a clean-machine
+      [`syllabus/94-site-reliability-engineering.md`](./syllabus/94-site-reliability-engineering.md)). **Acceptance**: the spec's done bar is met — a clean-machine
       reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
-### Phase 100 Gate
+### Phase 104 Gate
 
 - [ ] [AI] `capstone-lead-at-altitude/` complete (wt 1005, produces the stated artifact + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
@@ -3107,7 +12974,7 @@ Junction: whole journey — Topics 86–90 (internals build-your-own + platform 
 
 ---
 
-## Phase 101 — Nav wiring, parity, and full quality gate
+## Phase 105 — Nav wiring, parity, and full quality gate
 
 - [ ] **[AI]** Wire the section into the SE nav: edit
       `apps/ayokoding-www/content/en/learn/software-engineering/_index.md`, adding a
@@ -3134,9 +13001,9 @@ Junction: whole journey — Topics 86–90 (internals build-your-own + platform 
       failures (Root Cause Orientation: proactively fix preexisting errors; do not defer or
       mention-and-skip). **Acceptance**: a re-run of every gate above exits 0 with zero remaining failures.
 
-### Phase 101 Gate
+### Phase 105 Gate
 
-> All checks below must pass before starting Phase 102.
+> All checks below must pass before starting Phase 103.
 
 - [ ] [AI] Section is nav-reachable in ≤2 clicks from `learn/software-engineering/`.
 - [ ] [AI] Topic-first parity 90/90 (each topic has `learning/`, `learning/capstone/`, `drilling/`;
@@ -3150,7 +13017,7 @@ Junction: whole journey — Topics 86–90 (internals build-your-own + platform 
 
 ---
 
-## Phase 102 — Manual verification: Playwright smoke + Rule-15 three-tester retest
+## Phase 106 — Manual verification: Playwright smoke + Rule-15 three-tester retest
 
 - [ ] **[AI]** Playwright smoke (per repo manual-behavioral-verification): start `npx nx dev ayokoding-www`,
       then use `browser_navigate` to open the section landing + one learning page + one intra-topic capstone + one drilling page, `browser_snapshot` to inspect each page's DOM, `browser_click` to expand a
@@ -3173,13 +13040,13 @@ Junction: whole journey — Topics 86–90 (internals build-your-own + platform 
 
 ### Rule-15 three-tester retest follow-ups
 
-_(populated by `web-exploratory-tester` / `web-usability-tester` / `web-design-tester` when the Phase 102
+_(populated by `web-exploratory-tester` / `web-usability-tester` / `web-design-tester` when the Phase 103
 retest step above runs; every `EWT-###`/`UWT-###`/`DWT-###` defect must be fixed and ticked before Plan
 Archival)_
 
-### Phase 102 Gate
+### Phase 106 Gate
 
-> All checks below must pass before starting Phase 103.
+> All checks below must pass before starting Phase 104.
 
 - [ ] [AI] Playwright smoke passes with zero console errors; screenshots committed under `evidence/`.
 - [ ] [AI] Rule-15 three-tester retest follow-ups: every `EWT-###`/`UWT-###`/`DWT-###` defect finding is
@@ -3189,7 +13056,7 @@ Archival)_
 
 ---
 
-## Phase 103 — Final catch-up push to origin main + CI post-push verification (main-to-origin-main)
+## Phase 107 — Final catch-up push to origin main + CI post-push verification (main-to-origin-main)
 
 > Each topic/capstone phase already committed + pushed its own deliverable to `origin main` as it
 > completed (per the per-topic push HARD RULE in the Delivery Mode section). This phase is the **final
@@ -3209,9 +13076,9 @@ Archival)_
       run, then `gh run view <run-id> --json status,conclusion`; never `gh run watch`; on HTTP 403 wait
       ~35 min. **Acceptance**: the latest `main-ci` run on the pushed commit has `conclusion = success`.
 
-### Phase 103 Gate
+### Phase 107 Gate
 
-> All checks below must pass before starting Phase 104.
+> All checks below must pass before starting Phase 105.
 
 - [ ] [AI] Content is on `origin main` (local `main` and `origin/main` at the same commit).
 - [ ] [AI] The `main-ci` workflow run on the pushed commit is green (`conclusion = success`).
@@ -3221,11 +13088,11 @@ Archival)_
 
 ---
 
-## Phase 104 — Deploy ayokoding-www to production
+## Phase 108 — Deploy ayokoding-www to production
 
 The section content lives in `apps/ayokoding-www`; deployment ships it to the live site
 ([ayokoding.com](https://ayokoding.com)) by force-pushing `main` → the `prod-ayokoding-www` environment
-branch, which Vercel watches for automatic production builds. Runs only after Phase 103 (content on
+branch, which Vercel watches for automatic production builds. Runs only after Phase 104 (content on
 `origin main`, `main-ci` green).
 
 - [ ] **[AI]** Invoke the `apps-ayokoding-www-deployer` agent to deploy `apps/ayokoding-www` to
@@ -3239,9 +13106,9 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
       the section title renders. **Acceptance**: both URLs return 200 and show the newly published
       content (not a 404 or a stale page).
 
-### Phase 104 Gate
+### Phase 108 Gate
 
-> All checks below must pass before starting Phase 105.
+> All checks below must pass before starting Phase 106.
 
 - [ ] [AI] `origin/main` has been force-pushed to `prod-ayokoding-www` by the deployer.
 - [ ] [AI] The Vercel production build succeeded and the live section root + one topic page return 200
@@ -3253,7 +13120,7 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
 
 ---
 
-## Phase 105 — Knowledge Capture
+## Phase 109 — Knowledge Capture
 
 - [ ] **[AI]** Triage [learnings.md](./learnings.md) per the
       [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md):
@@ -3268,7 +13135,7 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
       routed-inline (non-code only), filed as a backlog plan (mandatory for code), or discarded with a
       reason — or the explicit "none" escape is recorded; no code-homed learning landed inline.
 
-### Phase 105 Gate
+### Phase 109 Gate
 
 > All checks below must pass before Plan Archival.
 

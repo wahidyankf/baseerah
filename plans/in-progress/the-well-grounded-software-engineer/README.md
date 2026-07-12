@@ -36,14 +36,14 @@ learning track and a drilling track covering the same topics in the same order.
   [prd.md](./prd.md) for the per-topic format assignment and volume targets.
 - A **drilling** track: one active-recall page per topic (same topics, same order) with four drill
   forms (recall Q&A, applied scenarios, code katas, self-check checklist).
-- **90 topics** (topic set is **frozen** — see [prd.md](./prd.md) for the canonical, locked table),
+- **94 topics** (topic set is **frozen** — see [prd.md](./prd.md) for the canonical, locked table),
   identical ordering across both tracks, sequenced as a **Pass 0 setup prologue followed by a
   five-pass spiral** under an **immediately-effective** principle: after the reader sets up their
   editor (Pass 0), the earliest learning topics get them building, storing, testing, and securing a
   small end-to-end system fast, then each later pass revisits the same concern areas at greater depth
   and breadth. The passes are **descriptive arcs, not gates**; big subjects are split into an
   Essentials topic early and an Advanced topic later, interleaved across passes (DD-11). See
-  [prd.md](./prd.md) for the canonical 90-topic table (per-topic pass, slug, format, primary language,
+  [prd.md](./prd.md) for the canonical 94-topic table (per-topic pass, slug, format, primary language,
   weights, editor-readiness) and the [syllabus/ folder](./syllabus/README.md) for every item and
   worked example inside each topic. The prologue and five passes:
   1. **Pass 0 · Editor Foundations** (topics 1–3) — Just Enough Nvim, Just Enough Lua, Extending
@@ -57,17 +57,19 @@ learning track and a drilling track covering the same topics in the same order.
      algorithms/SQL, data access (ORMs + build-your-own), advanced networking, engineering practices,
      agentic coding, and the start-early Product & Delivery track (▲: Software Product Engineering,
      Engineering Management).
-  4. **Pass 3 · Build for the Real World** (topics 34–59) — NoSQL, graph databases, DB internals, data
+  4. **Pass 3 · Build for the Real World** (topics 34–63) — NoSQL, graph databases, DB internals, data
      engineering, search & IR, backend at scale, build-your-own web framework, API design,
      architecture, DDD, system design, event-driven architecture, distributed systems, advanced
-     frontend, build-your-own reactive UI, information architecture & SEO, containers, cloud/IaC, CI/CD
-     & release engineering, AI-powered apps, agentic AI, the IT-security + red/blue-team split, IT
-     governance & GRC, and analytics & experimentation.
-  5. **Pass 4 · Concurrency & Systems** (topics 60–85) — CSP (Go) and actor (Elixir) concurrency, the
+     frontend, build-your-own reactive UI, information architecture & SEO, containers, cloud/IaC,
+     bare-metal virtualization, self-managed Kubernetes & on-prem GitOps, build automation & task
+     runners, CI/CD & release engineering, AI-powered apps, agentic AI, the IT-security +
+     red/blue-team split, vulnerability management & assessment, IT governance & GRC, and analytics &
+     experimentation.
+  5. **Pass 4 · Concurrency & Systems** (topics 64–89) — CSP (Go) and actor (Elixir) concurrency, the
      ◆ app domains (Android/iOS/Hybrid/Windows/Linux) with their language primers, building production
      CLI tools, C + OS internals (Linux/Windows), systems programming, Rust + modern systems
      programming, Java + the enterprise JVM, Lisp, F#, type systems, and compilers/transpilers.
-  6. **Pass 5 · Internals & Lead at Altitude** (topics 86–90) — Build Your Own Git, Build Your Own
+  6. **Pass 5 · Internals & Lead at Altitude** (topics 90–94) — Build Your Own Git, Build Your Own
      Database, Build Your Own Raft, Platform Engineering & Developer Experience, and Site Reliability
      Engineering (‡ senior leadership depth woven through the platform/SRE finale).
      Two **parallel tracks** run alongside the spiral as a reading-path affordance: the ◆ app-domain
@@ -127,7 +129,7 @@ checker plus `apps-ayokoding-www-facts-checker` + `apps-ayokoding-www-link-check
 - [Business Requirements (brd.md)](./brd.md) — WHY this section exists, who it serves, success signals.
 - [Product Requirements (prd.md)](./prd.md) — WHAT the pages contain, personas, user stories, Gherkin
   acceptance criteria, page anatomies.
-- [Syllabus (syllabus/)](./syllabus/README.md) — every item and worked example inside each of the 90 topics.
+- [Syllabus (syllabus/)](./syllabus/README.md) — every item and worked example inside each of the 94 topics.
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — HOW: content-tree layout, weights, frontmatter,
   drilling markup, file-impact, diagrams.
 - [Delivery Checklist (delivery.md)](./delivery.md) — DO: phased, executable checklist.

@@ -9,12 +9,12 @@ inter-topic capstone anchored at that topic), and the dated **Accuracy notes** f
 `web-researcher` sweep.
 
 Per the [Syllabus as a Folder decision (DD-29)](../prd.md#syllabus-as-a-folder-dd-29), the detail is
-split one file per topic — `NN-<slug>.md`, where `NN` = **order of appearance** (`01`, `02`, … `61`)
-matching the prd journey index. The [README](./README.md) indexes all 61 files.
+split one file per topic — `NN-<slug>.md`, where `NN` = **order of appearance** (`01`, `02`, … `91`)
+matching the prd journey index. The [README](./README.md) indexes all 94 files.
 
 ## How to read a topic file
 
-Topic order, slugs, format, and primary language come from the [prd table](../prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks).
+Topic order, slugs, format, and primary language come from the [prd table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks).
 Each `NN-<slug>.md` file carries these sections in order:
 
 1. **Header** — title, prd row echo (pass, format, primary language), scope note.
@@ -26,16 +26,26 @@ Each `NN-<slug>.md` file carries these sections in order:
    [Prerequisites Clarity Rule](#prerequisites-clarity-rule-hard-rule-dd-31) below).
 4. **Accuracy notes (web-verified)** — dated `web-researcher` findings folded in **before** authoring
    (DD-28): current versions, current API/CLI syntax, license status, CVE status, best-practice deltas.
-5. **Items** — the concrete subtopics the learning subtree and drilling page must cover (a **floor**,
-   not a cap — DD-8).
+5. **Concepts** — the **exhaustive, numbered enumeration** of every concept the topic teaches, per the
+   [Concept Enumeration rule (DD-34)](../prd.md#worked-example--concept-enumeration--exhaustive-per-topic-hard-rule-dd-34).
+   Each entry is `co-NN · <slug> — one-line claim`, numbered contiguously, and maps 1:1 to one
+   delivery.md checkbox. Count is proportionate to the topic's genuine idea inventory — a **floor**,
+   not a cap (DD-8): subject/Annotated-concept topics ≥ 10, Primers and leadership `‡` topics ≥ 8.
+   (Formalizes the old prose `## Items` list; an example typically cites the `co-NN` it exercises.)
 6. **Tensions & trade-offs + Lineage** (**judgment topics only** — see
    [Scaled Intellectual Depth](#scaled-intellectual-depth-dd-33)) — when NOT to reach for the topic's
    tools, and why the approach beat its historical alternative. Omitted for primers, Essentials, and
    pure how-to tool topics, where it would be padding.
-7. **Worked examples** — the named examples the topic authors. For **By Example**/**Primer** topics they
-   map to the `by-example/{beginner,intermediate,advanced}` progression; for **Annotated-concept** topics
-   they map to per-theme worked-example pages (with WCAG-accessible Mermaid diagrams where code does not
-   fit).
+7. **Worked examples** — the **exhaustive, numbered enumeration** of every example the topic authors
+   (**not** a 3-example sample), per the [Worked-Example & Concept Enumeration rule (DD-34)](../prd.md#worked-example--concept-enumeration--exhaustive-per-topic-hard-rule-dd-34).
+   For **By Example**/**Primer** topics the list is grouped `Beginner / Intermediate / Advanced`
+   (75–85 examples); for **Annotated-concept** topics it is grouped into per-theme clusters (45–60
+   worked examples, WCAG-accessible Mermaid diagrams where code does not fit); for leadership `‡`
+   no-code topics it is per-theme worked **scenarios/artifacts** (20–30, no code). Each entry is
+   `ex-NN · <slug> — one-line spec — verify <observable>`, numbered contiguously, and maps 1:1 to a
+   colocated `code/` (or `artifacts/`) file and one delivery.md checkbox. Each example typically cites
+   the `co-NN` concept (item 5) it demonstrates — concepts are the ideas, examples are the code that
+   proves them.
 8. **Capstone spec** — the full spec (see [Capstone Policy](#capstone-policy-dd-27) below) for this
    topic's intra-topic capstone, and — where this topic is the anchor of a pass boundary or a
    cross-cutting junction — the inter-topic capstone spec too.
@@ -101,7 +111,7 @@ page attention is zero-sum and padding a primer with "trade-offs of Just Enough 
 feel _less_ intellectual while taxing the working engineer re-grounding fast (the primary reader). The
 four layers and where each applies:
 
-- **Why-opener + big-idea tags (universal, all 90 topics)** — the `Why this exists · the big idea`
+- **Why-opener + big-idea tags (universal, all 94 topics)** — the `Why this exists · the big idea`
   section. Cheap, high-leverage, and it reframes every topic from _what_ to _why_. On primers/Essentials
   it is 2–3 tight lines; it never becomes padding because it is the reader's first orientation.
 - **The idea spine (universal, horizontal)** — every topic tags the **Cross-Cutting Big Ideas** it
@@ -121,7 +131,7 @@ four layers and where each applies:
   alongside the four existing forms. It lives in the opt-in drilling track, so it deepens without taxing
   the learning-track reader. See [prd Drilling-track anatomy](../prd.md#drilling-track-anatomy).
 
-**Concentrate at altitude.** Pass 5 (60–61) and the `▲` Product & Delivery topics (24, 25) carry the
+**Concentrate at altitude.** Pass 5 (90–94) and the `▲` Product & Delivery topics (9, 32) carry the
 fullest Tensions/Lineage treatment and the section's only synthesis/retrospective prompts (folded into the
 6 pass-boundary inter-topic capstones, not repeated per topic) — this is where the IC→CTO promise is
 actually paid, and it is currently the thinnest part of the arc.
@@ -214,7 +224,14 @@ footer. A prev/next link that 404s or points out of order is a defect, not a nic
 Every worked example and every capstone is **followable step-by-step, code-by-code, line-by-line, with
 no hidden assumptions**: prerequisites + exact pinned versions + install/run commands stated up front;
 no elided `...`-only listings presented as runnable (fragments are assembled into a complete listing on
-the same page); every command shown verbatim with its observable expected result. See
+the same page); every command shown verbatim with its observable expected result. Two sharpening
+contracts on the runnable code itself (DD-20, per user): **no implicit dependencies** — every
+identifier a snippet uses is defined or imported within that same snippet (or its fragment chain), never
+relying on unshown state / auto-imports / ambient globals ("as complete as possible" is the bar); and
+**expected output shown inline as a comment** — each block annotates its result inside the code in the
+language's idiomatic comment syntax (`# => …`, `// prints: …`, `-- …`), on top of the DD-8 annotation
+density (1.0–2.25 comments/line). See
+[prd.md §Runnable-Example Rule](../prd.md#runnable-example-rule-hard-rule-dd-20) and
 [prd.md §Follow-Along Completeness Rule](../prd.md#follow-along-completeness-rule-hard-rule-dd-30).
 
 ## Capstone Policy (DD-27)
@@ -234,18 +251,18 @@ web-verified (DD-28). Size is uncapped; correctness, accuracy, detail, and clari
 
 **Inter-topic capstones — inline milestone bundles at the section root:**
 
-| Capstone slug                      | Kind          | Junction (topics integrated)                               | Anchored in file                     |
-| ---------------------------------- | ------------- | ---------------------------------------------------------- | ------------------------------------ |
-| `capstone-forge-ready`             | pass-boundary | Pass 0 (01–03: nvim + lua + extending)                     | `03-extending-neovim.md`             |
-| `capstone-first-working-software`  | pass-boundary | Pass 1 (04–14: build → store → test → secure)              | `14-security-essentials.md`          |
-| `capstone-full-stack-app`          | cross-cutting | Frontend (12) + Backend (09) + SQL (08)                    | `14-security-essentials.md`          |
-| `capstone-solid-core`              | pass-boundary | Pass 2 (15–25)                                             | `25-project-management.md`           |
-| `capstone-real-world-delivery`     | pass-boundary | Pass 3 (26–40)                                             | `40-defensive-security.md`           |
-| `capstone-secure-service`          | cross-cutting | Backend (09) + Security Essentials (14) + IT Security (38) | `40-defensive-security.md`           |
-| `capstone-data-pipeline`           | cross-cutting | Data Engineering (36) + SQL/NoSQL (08/26) + a queue        | `40-defensive-security.md`           |
-| `capstone-concurrency-and-systems` | pass-boundary | Pass 4 (41–59)                                             | `59-site-reliability-engineering.md` |
-| `capstone-concurrency-showdown`    | cross-cutting | Concurrency Core (19) + CSP/Go (42) + Actor/Elixir (44)    | `59-site-reliability-engineering.md` |
-| `capstone-lead-at-altitude`        | pass-boundary | Pass 5 (60–61)                                             | `61-engineering-management.md`       |
+| Capstone slug                      | Kind          | Junction (topics integrated)                               | Anchored in file                          |
+| ---------------------------------- | ------------- | ---------------------------------------------------------- | ----------------------------------------- |
+| `capstone-forge-ready`             | pass-boundary | Pass 0 (01–03: nvim + lua + extending)                     | `03-extending-neovim.md`                  |
+| `capstone-first-working-software`  | pass-boundary | Pass 1 (04–18: build → store → test → secure)              | `17-security-essentials.md`               |
+| `capstone-full-stack-app`          | cross-cutting | Frontend (14) + Backend (11) + SQL (10)                    | `17-security-essentials.md`               |
+| `capstone-solid-core`              | pass-boundary | Pass 2 (19–33)                                             | `33-engineering-management.md`            |
+| `capstone-real-world-delivery`     | pass-boundary | Pass 3 (34–63)                                             | `60-defensive-security.md`                |
+| `capstone-secure-service`          | cross-cutting | Backend (11) + Security Essentials (17) + IT Security (56) | `60-defensive-security.md`                |
+| `capstone-data-pipeline`           | cross-cutting | Data Engineering (37) + SQL/NoSQL (10/34) + a queue        | `60-defensive-security.md`                |
+| `capstone-concurrency-and-systems` | pass-boundary | Pass 4 (64–89)                                             | `89-compilers-parsers-and-transpilers.md` |
+| `capstone-concurrency-showdown`    | cross-cutting | Concurrency Core (24) + CSP/Go (62) + Actor/Elixir (64)    | `89-compilers-parsers-and-transpilers.md` |
+| `capstone-lead-at-altitude`        | whole-journey | Pass 5 (90–94)                                             | `94-site-reliability-engineering.md`      |
 
 **Every capstone spec states**: (a) goal/outcome, (b) a concepts-exercised checklist, (c) an ordered
 step outline (each step naming a file + the code + the verify command), (d) testable acceptance
@@ -284,9 +301,15 @@ Each `NN-<slug>.md` is authored to this skeleton:
 
 - <YYYY-MM-DD> — <web-researcher finding: current version / API / license / CVE / best practice>.
 
-## Items
+## Concepts
 
-- <concrete subtopic> …
+<!-- EXHAUSTIVE enumeration (DD-34): every concept the topic teaches, numbered contiguously. Floor,
+     not a cap — subject/Annotated-concept ≥ 10; Primers and leadership ‡ ≥ 8. Each co-NN → one
+     delivery.md checkbox. An example (below) typically cites the co-NN it demonstrates. -->
+
+1. **co-01 · <slug>** — <one-line claim of what the concept asserts>.
+2. **co-02 · <slug>** — <one-line claim>.
+   … (continue contiguously)
 
 <!-- JUDGMENT TOPICS ONLY (see Scaled Intellectual Depth, DD-33): the two blocks below are REQUIRED for the
      ~20 judgment/altitude topics and OMITTED for primers, Essentials, and pure how-to tool topics, where they
@@ -304,7 +327,22 @@ Each `NN-<slug>.md` is authored to this skeleton:
 
 ## Worked examples
 
-- **<name>** (<beginner|intermediate|advanced or theme>) — <one-line spec>.
+<!-- EXHAUSTIVE enumeration (DD-34): the FULL example set, not a sample. Count band by shape —
+     By Example/Primer 75–85; Annotated-concept 45–60; leadership ‡ no-code 20–30. Floor, not a cap. -->
+
+### Beginner (ex 01–NN) <!-- or a per-theme cluster heading for Annotated-concept / ‡ topics -->
+
+1. **ex-01 · <slug>** — <one-line spec> — verify <observable result / command>.
+2. **ex-02 · <slug>** — <one-line spec> — verify <observable>.
+   … (continue contiguously)
+
+### Intermediate (ex NN–MM)
+
+…
+
+### Advanced (ex MM–PP)
+
+…
 
 ## Capstone spec — intra-topic (<kind>)
 
