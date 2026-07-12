@@ -1,7 +1,7 @@
 # Delivery Checklist — The Well-Grounded Software Engineer
 
 This checklist is **table-referential**: the canonical topic set, per-topic pass, slug, learning
-format, primary language, and weights live in the [prd.md 90-topic table](./prd.md#the-90-topics--canonical-table-spiral-order-identical-in-both-tracks) —
+format, primary language, and weights live in the [prd.md 94-topic table](./prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks) —
 the single source of truth. Each per-topic phase below reads its row from that table and its concrete
 items + worked examples + capstone spec from that topic's [syllabus/ file](./syllabus/). When a topic
 is added/removed, edit the prd table + its syllabus file, then add or drop the matching phase here.
