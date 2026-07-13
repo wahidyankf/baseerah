@@ -4,8 +4,9 @@
 //!
 //! Enforces the lowercase-kebab-case filename rule (`^[a-z0-9-]+\.md$`) for
 //! every `.md` file found under the supplied root paths.  `README.md`,
-//! `SKILL.md`, `AGENTS.md`, and `CLAUDE.md` are always exempt, and callers
-//! may supply additional glob patterns to exclude further filenames.
+//! `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, and `_index.md` are always exempt,
+//! and callers may supply additional glob patterns to exclude further
+//! filenames.
 
 use std::path::Path;
 use std::sync::OnceLock;
@@ -117,11 +118,17 @@ fn walk_naming_path(root: &str, exempt_globs: &[String]) -> Vec<DocsNamingFindin
 /// Code Agent Skills spec, the agents.md standard, and the Claude Code root-instruction shim,
 /// respectively — not a naming choice this repo's kebab-case rule governs; the rule's own stated
 /// scope is "files in `docs/`, `repo-governance/`, and similar repository locations", not
-/// ecosystem-standard root files). Additional exemptions are matched via `exempt_globs`.
+/// ecosystem-standard root files). `_index.md` is likewise always exempt: Hugo (used by every
+/// `apps/*-www` app in this repo) reserves `_index.md` as the structurally-required filename for
+/// a content section's list/branch page, not a naming choice either. This repo's Hugo content
+/// trees localize by directory (`content/en/`, `content/id/`), each still using the plain
+/// `_index.md` basename, so the filename-suffix variant (`_index.<lang>.md`) does not appear
+/// anywhere in this repo and is intentionally left unexempted. Additional exemptions are matched
+/// via `exempt_globs`.
 fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
     if matches!(
         basename,
-        "README.md" | "SKILL.md" | "AGENTS.md" | "CLAUDE.md"
+        "README.md" | "SKILL.md" | "AGENTS.md" | "CLAUDE.md" | "_index.md"
     ) {
         return true;
     }
@@ -201,6 +208,24 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         fs::write(tmp.path().join("AGENTS.md"), "x").unwrap();
         fs::write(tmp.path().join("CLAUDE.md"), "x").unwrap();
+        let findings =
+            validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    /// Regression: `_index.md` must be exempt, matching `README.md`/`SKILL.md`/`AGENTS.md`/
+    /// `CLAUDE.md` — Hugo (used by every `apps/*-www` app in this repo) reserves `_index.md` as
+    /// the structurally-required filename for a content section's list/branch page, exactly like
+    /// `README.md` isn't a naming choice for GitHub. 268 pre-existing `_index.md` files already
+    /// violated the unfixed rule without ever being caught, because `md naming validate` in
+    /// lint-staged only runs on newly-staged/changed files; the first newly-staged `_index.md`
+    /// (scaffolded by `apps-ayokoding-www-general-maker`) tripped the pre-commit hook.
+    #[test]
+    fn index_md_always_exempt() {
+        let tmp = TempDir::new().unwrap();
+        let section_dir = tmp.path().join("some-section");
+        fs::create_dir_all(&section_dir).unwrap();
+        fs::write(section_dir.join("_index.md"), "x").unwrap();
         let findings =
             validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.is_empty());
