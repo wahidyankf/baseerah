@@ -519,7 +519,7 @@ resolved_tree:
         let findings = check_instruction_sizes(&RealFs, tmp.path(), &config);
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].severity, Severity::Fail);
-        assert!(findings[0].path == "AGENTS.md");
+        assert_eq!(findings[0].path, "AGENTS.md");
     }
 
     #[test]
