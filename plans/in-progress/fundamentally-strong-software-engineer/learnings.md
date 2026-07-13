@@ -86,3 +86,39 @@ agent / skill / docs) or explicitly discards it with a reason. No entry leaves t
   the ``[`NN-slug`]`` display token, and inter-topic capstone `(NN)` inline refs decoded by meaning.
 - **Surfaced during**: Inter-topic capstone renumber (#122) + repo-wide slug sweep.
 - **Triage**: → pending (candidate home: a note in whatever renumber convention/tool this plan spawns).
+
+### npm `clang-format` has no native Apple Silicon macOS binary
+
+- **What**: The `clang-format` npm wrapper (angular/clang-format) only bundles `darwin_x64`; on
+  arm64 macOS its own `getNativeBinary()` silently falls back to the x64 binary via Rosetta, which
+  then throws `assertion failed [header->version <= kProjectSourceVersion]: runtime library is
+newer than runtime` — a confirmed, upstream-acknowledged gap (the package's own error message
+  says "Consider installing it with your native package manager instead"), not a local
+  misconfiguration. DD-36 originally classified it Tier-1 (npm-direct); reclassified to Tier-2
+  (Homebrew/apt via `npm run doctor -- --fix`) instead.
+- **Why it matters**: Any future DD-36-style "Tier-1 npm-installable" formatter decision for a repo
+  with Apple Silicon contributors should verify the npm package ships (or builds) a native
+  `darwin-arm64` binary before assuming npm-direct wiring is viable — `npm view <pkg>` alone won't
+  surface this; the platform-fallback logic has to be read.
+- **Surfaced during**: Phase 0, lint-staged formatter coverage item.
+- **Triage**: → pending (candidate home: a note in the dependency-bump / tooling-selection
+  convention about verifying native-arch binary coverage before choosing an npm-wrapper formatter).
+
+### `_index.md` naming-validator gap was a live landmine, not a hypothetical
+
+- **What**: rhino-cli's `md naming validate` always-exempted `README.md`/`SKILL.md`/`AGENTS.md`/
+  `CLAUDE.md` but not Hugo's reserved `_index.md`. 268 pre-existing `_index.md` files across
+  `ayokoding-www/content` alone already "violated" the rule undetected, because the lint-staged
+  invocation only checks newly-staged files — the first time in this repo's history a _new_
+  `_index.md` was staged, pre-commit blocked it. Fixed by adding `_index.md` to the same
+  always-exempt list (same shape as the pre-existing `AGENTS.md`/`CLAUDE.md` regression fix its own
+  test file documents).
+- **Why it matters**: A validator with an incomplete allow-list can sit dormant for a long time —
+  268 files' worth — until the exact right new file trips it. Any content-scaffold step in a plan
+  should expect to be the one that finally exercises an untested code path in a shared repo-wide
+  gate, and should treat that as a preexisting bug to root-cause-fix (Iron Rule 3), not a "just
+  rename the file" workaround (impossible here — `_index.md` is Hugo-structural).
+- **Surfaced during**: Phase 0, section-root scaffold commit (pre-commit hook failure).
+- **Triage**: → pending (candidate home: none needed beyond the code fix itself — already landed;
+  consider whether other ecosystem-reserved filenames, e.g. future non-Hugo apps, need a similar
+  proactive audit rather than reactive discovery).

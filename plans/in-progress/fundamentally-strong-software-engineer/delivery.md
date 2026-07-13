@@ -226,21 +226,31 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
 
 ## Phase 0 — Environment Setup, Baseline, and Section Scaffold
 
-- [ ] **[AI]** Confirm the primary checkout is on `main` and synced: run `git checkout main` then
+- [x] **[AI]** Confirm the primary checkout is on `main` and synced: run `git checkout main` then
       `git pull origin main`. **Acceptance**: on branch `main`, up to date with `origin/main`, working
-      tree clean.
-- [ ] **[AI]** Initialize toolchain: run `npm install` then `npm run doctor -- --fix` in the primary
-      checkout. **Acceptance**: both exit 0; no missing-tool warnings.
-- [ ] **[AI]** Baseline the target project: run `npx nx run ayokoding-www:build`. **Acceptance**: exits 0
-      (clean baseline before any new content).
-- [ ] **[AI]** Baseline markdown lint: run `npm run lint:md` (or `npm run lint:md:fix`). **Acceptance**:
-      exits 0 on the existing tree, or only auto-fixable issues that fix cleanly.
-- [ ] **[AI]** Scaffold the section root: create `CONTENT/_index.md` (frontmatter `weight: 1750`, title
+      tree clean. - _Date: 2026-07-13. Status: done. Files changed: none. Notes: `git checkout main` → already on
+      main; `git pull origin main` → already up to date; `git status --porcelain` → empty._
+- [x] **[AI]** Initialize toolchain: run `npm install` then `npm run doctor -- --fix` in the primary
+      checkout. **Acceptance**: both exit 0; no missing-tool warnings. - _Date: 2026-07-13. Status: done. Files changed: none. Notes: `npm install` exit 0 (1580
+      packages, husky prepare ran); `npm run doctor -- --fix` exit 0, 13/13 tools OK, 0 missing._
+- [x] **[AI]** Baseline the target project: run `npx nx run ayokoding-www:build`. **Acceptance**: exits 0
+      (clean baseline before any new content). - _Date: 2026-07-13. Status: done. Files changed: none. Notes: `npx nx run ayokoding-www:build`
+      exit 0; Next.js 16.2.6 Turbopack build, 1309/1309 static pages generated._
+- [x] **[AI]** Baseline markdown lint: run `npm run lint:md` (or `npm run lint:md:fix`). **Acceptance**:
+      exits 0 on the existing tree, or only auto-fixable issues that fix cleanly. - _Date: 2026-07-13. Status: done. Files changed: none. Notes: `npm run lint:md` exit 0; 3967
+      files linted, 0 errors._
+- [x] **[AI]** Scaffold the section root: create `CONTENT/_index.md` (frontmatter `weight: 1750`, title
       "The Fundamentally Strong Software Engineer", intro + link list to the journey map) and `CONTENT/overview.md`
       (weight 1 — read-then-drill workflow, the Pass 0 + five-pass spiral Mermaid map and the 94-node skill
       tree from [prd.md](./prd.md), accessible WCAG palette). **Acceptance**: both files exist;
-      `npx nx run ayokoding-www:build` still exits 0.
-- [ ] **[AI] Formatter coverage (lint-staged)** — Update the repo-root
+      `npx nx run ayokoding-www:build` still exits 0. - _Date: 2026-07-13. Status: done. Files changed:
+      `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/_index.md`,
+      `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/overview.md`.
+      Notes: authored via `apps-ayokoding-www-general-maker`; Pass-phase + 94-node skill-tree Mermaid
+      diagrams copied verbatim from prd.md (byte-diffed clean); `npx nx run ayokoding-www:build` exit
+      0; `npm run lint:md` exit 0; parent `learn/_index.md` intentionally untouched (nav wiring is
+      Phase 105)._
+- [x] **[AI] Formatter coverage (lint-staged)** — Update the repo-root
       [`package.json`](../../../package.json) `lint-staged` block so every code-sample file type this section
       commits (under `CONTENT/**/code/`) has a canonical auto-formatter, per the formatter matrix in
       [tech-docs.md §DD-36](./tech-docs.md#dd-36--formatter-coverage-for-code-samples-lint-staged). Wire
@@ -255,8 +265,26 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
       **no-canonical-formatter** types (Makefile, Gradle Groovy DSL, Scheme/Common Lisp) are **explicitly
       deferred** to CI / existing per-language lint gates — not pre-commit — and listed with rationale in the
       DD. **Acceptance**: `npx lint-staged` on a staged sample of each Tier-1/Tier-2 type formats it in place
-      and exits 0; the deferred set is enumerated in tech-docs §DD-36.
-- [ ] **[AI] Per-format agent trios + quality gates** — For each learning format this section uses that lacks
+      and exits 0; the deferred set is enumerated in tech-docs §DD-36. - _Date: 2026-07-13. Status: done. Files changed: `package.json`, `package-lock.json`,
+      `.prettierrc.json`, `apps/rhino-cli/src/application/doctor/tools.rs`,
+      `apps/rhino-cli/src/application/doctor/checker.rs`, `apps/rhino-cli/tests/doctor.rs`,
+      `tech-docs.md` (DD-36). Notes: added `*.html`/`*.sql` to Prettier, `*.lua` → `stylua`
+      (`@johnnymorganz/stylua-bin`; the sibling `@johnnymorganz/stylua` package is WASM-only with no
+      CLI, corrected during execution), `*.sql` → `prettier --write` via the `prettier-plugin-sql`
+      plugin registered in `.prettierrc.json`, `{BUILD,BUILD.bazel,*.bzl}` → `buildifier`
+      (`@bazel/buildifier`), `*.sh` → `[shfmt -w, shellcheck]`, `*.tf` → `tofu fmt`. **Preexisting
+      issue found + fixed (Iron Rule 3)**: the DD-36-specified `clang-format` npm wrapper has no
+      native Apple Silicon macOS binary (confirmed via its own `getNativeBinary()` Rosetta-fallback,
+      which throws a runtime-library-version assertion on this machine) — reclassified `clang-format`
+      Tier-1→Tier-2 in DD-36 and wired it through `doctor` (Homebrew/apt) instead. Added `shfmt`,
+      `tofu`, and `clang-format` to rhino-cli's doctor tool registry (13→16 tools), all via
+      `swe-rust-dev`; `cargo test --lib doctor` 54 passed, `cargo test --test doctor` 9
+      scenarios/36 steps passed, clippy clean, fmt clean. `npm run doctor -- --fix` installed all 3
+      (16/16 tools OK). Verified end-to-end: staged one sample file of every Tier-1/Tier-2 type
+      (`.lua`/`.sql`/`.c`/`.sh`/`.tf`/`BUILD.bazel`) and ran `npx lint-staged` — all tasks
+      COMPLETED, exit 0. `npm install` after pinning exact versions (repo convention: no `^` ranges)
+      held steady at the pre-existing 47 vulnerabilities baseline (0 new)._
+- [x] **[AI] Per-format agent trios + quality gates** — For each learning format this section uses that lacks
       a dedicated trio, create a `maker`/`checker`/`fixer` agent set plus a quality-gate workflow, mirroring
       the existing `apps-ayokoding-www-by-example-{maker,checker,fixer}` +
       [`ayokoding-web-swe-by-example-quality-gate.md`](../../../repo-governance/workflows/ayokoding-web/ayokoding-web-swe-by-example-quality-gate.md).
@@ -269,16 +297,37 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
       agents in the [agent catalog](../../../.claude/agents/README.md) + `AGENTS.md`, then run
       `npm run generate:bindings` to sync `.opencode/` + `.amazonq/`. **Acceptance**: `git status` shows the 6
       new agent files + 2 new workflow files; `npm run generate:bindings` exits 0 and
-      `nx run rhino-cli:validate:sync` passes; By Example keeps its existing trio unchanged.
+      `nx run rhino-cli:validate:sync` passes; By Example keeps its existing trio unchanged. - _Date: 2026-07-13. Status: done. Files changed: 6 new `.claude/agents/`
+      `apps-ayokoding-www-{annotated-concept,primer}-{maker,checker,fixer}.md` (+6 auto-synced
+      `.opencode/agents/` mirrors), 2 new workflows
+      `repo-governance/workflows/ayokoding-web/ayokoding-web-{annotated-concept,primer}-quality-gate.md`;
+      modified `.claude/agents/README.md`, `AGENTS.md`, `repo-governance/workflows/ayokoding-web/README.md`,
+      `repo-governance/workflows/README.md`. Notes: authored via `agent-maker`; Annotated-concept
+      trio built with the validated no-code sub-mode (20-30 scenarios, zero code) as an internal mode
+      of the same trio per the 3-format decision; Primer trio grounded at full By-Example pace/volume
+      (75-85 examples) per prd.md lines 39-40/744/918-920 ("authored at By-Example pace"), narrower in
+      subject scope not volume — verified this reading directly against prd.md before accepting.
+      `nx run rhino-cli:validate:sync` target doesn't exist by that name; used the equivalent
+      `npm run validate:sync` (same underlying `harness sync validate` binary) — 85/85 checks passed.
+      `npm run generate:bindings` exit 0 (82 agents converted, 0 failed, `.amazonq/` byte-identical no
+      diff). `npm run lint:md` exit 0 (3985 files). By Example trio confirmed byte-unchanged._
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npx nx run ayokoding-www:build` — exits 0 with the scaffold in place.
-- [ ] [AI] `npm run lint:md` — passes.
-- [ ] [AI] Section root renders with `weight: 1750`; `overview.md` renders with `weight: 1` and shows the
-      journey map + skill tree with the WCAG palette.
+- [x] [AI] `npx nx run ayokoding-www:build` — exits 0 with the scaffold in place. - _Date: 2026-07-13. Status: done. Notes: exit 0, 1311/1311 static pages generated (up from
+      1309-page baseline, +2 for the new `_index.md`/`overview.md`)._
+- [x] [AI] `npm run lint:md` — passes. - _Date: 2026-07-13. Status: done. Notes: exit 0, 3985 files linted, 0 errors._
+- [x] [AI] Section root renders with `weight: 1750`; `overview.md` renders with `weight: 1` and shows the
+      journey map + skill tree with the WCAG palette. - _Date: 2026-07-13. Status: done. Files changed:
+      `plans/in-progress/fundamentally-strong-software-engineer/evidence/phase-0-overview-en-fullpage.png`.
+      Notes: frontmatter confirmed `weight: 1750` (`_index.md`) / `weight: 1` (`overview.md`) via
+      grep; `nx dev ayokoding-www` on :3101; `curl` 200 on
+      `/en/c/learn/fundamentally-strong/software-engineer` and `.../overview`; Playwright
+      full-page screenshot confirms the Pass-phase flowchart and 94-node skill tree both render
+      with the WCAG-safe classDef palette (pink/blue/light-blue/green/orange/red-orange per pass),
+      0 console errors/warnings. Dev server stopped after verification._
 
 > **Pause Safety**: The section is additive scaffold only — no topic content yet, nav not wired into the
 > parent `learn/` index. Safe to pause here; the live site is unaffected because the section is not yet linked.
