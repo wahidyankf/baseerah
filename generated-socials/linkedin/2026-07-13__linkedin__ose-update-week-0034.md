@@ -22,7 +22,7 @@ A blameless post-mortem found a UI change had shipped past every green gate beca
 
 🏗️ ose-infra
 
-Twin-k3s deploy plans were sharpened — bigger VMs, corrected fleet specs, Tailscale SSH — plus a runner health-monitoring plan and a post-mortem on a false observer-side outage. coralpolyp moved to Rust edition 2024; clusters aren't up yet, and no backend runs in a real environment.
+Twin-k3s deploy plans were sharpened — right-sized capacity, corrected figures, Tailscale SSH — plus a runner health-monitoring plan and a post-mortem on a false observer-side outage. coralpolyp moved to Rust edition 2024; clusters aren't up yet, and no backend runs in a real environment.
 
 📦 ose-primer
 
