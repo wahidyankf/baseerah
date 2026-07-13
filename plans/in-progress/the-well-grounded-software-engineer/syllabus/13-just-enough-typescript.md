@@ -78,7 +78,7 @@ and the TS side of [`15-software-testing`](./15-software-testing.md). Node/TS ar
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (subject topic). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · running-ts** — TypeScript is authored in `.ts`, type-checked/compiled by `tsc`, and run
   directly with `tsx` (or emitted to `.js` and run by `node`).

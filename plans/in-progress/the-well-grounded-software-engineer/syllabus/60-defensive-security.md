@@ -1,4 +1,4 @@
-# 60 · Defensive Security (blue team, SOC/IR) (By Example, Python + shell †)
+# 60 · Defensive Security (By Example, Python + shell †)
 
 **prd row**: Pass 3 · Build for the Real World · By Example · Python + shell † · Learn 160 / Drill 260 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
@@ -24,14 +24,14 @@ inter-topic capstones** (Pass-3 boundary + two cross-cutting), specified at the 
 
 ## Prerequisites
 
-- **Prior topics**: [topic 58 Offensive Security](./59-offensive-security.md) (the attacks to detect),
-  [topic 57 IT / Application Security](./58-it-and-application-security.md) (threats, OWASP, crypto), and
+- **Prior topics**: [topic 59 Offensive Security](./59-offensive-security.md) (the attacks to detect),
+  [topic 58 IT / Application Security](./58-it-and-application-security.md) (threats, OWASP, crypto), and
   [topic 5 Just Enough Bash](./05-just-enough-bash.md) (log wrangling).
-- **Tools & environment**: a macOS/Linux terminal; the **same isolated local lab** from topic 57
+- **Tools & environment**: a macOS/Linux terminal; the **same isolated local lab** from topic 59
   (attacks generate the telemetry); a local log/SIEM stack (ELK/OpenSearch or an equivalent) + Python for
   detection logic; sample attack logs. Self-owned lab only.
-- **Assumed knowledge**: the attack lifecycle + how a web attack looks on the wire (topic 57); the OWASP
-  Top 10 + threat modeling (topic 56); shell + log filtering (topic 05).
+- **Assumed knowledge**: the attack lifecycle + how a web attack looks on the wire (topic 59); the OWASP
+  Top 10 + threat modeling (topic 58); shell + log filtering (topic 05).
 
 ## Accuracy notes (web-verified)
 
@@ -259,12 +259,12 @@ Contiguous `ex-01..ex-78`. Every example cites the `co-NN` it exercises. Concept
   produce a detection here. The invariant — assume breach, instrument, rehearse — is the defensive face of
   the same threat-driven thinking as [`58-it-and-application-security`](./58-it-and-application-security.md).
 
-## Worked examples
+## Capstone materials
 
 Colocated under `defensive-security/learning/`; Python + shell over lab-generated telemetry (DD-20/DD-30).
 
 - **beginner** — ingest the lab's attack logs into the SIEM; build a dashboard that surfaces the recon scan
-  from topic 57.
+  from topic 59.
 - **intermediate** — write a Sigma detection for the SQL-injection attempt + map it to a MITRE ATT&CK
   technique; verify it fires on the attack log and not on benign traffic.
 - **advanced** — run a full incident-response tabletop over one attack: detect → contain → eradicate →
@@ -299,19 +299,19 @@ Colocated under `defensive-security/learning/`; Python + shell over lab-generate
 
 ## Capstone spec — inter-topic: capstone-real-world-delivery (Pass-3 boundary)
 
-**Weight**: `learning/_index.md` and the drilling mirror place this capstone at **575** (Pass-3 boundary,
-after topic 58; ahead of Pass 4). Kind: **subject → full runnable** (DD-27). This is the Pass-3 graduation
+**Weight**: `learning/_index.md` and the drilling mirror place this capstone at **705** (Pass-3 boundary,
+after topic 60; ahead of Pass 4). Kind: **subject → full runnable** (DD-27). This is the Pass-3 graduation
 project — the "Build for the Real World" pass made real.
 
 - **Goal**: take the Pass-2 `capstone-solid-core` application and deliver it the way a real team ships:
   choose and justify a data layer beyond a single SQL DB (NoSQL/graph where it fits — topics 34/35),
   scale the backend (39) with an event-driven slice (45) modeled with DDD (43) under a documented
   architecture (42) and a system-design capacity plan (44), containerize + orchestrate it (50), describe
-  its infrastructure as code (51), add a CI/CD pipeline that builds, tests, and deploys it (52), and secure it end to end (55) with red-team validation (56) and
-  blue-team detection (57) — a complete, deployed-as-code, secured, observable system.
+  its infrastructure as code (51), add a CI/CD pipeline that builds, tests, and deploys it (55), and secure it end to end (58) with red-team validation (59) and
+  blue-team detection (60) — a complete, deployed-as-code, secured, observable system.
 - **Integrates topics**: 34 NoSQL · 35 Graph (where it fits) · 39 Backend at Scale · 42 Architecture ·
-  43 DDD · 44 System Design · 45 Event-Driven · 50 Containers/K8s · 51 Cloud/IaC · 52 CI/CD · 55 IT Security ·
-  56 Offensive (validation) · 57 Defensive (detection). (37/53 optional where the domain benefits.)
+  43 DDD · 44 System Design · 45 Event-Driven · 50 Containers/K8s · 51 Cloud/IaC · 55 CI/CD · 58 IT Security ·
+  59 Offensive (validation) · 60 Defensive (detection). (37/53 optional where the domain benefits.)
 - **Concepts exercised**: [ ] a justified polyglot-persistence choice [ ] a scaled, event-driven backend
   slice [ ] a DDD-modeled domain under a documented (C4) architecture [ ] a system-design capacity plan
   [ ] containerized + orchestrated deployment [ ] infrastructure described as code [ ] a CI/CD pipeline (build → test → deploy) [ ] a security
@@ -324,7 +324,7 @@ project — the "Build for the Real World" pass made real.
      the chosen data layer(s). Verify the domain invariants hold, the event slice is reliable (no lost/
      double messages), and the data-layer choice is exercised.
   3. `.../capstone-real-world-delivery/deploy/` — Dockerfile(s) + K8s manifests + Terraform/OpenTofu (local
-     provider) + a CI/CD pipeline (52) that builds, tests, and deploys on push. Verify the app deploys to the local cluster via the IaC + pipeline and self-heals.
+     provider) + a CI/CD pipeline (55) that builds, tests, and deploys on push. Verify the app deploys to the local cluster via the IaC + pipeline and self-heals.
   4. `.../capstone-real-world-delivery/security/` — a threat model + red-team validation (lab-local) + a
      blue-team detection set. Verify each identified threat has a mitigation and a firing detection.
 - **Acceptance criteria**: the system runs deployed-as-code on a local cluster; the domain + event slice are
@@ -335,16 +335,16 @@ project — the "Build for the Real World" pass made real.
 
 ## Capstone spec — inter-topic: capstone-secure-service (cross-cutting)
 
-**Weight**: `learning/_index.md` and the drilling mirror place this capstone at **576** (cross-cutting,
+**Weight**: `learning/_index.md` and the drilling mirror place this capstone at **706** (cross-cutting,
 just after `capstone-real-world-delivery`). Kind: **subject → full runnable** (DD-27). A focused
 security-thread capstone that can be pursued independently of the full Pass-3 project.
 
 - **Goal**: build (or take a prior) HTTP service and make it demonstrably secure end to end — apply the
   OWASP Top 10 (2025) mitigations, do proper identity (OAuth2/OIDC + JWT done right), harden it, then
-  **prove** the security by attacking it from the red-team lab (56) and **detecting** those attacks from
-  the blue-team stack (57) — a single service where the full security lifecycle is visible.
-- **Integrates topics**: 17 Security Essentials · 39 Backend (auth surface) · 55 IT Security (OWASP/crypto/
-  identity) · 56 Offensive (validation) · 57 Defensive (detection). (50 for a hardened container image
+  **prove** the security by attacking it from the red-team lab (59) and **detecting** those attacks from
+  the blue-team stack (60) — a single service where the full security lifecycle is visible.
+- **Integrates topics**: 17 Security Essentials · 39 Backend (auth surface) · 58 IT Security (OWASP/crypto/
+  identity) · 59 Offensive (validation) · 60 Defensive (detection). (50 for a hardened container image
   where used.)
 - **Concepts exercised**: [ ] OWASP Top 10 (2025) mitigations applied [ ] OAuth2/OIDC + JWT done right
   [ ] hardening (headers, least privilege, secrets in env) [ ] red-team validation of the mitigations
@@ -364,17 +364,17 @@ security-thread capstone that can be pursued independently of the full Pass-3 pr
 
 ## Capstone spec — inter-topic: capstone-data-pipeline (cross-cutting)
 
-**Weight**: `learning/_index.md` and the drilling mirror place this capstone at **577** (cross-cutting,
+**Weight**: `learning/_index.md` and the drilling mirror place this capstone at **707** (cross-cutting,
 just after `capstone-secure-service`). Kind: **subject → full runnable** (DD-27). A focused data-thread
 capstone, independently pursuable.
 
 - **Goal**: build an end-to-end data path — ingest raw data through a medallion pipeline (bronze/silver/
   gold) with data-quality gates (37), model it with advanced SQL for serving (26), optionally serve a
   read-optimized store (34/35 where the access pattern fits), and expose it through an AI-powered,
-  RAG-grounded query interface (53) over a backend (39) — a complete "raw data → governed warehouse →
+  RAG-grounded query interface (56) over a backend (39) — a complete "raw data → governed warehouse →
   intelligent interface" slice.
 - **Integrates topics**: 10 SQL · 26 Advanced SQL · 34 NoSQL / 35 Graph (where the serving pattern fits) ·
-  39 Backend at Scale (serving) · 37 Data Engineering (the pipeline) · 53 AI-Powered Apps (the interface).
+  39 Backend at Scale (serving) · 37 Data Engineering (the pipeline) · 56 AI-Powered Apps (the interface).
 - **Concepts exercised**: [ ] a medallion ETL/ELT pipeline (bronze→silver→gold) [ ] data-quality gates
   [ ] a star schema + advanced-SQL serving queries [ ] a fit-for-purpose serving store [ ] a RAG-grounded
   query interface [ ] served over a backend endpoint.
@@ -383,7 +383,7 @@ capstone, independently pursuable.
      idempotent re-runs, a bad batch caught by the gate, and a reconciling star schema.
   2. `.../capstone-data-pipeline/serve/` — advanced-SQL serving queries (26) + optionally a read-optimized
      store (34/35). Verify serving queries match hand-computed expected results.
-  3. `.../capstone-data-pipeline/interface/` — a RAG-grounded (53) query interface over the gold data,
+  3. `.../capstone-data-pipeline/interface/` — a RAG-grounded (56) query interface over the gold data,
      served via a backend endpoint (39). Verify answers are grounded in the served data + cited.
   4. `.../capstone-data-pipeline/eval.md` — an eval of the interface's answer quality + a data-freshness/
      quality report. Verify the eval is reproducible and the freshness/quality metrics are reported.

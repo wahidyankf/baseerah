@@ -32,16 +32,16 @@ whole-journey `capstone-lead-at-altitude` now anchors at the journey's true clos
 
 ## Prerequisites
 
-- **Prior topics**: [topic 85 Just Enough F#](./87-just-enough-fsharp.md) (the implementation language —
+- **Prior topics**: [topic 87 Just Enough F#](./87-just-enough-fsharp.md) (the implementation language —
   discriminated unions, records, pattern matching, pipelines),
   [topic 19 Computer Science Foundations](./19-computer-science-foundations.md) (trees, recursion, grammars),
-  and [topic 86 Type Systems](./88-type-systems.md) (ADTs + pattern matching make an AST + evaluator natural
+  and [topic 88 Type Systems](./88-type-systems.md) (ADTs + pattern matching make an AST + evaluator natural
   — the immediately-prior topic).
 - **Tools & environment**: the **.NET SDK** (`dotnet`) on a current LTS, which ships the F# compiler and FSI;
   **FParsec** (the F# parser-combinator library) to contrast with a hand-written recursive-descent parser; a
   test project via `dotnet test` (xUnit/Expecto); Neovim/VSCode with the F# LSP (Ionide, DD-17).
-- **Assumed knowledge**: F# discriminated unions + pattern matching and recursion (topic 84); trees + grammar
-  intuition (topic 19); sum types / pattern matching as a way to shape an AST (topic 85).
+- **Assumed knowledge**: F# discriminated unions + pattern matching and recursion (topic 87); trees + grammar
+  intuition (topic 19); sum types / pattern matching as a way to shape an AST (topic 88).
 
 ## Accuracy notes (web-verified)
 
@@ -113,6 +113,32 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
 - **co-28 · error-messages** — good diagnostics point at the offending location with a clear message.
 - **co-29 · guardrail-lens** — linters/type-checkers share this front-end (DD-16); knowing it sharpens review.
 - **co-30 · testing-stages** — `dotnet test` covers each stage (lexer, parser, interpreter, transpiler).
+
+## Tensions & trade-offs — when NOT to reach for this
+
+- **Recursive-descent vs parser combinators**: a hand-written recursive-descent parser gives full control
+  over error messages and performance but means hand-writing every grammar rule; FParsec's combinators
+  compose a grammar in far less code at the cost of a layer of abstraction between you and the exact parse
+  steps — this topic teaches both so you can judge the trade rather than default to one.
+- **Interpreting vs transpiling**: a tree-walking interpreter is the simplest way to run a language and is
+  enough for a DSL or config language, but it re-walks the AST on every run; transpiling to an existing
+  runtime reuses that runtime's performance and ecosystem at the cost of a whole extra code-generation
+  stage that must stay correct as the source language grows.
+- **When NOT to use it**: building a hand-rolled lexer/parser for a format that already has a stable,
+  well-tested library (JSON, YAML, a common config format). The pipeline built here earns its cost when
+  you are building a real language or DSL, not when you are re-parsing a solved format.
+
+## Lineage — why it beat the alternative
+
+- Early parser generators (yacc/bison-style LALR tools, and their F# analogue FsLexYacc) won for decades
+  because they produce fast, correct parsers from a compact grammar spec — but the generated tables are
+  opaque, and a grammar conflict is often harder to debug than the parser itself. Hand-written
+  recursive-descent parsing, together with Pratt/precedence-climbing operator parsing (Vaughan Pratt, 1973) and parser-combinator libraries like FParsec, won back ground because they read like ordinary
+  code, are debuggable with ordinary tools, and — in an ML-family language — let the AST be a
+  discriminated union walked by exhaustive pattern matching, so a missing case is a compiler warning
+  instead of a silent bug. That same front-end (lexer → parser → AST) is what every linter and
+  type-checker in [`88-type-systems`](./88-type-systems.md) reuses, which is the guardrail lens (DD-16)
+  this topic is built around.
 
 ## Worked examples
 
@@ -237,7 +263,7 @@ example cites the `co-NN` it exercises. Concepts come before examples.
 
 ## Capstone spec — inter-topic: capstone-concurrency-and-systems (Pass-4 boundary)
 
-> **Weight**: `capstone-concurrency-and-systems/_index.md` = **955** (section root, after Pass 4 / topic 86).
+> **Weight**: `capstone-concurrency-and-systems/_index.md` = **995** (section root, after Pass 4 / topic 89).
 > Kind: **subject → full runnable**. Integrates the pass's concurrency + systems-depth topics.
 
 - **Goal**: build a **concurrent, systems-aware, observable service** that ties Pass 4 together — a
@@ -245,10 +271,10 @@ example cites the `co-NN` it exercises. Concepts come before examples.
   systems-level component, containerized, and instrumented with SRE golden signals + an SLO — demonstrating
   that concurrency, systems depth, and reliability compose into one operable system.
 - **Concepts integrated**: [ ] a concurrency model in anger (Go CSP: goroutines/channels/`context`
-  [topic 62] **or** Elixir actors: GenServer/supervision [topic 64]) [ ] a systems-level component (a C
-  primitive / memory-aware data path [topics 75/78/80] **or** a justified equivalent) [ ] containerized +
+  [topic 65] **or** Elixir actors: GenServer/supervision [topic 67]) [ ] a systems-level component (a C
+  primitive / memory-aware data path [topics 78/79/80] **or** a justified equivalent) [ ] containerized +
   orchestrated deployment [topic 50, Pass 3] [ ] SRE instrumentation: four golden signals + an SLI/SLO +
-  error budget [topic 91] [ ] a symptom-based alert + dashboard.
+  error budget [topic 94] [ ] a symptom-based alert + dashboard.
 - **Ordered steps**:
   1. `capstone-concurrency-and-systems/code/` — a concurrent work-processing service in Go (CSP) **or**
      Elixir (actors), with a bounded worker pool / supervised workers and graceful shutdown. Verify it
@@ -264,14 +290,14 @@ example cites the `co-NN` it exercises. Concepts come before examples.
 
 ## Capstone spec — inter-topic: capstone-concurrency-showdown (cross-cutting)
 
-> **Weight**: `capstone-concurrency-showdown/_index.md` = **956** (section root, after Pass 4 / topic 86).
+> **Weight**: `capstone-concurrency-showdown/_index.md` = **996** (section root, after Pass 4 / topic 89).
 > Kind: **subject → full runnable + comparison artifact**. A deliberate CSP-vs-actor head-to-head.
 
 - **Goal**: solve the **same** concurrent problem twice — once with **CSP-style Go**
   (goroutines/channels/`select`/`context`) and once with the **actor-model Elixir/OTP**
   (GenServer/supervision/"let it crash") — then write a grounded comparison of the two paradigms on the same
   workload: how each handles coordination, backpressure, failure/supervision, and observability.
-- **Concepts integrated**: [ ] the same problem in Go CSP [topic 62] and Elixir actors [topic 64] [ ] channel
+- **Concepts integrated**: [ ] the same problem in Go CSP [topic 65] and Elixir actors [topic 67] [ ] channel
   coordination + `select` + `context` cancellation (Go) [ ] GenServer + supervision trees + "let it crash"
   (Elixir) [ ] backpressure + failure handling contrasted [ ] a decision write-up: when each model fits.
 - **Ordered steps**:

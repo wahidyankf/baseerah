@@ -168,7 +168,7 @@ from [`43-domain-driven-design`](./43-domain-driven-design.md); the messaging ba
 
 ## Worked examples
 
-Colocated under `event-driven-architecture/learning/code/` as typed, mypy-clean Python; each runnable
+Colocated under `event-driven-architecture/learning/code/` as typed, pyright-clean Python; each runnable
 against a local in-process bus or broker fake (DD-20/DD-30). Contiguous `ex-01..ex-80`. Every example cites
 the `co-NN` it exercises; concepts are taught before the examples that use them.
 

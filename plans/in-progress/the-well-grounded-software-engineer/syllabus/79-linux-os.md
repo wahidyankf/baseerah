@@ -24,12 +24,12 @@ observed from C + shell tooling (`/proc`, `strace`, `ps`/`top`). The app-develop
 
 ## Prerequisites
 
-- **Prior topics**: [topic 76 Just Enough C](./78-just-enough-c.md) (the language for syscalls) and
+- **Prior topics**: [topic 78 Just Enough C](./78-just-enough-c.md) (the language for syscalls) and
   [topic 5 Just Enough Bash](./05-just-enough-bash.md) (`/proc`, `ps`,
   `strace`).
 - **Tools & environment**: a **Linux** machine (or VM/WSL2); **gcc/clang** + make; `strace`, `/proc`,
   `ps`/`top`; Neovim/VSCode (DD-17).
-- **Assumed knowledge**: C pointers + structs + a `make` build (topic 75); shell process/job basics
+- **Assumed knowledge**: C pointers + structs + a `make` build (topic 78); shell process/job basics
   (topic 05).
 
 ## Accuracy notes (web-verified)
@@ -75,7 +75,7 @@ staleness corrections are flagged for the authoring pass.
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (◆ subject). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · kernel-vs-user** — code runs in privileged kernel space or unprivileged user space; the boundary protects the machine.
 - **co-02 · syscalls** — a system call traps from user space into the kernel to request a service.
@@ -107,6 +107,30 @@ staleness corrections are flagged for the authoring pass.
 - **co-28 · proc-filesystem** — `/proc` exposes live kernel and per-process state as files.
 - **co-29 · process-tools** — `ps`/`top` observe running processes from the shell.
 - **co-30 · os-theory** — these Linux mechanisms are one implementation of universal OS concepts (process, VM, scheduling, FS, IPC) that recur in every OS.
+
+## Tensions & trade-offs — when NOT to reach for this
+
+- **Observing from user space vs writing a kernel module**: this topic teaches the OS from user space —
+  syscalls, `/proc`, `strace` — which is where a working engineer needs fluency; writing kernel code is a
+  substantially higher-cost, higher-risk path that is out of scope here and rarely the right first move.
+- **Threads vs processes**: threads share an address space and are cheaper to create and context-switch,
+  but that sharing is exactly what makes concurrent bugs (races, corrupted shared state) possible — a
+  process boundary trades that risk for isolation at the cost of IPC and a heavier `fork`.
+- **When NOT to use it**: hand-rolling process/signal/IPC code when a higher-level abstraction (a language
+  runtime, a message queue, a supervised process manager) already solves the problem safely. Reach for
+  raw `fork`/`signal`/shared memory only when you are building the infrastructure itself, not an
+  application on top of it.
+
+## Lineage — why it beat the alternative
+
+- Early Unix systems ran cooperative, single-tasking programs with no memory protection between them — a
+  crash or a runaway process could take down the whole machine. The process model — an isolated virtual
+  address space per program, mediated entirely through a small syscall interface — won because it lets
+  many untrusted programs share one machine safely, at the cost of a real context-switch and IPC tax.
+  Linux's specific choices — the VFS's uniform file interface, `fork`+`exec` as two separate steps instead
+  of one combined "spawn" call, and (currently) EEVDF over CFS for scheduling — are refinements of that
+  same tradeoff, still visible today in [`76-linux-app-development`](./76-linux-app-development.md)'s use
+  of the very same syscalls this topic teaches directly.
 
 ## Worked examples
 

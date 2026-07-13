@@ -28,7 +28,7 @@ teaching of it. Domain events connect forward to
   contexts, ports), and [topic 8 Object-Oriented Programming Essentials](./08-object-oriented-programming-essentials.md).
 - **Tools & environment**: a macOS/Linux terminal; **Python 3.x** with a pinned CVE-clean test runner;
   Neovim/VSCode (DD-17). No DB required for the core — persistence is behind a repository port.
-- **Assumed knowledge**: classes/invariants (topic 08/16); the idea of a domain core separated from I/O
+- **Assumed knowledge**: classes/invariants (topic 08/21); the idea of a domain core separated from I/O
   (topic 42); writing a unit test.
 
 ## Accuracy notes (web-verified)
@@ -160,7 +160,7 @@ teaching of it. Domain events connect forward to
 
 ## Worked examples
 
-Colocated under `domain-driven-design/learning/code/` as typed, mypy-clean Python; each runnable +
+Colocated under `domain-driven-design/learning/code/` as typed, pyright-clean Python; each runnable +
 unit-tested (DD-20/DD-30). Contiguous `ex-01..ex-80`. Every example cites the `co-NN` concept(s) it
 exercises; concepts are taught before the examples that use them.
 

@@ -100,10 +100,10 @@ learn/software-engineering/the-well-grounded-software-engineer/
   _index.md               # section landing (nav list)
   overview.md             # what this is, how to use the journey
   <NN-topic-slug>/        # one folder per topic (journey order; folder weight 100 + 10×index)
-    learning/             # by-example depth (learning/_index.md = "Learn wt" 101..161)
+    learning/             # by-example depth (learning/_index.md = "Learn wt" 101..194)
       capstone/           # intra-topic capstone (_index.md weight 900)
       code/               # runnable sources
-    drilling/             # active-recall practice (drilling/_index.md = "Drill wt" 201..261)
+    drilling/             # active-recall practice (drilling/_index.md = "Drill wt" 201..294)
   <inter-topic-capstone>/ # pass-boundary + cross-cutting junction folders
 ```
 

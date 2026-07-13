@@ -1,4 +1,4 @@
-# 62 · IT Governance, Risk & Compliance ‡ (Annotated-concept, no-code)
+# 62 · IT Governance, Risk & Compliance (Annotated-concept, ‡ no-code)
 
 **prd row**: Pass 3 · Build for the Real World · Annotated-concept · ‡ no-code · Learn 162 / Drill 262 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
@@ -22,13 +22,13 @@ are **decision/governance artifacts**, not code.
 
 ## Prerequisites
 
-- **Prior topics**: [topic 57 IT / Application Security](./58-it-and-application-security.md) (CIA, threat modeling, controls),
-  [topic 59 Defensive Security](./60-defensive-security.md) (detection, IR, the blue-team view that GRC
+- **Prior topics**: [topic 58 IT / Application Security](./58-it-and-application-security.md) (CIA, threat modeling, controls),
+  [topic 60 Defensive Security](./60-defensive-security.md) (detection, IR, the blue-team view that GRC
   rolls up), and [topic 9 Project Management](./09-project-management.md)
   (policy, process, working within an org).
 - **Tools & environment**: no toolchain — a text editor for the governance artifacts (risk register, policy,
   control mapping); Neovim/VSCode (DD-17). No paid account, no code (DD-20).
-- **Assumed knowledge**: security controls + threat modeling (topic 56); detection/IR posture (topic 58);
+- **Assumed knowledge**: security controls + threat modeling (topic 58); detection/IR posture (topic 60);
   how teams adopt process (topic 09).
 
 ## Accuracy notes (web-verified)

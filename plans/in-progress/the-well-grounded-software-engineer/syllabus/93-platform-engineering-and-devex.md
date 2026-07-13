@@ -30,14 +30,14 @@ the operational substrate — [`50-containers-and-orchestration`](./50-container
 
 - **Prior topics**: [topic 50 Containers & Orchestration](./50-containers-and-orchestration.md) (the runtime
   substrate a platform abstracts), [topic 51 Cloud & IaC](./51-cloud-and-iac.md) (the self-service infra a
-  platform provisions), and [topic 54 CI/CD & Release Engineering](./55-cicd-and-release-engineering.md) (the
+  platform provisions), and [topic 55 CI/CD & Release Engineering](./55-cicd-and-release-engineering.md) (the
   delivery pipeline golden paths automate).
 - **Tools & environment**: no application to build; a developer portal / IDP concept (Backstage-style catalog
   - scaffolder templates), an IaC + CI stack from the prior topics for the golden path to sit on, and a
     DORA/SPACE metrics source. Any scripting for scaffolders or dashboards that uses Python is fully
-    type-annotated (DD-34). Neovim/VSCode (DD-17).
+    type-annotated (DD-39). Neovim/VSCode (DD-17).
 - **Assumed knowledge**: containers/orchestration basics (topic 50); IaC and cloud provisioning (topic 51);
-  CI/CD pipelines and DORA metrics (topic 53); team/organizational structure trade-offs (topic 33).
+  CI/CD pipelines and DORA metrics (topic 55); team/organizational structure trade-offs (topic 33).
 
 ## Accuracy notes (web-verified)
 
@@ -127,7 +127,7 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
 
 Colocated under `platform-engineering-and-devex/learning/`; the deliverables are platform artifacts —
 golden-path templates, a platform contract, and a metrics dashboard — not an application (DD-20/DD-30). Any
-scaffolder/dashboard scripting in Python is fully type-annotated (DD-34). `‡ no-code` topic: the `ex-NN`
+scaffolder/dashboard scripting in Python is fully type-annotated (DD-39). `‡ no-code` topic: the `ex-NN`
 below are **decision scenarios** (a situation → the right platform-leadership call), contiguous `ex-01..ex-26`.
 Every scenario cites the `co-NN` it exercises. Concepts come before scenarios.
 
@@ -169,7 +169,7 @@ Every scenario cites the `co-NN` it exercises. Concepts come before scenarios.
 ## Capstone spec — intra-topic (subject → paved golden path)
 
 - **Goal**: design and stand up a minimal internal developer platform slice — one golden-path scaffolder that
-  takes a new service from nothing to a deployed, monitored state using the topics-50–52 substrate; one
+  takes a new service from nothing to a deployed, monitored state using the topics-50/51/55 substrate; one
   self-service capability with guard-rails and an escape hatch; and a DORA/SPACE dashboard plus the policy
   that keeps it a system-measurement, not an individual scorecard.
 - **Concepts exercised**: [ ] a golden-path scaffolder template (co-06, co-10) [ ] self-service infra with
@@ -178,7 +178,7 @@ Every scenario cites the `co-NN` it exercises. Concepts come before scenarios.
   platform-as-a-product framing (internal customer + contract) (co-01, co-02, co-13).
 - **Ordered steps**:
   1. `.../learning/capstone/golden-path/` — a scaffolder template producing a new service pre-wired with CI +
-     container + deploy (topics 50–53). Verify a generated service builds and deploys with no hand-editing.
+     container + deploy (topics 50/51/55). Verify a generated service builds and deploys with no hand-editing.
   2. `.../learning/capstone/self-service/` — one capability (e.g. database provisioning) as a guard-railed,
      self-serve building block with a documented escape hatch. Verify a developer provisions it without a
      ticket and the guard-rails block an unsafe request.

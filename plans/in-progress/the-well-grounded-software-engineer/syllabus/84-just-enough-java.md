@@ -1,8 +1,8 @@
-# 84 · Just Enough Java (Primer §, Java †)
+# 84 · Just Enough Java (Primer, Java †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · Java † · Learn 184 / Drill 284 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 4 · Concurrency & Systems · Primer · Java † · Learn 184 / Drill 284 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough modern Java** to be productive on the JVM
+**Scope note**: **just enough modern Java** to be productive on the JVM
 ([`85-enterprise-java-and-the-jvm`](./85-enterprise-java-and-the-jvm.md)). How to run Java both ways — a
 one-off single source file (`java Hello.java`) and a full Maven/Gradle project; records, sealed types, and
 pattern matching; generics; collections and streams; and the memory model at a glance. `†`: Java, run as a
@@ -28,7 +28,7 @@ single source file for one-offs and built with a standard JVM build tool for pro
 - **Tools & environment**: a macOS/Linux/Windows machine; a **JDK** pinned to a current LTS and a standard
   build tool (**Maven** or **Gradle**); Neovim/VSCode with the Java LSP (DD-17).
 - **Assumed knowledge**: classes/interfaces/inheritance (topic 08); static types and generics from an
-  earlier typed language (topics 13/71); running a CLI build tool (topic 05).
+  earlier typed language (topic 13); running a CLI build tool (topic 05).
 
 ## Accuracy notes (web-verified)
 
@@ -68,7 +68,7 @@ single source file for one-offs and built with a standard JVM build tool for pro
 
 ## Concepts
 
-<!-- co-01 · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (primer). Each example below cites the co-NN it exercises. -->
+<!-- co-01 · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · jdk-build-tool** — a Maven or Gradle project compiles, runs, and tests Java from the terminal.
 - **co-02 · main-method** — `public static void main(String[])` is the program entry point.

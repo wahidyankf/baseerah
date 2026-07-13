@@ -72,8 +72,6 @@ and TS-for-UI, with applied component testing. Performance, SSR, and state-at-sc
 
 ## Concepts
 
-## Concepts
-
 <!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (subject topic). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · html-document-structure** — a valid page is `<!doctype html>` plus `head` (charset, viewport,

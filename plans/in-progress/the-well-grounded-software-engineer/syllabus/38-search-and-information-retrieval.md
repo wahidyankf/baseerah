@@ -8,7 +8,7 @@ a real engine (tokenization, TF-IDF/BM25, ranking) → building a small index yo
 relevance-vs-recall trade-off in the foreground. The vanilla tier grounds the intuition, the
 practical tier shows what a production engine (Lucene/Elasticsearch/OpenSearch family) actually
 does, and the build-your-own tier makes the machinery concrete. `†`: Python, fully type-annotated
-(DD-34) — every snippet carries type hints in the mypy-clean spirit.
+(DD-39) — every snippet carries type hints in the pyright-clean spirit.
 
 ## Why this exists · the big idea
 
@@ -30,7 +30,7 @@ does, and the build-your-own tier makes the machinery concrete. `†`: Python, f
   improves on) and [topic 7 Data Structures & Algorithms Essentials](./07-data-structures-and-algorithms-essentials.md)
   (hash maps, sorted postings, heaps for top-k).
 - **Tools & environment**: a macOS/Linux terminal; **Python** at a recent stable release with type
-  hints and `mypy`; a small text corpus (a docs folder or a public dataset dump); optionally a local
+  hints and `pyright`; a small text corpus (a docs folder or a public dataset dump); optionally a local
   search engine from the Lucene family (Elasticsearch/OpenSearch) via a container for the practical
   tier; Neovim/VSCode with the Python LSP (DD-17).
 - **Assumed knowledge**: writing and querying a table (topic 10); dictionaries, sets, and sorting
@@ -185,12 +185,12 @@ does, and the build-your-own tier makes the machinery concrete. `†`: Python, f
   because it is cheap, explainable, and strong without training data — which is exactly why the Lucene
   family made it the default. This topic hands its scoring and indexing intuition to
   [topic 39 Backend at Scale](./39-backend-at-scale.md) (search as a service to operate) and its
-  storage mechanics to [topic 89 Build Your Own Database](./91-build-your-own-database.md).
+  storage mechanics to [topic 91 Build Your Own Database](./91-build-your-own-database.md).
 
 ## Worked examples
 
 Colocated under `search-and-information-retrieval/learning/code/`; each runnable from the CLI, every
-Python snippet fully type-annotated and `mypy`-clean (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`.
+Python snippet fully type-annotated and `pyright`-clean (DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-80`.
 Every example cites the `co-NN` it exercises; every concept above is exercised by ≥ 1 example.
 
 ### Beginner
@@ -258,7 +258,7 @@ Every example cites the `co-NN` it exercises; every concept above is exercised b
 ### Advanced
 
 - **ex-57 · nrt-refresh-model** — model near-real-time refresh: buffered docs become searchable only after a `refresh()` — verify a doc added pre-refresh is invisible until refresh runs. (co-27)
-- **ex-58 · typed-index-class** — build an `InvertedIndex` class with typed `add`/`query` methods — verify `mypy` is clean and queries return correct sets. (co-01, co-29)
+- **ex-58 · typed-index-class** — build an `InvertedIndex` class with typed `add`/`query` methods — verify `pyright` is clean and queries return correct sets. (co-01, co-29)
 - **ex-59 · incremental-add** — add a document to a built index without a rebuild — verify it becomes findable immediately. (co-29)
 - **ex-60 · incremental-equals-rebuild** — compare the incremental index to a from-scratch rebuild — verify identical postings for every term. (co-29)
 - **ex-61 · persist-json** — serialize postings to JSON, reload, and query — verify results match the in-memory index. (co-30)
@@ -294,7 +294,7 @@ Every example cites the `co-NN` it exercises; every concept above is exercised b
   co-30).
 - **Ordered steps**:
   1. `.../learning/capstone/code/index.py` — a typed inverted index with tokenization and persisted
-     postings. Verify a boolean query returns the correct document set and `mypy` is clean.
+     postings. Verify a boolean query returns the correct document set and `pyright` is clean.
   2. `.../learning/capstone/code/rank.py` — add TF-IDF then BM25 top-k scoring. Verify the ranked
      order matches a hand-computed BM25 score on a 3-document fixture.
   3. `.../learning/capstone/code/evaluate.py` — run precision@k over a small relevance-judgment set
@@ -303,7 +303,7 @@ Every example cites the `co-NN` it exercises; every concept above is exercised b
      it becomes findable and its BM25 score is consistent with a from-scratch rebuild.
 - **Acceptance criteria**: boolean and ranked queries are correct; BM25 matches the hand computation;
   precision@k responds to analyzer changes; incremental add matches a rebuild; all Python is
-  type-annotated and `mypy`-clean.
+  type-annotated and `pyright`-clean.
 - **Done bar**: runnable end-to-end + web-verified.
 
 ## Read more

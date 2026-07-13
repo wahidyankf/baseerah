@@ -7,7 +7,7 @@ remains the single source of truth for topic set, order, slug, format, primary l
 this folder adds the concrete **Items**, **Worked examples**, **Capstone specs**, dated **Accuracy
 notes**, and **Read more** references per topic.
 
-One file per topic — `NN-<slug>.md`, `NN` = order of appearance (01..90). Ten inter-topic capstone
+One file per topic — `NN-<slug>.md`, `NN` = order of appearance (01..94). Ten inter-topic capstone
 specs are appended inside their anchor topic files (see the
 [Capstone Policy](./overview.md#capstone-policy-dd-27)).
 
@@ -53,7 +53,7 @@ Anchored inter-topic capstones (both in `17-security-essentials.md`): `capstone-
 | 21  | Object-Oriented Design & Patterns  | [21-object-oriented-design-and-patterns.md](./21-object-oriented-design-and-patterns.md)   |
 | 22  | Programming Paradigms              | [22-programming-paradigms.md](./22-programming-paradigms.md)                               |
 | 23  | Functional Programming             | [23-functional-programming.md](./23-functional-programming.md)                             |
-| 24  | Concurrency & Parallelism (Core)   | [24-concurrency-and-parallelism.md](./24-concurrency-and-parallelism.md)                   |
+| 24  | Concurrency & Parallelism          | [24-concurrency-and-parallelism.md](./24-concurrency-and-parallelism.md)                   |
 | 25  | Advanced Algorithms                | [25-advanced-algorithms.md](./25-advanced-algorithms.md)                                   |
 | 26  | Advanced SQL & Query Performance   | [26-advanced-sql-and-query-performance.md](./26-advanced-sql-and-query-performance.md)     |
 | 27  | Data Access: ORMs & Query Builders | [27-data-access-orms-and-query-builders.md](./27-data-access-orms-and-query-builders.md)   |
@@ -62,7 +62,7 @@ Anchored inter-topic capstones (both in `17-security-essentials.md`): `capstone-
 | 30  | Software Engineering Practices     | [30-software-engineering-practices.md](./30-software-engineering-practices.md)             |
 | 31  | Agentic Coding                     | [31-agentic-coding.md](./31-agentic-coding.md)                                             |
 | 32  | Software Product Engineering ▲     | [32-software-product-engineering.md](./32-software-product-engineering.md)                 |
-| 33  | Engineering Management ‡           | [33-engineering-management.md](./33-engineering-management.md)                             |
+| 33  | Engineering Management             | [33-engineering-management.md](./33-engineering-management.md)                             |
 
 Anchored inter-topic capstone: `capstone-solid-core` (Pass-2 boundary, in `33-engineering-management.md`).
 
@@ -87,7 +87,7 @@ Anchored inter-topic capstone: `capstone-solid-core` (Pass-2 boundary, in `33-en
 | 48  | Build Your Own Reactive UI               | [48-build-your-own-reactive-ui.md](./48-build-your-own-reactive-ui.md)                           |
 | 49  | Information Architecture & SEO           | [49-information-architecture-and-seo.md](./49-information-architecture-and-seo.md)               |
 | 50  | Containers & Orchestration               | [50-containers-and-orchestration.md](./50-containers-and-orchestration.md)                       |
-| 51  | Cloud & Infrastructure as Code           | [51-cloud-and-iac.md](./51-cloud-and-iac.md)                                                     |
+| 51  | Cloud & IaC                              | [51-cloud-and-iac.md](./51-cloud-and-iac.md)                                                     |
 | 52  | Bare-Metal Virtualization                | [52-bare-metal-virtualization.md](./52-bare-metal-virtualization.md)                             |
 | 53  | Self-Managed Kubernetes & On-Prem GitOps | [53-self-managed-kubernetes-and-gitops.md](./53-self-managed-kubernetes-and-gitops.md)           |
 | 54  | Build Automation & Task Runners          | [54-build-automation-and-task-runners.md](./54-build-automation-and-task-runners.md)             |
@@ -95,10 +95,10 @@ Anchored inter-topic capstone: `capstone-solid-core` (Pass-2 boundary, in `33-en
 | 56  | Creating AI-Powered Apps                 | [56-creating-ai-powered-apps.md](./56-creating-ai-powered-apps.md)                               |
 | 57  | Agentic AI                               | [57-agentic-ai.md](./57-agentic-ai.md)                                                           |
 | 58  | IT / Application Security                | [58-it-and-application-security.md](./58-it-and-application-security.md)                         |
-| 59  | Offensive Security (red team, Kali)      | [59-offensive-security.md](./59-offensive-security.md)                                           |
-| 60  | Defensive Security (blue team, SOC/IR)   | [60-defensive-security.md](./60-defensive-security.md)                                           |
+| 59  | Offensive Security                       | [59-offensive-security.md](./59-offensive-security.md)                                           |
+| 60  | Defensive Security                       | [60-defensive-security.md](./60-defensive-security.md)                                           |
 | 61  | Vulnerability Management & Assessment    | [61-vulnerability-management-and-assessment.md](./61-vulnerability-management-and-assessment.md) |
-| 62  | IT Governance, Risk & Compliance ‡       | [62-it-governance-grc.md](./62-it-governance-grc.md)                                             |
+| 62  | IT Governance, Risk & Compliance         | [62-it-governance-grc.md](./62-it-governance-grc.md)                                             |
 | 63  | Analytics & Experimentation              | [63-analytics-and-experimentation.md](./63-analytics-and-experimentation.md)                     |
 
 Anchored inter-topic capstones (all in `60-defensive-security.md`): `capstone-real-world-delivery`
@@ -117,7 +117,7 @@ Anchored inter-topic capstones (all in `60-defensive-security.md`): `capstone-re
 | 70  | Just Enough Swift                | [70-just-enough-swift.md](./70-just-enough-swift.md)                                 |
 | 71  | iOS App Development ◆            | [71-ios-app-development.md](./71-ios-app-development.md)                             |
 | 72  | Just Enough Dart                 | [72-just-enough-dart.md](./72-just-enough-dart.md)                                   |
-| 73  | Hybrid App Development           | [73-hybrid-app-development.md](./73-hybrid-app-development.md)                       |
+| 73  | Hybrid App Development ◆         | [73-hybrid-app-development.md](./73-hybrid-app-development.md)                       |
 | 74  | Just Enough C#                   | [74-just-enough-csharp.md](./74-just-enough-csharp.md)                               |
 | 75  | Windows App Development ◆        | [75-windows-app-development.md](./75-windows-app-development.md)                     |
 | 76  | Linux App Development ◆          | [76-linux-app-development.md](./76-linux-app-development.md)                         |
@@ -159,12 +159,12 @@ Anchored inter-topic capstone: `capstone-lead-at-altitude` (whole-journey, in
 | `capstone-first-working-software`  | Pass-1 boundary | `17-security-essentials.md`               | 275    |
 | `capstone-full-stack-app`          | cross-cutting   | `17-security-essentials.md`               | 276    |
 | `capstone-solid-core`              | Pass-2 boundary | `33-engineering-management.md`            | 435    |
-| `capstone-real-world-delivery`     | Pass-3 boundary | `60-defensive-security.md`                | 575    |
-| `capstone-secure-service`          | cross-cutting   | `60-defensive-security.md`                | 576    |
-| `capstone-data-pipeline`           | cross-cutting   | `60-defensive-security.md`                | 577    |
-| `capstone-concurrency-and-systems` | Pass-4 boundary | `89-compilers-parsers-and-transpilers.md` | 955    |
-| `capstone-concurrency-showdown`    | cross-cutting   | `89-compilers-parsers-and-transpilers.md` | 956    |
-| `capstone-lead-at-altitude`        | whole-journey   | `94-site-reliability-engineering.md`      | 1005   |
+| `capstone-real-world-delivery`     | Pass-3 boundary | `60-defensive-security.md`                | 705    |
+| `capstone-secure-service`          | cross-cutting   | `60-defensive-security.md`                | 706    |
+| `capstone-data-pipeline`           | cross-cutting   | `60-defensive-security.md`                | 707    |
+| `capstone-concurrency-and-systems` | Pass-4 boundary | `89-compilers-parsers-and-transpilers.md` | 995    |
+| `capstone-concurrency-showdown`    | cross-cutting   | `89-compilers-parsers-and-transpilers.md` | 996    |
+| `capstone-lead-at-altitude`        | whole-journey   | `94-site-reliability-engineering.md`      | 1045   |
 
 Each inter-topic capstone weight slots immediately after its host topic's folder weight
 (`(100 + 10 × NN) + 5`), so it sorts right after the topic that anchors it.

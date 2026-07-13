@@ -4,7 +4,7 @@
 
 **Scope note**: the three-tier spectrum from raw SQL → query builder → full ORM, the trade-offs each
 tier buys, the N+1 problem, the identity-map and unit-of-work patterns, migrations, and when each tier
-is the right call. `†`: fully type-annotated Python (DD-34) over the DB-API driver. The build-your-own
+is the right call. `†`: fully type-annotated Python (DD-39) over the DB-API driver. The build-your-own
 tier — reconstructing a minimal ORM so it stops being magic — is
 [`28-build-your-own-orm-and-query-builder`](./28-build-your-own-orm-and-query-builder.md).
 
@@ -51,7 +51,7 @@ This topic sits on [topic 10 SQL Essentials](./10-sql-essentials.md) and
 [topic 26 Advanced SQL](./26-advanced-sql-and-query-performance.md): it does not re-teach SQL — it teaches
 the abstraction layers built over it (query builders, ORMs) and the trade-off each tier buys. SQLAlchemy
 2.0.x is the Data-Mapper teaching engine; peewee is the Active-Record contrast; PyPika is the query-builder
-contrast; Alembic drives migrations. All Python is fully type-annotated (DD-34).
+contrast; Alembic drives migrations. All Python is fully type-annotated (DD-39).
 
 - **co-01 · data-access-spectrum** — the raw-SQL → query-builder → ORM spectrum, and what each tier buys and hides.
 - **co-02 · raw-sql-dbapi** — the PEP 249 DB-API: connection, cursor, execute, fetch, and manual row→object mapping.
@@ -107,7 +107,7 @@ contrast; Alembic drives migrations. All Python is fully type-annotated (DD-34).
 ## Worked examples
 
 Colocated under `data-access/learning/code/`; runnable against a local DB, fully type-annotated Python
-(DD-20/DD-30/DD-34). Contiguous `ex-01..ex-78`. Every example cites the `co-NN` it exercises; every concept
+(DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-78`. Every example cites the `co-NN` it exercises; every concept
 above is exercised by ≥1 example.
 
 ### Beginner

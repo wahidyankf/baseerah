@@ -1,6 +1,6 @@
-# 32 · Software Product Engineering ▲ (Annotated-concept, — ‡)
+# 32 · Software Product Engineering ▲ (Annotated-concept, ‡ no-code)
 
-**prd row**: Pass 2 · Depth, Design & Craft · Annotated-concept · — ‡ · Learn 132 / Drill 232 · Nvim-ready
+**prd row**: Pass 2 · Depth, Design & Craft · Annotated-concept · ‡ no-code · Learn 132 / Drill 232 · Nvim-ready
 Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: the **Product & Delivery** track (`▲`) — product thinking for engineers: discovery,

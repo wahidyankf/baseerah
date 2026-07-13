@@ -1,6 +1,6 @@
 # 75 · Windows App Development ◆ (By Example, C# †)
 
-**prd row**: Pass 4 · Concurrency & Systems · By Example · C# † ◆ · Learn 175 / Drill 275 ·
+**prd row**: Pass 4 · Concurrency & Systems · By Example · C# † · Learn 175 / Drill 275 ·
 Nvim-ready Partial · VSCode-ready Partial. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: `◆` app-domain — building a real Windows desktop app: .NET fundamentals, WinUI/WPF (XAML +
@@ -24,13 +24,13 @@ practical baseline for WinUI/WPF; the topic favours the `dotnet` CLI for build/t
 
 ## Prerequisites
 
-- **Prior topics**: [topic 72 Just Enough C#](./74-just-enough-csharp.md) (the language + `async`/`await`),
+- **Prior topics**: [topic 74 Just Enough C#](./74-just-enough-csharp.md) (the language + `async`/`await`),
   [topic 14 Frontend Essentials](./14-frontend-essentials.md) (component + state UI, MVVM intuition), and
   [topic 47 Advanced Frontend](./47-advanced-frontend.md) (data binding, state management).
 - **Tools & environment**: a **Windows** machine with **Visual Studio** / the **.NET SDK** (WinUI/WPF
   workloads); `dotnet` from the CLI where possible. (WinUI/WPF are Windows-only.)
-- **Assumed knowledge**: C# syntax + `async`/`await` (topic 71); MVVM + data-binding thinking (topics
-  12/29); local file/DB persistence (topic 10).
+- **Assumed knowledge**: C# syntax + `async`/`await` (topic 74); MVVM + data-binding thinking (topics
+  14/47); local file/DB persistence (topic 10).
 
 ## Accuracy notes (web-verified)
 
@@ -82,7 +82,7 @@ grounding; anything not directly confirmed is flagged `[Needs Verification]` for
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (◆ subject). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · dotnet-project-model** — a .NET desktop app is a `.csproj` project scaffolded/built/run with the `dotnet` CLI (`new`/`build`/`run`) against a Windows target framework.
 - **co-02 · nuget-packages** — desktop apps pull dependencies from NuGet via `dotnet add package`.

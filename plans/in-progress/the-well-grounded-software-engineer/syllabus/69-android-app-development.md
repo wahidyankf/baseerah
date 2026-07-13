@@ -1,6 +1,6 @@
 # 69 · Android App Development ◆ (By Example, Kotlin †)
 
-**prd row**: Pass 4 · Concurrency & Systems · By Example · Kotlin † ◆ · Learn 169 / Drill 269 ·
+**prd row**: Pass 4 · Concurrency & Systems · By Example · Kotlin † · Learn 169 / Drill 269 ·
 Nvim-ready Partial · VSCode-ready Partial. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: `◆` app-domain — building a real Android app: fundamentals (activities/lifecycle/manifest/
@@ -24,14 +24,14 @@ Studio + the Android SDK/Gradle are the practical baseline (emulator/AVD); the t
 
 ## Prerequisites
 
-- **Prior topics**: [topic 66 Just Enough Kotlin](./68-just-enough-kotlin.md) (the language + coroutines),
+- **Prior topics**: [topic 68 Just Enough Kotlin](./68-just-enough-kotlin.md) (the language + coroutines),
   [topic 14 Frontend Essentials](./14-frontend-essentials.md) (components, state, accessible UI), and
   [topic 47 Advanced Frontend](./47-advanced-frontend.md) (declarative UI, state management, optimistic
   updates).
 - **Tools & environment**: a macOS/Linux (or Windows) machine; **Android Studio** + the **Android SDK** +
   **Gradle** (`./gradlew`); an emulator/AVD or a device; a JDK. Favour the Gradle CLI for build/test.
-- **Assumed knowledge**: Kotlin syntax + coroutines (topic 65); component + state UI thinking (topics
-  12/29); calling an HTTP API (topic 11).
+- **Assumed knowledge**: Kotlin syntax + coroutines (topic 68); component + state UI thinking (topics
+  14/47); calling an HTTP API (topic 11).
 
 ## Accuracy notes (web-verified)
 
@@ -117,7 +117,7 @@ SharingStarted.WhileSubscribed(5_000), initialValue)` is the recommended UI-stat
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (◆ app-domain By-Example subject). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · project-and-gradle** — an Android app is a Gradle project (`settings.gradle`, module `build.gradle`, `./gradlew` wrapper); the build produces an APK/AAB.
 - **co-02 · manifest** — `AndroidManifest.xml` declares the app's components, the permissions it needs, and required device features to the OS and Play.

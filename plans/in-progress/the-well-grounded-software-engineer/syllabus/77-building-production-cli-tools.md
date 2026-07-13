@@ -27,7 +27,7 @@ building native, statically-linkable binaries.
 
 ## Prerequisites
 
-- **Prior topics**: [topic 61 Analytics & Experimentation](./63-analytics-and-experimentation.md)
+- **Prior topics**: [topic 63 Analytics & Experimentation](./63-analytics-and-experimentation.md)
   (honest measurement and self-reporting) and [topic 5 Just Enough Bash](./05-just-enough-bash.md) (pipes,
   exit codes, stdout/stderr, the shell environment a CLI lives in).
 - **Tools & environment**: a macOS/Linux/Windows terminal; the **Go toolchain** (`go`) and/or the **Rust
@@ -35,7 +35,7 @@ building native, statically-linkable binaries.
   `cobra`/`urfave`-style parser for Go, a `clap`-style parser for Rust); Neovim/VSCode with the Go/Rust LSP
   (DD-17).
 - **Assumed knowledge**: pipes, exit codes, and stdout-vs-stderr (topic 05); building and running a native
-  binary (topics 61/79); reading Go or Rust well enough to follow a small program (topics 61/79).
+  binary (topics 64/82); reading Go or Rust well enough to follow a small program (topics 64/82).
 
 ## Accuracy notes (web-verified)
 

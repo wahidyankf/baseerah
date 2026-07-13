@@ -1,7 +1,7 @@
 # 88 · Type Systems (By Example, OCaml + Haskell + F# †)
 
-**prd row**: Pass 4 · Concurrency & Systems · By Example · OCaml + Haskell + F# † · Learn 185 /
-Drill 285 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 4 · Concurrency & Systems · By Example · OCaml + Haskell + F# † · Learn 188 /
+Drill 288 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: what a strong static type system buys you — algebraic data types, sum/product types,
 exhaustive pattern matching, parametric polymorphism, Hindley-Milner inference, and typeclasses/modules —

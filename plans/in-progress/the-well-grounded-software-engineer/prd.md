@@ -113,22 +113,21 @@ The prologue and five passes:
   information architecture & SEO, containers & orchestration, cloud & IaC, **CI/CD & release
   engineering**, AI-powered apps, agentic AI, the IT-security + **Offensive Security (red team, Kali) +
   Defensive Security (blue team, SOC/IR)** split, IT governance & GRC, and analytics & experimentation.
-- **Pass 4 · Concurrency & Systems** (topics 61–86) — CSP (Go) and actor (Elixir) concurrency, the ◆
+- **Pass 4 · Concurrency & Systems** (topics 64–89) — CSP (Go) and actor (Elixir) concurrency, the ◆
   app domains (Android/iOS/Hybrid/Windows/Linux) with their language primers, building production CLI
   tools, C + OS internals (Linux/Windows, incl. PowerShell), systems programming, Rust + modern systems
   programming, Java + the enterprise JVM, Lisp (Scheme + Clojure sidebar), F#, type systems (OCaml +
   Haskell + F# sidebar; incl. applied category theory), compilers/parsers/transpilers.
-- **Pass 5 · Internals & Lead at Altitude** (topics 87–91) — Build Your Own Git, Build Your Own
-  Database, Build Your Own Raft, Platform Engineering & Developer Experience, and Site Reliability
-  Engineering (‡ senior leadership depth — IT governance and engineering management — woven through the
-  platform/SRE finale).
+- **Pass 5 · Internals & Lead at Altitude** (topics 90–94) — Build Your Own Git, Build Your Own
+  Database, Build Your Own Raft, Platform Engineering & Developer Experience (‡ senior leadership
+  depth), and Site Reliability Engineering (the platform/SRE finale).
 
 Two **parallel tracks** run alongside the spiral (a reader picks their path rather than reading all
 serially): the **app-domain** topics marked ◆ (Android / iOS / Hybrid / Windows / Linux app — pick the
 domain(s) that match your path) and the **Product & Delivery** track marked ▲ (Software Product
 Engineering + Project Management — readable early, from Pass 1 onward, since product and delivery
-thinking help a junior engineer immediately). Engineering Management and IT Governance stay as
-senior-altitude depth in Pass 5 (DD-14).
+thinking help a junior engineer immediately). Engineering Management (Pass 2) and IT Governance &
+GRC (Pass 3) come later as senior-altitude depth (DD-14).
 
 ```mermaid
 flowchart TD
@@ -242,7 +241,7 @@ flowchart TD
     N70["70 · Just Enough Swift"]
     N71["71 · iOS App Dev ◆"]
     N72["72 · Just Enough Dart"]
-    N73["73 · Hybrid App Dev"]
+    N73["73 · Hybrid App Dev ◆"]
     N74["74 · Just Enough C#"]
     N75["75 · Windows App Dev ◆"]
     N76["76 · Linux App Dev ◆"]
@@ -338,12 +337,12 @@ flowchart TD
 The passes give the section a spine of **topics** (vertical: order) and the skill tree gives it a spine of
 **dependencies** (which topic needs which). Neither gives it a spine of **ideas** — the handful of durable
 concepts that recur across many topics and are the real transferable payoff. Without this horizontal
-thread a reader finishes 90 competent-but-isolated topics; with it, they can trace one idea across
+thread a reader finishes 94 competent-but-isolated topics; with it, they can trace one idea across
 paradigms, concurrency, and distributed systems and **reason about the next technology they meet**, which
 is exactly the AI-age durable edge the brd names (understanding over recall).
 
 **The eight big ideas.** Every topic tags the ideas it advances in its `Why this exists · the big idea`
-opener (universal, all 90); judgment topics additionally develop them in their Tensions/Lineage blocks
+opener (universal, all 94); judgment topics additionally develop them in their Tensions/Lineage blocks
 (see [Scaled Intellectual Depth](./syllabus/overview.md#scaled-intellectual-depth-dd-33)):
 
 | Big idea (tag)                   | The through-line, in one sentence                                                                        | Recurs across (illustrative)                                                       |
@@ -410,7 +409,7 @@ marks only where the run/deploy step reaches past the editor (DD-17, DD-21, DD-2
 | 6   | P1 · Core Foundations             | Version Control & Git                       | Version control, branching, merging, and history with Git.                | Every collaboration and recovery workflow depends on Git fluency.                | `version-control-and-git`                   | By Example        | Git †                       | 106      | 206      | Yes        | Yes          |
 | 7   | P1 · Core Foundations             | Data Structures & Algorithms Essentials     | Core data structures and algorithms with complexity analysis.             | Choosing the right structure decides whether systems scale or stall.             | `data-structures-and-algorithms-essentials` | By Example        | Python                      | 107      | 207      | Yes        | Yes          |
 | 8   | P1 · Core Foundations             | Object-Oriented Programming Essentials      | Classes, inheritance, encapsulation, and polymorphism in practice.        | OOP vocabulary underpins most codebases you will read and modify.                | `object-oriented-programming-essentials`    | By Example        | Python                      | 108      | 208      | Yes        | Yes          |
-| 9   | P1 · Core Foundations             | Project Management ▲                        | Scoping, planning, estimating, and tracking software work.                | Delivering value needs the discipline to steer work, not just code.              | `project-management`                        | Annotated-concept | — ‡                         | 109      | 209      | Yes        | Yes          |
+| 9   | P1 · Core Foundations             | Project Management ▲                        | Scoping, planning, estimating, and tracking software work.                | Delivering value needs the discipline to steer work, not just code.              | `project-management`                        | Annotated-concept | ‡ no-code                   | 109      | 209      | Yes        | Yes          |
 | 10  | P1 · Core Foundations             | SQL Essentials                              | Relational modeling, joins, and querying with SQL.                        | Data lives in relational stores, so SQL is a non-negotiable literacy.            | `sql-essentials`                            | By Example        | SQL + Python † (SQLite)     | 110      | 210      | Yes        | Yes          |
 | 11  | P1 · Core Foundations             | Backend Essentials                          | Building HTTP backends with persistence, routing, and validation.         | Most products are backends, so this is the core building skill.                  | `backend-essentials`                        | By Example        | Python (PostgreSQL)         | 111      | 211      | Yes        | Yes          |
 | 12  | P1 · Core Foundations             | Networking Essentials                       | TCP/IP, HTTP, DNS, and sockets from first principles.                     | Networking knowledge lets you diagnose failures across every distributed system. | `networking-essentials`                     | By Example        | Python                      | 112      | 212      | Yes        | Yes          |
@@ -433,7 +432,7 @@ marks only where the run/deploy step reaches past the editor (DD-17, DD-21, DD-2
 | 29  | P2 · Depth, Design & Craft        | Advanced Networking                         | Load balancing, proxies, TLS, and network performance.                    | Production networking issues demand depth beyond the basics.                     | `advanced-networking`                       | Annotated-concept | Python \*                   | 129      | 229      | Yes        | Yes          |
 | 30  | P2 · Depth, Design & Craft        | Software Engineering Practices              | Code review, CI, quality gates, and team engineering practice.            | Sustainable delivery depends on the practices around the code.                   | `software-engineering-practices`            | Annotated-concept | Python \*                   | 130      | 230      | Yes        | Yes          |
 | 31  | P2 · Depth, Design & Craft        | Agentic Coding                              | Driving AI coding agents to plan, generate, and verify code.              | The AI-age core skill is directing and checking generated output.                | `agentic-coding`                            | Annotated-concept | ‡ polyglot                  | 131      | 231      | Yes        | Yes          |
-| 32  | P2 · Depth, Design & Craft        | Software Product Engineering ▲              | Turning engineering into shipped, valued software products.               | Building the right thing matters as much as building it right.                   | `software-product-engineering`              | Annotated-concept | — ‡                         | 132      | 232      | Yes        | Yes          |
+| 32  | P2 · Depth, Design & Craft        | Software Product Engineering ▲              | Turning engineering into shipped, valued software products.               | Building the right thing matters as much as building it right.                   | `software-product-engineering`              | Annotated-concept | ‡ no-code                   | 132      | 232      | Yes        | Yes          |
 | 33  | P2 · Depth, Design & Craft        | Engineering Management                      | Leading engineers, teams, delivery, and technical direction.              | Growth eventually means multiplying others, not just your own output.            | `engineering-management`                    | Annotated-concept | ‡ no-code                   | 133      | 233      | Yes        | Yes          |
 | 34  | P3 · Build for the Real World     | NoSQL Databases                             | Document, key-value, and column stores beyond relational.                 | Many workloads demand non-relational models you must choose correctly.           | `nosql-databases`                           | By Example        | Python †                    | 134      | 234      | Yes        | Yes          |
 | 35  | P3 · Build for the Real World     | Graph Databases                             | Modeling and querying connected data with graph databases.                | Relationship-heavy domains are far cleaner in a graph store.                     | `graph-databases`                           | By Example        | Cypher + Python †           | 135      | 235      | Yes        | Yes          |
@@ -470,14 +469,14 @@ marks only where the run/deploy step reaches past the editor (DD-17, DD-21, DD-2
 | 66  | P4 · Concurrency & Systems        | Just Enough Elixir                          | Elixir syntax, pattern matching, and functional idioms.                   | Elixir unlocks the BEAM's uniquely resilient concurrency model.                  | `just-enough-elixir`                        | Primer            | Elixir †                    | 166      | 266      | Yes        | Yes          |
 | 67  | P4 · Concurrency & Systems        | Actor-Model Concurrency                     | Actors, supervision trees, and fault-tolerant concurrency.                | The actor model shows how to build systems that self-heal.                       | `actor-model-concurrency`                   | By Example        | Elixir †                    | 167      | 267      | Yes        | Yes          |
 | 68  | P4 · Concurrency & Systems        | Just Enough Kotlin                          | Kotlin syntax, null safety, coroutines, and JVM idioms.                   | Kotlin is the modern language for Android and JVM work.                          | `just-enough-kotlin`                        | Primer            | Kotlin †                    | 168      | 268      | Yes        | Yes          |
-| 69  | P4 · Concurrency & Systems        | Android App Development                     | Building native Android apps with Kotlin and the SDK.                     | Mobile reach demands hands-on native Android delivery skill.                     | `android-app-development`                   | By Example        | Kotlin † ◆                  | 169      | 269      | Partial    | Partial      |
+| 69  | P4 · Concurrency & Systems        | Android App Development ◆                   | Building native Android apps with Kotlin and the SDK.                     | Mobile reach demands hands-on native Android delivery skill.                     | `android-app-development`                   | By Example        | Kotlin †                    | 169      | 269      | Partial    | Partial      |
 | 70  | P4 · Concurrency & Systems        | Just Enough Swift                           | Swift syntax, optionals, and value-oriented idioms.                       | Swift is the gateway to Apple's platforms and their tooling.                     | `just-enough-swift`                         | Primer            | Swift †                     | 170      | 270      | Partial    | Partial      |
-| 71  | P4 · Concurrency & Systems        | iOS App Development                         | Building native iOS apps with Swift and the SDK.                          | iOS is half the mobile market and needs first-hand experience.                   | `ios-app-development`                       | By Example        | Swift † ◆                   | 171      | 271      | Partial    | Partial      |
+| 71  | P4 · Concurrency & Systems        | iOS App Development ◆                       | Building native iOS apps with Swift and the SDK.                          | iOS is half the mobile market and needs first-hand experience.                   | `ios-app-development`                       | By Example        | Swift †                     | 171      | 271      | Partial    | Partial      |
 | 72  | P4 · Concurrency & Systems        | Just Enough Dart                            | Dart syntax, async, and idioms for Flutter development.                   | Dart underpins cross-platform Flutter app delivery.                              | `just-enough-dart`                          | Primer            | Dart †                      | 172      | 272      | Yes        | Yes          |
-| 73  | P4 · Concurrency & Systems        | Hybrid App Development                      | Building cross-platform apps from one Dart/Flutter codebase.              | Hybrid delivery ships to many platforms without duplicating work.                | `hybrid-app-development`                    | By Example        | Dart †                      | 173      | 273      | Yes        | Yes          |
+| 73  | P4 · Concurrency & Systems        | Hybrid App Development ◆                    | Building cross-platform apps from one Dart/Flutter codebase.              | Hybrid delivery ships to many platforms without duplicating work.                | `hybrid-app-development`                    | By Example        | Dart †                      | 173      | 273      | Yes        | Yes          |
 | 74  | P4 · Concurrency & Systems        | Just Enough C#                              | C# syntax, LINQ, async, and .NET idioms.                                  | C# anchors the vast .NET ecosystem across desktop and cloud.                     | `just-enough-csharp`                        | Primer            | C# †                        | 174      | 274      | Yes        | Yes          |
-| 75  | P4 · Concurrency & Systems        | Windows App Development                     | Building native Windows desktop applications in C#.                       | Windows remains dominant on the desktop you must sometimes target.               | `windows-app-development`                   | By Example        | C# † ◆                      | 175      | 275      | Partial    | Partial      |
-| 76  | P4 · Concurrency & Systems        | Linux App Development                       | Building native Linux desktop applications and packaging.                 | Linux desktop delivery rounds out cross-platform native capability.              | `linux-app-development`                     | By Example        | Python ◆                    | 176      | 276      | Yes        | Yes          |
+| 75  | P4 · Concurrency & Systems        | Windows App Development ◆                   | Building native Windows desktop applications in C#.                       | Windows remains dominant on the desktop you must sometimes target.               | `windows-app-development`                   | By Example        | C# †                        | 175      | 275      | Partial    | Partial      |
+| 76  | P4 · Concurrency & Systems        | Linux App Development ◆                     | Building native Linux desktop applications and packaging.                 | Linux desktop delivery rounds out cross-platform native capability.              | `linux-app-development`                     | By Example        | Python                      | 176      | 276      | Yes        | Yes          |
 | 77  | P4 · Concurrency & Systems        | Building Production CLI Tools               | Shipping robust, distributable command-line tools in Go and Rust.         | CLIs are how engineers deliver leverage to other engineers.                      | `building-production-cli-tools`             | By Example        | Go + Rust †                 | 177      | 277      | Yes        | Yes          |
 | 78  | P4 · Concurrency & Systems        | Just Enough C                               | C syntax, pointers, memory, and manual management.                        | C is the substrate beneath operating systems and every runtime.                  | `just-enough-c`                             | Primer            | C †                         | 178      | 278      | Yes        | Yes          |
 | 79  | P4 · Concurrency & Systems        | Linux OS                                    | Processes, syscalls, filesystems, and the Linux kernel interface.         | Linux runs the servers, so its internals explain production behavior.            | `linux-os`                                  | By Example        | C + shell †                 | 179      | 279      | Yes        | Yes          |
@@ -513,22 +512,29 @@ marks only where the run/deploy step reaches past the editor (DD-17, DD-21, DD-2
   F# — for type systems, with **F#** also anchoring Compilers, Parsers & Transpilers as the ML-family's
   natural home for parser combinators and algebraic ASTs; **YAML/HCL** as the declarative language of
   container manifests and infrastructure-as-code). Networking Essentials stays Python
-  (sockets/HTTP clients).
+  (sockets/HTTP clients). **Second sense**: on a few **Python-primary** topics the same `†` instead
+  flags the fully-typed-Python treatment (DD-39) — not a non-Python subject; each topic's per-topic
+  footnote states which of the two senses applies.
 - `§` — **tool primer**: an interactive-editor skill on **vanilla Neovim with no plugins**; minimal-to-no
   programming code, shown as `:set`/ex-commands and motions rather than a language. Just Enough Nvim
   precedes Just Enough Lua precisely so it needs no Lua.
-- `‡` — leadership/governance topic with minimal-to-no code; taught via prose, worked scenarios, and
-  diagrams.
+- `‡` — **minimal-to-no runnable code**; taught via prose, worked scenarios, artifacts, and diagrams.
+  **Primary sense**: leadership/governance topics (09, 18, 32, 33, 62, 93). **Second sense**: two
+  technical topics whose deliverables are a workflow or markup rather than a runnable program carry a
+  qualified `‡` — **31 Agentic Coding** (`‡ polyglot`: the skill is the agentic loop, so the target
+  language varies while the loop stays the same) and **49 Information Architecture & SEO**
+  (`‡ HTML †`: the worked artifacts are semantic HTML and structured-data markup, with `†` marking
+  HTML as the subject-mandated primary). Each topic's opening note states which sense applies.
 
 **Parallel-track markers**:
 
 - ◆ — **parallel app-domain topic**: pick the domain(s) matching your path; not every reader does
   every domain. Frontend and Backend are the default full-stack spine and are not marked.
-- ▲ — **parallel Product & Delivery track topic**: readable early (from Pass 2 onward), in parallel
+- ▲ — **parallel Product & Delivery track topic**: readable early (from Pass 1 onward), in parallel
   with the technical spiral, since product and delivery thinking help a junior engineer immediately.
 
-**Format split**: 58 By-Example topics, 17 Annotated-concept topics, 15 _Just Enough_ primer topics
-(90 total). Topic slugs are identical across both tracks (only parent folder + weight differ), so the
+**Format split**: 62 By-Example topics, 17 Annotated-concept topics, 15 _Just Enough_ primer topics
+(94 total). Topic slugs are identical across both tracks (only parent folder + weight differ), so the
 two tracks stay in the same order. The ordering requirement is satisfied at the **topic** level; the
 learning track's per-topic pages are richer (a By-Example-scale subtree) while the drilling track is
 one page per topic.
@@ -653,7 +659,7 @@ principle):
   later pass.
 - **A shell primer in Pass 1** — **Just Enough Bash (5)** teaches the shell as its own primer right
   after Python, so every later topic can drive builds, tests, and tooling from the terminal (the
-  raw-form stance). **PowerShell** is not a standalone primer; it is folded into **Windows OS (54)**
+  raw-form stance). **PowerShell** is not a standalone primer; it is folded into **Windows OS (80)**
   where Windows administration needs it.
 - **Databases split into three** — the old single data-storage topic becomes **SQL Essentials +
   Advanced SQL & Query Performance** (relational, SQLite→PostgreSQL vehicles), **NoSQL Databases**
@@ -669,25 +675,25 @@ principle):
   retained inside each app-dev topic** so testing is taught both as a discipline and in context.
 - **Architecture patterns** — **Domain-Driven Design** and **Event-Driven Architecture** are their
   own By-Example topics in Pass 3; **hexagonal architecture (ports & adapters)** folds into
-  **Software Architecture (30)** as one catalogued style alongside layered/clean/functional-core.
+  **Software Architecture (42)** as one catalogued style alongside layered/clean/functional-core.
 - **Functional programming + type systems carry applied category theory** — functors, monoids, monads,
-  and composition are taught **as they appear in code** inside **Functional Programming (18)** and
-  again, more deeply, inside **Type Systems (57)**; category theory is **not** a standalone topic. The
+  and composition are taught **as they appear in code** inside **Functional Programming (23)** and
+  again, more deeply, inside **Type Systems (88)**; category theory is **not** a standalone topic. The
   treatment is anchored on Bartosz Milewski's CC-licensed _Category Theory for Programmers_ (DD-21).
-- **Lisp = Scheme core + Clojure sidebar** — **Lisp (56)** teaches Lisp's ideas (homoiconicity,
+- **Lisp = Scheme core + Clojure sidebar** — **Lisp (86)** teaches Lisp's ideas (homoiconicity,
   macros, the REPL, `cons`/recursion) in a **minimal Racket/Scheme** for the cleanest teaching signal,
   with a **Clojure sidebar** showing the same ideas in a production Lisp on the JVM (employability,
   real-world tooling).
-- **Type Systems = OCaml + Haskell + F# sidebar** — **Type Systems (57)** teaches Hindley–Milner
+- **Type Systems = OCaml + Haskell + F# sidebar** — **Type Systems (88)** teaches Hindley–Milner
   inference in **OCaml** (the cleanest HM vehicle), typeclasses / higher-kinded types in **Haskell**,
   with an **F# sidebar** (ML on .NET — and this repo's own backend language) grounding the ideas in an
   industry setting.
-- **Security red/blue split** — beyond **Security Essentials (P1)** and **IT Security (38,
+- **Security red/blue split** — beyond **Security Essentials (P1)** and **IT Security (58,
   risk/asset/network)**, the offensive and defensive disciplines are their own By-Example topics:
-  **Offensive Security (39)** — red team, pentest methodology, **Kali Linux**, against
-  intentionally-vulnerable OSS targets and local VMs — and **Defensive Security (40)** — blue team,
+  **Offensive Security (59)** — red team, pentest methodology, **Kali Linux**, against
+  intentionally-vulnerable OSS targets and local VMs — and **Defensive Security (60)** — blue team,
   detection/SOC, hardening, incident response. **GDPR + NIST** compliance is studied in detail in
-  **IT Governance & GRC (60)** with an intro in Security Essentials; ISO 27001 / SOC 2 are
+  **IT Governance & GRC (62)** with an intro in Security Essentials; ISO 27001 / SOC 2 are
   landscape-only (DD-21).
 - **Compilers as AI-guardrail engineering** — Compilers, Parsers & Transpilers is framed around a
   concrete real-world motivation (DD-16): building the **deterministic guardrails** that keep
@@ -740,7 +746,7 @@ density on their code, but scoped to "just enough to be productive," not to full
 
 ## Implementation Completeness — no deferred items (HARD RULE, DD-19)
 
-**The implementation MUST NOT contain any deferred items.** Every topic committed to scope — all 90
+**The implementation MUST NOT contain any deferred items.** Every topic committed to scope — all 94
 topics across **both** tracks — is authored **completely, to the mastery bar, before the plan is
 done**. Concretely, the shipped section contains **zero** of the following:
 
@@ -759,7 +765,7 @@ unfinished item; both ship complete. Likewise the explicitly out-of-scope items 
 mirror, interactive flashcards, scoring/progress state) are **scope boundaries decided up front**,
 not implementation debt left inside a delivered artifact. The rule is absolute _within the committed
 scope_: nothing in scope ships partial, stubbed, or promised-for-later. Each phase gate asserts this
-for the topics in that phase; the final gate asserts it for all 90.
+for the topics in that phase; the final gate asserts it for all 94.
 
 ## Runnable-Example Rule (HARD RULE, DD-20)
 
@@ -840,7 +846,7 @@ forbids hidden dependencies between topics. Enforced per topic and re-checked at
 **Every material file carries an explicit navigation footer**, so a reader can always step one topic
 forward or back along the frozen spiral order. The footer is a horizontal rule followed by
 `← Previous: [...] · Next: [...] →`. In the [syllabus/ folder](./syllabus/) the chain runs
-`README → 01 → 02 → … → 90 → overview` (file 01's Previous points at `README`; file 90's Next points at
+`README → 01 → 02 → … → 94 → overview` (file 01's Previous points at `README`; file 94's Next points at
 `overview`); the authored learning/drilling pages carry the equivalent footer in content order. Footer
 targets follow the prd canonical-table order (DD-10 table-referential). Enforced per file and re-checked
 at each phase gate.
@@ -879,8 +885,8 @@ the bar.
    pass's topics into one project that proves the pass's promise.
 2. **Curated cross-cutting capstones** bringing the total to **~9–11**: **full-stack-app** (Frontend +
    Backend + SQL, after the Pass 1 arc), **secure-service** (Backend + Security Essentials + IT
-   Security, Pass 3), **data-pipeline** (Data Engineering + SQL/NoSQL + a queue, Pass 3), and
-   **concurrency-showdown** (core Concurrency + CSP/Go + actor/Elixir, same problem three ways, Pass 4).
+   Security, Pass 3), **data-pipeline** (Data Engineering + SQL/NoSQL + a RAG interface, Pass 3), and
+   **concurrency-showdown** (CSP/Go + actor/Elixir, same problem two ways, Pass 4).
 
 **Full spec per capstone lives in the [syllabus/ folder](./syllabus/)** (DD-29): each is specified with
 (a) goal / outcome, (b) concepts-exercised checklist, (c) ordered step outline (each step naming a
@@ -894,8 +900,8 @@ where the junction spans a pass boundary (delivery.md assigns the NN).
 Each canonical topic is a **single folder owning both its `learning/` and its `drilling/`
 subfolder** — not two top-level `learning/`/`drilling/` trees. A reader navigates once into a topic and
 finds its by-example depth, its intra-topic capstone, and its drill page together. Journey order lives
-on the **topic-slug folder weight** (`100 + 10 × journey-index` → 110..710, ×10-spaced so inter-topic
-capstone folders slot into the gaps); the prd **"Learn wt" (101..161)** and **"Drill wt" (201..261)**
+on the **topic-slug folder weight** (`100 + 10 × journey-index` → 110..1040, ×10-spaced so inter-topic
+capstone folders slot into the gaps); the prd **"Learn wt" (101..194)** and **"Drill wt" (201..294)**
 columns now describe the two **subfolder** weights and are unchanged, with the parity invariant
 `Drill wt = Learn wt + 100` preserved. The tech-docs [Content-Tree Layout](./tech-docs.md) is the
 authoritative shape.
@@ -904,7 +910,7 @@ authoritative shape.
 
 The per-topic detail lives in a **`syllabus/` folder**, not a single file: `README.md` (index +
 how-to-read), `overview.md` (design, legend, capstone policy, follow-along contract, per-file
-template), and one **`NN-<slug>.md` per topic** where **NN = order of appearance (01, 02, … 90)**. Each
+template), and one **`NN-<slug>.md` per topic** where **NN = order of appearance (01, 02, … 94)**. Each
 per-topic file is very detailed — the topic's full item list, worked-example specs, and the full
 intra-topic capstone spec (plus any inter-topic capstone spec anchored at that topic). Each delivery
 per-topic step authors exactly its syllabus file's content.
@@ -959,13 +965,13 @@ Annotated-concept, and leadership `‡` no-code alike — per user: "apply to no
 | Shape                         | Band (examples) | Unit                                                           |
 | ----------------------------- | --------------- | -------------------------------------------------------------- |
 | By Example                    | 75–85           | code example                                                   |
-| Primer § (_Just Enough X_)    | 75–85           | code example (authored at By-Example pace)                     |
+| Primer (_Just Enough X_)      | 75–85           | code example (authored at By-Example pace)                     |
 | Annotated-concept (with code) | 45–60           | worked example (code where it fits, else Mermaid-backed prose) |
 | Leadership `‡` no-code        | 20–30           | worked scenario / decision artifact (no code)                  |
 
-The 6 leadership `‡` no-code topics are **09, 18, 32, 33, 58, 89**; the 11 Annotated-concept
-code-bearing topics are **19, 29, 30, 31, 37, 42, 44, 49, 51, 55, 90**; the remaining 73 (58 By
-Example + 15 Primers) sit in the 75–85 band.
+The 6 leadership `‡` no-code topics are **09, 18, 32, 33, 62, 93**; the 11 Annotated-concept
+code-bearing topics are **19, 29, 30, 31, 37, 42, 44, 49, 51, 58, 94**; the remaining 77 (62 By Example + 15
+Primers) sit in the 75–85 band.
 
 **Delivery mirror (1:1)**: each topic's phase in [delivery.md](./delivery.md) lists **one `[AI]`
 checkbox per enumerated example** — `ex-NN · <slug>` with its colocated file path and its verify
@@ -1028,6 +1034,25 @@ Problem-Solving principles applied to factual accuracy — a defense against LLM
 both the planning surface and the execution gates. `plan-checker` flags an unsupported version/API
 claim in a plan doc; `apps-ayokoding-www-facts-checker` + `plan-execution-checker` flag it in authored
 content.
+
+## Typed-Python Rule — every Python example fully type-annotated (HARD RULE, DD-39)
+
+**Every Python worked example, capstone, snippet, and drill answer across the curriculum is fully
+type-annotated in the pyright-clean spirit.** Function signatures (parameters and return types),
+module-level constants, dataclass/`TypedDict` fields, and non-obvious locals carry
+[PEP 484](https://peps.python.org/pep-0484/) / [PEP 604](https://peps.python.org/pep-0604/) type
+hints; the intent is that a reader could run `pyright` in strict mode (set via `"typeCheckingMode":
+"strict"` in `pyrightconfig.json`/`pyproject.toml`, or a `# pyright: strict` file comment — pyright has
+no `--strict` CLI flag) over any authored Python page and see it report `0 errors`. Type hints are treated as first-class readability documentation, not optional
+decoration — they make the shape of every example legible at a glance and reinforce the static-typing
+discipline the series teaches.
+
+This is why several Python-primary topics carry a `†` in their Language column: on those topics the
+`†` footnote flags exactly this typed-Python treatment (not a non-Python language exception — that is
+the `†` legend's other, subject-mandated sense). A topic whose subject **is** Python but whose
+footnote emphasises the pyright-clean discipline reads its `†` through this rule. `plan-checker` flags an
+untyped Python example in a plan doc; `swe-code-checker` and `apps-ayokoding-www-*-checker` enforce it
+in authored `CONTENT/`.
 
 ## Drilling-track anatomy
 
@@ -1111,7 +1136,7 @@ Feature: The Well-Grounded Software Engineer section
     And "Extending Neovim" is where plugin management, LSP, DAP, Treesitter, and completion are taught
 
   Scenario: Journey ordering is immediately-effective-first and consistent across tracks
-    Given the 90 defined topics
+    Given the 94 defined topics
     When the learning and drilling tracks are compared
     Then each track covers exactly the same 94 topics in the same weight order
     And the order runs from Pass 0 (set up your forge) through Pass 5 (lead at altitude)
@@ -1259,7 +1284,7 @@ Feature: The Well-Grounded Software Engineer section
     And each listed worked example appears in the learning or drilling content
 
   Scenario: Each topic is a topic-first folder owning its own learning and drilling
-    Given any of the 91 canonical topics
+    Given any of the 94 canonical topics
     When its content tree is inspected
     Then a single "<topic-slug>/" folder holds both a "learning/" and a "drilling/" subfolder
     And there is no top-level "learning/" or "drilling/" tree splitting the topic across two trees
@@ -1324,7 +1349,7 @@ Feature: The Well-Grounded Software Engineer section
     And Pass 5 and the Product & Delivery track carry the fullest Tensions/Lineage treatment
 
   Scenario: Every drilling page carries the elaborative-interrogation drill form
-    Given any of the 90 drilling pages
+    Given any of the 94 drilling pages
     When its section order is inspected
     Then it carries a fifth "Elaborative interrogation / self-explanation" form after the self-check checklist
     And that form asks why a claim holds and why not the alternative, with model explanations in a "<details>" block
@@ -1340,7 +1365,7 @@ Feature: The Well-Grounded Software Engineer section
 ## Product Scope
 
 **In scope**: `_index.md` + `overview.md` (with the Pass 0 + five-pass spiral Mermaid map and the
-94-node skill tree); **91 topic-first folders** (DD-26), each `<topic-slug>/` owning its own
+94-node skill tree); **94 topic-first folders** (DD-26), each `<topic-slug>/` owning its own
 `learning/` subtree (By-Example-scale learning content, hybrid format per the canonical table,
 including the 15 _Just Enough_ primers) and its own `drilling/` page, covering every item/example
 enumerated in the [syllabus/ folder](./syllabus/), each with its colocated `code/` samples (DD-24);
@@ -1379,7 +1404,7 @@ colocated `code/` samples (deliberately excluded, DD-24); edits to existing deep
 | A taught dependency carries an open CVE                                        | CVE-free policy (DD-23): stdlib-first, exact pins, CVE-clean across five sources, free OSS scanners; facts-checker verifies at each gate.                                                  |
 | Colocated `code/` samples drag a dozen toolchains into the app build           | DD-24 excludes `content/**/code/**` from Nx build/test/lint/specs:coverage; samples covered by authoring/checker gates + runnable-example rule instead.                                    |
 | Editor setup drifts per topic / duplicates plugin lists                        | Plugins enumerated once per language in the Editor Setup matrix (DRY); each topic links the row rather than re-listing; nvim ⇒ vscode ⇒ stack precedence fixed.                            |
-| Topic-first `learning/`+`drilling/` pair drifts in set/order                   | Weight scheme (topic folder 100 + 10 x index; learning subfolder 101..161 / drilling subfolder 201..261, drill = learn + 100) + explicit parity gate per topic (DD-26).                    |
+| Topic-first `learning/`+`drilling/` pair drifts in set/order                   | Weight scheme (topic folder 100 + 10 x index; learning subfolder 101..194 / drilling subfolder 201..294, drill = learn + 100) + explicit parity gate per topic (DD-26).                    |
 | Capstones balloon or turn shallow / non-runnable                               | Capstone Policy (DD-27) scales by topic kind; full spec (goal, checklist, ordered steps, acceptance criteria) lives in the syllabus file; done-bar = "runnable end-to-end + web-verified". |
 | A worked example or capstone hides an assumption a reader can't fill           | Follow-Along Completeness Rule (DD-30): prerequisites + versions up front, no elided listings, verbatim commands with expected output; re-checked at every phase gate.                     |
 | Content goes stale between authoring and publish (versions, APIs, CVEs)        | Accuracy Verification Rule (DD-28): web-researcher verifies each topic before authoring (sequential); facts-checker re-verifies rendered pages at each gate.                               |

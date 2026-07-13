@@ -1,7 +1,7 @@
 # 94 · Site Reliability Engineering (Annotated-concept, Python \*)
 
-**prd row**: Pass 5 · Internals & Lead at Altitude · Annotated-concept · Python \* · Learn 191 /
-Drill 291 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 5 · Internals & Lead at Altitude · Annotated-concept · Python \* · Learn 194 /
+Drill 294 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: `*` concept-centric (Python where code appears) — operating software reliably at scale:
 SLIs/SLOs/error budgets, the four golden signals, observability (metrics/logs/traces), alerting on symptoms
@@ -224,23 +224,23 @@ Contiguous `ex-01..ex-52`. Every example cites the `co-NN` it exercises. Concept
 
 ## Capstone spec — inter-topic: capstone-lead-at-altitude (whole-journey)
 
-> **Weight**: `capstone-lead-at-altitude/_index.md` = **1005** (section root, after the journey's final
-> topic 91). Kind: **whole-journey synthesis → leadership/decision artifact + a shipped system**. The
-> capstone of the entire program — it looks back across all 90 topics.
+> **Weight**: `capstone-lead-at-altitude/_index.md` = **1045** (section root, after the journey's final
+> topic 94). Kind: **whole-journey synthesis → leadership/decision artifact + a shipped system**. The
+> capstone of the entire program — it looks back across all 94 topics.
 
 - **Goal**: act as the **technical lead of the whole journey** — take one of the earlier runnable systems (the
   `capstone-concurrency-and-systems` service from [`89-compilers-parsers-and-transpilers`](./89-compilers-parsers-and-transpilers.md)
   or the `capstone-real-world-delivery` app) and **operate it at altitude**: define its SLOs and reliability
-  posture (topic 91), author a technical strategy + prioritization record that a team could execute (topics
+  posture (topic 94), author a technical strategy + prioritization record that a team could execute (topics
   32/33), and produce a whole-journey **retrospective** that names, per pass, what the relearn-and-drill habit
   changed — closing the program by turning the individual learning loop into an organizational one.
-- **Concepts integrated**: [ ] SLIs/SLOs/error budgets + a golden-signals dashboard on a real service (90)
+- **Concepts integrated**: [ ] SLIs/SLOs/error budgets + a golden-signals dashboard on a real service (94)
   [ ] a one-page technical strategy tying team → product outcomes (32/33) [ ] a prioritization/trade-off
   decision record for the service's roadmap (33) [ ] a growth-plan + leading-through-influence frame (33)
   [ ] a whole-journey retrospective mapping each pass (P0–P5) to a concrete capability gained.
 - **Ordered steps**:
   1. `capstone-lead-at-altitude/code/` — take an earlier capstone service, define its SLI/SLO/error budget,
-     and stand up a golden-signals dashboard + a symptom-based alert (90). Verify the SLO alert fires on an
+     and stand up a golden-signals dashboard + a symptom-based alert (94). Verify the SLO alert fires on an
      injected violation and the dashboard reflects load.
   2. `strategy.md` + `prioritization.md` — a one-page technical strategy linking the service's reliability
      work to product outcomes, and a prioritization record for its roadmap under an error-budget constraint

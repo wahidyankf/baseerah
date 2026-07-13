@@ -1,6 +1,6 @@
-# 9 · Project Management ▲ (Annotated-concept, — ‡)
+# 9 · Project Management ▲ (Annotated-concept, ‡ no-code)
 
-**prd row**: Pass 1 · Core Foundations · Annotated-concept · — ‡ · Learn 109 / Drill 209 · Nvim-ready
+**prd row**: Pass 1 · Core Foundations · Annotated-concept · ‡ no-code · Learn 109 / Drill 209 · Nvim-ready
 Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: the **Product & Delivery** track (`▲`) — delivery execution: methodologies, the triple

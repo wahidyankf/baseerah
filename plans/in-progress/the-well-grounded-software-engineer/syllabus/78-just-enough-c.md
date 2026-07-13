@@ -1,9 +1,9 @@
-# 78 · Just Enough C (Primer §, C †)
+# 78 · Just Enough C (Primer, C †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · C † · Learn 178 / Drill 278 ·
+**prd row**: Pass 4 · Concurrency & Systems · Primer · C † · Learn 178 / Drill 278 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough C** to be productive in the OS and systems-programming topics
+**Scope note**: **just enough C** to be productive in the OS and systems-programming topics
 ([`79-linux-os`](./79-linux-os.md), [`80-windows-os`](./80-windows-os.md),
 [`81-system-programming`](./81-system-programming.md)). The compiler/`make` toolchain, syntax/types,
 a pointers intro, arrays/structs, `stdio`, the preprocessor, and a minimal `Makefile`.
@@ -73,7 +73,7 @@ flagged for re-verification at authoring time.
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (§ primer). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · gcc-clang** — `gcc`/`clang` compile a C source file into a runnable binary.
 - **co-02 · compile-link** — compilation produces object files that the linker combines into an executable.

@@ -1,4 +1,4 @@
-# 33 · Engineering Management ‡ (Annotated-concept, no-code)
+# 33 · Engineering Management (Annotated-concept, ‡ no-code)
 
 **prd row**: Pass 2 · Depth, Design & Craft · Annotated-concept · ‡ no-code · Learn 133 / Drill 233 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))

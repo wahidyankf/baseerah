@@ -6,7 +6,7 @@
 [`27-data-access-orms-and-query-builders`](./27-data-access-orms-and-query-builders.md) — implement a
 minimal ORM and query builder so the tier above stops being magic. You build a fluent query builder,
 row→object mapping, an identity map, a unit of work, and lazy loading. `†`: fully type-annotated
-Python (DD-34) over the DB-API driver.
+Python (DD-39) over the DB-API driver.
 
 ## Why this exists · the big idea
 
@@ -77,7 +77,7 @@ rebuilds them so they stop being magic.
 ## Worked examples
 
 Colocated under `build-your-own-orm/learning/code/`; each component is built and unit-tested against a
-local SQLite database, fully type-annotated Python (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-78`.
+local SQLite database, fully type-annotated Python (DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-78`.
 Every example cites the `co-NN` it exercises; every concept above is exercised by ≥1 example.
 
 ### Beginner
@@ -107,7 +107,7 @@ Every example cites the `co-NN` it exercises; every concept above is exercised b
 - **ex-23 · compile-is-pure** — compile the same query twice — verify identical output with no side effects. (co-08, co-03)
 - **ex-24 · execute-over-cursor** — pass a compiled `(sql, params)` to a DB-API cursor — verify rows returned. (co-23)
 - **ex-25 · connect-cursor-lifecycle** — open connection, cursor, execute, close — verify the PEP 249 flow. (co-23)
-- **ex-26 · builder-typed-api** — annotate builder methods with return types — verify `mypy` passes on a query chain. (co-25)
+- **ex-26 · builder-typed-api** — annotate builder methods with return types — verify `pyright` passes on a query chain. (co-25)
 
 ### Intermediate
 
@@ -138,7 +138,7 @@ Every example cites the `co-NN` it exercises; every concept above is exercised b
 - **ex-51 · identity-map-feeds-mapper** — the mapper checks the identity map before constructing — verify a cached object is reused. (co-13, co-10)
 - **ex-52 · metadata-typed-columns** — annotate metadata columns with Python types — verify the type drives the coercer. (co-12, co-09)
 - **ex-53 · builder-plus-mapper-select** — compose a builder query, execute, map rows — verify a list of typed objects. (co-08, co-10)
-- **ex-54 · typed-session-api** — annotate `session.get[T](pk) -> T` generically — verify `mypy` infers the return type. (co-25)
+- **ex-54 · typed-session-api** — annotate `session.get[T](pk) -> T` generically — verify `pyright` infers the return type. (co-25)
 
 ### Advanced
 
@@ -164,7 +164,7 @@ Every example cites the `co-NN` it exercises; every concept above is exercised b
 - **ex-74 · migration-runner-order** — apply out-of-order files — verify they run in version order. (co-24)
 - **ex-75 · wire-full-stack-select** — metadata + builder + mapper + identity map end to end — verify typed objects from a real query. (co-08, co-10, co-13, co-23)
 - **ex-76 · wire-full-stack-write** — session + unit of work + builder on the write path — verify an atomic persist. (co-15, co-16, co-20)
-- **ex-77 · typed-end-to-end** — run `mypy` over the whole hand-built stack — verify zero type errors. (co-25)
+- **ex-77 · typed-end-to-end** — run `pyright` over the whole hand-built stack — verify zero type errors. (co-25)
 - **ex-78 · capstone-preview-mini-orm** — run the customers/orders scenario over the mini-ORM — verify the same result as topic 27's ORM tier. (co-13, co-20, co-22, co-24)
 
 ## Capstone spec — intra-topic (subject → full runnable)

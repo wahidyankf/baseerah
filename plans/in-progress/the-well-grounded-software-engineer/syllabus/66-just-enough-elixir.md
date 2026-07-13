@@ -1,16 +1,16 @@
-# 66 · Just Enough Elixir (Primer §, Elixir †)
+# 66 · Just Enough Elixir (Primer, Elixir †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · Elixir † · Learn 166 / Drill 266 ·
+**prd row**: Pass 4 · Concurrency & Systems · Primer · Elixir † · Learn 166 / Drill 266 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough Elixir** to be productive in
+**Scope note**: **just enough Elixir** to be productive in
 [`67-actor-model-concurrency`](./67-actor-model-concurrency.md). Immutable data, pattern matching, the pipe
 operator, functions/modules, recursion, and a `spawn`/`send`/`receive` _preview_ only (process depth
-belongs to topic 64).
+belongs to topic 67).
 
 ## Why this exists · the big idea
 
-- **The problem before the solution**: the actor model in topic 64 assumes immutable data and lightweight
+- **The problem before the solution**: the actor model in topic 67 assumes immutable data and lightweight
   processes, which map poorly onto imperative habits — this primer rewires you to think in immutable
   transforms and message passing before the depth arrives.
 - **Keep-this-if-you-forget-everything**: with no mutable state, a program is just data flowing through
@@ -94,7 +94,7 @@ belongs to topic 64).
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer §, subject band). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · iex-repl** — `iex` is the interactive shell; the fastest loop for exploring values, functions,
   and pattern matches before writing a file.

@@ -6,7 +6,7 @@
 log, the buffer pool, MVCC, and on-disk page layout. This explains the query-performance topic above
 it (why an index is a B-tree, why writes are cheap in one engine and reads in another) and feeds the
 build-your-own-database pass at [`91-build-your-own-database`](./91-build-your-own-database.md). `†`:
-fully type-annotated Python examples (DD-34) that model the structures at small scale.
+fully type-annotated Python examples (DD-39) that model the structures at small scale.
 
 ## Why this exists · the big idea
 
@@ -139,7 +139,7 @@ fully type-annotated Python examples (DD-34) that model the structures at small 
 ## Worked examples
 
 Colocated under `database-internals-and-storage-engines/learning/code/` as runnable, fully
-type-annotated Python (DD-20/DD-30/DD-34) that models each internal at small scale. Contiguous
+type-annotated Python (DD-20/DD-30/DD-34/DD-39) that models each internal at small scale. Contiguous
 `ex-01..ex-80`. Every example cites the `co-NN` it exercises; every concept above is exercised by
 ≥ 1 example.
 

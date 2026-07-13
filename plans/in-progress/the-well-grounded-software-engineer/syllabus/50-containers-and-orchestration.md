@@ -189,7 +189,7 @@ handled with the license/standards-awareness lens (DD-15). Cloud provisioning is
 
 Colocated under `containers-and-orchestration/learning/`; each is a real Dockerfile, Compose file, or K8s
 manifest applied from the `docker`/`kubectl` CLI **or** an annotated decision artifact (DD-20/DD-30).
-Contiguous `ex-01..ex-80`. Every example cites the `co-NN` it exercises. Concepts come before examples.
+Contiguous `ex-01..ex-83`. Every example cites the `co-NN` it exercises. Concepts come before examples.
 
 ### Beginner
 

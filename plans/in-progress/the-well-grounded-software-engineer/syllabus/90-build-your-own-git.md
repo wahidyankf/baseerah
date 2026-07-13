@@ -8,7 +8,7 @@ Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topi
 — written against a real `.git` directory so your reimplementation and the real `git` binary can read
 each other's output. This is the build-your-own tier of [`06-version-control-and-git`](./06-version-control-and-git.md):
 that topic taught the object-model intuition and the CLI; here you make it concrete by implementing it.
-`†`: Python, fully type-annotated (DD-34), verified with `pytest`.
+`†`: Python, fully type-annotated (DD-39), verified with `pytest`.
 
 ## Why this exists · the big idea
 
@@ -29,7 +29,7 @@ that topic taught the object-model intuition and the CLI; here you make it concr
 - **Prior topics**: [topic 6 Version Control & Git](./06-version-control-and-git.md) (the object-model
   intuition — commits/trees/blobs/refs — and everyday CLI fluency this topic makes concrete) and
   [topic 4 Just Enough Python](./04-just-enough-python.md) (the implementation language).
-- **Tools & environment**: a macOS/Linux terminal; **Python 3.x** with type hints (mypy-clean spirit, DD-34);
+- **Tools & environment**: a macOS/Linux terminal; **Python 3.x** with type hints (pyright-clean spirit, DD-39);
   `pytest`; the real **`git`** binary installed so you can cross-check your objects against genuine ones;
   Neovim/VSCode with the Python LSP (DD-17).
 - **Assumed knowledge**: Git's object model and the porcelain commands (topic 06); Python classes, files,
@@ -70,7 +70,7 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
   (git-scm.com/docs/gitformat-index)
 - **Git 2.55.0** is the current stable release used to cross-check objects; treat the exact patch as
   `[Needs Verification]` at authoring — the on-disk formats above are stable regardless. (github.com/git/git/tags)
-- **Implementation language** — Python **fully type-annotated** (DD-34), tested with **pytest**; every
+- **Implementation language** — Python **fully type-annotated** (DD-39), tested with **pytest**; every
   object written is cross-checked against the real `git` binary (`git cat-file`, `git ls-tree`, `git log`).
 
 ## Concepts
@@ -108,10 +108,37 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
 - **co-29 · hash-algo-parameter** — the hash algorithm (SHA-1/SHA-256) is a parameter, not hard-coded.
 - **co-30 · pytest-stages** — `pytest` covers each stage (objects, refs, index, porcelain, interop).
 
+## Tensions & trade-offs — when NOT to reach for this
+
+- **Building the plumbing vs trusting the porcelain**: reimplementing Git's object store teaches exactly
+  what sits under `commit`/`log`/`checkout`, but a working engineer should still use the real `git` binary
+  day to day — this topic is understanding-for-judgment, not a recommendation to replace Git with a
+  hand-rolled reimplementation.
+- **SHA-1 vs SHA-256 object naming**: building against the default SHA-1 keeps the implementation
+  compatible with a stock `git init` and every existing repository, but SHA-1 is the outgoing algorithm —
+  treating the hash algorithm as a named parameter (co-29) rather than hard-coding it is what keeps the
+  reimplementation honest about that transition instead of silently locking in a deprecated choice.
+- **When NOT to use it**: don't over-invest in packfile/delta-compression internals here — loose objects
+  and the index are enough to demystify the object model and interoperate with real `git`; packfiles are
+  explicitly a stretch, not the done bar, because chasing them trades the topic's actual payoff
+  (understanding) for reimplementing an optimization.
+
+## Lineage — why it beat the alternative
+
+- Before Git, version control (CVS, then Subversion) tracked file-by-file deltas against a central
+  server, so history was a series of diffs and most operations needed a network round-trip. Git's
+  content-addressed object model — every blob/tree/commit named by the hash of its content, with commits
+  forming a DAG of pointers rather than a linear diff chain — won because it makes the entire history
+  locally available, tamper-evident (any change to a past object changes its hash and every hash after
+  it), and trivially distributable (two repositories with the same object graph are the same history, no
+  server required). Rebuilding that model here is what turns
+  [`06-version-control-and-git`](./06-version-control-and-git.md)'s porcelain commands from memorized
+  incantations into a graph you can reason about directly.
+
 ## Worked examples
 
-Colocated under `build-your-own-git/learning/code/`; Python (fully type-annotated, DD-34) + `pytest`
-(DD-20/DD-30). Every object your code writes is cross-checked against the real `git` binary. Contiguous
+Colocated under `build-your-own-git/learning/code/`; Python (fully type-annotated, DD-39) + `pytest`
+(DD-20/DD-30/DD-39). Every object your code writes is cross-checked against the real `git` binary. Contiguous
 `ex-01..ex-78`. Every example cites the `co-NN` it exercises. Concepts come before examples.
 
 ### Beginner
@@ -141,7 +168,7 @@ Colocated under `build-your-own-git/learning/code/`; Python (fully type-annotate
 - **ex-23 · write-tree-single** — a tree of one blob — verify it writes and hashes. (co-04, co-12)
 - **ex-24 · tree-sha** — hash the tree — verify it matches `git write-tree`. (co-02, co-04)
 - **ex-25 · real-git-ls-tree** — `git ls-tree <your-tree>` — verify real git lists your entries. (co-26, co-04)
-- **ex-26 · typed-object-model** — a fully type-annotated object dataclass — verify `mypy`-clean typing. (co-03)
+- **ex-26 · typed-object-model** — a fully type-annotated object dataclass — verify `pyright`-clean typing. (co-03)
 
 ### Intermediate
 

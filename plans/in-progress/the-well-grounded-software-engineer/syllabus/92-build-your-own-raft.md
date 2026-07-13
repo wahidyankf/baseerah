@@ -27,12 +27,12 @@ cleanly onto Raft's timers, RPCs, and per-peer state.
 
 - **Prior topics**: [topic 46 Distributed Systems](./46-distributed-systems.md) (CAP/PACELC, consensus
   intuition, logical clocks, quorums — the theory this topic implements) and
-  [topic 62 Just Enough Go](./64-just-enough-go.md) (goroutines, channels, and RPC for the concurrency model).
+  [topic 64 Just Enough Go](./64-just-enough-go.md) (goroutines, channels, and RPC for the concurrency model).
 - **Tools & environment**: a macOS/Linux terminal; **Go** on a recent stable toolchain; the standard library
   (`net/rpc` or gRPC, `testing`, `time`) plus a way to simulate an unreliable network (a message-dropping/
   delaying test harness); Neovim/VSCode with the Go LSP (`gopls`, DD-17).
 - **Assumed knowledge**: the consensus problem and why quorums matter (topic 46); Go concurrency —
-  goroutines, channels, `select`, timers (topic 61); writing tests that inject failure (topic 15).
+  goroutines, channels, `select`, timers (topic 64); writing tests that inject failure (topic 15).
 
 ## Accuracy notes (web-verified)
 

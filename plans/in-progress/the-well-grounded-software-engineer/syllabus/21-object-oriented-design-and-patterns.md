@@ -114,7 +114,7 @@ is about designing well with them. Domain modeling at scale continues in
 ## Worked examples
 
 Colocated under `object-oriented-design-and-patterns/learning/code/`; each a runnable before→after refactor
-with a locking `pytest` test (DD-20/DD-30) and static type hints (DD-34). Every example cites the `co-NN`
+with a locking `pytest` test (DD-20/DD-30) and static type hints (DD-39). Every example cites the `co-NN`
 it exercises. Contiguous `ex-01..ex-84`.
 
 ### Beginner
@@ -197,7 +197,7 @@ it exercises. Contiguous `ex-01..ex-84`.
 - **ex-70 · solid-full-order-engine** — apply all five SOLID principles to an order engine — verify each principle's seam. (co-01, co-02, co-03, co-04, co-05)
 - **ex-71 · grasp-full-assignment** — assign responsibilities across a domain via all nine GRASP patterns — verify each pattern is placed. (co-06, co-07, co-08, co-09, co-10, co-11, co-12, co-13, co-14)
 - **ex-72 · lsp-contract-test** — write a contract test suite every subtype must pass — verify a violating subtype fails it. (co-03)
-- **ex-73 · isp-protocol-decomposition** — decompose a fat service into fine protocols checked with `mypy` — verify `mypy` passes minimal implementations. (co-04)
+- **ex-73 · isp-protocol-decomposition** — decompose a fat service into fine protocols checked with `pyright` — verify `pyright` passes minimal implementations. (co-04)
 - **ex-74 · dip-hexagonal-ports** — ports-and-adapters wiring domain to infra — verify the domain imports no infra module. (co-05, co-14)
 - **ex-75 · observer-memory-leak** — fix an observer leak via `weakref` — verify unsubscribed observers are garbage-collected. (co-26)
 - **ex-76 · command-macro-undo** — a composite macro command with grouped undo — verify the group undoes atomically. (co-27, co-23)

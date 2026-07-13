@@ -73,7 +73,7 @@ taught here. All tooling is OSS (Tier-1, DD-21).
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 8 (Primer §). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 8 (Primer). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · shebang-and-execution** — `#!/usr/bin/env bash` plus `chmod +x` makes a file a runnable
   program; a script can also be run directly with `bash file.sh`.

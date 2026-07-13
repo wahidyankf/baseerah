@@ -7,8 +7,8 @@ Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topi
 demystifies the ones you use (Flask/FastAPI/Django): the WSGI/ASGI contract, a router, a middleware
 chain, request/response objects, and lightweight dependency injection. Interleaved after
 [`39-backend-at-scale`](./39-backend-at-scale.md), it makes the "magic" of `@app.route` and
-middleware concrete. `†`: Python, fully type-annotated (DD-34) — every snippet carries type hints in
-the mypy-clean spirit.
+middleware concrete. `†`: Python, fully type-annotated (DD-39) — every snippet carries type hints in
+the pyright-clean spirit.
 
 ## Why this exists · the big idea
 
@@ -30,7 +30,7 @@ the mypy-clean spirit.
   handling, status codes as a _user_ of a framework) and [topic 39 Backend at Scale](./39-backend-at-scale.md)
   (middleware, auth, and reliability patterns you'll now implement the substrate for).
 - **Tools & environment**: a macOS/Linux terminal; **Python** at a recent stable release with type
-  hints and `mypy`; a WSGI server (e.g. a reference `gunicorn`/`waitress`) and/or an ASGI server
+  hints and `pyright`; a WSGI server (e.g. a reference `gunicorn`/`waitress`) and/or an ASGI server
   (e.g. `uvicorn`); `curl`; Neovim/VSCode with the Python LSP (DD-17). No web framework — that's the
   point.
 - **Assumed knowledge**: serving and calling a CRUD JSON endpoint through an existing framework
@@ -149,8 +149,8 @@ the mypy-clean spirit.
 ## Worked examples
 
 Colocated under `build-your-own-web-framework/learning/code/`; each runnable behind a real WSGI/ASGI
-server and exercised with `curl`, every Python snippet fully type-annotated and `mypy`-clean
-(DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`. Every example cites the `co-NN` it exercises; every
+server and exercised with `curl`, every Python snippet fully type-annotated and `pyright`-clean
+(DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-80`. Every example cites the `co-NN` it exercises; every
 concept above is exercised by ≥ 1 example.
 
 ### Beginner
@@ -164,7 +164,7 @@ concept above is exercised by ≥ 1 example.
 - **ex-07 · read-wsgi-input** — read the request body from `environ["wsgi.input"]` — verify the echoed length matches `CONTENT_LENGTH`. (co-02)
 - **ex-08 · query-string-parse** — parse `QUERY_STRING` with `urllib.parse` — verify `?a=1&a=2` yields both values. (co-26)
 - **ex-09 · http-header-read** — read `HTTP_ACCEPT` from `environ` — verify the sent `Accept` header appears. (co-27)
-- **ex-10 · request-object-build** — wrap `environ` into a typed `Request` dataclass — verify `mypy` clean and fields populated. (co-15)
+- **ex-10 · request-object-build** — wrap `environ` into a typed `Request` dataclass — verify `pyright` clean and fields populated. (co-15)
 - **ex-11 · response-object-build** — a typed `Response` dataclass with status/headers/body — verify it holds the expected values. (co-16)
 - **ex-12 · response-to-wsgi** — `Response.__call__(environ, start_response)` serializes to the protocol — verify the served bytes match. (co-16, co-04)
 - **ex-13 · not-found-404** — return `404` for an unknown path — verify the status and body. (co-14)
@@ -229,7 +229,7 @@ concept above is exercised by ≥ 1 example.
 - **ex-66 · sse-endpoint** — a `text/event-stream` SSE endpoint via ASGI streaming — verify `curl` receives successive events. (co-28)
 - **ex-67 · middleware-stack-three** — a logging → auth → timing three-layer onion — verify the full nesting order. (co-18, co-19)
 - **ex-68 · full-request-lifecycle** — trace `socket → environ → router → middleware → handler → response` — verify each stage runs once in order. (co-30)
-- **ex-69 · typed-request-response-full** — a fully typed `Request`/`Response` pair — verify `mypy --strict` is clean. (co-15, co-16)
+- **ex-69 · typed-request-response-full** — a fully typed `Request`/`Response` pair — verify `pyright` (strict mode) is clean. (co-15, co-16)
 - **ex-70 · content-negotiation** — an `Accept` header choosing JSON vs plain text — verify the right `Content-Type` returns. (co-17, co-27)
 - **ex-71 · header-case-insensitive** — a case-insensitive `Request.headers` lookup — verify `content-type` and `Content-Type` match. (co-27)
 - **ex-72 · port-flask-handler** — port a Flask handler onto the framework — verify identical response bytes. (co-30)
@@ -254,7 +254,7 @@ concept above is exercised by ≥ 1 example.
 - **Ordered steps**:
   1. `.../learning/capstone/code/app.py` — a WSGI/ASGI callable that builds a typed `Request` and
      returns a typed `Response`. Verify a standard server serves it and `curl` gets a 200 with the
-     expected body; `mypy` clean.
+     expected body; `pyright` clean.
   2. `.../learning/capstone/code/router.py` — a router + `@route` decorator with a path parameter.
      Verify a parameterized route resolves and an unknown path returns 404.
   3. `.../learning/capstone/code/middleware.py` — a logging + error-handling middleware chain. Verify
@@ -265,7 +265,7 @@ concept above is exercised by ≥ 1 example.
      passes.
 - **Acceptance criteria**: the framework serves a JSON API behind a real server; routing, middleware
   ordering, DI, and error-to-response all behave; the integration suite is green; all Python is
-  type-annotated and `mypy`-clean.
+  type-annotated and `pyright`-clean.
 - **Done bar**: runnable end-to-end + web-verified.
 
 ## Read more

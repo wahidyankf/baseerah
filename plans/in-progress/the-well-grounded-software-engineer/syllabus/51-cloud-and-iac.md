@@ -1,4 +1,4 @@
-# 51 · Cloud & Infrastructure as Code (Annotated-concept, HCL/YAML †)
+# 51 · Cloud & IaC (Annotated-concept, HCL/YAML †)
 
 **prd row**: Pass 3 · Build for the Real World · Annotated-concept · HCL/YAML † · Learn 151 / Drill 251 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))

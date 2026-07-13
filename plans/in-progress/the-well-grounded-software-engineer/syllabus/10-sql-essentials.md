@@ -148,7 +148,7 @@ public-domain (Tier-1, DD-21).
 ## Worked examples
 
 Colocated under `sql-essentials/learning/code/`; `.sql` scripts run via `sqlite3` and Python access
-scripts run via `python3` with static type hints (DD-20/DD-30/DD-34). Each cites the `co-NN` it exercises.
+scripts run via `python3` with static type hints (DD-20/DD-30/DD-34/DD-39). Each cites the `co-NN` it exercises.
 Contiguous `ex-01..ex-80`.
 
 ### Beginner

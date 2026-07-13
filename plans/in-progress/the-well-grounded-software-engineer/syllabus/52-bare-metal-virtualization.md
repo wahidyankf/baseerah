@@ -507,4 +507,4 @@ Every example cites the `co-NN` it exercises. Concepts come before examples.
 
 ---
 
-← Previous: [51 · Cloud & Infrastructure as Code](./51-cloud-and-iac.md) · Next: [53 · Self-Managed Kubernetes & On-Prem GitOps](./53-self-managed-kubernetes-and-gitops.md) →
+← Previous: [51 · Cloud & IaC](./51-cloud-and-iac.md) · Next: [53 · Self-Managed Kubernetes & On-Prem GitOps](./53-self-managed-kubernetes-and-gitops.md) →

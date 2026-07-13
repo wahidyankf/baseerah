@@ -27,13 +27,13 @@ current LTS JDK, Spring Boot, and a build tool (Maven/Gradle).
 
 ## Prerequisites
 
-- **Prior topics**: [topic 82 Just Enough Java](./84-just-enough-java.md) (the language, records, streams,
+- **Prior topics**: [topic 84 Just Enough Java](./84-just-enough-java.md) (the language, records, streams,
   the memory model at a glance) and [topic 42 Software Architecture](./42-software-architecture.md) (layering,
   boundaries, and where a DI container fits an architecture).
 - **Tools & environment**: a macOS/Linux/Windows machine; a **JDK** pinned to a current LTS; **Spring Boot**
   via **Maven or Gradle**; `curl` for exercising endpoints; Neovim/VSCode with the Java LSP (DD-17). Keep the
   JDK and Spring Boot versions unpinned in prose — re-pull at authoring time.
-- **Assumed knowledge**: classes/interfaces and generics (topic 81); collections/streams (topic 81);
+- **Assumed knowledge**: classes/interfaces and generics (topic 84); collections/streams (topic 84);
   architectural layering and dependency direction (topic 42); building/serving an HTTP API (topic 11).
 
 ## Accuracy notes (web-verified)

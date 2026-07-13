@@ -146,7 +146,7 @@ a consistent-hashing ring), else annotated architecture diagrams. Single-service
 
 ## Worked examples
 
-Colocated under `system-design/learning/`; each example is either a runnable, type-annotated `mypy`-clean
+Colocated under `system-design/learning/`; each example is either a runnable, type-annotated `pyright`-clean
 Python component (DD-20/DD-30) **or** an annotated design artifact (Mermaid architecture, capacity table,
 decision table) per the `*` Annotated-concept designation. Contiguous `ex-01..ex-53`. Every example cites
 the `co-NN` it exercises; concepts are taught before the examples that use them.

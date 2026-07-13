@@ -33,7 +33,7 @@ push runs **direct-push + CI post-push verification** instead of the PR-Review M
 single push at the end. The moment a topic (or inter-topic capstone) phase passes its gate, the AI
 **commits and pushes that deliverable to `origin main`** and confirms its `main-ci` run is green before
 starting the next phase — so each topic lands green on `main` as it completes. Content is additive and
-not yet nav-wired at this stage, so per-topic pushes are safe (nav wiring lands in Phase 102). The
+not yet nav-wired at this stage, so per-topic pushes are safe (nav wiring lands in Phase 105). The
 finalization push phase is therefore a **final catch-up + verify** (nav-wiring commit + confirm
 `origin/main` fully green), not the sole push.
 
@@ -46,7 +46,7 @@ Commit per domain/concern with Conventional Commit messages.
 ```mermaid
 flowchart TD
     S["Phase 0<br/>setup and scaffold"]
-    T["Per-topic phase (x90)<br/>V-verify A-author<br/>D-drill G-gate<br/>commit+push origin main"]
+    T["Per-topic phase (x94)<br/>V-verify A-author<br/>D-drill G-gate<br/>commit+push origin main"]
     C["Inter-topic capstone (x10)<br/>pass-boundary +<br/>cross-cutting<br/>commit+push origin main"]
     N["Nav wiring + quality gate"]
     R["Playwright + Rule-15 retest"]
@@ -86,15 +86,15 @@ per-topic commit+push block, and Pause Safety note.
 
 - **Topic-slug folder** `CONTENT/<slug>/_index.md` → weight `100 + 10 × journey-index` (topic 1 = 110,
   topic 2 = 120, … topic 94 = 1040). The ×10 spacing leaves integer gaps for inter-topic capstones.
-- **Learning subfolder** `CONTENT/<slug>/learning/_index.md` → weight = prd **"Learn wt"** (101..191).
-- **Drilling subfolder** `CONTENT/<slug>/drilling/_index.md` → weight = prd **"Drill wt"** (201..291),
+- **Learning subfolder** `CONTENT/<slug>/learning/_index.md` → weight = prd **"Learn wt"** (101..194).
+- **Drilling subfolder** `CONTENT/<slug>/drilling/_index.md` → weight = prd **"Drill wt"** (201..294),
   with the parity invariant **`Drill wt = Learn wt + 100`**.
 - **Intra-topic capstone** `CONTENT/<slug>/learning/capstone/_index.md` → weight **900** (sorts last
   inside `learning/`).
 - **Inter-topic capstone** `CONTENT/<capstone-slug>/_index.md` → a weight in the ×10 gap after its
   junction (Pass-0 cap = 135, Pass-1 cap = 275, full-stack-app = 276, Pass-2 cap = 435, Pass-3 cap =
-  575, secure-service = 576, data-pipeline = 577, Pass-4 cap = 955, concurrency-showdown = 956, Pass-5
-  cap = 1005), each with colocated `code/`.
+  705, secure-service = 706, data-pipeline = 707, Pass-4 cap = 995, concurrency-showdown = 996, Pass-5
+  cap = 1045), each with colocated `code/`.
 - **Section root** `CONTENT/_index.md` → weight **1750** (position in the parent SE nav);
   `CONTENT/overview.md` → weight **1** (sorts first inside the section).
 
@@ -137,8 +137,8 @@ invocation, and a concrete acceptance criterion (execution-grade clarity).
    how-to tool topics, richer for judgment topics), then the install command + raw-form run command up
    front, DD-30), and example pages covering **every item
    and worked example in `syllabus/<NN>-<slug>.md`**, with runnable files colocated under
-   `CONTENT/<slug>/learning/code/`. **For the ~26 judgment/altitude topics only** (DD-33 list: 9, 18, 20, 21, 22, 23, 27, 30, 31, 32, 33, 36, 38, 42, 43,
-   44, 45, 46, 49, 55, 56, 57, 59, 79, 89, 90), the learning content
+   `CONTENT/<slug>/learning/code/`. **For the ~41 judgment/altitude topics** (DD-33 list: 6, 9, 18, 20, 21, 22, 23, 27, 30, 31, 32, 33, 36, 38, 39, 41, 42, 43,
+   44, 45, 46, 49, 51, 52, 55, 56, 57, 58, 59, 60, 61, 63, 73, 77, 79, 83, 85, 89, 90, 93, 94), the learning content
    additionally carries the **`Tensions & trade-offs`** and **`Lineage`** sections from
    `syllabus/<NN>-<slug>.md`; primers, Essentials, and how-to tool topics **omit** them (padding avoidance).
    `<fmt>` = By Example → invoke `apps-ayokoding-www-by-example-maker`
@@ -555,7 +555,7 @@ Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. T
 ### Phase 2 Gate
 
 - [ ] [AI] `just-enough-lua/` complete: `_index.md` wt 120, `learning/_index.md` wt 102,
-      `drilling/_index.md` wt 202, capstone wt 900; all 18 concepts + 80 worked examples + capstone present;
+      `drilling/_index.md` wt 202, capstone wt 900; all 18 concepts + 84 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -655,7 +655,7 @@ Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject
   - [ ] ex-60 · lsp-wildcard-shared-defaults — verify root resolves at `.git`
   - [ ] ex-61 · lsp-multiple-clients-one-buffer — verify two clients on one buffer
   - [ ] ex-62 · lsp-stop-and-reattach — verify detach then reattach
-  - [ ] ex-63 · lsp-codelens-refresh-and-run — verify lenses render + `grx` runs
+  - [ ] ex-63 · lsp-codelens-enable-and-run — verify lenses render + `grx` runs
   - [ ] ex-64 · lsp-workspace-symbol-search — verify project-wide symbol picker
   - [ ] ex-65 · lsp-inlay-hints-toggle — verify inlay hints render inline
   - [ ] ex-66 · treesitter-iter-captures — verify capture loop completes
@@ -757,8 +757,9 @@ Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Te
   - [ ] co-22 · files-and-io
   - [ ] co-23 · json-serialization
   - [ ] co-24 · classes
+  - [ ] co-25 · static-type-checking
 - [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-python/learning/code/` — one runnable `.py` script +
-      expected output per worked example in `syllabus/04-just-enough-python.md` §Worked examples (DD-20/DD-30).
+      expected output per worked example in `syllabus/04-just-enough-python.md` §Worked examples (DD-20/DD-30/DD-39).
       One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · hello-script — verify `Hello, world!`
   - [ ] ex-02 · run-inline-code — verify `42`
@@ -842,6 +843,8 @@ Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Te
   - [ ] ex-80 · fstring-debug — verify `value=42`
   - [ ] ex-81 · typed-cli-json-roundtrip — verify roundtrip + ruff clean
   - [ ] ex-82 · module-docstring-and-main — verify prints + docstring accessible
+  - [ ] ex-83 · pyright-clean-pass — verify `pyright` reports 0 errors on a fully-annotated module
+  - [ ] ex-84 · pyright-catches-type-error — verify `pyright` flags a `str`-for-`int` mismatch while the script still runs
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-python/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -853,7 +856,7 @@ Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Te
 ### Phase 5 Gate
 
 - [ ] [AI] `just-enough-python/` complete: `_index.md` wt 140, `learning/_index.md` wt 104,
-      `drilling/_index.md` wt 204, capstone wt 900; all 24 concepts + 82 worked examples + capstone present;
+      `drilling/_index.md` wt 204, capstone wt 900; all 25 concepts + 84 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -1297,7 +1300,7 @@ Row: By Example · Python · topic wt 180 · Learn 108 / Drill 208 · **subject*
   - [ ] co-15 · classmethod-and-staticmethod
   - [ ] co-16 · encapsulation-conventions
   - [ ] co-17 · invariant-enforcement
-- [ ] **[AI] A1-examples** — Author `CONTENT/object-oriented-programming-essentials/learning/code/` — one runnable Python module per worked example in `syllabus/08-object-oriented-programming-essentials.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/object-oriented-programming-essentials/learning/code/` — one runnable Python module per worked example in `syllabus/08-object-oriented-programming-essentials.md` §Worked examples (DD-20/DD-30/DD-39). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · define-minimal-class — verify `type(d) is Dog`
   - [ ] ex-02 · init-with-fields — verify `Dog("Rex").name == "Rex"`
   - [ ] ex-03 · instance-method — verify `d.bark() == "woof"`
@@ -1398,7 +1401,7 @@ Row: By Example · Python · topic wt 180 · Learn 108 / Drill 208 · **subject*
 
 ## Phase 10 — Topic 09 Project Management ▲ (`project-management`)
 
-Row: Annotated-concept · — ‡ · topic wt 190 · Learn 109 / Drill 209 · **leadership/design artifact (no code)**. Template →
+Row: Annotated-concept · ‡ no-code · topic wt 190 · Learn 109 / Drill 209 · **leadership/design artifact (no code)**. Template →
 [`syllabus/09-project-management.md`](./syllabus/09-project-management.md).
 
 - [ ] **[AI] V** — `web-researcher` for `project-management`; resolve every Accuracy-notes "to verify" line in
@@ -1497,7 +1500,7 @@ Row: By Example · SQL + Python † (SQLite) · topic wt 200 · Learn 110 / Dril
   - [ ] co-22 · schema-migration
   - [ ] co-23 · n-plus-1-avoidance
   - [ ] co-24 · cli-usage
-- [ ] **[AI] A1-examples** — Author `CONTENT/sql-essentials/learning/code/` — one runnable `.sql`/`python3` example per worked example in `syllabus/10-sql-essentials.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/sql-essentials/learning/code/` — one runnable `.sql`/`python3` example per worked example in `syllabus/10-sql-essentials.md` §Worked examples (DD-20/DD-30/DD-34/DD-39). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · create-author-table — verify `.schema` lists column + PK
   - [ ] ex-02 · open-database-cli — verify prompt opens, no tables yet
   - [ ] ex-03 · insert-single-row — verify exactly one row returns
@@ -1631,7 +1634,7 @@ Row: By Example · Python (PostgreSQL) · topic wt 210 · Learn 111 / Drill 211 
   - [ ] co-23 · dependency-injection
   - [ ] co-24 · layering
 - [ ] **[AI] A1-examples** — Author `CONTENT/backend-essentials/learning/code/` — one runnable HTTP service / endpoint
-      per worked example, served via `uvicorn`/stdlib and exercised with `curl`+`pytest` (DD-20/DD-30), covering **every**
+      per worked example, served via `uvicorn`/stdlib and exercised with `curl`+`pytest` (DD-20/DD-30/DD-34/DD-39), covering **every**
       example in `syllabus/11-backend-essentials.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · raw-server-hello — verify `curl localhost:8000/` returns `hello`
   - [ ] ex-02 · raw-status-line — verify `curl -i` shows `HTTP/1.0 200`
@@ -2190,92 +2193,92 @@ Row: By Example · Python + TS · topic wt 250 · Learn 115 / Drill 215 · **sub
 - [ ] **[AI] A1-examples** — Author `CONTENT/software-testing/learning/code/` — one runnable pytest (primary; TS/Vitest
       cross-refs where noted) per worked example (DD-20/DD-30), covering **every** example in
       `syllabus/15-software-testing.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · first-passing-test — verify pytest reports 1 passed
-  - [ ] ex-02 · run-and-read-output — verify dot/summary line matches
-  - [ ] ex-03 · assert-equality — verify passes on equal values
-  - [ ] ex-04 · assert-failure-diff — verify failure shows expected vs actual
-  - [ ] ex-05 · assert-truthiness — verify bool assertion passes
-  - [ ] ex-06 · assert-in-collection — verify membership assertion
-  - [ ] ex-07 · assert-raises — verify exception captured
-  - [ ] ex-08 · assert-raises-match — verify message pattern matched
-  - [ ] ex-09 · function-fixture — verify fixture value injected
-  - [ ] ex-10 · fixture-teardown — verify teardown runs after test
-  - [ ] ex-11 · fixture-scope-module — verify setup runs once per module
-  - [ ] ex-12 · tmp-path-fixture — verify file created under tmp dir
-  - [ ] ex-13 · parametrize-cases — verify one run per param row
-  - [ ] ex-14 · parametrize-ids — verify readable case ids in output
-  - [ ] ex-15 · approx-float — verify near-equal floats pass
-  - [ ] ex-16 · marker-skip — verify test reported skipped
-  - [ ] ex-17 · marker-xfail — verify xfail counted separately
-  - [ ] ex-18 · marker-custom-select — verify -m selects only marked
-  - [ ] ex-19 · arrange-act-assert-shape — verify three sections readable
-  - [ ] ex-20 · test-file-discovery — verify test\_\*.py auto-collected
-  - [ ] ex-21 · stub-return-value — verify stub returns canned value
-  - [ ] ex-22 · stub-sequence — verify successive calls return sequence
-  - [ ] ex-23 · mock-call-assert — verify called once with args
-  - [ ] ex-24 · mock-call-count — verify call_count matches
-  - [ ] ex-25 · patch-object — verify dependency patched in scope
-  - [ ] ex-26 · patch-context-manager — verify patch reverts after block
-  - [ ] ex-27 · spy-wraps-real — verify real runs + call recorded
-  - [ ] ex-28 · fake-in-memory-repo — verify fake behaves like real
-  - [ ] ex-29 · mock-side-effect-raise — verify side_effect raises
-  - [ ] ex-30 · autospec-signature — verify wrong-arg call rejected
-  - [ ] ex-31 · verify-no-interaction — verify assert_not_called passes
-  - [ ] ex-32 · tdd-red — verify test fails before code
-  - [ ] ex-33 · tdd-green — verify minimal code passes
-  - [ ] ex-34 · tdd-refactor — verify test stays green post-refactor
-  - [ ] ex-35 · property-roundtrip — verify encode∘decode == identity
-  - [ ] ex-36 · property-invariant — verify sorted output ordered
-  - [ ] ex-37 · property-shrink-report — verify minimal counterexample shown
-  - [ ] ex-38 · strategy-integers — verify generated ints in range
-  - [ ] ex-39 · strategy-composite — verify built model instances valid
-  - [ ] ex-40 · strategy-filter-assume — verify filtered inputs honored
-  - [ ] ex-41 · coverage-run — verify coverage % reported
-  - [ ] ex-42 · coverage-missing-lines — verify uncovered lines listed
-  - [ ] ex-43 · coverage-branch — verify branch coverage counted
-  - [ ] ex-44 · coverage-fail-under — verify exits non-zero below threshold
-  - [ ] ex-45 · integration-db-fixture — verify real DB round-trip
-  - [ ] ex-46 · integration-http-client — verify endpoint returns 200
-  - [ ] ex-47 · integration-rollback-isolation — verify each test starts clean
-  - [ ] ex-48 · contract-consumer — verify consumer pact recorded
-  - [ ] ex-49 · contract-provider-verify — verify provider satisfies pact
-  - [ ] ex-50 · schema-contract-check — verify response matches schema
-  - [ ] ex-51 · vitest-first-test — verify TS test passes
-  - [ ] ex-52 · vitest-mock-fn — verify vi.fn spy recorded
-  - [ ] ex-53 · fast-check-property — verify fc property holds
-  - [ ] ex-54 · fast-check-shrink — verify minimal TS counterexample
-  - [ ] ex-55 · flaky-test-diagnose — verify nondeterminism reproduced
-  - [ ] ex-56 · fix-flaky-with-freeze-time — verify time frozen, test stable
-  - [ ] ex-57 · fix-flaky-with-seed — verify seeded RNG deterministic
-  - [ ] ex-58 · parallel-safe-tmpdir — verify no cross-test file clash
-  - [ ] ex-59 · fixture-factory — verify factory builds distinct objects
-  - [ ] ex-60 · parametrize-matrix — verify cartesian cases all run
-  - [ ] ex-61 · mutation-run — verify surviving mutants reported
-  - [ ] ex-62 · mutation-kill-with-test — verify new test kills mutant
-  - [ ] ex-63 · e2e-testcontainer-db — verify container DB reachable
-  - [ ] ex-64 · e2e-api-flow — verify create→read round-trip
-  - [ ] ex-65 · e2e-browser-smoke — verify page renders expected text
-  - [ ] ex-66 · test-double-choice-rationale — verify right double per seam
-  - [ ] ex-67 · patch-where-used — verify patch target = import site
-  - [ ] ex-68 · avoid-over-mocking — verify test survives internal refactor
-  - [ ] ex-69 · characterization-test — verify legacy behavior pinned
-  - [ ] ex-70 · golden-file-test — verify output matches snapshot
-  - [ ] ex-71 · update-golden-file — verify approved change updates snapshot
-  - [ ] ex-72 · property-vs-example-tradeoff — verify both catch the bug
-  - [ ] ex-73 · coverage-gap-to-test — verify new test closes gap
-  - [ ] ex-74 · read-junit-report — verify failing case located in XML
-  - [ ] ex-75 · read-html-coverage — verify hotspot identified
-  - [ ] ex-76 · test-naming-clarity — verify name states behavior
-  - [ ] ex-77 · one-assert-per-behavior — verify focused failure message
-  - [ ] ex-78 · isolate-external-service — verify no network in unit run
-  - [ ] ex-79 · deterministic-clock-injection — verify time-dependent code tested
-  - [ ] ex-80 · full-verification-suite — verify unit+integration+property+coverage all green
-  - [ ] ex-81 · pytest-bdd-first-scenario — verify pytest runs the Given/When/Then scenario green
-  - [ ] ex-82 · gherkin-feature-grammar — verify the runner parses Feature/Scenario/Given/When/Then/And
-  - [ ] ex-83 · step-definition-shared-context — verify a Given value is asserted in Then via shared context
-  - [ ] ex-84 · scenario-outline-examples-table — verify each Examples row runs as its own case
-  - [ ] ex-85 · behave-vs-pytest-bdd-same-feature — verify both runners execute the identical feature
-  - [ ] ex-86 · bdd-vs-tdd-decision — verify the TDD-vs-BDD choice matches risk and audience
+  - [ ] ex-01 · first-passing-test — verify `pytest` reports `1 passed`
+  - [ ] ex-02 · failing-test-output — verify pytest prints the expected-vs-actual introspection
+  - [ ] ex-03 · arrange-act-assert — verify it passes and each phase is distinct
+  - [ ] ex-04 · run-single-test — verify only that test executes
+  - [ ] ex-05 · assert-equality — verify it passes on a match and fails otherwise
+  - [ ] ex-06 · assert-truthiness — verify pytest reports the operands on failure
+  - [ ] ex-07 · assert-membership — verify it passes for a present element
+  - [ ] ex-08 · raises-valueerror — verify the test passes when it raises
+  - [ ] ex-09 · raises-match-message — verify it asserts the message text
+  - [ ] ex-10 · approx-float — verify the float comparison passes
+  - [ ] ex-11 · simple-fixture — verify the test receives it
+  - [ ] ex-12 · fixture-teardown — verify teardown runs after the test body
+  - [ ] ex-13 · fixture-scope — verify it is built once across the module's tests
+  - [ ] ex-14 · parametrize-cases — verify three cases run
+  - [ ] ex-15 · parametrize-ids — verify each shows its id in the output
+  - [ ] ex-16 · parametrize-multiple-args — verify each combination runs
+  - [ ] ex-17 · mark-skip — verify the test reports skipped, not failed
+  - [ ] ex-18 · mark-xfail — verify it reports xfail
+  - [ ] ex-19 · custom-marker-select — verify the slow ones are excluded
+  - [ ] ex-20 · keyword-select — verify only matching-named tests run
+  - [ ] ex-21 · group-tests-in-class — verify they run together
+  - [ ] ex-22 · shared-conftest-fixture — verify multiple test files can use it
+  - [ ] ex-23 · tdd-write-failing-first — verify it fails red with an `ImportError`/`AssertionError`
+  - [ ] ex-24 · tdd-make-it-pass — verify the previously red test goes green
+  - [ ] ex-25 · tdd-refactor-under-green — verify the tests stay green throughout
+  - [ ] ex-26 · test-pure-function — verify deterministic outputs
+  - [ ] ex-27 · deterministic-no-hidden-state — verify identical results with no order dependence
+  - [ ] ex-28 · run-verbose-report — verify per-test names and PASS/FAIL lines appear
+  - [ ] ex-29 · stub-returns-canned-value — verify the unit uses it without the real dependency
+  - [ ] ex-30 · dummy-object-unused — verify it only satisfies the signature
+  - [ ] ex-31 · mock-records-call — verify the interaction happened
+  - [ ] ex-32 · mock-assert-called-with — verify the exact arguments passed
+  - [ ] ex-33 · mock-return-value — verify the unit consumes the mocked return
+  - [ ] ex-34 · mock-side-effect-raises — verify the unit handles the raised error
+  - [ ] ex-35 · patch-dependency — verify the real dependency is replaced during the call
+  - [ ] ex-36 · monkeypatch-attr — verify the patched version runs
+  - [ ] ex-37 · monkeypatch-env — verify code reads the patched environment variable
+  - [ ] ex-38 · spy-wraps-real — verify calls are recorded while delegating to the real object
+  - [ ] ex-39 · fake-in-memory-repo — verify the service works against it
+  - [ ] ex-40 · fake-vs-mock-contrast — verify both pass but assert different things (state vs interaction)
+  - [ ] ex-41 · patch-time — verify time-dependent logic becomes deterministic
+  - [ ] ex-42 · control-randomness-seed — verify repeatable "random" output
+  - [ ] ex-43 · property-idempotent — verify the invariant holds
+  - [ ] ex-44 · property-roundtrip — verify the round-trip property
+  - [ ] ex-45 · property-commutative — verify commutativity
+  - [ ] ex-46 · property-list-invariant — verify both invariants
+  - [ ] ex-47 · shrinking-minimal-counterexample — verify it reports a minimal shrunk input
+  - [ ] ex-48 · custom-strategy-composite — verify generated values satisfy the preconditions
+  - [ ] ex-49 · hypothesis-assume — verify only valid cases are exercised
+  - [ ] ex-50 · example-plus-property — verify the pinned case always runs alongside generated ones
+  - [ ] ex-51 · fast-check-property-ts — verify it passes in the TS stack
+  - [ ] ex-52 · coverage-line-report — verify the report shows per-file line coverage
+  - [ ] ex-53 · coverage-branch — verify an untaken branch is reported as missed
+  - [ ] ex-54 · coverage-gap-then-cover — verify coverage rises to include it
+  - [ ] ex-55 · coverage-not-proof — verify coverage passes yet a property test catches the bug
+  - [ ] ex-56 · fixture-parametrized — verify each variant runs
+  - [ ] ex-57 · aaa-with-double — verify the combined check
+  - [ ] ex-58 · tdd-with-double — verify red→green with the double in place
+  - [ ] ex-59 · isolate-io-boundary — verify the unit test performs no real IO
+  - [ ] ex-60 · marker-for-integration — verify they are skipped in the fast unit run
+  - [ ] ex-61 · pyramid-shape-suite — verify the counts reflect the pyramid
+  - [ ] ex-62 · trophy-weighted-integration — verify the integration tier carries the most cases
+  - [ ] ex-63 · integration-two-modules — verify the combined behavior without stubbing the seam
+  - [ ] ex-64 · integration-app-plus-db — verify a write then read round-trips
+  - [ ] ex-65 · integration-http-endpoint — verify the response status and body
+  - [ ] ex-66 · testcontainers-ephemeral-db — verify it is created and torn down around the run
+  - [ ] ex-67 · contract-consumer-pact — verify it produces a pact file
+  - [ ] ex-68 · contract-provider-verify — verify the provider against the pact — verify the provider satisfies the recorded contract
+  - [ ] ex-69 · e2e-happy-path — verify the resulting end-state is correct
+  - [ ] ex-70 · mutation-baseline — verify the surviving-mutant report is produced
+  - [ ] ex-71 · mutation-kill-survivor — verify the mutation score improves
+  - [ ] ex-72 · mutation-vs-coverage — verify mutation exposes weak assertions that coverage missed
+  - [ ] ex-73 · read-coverage-report — verify you can name the uncovered lines
+  - [ ] ex-74 · read-failing-traceback — verify you can locate the assertion and the offending values
+  - [ ] ex-75 · flaky-test-diagnosis — verify it becomes deterministic
+  - [ ] ex-76 · fixture-cleanup-isolation — verify order-independence across the module
+  - [ ] ex-77 · double-taxonomy-mapping — verify each matches its Meszaros definition
+  - [ ] ex-78 · choose-right-double — verify the test asserts the correct dimension (state vs behavior)
+  - [ ] ex-79 · full-pyramid-feature — verify every tier is green
+  - [ ] ex-80 · full-verification-suite — verify every gate passes and the mutation score is read
+  - [ ] ex-81 · pytest-bdd-first-scenario — verify `pytest` runs the scenario and reports `1 passed`
+  - [ ] ex-82 · gherkin-feature-grammar — verify the runner parses it and lists the named scenario
+  - [ ] ex-83 · step-definition-shared-context — verify a value set in `Given` is asserted in `Then`
+  - [ ] ex-84 · scenario-outline-examples-table — verify each row runs as its own case
+  - [ ] ex-85 · behave-vs-pytest-bdd-same-feature — verify both execute the identical scenario green
+  - [ ] ex-86 · bdd-vs-tdd-decision — verify the choice matches the risk and the audience
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-testing/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -2328,7 +2331,7 @@ Row: By Example · Python + native † · topic wt 260 · Learn 116 / Drill 216 
   - [ ] co-22 · native-layer-costs-and-native-debugging
   - [ ] co-23 · before-after-measurement-discipline
 - [ ] **[AI] A1-examples** — Author `CONTENT/debugging-and-profiling/learning/code/` — one runnable, fully type-annotated
-      Python (+ one native pass) per worked example (DD-20/DD-30/DD-34), covering **every** example in
+      Python (+ one native pass) per worked example (DD-20/DD-30/DD-34/DD-39), covering **every** example in
       `syllabus/16-debugging-and-profiling.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · first-breakpoint-with-breakpoint — verify reader names the line the total first goes wrong
   - [ ] ex-02 · step-into-vs-step-over — verify `s` enters helper, `n` skips the call
@@ -2467,7 +2470,7 @@ Row: By Example · Python · topic wt 270 · Learn 117 / Drill 217 · **subject*
   - [ ] co-27 · rate-limiting-and-brute-force-protection
   - [ ] co-28 · open-redirect
 - [ ] **[AI] A1-examples** — Author `CONTENT/security-essentials/learning/code/` — runnable, type-annotated sources
-      (DD-20/DD-30) for **every** worked example in `syllabus/17-security-essentials.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+      (DD-20/DD-30/DD-39) for **every** worked example in `syllabus/17-security-essentials.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · trust-boundary-map-tainted-input — verify every entry point listed + attacker-controlled marked
   - [ ] ex-02 · owasp-top-10-mapping-exercise — verify each bug tagged with correct A0N id
   - [ ] ex-03 · sql-injection-live-exploit — verify attacker logs in with no valid password
@@ -2593,7 +2596,7 @@ Junction: Topics 04–17 (build → store → test → secure). Inter-Topic Caps
 
 ## Phase 20 — Inter-topic: Full-Stack App Capstone (`capstone-full-stack-app`)
 
-Junction: Frontend Essentials (14) + Backend Essentials (11) + SQL Essentials (10). Inter-Topic Capstone Phase Template; spec in
+Junction: Frontend (14) + Backend (11) + SQL (10). Inter-Topic Capstone Phase Template; spec in
 `syllabus/17-security-essentials.md` (full-stack cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
@@ -2987,7 +2990,7 @@ Row: By Example · Python · topic wt 310 · Learn 121 / Drill 221 · **subject*
   - [ ] co-36 · statecharts-and-hierarchical-states
   - [ ] co-37 · guards-and-entry-exit-actions
 - [ ] **[AI] A1-examples** — Author `CONTENT/object-oriented-design-and-patterns/learning/code/` — every worked example in
-      `syllabus/21-object-oriented-design-and-patterns.md` §Worked examples, each runnable + `pytest` (DD-20/DD-30), static-typed (DD-34).
+      `syllabus/21-object-oriented-design-and-patterns.md` §Worked examples, each runnable + `pytest` (DD-20/DD-30), static-typed (DD-39).
       One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · srp-split-god-class — verify each class has one reason to change
   - [ ] ex-02 · srp-extract-report-writer — verify calculator module imports no IO
@@ -3061,7 +3064,7 @@ Row: By Example · Python · topic wt 310 · Learn 121 / Drill 221 · **subject*
   - [ ] ex-70 · solid-full-order-engine — verify each principle's seam
   - [ ] ex-71 · grasp-full-assignment — verify each of the nine GRASP patterns is placed
   - [ ] ex-72 · lsp-contract-test — verify a violating subtype fails it
-  - [ ] ex-73 · isp-protocol-decomposition — verify mypy passes minimal implementations
+  - [ ] ex-73 · isp-protocol-decomposition — verify pyright passes minimal implementations
   - [ ] ex-74 · dip-hexagonal-ports — verify the domain imports no infra module
   - [ ] ex-75 · observer-memory-leak — verify unsubscribed observers are garbage-collected
   - [ ] ex-76 · command-macro-undo — verify the group undoes atomically
@@ -3832,7 +3835,7 @@ Row: By Example · Python † · topic wt 370 · Learn 127 / Drill 227 · **subj
   - [ ] co-25 · orm-vs-raw-sql-tradeoff
   - [ ] co-26 · query-builder-vs-orm-tradeoff
   - [ ] co-27 · choosing-tier-per-workload
-- [ ] **[AI] A1-examples** — Author `CONTENT/data-access-orms-and-query-builders/learning/code/` (runnable Python sources over SQLAlchemy 2.0 / peewee / PyPika / Alembic, DD-20/DD-30)
+- [ ] **[AI] A1-examples** — Author `CONTENT/data-access-orms-and-query-builders/learning/code/` (runnable Python sources over SQLAlchemy 2.0 / peewee / PyPika / Alembic, DD-20/DD-30/DD-34/DD-39)
       rendering **every** Worked example in `syllabus/27-data-access-orms-and-query-builders.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · spectrum-same-query-three-ways — verify identical rows via dbapi/builder/orm
   - [ ] ex-02 · dbapi-connect-cursor — verify cursor yields rows
@@ -3965,7 +3968,7 @@ Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subj
   - [ ] co-23 · connection-cursor-wiring
   - [ ] co-24 · schema-migration-runner
   - [ ] co-25 · fully-typed-builder-api
-- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/code/` (runnable type-annotated Python built + unit-tested against local SQLite, DD-20/DD-30/DD-34)
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/code/` (runnable type-annotated Python built + unit-tested against local SQLite, DD-20/DD-30/DD-34/DD-39)
       rendering **every** Worked example in `syllabus/28-build-your-own-orm-and-query-builder.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · clause-as-data-node — verify node stores name, renders lazily
   - [ ] ex-02 · render-column-node — verify emits `users.id` fragment
@@ -3992,7 +3995,7 @@ Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subj
   - [ ] ex-23 · compile-is-pure — verify identical output, no side effects
   - [ ] ex-24 · execute-over-cursor — verify rows returned
   - [ ] ex-25 · connect-cursor-lifecycle — verify PEP 249 flow
-  - [ ] ex-26 · builder-typed-api — verify mypy passes on a query chain
+  - [ ] ex-26 · builder-typed-api — verify pyright passes on a query chain
   - [ ] ex-27 · register-table-metadata — verify registry returns column list
   - [ ] ex-28 · metadata-drives-select — verify column order matches registration
   - [ ] ex-29 · primary-key-from-metadata — verify identifies `id`
@@ -4020,7 +4023,7 @@ Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subj
   - [ ] ex-51 · identity-map-feeds-mapper — verify cached object reused
   - [ ] ex-52 · metadata-typed-columns — verify type drives coercer
   - [ ] ex-53 · builder-plus-mapper-select — verify list of typed objects
-  - [ ] ex-54 · typed-session-api — verify mypy infers return type
+  - [ ] ex-54 · typed-session-api — verify pyright infers return type
   - [ ] ex-55 · uow-track-new — verify object recorded in new-set
   - [ ] ex-56 · uow-new-becomes-insert — verify INSERT emitted
   - [ ] ex-57 · uow-track-dirty — verify dirty detection vs snapshot
@@ -4043,7 +4046,7 @@ Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subj
   - [ ] ex-74 · migration-runner-order — verify runs in version order
   - [ ] ex-75 · wire-full-stack-select — verify typed objects from a real query
   - [ ] ex-76 · wire-full-stack-write — verify atomic persist
-  - [ ] ex-77 · typed-end-to-end — verify zero mypy type errors
+  - [ ] ex-77 · typed-end-to-end — verify zero pyright type errors
   - [ ] ex-78 · capstone-preview-mini-orm — verify same result as topic 27 ORM tier
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-your-own-orm-and-query-builder/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
@@ -4399,7 +4402,7 @@ Row: Annotated-concept · ‡ polyglot · topic wt 410 · Learn 131 / Drill 231 
 
 ## Phase 35 — Topic 32 Software Product Engineering ▲ (`software-product-engineering`)
 
-Row: Annotated-concept · — ‡ · topic wt 420 · Learn 132 / Drill 232 · **leadership/design artifact (no code)**. Template →
+Row: Annotated-concept · ‡ no-code · topic wt 420 · Learn 132 / Drill 232 · **leadership/design artifact (no code)**. Template →
 [`syllabus/32-software-product-engineering.md`](./syllabus/32-software-product-engineering.md).
 
 - [ ] **[AI] V** — `web-researcher` for `software-product-engineering`; resolve every Accuracy-notes "to verify" line in
@@ -4589,7 +4592,7 @@ Junction: Topics 19–33 (CS depth + OO design + FP + concurrency + advanced SQL
 
 ---
 
-## Pass 3 — Build for the Real World (Phases 38-66 + Pass-3 + secure-service + data-pipeline capstones)
+## Pass 3 — Build for the Real World (Phases 38-70 + Pass-3 + secure-service + data-pipeline capstones)
 
 ## Phase 38 — Topic 34 NoSQL Databases (`nosql-databases`)
 
@@ -4638,7 +4641,7 @@ Row: By Example · Python † · topic wt 440 · Learn 134 / Drill 234 · **subj
   - [ ] co-35 · columnar-formats-parquet-arrow
   - [ ] co-36 · wide-column-vs-columnar-olap
 - [ ] **[AI] A1-examples** — Author `CONTENT/nosql-databases/learning/code/` (runnable typed-Python /
-      store-shell sources, DD-20) — one per worked example in `syllabus/34-nosql-databases.md` §Worked
+      store-shell sources, DD-20/DD-39) — one per worked example in `syllabus/34-nosql-databases.md` §Worked
       examples, each rendered runnable (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · key-value-set-get — verify value round-trips
   - [ ] ex-02 · key-value-crud-python — verify full CRUD round trip from Python
@@ -4920,7 +4923,7 @@ Row: By Example · Python † · topic wt 460 · Learn 136 / Drill 236 · **subj
   - [ ] co-26 · durability-fsync-torn-page
   - [ ] co-27 · clustered-vs-heap
   - [ ] co-28 · column-vs-row-store
-- [ ] **[AI] A1-examples** — Author `CONTENT/database-internals-and-storage-engines/learning/code/` (runnable, fully type-annotated Python, DD-20/DD-30) rendering **every** `ex-NN` in `syllabus/36-database-internals-and-storage-engines.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/database-internals-and-storage-engines/learning/code/` (runnable, fully type-annotated Python, DD-20/DD-30/DD-34/DD-39) rendering **every** `ex-NN` in `syllabus/36-database-internals-and-storage-engines.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · fixed-size-page-alloc — verify `len(page)` equals the page-size constant
   - [ ] ex-02 · page-header-pack-unpack — verify unpack round-trips
   - [ ] ex-03 · slot-array-append — verify slot count increments and `pd_lower` advances
@@ -5165,7 +5168,7 @@ Row: By Example · Python † · topic wt 480 · Learn 138 / Drill 238 · **subj
   - [ ] co-34 · query-expansion-synonyms
   - [ ] co-35 · semantic-vector-search
   - [ ] co-36 · pagerank-link-analysis
-- [ ] **[AI] A1-examples** — Author `CONTENT/search-and-information-retrieval/learning/code/` (runnable, type-annotated `mypy`-clean Python, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/38-search-and-information-retrieval.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/search-and-information-retrieval/learning/code/` (runnable, type-annotated `pyright`-clean Python, DD-20/DD-30/DD-34/DD-39) rendering **every** `ex-NN` in `syllabus/38-search-and-information-retrieval.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · tokenize-whitespace — verify token count equals space-separated word count
   - [ ] ex-02 · tokenize-regex — verify `"end."` and `"end"` yield the same token
   - [ ] ex-03 · case-fold — verify `"The"` and `"the"` collapse to one term
@@ -5223,7 +5226,7 @@ Row: By Example · Python † · topic wt 480 · Learn 138 / Drill 238 · **subj
   - [ ] ex-55 · proximity-query — verify doc with terms N+1 apart excluded
   - [ ] ex-56 · segment-merge-model — verify merged index answers query identically
   - [ ] ex-57 · nrt-refresh-model — verify pre-refresh doc invisible until refresh
-  - [ ] ex-58 · typed-index-class — verify `mypy` clean, queries correct
+  - [ ] ex-58 · typed-index-class — verify `pyright` clean, queries correct
   - [ ] ex-59 · incremental-add — verify added doc findable immediately
   - [ ] ex-60 · incremental-equals-rebuild — verify identical postings for every term
   - [ ] ex-61 · persist-json — verify reloaded results match in-memory
@@ -5313,7 +5316,7 @@ Row: By Example · Python · topic wt 490 · Learn 139 / Drill 239 · **subject*
   - [ ] co-38 · retry-backoff-jitter
   - [ ] co-39 · timeout-bulkhead
   - [ ] co-40 · connection-pool-n-plus-1
-- [ ] **[AI] A1-examples** — Author `CONTENT/backend-at-scale/learning/code/` (runnable, type-annotated `mypy`-clean Python exercised from the CLI, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/39-backend-at-scale.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/backend-at-scale/learning/code/` (runnable, type-annotated `pyright`-clean Python exercised from the CLI, DD-20/DD-30/DD-34/DD-39) rendering **every** `ex-NN` in `syllabus/39-backend-at-scale.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · rest-crud-endpoints — verify each verb takes its path
   - [ ] ex-02 · safe-vs-idempotent — verify GET/PUT repeatable, POST duplicates
   - [ ] ex-03 · status-201-created — verify 201 + `Location`
@@ -5451,7 +5454,7 @@ Row: By Example · Python † · topic wt 500 · Learn 140 / Drill 240 · **subj
   - [ ] co-28 · streaming-response
   - [ ] co-29 · server-invocation
   - [ ] co-30 · framework-as-transformation
-- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-web-framework/learning/code/` (runnable, type-annotated `mypy`-clean Python behind a real WSGI/ASGI server, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/40-build-your-own-web-framework.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-web-framework/learning/code/` (runnable, type-annotated `pyright`-clean Python behind a real WSGI/ASGI server, DD-20/DD-30/DD-34/DD-39) rendering **every** `ex-NN` in `syllabus/40-build-your-own-web-framework.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · hello-wsgi — verify server serves it, `curl` gets 200
   - [ ] ex-02 · environ-dump — verify each field matches the request
   - [ ] ex-03 · start-response-status — verify the status line
@@ -5461,7 +5464,7 @@ Row: By Example · Python † · topic wt 500 · Learn 140 / Drill 240 · **subj
   - [ ] ex-07 · read-wsgi-input — verify echoed length matches `CONTENT_LENGTH`
   - [ ] ex-08 · query-string-parse — verify `?a=1&a=2` yields both values
   - [ ] ex-09 · http-header-read — verify the sent `Accept` header appears
-  - [ ] ex-10 · request-object-build — verify `mypy` clean, fields populated
+  - [ ] ex-10 · request-object-build — verify `pyright` clean, fields populated
   - [ ] ex-11 · response-object-build — verify it holds the expected values
   - [ ] ex-12 · response-to-wsgi — verify the served bytes match
   - [ ] ex-13 · not-found-404 — verify status and body
@@ -5520,7 +5523,7 @@ Row: By Example · Python † · topic wt 500 · Learn 140 / Drill 240 · **subj
   - [ ] ex-66 · sse-endpoint — verify `curl` receives successive events
   - [ ] ex-67 · middleware-stack-three — verify the full nesting order
   - [ ] ex-68 · full-request-lifecycle — verify each stage runs once in order
-  - [ ] ex-69 · typed-request-response-full — verify `mypy --strict` is clean
+  - [ ] ex-69 · typed-request-response-full — verify `pyright` (strict mode) is clean
   - [ ] ex-70 · content-negotiation — verify the right `Content-Type` returns
   - [ ] ex-71 · header-case-insensitive — verify `content-type`/`Content-Type` match
   - [ ] ex-72 · port-flask-handler — verify identical response bytes
@@ -5593,7 +5596,7 @@ Row: By Example · Python † · topic wt 510 · Learn 141 / Drill 241 · **subj
   - [ ] co-32 · bulk-batch-endpoints
   - [ ] co-33 · webhook-api-surface
   - [ ] co-34 · openapi-security-schemes
-- [ ] **[AI] A1-examples** — Author `CONTENT/api-design/learning/code/` (runnable, type-annotated `mypy`-clean Python exercised with `curl`/a client, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/41-api-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/api-design/learning/code/` (runnable, type-annotated `pyright`-clean Python exercised with `curl`/a client, DD-20/DD-30/DD-34/DD-39) rendering **every** `ex-NN` in `syllabus/41-api-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · resource-noun-uri — verify URIs name nouns
   - [ ] ex-02 · rpc-vs-resource-contrast — verify the resource form is verb-free
   - [ ] ex-03 · method-semantics-map — verify each verb's intent
@@ -5728,7 +5731,7 @@ Row: Annotated-concept · Python \* · topic wt 520 · Learn 142 / Drill 242 · 
   - [ ] co-25 · big-ball-of-mud
   - [ ] co-26 · essential-vs-accidental-complexity
   - [ ] co-27 · cross-cutting-concerns
-- [ ] **[AI] A1-examples** — Author `CONTENT/software-architecture/learning/` (each example a runnable, type-annotated `mypy`-clean Python snippet **or** an annotated C4/ADR/table artifact per the `*` designation, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/42-software-architecture.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/software-architecture/learning/` (each example a runnable, type-annotated `pyright`-clean Python snippet **or** an annotated C4/ADR/table artifact per the `*` designation, DD-20/DD-30/DD-34/DD-39) rendering **every** `ex-NN` in `syllabus/42-software-architecture.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · coupling-count — verify counts match its imports
   - [ ] ex-02 · instability-metric — verify the more-depended-on module is more stable
   - [ ] ex-03 · cohesion-smell — verify the split raises cohesion
@@ -5840,7 +5843,7 @@ Row: By Example · Python · topic wt 530 · Learn 143 / Drill 243 · **subject*
   - [ ] co-30 · cqrs
   - [ ] co-31 · event-sourcing
   - [ ] co-32 · when-ddd-pays-off
-- [ ] **[AI] A1-examples** — Author `CONTENT/domain-driven-design/learning/code/` (each example a runnable, type-annotated `mypy`-clean Python source, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/43-domain-driven-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/domain-driven-design/learning/code/` (each example a runnable, type-annotated `pyright`-clean Python source, DD-20/DD-30) rendering **every** `ex-NN` in `syllabus/43-domain-driven-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · ubiquitous-language-rename — verify tests read as domain sentences
   - [ ] ex-02 · model-vs-table — verify a method enforces a rule a table could not
   - [ ] ex-03 · value-object-equality — verify equality by value
@@ -5978,7 +5981,7 @@ Row: Annotated-concept · Python \* · topic wt 540 · Learn 144 / Drill 244 · 
   - [ ] co-28 · blob-object-storage
   - [ ] co-29 · case-study-method
   - [ ] co-30 · communicating-a-design
-- [ ] **[AI] A1-examples** — Author `CONTENT/system-design/learning/` (each example a runnable, type-annotated `mypy`-clean Python component **or** an annotated Mermaid/capacity/decision-table artifact per the `*` designation, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/44-system-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/system-design/learning/` (each example a runnable, type-annotated `pyright`-clean Python component **or** an annotated Mermaid/capacity/decision-table artifact per the `*` designation, DD-20/DD-30) rendering **every** `ex-NN` in `syllabus/44-system-design.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · requirements-split — verify each requirement is labelled and testable
   - [ ] ex-02 · latency-ladder-table — verify each row's relative multiplier
   - [ ] ex-03 · powers-of-two-table — verify each identity arithmetically
@@ -6092,7 +6095,7 @@ Row: By Example · Python · topic wt 550 · Learn 145 / Drill 245 · **subject*
   - [ ] co-31 · eventual-consistency
   - [ ] co-32 · schema-evolution
   - [ ] co-33 · when-not-eda
-- [ ] **[AI] A1-examples** — Author `CONTENT/event-driven-architecture/learning/code/` (each example a runnable, type-annotated `mypy`-clean Python source against a local in-process bus/broker fake, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/45-event-driven-architecture.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/event-driven-architecture/learning/code/` (each example a runnable, type-annotated `pyright`-clean Python source against a local in-process bus/broker fake, DD-20/DD-30) rendering **every** `ex-NN` in `syllabus/45-event-driven-architecture.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · event-as-fact — verify the class is frozen and named as a fact
   - [ ] ex-02 · event-vs-command — verify each is typed by intent
   - [ ] ex-03 · event-vs-query — verify no state mutation occurs
@@ -6239,7 +6242,7 @@ Row: By Example · Python † · topic wt 560 · Learn 146 / Drill 246 · **subj
   - [ ] co-37 · etcd-raft-kv
   - [ ] co-38 · coordination-recipes
   - [ ] co-39 · service-discovery-and-membership
-- [ ] **[AI] A1-examples** — Author `CONTENT/distributed-systems/learning/code/` (each example a runnable, type-annotated `mypy`-clean Python source over injectable delay/loss, DD-20/DD-30/DD-34) rendering **every** `ex-NN` in `syllabus/46-distributed-systems.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/distributed-systems/learning/code/` (each example a runnable, type-annotated `pyright`-clean Python source over injectable delay/loss, DD-20/DD-30/DD-34/DD-39) rendering **every** `ex-NN` in `syllabus/46-distributed-systems.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · fallacies-checklist — verify each fallacy names a concrete failure
   - [ ] ex-02 · network-loss-inject — verify some sends never arrive
   - [ ] ex-03 · network-delay-inject — verify arrival order can differ from send order
@@ -7051,86 +7054,86 @@ Row: By Example · HCL/YAML/shell † · topic wt 620 · Learn 152 / Drill 252 �
   - [ ] co-34 · failure-domain-reasoning
 - [ ] **[AI] A1-examples** — Author `CONTENT/bare-metal-virtualization/learning/code/` with **every** worked example in
       `syllabus/52-bare-metal-virtualization.md` §Worked examples as a real `*.tf` / `cloud-init.yaml` / Ansible playbook / shell script **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · why-own-substrate
-  - [ ] ex-02 · type1-vs-type2
-  - [ ] ex-03 · kvm-capability-check
-  - [ ] ex-04 · kvm-qemu-split
-  - [ ] ex-05 · vm-vs-lxc-table
-  - [ ] ex-06 · proxmox-stack
-  - [ ] ex-07 · pveversion
-  - [ ] ex-08 · proxmox-api-token
-  - [ ] ex-09 · api-underlies-all
-  - [ ] ex-10 · qm-create-vm
-  - [ ] ex-11 · qm-pct-list
-  - [ ] ex-12 · pct-create-lxc
-  - [ ] ex-13 · vm-lifecycle-cli
-  - [ ] ex-14 · virsh-list
-  - [ ] ex-15 · virsh-vs-proxmox
-  - [ ] ex-16 · libvirt-hypervisor-scope
-  - [ ] ex-17 · storage-models-table
-  - [ ] ex-18 · no-hardware-raid
-  - [ ] ex-19 · zpool-create-raidz
-  - [ ] ex-20 · raidz-parity-table
-  - [ ] ex-21 · zfs-dataset
-  - [ ] ex-22 · zfs-snapshot-cli
-  - [ ] ex-23 · zfs-rollback
-  - [ ] ex-24 · cloud-init-first-boot
-  - [ ] ex-25 · cloud-init-userdata-yaml
-  - [ ] ex-26 · proxmox-ci-drive
-  - [ ] ex-27 · pvecm-status
-  - [ ] ex-28 · quorum-majority-annotate
-  - [ ] ex-29 · pvecm-create-join
-  - [ ] ex-30 · corosync-annotate
-  - [ ] ex-31 · three-node-quorum
-  - [ ] ex-32 · live-migrate-online
-  - [ ] ex-33 · migration-cpu-constraint
-  - [ ] ex-34 · ha-add-service
-  - [ ] ex-35 · ha-failover-annotate
-  - [ ] ex-36 · ha-requirements-table
-  - [ ] ex-37 · zfs-send-receive
-  - [ ] ex-38 · zfs-incremental-send
-  - [ ] ex-39 · zfs-scrub
-  - [ ] ex-40 · proxmox-pvesr
-  - [ ] ex-41 · ceph-hyperconverged-annotate
-  - [ ] ex-42 · pveceph-init-mon
-  - [ ] ex-43 · pveceph-osd-create
-  - [ ] ex-44 · ceph-daemons-table
-  - [ ] ex-45 · ceph-crush-annotate
-  - [ ] ex-46 · ceph-failure-domain
-  - [ ] ex-47 · ceph-rbd-pool
-  - [ ] ex-48 · cephfs-annotate
-  - [ ] ex-49 · ceph-three-node
-  - [ ] ex-50 · tf-proxmox-provider
-  - [ ] ex-51 · tf-proxmox-endpoint
-  - [ ] ex-52 · tf-vm-resource
-  - [ ] ex-53 · tf-plan-apply
-  - [ ] ex-54 · tf-idempotent-apply
-  - [ ] ex-55 · tf-cloud-init-inject
-  - [ ] ex-56 · provider-choice-table
-  - [ ] ex-57 · packer-annotate
-  - [ ] ex-58 · packer-proxmox-template
-  - [ ] ex-59 · packer-cloud-init-bake
-  - [ ] ex-60 · image-pipeline-annotate
-  - [ ] ex-61 · immutable-vs-mutable-table
-  - [ ] ex-62 · tf-golden-clone
-  - [ ] ex-63 · ansible-proxmox-kvm
-  - [ ] ex-64 · ansible-idempotent
-  - [ ] ex-65 · ansible-collection-note
-  - [ ] ex-66 · declarative-vs-imperative-table
-  - [ ] ex-67 · terraform-plus-ansible
-  - [ ] ex-68 · pxe-boot-chain
-  - [ ] ex-69 · pxe-autoinstall
-  - [ ] ex-70 · pbs-annotate
-  - [ ] ex-71 · pbs-backup
-  - [ ] ex-72 · pbs-restore
-  - [ ] ex-73 · backup-tiers-table
-  - [ ] ex-74 · terraform-license-table
-  - [ ] ex-75 · opentofu-swap
-  - [ ] ex-76 · failure-domain-reasoning
-  - [ ] ex-77 · quorum-vs-crush-table
-  - [ ] ex-78 · secrets-out-of-state
-  - [ ] ex-79 · substrate-stack-annotate
-  - [ ] ex-80 · bare-metal-capstone
+  - [ ] ex-01 · why-own-substrate — verify each column's trade-off
+  - [ ] ex-02 · type1-vs-type2 — verify KVM is Type-1-class
+  - [ ] ex-03 · kvm-capability-check — verify hardware virtualization is present and the KVM module is loaded
+  - [ ] ex-04 · kvm-qemu-split — verify each part's role in near-native speed
+  - [ ] ex-05 · vm-vs-lxc-table — verify the isolation-vs-density trade-off
+  - [ ] ex-06 · proxmox-stack — verify the license and the bundled stack
+  - [ ] ex-07 · pveversion — verify the running PVE + kernel version string
+  - [ ] ex-08 · proxmox-api-token — verify the REST API answers with the version
+  - [ ] ex-09 · api-underlies-all — verify the single control plane
+  - [ ] ex-10 · qm-create-vm — verify the VM is defined and boots
+  - [ ] ex-11 · qm-pct-list — verify VMs and containers are enumerated with status
+  - [ ] ex-12 · pct-create-lxc — verify the LXC container starts
+  - [ ] ex-13 · vm-lifecycle-cli — verify each lifecycle transition on one VM
+  - [ ] ex-14 · virsh-list — verify the lower-level toolkit lists and describes domains
+  - [ ] ex-15 · virsh-vs-proxmox — verify when each fits
+  - [ ] ex-16 · libvirt-hypervisor-scope — verify the multi-hypervisor abstraction
+  - [ ] ex-17 · storage-models-table — verify each model's failure handling and scale
+  - [ ] ex-18 · no-hardware-raid — verify why the controller is the anti-pattern
+  - [ ] ex-19 · zpool-create-raidz — verify the pool and its RAID-Z1 vdev topology
+  - [ ] ex-20 · raidz-parity-table — verify the parity-to-redundancy mapping
+  - [ ] ex-21 · zfs-dataset — verify the dataset appears under the pool
+  - [ ] ex-22 · zfs-snapshot-cli — verify the point-in-time snapshot exists
+  - [ ] ex-23 · zfs-rollback — verify the dataset returns to the snapshot state
+  - [ ] ex-24 · cloud-init-first-boot — verify the ordered steps
+  - [ ] ex-25 · cloud-init-userdata-yaml — verify the declarative keys parse
+  - [ ] ex-26 · proxmox-ci-drive — verify the cloud-init drive injects the config at boot
+  - [ ] ex-27 · pvecm-status — verify quorum state and cluster membership
+  - [ ] ex-28 · quorum-majority-annotate — verify the majority rule
+  - [ ] ex-29 · pvecm-create-join — verify the second node joins the cluster
+  - [ ] ex-30 · corosync-annotate — verify its role
+  - [ ] ex-31 · three-node-quorum — verify the count
+  - [ ] ex-32 · live-migrate-online — verify the running VM moves with no downtime
+  - [ ] ex-33 · migration-cpu-constraint — verify the constraint
+  - [ ] ex-34 · ha-add-service — verify the VM enters HA state `started`
+  - [ ] ex-35 · ha-failover-annotate — verify the recovery path
+  - [ ] ex-36 · ha-requirements-table — verify each is required
+  - [ ] ex-37 · zfs-send-receive — verify the snapshot replicates to a second host
+  - [ ] ex-38 · zfs-incremental-send — verify only the delta between snapshots transfers
+  - [ ] ex-39 · zfs-scrub — verify a checksum scrub runs and reports errors repaired
+  - [ ] ex-40 · proxmox-pvesr — verify a guest's disk replicates on schedule
+  - [ ] ex-41 · ceph-hyperconverged-annotate — verify the unification
+  - [ ] ex-42 · pveceph-init-mon — verify a Ceph monitor comes up
+  - [ ] ex-43 · pveceph-osd-create — verify the OSD joins the cluster (`ceph osd tree`)
+  - [ ] ex-44 · ceph-daemons-table — verify each daemon's job
+  - [ ] ex-45 · ceph-crush-annotate — verify the decentralized placement
+  - [ ] ex-46 · ceph-failure-domain — verify a host loss keeps a full replica set
+  - [ ] ex-47 · ceph-rbd-pool — verify the VM disk lands on RBD
+  - [ ] ex-48 · cephfs-annotate — verify the shared file interface
+  - [ ] ex-49 · ceph-three-node — verify the minimum
+  - [ ] ex-50 · tf-proxmox-provider — verify `terraform init` installs the provider
+  - [ ] ex-51 · tf-proxmox-endpoint — verify it authenticates against the Proxmox API
+  - [ ] ex-52 · tf-vm-resource — verify `terraform apply` creates the VM
+  - [ ] ex-53 · tf-plan-apply — verify the plan previews the VM and apply creates it
+  - [ ] ex-54 · tf-idempotent-apply — verify a no-op (the idempotency recap from topic 51 holds on-prem)
+  - [ ] ex-55 · tf-cloud-init-inject — verify the guest boots SSH-ready
+  - [ ] ex-56 · provider-choice-table — verify the maintained-provider pick
+  - [ ] ex-57 · packer-annotate — verify the single-source / many-image idea
+  - [ ] ex-58 · packer-proxmox-template — verify a reusable golden template appears
+  - [ ] ex-59 · packer-cloud-init-bake — verify the template is cloud-init-ready at boot
+  - [ ] ex-60 · image-pipeline-annotate — verify the split of concerns
+  - [ ] ex-61 · immutable-vs-mutable-table — verify the reproducibility trade-off
+  - [ ] ex-62 · tf-golden-clone — verify every clone derives from one image
+  - [ ] ex-63 · ansible-proxmox-kvm — verify the play creates it through the Proxmox API
+  - [ ] ex-64 · ansible-idempotent — verify it reports `ok` / no change (converge, not re-create)
+  - [ ] ex-65 · ansible-collection-note — verify the current collection is named
+  - [ ] ex-66 · declarative-vs-imperative-table — verify each tool's category
+  - [ ] ex-67 · terraform-plus-ansible — verify the hand-off boundary
+  - [ ] ex-68 · pxe-boot-chain — verify the netboot sequence
+  - [ ] ex-69 · pxe-autoinstall — verify no manual console prompt is needed
+  - [ ] ex-70 · pbs-annotate — verify the incremental/dedup model
+  - [ ] ex-71 · pbs-backup — verify a backup snapshot lands in the datastore
+  - [ ] ex-72 · pbs-restore — verify the guest is recreated and boots
+  - [ ] ex-73 · backup-tiers-table — verify each tier's recovery scope (rollback vs disaster)
+  - [ ] ex-74 · terraform-license-table — verify the license-clean pick
+  - [ ] ex-75 · opentofu-swap — verify the identical plan runs under OpenTofu
+  - [ ] ex-76 · failure-domain-reasoning — verify the distributed-systems framing of "what survives a loss"
+  - [ ] ex-77 · quorum-vs-crush-table — verify each protects a different layer
+  - [ ] ex-78 · secrets-out-of-state — verify no secret appears in any committed file
+  - [ ] ex-79 · substrate-stack-annotate — verify this topic is the layer beneath topics 50 and 51
+  - [ ] ex-80 · bare-metal-capstone — verify the VMs come up SSH-ready and a re-plan shows no drift
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/bare-metal-virtualization/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -7195,88 +7198,88 @@ Row: By Example · YAML/CLI † · topic wt 630 · Learn 153 / Drill 253 · **su
   - [ ] co-34 · immutable-nodes
 - [ ] **[AI] A1-examples** — Author `CONTENT/self-managed-kubernetes-and-gitops/learning/code/` with **every** worked example in
       `syllabus/53-self-managed-kubernetes-and-gitops.md` §Worked examples as a real k3s / `kubectl` / Helm / Argo CD / Flux YAML manifest set run from the CLI **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · why-self-managed
-  - [ ] ex-02 · control-plane-vs-workers
-  - [ ] ex-03 · control-plane-components
-  - [ ] ex-04 · reconciliation-loop
-  - [ ] ex-05 · etcd-raft
-  - [ ] ex-06 · quorum-math
-  - [ ] ex-07 · k3s-install-server
-  - [ ] ex-08 · k3s-single-binary
-  - [ ] ex-09 · k3s-kubeconfig
-  - [ ] ex-10 · k3s-datastore-sqlite
-  - [ ] ex-11 · k3s-embedded-etcd
-  - [ ] ex-12 · ha-odd-servers
-  - [ ] ex-13 · k3s-ha-three-servers
-  - [ ] ex-14 · kubeadm-init
-  - [ ] ex-15 · kubeadm-join
-  - [ ] ex-16 · kubeadm-scope
-  - [ ] ex-17 · k0s-single-binary
-  - [ ] ex-18 · talos-immutable
-  - [ ] ex-19 · talos-machineconfig
-  - [ ] ex-20 · distro-decision
-  - [ ] ex-21 · immutable-nodes
-  - [ ] ex-22 · kubectl-get-nodes
-  - [ ] ex-23 · add-worker-join
-  - [ ] ex-24 · node-cordon
-  - [ ] ex-25 · node-drain
-  - [ ] ex-26 · node-uncordon
-  - [ ] ex-27 · etcd-snapshot-save
-  - [ ] ex-28 · etcd-snapshot-restore
-  - [ ] ex-29 · upgrade-sequencing
-  - [ ] ex-30 · k3s-upgrade
-  - [ ] ex-31 · cni-required
-  - [ ] ex-32 · k8s-network-model
-  - [ ] ex-33 · install-cilium
-  - [ ] ex-34 · cni-decision
-  - [ ] ex-35 · flannel-vxlan
-  - [ ] ex-36 · netpol-default-open
-  - [ ] ex-37 · netpol-deny-ingress
-  - [ ] ex-38 · netpol-allow-frontend
-  - [ ] ex-39 · metallb-install
-  - [ ] ex-40 · metallb-ipaddresspool
-  - [ ] ex-41 · loadbalancer-gets-ip
-  - [ ] ex-42 · metallb-l2advertisement
-  - [ ] ex-43 · metallb-l2-vs-bgp
-  - [ ] ex-44 · metallb-bgp
-  - [ ] ex-45 · longhorn-install
-  - [ ] ex-46 · longhorn-replicated
-  - [ ] ex-47 · local-path-provisioner
-  - [ ] ex-48 · storageclass-pvc
-  - [ ] ex-49 · storage-decision
-  - [ ] ex-50 · ingress-controller-choice
-  - [ ] ex-51 · traefik-default
-  - [ ] ex-52 · ingress-manifest
-  - [ ] ex-53 · cert-manager-install
-  - [ ] ex-54 · clusterissuer-acme
-  - [ ] ex-55 · certificate-resource
-  - [ ] ex-56 · ingress-tls-auto
-  - [ ] ex-57 · acme-http01
-  - [ ] ex-58 · gitops-model
-  - [ ] ex-59 · argocd-install
-  - [ ] ex-60 · argocd-application
-  - [ ] ex-61 · argocd-sync-status
-  - [ ] ex-62 · argocd-applicationset
-  - [ ] ex-63 · argocd-auto-sync
-  - [ ] ex-64 · flux-bootstrap
-  - [ ] ex-65 · flux-kustomization
-  - [ ] ex-66 · flux-helmrelease
-  - [ ] ex-67 · argo-vs-flux
-  - [ ] ex-68 · kustomize-base-overlay
-  - [ ] ex-69 · overlay-patch
-  - [ ] ex-70 · helm-values-per-env
-  - [ ] ex-71 · build-once-promote
-  - [ ] ex-72 · promotion-via-git
-  - [ ] ex-73 · secrets-not-in-git
-  - [ ] ex-74 · sealed-secret
-  - [ ] ex-75 · external-secrets
-  - [ ] ex-76 · secrets-decision
-  - [ ] ex-77 · velero-install
-  - [ ] ex-78 · velero-backup
-  - [ ] ex-79 · velero-schedule
-  - [ ] ex-80 · rpo-rto
-  - [ ] ex-81 · restore-drill
-  - [ ] ex-82 · self-managed-capstone
+  - [ ] ex-01 · why-self-managed — verify what each side owns
+  - [ ] ex-02 · control-plane-vs-workers — verify which node runs the API server vs the workloads
+  - [ ] ex-03 · control-plane-components — verify each component's job
+  - [ ] ex-04 · reconciliation-loop — verify the declarative (not imperative) model
+  - [ ] ex-05 · etcd-raft — verify the API server persists all state there
+  - [ ] ex-06 · quorum-math — verify why 3 tolerates 1 loss and even counts don't help
+  - [ ] ex-07 · k3s-install-server — verify the server comes up and `kubectl get nodes` shows it Ready
+  - [ ] ex-08 · k3s-single-binary — verify one process serves the cluster
+  - [ ] ex-09 · k3s-kubeconfig — verify remote access
+  - [ ] ex-10 · k3s-datastore-sqlite — verify the default storage
+  - [ ] ex-11 · k3s-embedded-etcd — verify k3s selects embedded etcd for HA instead of SQLite
+  - [ ] ex-12 · ha-odd-servers — verify a two-server "HA" cluster has no fault tolerance
+  - [ ] ex-13 · k3s-ha-three-servers — verify a three-server HA control plane
+  - [ ] ex-14 · kubeadm-init — verify a control-plane node and the printed join command
+  - [ ] ex-15 · kubeadm-join — verify the node joins and reports Ready (after CNI)
+  - [ ] ex-16 · kubeadm-scope — verify what it deliberately leaves to you
+  - [ ] ex-17 · k0s-single-binary — verify a k0s single-binary control plane runs
+  - [ ] ex-18 · talos-immutable — verify why you can't `ssh` in to fix a node
+  - [ ] ex-19 · talos-machineconfig — verify the node configures itself from declarative YAML over the API
+  - [ ] ex-20 · distro-decision — verify the selection heuristic
+  - [ ] ex-21 · immutable-nodes — verify a failed update reverts instead of leaving a broken node
+  - [ ] ex-22 · kubectl-get-nodes — verify all nodes are Ready with roles
+  - [ ] ex-23 · add-worker-join — verify the worker appears and schedules pods
+  - [ ] ex-24 · node-cordon — verify it goes `SchedulingDisabled` and takes no new pods
+  - [ ] ex-25 · node-drain — verify pods evict and reschedule elsewhere
+  - [ ] ex-26 · node-uncordon — verify scheduling resumes on the node
+  - [ ] ex-27 · etcd-snapshot-save — verify a timestamped snapshot file is written
+  - [ ] ex-28 · etcd-snapshot-restore — verify the cluster restores state from the snapshot
+  - [ ] ex-29 · upgrade-sequencing — verify the safe sequence
+  - [ ] ex-30 · k3s-upgrade — verify the version rolls forward
+  - [ ] ex-31 · cni-required — verify the CNI is what makes them Ready
+  - [ ] ex-32 · k8s-network-model — verify the flat pod-IP model
+  - [ ] ex-33 · install-cilium — verify eBPF-based pod networking brings nodes Ready
+  - [ ] ex-34 · cni-decision — verify each CNI's trade-off
+  - [ ] ex-35 · flannel-vxlan — verify the overlay path between nodes
+  - [ ] ex-36 · netpol-default-open — verify the open baseline before any policy
+  - [ ] ex-37 · netpol-deny-ingress — verify traffic to those pods is now blocked
+  - [ ] ex-38 · netpol-allow-frontend — verify only the frontend reaches the db
+  - [ ] ex-39 · metallb-install — verify the controller and speaker pods run
+  - [ ] ex-40 · metallb-ipaddresspool — verify the pool is registered
+  - [ ] ex-41 · loadbalancer-gets-ip — verify MetalLB assigns it an external IP from the pool (no cloud provider)
+  - [ ] ex-42 · metallb-l2advertisement — verify the IP is reachable on the LAN via ARP from one owner node
+  - [ ] ex-43 · metallb-l2-vs-bgp — verify each mode's fit
+  - [ ] ex-44 · metallb-bgp — verify routes are advertised over BGP
+  - [ ] ex-45 · longhorn-install — verify the Longhorn StorageClass and manager pods appear
+  - [ ] ex-46 · longhorn-replicated — verify a replica survives a node loss
+  - [ ] ex-47 · local-path-provisioner — verify a node-local PV is provisioned
+  - [ ] ex-48 · storageclass-pvc — verify a PV is dynamically bound to the claim
+  - [ ] ex-49 · storage-decision — verify when to use each
+  - [ ] ex-50 · ingress-controller-choice — verify each's trade-off and license
+  - [ ] ex-51 · traefik-default — verify Ingress objects are satisfied out of the box
+  - [ ] ex-52 · ingress-manifest — verify external HTTP reaches the app through the controller
+  - [ ] ex-53 · cert-manager-install — verify its CRDs and controller run
+  - [ ] ex-54 · clusterissuer-acme — verify the issuer is Ready
+  - [ ] ex-55 · certificate-resource — verify cert-manager writes the signed cert into a TLS Secret
+  - [ ] ex-56 · ingress-tls-auto — verify the TLS cert is issued and renewed automatically
+  - [ ] ex-57 · acme-http01 — verify the domain-validation flow
+  - [ ] ex-58 · gitops-model — verify the pull-based model vs `kubectl apply`
+  - [ ] ex-59 · argocd-install — verify the API/UI and repo-server pods run
+  - [ ] ex-60 · argocd-application — verify Argo CD syncs the manifests into the cluster
+  - [ ] ex-61 · argocd-sync-status — verify it flips `OutOfSync` then `Synced` on reconcile
+  - [ ] ex-62 · argocd-applicationset — verify dev/staging/prod apps appear
+  - [ ] ex-63 · argocd-auto-sync — verify a manual cluster edit is reverted back to Git
+  - [ ] ex-64 · flux-bootstrap — verify Flux installs itself and commits its own manifests
+  - [ ] ex-65 · flux-kustomization — verify the manifests apply on the sync interval
+  - [ ] ex-66 · flux-helmrelease — verify Flux releases and upgrades it from Git
+  - [ ] ex-67 · argo-vs-flux — verify when to reach for each
+  - [ ] ex-68 · kustomize-base-overlay — verify each overlay hydrates the shared base
+  - [ ] ex-69 · overlay-patch — verify only prod differs from the base
+  - [ ] ex-70 · helm-values-per-env — verify each env renders distinct config
+  - [ ] ex-71 · build-once-promote — verify identical bits ship to every env
+  - [ ] ex-72 · promotion-via-git — verify the audit trail
+  - [ ] ex-73 · secrets-not-in-git — verify the leak risk of Git history
+  - [ ] ex-74 · sealed-secret — verify only the in-cluster controller can decrypt it
+  - [ ] ex-75 · external-secrets — verify the operator materializes a Secret at runtime
+  - [ ] ex-76 · secrets-decision — verify each model's fit
+  - [ ] ex-77 · velero-install — verify the backup location is Available
+  - [ ] ex-78 · velero-backup — verify the tarball + PV snapshot land in object storage
+  - [ ] ex-79 · velero-schedule — verify the RPO the interval implies
+  - [ ] ex-80 · rpo-rto — verify how the schedule sizes each
+  - [ ] ex-81 · restore-drill — verify the app + data come back, proving the DR path
+  - [ ] ex-82 · self-managed-capstone — verify a Git commit promotes the app and the cluster self-heals
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/self-managed-kubernetes-and-gitops/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -7340,40 +7343,40 @@ Row: By Example · multi-tool † · topic wt 640 · Learn 154 / Drill 254 · **
 - [ ] **[AI] A1-examples** — Author `CONTENT/build-automation-and-task-runners/learning/code/` with **every** worked example in
       `syllabus/54-build-automation-and-task-runners.md` §Worked examples as a real `Makefile`/`justfile`/`package.json`/`BUILD`/`build.gradle(.kts)`
       run from the CLI **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · why-build-automation — a decision table ad-hoc shell vs an automated build (repeatable,
-  - [ ] ex-02 · runner-vs-build-system — a decision table command runner (names recipes) vs build system
-  - [ ] ex-03 · first-makefile-rule — verify
+  - [ ] ex-01 · why-build-automation — verify each column's trade-off
+  - [ ] ex-02 · runner-vs-build-system — verify the distinction
+  - [ ] ex-03 · first-makefile-rule — verify `make` builds the target
   - [ ] ex-04 · make-run-target — verify the target file appears
   - [ ] ex-05 · target-prereq-recipe — verify each part's role
-  - [ ] ex-06 · dependency-graph — verify the build
+  - [ ] ex-06 · dependency-graph — verify the build order the graph implies
   - [ ] ex-07 · make-default-goal — verify bare `make` builds it
-  - [ ] ex-08 · incremental-rebuild — verify only the dependent
+  - [ ] ex-08 · incremental-rebuild — verify only the dependent target rebuilds
   - [ ] ex-09 · up-to-date-skip — verify "Nothing to be done"
-  - [ ] ex-10 · timestamp-comparison — verify the
+  - [ ] ex-10 · timestamp-comparison — verify the freshness rule
   - [ ] ex-11 · phony-clean — verify `make clean` always runs
-  - [ ] ex-12 · phony-file-collision — verify
+  - [ ] ex-12 · phony-file-collision — verify `.PHONY` fixes the "up to date" bug
   - [ ] ex-13 · phony-aggregate — verify it builds each
   - [ ] ex-14 · autovar-target — verify it expands to the target name
   - [ ] ex-15 · autovar-first-prereq — verify it expands to the first prerequisite
   - [ ] ex-16 · autovar-all-prereqs — verify it expands to all prerequisites
   - [ ] ex-17 · pattern-rule — verify one rule compiles many files
   - [ ] ex-18 · pattern-stem-match — verify `foo.c`→`foo.o`
-  - [ ] ex-19 · recursive-assignment — verify it expands at
+  - [ ] ex-19 · recursive-assignment — verify it expands at use
   - [ ] ex-20 · simple-assignment — verify it expands once at definition
-  - [ ] ex-21 · assignment-difference — verify when each
+  - [ ] ex-21 · assignment-difference — verify when each differs
   - [ ] ex-22 · implicit-rule — verify Make's built-in rule fires
-  - [ ] ex-23 · builtin-variables — verify the built-in variables
+  - [ ] ex-23 · builtin-variables — verify the built-in variables resolve
   - [ ] ex-24 · make-wildcard — verify it lists the source files
   - [ ] ex-25 · make-patsubst — verify the name transform
   - [ ] ex-26 · first-justfile — verify `just <recipe>` runs it
   - [ ] ex-27 · just-run — verify it executes
   - [ ] ex-28 · just-list — verify it prints the available recipes
-  - [ ] ex-29 · just-recipe-dependency — verify the dep
-  - [ ] ex-30 · just-always-runs — verify no
+  - [ ] ex-29 · just-recipe-dependency — verify the dep runs first
+  - [ ] ex-30 · just-always-runs — verify no freshness skip
   - [ ] ex-31 · just-parameter — verify the argument is passed
   - [ ] ex-32 · just-default-param — verify the default when omitted
   - [ ] ex-33 · just-variadic — verify multiple args collect
-  - [ ] ex-34 · just-vs-make — verify when
+  - [ ] ex-34 · just-vs-make — verify when to reach for each
   - [ ] ex-35 · npm-script — verify the command runs
   - [ ] ex-36 · npm-run-list — verify it lists the scripts
   - [ ] ex-37 · npm-test-shortcut — verify the shortcut
@@ -7382,50 +7385,50 @@ Row: By Example · multi-tool † · topic wt 640 · Learn 154 / Drill 254 · **
   - [ ] ex-40 · npm-post-hook — verify it runs after `build`
   - [ ] ex-41 · npm-pre-post-order — verify the sequence
   - [ ] ex-42 · npm-compose-scripts — verify both run
-  - [ ] ex-43 · make-calls-npm — verify cross-tool
+  - [ ] ex-43 · make-calls-npm — verify cross-tool composition
   - [ ] ex-44 · composition-graph — verify the composed order
   - [ ] ex-45 · parallel-make — verify concurrent execution
-  - [ ] ex-46 · parallel-correctness — verify a
+  - [ ] ex-46 · parallel-correctness — verify a missing-dep race
   - [ ] ex-47 · posix-make — verify the portable-subset behavior
-  - [ ] ex-48 · posix-portability — verify the
+  - [ ] ex-48 · posix-portability — verify the opt-in marker
   - [ ] ex-49 · clean-rebuild — verify a full from-scratch rebuild
-  - [ ] ex-50 · hermetic-build — verify
-  - [ ] ex-51 · non-hermetic-pitfall — verify the
+  - [ ] ex-50 · hermetic-build — verify the definition
+  - [ ] ex-51 · non-hermetic-pitfall — verify the reproducibility break
   - [ ] ex-52 · content-hash-cache — verify why it beats mtime
   - [ ] ex-53 · cache-hit-reuse — verify no recompute
-  - [ ] ex-54 · timestamp-vs-hash — verify each's failure
-  - [ ] ex-55 · freshness-three-way — verify
+  - [ ] ex-54 · timestamp-vs-hash — verify each's failure mode
+  - [ ] ex-55 · freshness-three-way — verify the three models
   - [ ] ex-56 · bazel-build-file — verify the target is defined
   - [ ] ex-57 · bazel-build-cmd — verify the single target builds
   - [ ] ex-58 · bazel-all-targets — verify all main-repo targets build
   - [ ] ex-59 · bazel-label-syntax — verify the addressing
   - [ ] ex-60 · bazel-incremental — verify unchanged actions are reused
   - [ ] ex-61 · bazel-remote-cache — verify shared-output reuse
-  - [ ] ex-62 · bazel-hermetic-hash — verify
+  - [ ] ex-62 · bazel-hermetic-hash — verify reproducibility
   - [ ] ex-63 · gradle-task — verify it is registered
-  - [ ] ex-64 · gradle-task-graph — verify
+  - [ ] ex-64 · gradle-task-graph — verify the pre-build graph
   - [ ] ex-65 · gradle-run-task — verify the task executes
-  - [ ] ex-66 · gradle-up-to-date — verify the `UP-TO-DATE` skip via input
+  - [ ] ex-66 · gradle-up-to-date — verify the `UP-TO-DATE` skip via input fingerprint
   - [ ] ex-67 · gradle-incremental-change — verify only the affected task reruns
   - [ ] ex-68 · gradle-build-cache — verify a cache-restored output
   - [ ] ex-69 · gradle-groovy-dsl — verify it configures the build
   - [ ] ex-70 · gradle-kotlin-dsl — verify the typed equivalent
   - [ ] ex-71 · dsl-comparison — verify each's trade-off
-  - [ ] ex-72 · reproducible-build — verify
-  - [ ] ex-73 · reproducible-vs-incremental — annotate reproducibility (same output) vs incrementality (skip
-  - [ ] ex-74 · tool-selection — a decision table runner vs make vs bazel/gradle by scale + language —
-  - [ ] ex-75 · monorepo-scaling — verify the caching
-  - [ ] ex-76 · ci-invokes-build — annotate CI calling `make ci` / `bazel test //...` / `gradle build` —
-  - [ ] ex-77 · cache-in-ci — verify the CI cache
-  - [ ] ex-78 · npm-lifecycle-install — verify they
-  - [ ] ex-79 · build-graph-end-to-end — the full source → object → binary incremental loop with Make —
-  - [ ] ex-80 · build-automation-capstone — a top-level `Makefile` orchestrating an `npm run build`, a
+  - [ ] ex-72 · reproducible-build — verify reproducibility
+  - [ ] ex-73 · reproducible-vs-incremental — verify they are distinct
+  - [ ] ex-74 · tool-selection — verify the selection heuristic
+  - [ ] ex-75 · monorepo-scaling — verify the caching motivation
+  - [ ] ex-76 · ci-invokes-build — verify the build tool as the CI unit
+  - [ ] ex-77 · cache-in-ci — verify the CI cache reuse
+  - [ ] ex-78 · npm-lifecycle-install — verify they fire on `npm install`
+  - [ ] ex-79 · build-graph-end-to-end — verify one changed source rebuilds only its chain
+  - [ ] ex-80 · build-automation-capstone — verify a one-file change rebuilds only the affected chain
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/build-automation-and-task-runners/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/build-automation-and-task-runners/drilling/_index.md` (wt 252) covering the same Items with mocked/self-contained
+      `CONTENT/build-automation-and-task-runners/drilling/_index.md` (wt 254) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 58 Gate
@@ -7484,7 +7487,7 @@ Row: By Example · YAML + Python † · topic wt 650 · Learn 155 / Drill 255 ·
   - [ ] co-34 · automated-canary-analysis
 - [ ] **[AI] A1-examples** — Author `CONTENT/cicd-and-release-engineering/learning/code/` with **every** worked example in
       `syllabus/55-cicd-and-release-engineering.md` §Worked examples as a runnable GitHub Actions workflow **or** typed
-      `mypy`-clean Python automation (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+      `pyright`-clean Python automation (DD-20/DD-30/DD-34/DD-39). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · ci-daily-merge — verify both halves named
   - [ ] ex-02 · ci-broken-build-fix — verify merges pause while red
   - [ ] ex-03 · cd-always-releasable — verify releasability is continuous
@@ -7573,7 +7576,7 @@ Row: By Example · YAML + Python † · topic wt 650 · Learn 155 / Drill 255 ·
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/cicd-and-release-engineering/drilling/_index.md` (wt 252) covering the same Items with mocked/self-contained
+      `CONTENT/cicd-and-release-engineering/drilling/_index.md` (wt 255) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 59 Gate
@@ -7627,8 +7630,8 @@ Row: By Example · Python · topic wt 660 · Learn 156 / Drill 256 · **subject*
   - [ ] co-29 · observability-tracing
   - [ ] co-30 · secrets-no-committed-keys
 - [ ] **[AI] A1-examples** — Author `CONTENT/creating-ai-powered-apps/learning/code/` with **every** worked example in
-      `syllabus/56-creating-ai-powered-apps.md` §Worked examples as typed `mypy`-clean Python runnable against a
-      local/mockable model (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+      `syllabus/56-creating-ai-powered-apps.md` §Worked examples as typed `pyright`-clean Python runnable against a
+      local/mockable model (DD-20/DD-30/DD-34/DD-39). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · messages-request — verify a response is returned
   - [ ] ex-02 · roles-user-assistant — verify roles alternate
   - [ ] ex-03 · system-prompt — verify it shapes the answer
@@ -7714,7 +7717,7 @@ Row: By Example · Python · topic wt 660 · Learn 156 / Drill 256 · **subject*
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/creating-ai-powered-apps/drilling/_index.md` (wt 253) covering the same Items with mocked/self-contained
+      `CONTENT/creating-ai-powered-apps/drilling/_index.md` (wt 256) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 60 Gate
@@ -7769,8 +7772,8 @@ Row: By Example · Python † · topic wt 670 · Learn 157 / Drill 257 · **subj
   - [ ] co-30 · lethal-trifecta
   - [ ] co-31 · agent-frameworks
   - [ ] co-32 · simplest-solution-first
-- [ ] **[AI] A1-examples** — Author `CONTENT/agentic-ai/learning/code/` as typed `mypy`-clean Python, each example
-      runnable and citing the `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+- [ ] **[AI] A1-examples** — Author `CONTENT/agentic-ai/learning/code/` as typed `pyright`-clean Python, each example
+      runnable and citing the `co-NN` it exercises (DD-20/DD-30/DD-34/DD-39). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · agent-vs-workflow — verify the dynamic-vs-predefined distinction
   - [ ] ex-02 · workflow-predefined-path — verify the fixed pipeline path
   - [ ] ex-03 · augmented-llm — verify all four building blocks
@@ -7856,7 +7859,7 @@ Row: By Example · Python † · topic wt 670 · Learn 157 / Drill 257 · **subj
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/agentic-ai/drilling/_index.md` (wt 254) covering the same Items with mocked/self-contained
+      `CONTENT/agentic-ai/drilling/_index.md` (wt 257) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 61 Gate
@@ -7910,8 +7913,8 @@ Row: Annotated-concept · Python \* · topic wt 680 · Learn 158 / Drill 258 · 
   - [ ] co-29 · cve-cvss-nvd
   - [ ] co-30 · data-protection-privacy
 - [ ] **[AI] A1-examples** — Author `CONTENT/it-and-application-security/learning/` as an Annotated-concept mix
-      (annotated threat models + tables/diagrams + typed `mypy`-clean runnable Python mechanisms in `code/`), each
-      example citing the `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+      (annotated threat models + tables/diagrams + typed `pyright`-clean runnable Python mechanisms in `code/`), each
+      example citing the `co-NN` it exercises (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · cia-triad-table — verify each dimension has a concrete loss scenario
   - [ ] ex-02 · cia-tradeoff — verify the tension is named
   - [ ] ex-03 · defense-in-depth-layers — verify each layer is assumed to leak
@@ -7969,7 +7972,7 @@ Row: Annotated-concept · Python \* · topic wt 680 · Learn 158 / Drill 258 · 
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/it-and-application-security/drilling/_index.md` (wt 255) covering the same Items with mocked/self-contained
+      `CONTENT/it-and-application-security/drilling/_index.md` (wt 258) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 62 Gate
@@ -8026,7 +8029,7 @@ Row: By Example · Python + shell † · topic wt 690 · Learn 159 / Drill 259 �
   - [ ] co-31 · lab-isolation
 - [ ] **[AI] A1-examples** — Author `CONTENT/offensive-security/learning/code/` as Python + shell driving
       tooling against the local lab only, each example restating "authorized lab target only" and citing the
-      `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox per `ex-NN` (1:1 mirror):
+      `co-NN` it exercises (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · ethics-authorization — verify scope + authorized-target-only
   - [ ] ex-02 · scope-boundaries — verify out-of-scope is explicit
   - [ ] ex-03 · roe-document — verify it precedes testing
@@ -8110,7 +8113,7 @@ Row: By Example · Python + shell † · topic wt 690 · Learn 159 / Drill 259 �
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/offensive-security/drilling/_index.md` (wt 256) covering the same Items with mocked/self-contained
+      `CONTENT/offensive-security/drilling/_index.md` (wt 259) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 63 Gate
@@ -8169,7 +8172,7 @@ Row: By Example · Python + shell † · topic wt 700 · Learn 160 / Drill 260 �
   - [ ] co-33 · alert-fatigue
   - [ ] co-34 · soar
 - [ ] **[AI] A1-examples** — Author `CONTENT/defensive-security/learning/code/` as Python + shell over
-      lab-generated telemetry, each example citing the `co-NN` it exercises (DD-20/DD-30/DD-34). One checkbox
+      lab-generated telemetry, each example citing the `co-NN` it exercises (DD-20/DD-30). One checkbox
       per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · blue-red-purple-roles — verify the defend-vs-attack distinction
   - [ ] ex-02 · what-to-log — verify auditable events listed
@@ -8254,7 +8257,7 @@ Row: By Example · Python + shell † · topic wt 700 · Learn 160 / Drill 260 �
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/defensive-security/drilling/_index.md` (wt 257) covering the same Items with mocked/self-contained
+      `CONTENT/defensive-security/drilling/_index.md` (wt 260) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 64 Gate
@@ -8312,87 +8315,87 @@ Row: By Example · Python † · topic wt 710 · Learn 161 / Drill 261 · **subj
   - [ ] co-33 · nice-vuln-analysis-role
   - [ ] co-34 · program-reporting
 - [ ] **[AI] A1-examples** — Author `CONTENT/vulnerability-management-and-assessment/learning/code/` with **every** worked example in
-      `syllabus/61-vulnerability-management-and-assessment.md` §Worked examples as a real fully type-hinted (`mypy`-clean) Python module run from the CLI **or** an annotated decision artifact (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · vuln-lifecycle-map
-  - [ ] ex-02 · weakness-vuln-exploit-chain
-  - [ ] ex-03 · anatomy-of-a-cve
-  - [ ] ex-04 · cna-issuance
-  - [ ] ex-05 · nvd-enrichment-fields
-  - [ ] ex-06 · query-nvd-api
-  - [ ] ex-07 · cwe-lookup
-  - [ ] ex-08 · cve-to-cwe-map
-  - [ ] ex-09 · cpe-match
-  - [ ] ex-10 · parse-cvss-vector
-  - [ ] ex-11 · exploitability-vs-impact
-  - [ ] ex-12 · cvss-severity-band
-  - [ ] ex-13 · cvss-four-groups
-  - [ ] ex-14 · cvss-nomenclature
-  - [ ] ex-15 · severity-not-risk
-  - [ ] ex-16 · sbom-what-it-is
-  - [ ] ex-17 · sbom-minimum-elements
-  - [ ] ex-18 · read-spdx
-  - [ ] ex-19 · read-cyclonedx
-  - [ ] ex-20 · parse-sbom-python
-  - [ ] ex-21 · parse-purl
-  - [ ] ex-22 · generate-sbom-syft
-  - [ ] ex-23 · scan-sbom-grype
-  - [ ] ex-24 · trivy-fs-scan
-  - [ ] ex-25 · sast-concept
-  - [ ] ex-26 · dast-concept
-  - [ ] ex-27 · sast-vs-dast
-  - [ ] ex-28 · sca-concept
-  - [ ] ex-29 · semgrep-run
-  - [ ] ex-30 · semgrep-rule-shape
-  - [ ] ex-31 · dast-baseline
-  - [ ] ex-32 · container-image-scan
-  - [ ] ex-33 · iac-scan
-  - [ ] ex-34 · secret-scan
-  - [ ] ex-35 · scanner-false-positive
-  - [ ] ex-36 · modality-coverage-matrix
-  - [ ] ex-37 · epss-concept
-  - [ ] ex-38 · query-epss-api
-  - [ ] ex-39 · kev-concept
-  - [ ] ex-40 · load-kev-catalog
-  - [ ] ex-41 · cvss-alone-over-alerts
-  - [ ] ex-42 · combine-cvss-epss-kev
-  - [ ] ex-43 · asset-context-weight
-  - [ ] ex-44 · prioritization-policy-table
-  - [ ] ex-45 · remediation-sla
-  - [ ] ex-46 · risk-acceptance-record
-  - [ ] ex-47 · osv-schema
-  - [ ] ex-48 · query-osv-api
-  - [ ] ex-49 · osv-scanner-run
-  - [ ] ex-50 · parse-grype-json
-  - [ ] ex-51 · parse-trivy-json
-  - [ ] ex-52 · common-finding-schema
-  - [ ] ex-53 · vex-concept
-  - [ ] ex-54 · vex-suppress
-  - [ ] ex-55 · reachability-concept
-  - [ ] ex-56 · reachability-downgrade
-  - [ ] ex-57 · correlate-across-scanners
-  - [ ] ex-58 · dedup-findings
-  - [ ] ex-59 · enrich-with-epss-kev
-  - [ ] ex-60 · score-and-rank
-  - [ ] ex-61 · network-scan-concept
-  - [ ] ex-62 · openvas-scan
-  - [ ] ex-63 · scan-cadence
-  - [ ] ex-64 · sbom-diff
-  - [ ] ex-65 · new-cve-recheck
-  - [ ] ex-66 · triage-report-json
-  - [ ] ex-67 · triage-report-markdown
-  - [ ] ex-68 · metric-mttr
-  - [ ] ex-69 · metric-coverage
-  - [ ] ex-70 · exposure-trend
-  - [ ] ex-71 · sla-breach-report
-  - [ ] ex-72 · nice-work-role
-  - [ ] ex-73 · ci-gate-scan
-  - [ ] ex-74 · verify-remediation
-  - [ ] ex-75 · false-positive-triage
-  - [ ] ex-76 · advisory-source-reconcile
-  - [ ] ex-77 · cpe-vs-purl-matching
-  - [ ] ex-78 · policy-end-to-end
-  - [ ] ex-79 · program-dashboard
-  - [ ] ex-80 · vuln-triage-preview
+      `syllabus/61-vulnerability-management-and-assessment.md` §Worked examples as a real fully type-hinted (`pyright`-clean) Python module run from the CLI **or** an annotated decision artifact (DD-20/DD-30/DD-39). One checkbox per `ex-NN` (1:1 mirror):
+  - [ ] ex-01 · vuln-lifecycle-map — verify each stage's output
+  - [ ] ex-02 · weakness-vuln-exploit-chain — verify the three levels
+  - [ ] ex-03 · anatomy-of-a-cve — verify the id format `CVE-YYYY-NNNNN`
+  - [ ] ex-04 · cna-issuance — verify the issuance path
+  - [ ] ex-05 · nvd-enrichment-fields — verify the enrichment set
+  - [ ] ex-06 · query-nvd-api — verify the CVSS vector is present
+  - [ ] ex-07 · cwe-lookup — verify the weakness class
+  - [ ] ex-08 · cve-to-cwe-map — verify the mapping
+  - [ ] ex-09 · cpe-match — verify the applicability match
+  - [ ] ex-10 · parse-cvss-vector — verify the parsed fields
+  - [ ] ex-11 · exploitability-vs-impact — verify the two sets
+  - [ ] ex-12 · cvss-severity-band — verify the band boundaries
+  - [ ] ex-13 · cvss-four-groups — verify all four named
+  - [ ] ex-14 · cvss-nomenclature — verify which groups each includes
+  - [ ] ex-15 · severity-not-risk — verify the FIRST user-guide distinction
+  - [ ] ex-16 · sbom-what-it-is — verify the definition
+  - [ ] ex-17 · sbom-minimum-elements — verify each baseline field named
+  - [ ] ex-18 · read-spdx — verify the package + license + relationship fields
+  - [ ] ex-19 · read-cyclonedx — verify the `components` array + `bomFormat`
+  - [ ] ex-20 · parse-sbom-python — verify the component count
+  - [ ] ex-21 · parse-purl — verify each field
+  - [ ] ex-22 · generate-sbom-syft — verify the SBOM file is produced
+  - [ ] ex-23 · scan-sbom-grype — verify vulnerabilities are listed
+  - [ ] ex-24 · trivy-fs-scan — verify findings enumerated
+  - [ ] ex-25 · sast-concept — verify the OWASP definition
+  - [ ] ex-26 · dast-concept — verify the OWASP definition
+  - [ ] ex-27 · sast-vs-dast — verify each's coverage
+  - [ ] ex-28 · sca-concept — verify the transitive-dep match
+  - [ ] ex-29 · semgrep-run — verify a finding is reported
+  - [ ] ex-30 · semgrep-rule-shape — verify the pattern match
+  - [ ] ex-31 · dast-baseline — verify alerts raised
+  - [ ] ex-32 · container-image-scan — verify OS + app package vulns
+  - [ ] ex-33 · iac-scan — verify a misconfiguration flagged
+  - [ ] ex-34 · secret-scan — verify the leaked credential flagged
+  - [ ] ex-35 · scanner-false-positive — verify the FP is spurious
+  - [ ] ex-36 · modality-coverage-matrix — verify each modality's niche + blind spot
+  - [ ] ex-37 · epss-concept — verify the range + window
+  - [ ] ex-38 · query-epss-api — verify the probability field
+  - [ ] ex-39 · kev-concept — verify the criteria list
+  - [ ] ex-40 · load-kev-catalog — verify a membership check
+  - [ ] ex-41 · cvss-alone-over-alerts — verify the over-alert with counts
+  - [ ] ex-42 · combine-cvss-epss-kev — verify the ranked order
+  - [ ] ex-43 · asset-context-weight — verify the adjusted rank
+  - [ ] ex-44 · prioritization-policy-table — verify the tier boundaries
+  - [ ] ex-45 · remediation-sla — verify the SLA-per-tier table
+  - [ ] ex-46 · risk-acceptance-record — verify the required fields
+  - [ ] ex-47 · osv-schema — verify the `affected` version ranges
+  - [ ] ex-48 · query-osv-api — verify vulnerabilities returned
+  - [ ] ex-49 · osv-scanner-run — verify vulns matched to versions
+  - [ ] ex-50 · parse-grype-json — verify normalized fields
+  - [ ] ex-51 · parse-trivy-json — verify schema parity
+  - [ ] ex-52 · common-finding-schema — verify the required fields
+  - [ ] ex-53 · vex-concept — verify a `not_affected` status
+  - [ ] ex-54 · vex-suppress — verify it drops from the report
+  - [ ] ex-55 · reachability-concept — verify reachable vs unreachable
+  - [ ] ex-56 · reachability-downgrade — verify the lowered rank
+  - [ ] ex-57 · correlate-across-scanners — verify the merged key set
+  - [ ] ex-58 · dedup-findings — verify one record per pair
+  - [ ] ex-59 · enrich-with-epss-kev — verify each finding carries both
+  - [ ] ex-60 · score-and-rank — verify the ranked output
+  - [ ] ex-61 · network-scan-concept — verify the coverage difference
+  - [ ] ex-62 · openvas-scan — verify host/service findings
+  - [ ] ex-63 · scan-cadence — verify the re-scan trigger
+  - [ ] ex-64 · sbom-diff — verify the delta set
+  - [ ] ex-65 · new-cve-recheck — verify a newly-disclosed CVE surfaces
+  - [ ] ex-66 · triage-report-json — verify the schema + descending priority order
+  - [ ] ex-67 · triage-report-markdown — verify the readable ranking
+  - [ ] ex-68 · metric-mttr — verify the MTTR value
+  - [ ] ex-69 · metric-coverage — verify the percentage
+  - [ ] ex-70 · exposure-trend — verify the descending series
+  - [ ] ex-71 · sla-breach-report — verify the breached list
+  - [ ] ex-72 · nice-work-role — verify the role competencies
+  - [ ] ex-73 · ci-gate-scan — verify the gate blocks
+  - [ ] ex-74 · verify-remediation — verify the finding is closed
+  - [ ] ex-75 · false-positive-triage — verify the suppression record
+  - [ ] ex-76 · advisory-source-reconcile — verify source agreement or a documented conflict
+  - [ ] ex-77 · cpe-vs-purl-matching — verify a false-match/miss case
+  - [ ] ex-78 · policy-end-to-end — verify the fix-now list
+  - [ ] ex-79 · program-dashboard — verify the KPIs shown
+  - [ ] ex-80 · vuln-triage-preview — verify the prioritized output
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/vulnerability-management-and-assessment/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
@@ -8416,12 +8419,14 @@ Row: By Example · Python † · topic wt 710 · Learn 161 / Drill 261 · **subj
 Junction: Topics 34–60 (data stores + scale + architecture + cloud/on-prem + CI/CD + security core). Inter-Topic Capstone Phase Template; spec in
 `syllabus/60-defensive-security.md` (Pass-3 capstone section). Note: it is anchored after the security **core** (topic 60);
 the Pass-3 tail — 61 vulnerability management, 62 GRC, 63 analytics & experimentation — is a deliberate assurance-and-measurement
-coda taught after this build-and-ship integration capstone (see tech-docs DD-38).
+coda taught after this build-and-ship integration capstone in rendered curriculum order — the capstone sorts at folder weight
+705–707, ahead of topic 61 at weight 710, so a reader meets it first even though this delivery phase authors topic 61 earlier
+for build grouping (see tech-docs DD-38).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-real-world-delivery/` (`_index.md` `weight: 575`, + `code/`) per the cited capstone
+- [ ] **[AI] A** — Author `CONTENT/capstone-real-world-delivery/` (`_index.md` `weight: 705`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
@@ -8431,7 +8436,7 @@ coda taught after this build-and-ship integration capstone (see tech-docs DD-38)
 
 ### Phase 66 Gate
 
-- [ ] [AI] `capstone-real-world-delivery/` complete (wt 575, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `capstone-real-world-delivery/` complete (wt 705, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -8440,13 +8445,13 @@ coda taught after this build-and-ship integration capstone (see tech-docs DD-38)
 
 ## Phase 67 — Inter-topic: Secure-Service Capstone (`capstone-secure-service`)
 
-Junction: Backend Essentials (11) + Security Essentials (17) + IT / Application Security (55). Inter-Topic Capstone Phase Template; spec in
+Junction: Backend at Scale (39) + Security Essentials (17) + IT Security (58). Inter-Topic Capstone Phase Template; spec in
 `syllabus/60-defensive-security.md` (secure-service cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-secure-service/` (`_index.md` `weight: 576`, + `code/`) per the cited capstone
+- [ ] **[AI] A** — Author `CONTENT/capstone-secure-service/` (`_index.md` `weight: 706`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
@@ -8456,7 +8461,7 @@ Junction: Backend Essentials (11) + Security Essentials (17) + IT / Application 
 
 ### Phase 67 Gate
 
-- [ ] [AI] `capstone-secure-service/` complete (wt 576, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `capstone-secure-service/` complete (wt 706, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -8465,13 +8470,13 @@ Junction: Backend Essentials (11) + Security Essentials (17) + IT / Application 
 
 ## Phase 68 — Inter-topic: Data-Pipeline Capstone (`capstone-data-pipeline`)
 
-Junction: Data Engineering (37) + SQL/NoSQL (10/34) + a queue. Inter-Topic Capstone Phase Template; spec in
+Junction: Data Engineering (37) + SQL/NoSQL (10/34) + a RAG interface (56). Inter-Topic Capstone Phase Template; spec in
 `syllabus/60-defensive-security.md` (data-pipeline cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-data-pipeline/` (`_index.md` `weight: 577`, + `code/`) per the cited capstone
+- [ ] **[AI] A** — Author `CONTENT/capstone-data-pipeline/` (`_index.md` `weight: 707`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/60-defensive-security.md`](./syllabus/60-defensive-security.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
@@ -8481,7 +8486,7 @@ Junction: Data Engineering (37) + SQL/NoSQL (10/34) + a queue. Inter-Topic Capst
 
 ### Phase 68 Gate
 
-- [ ] [AI] `capstone-data-pipeline/` complete (wt 577, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `capstone-data-pipeline/` complete (wt 707, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -8563,7 +8568,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 720 · Learn 162 / Drill 262 �
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/it-governance-grc/drilling/_index.md` (wt 258) covering the same Items with mocked/self-contained
+      `CONTENT/it-governance-grc/drilling/_index.md` (wt 262) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 69 Gate
@@ -8612,10 +8617,10 @@ Row: By Example · Python † · topic wt 730 · Learn 163 / Drill 263 · **subj
   - [ ] co-24 · goodhart-metrics-theater
   - [ ] co-25 · frequentist-vs-bayesian
   - [ ] co-26 · feature-flags-as-delivery
-- [ ] **[AI] A1-examples** — Author `CONTENT/analytics-and-experimentation/learning/code/` (runnable typed-Python sources, DD-20/DD-30)
+- [ ] **[AI] A1-examples** — Author `CONTENT/analytics-and-experimentation/learning/code/` (runnable typed-Python sources, DD-20/DD-30/DD-34/DD-39)
       exercising **every** worked example in `syllabus/63-analytics-and-experimentation.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
   - [ ] ex-01 · tracking-plan-doc — verify every emitted event validates against the plan
-  - [ ] ex-02 · event-schema-typed — verify mypy rejects a mistyped property
+  - [ ] ex-02 · event-schema-typed — verify pyright rejects a mistyped property
   - [ ] ex-03 · emit-events-to-table — verify rows land with correct columns
   - [ ] ex-04 · idempotency-key-dedup — verify an upsert keyed on event_id leaves one row
   - [ ] ex-05 · client-vs-server-event — verify dedup keeps the server-authoritative row
@@ -8697,7 +8702,7 @@ Row: By Example · Python † · topic wt 730 · Learn 163 / Drill 263 · **subj
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/analytics-and-experimentation/drilling/_index.md` (wt 259) covering the same Items with mocked/self-contained
+      `CONTENT/analytics-and-experimentation/drilling/_index.md` (wt 263) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 70 Gate
@@ -8712,11 +8717,11 @@ Row: By Example · Python † · topic wt 730 · Learn 163 / Drill 263 · **subj
 
 ---
 
-## Pass 4 — Concurrency & Systems (Phases 67-94 + Pass-4 + concurrency-showdown capstones)
+## Pass 4 — Concurrency & Systems (Phases 71-98 + Pass-4 + concurrency-showdown capstones)
 
 ## Phase 71 — Topic 64 Just Enough Go (`just-enough-go`)
 
-Row: Primer § · Go † · topic wt 740 · Learn 164 / Drill 264 · **primer**. Template →
+Row: Primer · Go † · topic wt 740 · Learn 164 / Drill 264 · **primer**. Template →
 [`syllabus/64-just-enough-go.md`](./syllabus/64-just-enough-go.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-go`; resolve every Accuracy-notes "to verify" line in
@@ -8835,7 +8840,7 @@ Row: Primer § · Go † · topic wt 740 · Learn 164 / Drill 264 · **primer**.
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-go/drilling/_index.md` (wt 260) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-go/drilling/_index.md` (wt 264) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 71 Gate
@@ -8969,7 +8974,7 @@ Row: By Example · Go † · topic wt 750 · Learn 165 / Drill 265 · **subject*
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/csp-style-concurrency/drilling/_index.md` (wt 261) covering the same Items with mocked/self-contained
+      `CONTENT/csp-style-concurrency/drilling/_index.md` (wt 265) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 72 Gate
@@ -8984,7 +8989,7 @@ Row: By Example · Go † · topic wt 750 · Learn 165 / Drill 265 · **subject*
 
 ## Phase 73 — Topic 66 Just Enough Elixir (`just-enough-elixir`)
 
-Row: Primer § · Elixir † · topic wt 760 · Learn 166 / Drill 266 · **primer**. Template →
+Row: Primer · Elixir † · topic wt 760 · Learn 166 / Drill 266 · **primer**. Template →
 [`syllabus/66-just-enough-elixir.md`](./syllabus/66-just-enough-elixir.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-elixir`; resolve every Accuracy-notes "to verify" line in
@@ -9103,7 +9108,7 @@ Row: Primer § · Elixir † · topic wt 760 · Learn 166 / Drill 266 · **prime
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-elixir/drilling/_index.md` (wt 262) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-elixir/drilling/_index.md` (wt 266) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 73 Gate
@@ -9237,7 +9242,7 @@ Row: By Example · Elixir † · topic wt 770 · Learn 167 / Drill 267 · **subj
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/actor-model-concurrency/drilling/_index.md` (wt 263) covering the same Items with mocked/self-contained
+      `CONTENT/actor-model-concurrency/drilling/_index.md` (wt 267) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 74 Gate
@@ -9252,7 +9257,7 @@ Row: By Example · Elixir † · topic wt 770 · Learn 167 / Drill 267 · **subj
 
 ## Phase 75 — Topic 68 Just Enough Kotlin (`just-enough-kotlin`)
 
-Row: Primer § · Kotlin † · topic wt 780 · Learn 168 / Drill 268 · **primer**. Template →
+Row: Primer · Kotlin † · topic wt 780 · Learn 168 / Drill 268 · **primer**. Template →
 [`syllabus/68-just-enough-kotlin.md`](./syllabus/68-just-enough-kotlin.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-kotlin`; resolve every Accuracy-notes "to verify" line in
@@ -9371,7 +9376,7 @@ Row: Primer § · Kotlin † · topic wt 780 · Learn 168 / Drill 268 · **prime
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-kotlin/drilling/_index.md` (wt 264) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-kotlin/drilling/_index.md` (wt 268) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 75 Gate
@@ -9384,9 +9389,9 @@ Row: Primer § · Kotlin † · topic wt 780 · Learn 168 / Drill 268 · **prime
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 76 — Topic 69 Android App Development (`android-app-development`)
+## Phase 76 — Topic 69 Android App Development ◆ (`android-app-development`)
 
-Row: By Example · Kotlin † ◆ · topic wt 790 · Learn 169 / Drill 269 · **subject**. Template →
+Row: By Example · Kotlin † · topic wt 790 · Learn 169 / Drill 269 · **subject**. Template →
 [`syllabus/69-android-app-development.md`](./syllabus/69-android-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `android-app-development`; resolve every Accuracy-notes "to verify" line in
@@ -9509,7 +9514,7 @@ Row: By Example · Kotlin † ◆ · topic wt 790 · Learn 169 / Drill 269 · **
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/android-app-development/drilling/_index.md` (wt 265) covering the same Items with mocked/self-contained
+      `CONTENT/android-app-development/drilling/_index.md` (wt 269) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 76 Gate
@@ -9524,7 +9529,7 @@ Row: By Example · Kotlin † ◆ · topic wt 790 · Learn 169 / Drill 269 · **
 
 ## Phase 77 — Topic 70 Just Enough Swift (`just-enough-swift`)
 
-Row: Primer § · Swift † · topic wt 800 · Learn 170 / Drill 270 · **primer**. Template →
+Row: Primer · Swift † · topic wt 800 · Learn 170 / Drill 270 · **primer**. Template →
 [`syllabus/70-just-enough-swift.md`](./syllabus/70-just-enough-swift.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-swift`; resolve every Accuracy-notes "to verify" line in
@@ -9645,7 +9650,7 @@ Row: Primer § · Swift † · topic wt 800 · Learn 170 / Drill 270 · **primer
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-swift/drilling/_index.md` (wt 266) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-swift/drilling/_index.md` (wt 270) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 77 Gate
@@ -9658,9 +9663,9 @@ Row: Primer § · Swift † · topic wt 800 · Learn 170 / Drill 270 · **primer
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 78 — Topic 71 iOS App Development (`ios-app-development`)
+## Phase 78 — Topic 71 iOS App Development ◆ (`ios-app-development`)
 
-Row: By Example · Swift † ◆ · topic wt 810 · Learn 171 / Drill 271 · **subject**. Template →
+Row: By Example · Swift † · topic wt 810 · Learn 171 / Drill 271 · **subject**. Template →
 [`syllabus/71-ios-app-development.md`](./syllabus/71-ios-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `ios-app-development`; resolve every Accuracy-notes "to verify" line in
@@ -9783,7 +9788,7 @@ Row: By Example · Swift † ◆ · topic wt 810 · Learn 171 / Drill 271 · **s
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/ios-app-development/drilling/_index.md` (wt 267) covering the same Items with mocked/self-contained
+      `CONTENT/ios-app-development/drilling/_index.md` (wt 271) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 78 Gate
@@ -9798,7 +9803,7 @@ Row: By Example · Swift † ◆ · topic wt 810 · Learn 171 / Drill 271 · **s
 
 ## Phase 79 — Topic 72 Just Enough Dart (`just-enough-dart`)
 
-Row: Primer § · Dart † · topic wt 820 · Learn 172 / Drill 272 · **primer**. Template →
+Row: Primer · Dart † · topic wt 820 · Learn 172 / Drill 272 · **primer**. Template →
 [`syllabus/72-just-enough-dart.md`](./syllabus/72-just-enough-dart.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-dart`; resolve every Accuracy-notes "to verify" line in
@@ -9917,7 +9922,7 @@ Row: Primer § · Dart † · topic wt 820 · Learn 172 / Drill 272 · **primer*
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-dart/drilling/_index.md` (wt 268) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-dart/drilling/_index.md` (wt 272) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 79 Gate
@@ -9930,7 +9935,7 @@ Row: Primer § · Dart † · topic wt 820 · Learn 172 / Drill 272 · **primer*
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 80 — Topic 73 Hybrid App Development (`hybrid-app-development`)
+## Phase 80 — Topic 73 Hybrid App Development ◆ (`hybrid-app-development`)
 
 Row: By Example · Dart † · topic wt 830 · Learn 173 / Drill 273 · **subject**. Template →
 [`syllabus/73-hybrid-app-development.md`](./syllabus/73-hybrid-app-development.md).
@@ -10055,7 +10060,7 @@ Row: By Example · Dart † · topic wt 830 · Learn 173 / Drill 273 · **subjec
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/hybrid-app-development/drilling/_index.md` (wt 269) covering the same Items with mocked/self-contained
+      `CONTENT/hybrid-app-development/drilling/_index.md` (wt 273) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 80 Gate
@@ -10070,7 +10075,7 @@ Row: By Example · Dart † · topic wt 830 · Learn 173 / Drill 273 · **subjec
 
 ## Phase 81 — Topic 74 Just Enough C# (`just-enough-csharp`)
 
-Row: Primer § · C# † · topic wt 840 · Learn 174 / Drill 274 · **primer**. Template →
+Row: Primer · C# † · topic wt 840 · Learn 174 / Drill 274 · **primer**. Template →
 [`syllabus/74-just-enough-csharp.md`](./syllabus/74-just-enough-csharp.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-csharp`; resolve every Accuracy-notes "to verify" line in
@@ -10189,7 +10194,7 @@ Row: Primer § · C# † · topic wt 840 · Learn 174 / Drill 274 · **primer**.
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-csharp/drilling/_index.md` (wt 270) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-csharp/drilling/_index.md` (wt 274) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 81 Gate
@@ -10202,9 +10207,9 @@ Row: Primer § · C# † · topic wt 840 · Learn 174 / Drill 274 · **primer**.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 82 — Topic 75 Windows App Development (`windows-app-development`)
+## Phase 82 — Topic 75 Windows App Development ◆ (`windows-app-development`)
 
-Row: By Example · C# † ◆ · topic wt 850 · Learn 175 / Drill 275 · **subject**. Template →
+Row: By Example · C# † · topic wt 850 · Learn 175 / Drill 275 · **subject**. Template →
 [`syllabus/75-windows-app-development.md`](./syllabus/75-windows-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `windows-app-development`; resolve every Accuracy-notes "to verify" line in
@@ -10327,7 +10332,7 @@ Row: By Example · C# † ◆ · topic wt 850 · Learn 175 / Drill 275 · **subj
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/windows-app-development/drilling/_index.md` (wt 271) covering the same Items with mocked/self-contained
+      `CONTENT/windows-app-development/drilling/_index.md` (wt 275) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 82 Gate
@@ -10340,9 +10345,9 @@ Row: By Example · C# † ◆ · topic wt 850 · Learn 175 / Drill 275 · **subj
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
-## Phase 83 — Topic 76 Linux App Development (`linux-app-development`)
+## Phase 83 — Topic 76 Linux App Development ◆ (`linux-app-development`)
 
-Row: By Example · Python ◆ · topic wt 860 · Learn 176 / Drill 276 · **subject**. Template →
+Row: By Example · Python · topic wt 860 · Learn 176 / Drill 276 · **subject**. Template →
 [`syllabus/76-linux-app-development.md`](./syllabus/76-linux-app-development.md).
 
 - [ ] **[AI] V** — `web-researcher` for `linux-app-development`; resolve every Accuracy-notes "to verify" line in
@@ -10465,7 +10470,7 @@ Row: By Example · Python ◆ · topic wt 860 · Learn 176 / Drill 276 · **subj
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/linux-app-development/drilling/_index.md` (wt 272) covering the same Items with mocked/self-contained
+      `CONTENT/linux-app-development/drilling/_index.md` (wt 276) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 83 Gate
@@ -10603,7 +10608,7 @@ Row: By Example · Go + Rust † · topic wt 870 · Learn 177 / Drill 277 · **s
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/building-production-cli-tools/drilling/_index.md` (wt 273) covering the same Items with mocked/self-contained
+      `CONTENT/building-production-cli-tools/drilling/_index.md` (wt 277) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 84 Gate
@@ -10618,7 +10623,7 @@ Row: By Example · Go + Rust † · topic wt 870 · Learn 177 / Drill 277 · **s
 
 ## Phase 85 — Topic 78 Just Enough C (`just-enough-c`)
 
-Row: Primer § · C † · topic wt 880 · Learn 178 / Drill 278 · **primer**. Template →
+Row: Primer · C † · topic wt 880 · Learn 178 / Drill 278 · **primer**. Template →
 [`syllabus/78-just-enough-c.md`](./syllabus/78-just-enough-c.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-c`; resolve every Accuracy-notes "to verify" line in
@@ -10737,7 +10742,7 @@ Row: Primer § · C † · topic wt 880 · Learn 178 / Drill 278 · **primer**. 
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-c/drilling/_index.md` (wt 274) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-c/drilling/_index.md` (wt 278) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 85 Gate
@@ -10875,7 +10880,7 @@ Row: By Example · C + shell † · topic wt 890 · Learn 179 / Drill 279 · **s
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/linux-os/drilling/_index.md` (wt 275) covering the same Items with mocked/self-contained
+      `CONTENT/linux-os/drilling/_index.md` (wt 279) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 86 Gate
@@ -11015,7 +11020,7 @@ Row: By Example · C + PowerShell † · topic wt 900 · Learn 180 / Drill 280 �
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/windows-os/drilling/_index.md` (wt 276) covering the same Items with mocked/self-contained
+      `CONTENT/windows-os/drilling/_index.md` (wt 280) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 87 Gate
@@ -11156,7 +11161,7 @@ Row: By Example · C † · topic wt 910 · Learn 181 / Drill 281 · **subject**
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/system-programming/drilling/_index.md` (wt 277) covering the same Items with mocked/self-contained
+      `CONTENT/system-programming/drilling/_index.md` (wt 281) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 88 Gate
@@ -11171,7 +11176,7 @@ Row: By Example · C † · topic wt 910 · Learn 181 / Drill 281 · **subject**
 
 ## Phase 89 — Topic 82 Just Enough Rust (`just-enough-rust`)
 
-Row: Primer § · Rust † · topic wt 920 · Learn 182 / Drill 282 · **primer**. Template →
+Row: Primer · Rust † · topic wt 920 · Learn 182 / Drill 282 · **primer**. Template →
 [`syllabus/82-just-enough-rust.md`](./syllabus/82-just-enough-rust.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-rust`; resolve every Accuracy-notes "to verify" line in
@@ -11293,7 +11298,7 @@ Row: Primer § · Rust † · topic wt 920 · Learn 182 / Drill 282 · **primer*
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-rust/drilling/_index.md` (wt 278) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-rust/drilling/_index.md` (wt 282) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 89 Gate
@@ -11434,7 +11439,7 @@ Row: By Example · Rust † · topic wt 930 · Learn 183 / Drill 283 · **subjec
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/modern-system-programming/drilling/_index.md` (wt 279) covering the same Items with mocked/self-contained
+      `CONTENT/modern-system-programming/drilling/_index.md` (wt 283) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 90 Gate
@@ -11449,7 +11454,7 @@ Row: By Example · Rust † · topic wt 930 · Learn 183 / Drill 283 · **subjec
 
 ## Phase 91 — Topic 84 Just Enough Java (`just-enough-java`)
 
-Row: Primer § · Java † · topic wt 940 · Learn 184 / Drill 284 · **primer**. Template →
+Row: Primer · Java † · topic wt 940 · Learn 184 / Drill 284 · **primer**. Template →
 [`syllabus/84-just-enough-java.md`](./syllabus/84-just-enough-java.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-java`; resolve every Accuracy-notes "to verify" line in
@@ -11575,13 +11580,13 @@ Row: Primer § · Java † · topic wt 940 · Learn 184 / Drill 284 · **primer*
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-java/drilling/_index.md` (wt 280) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-java/drilling/_index.md` (wt 284) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 91 Gate
 
 - [ ] [AI] `just-enough-java/` complete: `_index.md` wt 940, `learning/_index.md` wt 184,
-      `drilling/_index.md` wt 284, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
+      `drilling/_index.md` wt 284, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -11716,7 +11721,7 @@ Row: By Example · Java † · topic wt 950 · Learn 185 / Drill 285 · **subjec
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/enterprise-java-and-the-jvm/drilling/_index.md` (wt 281) covering the same Items with mocked/self-contained
+      `CONTENT/enterprise-java-and-the-jvm/drilling/_index.md` (wt 285) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 92 Gate
@@ -11857,7 +11862,7 @@ Row: By Example · Scheme + Clojure † · topic wt 960 · Learn 186 / Drill 286
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/lisp/drilling/_index.md` (wt 282) covering the same Items with mocked/self-contained
+      `CONTENT/lisp/drilling/_index.md` (wt 286) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 93 Gate
@@ -11872,7 +11877,7 @@ Row: By Example · Scheme + Clojure † · topic wt 960 · Learn 186 / Drill 286
 
 ## Phase 94 — Topic 87 Just Enough F# (`just-enough-fsharp`)
 
-Row: Primer § · F# † · topic wt 970 · Learn 187 / Drill 287 · **primer**. Template →
+Row: Primer · F# † · topic wt 970 · Learn 187 / Drill 287 · **primer**. Template →
 [`syllabus/87-just-enough-fsharp.md`](./syllabus/87-just-enough-fsharp.md).
 
 - [ ] **[AI] V** — `web-researcher` for `just-enough-fsharp`; resolve every Accuracy-notes "to verify" line in
@@ -11945,7 +11950,7 @@ Row: Primer § · F# † · topic wt 970 · Learn 187 / Drill 287 · **primer**.
   - [ ] ex-34 · du-missing-case-warning — verify FS0025 emitted
   - [ ] ex-35 · option-match — verify both arms
   - [ ] ex-36 · option-map — verify `Some 16`
-  - [ ] ex-37 · option-defaultValue — verify `0`
+  - [ ] ex-37 · option-default-value — verify `0`
   - [ ] ex-38 · result-ok — verify `Ok v` binds `42`
   - [ ] ex-39 · result-error — verify `Error` carries message
   - [ ] ex-40 · result-match — verify both paths
@@ -11992,7 +11997,7 @@ Row: Primer § · F# † · topic wt 970 · Learn 187 / Drill 287 · **primer**.
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/just-enough-fsharp/drilling/_index.md` (wt 283) covering the same Items with mocked/self-contained
+      `CONTENT/just-enough-fsharp/drilling/_index.md` (wt 287) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 94 Gate
@@ -12131,7 +12136,7 @@ Row: By Example · OCaml + Haskell + F# † · topic wt 980 · Learn 188 / Drill
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/type-systems/drilling/_index.md` (wt 284) covering the same Items with mocked/self-contained
+      `CONTENT/type-systems/drilling/_index.md` (wt 288) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 95 Gate
@@ -12270,7 +12275,7 @@ Row: By Example · F# † · topic wt 990 · Learn 189 / Drill 289 · **subject*
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/compilers-parsers-and-transpilers/drilling/_index.md` (wt 285) covering the same Items with mocked/self-contained
+      `CONTENT/compilers-parsers-and-transpilers/drilling/_index.md` (wt 289) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 96 Gate
@@ -12285,13 +12290,13 @@ Row: By Example · F# † · topic wt 990 · Learn 189 / Drill 289 · **subject*
 
 ## Phase 97 — Inter-topic: Pass-4 Capstone (`capstone-concurrency-and-systems`)
 
-Junction: Topics 61–85 (Go/Elixir concurrency + native app domains + C/OS/systems + language theory). Inter-Topic Capstone Phase Template; spec in
+Junction: Topics 64–89 (Go/Elixir concurrency + native app domains + C/OS/systems + language theory). Inter-Topic Capstone Phase Template; spec in
 `syllabus/89-compilers-parsers-and-transpilers.md` (Pass-4 capstone section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-and-systems/` (`_index.md` `weight: 955`, + `code/`) per the cited capstone
+- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-and-systems/` (`_index.md` `weight: 995`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/89-compilers-parsers-and-transpilers.md`](./syllabus/89-compilers-parsers-and-transpilers.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
@@ -12301,7 +12306,7 @@ Junction: Topics 61–85 (Go/Elixir concurrency + native app domains + C/OS/syst
 
 ### Phase 97 Gate
 
-- [ ] [AI] `capstone-concurrency-and-systems/` complete (wt 955, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `capstone-concurrency-and-systems/` complete (wt 995, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -12310,13 +12315,13 @@ Junction: Topics 61–85 (Go/Elixir concurrency + native app domains + C/OS/syst
 
 ## Phase 98 — Inter-topic: Concurrency-Showdown Capstone (`capstone-concurrency-showdown`)
 
-Junction: Concurrency & Parallelism (24) + CSP/Go (61) + Actor/Elixir (63) — the same problem solved three ways. Inter-Topic Capstone Phase Template; spec in
+Junction: CSP/Go (65) + Actor/Elixir (67) — the same problem solved two ways. Inter-Topic Capstone Phase Template; spec in
 `syllabus/89-compilers-parsers-and-transpilers.md` (concurrency-showdown cross-cutting section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-showdown/` (`_index.md` `weight: 956`, + `code/`) per the cited capstone
+- [ ] **[AI] A** — Author `CONTENT/capstone-concurrency-showdown/` (`_index.md` `weight: 996`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/89-compilers-parsers-and-transpilers.md`](./syllabus/89-compilers-parsers-and-transpilers.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
 - [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
@@ -12326,7 +12331,7 @@ Junction: Concurrency & Parallelism (24) + CSP/Go (61) + Actor/Elixir (63) — t
 
 ### Phase 98 Gate
 
-- [ ] [AI] `capstone-concurrency-showdown/` complete (wt 956, runnable end-to-end + web-verified); checker +
+- [ ] [AI] `capstone-concurrency-showdown/` complete (wt 996, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
@@ -12335,7 +12340,7 @@ Junction: Concurrency & Parallelism (24) + CSP/Go (61) + Actor/Elixir (63) — t
 
 ---
 
-## Pass 5 — Internals & Lead at Altitude (Phases 95-100 + Pass-5 capstone)
+## Pass 5 — Internals & Lead at Altitude (Phases 99-109 + Pass-5 capstone)
 
 ## Phase 99 — Topic 90 Build Your Own Git (`build-your-own-git`)
 
@@ -12377,7 +12382,7 @@ Row: By Example · Python † · topic wt 1000 · Learn 190 / Drill 290 · **sub
   - [ ] co-28 · dangling-objects
   - [ ] co-29 · hash-algo-parameter
   - [ ] co-30 · pytest-stages
-- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-git/learning/code/` (runnable sources, DD-20/DD-30) with
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-git/learning/code/` (runnable sources, DD-20/DD-30/DD-39) with
       **every** worked example `ex-01..ex-78` in `syllabus/90-build-your-own-git.md` §Worked examples, each with its expected output.
       **Acceptance**: all 78 examples below appear runnable with the stated observable.
   - [ ] ex-01 · init-git-dir — verify stock `git status` accepts it
@@ -12405,7 +12410,7 @@ Row: By Example · Python † · topic wt 1000 · Learn 190 / Drill 290 · **sub
   - [ ] ex-23 · write-tree-single — verify it writes and hashes
   - [ ] ex-24 · tree-sha — verify matches `git write-tree`
   - [ ] ex-25 · real-git-ls-tree — verify real git lists entries
-  - [ ] ex-26 · typed-object-model — verify `mypy`-clean typing
+  - [ ] ex-26 · typed-object-model — verify `pyright`-clean typing
   - [ ] ex-27 · tree-multiple-blobs — verify all entries present + sorted
   - [ ] ex-28 · nested-tree — verify nested hash resolves
   - [ ] ex-29 · parse-tree-bytes — verify the parse
@@ -12463,7 +12468,7 @@ Row: By Example · Python † · topic wt 1000 · Learn 190 / Drill 290 · **sub
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/build-your-own-git/drilling/_index.md` (wt 286) covering the same Items with mocked/self-contained
+      `CONTENT/build-your-own-git/drilling/_index.md` (wt 290) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 99 Gate
@@ -12516,7 +12521,7 @@ Row: By Example · Python † · topic wt 1010 · Learn 191 / Drill 291 · **sub
   - [ ] co-28 · mvcc-forward
   - [ ] co-29 · free-list
   - [ ] co-30 · pytest-durability
-- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-database/learning/code/` (runnable sources, DD-20/DD-30) with
+- [ ] **[AI] A1-examples** — Author `CONTENT/build-your-own-database/learning/code/` (runnable sources, DD-20/DD-30/DD-39) with
       **every** worked example `ex-01..ex-78` in `syllabus/91-build-your-own-database.md` §Worked examples, each with its expected output.
       **Acceptance**: all 78 examples below appear runnable with the stated observable.
   - [ ] ex-01 · define-page-size — verify the constant used everywhere
@@ -12539,7 +12544,7 @@ Row: By Example · Python † · topic wt 1010 · Learn 191 / Drill 291 · **sub
   - [ ] ex-18 · page-full — verify overflow handling
   - [ ] ex-19 · pytest-pager — verify it passes
   - [ ] ex-20 · pytest-cache-evict — verify it passes
-  - [ ] ex-21 · typed-page-model — verify `mypy`-clean typing
+  - [ ] ex-21 · typed-page-model — verify `pyright`-clean typing
   - [ ] ex-22 · pager-file-header — verify it identifies the file
   - [ ] ex-23 · page-count-grow — verify the page count
   - [ ] ex-24 · sync-to-disk — verify data on disk after
@@ -12602,7 +12607,7 @@ Row: By Example · Python † · topic wt 1010 · Learn 191 / Drill 291 · **sub
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/build-your-own-database/drilling/_index.md` (wt 287) covering the same Items with mocked/self-contained
+      `CONTENT/build-your-own-database/drilling/_index.md` (wt 291) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 100 Gate
@@ -12741,7 +12746,7 @@ Row: By Example · Go † · topic wt 1020 · Learn 192 / Drill 292 · **subject
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/build-your-own-raft/drilling/_index.md` (wt 288) covering the same Items with mocked/self-contained
+      `CONTENT/build-your-own-raft/drilling/_index.md` (wt 292) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 101 Gate
@@ -12785,7 +12790,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 1030 · Learn 193 / Drill 293 
   - [ ] co-19 · devex
   - [ ] co-20 · platform-maturity
 - [ ] **[AI] A1-scenarios** — Author `CONTENT/platform-engineering-and-devex/learning/` covering **every** decision scenario
-      `ex-01..ex-26` in `syllabus/93-platform-engineering-and-devex.md` §Worked examples (‡ no-code decision scenarios).
+      `ex-01..ex-26` in `syllabus/93-platform-engineering-and-devex.md` §Worked examples (‡ no-code decision scenarios, DD-27/DD-30; any Python scaffolder/dashboard scripting fully type-annotated, DD-39).
       **Acceptance**: all 26 scenarios below appear with the right platform-leadership call.
   - [ ] ex-01 · platform-before-pain — not yet; wait for measurable org-wide friction
   - [ ] ex-02 · cognitive-load-audit — factor shared work into the platform
@@ -12818,7 +12823,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 1030 · Learn 193 / Drill 293 
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/platform-engineering-and-devex/drilling/_index.md` (wt 289) covering the same Items with mocked/self-contained
+      `CONTENT/platform-engineering-and-devex/drilling/_index.md` (wt 293) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 102 Gate
@@ -12931,7 +12936,7 @@ Row: Annotated-concept · Python \* · topic wt 1040 · Learn 194 / Drill 294 ·
       is fully hit.
 - [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
-      `CONTENT/site-reliability-engineering/drilling/_index.md` (wt 290) covering the same Items with mocked/self-contained
+      `CONTENT/site-reliability-engineering/drilling/_index.md` (wt 294) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
 ### Phase 103 Gate
@@ -12946,13 +12951,13 @@ Row: Annotated-concept · Python \* · topic wt 1040 · Learn 194 / Drill 294 ·
 
 ## Phase 104 — Inter-topic: Pass-5 Capstone (`capstone-lead-at-altitude`)
 
-Junction: whole journey — Topics 87–90 (internals build-your-own + platform + SRE) synthesized against every prior pass. Inter-Topic Capstone Phase Template; spec in
+Junction: whole journey — Topics 90–94 (internals build-your-own + platform + SRE) synthesized against every prior pass. Inter-Topic Capstone Phase Template; spec in
 `syllabus/94-site-reliability-engineering.md` (whole-journey capstone section).
 
 - [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-lead-at-altitude/` (`_index.md` `weight: 1005`, artifacts only (no `code/`,
+- [ ] **[AI] A** — Author `CONTENT/capstone-lead-at-altitude/` (`_index.md` `weight: 1045`, artifacts only (no `code/`,
       leadership `‡`)) per this phase's cited capstone spec's ordered steps (detail source:
       [`syllabus/94-site-reliability-engineering.md`](./syllabus/94-site-reliability-engineering.md)). **Acceptance**: the spec's done bar is met — a clean-machine
       reader reproduces it end-to-end.
@@ -12963,7 +12968,7 @@ Junction: whole journey — Topics 87–90 (internals build-your-own + platform 
 
 ### Phase 104 Gate
 
-- [ ] [AI] `capstone-lead-at-altitude/` complete (wt 1005, produces the stated artifact + web-verified); checker +
+- [ ] [AI] `capstone-lead-at-altitude/` complete (wt 1045, produces the stated artifact + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 - [ ] [AI] All 10 inter-topic capstones authored — 6 pass-boundary (Pass 0–5) + 4 cross-cutting
       (full-stack-app, secure-service, data-pipeline, concurrency-showdown).
@@ -12984,10 +12989,10 @@ Junction: whole journey — Topics 87–90 (internals build-your-own + platform 
 - [ ] **[AI]** Wire the sub-entry into the learn index: edit
       `apps/ayokoding-www/content/en/learn/_index.md`, adding the section as a sub-entry under Software
       Engineering. **Acceptance**: entry present; build exits 0.
-- [ ] **[AI]** Topic-first parity check: verify every one of the 90 topics has
+- [ ] **[AI]** Topic-first parity check: verify every one of the 94 topics has
       `CONTENT/<slug>/learning/_index.md`, `CONTENT/<slug>/learning/capstone/_index.md`, and
       `CONTENT/<slug>/drilling/_index.md`, that the topic-folder weight = `100 + 10 × index`, and that
-      `drilling weight = learning weight + 100` for every topic. **Acceptance**: 90/90 topics complete; all
+      `drilling weight = learning weight + 100` for every topic. **Acceptance**: 94/94 topics complete; all
       10 inter-topic capstone folders present; no orphaned or mismatched weights.
 - [ ] **[AI]** Link check: run `apps-ayokoding-www-link-checker` across the new section. **Acceptance**: no
       broken internal/external links.
@@ -13003,10 +13008,10 @@ Junction: whole journey — Topics 87–90 (internals build-your-own + platform 
 
 ### Phase 105 Gate
 
-> All checks below must pass before starting Phase 103.
+> All checks below must pass before starting Phase 106.
 
 - [ ] [AI] Section is nav-reachable in ≤2 clicks from `learn/software-engineering/`.
-- [ ] [AI] Topic-first parity 90/90 (each topic has `learning/`, `learning/capstone/`, `drilling/`;
+- [ ] [AI] Topic-first parity 94/94 (each topic has `learning/`, `learning/capstone/`, `drilling/`;
       topic wt `100 + 10 × index`; drill wt = learn wt + 100) and all 10 inter-topic capstones present.
 - [ ] [AI] Link-checker, markdown lint, and build all green.
 - [ ] [AI] Affected quality gate (`typecheck`, `lint`, `test:quick`, `specs:behavior:coverage`) exits 0
@@ -13023,7 +13028,7 @@ Junction: whole journey — Topics 87–90 (internals build-your-own + platform 
       then use `browser_navigate` to open the section landing + one learning page + one intra-topic capstone + one drilling page, `browser_snapshot` to inspect each page's DOM, `browser_click` to expand a
       `<details>` block and follow a nav link, and `browser_console_messages` to confirm zero errors.
       Capture one `browser_take_screenshot` per page verified, save each to
-      `evidence/phase-102-<page-slug>-en-1280px.png` (per the
+      `evidence/phase-106-<page-slug>-en-1280px.png` (per the
       [Evidence Capture Convention](../../../repo-governance/development/quality/evidence-capture.md)), and
       reference each screenshot inline here. **Acceptance**: four pages render; `<details>` toggles; nav
       resolves; zero console errors; four screenshots exist under `evidence/` and are referenced here.
@@ -13040,13 +13045,13 @@ Junction: whole journey — Topics 87–90 (internals build-your-own + platform 
 
 ### Rule-15 three-tester retest follow-ups
 
-_(populated by `web-exploratory-tester` / `web-usability-tester` / `web-design-tester` when the Phase 103
+_(populated by `web-exploratory-tester` / `web-usability-tester` / `web-design-tester` when the Phase 106
 retest step above runs; every `EWT-###`/`UWT-###`/`DWT-###` defect must be fixed and ticked before Plan
 Archival)_
 
 ### Phase 106 Gate
 
-> All checks below must pass before starting Phase 104.
+> All checks below must pass before starting Phase 107.
 
 - [ ] [AI] Playwright smoke passes with zero console errors; screenshots committed under `evidence/`.
 - [ ] [AI] Rule-15 three-tester retest follow-ups: every `EWT-###`/`UWT-###`/`DWT-###` defect finding is
@@ -13078,7 +13083,7 @@ Archival)_
 
 ### Phase 107 Gate
 
-> All checks below must pass before starting Phase 105.
+> All checks below must pass before starting Phase 108.
 
 - [ ] [AI] Content is on `origin main` (local `main` and `origin/main` at the same commit).
 - [ ] [AI] The `main-ci` workflow run on the pushed commit is green (`conclusion = success`).
@@ -13092,7 +13097,7 @@ Archival)_
 
 The section content lives in `apps/ayokoding-www`; deployment ships it to the live site
 ([ayokoding.com](https://ayokoding.com)) by force-pushing `main` → the `prod-ayokoding-www` environment
-branch, which Vercel watches for automatic production builds. Runs only after Phase 104 (content on
+branch, which Vercel watches for automatic production builds. Runs only after Phase 107 (content on
 `origin main`, `main-ci` green).
 
 - [ ] **[AI]** Invoke the `apps-ayokoding-www-deployer` agent to deploy `apps/ayokoding-www` to
@@ -13108,7 +13113,7 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
 
 ### Phase 108 Gate
 
-> All checks below must pass before starting Phase 106.
+> All checks below must pass before starting Phase 109.
 
 - [ ] [AI] `origin/main` has been force-pushed to `prod-ayokoding-www` by the deployer.
 - [ ] [AI] The Vercel production build succeeded and the live section root + one topic page return 200

@@ -1,7 +1,7 @@
 # 86 · Lisp (By Example, Scheme + Clojure †)
 
-**prd row**: Pass 4 · Concurrency & Systems · By Example · Scheme + Clojure † · Learn 183 /
-Drill 283 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 4 · Concurrency & Systems · By Example · Scheme + Clojure † · Learn 186 /
+Drill 286 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: the Lisp idea — code-as-data (homoiconicity), s-expressions, the read-eval loop, and macros
 that let the language extend itself. Taught in **Scheme from scratch** (minimal, pedagogical), with a

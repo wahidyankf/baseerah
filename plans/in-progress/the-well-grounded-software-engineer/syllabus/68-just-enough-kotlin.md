@@ -1,15 +1,15 @@
-# 68 · Just Enough Kotlin (Primer §, Kotlin †)
+# 68 · Just Enough Kotlin (Primer, Kotlin †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · Kotlin † · Learn 168 / Drill 268 ·
+**prd row**: Pass 4 · Concurrency & Systems · Primer · Kotlin † · Learn 168 / Drill 268 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough Kotlin** to be productive in
+**Scope note**: **just enough Kotlin** to be productive in
 [`69-android-app-development`](./69-android-app-development.md). The toolchain, syntax, null-safety,
 `val`/`var`, data classes, functions/lambdas, collections, classes/interfaces, and a coroutine _preview_.
 
 ## Why this exists · the big idea
 
-- **The problem before the solution**: Android in topic 66 leans on null-safety and coroutines from the
+- **The problem before the solution**: Android in topic 69 leans on null-safety and coroutines from the
   first line — this primer makes Kotlin's type system and concurrency preview familiar before the
   platform's complexity lands on top of them.
 - **Keep-this-if-you-forget-everything**: Kotlin makes null a compile-time decision, not a runtime
@@ -92,7 +92,7 @@ Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topi
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer §, subject band). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · kotlin-toolchain** — `kotlinc`/Gradle (`./gradlew`) compile and run; `fun main()` is the
   entry point and `println` the standard output — the daily loop.

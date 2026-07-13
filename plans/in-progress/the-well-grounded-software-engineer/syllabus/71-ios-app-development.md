@@ -1,6 +1,6 @@
 # 71 · iOS App Development ◆ (By Example, Swift †)
 
-**prd row**: Pass 4 · Concurrency & Systems · By Example · Swift † ◆ · Learn 171 / Drill 271 ·
+**prd row**: Pass 4 · Concurrency & Systems · By Example · Swift † · Learn 171 / Drill 271 ·
 Nvim-ready Partial · VSCode-ready Partial. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: `◆` app-domain — building a real iOS app: the app/scene lifecycle, SwiftUI (declarative
@@ -22,12 +22,12 @@ the `swift`/`xcodebuild` CLI form where possible.
 
 ## Prerequisites
 
-- **Prior topics**: [topic 68 Just Enough Swift](./70-just-enough-swift.md) (the language + `async`/`await`),
+- **Prior topics**: [topic 70 Just Enough Swift](./70-just-enough-swift.md) (the language + `async`/`await`),
   [topic 14 Frontend Essentials](./14-frontend-essentials.md) (component + state UI), and
-  [topic 67 Android App Development](./69-android-app-development.md) (the mobile app pattern to contrast).
+  [topic 69 Android App Development](./69-android-app-development.md) (the mobile app pattern to contrast).
 - **Tools & environment**: a **macOS** machine with **Xcode** (simulator, signing, SwiftUI previews);
   `swift` / `xcodebuild` from the CLI where possible; a simulator or a device.
-- **Assumed knowledge**: Swift syntax + `async`/`await` (topic 67); declarative UI + state (topics 12/46);
+- **Assumed knowledge**: Swift syntax + `async`/`await` (topic 70); declarative UI + state (topic 14);
   calling an HTTP API (topic 11).
 
 ## Accuracy notes (web-verified)
@@ -103,7 +103,7 @@ Decodable`) with `JSONDecoder().decode(T.self, from: data)` maps JSON to types. 
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (◆ app-domain By-Example subject). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · xcode-project** — an iOS app is an Xcode project built against an SDK and run on a simulator/device; the build SDK and the deployment target are distinct.
 - **co-02 · app-scene-lifecycle** — the `App` protocol + `@main` is the entry point; a `Scene` (`WindowGroup`) has a system-managed lifecycle observable via `scenePhase`.

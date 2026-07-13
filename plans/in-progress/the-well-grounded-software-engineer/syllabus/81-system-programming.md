@@ -25,14 +25,14 @@ Builds on the OS topics ([`79-linux-os`](./79-linux-os.md)) and the CS memory fo
 
 ## Prerequisites
 
-- **Prior topics**: [topic 76 Just Enough C](./78-just-enough-c.md) (the language),
-  [topic 77 Linux OS](./79-linux-os.md) (syscalls, the process/memory model), and
+- **Prior topics**: [topic 78 Just Enough C](./78-just-enough-c.md) (the language),
+  [topic 79 Linux OS](./79-linux-os.md) (syscalls, the process/memory model), and
   [topic 19 Computer Science Foundations](./19-computer-science-foundations.md) (data representation,
   memory).
 - **Tools & environment**: a macOS/Linux terminal; **gcc/clang** + make + **valgrind**/**AddressSanitizer**
   for memory checking; Neovim/VSCode (DD-17).
-- **Assumed knowledge**: C pointers/structs + a `make` build (topic 75); the process/memory/syscall model
-  (topic 76); binary/number representation (topic 19).
+- **Assumed knowledge**: C pointers/structs + a `make` build (topic 78); the process/memory/syscall model
+  (topic 79); binary/number representation (topic 19).
 
 ## Accuracy notes (web-verified)
 

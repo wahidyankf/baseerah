@@ -184,7 +184,7 @@ system-level scaling is [`44-system-design`](./44-system-design.md).
 ## Worked examples
 
 Colocated under `backend-at-scale/learning/code/`; each runnable + exercised from the CLI, every Python
-snippet fully type-annotated and `mypy`-clean (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`. Every
+snippet fully type-annotated and `pyright`-clean (DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-80`. Every
 example cites the `co-NN` it exercises; every concept above is exercised by ≥ 1 example.
 
 ### Beginner

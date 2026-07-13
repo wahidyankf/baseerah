@@ -1,8 +1,8 @@
-# 72 · Just Enough Dart (Primer §, Dart †)
+# 72 · Just Enough Dart (Primer, Dart †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · Dart † · Learn 172 / Drill 272 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 4 · Concurrency & Systems · Primer · Dart † · Learn 172 / Drill 272 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough Dart** to be productive in
+**Scope note**: **just enough Dart** to be productive in
 [`73-hybrid-app-development`](./73-hybrid-app-development.md). The `dart` / `pub` CLI, sound null safety,
 syntax and types, `async`/`await` with `Future`s and `Stream`s, and classes/mixins. `†`: Dart, run and
 built with the `dart` toolchain.
@@ -103,7 +103,7 @@ this.y);`" initializing formals); named constructors ("`Point.origin() : x = xOr
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (§ primer). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · dart-cli** — `dart create`/`run`/`test`/`compile` scaffold, run, test, and compile a Dart program from the terminal.
 - **co-02 · pub** — `pubspec.yaml` declares dependencies; `dart pub get` resolves them and writes `pubspec.lock` for reproducible versions.

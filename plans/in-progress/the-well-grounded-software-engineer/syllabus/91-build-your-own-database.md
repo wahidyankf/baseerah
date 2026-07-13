@@ -8,7 +8,7 @@ LSM alternative) for indexed storage, a write-ahead log for durability, a tiny S
 crash recovery. This is the build-your-own tier of
 [`36-database-internals-and-storage-engines`](./36-database-internals-and-storage-engines.md): that topic
 explained B-trees, the WAL, the buffer pool, and MVCC; here you implement enough of them that a durable,
-crash-safe key-value/table store stops being magic. `†`: Python, fully type-annotated (DD-34), verified
+crash-safe key-value/table store stops being magic. `†`: Python, fully type-annotated (DD-39), verified
 with `pytest`.
 
 ## Why this exists · the big idea
@@ -30,7 +30,7 @@ with `pytest`.
 - **Prior topics**: [topic 36 Database Internals & Storage Engines](./36-database-internals-and-storage-engines.md)
   (B-tree vs LSM, the write-ahead log, buffer pool, MVCC — the concepts this topic makes concrete) and
   [topic 10 SQL Essentials](./10-sql-essentials.md) (the query surface you build a tiny version of).
-- **Tools & environment**: a macOS/Linux terminal; **Python 3.x** with type hints (mypy-clean spirit, DD-34);
+- **Tools & environment**: a macOS/Linux terminal; **Python 3.x** with type hints (pyright-clean spirit, DD-39);
   `pytest`; the standard library only for file I/O and `struct`-style packing (no external DB engine);
   Neovim/VSCode with the Python LSP (DD-17).
 - **Assumed knowledge**: storage-engine concepts — pages, B-trees, the WAL, recovery (topic 36); SQL basics
@@ -70,7 +70,7 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
   SQL-ish subset** (`insert`/`select`/`where`), not a conformant SQL engine.
 - **Reference implementations** — cstack's _Let's Build a Simple Database_ (SQLite-like, C) and Petrov are the
   grounding tutorials. (cstack.github.io/db_tutorial)
-- **Implementation** — Python **fully type-annotated** (DD-34), **standard library only** (file I/O +
+- **Implementation** — Python **fully type-annotated** (DD-39), **standard library only** (file I/O +
   `struct`-style packing, no third-party DB engine), tested with **pytest** including a simulated mid-write crash.
 
 ## Concepts
@@ -110,8 +110,8 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
 
 ## Worked examples
 
-Colocated under `build-your-own-database/learning/code/`; Python (fully type-annotated, DD-34) + `pytest`
-(DD-20/DD-30). Durability is proven by killing the process mid-write and reopening. Contiguous `ex-01..ex-78`.
+Colocated under `build-your-own-database/learning/code/`; Python (fully type-annotated, DD-39) + `pytest`
+(DD-20/DD-30/DD-39). Durability is proven by killing the process mid-write and reopening. Contiguous `ex-01..ex-78`.
 Every example cites the `co-NN` it exercises. Concepts come before examples.
 
 ### Beginner
@@ -136,7 +136,7 @@ Every example cites the `co-NN` it exercises. Concepts come before examples.
 - **ex-18 · page-full** — a full page rolls to a new page — verify overflow handling. (co-05)
 - **ex-19 · pytest-pager** — a `pytest` over pager round-trip — verify it passes. (co-30)
 - **ex-20 · pytest-cache-evict** — a `pytest` over eviction — verify it passes. (co-30, co-04)
-- **ex-21 · typed-page-model** — a fully type-annotated page dataclass — verify `mypy`-clean typing. (co-05)
+- **ex-21 · typed-page-model** — a fully type-annotated page dataclass — verify `pyright`-clean typing. (co-05)
 - **ex-22 · pager-file-header** — a db file header/magic on page 0 — verify it identifies the file. (co-05)
 - **ex-23 · page-count-grow** — writing new pages grows the file — verify the page count. (co-02)
 - **ex-24 · sync-to-disk** — flush all cached pages — verify data is on disk after. (co-15)

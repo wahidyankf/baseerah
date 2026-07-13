@@ -9,7 +9,7 @@ inter-topic capstone anchored at that topic), and the dated **Accuracy notes** f
 `web-researcher` sweep.
 
 Per the [Syllabus as a Folder decision (DD-29)](../prd.md#syllabus-as-a-folder-dd-29), the detail is
-split one file per topic — `NN-<slug>.md`, where `NN` = **order of appearance** (`01`, `02`, … `91`)
+split one file per topic — `NN-<slug>.md`, where `NN` = **order of appearance** (`01`, `02`, … `94`)
 matching the prd journey index. The [README](./README.md) indexes all 94 files.
 
 ## How to read a topic file
@@ -120,12 +120,14 @@ four layers and where each applies:
   compound; a reader can trace one idea (e.g. `taming-state`) across paradigms, concurrency, and
   distributed systems.
 - **Tensions & trade-offs + Lineage (judgment topics only)** — the two REQUIRED depth blocks in the
-  template. Concentrated where judgment is the actual skill: paradigms & design (21–23), engineering
-  practice, product & leadership (09, 18, 30–33), data modelling & architecture (27, 36, 42–46), security
-  reasoning (55–57), retrieval/IA/analytics (38, 49, 59), and the systems/altitude topics (20, 79, 89, plus
-  SRE trade-offs at 90). **Omitted** for the 15 _Just Enough_ primers, the Essentials fluency topics, and
-  the hands-on how-to tool/app-domain topics — there the lesson is fluency, not judgment, and a trade-off
-  section is padding.
+  template. Concentrated on the 41 judgment/altitude topics where judgment is the actual skill (the
+  DD-33 set): **6, 9, 18, 20, 21, 22, 23, 27, 30, 31, 32, 33, 36, 38, 39, 41, 42, 43, 44, 45, 46, 49,
+  51, 52, 55, 56, 57, 58, 59, 60, 61, 63, 73, 77, 79, 83, 85, 89, 90, 93, 94** — spanning paradigms &
+  design, engineering practice, product & leadership, data modelling & architecture, security,
+  retrieval/IA/analytics, delivery & platform engineering, and the systems/altitude topics. **Omitted**
+  for the remaining 53 topics — most _Just Enough_ primers, the Essentials fluency topics, and the pure
+  hands-on how-to tool topics — where the lesson is fluency, not judgment, and a trade-off section is
+  padding.
 - **Elaborative drilling (universal, drilling track)** — every drilling page carries a fifth drill form,
   **elaborative interrogation / self-explanation** ("why does this hold? why not the alternative?"),
   alongside the four existing forms. It lives in the opt-in drilling track, so it deepens without taxing
@@ -183,8 +185,8 @@ so a reader can walk the whole journey forward or backward without guessing what
 - **This plan's `syllabus/NN-<slug>.md` files** — each ends with a `---` rule then a navigation footer:
   `← Previous: [NN-1 · Title](./NN-1-<slug>.md) · Next: [NN+1 · Title](./NN+1-<slug>.md) →`. The first
   file ([01](./01-just-enough-nvim.md)) points **Previous** at [README](./README.md); the last file
-  ([61](./33-engineering-management.md)) points **Next** at [overview](./overview.md) (journey complete).
-  Order is the prd journey index (01 → 61); inter-topic capstone specs, being anchored inside a topic
+  ([94](./94-site-reliability-engineering.md)) points **Next** at [overview](./overview.md) (journey complete).
+  Order is the prd journey index (01 → 94); inter-topic capstone specs, being anchored inside a topic
   file, inherit that file's footer.
 - **The eventual `apps/ayokoding-www` content pages** — every authored page (`_index.md` for each
   `<slug>/`, `learning/`, `drilling/`, `capstone/`, and each worked-example/drill leaf) ends with the
@@ -251,18 +253,18 @@ web-verified (DD-28). Size is uncapped; correctness, accuracy, detail, and clari
 
 **Inter-topic capstones — inline milestone bundles at the section root:**
 
-| Capstone slug                      | Kind          | Junction (topics integrated)                               | Anchored in file                          |
-| ---------------------------------- | ------------- | ---------------------------------------------------------- | ----------------------------------------- |
-| `capstone-forge-ready`             | pass-boundary | Pass 0 (01–03: nvim + lua + extending)                     | `03-extending-neovim.md`                  |
-| `capstone-first-working-software`  | pass-boundary | Pass 1 (04–18: build → store → test → secure)              | `17-security-essentials.md`               |
-| `capstone-full-stack-app`          | cross-cutting | Frontend (14) + Backend (11) + SQL (10)                    | `17-security-essentials.md`               |
-| `capstone-solid-core`              | pass-boundary | Pass 2 (19–33)                                             | `33-engineering-management.md`            |
-| `capstone-real-world-delivery`     | pass-boundary | Pass 3 (34–63)                                             | `60-defensive-security.md`                |
-| `capstone-secure-service`          | cross-cutting | Backend (11) + Security Essentials (17) + IT Security (56) | `60-defensive-security.md`                |
-| `capstone-data-pipeline`           | cross-cutting | Data Engineering (37) + SQL/NoSQL (10/34) + a queue        | `60-defensive-security.md`                |
-| `capstone-concurrency-and-systems` | pass-boundary | Pass 4 (64–89)                                             | `89-compilers-parsers-and-transpilers.md` |
-| `capstone-concurrency-showdown`    | cross-cutting | Concurrency Core (24) + CSP/Go (62) + Actor/Elixir (64)    | `89-compilers-parsers-and-transpilers.md` |
-| `capstone-lead-at-altitude`        | whole-journey | Pass 5 (90–94)                                             | `94-site-reliability-engineering.md`      |
+| Capstone slug                      | Kind          | Junction (topics integrated)                                        | Anchored in file                          |
+| ---------------------------------- | ------------- | ------------------------------------------------------------------- | ----------------------------------------- |
+| `capstone-forge-ready`             | pass-boundary | Pass 0 (01–03: nvim + lua + extending)                              | `03-extending-neovim.md`                  |
+| `capstone-first-working-software`  | pass-boundary | Pass 1 (04–17: build → store → test → secure)                       | `17-security-essentials.md`               |
+| `capstone-full-stack-app`          | cross-cutting | Frontend (14) + Backend (11) + SQL (10)                             | `17-security-essentials.md`               |
+| `capstone-solid-core`              | pass-boundary | Pass 2 (19–33)                                                      | `33-engineering-management.md`            |
+| `capstone-real-world-delivery`     | pass-boundary | Pass 3 (34–60)                                                      | `60-defensive-security.md`                |
+| `capstone-secure-service`          | cross-cutting | Backend at Scale (39) + Security Essentials (17) + IT Security (58) | `60-defensive-security.md`                |
+| `capstone-data-pipeline`           | cross-cutting | Data Engineering (37) + SQL/NoSQL (10/34) + a RAG interface (56)    | `60-defensive-security.md`                |
+| `capstone-concurrency-and-systems` | pass-boundary | Pass 4 (64–89)                                                      | `89-compilers-parsers-and-transpilers.md` |
+| `capstone-concurrency-showdown`    | cross-cutting | CSP/Go (65) + Actor/Elixir (67)                                     | `89-compilers-parsers-and-transpilers.md` |
+| `capstone-lead-at-altitude`        | whole-journey | Pass 5 (90–94)                                                      | `94-site-reliability-engineering.md`      |
 
 **Every capstone spec states**: (a) goal/outcome, (b) a concepts-exercised checklist, (c) an ordered
 step outline (each step naming a file + the code + the verify command), (d) testable acceptance

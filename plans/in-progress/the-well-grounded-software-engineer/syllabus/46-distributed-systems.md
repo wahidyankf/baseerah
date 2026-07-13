@@ -7,7 +7,7 @@ Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topi
 logical clocks, replication, quorums, and CRDTs — taught as the failure modes that appear the moment
 one machine becomes many. The point is judgment about trade-offs, not a from-scratch consensus
 engine; that build lives in [`92-build-your-own-raft`](./92-build-your-own-raft.md). `†`: Python,
-fully type-annotated (DD-34) — every snippet carries type hints in the mypy-clean spirit.
+fully type-annotated (DD-39) — every snippet carries type hints in the pyright-clean spirit.
 
 ## Why this exists · the big idea
 
@@ -29,7 +29,7 @@ fully type-annotated (DD-34) — every snippet carries type hints in the mypy-cl
   timeouts, why the network lies) and [topic 44 System Design](./44-system-design.md) (replication,
   partitioning, and the scaling context these guarantees serve).
 - **Tools & environment**: a macOS/Linux terminal; **Python** at a recent stable release with type
-  hints and `mypy`; the ability to run several communicating processes locally (asyncio or multiple
+  hints and `pyright`; the ability to run several communicating processes locally (asyncio or multiple
   processes) with simulated message delay/loss/reordering; Neovim/VSCode with the Python LSP (DD-17).
 - **Assumed knowledge**: timeouts, retries, and network latency (topic 12); replication and sharding
   at a design level (topic 44); running concurrent tasks in Python (topics 04/24).
@@ -178,7 +178,7 @@ fully type-annotated (DD-34) — every snippet carries type hints in the mypy-cl
   and stalls under partition; many workloads are fine with causal or eventual consistency and a CRDT.
   Paying for strong consistency where the domain tolerates staleness is latency you burn for nothing.
 - **Rolling your own consensus is a trap in production**: the algorithms are subtle and the failure
-  cases are adversarial. Build one to _understand_ it (topic 89), but in production adopt a proven
+  cases are adversarial. Build one to _understand_ it (topic 92), but in production adopt a proven
   implementation (etcd/Consul/a database that embeds Raft) rather than hand-writing the protocol.
 
 ## Lineage — why it beat the alternative
@@ -195,8 +195,8 @@ fully type-annotated (DD-34) — every snippet carries type hints in the mypy-cl
 
 ## Worked examples
 
-Colocated under `distributed-systems/learning/code/` as typed, mypy-clean Python; each runnable as several
-communicating local processes/tasks with injectable delay/loss (DD-20/DD-30/DD-34). Contiguous
+Colocated under `distributed-systems/learning/code/` as typed, pyright-clean Python; each runnable as several
+communicating local processes/tasks with injectable delay/loss (DD-20/DD-30/DD-34/DD-39). Contiguous
 `ex-01..ex-85`. Every example cites the `co-NN` it exercises; concepts are taught before the examples.
 
 ### Beginner
@@ -307,7 +307,7 @@ communicating local processes/tasks with injectable delay/loss (DD-20/DD-30/DD-3
   co-32) [ ] a consistency-behaviour assertion per mode (co-10).
 - **Ordered steps**:
   1. `.../learning/capstone/code/clocks.py` — vector clocks tagging every write. Verify concurrent vs
-     causally-ordered writes are correctly classified; `mypy` clean.
+     causally-ordered writes are correctly classified; `pyright` clean.
   2. `.../learning/capstone/code/quorum.py` — a leaderless quorum store with read-repair. Verify that
      `W + R > N` yields the latest value and that a sub-quorum can observe a stale read.
   3. `.../learning/capstone/code/raft.py` — leader election + log replication. Verify a single leader
@@ -316,7 +316,7 @@ communicating local processes/tasks with injectable delay/loss (DD-20/DD-30/DD-3
      CP mode blocks/loses availability while the AP mode stays available but may diverge then converge.
 - **Acceptance criteria**: clocks classify causality correctly; quorum reads/writes obey R + W > N;
   leader election is stable; the partition test demonstrates each mode's advertised consistency/
-  availability behaviour; all Python is type-annotated and `mypy`-clean.
+  availability behaviour; all Python is type-annotated and `pyright`-clean.
 - **Done bar**: runnable end-to-end + web-verified.
 
 ## Read more

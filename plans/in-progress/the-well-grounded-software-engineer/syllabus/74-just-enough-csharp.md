@@ -1,15 +1,15 @@
-# 74 · Just Enough C# (Primer §, C# †)
+# 74 · Just Enough C# (Primer, C# †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · C# † · Learn 174 / Drill 274 ·
+**prd row**: Pass 4 · Concurrency & Systems · Primer · C# † · Learn 174 / Drill 274 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough C#** to be productive in
+**Scope note**: **just enough C#** to be productive in
 [`75-windows-app-development`](./75-windows-app-development.md). The `dotnet` CLI, syntax/types, nullable
 reference types, properties, records, a LINQ intro, classes/interfaces, and an `async`/`await` _preview_.
 
 ## Why this exists · the big idea
 
-- **The problem before the solution**: Windows app development in topic 72 assumes fluency in .NET's type
+- **The problem before the solution**: Windows app development in topic 75 assumes fluency in .NET's type
   system and async model — this primer gets you productive in C# and the `dotnet` CLI so the platform topic
   isn't also a language lesson.
 - **Keep-this-if-you-forget-everything**: nullable reference types turn "could this be null?" from a
@@ -25,7 +25,7 @@ reference types, properties, records, a LINQ intro, classes/interfaces, and an `
   primers transfers).
 - **Tools & environment**: a macOS/Linux/Windows machine; the **.NET SDK** (`dotnet`), pinned to a current
   LTS; Neovim/VSCode with the C# LSP (DD-17).
-- **Assumed knowledge**: classes/interfaces (topic 08); nullable-vs-non-null thinking (topics 11/45);
+- **Assumed knowledge**: classes/interfaces (topic 08); nullable-vs-non-null thinking (topics 13/68/70);
   running a CLI build tool (topic 05).
 
 ## Accuracy notes (web-verified)
@@ -98,7 +98,7 @@ reference types, properties, records, a LINQ intro, classes/interfaces, and an `
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (§ primer). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · dotnet-cli** — `dotnet new`/`run`/`build`/`test` scaffold, run, build, and test a .NET project from the terminal.
 - **co-02 · top-level-statements** — a console app's entry point can be top-level statements in `Program.cs`, without an explicit `Main`.

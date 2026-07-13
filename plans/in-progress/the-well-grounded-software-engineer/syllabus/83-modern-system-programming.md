@@ -26,14 +26,14 @@ overruns — moved from runtime crashes to compile errors. The usable language s
 
 ## Prerequisites
 
-- **Prior topics**: [topic 80 Just Enough Rust](./82-just-enough-rust.md) (ownership/borrowing intuition,
-  the type system, `Result`/`Option`, traits, pattern matching) and [topic 78 Windows OS](./80-windows-os.md)
+- **Prior topics**: [topic 82 Just Enough Rust](./82-just-enough-rust.md) (ownership/borrowing intuition,
+  the type system, `Result`/`Option`, traits, pattern matching) and [topic 80 Windows OS](./80-windows-os.md)
   (the OS-level view of memory, threads, and system calls that systems code sits on).
 - **Tools & environment**: a macOS/Linux/Windows terminal; the **Rust toolchain** (`cargo`, `rustc`) pinned
   to a current stable; a C compiler/toolchain available for the FFI examples; Neovim/VSCode with the Rust
   LSP (rust-analyzer, DD-17).
 - **Assumed knowledge**: ownership/borrowing and lifetimes at intuition level, traits, and `Result`/`Option`
-  (topic 79); processes/threads and system calls (topics 77/78); the memory hierarchy and stack-vs-heap
+  (topic 82); processes/threads and system calls (topics 79/80); the memory hierarchy and stack-vs-heap
   (topic 20).
 
 ## Accuracy notes (web-verified)

@@ -23,12 +23,12 @@ up the deliberate contrast with the actor model in
 
 ## Prerequisites
 
-- **Prior topics**: [topic 62 Just Enough Go](./64-just-enough-go.md) (the language + a channel preview) and
+- **Prior topics**: [topic 64 Just Enough Go](./64-just-enough-go.md) (the language + a channel preview) and
   [topic 24 Concurrency & Parallelism](./24-concurrency-and-parallelism.md) (races, deadlocks, the shared-
   state hazards CSP avoids).
 - **Tools & environment**: a macOS/Linux terminal; the **Go toolchain** with the **race detector**
   (`go test -race`); Neovim/VSCode with Go LSP (DD-17).
-- **Assumed knowledge**: Go syntax + goroutines/channels at a preview level (topic 61); what a race
+- **Assumed knowledge**: Go syntax + goroutines/channels at a preview level (topic 64); what a race
   condition and a deadlock are (topic 24).
 
 ## Accuracy notes (web-verified)

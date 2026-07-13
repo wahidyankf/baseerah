@@ -161,8 +161,8 @@ Python where code appears, else annotated C4 diagrams.
 ## Worked examples
 
 Colocated under `software-architecture/learning/`; each example is either a runnable, type-annotated
-`mypy`-clean Python snippet (ports-and-adapters, fitness functions) or an annotated artifact (a C4
-Mermaid diagram, an ADR, a quality-attribute table) per the `*` designation (DD-20/DD-30/DD-34).
+`pyright`-clean Python snippet (ports-and-adapters, fitness functions) or an annotated artifact (a C4
+Mermaid diagram, an ADR, a quality-attribute table) per the `*` designation (DD-20/DD-30/DD-34/DD-39).
 Contiguous `ex-01..ex-52`. Every example cites the `co-NN` it exercises; every concept above is
 exercised by ≥ 1 example.
 

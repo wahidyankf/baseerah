@@ -35,7 +35,7 @@ cross-cutting junctions.
 
 ## Content-Tree Layout (topic-first; per-topic shape, not a hard-coded slug list)
 
-For **N** canonical topics (currently 61), the section is:
+For **N** canonical topics (currently 94), the section is:
 
 ```text
 apps/ayokoding-www/content/en/learn/software-engineering/
@@ -43,20 +43,20 @@ apps/ayokoding-www/content/en/learn/software-engineering/
     ├── _index.md                     # section landing (weight 1750; nav + six-pass journey map + skill tree)
     ├── overview.md                   # what this is + read-then-drill workflow + journey map + skill tree (weight 1)
     ├── <topic-slug>/                 # one folder PER canonical topic, folder = table "Slug"
-    │   ├── _index.md                 # topic nav (weight = 100 + 10 × journey-index → 110..710, journey order)
+    │   ├── _index.md                 # topic nav (weight = 100 + 10 × journey-index → 110..1040, journey order)
     │   ├── overview.md               # what/why, prerequisites, primary language, how examples progress (weight 1)
     │   ├── learning/                 # the by-example / annotated-concept subtree for this topic
-    │   │   ├── _index.md             # learning-subfolder landing (weight = prd "Learn wt" = 101..161)
+    │   │   ├── _index.md             # learning-subfolder landing (weight = prd "Learn wt" = 101..194)
     │   │   ├── overview.md           # how this topic's examples progress (weight 1)
     │   │   ├── <example pages>       # By-Example: by-example/{overview,beginner,intermediate,advanced}
     │   │   │                         # Annotated-concept: worked-example pages by theme
     │   │   ├── capstone/             # DD-27 intra-topic capstone (weight 900; sorts last in learning/)
     │   │   └── code/                 # DD-24 colocated runnable sources for this bundle (excluded from Nx gates)
     │   └── drilling/                 # the drill page(s) for this topic
-    │       ├── _index.md             # drilling-subfolder landing (weight = prd "Drill wt" = 201..261)
+    │       ├── _index.md             # drilling-subfolder landing (weight = prd "Drill wt" = 201..294)
     │       └── <topic-slug>.md       # the four-section drill page (or index-embedded single page)
     └── <inter-topic-capstone>/       # DD-27 pass-boundary + cross-cutting milestone bundles (see Capstone Policy)
-        ├── _index.md                 # capstone nav (weight slots at its pass boundary, e.g. 245)
+        ├── _index.md                 # capstone nav (weight slots at its pass boundary, e.g. 275)
         ├── overview.md               # goal/outcome, concepts exercised, ordered steps, acceptance criteria
         └── code/                     # colocated runnable capstone sources (excluded from Nx gates)
 ```
@@ -79,14 +79,14 @@ section immediately after `system-design` (weight 1700) in the software-engineer
 
 - Section landing: **1750**. Section overview: **1** (first child).
 - Each **topic-slug folder** (`<topic-slug>/_index.md`): **100 + 10 × (journey index)** → currently
-  110..710. The ×10 spacing leaves integer gaps between consecutive topics so inter-topic capstone
+  110..1040. The ×10 spacing leaves integer gaps between consecutive topics so inter-topic capstone
   folders can slot at a pass boundary without a float (e.g. the Pass 1 capstone concludes after topic
-  14 → topic weight 240 → capstone folder weight **245**).
+  17 → topic weight 270 → capstone folder weight **275**).
 - Inside each topic folder:
-  - `learning/_index.md`: weight = the prd **"Learn wt"** column (**101..161**) — orders `learning/`
+  - `learning/_index.md`: weight = the prd **"Learn wt"** column (**101..194**) — orders `learning/`
     before `drilling/` and mirrors the topic's journey position in the prd table.
   - `learning/capstone/`: weight **900** (sorts last inside the learning subtree).
-  - `drilling/_index.md`: weight = the prd **"Drill wt"** column (**201..261**).
+  - `drilling/_index.md`: weight = the prd **"Drill wt"** column (**201..294**).
 - **Parity invariant**: for every topic, `Drill wt = Learn wt + 100`. This is the mechanical parity
   gate that keeps the two tracks in the same order (verified in delivery.md). The prd table columns are
   unchanged by the topic-first layout — they now describe the two **subfolder** weights.
@@ -102,7 +102,7 @@ All pages use the existing ayokoding content frontmatter shape. [Repo-grounded �
 ```yaml
 ---
 title: "Data Structures & Algorithms"
-weight: 101
+weight: 107
 date: 2026-07-11T00:00:00+07:00
 draft: false
 description: "Relearn core data structures and algorithms by example, then drill for recall"
@@ -253,8 +253,8 @@ families:
    topics compose into a realistic system. The named cross-cutting builds:
    - **full-stack-app** — Frontend + Backend + SQL (after the Pass 1 first-working-software arc).
    - **secure-service** — Backend + Security Essentials + IT Security (Pass 3 real-world delivery).
-   - **data-pipeline** — Data Engineering + SQL/NoSQL + a queue (Pass 3).
-   - **concurrency-showdown** — core Concurrency + CSP (Go) + actor (Elixir), same problem three ways
+   - **data-pipeline** — Data Engineering + SQL/NoSQL + a RAG interface (Pass 3).
+   - **concurrency-showdown** — CSP (Go) + actor (Elixir), same problem two ways
      (Pass 4).
 
 **Full spec per capstone lives in the syllabus file** (DD-29): each capstone is specified with
@@ -365,12 +365,13 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    P0["Phase 0<br/>setup + baseline<br/>+ scaffold"] --> PT["Per-topic phases (61)<br/>verify to learn+cap<br/>to drill to gate"]
+    P0["Phase 0<br/>setup + baseline<br/>+ scaffold"] --> PT["Per-topic phases (94)<br/>verify to learn+cap<br/>to drill to gate"]
     PT --> PC["Inter-topic capstones<br/>(pass-boundary,<br/>cross-cutting)"]
     PC --> PN["Nav wiring + full quality gate"]
     PN --> PR["Rule-15 three-tester retest"]
     PR --> PP["Push origin main + CI verify"]
-    PP --> PK["Knowledge Capture"]
+    PP --> PD["Deploy ayokoding-www to prod"]
+    PD --> PK["Knowledge Capture"]
     PK --> PA["Plan Archival"]
 
     classDef setup fill:#CC79A7,stroke:#000,color:#000
@@ -394,7 +395,7 @@ capstone phases run at their journey position (pass boundaries + cross-cutting j
 | -------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
 | `.../the-well-grounded-software-engineer/_index.md`                  | New    | Section landing, weight 1750                                               |
 | `.../the-well-grounded-software-engineer/overview.md`                | New    | Read-then-drill workflow + six-pass journey map + 94-node skill tree       |
-| `.../<topic-slug>/_index.md` × N                                     | New    | Topic folder nav, weight 110..1000 (journey order)                         |
+| `.../<topic-slug>/_index.md` × N                                     | New    | Topic folder nav, weight 110..1040 (journey order)                         |
 | `.../<topic-slug>/overview.md` × N                                   | New    | Per-topic what/why + primary language + prerequisites                      |
 | `.../<topic-slug>/learning/…` × N                                    | New    | By-Example / Annotated-concept subtree + `capstone/` + `code/` per prd row |
 | `.../<topic-slug>/drilling/…` × N                                    | New    | One four-section drill page per prd row (Drill wt = Learn wt + 100)        |
@@ -443,7 +444,7 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   NoSQL / Graph; containers split out from cloud & IaC; CSP (Go) and actor (Elixir) concurrency stand
   alone beside core Concurrency; Software Testing stands alone (folding in TDD + property-based);
   architecture adds standalone `domain-driven-design` + `event-driven-architecture` (hexagonal folds
-  into `software-architecture`); security splits into `security-essentials` + `it-security` +
+  into `software-architecture`); security splits into `security-essentials` + `it-and-application-security` +
   `offensive-security` (red/Kali) + `defensive-security` (blue/SOC-IR); the editor branch adds
   `just-enough-nvim` + `just-enough-lua` + `extending-neovim`. **94 topics total.** [User decision]
 - **DD-13: Language + tool primers.** Fifteen _Just Enough_ primer topics (Nvim, Python, Bash,
@@ -453,8 +454,8 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   Cypher→Graph DB) fold the primer in. The Nvim primer (`§`) is a vanilla-Neovim tool primer (no
   plugins); `just-enough-lua` + `extending-neovim` complete Pass 0's editor-extensibility arc. [User decision]
 - **DD-14: Leadership split by altitude.** Product & Delivery (Software Product Engineering + Project
-  Management, ▲) is readable early from Pass 2; Engineering Management and IT Governance/GRC stay as
-  senior-altitude depth in Pass 5. [User decision]
+  Management, ▲) is readable early from Pass 1; Engineering Management (Pass 2) and IT Governance/GRC
+  (Pass 3) come later as senior-altitude depth. [User decision]
 - **DD-15: License-aware technology choices.** Where a well-known tool changes license (Redis
   SSPL→AGPL, Akka→BSL + the Apache Pekko fork, MongoDB SSPL, ScyllaDB source-available), the topic
   explains the shift and the free/teachable choice it drives; GQL noted as ISO/IEC 39075:2024; K8s
@@ -470,14 +471,14 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   This drives the Nvim-ready column. [User decision]
 - **DD-18: Per-topic syllabus in a companion folder.** Every topic's concrete items (subtopics), named
   worked examples, and capstone specs are enumerated in the [syllabus/ folder](./syllabus/) — one
-  `NN-<slug>.md` file per topic (NN = order of appearance, 01..90) plus `README.md` + `overview.md`;
+  `NN-<slug>.md` file per topic (NN = order of appearance, 01..94) plus `README.md` + `overview.md`;
   each delivery per-topic step authors exactly its syllabus file, so "detail every item and example" is
   specified once and not scattered across the checklist. Layout detailed in DD-29. [User decision]
-- **DD-19: No deferred items (HARD RULE).** Every in-scope topic — all 61, both tracks, plus every
+- **DD-19: No deferred items (HARD RULE).** Every in-scope topic — all 94, both tracks, plus every
   capstone — ships complete to the mastery bar: zero TODO/TBD/stub/placeholder/"author later" content,
   and every syllabus item/example/capstone actually present. Split-and-interleave (two complete
   deliverables) and the out-of-scope list (scope boundaries) are not deferrals. Each phase gate asserts
-  this; the final gate asserts it for all 61 + all capstones. [User decision]
+  this; the final gate asserts it for all 94 + all capstones. [User decision]
 - **DD-20: Runnable-example rule (HARD RULE).** Every code example is runnable — standalone blocks run
   in isolation via the stated raw-form command (DD-17); long/fragmented examples end in a complete
   runnable full listing. No elided-body "assume the rest" snippets presented as runnable. Two sharpening
@@ -535,7 +536,7 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
 - **DD-29: Syllabus as a folder.** The single `syllabus.md` is replaced by a `syllabus/` folder:
   `README.md` (index + how-to-read) + `overview.md` (design, legend, capstone policy, follow-along
   contract, per-file template) + one **`NN-<slug>.md` per topic** where **NN = order of appearance
-  (01, 02, … 61)**. Each per-topic file is very detailed: full item list, worked-example specs, and the
+  (01, 02, … 94)**. Each per-topic file is very detailed: full item list, worked-example specs, and the
   full intra-topic capstone spec (plus any inter-topic capstone spec anchored at that topic). [User decision]
 - **DD-30: Follow-along completeness (HARD RULE).** Every example and capstone is reproducible
   step-by-step, code-by-code, line-by-line, with no hidden assumptions: explicit prerequisites +
@@ -552,7 +553,7 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
 - **DD-32: Prev/Next navigation (HARD RULE).** Every material file carries an explicit navigation footer
   — a horizontal rule followed by `← Previous: [...] · Next: [...] →` — so a reader can always move one
   step forward or back along the frozen spiral order. In the syllabus folder the chain runs
-  `README → 01 → 02 → … → 61 → overview` (file 01's Previous points at `README`; file 61's Next points at
+  `README → 01 → 02 → … → 94 → overview` (file 01's Previous points at `README`; file 94's Next points at
   `overview`); the authored learning/drilling pages carry the equivalent footer in content order. The
   footer target order is the prd canonical table order (DD-10 table-referential). Enforced per file and
   at each phase gate. [User decision]
@@ -567,9 +568,10 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   Cross-Cutting Big Ideas (`abstraction-and-its-cost`, `taming-state`, `coupling-vs-cohesion`,
   `consistency-latency-throughput`, `mechanism-vs-policy`, `determinism-vs-emergence`,
   `correctness-vs-pragmatism`, `layering-and-leaks`) that each topic tags, so the section teaches ideas,
-  not just topics; (3) **Tensions & trade-offs + Lineage** depth blocks on the ~20 judgment/altitude
-  topics only (16, 17, 18, 22, 24, 25, 28, 30, 31, 32, 33, 35, 38, 39, 40, 42, 44, 57, 58, 59, 60, 61),
-  omitted for primers, Essentials, and how-to tool topics where they would be padding; (4) a universal
+  not just topics; (3) **Tensions & trade-offs + Lineage** depth blocks on the ~41 judgment/altitude
+  topics (6, 9, 18, 20, 21, 22, 23, 27, 30, 31, 32, 33, 36, 38, 39, 41, 42, 43, 44, 45, 46, 49, 51, 52,
+  55, 56, 57, 58, 59, 60, 61, 63, 73, 77, 79, 83, 85, 89, 90, 93, 94), omitted for the remaining primers,
+  Essentials, and how-to tool topics where they would be padding; (4) a universal
   fifth **elaborative-interrogation / self-explanation** drill form in the opt-in drilling track, so
   depth never taxes the learning-track reader. Depth concentrates at altitude (Pass 5 + `▲`), where the
   IC→CTO promise is actually paid. Rationale: a competency curriculum without an intellectual spine
@@ -579,6 +581,22 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   Full rubric: [syllabus/overview.md §Scaled Intellectual Depth](./syllabus/overview.md#scaled-intellectual-depth-dd-33);
   idea spine: [prd.md §Cross-Cutting Big Ideas](./prd.md#cross-cutting-big-ideas-the-idea-spine-dd-33).
   Enforced per topic and at each phase gate. [User decision]
+
+### DD-34 — Worked-Example & Concept Enumeration (exhaustive per topic, HARD RULE)
+
+Every topic exhaustively enumerates its concepts (`co-NN`) and worked examples (`ex-NN`), with a
+strict 1:1 mirror between the syllabus enumeration and the `delivery.md` checkboxes: each `co-NN`/`ex-NN`
+appears once, contiguous, no gaps or duplicates, and every phase gate's declared counts equal the true
+unique counts. Full rule and rationale:
+[prd.md §Worked-Example & Concept Enumeration](./prd.md#worked-example--concept-enumeration--exhaustive-per-topic-hard-rule-dd-34).
+Enforced per topic and at each phase gate. [User decision]
+
+### DD-35 — No-Hallucination Citation Verification (HARD RULE)
+
+Every cited fact (command syntax, version string, API name, statistic) traces to a read primary source;
+uncited or unverifiable claims are removed rather than guessed. Full rule and rationale:
+[prd.md §No-Hallucination Citation Verification](./prd.md#no-hallucination-citation-verification--every-cited-fact-traces-to-a-read-primary-source-hard-rule-dd-35).
+Enforced per topic via the Accuracy-notes block and at each phase gate. [User decision]
 
 ### DD-36 — Formatter coverage for code samples (lint-staged)
 
@@ -669,7 +687,9 @@ no capstone spec required editing). The ten inter-topic capstones are cross-topi
 intra-topic folds. One placement note surfaced and is made explicit: the **Pass-3 boundary capstone**
 `capstone-real-world-delivery` is anchored after the security **core** (topic 60) and integrates topics
 **34–60**; the Pass-3 tail — 61 vulnerability management, 62 GRC, 63 analytics & experimentation — is a
-deliberate **assurance-and-measurement coda** taught _after_ the build-and-ship integration capstone, not a
+deliberate **assurance-and-measurement coda** taught _after_ the build-and-ship integration capstone in
+rendered curriculum order (the capstone sorts at folder weight 705–707, ahead of topic 61 at weight 710, so a
+reader meets it first; the delivery-phase build order authors topic 61 earlier only for grouping), not a
 gap in its coverage. Kept as-is (no capstone move) to avoid destabilizing re-sequencing this late; documented
 so the placement reads as intentional.
 
@@ -689,6 +709,21 @@ covered" decision is explicit and auditable:
   (`bpg/proxmox` provider, `community.proxmox` collection, Packer golden images) and GitOps in topic
   **53 Self-Managed Kubernetes & On-Prem GitOps**. No fold needed — coverage is deeper as a standalone
   topic than any single folded rung would be.
+
+### DD-39 — Typed-Python Rule (every Python example fully type-annotated, `pyright`-clean)
+
+Every Python worked example, capstone, snippet, and drill answer across the curriculum is **fully
+type-annotated** in the `pyright`-clean spirit (canonical statement:
+[prd.md Typed-Python Rule](./prd.md#typed-python-rule--every-python-example-fully-type-annotated-hard-rule-dd-39)).
+Signatures, dataclass/`TypedDict` fields, and non-obvious locals carry PEP 484 / PEP 604 hints; the bar
+is a clean `pyright` strict run (`typeCheckingMode: strict` in config, or a `# pyright: strict` file
+comment — pyright has **no** `--strict` CLI flag). `pyright` **1.1.411** (2026-06-25) installs via
+`pip install pyright`; the Python primer (topic 04) teaches it as `co-25 · static-type-checking` with
+worked examples `ex-83`/`ex-84`. On Python-primary topics that nonetheless carry a `†`, that marker's
+per-topic footnote flags exactly this typed-Python treatment (distinct from `†`'s other,
+non-Python-subject sense — both senses are documented in the prd primary-language legend). Enforced by
+`plan-checker` in plan docs and by `swe-code-checker` / `apps-ayokoding-www-*-checker` in authored
+`CONTENT/`.
 
 ## Dependencies
 
@@ -723,8 +758,8 @@ the two `_index.md` nav edits. No data migration, no build-config change, no run
   `<details>` expands; nav link resolves; zero console errors.
 - **Not** a UI/component change: the UI-design-funnel does not apply (no new UI components; pure
   markdown content). The **rule-15 three-tester retest DOES apply**: this plan adds well over 100 new
-  browser-rendered pages (91 topic folders × learning subtree + drill page + intra-topic capstone,
-  ~9–11 inter-topic capstones, plus section landing/overview) plus 2 nav entries to the live
+  browser-rendered pages (94 topic folders × learning subtree + drill page + intra-topic capstone,
+  10 inter-topic capstones, plus section landing/overview) plus 2 nav entries to the live
   ayokoding-www site, which is a user-facing feature change under
   [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md)
   Rule 15 — content-only is not itself an exemption from Rule 15. See the finalization retest step in

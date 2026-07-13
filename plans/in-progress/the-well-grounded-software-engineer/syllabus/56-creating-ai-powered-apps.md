@@ -183,10 +183,33 @@ cache_read + cache_creation + input`. Batch APIs give a **50% discount** (both p
 - **co-29 · observability-tracing** — tracing spans of an LLM call chain feed an evaluation feedback loop.
 - **co-30 · secrets-no-committed-keys** — API keys come from the environment and are never committed.
 
+## Tensions & trade-offs — when NOT to reach for this
+
+- **RAG vs fine-tuning**: RAG grounds answers in retrievable data without retraining, but its accuracy
+  depends entirely on retrieval quality — a well-tuned fine-tune can beat a poor retrieval pipeline, and
+  RAG adds a whole indexing/retrieval system to operate and keep fresh.
+- **Agentic loops vs a single call**: a bounded agentic loop unlocks multi-step tool use, but every extra
+  iteration multiplies cost, latency, and the chance the model wanders off-task — reach for a single
+  structured-output call first, and add a loop only when one call genuinely can't reach the answer.
+- **When NOT to use it**: treating the model's output as ground truth. An LLM-powered feature that skips
+  evals, budgets, and injection guards is the failure mode this topic exists to prevent — the
+  accountability of evaluation, cost/latency limits, and prompt-injection defenses is what makes
+  probabilistic output usable in production, not an optional hardening pass.
+
+## Lineage — why it beat the alternative
+
+- Before RAG (Lewis et al. 2020) and tool/function calling matured, LLM apps either fine-tuned a model
+  per task — slow, expensive, and stale the moment the underlying facts changed — or stuffed everything
+  into the prompt, bounded by the context window. Grounding via retrieval plus structured tool calls won
+  because it keeps the model's knowledge current without retraining and lets it act on live systems,
+  pushing the correctness burden onto retrieval quality, evals, and guardrails rather than the model's
+  frozen weights — which is exactly why [`39-backend-at-scale`](./39-backend-at-scale.md) (serving the
+  app) and this topic's eval/cost/injection disciplines matter as much as the model call itself.
+
 ## Worked examples
 
-Colocated under `creating-ai-powered-apps/learning/code/`; each is typed, `mypy`-clean Python runnable
-against a local/mockable model so no paid key is required (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`.
+Colocated under `creating-ai-powered-apps/learning/code/`; each is typed, `pyright`-clean Python runnable
+against a local/mockable model so no paid key is required (DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-80`.
 Every example cites the `co-NN` it exercises. Concepts come before examples.
 
 ### Beginner

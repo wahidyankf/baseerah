@@ -23,7 +23,7 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
 - **Prior topics**: [topic 1 Just Enough Nvim](./01-just-enough-nvim.md) (to edit/run files); the
   [`capstone-forge-ready`](./03-extending-neovim.md) forge is recommended but not required.
 - **Tools & environment**: a macOS/Linux terminal; **Python 3.x** installed (`python3 --version`) with
-  `venv` + `pip`; the `black` and `ruff` CLIs (or installed via `pip`).
+  `venv` + `pip`; the `black`, `ruff`, and `pyright` CLIs (or installed via `pip`).
 - **Assumed knowledge**: basic terminal use; no prior Python required (this is the reader's Python
   starting point).
 
@@ -35,6 +35,11 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
   workflow unchanged. (python.org)
 - 2026-07-12 — verified: `black` **26.5.1**, `ruff` **0.15.21** (2026-07-09) — both current, CVE-clean, CLI
   unchanged. (black.readthedocs.io / astral.sh)
+- 2026-07-13 — verified: `pyright` **1.1.411** (2026-06-25) current, no published security advisories;
+  installs via `pip install pyright` (a community wrapper by R. Craigie that fetches Microsoft's `pyright`
+  npm package). Strict mode is set via config (`typeCheckingMode: strict`) or a `# pyright: strict`
+  comment — there is **no** `--strict` CLI flag; a clean run prints `0 errors, 0 warnings, 0 informations`.
+  (github.com/microsoft/pyright / PyPI)
 - 2026-07-12 — verified: `json` stdlib, f-strings, and `match` are unchanged in 3.14 (PEP 750 t-strings
   are an additive complement to f-strings, not a replacement). (docs.python.org whatsnew/3.14)
 
@@ -54,6 +59,15 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
   (2026-07-09, [astral-sh/ruff releases](https://github.com/astral-sh/ruff/releases), no published advisories).
   ruff `F401` unused-import per [rule reference](https://docs.astral.sh/ruff/rules/unused-import/). Pin
   bumped from stale 0.15.20 during grounding.
+- **Type checker (co-25)** — `pyright` **1.1.411** (2026-06-25) per
+  [microsoft/pyright releases](https://github.com/microsoft/pyright/releases) and
+  [PyPI](https://pypi.org/project/pyright/); no advisories
+  ([security tab](https://github.com/microsoft/pyright/security/advisories)). Strict mode is enabled by
+  config (`"typeCheckingMode": "strict"`) or an inline `# pyright: strict` comment, not a CLI flag, per
+  [command-line docs](https://raw.githubusercontent.com/microsoft/pyright/main/docs/command-line.md) +
+  [configuration docs](https://raw.githubusercontent.com/microsoft/pyright/main/docs/configuration.md).
+  The PyPI `pyright` package is R. Craigie's wrapper around Microsoft's official npm build, not a
+  Microsoft-published package.
 - **venv (co-02)** — [venv docs](https://docs.python.org/3/library/venv.html): pip installs into the venv
   without explicit instruction; isolated from base environment. Confirmed.
 - **Type hints (co-06/13)** — [typing.Optional](https://docs.python.org/3/library/typing.html#typing.Optional)
@@ -84,7 +98,7 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 8 (Primer §). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 8 (Primer). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · running-python** — CPython runs code three ways: a saved script (`python3 file.py`), an
   inline one-liner (`python3 -c "..."`), and the interactive REPL — no IDE required.
@@ -96,8 +110,9 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
   dynamically typed, so a name can be rebound to a value of any type.
 - **co-05 · primitive-types** — `int`, `float`, `str`, `bool`, and `None` are the atomic value types,
   each with literal syntax and its own operators.
-- **co-06 · type-hints** — optional annotations (`x: int`, `def f(a: str) -> bool`, `list[int]`,
-  `Optional[T]`) document intent and are checked by tooling without changing runtime behavior.
+- **co-06 · type-hints** — annotations (`x: int`, `def f(a: str) -> bool`, `list[int]`,
+  `Optional[T]`) document intent and are verified statically by a type checker (`pyright`, co-25)
+  without changing runtime behavior; this book type-annotates **every** Python example (DD-39).
 - **co-07 · operators** — arithmetic (`+ - * / // % **`), comparison (`== != < >`), boolean
   (`and`/`or`/`not`), membership (`in`), and identity (`is`) combine values into expressions.
 - **co-08 · strings-and-fstrings** — string methods (`.upper()`, `.strip()`, `.split()`) plus
@@ -134,11 +149,14 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
   and `json.dump`/`load` do the same directly to/from files.
 - **co-24 · classes** — a `class` bundles typed attributes and methods with `__init__`; `@dataclass`
   and custom context managers (`__enter__`/`__exit__`) are lightweight variants (full OOP in topic 08).
+- **co-25 · static-type-checking** — `pyright` reads the type hints and reports mismatches _without
+  running the code_; a clean run ("pyright-clean") is the bar every Python example in this book meets
+  (DD-39). Type-checking (`pyright`) and linting (`ruff`) are distinct, complementary passes.
 
 ## Worked examples
 
 Colocated under `just-enough-python/learning/code/`; each is a complete file run with `python3 <file>`
-(DD-20/DD-30) and cites the `co-NN` it exercises. Contiguous `ex-01..ex-82`.
+(DD-20/DD-30/DD-39) and cites the `co-NN` it exercises. Contiguous `ex-01..ex-84`.
 
 ### Beginner
 
@@ -308,6 +326,11 @@ Colocated under `just-enough-python/learning/code/`; each is a complete file run
 - **ex-82 · module-docstring-and-main** — a module with a top docstring and `def main() -> None` under
   the name guard — verify running it prints, and `python3 -c "import app; print(app.__doc__)"` shows the
   docstring. (co-20)
+- **ex-83 · pyright-clean-pass** — run `pyright` on a fully type-annotated module — verify it reports
+  `0 errors`. (co-25, co-06)
+- **ex-84 · pyright-catches-type-error** — pass a `str` to a parameter annotated `int` — verify
+  `pyright` reports the type error even though `python3` still runs the file (static vs runtime).
+  (co-25, co-06)
 
 ## Capstone spec — intra-topic (primer → light consolidation)
 

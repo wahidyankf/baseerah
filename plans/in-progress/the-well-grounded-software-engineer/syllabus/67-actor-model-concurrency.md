@@ -20,13 +20,13 @@ contrast with CSP ([`65-csp-style-concurrency`](./65-csp-style-concurrency.md)).
 
 ## Prerequisites
 
-- **Prior topics**: [topic 64 Just Enough Elixir](./66-just-enough-elixir.md) (the language + a process
-  preview), [topic 63 CSP-Style Concurrency](./65-csp-style-concurrency.md) (the model to contrast), and
+- **Prior topics**: [topic 66 Just Enough Elixir](./66-just-enough-elixir.md) (the language + a process
+  preview), [topic 65 CSP-Style Concurrency](./65-csp-style-concurrency.md) (the model to contrast), and
   [topic 24 Concurrency & Parallelism](./24-concurrency-and-parallelism.md).
 - **Tools & environment**: a macOS/Linux terminal; **Elixir/OTP** + `mix` + `iex`, pinned to a current
   stable release; Neovim/VSCode (DD-17).
-- **Assumed knowledge**: Elixir syntax + a `spawn`/`send`/`receive` preview (topic 63); channels/CSP for the
-  contrast (topic 62).
+- **Assumed knowledge**: Elixir syntax + a `spawn`/`send`/`receive` preview (topic 66); channels/CSP for the
+  contrast (topic 65).
 
 ## Accuracy notes (web-verified)
 

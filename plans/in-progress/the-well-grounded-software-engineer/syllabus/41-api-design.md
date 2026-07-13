@@ -8,7 +8,7 @@ each fits, OpenAPI as the machine-readable contract, versioning, pagination, ide
 envelopes, and rate limiting. The through-line is that an API is a promise to callers you don't
 control, so its shape and its failure modes are the design. Builds on the serving mechanics of
 [`40-build-your-own-web-framework`](./40-build-your-own-web-framework.md). `†`: Python, fully
-type-annotated (DD-34) — every snippet carries type hints in the mypy-clean spirit.
+type-annotated (DD-39) — every snippet carries type hints in the pyright-clean spirit.
 
 ## Why this exists · the big idea
 
@@ -30,7 +30,7 @@ type-annotated (DD-34) — every snippet carries type hints in the mypy-clean sp
   codes, routing, JSON handling) and [topic 39 Backend at Scale](./39-backend-at-scale.md)
   (idempotency, auth, and rate limiting as production concerns).
 - **Tools & environment**: a macOS/Linux terminal; **Python** at a recent stable release with type
-  hints and `mypy`; a web framework you can serve locally; `curl`/an HTTP client; an OpenAPI toolchain
+  hints and `pyright`; a web framework you can serve locally; `curl`/an HTTP client; an OpenAPI toolchain
   (spec validator + a mock/codegen); optionally a gRPC/Protobuf and a GraphQL toolchain for the
   contrast tiers; Neovim/VSCode with the Python LSP (DD-17).
 - **Assumed knowledge**: serving a CRUD JSON API (topic 11); what idempotency and rate limiting buy
@@ -157,7 +157,7 @@ type-annotated (DD-34) — every snippet carries type hints in the mypy-clean sp
 ## Worked examples
 
 Colocated under `api-design/learning/code/`; each runnable and exercised with `curl`/a client, every
-Python snippet fully type-annotated and `mypy`-clean (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`.
+Python snippet fully type-annotated and `pyright`-clean (DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-80`.
 Every example cites the `co-NN` it exercises; every concept above is exercised by ≥ 1 example.
 
 ### Beginner
@@ -268,7 +268,7 @@ Every example cites the `co-NN` it exercises; every concept above is exercised b
      contrast note. Verify the facade returns equivalent data and the note names when each style wins.
 - **Acceptance criteria**: live responses conform to the OpenAPI contract; idempotent writes and rate
   limiting behave; the second-style facade returns equivalent data; the contrast note is concrete; all
-  Python is type-annotated and `mypy`-clean.
+  Python is type-annotated and `pyright`-clean.
 - **Done bar**: runnable end-to-end + web-verified.
 
 ## Read more

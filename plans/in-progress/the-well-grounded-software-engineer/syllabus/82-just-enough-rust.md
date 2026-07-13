@@ -1,8 +1,8 @@
-# 82 · Just Enough Rust (Primer §, Rust †)
+# 82 · Just Enough Rust (Primer, Rust †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · Rust † · Learn 182 / Drill 282 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 4 · Concurrency & Systems · Primer · Rust † · Learn 182 / Drill 282 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough Rust** to be productive in modern systems programming
+**Scope note**: **just enough Rust** to be productive in modern systems programming
 ([`83-modern-system-programming`](./83-modern-system-programming.md)). `cargo`, an intuition for
 ownership/borrowing/lifetimes, the type system, `Result`/`Option`, traits, and pattern matching. `†`:
 Rust, run and built with the `cargo` toolchain.
@@ -60,7 +60,7 @@ Rust, run and built with the `cargo` toolchain.
 
 ## Concepts
 
-<!-- co-01 · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (primer). Each example below cites the co-NN it exercises. -->
+<!-- co-01 · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · cargo-new** — `cargo new` scaffolds a project with `Cargo.toml` and `src/main.rs`.
 - **co-02 · cargo-run** — `cargo run` compiles and runs the binary in one step.

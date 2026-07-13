@@ -241,7 +241,7 @@ come before examples.
   into the hands-on red/blue topics [`59-offensive-security`](./59-offensive-security.md) and
   [`60-defensive-security`](./60-defensive-security.md).
 
-## Worked examples
+## Capstone materials
 
 Colocated under `it-security/learning/`; annotated threat models + runnable Python security mechanisms
 (DD-20/DD-30).

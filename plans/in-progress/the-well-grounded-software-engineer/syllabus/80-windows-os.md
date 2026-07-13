@@ -1,7 +1,7 @@
 # 80 · Windows OS (By Example, C + PowerShell †)
 
-**prd row**: Pass 4 · Concurrency & Systems · By Example · C + PowerShell † · Learn 177 /
-Drill 277 · Nvim-ready Partial · VSCode-ready Partial. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
+**prd row**: Pass 4 · Concurrency & Systems · By Example · C + PowerShell † · Learn 180 /
+Drill 280 · Nvim-ready Partial · VSCode-ready Partial. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: the Windows OS from the inside — user vs kernel mode, the Win32 API, the object/handle
 model, the registry, processes/threads (`CreateProcess`), memory management, Win32 synchronization,
@@ -23,14 +23,14 @@ NTFS/async I/O — observed from C (Win32) + PowerShell tooling. The deliberate 
 
 ## Prerequisites
 
-- **Prior topics**: [topic 76 Just Enough C](./78-just-enough-c.md) (the language for Win32 calls),
-  [topic 77 Linux OS](./79-linux-os.md) (the OS-concept baseline to contrast), and
+- **Prior topics**: [topic 78 Just Enough C](./78-just-enough-c.md) (the language for Win32 calls),
+  [topic 79 Linux OS](./79-linux-os.md) (the OS-concept baseline to contrast), and
   [topic 5 Just Enough Bash](./05-just-enough-bash.md) (shell/PowerShell
   fluency).
 - **Tools & environment**: a **Windows** machine; a C toolchain (MSVC or MinGW) for Win32; **PowerShell**;
   Task Manager / Process Explorer for inspection; Neovim/VSCode (DD-17).
-- **Assumed knowledge**: C pointers + structs (topic 75); the process/memory/IPC model from Linux to
-  contrast (topic 76); shell basics (topic 05).
+- **Assumed knowledge**: C pointers + structs (topic 78); the process/memory/IPC model from Linux to
+  contrast (topic 79); shell basics (topic 05).
 
 ## Accuracy notes (web-verified)
 
@@ -93,7 +93,7 @@ are decades-stable interfaces (minimum-supported-client Windows XP/2000 on the r
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (◆ subject). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · user-kernel-mode** — applications run in user mode; core OS components run in privileged kernel mode.
 - **co-02 · win32-api** — the Win32 (Windows) API is the C interface user-mode code calls into.

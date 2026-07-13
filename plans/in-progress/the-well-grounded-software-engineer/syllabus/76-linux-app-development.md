@@ -1,6 +1,6 @@
 # 76 · Linux App Development ◆ (By Example, Python)
 
-**prd row**: Pass 4 · Concurrency & Systems · By Example · Python ◆ · Learn 176 / Drill 276 ·
+**prd row**: Pass 4 · Concurrency & Systems · By Example · Python · Learn 176 / Drill 276 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
 **Scope note**: `◆` app-domain — building real Linux applications (CLIs and daemons) as an app developer:
@@ -75,7 +75,7 @@ flagged `[Needs Verification]` for the authoring pass.
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (◆ subject). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · process-model** — a Linux app is a process bound by the OS contract: env, args, exit codes, standard streams, and signals.
 - **co-02 · argv** — command-line arguments arrive via `sys.argv`.

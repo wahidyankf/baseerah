@@ -106,7 +106,7 @@ and deeper design go to [`21-object-oriented-design-and-patterns`](./21-object-o
 ## Worked examples
 
 Colocated under `object-oriented-programming-essentials/learning/code/`; every example is runnable + `pytest`
-(DD-20) and uses static type hints throughout (DD-34). Each cites the `co-NN` it exercises. Contiguous
+(DD-20) and uses static type hints throughout (DD-39). Each cites the `co-NN` it exercises. Contiguous
 `ex-01..ex-80`.
 
 ### Beginner

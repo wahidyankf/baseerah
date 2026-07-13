@@ -31,7 +31,7 @@ visible rather than hidden. Builds on [`19-computer-science-foundations`](./19-c
 - **Tools & environment**: a macOS/Linux terminal; a C toolchain (a recent stable `clang`/`gcc`); a
   profiler/`perf`-style tool to measure cache and cycle behavior; optionally a disassembler to read
   emitted assembly; Neovim/VSCode with the C LSP (DD-17).
-- **Assumed knowledge**: reading and running a small C program (topic 19); binary/number
+- **Assumed knowledge**: reading and running a small program (topic 04); binary/number
   representation and complexity intuition (topic 19); reading a typed script to drive experiments
   (topic 04).
 

@@ -4,7 +4,7 @@
 
 **Scope note**: finding and fixing what the tests didn't catch — interactive debuggers (breakpoints,
 watches, stepping), sampling versus instrumenting profilers, flame graphs, and a systematic bisection
-method. `†`: fully type-annotated Python examples (DD-34) plus a native-profiler pass to see costs the
+method. `†`: fully type-annotated Python examples (DD-39) plus a native-profiler pass to see costs the
 interpreter hides. Builds directly on [`15-software-testing`](./15-software-testing.md) — tests tell
 you _that_ something is wrong; this topic is _where_ and _why_.
 
@@ -104,7 +104,7 @@ you _that_ something is wrong; this topic is _where_ and _why_.
 ## Worked examples
 
 Colocated under `debugging-and-profiling/learning/code/`; each is a seeded bug or slow function you
-diagnose from the CLI, fully type-annotated Python (DD-20/DD-30/DD-34) with one native pass. Contiguous
+diagnose from the CLI, fully type-annotated Python (DD-20/DD-30/DD-34/DD-39) with one native pass. Contiguous
 `ex-01..ex-80`; every example cites the `co-NN` it exercises.
 
 - **ex-01 · first-breakpoint-with-breakpoint** — insert `breakpoint()` in a running-total function and step with `n` — verify the reader names the exact line the total first goes wrong. (co-01)

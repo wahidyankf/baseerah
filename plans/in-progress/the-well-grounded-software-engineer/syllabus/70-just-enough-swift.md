@@ -1,16 +1,16 @@
-# 70 · Just Enough Swift (Primer §, Swift †)
+# 70 · Just Enough Swift (Primer, Swift †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · Swift † · Learn 170 / Drill 270 ·
+**prd row**: Pass 4 · Concurrency & Systems · Primer · Swift † · Learn 170 / Drill 270 ·
 Nvim-ready Partial · VSCode-ready Partial. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough Swift** to be productive in
+**Scope note**: **just enough Swift** to be productive in
 [`71-ios-app-development`](./71-ios-app-development.md), taught from the `swift` REPL / `swiftc` CLI
 **before** the Xcode-bound topic. Syntax, optionals, structs vs classes, enums with associated values,
 protocols, closures, and an `async`/`await` _preview_.
 
 ## Why this exists · the big idea
 
-- **The problem before the solution**: iOS in topic 68 is Xcode-bound and dense — learning Swift's value
+- **The problem before the solution**: iOS in topic 71 is Xcode-bound and dense — learning Swift's value
   semantics, optionals, and concurrency from the plain `swiftc` CLI first strips away the IDE so the
   language itself is what you actually learn.
 - **Keep-this-if-you-forget-everything**: Swift defaults to value types (structs) — copies don't alias, so
@@ -22,11 +22,11 @@ protocols, closures, and an `async`/`await` _preview_.
 ## Prerequisites
 
 - **Prior topics**: [topic 8 Object-Oriented Programming Essentials](./08-object-oriented-programming-essentials.md) (types,
-  classes) and [topic 66 Just Enough Kotlin](./68-just-enough-kotlin.md) (null-safety/optionals intuition
+  classes) and [topic 68 Just Enough Kotlin](./68-just-enough-kotlin.md) (null-safety/optionals intuition
   transfers).
 - **Tools & environment**: a **macOS** machine (Swift toolchain; Xcode not yet required); the `swift` REPL
   - `swiftc` from the CLI; Neovim/VSCode (DD-17). (Linux Swift works for the CLI examples.)
-- **Assumed knowledge**: classes/structs + types (topic 08); optional/nullable thinking (topic 65).
+- **Assumed knowledge**: classes/structs + types (topic 08); optional/nullable thinking (topic 68).
 
 ## Accuracy notes (web-verified)
 
@@ -91,7 +91,7 @@ protocols, closures, and an `async`/`await` _preview_.
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (§ primer). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · repl-and-swiftc** — the `swift` REPL evaluates expressions interactively; `swiftc file.swift` compiles a standalone executable from the CLI (before Xcode).
 - **co-02 · var-and-let** — `let` declares an immutable constant, `var` a mutable variable; prefer `let` by default.

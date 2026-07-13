@@ -18,6 +18,9 @@ real engineering step. Relational depth is [`26-advanced-sql-and-query-performan
 - **Big ideas touched**: `consistency-latency-throughput` (CAP/PACELC is the whole decision),
   `abstraction-and-its-cost` (denormalization buys read speed and charges duplication + write complexity).
 
+`†`: Python is the primary language here; the dagger flags the fully-typed-Python treatment (DD-39) —
+every driver-facing example is type-annotated and `pyright`-clean, not a non-Python subject exception.
+
 ## Prerequisites
 
 - **Prior topics**: [topic 10 SQL Essentials](./10-sql-essentials.md) (the relational model these contrast
@@ -183,7 +186,7 @@ Colocated under `nosql-databases/learning/code/`; each runnable from typed Pytho
 `cassandra-driver`, `boto3`, `psycopg` for the TimescaleDB time-series examples, and `duckdb` + `pyarrow` for
 the OLAP-columnar examples) or the store's own shell (`redis-cli`/`mongosh`/`cqlsh`/`psql`/`clickhouse-client`)
 against a local instance — Valkey/Redis and MongoDB and Cassandra and TimescaleDB and ClickHouse via Docker
-(DuckDB runs in-process), DynamoDB via the official `amazon/dynamodb-local` Docker image (DD-20/DD-30).
+(DuckDB runs in-process), DynamoDB via the official `amazon/dynamodb-local` Docker image (DD-20/DD-30/DD-39).
 Contiguous `ex-01..ex-91`. Every example cites the `co-NN` it exercises; every concept above is exercised by
 ≥1 example.
 

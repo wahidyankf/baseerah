@@ -1,9 +1,9 @@
-# 87 · Just Enough F# (Primer §, F# †)
+# 87 · Just Enough F# (Primer, F# †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · F# † · Learn 187 / Drill 287 ·
+**prd row**: Pass 4 · Concurrency & Systems · Primer · F# † · Learn 187 / Drill 287 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` primer — **just enough F#** to be productive in
+**Scope note**: **just enough F#** to be productive in
 [`89-compilers-parsers-and-transpilers`](./89-compilers-parsers-and-transpilers.md). The `dotnet` F#
 toolchain, let-bindings and immutability by default, discriminated unions + records, exhaustive pattern
 matching, the pipeline (`|>`) style, and the type system. F# is the ML-family language on .NET — its
@@ -74,7 +74,7 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
 
 ## Concepts
 
-<!-- co-01 · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (primer §). Each example below cites the co-NN it exercises. -->
+<!-- co-01 · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · dotnet-new** — `dotnet new console -lang F#` scaffolds a runnable F# project with an `.fsproj`.
 - **co-02 · dotnet-run** — `dotnet run` compiles and executes the project's entry point.
@@ -149,7 +149,7 @@ Colocated under `just-enough-fsharp/learning/code/`; each runnable via `dotnet` 
 - **ex-34 · du-missing-case-warning** — omit the `Rect` arm — verify the compiler emits warning FS0025. (co-16)
 - **ex-35 · option-match** — `match opt with Some v -> v | None -> 0` — verify both arms behave. (co-18, co-15)
 - **ex-36 · option-map** — `Option.map square (Some 4)` — verify it returns `Some 16`. (co-18, co-22)
-- **ex-37 · option-defaultValue** — `Option.defaultValue 0 None` — verify it returns `0`. (co-18)
+- **ex-37 · option-default-value** — `Option.defaultValue 0 None` — verify it returns `0`. (co-18)
 - **ex-38 · result-ok** — `Ok 42` — verify pattern `Ok v` binds `v = 42`. (co-19)
 - **ex-39 · result-error** — `Error "bad input"` — verify the `Error` arm carries the message. (co-19)
 - **ex-40 · result-match** — `match r with Ok v -> ... | Error e -> ...` — verify both paths run. (co-19, co-15)

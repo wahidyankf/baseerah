@@ -1,4 +1,4 @@
-# 24 · Concurrency & Parallelism (Core) (By Example, Python)
+# 24 · Concurrency & Parallelism (By Example, Python)
 
 **prd row**: Pass 2 · Depth, Design & Craft · By Example · Python · Learn 124 / Drill 224 · Nvim-ready Yes ·
 VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))

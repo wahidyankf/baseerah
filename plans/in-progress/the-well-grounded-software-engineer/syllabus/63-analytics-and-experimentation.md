@@ -7,7 +7,7 @@ cohorts, A/B testing, statistical significance and its traps, and reading a metr
 data-literacy pass every shipping engineer needs: the usable persistence layer is
 [`10-sql-essentials`](./10-sql-essentials.md) and the discipline of a controlled comparison extends
 [`15-software-testing`](./15-software-testing.md). Pulled earlier in the spiral because its prerequisites
-are light. `†`: Python, fully type-annotated (DD-34, mypy-clean spirit), driving a query engine and a
+are light. `†`: Python, fully type-annotated (DD-39, pyright-clean spirit), driving a query engine and a
 small statistics stack.
 
 ## Why this exists · the big idea
@@ -191,7 +191,7 @@ small statistics stack.
 ## Worked examples
 
 Colocated under `analytics-and-experimentation/learning/code/`; each runnable + exercised from the CLI,
-Python fully type-annotated (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-78`. Every example cites the
+Python fully type-annotated (DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-78`. Every example cites the
 `co-NN` it exercises. Concepts come before examples.
 
 ### Beginner
@@ -199,7 +199,7 @@ Python fully type-annotated (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-78`. Ever
 - **ex-01 · tracking-plan-doc** — write a typed `Event` dataclass + a tracking-plan table (event name,
   properties, types) for a 3-step signup flow — verify every emitted event validates against the plan. (co-01)
 - **ex-02 · event-schema-typed** — model events as a typed union (`SignupStarted`, `PlanSelected`,
-  `SignupCompleted`) — verify mypy rejects a mistyped property. (co-01)
+  `SignupCompleted`) — verify pyright rejects a mistyped property. (co-01)
 - **ex-03 · emit-events-to-table** — insert typed events into a local SQL `events` table via a
   hand-rolled writer (no vendor SDK) — verify rows land with correct columns. (co-01)
 - **ex-04 · idempotency-key-dedup** — attach a stable `event_id`; re-emit the same event twice — verify

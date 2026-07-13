@@ -74,6 +74,6 @@ These are **observable signals**, not fabricated KPIs:
 | Risk                                                      | Likelihood | Mitigation                                                                                                                   |
 | --------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | Content duplicates existing deep tutorials, diluting both | Medium     | Self-contained section; breadth-first framing; own by-example subtree distinct from existing trees.                          |
-| Breadth invites factual drift across 61 wide topics       | Medium     | `apps-ayokoding-www-facts-checker` pass on all pages before archival; pre-authoring `web-researcher` accuracy sweep (DD-28). |
-| Two tracks drift out of topic-order sync                  | Low        | Fixed weight scheme (learning 101..161 / drilling 201..261); parity check in delivery gate.                                  |
+| Breadth invites factual drift across 94 wide topics       | Medium     | `apps-ayokoding-www-facts-checker` pass on all pages before archival; pre-authoring `web-researcher` accuracy sweep (DD-28). |
+| Two tracks drift out of topic-order sync                  | Low        | Fixed weight scheme (learning 101..194 / drilling 201..294); parity check in delivery gate.                                  |
 | Breadth becomes shallow "grounded-in-name-only" coverage  | Medium     | Depth-to-mastery per topic is the done-bar (not length); checker quality floors; level-phased.                               |

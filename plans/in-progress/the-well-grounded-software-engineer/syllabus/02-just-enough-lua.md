@@ -88,7 +88,7 @@ tooling is OSS (Lua is MIT-licensed) — Tier-1 per DD-21.
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 8 (Primer §). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 8 (Primer). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · dynamic-typing-eight-types** — Lua values carry types at runtime, not variables; every value is
   one of exactly eight types (`nil`, `boolean`, `number`, `string`, `function`, `userdata`, `thread`,

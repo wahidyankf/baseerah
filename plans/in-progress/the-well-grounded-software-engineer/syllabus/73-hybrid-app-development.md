@@ -1,4 +1,4 @@
-# 73 · Hybrid App Development (By Example, Dart †)
+# 73 · Hybrid App Development ◆ (By Example, Dart †)
 
 **prd row**: Pass 4 · Concurrency & Systems · By Example · Dart † · Learn 173 / Drill 273 · Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
@@ -24,13 +24,13 @@ and the UI-composition instincts carry over from [`14-frontend-essentials`](./14
 
 ## Prerequisites
 
-- **Prior topics**: [topic 70 Just Enough Dart](./72-just-enough-dart.md) (null-safe Dart, async/await,
+- **Prior topics**: [topic 72 Just Enough Dart](./72-just-enough-dart.md) (null-safe Dart, async/await,
   classes/mixins) and [topic 14 Frontend Essentials](./14-frontend-essentials.md) (declarative UI,
   component composition, layout thinking).
 - **Tools & environment**: a macOS/Linux/Windows machine; the **Flutter SDK** (`flutter`) and Dart SDK
   pinned to a current stable; at least one target toolchain (an Android emulator, an iOS simulator on macOS,
   or a desktop target); Neovim/VSCode with the Dart LSP (DD-17).
-- **Assumed knowledge**: writing null-safe Dart with async/await and classes (topic 69); thinking in a
+- **Assumed knowledge**: writing null-safe Dart with async/await and classes (topic 72); thinking in a
   declarative component tree (topic 14); running a CLI build/run tool (topic 05).
 
 ## Accuracy notes (web-verified)
@@ -113,7 +113,7 @@ and the UI-composition instincts carry over from [`14-frontend-essentials`](./14
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (◆ app-domain By-Example subject). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (By-Example subject). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · flutter-cli** — `flutter create`/`run`/`build`/`test` scaffold, run, build, and test an app; DevTools inspects a running app.
 - **co-02 · everything-is-a-widget** — a Flutter UI is a tree of widgets; layout, styling, and structure are all widgets.
@@ -263,7 +263,7 @@ Colocated under `hybrid-app-development/learning/code/`; each runnable via the `
   to the next primer's platform work in [`74-just-enough-csharp`](./74-just-enough-csharp.md) and to any
   declarative-UI framework you meet later.
 
-## Worked examples
+## Capstone materials
 
 Colocated under `hybrid-app-development/learning/code/`; each runnable via the `flutter` CLI on at least
 one target (DD-20/DD-30).

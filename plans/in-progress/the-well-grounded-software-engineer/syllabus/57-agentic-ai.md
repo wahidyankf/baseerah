@@ -7,7 +7,7 @@ Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topi
 the Model Context Protocol (MCP), memory and context management, and evals as the test suite for
 non-deterministic systems. It follows [`56-creating-ai-powered-apps`](./56-creating-ai-powered-apps.md)
 and turns a single model call into a system that reasons, acts, observes, and iterates toward a goal.
-`†`: Python, fully type-annotated (DD-34) — every snippet carries type hints in the mypy-clean spirit.
+`†`: Python, fully type-annotated (DD-39) — every snippet carries type hints in the pyright-clean spirit.
 
 ## Why this exists · the big idea
 
@@ -26,14 +26,14 @@ and turns a single model call into a system that reasons, acts, observes, and it
 
 ## Prerequisites
 
-- **Prior topics**: [topic 54 CI/CD & Release Engineering](./55-cicd-and-release-engineering.md)
+- **Prior topics**: [topic 55 CI/CD & Release Engineering](./55-cicd-and-release-engineering.md)
   (the pipeline that runs your eval suite as a gate) and [topic 15 Software Testing](./15-software-testing.md)
   (the testing mindset you'll adapt for non-deterministic systems).
 - **Tools & environment**: a macOS/Linux terminal; **Python** at a recent stable release with type
-  hints and `mypy`; access to an LLM with tool/function-calling (via an API or a local model); an MCP
+  hints and `pyright`; access to an LLM with tool/function-calling (via an API or a local model); an MCP
   client/server library; an eval harness; Neovim/VSCode with the Python LSP (DD-17).
-- **Assumed knowledge**: making a model API call and shaping a prompt (topic 54); writing and running
-  a test suite and reasoning about coverage (topic 15); running a job in a CI pipeline (topic 53).
+- **Assumed knowledge**: making a model API call and shaping a prompt (topic 56); writing and running
+  a test suite and reasoning about coverage (topic 15); running a job in a CI pipeline (topic 55).
 
 ## Accuracy notes (web-verified)
 
@@ -201,13 +201,13 @@ and turns a single model call into a system that reasons, acts, observes, and it
   captures the flexibility that makes agents useful while the eval suite and guardrails supply the
   discipline that stochastic systems otherwise lack — and MCP standardized the tool interface so
   integrations stopped being bespoke. This builds directly on the model-application foundations of
-  [topic 55 Creating AI-Powered Apps](./56-creating-ai-powered-apps.md) and uses the pipeline of
-  [topic 54 CI/CD & Release Engineering](./55-cicd-and-release-engineering.md) to run evals as a gate.
+  [topic 56 Creating AI-Powered Apps](./56-creating-ai-powered-apps.md) and uses the pipeline of
+  [topic 55 CI/CD & Release Engineering](./55-cicd-and-release-engineering.md) to run evals as a gate.
 
 ## Worked examples
 
-Colocated under `agentic-ai/learning/code/`; each is typed, `mypy`-clean Python runnable from the CLI
-against a local/mockable model (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`. Every example cites the
+Colocated under `agentic-ai/learning/code/`; each is typed, `pyright`-clean Python runnable from the CLI
+against a local/mockable model (DD-20/DD-30/DD-34/DD-39). Contiguous `ex-01..ex-80`. Every example cites the
 `co-NN` it exercises. Concepts come before examples.
 
 ### Beginner
@@ -344,7 +344,7 @@ against a local/mockable model (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`. E
   the restraint. (co-32)
 - **ex-77 · reason-act-observe** — a full reason → act → observe cycle on a multi-step task — verify the
   three phases per step. (co-02)
-- **ex-78 · tool-dispatch-typed** — typed tool dispatch, `mypy`-clean — verify the type-checked dispatch.
+- **ex-78 · tool-dispatch-typed** — typed tool dispatch, `pyright`-clean — verify the type-checked dispatch.
   (co-04)
 - **ex-79 · memory-plus-loop** — a bounded loop carrying step memory — verify prior steps inform later ones.
   (co-10)
@@ -363,7 +363,7 @@ against a local/mockable model (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`. E
   human checkpoint (co-20, co-21) [ ] an eval suite in CI (co-25, co-26).
 - **Ordered steps**:
   1. `.../learning/capstone/code/tools.py` — typed tools plus function-call parsing/dispatch. Verify
-     the model selects and the runtime executes the correct tool; `mypy` clean.
+     the model selects and the runtime executes the correct tool; `pyright` clean.
   2. `.../learning/capstone/code/agent.py` — a bounded reason-act-observe loop with a step budget,
      stop condition, and step memory. Verify it completes a multi-step task and halts within the
      budget.
@@ -374,7 +374,7 @@ against a local/mockable model (DD-20/DD-30/DD-34). Contiguous `ex-01..ex-80`. E
      a score and fails the pipeline when the agent regresses below the bar.
 - **Acceptance criteria**: tool calling and the bounded loop work; MCP connects a tool; guardrails
   block ungated consequential actions; the eval suite scores the agent and gates CI on regression; all
-  Python is type-annotated and `mypy`-clean.
+  Python is type-annotated and `pyright`-clean.
 - **Done bar**: runnable end-to-end + web-verified.
 
 ## Read more

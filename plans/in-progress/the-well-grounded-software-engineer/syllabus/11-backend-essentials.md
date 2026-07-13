@@ -120,7 +120,7 @@ precede [topic 12 Networking](./12-networking-essentials.md) in the spiral).
 ## Worked examples
 
 Colocated under `backend-essentials/learning/code/`; each served via `uvicorn` (or the stdlib server) and
-exercised with `curl` and `pytest`, with static type hints throughout (DD-20/DD-30/DD-34). Each cites the
+exercised with `curl` and `pytest`, with static type hints throughout (DD-20/DD-30/DD-34/DD-39). Each cites the
 `co-NN` it exercises. Contiguous `ex-01..ex-80`.
 
 ### Beginner

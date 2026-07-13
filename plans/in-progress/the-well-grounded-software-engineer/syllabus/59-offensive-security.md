@@ -1,4 +1,4 @@
-# 59 · Offensive Security (red team, Kali) (By Example, Python + shell †)
+# 59 · Offensive Security (By Example, Python + shell †)
 
 **prd row**: Pass 3 · Build for the Real World · By Example · Python + shell † · Learn 159 / Drill 259 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
@@ -28,14 +28,14 @@ driving standard tooling (nmap, sqlmap, Burp/ZAP). Pairs with [`60-defensive-sec
 
 ## Prerequisites
 
-- **Prior topics**: [topic 57 IT / Application Security](./58-it-and-application-security.md) (OWASP Top 10, threat modeling, crypto),
+- **Prior topics**: [topic 58 IT / Application Security](./58-it-and-application-security.md) (OWASP Top 10, threat modeling, crypto),
   [topic 17 Security Essentials](./17-security-essentials.md) (injection, auth), and
   [topic 5 Just Enough Bash](./05-just-enough-bash.md) (tool driving).
 - **Tools & environment**: a macOS/Linux terminal; an **isolated local lab** — deliberately vulnerable
   targets you own (OWASP Juice Shop, DVWA, a local vuln VM) on a private/host-only network; standard
   tooling (nmap, sqlmap, an intercepting proxy — ZAP/Burp) driven from Python/shell. **No** target you are
   not authorized to test.
-- **Assumed knowledge**: the OWASP Top 10 + how vulns manifest (topic 56); shell + running CLI tools
+- **Assumed knowledge**: the OWASP Top 10 + how vulns manifest (topic 58); shell + running CLI tools
   (topic 05); HTTP/requests (topic 11).
 
 ## Accuracy notes (web-verified)
@@ -268,7 +268,7 @@ Every example cites the `co-NN` it exercises. Concepts come before examples.
   [`60-defensive-security`](./60-defensive-security.md); the vulnerability classes themselves come from
   [`58-it-and-application-security`](./58-it-and-application-security.md).
 
-## Worked examples
+## Capstone materials
 
 Colocated under `offensive-security/learning/`; Python + shell driving tooling against the local lab only
 (DD-20/DD-30). Every example header restates "authorized lab target only".

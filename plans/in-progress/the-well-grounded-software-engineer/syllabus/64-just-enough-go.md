@@ -1,12 +1,12 @@
-# 64 · Just Enough Go (Primer §, Go †)
+# 64 · Just Enough Go (Primer, Go †)
 
-**prd row**: Pass 4 · Concurrency & Systems · Primer § · Go † · Learn 164 / Drill 264 ·
+**prd row**: Pass 4 · Concurrency & Systems · Primer · Go † · Learn 164 / Drill 264 ·
 Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks))
 
-**Scope note**: `§` tool/language primer — **just enough Go** to be productive in the next topic
+**Scope note**: **just enough Go** to be productive in the next topic
 ([`65-csp-style-concurrency`](./65-csp-style-concurrency.md)), no more. The toolchain, syntax, structs,
 interfaces, the error-value convention, and a goroutine/channel _preview_ only (concurrency depth belongs
-to topic 62). This opens Pass 4.
+to topic 65). This opens Pass 4.
 
 ## Why this exists · the big idea
 
@@ -97,7 +97,7 @@ error)`. `[Verified]`
 
 ## Concepts
 
-<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer §, subject band). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration (DD-34): every concept this topic teaches, 1:1-mirrored to a delivery.md checkbox. Floor ≥ 10 (Primer, subject band). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · go-toolchain** — `go run`, `go build`, `go test`, `go mod` are the whole daily loop; the tool
   compiles, runs, tests, and manages dependencies with no external build system.
@@ -138,13 +138,13 @@ error)`. `[Verified]`
 - **co-19 · generics** — type parameters in `[...]` with union/`comparable` constraints let one function
   or type work over many concrete types with compile-time checking.
 - **co-20 · goroutines-preview** — the `go` keyword starts a function as a concurrent goroutine in the
-  same address space; lightweight, multiplexed onto OS threads (depth in topic 62).
+  same address space; lightweight, multiplexed onto OS threads (depth in topic 65).
 - **co-21 · channels-preview** — `chan T` carries typed values between goroutines; unbuffered channels
-  synchronise sender and receiver, `close` + range drains, `v, ok := <-c` detects close (depth in 61).
+  synchronise sender and receiver, `close` + range drains, `v, ok := <-c` detects close (depth in 65).
 - **co-22 · select-preview** — `select` waits on multiple channel operations, picking a ready case (with
-  an optional `default` for non-blocking) — the multiplexer for concurrent Go (depth in topic 62).
+  an optional `default` for non-blocking) — the multiplexer for concurrent Go (depth in topic 65).
 - **co-23 · sync-preview** — `sync.WaitGroup` waits for a set of goroutines to finish and `sync.Mutex`
-  guards shared state, for the cases where channels are the wrong tool (depth in topic 62).
+  guards shared state, for the cases where channels are the wrong tool (depth in topic 65).
 - **co-24 · testing** — `func TestXxx(t *testing.T)` in a `_test.go` file, run by `go test`; the
   table-driven + `t.Run` subtest pattern is idiomatic Go testing.
 - **co-25 · gofmt-idiom** — `gofmt`/`go fmt` imposes one canonical layout so formatting is never

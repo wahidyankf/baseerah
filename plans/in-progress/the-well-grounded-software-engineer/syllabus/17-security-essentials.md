@@ -82,7 +82,7 @@ This topic closes Pass 1 and anchors two inter-topic capstones.
 ## Worked examples
 
 Colocated under `security-essentials/learning/code/`; each attack + fix is runnable against the
-Backend-Essentials app with `curl` (DD-20/DD-30), fully type-annotated Python (DD-34). Contiguous
+Backend-Essentials app with `curl` (DD-20/DD-30), fully type-annotated Python (DD-39). Contiguous
 `ex-01..ex-80`; every example cites the `co-NN` it exercises.
 
 - **ex-01 · trust-boundary-map-tainted-input** — map where untrusted data enters a handler (query, form, header, cookie) and mark each as tainted — verify the reader lists every entry point and which are attacker-controlled. (co-01)

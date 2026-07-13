@@ -7,8 +7,8 @@ Nvim-ready Yes · VSCode-ready Yes. ([prd canonical table](../prd.md#the-94-topi
 builds, caching, artifacts, environments, secrets, reusable/composite workflows), CD strategies
 (blue-green, canary, progressive delivery), release automation, and supply-chain basics (SLSA,
 provenance, signing). GitHub Actions is free for public repos, so every example is reproducible.
-`†`: pipelines are YAML; automation scripts are Python, fully type-annotated (DD-34) — every snippet
-carries type hints in the mypy-clean spirit.
+`†`: pipelines are YAML; automation scripts are Python, fully type-annotated (DD-39) — every snippet
+carries type hints in the pyright-clean spirit.
 
 ## Why this exists · the big idea
 
@@ -34,7 +34,7 @@ carries type hints in the mypy-clean spirit.
   (the image artifact you build and deploy), and [topic 51 Cloud & IaC](./51-cloud-and-iac.md) (the
   environments you deploy into).
 - **Tools & environment**: a macOS/Linux terminal; a **GitHub** repo (public, so Actions is free);
-  the `gh` CLI; **Python** at a recent stable release with type hints and `mypy` for automation
+  the `gh` CLI; **Python** at a recent stable release with type hints and `pyright` for automation
   scripts; a container registry and a deploy target (from topics 50/51); optionally `cosign`/an SLSA
   provenance tool; Neovim/VSCode with YAML + Python LSPs (DD-17).
 - **Assumed knowledge**: opening a PR against a trunk (topic 06); running a test suite from the CLI
@@ -222,7 +222,7 @@ carries type hints in the mypy-clean spirit.
   low-risk deploys with fast recovery — correlates with these practices, which settled the debate in
   their favor. Managed platforms like GitHub Actions made the pipeline itself version-controlled and
   reusable. This hands a reliable, automated release path to
-  [topic 91 Platform Engineering & Developer Experience](./93-platform-engineering-and-devex.md)
+  [topic 93 Platform Engineering & Developer Experience](./93-platform-engineering-and-devex.md)
   (golden paths built on it) and depends on the containers and infrastructure of
   [topic 50 Containers & Orchestration](./50-containers-and-orchestration.md) and
   [topic 51 Cloud & IaC](./51-cloud-and-iac.md).
@@ -230,7 +230,7 @@ carries type hints in the mypy-clean spirit.
 ## Worked examples
 
 Colocated under `cicd-and-release-engineering/learning/code/`; each is a runnable GitHub Actions
-workflow (public-repo free) plus typed Python automation, `mypy`-clean (DD-20/DD-30/DD-34). Contiguous
+workflow (public-repo free) plus typed Python automation, `pyright`-clean (DD-20/DD-30/DD-34/DD-39). Contiguous
 `ex-01..ex-83`. Every example cites the `co-NN` it exercises. Concepts come before examples.
 
 ### Beginner
@@ -310,7 +310,7 @@ workflow (public-repo free) plus typed Python automation, `mypy`-clean (DD-20/DD
 - **ex-41 · npm-publish** — `npm publish` to a registry — verify the package is installable by name. (co-22)
 - **ex-42 · docker-push** — `docker push` to a registry after login — verify the image is pushed. (co-22)
 - **ex-43 · lint-gate** — a lint job as a required check — verify a lint failure blocks. (co-28)
-- **ex-44 · typecheck-gate** — a `mypy` type-check gate on Python — verify a type error blocks. (co-28)
+- **ex-44 · typecheck-gate** — a `pyright` type-check gate on Python — verify a type error blocks. (co-28)
 - **ex-45 · coverage-gate** — a coverage-threshold gate — verify below-threshold blocks. (co-28)
 - **ex-46 · sast-codeql** — annotate a CodeQL SAST scan job — verify it reports findings. (co-28)
 - **ex-47 · dependency-scan** — annotate Dependabot alerts/security/version updates — verify the three
@@ -413,7 +413,7 @@ workflow (public-repo free) plus typed Python automation, `mypy`-clean (DD-20/DD
      auto-rolls-back and the artifact's signature/provenance verifies.
 - **Acceptance criteria**: CI is green with caching and artifacts; production is gated by approval;
   shared logic is reused not copied; a bad canary rolls back automatically; the artifact is signed and
-  its provenance verifies; all Python is type-annotated and `mypy`-clean.
+  its provenance verifies; all Python is type-annotated and `pyright`-clean.
 - **Done bar**: runnable end-to-end + web-verified.
 
 ## Read more
@@ -437,4 +437,4 @@ workflow (public-repo free) plus typed Python automation, `mypy`-clean (DD-20/DD
 
 ---
 
-← Previous: [51 · Cloud & IaC](./51-cloud-and-iac.md) · Next: [56 · Creating AI-Powered Apps](./56-creating-ai-powered-apps.md) →
+← Previous: [54 · Build Automation & Task Runners](./54-build-automation-and-task-runners.md) · Next: [56 · Creating AI-Powered Apps](./56-creating-ai-powered-apps.md) →

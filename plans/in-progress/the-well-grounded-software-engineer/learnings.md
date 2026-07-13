@@ -1,7 +1,7 @@
 # Learnings — The Well-Grounded Software Engineer
 
 Running knowledge-capture log for this plan. Append an entry whenever something is discovered during
-execution that a future plan, agent, convention, skill, or doc should absorb. The **Phase 76 — Knowledge
+execution that a future plan, agent, convention, skill, or doc should absorb. The **Phase 109 — Knowledge
 Capture** step in [delivery.md](./delivery.md) triages every entry here to a durable home (convention /
 agent / skill / docs) or explicitly discards it with a reason. No entry leaves this file untriaged.
 
@@ -68,7 +68,7 @@ agent / skill / docs) or explicitly discards it with a reason. No entry leaves t
 - **What**: `delivery.md` (mode `main-to-origin-main` implementation) commits + pushes to
   `origin main` after **every** completed topic — a standing HARD RULE plus a per-gate checklist item
   before each phase's Pause Safety note, with a `main-ci`-green acceptance gate before the next phase
-  begins. Final Phase 74 reframed as a catch-up push (subtrees already landed).
+  begins. Final Phase 107 reframed as a catch-up push (subtrees already landed).
 - **Why it matters**: Each topic lands green independently instead of one giant end-of-plan push —
   smaller blast radius, earlier CI signal, matches the worktree-to-pr "maximize parallelization"
   ethos even under direct-to-main. Encoded renumber-robustly so the pending #79 renumber preserves it.
