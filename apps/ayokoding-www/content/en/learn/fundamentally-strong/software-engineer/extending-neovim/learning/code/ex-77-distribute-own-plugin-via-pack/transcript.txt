@@ -1,0 +1,29 @@
+ex-77 :: Distribute Your Own Plugin via vim.pack  (exercises co-18, co-08)
+
+vim.pack.add() clones over plain git -- it has no idea whether "src" points at github.com or anywhere
+else, so this was verified against a REAL local git repository (a genuine `git init` + commit, cloned via
+a file:// URL) as a fully faithful stand-in for "https://github.com/you/myplugin": the code path
+vim.pack.add executes is identical either way.
+
+$ git init -q -b main myplugin-repo && cd myplugin-repo
+  # myplugin-repo/lua/myplugin/init.lua returns { setup = function() end }
+  # myplugin-repo/plugin/myplugin.lua sets vim.g.myplugin_autoloaded = true, guarded by a loaded flag
+$ git add -A && git commit -q -m init
+
+$ nvim --headless -c "lua vim.pack.add({{ src = 'file:///path/to/myplugin-repo', version = 'main' }})" \
+  -c "lua print(pcall(require, 'myplugin'))" \
+  -c "lua print(vim.g.myplugin_autoloaded)" \
+  -c 'qa!'
+true	table: 0x0102bfeac0
+true
+                                    " => require('myplugin') succeeds -- vim.pack.add put lua/ on the
+                                    "    runtimepath exactly like any other installed plugin
+                                    " => vim.g.myplugin_autoloaded is true WITH NO explicit require() call
+                                    "    anywhere in this init.lua -- the plugin's OWN plugin/myplugin.lua
+                                    "    auto-ran at :packadd time, identically to Example 73's own-authored
+                                    "    autoload file, and identically to how ANY third-party plugin
+                                    "    installed with vim.pack.add auto-runs its plugin/ files
+
+-- Verified: real git clone (via a real repository and a file:// URL, since no actual public
+-- github.com/you/myplugin exists) exercising the EXACT same vim.pack code path a genuine GitHub URL
+-- would -- git clone does not distinguish transport by what happens after cloning.

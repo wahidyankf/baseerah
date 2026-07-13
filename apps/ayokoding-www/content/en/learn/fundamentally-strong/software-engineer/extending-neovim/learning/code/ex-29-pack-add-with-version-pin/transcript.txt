@@ -1,0 +1,20 @@
+ex-29 :: Pin a Plugin Version with vim.pack.add  (exercises co-08)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.inspect(vim.pack.get({'nvim-lspconfig'})))" -c 'qa!'
+{ {
+    active = true,
+    path = ".../site/pack/core/opt/nvim-lspconfig",
+    rev = "4ea9083b6d3dff4ddc6da17c51334c3255b7eba5",
+    spec = { name = "nvim-lspconfig", src = "...", version = "v2.0.0" },
+    tags = { "v2.10.0", "v2.9.0", ..., "v2.0.0", ... }
+  } }
+                                    " => vim.pack.get() reports the resolved commit "rev" -- confirmed
+                                    "    against the real repository with `git ls-remote --tags` to be
+                                    "    EXACTLY the commit the v2.0.0 tag itself points to
+
+-- Verified: real network clone against github.com/neovim/nvim-lspconfig, cross-checked with a direct
+-- `git ls-remote --tags https://github.com/neovim/nvim-lspconfig v2.0.0`, which returned the identical
+-- SHA (4ea9083b6d3dff4ddc6da17c51334c3255b7eba5) -- the pin resolved to the correct commit, not just "a"
+-- commit. Note: the on-disk JSON lockfile (ex-30) renders this field as "'v2.0.0'" with embedded quote
+-- characters -- that is Neovim's own serialization for an exact (non-range) version match, observed as-is,
+-- not a transcription artifact.

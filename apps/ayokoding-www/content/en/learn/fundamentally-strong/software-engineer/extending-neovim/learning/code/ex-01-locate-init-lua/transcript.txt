@@ -1,0 +1,14 @@
+ex-01 :: Locate Init.lua  (exercises co-01)
+
+$ mkdir -p ~/.config/nvim && printf -- '-- init.lua\nvim.o.number = true\n' > ~/.config/nvim/init.lua
+                                    " => creates the entry point file at the XDG default location
+
+$ nvim --headless -c 'echo $MYVIMRC' -c 'lua print(vim.fn.stdpath("config"))' -c 'qa!'
+/Users/you/.config/nvim/init.lua
+/Users/you/.config/nvim
+                                    " => :echo $MYVIMRC reports the EXACT file Neovim sourced this run
+                                    " => stdpath('config') reports the base directory independently,
+                                    "    even before init.lua exists -- both resolve to the config root
+
+-- Verified against this sandbox's isolated XDG_CONFIG_HOME (real captured paths shown above with the
+-- literal scratch path swapped for the reader-facing ~/.config/nvim form the syllabus specifies).

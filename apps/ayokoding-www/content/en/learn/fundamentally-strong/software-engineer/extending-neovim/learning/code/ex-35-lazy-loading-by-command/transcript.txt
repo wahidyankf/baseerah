@@ -1,0 +1,19 @@
+ex-35 :: Lazy-Load a Plugin by Command  (exercises co-09)
+
+$ nvim --headless -u after/init.lua -c 'lua vim.wait(6000)' \
+  -c "lua print('telescope installed on disk:', vim.uv.fs_stat(vim.fn.stdpath('data')..'/lazy/telescope.nvim') ~= nil)" \
+  -c "lua print(':Telescope command pre-registered:', vim.api.nvim_get_commands({})['Telescope'] ~= nil)" \
+  -c "lua print('loaded count BEFORE first :Telescope call:', require('lazy').stats().loaded)" \
+  -c 'qa!'
+telescope installed on disk: true
+:Telescope command pre-registered: true
+loaded count BEFORE first :Telescope call: 1
+                                    " => telescope.nvim was cloned to disk during setup(), and :Telescope
+                                    "    is already a real, callable command -- but it is a lazy.nvim STUB
+                                    "    command, not the plugin's own; the loaded count (1, only
+                                    "    lazy.nvim itself) proves telescope.nvim's actual module has NOT
+                                    "    run yet, confirming co-09's exact claim: the real plugin loads on
+                                    "    the command's FIRST invocation, not at startup
+
+-- Verified: real network clone of both nvim-telescope/telescope.nvim and its plenary.nvim dependency;
+-- loaded count read live from require('lazy').stats() before the command was ever invoked.

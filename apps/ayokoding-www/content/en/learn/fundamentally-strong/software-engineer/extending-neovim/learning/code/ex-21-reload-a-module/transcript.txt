@@ -1,0 +1,23 @@
+ex-21 :: Reload a Module  (exercises co-07)
+
+Starting from before/ (shiftwidth = 2 on disk):
+
+$ nvim --headless -u before/init.lua \
+  -c 'set shiftwidth?' \
+  -c "lua vim.fn.writefile({'vim.o.shiftwidth = 4'}, vim.fn.stdpath('config') .. '/lua/config/options.lua')" \
+  -c "lua package.loaded['config.options'] = nil; require('config.options')" \
+  -c 'set shiftwidth?' \
+  -c 'qa!'
+  shiftwidth=2
+  shiftwidth=4
+                                    " => the FIRST :set shiftwidth? reflects the module's original value (2)
+                                    "    loaded at startup
+                                    " => after editing the file on disk to shiftwidth = 4, plain re-running
+                                    "    require('config.options') alone would do NOTHING -- Lua caches
+                                    "    modules in package.loaded once required
+                                    " => clearing the cache entry first (package.loaded[...] = nil) forces
+                                    "    the next require() to re-read and re-run the file from disk, so the
+                                    "    SECOND :set shiftwidth? shows 4 -- the edit took effect with no
+                                    "    Neovim restart
+
+-- Verified: real headless run; after/ captures the resulting on-disk file content for reference.

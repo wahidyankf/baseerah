@@ -1,0 +1,23 @@
+kata-08 :: Plugin Setup Opt-In  (drills co-06, co-18)
+
+$ mkdir -p /tmp/xdg-before && ln -s "$PWD/before" /tmp/xdg-before/nvim
+$ XDG_CONFIG_HOME=/tmp/xdg-before nvim --headless \
+  -c "lua print(vim.api.nvim_get_commands({})['MyPluginCmd'] ~= nil)" -c 'qa!'
+true
+
+$ mkdir -p /tmp/xdg-after && ln -s "$PWD/after" /tmp/xdg-after/nvim
+$ XDG_CONFIG_HOME=/tmp/xdg-after nvim --headless \
+  -c "lua print(vim.api.nvim_get_commands({})['MyPluginCmd'] ~= nil)" -c 'qa!'
+false
+                                    " => both init.lua files are IDENTICAL: require('myplugin') and nothing
+                                    "    else -- .setup() is deliberately never called in EITHER run
+                                    " => before/lua/myplugin/init.lua registers MyPluginCmd at FILE SCOPE,
+                                    "    so it runs the instant the module is require()-d -- the command
+                                    "    genuinely exists (true) even though no caller ever opted in
+                                    " => after/lua/myplugin/init.lua moves the SAME registration inside
+                                    "    M.setup() -- module loading and setup() running stay two genuinely
+                                    "    separate steps (co-18), so the command correctly does NOT exist
+                                    "    (false) until a caller explicitly calls .setup()
+
+-- Verified: two real headless runs against fully isolated, throwaway XDG_CONFIG_HOME directories, output
+-- captured verbatim above.

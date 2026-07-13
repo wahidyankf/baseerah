@@ -1,0 +1,32 @@
+kata-03 :: Module Reload Cache  (drills co-07)
+
+$ mkdir -p /tmp/xdg-before && ln -s "$PWD/before" /tmp/xdg-before/nvim
+$ XDG_CONFIG_HOME=/tmp/xdg-before nvim --headless -c 'qa!'
+first require: 1
+second require (no cache clear): 1
+
+$ mkdir -p /tmp/xdg-after && ln -s "$PWD/after" /tmp/xdg-after/nvim
+$ XDG_CONFIG_HOME=/tmp/xdg-after nvim --headless -c 'qa!'
+first require: 1
+second require (cache cleared first): 2
+                                    " => both runs start identically: lua/config/scratch.lua on disk holds
+                                    "    { value = 1 }, and the first require() reports 1, as expected
+                                    " => both runs then rewrite that SAME file on disk to { value = 2 }, live,
+                                    "    while Neovim is still running -- simulating an editor-open-file save
+                                    " => before/init.lua calls require('config.scratch') again with NO cache
+                                    "    clear -- package.loaded already holds the cached table from the
+                                    "    FIRST call, so the second call returns that identical stale object;
+                                    "    value is still 1, even though the file on disk now says 2
+                                    " => after/init.lua clears package.loaded['config.scratch'] = nil FIRST
+                                    "    (co-07) -- the next require() genuinely re-reads and re-runs the
+                                    "    file from disk, so the second call correctly reports 2
+
+Note: `nvim -u before/init.lua` alone does NOT add a sibling lua/ directory to the runtimepath -- only
+Neovim's normal XDG-based startup does (stdpath('config')/lua joins the runtimepath automatically, per
+co-01). The commands above set XDG_CONFIG_HOME to a throwaway directory whose nvim/ symlinks into this
+kata's before/ or after/ tree, so require('config.scratch') resolves exactly the way a real
+~/.config/nvim/init.lua would. On-disk lua/config/scratch.lua is reset back to { value = 1 } in both
+directories after each verification run, matching the listing shown on the drilling page.
+
+-- Verified: two real headless runs against fully isolated, throwaway XDG_CONFIG_HOME/XDG_DATA_HOME
+-- directories, output captured verbatim above.

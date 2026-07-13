@@ -1,0 +1,9 @@
+ex-50 :: Inspect the Active Parser's Language  (exercises co-16)
+
+$ nvim --headless -u before/init.lua scratch.lua -c "lua print(vim.treesitter.get_parser():lang())" -c 'qa!'
+lua
+                                    " => vim.treesitter.get_parser() (no arguments) returns the CURRENT
+                                    "    buffer's active parser object; :lang() reports which language it
+                                    "    was compiled for -- "lua", matching scratch.lua's filetype
+
+-- Verified: real headless run against before/init.lua, output captured verbatim above.

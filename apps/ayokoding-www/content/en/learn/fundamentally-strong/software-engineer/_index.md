@@ -12,3 +12,6 @@ weight: 1750
 - [2 · Just Enough Lua](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua)
   - [Learning](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua/learning)
   - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua/drilling)
+- [3 · Extending Neovim](/en/c/learn/fundamentally-strong/software-engineer/extending-neovim)
+  - [Learning](/en/c/learn/fundamentally-strong/software-engineer/extending-neovim/learning)
+  - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/extending-neovim/drilling)

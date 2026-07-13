@@ -1,0 +1,10 @@
+ex-57 :: Expression Keymap  (exercises co-04)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.fn.maparg('<Tab>', 'i', false, true).expr)" -c 'qa!'
+1
+                                    " => maparg()'s DICTIONARY form (the fourth argument, true) reports
+                                    "    the mapping's raw attribute flags -- expr = 1 confirms Neovim will
+                                    "    call the rhs function and feed back WHATEVER STRING it returns,
+                                    "    rather than treating the function's return value as a no-op
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

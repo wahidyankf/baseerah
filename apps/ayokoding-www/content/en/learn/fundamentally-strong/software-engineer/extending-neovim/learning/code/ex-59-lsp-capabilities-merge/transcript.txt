@@ -1,0 +1,18 @@
+ex-59 :: Merge Shared Capabilities via the LSP Wildcard  (exercises co-10)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print(vim.lsp.get_clients()[1].config.capabilities.textDocument.completion.completionItem.snippetSupport)" \
+  -c 'edit scratch.py' \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients({bufnr=0}) > 0 end)' \
+  -c "lua print(vim.lsp.get_clients({bufnr=0})[1].config.capabilities.textDocument.completion.completionItem.snippetSupport)" \
+  -c 'qa!'
+true
+true
+                                    " => TWO different servers (lua_ls, then pyright, in the SAME session)
+                                    "    each independently report snippetSupport = true -- confirming the
+                                    "    ONE vim.lsp.config('*', {...}) call reached BOTH, not just
+                                    "    whichever server happened to be enabled first
+
+-- Verified: real dual-server run -- lua_ls attaches to scratch.lua, pyright attaches to scratch.py, both
+-- in the same Neovim session, both showing the wildcard-merged capability.

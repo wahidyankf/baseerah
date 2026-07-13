@@ -1,0 +1,19 @@
+ex-14 :: Autocmd with a Command String  (exercises co-05)
+
+$ cat -A scratch.lua                 " => BEFORE saving: trailing whitespace present on lines 1-2
+local·x·=·1···$
+local·y·=·2^I$
+print(x,·y)$
+
+$ nvim --headless -u after/init.lua scratch.lua -c 'w' -c 'qa!'
+"scratch.lua" 3L, 36B written
+                                    " => BufWritePre fires before the write lands on disk, running the
+                                    "    :%s/\s\+$//e substitute -- the trailing 'e' flag suppresses the
+                                    "    "no matches" error on lines that already have no trailing space
+
+$ cat -A scratch.lua                 " => AFTER saving: every trailing space and the trailing tab are gone
+local·x·=·1$
+local·y·=·2$
+print(x,·y)$
+
+-- Verified: real headless run; before/after bytes both captured with `cat -A` above (^I = tab, $ = EOL).

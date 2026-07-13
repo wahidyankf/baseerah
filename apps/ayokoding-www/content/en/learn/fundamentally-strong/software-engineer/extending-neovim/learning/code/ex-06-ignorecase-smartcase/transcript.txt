@@ -1,0 +1,16 @@
+ex-06 :: ignorecase + smartcase  (exercises co-02)
+
+$ nvim --headless -u after/init.lua scratch.txt \
+  -c "lua print('Foo (has uppercase) match count:')" -c 'lua print(vim.fn.execute("%s/Foo//gn"))' \
+  -c "lua print('foo (all lowercase) match count:')" -c 'lua print(vim.fn.execute("%s/foo//gn"))' \
+  -c 'qa!'
+Foo (has uppercase) match count:
+1 match on 1 line
+foo (all lowercase) match count:
+3 matches on 3 lines
+                                    " => pattern "Foo" contains an uppercase letter, so smartcase forces a
+                                    "    CASE-SENSITIVE search -- only line 1 ("Foo bar") matches
+                                    " => pattern "foo" is all lowercase, so smartcase steps aside and
+                                    "    ignorecase's CASE-INSENSITIVE default applies -- all three lines match
+
+-- Verified: real headless run against after/init.lua + after/scratch.txt, output captured verbatim above.

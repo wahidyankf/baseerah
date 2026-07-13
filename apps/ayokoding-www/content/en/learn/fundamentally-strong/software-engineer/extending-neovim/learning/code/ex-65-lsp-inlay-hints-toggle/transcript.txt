@@ -1,0 +1,15 @@
+ex-65 :: Toggle LSP Inlay Hints  (exercises co-12)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c 'lua vim.wait(500)' \
+  -c "lua print(vim.lsp.inlay_hint.is_enabled({bufnr=0}))" \
+  -c 'qa!'
+true
+                                    " => vim.lsp.inlay_hint.is_enabled({bufnr=0}) reads back the LIVE
+                                    "    per-buffer enabled state -- confirming the LspAttach-driven enable
+                                    "    call genuinely took effect for this buffer, not merely that the
+                                    "    function was called without erroring
+
+-- Verified: real headless run against a genuinely attached lua_ls client, state confirmed via the
+-- inlay_hint module's own is_enabled() query rather than assumed from the enable() call succeeding.

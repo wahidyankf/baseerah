@@ -1,0 +1,21 @@
+ex-32 :: Bootstrap lazy.nvim  (exercises co-09)
+
+$ nvim --headless -u after/init.lua \
+  -c "lua print('Lazy command exists:', vim.api.nvim_get_commands({})['Lazy'] ~= nil)" \
+  -c "lua print(vim.inspect(require('lazy').stats()))" \
+  -c 'qa!'
+Lazy command exists: true
+{
+  count = 1,
+  loaded = 1,
+  real_cputime = true,
+  startuptime = 0,
+  times = { LazyDone = 17.472, LazyStart = 11.513 }
+}
+                                    " => on a FRESH data directory, the clone-if-missing block did a real
+                                    "    `git clone` of folke/lazy.nvim over the network; the :Lazy command
+                                    "    existing AND require('lazy').stats() succeeding both confirm the
+                                    "    manager is fully installed and running, not just cloned
+
+-- Verified: real network clone against github.com/folke/lazy.nvim (--branch=stable, --filter=blob:none
+-- for a partial/fast clone) -- the exact bootstrap block lazy.nvim's own README documents.

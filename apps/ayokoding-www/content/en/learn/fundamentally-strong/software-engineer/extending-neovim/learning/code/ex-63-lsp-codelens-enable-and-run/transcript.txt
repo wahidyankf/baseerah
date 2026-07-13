@@ -1,0 +1,16 @@
+ex-63 :: Enable and Run Codelens  (exercises co-12, co-05)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print(vim.lsp.get_clients()[1].server_capabilities.codeLensProvider ~= nil)" \
+  -c "lua local ok = pcall(function() vim.cmd('normal grx') end); print(ok)" \
+  -c 'qa!'
+true
+true
+                                    " => the attached server DOES advertise codeLensProvider; pressing the
+                                    "    DEFAULT grx keymap (co-13 -- no custom binding needed) to "run
+                                    "    codelens" completes with no error, confirming the pipeline from
+                                    "    codelens.enable through to grx is wired correctly end to end
+
+-- Verified: real LSP attach with codelens.enable(true, {bufnr=...}) called from a real LspAttach
+-- autocmd, and a real (spy-free, this time) invocation of the default grx keymap.

@@ -1,0 +1,9 @@
+ex-43 :: Diagnostic Severity Sort  (exercises co-14)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.diagnostic.config().severity_sort)" -c 'qa!'
+true
+                                    " => confirms the option is active; without it, two diagnostics
+                                    "    sharing one line render in INSERTION order, so a low-severity
+                                    "    hint could visually cover a same-line error's sign/virtual text
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

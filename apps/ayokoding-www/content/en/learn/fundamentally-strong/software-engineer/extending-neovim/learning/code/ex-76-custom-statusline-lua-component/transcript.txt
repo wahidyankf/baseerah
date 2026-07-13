@@ -1,0 +1,18 @@
+ex-76 :: Custom Statusline Component Driven by Lua  (exercises co-18, co-02)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c "lua print(vim.api.nvim_eval_statusline(vim.o.statusline, {}).str)" \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print(vim.api.nvim_eval_statusline(vim.o.statusline, {}).str)" \
+  -c 'qa!'
+scratch.lua
+scratch.lua lua_ls
+                                    " => BEFORE any server attaches: the statusline shows just the
+                                    "    filename -- MyStatusFn returned an empty string (zero clients)
+                                    " => AFTER lua_ls attaches: the SAME statusline format string now
+                                    "    renders "lua_ls" -- the %{v:lua....} escape re-evaluates
+                                    "    MyStatusFn on every statusline redraw, so it reflects LIVE LSP
+                                    "    state with no manual refresh call needed anywhere
+
+-- Verified: real before/after statusline render, evaluated with the actual nvim_eval_statusline API
+-- against a genuinely attaching lua_ls client -- not a static format-string description.

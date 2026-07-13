@@ -1,0 +1,15 @@
+ex-11 :: Buffer-Local Keymap via FileType Autocmd  (exercises co-04, co-05)
+
+$ nvim --headless -u after/init.lua -c 'verbose map q' -c 'help' -c 'verbose map q' -c 'qa!'
+No mapping found
+                                    " => BEFORE any help buffer opens, plain q has no mapping anywhere --
+                                    "    the FileType callback has not fired yet
+n  q           *@<Cmd>close<CR>
+                 Close help window
+	Last set from /path/to/after/init.lua (run Nvim with -V1 for more details)
+                                    " => AFTER :help opens a help buffer, its FileType=help event fires the
+                                    "    callback, which binds q with { buffer = args.buf } -- the '@' flag
+                                    "    in the listing marks it as buffer-local, confirming it exists only
+                                    "    in THIS buffer, not globally
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

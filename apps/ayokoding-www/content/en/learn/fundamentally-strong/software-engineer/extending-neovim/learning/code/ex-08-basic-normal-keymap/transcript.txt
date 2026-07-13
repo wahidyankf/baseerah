@@ -1,0 +1,17 @@
+ex-08 :: Basic Normal Keymap  (exercises co-04)
+
+$ nvim --headless -u after/init.lua scratch.txt \
+  -c 'verbose map <leader>w' \
+  -c "lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(' w', true, false, true), 'x', false)" \
+  -c 'qa!'
+n  <Space>w    * :w<CR>
+                 Save file
+	Last set from /path/to/after/init.lua (run Nvim with -V1 for more details)
+"scratch.txt" 0L, 0B written
+                                    " => :verbose map shows the mapping's desc AND its exact defining file
+                                    "    (the single most useful command for "why did my keymap stop
+                                    "    working")
+                                    " => feeding the literal keystrokes ' w' (space then w) then triggered
+                                    "    the mapping's RHS (:w<CR>), producing the real ":w" write message
+
+-- Verified: real headless run, feedkeys drove the mapping end to end; output captured verbatim above.

@@ -1,0 +1,44 @@
+ex-28 :: Install a Plugin with vim.pack.add  (exercises co-08)
+
+$ nvim --headless -u after/init.lua -c 'lua print(vim.g.colors_name)' -c 'qa!'
+
+These plugins will be installed:
+
+gruvbox-material from https://github.com/sainnhe/gruvbox-material
+
+vim.pack: Installing plugins (0/1)
+vim.pack: 100% Installing plugins (1/1) - gruvbox-material
+gruvbox-material
+                                    " => vim.pack.add cloned the real repository over the network on this
+                                    "    exact run (no prior cache), then vim.cmd.colorscheme succeeded
+                                    "    immediately after, printing the applied scheme's name
+
+$ find "$(nvim --headless -c 'lua io.write(vim.fn.stdpath(\"data\"))' -c 'qa!')/site/pack/core/opt" -maxdepth 1
+.../site/pack/core/opt
+.../site/pack/core/opt/gruvbox-material
+                                    " => confirms co-08's exact claim: the clone lands on the OPT side of
+                                    "    the packpath (site/pack/core/opt/), never a start/ directory --
+                                    "    vim.pack :packadd's it programmatically instead of relying on
+                                    "    Neovim's automatic start/ plugin loading
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.inspect(vim.pack.get({'gruvbox-material'})))" -c 'qa!'
+{ {
+    active = true,
+    branches = { "master", "HEAD" },
+    path = ".../site/pack/core/opt/gruvbox-material",
+    rev = "11d779b26a9ab2b3db8c22c6ac9fb6e8ed4fea79",
+    spec = {
+      name = "gruvbox-material",
+      src = "https://github.com/sainnhe/gruvbox-material"
+    },
+    tags = { "v1.2.5", "v1.2.4", "v1.2.3", "..." }
+  } }
+                                    " => vim.pack.get reports the installed revision back as a real Lua
+                                    "    table: the resolved commit SHA (rev), the branches it tracked, and
+                                    "    every tag the repository publishes
+
+-- Verified: real network clone against the live github.com/sainnhe/gruvbox-material repository, executed
+-- against Neovim v0.12.3 (this sandbox's nvim was upgraded from 0.11.6 -> 0.12.3 via Homebrew specifically
+-- to match the syllabus's target v0.12.4, since vim.pack does not exist before Neovim 0.12). Absolute
+-- scratch paths above are abbreviated to ".../..." for portability; the directory layout and file names
+-- shown are exactly what was observed on disk.

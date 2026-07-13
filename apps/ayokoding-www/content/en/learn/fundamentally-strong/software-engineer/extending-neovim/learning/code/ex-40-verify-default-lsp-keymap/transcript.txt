@@ -1,0 +1,17 @@
+ex-40 :: Verify the Default grn LSP Keymap  (exercises co-13)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print('grn maparg exists before any press:', vim.fn.maparg('grn','n') ~= '')" \
+  -c "lua local called = false; local orig = vim.lsp.buf.rename; vim.lsp.buf.rename = function(...) called = true end; vim.cmd('normal grn'); print('pressing grn invoked vim.lsp.buf.rename:', called); vim.lsp.buf.rename = orig" \
+  -c 'qa!'
+grn maparg exists before any press: true
+pressing grn invoked vim.lsp.buf.rename: true
+                                    " => grn was ALREADY mapped the instant lua_ls attached, with zero
+                                    "    vim.keymap.set calls anywhere in this config -- and pressing it
+                                    "    (via a scripted :normal grn, with vim.lsp.buf.rename temporarily
+                                    "    swapped for a spy function) proves it genuinely dispatches to the
+                                    "    real rename API, not merely LOOKS mapped
+
+-- Verified: real LSP attach; the spy-function swap is a real behavioral test of what grn calls, not just
+-- a static `:verbose map` listing.

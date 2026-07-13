@@ -1,0 +1,11 @@
+ex-09 :: Keymap with a Lua Function  (exercises co-04)
+
+$ nvim --headless -u after/init.lua -c 'verbose map <leader>q' -c 'qa!'
+n  <Space>q    * <Lua 71: /path/to/after/init.lua:2>
+	Last set from /path/to/after/init.lua (run Nvim with -V1 for more details)
+                                    " => the mapping's rhs column shows "<Lua NN: file:line>" instead of a
+                                    "    string -- proof the rhs is a real Lua CLOSURE, not text that gets
+                                    "    fed back through the command line (which is also why `opts.expr`
+                                    "    and `opts.silent` both work directly against its return value)
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

@@ -1,0 +1,21 @@
+ex-49 :: Manually Start Treesitter for a Non-Bundled Language  (exercises co-16)
+
+$ nvim --headless -u before/init.lua scratch.py \
+  -c "lua print('highlighter active with NO manual start:', vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil)" \
+  -c 'qa!'
+highlighter active with NO manual start: false
+                                    " => confirms the baseline: opening a .py file with an EMPTY init.lua
+                                    "    (before/init.lua) leaves the highlighter OFF -- python genuinely
+                                    "    needs the manual autocmd this example adds
+
+$ nvim --headless -u after/init.lua scratch.py \
+  -c "lua print('highlighter active via the FileType autocmd:', vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil)" \
+  -c 'qa!'
+highlighter active via the FileType autocmd: true
+                                    " => same file, same parser already installed (Example 48's install
+                                    "    step, repeated here for self-containment) -- now WITH the FileType
+                                    "    autocmd calling vim.treesitter.start(0, 'python') manually,
+                                    "    highlighting turns on
+
+-- Verified: real before/after contrast across two full headless sessions -- both against the same
+-- physical file, one with a manual start call and one without.

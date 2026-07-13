@@ -1,0 +1,19 @@
+ex-67 :: Override the Highlights Query  (exercises co-17)
+
+$ nvim --headless -u before/init.lua scratch.lua \
+  -c "lua local q = vim.treesitter.query.get('lua', 'highlights'); print(#q.captures)" \
+  -c 'qa!'
+11
+                                    " => BASELINE (before/init.lua, the bundled query): 11 distinct
+                                    "    capture names -- the full, ordinary Lua highlights query
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c "lua local q = vim.treesitter.query.get('lua', 'highlights'); print(#q.captures)" \
+  -c 'qa!'
+1
+                                    " => AFTER vim.treesitter.query.set('lua', 'highlights', ...): exactly
+                                    "    1 capture name (@custom_ident) -- the override fully REPLACED the
+                                    "    bundled query, not merged with it
+
+-- Verified: real before/after contrast; query.get() reads back the query Neovim will actually use for
+-- the next parse/highlight pass, confirming set() genuinely swapped it out.

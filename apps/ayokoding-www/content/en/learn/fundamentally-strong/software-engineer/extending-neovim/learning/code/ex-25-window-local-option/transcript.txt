@@ -1,0 +1,18 @@
+ex-25 :: Window-Local Option  (exercises co-02)
+
+$ nvim --headless -u before/init.lua scratch.txt \
+  -c 'set number' \
+  -c 'vsplit' \
+  -c 'lua vim.wo[vim.api.nvim_get_current_win()].number = false' \
+  -c 'lua local wins = vim.api.nvim_tabpage_list_wins(0); for _,w in ipairs(wins) do print(w, vim.wo[w].number) end' \
+  -c 'qa!'
+1001 false
+1000 true
+                                    " => 'number' was turned on GLOBALLY, then :vsplit opened a second
+                                    "    window (id 1001, the new current window after the split)
+                                    " => vim.wo[winid].number = false targets ONLY window 1001's local copy
+                                    "    of 'number' -- the loop over both windows confirms window 1001
+                                    "    shows false while the original window 1000 still shows true, the
+                                    "    same global-vs-scoped distinction vim.o/vim.bo make for buffers
+
+-- Verified: real headless run against before/init.lua, output captured verbatim above.

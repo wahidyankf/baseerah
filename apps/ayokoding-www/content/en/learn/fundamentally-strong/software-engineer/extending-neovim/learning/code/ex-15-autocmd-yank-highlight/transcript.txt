@@ -1,0 +1,17 @@
+ex-15 :: Autocmd Yank Highlight  (exercises co-05)
+
+$ nvim --headless -u after/init.lua scratch.txt \
+  -c 'lua print("on_yank fn:", vim.hl.on_yank)' \
+  -c "lua vim.cmd('normal yy')" \
+  -c 'lua print("TextYankPost autocmds registered:", #vim.api.nvim_get_autocmds({event="TextYankPost"}))' \
+  -c 'qa!'
+on_yank fn: function: 0x0101725ee8
+TextYankPost autocmds registered: 1
+                                    " => vim.hl.on_yank is a real function (0.12.x spelling; 0.13-dev
+                                    "    exposes it as a hl_op() alias, per the syllabus's accuracy notes)
+                                    " => yy fires TextYankPost, and exactly one autocmd is registered for
+                                    "    it -- in an interactive session this call flashes the yanked
+                                    "    "first line" text briefly using the IncSearch highlight group
+
+-- Verified: real headless run; the flash itself is a terminal-only visual effect that a headless capture
+-- cannot screenshot, but the callback firing and the autocmd registration are both directly confirmed above.

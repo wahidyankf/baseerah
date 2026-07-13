@@ -1,0 +1,14 @@
+ex-36 :: Enable an LSP Server  (exercises co-10, co-11)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(3000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua local c = vim.lsp.get_clients()[1]; print('client name:', c.name); print('client cmd:', vim.inspect(c.config.cmd))" \
+  -c 'qa!'
+client name: lua_ls
+client cmd: { "lua-language-server" }
+                                    " => opening a .lua file with lua_ls enabled attached a REAL,
+                                    "    already-installed lua-language-server binary -- vim.lsp.get_clients()
+                                    "    lists it with the exact cmd nvim-lspconfig's lsp/lua_ls.lua supplied
+
+-- Verified: real LSP attach against a genuine `lua-language-server` binary (installed via Homebrew for
+-- this verification), with nvim-lspconfig cloned live from github.com/neovim/nvim-lspconfig.

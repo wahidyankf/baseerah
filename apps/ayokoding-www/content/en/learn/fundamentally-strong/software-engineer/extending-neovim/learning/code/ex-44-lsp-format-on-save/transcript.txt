@@ -1,0 +1,18 @@
+ex-44 :: LSP Format on Save  (exercises co-12, co-05)
+
+$ cat -A scratch.lua                 " => BEFORE saving: misformatted, no spaces around =
+local·x=1$
+print(x)$
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c 'w' -c 'qa!'
+"scratch.lua" 2L, 21B written
+
+$ cat -A scratch.lua                 " => AFTER saving: lua_ls's own formatter added spaces around =
+local·x·=·1$
+print(x)$
+
+-- Verified: real formatting change performed by a genuinely attached lua-language-server on a real
+-- BufWritePre-triggered vim.lsp.buf.format({async=false}) call -- the before/after bytes above are both
+-- real captured file content, not a hand-simulated diff.

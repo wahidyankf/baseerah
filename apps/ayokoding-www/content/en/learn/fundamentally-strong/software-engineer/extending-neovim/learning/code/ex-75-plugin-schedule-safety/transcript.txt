@@ -1,0 +1,22 @@
+ex-75 :: Schedule Safety Inside a Fast-Event Callback  (exercises co-18)
+
+$ nvim --headless -u before/init.lua \
+  -c "lua local t = vim.uv.new_timer(); local ok, err; t:start(10, 0, function() ok, err = pcall(vim.notify, 'unwrapped', vim.log.levels.INFO); t:close() end); vim.wait(500); print(ok, err)" \
+  -c 'qa!'
+false	[string "vim/_core/editor"]:550: E5560: nvim_echo must not be called in a fast event context
+                                    " => UNWRAPPED: calling vim.notify directly inside a vim.uv timer
+                                    "    callback (a "fast event" -- libuv's own event loop, running
+                                    "    outside Neovim's main scheduler) genuinely raises E5560 -- this is
+                                    "    the REAL, exact error text, not a paraphrase
+
+$ nvim --headless -u before/init.lua \
+  -c "lua local t = vim.uv.new_timer(); local ok, err; t:start(10, 0, function() ok, err = pcall(function() vim.schedule(function() vim.notify('wrapped', vim.log.levels.INFO) end) end); t:close() end); vim.wait(500); print(ok, err)" \
+  -c 'qa!'
+true	nil
+                                    " => WRAPPED: the SAME vim.notify call, now deferred via
+                                    "    vim.schedule#40;...#41;, succeeds with no error -- vim.schedule is
+                                    "    what moves the callback from libuv's fast-event context onto
+                                    "    Neovim's main event loop, where vim.api calls are safe
+
+-- Verified: two real, contrasting pcall results from a genuine vim.uv.new_timer() callback -- the exact
+-- error text (E5560) was captured verbatim, not invented to match the concept's description.

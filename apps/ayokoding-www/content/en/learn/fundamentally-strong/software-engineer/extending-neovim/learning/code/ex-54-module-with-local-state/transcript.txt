@@ -1,0 +1,15 @@
+ex-54 :: Module with Local (Closure) State  (exercises co-07)
+
+$ nvim --headless -u after/init.lua \
+  -c "lua local m = require('config.scratch'); print('first call:', m.increment())" \
+  -c "lua local m = require('config.scratch'); print('second call:', m.increment())" \
+  -c 'qa!'
+first call: 1
+second call: 2
+                                    " => TWO separate require('config.scratch') calls, in TWO separate
+                                    "    -c commands, still share the SAME count upvalue -- the second
+                                    "    call picks up right where the first left off (2, not 1 again)
+                                    "    because require() returned the SAME cached module table both times
+
+-- Verified: real headless run; the counter genuinely incremented across two independent require() calls,
+-- proving the module's local state persists via package.loaded, not merely asserted.

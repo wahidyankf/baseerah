@@ -1,0 +1,9 @@
+ex-19 :: User Command with an Argument  (exercises co-06)
+
+$ nvim --headless -u after/init.lua -c 'Greet World' -c 'qa!'
+Hello World
+                                    " => { nargs = 1 } requires exactly one argument; o.args inside the
+                                    "    callback receives the raw text after the command name ("World"),
+                                    "    which the callback then concatenates into the printed greeting
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

@@ -1,0 +1,24 @@
+ex-33 :: lazy.nvim Plugin Spec with opts  (exercises co-09)
+
+$ nvim --headless -u after/init.lua -c 'lua vim.wait(500)' \
+  -c "lua print('stats:', vim.inspect(require('lazy').stats()))" \
+  -c "lua print('require ok:', pcall(require, 'plenary'))" \
+  -c 'qa!'
+stats: { count = 2, loaded = 1, ... }
+require ok: true table: 0x0104f232f0
+Error in command line:
+Failed to run `config` for plenary.nvim
+.../lazy/lazy.nvim/lua/lazy/core/loader.lua:387: attempt to call field 'setup' (a string value)
+                                    " => require('plenary') succeeds fine on its own -- plenary.nvim
+                                    "    installs and its module is requireable with no manual setup() call
+                                    " => the opts = {} spec ALSO tries lazy's own convention:
+                                    "    require('plenary').setup(opts) -- and THIS genuinely errors here,
+                                    "    because plenary.nvim's module uses a lazy-loading __index
+                                    "    metatable, and `.setup` resolves through it to an UNRELATED
+                                    "    lua/plenary/setup.lua submodule (a string value, not a function)
+
+-- Verified: real run; the error above is a genuine, reproducible result of this exact plugin+opts
+-- combination, not a fabricated success. It is a useful, real-world lesson in its own right: opts = {}
+-- assumes a plugin exposes a conventional M.setup(opts) function, and not every plugin does -- checking a
+-- plugin's own README before reaching for opts (versus a plain empty spec `{ 'nvim-lua/plenary.nvim' }`,
+-- which loads cleanly with no setup call attempted) avoids this exact error.

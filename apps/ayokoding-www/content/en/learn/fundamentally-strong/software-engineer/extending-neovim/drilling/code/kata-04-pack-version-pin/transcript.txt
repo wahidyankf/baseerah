@@ -1,0 +1,49 @@
+kata-04 :: vim.pack Version Pin  (drills co-08)
+
+$ XDG_CONFIG_HOME=/tmp/xdg-before XDG_DATA_HOME=/tmp/xdg-data \
+  nvim --headless -c "lua local p = vim.pack.get({'gruvbox-material'})[1]; print('version field:', p.spec.version); print('resolved rev:', p.rev)" \
+  -c 'qa!'
+
+These plugins will be installed:
+
+gruvbox-material from https://github.com/sainnhe/gruvbox-material
+
+vim.pack: 100% Installing plugins (1/1) - gruvbox-material
+version field: nil
+resolved rev: 11d779b26a9ab2b3db8c22c6ac9fb6e8ed4fea79
+
+$ XDG_CONFIG_HOME=/tmp/xdg-after XDG_DATA_HOME=/tmp/xdg-data \
+  nvim --headless -c "lua local p = vim.pack.get({'gruvbox-material'})[1]; print('version field:', p.spec.version); print('resolved rev:', p.rev)" \
+  -c 'qa!'
+
+These plugins will be installed:
+
+gruvbox-material from https://github.com/sainnhe/gruvbox-material
+
+vim.pack: 100% Installing plugins (1/1) - gruvbox-material
+version field: v1.0.0
+resolved rev: 1671e0ecd7ffb78f79eda9c00219685fba63df98
+
+$ git ls-remote https://github.com/sainnhe/gruvbox-material | grep v1.0.0
+2ecc699fb65944f973f7a736f896df341e31c92f    refs/tags/v1.0.0
+1671e0ecd7ffb78f79eda9c00219685fba63df98    refs/tags/v1.0.0^{}
+                                    " => before/init.lua's bare URL spec has NO version field at all
+                                    "    (spec.version reports nil) -- vim.pack.add resolved to whatever
+                                    "    the default branch's HEAD happened to be at install time
+                                    " => after/init.lua's TABLE spec pins version = 'v1.0.0'; vim.pack.get()
+                                    "    reports that field back verbatim AND the exact commit it resolved to
+                                    "    (co-08) -- 1671e0e...
+                                    " => cross-checking with a genuine `git ls-remote` against the real
+                                    "    repository confirms the SAME commit: v1.0.0 is an ANNOTATED tag, so
+                                    "    ls-remote's plain `refs/tags/v1.0.0` line reports the tag OBJECT's
+                                    "    own SHA (2ecc699...), while the dereferenced `v1.0.0^{}` line reports
+                                    "    the underlying COMMIT (1671e0e...) -- the exact value vim.pack
+                                    "    resolved and reported as `rev`, proving the pin landed on the real
+                                    "    tagged commit, not merely "some" commit near it
+
+Both runs used fully isolated, throwaway XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_STATE_HOME, and
+XDG_CACHE_HOME directories so the real network clone never touched this machine's actual Neovim data
+directory.
+
+-- Verified: two real, genuine `git clone` operations against the live github.com/sainnhe/gruvbox-material
+-- repository, plus an independent `git ls-remote` cross-check, output captured verbatim above.

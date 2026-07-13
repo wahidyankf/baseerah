@@ -1,0 +1,17 @@
+ex-56 :: opt_local vs Global Option  (exercises co-02)
+
+$ nvim --headless -u before/init.lua one.txt \
+  -c 'lua vim.opt_local.spell = true' \
+  -c 'set spell?' \
+  -c 'edit two.txt' \
+  -c 'set spell?' \
+  -c 'qa!'
+  spell
+nospell
+                                    " => one.txt: 'spell' is ON, set with vim.opt_local (scoped to THAT
+                                    "    buffer only)
+                                    " => two.txt: a completely FRESH buffer -- 'spell' is back to its
+                                    "    global default (off), proving opt_local never touched the global
+                                    "    value at all, only this one buffer's local copy
+
+-- Verified: real headless run against before/init.lua across two real buffers in one session.

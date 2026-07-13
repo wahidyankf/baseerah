@@ -1,0 +1,16 @@
+ex-39 :: LspAttach Buffer-Local Keymap  (exercises co-12)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print('K in the LSP-attached .lua buffer:', vim.fn.maparg('K','n') ~= '')" \
+  -c 'edit scratch.txt' \
+  -c "lua print('K in a plain .txt buffer:', vim.fn.maparg('K','n') ~= '')" \
+  -c 'qa!'
+K in the LSP-attached .lua buffer: true
+K in a plain .txt buffer: false
+                                    " => LspAttach fired once lua_ls attached to scratch.lua, and its
+                                    "    callback bound K THERE; switching to a plain .txt buffer (no LSP
+                                    "    client attached) shows K has NO mapping at all -- confirming the
+                                    "    keymap exists only where a server is actually attached
+
+-- Verified: real LSP attach + buffer-local keymap check across two real buffers in one session.

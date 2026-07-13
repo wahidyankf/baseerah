@@ -1,0 +1,16 @@
+ex-47 :: Confirm Builtin Treesitter Highlighting  (exercises co-16)
+
+$ nvim --headless -u before/init.lua scratch.lua \
+  -c "lua print(vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil)" \
+  -c 'qa!'
+true
+                                    " => ZERO plugins installed, EMPTY init.lua, and the highlighter is
+                                    "    already active for a .lua file -- Neovim's own
+                                    "    runtime/ftplugin/lua.lua calls vim.treesitter.start() automatically
+                                    "    for every one of its bundled parsers (C, Lua, Markdown, Vimscript,
+                                    "    Vimdoc), confirmed directly by grepping the runtime for
+                                    "    every ftplugin/*.lua file that calls treesitter.start
+
+-- Verified: real headless run with a genuinely empty init.lua (before/init.lua) -- no vim.pack.add, no
+-- lazy.nvim, nothing. `grep -rl 'treesitter.start' runtime/ftplugin/` on this Neovim's own installed
+-- runtime confirmed exactly four ftplugin files call it: lua.lua, markdown.lua, help.lua, query.lua.

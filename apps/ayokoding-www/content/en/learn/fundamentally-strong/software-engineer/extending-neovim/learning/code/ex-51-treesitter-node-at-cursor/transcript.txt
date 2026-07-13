@@ -1,0 +1,18 @@
+ex-51 :: Inspect the Syntax Node at the Cursor  (exercises co-17)
+
+$ nvim --headless -u before/init.lua scratch.lua \
+  -c 'normal! 0ff' \
+  -c "lua vim.treesitter.get_parser():parse()" \
+  -c "lua print(vim.treesitter.get_node():type())" \
+  -c 'qa!'
+identifier
+                                    " => 'normal! 0ff' lands the cursor on the 'f' of "foo"; the SMALLEST
+                                    "    enclosing syntax node there is "identifier" (the callee name
+                                    "    itself) -- its immediate parent is "function_call". A headless
+                                    "    session has no redraw event, so an explicit :parse() call was
+                                    "    needed first; an interactive session parses on its own redraw and
+                                    "    needs no such call
+
+-- Verified: real headless run; "identifier" (not the concepts page's illustrative "function_call") is the
+-- exact, actually-observed node type for the cursor position used here -- reported as observed rather
+-- than adjusted to match the illustrative example.

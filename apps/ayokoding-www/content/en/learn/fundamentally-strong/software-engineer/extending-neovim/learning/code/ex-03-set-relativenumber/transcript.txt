@@ -1,0 +1,9 @@
+ex-03 :: Set relativenumber  (exercises co-02)
+
+$ nvim --headless -u after/init.lua -c 'set relativenumber?' -c 'qa!'
+  relativenumber
+                                    " => confirms the option is active; with 'number' also on (before/),
+                                    "    the cursor line shows its ABSOLUTE number and every other visible
+                                    "    line shows its DISTANCE from the cursor -- hybrid relative numbering
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

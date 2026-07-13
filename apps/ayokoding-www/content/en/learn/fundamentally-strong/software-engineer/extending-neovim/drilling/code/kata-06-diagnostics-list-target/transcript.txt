@@ -1,0 +1,30 @@
+kata-06 :: Diagnostics List Target  (drills co-14)
+
+$ cd before && nvim --headless -u init.lua scratch.txt \
+  -c "lua vim.diagnostic.set(vim.api.nvim_create_namespace('test'), 0, {{lnum=0, col=0, message='fake error', severity=vim.diagnostic.severity.ERROR}})" \
+  -c "lua vim.fn.maparg('<leader>xl', 'n', false, true).callback()" \
+  -c "lua print('loclist count:', #vim.fn.getloclist(0), 'qflist count:', #vim.fn.getqflist())" \
+  -c 'qa!'
+loclist count: 0 qflist count: 1
+
+$ cd after && nvim --headless -u init.lua scratch.txt \
+  -c "lua vim.diagnostic.set(vim.api.nvim_create_namespace('test'), 0, {{lnum=0, col=0, message='fake error', severity=vim.diagnostic.severity.ERROR}})" \
+  -c "lua vim.fn.maparg('<leader>xl', 'n', false, true).callback()" \
+  -c "lua print('loclist count:', #vim.fn.getloclist(0), 'qflist count:', #vim.fn.getqflist())" \
+  -c 'qa!'
+loclist count: 1 qflist count: 0
+                                    " => a synthetic diagnostic is set directly on the buffer -- no LSP
+                                    "    server needed for this specific check, same technique as Example 79
+                                    " => both runs invoke the SAME keymap's callback directly (via
+                                    "    maparg(...).callback()), so the only variable is what each callback
+                                    "    actually does
+                                    " => before/init.lua's callback calls vim.fn.setqflist() -- the entry
+                                    "    lands in the GLOBAL quickfix list (qflist count: 1), while the
+                                    "    per-window location list stays empty (loclist count: 0) -- exactly
+                                    "    the OPPOSITE of what <leader>xl's own desc ("Diagnostics to loclist")
+                                    "    promises
+                                    " => after/init.lua's callback is vim.diagnostic.setloclist() itself
+                                    "    (co-14) -- the entry lands correctly in the location list (loclist
+                                    "    count: 1), and the quickfix list is untouched (qflist count: 0)
+
+-- Verified: two real headless runs, output captured verbatim above.

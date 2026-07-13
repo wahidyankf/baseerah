@@ -1,0 +1,33 @@
+kata-05 :: LspAttach Buffer Scope  (drills co-04, co-05, co-12)
+
+$ cd before && nvim --headless -u init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print('K in scratch.lua:', vim.fn.maparg('K','n') ~= '')" \
+  -c 'edit scratch.txt' \
+  -c "lua print('K in scratch.txt:', vim.fn.maparg('K','n') ~= '')" \
+  -c 'qa!'
+K in scratch.lua: true
+K in scratch.txt: true
+
+$ cd after && nvim --headless -u init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print('K in scratch.lua:', vim.fn.maparg('K','n') ~= '')" \
+  -c 'edit scratch.txt' \
+  -c "lua print('K in scratch.txt:', vim.fn.maparg('K','n') ~= '')" \
+  -c 'qa!'
+K in scratch.lua: true
+K in scratch.txt: false
+                                    " => both runs attach a REAL lua_ls (lua-language-server) client to
+                                    "    scratch.lua (co-10, co-11) -- confirmed by vim.wait() succeeding
+                                    " => before/init.lua binds K unconditionally at the top level -- it
+                                    "    exists in scratch.lua (where a server attached) AND, wrongly, in
+                                    "    scratch.txt too, a plain text buffer with no LSP server anywhere
+                                    "    near it -- silently shadowing built-in K (keywordprg lookup) in
+                                    "    every buffer this config ever opens
+                                    " => after/init.lua binds K inside LspAttach with buffer = args.buf
+                                    "    (co-04, co-05, co-12) -- it still exists in scratch.lua, but
+                                    "    switching to scratch.txt shows K correctly has NO mapping there,
+                                    "    exactly Example 39's own verification shape applied to a fresh bug
+
+-- Verified: two real headless runs, each against a genuinely attached lua-language-server process,
+-- output captured verbatim above.

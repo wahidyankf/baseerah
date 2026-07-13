@@ -1,0 +1,15 @@
+ex-72 :: Register a User Command Inside setup()  (exercises co-18, co-06)
+
+$ nvim --headless -u before/init.lua -c "lua print(vim.api.nvim_get_commands({})['MyPluginCmd'] ~= nil)" -c 'qa!'
+false
+                                    " => before/init.lua never calls setup() -- the command genuinely
+                                    "    does NOT exist yet, even though lua/myplugin/init.lua was
+                                    "    require()-able the whole time (module loading and setup() running
+                                    "    are two SEPARATE steps)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.api.nvim_get_commands({})['MyPluginCmd'] ~= nil)" -c 'qa!'
+true
+                                    " => after/init.lua calls require('myplugin').setup() -- now the
+                                    "    command exists
+
+-- Verified: real before/after contrast across two full headless sessions.

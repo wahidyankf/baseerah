@@ -1,0 +1,10 @@
+ex-41 :: Turn Off Diagnostic Virtual Text  (exercises co-14)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.diagnostic.config().virtual_text)" -c "lua print(vim.diagnostic.config().signs)" -c 'qa!'
+false
+true
+                                    " => vim.diagnostic.config() with no arguments reads back the CURRENT
+                                    "    live config -- confirms virtual_text is false and signs is true,
+                                    "    independently of each other
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

@@ -1,0 +1,17 @@
+ex-45 :: Enable Native LSP Completion  (exercises co-15)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c 'lua vim.wait(500)' \
+  -c "lua print('InsertCharPre autocmds for this buffer:', #vim.api.nvim_get_autocmds({event='InsertCharPre', buffer=0}))" \
+  -c "lua print('server advertises completionProvider:', vim.lsp.get_clients()[1].server_capabilities.completionProvider ~= nil)" \
+  -c 'qa!'
+InsertCharPre autocmds for this buffer: 1
+server advertises completionProvider: true
+                                    " => vim.lsp.completion.enable(true, ..., {autotrigger=true}) registered
+                                    "    EXACTLY one buffer-scoped InsertCharPre autocmd -- the internal
+                                    "    mechanism that drives typing-triggers-completion, confirmed by
+                                    "    directly counting Neovim's own autocmd registry, not inferred
+
+-- Verified: real LSP attach; the InsertCharPre count is read directly from Neovim's live autocmd table
+-- after calling completion.enable, confirming the wiring this concept describes actually happened.

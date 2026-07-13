@@ -1,0 +1,11 @@
+ex-27 :: termguicolors  (exercises co-02)
+
+$ nvim --headless -u after/init.lua -c 'set termguicolors?' -c 'qa!'
+  termguicolors
+                                    " => confirms the option is active; in an interactive truecolor
+                                    "    terminal this switches highlight groups from the nearest of 256
+                                    "    indexed colors to their exact 24-bit RGB hex values -- gradients in
+                                    "    a colorscheme like the gruvbox-material of ex-28 render smoothly
+                                    "    instead of visibly banding
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

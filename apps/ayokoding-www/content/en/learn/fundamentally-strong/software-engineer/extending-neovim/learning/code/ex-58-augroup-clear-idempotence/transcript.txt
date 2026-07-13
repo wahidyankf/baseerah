@@ -1,0 +1,15 @@
+ex-58 :: Augroup Clear Idempotence Across Three Re-Sources  (exercises co-05)
+
+$ nvim --headless -u after/init.lua \
+  -c 'source $MYVIMRC' -c 'source $MYVIMRC' -c 'source $MYVIMRC' \
+  -c "lua print(#vim.api.nvim_get_autocmds({group='Idempotent'}))" \
+  -c 'qa!'
+2
+                                    " => FOUR total loads happened -- the initial -u load plus three more
+                                    "    explicit :source calls -- yet exactly 2 autocmds remain
+                                    "    (BufWritePre + BufWritePost), never 8. { clear = true } on the
+                                    "    augroup wipes Idempotent's entries at the TOP of every load,
+                                    "    before the two nvim_create_autocmd calls re-add them
+
+-- Verified: real headless run, four total config loads, output captured verbatim above (this is Example
+-- 16's same idempotence guarantee, driven through one more re-source to make the pattern unmistakable).

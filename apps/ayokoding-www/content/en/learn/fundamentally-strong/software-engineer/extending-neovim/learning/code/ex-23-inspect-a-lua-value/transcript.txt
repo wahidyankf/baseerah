@@ -1,0 +1,11 @@
+ex-23 :: Inspect a Lua Value  (exercises co-02)
+
+$ nvim --headless -u before/init.lua -c 'lua print(vim.inspect(vim.opt.shiftwidth:get()))' -c 'qa!'
+4
+                                    " => vim.opt.shiftwidth:get() returns the option's value AS A REAL LUA
+                                    "    VALUE (the number 4, not a string), and vim.inspect() pretty-prints
+                                    "    it -- for a scalar number the "pretty" output is just the number
+                                    "    itself; the same call on a list-like option (co-02's wildignore,
+                                    "    ex-05) would instead print a Lua table literal
+
+-- Verified: real headless run against before/init.lua, output captured verbatim above.

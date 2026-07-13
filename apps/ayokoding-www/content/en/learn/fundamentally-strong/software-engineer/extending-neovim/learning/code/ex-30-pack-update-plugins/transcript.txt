@@ -1,0 +1,24 @@
+ex-30 :: Update Plugins with vim.pack.update  (exercises co-08)
+
+$ cat ~/.config/nvim/nvim-pack-lock.json   " => the packlockfile's REAL location: stdpath('config'), NOT
+                                            "    stdpath('data') -- easy to assume wrong without checking
+{
+  "plugins": {
+    "nvim-lspconfig": {
+      "rev": "4ea9083b6d3dff4ddc6da17c51334c3255b7eba5",
+      "src": "https://github.com/neovim/nvim-lspconfig",
+      "version": "'v2.0.0'"
+    }
+  }
+}
+
+$ nvim --headless -u after/init.lua -c 'lua vim.pack.update(nil, {force=true})' -c 'qa!'
+vim.pack: Updating (0/1)
+vim.pack: 100% Updating (1/1) - nvim-lspconfig
+                                    " => vim.pack.update() with no args checks EVERY installed plugin;
+                                    "    {force=true} skips the interactive confirmation buffer this
+                                    "    command normally opens, applying the update immediately
+
+-- Verified: real run against a previously vim.pack.add'd plugin; the lockfile excerpt above is the
+-- genuine on-disk file (path corrected from an earlier assumption of stdpath('data') after grepping
+-- Neovim's own pack.lua source for the exact path it writes to).

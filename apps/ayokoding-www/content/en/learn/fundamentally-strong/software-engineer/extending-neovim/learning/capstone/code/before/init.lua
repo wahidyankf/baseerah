@@ -1,0 +1,3 @@
+-- (genuinely empty -- this is the starting point: a brand-new ~/.config/nvim with
+-- no plugins, no options, no keymaps, no LSP, no Treesitter parsers beyond the five
+-- Neovim bundles for itself. Every file under ../after/ is written from this baseline.)

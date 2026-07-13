@@ -1,0 +1,14 @@
+ex-17 :: Filetype-Local Option  (exercises co-05, co-02)
+
+$ nvim --headless -u after/init.lua scratch.md -c 'set wrap?' -c 'qa!'
+  wrap
+                                    " => scratch.md's filetype is 'markdown', so the FileType callback ran
+                                    "    and opt_local.wrap = true overrode the global default JUST for
+                                    "    this buffer
+
+$ nvim --headless -u after/init.lua scratch.txt -c 'set wrap?' -c 'qa!'
+nowrap
+                                    " => scratch.txt's filetype is plain 'text' (no FileType=markdown
+                                    "    event), so the global vim.o.wrap = false baseline still applies
+
+-- Verified: two separate real headless runs, one per file, output captured verbatim above.

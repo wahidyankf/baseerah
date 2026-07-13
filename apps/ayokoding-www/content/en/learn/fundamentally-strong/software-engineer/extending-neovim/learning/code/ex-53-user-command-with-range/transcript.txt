@@ -1,0 +1,17 @@
+ex-53 :: User Command with a Line Range  (exercises co-06)
+
+$ cat scratch.txt                    " => BEFORE: three lowercase lines
+one
+two
+three
+
+$ nvim --headless -u after/init.lua scratch.txt -c '2,3Upper' -c 'w' -c 'qa!'
+"scratch.txt" 3L, 14B written
+
+$ cat scratch.txt                    " => AFTER: ONLY lines 2-3 uppercased; line 1 untouched
+one
+TWO
+THREE
+
+-- Verified: real headless run; before/after file contents both captured verbatim above, confirming the
+-- range genuinely scoped the effect to lines 2-3 only.

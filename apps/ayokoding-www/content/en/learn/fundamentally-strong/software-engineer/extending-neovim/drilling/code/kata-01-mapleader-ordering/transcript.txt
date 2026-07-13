@@ -1,0 +1,25 @@
+kata-01 :: Mapleader Ordering  (drills co-03, co-04)
+
+$ cd before && nvim --headless -u init.lua \
+  -c 'verbose map <space>w' -c 'verbose map \w' -c 'qa!'
+No mapping found
+n  \w          * :w<CR>
+                 Save file
+	Last set from .../kata-01-mapleader-ordering/before/init.lua
+
+$ cd after && nvim --headless -u init.lua \
+  -c 'verbose map <space>w' -c 'verbose map \w' -c 'qa!'
+n  <Space>w    * :w<CR>
+                 Save file
+	Last set from .../kata-01-mapleader-ordering/after/init.lua
+No mapping found
+                                    " => <leader> is resolved to whatever vim.g.mapleader holds RIGHT NOW,
+                                    "    at the exact moment vim.keymap.set runs (co-03) -- before/init.lua
+                                    "    sets the keymap BEFORE mapleader, so <leader> silently falls back
+                                    "    to Neovim's default leader, backslash -- the mapping still exists,
+                                    "    just bound to the WRONG key, with no error anywhere
+                                    " => after/init.lua reorders the two lines: mapleader is set first, so
+                                    "    <leader>w correctly resolves to <Space>w (co-04), and \w has no
+                                    "    mapping at all
+
+-- Verified: two real headless runs, one per directory, output captured verbatim above.

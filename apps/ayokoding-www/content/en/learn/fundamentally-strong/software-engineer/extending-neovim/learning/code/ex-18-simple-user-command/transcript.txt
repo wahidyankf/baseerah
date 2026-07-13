@@ -1,0 +1,10 @@
+ex-18 :: Simple User Command  (exercises co-06)
+
+$ nvim --headless -u after/init.lua -c 'Reload' -c "echo 'reload ok, no error'" -c 'qa!'
+reload ok, no error
+                                    " => :Reload ran with NO error, which means vim.cmd('source $MYVIMRC')
+                                    "    inside the callback successfully re-sourced the very file the
+                                    "    command itself was defined in -- the second echo only prints
+                                    "    because :Reload didn't abort the command chain
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

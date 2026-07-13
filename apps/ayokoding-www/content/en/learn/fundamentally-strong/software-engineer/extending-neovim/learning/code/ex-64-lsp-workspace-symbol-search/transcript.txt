@@ -1,0 +1,15 @@
+ex-64 :: Workspace Symbol Search  (exercises co-12)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print(vim.fn.maparg('<leader>ws','n') ~= '')" \
+  -c "lua print(vim.lsp.get_clients()[1].server_capabilities.workspaceSymbolProvider ~= nil)" \
+  -c 'qa!'
+true
+true
+                                    " => the keymap is registered AND the attached server genuinely
+                                    "    advertises workspaceSymbolProvider -- confirming <leader>ws would
+                                    "    open a real, server-populated picker/quickfix of project-wide
+                                    "    symbols, not silently fail against a server with no such capability
+
+-- Verified: real LSP attach; both the keymap registration and the server capability checked directly.

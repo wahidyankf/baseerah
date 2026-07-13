@@ -1,0 +1,13 @@
+ex-55 :: Module setup(opts) Merge Pattern  (exercises co-07, co-18)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.inspect(require('myplugin').options))" -c 'qa!'
+{
+  greeting = "Hi there",
+  width = 80
+}
+                                    " => greeting was OVERRIDDEN to the caller's "Hi there"; width was
+                                    "    NEVER mentioned by the caller and passed through from defaults
+                                    "    UNTOUCHED at 80 -- exactly the "merge, don't replace" semantics
+                                    "    vim.tbl_deep_extend('force', ...) provides
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

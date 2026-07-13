@@ -1,0 +1,11 @@
+ex-13 :: Set Colorscheme  (exercises co-02)
+
+$ nvim --headless -u after/init.lua -c 'colorscheme' -c 'lua print(vim.g.colors_name)' -c 'qa!'
+habamax
+habamax
+                                    " => bare :colorscheme with no argument echoes the CURRENTLY ACTIVE
+                                    "    scheme's name; vim.g.colors_name is the same value read as a Lua
+                                    "    global -- both confirm vim.cmd.colorscheme('habamax') applied and
+                                    "    recolored the editor
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

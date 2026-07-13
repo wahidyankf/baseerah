@@ -1,0 +1,14 @@
+ex-74 :: Run an Async Job with vim.uv.spawn  (exercises co-18)
+
+$ nvim --headless -u after/init.lua -c 'RunFormat' -c 'lua vim.wait(3000, function() return vim.g.run_format_done end)' \
+  -c "lua print(vim.g.run_format_code)" -c 'qa!'
+0
+                                    " => vim.uv.spawn launched a REAL child process (echo); the exit code
+                                    "    0 confirms it completed successfully -- the entire wait() call
+                                    "    around it is what proves the editor was free to keep processing
+                                    "    other -c commands rather than being blocked inside the spawn call
+                                    "    itself (a genuinely blocking vim.fn.system call would need no such
+                                    "    wait -- it would already have returned by the time control resumed)
+
+-- Verified: real vim.uv.spawn call against a real child process, with output captured through a real
+-- libuv pipe and landed into a real scratch buffer on exit.

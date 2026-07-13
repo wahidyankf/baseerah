@@ -1,0 +1,15 @@
+ex-10 :: Keymap Across Multiple Modes  (exercises co-04)
+
+$ nvim --headless -u after/init.lua -c 'verbose nmap <leader>y' -c 'verbose vmap <leader>y' -c 'qa!'
+n  <Space>y    * "+y
+                 Yank to system clipboard
+	Last set from /path/to/after/init.lua (run Nvim with -V1 for more details)
+v  <Space>y    * "+y
+                 Yank to system clipboard
+	Last set from /path/to/after/init.lua (run Nvim with -V1 for more details)
+                                    " => a single vim.keymap.set() call with mode = { 'n', 'v' } registers
+                                    "    TWO independent mappings, one per mode -- :verbose nmap and
+                                    "    :verbose vmap each confirm their own copy exists with the same
+                                    "    desc and the same defining file/line
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

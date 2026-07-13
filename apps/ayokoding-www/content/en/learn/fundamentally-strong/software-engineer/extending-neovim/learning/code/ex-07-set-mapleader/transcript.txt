@@ -1,0 +1,12 @@
+ex-07 :: Set mapleader  (exercises co-03)
+
+$ nvim --headless -u after/init.lua -c 'verbose map <space>w' -c 'qa!'
+n  <Space>w    * :w<CR>
+                 Save file
+	Last set from /path/to/after/init.lua (run Nvim with -V1 for more details)
+                                    " => <leader>w in the vim.keymap.set() CALL resolved to the LITERAL
+                                    "    <Space> key, because vim.g.mapleader was set to " " one line
+                                    "    earlier -- <leader> is resolved AT MAPPING TIME, not at press time,
+                                    "    which is exactly why mapleader must be set first
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

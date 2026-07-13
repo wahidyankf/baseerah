@@ -1,0 +1,16 @@
+ex-62 :: Stop and Reattach an LSP Client  (exercises co-12)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua local id = vim.lsp.get_clients()[1].id; vim.lsp.get_client_by_id(id):stop(); vim.wait(2000, function() return #vim.lsp.get_clients() == 0 end); print(#vim.lsp.get_clients())" \
+  -c 'edit!' \
+  -c "lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end); print(#vim.lsp.get_clients())" \
+  -c 'qa!'
+0
+1
+                                    " => Client:stop() (the current 0.12 idiom -- vim.lsp.stop_client() is
+                                    "    deprecated) detaches cleanly: 0 clients immediately after
+                                    " => re-reading the SAME buffer with :edit! re-triggers attachment:
+                                    "    back to 1 client, a genuine detach-then-reattach cycle
+
+-- Verified: real stop + reattach cycle against a genuinely running lua-language-server process.

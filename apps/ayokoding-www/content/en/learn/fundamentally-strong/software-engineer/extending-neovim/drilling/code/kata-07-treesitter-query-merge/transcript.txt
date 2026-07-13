@@ -1,0 +1,29 @@
+kata-07 :: Treesitter Query Merge  (drills co-17)
+
+$ nvim --headless --clean scratch.lua \
+  -c "lua print('captures:', #vim.treesitter.query.get('lua', 'highlights').captures)" -c 'qa!'
+captures: 37
+                                    " => BASELINE: this exact Neovim install's bundled Lua highlights.scm
+                                    "    exposes 37 distinct capture names, completely untouched
+
+$ cd before && nvim --headless -u init.lua scratch.lua \
+  -c "lua print('captures:', #vim.treesitter.query.get('lua', 'highlights').captures)" -c 'qa!'
+captures: 1
+
+$ cd after && nvim --headless -u init.lua scratch.lua \
+  -c "lua print('captures:', #vim.treesitter.query.get('lua', 'highlights').captures)" -c 'qa!'
+captures: 38
+                                    " => before/init.lua's query.set('lua', 'highlights', '(identifier)
+                                    "    @custom_ident') REPLACES the entire compiled query with that one
+                                    "    pattern -- captures collapses from 37 down to 1, silently losing
+                                    "    keyword/string/comment/number highlighting and everything else
+                                    " => after/init.lua reads the bundled query's own SOURCE TEXT first via
+                                    "    vim.treesitter.query.get_files('lua', 'highlights') (co-17), then
+                                    "    concatenates the custom pattern onto the end before calling
+                                    "    query.set() -- captures becomes 38: the original 37, PLUS the one
+                                    "    new @custom_ident capture, with nothing lost
+
+-- Verified: three real headless runs (one baseline, one per kata directory), output captured verbatim
+-- above. Capture counts are specific to this Neovim install's bundled queries/lua/highlights.scm file and
+-- will differ across Neovim versions -- the RATIO (37 -> 1 -> 38) is what the kata demonstrates, not the
+-- exact numbers themselves.

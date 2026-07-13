@@ -1,0 +1,12 @@
+ex-46 :: Manually Trigger Native Completion  (exercises co-15)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print('<C-Space> maparg in insert mode:', vim.fn.maparg('<C-Space>','i') ~= '')" \
+  -c 'qa!'
+<C-Space> maparg in insert mode: true
+                                    " => the mapping is registered and callable independently of
+                                    "    Example 45's autotrigger -- pressing Ctrl-Space opens the same
+                                    "    completion menu on demand, with no autotrigger config needed at all
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

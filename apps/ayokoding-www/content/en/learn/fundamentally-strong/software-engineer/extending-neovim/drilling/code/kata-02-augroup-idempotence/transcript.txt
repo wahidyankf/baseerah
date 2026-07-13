@@ -1,0 +1,24 @@
+kata-02 :: Augroup Clear Idempotence  (drills co-05)
+
+$ cd before && nvim --headless -u init.lua \
+  -c 'source init.lua' -c 'source init.lua' \
+  -c "lua print(#vim.api.nvim_get_autocmds({event='BufWritePre'}))" \
+  -c 'qa!'
+3
+
+$ cd after && nvim --headless -u init.lua \
+  -c 'source init.lua' -c 'source init.lua' \
+  -c "lua print(#vim.api.nvim_get_autocmds({event='BufWritePre'}))" \
+  -c 'qa!'
+1
+                                    " => THREE total loads happened each run (the initial -u load plus two
+                                    "    more :source calls) -- before/init.lua registers its autocmd with
+                                    "    no augroup at all, so nothing ever clears the earlier entries: three
+                                    "    loads leaves three duplicate BufWritePre autocmds, each of which
+                                    "    would independently echo "saving" on every single write
+                                    " => after/init.lua wraps the SAME autocmd in an augroup created with
+                                    "    { clear = true } (co-05) -- that wipes the group's own prior entries
+                                    "    at the top of every load, before the one nvim_create_autocmd call
+                                    "    re-adds it, so three loads still leaves exactly one entry
+
+-- Verified: two real headless runs, one per directory, output captured verbatim above.

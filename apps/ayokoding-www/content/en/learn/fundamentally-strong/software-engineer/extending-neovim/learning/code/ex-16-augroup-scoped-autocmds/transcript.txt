@@ -1,0 +1,27 @@
+ex-16 :: Augroup-Scoped Autocmds  (exercises co-05)
+
+$ nvim --headless -u after/init.lua \
+  -c 'au MyConfig' \
+  -c 'source $MYVIMRC' -c 'source $MYVIMRC' \
+  -c 'au MyConfig' \
+  -c 'qa!'
+
+--- Autocommands ---
+MyConfig  BufReadPost
+    *         echo "reading"
+MyConfig  BufWritePre
+    *         echo "saving"
+
+--- Autocommands ---
+MyConfig  BufReadPost
+    *         echo "reading"
+MyConfig  BufWritePre
+    *         echo "saving"
+                                    " => both listings are IDENTICAL: exactly one BufReadPost and one
+                                    "    BufWritePre entry, even after :source-ing init.lua TWICE MORE on
+                                    "    top of the initial load (three loads total) -- { clear = true } on
+                                    "    the augroup wipes MyConfig's old entries before each re-source adds
+                                    "    the new ones, which is what prevents autocmds from silently piling
+                                    "    up duplicates
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

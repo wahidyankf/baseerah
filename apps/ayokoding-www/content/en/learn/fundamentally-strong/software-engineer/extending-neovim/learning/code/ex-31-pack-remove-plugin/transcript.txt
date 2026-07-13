@@ -1,0 +1,21 @@
+ex-31 :: Remove a Plugin with vim.pack.del  (exercises co-08)
+
+$ nvim --headless -u before/init.lua -c 'qa!'    " => installs gruvbox-material (before/init.lua still has it)
+
+$ nvim --headless -u before/init.lua -c "lua vim.pack.del({'gruvbox-material'})" -c 'qa!'
+Error in command line:
+E5108: Lua: .../vim/pack.lua:1398: Some plugins are active and were not deleted: gruvbox-material.
+Remove them from init.lua, restart, and try again.
+                                    " => vim.pack.del REFUSES to delete a plugin that is still ACTIVE
+                                    "    (still :packadd'd in THIS session, per its own init.lua)
+
+$ nvim --headless -u after/init.lua -c "lua vim.pack.del({'gruvbox-material'})" -c 'qa!'
+                                    " => after/init.lua no longer calls vim.pack.add for it -- the plugin
+                                    "    is installed on disk but NOT active this session
+vim.pack: Removed plugin 'gruvbox-material'
+                                    " => now the delete succeeds, and the directory is gone from
+                                    "    site/pack/core/opt/
+
+-- Verified: real two-step flow reproduced end to end -- the REQUIRED sequence is remove the vim.pack.add
+-- call from init.lua first, restart Neovim, THEN call vim.pack.del -- deleting an active plugin in the same
+-- session that installed it is a hard error, not a silent no-op.

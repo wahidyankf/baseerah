@@ -1,0 +1,18 @@
+ex-20 :: Split Config into a Module  (exercises co-07)
+
+$ nvim --headless -u after/init.lua \
+  -c "lua print(package.loaded['config.options'])" \
+  -c 'set number?' -c 'set expandtab?' \
+  -c 'qa!'
+true
+  number
+  expandtab
+                                    " => package.loaded['config.options'] is `true` (the module's own
+                                    "    return value, since options.lua returns nothing explicit) and NOT
+                                    "    nil -- proof require() found and ran lua/config/options.lua
+                                    " => both options still apply exactly as before/init.lua set them
+                                    "    directly -- moving the lines into a module changed nothing
+                                    "    observable about the running editor, only how the config is organized
+
+-- Verified: real headless run against after/init.lua (which requires lua/config/options.lua), output
+-- captured verbatim above.

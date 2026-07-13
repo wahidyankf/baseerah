@@ -1,0 +1,9 @@
+ex-12 :: Remove a Keymap  (exercises co-04)
+
+$ nvim --headless -u after/init.lua -c 'verbose map <leader>w' -c 'qa!'
+No mapping found
+                                    " => vim.keymap.del('n', '<leader>w') removed the exact mapping that
+                                    "    vim.keymap.set() had just created two lines earlier -- the same
+                                    "    {mode, lhs} pair identifies a mapping for BOTH set and del
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

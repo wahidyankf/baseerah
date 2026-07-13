@@ -1,0 +1,16 @@
+ex-70 :: Fold by Syntax Tree with treesitter.foldexpr  (exercises co-17)
+
+$ nvim --headless -u after/init.lua scratch.lua -c 'normal! 1Gzc' \
+  -c "lua print(vim.fn.foldclosed(1) ~= -1)" \
+  -c "lua print(vim.fn.foldclosedend(1))" \
+  -c 'qa!'
+true
+4
+                                    " => zc on line 1 (the "local function greet()" header) closed a fold
+                                    "    spanning lines 1-4 -- EXACTLY the function body, ending at its
+                                    "    "end" keyword -- NOT line 5 ("print('after')", a sibling statement
+                                    "    outside the function entirely), confirming the fold boundary comes
+                                    "    from the real syntax tree, not from indentation or brace-counting
+
+-- Verified: real fold created and closed against a real parsed tree; foldclosedend(1) read back the
+-- ACTUAL last line the fold covers, not assumed from the source's visual indentation alone.

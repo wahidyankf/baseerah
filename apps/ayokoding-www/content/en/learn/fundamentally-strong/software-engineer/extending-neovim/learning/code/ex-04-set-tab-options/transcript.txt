@@ -1,0 +1,18 @@
+ex-04 :: Set Tab Options  (exercises co-02)
+
+$ nvim --headless -u after/init.lua scratch.txt -c 'set expandtab? shiftwidth? tabstop?' \
+  -c "lua vim.cmd('normal ' .. vim.api.nvim_replace_termcodes('i<Tab>text<Esc>', true, false, true))" \
+  -c 'w' -c 'qa!'
+  expandtab
+  shiftwidth=2
+  tabstop=2
+"scratch.txt" 1L, 7B written
+                                    " => the three options are all active before any edit happens
+
+$ cat -A scratch.txt
+··text$
+                                    " => the ^I (Tab key) inserted TWO SPACES ("··", cat -A's marker for a
+                                    "    space) instead of a literal tab byte -- expandtab converts every
+                                    "    <Tab> keystroke to shiftwidth-worth of spaces on insert
+
+-- Verified: real headless run; resulting file bytes captured with `cat -A` above (no tab byte present).

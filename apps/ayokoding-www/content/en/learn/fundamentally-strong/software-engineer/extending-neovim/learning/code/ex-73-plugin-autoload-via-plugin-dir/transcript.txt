@@ -1,0 +1,15 @@
+ex-73 :: Autoload a Plugin via plugin/  (exercises co-18)
+
+$ cat init.lua                       " => genuinely empty -- confirmed by reading it back
+(empty file)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.api.nvim_get_commands({})['MyPluginCmd'] ~= nil)" -c 'qa!'
+true
+                                    " => MyPluginCmd exists at startup with ZERO require() calls anywhere
+                                    "    in init.lua -- Neovim's own startup sequence sources every file
+                                    "    under plugin/*.lua automatically, which is what ran
+                                    "    require('myplugin').setup() on our behalf
+
+-- Verified: real headless run against a genuinely empty init.lua (read back and confirmed empty above);
+-- this is the exact mechanism third-party plugins use to make their commands/keymaps available the
+-- instant they are installed, with no setup call required from the user's own config.

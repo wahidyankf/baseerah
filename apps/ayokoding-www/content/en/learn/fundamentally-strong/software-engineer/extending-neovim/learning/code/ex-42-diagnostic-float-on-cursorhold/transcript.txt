@@ -1,0 +1,13 @@
+ex-42 :: Diagnostic Float on CursorHold  (exercises co-14, co-05)
+
+$ nvim --headless -u after/init.lua -c "lua print(#vim.api.nvim_get_autocmds({event='CursorHold'}))" -c 'qa!'
+1
+                                    " => exactly one CursorHold autocmd is registered, running
+                                    "    vim.diagnostic.open_float() -- in an interactive session, holding
+                                    "    the cursor still on a line with a diagnostic (no keypress for
+                                    "    'updatetime' milliseconds) pops the float; a headless run has no
+                                    "    passage of idle time to trigger it, so the registration itself,
+                                    "    not the pause-driven firing, is what this transcript confirms
+
+-- Verified: real headless run confirming the autocmd registration; the event's actual FIRING depends on
+-- keyboard idle time, which a scripted headless session cannot reproduce.

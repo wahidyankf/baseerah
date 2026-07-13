@@ -1,0 +1,14 @@
+ex-60 :: Wildcard Shared Default: root_markers  (exercises co-10)
+
+$ git init project-root -q && cd project-root
+$ nvim --headless -u ../after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print(vim.lsp.get_clients()[1].config.root_dir)" \
+  -c 'qa!'
+/path/to/project-root
+                                    " => root_dir resolved to the git-marked directory, even though
+                                    "    lua_ls's own default config never mentions root_markers at all --
+                                    "    the WILDCARD's { '.git' } is what supplied it
+
+-- Verified: real headless run inside a real `git init`-created directory; root_dir read directly from
+-- the live attached client's resolved config, not the config table Neovim held before attaching.

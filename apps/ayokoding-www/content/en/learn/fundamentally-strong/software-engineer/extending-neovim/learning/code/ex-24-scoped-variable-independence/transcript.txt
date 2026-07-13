@@ -1,0 +1,18 @@
+ex-24 :: Scoped Variable Independence  (exercises co-03)
+
+$ nvim --headless -u before/init.lua one.txt \
+  -c 'lua vim.g.my_setting = 1; vim.b.my_setting = 2' \
+  -c 'lua print(vim.g.my_setting, vim.b.my_setting)' \
+  -c 'edit two.txt' \
+  -c 'lua print(vim.g.my_setting, vim.b.my_setting)' \
+  -c 'qa!'
+1 2
+1 nil
+                                    " => in one.txt's buffer: vim.g.my_setting is 1 (global) AND
+                                    "    vim.b.my_setting is 2 (buffer-local) -- both readable together
+                                    " => after :edit two.txt switches to a FRESH buffer: vim.g.my_setting is
+                                    "    still 1 (globals persist across every buffer), but
+                                    "    vim.b.my_setting is nil -- the buffer-local value never leaked into
+                                    "    the new buffer, exactly the isolation vim.b exists to provide
+
+-- Verified: real headless run against before/init.lua, output captured verbatim above.

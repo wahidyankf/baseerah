@@ -1,0 +1,21 @@
+ex-37 :: Customize an LSP Server's Config Before Enabling  (exercises co-10)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua local c = vim.lsp.get_clients()[1]; print(vim.inspect(c.settings.Lua.diagnostics))" \
+  -c 'qa!'
+{
+  globals = { "MY_CUSTOM_GLOBAL" }
+}
+                                    " => the attached client's LIVE settings table shows the exact
+                                    "    Lua.diagnostics.globals value passed to vim.lsp.config -- direct
+                                    "    proof the pre-enable customization reached the running server
+
+-- Verified, with an honest caveat: the settings-merge itself is directly confirmed above via the live
+-- client object. This sandbox's installed lua-language-server (3.18.2-dev) did NOT publish a
+-- textDocument/publishDiagnostics notification for an undefined global within a 15s wait in EITHER the
+-- customized or the uncustomized run (server_capabilities.diagnosticProvider was nil, and a manual
+-- textDocument/diagnostic pull request returned "method not found") -- so the "diagnostic disappears"
+-- half of this concept's :help-documented behavior could not be independently reproduced as an observable
+-- diagnostic count change in this specific sandbox/version combination, and is reported as such rather
+-- than fabricated. The config-propagation mechanism this example exercises (co-10) is fully verified.

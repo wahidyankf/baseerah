@@ -1,0 +1,10 @@
+ex-05 :: Append List Option (vim.opt)  (exercises co-02)
+
+$ nvim --headless -u after/init.lua -c 'set wildignore?' -c 'qa!'
+  wildignore=*.pyc,node_modules
+                                    " => vim.opt's :append() joined both entries into wildignore's
+                                    "    comma-separated list; vim.o.wildignore = {...} would instead have
+                                    "    OVERWRITTEN the whole list with a Lua table (a type error, since
+                                    "    vim.o wants a scalar string, not a table)
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

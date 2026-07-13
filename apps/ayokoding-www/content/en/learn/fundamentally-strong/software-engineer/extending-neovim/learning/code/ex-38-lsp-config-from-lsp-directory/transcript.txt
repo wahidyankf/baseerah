@@ -1,0 +1,16 @@
+ex-38 :: LSP Config from the lsp/ Directory  (exercises co-11)
+
+$ nvim --headless -u after/init.lua \
+  -c "lua print(vim.inspect(vim.lsp.config.pyright.cmd))" \
+  -c "lua print(vim.inspect(vim.lsp.config.pyright.filetypes))" \
+  -c 'qa!'
+{ "pyright-langserver", "--stdio" }
+{ "python" }
+                                    " => vim.lsp.config.pyright is populated with NO explicit
+                                    "    vim.lsp.config('pyright', {...}) call anywhere in init.lua --
+                                    "    Neovim auto-discovered lsp/pyright.lua purely because it sits on
+                                    "    the runtimepath at the documented lsp/<name>.lua location
+
+-- Verified: real headless run against after/init.lua + after/lsp/pyright.lua, output captured verbatim
+-- above. This is the same auto-discovery mechanism nvim-lspconfig's own lsp/*.lua files use (ex-36) --
+-- a user-authored lsp/<name>.lua merges in exactly the same way, no plugin API required.

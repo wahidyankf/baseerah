@@ -1,0 +1,18 @@
+ex-79 :: Populate the Location List from Diagnostics  (exercises co-14)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c "lua vim.diagnostic.set(vim.api.nvim_create_namespace('test'), 0, {{lnum=0, col=0, message='fake error', severity=vim.diagnostic.severity.ERROR}})" \
+  -c 'lua vim.diagnostic.setloclist()' \
+  -c "lua print(#vim.fn.getloclist(0))" \
+  -c "lua print(vim.fn.getloclist(0)[1].text)" \
+  -c 'qa!'
+1
+fake error
+                                    " => a synthetic diagnostic was set on the buffer directly (no LSP
+                                    "    server needed for this specific verification); calling
+                                    "    vim.diagnostic.setloclist() populated the LOCATION list (not the
+                                    "    quickfix list -- contrast Example 78) with exactly that one
+                                    "    diagnostic, its message readable straight from getloclist()
+
+-- Verified: real diagnostic set + real location-list population, both read back through Neovim's own
+-- list-inspection functions rather than assumed from the setloclist() call succeeding.

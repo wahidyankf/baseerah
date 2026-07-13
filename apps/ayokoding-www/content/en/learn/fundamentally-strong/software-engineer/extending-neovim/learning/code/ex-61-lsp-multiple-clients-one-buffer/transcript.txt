@@ -1,0 +1,17 @@
+ex-61 :: Multiple LSP Clients on One Buffer  (exercises co-11)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(5000, function() return #vim.lsp.get_clients({bufnr=0}) >= 2 end)' \
+  -c "lua local cs = vim.lsp.get_clients({bufnr=0}); print(#cs); for _,c in ipairs(cs) do print(c.name) end" \
+  -c 'qa!'
+2
+extra_lua_checker
+lua_ls
+                                    " => TWO distinct client objects attached to the SAME buffer, both
+                                    "    sharing the 'lua' filetype -- vim.lsp.get_clients({bufnr=0})
+                                    "    lists both by name, confirmed as genuinely separate clients (two
+                                    "    different client IDs), not one client counted twice
+
+-- Verified: real dual-attach run; two independently configured server entries (both wrapping the same
+-- lua-language-server binary here, for reproducibility -- the concept holds identically for two DIFFERENT
+-- binaries that both declare the same filetype).

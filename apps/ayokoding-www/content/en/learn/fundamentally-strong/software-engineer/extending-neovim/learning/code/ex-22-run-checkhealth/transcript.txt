@@ -1,0 +1,36 @@
+ex-22 :: Run Checkhealth  (exercises co-01)
+
+$ nvim --headless -u before/init.lua -c 'checkhealth vim.health' -c 'write! health-out.txt' -c 'qa!'
+                                    " => on current Neovim, the base built-in checks live under the
+                                    "    'vim.health' target name (bare `:checkhealth` with no argument
+                                    "    would run this PLUS every other discoverable module, e.g.
+                                    "    'vim.lsp', 'vim.treesitter', 'vim.pack')
+
+$ cat health-out.txt                 " => real captured report, trimmed to the per-component structure
+==============================================================================
+vim.health:                                                         2 WARN  1 ERROR
+
+System Info ~
+- WARN Nvim 0.12.4 is available (current: 0.12.3)
+- Nvim version: `v0.12.3`
+- Operating system: Darwin 24.5.0
+
+Configuration ~
+- OK no issues found
+
+Runtime ~
+- OK $VIMRUNTIME: /opt/homebrew/Cellar/neovim/0.12.3/share/nvim/runtime
+
+External Tools ~
+- OK ripgrep 15.1.0 (/opt/homebrew/bin/rg)
+- OK git version 2.39.5 (Apple Git-154) (/usr/bin/git)
+- OK curl 8.7.1 (/usr/bin/curl)
+                                    " => this IS the per-component OK/WARN/ERROR report the concept promises:
+                                    "    each line is tagged OK, WARN, or ERROR, grouped under a component
+                                    "    heading ("System Info", "Configuration", "Runtime", "External Tools")
+                                    " => this sandbox's own WARN ("0.12.4 is available, current: 0.12.3") is
+                                    "    a genuinely observed, unedited result -- a one-patch-behind Neovim,
+                                    "    caught by the health check itself
+
+-- Verified: real headless run; emoji glyphs from the terminal renderer (checkmark/warning/cross) are
+-- transcribed here as OK/WARN/ERROR text for portability, exactly matching the underlying status words.

@@ -1,0 +1,16 @@
+ex-26 :: Custom Statusline Format  (exercises co-02)
+
+$ nvim --headless -u after/init.lua scratch.txt \
+  -c 'normal 2Gllll' \
+  -c 'lua print(vim.api.nvim_eval_statusline(vim.o.statusline, {}).str)' \
+  -c 'qa!'
+scratch.txt  2:5
+                                    " => %f expands to the relative filename, %m to the modified flag
+                                    "    (blank here -- nothing changed), %= pushes everything after it to
+                                    "    the right edge, and %l:%c prints line:column -- after moving to
+                                    "    line 2 and 4 characters right, the rendered statusline shows
+                                    "    exactly "2:5" (column is 1-indexed, so 4 rightward moves from
+                                    "    column 1 land on column 5)
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above (evaluated with the
+-- real nvim_eval_statusline API, not a hand-simulated format string).

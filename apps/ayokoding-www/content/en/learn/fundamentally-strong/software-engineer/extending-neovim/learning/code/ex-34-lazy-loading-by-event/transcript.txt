@@ -1,0 +1,19 @@
+ex-34 :: Lazy-Load a Plugin by Event  (exercises co-09)
+
+$ nvim --headless -u after/init.lua \
+  -c 'lua vim.wait(2000)' \
+  -c "lua print('loaded count BEFORE InsertEnter:', require('lazy').stats().loaded)" \
+  -c "lua vim.cmd('normal! i'); vim.cmd('stopinsert')" \
+  -c 'lua vim.wait(200)' \
+  -c "lua print('loaded count AFTER InsertEnter:', require('lazy').stats().loaded)" \
+  -c 'qa!'
+loaded count BEFORE InsertEnter: 1
+loaded count AFTER InsertEnter: 2
+                                    " => BEFORE any insert-mode entry: only lazy.nvim itself counts as
+                                    "    loaded (1) -- plenary.nvim is installed on disk but inactive
+                                    " => firing InsertEnter once (a scripted `i<Esc>` via :normal) bumps
+                                    "    the loaded count to 2 -- plenary.nvim loaded EXACTLY when its
+                                    "    trigger event fired, not at startup
+
+-- Verified: real lazy.nvim event-loading run; loaded count read from require('lazy').stats(), a live
+-- count, not a static claim.

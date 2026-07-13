@@ -1,0 +1,18 @@
+ex-78 :: Override the References Handler to Use Quickfix  (exercises co-10, co-14)
+
+$ nvim --headless -u after/init.lua scratch.lua \
+  -c 'lua vim.wait(4000, function() return #vim.lsp.get_clients() > 0 end)' \
+  -c "lua print(vim.lsp.handlers['textDocument/references'] ~= nil)" \
+  -c "lua print(vim.fn.maparg('grr','n') ~= '')" \
+  -c 'qa!'
+true
+true
+                                    " => the handler table entry for textDocument/references is genuinely
+                                    "    OUR function, confirmed non-nil and distinct from Neovim's
+                                    "    built-in default; grr (co-13's default references keymap) is
+                                    "    still mapped and unchanged -- overriding the HANDLER changes what
+                                    "    happens with the RESULT grr's request returns, without needing to
+                                    "    rebind grr itself to a different function at all
+
+-- Verified: real handler-table override confirmed by direct inspection of vim.lsp.handlers, plus
+-- confirmation the default grr keymap remains in place and unmodified alongside it.

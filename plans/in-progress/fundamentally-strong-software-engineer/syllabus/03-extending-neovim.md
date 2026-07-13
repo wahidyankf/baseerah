@@ -51,6 +51,25 @@ later topic assumes this forge exists (DD-17). Neovim and every plugin/LSP used 
 opts)` (and `vim.opt`/`vim.g`/`vim.keymap.set`) signatures are current. (neovim.io API docs)
 - 2026-07-12 — verified: XDG layout — `$XDG_CONFIG_HOME/nvim/init.lua` (default `~/.config/nvim`), `lua/`
   on `runtimepath`; inspect via `stdpath('config')`. (neovim.io / archwiki)
+- 2026-07-14 — re-confirmed at authoring time (Phase 3 V step, `web-researcher`): v0.12.4 (2026-07-05) is
+  still current stable (github.com/neovim/neovim/releases); the native `vim.lsp.config()` +
+  `vim.lsp.enable()` description and nvim-lspconfig's "0.11.3+" requirement re-confirmed verbatim against
+  its README — no change. **Correction**: `nvim-treesitter/nvim-treesitter` is confirmed still archived
+  (frozen 2026-04-03, zero commits since, per the GitHub API). Core Neovim's own `treesitter.txt` still
+  names that archived repo as the reference installer and ships no built-in `:TSInstall`. A community fork,
+  `neovim-treesitter/nvim-treesitter` (created 2026-04-06, 141 stars, last push 2026-06-22), is active and
+  ships `:TSInstall`; ecosystem is fragmented with no consolidated winner (see
+  github.com/neovim/neovim/discussions/38848) — ex-48 should cite this fork by name rather than an abstract
+  "successor." **Correction**: `nvim_create_user_command`'s signature is upgraded from
+  `[Needs Verification]` to `[Verified]`, fetched directly at the `v0.12.4` tag
+  (`src/nvim/api/command.c`) — `bang` is not a distinctly-documented `opts` field like `nargs`/`range`/
+  `count`/`complete`; it is one of the generic boolean `|command-attributes|` (alongside `bar`). The Lua
+  callback table's full field set is `args`, `bang`, `count`, `fargs`, `line1`, `line2`, `mods`, `name`,
+  `nargs`, `range`, `reg`, `smods` — richer than previously documented. **Correction**: Microsoft's LSP
+  spec site now labels **3.18 "Current"** (3.17 demoted to "Previous"), though 3.18 itself still
+  self-describes as "under development"; Neovim's own `lsp.txt` does not pin a spec version number — it
+  links to whichever spec Microsoft currently marks "current," so citing "3.17" as Neovim's target is
+  illustrative, not a settled fact confirmed by a Neovim primary source.
 
 ### DD-35 primary-source citations (fetched-and-read)
 
@@ -70,17 +89,26 @@ opts)` (and `vim.opt`/`vim.g`/`vim.keymap.set`) signatures are current. (neovim.
   installs to `site/pack/core/opt` (opt side only, `:packadd`s programmatically — never a `start/` dir);
   JSON `packlockfile`; `add`/`get`/`update`/`del` confirmed. Accuracy-note phrasing corrected accordingly.
 - **`nvim-treesitter` archival (co-16, ex-47/48)** — repo banner verbatim: "archived by the owner on
-  Apr 3, 2026 … read-only"; `master` frozen (0.11 compat), `main` rewrite needs 0.12+; successor status
-  fluid (hedge kept). `:TSInstall` confirmed **not** a core command. Bundled parsers (C/Lua/Markdown/
-  Vimscript/Vimdoc) + auto-`vim.treesitter.start()` per
+  Apr 3, 2026 … read-only"; `master` frozen (0.11 compat), `main` rewrite needs 0.12+. **Re-confirmed
+  2026-07-14**: still archived (zero commits since), core Neovim's `treesitter.txt` still names it as the
+  reference installer with no built-in `:TSInstall`; the active community fork
+  [`neovim-treesitter/nvim-treesitter`](https://github.com/neovim-treesitter/nvim-treesitter) (created
+  2026-04-06, 141 stars, last push 2026-06-22) ships `:TSInstall` and is what ex-48 should cite by name —
+  ecosystem remains fragmented, no consolidated winner
+  ([neovim/neovim#38848](https://github.com/neovim/neovim/discussions/38848)). Bundled parsers
+  (C/Lua/Markdown/Vimscript/Vimdoc) + auto-`vim.treesitter.start()` per
   [`treesitter.txt`](https://raw.githubusercontent.com/neovim/neovim/master/runtime/doc/treesitter.txt) —
   supports ex-47's zero-plugin `.lua` highlight claim.
 - **Autocommands, user commands, keymaps (co-04/05/06)** —
   [`api.txt`](https://raw.githubusercontent.com/neovim/neovim/master/runtime/doc/api.txt) +
   [`keymap.lua`](https://raw.githubusercontent.com/neovim/neovim/master/runtime/lua/vim/keymap.lua):
   `nvim_create_autocmd`/`nvim_create_augroup({clear})`, `keymap.set(modes,lhs,rhs,opts)`/`keymap.del`
-  confirmed. `nvim_create_user_command` signature marked `[Needs Verification]` at byte-exact level
-  (api.txt too large to fetch that entry directly; long-stable since ~0.7, secondary sources agree).
+  confirmed. `nvim_create_user_command` signature **[Verified] 2026-07-14** against
+  [`src/nvim/api/command.c` at the `v0.12.4` tag](https://raw.githubusercontent.com/neovim/neovim/v0.12.4/src/nvim/api/command.c):
+  `opts` fields are `nargs`/`range`/`count`/`complete`/`desc`/`force`/`preview`/`addr` plus boolean
+  `|command-attributes|` such as `bang`/`bar` (`bang` is not a distinctly-documented `opts` key, unlike
+  the syllabus's prior shorthand); the Lua callback table's full field set is `args`, `bang`, `count`,
+  `fargs`, `line1`, `line2`, `mods`, `name`, `nargs`, `range`, `reg`, `smods`.
 - **Options, diagnostics, Treesitter API, LSP surfaces** — `vim.o`/`vim.opt`/`vim.g`/`vim.bo`/`vim.wo`
   ([`lua.txt`](https://raw.githubusercontent.com/neovim/neovim/master/runtime/doc/lua.txt));
   `vim.diagnostic.config`/`setloclist` defaults
@@ -95,8 +123,12 @@ opts)` (and `vim.opt`/`vim.g`/`vim.keymap.set`) signatures are current. (neovim.
 - **`vim.uv`/fast-event, `vim.hl.on_yank` (ex-74/75/15)** — `vim.uv.spawn(program,opts,on_exit)`;
   `vim.api` calls illegal in `vim.uv` callbacks → `vim.schedule()` fix; `vim.hl.on_yank` is a `hl_op()`
   alias on 0.13+, `on_yank` on 0.12.x (secondary-corroborated, matches file's parenthetical).
-- **Read more** — LSP spec **3.17** cited (3.18 now "Current" but "under development" — re-check at
-  authoring); `lazy.nvim` spec fields (`event`/`cmd`/`ft`/`keys`/`opts`/`config`) verbatim from
+- **Read more** — LSP spec version **re-checked 2026-07-14**: Microsoft's spec site now labels **3.18
+  "Current"** (3.17 demoted to "Previous"), while 3.18 itself still self-describes as "under development";
+  Neovim's own `lsp.txt` does not pin a spec version number — it links to whichever spec Microsoft
+  currently marks "current." Citing "3.17" below is illustrative (matches the version community sources
+  associate with Neovim 0.12's LSP client), not a settled fact confirmed by a Neovim primary source.
+  `lazy.nvim` spec fields (`event`/`cmd`/`ft`/`keys`/`opts`/`config`) verbatim from
   [lazy.folke.io/spec](https://lazy.folke.io/spec); nvim-lspconfig attribution corrected from "core team"
   to community-maintained.
 
@@ -264,8 +296,10 @@ bufnr, { autotrigger = true })` — verify typing `.` opens native completion wi
   — verify Ctrl-Space opens the completion menu. (co-15)
 - **ex-47 · confirm-builtin-treesitter-highlight** — open a `.lua` file on 0.12+ with zero plugins — verify
   `:lua =vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()]` returns non-nil. (co-16)
-- **ex-48 · treesitter-install-missing-parser** — `:TSInstall <lang>` for a non-bundled language — verify
-  the parser compiles and highlighting activates next open (confirm core-vs-fork provenance post-archival).
+- **ex-48 · treesitter-install-missing-parser** — install the active community fork
+  [`neovim-treesitter/nvim-treesitter`](https://github.com/neovim-treesitter/nvim-treesitter) (the
+  original `nvim-treesitter/nvim-treesitter` is archived and frozen since 2026-04-03), then `:TSInstall
+<lang>` for a non-bundled language — verify the parser compiles and highlighting activates next open.
   (co-16)
 - **ex-49 · treesitter-manual-start** — `vim.treesitter.start(0, 'python')` in a `FileType` autocmd — verify
   highlighting turns on for that buffer. (co-16)
@@ -398,7 +432,7 @@ Integrates topics 01–03: vanilla editing fluency + Lua + a real extended confi
 **Papers & articles**
 
 - **Neovim User Documentation (`:help lsp`, `:help treesitter`, `:help lua-guide`)** — Neovim core team. Authoritative reference for the built-in LSP client, Tree-sitter, and the Lua plugin API. <https://neovim.io/doc/user/>
-- **Language Server Protocol Specification** — Microsoft (3.17). The formal protocol Neovim's LSP client implements. <https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/>
+- **Language Server Protocol Specification** — Microsoft (3.17; illustrative version — Neovim's own docs do not pin a spec number, and Microsoft's site now labels 3.18 "Current" while it remains "under development"). The formal protocol family Neovim's LSP client implements against. <https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/>
 - **Tree-sitter Documentation** — Max Brunsfeld and maintainers. Official docs for the incremental-parsing library Neovim uses. <https://tree-sitter.github.io/tree-sitter/>
 - **nvim-lspconfig** — community-maintained (hosted under the `neovim` GitHub org; its README states the configs are "best-effort and supported by the community"). Reference collection of default LSP client configs, now consumed via `vim.lsp.enable()`. <https://github.com/neovim/nvim-lspconfig>
 

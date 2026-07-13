@@ -1,0 +1,26 @@
+ex-69 :: Sibling Navigation with ]n  (exercises co-17)
+
+$ nvim --headless -u before/init.lua scratch.lua -c 'verbose xmap ]n' -c 'verbose nmap ]n' -c 'qa!'
+x  ]n          * <Lua 64: vim/_core/defaults:458>
+                 Select next node
+No mapping found
+                                    " => IMPORTANT correction: ]n/[n are CORE DEFAULT mappings in VISUAL
+                                    "    mode ONLY (:help v_]n confirms the "v_" prefix), not Normal mode
+                                    "    -- a plain Normal-mode ':normal ]n' does nothing, which this
+                                    "    transcript discovered directly rather than assuming both modes work
+
+$ nvim --headless -u before/init.lua scratch.lua \
+  -c "lua vim.api.nvim_win_set_cursor(0, {2, 2})" \
+  -c "lua vim.treesitter.get_parser():parse()" \
+  -c "lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('v', true, false, true), 'x', false)" \
+  -c "lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(']n', true, false, true), 'x', false)" \
+  -c "lua print(vim.inspect(vim.api.nvim_win_get_cursor(0)))" \
+  -c 'qa!'
+{ 3, 12 }
+                                    " => starting in VISUAL mode with the cursor on line 2 ("local a = 1"),
+                                    "    ]n jumped to line 3 ("local b = 2") -- the next SIBLING statement
+                                    "    in the syntax tree, confirming ]n genuinely navigates by tree
+                                    "    structure rather than by plain line movement
+
+-- Verified: real feedkeys-driven Visual-mode navigation; the Normal-mode "No mapping found" result above
+-- is a genuine, useful correction over an initial assumption that ]n/[n work in any mode.

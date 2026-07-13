@@ -803,125 +803,226 @@ ayokoding-www:build` and `npm run lint:md` both exit 0._
 Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject**. Template →
 [`syllabus/03-extending-neovim.md`](./syllabus/03-extending-neovim.md).
 
-- [ ] **[AI] V** — `web-researcher` for `extending-neovim`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `extending-neovim`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/03-extending-neovim.md`](./syllabus/03-extending-neovim.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/extending-neovim/learning/` teaching **every** concept in
+
+  _2026-07-14. Status: done. Files changed: `syllabus/03-extending-neovim.md`. Notes: resolved all 4
+  flagged "to verify" items via `web-researcher`: (1) Neovim v0.12.4 + native `vim.lsp.config`/
+  `vim.lsp.enable` path — re-confirmed accurate, no change. (2) `nvim-treesitter` archival — confirmed
+  still archived (zero commits since 2026-04-03); sharpened the hedge to name the active community fork
+  `neovim-treesitter/nvim-treesitter` (141 stars) that ex-48 should install, noting ecosystem fragmentation.
+  (3) `nvim_create_user_command` signature upgraded from `[Needs Verification]` to `[Verified]` (fetched
+  `src/nvim/api/command.c` at the `v0.12.4` tag directly); corrected that `bang` is a generic
+  command-attribute, not a distinct `opts` field, and documented the full Lua callback field set. (4) LSP
+  spec version — confirmed 3.18 is now Microsoft's "Current" label (still "under development"); added a
+  hedge that Neovim's own docs don't pin a spec version number. All findings appended to the syllabus's
+  Accuracy notes + DD-35 citations + Read-more sections with dated citations. No unresolved "verify" line
+  remains._
+
+- [x] **[AI] A1-concepts** — Author `CONTENT/extending-neovim/learning/` teaching **every** concept in
       `syllabus/03-extending-neovim.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · init-lua-entrypoint
-  - [ ] co-02 · options-vim-o-vs-opt
-  - [ ] co-03 · global-and-scoped-variables
-  - [ ] co-04 · keymap-set
-  - [ ] co-05 · autocommands
-  - [ ] co-06 · user-commands
-  - [ ] co-07 · lua-module-system
-  - [ ] co-08 · plugin-management-vim-pack
-  - [ ] co-09 · plugin-management-lazy-nvim
-  - [ ] co-10 · native-lsp-config
-  - [ ] co-11 · lsp-server-configs-and-lspconfig
-  - [ ] co-12 · lsp-attach-and-keymaps
-  - [ ] co-13 · default-lsp-keymaps
-  - [ ] co-14 · diagnostics-config
-  - [ ] co-15 · native-lsp-completion
-  - [ ] co-16 · treesitter-highlighting
-  - [ ] co-17 · treesitter-textobjects-and-queries
-  - [ ] co-18 · writing-a-custom-plugin-module
-- [ ] **[AI] A1-examples** — Author `CONTENT/extending-neovim/learning/code/` — one runnable source +
+      Notes: authored via `apps-ayokoding-www-by-example-maker` (By Example mode, not primer-maker) into
+      `extending-neovim/learning/overview.md` (357 lines) — Prerequisites, "Why this exists" narrative with
+      both `mechanism-vs-policy` and `abstraction-and-its-cost` DD-33 tags, a new "How verification works in
+      this topic" section framing live-Neovim/headless verification (this topic is interactive, unlike topic
+      2's scriptable Lua), a 5-cluster accessible Mermaid diagram, and all 18 `co-NN` concepts each with a
+      "Why it matters" + "Verify it" pair citing an exact command/API. `_index.md` and `learning/_index.md`
+      independently re-read and confirmed bare 6-line frontmatter stubs (body auto-populated by
+      `generate-indexes`, never hand-authored) — HARD RULE upheld. DD-32 footer confirmed: Previous correctly
+      re-pointed to `just-enough-lua/learning/capstone/overview.md` (the topic's true final page, path
+      independently verified to exist on disk) rather than the originally-briefed `learning/overview.md`;
+      Next is an intentional forward link to not-yet-authored `./beginner.md` (established convention). Parent
+      nav `.../software-engineer/_index.md` independently re-read — correctly shows the new "3 · Extending
+      Neovim" entry with a Learning sub-entry. All 18 facts traced to the syllabus's Accuracy notes / DD-35
+      citations (v0.12.4, native `vim.lsp.config`/`vim.lsp.enable`, `vim.pack` opt-side-only, `nvim-treesitter`
+      archival + fork name, `nvim_create_user_command` field set incl. `bang`-as-command-attribute correction,
+      the 8 default LSP keymaps). Agent ran markdownlint/prettier/generate-indexes/validate-indexes/mermaid/
+      heading-hierarchy/naming/frontmatter validators, all exit 0 on the new files.
+  - [x] co-01 · init-lua-entrypoint
+  - [x] co-02 · options-vim-o-vs-opt
+  - [x] co-03 · global-and-scoped-variables
+  - [x] co-04 · keymap-set
+  - [x] co-05 · autocommands
+  - [x] co-06 · user-commands
+  - [x] co-07 · lua-module-system
+  - [x] co-08 · plugin-management-vim-pack
+  - [x] co-09 · plugin-management-lazy-nvim
+  - [x] co-10 · native-lsp-config
+  - [x] co-11 · lsp-server-configs-and-lspconfig
+  - [x] co-12 · lsp-attach-and-keymaps
+  - [x] co-13 · default-lsp-keymaps
+  - [x] co-14 · diagnostics-config
+  - [x] co-15 · native-lsp-completion
+  - [x] co-16 · treesitter-highlighting
+  - [x] co-17 · treesitter-textobjects-and-queries
+  - [x] co-18 · writing-a-custom-plugin-module
+- [x] **[AI] A1-examples** — Author `CONTENT/extending-neovim/learning/code/` — one runnable source +
       expected output per worked example in `syllabus/03-extending-neovim.md` §Worked examples (DD-20/DD-30).
       One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · locate-init-lua — verify `:echo $MYVIMRC` reports the path
-  - [ ] ex-02 · set-boolean-option-vim-o — verify `:set number?`
-  - [ ] ex-03 · set-relativenumber — verify relative line numbers
-  - [ ] ex-04 · set-tab-options — verify `<Tab>` inserts two spaces
-  - [ ] ex-05 · append-list-option-vim-opt — verify `:set wildignore?`
-  - [ ] ex-06 · ignorecase-smartcase — verify `/Foo` vs `/foo` matching
-  - [ ] ex-07 · set-mapleader — verify `<leader>` resolves to space
-  - [ ] ex-08 · basic-normal-keymap — verify `<leader>w` saves + `desc`
-  - [ ] ex-09 · keymap-with-lua-function — verify `<leader>q` closes silently
-  - [ ] ex-10 · keymap-multiple-modes — verify yank to system clipboard both modes
-  - [ ] ex-11 · buffer-local-keymap — verify `q` maps only in that filetype
-  - [ ] ex-12 · remove-a-keymap — verify no mapping remains
-  - [ ] ex-13 · set-colorscheme — verify `:colorscheme` echoes `habamax`
-  - [ ] ex-14 · autocmd-command-string — verify trailing whitespace stripped on save
-  - [ ] ex-15 · autocmd-yank-highlight — verify yanked text flashes
-  - [ ] ex-16 · augroup-scoped-autocmds — verify `:au MyConfig` lists two
-  - [ ] ex-17 · filetype-local-option — verify `.md` wraps, others don't
-  - [ ] ex-18 · simple-user-command — verify `:Reload` re-sources
-  - [ ] ex-19 · user-command-with-arg — verify `:Greet World` prints `Hello World`
-  - [ ] ex-20 · split-config-into-module — verify module loaded + options apply
-  - [ ] ex-21 · reload-a-module — verify edited value without restart
-  - [ ] ex-22 · run-checkhealth — verify per-component OK/ERROR report
-  - [ ] ex-23 · inspect-a-lua-value — verify `shiftwidth` echoed
-  - [ ] ex-24 · scoped-variable-independence — verify `1 2` then `1 nil`
-  - [ ] ex-25 · window-local-option — verify one split numbered, other not
-  - [ ] ex-26 · custom-statusline-format — verify filename/flag/line:col update
-  - [ ] ex-27 · termguicolors — verify truecolor rendering
-  - [ ] ex-28 · install-plugin-vim-pack-add — verify clone under `site/pack/core/opt/` + applies
-  - [ ] ex-29 · pack-add-with-version-pin — verify `v2.0.0` rev reported
-  - [ ] ex-30 · pack-update-plugins — verify diff buffer + lockfile update
-  - [ ] ex-31 · pack-remove-plugin — verify dir removed + drops from lockfile
-  - [ ] ex-32 · lazy-nvim-bootstrap — verify `:Lazy` opens manager UI
-  - [ ] ex-33 · lazy-plugin-spec-opts — verify loaded without manual `setup()`
-  - [ ] ex-34 · lazy-loading-by-event — verify loads only after InsertEnter
-  - [ ] ex-35 · lazy-loading-by-command — verify unloaded until `:Telescope`
-  - [ ] ex-36 · enable-lsp-server — verify `lua_ls` attaches on `.lua`
-  - [ ] ex-37 · customize-lsp-config — verify "undefined global `vim`" gone
-  - [ ] ex-38 · lsp-config-from-lsp-directory — verify auto-discovery of `pyright`
-  - [ ] ex-39 · lspattach-buffer-keymap — verify `K` hover only in LSP buffers
-  - [ ] ex-40 · verify-default-lsp-keymap — verify `grn` rename prompt (0.11+ default)
-  - [ ] ex-41 · diagnostic-virtual-text-off — verify inline text gone, signs remain
-  - [ ] ex-42 · diagnostic-float-on-cursorhold — verify float on error line
-  - [ ] ex-43 · diagnostic-severity-sort — verify error priority over warning
-  - [ ] ex-44 · lsp-format-on-save — verify auto-reformat before write
-  - [ ] ex-45 · native-completion-enable — verify native completion, no nvim-cmp
-  - [ ] ex-46 · native-completion-manual-trigger — verify Ctrl-Space menu
-  - [ ] ex-47 · confirm-builtin-treesitter-highlight — verify highlighter active non-nil
-  - [ ] ex-48 · treesitter-install-missing-parser — verify parser compiles + highlights
-  - [ ] ex-49 · treesitter-manual-start — verify highlighting turns on
-  - [ ] ex-50 · treesitter-inspect-parser-lang — verify active parser lang echoed
-  - [ ] ex-51 · treesitter-node-at-cursor — verify node type printed
-  - [ ] ex-52 · user-command-with-complete — verify `:SetColor <Tab>` completes colors
-  - [ ] ex-53 · user-command-with-range — verify `:'<,'>Upper` uppercases selection
-  - [ ] ex-54 · module-with-local-state — verify `1` then `2` persists
-  - [ ] ex-55 · module-setup-merge-pattern — verify merged defaults + override
-  - [ ] ex-56 · opt-local-vs-global — verify spell on there, off in second buffer
-  - [ ] ex-57 · keymap-expr-mapping — verify `<Tab>` cycles popup or inserts tab
-  - [ ] ex-58 · augroup-clear-idempotence — verify `:au` still lists originals after 3× source
-  - [ ] ex-59 · lsp-capabilities-merge — verify `snippetSupport = true` all servers
-  - [ ] ex-60 · lsp-wildcard-shared-defaults — verify root resolves at `.git`
-  - [ ] ex-61 · lsp-multiple-clients-one-buffer — verify two clients on one buffer
-  - [ ] ex-62 · lsp-stop-and-reattach — verify detach then reattach
-  - [ ] ex-63 · lsp-codelens-enable-and-run — verify lenses render + `grx` runs
-  - [ ] ex-64 · lsp-workspace-symbol-search — verify project-wide symbol picker
-  - [ ] ex-65 · lsp-inlay-hints-toggle — verify inlay hints render inline
-  - [ ] ex-66 · treesitter-iter-captures — verify capture loop completes
-  - [ ] ex-67 · treesitter-custom-query-override — verify highlighting reflects override
-  - [ ] ex-68 · treesitter-select-parent-node — verify `an` selects enclosing node
-  - [ ] ex-69 · treesitter-sibling-navigation — verify `]n` jumps to next sibling
-  - [ ] ex-70 · treesitter-fold-expr — verify `zc` folds function body by syntax
-  - [ ] ex-71 · plugin-health-check — verify `:checkhealth myplugin` reports pass/fail
-  - [ ] ex-72 · plugin-command-registered-in-setup — verify cmd absent until `setup()`
-  - [ ] ex-73 · plugin-autoload-via-plugin-dir — verify commands available at startup
-  - [ ] ex-74 · plugin-async-job-with-uv — verify editor responsive + output on exit
-  - [ ] ex-75 · plugin-schedule-safety — verify wrapped succeeds, unwrapped errors
-  - [ ] ex-76 · custom-statusline-lua-component — verify statusline shows server name
-  - [ ] ex-77 · distribute-own-plugin-via-pack — verify module require-able + `plugin/` runs
-  - [ ] ex-78 · lsp-handler-override-to-quickfix — verify `grr` opens quickfix
-  - [ ] ex-79 · diagnostic-setloclist — verify location list populated
-  - [ ] ex-80 · full-config-healthcheck — verify `:checkhealth all` no unresolved ERROR
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/extending-neovim/learning/capstone/` (`_index.md` weight 900) per the
+      Notes: authored via `apps-ayokoding-www-by-example-maker` into three tier files —
+      `beginner.md` (900 lines, ex-01..28), `intermediate.md` (957 lines, ex-29..58),
+      `advanced.md` (705 lines, ex-59..80) — sum 80, independently re-verified: `learning/code/`
+      has exactly 80 `ex-NN-*` dirs (ex-01 through ex-80, no gaps/dupes, confirmed via a
+      Python set-diff against `range(1,81)`), each with a `transcript.txt` plus `before/`/`after/`
+      file-state dirs following the `just-enough-nvim` interactive-topic convention (not
+      scriptable-Lua). Every example run against real headless Neovim v0.12.3, real
+      `lua-language-server`/`pyright`, real `vim.pack`/`lazy.nvim` git clones, real
+      `tree-sitter-cli` parser compiles. One honestly-flagged partial-verification: ex-37 —
+      the config-propagation mechanism (co-10) is fully verified via the live client's
+      `settings` table, but the "diagnostic disappears" half could not be reproduced as an
+      observable count change with this sandbox's `lua-language-server` 3.18.2-dev build
+      (independently re-read the caveat in `intermediate.md:301` — matches the agent's report,
+      no fabricated output). DD-32 footer chain independently re-verified across all four
+      files: `overview.md` → `beginner.md` → `intermediate.md` → `advanced.md` →
+      `capstone/overview.md` (intentional forward link, capstone not yet authored). `ex-48`
+      independently confirmed cites the `neovim-treesitter/nvim-treesitter` active fork, not
+      the archived original. `overview.md` and both `_index.md` files confirmed untouched
+      (byte-identical line counts to the A1-concepts step).
+  - [x] ex-01 · locate-init-lua — verify `:echo $MYVIMRC` reports the path
+  - [x] ex-02 · set-boolean-option-vim-o — verify `:set number?`
+  - [x] ex-03 · set-relativenumber — verify relative line numbers
+  - [x] ex-04 · set-tab-options — verify `<Tab>` inserts two spaces
+  - [x] ex-05 · append-list-option-vim-opt — verify `:set wildignore?`
+  - [x] ex-06 · ignorecase-smartcase — verify `/Foo` vs `/foo` matching
+  - [x] ex-07 · set-mapleader — verify `<leader>` resolves to space
+  - [x] ex-08 · basic-normal-keymap — verify `<leader>w` saves + `desc`
+  - [x] ex-09 · keymap-with-lua-function — verify `<leader>q` closes silently
+  - [x] ex-10 · keymap-multiple-modes — verify yank to system clipboard both modes
+  - [x] ex-11 · buffer-local-keymap — verify `q` maps only in that filetype
+  - [x] ex-12 · remove-a-keymap — verify no mapping remains
+  - [x] ex-13 · set-colorscheme — verify `:colorscheme` echoes `habamax`
+  - [x] ex-14 · autocmd-command-string — verify trailing whitespace stripped on save
+  - [x] ex-15 · autocmd-yank-highlight — verify yanked text flashes
+  - [x] ex-16 · augroup-scoped-autocmds — verify `:au MyConfig` lists two
+  - [x] ex-17 · filetype-local-option — verify `.md` wraps, others don't
+  - [x] ex-18 · simple-user-command — verify `:Reload` re-sources
+  - [x] ex-19 · user-command-with-arg — verify `:Greet World` prints `Hello World`
+  - [x] ex-20 · split-config-into-module — verify module loaded + options apply
+  - [x] ex-21 · reload-a-module — verify edited value without restart
+  - [x] ex-22 · run-checkhealth — verify per-component OK/ERROR report
+  - [x] ex-23 · inspect-a-lua-value — verify `shiftwidth` echoed
+  - [x] ex-24 · scoped-variable-independence — verify `1 2` then `1 nil`
+  - [x] ex-25 · window-local-option — verify one split numbered, other not
+  - [x] ex-26 · custom-statusline-format — verify filename/flag/line:col update
+  - [x] ex-27 · termguicolors — verify truecolor rendering
+  - [x] ex-28 · install-plugin-vim-pack-add — verify clone under `site/pack/core/opt/` + applies
+  - [x] ex-29 · pack-add-with-version-pin — verify `v2.0.0` rev reported
+  - [x] ex-30 · pack-update-plugins — verify diff buffer + lockfile update
+  - [x] ex-31 · pack-remove-plugin — verify dir removed + drops from lockfile
+  - [x] ex-32 · lazy-nvim-bootstrap — verify `:Lazy` opens manager UI
+  - [x] ex-33 · lazy-plugin-spec-opts — verify loaded without manual `setup()`
+  - [x] ex-34 · lazy-loading-by-event — verify loads only after InsertEnter
+  - [x] ex-35 · lazy-loading-by-command — verify unloaded until `:Telescope`
+  - [x] ex-36 · enable-lsp-server — verify `lua_ls` attaches on `.lua`
+  - [x] ex-37 · customize-lsp-config — verify "undefined global `vim`" gone
+  - [x] ex-38 · lsp-config-from-lsp-directory — verify auto-discovery of `pyright`
+  - [x] ex-39 · lspattach-buffer-keymap — verify `K` hover only in LSP buffers
+  - [x] ex-40 · verify-default-lsp-keymap — verify `grn` rename prompt (0.11+ default)
+  - [x] ex-41 · diagnostic-virtual-text-off — verify inline text gone, signs remain
+  - [x] ex-42 · diagnostic-float-on-cursorhold — verify float on error line
+  - [x] ex-43 · diagnostic-severity-sort — verify error priority over warning
+  - [x] ex-44 · lsp-format-on-save — verify auto-reformat before write
+  - [x] ex-45 · native-completion-enable — verify native completion, no nvim-cmp
+  - [x] ex-46 · native-completion-manual-trigger — verify Ctrl-Space menu
+  - [x] ex-47 · confirm-builtin-treesitter-highlight — verify highlighter active non-nil
+  - [x] ex-48 · treesitter-install-missing-parser — verify parser compiles + highlights
+  - [x] ex-49 · treesitter-manual-start — verify highlighting turns on
+  - [x] ex-50 · treesitter-inspect-parser-lang — verify active parser lang echoed
+  - [x] ex-51 · treesitter-node-at-cursor — verify node type printed
+  - [x] ex-52 · user-command-with-complete — verify `:SetColor <Tab>` completes colors
+  - [x] ex-53 · user-command-with-range — verify `:'<,'>Upper` uppercases selection
+  - [x] ex-54 · module-with-local-state — verify `1` then `2` persists
+  - [x] ex-55 · module-setup-merge-pattern — verify merged defaults + override
+  - [x] ex-56 · opt-local-vs-global — verify spell on there, off in second buffer
+  - [x] ex-57 · keymap-expr-mapping — verify `<Tab>` cycles popup or inserts tab
+  - [x] ex-58 · augroup-clear-idempotence — verify `:au` still lists originals after 3× source
+  - [x] ex-59 · lsp-capabilities-merge — verify `snippetSupport = true` all servers
+  - [x] ex-60 · lsp-wildcard-shared-defaults — verify root resolves at `.git`
+  - [x] ex-61 · lsp-multiple-clients-one-buffer — verify two clients on one buffer
+  - [x] ex-62 · lsp-stop-and-reattach — verify detach then reattach
+  - [x] ex-63 · lsp-codelens-enable-and-run — verify lenses render + `grx` runs
+  - [x] ex-64 · lsp-workspace-symbol-search — verify project-wide symbol picker
+  - [x] ex-65 · lsp-inlay-hints-toggle — verify inlay hints render inline
+  - [x] ex-66 · treesitter-iter-captures — verify capture loop completes
+  - [x] ex-67 · treesitter-custom-query-override — verify highlighting reflects override
+  - [x] ex-68 · treesitter-select-parent-node — verify `an` selects enclosing node
+  - [x] ex-69 · treesitter-sibling-navigation — verify `]n` jumps to next sibling
+  - [x] ex-70 · treesitter-fold-expr — verify `zc` folds function body by syntax
+  - [x] ex-71 · plugin-health-check — verify `:checkhealth myplugin` reports pass/fail
+  - [x] ex-72 · plugin-command-registered-in-setup — verify cmd absent until `setup()`
+  - [x] ex-73 · plugin-autoload-via-plugin-dir — verify commands available at startup
+  - [x] ex-74 · plugin-async-job-with-uv — verify editor responsive + output on exit
+  - [x] ex-75 · plugin-schedule-safety — verify wrapped succeeds, unwrapped errors
+  - [x] ex-76 · custom-statusline-lua-component — verify statusline shows server name
+  - [x] ex-77 · distribute-own-plugin-via-pack — verify module require-able + `plugin/` runs
+  - [x] ex-78 · lsp-handler-override-to-quickfix — verify `grr` opens quickfix
+  - [x] ex-79 · diagnostic-setloclist — verify location list populated
+  - [x] ex-80 · full-config-healthcheck — verify `:checkhealth all` no unresolved ERROR
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/extending-neovim/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      Notes: authored via `apps-ayokoding-www-by-example-maker`; `_index.md` (8-line bare stub,
+      independently re-read post-`generate-indexes`), `overview.md` (396 lines — Goal, Mermaid diagram,
+      all 7 concepts-exercised items checked, all 5 ordered steps each with a complete file listing +
+      real Verify/Output block, Acceptance criteria, Done bar), `code/before/init.lua` (genuinely empty
+      starting config) + `code/after/` full config tree (`init.lua`, `lua/options.lua`,
+      `lua/keymaps.lua`, `lua/lsp.lua`, `lua/treesitter.lua`, `lua/plugins/greet.lua`,
+      `lsp/pyright.lua`) + `code/transcript.md` (220 lines). Independently re-verified: all 3 plugins
+      pinned by exact tag/commit (not a moving branch); Step 3's Python LSP+Treesitter wiring shows
+      real `pyright` attach + 2 real diagnostics on a deliberately broken file + real parser install;
+      Step 4's `:Greet`/`:Greet Neovim`/`BufWritePost` all independently re-read with real captured
+      output; Step 5's `nvim -u NONE` baseline contrast and pinned-version table both present. The
+      acceptance-criteria `:checkhealth` run independently re-read in `transcript.md` — one honestly
+      documented unrelated `ERROR` (sandbox tmux `$TERM` terminal-emulation setting, not a config
+      dependency), matching the same honest-caveat convention already used for ex-37. DD-32 footer:
+      Previous → `../advanced.md`, no fabricated Next (drilling/topic-4 not yet authored). Every fact
+      traces to the syllabus's already-verified Accuracy notes / DD-35 citations.
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/extending-neovim/drilling/_index.md` (wt 203) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+      Notes: **A3** — `apps-ayokoding-www-by-example-checker` initial run FAIL (3 CRITICAL: annotation
+      density 42/69 examples below floor, missing `## Examples by Level` section, diagram count 3 vs
+      30-50 target; 1 HIGH: advanced.md 22 examples vs 25-28 floor; 2 MEDIUM). `apps-ayokoding-www-by-example-fixer`
+      resolved all 3 CRITICAL + both MEDIUM, deliberately left the HIGH unresolved (syllabus fixes
+      Advanced at exactly ex-59..80 = 22 items — a plan-authoritative distribution, not an oversight;
+      fabricating new examples would break the 1:1 `ex-NN` checkbox mirror). Re-check PASS (independently
+      re-verified: 34 diagrams via direct grep, 80/80 Examples-by-Level entries via direct grep, tier
+      counts unchanged 28+30+22=80). Recheck surfaced 2 new MEDIUM (ex-74 density 0.83, residual
+      `-- =>` comments leaked into 38 runnable `.lua` files) — fixed via one more fixer round,
+      independently re-verified (0 residual comments, all 173 `.lua` files pass `luac -p`).
+      **D** — `apps-ayokoding-www-general-maker` authored `drilling/_index.md` (bare stub, wt 203) +
+      `drilling/overview.md` (1034 lines) — independently re-verified all 5 sections present in
+      correct order (Recall Q&A → Applied problems → Code katas → Self-check checklist →
+      Elaborative interrogation, last), 8 code katas, capstone footer correctly updated with the
+      Next→Drilling link, zero debris in-repo.
+      **F** — `apps-ayokoding-www-link-checker` initial run FAIL (12 broken, but investigation showed
+      3 of its 4 finding categories were checker false positives: `/en/c/learn/` IS the correct routing
+      prefix per `content-url.ts` + the live Next.js route, confirmed against both already-deployed
+      sibling topics; the `#example-6-ignorecase--smartcase` double-hyphen anchor is exactly what the
+      repo's own `github-slugger` produces; `beginner.md`'s Previous-link footer was already present).
+      Independent investigation found the checker's real miss: `overview.md`'s new Examples-by-Level
+      section had 80 links missing the `/c/` segment — fixed directly via scoped `sed`, then all 80
+      anchors independently cross-verified against real `github-slugger` output (0 mismatches; an
+      earlier self-authored verification script had a regex bug excluding underscores, corrected before
+      trusting its output). Re-check PASS, confirmed the false-positive analysis and the real fix.
+      `apps-ayokoding-www-facts-checker` PASS with 1 MEDIUM ("five bundled parsers" should be "six" —
+      the parenthetical lists 6: c/lua/markdown/markdown_inline/vim/vimdoc) across 3 files — fixed
+      directly via `sed`, re-verified.
+      **G** — `npx nx run ayokoding-www:build`: 1341/1341 pages, exit 0 (LaTeX-unicode warnings are
+      pre-existing/unrelated, not from this topic). `npm run lint:md`: 4057 files, 0 errors.
 
 ### Phase 3 Gate
 
-- [ ] [AI] `extending-neovim/` complete: `_index.md` wt 130, `learning/_index.md` wt 103,
+- [x] [AI] `extending-neovim/` complete: `_index.md` wt 130, `learning/_index.md` wt 103,
       `drilling/_index.md` wt 203, capstone wt 900; all 18 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
+      Notes: final completeness sweep confirmed all 4 weights correct (130/103/203/900), 18 `### co-NN`
+      headings in `learning/overview.md`, 80 example headings across `beginner.md`(28)/`intermediate.md`(30)/
+      `advanced.md`(22), capstone `overview.md`+`code/after/init.lua` present, drilling `overview.md`
+      present, 332 total files in the topic tree. All checkers (by-example, link, facts) clean per the
+      A3/D/F/G notes above; build 1341/1341 pages exit 0; `lint:md` 0 errors across 4057 files.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 

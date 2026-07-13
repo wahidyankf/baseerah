@@ -1,0 +1,27 @@
+ex-48 :: Install a Missing Parser with the Active Fork  (exercises co-16)
+
+$ nvim --headless -u after/init.lua -c 'TSInstall! python' \
+  -c "lua vim.wait(30000, function() return #vim.fs.find('python.so', {path=vim.fn.stdpath('data')}) > 0 end, 500)" \
+  -c "lua print(vim.inspect(vim.fs.find('python.so', {path=vim.fn.stdpath('data')})))" \
+  -c 'qa!'
+[nvim-treesitter/install/python]: Downloading tree-sitter-queries-python...
+[nvim-treesitter/install/python]: Downloading shared-f1cbf91dc8d3...
+[nvim-treesitter/install/python]: Compiling parser...
+[nvim-treesitter/install/python]: Installing parser...
+{ ".../site/parser/python.so" }
+                                    " => a REAL compiled parser landed on disk -- this required installing
+                                    "    the `tree-sitter` CLI itself (via Homebrew) first: without it,
+                                    "    :TSInstall fails outright with "ENOENT: no such file or
+                                    "    directory (cmd): 'tree-sitter'", a genuinely-hit prerequisite
+
+$ nvim --headless -u after/init.lua scratch.py \
+  -c "lua vim.treesitter.start(0, 'python')" \
+  -c "lua print(vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] ~= nil)" \
+  -c 'qa!'
+true
+                                    " => opening scratch.py fresh (a new session) and manually starting
+                                    "    the now-installed python parser activates highlighting
+
+-- Verified: real network clone of BOTH required repositories (the fork plus its parser-registry
+-- dependency, discovered only after the plugin's own plugin/ file raised a real "Missing required
+-- dependency" error on the first attempt), a real `tree-sitter` CLI install, and a real parser compile.

@@ -1,0 +1,8 @@
+ex-02 :: Set Boolean Option (vim.o)  (exercises co-02)
+
+$ nvim --headless -u after/init.lua -c 'set number?' -c 'qa!'
+  number
+                                    " => :set number? echoes the LIVE option value straight from Neovim's
+                                    "    own settings table, confirming vim.o.number = true took effect
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.

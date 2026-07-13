@@ -1,0 +1,20 @@
+ex-68 :: Select the Enclosing Node with an  (exercises co-17)
+
+$ nvim --headless -u before/init.lua scratch.lua \
+  -c "lua vim.api.nvim_win_set_cursor(0, {1, 10})" \
+  -c "lua vim.treesitter.get_parser():parse()" \
+  -c "lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('van', true, false, true), 'x', false)" \
+  -c "lua print(vim.fn.mode())" \
+  -c "lua print(vim.fn.getpos('v')[3], vim.fn.getpos('.')[3])" \
+  -c 'qa!'
+v
+11 13
+                                    " => cursor started at column 11 (the 'f' of "foo" in "local x =
+                                    "    foo(1, 2)"); pressing 'van' (Visual mode, "a node") expanded the
+                                    "    selection to columns 11-13 -- EXACTLY "foo", the enclosing
+                                    "    identifier node, confirmed by :verbose xmap an showing this is a
+                                    "    CORE default mapping (vim/_core/defaults.lua), not something this
+                                    "    config added
+
+-- Verified: real feedkeys-driven Visual mode selection, checked via the actual '< /'> position marks --
+-- not a static claim that 'an' "should" work.

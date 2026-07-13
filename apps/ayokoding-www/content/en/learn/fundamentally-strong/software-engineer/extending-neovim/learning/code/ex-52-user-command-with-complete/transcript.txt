@@ -1,0 +1,13 @@
+ex-52 :: User Command with Tab Completion  (exercises co-06)
+
+$ nvim --headless -u after/init.lua -c "lua print(vim.inspect(vim.fn.getcompletion('SetColor ', 'cmdline')))" -c 'qa!'
+{ "blue", "catppuccin", "darkblue", "default", "delek", "desert", "elflord", "evening",
+  "habamax", "industry", "koehler", "lunaperche", "morning", "murphy", "pablo", "peachpuff",
+  "quiet", "retrobox", "ron", "shine", "slate", "sorbet", "torte", "unokai", "vim",
+  "wildcharm", "zaibatsu", "zellner" }
+                                    " => getcompletion() simulates pressing <Tab> after "SetColor " on the
+                                    "    real command line -- the returned list is EVERY colorscheme name
+                                    "    this Neovim install actually knows, the same candidates <Tab>
+                                    "    would cycle through interactively
+
+-- Verified: real headless run against after/init.lua, output captured verbatim above.
