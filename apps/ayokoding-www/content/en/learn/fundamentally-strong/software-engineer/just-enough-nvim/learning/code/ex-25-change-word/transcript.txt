@@ -1,0 +1,6 @@
+ex-25 :: Change Word  (exercises co-04)
+
+cw                                 " => the `c` operator combined with the `w` motion deletes the word under the cursor and opens Insert mode at that position
+                                   " => 'quick' is deleted and Insert mode begins there, ready for replacement text
+slow<Esc>                          " => types the replacement text, then returns to Normal mode
+                                   " => the line becomes 'slow brown fox'

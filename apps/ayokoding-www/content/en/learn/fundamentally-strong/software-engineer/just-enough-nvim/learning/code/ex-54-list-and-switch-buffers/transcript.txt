@@ -1,0 +1,6 @@
+ex-54 :: List and Switch Buffers  (exercises co-15)
+
+:ls<CR>                            " => lists every open buffer with its number, name, and status
+                                   " => the listing shows buffer 1 'a.txt' and buffer 2 'b.txt'
+:b 2<CR>                           " => switches the active window to buffer number 2
+                                   " => the window now displays b.txt's contents

@@ -1,0 +1,7 @@
+ex-78 :: Inspect Undo Tree  (exercises co-13)
+
+A one<Esc>                         " => makes change 1: the line becomes 'base one'
+u                                  " => undoes change 1: the line reverts to 'base'
+A two<Esc>                         " => makes change 2 from the undone state, branching the undo tree: the line becomes 'base two'
+:undolist<CR>                      " => lists every change in the undo tree
+                                   " => the output shows change numbers, line-count deltas, and a timestamp ('seconds ago') for both change 1 and change 2, including the abandoned branch

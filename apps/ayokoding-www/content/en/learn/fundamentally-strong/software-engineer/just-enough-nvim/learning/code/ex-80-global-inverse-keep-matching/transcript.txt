@@ -1,0 +1,4 @@
+ex-80 :: Global Inverse Keep Matching  (exercises co-12)
+
+:g!/KEEP/d<CR>                     " => `:g!` (equivalently `:v`) inverts the match: it runs the command on every line that does NOT match the pattern
+                                   " => both lines without 'KEEP' are deleted, leaving only the matching lines

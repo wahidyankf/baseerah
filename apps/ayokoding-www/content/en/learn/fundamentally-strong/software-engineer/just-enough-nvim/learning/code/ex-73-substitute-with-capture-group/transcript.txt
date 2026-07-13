@@ -1,0 +1,4 @@
+ex-73 :: Substitute with Capture Group  (exercises co-10)
+
+:%s/\(foo\)bar/\1baz/<CR>          " => `\(foo\)` captures 'foo' into group 1; `\1` reinserts that captured text into the replacement
+                                   " => the match 'foobar' becomes 'foobaz' -- the captured 'foo' is reused, only 'bar' is swapped for 'baz'

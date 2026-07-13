@@ -1,0 +1,4 @@
+ex-02 :: Quit Unmodified Buffer  (exercises co-11)
+
+:q<CR>                             " => the unmodified buffer closes immediately
+                                   " => Neovim exits straight to the shell prompt with no save prompt

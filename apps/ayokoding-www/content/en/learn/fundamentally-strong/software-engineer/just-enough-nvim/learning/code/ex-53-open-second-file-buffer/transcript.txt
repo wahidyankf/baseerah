@@ -1,0 +1,4 @@
+ex-53 :: Open Second File Buffer  (exercises co-15)
+
+:e other.txt<CR>                   " => opens 'other.txt' as a new buffer and switches the active window to show it
+                                   " => the window now displays other.txt's contents; notes.txt remains open as a background buffer

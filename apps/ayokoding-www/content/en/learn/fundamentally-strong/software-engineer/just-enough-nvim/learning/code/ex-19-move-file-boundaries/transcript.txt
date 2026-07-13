@@ -1,0 +1,4 @@
+ex-19 :: Move File Boundaries  (exercises co-03)
+
+gg                                 " => jumps to line 1, the first line of the file
+G                                  " => jumps to the last line of the file -- line 3

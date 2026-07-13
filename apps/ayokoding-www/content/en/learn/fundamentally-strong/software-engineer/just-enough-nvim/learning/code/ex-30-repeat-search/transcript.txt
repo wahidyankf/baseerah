@@ -1,0 +1,7 @@
+ex-30 :: Repeat Search  (exercises co-10)
+
+/needle<CR>                        " => searches forward for 'needle'; the cursor lands on line 1's match
+n                                  " => repeats the search in the same direction
+                                   " => the cursor advances to the next match, on line 3
+N                                  " => repeats the search in the opposite direction
+                                   " => the cursor moves back to the previous match, on line 1

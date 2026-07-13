@@ -1,0 +1,6 @@
+ex-03 :: Quit Discard Changes  (exercises co-11)
+
+A more milk<Esc>                   " => appends ' more milk' to line 1 and returns to Normal mode
+                                   " => the in-memory buffer now differs from the on-disk file
+:q!<CR>                            " => the ! flag forces the quit even though the buffer is modified
+                                   " => Neovim exits without writing; the discarded edit never touches disk

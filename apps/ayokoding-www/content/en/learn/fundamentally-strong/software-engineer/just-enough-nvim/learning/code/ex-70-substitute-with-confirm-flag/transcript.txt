@@ -1,0 +1,8 @@
+ex-70 :: Substitute with Confirm Flag  (exercises co-10)
+
+:%s/old/new/gc<CR>                 " => the `c` flag makes `:substitute` prompt before each replacement instead of applying silently
+                                   " => Neovim shows a y/n/a/q/l prompt before touching the first match
+y                                  " => confirms the first replacement
+                                   " => 'old fish' becomes 'new fish'
+y                                  " => confirms the second replacement
+                                   " => 'old dog' becomes 'new dog'

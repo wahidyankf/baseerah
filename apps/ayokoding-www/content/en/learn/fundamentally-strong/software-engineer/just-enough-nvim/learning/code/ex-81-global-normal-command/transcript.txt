@@ -1,0 +1,4 @@
+ex-81 :: Global Normal Command  (exercises co-12)
+
+:g/^-/normal A;<CR>                " => `:g/^-/` matches every line starting with a hyphen; `normal A;` runs the Normal-mode command `A;` (append a semicolon) on each match
+                                   " => '-first item' and '-second item' each gain a trailing ';'; the untouched line is skipped entirely

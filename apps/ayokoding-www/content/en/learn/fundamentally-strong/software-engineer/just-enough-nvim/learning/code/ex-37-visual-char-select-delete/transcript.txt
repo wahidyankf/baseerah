@@ -1,0 +1,6 @@
+ex-37 :: Visual Char Select Delete  (exercises co-19)
+
+v                                  " => enters Visual mode (characterwise); the selection anchors at the current cursor cell
+ww                                 " => extends the highlighted selection forward across two words, ending on the 'j' of 'jumps'
+d                                  " => deletes exactly the highlighted span 'brown fox j'
+                                   " => the line becomes 'umps' -- only the highlighted characters were removed

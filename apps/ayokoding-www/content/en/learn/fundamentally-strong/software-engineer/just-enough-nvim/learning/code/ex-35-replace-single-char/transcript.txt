@@ -1,0 +1,5 @@
+ex-35 :: Replace Single Char  (exercises co-02)
+
+r                                  " => `r` waits for exactly one more keystroke to use as the replacement character
+a                                  " => replaces only the character under the cursor with 'a'
+                                   " => the line becomes 'abt'; the cursor stays put and Neovim remains in Normal mode

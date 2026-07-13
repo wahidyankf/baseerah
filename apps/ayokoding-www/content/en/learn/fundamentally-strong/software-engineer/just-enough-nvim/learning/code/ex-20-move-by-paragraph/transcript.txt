@@ -1,0 +1,4 @@
+ex-20 :: Move By Paragraph  (exercises co-03)
+
+}                                  " => jumps forward to the next blank-line paragraph boundary -- lands on the empty line 3
+{                                  " => jumps backward to the previous blank-line boundary -- back to the top of the file

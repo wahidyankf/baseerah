@@ -1,0 +1,6 @@
+ex-63 :: Indent Shift Multiple Lines  (exercises co-05, co-19)
+
+V                                  " => enters Visual mode (linewise), selecting the current line
+jj                                 " => extends the selection down two more lines, covering all three
+3>                                 " => a count before the `>` operator shifts every selected line right by three shiftwidths in one operation
+                                   " => all three lines are now indented by 3x shiftwidth (e.g. 12 spaces)

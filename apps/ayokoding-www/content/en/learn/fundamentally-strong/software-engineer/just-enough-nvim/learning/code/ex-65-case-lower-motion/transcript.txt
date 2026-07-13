@@ -1,0 +1,4 @@
+ex-65 :: Case Lower Motion  (exercises co-04, co-06)
+
+guiw                               " => the `gu` operator combined with the `iw` text object lowercases the entire word under the cursor in one command
+                                   " => 'BROWN' becomes 'brown'; the rest of the line is untouched

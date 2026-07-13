@@ -1,0 +1,4 @@
+ex-01 :: Launch Nvim on File  (exercises co-01)
+
+$ nvim notes.txt                   " => Neovim opens notes.txt and starts in Normal mode (the default 'home' mode)
+                                   " => the buffer displays all three lines exactly as they are on disk

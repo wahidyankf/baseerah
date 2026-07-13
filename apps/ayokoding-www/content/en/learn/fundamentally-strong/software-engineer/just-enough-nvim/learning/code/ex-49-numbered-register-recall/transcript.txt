@@ -1,0 +1,6 @@
+ex-49 :: Numbered Register Recall  (exercises co-07)
+
+dd                                 " => deletes 'line A'; the numbered registers shift: register 1 now holds 'line A'
+dd                                 " => deletes 'line B' (now the current line); registers shift again: register 1 holds 'line B', register 2 holds 'line A'
+"2p                                " => pastes from register 2, not the default unnamed register
+                                   " => 'line A' (the second-most-recent deletion) is inserted, not 'line B'

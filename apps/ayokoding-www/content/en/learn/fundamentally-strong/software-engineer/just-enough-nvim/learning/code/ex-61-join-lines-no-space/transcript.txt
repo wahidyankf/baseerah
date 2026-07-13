@@ -1,0 +1,4 @@
+ex-61 :: Join Lines No Space  (exercises co-04)
+
+gJ                                 " => joins the next line onto the current one with no inserted space
+                                   " => the two lines merge directly: 'brown foxjumps high'

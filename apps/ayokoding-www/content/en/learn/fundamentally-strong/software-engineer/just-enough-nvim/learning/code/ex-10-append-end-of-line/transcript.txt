@@ -1,0 +1,5 @@
+ex-10 :: Append End of Line  (exercises co-02)
+
+A                                  " => moves the cursor to end-of-line first, then enters Insert mode there
+ jumps<Esc>                        " => types ' jumps' at end of line
+                                   " => the line becomes 'brown fox jumps' regardless of where the cursor started

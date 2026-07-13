@@ -1,0 +1,5 @@
+INFO: server started
+DEBUG: cache warmed
+INFO: request received
+DEBUG: cache hit
+INFO: response sent

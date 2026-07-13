@@ -1,0 +1,4 @@
+ex-71 :: Substitute with Line Range  (exercises co-11)
+
+:10,20s/old/new/g<CR>              " => the explicit range `10,20` restricts the substitution to only those line numbers
+                                   " => lines 10 through 20 change from 'old N' to 'new N'; lines 1-9 and 21-22 keep 'old'

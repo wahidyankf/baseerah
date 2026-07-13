@@ -1,0 +1,6 @@
+ex-26 :: Yank and Paste Line  (exercises co-07)
+
+yy                                 " => yanks (copies) the current line into the unnamed register
+                                   " => the buffer is unchanged; the line is now available to paste
+p                                  " => pastes the yanked line directly below the current line
+                                   " => the buffer gains a duplicate: 'buy milk' now appears twice

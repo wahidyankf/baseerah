@@ -1,0 +1,4 @@
+ex-45 :: Text Object a Paragraph  (exercises co-06)
+
+dap                                " => `d` combined with the `ap` ('a paragraph') text object deletes the whole paragraph under the cursor plus its trailing blank line
+                                   " => the first paragraph's two lines and the blank line after it are all removed in one command

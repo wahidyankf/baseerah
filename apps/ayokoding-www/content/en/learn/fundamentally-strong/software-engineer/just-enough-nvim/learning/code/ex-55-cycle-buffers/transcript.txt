@@ -1,0 +1,6 @@
+ex-55 :: Cycle Buffers  (exercises co-15)
+
+:bnext<CR>                         " => advances to the next buffer in the list
+                                   " => the active buffer becomes #2 (b.txt)
+:bprevious<CR>                     " => moves back to the previous buffer in the list
+                                   " => the active buffer returns to #1 (a.txt)

@@ -1,0 +1,4 @@
+ex-43 :: Text Object Inner Quote  (exercises co-06)
+
+di"                                " => `d` combined with the `i"` text object deletes only the text between the quote marks
+                                   " => the quotes remain empty: 'say "" now'

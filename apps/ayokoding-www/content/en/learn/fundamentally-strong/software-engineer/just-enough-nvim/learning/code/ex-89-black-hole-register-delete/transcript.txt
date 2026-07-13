@@ -1,0 +1,9 @@
+ex-89 :: Black Hole Register Delete  (exercises co-07)
+
+dw                                 " => deletes 'keep ' into the unnamed register (default behavior)
+                                   " => the unnamed register now holds 'keep '
+j                                  " => moves down to the second line
+"_dd                               " => deleting into the black hole register `_` discards the line without touching any other register
+                                   " => the second line is gone, but the unnamed register still holds 'keep ' from the earlier delete
+p                                  " => pastes from the unnamed register
+                                   " => 'keep ' reappears -- proof the black-hole deletion never overwrote it

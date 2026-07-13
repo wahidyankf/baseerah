@@ -1,0 +1,9 @@
+ex-74 :: Record and Play Macro  (exercises co-14)
+
+qa                                 " => starts recording keystrokes into register `a`
+A!<Esc>                            " => appends '!' to the end of the current line and returns to Normal mode -- the edit being recorded
+q                                  " => stops recording
+                                   " => register a now holds the exact keystroke sequence 'A!<Esc>'
+j                                  " => moves down to line 2
+@a                                 " => replays register a's recorded sequence once at the new cursor position
+                                   " => line 2 also gets '!' appended, reproducing the recorded edit exactly

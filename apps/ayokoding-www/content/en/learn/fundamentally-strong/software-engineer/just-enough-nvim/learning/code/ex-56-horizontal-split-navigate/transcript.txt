@@ -1,0 +1,7 @@
+ex-56 :: Horizontal Split Navigate  (exercises co-15)
+
+:split<CR>                         " => opens a second horizontal viewport onto the same buffer
+                                   " => the window is now divided top and bottom, both showing buffer.txt
+<C-w>j                             " => moves focus to the window below
+<C-w>k                             " => moves focus to the window above
+                                   " => focus toggles between the top and bottom windows

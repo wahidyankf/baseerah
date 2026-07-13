@@ -122,3 +122,84 @@ newer than runtime` — a confirmed, upstream-acknowledged gap (the package's ow
 - **Triage**: → pending (candidate home: none needed beyond the code fix itself — already landed;
   consider whether other ecosystem-reserved filenames, e.g. future non-Hugo apps, need a similar
   proactive audit rather than reactive discovery).
+
+### openapi-generator-cli jar-download race is a second concurrency-flake class
+
+- **What**: `organiclever-be:codegen` failed on the Phase 0 push's `main-ci` run with
+  `Error: Unable to access jarfile ...`. Root cause: `main-ci` and `pr-quality-gate` both trigger
+  off the same push and both run `organiclever-be:codegen` (via `npx openapi-generator-cli`) on the
+  same self-hosted runner at nearly the same instant; the two invocations raced on the shared
+  jar-download cache and one saw a jarfile the other had already moved/cleaned up. No relationship
+  to the Phase 0 diff (no `organiclever-be`, spec, or codegen files touched).
+- **Why it matters**: This is the same _class_ of failure as the previously-documented rustup
+  concurrency race (self-hosted runner + multiple co-triggered workflows racing a shared tool
+  cache) but a different tool/cache (`openapi-generator-cli`'s jar cache vs. rustup components).
+  Confirms the pattern is generic to "any tool with a shared local cache, invoked by 2+ workflows
+  the same push fires concurrently" — not specific to Rust. Fix is re-run, not a code change;
+  worth an infra-side fix (per-workflow cache isolation or a concurrency lock) if it keeps recurring.
+- **Surfaced during**: Phase 0 push, `main-ci` run 29260619917, job "`.NET quality gate (all
+projects)`".
+- **Triage**: → pending (candidate home: extend the existing CI-concurrency infra note — same
+  remediation class as rustup — to cover openapi-generator-cli, or any shared-cache tool, once a
+  second occurrence confirms it's not a one-off).
+
+### Per-Topic Phase Template lagged its own Phase 0 decision (DD-37)
+
+- **What**: `delivery.md`'s shared "Per-Topic Phase Template" (§A1 maker dispatch, §A3 checker
+  dispatch) still routed `<fmt>=Primer` → `apps-ayokoding-www-by-example-maker`/`-checker` and
+  `<fmt>=Annotated-concept` → `apps-ayokoding-www-general-maker`/`-checker` — stale text written
+  before this plan's own Phase 0 created dedicated `apps-ayokoding-www-primer-*` and
+  `apps-ayokoding-www-annotated-concept-*` trios (DD-37, tech-docs.md). Independently, all 32
+  concrete per-phase `A3/D/F/G` lines (15 Primer + 17 Annotated-concept phases) hardcoded
+  `apps-ayokoding-www-by-example-checker` uniformly regardless of format — a second, separate copy
+  of the same staleness, not derived from the template. Caught while scoping Phase 1's A1 step,
+  before authoring a single topic, by grepping every Primer/Annotated-concept-tagged phase block for
+  `by-example-checker`/`general-checker`/`general-maker`. Fixed the template (2 dispatch lines) and
+  all 32 phase-level lines via targeted `sed` on the exact line numbers (re-scanned after each edit
+  batch, since line numbers shift once inserted text changes line counts — one phase, Java/Phase 91,
+  was missed on the first pass for exactly this reason and caught by a full re-scan before moving on).
+- **Why it matters**: A plan that spans 94 near-identical phases is exactly where a template/decision
+  drift compounds silently — every one of 32 remaining topics would have invoked the wrong, no-longer
+  authoritative agent if this weren't caught before Phase 1 authoring began. The fix pattern (full
+  programmatic re-scan after every batch edit, never trust line numbers captured before an edit) is
+  itself worth remembering for any future delivery.md bulk-correction.
+- **Surfaced during**: Phase 1 setup, scoping A1's maker agent before authoring `just-enough-nvim`.
+- **Triage**: → pending (candidate home: none needed beyond the fix itself — already landed across
+  the template + all 32 phases; consider whether plan-checker should gain a "phase text vs. DD
+  registry" drift check for future large multi-phase plans).
+
+### `_index.md` body content is silently wiped by the build — a repo-wide landmine
+
+- **What**: `apps/ayokoding-www/src/features/content/shell/index-generator.ts`'s `rebuildIndexFile()`
+  treats **every** file literally named `_index.md` as an auto-generated section-nav-stub: on every
+  `npx nx run ayokoding-www:build`, it keeps only the frontmatter and wholesale-replaces the body with
+  an auto-generated child link list — for a leaf directory with **no** child content pages, the child
+  list is empty, so the body is wiped to **bare frontmatter, nothing else survives**. Discovered when
+  the drilling-page authoring agent wrote its full five-section content directly into
+  `just-enough-nvim/drilling/_index.md`; a later `npx nx run ayokoding-www:build` (run by that same
+  agent, and again by me during verification) silently destroyed it — the agent's own self-report
+  claimed rich verified content (55 `<details>` blocks, 60 headings, a passing build) that in fact no
+  longer existed on disk, because its checks ran _before_ the wiping build call, not after. Caught only
+  by independently re-verifying with `wc -l` instead of trusting the agent's report. The already-correct
+  pattern elsewhere in this same topic (`learning/_index.md` is a thin stub; the real prose lives in
+  `learning/overview.md`) was the tell — it worked by accident because it was authored as a stub from
+  the start, not because anyone knew the rule.
+- **Why it matters**: `delivery.md`'s Per-Topic Phase Template (A2 capstone, D drilling) and the
+  Inter-Topic Capstone Template both instructed authoring content directly into an `_index.md` file —
+  unsafe repo-wide, and would have silently destroyed the capstone/drilling page for every one of the
+  remaining 93 topics plus all 10 inter-topic capstones (~197 pages) the moment anyone ran the build
+  after authoring them, with the _appearance_ of success (agents self-verify with a build that itself
+  causes the corruption, then report content that used to exist). Fixed by updating both templates: an
+  `_index.md` in these positions is now explicitly bare-frontmatter-only, with real content moved to a
+  sibling `overview.md` (`weight: 1`), mirroring the pattern that already worked for `learning/`. Also
+  sent a live correction to the in-flight A2 capstone agent before it could hit the same trap. General
+  lesson: a subagent's self-reported verification is only as trustworthy as the order of its checks
+  relative to any destructive side effect it triggers itself — "I ran the build and it passed" does not
+  mean "my content survived the build."
+- **Surfaced during**: Phase 1, step D (drilling) authoring + independent verification.
+- **Triage**: → pending (candidate home: (1) the fix is already landed in delivery.md's templates for
+  this plan; (2) consider whether `index-generator.ts`'s destructive wipe-on-no-children behavior is
+  itself worth hardening — e.g. refuse to overwrite a non-trivial existing body rather than silently
+  discarding it — as a durable platform-level guardrail, filed separately from this plan; (3) the
+  "verify after side-effecting operations, not before" lesson is generic enough to consider for a
+  agent-authoring convention/skill note).

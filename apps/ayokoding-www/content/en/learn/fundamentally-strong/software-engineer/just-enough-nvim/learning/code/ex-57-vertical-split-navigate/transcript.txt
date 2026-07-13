@@ -1,0 +1,7 @@
+ex-57 :: Vertical Split Navigate  (exercises co-15)
+
+:vsplit<CR>                        " => opens a second vertical viewport onto the same buffer
+                                   " => the window is now divided left and right
+<C-w>l                             " => moves focus to the window on the right
+<C-w>h                             " => moves focus to the window on the left
+                                   " => focus toggles between the left and right windows

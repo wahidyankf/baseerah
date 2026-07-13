@@ -1,0 +1,4 @@
+ex-64 :: Case Toggle Tilde  (exercises co-04)
+
+~                                  " => flips the case of the character under the cursor ('C' becomes 'c') and advances the cursor one column to the right
+                                   " => the line becomes 'cat' after this single press; the cursor now sits on 'a'

@@ -1,0 +1,4 @@
+ex-34 :: Count Prefixed Delete  (exercises co-05)
+
+3dd                                " => a count before an operator+motion multiplies the whole command: `3dd` deletes 3 lines starting at the cursor
+                                   " => 'line one' through 'line three' are removed in a single command

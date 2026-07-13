@@ -1,0 +1,8 @@
+ex-58 :: Open New Tab  (exercises co-15)
+
+:tabnew<CR>                        " => opens a new, numbered tab page with an empty buffer
+                                   " => there are now two tab pages; the new one is active
+gt                                 " => cycles forward to the next tab page
+                                   " => focus wraps back to tab 1
+gT                                 " => cycles backward to the previous tab page
+                                   " => focus returns to tab 2

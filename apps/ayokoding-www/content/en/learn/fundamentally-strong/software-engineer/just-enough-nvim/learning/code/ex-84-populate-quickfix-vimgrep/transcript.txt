@@ -1,0 +1,4 @@
+ex-84 :: Populate Quickfix Vimgrep  (exercises co-17)
+
+:vimgrep /TODO/ **/*.txt<CR>       " => searches every .txt file matching the glob for the pattern 'TODO' and populates the quickfix list with each match
+                                   " => the quickfix list now holds two entries: one in a.txt, one in c.txt; b.txt contributes nothing

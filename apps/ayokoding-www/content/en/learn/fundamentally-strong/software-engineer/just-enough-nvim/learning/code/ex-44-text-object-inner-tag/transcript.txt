@@ -1,0 +1,6 @@
+ex-44 :: Text Object Inner Tag  (exercises co-06)
+
+cit                                " => `c` combined with the `it` (inner tag) text object deletes only the content between the opening and closing tags and opens Insert mode there
+                                   " => 'old text' is deleted; the `<p>` and `</p>` tags themselves remain
+new text<Esc>                      " => types the replacement content
+                                   " => the line becomes '<p>new text</p>'

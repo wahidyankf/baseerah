@@ -1,0 +1,12 @@
+ex-77 :: Undo Tree Time Travel  (exercises co-13)
+
+A one<Esc>                         " => appends ' one'; this is change #1
+                                   " => the line becomes 'base line one'
+u                                  " => undoes change #1
+                                   " => the line reverts to 'base line'
+A two<Esc>                         " => makes a NEW edit from the undone state; this creates a second branch in the undo tree rather than erasing the first
+                                   " => the line becomes 'base line two'
+g-                                 " => steps backward through the undo tree by change number rather than by branch
+                                   " => the buffer reaches an earlier state, 'base line'
+g+                                 " => steps forward through the undo tree
+                                   " => the buffer reaches 'base line two' again -- the branch that plain `u`/`<C-r>` alone could not reliably reach once a new edit had been made

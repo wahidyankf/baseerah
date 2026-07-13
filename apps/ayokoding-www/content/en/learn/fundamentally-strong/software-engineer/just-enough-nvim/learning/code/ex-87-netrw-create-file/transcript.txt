@@ -1,0 +1,5 @@
+ex-87 :: Netrw Create File  (exercises co-18)
+
+%                                  " => inside netrw, prompts for a new filename to create
+new-notes.txt<CR>                  " => types the filename and confirms
+                                   " => a new, empty file 'new-notes.txt' is created on disk and opened for editing

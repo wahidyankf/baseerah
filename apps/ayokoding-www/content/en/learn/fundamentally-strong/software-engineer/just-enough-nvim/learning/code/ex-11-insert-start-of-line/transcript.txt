@@ -1,0 +1,5 @@
+ex-11 :: Insert Start of Line  (exercises co-02)
+
+I                                  " => moves the cursor to the line's first non-blank character (skipping the leading spaces), then enters Insert mode there
+the <Esc>                          " => types 'the ' right before 'brown', not before the leading spaces
+                                   " => the line becomes '   the brown fox' -- indentation preserved

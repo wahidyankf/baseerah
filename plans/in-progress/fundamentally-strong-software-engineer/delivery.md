@@ -143,8 +143,10 @@ invocation, and a concrete acceptance criterion (execution-grade clarity).
    `syllabus/<NN>-<slug>.md`; primers, Essentials, and how-to tool topics **omit** them (padding avoidance).
    `<fmt>` = By Example → invoke `apps-ayokoding-www-by-example-maker`
    (five-part examples in `<lang>`, density 1.0–2.25); `<fmt>` = Annotated-concept → invoke
-   `apps-ayokoding-www-general-maker` (annotated worked examples + diagrams); `<fmt>` = Primer → invoke
-   `apps-ayokoding-www-by-example-maker` scoped to "just enough". **Acceptance**: files exist with the
+   `apps-ayokoding-www-annotated-concept-maker` (45-60 concept-centric worked examples + diagrams, or
+   the validated no-code sub-mode for leadership ‡ topics); `<fmt>` = Primer → invoke
+   `apps-ayokoding-www-primer-maker` (75-85 examples at By-Example pace, scoped to "just enough").
+   **Acceptance**: files exist with the
    stated weights; `overview.md` carries the three-part Prerequisites block (DD-31); the `Why this exists ·
 the big idea` opener is present with ≥1 Cross-Cutting Big-Idea tag drawn from the eight-idea spine
    (DD-33); a judgment/altitude topic carries the Tensions & trade-offs + Lineage sections and a
@@ -154,8 +156,16 @@ the big idea` opener is present with ≥1 Cross-Cutting Big-Idea tag drawn from 
    DD-20 sharpening holds (no implicit dependencies — every identifier defined/imported in-snippet; and
    expected output shown inline as a comment in idiomatic syntax, e.g. `# => …` / `// prints: …`);
    DD-19 (no TODO/TBD/stub/placeholder).
-3. **[AI] A2 — Author the intra-topic capstone (DD-27).** Create `CONTENT/<slug>/learning/capstone/_index.md`
-   (frontmatter `weight: 900`) and capstone pages built strictly from the capstone spec in
+3. **[AI] A2 — Author the intra-topic capstone (DD-27).** **HARD RULE — never author body content into
+   an `_index.md` file** (`apps/ayokoding-www/src/features/content/shell/index-generator.ts`'s
+   `rebuildIndexFile()` treats every file literally named `_index.md` as a section-nav-stub and
+   wholesale-replaces its body with an auto-generated child link list on every
+   `npx nx run ayokoding-www:build` — for a leaf directory with no child pages this **silently wipes the
+   body to bare frontmatter**, discovered and confirmed during Phase 1). Create
+   `CONTENT/<slug>/learning/capstone/_index.md` as **bare frontmatter only** (`weight: 900`, title — no
+   body), and put the actual capstone content in `CONTENT/<slug>/learning/capstone/overview.md`
+   (frontmatter `weight: 1`, mirroring the proven-safe `learning/_index.md` stub + `learning/overview.md`
+   content pattern) built strictly from the capstone spec in
    `syllabus/<NN>-<slug>.md`, with colocated code under `CONTENT/<slug>/learning/capstone/code/`. Scale by
    `<kind>`: **subject** = one cohesive full runnable project; **primer** = a short consolidation program;
    **leadership ‡** = a design/decision capstone producing an artifact (no code). **Acceptance**: the
@@ -163,18 +173,23 @@ the big idea` opener is present with ≥1 Cross-Cutting Big-Idea tag drawn from 
    verify command per step), and testable acceptance criteria; it is runnable end-to-end via its stated
    command (or produces the stated artifact for ‡); DD-30 follow-along holds.
 4. **[AI] A3 — Check the learning subtree + capstone.** Invoke the matching checker
-   (`apps-ayokoding-www-by-example-checker` for By Example/Primer, `apps-ayokoding-www-general-checker` for
-   Annotated-concept) across `CONTENT/<slug>/learning/`. **Acceptance**: no unresolved HIGH/CRITICAL
+   (`apps-ayokoding-www-by-example-checker` for By Example, `apps-ayokoding-www-primer-checker` for
+   Primer, `apps-ayokoding-www-annotated-concept-checker` for Annotated-concept) across
+   `CONTENT/<slug>/learning/`. **Acceptance**: no unresolved HIGH/CRITICAL
    findings; density/five-part/format floors met.
-5. **[AI] D — Author + check the drilling page.** Create `CONTENT/<slug>/drilling/_index.md` (frontmatter
-   `weight: <Dwt>`) via `apps-ayokoding-www-general-maker` using the fixed **five-section** anatomy (Recall
+5. **[AI] D — Author + check the drilling page.** Same **HARD RULE** as A2 — never author body content
+   into an `_index.md` file (silently wiped by the build's `generate-indexes` step for a leaf directory
+   with no child pages). Create `CONTENT/<slug>/drilling/_index.md` as **bare frontmatter only**
+   (`weight: <Dwt>`, title — no body), and put the fixed **five-section** anatomy (Recall
    Q&A / Applied problems / Code katas / Self-check checklist / **Elaborative interrogation &
-   self-explanation**, DD-33), answers and model explanations hidden in `<details>`, katas in
+   self-explanation**, DD-33) in `CONTENT/<slug>/drilling/overview.md` (frontmatter `weight: 1`) via
+   `apps-ayokoding-www-general-maker`, answers and model explanations hidden in `<details>`, katas in
    `<lang>` with colocated files under `CONTENT/<slug>/drilling/code/`; then invoke
    `apps-ayokoding-www-general-checker` on the page. The fifth section asks "**why** does this hold, and
    **why not** the alternative?", links back to the topic's Cross-Cutting Big-Idea tags, and — for
-   judgment topics — references the topic's Tensions/Lineage material. **Acceptance**: `weight: <Dwt>`
-   where `<Dwt> = <Lwt> + 100`; **five** sections present in order (the elaborative section last); every
+   judgment topics — references the topic's Tensions/Lineage material. **Acceptance**: `drilling/_index.md`
+   is a bare-frontmatter stub with `weight: <Dwt>` where `<Dwt> = <Lwt> + 100`; `drilling/overview.md`
+   carries `weight: 1` and all **five** sections present in order (the elaborative section last); every
    answer/explanation inside a `<details>` block; the elaborative section carries ≥1 why/why-not prompt
    tied to a big-idea tag; checker reports no unresolved HIGH/CRITICAL findings.
 6. **[AI] F — Fact-check the topic (DD-35 anti-hallucination gate).** Run `apps-ayokoding-www-facts-checker`
@@ -203,8 +218,12 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
 1. **[AI] Web-verify the capstone stack (DD-28).** Invoke `web-researcher` for the integrated stack;
    fold findings into the capstone's syllabus spec. **Acceptance**: spec's accuracy notes updated; no
    unresolved version/license/CVE conflict.
-2. **[AI] Author the capstone bundle.** Create `CONTENT/<capstone-slug>/_index.md` (frontmatter
-   `weight: <capstoneWt>`) + pages from the syllabus spec, with colocated code under
+2. **[AI] Author the capstone bundle.** Same **HARD RULE** as the per-topic A2/D steps — never author
+   body content into an `_index.md` file (silently wiped by the build's `generate-indexes` step for a
+   leaf directory with no child pages). Create `CONTENT/<capstone-slug>/_index.md` as **bare frontmatter
+   only** (`weight: <capstoneWt>`, title — no body), and put the actual capstone content in
+   `CONTENT/<capstone-slug>/overview.md` (frontmatter `weight: 1`) + any further pages from the syllabus
+   spec, with colocated code under
    `CONTENT/<capstone-slug>/code/`, integrating `<junction>` end-to-end. **For the 6 pass-boundary
    capstones only** (`capstone-forge-ready`, `capstone-first-working-software`, `capstone-solid-core`,
    `capstone-real-world-delivery`, `capstone-concurrency-and-systems`, `capstone-lead-at-altitude`),
@@ -341,138 +360,220 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
 Row: Primer · Neovim § · topic wt 110 · Learn 101 / Drill 201 · **primer**. Template →
 [`syllabus/01-just-enough-nvim.md`](./syllabus/01-just-enough-nvim.md).
 
-- [ ] **[AI] V** — `web-researcher` for `just-enough-nvim`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `just-enough-nvim`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/01-just-enough-nvim.md`](./syllabus/01-just-enough-nvim.md) and fold dated findings back into that file.
-      **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-nvim/learning/` teaching **every** concept in
-      `syllabus/01-just-enough-nvim.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · modal-editing
-  - [ ] co-02 · mode-taxonomy
-  - [ ] co-03 · motions
-  - [ ] co-04 · operator-motion-grammar
-  - [ ] co-05 · counts
-  - [ ] co-06 · text-objects
-  - [ ] co-07 · registers
-  - [ ] co-08 · marks-and-jumplist
-  - [ ] co-09 · the-dot-repeat
-  - [ ] co-10 · search-and-substitution
-  - [ ] co-11 · ex-command-ranges
-  - [ ] co-12 · the-global-command
-  - [ ] co-13 · undo-tree
-  - [ ] co-14 · macros
-  - [ ] co-15 · buffers-windows-tabs
-  - [ ] co-16 · folding
-  - [ ] co-17 · quickfix-list
-  - [ ] co-18 · netrw-file-explorer
-  - [ ] co-19 · visual-mode-variants
-  - [ ] co-20 · terminal-mode-and-jobs
-- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-nvim/learning/code/` — one runnable before/after +
+      **Acceptance**: no unresolved "verify" line remains. - _Date: 2026-07-13. Status: done. Files changed: none. Notes: the file's
+      `## Accuracy notes (web-verified)` section (lines 31-87) was already fully web-verified with
+      dated, primary-source citations in a prior sweep (2026-07-12, DD-28/#48); grepped the whole file
+      for `to verify`/`TODO`/`TBD`/`unconfirmed` markers — zero unresolved lines found (the two `TODO`
+      hits are literal example search targets in ex-79/ex-84, not markers). Ran a lightweight
+      `web-researcher` freshness spot-check (not a full re-sweep) per the file's own "re-confirm at
+      authoring time" note: Neovim v0.12.4 (2026-07-05) still current stable, Apache-2.0 license
+      unchanged, netrw opt-in proposal #32280 still open/not landed. No edits required._
+- [x] **[AI] A1-concepts** — Author `CONTENT/just-enough-nvim/learning/` teaching **every** concept in
+      `syllabus/01-just-enough-nvim.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`: - _Date: 2026-07-13. Status: done. Files changed:
+      `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/just-enough-nvim/_index.md`
+      (wt 110), `.../learning/_index.md` (wt 101), `.../learning/overview.md` (wt 1, three-part
+      Prerequisites + Why-this-exists opener tagged `mechanism-vs-policy` + install/run commands up
+      front). Notes: authored via `apps-ayokoding-www-primer-maker`; all 20 concepts (co-01..co-20)
+      independently verified present via `grep -oh 'co-[0-9]\{2\}' | sort -u` = 20; no
+      Tensions/Lineage sections (not a DD-33 judgment topic, correctly omitted); English-only,
+      matching Phase 0's section-root convention._
+  - [x] co-01 · modal-editing
+  - [x] co-02 · mode-taxonomy
+  - [x] co-03 · motions
+  - [x] co-04 · operator-motion-grammar
+  - [x] co-05 · counts
+  - [x] co-06 · text-objects
+  - [x] co-07 · registers
+  - [x] co-08 · marks-and-jumplist
+  - [x] co-09 · the-dot-repeat
+  - [x] co-10 · search-and-substitution
+  - [x] co-11 · ex-command-ranges
+  - [x] co-12 · the-global-command
+  - [x] co-13 · undo-tree
+  - [x] co-14 · macros
+  - [x] co-15 · buffers-windows-tabs
+  - [x] co-16 · folding
+  - [x] co-17 · quickfix-list
+  - [x] co-18 · netrw-file-explorer
+  - [x] co-19 · visual-mode-variants
+  - [x] co-20 · terminal-mode-and-jobs
+- [x] **[AI] A1-examples** — Author `CONTENT/just-enough-nvim/learning/code/` — one runnable before/after +
       keystroke transcript per worked example in `syllabus/01-just-enough-nvim.md` §Worked examples (DD-20/DD-30).
-      One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · launch-nvim-on-file — verify Normal mode shows file contents
-  - [ ] ex-02 · quit-unmodified-buffer — verify `:q` exits, no prompt
-  - [ ] ex-03 · quit-discard-changes — verify `:q!` exits, file unchanged
-  - [ ] ex-04 · reload-discard-with-e-bang — verify `:e!` drops edit
-  - [ ] ex-05 · save-file — verify `:w` writes buffer to disk
-  - [ ] ex-06 · save-and-quit — verify `:wq` writes and exits
-  - [ ] ex-07 · save-and-quit-shortcut — verify `ZZ` writes-if-modified and quits
-  - [ ] ex-08 · enter-insert-before-cursor — verify `i` inserts before column
-  - [ ] ex-09 · enter-insert-after-cursor — verify `a` inserts after column
-  - [ ] ex-10 · append-end-of-line — verify `A` appends at EOL
-  - [ ] ex-11 · insert-start-of-line — verify `I` inserts at first non-blank
-  - [ ] ex-12 · open-line-below — verify `o` opens line below
-  - [ ] ex-13 · open-line-above — verify `O` opens line above
-  - [ ] ex-14 · escape-to-normal — verify `<Esc>` returns to Normal
-  - [ ] ex-15 · move-with-hjkl — verify one-cell moves
-  - [ ] ex-16 · move-by-word — verify `w`/`b` land on word starts
-  - [ ] ex-17 · move-to-word-end — verify `e` lands on word end
-  - [ ] ex-18 · move-line-boundaries — verify `0`/`^`/`$`
-  - [ ] ex-19 · move-file-boundaries — verify `gg`/`G`
-  - [ ] ex-20 · move-by-paragraph — verify `}`/`{`
-  - [ ] ex-21 · delete-char — verify `x` removes one char
-  - [ ] ex-22 · delete-word — verify `dw` removes word+trailing ws
-  - [ ] ex-23 · delete-line — verify `dd` removes line
-  - [ ] ex-24 · delete-to-eol — verify `D` deletes to EOL
-  - [ ] ex-25 · change-word — verify `cw` deletes word, opens Insert
-  - [ ] ex-26 · yank-and-paste-line — verify `yy`+`p` duplicates line
-  - [ ] ex-27 · undo-last-change — verify `u` reverts
-  - [ ] ex-28 · redo-change — verify `<C-r>` reapplies
-  - [ ] ex-29 · basic-search-forward — verify `/needle` jumps to match
-  - [ ] ex-30 · repeat-search — verify `n`/`N`
-  - [ ] ex-31 · basic-substitute-line — verify `:s/old/new/` first hit
-  - [ ] ex-32 · substitute-whole-file — verify `:%s/old/new/g`
-  - [ ] ex-33 · count-prefixed-motion — verify `3w` advances 3 words
-  - [ ] ex-34 · count-prefixed-delete — verify `3dd` deletes 3 lines
-  - [ ] ex-35 · replace-single-char — verify `r` changes one char
-  - [ ] ex-36 · replace-mode-typing — verify `R` overwrites
-  - [ ] ex-37 · visual-char-select-delete — verify `v`+`d`
-  - [ ] ex-38 · visual-line-select-indent — verify `V`+`>`
-  - [ ] ex-39 · visual-block-insert — verify `<C-v>`+`I` on every line
-  - [ ] ex-40 · text-object-inner-word — verify `diw`
-  - [ ] ex-41 · text-object-a-word — verify `daw`
-  - [ ] ex-42 · text-object-inner-paren — verify `ci(`
-  - [ ] ex-43 · text-object-inner-quote — verify `di"`
-  - [ ] ex-44 · text-object-inner-tag — verify `cit`
-  - [ ] ex-45 · text-object-a-paragraph — verify `dap`
-  - [ ] ex-46 · dot-repeat-edit — verify `.` reapplies change
-  - [ ] ex-47 · named-register-yank-paste — verify `"ayy`/`"ap`
-  - [ ] ex-48 · named-register-append — verify `"Ayy` appends
-  - [ ] ex-49 · numbered-register-recall — verify `"2p`
-  - [ ] ex-50 · set-mark-and-jump — verify `ma`/`'a`
-  - [ ] ex-51 · exact-mark-jump — verify `` `b `` exact column
-  - [ ] ex-52 · jumplist-navigation — verify `<C-o>`/`<C-i>`
-  - [ ] ex-53 · open-second-file-buffer — verify `:e other.txt`
-  - [ ] ex-54 · list-and-switch-buffers — verify `:ls`/`:b 2`
-  - [ ] ex-55 · cycle-buffers — verify `:bnext`/`:bprevious`
-  - [ ] ex-56 · horizontal-split-navigate — verify `:split`+`<C-w>j/k`
-  - [ ] ex-57 · vertical-split-navigate — verify `:vsplit`+`<C-w>l/h`
-  - [ ] ex-58 · open-new-tab — verify `:tabnew`+`gt`/`gT`
-  - [ ] ex-59 · write-all-buffers — verify `:wa`
-  - [ ] ex-60 · join-lines — verify `J`
-  - [ ] ex-61 · join-lines-no-space — verify `gJ`
-  - [ ] ex-62 · decrease-indent — verify `<<`
-  - [ ] ex-63 · indent-shift-multiple-lines — verify `V`+`3>`
-  - [ ] ex-64 · case-toggle-tilde — verify `~`
-  - [ ] ex-65 · case-lower-motion — verify `guiw`
-  - [ ] ex-66 · case-upper-motion — verify `gUiw`
-  - [ ] ex-67 · increment-number — verify `<C-a>`
-  - [ ] ex-68 · decrement-number — verify `<C-x>`
-  - [ ] ex-69 · sequential-increment-visual-block — verify `g<C-a>` sequential
-  - [ ] ex-70 · substitute-with-confirm-flag — verify `:%s///gc` prompts
-  - [ ] ex-71 · substitute-with-line-range — verify `:10,20s///g`
-  - [ ] ex-72 · substitute-visual-range — verify `'<,'>s///g`
-  - [ ] ex-73 · substitute-with-capture-group — verify `\1` reuse
-  - [ ] ex-74 · record-and-play-macro — verify `qa…q`/`@a`
-  - [ ] ex-75 · repeat-macro-with-count — verify `5@a`
-  - [ ] ex-76 · repeat-last-macro — verify `@@`
-  - [ ] ex-77 · undo-tree-time-travel — verify `g-`/`g+` reach branch
-  - [ ] ex-78 · inspect-undo-tree — verify `:undolist`
-  - [ ] ex-79 · global-delete-matching-lines — verify `:g/TODO/d`
-  - [ ] ex-80 · global-inverse-keep-matching — verify `:v/KEEP/d`
-  - [ ] ex-81 · global-normal-command — verify `:g/^-/normal A;`
-  - [ ] ex-82 · create-and-toggle-fold — verify `zf`/`za`
-  - [ ] ex-83 · close-open-all-folds — verify `zM`/`zR`
-  - [ ] ex-84 · populate-quickfix-vimgrep — verify `:vimgrep`
-  - [ ] ex-85 · navigate-quickfix-list — verify `:copen`/`:cnext`
-  - [ ] ex-86 · netrw-open-explorer — verify `:Explore`
-  - [ ] ex-87 · netrw-create-file — verify netrw `%`
-  - [ ] ex-88 · netrw-delete-file — verify netrw `D`
-  - [ ] ex-89 · black-hole-register-delete — verify `"_dd` preserves unnamed
-  - [ ] ex-90 · saveas-new-filename — verify `:saveas copy.txt`
-  - [ ] ex-91 · terminal-run-and-escape — verify `:terminal ls` + `<C-\><C-n>` output navigable
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-nvim/learning/capstone/` (`_index.md` weight 900) per the
+      One checkbox per `ex-NN` (1:1 mirror): - _Date: 2026-07-13. Status: done. Files changed:
+      `.../learning/beginner.md` (wt 10, ex-01..30), `.../learning/intermediate.md` (wt 20,
+      ex-31..62), `.../learning/advanced.md` (wt 30, ex-63..91), plus 91 colocated
+      `.../learning/code/ex-NN-<slug>/{before,after,transcript.txt}` directories (300 code files
+      total, 306 files overall). Notes: all 91 examples independently verified present (`grep -oh
+'ex-[0-9]\{2\}'` across the three pages + all transcripts = 91 unique, none skipped/merged/
+      invented); spot-checked ex-73 (capture-group substitute) byte-matches the syllabus's
+      DD-35-cited primary source (`foobar` → `foobaz`); annotation density 1.0-2.25 per example
+      (agent-measured, spot-verified); DD-32 Prev/Next footer chain confirmed correct: section
+      overview → learning/overview → beginner → intermediate → advanced → Topic 2 (the last hop is
+      an intentional forward dead-link to `just-enough-lua`, not yet authored — expected under this
+      plan's per-topic incremental delivery, resolves when Phase 2 lands). Reverted one unrelated
+      build artifact (`apps/ayokoding-www/next-env.d.ts`, a local Next.js routes-path diff, not
+      project state) before verifying. `npx nx run ayokoding-www:build` exit 0 (independently
+      re-run); `npm run lint:md` exit 0, 4001 files. No checker agent invoked yet — that's step A3
+      (separate)._
+  - [x] ex-01 · launch-nvim-on-file — verify Normal mode shows file contents
+  - [x] ex-02 · quit-unmodified-buffer — verify `:q` exits, no prompt
+  - [x] ex-03 · quit-discard-changes — verify `:q!` exits, file unchanged
+  - [x] ex-04 · reload-discard-with-e-bang — verify `:e!` drops edit
+  - [x] ex-05 · save-file — verify `:w` writes buffer to disk
+  - [x] ex-06 · save-and-quit — verify `:wq` writes and exits
+  - [x] ex-07 · save-and-quit-shortcut — verify `ZZ` writes-if-modified and quits
+  - [x] ex-08 · enter-insert-before-cursor — verify `i` inserts before column
+  - [x] ex-09 · enter-insert-after-cursor — verify `a` inserts after column
+  - [x] ex-10 · append-end-of-line — verify `A` appends at EOL
+  - [x] ex-11 · insert-start-of-line — verify `I` inserts at first non-blank
+  - [x] ex-12 · open-line-below — verify `o` opens line below
+  - [x] ex-13 · open-line-above — verify `O` opens line above
+  - [x] ex-14 · escape-to-normal — verify `<Esc>` returns to Normal
+  - [x] ex-15 · move-with-hjkl — verify one-cell moves
+  - [x] ex-16 · move-by-word — verify `w`/`b` land on word starts
+  - [x] ex-17 · move-to-word-end — verify `e` lands on word end
+  - [x] ex-18 · move-line-boundaries — verify `0`/`^`/`$`
+  - [x] ex-19 · move-file-boundaries — verify `gg`/`G`
+  - [x] ex-20 · move-by-paragraph — verify `}`/`{`
+  - [x] ex-21 · delete-char — verify `x` removes one char
+  - [x] ex-22 · delete-word — verify `dw` removes word+trailing ws
+  - [x] ex-23 · delete-line — verify `dd` removes line
+  - [x] ex-24 · delete-to-eol — verify `D` deletes to EOL
+  - [x] ex-25 · change-word — verify `cw` deletes word, opens Insert
+  - [x] ex-26 · yank-and-paste-line — verify `yy`+`p` duplicates line
+  - [x] ex-27 · undo-last-change — verify `u` reverts
+  - [x] ex-28 · redo-change — verify `<C-r>` reapplies
+  - [x] ex-29 · basic-search-forward — verify `/needle` jumps to match
+  - [x] ex-30 · repeat-search — verify `n`/`N`
+  - [x] ex-31 · basic-substitute-line — verify `:s/old/new/` first hit
+  - [x] ex-32 · substitute-whole-file — verify `:%s/old/new/g`
+  - [x] ex-33 · count-prefixed-motion — verify `3w` advances 3 words
+  - [x] ex-34 · count-prefixed-delete — verify `3dd` deletes 3 lines
+  - [x] ex-35 · replace-single-char — verify `r` changes one char
+  - [x] ex-36 · replace-mode-typing — verify `R` overwrites
+  - [x] ex-37 · visual-char-select-delete — verify `v`+`d`
+  - [x] ex-38 · visual-line-select-indent — verify `V`+`>`
+  - [x] ex-39 · visual-block-insert — verify `<C-v>`+`I` on every line
+  - [x] ex-40 · text-object-inner-word — verify `diw`
+  - [x] ex-41 · text-object-a-word — verify `daw`
+  - [x] ex-42 · text-object-inner-paren — verify `ci(`
+  - [x] ex-43 · text-object-inner-quote — verify `di"`
+  - [x] ex-44 · text-object-inner-tag — verify `cit`
+  - [x] ex-45 · text-object-a-paragraph — verify `dap`
+  - [x] ex-46 · dot-repeat-edit — verify `.` reapplies change
+  - [x] ex-47 · named-register-yank-paste — verify `"ayy`/`"ap`
+  - [x] ex-48 · named-register-append — verify `"Ayy` appends
+  - [x] ex-49 · numbered-register-recall — verify `"2p`
+  - [x] ex-50 · set-mark-and-jump — verify `ma`/`'a`
+  - [x] ex-51 · exact-mark-jump — verify `` `b `` exact column
+  - [x] ex-52 · jumplist-navigation — verify `<C-o>`/`<C-i>`
+  - [x] ex-53 · open-second-file-buffer — verify `:e other.txt`
+  - [x] ex-54 · list-and-switch-buffers — verify `:ls`/`:b 2`
+  - [x] ex-55 · cycle-buffers — verify `:bnext`/`:bprevious`
+  - [x] ex-56 · horizontal-split-navigate — verify `:split`+`<C-w>j/k`
+  - [x] ex-57 · vertical-split-navigate — verify `:vsplit`+`<C-w>l/h`
+  - [x] ex-58 · open-new-tab — verify `:tabnew`+`gt`/`gT`
+  - [x] ex-59 · write-all-buffers — verify `:wa`
+  - [x] ex-60 · join-lines — verify `J`
+  - [x] ex-61 · join-lines-no-space — verify `gJ`
+  - [x] ex-62 · decrease-indent — verify `<<`
+  - [x] ex-63 · indent-shift-multiple-lines — verify `V`+`3>`
+  - [x] ex-64 · case-toggle-tilde — verify `~`
+  - [x] ex-65 · case-lower-motion — verify `guiw`
+  - [x] ex-66 · case-upper-motion — verify `gUiw`
+  - [x] ex-67 · increment-number — verify `<C-a>`
+  - [x] ex-68 · decrement-number — verify `<C-x>`
+  - [x] ex-69 · sequential-increment-visual-block — verify `g<C-a>` sequential
+  - [x] ex-70 · substitute-with-confirm-flag — verify `:%s///gc` prompts
+  - [x] ex-71 · substitute-with-line-range — verify `:10,20s///g`
+  - [x] ex-72 · substitute-visual-range — verify `'<,'>s///g`
+  - [x] ex-73 · substitute-with-capture-group — verify `\1` reuse
+  - [x] ex-74 · record-and-play-macro — verify `qa…q`/`@a`
+  - [x] ex-75 · repeat-macro-with-count — verify `5@a`
+  - [x] ex-76 · repeat-last-macro — verify `@@`
+  - [x] ex-77 · undo-tree-time-travel — verify `g-`/`g+` reach branch
+  - [x] ex-78 · inspect-undo-tree — verify `:undolist`
+  - [x] ex-79 · global-delete-matching-lines — verify `:g/TODO/d`
+  - [x] ex-80 · global-inverse-keep-matching — verify `:v/KEEP/d`
+  - [x] ex-81 · global-normal-command — verify `:g/^-/normal A;`
+  - [x] ex-82 · create-and-toggle-fold — verify `zf`/`za`
+  - [x] ex-83 · close-open-all-folds — verify `zM`/`zR`
+  - [x] ex-84 · populate-quickfix-vimgrep — verify `:vimgrep`
+  - [x] ex-85 · navigate-quickfix-list — verify `:copen`/`:cnext`
+  - [x] ex-86 · netrw-open-explorer — verify `:Explore`
+  - [x] ex-87 · netrw-create-file — verify netrw `%`
+  - [x] ex-88 · netrw-delete-file — verify netrw `D`
+  - [x] ex-89 · black-hole-register-delete — verify `"_dd` preserves unnamed
+  - [x] ex-90 · saveas-new-filename — verify `:saveas copy.txt`
+  - [x] ex-91 · terminal-run-and-escape — verify `:terminal ls` + `<C-\><C-n>` output navigable
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-nvim/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
-      is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+      is fully hit. - _Date: 2026-07-13. Status: done. Files changed:
+      `.../learning/capstone/_index.md` (bare frontmatter stub, wt 900),
+      `.../learning/capstone/overview.md` (wt 1, full content, 272 lines),
+      `.../learning/capstone/code/{before,after}/{calc.py,main.py,tasks.txt}`,
+      `.../learning/capstone/code/transcript.md`. Notes: authored via
+      `apps-ayokoding-www-primer-maker`; correctly avoided the `_index.md`-body-wipe trap from the
+      start (real content in `overview.md`, `_index.md` left as a stub) — confirmed via independent
+      re-verification: `wc -l` shows `_index.md`=8, `overview.md`=272, stable across an independent
+      `npx nx run ayokoding-www:build` re-run I performed myself after the agent's own. Every
+      keystroke in the capstone was verified against a real headless Neovim session (not just
+      reasoned about) via `nvim --headless --listen <socket>` + `--remote-send`; `:vimgrep`→`:copen`→
+      `:cdo` rename, macro+`10@a` replay, and `python3 -m py_compile *.py` all confirmed working
+      end-to-end; `diff -r` between the reproduced tree and shipped `after/` is empty. No plugin,
+      mouse, or arrow key. Correctly-ordered Prev/Next footer confirmed (`../advanced.md` ←→
+      `../../../just-enough-lua/learning/overview.md`, same intentional forward-dead-link pattern as
+      `advanced.md`). Reverted the recurring `next-env.d.ts` build-noise artifact again before
+      verifying. No checker agent invoked yet — that's step A3._
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-nvim/drilling/_index.md` (wt 201) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. - _Date: 2026-07-14.
+      Status: done. Files changed: `.../drilling/_index.md` (bare stub, wt 201),
+      `.../drilling/overview.md` (wt 1, 846 lines, 5-section spaced-repetition anatomy),
+      `.../drilling/code/kata-01..08-*/` (8 katas, before/after fixtures), plus targeted fixes to
+      `.../learning/advanced.md` and `.../drilling/overview.md`. Notes: **A3** —
+      `apps-ayokoding-www-primer-checker` on `learning/`: PASS, 0 CRITICAL/HIGH (91 examples, density
+      1.00-2.25, five-part structure 100% compliant, scope discipline confirmed no plugin/LSP drift;
+      2 LOW informational findings, both pre-approved patterns, no fix needed). **D** —
+      `apps-ayokoding-www-general-checker` on `drilling/overview.md`: 1 HIGH (footer Next-target
+      inconsistency) + 1 MEDIUM (co-01/co-02 checklist merge), both fixed via
+      `apps-ayokoding-www-general-fixer` and independently re-verified (footer now
+      `../../just-enough-lua/learning/overview.md`; checklist now 20:20 concept mapping). **F** —
+      `apps-ayokoding-www-link-checker`: PASS clean, 0 broken links (3 expected forward dead-links to
+      unauthored Topic 2 correctly not flagged). `apps-ayokoding-www-facts-checker` (DD-35 gate,
+      real headless-Neovim execution against every distinct command): found 2 CRITICAL + 2 HIGH real
+      bugs — Example 69 (advanced.md) missing a `f0` cursor-positioning motion before
+      `<C-v>jjg<C-a>`, left the buffer unchanged instead of the documented `item 1/2/3`; Example 89
+      (advanced.md) black-hole-register "After" block contradicted both real Neovim output and its
+      own prose annotation; Example 73 (advanced.md) falsely claimed a capture-group example was
+      "Neovim's own documented example... verbatim" (it isn't — real doc example is
+      `\([abc]\)\([efg]\)`/`\2\1`); Example 77 (advanced.md) + Kata 7 (drilling/overview.md)
+      misstated the undo-tree `g-` press count needed to reach the abandoned branch (real: 1 press,
+      not the higher count each claimed). All 4 fixed via `apps-ayokoding-www-facts-fixer` and
+      independently re-verified by me via my own real headless-Neovim runs (`nvim -u NONE -N
+--headless`), reproducing each documented Before→transcript→After sequence and confirming
+      exact match post-fix. 2 LOW findings left untouched per audit (internal editorial terminology;
+      Prettier-trimmed trailing-whitespace cosmetic diff — neither a real content bug). **G** —
+      `npx nx run ayokoding-www:build` exit 0 (1320/1320 static pages); `npm run lint:md` exit 0
+      (4011 files, 0 errors); `drilling/_index.md` (8 lines) and `drilling/overview.md` (846 lines)
+      confirmed stable across this build. Reverted `next-env.d.ts` build-noise artifact._
 
 ### Phase 1 Gate
 
-- [ ] [AI] `just-enough-nvim/` complete: `_index.md` wt 110, `learning/_index.md` wt 101,
+- [x] [AI] `just-enough-nvim/` complete: `_index.md` wt 110, `learning/_index.md` wt 101,
       `drilling/_index.md` wt 201, capstone wt 900; all 20 concepts + 91 worked examples + capstone present;
-      checkers + facts-checker clean; build + `lint:md` exit 0.
+      checkers + facts-checker clean; build + `lint:md` exit 0. - \_Date: 2026-07-14. Status: done.
+      Notes: completeness verified independently — `find learning/code -maxdepth 1 -type d -name
+  'ex-*'` = 91; all `co-01`..`co-20` referenced across `learning/*.md`; `learning/_index.md` wt
+      101, `drilling/_index.md` wt 201, `learning/capstone/_index.md` wt 900, top-level `_index.md`
+      wt 110 (all confirmed via frontmatter read); capstone present and runnable
+      (`learning/capstone/overview.md`, 272 lines); primer-checker/link-checker/general-checker/
+      facts-checker all clean (facts-checker's 2 CRITICAL + 2 HIGH resolved and re-verified in the
+      A3/D/F/G step above); `npx nx run ayokoding-www:build` + `npm run lint:md` both exit 0. 337
+      total files under `just-enough-nvim/`.
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 
@@ -596,7 +697,7 @@ Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. T
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-lua/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-lua/drilling/_index.md` (wt 202) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -897,7 +998,7 @@ Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Te
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-python/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-python/drilling/_index.md` (wt 204) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -1037,7 +1138,7 @@ Row: Primer · Bash/shell † · topic wt 150 · Learn 105 / Drill 205 · **prim
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-bash/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-bash/drilling/_index.md` (wt 205) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -1501,7 +1602,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 190 · Learn 109 / Drill 209 �
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/project-management/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/project-management/drilling/_index.md` (wt 209) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -2043,7 +2144,7 @@ Row: Primer · TypeScript † · topic wt 230 · Learn 113 / Drill 213 · **prim
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-typescript/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-typescript/drilling/_index.md` (wt 213) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -2724,7 +2825,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 280 · Learn 118 / Drill 218 �
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/technical-communication/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/technical-communication/drilling/_index.md` (wt 218) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -2841,7 +2942,7 @@ Row: Annotated-concept · Python \* · topic wt 290 · Learn 119 / Drill 219 · 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/computer-science-foundations/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/computer-science-foundations/drilling/_index.md` (wt 219) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -4219,7 +4320,7 @@ Row: Annotated-concept · Python \* · topic wt 390 · Learn 129 / Drill 229 · 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-networking/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/advanced-networking/drilling/_index.md` (wt 229) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -4324,7 +4425,7 @@ Row: Annotated-concept · Python \* · topic wt 400 · Learn 130 / Drill 230 · 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-engineering-practices/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/software-engineering-practices/drilling/_index.md` (wt 230) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -4434,7 +4535,7 @@ Row: Annotated-concept · ‡ polyglot · topic wt 410 · Learn 131 / Drill 231 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/agentic-coding/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/agentic-coding/drilling/_index.md` (wt 231) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -4521,7 +4622,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 420 · Learn 132 / Drill 232 �
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-product-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/software-product-engineering/drilling/_index.md` (wt 232) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -4599,7 +4700,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 430 · Learn 133 / Drill 233 �
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/engineering-management/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/engineering-management/drilling/_index.md` (wt 233) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5157,7 +5258,7 @@ Row: Annotated-concept · Python · topic wt 470 · Learn 137 / Drill 237 · **s
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/data-engineering/drilling/_index.md` (wt 237) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5836,7 +5937,7 @@ Row: Annotated-concept · Python \* · topic wt 520 · Learn 142 / Drill 242 · 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-architecture/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/software-architecture/drilling/_index.md` (wt 242) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -6087,7 +6188,7 @@ Row: Annotated-concept · Python \* · topic wt 540 · Learn 144 / Drill 244 · 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/system-design/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/system-design/drilling/_index.md` (wt 244) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -6777,7 +6878,7 @@ Row: Annotated-concept · ‡ HTML † · topic wt 590 · Learn 149 / Drill 249 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/information-architecture-and-seo/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/information-architecture-and-seo/drilling/_index.md` (wt 249) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -7042,7 +7143,7 @@ Row: Annotated-concept · HCL/YAML † · topic wt 610 · Learn 151 / Drill 251 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/cloud-and-iac/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/cloud-and-iac/drilling/_index.md` (wt 251) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -8019,7 +8120,7 @@ Row: Annotated-concept · Python \* · topic wt 680 · Learn 158 / Drill 258 · 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-and-application-security/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/it-and-application-security/drilling/_index.md` (wt 258) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -8615,7 +8716,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 720 · Learn 162 / Drill 262 �
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/it-governance-grc/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/it-governance-grc/drilling/_index.md` (wt 262) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -8887,7 +8988,7 @@ Row: Primer · Go † · topic wt 740 · Learn 164 / Drill 264 · **primer**. Te
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-go/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-go/drilling/_index.md` (wt 264) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -9155,7 +9256,7 @@ Row: Primer · Elixir † · topic wt 760 · Learn 166 / Drill 266 · **primer**
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-elixir/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-elixir/drilling/_index.md` (wt 266) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -9423,7 +9524,7 @@ Row: Primer · Kotlin † · topic wt 780 · Learn 168 / Drill 268 · **primer**
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-kotlin/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-kotlin/drilling/_index.md` (wt 268) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -9697,7 +9798,7 @@ Row: Primer · Swift † · topic wt 800 · Learn 170 / Drill 270 · **primer**.
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-swift/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-swift/drilling/_index.md` (wt 270) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -9969,7 +10070,7 @@ Row: Primer · Dart † · topic wt 820 · Learn 172 / Drill 272 · **primer**. 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-dart/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-dart/drilling/_index.md` (wt 272) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -10241,7 +10342,7 @@ Row: Primer · C# † · topic wt 840 · Learn 174 / Drill 274 · **primer**. Te
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-csharp/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-csharp/drilling/_index.md` (wt 274) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -10789,7 +10890,7 @@ Row: Primer · C † · topic wt 880 · Learn 178 / Drill 278 · **primer**. Tem
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-c/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-c/drilling/_index.md` (wt 278) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -11345,7 +11446,7 @@ Row: Primer · Rust † · topic wt 920 · Learn 182 / Drill 282 · **primer**. 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-rust/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-rust/drilling/_index.md` (wt 282) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -11627,7 +11728,7 @@ Row: Primer · Java † · topic wt 940 · Learn 184 / Drill 284 · **primer**. 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-java/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-java/drilling/_index.md` (wt 284) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -12044,7 +12145,7 @@ Row: Primer · F# † · topic wt 970 · Learn 187 / Drill 287 · **primer**. Te
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-fsharp/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-fsharp/drilling/_index.md` (wt 287) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -12870,7 +12971,7 @@ Row: Annotated-concept · ‡ no-code · topic wt 1030 · Learn 193 / Drill 293 
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/platform-engineering-and-devex/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/platform-engineering-and-devex/drilling/_index.md` (wt 293) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -12983,7 +13084,7 @@ Row: Annotated-concept · Python \* · topic wt 1040 · Learn 194 / Drill 294 ·
 - [ ] **[AI] A2 (capstone)** — Author `CONTENT/site-reliability-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/site-reliability-engineering/drilling/_index.md` (wt 294) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.

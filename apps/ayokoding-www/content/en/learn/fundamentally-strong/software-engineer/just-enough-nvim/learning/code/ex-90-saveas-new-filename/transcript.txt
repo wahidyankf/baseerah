@@ -1,0 +1,4 @@
+ex-90 :: Saveas New Filename  (exercises co-11, co-15)
+
+:saveas copy.txt<CR>               " => writes the buffer's content to a new file 'copy.txt' and switches the buffer's associated filename to it
+                                   " => a new file 'copy.txt' now exists on disk with the same content; subsequent `:w` writes to copy.txt, not notes.txt

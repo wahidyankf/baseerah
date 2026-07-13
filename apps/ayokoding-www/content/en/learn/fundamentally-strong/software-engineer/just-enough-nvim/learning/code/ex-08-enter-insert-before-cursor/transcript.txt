@@ -1,0 +1,5 @@
+ex-08 :: Enter Insert Before Cursor  (exercises co-02)
+
+i                                  " => enters Insert mode; the cursor stays on its current column
+the <Esc>                          " => types 'the ' immediately before the original cursor column, then returns to Normal mode
+                                   " => the line becomes 'the brown fox' -- text inserted BEFORE where the cursor was

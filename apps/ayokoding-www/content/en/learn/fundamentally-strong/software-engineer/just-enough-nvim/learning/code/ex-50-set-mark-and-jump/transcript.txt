@@ -1,0 +1,6 @@
+ex-50 :: Set Mark and Jump  (exercises co-08)
+
+ma                                 " => sets mark `a` at the current line (line one), bookmarking this position
+G                                  " => moves to the last line of the file
+'a                                 " => jumps back to the line holding mark `a`
+                                   " => the cursor returns to line one, on its first non-blank column

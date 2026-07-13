@@ -1,0 +1,4 @@
+ex-86 :: Netrw Open Explorer  (exercises co-18)
+
+:Explore<CR>                       " => opens netrw, Neovim's built-in file explorer, showing a directory listing of the current file's folder
+                                   " => the buffer switches to a netrw listing showing report.txt and draft.txt

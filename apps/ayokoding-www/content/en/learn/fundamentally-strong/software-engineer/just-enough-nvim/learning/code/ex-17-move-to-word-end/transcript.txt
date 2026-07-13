@@ -1,0 +1,4 @@
+ex-17 :: Move to Word End  (exercises co-03)
+
+e                                  " => moves to the last character of the current/next word: lands on the 'k' of 'quick'
+e                                  " => advances again: lands on the 'n' of 'brown'

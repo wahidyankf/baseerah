@@ -1,0 +1,7 @@
+ex-75 :: Repeat Macro with Count  (exercises co-14)
+
+qa                                 " => starts recording into register `a`
+A!<Esc>j                           " => appends '!' to the current line, returns to Normal mode, then moves down one line -- the full recorded sequence
+q                                  " => stops recording
+5@a                                " => a count before `@a` replays the macro 5 times in succession
+                                   " => the next five lines each get '!' appended, one after another, in a single command

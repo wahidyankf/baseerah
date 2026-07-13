@@ -1,0 +1,8 @@
+ex-28 :: Redo Change  (exercises co-13)
+
+dd                                 " => deletes the line
+                                   " => the buffer becomes empty
+u                                  " => undoes the delete
+                                   " => 'buy milk' is restored
+<C-r>                              " => redoes the undone change
+                                   " => the line is deleted again -- redo reapplies exactly what undo reverted

@@ -1,0 +1,7 @@
+ex-39 :: Visual Block Insert  (exercises co-19)
+
+<C-v>                              " => enters Visual Block mode; the selection anchors as a single-column block at the cursor
+jj                                 " => extends the block selection down two more rows, covering column 1 on all three lines
+I                                  " => opens Insert mode at the left edge of the block, but only on the first line for now
+- <Esc>                            " => types the text, then `<Esc>` replays the insertion on every other line in the block
+                                   " => each of the three lines now has '- ' inserted at column 1

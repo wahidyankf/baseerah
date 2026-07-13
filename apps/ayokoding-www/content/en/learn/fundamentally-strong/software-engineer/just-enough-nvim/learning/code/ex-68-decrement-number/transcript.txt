@@ -1,0 +1,4 @@
+ex-68 :: Decrement Number  (exercises co-04)
+
+<C-x>                              " => decrements the number under the cursor by 1
+                                   " => '10' becomes '9'; the line reads 'count: 9'

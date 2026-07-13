@@ -1,0 +1,7 @@
+ex-85 :: Navigate Quickfix List  (exercises co-17)
+
+:copen<CR>                         " => opens the quickfix window, listing every match with its file and line number
+:cnext<CR>                         " => jumps to the first match: a.txt at its matching line
+:cnext<CR>                         " => jumps to the second match: c.txt at its matching line
+:cprevious<CR>                     " => jumps back to the previous match
+                                   " => the cursor returns to a.txt's matching line

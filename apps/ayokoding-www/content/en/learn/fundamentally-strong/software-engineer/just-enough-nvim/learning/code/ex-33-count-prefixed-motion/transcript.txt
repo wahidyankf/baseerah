@@ -1,0 +1,4 @@
+ex-33 :: Count Prefixed Motion  (exercises co-05)
+
+3w                                 " => a numeric count before a motion repeats it that many times: `3w` moves forward exactly 3 words
+                                   " => the cursor advances from 'one' to 'four'

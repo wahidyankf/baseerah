@@ -1,0 +1,6 @@
+section one
+detail 1a
+detail 1b
+section two
+detail 2a
+detail 2b

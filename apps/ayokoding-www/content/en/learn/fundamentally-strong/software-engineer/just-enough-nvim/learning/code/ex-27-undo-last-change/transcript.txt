@@ -1,0 +1,6 @@
+ex-27 :: Undo Last Change  (exercises co-13)
+
+dd                                 " => deletes the only line
+                                   " => the buffer becomes empty
+u                                  " => undoes the last change
+                                   " => 'buy milk' reappears exactly as it was before the delete

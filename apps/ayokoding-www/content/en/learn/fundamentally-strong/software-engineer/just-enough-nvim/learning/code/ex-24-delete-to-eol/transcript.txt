@@ -1,0 +1,5 @@
+ex-24 :: Delete to Eol  (exercises co-04)
+
+w                                  " => moves the cursor to the start of 'brown'
+D                                  " => deletes from the cursor to end of line -- equivalent to `d$`
+                                   " => 'brown fox' is removed; the line becomes 'quick '

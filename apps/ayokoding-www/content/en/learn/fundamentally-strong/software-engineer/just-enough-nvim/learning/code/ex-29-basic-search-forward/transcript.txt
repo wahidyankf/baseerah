@@ -1,0 +1,4 @@
+ex-29 :: Basic Search Forward  (exercises co-10)
+
+/needle<CR>                        " => searches forward for the next occurrence of 'needle'
+                                   " => the cursor jumps to the first match, on line 1

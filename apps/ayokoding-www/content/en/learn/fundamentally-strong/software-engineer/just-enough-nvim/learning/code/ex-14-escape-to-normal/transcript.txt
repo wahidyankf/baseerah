@@ -1,0 +1,6 @@
+ex-14 :: Escape to Normal  (exercises co-01)
+
+i                                  " => enters Insert mode at column 1
+XY                                 " => types two characters; the cursor now sits after the 'Y', at column 3, still in Insert mode
+<Esc>                              " => returns to Normal mode
+                                   " => the cursor moves one column left, landing back on the 'Y' rather than past it

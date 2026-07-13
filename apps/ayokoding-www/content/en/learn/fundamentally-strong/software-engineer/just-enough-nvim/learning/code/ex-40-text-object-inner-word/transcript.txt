@@ -1,0 +1,4 @@
+ex-40 :: Text Object Inner Word  (exercises co-06)
+
+diw                                " => `d` combined with the `iw` text object deletes exactly the word under the cursor, leaving surrounding whitespace intact
+                                   " => 'brown' is removed but the spaces on both sides remain: '    fox'

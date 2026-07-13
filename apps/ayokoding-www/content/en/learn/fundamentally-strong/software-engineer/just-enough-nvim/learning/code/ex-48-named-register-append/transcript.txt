@@ -1,0 +1,7 @@
+ex-48 :: Named Register Append  (exercises co-07)
+
+"ayy                               " => yanks line 1 into register `a`
+                                   " => register a now holds 'first line'
+j                                  " => moves down to line 2
+"Ayy                               " => the uppercase register name `A` appends to register `a` instead of overwriting it
+                                   " => register a now holds 'first line' followed by 'second line', not just the newest yank

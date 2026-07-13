@@ -1,0 +1,5 @@
+ex-16 :: Move By Word  (exercises co-03)
+
+w                                  " => moves to the first character of the next word: from 'quick' to 'brown'
+w                                  " => advances again: from 'brown' to 'fox'
+b                                  " => moves back to the first character of the previous word: from 'fox' back to 'brown'

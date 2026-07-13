@@ -1,0 +1,4 @@
+ex-41 :: Text Object a Word  (exercises co-06)
+
+daw                                " => `d` combined with the `aw` ('a word') text object deletes the word plus one adjacent run of whitespace
+                                   " => 'brown  ' (word plus the trailing spaces) is removed: '  fox'

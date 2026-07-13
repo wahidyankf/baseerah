@@ -1,0 +1,4 @@
+ex-32 :: Substitute Whole File  (exercises co-10, co-11)
+
+:%s/old/new/g<CR>                  " => the `%` range targets the whole buffer; the `g` flag replaces every match on each line, not just the first
+                                   " => every 'old' becomes 'new' across all three lines

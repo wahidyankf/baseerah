@@ -1,0 +1,4 @@
+ex-67 :: Increment Number  (exercises co-04)
+
+<C-a>                              " => increments the number under or after the cursor by 1
+                                   " => '9' becomes '10'; the line reads 'count: 10'

@@ -1,0 +1,8 @@
+ex-72 :: Substitute Visual Range  (exercises co-11, co-19)
+
+j                                  " => moves down to line 2 ('old B')
+V                                  " => enters Visual mode (linewise), highlighting line 2
+j                                  " => extends the selection down one more line, covering lines 2 and 3
+:                                  " => opens Command-line mode; because a Visual selection is active, Neovim auto-fills the range as `:'<,'>`, scoping the next command to exactly the highlighted lines
+s/old/new/g<CR>                    " => completes the command as `:'<,'>s/old/new/g` and runs it
+                                   " => only lines 2 and 3 change to 'new B' and 'new C'; lines 1 and 4 keep 'old'

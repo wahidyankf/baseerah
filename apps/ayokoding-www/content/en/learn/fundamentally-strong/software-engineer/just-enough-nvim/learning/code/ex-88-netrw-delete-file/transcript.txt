@@ -1,0 +1,6 @@
+ex-88 :: Netrw Delete File  (exercises co-18)
+
+D                                  " => inside netrw, requests deletion of the file under the cursor
+                                   " => netrw prompts for confirmation before removing it
+y                                  " => confirms the deletion
+                                   " => draft.txt is removed from disk and disappears from the netrw listing

@@ -1,0 +1,4 @@
+ex-79 :: Global Delete Matching Lines  (exercises co-12)
+
+:g/TODO/d<CR>                      " => `:g/pattern/command` runs `command` once on every line matching `pattern` across the whole buffer by default
+                                   " => both lines containing 'TODO' are deleted in a single pass

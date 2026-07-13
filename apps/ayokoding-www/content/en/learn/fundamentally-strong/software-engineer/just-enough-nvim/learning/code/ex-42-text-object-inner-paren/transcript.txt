@@ -1,0 +1,6 @@
+ex-42 :: Text Object Inner Paren  (exercises co-06)
+
+ci(                                " => `c` combined with the `i(` text object deletes only the content between the matching parentheses and opens Insert mode there
+                                   " => 'hello world' is deleted; the parentheses themselves remain, cursor now inside them
+goodbye<Esc>                       " => types the replacement text inside the parentheses
+                                   " => the line becomes 'print(goodbye)'

@@ -1,0 +1,6 @@
+ex-83 :: Close Open All Folds  (exercises co-16)
+
+zM                                 " => closes every fold in the buffer down to the top level
+                                   " => all foldable regions collapse into their single-line summaries at once
+zR                                 " => opens every fold in the buffer
+                                   " => all regions expand back to their full line-by-line content

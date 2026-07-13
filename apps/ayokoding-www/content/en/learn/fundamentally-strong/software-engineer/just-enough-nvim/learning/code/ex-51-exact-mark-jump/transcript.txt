@@ -1,0 +1,6 @@
+ex-51 :: Exact Mark Jump  (exercises co-08)
+
+mb                                 " => sets mark `b` at the exact current cursor position, line and column
+G$                                 " => moves to the last line, then to its last column -- far from the mark
+`b                                 " => jumps back to mark `b`'s exact column, not just its line
+                                   " => the cursor returns to column 5 precisely, unlike `'b` which would only guarantee the right line

@@ -1,0 +1,4 @@
+ex-22 :: Delete Word  (exercises co-04)
+
+dw                                 " => the `d` operator combined with the `w` motion deletes from the cursor to the start of the next word
+                                   " => 'quick ' (word plus trailing space) is removed; the line becomes 'brown fox'

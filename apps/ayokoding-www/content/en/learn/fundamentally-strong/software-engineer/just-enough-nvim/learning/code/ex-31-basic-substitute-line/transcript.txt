@@ -1,0 +1,4 @@
+ex-31 :: Basic Substitute Line  (exercises co-10)
+
+:s/old/new/<CR>                    " => `:substitute` without a range targets only the current line, and without the `g` flag replaces only the first match
+                                   " => the line becomes 'new old old' -- only the first 'old' changed

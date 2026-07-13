@@ -1,0 +1,8 @@
+ex-59 :: Write All Buffers  (exercises co-15)
+
+:e a.txt<CR>                       " => opens a.txt
+A appended<Esc>                    " => appends text, marking a.txt as modified
+:e b.txt<CR>                       " => switches to b.txt, keeping a.txt open in the background
+A appended<Esc>                    " => appends text, marking b.txt as modified too
+:wa<CR>                            " => writes every modified buffer to disk in a single command
+                                   " => both a.txt and b.txt are saved, without switching to each one individually

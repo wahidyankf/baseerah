@@ -1,0 +1,5 @@
+ex-09 :: Enter Insert After Cursor  (exercises co-02)
+
+a                                  " => enters Insert mode; the insertion point sits one column to the right of the original cursor (after the 'b')
+-<Esc>                             " => types '-' immediately after the original cursor column, then returns to Normal mode
+                                   " => the line becomes 'b-rown fox' -- text inserted AFTER where the cursor was

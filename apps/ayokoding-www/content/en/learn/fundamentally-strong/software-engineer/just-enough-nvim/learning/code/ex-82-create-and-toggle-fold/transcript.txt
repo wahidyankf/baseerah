@@ -1,0 +1,9 @@
+ex-82 :: Create and Toggle Fold  (exercises co-16)
+
+j                                  " => moves down to 'line a', the first line to fold
+V                                  " => enters Visual mode (linewise) on 'line a'
+jj                                 " => extends the selection down two more lines, covering 'line a' through 'line c'
+zf                                 " => creates a manual fold from the selected lines
+                                   " => the three lines collapse into a single foldable summary line showing a line count
+za                                 " => toggles the fold under the cursor open
+                                   " => the three original lines reappear, expanded

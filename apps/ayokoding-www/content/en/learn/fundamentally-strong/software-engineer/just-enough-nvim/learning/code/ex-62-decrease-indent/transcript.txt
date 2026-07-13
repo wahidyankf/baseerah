@@ -1,0 +1,4 @@
+ex-62 :: Decrease Indent  (exercises co-04)
+
+<<                                 " => shifts the current line left by one shiftwidth
+                                   " => the leading indentation shrinks, e.g. from 4 spaces to 0

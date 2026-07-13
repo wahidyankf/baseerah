@@ -1,0 +1,6 @@
+ex-04 :: Reload Discard with E Bang  (exercises co-11)
+
+A more milk<Esc>                   " => appends ' more milk' to line 1
+                                   " => the in-memory buffer now differs from the on-disk file
+:e!<CR>                            " => reloads the current file from disk, discarding the in-memory edit
+                                   " => the buffer now matches the on-disk file again, and Neovim stays open

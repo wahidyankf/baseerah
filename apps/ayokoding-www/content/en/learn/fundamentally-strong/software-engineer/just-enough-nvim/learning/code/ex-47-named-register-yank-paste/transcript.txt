@@ -1,0 +1,7 @@
+ex-47 :: Named Register Yank Paste  (exercises co-07)
+
+"ayy                               " => yanks the current line into the named register `a`, bypassing the unnamed register
+                                   " => 'target line' is now stored specifically in register a
+G                                  " => moves to the last line of the file
+"ap                                " => pastes the contents of register `a` below the current line
+                                   " => 'target line' appears at the end of the file, independent of whatever the unnamed register holds

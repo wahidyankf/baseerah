@@ -1,0 +1,9 @@
+ex-91 :: Terminal Run and Escape  (exercises co-20)
+
+:terminal ls<CR>                   " => opens a real shell inside a buffer running `ls`; this buffer has its own Terminal mode
+                                   " => the command's output -- the directory listing -- appears directly in the buffer
+<C-\><C-n>                         " => escapes from Terminal mode to Normal mode without killing the shell
+                                   " => the buffer persists like any other; Normal-mode motions now work on its text
+gg                                 " => jumps to the first line of the terminal output
+G                                  " => jumps to the last line of the terminal output
+                                   " => `gg`/`G` navigate the captured output exactly like any other buffer

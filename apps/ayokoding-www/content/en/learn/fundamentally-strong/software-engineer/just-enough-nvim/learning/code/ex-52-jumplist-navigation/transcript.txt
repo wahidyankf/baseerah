@@ -1,0 +1,10 @@
+ex-52 :: Jumplist Navigation  (exercises co-08)
+
+G                                  " => jumps to the last line -- a 'jump' motion, so it's recorded in the jumplist
+/needle<CR>                        " => searches for 'needle' -- another jump motion, also recorded
+<C-o>                              " => steps backward through the jumplist
+                                   " => the cursor returns to the position before the search -- the last line
+<C-o>                              " => steps backward again
+                                   " => the cursor returns to the position before the very first jump
+<C-i>                              " => steps forward through the jumplist again
+                                   " => the cursor moves forward to the last line, retracing the path

@@ -1,0 +1,7 @@
+ex-46 :: Dot Repeat Edit  (exercises co-09)
+
+cwFOO<Esc>                         " => `cw` deletes the word under the cursor and opens Insert mode; typing 'FOO' then `<Esc>` completes the change
+                                   " => line 1 becomes 'FOO bug1' -- the dot-repeatable change is now recorded
+j0                                 " => moves down to line 2 and to column 1
+.                                  " => repeats the last change verbatim at the new cursor position
+                                   " => line 2 becomes 'FOO bug2' -- the same change reapplies without retyping it

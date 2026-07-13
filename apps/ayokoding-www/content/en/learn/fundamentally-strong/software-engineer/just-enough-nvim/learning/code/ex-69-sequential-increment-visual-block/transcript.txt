@@ -1,0 +1,6 @@
+ex-69 :: Sequential Increment Visual Block  (exercises co-19)
+
+<C-v>                              " => enters Visual Block mode, anchoring a single-cell block at the cursor
+jj                                 " => extends the block down two more rows, selecting the '0' digit on all three lines
+g<C-a>                             " => increments sequentially rather than uniformly: each selected line's number increases by one more than the line above
+                                   " => the three lines become 'item 1', 'item 2', 'item 3' -- not all '1'

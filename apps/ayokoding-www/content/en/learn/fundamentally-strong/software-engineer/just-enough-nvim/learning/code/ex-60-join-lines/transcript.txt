@@ -1,0 +1,4 @@
+ex-60 :: Join Lines  (exercises co-04)
+
+J                                  " => joins the next line onto the current one, inserting a single space between them
+                                   " => the two lines merge into one: 'brown fox jumps high'

@@ -1,0 +1,5 @@
+ex-18 :: Move Line Boundaries  (exercises co-03)
+
+0                                  " => moves to column 1 -- the very first character on the line, including leading whitespace
+^                                  " => moves to the first non-blank character -- skips past the leading spaces onto 'q'
+$                                  " => moves to the last character of the line -- lands on the final 'x' of 'fox'

@@ -1,0 +1,4 @@
+ex-66 :: Case Upper Motion  (exercises co-04, co-06)
+
+gUiw                               " => the `gU` operator combined with the `iw` text object uppercases the entire word under the cursor in one command
+                                   " => 'brown' becomes 'BROWN'; the rest of the line is untouched

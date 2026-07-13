@@ -1,0 +1,6 @@
+ex-38 :: Visual Line Select Indent  (exercises co-19)
+
+V                                  " => enters Visual mode (linewise); the whole current line highlights immediately
+jj                                 " => extends the selection down two more lines, covering all three lines
+>                                  " => shifts every selected line right by one shiftwidth
+                                   " => all three lines are now indented by one shiftwidth (e.g. 4 spaces)

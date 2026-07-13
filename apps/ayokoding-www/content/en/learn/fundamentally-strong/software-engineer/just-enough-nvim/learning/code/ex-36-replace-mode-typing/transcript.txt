@@ -1,0 +1,5 @@
+ex-36 :: Replace Mode Typing  (exercises co-02)
+
+R                                  " => enters Replace mode: subsequent typed characters overwrite rather than insert
+abc<Esc>                           " => types three characters that overwrite the first three 'x's
+                                   " => the line becomes 'abcxx' -- the last two original characters are untouched

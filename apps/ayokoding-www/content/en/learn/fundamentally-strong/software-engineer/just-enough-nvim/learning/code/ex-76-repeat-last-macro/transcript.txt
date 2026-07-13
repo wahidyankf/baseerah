@@ -1,0 +1,9 @@
+ex-76 :: Repeat Last Macro  (exercises co-14)
+
+qa                                 " => starts recording into register `a`
+A!<Esc>j                           " => appends '!', returns to Normal mode, then moves down one line
+q                                  " => stops recording
+@a                                 " => plays register a once
+                                   " => line 2 gets '!' appended
+@@                                 " => repeats the most recently executed macro without naming a register
+                                   " => line 3 gets '!' appended too, using the same recorded sequence

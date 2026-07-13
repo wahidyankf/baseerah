@@ -1,0 +1,5 @@
+ex-05 :: Save File  (exercises co-11)
+
+A more milk<Esc>                   " => appends ' more milk' to line 1 and returns to Normal mode
+:w<CR>                             " => writes the modified buffer to disk
+                                   " => the file on disk now contains 'Buy milk more milk'

@@ -1,0 +1,5 @@
+ex-13 :: Open Line Above  (exercises co-02)
+
+O                                  " => opens a new, empty line directly above the current line and enters Insert mode on it
+brown fox<Esc>                     " => types the new line's text
+                                   " => the buffer now has two lines: 'brown fox' then 'jumps high'

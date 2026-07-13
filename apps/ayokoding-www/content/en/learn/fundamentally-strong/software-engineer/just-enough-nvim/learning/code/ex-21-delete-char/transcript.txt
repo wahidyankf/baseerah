@@ -1,0 +1,4 @@
+ex-21 :: Delete Char  (exercises co-04)
+
+x                                  " => deletes the character under the cursor ('x')
+                                   " => the remaining text shifts left; the line becomes 'cat'

@@ -1,0 +1,6 @@
+ex-15 :: Move with Hjkl  (exercises co-03)
+
+l                                  " => moves the cursor right one cell, from column 1 to column 2 on line 1
+j                                  " => moves the cursor down one line, to line 2, same column
+k                                  " => moves the cursor up one line, back to line 1
+h                                  " => moves the cursor left one cell, back to column 1

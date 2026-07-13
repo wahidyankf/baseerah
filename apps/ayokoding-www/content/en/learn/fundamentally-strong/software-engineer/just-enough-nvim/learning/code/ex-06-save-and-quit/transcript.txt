@@ -1,0 +1,5 @@
+ex-06 :: Save and Quit  (exercises co-11)
+
+A more milk<Esc>                   " => appends ' more milk' to line 1
+:wq<CR>                            " => writes the buffer to disk, then exits Neovim
+                                   " => the process returns to the shell prompt with the edit already saved

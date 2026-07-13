@@ -1,0 +1,4 @@
+ex-23 :: Delete Line  (exercises co-04)
+
+dd                                 " => deletes the entire current line (line one)
+                                   " => line two shifts up to become the new line one
