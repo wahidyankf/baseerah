@@ -1024,7 +1024,14 @@ Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject
       present, 332 total files in the topic tree. All checkers (by-example, link, facts) clean per the
       A3/D/F/G notes above; build 1341/1341 pages exit 0; `lint:md` 0 errors across 4057 files.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [x] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+      Notes: committed `ff90be0e23cf282f81fac0d357361b15e8c8d315` and pushed to `origin main`. First
+      commit attempt was rejected by the pre-commit `rhino-cli md mermaid validate` hook (4 diagram labels
+      over the 30-char limit — 3 in `intermediate.md` Example 58, 1 in `advanced.md` Example 62); shortened
+      the 4 labels, re-verified 0 violations directly via `cargo run --release --manifest-path
+  apps/rhino-cli/Cargo.toml -- md mermaid validate`, then committed successfully. CI on `ff90be0e2`:
+      `validate-env` success, `publish-images` success, `pr-quality-gate` success, `main-ci` success (all
+      four workflow runs green).
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
