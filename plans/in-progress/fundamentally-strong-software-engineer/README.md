@@ -121,8 +121,10 @@ per-topic language column.
 
 Content authored via `apps-ayokoding-www-by-example-maker` (code topics) and
 `apps-ayokoding-www-general-maker` (concept topics + scaffolding); validated via the matching
-checker plus `apps-ayokoding-www-facts-checker` + `apps-ayokoding-www-link-checker`. Delivered as
-`main-to-origin-main` (primary checkout, direct `[AI]` push to `origin main`, no worktree, no PR).
+checker plus `apps-ayokoding-www-facts-checker` + `apps-ayokoding-www-link-checker`. Delivery mode is
+mixed: Phases 0–3 (closed, historical) used `main-to-origin-main`; Phases 4–109 (active) use
+`worktree-to-pr` with a per-phase PR, so several phases can be in review concurrently — see Delivery
+Mode below.
 
 ## Navigation
 
@@ -137,6 +139,14 @@ checker plus `apps-ayokoding-www-facts-checker` + `apps-ayokoding-www-link-check
 
 ## Delivery Mode
 
-`main-to-origin-main` — primary checkout (no worktree), direct `[AI]` push to `origin main`, no PR
-and no human-merge gate. See [delivery.md](./delivery.md) for the `## Worktree` and `## Delivery Mode`
-declarations.
+Mixed. **Phases 0–3 (closed, historical)**: `main-to-origin-main` — primary checkout (no worktree),
+direct `[AI]` push to `origin main`, no PR, no human-merge gate; already executed. **Phases 4–109
+(active)**: `worktree-to-pr` — one shared worktree, a separate branch and draft PR per phase, the
+PR-Review Maker→Fixer Cycle (3 cycles), then `[AI]` merges once all quality gates are green, and
+deploys ayokoding-www to prod immediately after — several phases' PRs may be open and in review
+concurrently. **Note**: the repo's
+[PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally requires
+`[HUMAN]` approval on every merge with no exceptions; this plan's AI-auto-merge is an explicit,
+plan-scoped deviation the user authorized in-session (2026-07-14) — it does not amend the protocol
+itself or apply to any other plan. See [delivery.md](./delivery.md) for the full `## Worktree`,
+`## Parallelization Model`, and `## Delivery Mode` declarations.

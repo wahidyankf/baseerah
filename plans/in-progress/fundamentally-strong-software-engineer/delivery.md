@@ -17,49 +17,112 @@ mode. There is no PR and no human-merge gate — work lands directly on `main`.
 
 ## Worktree
 
-**Not used.** This plan's delivery mode is `main-to-origin-main`, which works in the **primary
-checkout** (no worktree). All work happens on the `main` working tree and is pushed directly to
-`origin main`.
+**Phases 0-3 (closed, historical)**: executed in the **primary checkout** (no worktree) under
+`main-to-origin-main`; content is already on `origin/main` and is not retroactively changed.
+
+**Phases 4-109 (active)**: one shared worktree for the rest of the plan, per the standard
+[Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md):
+
+Worktree path: `worktrees/fundamentally-strong-software-engineer/`
+
+Every phase branches from the **latest `origin/main`** inside this one worktree
+(`git fetch origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), does its authoring there, commits, pushes that
+branch, and opens **its own draft PR**. The worktree is reused across phases — one checkout, many
+branches, many PRs — instead of provisioning a fresh worktree per phase. See Parallelization Model below
+for how this still allows several phases to be in flight concurrently.
 
 See [Plans Organization Convention §Delivery Mode](../../../repo-governance/conventions/structure/plans.md#delivery-mode).
 
-## Delivery Mode: main-to-origin-main
+## Parallelization Model (Phases 4-109)
 
-Work in the **primary checkout** on `main` (no worktree, no PR). The AI commits and **pushes directly
-to `origin main`**. "Done" = the content is on `origin main` with CI green. Because there is no PR, each
-push runs **direct-push + CI post-push verification** instead of the PR-Review Maker→Fixer Cycle.
+Each phase produces **its own PR**, so several phases can be **in flight concurrently** even though they
+share one local worktree: once a phase's branch is committed, pushed, and its draft PR opened, the
+worktree re-syncs to `origin/main` and starts the next phase's branch immediately — it does not block on
+the prior phase's review cycle, merge, or deploy. The parallelism lives in GitHub (N open PRs moving
+through review at once), not in N simultaneous local checkouts.
 
-**Push cadence — commit + push after every completed topic (HARD RULE)**: this plan does **not** batch a
-single push at the end. The moment a topic (or inter-topic capstone) phase passes its gate, the AI
-**commits and pushes that deliverable to `origin main`** and confirms its `main-ci` run is green before
-starting the next phase — so each topic lands green on `main` as it completes. Content is additive and
-not yet nav-wired at this stage, so per-topic pushes are safe (nav wiring lands in Phase 105). The
-finalization push phase is therefore a **final catch-up + verify** (nav-wiring commit + confirm
-`origin/main` fully green), not the sole push.
+**N is not fixed by this plan.** How many phases are pipelined/in-review at once is chosen at execution
+time, bounded by whatever subagent/PR-review concurrency policy is in force when the plan runs
+(currently the repo-wide cap in
+[Agent Workflow Orchestration](../../../repo-governance/development/agents/agent-workflow-orchestration.md),
+the [Subagent Orchestration Convention](../../../repo-governance/development/agents/subagent-orchestration.md),
+and the [Parallel-by-Default Practice](../../../repo-governance/development/practice/parallel-by-default.md)),
+unless the user explicitly raises that cap for this plan's run.
 
-**Direct-to-main discipline** (per repo memory/policy): stage **explicit paths only** (the new content
-files and the two nav `_index.md` edits) — never `git add -A` in this repo. Do not touch git identity.
-Commit per domain/concern with Conventional Commit messages.
+**What's safe to pipeline**: per-topic phases within the same pass are mutually independent content-wise
+(each writes only to its own `CONTENT/<slug>/` subtree) and can have their PRs open and in review
+simultaneously.
+
+**Sync points**: an inter-topic capstone phase depends on every topic in its pass being merged to `main`
+first — branch it only after its prerequisite topic phases have merged, not concurrently with them.
+
+**Shared-file contention**: every phase also updates the shared parent nav `_index.md` (auto-updated by
+the content tooling). When multiple phases' PRs are open at once, whichever merges second needs a rebase
+onto the just-merged `main` and a re-run of the nav-index generation before its own merge — a
+mechanical, regenerable conflict, not a hand-authored one. Merges still land **serially** (one
+`[HUMAN]` merge at a time) even when several PRs are open and in review concurrently.
+
+**CI waits are non-blocking across phases**: waiting on a phase's `main-ci`/PR-checks run, or on its
+review cycle, never blocks starting the _next_ phase's branch. `[AI]` opens phase N's PR, then
+immediately re-syncs the worktree and starts phase N+1's branch rather than idling until phase N's CI or
+review finishes — CI runs and review cycles for several phases progress **in parallel** in the
+background, each polled on its own cadence (CI-monitoring policy: poll every 2 min, never `gh run
+watch`, never tight-loop). This is what actually saves wall-clock time: authoring pipelines forward while
+CI/review for earlier phases completes concurrently, not after.
+
+## Delivery Mode
+
+**Phases 0-3 (closed, historical)**: `main-to-origin-main` — primary checkout (no worktree), direct
+`[AI]` push to `origin main`, no PR, no human-merge gate. Already executed; not retroactively changed.
+
+**Phases 4-109 (active)**: `worktree-to-pr` — each phase works in the shared worktree (see Worktree
+above) on its own branch, opens a **draft PR** against `main`, runs the **PR-Review Maker→Fixer Cycle**
+(`pr-review-maker` / `pr-review-fixer`, 3 sequential CI-gated cycles) then flips the PR to ready, and
+`[AI]` **merges it automatically once all quality gates are green** — and `[AI]` deploys `ayokoding-www`
+to `prod-ayokoding-www` immediately after every merge.
+
+> **DEVIATION FROM STANDING POLICY**: the repo's
+> [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+> requires a `[HUMAN]` to merge every PR with explicit per-instance approval, with no blanket
+> pre-authorization and no exceptions. For **this plan only**, the user explicitly instructed
+> (2026-07-14, in-session) that `[AI]` merges automatically once the 3-cycle review and all quality
+> gates are green, to keep ~100+ per-phase PRs flowing without a manual click on every one. This is a
+> deliberate, plan-scoped override recorded here — it does **not** amend `pr-merge-protocol.md` itself,
+> and does not apply to any other plan in this repo.
+
+**Push cadence — one PR per completed phase, deployed on merge (HARD RULE)**: this plan does not batch
+phases into a single PR. The moment a phase passes its gate, `[AI]` opens that phase's PR, drives it
+through the review cycle, merges it once green, and deploys immediately — so each phase reaches
+production independently, as it completes. This applies to **every** phase 4-109, including the
+finalization phases (nav wiring, verification, knowledge capture, archival) — not just per-topic
+content phases.
+
+**Direct-to-main discipline no longer applies to Phases 4-109** (superseded by the PR flow above); it
+remains historically accurate for Phases 0-3.
 
 ## Delivery pipeline (per topic, then finalization)
 
 ```mermaid
 flowchart TD
     S["Phase 0<br/>setup and scaffold"]
-    T["Per-topic phase (x94)<br/>V-verify A-author<br/>D-drill G-gate<br/>commit+push origin main"]
-    C["Inter-topic capstone (x10)<br/>pass-boundary +<br/>cross-cutting<br/>commit+push origin main"]
-    N["Nav wiring + quality gate"]
-    R["Playwright + Rule-15 retest"]
-    P["Catch-up push + CI verify"]
-    D["Deploy ayokoding-www to prod"]
-    K["Knowledge Capture"]
-    A["Plan Archival"]
-    S --> T --> C --> N --> R --> P --> D --> K --> A
+    T["Per-topic phase (x94)<br/>V-verify A-author<br/>D-drill G-gate<br/>worktree branch to PR"]
+    C["Inter-topic capstone (x10)<br/>pass-boundary +<br/>cross-cutting<br/>worktree branch to PR"]
+    RV["PR-Review Maker to Fixer<br/>Cycle x3, flip to ready"]
+    M["AI merges PR when green"]
+    DP["AI deploys ayokoding-www<br/>to prod"]
+    N["Nav wiring + quality gate<br/>own PR, review, merge, deploy"]
+    R["Playwright + Rule-15 retest<br/>own PR, review, merge, deploy"]
+    P["Final origin/main + CI check<br/>own PR, review, merge, deploy"]
+    K["Knowledge Capture<br/>own PR, review, merge, deploy"]
+    A["Plan Archival<br/>own PR, review, merge, deploy"]
+    S --> T --> RV --> M --> DP --> C
+    C --> N --> R --> P --> K --> A
 
     classDef s fill:#0072B2,stroke:#000,color:#fff
     classDef done fill:#009E73,stroke:#000,color:#fff
-    class S,T,C s
-    class N,R,P,D,K,A done
+    class S,T s
+    class RV,M,DP,C,N,R,P,K,A done
 ```
 
 ## Per-topic phase anatomy — one checkbox per concept and per worked example (DD-34)
@@ -1029,7 +1092,7 @@ Row: By Example · Lua † · topic wt 130 · Learn 103 / Drill 203 · **subject
       commit attempt was rejected by the pre-commit `rhino-cli md mermaid validate` hook (4 diagram labels
       over the 30-char limit — 3 in `intermediate.md` Example 58, 1 in `advanced.md` Example 62); shortened
       the 4 labels, re-verified 0 violations directly via `cargo run --release --manifest-path
-  apps/rhino-cli/Cargo.toml -- md mermaid validate`, then committed successfully. CI on `ff90be0e2`:
+apps/rhino-cli/Cargo.toml -- md mermaid validate`, then committed successfully. CI on `ff90be0e2`:
       `validate-env` success, `publish-images` success, `pr-quality-gate` success, `main-ci` success (all
       four workflow runs green).
 
@@ -1059,7 +1122,34 @@ Junction: Topics 01–03 (nvim + lua + extending). Apply the Inter-Topic Capston
       done bar met (clean-machine reproduction runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -1203,7 +1293,34 @@ Row: Primer · Python · topic wt 140 · Learn 104 / Drill 204 · **primer**. Te
       `drilling/_index.md` wt 204, capstone wt 900; all 25 concepts + 84 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -1343,7 +1460,34 @@ Row: Primer · Bash/shell † · topic wt 150 · Learn 105 / Drill 205 · **prim
       `drilling/_index.md` wt 205, capstone wt 900; all 26 concepts + 83 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -1482,7 +1626,34 @@ Row: By Example · Git † · topic wt 160 · Learn 106 / Drill 206 · **subject
       `drilling/_index.md` wt 206, capstone wt 900; all 29 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -1614,7 +1785,34 @@ Row: By Example · Python · topic wt 170 · Learn 107 / Drill 207 · **subject*
       `drilling/_index.md` wt 207, capstone wt 900; all 22 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -1739,7 +1937,34 @@ Row: By Example · Python · topic wt 180 · Learn 108 / Drill 208 · **subject*
       `drilling/_index.md` wt 208, capstone wt 900; all 17 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -1807,7 +2032,34 @@ Row: Annotated-concept · ‡ no-code · topic wt 190 · Learn 109 / Drill 209 �
       `drilling/_index.md` wt 209, capstone wt 900; all 15 concepts + 25 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -1939,7 +2191,34 @@ Row: By Example · SQL + Python † (SQLite) · topic wt 200 · Learn 110 / Dril
       `drilling/_index.md` wt 210, capstone wt 900; all 24 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2074,7 +2353,34 @@ Row: By Example · Python (PostgreSQL) · topic wt 210 · Learn 111 / Drill 211 
       `drilling/_index.md` wt 211, capstone wt 900; all 24 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2210,7 +2516,34 @@ Row: By Example · Python · topic wt 220 · Learn 112 / Drill 212 · **subject*
       `drilling/_index.md` wt 212, capstone wt 900; all 23 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2349,7 +2682,34 @@ Row: Primer · TypeScript † · topic wt 230 · Learn 113 / Drill 213 · **prim
       `drilling/_index.md` wt 213, capstone wt 900; all 26 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2488,7 +2848,34 @@ Row: By Example · TypeScript † · topic wt 240 · Learn 114 / Drill 214 · **
       `drilling/_index.md` wt 214, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2637,7 +3024,34 @@ Row: By Example · Python + TS · topic wt 250 · Learn 115 / Drill 215 · **sub
       `drilling/_index.md` wt 215, capstone wt 900; all 32 concepts + 86 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2771,7 +3185,34 @@ Row: By Example · Python + native † · topic wt 260 · Learn 116 / Drill 216 
       `drilling/_index.md` wt 216, capstone wt 900; all 23 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2909,7 +3350,34 @@ Row: By Example · Python · topic wt 270 · Learn 117 / Drill 217 · **subject*
       `drilling/_index.md` wt 217, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -2934,7 +3402,34 @@ Junction: Topics 04–17 (build → store → test → secure). Inter-Topic Caps
 - [ ] [AI] `capstone-first-working-software/` complete (wt 275, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -2959,7 +3454,34 @@ Junction: Frontend (14) + Backend (11) + SQL (10). Inter-Topic Capstone Phase Te
 - [ ] [AI] `capstone-full-stack-app/` complete (wt 276, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -3030,7 +3552,34 @@ Row: Annotated-concept · ‡ no-code · topic wt 280 · Learn 118 / Drill 218 �
       `drilling/_index.md` wt 218, capstone wt 900; all 17 concepts + 25 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -3147,7 +3696,34 @@ Row: Annotated-concept · Python \* · topic wt 290 · Learn 119 / Drill 219 · 
       `drilling/_index.md` wt 219, capstone wt 900; all 28 concepts + 55 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -3282,7 +3858,34 @@ Row: By Example · C † · topic wt 300 · Learn 120 / Drill 220 · **subject**
       `drilling/_index.md` wt 220, capstone wt 900; all 25 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -3434,7 +4037,34 @@ Row: By Example · Python · topic wt 310 · Learn 121 / Drill 221 · **subject*
       `drilling/_index.md` wt 221, capstone wt 900; all 37 concepts + 84 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -3569,7 +4199,34 @@ Row: By Example · Python \*\* · topic wt 320 · Learn 122 / Drill 222 · **sub
       `drilling/_index.md` wt 222, capstone wt 900; all 25 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -3707,7 +4364,34 @@ Row: By Example · Python · topic wt 330 · Learn 123 / Drill 223 · **subject*
       `drilling/_index.md` wt 223, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -3857,7 +4541,34 @@ Row: By Example · Python · topic wt 340 · Learn 124 / Drill 224 · **subject*
       `drilling/_index.md` wt 224, capstone wt 900; all 33 concepts + 87 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -3995,7 +4706,34 @@ Row: By Example · Python · topic wt 350 · Learn 125 / Drill 225 · **subject*
       `drilling/_index.md` wt 225, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4138,7 +4876,34 @@ Row: By Example · SQL + Python † (PostgreSQL) · topic wt 360 · Learn 126 / 
       `drilling/_index.md` wt 226, capstone wt 900; all 28 concepts + 85 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4273,7 +5038,34 @@ Row: By Example · Python † · topic wt 370 · Learn 127 / Drill 227 · **subj
       `drilling/_index.md` wt 227, capstone wt 900; all 27 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4406,7 +5198,34 @@ Row: By Example · Python † · topic wt 380 · Learn 128 / Drill 228 · **subj
       `drilling/_index.md` wt 228, capstone wt 900; all 25 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4525,7 +5344,34 @@ Row: Annotated-concept · Python \* · topic wt 390 · Learn 129 / Drill 229 · 
       `drilling/_index.md` wt 229, capstone wt 900; all 29 concepts + 62 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4630,7 +5476,34 @@ Row: Annotated-concept · Python \* · topic wt 400 · Learn 130 / Drill 230 · 
       `drilling/_index.md` wt 230, capstone wt 900; all 23 concepts + 54 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4740,7 +5613,34 @@ Row: Annotated-concept · ‡ polyglot · topic wt 410 · Learn 131 / Drill 231 
       `drilling/_index.md` wt 231, capstone wt 900; all 24 concepts + 54 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4827,7 +5727,34 @@ Row: Annotated-concept · ‡ no-code · topic wt 420 · Learn 132 / Drill 232 �
       `drilling/_index.md` wt 232, capstone wt 900; all 26 concepts + 30 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4905,7 +5832,34 @@ Row: Annotated-concept · ‡ no-code · topic wt 430 · Learn 133 / Drill 233 �
       `drilling/_index.md` wt 233, capstone wt 900; all 20 concepts + 27 worked scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -4930,7 +5884,34 @@ Junction: Topics 19–33 (CS depth + OO design + FP + concurrency + advanced SQL
 - [ ] [AI] `capstone-solid-core/` complete (wt 435, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -5092,7 +6073,34 @@ Row: By Example · Python † · topic wt 440 · Learn 134 / Drill 234 · **subj
       `drilling/_index.md` wt 234, capstone wt 900; all 36 concepts + 91 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -5226,7 +6234,34 @@ Row: By Example · Cypher + Python † · topic wt 450 · Learn 135 / Drill 235 
       `drilling/_index.md` wt 235, capstone wt 900; all 26 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -5362,7 +6397,34 @@ Row: By Example · Python † · topic wt 460 · Learn 136 / Drill 236 · **subj
       `drilling/_index.md` wt 236, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -5463,7 +6525,34 @@ Row: Annotated-concept · Python · topic wt 470 · Learn 137 / Drill 237 · **s
       `drilling/_index.md` wt 237, capstone wt 900; all 21 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -5607,7 +6696,34 @@ Row: By Example · Python † · topic wt 480 · Learn 138 / Drill 238 · **subj
       `drilling/_index.md` wt 238, capstone wt 900; all 36 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -5755,7 +6871,34 @@ Row: By Example · Python · topic wt 490 · Learn 139 / Drill 239 · **subject*
       `drilling/_index.md` wt 239, capstone wt 900; all 40 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -5893,7 +7036,34 @@ Row: By Example · Python † · topic wt 500 · Learn 140 / Drill 240 · **subj
       `drilling/_index.md` wt 240, capstone wt 900; all 30 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6035,7 +7205,34 @@ Row: By Example · Python † · topic wt 510 · Learn 141 / Drill 241 · **subj
       `drilling/_index.md` wt 241, capstone wt 900; all 34 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6142,7 +7339,34 @@ Row: Annotated-concept · Python \* · topic wt 520 · Learn 142 / Drill 242 · 
       `drilling/_index.md` wt 242, capstone wt 900; all 27 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6282,7 +7506,34 @@ Row: By Example · Python · topic wt 530 · Learn 143 / Drill 243 · **subject*
       `drilling/_index.md` wt 243, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6393,7 +7644,34 @@ Row: Annotated-concept · Python \* · topic wt 540 · Learn 144 / Drill 244 · 
       `drilling/_index.md` wt 244, capstone wt 900; all 30 concepts + 53 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6534,7 +7812,34 @@ Row: By Example · Python · topic wt 550 · Learn 145 / Drill 245 · **subject*
       `drilling/_index.md` wt 245, capstone wt 900; all 33 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6686,7 +7991,34 @@ Row: By Example · Python † · topic wt 560 · Learn 146 / Drill 246 · **subj
       `drilling/_index.md` wt 246, capstone wt 900; all 39 concepts + 85 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6831,7 +8163,34 @@ Row: By Example · TypeScript † · topic wt 570 · Learn 147 / Drill 247 · **
       `drilling/_index.md` wt 247, capstone wt 900; all 37 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -6971,7 +8330,34 @@ Row: By Example · TypeScript † · topic wt 580 · Learn 148 / Drill 248 · **
       `drilling/_index.md` wt 248, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -7083,7 +8469,34 @@ Row: Annotated-concept · ‡ HTML † · topic wt 590 · Learn 149 / Drill 249 
       `drilling/_index.md` wt 249, capstone wt 900; all 28 concepts + 53 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -7232,7 +8645,34 @@ Row: By Example · YAML/CLI † · topic wt 600 · Learn 150 / Drill 250 · **su
       `drilling/_index.md` wt 250, capstone wt 900; all 35 concepts + 83 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -7348,7 +8788,34 @@ Row: Annotated-concept · HCL/YAML † · topic wt 610 · Learn 151 / Drill 251 
       `drilling/_index.md` wt 251, capstone wt 900; all 32 concepts + 53 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -7492,7 +8959,34 @@ Row: By Example · HCL/YAML/shell † · topic wt 620 · Learn 152 / Drill 252 �
       `drilling/_index.md` wt 252, capstone wt 900; all 34 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -7638,7 +9132,34 @@ Row: By Example · YAML/CLI † · topic wt 630 · Learn 153 / Drill 253 · **su
       `drilling/_index.md` wt 253, capstone wt 900; all 34 concepts + 82 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -7781,7 +9302,34 @@ Row: By Example · multi-tool † · topic wt 640 · Learn 154 / Drill 254 · **
       `drilling/_index.md` wt 254, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -7929,7 +9477,34 @@ Row: By Example · YAML + Python † · topic wt 650 · Learn 155 / Drill 255 ·
       `drilling/_index.md` wt 255, capstone wt 900; all 34 concepts + 83 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -8070,7 +9645,34 @@ Row: By Example · Python · topic wt 660 · Learn 156 / Drill 256 · **subject*
       `drilling/_index.md` wt 256, capstone wt 900; all 30 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -8212,7 +9814,34 @@ Row: By Example · Python † · topic wt 670 · Learn 157 / Drill 257 · **subj
       `drilling/_index.md` wt 257, capstone wt 900; all 32 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -8325,7 +9954,34 @@ Row: Annotated-concept · Python \* · topic wt 680 · Learn 158 / Drill 258 · 
       `drilling/_index.md` wt 258, capstone wt 900; all 30 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -8466,7 +10122,34 @@ Row: By Example · Python + shell † · topic wt 690 · Learn 159 / Drill 259 �
       `drilling/_index.md` wt 259, capstone wt 900; all 31 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -8610,7 +10293,34 @@ Row: By Example · Python + shell † · topic wt 700 · Learn 160 / Drill 260 �
       `drilling/_index.md` wt 260, capstone wt 900; all 34 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -8754,7 +10464,34 @@ Row: By Example · Python † · topic wt 710 · Learn 161 / Drill 261 · **subj
       `drilling/_index.md` wt 261, capstone wt 900; all 34 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -8783,7 +10520,34 @@ for build grouping (see tech-docs DD-38).
 - [ ] [AI] `capstone-real-world-delivery/` complete (wt 705, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -8808,7 +10572,34 @@ Junction: Backend at Scale (39) + Security Essentials (17) + IT Security (58). I
 - [ ] [AI] `capstone-secure-service/` complete (wt 706, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -8833,7 +10624,34 @@ Junction: Data Engineering (37) + SQL/NoSQL (10/34) + a RAG interface (56). Inte
 - [ ] [AI] `capstone-data-pipeline/` complete (wt 707, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -8921,7 +10739,34 @@ Row: Annotated-concept · ‡ no-code · topic wt 720 · Learn 162 / Drill 262 �
       `drilling/_index.md` wt 262, capstone wt 900; all 27 concepts + 30 scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -9055,7 +10900,34 @@ Row: By Example · Python † · topic wt 730 · Learn 163 / Drill 263 · **subj
       `drilling/_index.md` wt 263, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -9193,7 +11065,34 @@ Row: Primer · Go † · topic wt 740 · Learn 164 / Drill 264 · **primer**. Te
       `drilling/_index.md` wt 264, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -9327,7 +11226,34 @@ Row: By Example · Go † · topic wt 750 · Learn 165 / Drill 265 · **subject*
       `drilling/_index.md` wt 265, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -9461,7 +11387,34 @@ Row: Primer · Elixir † · topic wt 760 · Learn 166 / Drill 266 · **primer**
       `drilling/_index.md` wt 266, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -9595,7 +11548,34 @@ Row: By Example · Elixir † · topic wt 770 · Learn 167 / Drill 267 · **subj
       `drilling/_index.md` wt 267, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -9729,7 +11709,34 @@ Row: Primer · Kotlin † · topic wt 780 · Learn 168 / Drill 268 · **primer**
       `drilling/_index.md` wt 268, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -9867,7 +11874,34 @@ Row: By Example · Kotlin † · topic wt 790 · Learn 169 / Drill 269 · **subj
       `drilling/_index.md` wt 269, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10003,7 +12037,34 @@ Row: Primer · Swift † · topic wt 800 · Learn 170 / Drill 270 · **primer**.
       `drilling/_index.md` wt 270, capstone wt 900; all 28 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10141,7 +12202,34 @@ Row: By Example · Swift † · topic wt 810 · Learn 171 / Drill 271 · **subje
       `drilling/_index.md` wt 271, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10275,7 +12363,34 @@ Row: Primer · Dart † · topic wt 820 · Learn 172 / Drill 272 · **primer**. 
       `drilling/_index.md` wt 272, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10413,7 +12528,34 @@ Row: By Example · Dart † · topic wt 830 · Learn 173 / Drill 273 · **subjec
       `drilling/_index.md` wt 273, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10547,7 +12689,34 @@ Row: Primer · C# † · topic wt 840 · Learn 174 / Drill 274 · **primer**. Te
       `drilling/_index.md` wt 274, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10685,7 +12854,34 @@ Row: By Example · C# † · topic wt 850 · Learn 175 / Drill 275 · **subject*
       `drilling/_index.md` wt 275, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10823,7 +13019,34 @@ Row: By Example · Python · topic wt 860 · Learn 176 / Drill 276 · **subject*
       `drilling/_index.md` wt 276, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -10961,7 +13184,34 @@ Row: By Example · Go + Rust † · topic wt 870 · Learn 177 / Drill 277 · **s
       `drilling/_index.md` wt 277, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -11095,7 +13345,34 @@ Row: Primer · C † · topic wt 880 · Learn 178 / Drill 278 · **primer**. Tem
       `drilling/_index.md` wt 278, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -11233,7 +13510,34 @@ Row: By Example · C + shell † · topic wt 890 · Learn 179 / Drill 279 · **s
       `drilling/_index.md` wt 279, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -11373,7 +13677,34 @@ Row: By Example · C + PowerShell † · topic wt 900 · Learn 180 / Drill 280 �
       `drilling/_index.md` wt 280, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -11514,7 +13845,34 @@ Row: By Example · C † · topic wt 910 · Learn 181 / Drill 281 · **subject**
       `drilling/_index.md` wt 281, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -11651,7 +14009,34 @@ Row: Primer · Rust † · topic wt 920 · Learn 182 / Drill 282 · **primer**. 
       `drilling/_index.md` wt 282, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -11792,7 +14177,34 @@ Row: By Example · Rust † · topic wt 930 · Learn 183 / Drill 283 · **subjec
       `drilling/_index.md` wt 283, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -11933,7 +14345,34 @@ Row: Primer · Java † · topic wt 940 · Learn 184 / Drill 284 · **primer**. 
       `drilling/_index.md` wt 284, capstone wt 900; all 28 concepts + 80 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -12074,7 +14513,34 @@ Row: By Example · Java † · topic wt 950 · Learn 185 / Drill 285 · **subjec
       `drilling/_index.md` wt 285, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -12215,7 +14681,34 @@ Row: By Example · Scheme + Clojure † · topic wt 960 · Learn 186 / Drill 286
       `drilling/_index.md` wt 286, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -12350,7 +14843,34 @@ Row: Primer · F# † · topic wt 970 · Learn 187 / Drill 287 · **primer**. Te
       `drilling/_index.md` wt 287, capstone wt 900; all 26 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -12489,7 +15009,34 @@ Row: By Example · OCaml + Haskell + F# † · topic wt 980 · Learn 188 / Drill
       `drilling/_index.md` wt 288, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -12628,7 +15175,34 @@ Row: By Example · F# † · topic wt 990 · Learn 189 / Drill 289 · **subject*
       `drilling/_index.md` wt 289, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -12653,7 +15227,34 @@ Junction: Topics 64–89 (Go/Elixir concurrency + native app domains + C/OS/syst
 - [ ] [AI] `capstone-concurrency-and-systems/` complete (wt 995, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -12678,7 +15279,34 @@ Junction: CSP/Go (65) + Actor/Elixir (67) — the same problem solved two ways. 
 - [ ] [AI] `capstone-concurrency-showdown/` complete (wt 996, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -12821,7 +15449,34 @@ Row: By Example · Python † · topic wt 1000 · Learn 190 / Drill 290 · **sub
       `drilling/_index.md` wt 290, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -12960,7 +15615,34 @@ Row: By Example · Python † · topic wt 1010 · Learn 191 / Drill 291 · **sub
       `drilling/_index.md` wt 291, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -13099,7 +15781,34 @@ Row: By Example · Go † · topic wt 1020 · Learn 192 / Drill 292 · **subject
       `drilling/_index.md` wt 292, capstone wt 900; all 30 concepts + 78 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -13176,7 +15885,34 @@ Row: Annotated-concept · ‡ no-code · topic wt 1030 · Learn 193 / Drill 293 
       `drilling/_index.md` wt 293, capstone wt 900; all 20 concepts + 26 decision scenarios + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -13289,7 +16025,34 @@ Row: Annotated-concept · Python \* · topic wt 1040 · Learn 194 / Drill 294 ·
       `drilling/_index.md` wt 294, capstone wt 900; all 30 concepts + 52 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
@@ -13317,7 +16080,34 @@ Junction: whole journey — Topics 90–94 (internals build-your-own + platform 
 - [ ] [AI] All 10 inter-topic capstones authored — 6 pass-boundary (Pass 0–5) + 4 cross-cutting
       (full-stack-app, secure-service, data-pipeline, concurrency-showdown).
 
-- [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
@@ -13361,6 +16151,35 @@ Junction: whole journey — Topics 90–94 (internals build-your-own + platform 
 - [ ] [AI] Affected quality gate (`typecheck`, `lint`, `test:quick`, `specs:behavior:coverage`) exits 0
       with zero remaining failures (including any pre-existing ones fixed).
 
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
+
 > **Pause Safety**: Section is now live in nav but purely additive — no existing content changed. Safe to
 > pause; if paused mid-verify, the nav links already resolve to valid pages.
 
@@ -13401,39 +16220,93 @@ Archival)_
 - [ ] [AI] Rule-15 three-tester retest follow-ups: every `EWT-###`/`UWT-###`/`DWT-###` defect finding is
       fixed and ticked (no open defect findings remain).
 
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
+
 > **Pause Safety**: Verification-only phase; content already live and additive. Safe to pause.
 
 ---
 
-## Phase 107 — Final catch-up push to origin main + CI post-push verification (main-to-origin-main)
+## Phase 107 — Final `origin/main` + CI verification
 
-> Each topic/capstone phase already committed + pushed its own deliverable to `origin main` as it
-> completed (per the per-topic push HARD RULE in the Delivery Mode section). This phase is the **final
-> catch-up + verify**: it lands the nav-wiring commit and confirms `origin/main` is fully green — it is
-> **not** the sole push.
+> Under `worktree-to-pr` (Phases 4-109), every prior phase — including Phase 105 (nav wiring) and
+> Phase 106 (manual verification) — already merged its own PR and deployed independently. There is no
+> "catch-up push" left to do: this phase is a **read-only confirmation sweep** that `origin/main` reflects
+> every merged phase and is fully green, delivered through the same PR flow as every other phase (its
+> diff is this phase's own delivery.md verification notes).
 
-- [ ] **[AI]** Stage **explicit paths only** — anything not yet pushed by a per-topic phase: the two nav
-      `_index.md` edits and the `evidence/` screenshots (the topic content subtrees are already on `main`)
-      — never `git add -A`. Commit per domain/concern with Conventional Commit messages (e.g.
-      `docs(ayokoding-www): wire fundamentally-strong-software-engineer nav`). **Acceptance**: `git status`
-      shows only intended paths staged; commit(s) created.
-- [ ] **[AI]** Push directly to `origin main`: `git push origin main`. **Acceptance**: push succeeds; local
-      `main` and `origin/main` at the same commit.
-- [ ] **[AI]** CI post-push verification: observe the `main-ci` workflow
-      (`.github/workflows/main-ci.yml`, triggered automatically by the push to `main`) and poll every 2 min
-      per ci-monitoring policy: `gh run list --workflow=main-ci.yml --branch=main --limit=1` to find the
-      run, then `gh run view <run-id> --json status,conclusion`; never `gh run watch`; on HTTP 403 wait
-      ~35 min. **Acceptance**: the latest `main-ci` run on the pushed commit has `conclusion = success`.
+- [ ] **[AI]** Confirm `origin/main` contains every phase's merge (spot-check the merge commits for
+      Phases 4-106 are present in `git log origin/main`) and that the latest `main-ci` run on
+      `origin/main`'s tip has `conclusion = success`
+      (`gh run list --workflow=main-ci.yml --branch=main --limit=1`, then
+      `gh run view <run-id> --json status,conclusion`; never `gh run watch`; on HTTP 403 wait ~35 min).
+      **Acceptance**: every phase's merge commit is present on `origin/main`; the latest `main-ci` run is
+      green.
 
 ### Phase 107 Gate
 
 > All checks below must pass before starting Phase 108.
 
-- [ ] [AI] Content is on `origin main` (local `main` and `origin/main` at the same commit).
-- [ ] [AI] The `main-ci` workflow run on the pushed commit is green (`conclusion = success`).
+- [ ] [AI] `origin/main` contains every Phase 4-106 merge commit.
+- [ ] [AI] The `main-ci` workflow run on `origin/main`'s tip is green (`conclusion = success`).
 
-> **Pause Safety**: Changes are additive content only; if paused after a partial push, `main` still builds
-> because every pushed commit passed its phase gate before the push.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
+
+> **Pause Safety**: Read-only verification; if paused mid-check, `main` is already green (every prior
+> phase gated its own merge before landing).
 
 ---
 
@@ -13450,8 +16323,9 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
       directly). **Acceptance**: the deployer reports a successful validation and a successful
       force-push of `origin/main` → `prod-ayokoding-www`; the deploy is triggered.
 - [ ] **[AI]** Verify the Vercel production build for `prod-ayokoding-www` completes successfully and the
-      new section renders live. Load `https://ayokoding.com/en/learn/fundamentally-strong/software-engineer/`
-      (section root) and one topic page (e.g. `.../just-enough-nvim/learning/`) and confirm HTTP 200 +
+      new section renders live. Load `https://ayokoding.com/en/c/learn/fundamentally-strong/software-engineer/`
+      (section root — note the `/c/` content-tree segment, per `content-url.ts`'s `contentUrl()`) and one
+      topic page (e.g. `.../just-enough-nvim/learning/`) and confirm HTTP 200 +
       the section title renders. **Acceptance**: both URLs return 200 and show the newly published
       content (not a 404 or a stale page).
 
@@ -13462,6 +16336,35 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
 - [ ] [AI] `origin/main` has been force-pushed to `prod-ayokoding-www` by the deployer.
 - [ ] [AI] The Vercel production build succeeded and the live section root + one topic page return 200
       with the new content.
+
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
 
 > **Pause Safety**: Deployment is a promotion of already-pushed, CI-green `main` content to the prod
 > branch; if paused before the deploy, the live site is simply unchanged (last known-good), and the
@@ -13492,6 +16395,35 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
       discarded-with-reason, or the explicit "none" escape is recorded.
 - [ ] [AI] No code-homed learning landed inline in this plan's own commits.
 
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
+
 > **Pause Safety**: Documentation-only step; safe to pause at any point.
 
 ---
@@ -13499,11 +16431,42 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
 ## Plan Archival
 
 - [ ] **[AI]** After the section is on `origin main` with CI green, move the plan folder to `done/` with
-      today's completion date:
+      today's completion date, inside this phase's worktree branch:
       `git mv plans/in-progress/fundamentally-strong-software-engineer plans/done/YYYY-MM-DD__fundamentally-strong-software-engineer`
       and update `plans/in-progress/README.md` (remove the active entry). **Acceptance**: plan under `done/`
       with date prefix; in-progress index no longer lists it.
-- [ ] **[AI]** Commit the archival move (explicit paths) and push directly to `origin main`.
-      **Acceptance**: `git mv` committed; `git push origin main` succeeds; `origin/main` reflects the move.
 
-No worktree is used under `main-to-origin-main`, so there is no worktree-removal step.
+- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+origin && git checkout main && git pull && git checkout -b
+fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
+      phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
+      message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
+      `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
+      draft PR open carrying this phase's commit; CI running on the PR.
+- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      sequential CI-gated cycles per
+      [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
+      against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
+      done-definition is met (review cycles complete, every inline comment addressed, all quality gates
+      green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
+      Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
+      marked ready for review; all CI checks green; no unresolved review threads.
+- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
+      [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
+      requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
+      plan only, the user explicitly instructed (2026-07-14, in-session) that `[AI]` merges automatically
+      once the quality gate passes, to keep phases flowing without a manual click every time — a
+      deliberate, plan-scoped override of the general rule, not a repo-wide change to
+      `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
+      merge time.
+- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
+      `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
+      production as it completes.
+
+- [ ] **[AI]** After this archival PR is merged and its deploy step above completes, remove the shared
+      Phases 4-109 worktree (`git worktree remove worktrees/fundamentally-strong-software-engineer/`)
+      per the [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)'s
+      prompted-cleanup step — only after confirming nothing in it is uncommitted or unpushed.
+      **Acceptance**: worktree removed; `git worktree list` no longer shows it.
