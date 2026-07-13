@@ -1,4 +1,4 @@
-# The Well-Grounded Software Engineer
+# The Fundamentally Strong Software Engineer
 
 A cross-cutting **relearn-and-drill** tutorial section on ayokoding-www that lets a working
 software engineer re-ground themselves across the breadth of the discipline — computer science
@@ -18,16 +18,16 @@ actually stuck.
 
 This matters most **in the age of AI and LLMs**: when assistants generate more and more of the code,
 the engineer's durable edge is a solid grasp of the fundamentals needed to judge, review, and
-correct that output. This section is the human-in-the-loop's reference for staying well-grounded
+correct that output. This section is the human-in-the-loop's reference for staying fundamentally strong
 across the field rather than deferring blindly to generated answers.
 
-This plan adds **"The Well-Grounded Software Engineer"** — a new section under
-`learn/software-engineering/` — that is deliberately breadth-first, self-contained, and split into a
+This plan adds **"The Fundamentally Strong Software Engineer"** — a new top-level collection at
+`learn/fundamentally-strong/` — that is deliberately breadth-first, self-contained, and split into a
 learning track and a drilling track covering the same topics in the same order.
 
 ## Scope
 
-**In scope** (all under `apps/ayokoding-www/content/en/learn/software-engineering/the-well-grounded-software-engineer/`):
+**In scope** (all under `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`):
 
 - A section landing (`_index.md`) + `overview.md`.
 - A **learning** track: a by-example-depth learning subtree per topic (**hybrid format** — code-centric
@@ -75,8 +75,8 @@ learning track and a drilling track covering the same topics in the same order.
      Two **parallel tracks** run alongside the spiral as a reading-path affordance: the ◆ app-domain
      topics (pick the domain(s) matching your path) and the ▲ Product & Delivery track (readable from
      Pass 1 onward).
-- Wiring the new section into the `learn/software-engineering/_index.md` and `learn/_index.md`
-  navigation.
+- Wiring the new collection into `learn/_index.md` and a new `learn/fundamentally-strong/_index.md`
+  collection landing.
 - English only.
 
 **Out of scope**:
@@ -96,7 +96,7 @@ learning track and a drilling track covering the same topics in the same order.
 and drilling material side by side — there are no two top-level tracks.
 
 ```
-learn/software-engineering/the-well-grounded-software-engineer/
+learn/fundamentally-strong/software-engineer/
   _index.md               # section landing (nav list)
   overview.md             # what this is, how to use the journey
   <NN-topic-slug>/        # one folder per topic (journey order; folder weight 100 + 10×index)

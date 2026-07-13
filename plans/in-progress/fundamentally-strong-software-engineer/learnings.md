@@ -1,4 +1,4 @@
-# Learnings — The Well-Grounded Software Engineer
+# Learnings — The Fundamentally Strong Software Engineer
 
 Running knowledge-capture log for this plan. Append an entry whenever something is discovered during
 execution that a future plan, agent, convention, skill, or doc should absorb. The **Phase 109 — Knowledge

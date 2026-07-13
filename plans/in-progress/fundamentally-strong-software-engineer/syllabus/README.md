@@ -1,4 +1,4 @@
-# Syllabus — The Well-Grounded Software Engineer
+# Syllabus — The Fundamentally Strong Software Engineer
 
 The **per-topic detail layer** for this section. Start with **[overview.md](./overview.md)** — it
 defines how to read a topic file, the legend, the cross-cutting authoring guarantees, the capstone

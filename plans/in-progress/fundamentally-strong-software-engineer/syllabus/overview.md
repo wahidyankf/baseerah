@@ -1,4 +1,4 @@
-# Syllabus Overview — The Well-Grounded Software Engineer
+# Syllabus Overview — The Fundamentally Strong Software Engineer
 
 This `syllabus/` folder is the **per-topic detail layer** for the section defined in
 [prd.md](../prd.md) — **the single source of truth** for topic set, pass, format, primary language,
@@ -69,7 +69,7 @@ capstone**, to the mastery bar (DD-8).
 ## Cross-cutting authoring guarantees
 
 **Coverage is a floor, not a cap** (DD-8): the items/examples/capstones below are the minimum surface a
-topic must reach to leave a reader well-grounded; a maker may add more, never fewer.
+topic must reach to leave a reader fundamentally strong; a maker may add more, never fewer.
 
 **Raw-form-first tooling** (DD-17): every topic assumes the reader edits in **Neovim** and drives
 build/run/test/debug/git from the terminal on a macOS/Linux-compatible environment, learning the raw
@@ -320,7 +320,7 @@ Each `NN-<slug>.md` is authored to this skeleton:
 ## Tensions & trade-offs — when NOT to reach for this
 
 - **<decision axis>**: <when this wins vs when the alternative wins; the cost you pay to adopt it>.
-- **When NOT to use it**: <the over-application / failure mode a well-grounded engineer recognises>.
+- **When NOT to use it**: <the over-application / failure mode a fundamentally strong engineer recognises>.
 
 ## Lineage — why it beat the alternative
 

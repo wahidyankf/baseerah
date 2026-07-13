@@ -1,4 +1,4 @@
-# Delivery Checklist — The Well-Grounded Software Engineer
+# Delivery Checklist — The Fundamentally Strong Software Engineer
 
 This checklist is **table-referential**: the canonical topic set, per-topic pass, slug, learning
 format, primary language, and weights live in the [prd.md 94-topic table](./prd.md#the-94-topics--canonical-table-spiral-order-identical-in-both-tracks) —
@@ -82,7 +82,7 @@ per-topic commit+push block, and Pause Safety note.
 
 ## Weight Scheme (topic-first, DD-26)
 
-`CONTENT = apps/ayokoding-www/content/en/learn/software-engineering/the-well-grounded-software-engineer`.
+`CONTENT = apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer`.
 
 - **Topic-slug folder** `CONTENT/<slug>/_index.md` → weight `100 + 10 × journey-index` (topic 1 = 110,
   topic 2 = 120, … topic 94 = 1040). The ×10 spacing leaves integer gaps for inter-topic capstones.
@@ -95,7 +95,7 @@ per-topic commit+push block, and Pause Safety note.
   junction (Pass-0 cap = 135, Pass-1 cap = 275, full-stack-app = 276, Pass-2 cap = 435, Pass-3 cap =
   705, secure-service = 706, data-pipeline = 707, Pass-4 cap = 995, concurrency-showdown = 996, Pass-5
   cap = 1045), each with colocated `code/`.
-- **Section root** `CONTENT/_index.md` → weight **1750** (position in the parent SE nav);
+- **Section root** `CONTENT/_index.md` → weight **1750** (position in the parent `fundamentally-strong/` collection nav);
   `CONTENT/overview.md` → weight **1** (sorts first inside the section).
 
 ## Per-Topic Phase Template
@@ -121,7 +121,7 @@ invocation, and a concrete acceptance criterion (execution-grade clarity).
 1. **[AI] V — Web-verify before authoring (DD-28).** Invoke `web-researcher` for `<slug>`: current
    stable versions, current API/CLI syntax, license status (DD-21), CVE status (DD-23), and current
    best practice for `<lang>`/the subject. Fold the dated findings into the topic's
-   `plans/in-progress/the-well-grounded-software-engineer/syllabus/<NN>-<slug>.md` **before** authoring.
+   `plans/in-progress/fundamentally-strong-software-engineer/syllabus/<NN>-<slug>.md` **before** authoring.
    Runs **sequentially, one topic at a time** (token-bounded). Each dated finding carries the **primary
    source URL the researcher fetched and read** (DD-35); anything unconfirmed is flagged
    `[Needs Verification]` rather than asserted. **Acceptance**: the syllabus file's "Accuracy notes
@@ -236,7 +236,7 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
 - [ ] **[AI]** Baseline markdown lint: run `npm run lint:md` (or `npm run lint:md:fix`). **Acceptance**:
       exits 0 on the existing tree, or only auto-fixable issues that fix cleanly.
 - [ ] **[AI]** Scaffold the section root: create `CONTENT/_index.md` (frontmatter `weight: 1750`, title
-      "The Well-Grounded Software Engineer", intro + link list to the journey map) and `CONTENT/overview.md`
+      "The Fundamentally Strong Software Engineer", intro + link list to the journey map) and `CONTENT/overview.md`
       (weight 1 — read-then-drill workflow, the Pass 0 + five-pass spiral Mermaid map and the 94-node skill
       tree from [prd.md](./prd.md), accessible WCAG palette). **Acceptance**: both files exist;
       `npx nx run ayokoding-www:build` still exits 0.
@@ -281,7 +281,7 @@ its full spec in the anchoring `syllabus/<NN>-*.md` file:
       journey map + skill tree with the WCAG palette.
 
 > **Pause Safety**: The section is additive scaffold only — no topic content yet, nav not wired into the
-> parent SE index. Safe to pause here; the live site is unaffected because the section is not yet linked.
+> parent `learn/` index. Safe to pause here; the live site is unaffected because the section is not yet linked.
 
 ---
 
@@ -12981,14 +12981,14 @@ Junction: whole journey — Topics 90–94 (internals build-your-own + platform 
 
 ## Phase 105 — Nav wiring, parity, and full quality gate
 
-- [ ] **[AI]** Wire the section into the SE nav: edit
-      `apps/ayokoding-www/content/en/learn/software-engineering/_index.md`, adding a
-      "The Well-Grounded Software Engineer" link (route
-      `/en/c/learn/software-engineering/the-well-grounded-software-engineer`) in weight order.
+- [ ] **[AI]** Create the collection landing: add
+      `apps/ayokoding-www/content/en/learn/fundamentally-strong/_index.md`, adding a
+      "The Fundamentally Strong Software Engineer" link (route
+      `/en/c/learn/fundamentally-strong/software-engineer`) in weight order.
       **Acceptance**: link present; `npx nx run ayokoding-www:build` exits 0.
-- [ ] **[AI]** Wire the sub-entry into the learn index: edit
-      `apps/ayokoding-www/content/en/learn/_index.md`, adding the section as a sub-entry under Software
-      Engineering. **Acceptance**: entry present; build exits 0.
+- [ ] **[AI]** Wire the collection into the learn index: edit
+      `apps/ayokoding-www/content/en/learn/_index.md`, adding the fundamentally-strong collection as a
+      top-level entry. **Acceptance**: entry present; build exits 0.
 - [ ] **[AI]** Topic-first parity check: verify every one of the 94 topics has
       `CONTENT/<slug>/learning/_index.md`, `CONTENT/<slug>/learning/capstone/_index.md`, and
       `CONTENT/<slug>/drilling/_index.md`, that the topic-folder weight = `100 + 10 × index`, and that
@@ -13010,7 +13010,7 @@ Junction: whole journey — Topics 90–94 (internals build-your-own + platform 
 
 > All checks below must pass before starting Phase 106.
 
-- [ ] [AI] Section is nav-reachable in ≤2 clicks from `learn/software-engineering/`.
+- [ ] [AI] Section is nav-reachable in ≤2 clicks from `learn/`.
 - [ ] [AI] Topic-first parity 94/94 (each topic has `learning/`, `learning/capstone/`, `drilling/`;
       topic wt `100 + 10 × index`; drill wt = learn wt + 100) and all 10 inter-topic capstones present.
 - [ ] [AI] Link-checker, markdown lint, and build all green.
@@ -13071,7 +13071,7 @@ Archival)_
 - [ ] **[AI]** Stage **explicit paths only** — anything not yet pushed by a per-topic phase: the two nav
       `_index.md` edits and the `evidence/` screenshots (the topic content subtrees are already on `main`)
       — never `git add -A`. Commit per domain/concern with Conventional Commit messages (e.g.
-      `docs(ayokoding-www): wire well-grounded-software-engineer nav`). **Acceptance**: `git status`
+      `docs(ayokoding-www): wire fundamentally-strong-software-engineer nav`). **Acceptance**: `git status`
       shows only intended paths staged; commit(s) created.
 - [ ] **[AI]** Push directly to `origin main`: `git push origin main`. **Acceptance**: push succeeds; local
       `main` and `origin/main` at the same commit.
@@ -13106,7 +13106,7 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
       directly). **Acceptance**: the deployer reports a successful validation and a successful
       force-push of `origin/main` → `prod-ayokoding-www`; the deploy is triggered.
 - [ ] **[AI]** Verify the Vercel production build for `prod-ayokoding-www` completes successfully and the
-      new section renders live. Load `https://ayokoding.com/en/learn/software-engineering/the-well-grounded-software-engineer/`
+      new section renders live. Load `https://ayokoding.com/en/learn/fundamentally-strong/software-engineer/`
       (section root) and one topic page (e.g. `.../just-enough-nvim/learning/`) and confirm HTTP 200 +
       the section title renders. **Acceptance**: both URLs return 200 and show the newly published
       content (not a 404 or a stale page).
@@ -13156,7 +13156,7 @@ branch, which Vercel watches for automatic production builds. Runs only after Ph
 
 - [ ] **[AI]** After the section is on `origin main` with CI green, move the plan folder to `done/` with
       today's completion date:
-      `git mv plans/in-progress/the-well-grounded-software-engineer plans/done/YYYY-MM-DD__the-well-grounded-software-engineer`
+      `git mv plans/in-progress/fundamentally-strong-software-engineer plans/done/YYYY-MM-DD__fundamentally-strong-software-engineer`
       and update `plans/in-progress/README.md` (remove the active entry). **Acceptance**: plan under `done/`
       with date prefix; in-progress index no longer lists it.
 - [ ] **[AI]** Commit the archival move (explicit paths) and push directly to `origin main`.

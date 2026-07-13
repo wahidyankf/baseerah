@@ -1,9 +1,9 @@
-# Technical Docs — The Well-Grounded Software Engineer
+# Technical Docs — The Fundamentally Strong Software Engineer
 
 ## Summary
 
 Content-only addition to ayokoding-www: a new self-contained section under
-`apps/ayokoding-www/content/en/learn/software-engineering/the-well-grounded-software-engineer/`, laid
+`apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`, laid
 out **topic-first** — one folder per canonical topic, each owning its own `learning/` and `drilling/`
 subfolders (DD-26), covering the **same topic set in identical order** across both tracks. The
 canonical topic set, per-topic level, learning format, primary language, and weights live in
@@ -38,8 +38,8 @@ cross-cutting junctions.
 For **N** canonical topics (currently 94), the section is:
 
 ```text
-apps/ayokoding-www/content/en/learn/software-engineering/
-└── the-well-grounded-software-engineer/
+apps/ayokoding-www/content/en/learn/fundamentally-strong/
+└── software-engineer/
     ├── _index.md                     # section landing (weight 1750; nav + six-pass journey map + skill tree)
     ├── overview.md                   # what this is + read-then-drill workflow + journey map + skill tree (weight 1)
     ├── <topic-slug>/                 # one folder PER canonical topic, folder = table "Slug"
@@ -114,7 +114,7 @@ description: "Relearn core data structures and algorithms by example, then drill
   wt"; `drilling/` = prd "Drill wt".
 - `description` — one line; states the topic and the relearn-then-drill intent.
 
-Route pattern for cross-links: `/en/c/learn/software-engineering/the-well-grounded-software-engineer/...`.
+Route pattern for cross-links: `/en/c/learn/fundamentally-strong/software-engineer/...`.
 [Repo-grounded — existing content links use `/en/c/learn/...`]
 
 ## Primary-Language Rule (DD-7)
@@ -158,7 +158,7 @@ per-topic Nvim/VSCode readiness and setup notes.
 
 **The done-bar is the reader outcome, not page length or example count.** Per the user, length of any
 topic or of the whole tutorial does not matter; what matters is that a reader who works a topic comes
-away **well-grounded** — able to operate at any company size, any complexity level, from IC to CTO.
+away **fundamentally strong** — able to operate at any company size, any complexity level, from IC to CTO.
 The by-example _pace_ (annotation density **1.0–2.25** comments per code line per example, incremental
 real-code) governs how densely each example is explained, not how many pages a topic runs to. The
 per-agent checker density/format bands are applied as **quality floors**, never as length caps: a
@@ -324,7 +324,7 @@ exercise** where code does not fit.
 
 ```mermaid
 graph TD
-    Root["well-grounded-swe/"]
+    Root["software-engineer/"]
     Root --> Idx["_index.md + overview.md<br/>(landing + journey map)"]
     Root --> Topic["one folder per topic<br/>(journey order)"]
     Root --> Inter["inter-topic capstones<br/>(pass-boundary,<br/>cross-cutting)"]
@@ -393,22 +393,23 @@ capstone phases run at their journey position (pass boundaries + cross-cutting j
 
 | Path                                                                 | Change | Notes                                                                      |
 | -------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
-| `.../the-well-grounded-software-engineer/_index.md`                  | New    | Section landing, weight 1750                                               |
-| `.../the-well-grounded-software-engineer/overview.md`                | New    | Read-then-drill workflow + six-pass journey map + 94-node skill tree       |
+| `.../fundamentally-strong/software-engineer/_index.md`               | New    | Section landing, weight 1750                                               |
+| `.../fundamentally-strong/software-engineer/overview.md`             | New    | Read-then-drill workflow + six-pass journey map + 94-node skill tree       |
 | `.../<topic-slug>/_index.md` × N                                     | New    | Topic folder nav, weight 110..1040 (journey order)                         |
 | `.../<topic-slug>/overview.md` × N                                   | New    | Per-topic what/why + primary language + prerequisites                      |
 | `.../<topic-slug>/learning/…` × N                                    | New    | By-Example / Annotated-concept subtree + `capstone/` + `code/` per prd row |
 | `.../<topic-slug>/drilling/…` × N                                    | New    | One four-section drill page per prd row (Drill wt = Learn wt + 100)        |
 | `.../<inter-topic-capstone>/…` × ~9–11                               | New    | Pass-boundary + cross-cutting capstone bundles (Capstone Policy)           |
-| `apps/ayokoding-www/content/en/learn/software-engineering/_index.md` | Edit   | Add section link to the SE nav list                                        |
-| `apps/ayokoding-www/content/en/learn/_index.md`                      | Edit   | Add sub-entry under Software Engineering                                   |
+| `apps/ayokoding-www/content/en/learn/fundamentally-strong/_index.md` | New    | Collection landing + nav for the fundamentally-strong collection           |
+| `apps/ayokoding-www/content/en/learn/_index.md`                      | Edit   | Add top-level entry for the fundamentally-strong collection                |
 
 No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
 
 ## Design Decisions
 
-- **DD-1: Nested under `software-engineering/`, not a new top-level section.** Chosen by the user;
-  keeps it beside the deep SE content it complements. [User decision]
+- **DD-1: A new top-level `fundamentally-strong/` collection, not nested under `software-engineering/`.**
+  Chosen by the user; the series is its own top-level collection at `learn/fundamentally-strong/`,
+  complementing the deep SE content beside it rather than nesting inside it. [User decision]
 - **DD-2: Self-contained, no links into existing subtrees.** Chosen by the user; each topic stands
   alone so a reader is never bounced elsewhere. [User decision]
 - **DD-3: By-example pace per topic, hybrid by nature.** Code topics use the By Example content type;
@@ -424,7 +425,7 @@ No `apps/ayokoding-www/src/` files, no `project.json`, no new npm packages.
   language; Python is used everywhere it is honest; every non-Python topic is a platform/subject
   exception recorded in the prd "Primary language" column. [User decision]
 - **DD-8: Outcome over length.** Depth-to-mastery of each topic's core is the done-bar; checker bands
-  are quality floors, not length caps; the target reader outcome is "well-grounded from IC to CTO,
+  are quality floors, not length caps; the target reader outcome is "fundamentally strong from IC to CTO,
   any company size, any complexity." [User decision]
 - **DD-9: Journey ordering as a five-pass spiral, immediately-effective-first; ◆ and ▲ parallel.**
   Topics sequenced so the earliest get the reader **building, persisting, testing, and securing a small
@@ -743,7 +744,7 @@ non-Python-subject sense — both senses are documented in the prd primary-langu
 
 ## Rollback
 
-Pure additive content. Rollback = delete the `the-well-grounded-software-engineer/` folder and revert
+Pure additive content. Rollback = delete the `fundamentally-strong/software-engineer/` folder and revert
 the two `_index.md` nav edits. No data migration, no build-config change, no runtime state.
 
 ## Testing & Verification

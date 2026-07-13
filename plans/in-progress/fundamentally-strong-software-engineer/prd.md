@@ -1,8 +1,8 @@
-# Product Requirements — The Well-Grounded Software Engineer
+# Product Requirements — The Fundamentally Strong Software Engineer
 
 ## Product Overview
 
-A new self-contained section under `learn/software-engineering/` on ayokoding-www, built for
+A new self-contained top-level collection at `learn/fundamentally-strong/` on ayokoding-www, built for
 **breadth-across-the-field with by-example depth per topic**, sequenced as a **spiral learning
 journey**: the reader first sets up their editor/forge, then builds, stores, tests, and secures a
 small working system early, then revisits each concern area at increasing depth on later passes. The
@@ -20,7 +20,7 @@ capstone inside each topic plus inter-topic capstones at pass boundaries and cro
 [syllabus/ folder](./syllabus/), one `NN-<slug>.md` file per topic (DD-29).
 
 **The goal is an outcome, not a page count**: a reader who works this section becomes a
-**well-grounded software engineer** — grounded enough to operate at **any company size, at any level
+**fundamentally strong software engineer** — grounded enough to operate at **any company size, at any level
 of complexity, and at any career altitude from individual contributor up to CTO**. Topic and tutorial
 length are explicitly not a concern (per the user); depth-to-grounding of each topic's core is. Scope
 is judged by real-world usefulness, not by topic count — genuinely useful material is in scope even
@@ -48,7 +48,7 @@ per DD-24). It is not a UI/component change, so the UI-design-funnel requirement
 Across every topic, the content assumes and teaches a **pure-editor, CLI-first workflow on a
 macOS/Linux-compatible environment** — the reader edits in **Neovim** and drives everything else
 (compile, run, test, debug, package, version-control) from the terminal, rather than behind the
-buttons of a full IDE such as IntelliJ (DD-17). The point is pedagogical: a well-grounded engineer
+buttons of a full IDE such as IntelliJ (DD-17). The point is pedagogical: a fundamentally strong engineer
 should know the **raw form** of the tools — the actual compiler/interpreter invocation, the test
 runner command, the `git` plumbing, the build step — not just the IDE gesture that hides it. Where a
 topic shows an editor/terminal interaction, it shows the command, not a screenshot of a GUI.
@@ -731,7 +731,7 @@ run via its stated raw-form command. The exclusion is recorded in the app's igno
 
 **The measure of done is the reader outcome, not page length or example count.** Per the user: length
 of any topic or of the whole tutorial does not matter — what matters is that a reader who works a
-topic comes away **well-grounded** in it: able to operate at any company size, at any level of
+topic comes away **fundamentally strong** in it: able to operate at any company size, at any level of
 complexity, from individual contributor up to CTO. Each topic is authored to whatever depth achieves
 that grounding of its core surface, no more and no less. Scope creep is acceptable when it is
 genuinely useful in real-world practice.
@@ -1089,7 +1089,7 @@ needed. [Repo-grounded — `apps/ayokoding-www/content/en/learn/business/corpora
   to be parallel tracks so I pick my path (e.g. backend or mobile; product thinking early) instead of
   reading every topic serially.
 - **US-5** — As a reader, I want every topic reachable from the section landing and from the
-  `learn/software-engineering/` nav, so that I can find any topic in at most two clicks without
+  `learn/` nav, so that I can find any topic in at most two clicks without
   hunting through unrelated content.
 - **US-6** — As a gap-finder, I want a self-check checklist per topic, so that I can surface what I
   don't know without waiting for an external quiz or interview to expose the gap.
@@ -1116,11 +1116,11 @@ needed. [Repo-grounded — `apps/ayokoding-www/content/en/learn/business/corpora
 ## Acceptance Criteria (Gherkin)
 
 ```gherkin
-Feature: The Well-Grounded Software Engineer section
+Feature: The Fundamentally Strong Software Engineer section
 
   Background:
     Given the ayokoding-www content tree
-    And the section root "learn/software-engineering/the-well-grounded-software-engineer"
+    And the section root "learn/fundamentally-strong/software-engineer"
 
   Scenario: Section landing, overview, and journey map exist
     Given the section root
@@ -1251,9 +1251,9 @@ Feature: The Well-Grounded Software Engineer section
     And every question or exercise hides its answer in a collapsible "<details>" block
 
   Scenario: Navigation wiring
-    Given the "learn/software-engineering/_index.md" navigation
-    When a reader browses software-engineering
-    Then "The Well-Grounded Software Engineer" appears in the list
+    Given the "learn/_index.md" navigation
+    When a reader browses the learn index
+    Then "The Fundamentally Strong Software Engineer" appears in the list
     And it links to the new section landing
 
   Scenario: Every topic states its prerequisites explicitly
@@ -1375,7 +1375,7 @@ curated cross-cutting capstones (full-stack-app, secure-service, data-pipeline, 
 each with colocated `code/` (DD-27); the [syllabus/ folder](./syllabus/) itself (`README.md` +
 `overview.md` + one `NN-<slug>.md` per topic with full item list, worked-example specs, and capstone
 spec, DD-29); a topic-slug-`overview.md` per topic; the [Editor Setup matrix](#editor-setup-matrix-dd-25);
-nav wiring in `learn/software-engineering/_index.md` and `learn/_index.md`. Every topic is
+nav wiring in `learn/_index.md` and a new `learn/fundamentally-strong/_index.md`. Every topic is
 **accuracy-verified by `web-researcher` before authoring** (DD-28) and every example/capstone is
 **follow-along-complete** (DD-30).
 
@@ -1395,21 +1395,21 @@ colocated `code/` samples (deliberately excluded, DD-24); edits to existing deep
 
 ## Product Risks
 
-| Risk                                                                           | Mitigation                                                                                                                                                                                 |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Breadth (94 topics) risks shallow, "well-grounded"-in-name-only coverage       | Depth-to-mastery per topic is the done-bar (not length); by-example pace + checker quality floors; pass-phased, one topic finished before the next.                                        |
-| Concept topics can't hit strict by-example format                              | Annotated-concept format defined with equal density + diagrams.                                                                                                                            |
-| Factual/licensing drift across a wide, fast-moving surface                     | facts-checker pass on all pages; license-aware choices grounded by web research (DD-15); standard-library-first, cited claims.                                                             |
-| A material turns out to be non-free or non-teachable (e.g. paywalled standard) | Free-to-use-and-teachable-first policy (DD-21) applied per material; ISO 27001 / SOC 2 landscape-only; Tier-2 proprietary SDKs used only where a domain requires and permits tutorials.    |
-| A taught dependency carries an open CVE                                        | CVE-free policy (DD-23): stdlib-first, exact pins, CVE-clean across five sources, free OSS scanners; facts-checker verifies at each gate.                                                  |
-| Colocated `code/` samples drag a dozen toolchains into the app build           | DD-24 excludes `content/**/code/**` from Nx build/test/lint/specs:coverage; samples covered by authoring/checker gates + runnable-example rule instead.                                    |
-| Editor setup drifts per topic / duplicates plugin lists                        | Plugins enumerated once per language in the Editor Setup matrix (DRY); each topic links the row rather than re-listing; nvim ⇒ vscode ⇒ stack precedence fixed.                            |
-| Topic-first `learning/`+`drilling/` pair drifts in set/order                   | Weight scheme (topic folder 100 + 10 x index; learning subfolder 101..194 / drilling subfolder 201..294, drill = learn + 100) + explicit parity gate per topic (DD-26).                    |
-| Capstones balloon or turn shallow / non-runnable                               | Capstone Policy (DD-27) scales by topic kind; full spec (goal, checklist, ordered steps, acceptance criteria) lives in the syllabus file; done-bar = "runnable end-to-end + web-verified". |
-| A worked example or capstone hides an assumption a reader can't fill           | Follow-Along Completeness Rule (DD-30): prerequisites + versions up front, no elided listings, verbatim commands with expected output; re-checked at every phase gate.                     |
-| Content goes stale between authoring and publish (versions, APIs, CVEs)        | Accuracy Verification Rule (DD-28): web-researcher verifies each topic before authoring (sequential); facts-checker re-verifies rendered pages at each gate.                               |
-| Spiral splits (Essentials vs Advanced) fragment a subject confusingly          | Each Essentials topic cross-links its Advanced counterpart; overview states what is deferred to the later pass.                                                                            |
-| Language primer duplicates or drifts from the topic that uses it               | Primers are "just enough to be productive"; the consuming topic references the primer as prerequisite rather than re-teaching the language.                                                |
-| Multi-language exceptions dilute the "one primary language" goal               | Python is the default everywhere it's honest; every non-Python topic is a documented platform/subject exception in the canonical table.                                                    |
-| `<details>` renders poorly in the Next.js content pipeline                     | Verify rendering in a Playwright smoke check before archival.                                                                                                                              |
-| Journey Mermaid not color-blind safe                                           | Use verified WCAG palette; mermaid-validation gate in delivery.                                                                                                                            |
+| Risk                                                                            | Mitigation                                                                                                                                                                                 |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Breadth (94 topics) risks shallow, "fundamentally strong"-in-name-only coverage | Depth-to-mastery per topic is the done-bar (not length); by-example pace + checker quality floors; pass-phased, one topic finished before the next.                                        |
+| Concept topics can't hit strict by-example format                               | Annotated-concept format defined with equal density + diagrams.                                                                                                                            |
+| Factual/licensing drift across a wide, fast-moving surface                      | facts-checker pass on all pages; license-aware choices grounded by web research (DD-15); standard-library-first, cited claims.                                                             |
+| A material turns out to be non-free or non-teachable (e.g. paywalled standard)  | Free-to-use-and-teachable-first policy (DD-21) applied per material; ISO 27001 / SOC 2 landscape-only; Tier-2 proprietary SDKs used only where a domain requires and permits tutorials.    |
+| A taught dependency carries an open CVE                                         | CVE-free policy (DD-23): stdlib-first, exact pins, CVE-clean across five sources, free OSS scanners; facts-checker verifies at each gate.                                                  |
+| Colocated `code/` samples drag a dozen toolchains into the app build            | DD-24 excludes `content/**/code/**` from Nx build/test/lint/specs:coverage; samples covered by authoring/checker gates + runnable-example rule instead.                                    |
+| Editor setup drifts per topic / duplicates plugin lists                         | Plugins enumerated once per language in the Editor Setup matrix (DRY); each topic links the row rather than re-listing; nvim ⇒ vscode ⇒ stack precedence fixed.                            |
+| Topic-first `learning/`+`drilling/` pair drifts in set/order                    | Weight scheme (topic folder 100 + 10 x index; learning subfolder 101..194 / drilling subfolder 201..294, drill = learn + 100) + explicit parity gate per topic (DD-26).                    |
+| Capstones balloon or turn shallow / non-runnable                                | Capstone Policy (DD-27) scales by topic kind; full spec (goal, checklist, ordered steps, acceptance criteria) lives in the syllabus file; done-bar = "runnable end-to-end + web-verified". |
+| A worked example or capstone hides an assumption a reader can't fill            | Follow-Along Completeness Rule (DD-30): prerequisites + versions up front, no elided listings, verbatim commands with expected output; re-checked at every phase gate.                     |
+| Content goes stale between authoring and publish (versions, APIs, CVEs)         | Accuracy Verification Rule (DD-28): web-researcher verifies each topic before authoring (sequential); facts-checker re-verifies rendered pages at each gate.                               |
+| Spiral splits (Essentials vs Advanced) fragment a subject confusingly           | Each Essentials topic cross-links its Advanced counterpart; overview states what is deferred to the later pass.                                                                            |
+| Language primer duplicates or drifts from the topic that uses it                | Primers are "just enough to be productive"; the consuming topic references the primer as prerequisite rather than re-teaching the language.                                                |
+| Multi-language exceptions dilute the "one primary language" goal                | Python is the default everywhere it's honest; every non-Python topic is a documented platform/subject exception in the canonical table.                                                    |
+| `<details>` renders poorly in the Next.js content pipeline                      | Verify rendering in a Playwright smoke check before archival.                                                                                                                              |
+| Journey Mermaid not color-blind safe                                            | Use verified WCAG palette; mermaid-validation gate in delivery.                                                                                                                            |
