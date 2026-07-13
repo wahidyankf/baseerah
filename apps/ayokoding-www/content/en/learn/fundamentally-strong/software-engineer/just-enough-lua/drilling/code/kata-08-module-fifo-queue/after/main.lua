@@ -1,0 +1,8 @@
+local queue = require("queue")
+local q = queue.new()
+queue.push(q, "first")
+queue.push(q, "second")
+queue.push(q, "third")
+print(queue.pop(q))
+print(queue.pop(q))
+print(queue.pop(q))

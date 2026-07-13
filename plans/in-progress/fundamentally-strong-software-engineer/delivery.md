@@ -567,7 +567,7 @@ Row: Primer · Neovim § · topic wt 110 · Learn 101 / Drill 201 · **primer**.
       `drilling/_index.md` wt 201, capstone wt 900; all 20 concepts + 91 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0. - \_Date: 2026-07-14. Status: done.
       Notes: completeness verified independently — `find learning/code -maxdepth 1 -type d -name
-  'ex-*'` = 91; all `co-01`..`co-20` referenced across `learning/*.md`; `learning/_index.md` wt
+'ex-*'` = 91; all `co-01`..`co-20` referenced across `learning/*.md`; `learning/_index.md` wt
       101, `drilling/_index.md` wt 201, `learning/capstone/_index.md` wt 900, top-level `_index.md`
       wt 110 (all confirmed via frontmatter read); capstone present and runnable
       (`learning/capstone/overview.md`, 272 lines); primer-checker/link-checker/general-checker/
@@ -584,129 +584,215 @@ Row: Primer · Neovim § · topic wt 110 · Learn 101 / Drill 201 · **primer**.
 Row: Primer · Lua † · topic wt 120 · Learn 102 / Drill 202 · **primer**. Template →
 [`syllabus/02-just-enough-lua.md`](./syllabus/02-just-enough-lua.md).
 
-- [ ] **[AI] V** — `web-researcher` for `just-enough-lua`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `just-enough-lua`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/02-just-enough-lua.md`](./syllabus/02-just-enough-lua.md) and fold dated findings back into that file.
-      **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/just-enough-lua/learning/` teaching **every** concept in
-      `syllabus/02-just-enough-lua.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · dynamic-typing-eight-types
-  - [ ] co-02 · nil-and-false-are-falsy
-  - [ ] co-03 · tables-are-the-only-data-structure
-  - [ ] co-04 · array-part-vs-hash-part
-  - [ ] co-05 · functions-are-first-class-values
-  - [ ] co-06 · lexical-scope-and-local
-  - [ ] co-07 · closures-and-upvalues
-  - [ ] co-08 · multiple-return-values
-  - [ ] co-09 · varargs-and-select
-  - [ ] co-10 · metatables-and-metamethods
-  - [ ] co-11 · index-metamethod-prototype-oop
-  - [ ] co-12 · colon-syntax-for-methods
-  - [ ] co-13 · error-handling-with-pcall
-  - [ ] co-14 · modules-and-require
-  - [ ] co-15 · coroutines-cooperative-multitasking
-  - [ ] co-16 · string-library-and-patterns
-  - [ ] co-17 · standard-libraries-overview
-  - [ ] co-18 · luajit-and-lua51-in-neovim
-- [ ] **[AI] A1-examples** — Author `CONTENT/just-enough-lua/learning/code/` — one runnable `.lua` script +
+      **Acceptance**: no unresolved "verify" line remains. - _Date: 2026-07-14. Status: done. Files
+      changed: `syllabus/02-just-enough-lua.md`. Notes: the syllabus already carried a full DD-35
+      primary-source-cited accuracy-notes block from a 2026-07-12 pre-authoring sweep, flagged
+      "re-confirm version pins at authoring." Dispatched `web-researcher` to re-fetch all 4 fast-moving
+      sources at authoring time: Lua 5.5.0 (2025-12-22, current major) + 5.4.8 (latest 5.4.x patch) per
+      `lua.org/versions.html`/`news.html`; MIT license per `lua.org/license.html`; Neovim's Lua-5.1/
+      LuaJIT-2.1 targeting per current `runtime/doc/lua.txt`; LuaJIT's rolling-release-only status per
+      `luajit.org/status.html`. All 4 confirmed still current, no drift. Appended a dated
+      2026-07-14 re-confirmation bullet to the file's Accuracy notes section. No unresolved verify
+      line remains._
+- [x] **[AI] A1-concepts** — Author `CONTENT/just-enough-lua/learning/` teaching **every** concept in
+      `syllabus/02-just-enough-lua.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`: - _Date:
+      2026-07-14. Status: done. Files changed: `.../just-enough-lua/_index.md` (bare stub, wt 120),
+      `.../learning/_index.md` (bare stub, wt 102), `.../learning/overview.md` (109 lines, Prerequisites +
+      Why-this-exists w/ `abstraction-and-its-cost` tag + install/run-command-up-front + scope-exclusion
+      section). Notes: authored via `apps-ayokoding-www-primer-maker`; all 18 concepts (co-01..co-18)
+      confirmed referenced across `learning/*.md`. Independently re-verified by me: example/concept
+      counts, `_index.md` stub integrity, and stability across my own independent
+      `npx nx run ayokoding-www:build` (line counts unchanged before/after: `_index.md`=12,
+      `learning/_index.md`=11)._
+  - [x] co-01 · dynamic-typing-eight-types
+  - [x] co-02 · nil-and-false-are-falsy
+  - [x] co-03 · tables-are-the-only-data-structure
+  - [x] co-04 · array-part-vs-hash-part
+  - [x] co-05 · functions-are-first-class-values
+  - [x] co-06 · lexical-scope-and-local
+  - [x] co-07 · closures-and-upvalues
+  - [x] co-08 · multiple-return-values
+  - [x] co-09 · varargs-and-select
+  - [x] co-10 · metatables-and-metamethods
+  - [x] co-11 · index-metamethod-prototype-oop
+  - [x] co-12 · colon-syntax-for-methods
+  - [x] co-13 · error-handling-with-pcall
+  - [x] co-14 · modules-and-require
+  - [x] co-15 · coroutines-cooperative-multitasking
+  - [x] co-16 · string-library-and-patterns
+  - [x] co-17 · standard-libraries-overview
+  - [x] co-18 · luajit-and-lua51-in-neovim
+- [x] **[AI] A1-examples** — Author `CONTENT/just-enough-lua/learning/code/` — one runnable `.lua` script +
       expected output per worked example in `syllabus/02-just-enough-lua.md` §Worked examples (DD-20/DD-30).
-      One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · hello-world-print — verify `Hello, world!`
-  - [ ] ex-02 · type-function-eight-types — verify type names printed
-  - [ ] ex-03 · nil-vs-false-truthiness — verify `0`/`""` truthy
-  - [ ] ex-04 · local-vs-global-shadowing — verify `20` then `10`
-  - [ ] ex-05 · multiple-assignment-swap — verify `2 1`
-  - [ ] ex-06 · arithmetic-operators-modulo-power — verify `1 1024 -5`
-  - [ ] ex-07 · math-library-floor-random — verify `3 true`
-  - [ ] ex-08 · string-concatenation-coercion — verify `Value: 42`
-  - [ ] ex-09 · string-length-operator — verify `5`
-  - [ ] ex-10 · comparison-operators — verify `true true true`
-  - [ ] ex-11 · logical-or-default-idiom — verify `default`
-  - [ ] ex-12 · logical-and-or-ternary-idiom — verify `yes`
-  - [ ] ex-13 · not-operator-truthiness — verify `true true false`
-  - [ ] ex-14 · if-elseif-else-branching — verify correct branch prints
-  - [ ] ex-15 · numeric-for-loop-ascending — verify `1 2 3 4 5`
-  - [ ] ex-16 · numeric-for-loop-descending-step — verify `10 8 6 4 2`
-  - [ ] ex-17 · while-loop-counter — verify `3`
-  - [ ] ex-18 · repeat-until-loop — verify body runs once
-  - [ ] ex-19 · table-array-literal-and-length — verify `10 30 3`
-  - [ ] ex-20 · table-map-literal-and-field-access — verify `Ada 36`
-  - [ ] ex-21 · table-nested-field-access — verify `42`
-  - [ ] ex-22 · ipairs-iteration-array — verify ordered `1 x`/`2 y`/`3 z`
-  - [ ] ex-23 · pairs-iteration-map — verify both pairs printed
-  - [ ] ex-24 · function-basic-definition-call — verify `5`
-  - [ ] ex-25 · function-default-parameter-idiom — verify `Hello world`
-  - [ ] ex-26 · function-multiple-return-values — verify `2 5`
-  - [ ] ex-27 · varargs-basic-sum — verify `6`
-  - [ ] ex-28 · varargs-select-count — verify `3` counts nil
-  - [ ] ex-29 · table-insert-append — verify `3`
-  - [ ] ex-30 · table-insert-at-position — verify `0` shifted
-  - [ ] ex-31 · table-remove-last — verify returned last, `#t`−1
-  - [ ] ex-32 · table-remove-at-position — verify prior-second
-  - [ ] ex-33 · table-concat-join — verify `a, b, c`
-  - [ ] ex-34 · table-sort-default-order — verify `1,2,3`
-  - [ ] ex-35 · table-sort-custom-comparator — verify `3,2,1`
-  - [ ] ex-36 · string-format-basic-placeholders — verify `age is 36`
-  - [ ] ex-37 · string-format-float-width-precision — verify `3.14` right-aligned in width 5 (one leading space)
-  - [ ] ex-38 · string-sub-substring-range — verify `hello`
-  - [ ] ex-39 · string-sub-negative-index-colon-syntax — verify `llo`
-  - [ ] ex-40 · string-upper-lower-colon-syntax — verify `NEOVIM neovim`
-  - [ ] ex-41 · string-rep-repeat — verify `ababab`
-  - [ ] ex-42 · string-find-plain-search — verify `7 11`
-  - [ ] ex-43 · string-match-pattern-captures — verify `key value`
-  - [ ] ex-44 · string-gmatch-word-iteration — verify `one|two|three|`
-  - [ ] ex-45 · string-gsub-substitution-count — verify `hell0 w0rld 2`
-  - [ ] ex-46 · generic-for-stateless-iterator — verify `1`/`2`/`3`
-  - [ ] ex-47 · closures-counter-factory — verify `1 2 3`
-  - [ ] ex-48 · closures-independent-instances — verify separate counts
-  - [ ] ex-49 · function-recursion-factorial — verify `120`
-  - [ ] ex-50 · function-as-callback-argument — verify `25`
-  - [ ] ex-51 · function-returning-function-adder — verify `15`
-  - [ ] ex-52 · table-mixed-array-and-map — verify `3 mix`
-  - [ ] ex-53 · metatable-index-function-default — verify `N/A`
-  - [ ] ex-54 · metatable-index-table-inheritance — verify fallthrough
-  - [ ] ex-55 · metatable-tostring-custom-print — verify `Point(1,2)`
-  - [ ] ex-56 · metatable-add-operator-overload — verify summed `x`
-  - [ ] ex-57 · modules-require-return-table-and-caching — verify `hi true`
-  - [ ] ex-58 · error-raise-with-message-and-pcall — verify `false`+msg
-  - [ ] ex-59 · error-raise-table-object — verify `42`
-  - [ ] ex-60 · assert-custom-message — verify `custom failure`
-  - [ ] ex-61 · xpcall-with-traceback-handler — verify `stack traceback`
-  - [ ] ex-62 · error-level-suppress-position — verify bare `raw`
-  - [ ] ex-63 · metatable-eq-operator — verify `true` on shared id
-  - [ ] ex-64 · metatable-call-operator — verify `called`
-  - [ ] ex-65 · oop-class-with-index-metatable — verify `Rex makes a sound`
-  - [ ] ex-66 · oop-inheritance-chain-setmetatable — verify inherited msg
-  - [ ] ex-67 · oop-method-override — verify `barks` vs base
-  - [ ] ex-68 · coroutine-create-and-resume — verify `a` then `b`
-  - [ ] ex-69 · coroutine-yield-value-exchange — verify bidirectional value
-  - [ ] ex-70 · coroutine-wrap-as-iterator — verify `1 2 3`
-  - [ ] ex-71 · coroutine-status-transitions — verify suspended/running/dead
-  - [ ] ex-72 · unpack-global-function-51 — verify `1 2 3`
-  - [ ] ex-73 · string-format-q-escape-quote — verify reloadable literal
-  - [ ] ex-74 · pattern-capture-anchored-date — verify `2026 07 12`
-  - [ ] ex-75 · memoized-closure-fibonacci — verify `832040` cached
-  - [ ] ex-76 · rawget-rawequal-bypass-metamethods — verify metamethods bypassed
-  - [ ] ex-77 · varargs-table-constructor — verify `3 1 3`
-  - [ ] ex-78 · neovim-vim-tbl-deep-extend-merge — verify `b.c`→3, `a`=1
-  - [ ] ex-79 · neovim-vim-tbl-map-filter — verify `2, 4, 6`
-  - [ ] ex-80 · neovim-vim-keymap-set-callback — verify `mapped` in `:messages`
-  - [ ] ex-81 · neovim-vim-opt-scalar-option — verify `2`
-  - [ ] ex-82 · neovim-vim-api-buf-set-lines — verify `hello|world`
-  - [ ] ex-83 · neovim-vim-inspect-pretty-print — verify nested `x = 3`
-  - [ ] ex-84 · neovim-vim-split-string-utility — verify 4 elements w/ empty
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-lua/learning/capstone/` (`_index.md` weight 900) per the
+      One checkbox per `ex-NN` (1:1 mirror): - _Date: 2026-07-14. Status: done. Files changed:
+      `.../learning/beginner.md` (826 lines, ex-01..26), `.../learning/intermediate.md` (1072 lines,
+      ex-27..58), `.../learning/advanced.md` (935 lines, ex-59..84), `.../learning/code/ex-01-*/`
+      through `ex-84-*/` (85 `.lua` files: 84 `example.lua` + 1 `mymodule.lua` for ex-57's `require`
+      demo). Notes: all 84 examples authored and executed for real (81 via `lua`, 1 via `luajit` for
+      ex-72's Lua-5.1-only `unpack()`, 7 via `nvim --headless -c luafile` for the `vim.*` API examples
+      ex-78..84) — every documented "Output" line is a real captured result, not reasoned-about.
+      Caught + fixed 2 real bugs during authoring: ex-71's coroutine self-reference (fixed via
+      forward-declaration `local co; co = coroutine.create(...)`) and `2^10` genuinely printing
+      `1024.0` not `1024` (`^` always returns float in Lua). I independently re-verified by re-running
+      several scripts myself (ex-06, ex-45, ex-71, ex-72, ex-78) via real `lua`/`luajit`/headless-nvim
+      and diffing against documented output — all matched exactly. `find learning/code -maxdepth 1
+-type d -name 'ex-*' | wc -l` = 84. DD-32 footer chain confirmed bidirectionally consistent with
+      Topic 1 (`overview.md` Previous → `../../just-enough-nvim/learning/advanced.md`; `advanced.md`
+      Next → intentional forward dead-link `../../extending-neovim/learning/overview.md`). Content
+      stable across my own independent `npx nx run ayokoding-www:build` re-run (all tier-page line
+      counts unchanged). `git status` confirmed `just-enough-nvim/` completely untouched._
+  - [x] ex-01 · hello-world-print — verify `Hello, world!`
+  - [x] ex-02 · type-function-eight-types — verify type names printed
+  - [x] ex-03 · nil-vs-false-truthiness — verify `0`/`""` truthy
+  - [x] ex-04 · local-vs-global-shadowing — verify `20` then `10`
+  - [x] ex-05 · multiple-assignment-swap — verify `2 1`
+  - [x] ex-06 · arithmetic-operators-modulo-power — verify `1 1024 -5`
+  - [x] ex-07 · math-library-floor-random — verify `3 true`
+  - [x] ex-08 · string-concatenation-coercion — verify `Value: 42`
+  - [x] ex-09 · string-length-operator — verify `5`
+  - [x] ex-10 · comparison-operators — verify `true true true`
+  - [x] ex-11 · logical-or-default-idiom — verify `default`
+  - [x] ex-12 · logical-and-or-ternary-idiom — verify `yes`
+  - [x] ex-13 · not-operator-truthiness — verify `true true false`
+  - [x] ex-14 · if-elseif-else-branching — verify correct branch prints
+  - [x] ex-15 · numeric-for-loop-ascending — verify `1 2 3 4 5`
+  - [x] ex-16 · numeric-for-loop-descending-step — verify `10 8 6 4 2`
+  - [x] ex-17 · while-loop-counter — verify `3`
+  - [x] ex-18 · repeat-until-loop — verify body runs once
+  - [x] ex-19 · table-array-literal-and-length — verify `10 30 3`
+  - [x] ex-20 · table-map-literal-and-field-access — verify `Ada 36`
+  - [x] ex-21 · table-nested-field-access — verify `42`
+  - [x] ex-22 · ipairs-iteration-array — verify ordered `1 x`/`2 y`/`3 z`
+  - [x] ex-23 · pairs-iteration-map — verify both pairs printed
+  - [x] ex-24 · function-basic-definition-call — verify `5`
+  - [x] ex-25 · function-default-parameter-idiom — verify `Hello world`
+  - [x] ex-26 · function-multiple-return-values — verify `2 5`
+  - [x] ex-27 · varargs-basic-sum — verify `6`
+  - [x] ex-28 · varargs-select-count — verify `3` counts nil
+  - [x] ex-29 · table-insert-append — verify `3`
+  - [x] ex-30 · table-insert-at-position — verify `0` shifted
+  - [x] ex-31 · table-remove-last — verify returned last, `#t`−1
+  - [x] ex-32 · table-remove-at-position — verify prior-second
+  - [x] ex-33 · table-concat-join — verify `a, b, c`
+  - [x] ex-34 · table-sort-default-order — verify `1,2,3`
+  - [x] ex-35 · table-sort-custom-comparator — verify `3,2,1`
+  - [x] ex-36 · string-format-basic-placeholders — verify `age is 36`
+  - [x] ex-37 · string-format-float-width-precision — verify `3.14` right-aligned in width 5 (one leading space)
+  - [x] ex-38 · string-sub-substring-range — verify `hello`
+  - [x] ex-39 · string-sub-negative-index-colon-syntax — verify `llo`
+  - [x] ex-40 · string-upper-lower-colon-syntax — verify `NEOVIM neovim`
+  - [x] ex-41 · string-rep-repeat — verify `ababab`
+  - [x] ex-42 · string-find-plain-search — verify `7 11`
+  - [x] ex-43 · string-match-pattern-captures — verify `key value`
+  - [x] ex-44 · string-gmatch-word-iteration — verify `one|two|three|`
+  - [x] ex-45 · string-gsub-substitution-count — verify `hell0 w0rld 2`
+  - [x] ex-46 · generic-for-stateless-iterator — verify `1`/`2`/`3`
+  - [x] ex-47 · closures-counter-factory — verify `1 2 3`
+  - [x] ex-48 · closures-independent-instances — verify separate counts
+  - [x] ex-49 · function-recursion-factorial — verify `120`
+  - [x] ex-50 · function-as-callback-argument — verify `25`
+  - [x] ex-51 · function-returning-function-adder — verify `15`
+  - [x] ex-52 · table-mixed-array-and-map — verify `3 mix`
+  - [x] ex-53 · metatable-index-function-default — verify `N/A`
+  - [x] ex-54 · metatable-index-table-inheritance — verify fallthrough
+  - [x] ex-55 · metatable-tostring-custom-print — verify `Point(1,2)`
+  - [x] ex-56 · metatable-add-operator-overload — verify summed `x`
+  - [x] ex-57 · modules-require-return-table-and-caching — verify `hi true`
+  - [x] ex-58 · error-raise-with-message-and-pcall — verify `false`+msg
+  - [x] ex-59 · error-raise-table-object — verify `42`
+  - [x] ex-60 · assert-custom-message — verify `custom failure`
+  - [x] ex-61 · xpcall-with-traceback-handler — verify `stack traceback`
+  - [x] ex-62 · error-level-suppress-position — verify bare `raw`
+  - [x] ex-63 · metatable-eq-operator — verify `true` on shared id
+  - [x] ex-64 · metatable-call-operator — verify `called`
+  - [x] ex-65 · oop-class-with-index-metatable — verify `Rex makes a sound`
+  - [x] ex-66 · oop-inheritance-chain-setmetatable — verify inherited msg
+  - [x] ex-67 · oop-method-override — verify `barks` vs base
+  - [x] ex-68 · coroutine-create-and-resume — verify `a` then `b`
+  - [x] ex-69 · coroutine-yield-value-exchange — verify bidirectional value
+  - [x] ex-70 · coroutine-wrap-as-iterator — verify `1 2 3`
+  - [x] ex-71 · coroutine-status-transitions — verify suspended/running/dead
+  - [x] ex-72 · unpack-global-function-51 — verify `1 2 3`
+  - [x] ex-73 · string-format-q-escape-quote — verify reloadable literal
+  - [x] ex-74 · pattern-capture-anchored-date — verify `2026 07 12`
+  - [x] ex-75 · memoized-closure-fibonacci — verify `832040` cached
+  - [x] ex-76 · rawget-rawequal-bypass-metamethods — verify metamethods bypassed
+  - [x] ex-77 · varargs-table-constructor — verify `3 1 3`
+  - [x] ex-78 · neovim-vim-tbl-deep-extend-merge — verify `b.c`→3, `a`=1
+  - [x] ex-79 · neovim-vim-tbl-map-filter — verify `2, 4, 6`
+  - [x] ex-80 · neovim-vim-keymap-set-callback — verify `mapped` in `:messages`
+  - [x] ex-81 · neovim-vim-opt-scalar-option — verify `2`
+  - [x] ex-82 · neovim-vim-api-buf-set-lines — verify `hello|world`
+  - [x] ex-83 · neovim-vim-inspect-pretty-print — verify nested `x = 3`
+  - [x] ex-84 · neovim-vim-split-string-utility — verify 4 elements w/ empty
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/just-enough-lua/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
-      is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
+      is fully hit. - _Date: 2026-07-14. Status: done. Files changed:
+      `.../learning/capstone/_index.md` (bare stub, wt 900), `.../learning/capstone/overview.md`
+      (279 lines, closure-backed config-value-store mini-project), `.../learning/capstone/code/
+{store.lua,main.lua}`. Notes: authored via `apps-ayokoding-www-primer-maker`; all 6
+      concepts-exercised items hit (tables as records+arrays, ipairs/pairs, closures capturing state,
+      a require'd module returning a function table, `__index` metatable defaulting, pcall/`nil, err`).
+      Independently re-verified by me: ran `lua main.lua` myself from `capstone/code/`, real output
+      matched the documented listing exactly (`alice`/`default`/`dark`/tag list/sorted keys/
+      `nil    missing required key: api_key`, exit 0); `lua -e 'require("store")'` loads clean;
+      `_index.md` confirmed a clean 6-line bare-frontmatter stub; DD-32 footer confirmed
+      (`../advanced.md` ← → intentional forward dead-link `../../../extending-neovim/learning/
+overview.md`)._
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-primer-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/just-enough-lua/drilling/_index.md` (wt 202) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
 
+  _2026-07-14. Status: done. **A3**: `apps-ayokoding-www-primer-checker` on `learning/` — PASS, 0
+  CRITICAL/HIGH, 1 MEDIUM (stale committed nav-index files missing the Capstone entry — self-healing
+  at build time but stale in committed source), 2 LOW informational. Fixed directly (mechanical, no
+  fixer needed) via `npx nx run ayokoding-www:generate-indexes`; regenerated and independently
+  re-read all 3 `_index.md` files, confirmed each now includes the Capstone entry. **D**: authored
+  `CONTENT/just-enough-lua/drilling/_index.md` (6-line bare stub, wt 202) and `drilling/overview.md`
+  (1265 lines) with all 5 required sections in order (Recall Q&A → Applied problems → Code katas →
+  Self-check checklist → Elaborative interrogation, elaborative last) — 18 Recall Q&A pairs (`co-01`–
+  `co-18`), 12 Applied problems (AP1–AP12), 8 code katas each with before/after `.lua` fixtures and a
+  model-solution `<details>` block, 19 self-check items, 6 elaborative-interrogation prompts tied to
+  the `abstraction-and-its-cost` big-idea tag. Independently re-verified: all 8 katas' before/after
+  scripts actually executed by the maker agent via real `lua` from their real repo paths (documented
+  crashes for kata-03/kata-07 genuinely reproduced); I independently re-ran kata-05/kata-06/kata-08
+  after-solutions myself via `lua` and confirmed output matches the page exactly (`4.0`; `theme dark`
+  / `mode fast`; `first`/`second`/`third`); confirmed 18 unique `co-NN` references and 19 self-check
+  checklist items via grep; confirmed DD-32 footer chain. **F**: `apps-ayokoding-www-facts-checker`
+  (DD-35) — 11 findings, 10 `[Verified]`, 1 MEDIUM `[Error]` (HIGH confidence): `learning/
+advanced.md:525` claimed Lua 5.5.0 is "three major versions ahead" of the Lua 5.1 semantics Neovim
+  targets; actual gap is four (5.2/5.3/5.4/5.5). Fixed directly (one-line text edit) and independently
+  recounted the version list to confirm four is correct. Every one of the 84 worked examples, the
+  capstone, and all 16 kata scripts were actually executed by the checker (`lua` 5.5.0, `luajit`
+  2.1.1772619647 for `unpack()`, `nvim --headless` 0.11.6 for the 7 `vim.*` examples) — all byte-exact
+  matches; no invented/fabricated facts found. `apps-ayokoding-www-link-checker` — PASS, 0 findings
+  (15 links total: 13 valid internal + 1 intentional forward dead-link chain to not-yet-authored
+  `extending-neovim` + 1 external `lua.org/download.html`, HTTP 200); independently re-confirmed via
+  `grep -rn "https\?://"` across the whole tree that exactly 1 external link exists, matching the
+  checker's count exactly. **G**: `npx nx run ayokoding-www:build` — compiled clean, 1331/1331 static
+  pages generated, exit 0 (pre-existing unrelated LaTeX-warning noise only); `generate-indexes`
+  regenerated the 3 just-enough-lua `_index.md` files as a build dependency — independently re-read
+  all 4 (`_index.md`, `learning/_index.md`, `learning/capstone/_index.md`, `drilling/_index.md`) after
+  the build and confirmed each stayed a bare frontmatter-plus-auto-nav stub with no leaked body
+  content; `next-env.d.ts` build-artifact noise reverted via `git checkout --`. `npm run lint:md` —
+  4031 files linted, 0 errors._
+
 ### Phase 2 Gate
 
-- [ ] [AI] `just-enough-lua/` complete: `_index.md` wt 120, `learning/_index.md` wt 102,
+- [x] [AI] `just-enough-lua/` complete: `_index.md` wt 120, `learning/_index.md` wt 102,
       `drilling/_index.md` wt 202, capstone wt 900; all 18 concepts + 84 worked examples + capstone present;
       checkers + facts-checker clean; build + `lint:md` exit 0.
+
+  _2026-07-14. Confirmed: `_index.md` wt 120 ✓, `learning/_index.md` wt 102 ✓, `drilling/_index.md`
+  wt 202 ✓, `learning/capstone/_index.md` wt 900 ✓; 18/18 concepts present (`co-01`–`co-18`); 84/84
+  worked examples present (`learning/code/ex-01-*` through `ex-84-*`, 85 `.lua` files including the
+  `ex-57` module companion); capstone present (`learning/capstone/overview.md` + `store.lua`/
+  `main.lua`); `apps-ayokoding-www-primer-checker`, `apps-ayokoding-www-link-checker`, and
+  `apps-ayokoding-www-facts-checker` all clean (findings resolved above); `npx nx run
+ayokoding-www:build` and `npm run lint:md` both exit 0._
 
 - [ ] **[AI]** Commit + push this deliverable to `origin main`: stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit message (`Co-Authored-By` trailer per repo policy), then `git push origin main`. Observe the `main-ci` workflow on the pushed commit and poll every 2 min (CI-monitoring policy) until it finishes. **Acceptance**: `origin/main` contains this phase's commit and its `main-ci` run has `conclusion = success` **before the next phase begins** — each topic lands green on `main` as it completes.
 

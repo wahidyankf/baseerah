@@ -9,3 +9,6 @@ weight: 1750
 - [1 · Just Enough Nvim](/en/c/learn/fundamentally-strong/software-engineer/just-enough-nvim)
   - [Learning](/en/c/learn/fundamentally-strong/software-engineer/just-enough-nvim/learning)
   - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/just-enough-nvim/drilling)
+- [2 · Just Enough Lua](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua)
+  - [Learning](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua/learning)
+  - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua/drilling)

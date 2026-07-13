@@ -37,6 +37,11 @@ tooling is OSS (Lua is MIT-licensed) — Tier-1 per DD-21.
 - 2026-07-12 — verified: Lua remains **MIT**-licensed; Neovim bundles it as MIT (Tier-1, DD-21). (lua.org)
 - 2026-07-12 — verified (stable): the `vim` global + `require` semantics match current embedded Lua; no
   change found.
+- 2026-07-14 — re-confirmed at authoring time (Phase 2 V step): all four fast-moving claims above
+  (Lua 5.5.0/2025-12-22 current major, 5.4.8 latest 5.4.x patch, MIT license, Neovim's Lua-5.1/LuaJIT-2.1
+  targeting, LuaJIT's rolling-release-only status) re-checked against `lua.org/versions.html`,
+  `lua.org/news.html`, `lua.org/license.html`, `runtime/doc/lua.txt` on `github.com/neovim/neovim`, and
+  `luajit.org/status.html` — no change, all still current.
 
 ### DD-35 primary-source citations (fetched-and-read)
 
