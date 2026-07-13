@@ -9,10 +9,10 @@ use std::path::{Path, PathBuf};
 use super::ToolStatus;
 use super::checker::{
     compare_exact, compare_gte, compare_major_gte, compare_playwright, parse_actionlint_version,
-    parse_cargo_llvm_cov, parse_docker_version, parse_dotnet_version, parse_hadolint_version,
-    parse_jq_version, parse_line_word, parse_playwright_version, parse_rust_version,
-    parse_shellcheck_version, parse_trim_version, read_dotnet_version, read_node_version,
-    read_npm_version, read_rust_version,
+    parse_cargo_llvm_cov, parse_clang_format_version, parse_docker_version, parse_dotnet_version,
+    parse_hadolint_version, parse_jq_version, parse_line_word, parse_playwright_version,
+    parse_rust_version, parse_shellcheck_version, parse_trim_version, read_dotnet_version,
+    read_node_version, read_npm_version, read_rust_version,
 };
 
 /// A single step in an auto-install sequence.
@@ -65,6 +65,12 @@ fn no_req() -> String {
 /// (e.g. `"git version 2.42.0"`).
 fn parse_git_version(s: &str) -> String {
     parse_line_word(s, "git version ", 2, "")
+}
+
+/// Extracts the `OpenTofu` version from `tofu --version` output
+/// (e.g. `"OpenTofu v1.10.2\non darwin_arm64"` → `"1.10.2"`).
+fn parse_tofu_version(s: &str) -> String {
+    parse_line_word(s, "OpenTofu ", 1, "v")
 }
 
 // Per-binary readers using a path captured in a static OnceLock.
@@ -349,6 +355,86 @@ fn install_hadolint(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for `shfmt` (Homebrew on macOS; pinned binary
+/// download on Linux, where no apt package is published).
+fn install_shfmt(_req: &str, platform: &str) -> Vec<InstallStep> {
+    if platform == "darwin" {
+        vec![InstallStep {
+            description: "Install shfmt via Homebrew".into(),
+            command: "brew".into(),
+            args: vec!["install".into(), "shfmt".into()],
+        }]
+    } else {
+        vec![
+            InstallStep {
+                description: "Download shfmt binary".into(),
+                command: "sudo".into(),
+                args: vec![
+                    "curl".into(),
+                    "-sSL".into(),
+                    "-o".into(),
+                    "/usr/local/bin/shfmt".into(),
+                    "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_amd64".into(),
+                ],
+            },
+            InstallStep {
+                description: "Make shfmt executable".into(),
+                command: "sudo".into(),
+                args: vec!["chmod".into(), "+x".into(), "/usr/local/bin/shfmt".into()],
+            },
+        ]
+    }
+}
+
+/// Returns install steps for `tofu` (`OpenTofu`).
+///
+/// On macOS: `brew install opentofu`.
+/// On Linux: the official `OpenTofu` standalone install script.
+fn install_tofu(_req: &str, platform: &str) -> Vec<InstallStep> {
+    if platform == "darwin" {
+        vec![InstallStep {
+            description: "Install OpenTofu via Homebrew".into(),
+            command: "brew".into(),
+            args: vec!["install".into(), "opentofu".into()],
+        }]
+    } else {
+        vec![InstallStep {
+            description: "Install OpenTofu via the official standalone install script".into(),
+            command: "bash".into(),
+            args: vec![
+                "-c".into(),
+                "curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh -o install-opentofu.sh && chmod +x install-opentofu.sh && ./install-opentofu.sh --install-method standalone && rm -f install-opentofu.sh".into(),
+            ],
+        }]
+    }
+}
+
+/// Returns install steps for `clang-format` (Homebrew on macOS, apt on Linux).
+///
+/// Uses the dedicated Homebrew formula / apt package rather than Xcode's
+/// bundled copy: Xcode's `clang-format` binary is not on `PATH` and its
+/// version is not pinned consistently across Xcode releases.
+fn install_clang_format(_req: &str, platform: &str) -> Vec<InstallStep> {
+    if platform == "darwin" {
+        vec![InstallStep {
+            description: "Install clang-format via Homebrew".into(),
+            command: "brew".into(),
+            args: vec!["install".into(), "clang-format".into()],
+        }]
+    } else {
+        vec![InstallStep {
+            description: "Install clang-format".into(),
+            command: "sudo".into(),
+            args: vec![
+                "apt-get".into(),
+                "install".into(),
+                "-y".into(),
+                "clang-format".into(),
+            ],
+        }]
+    }
+}
+
 /// Returns install steps for Playwright browsers.
 ///
 /// On macOS: `npx playwright install`.
@@ -384,6 +470,7 @@ pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
     defs.extend(tool_defs_rust());
     defs.extend(tool_defs_dotnet());
     defs.extend(tool_defs_infra());
+    defs.extend(tool_defs_formatters());
     defs
 }
 
@@ -553,6 +640,46 @@ fn tool_defs_infra() -> Vec<ToolDef> {
     ]
 }
 
+/// Returns tool definitions for formatters invoked from lint-staged:
+/// `shfmt`, `tofu`, `clang-format`.
+fn tool_defs_formatters() -> Vec<ToolDef> {
+    vec![
+        ToolDef {
+            name: "shfmt".into(),
+            binary: "shfmt".into(),
+            source: "(no config file)".into(),
+            args: vec!["--version".into()],
+            use_stderr: false,
+            parse_ver: parse_trim_version,
+            compare: compare_exact,
+            read_req: no_req,
+            install_cmd: Some(install_shfmt),
+        },
+        ToolDef {
+            name: "tofu".into(),
+            binary: "tofu".into(),
+            source: "(no config file)".into(),
+            args: vec!["--version".into()],
+            use_stderr: false,
+            parse_ver: parse_tofu_version,
+            compare: compare_exact,
+            read_req: no_req,
+            install_cmd: Some(install_tofu),
+        },
+        ToolDef {
+            name: "clang-format".into(),
+            binary: "clang-format".into(),
+            source: "(no config file)".into(),
+            args: vec!["--version".into()],
+            use_stderr: false,
+            parse_ver: parse_clang_format_version,
+            compare: compare_exact,
+            read_req: no_req,
+            install_cmd: Some(install_clang_format),
+        },
+    ]
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
@@ -562,12 +689,34 @@ mod tests {
     fn build_returns_all_known_tools() {
         let dir = tempfile::tempdir().unwrap();
         let defs = build_tool_defs(dir.path());
-        assert_eq!(defs.len(), 13);
+        assert_eq!(defs.len(), 16);
         assert_eq!(defs[0].name, "git");
-        assert_eq!(defs.last().unwrap().name, "playwright");
+        assert_eq!(defs.last().unwrap().name, "clang-format");
         assert!(defs.iter().any(|d| d.name == "shellcheck"));
         assert!(defs.iter().any(|d| d.name == "hadolint"));
         assert!(defs.iter().any(|d| d.name == "actionlint"));
+        assert!(defs.iter().any(|d| d.name == "playwright"));
+    }
+
+    #[test]
+    fn build_returns_shfmt() {
+        let dir = tempfile::tempdir().unwrap();
+        let defs = build_tool_defs(dir.path());
+        assert!(defs.iter().any(|d| d.name == "shfmt"));
+    }
+
+    #[test]
+    fn build_returns_tofu() {
+        let dir = tempfile::tempdir().unwrap();
+        let defs = build_tool_defs(dir.path());
+        assert!(defs.iter().any(|d| d.name == "tofu"));
+    }
+
+    #[test]
+    fn build_returns_clang_format() {
+        let dir = tempfile::tempdir().unwrap();
+        let defs = build_tool_defs(dir.path());
+        assert!(defs.iter().any(|d| d.name == "clang-format"));
     }
 
     #[test]
@@ -592,5 +741,62 @@ mod tests {
     fn install_node_formats_required() {
         let s = install_node("24.11.1", "darwin");
         assert_eq!(s[0].args[1], "node@24.11.1");
+    }
+
+    #[test]
+    fn install_shfmt_macos() {
+        let steps = install_shfmt("", "darwin");
+        assert_eq!(steps[0].command, "brew");
+        assert!(steps[0].args.contains(&"shfmt".to_string()));
+    }
+
+    #[test]
+    fn install_shfmt_linux() {
+        let steps = install_shfmt("", "linux");
+        assert_eq!(steps[0].command, "sudo");
+        assert!(steps[0].args.iter().any(|a| a.contains("shfmt")));
+        assert_eq!(steps[1].command, "sudo");
+        assert!(steps[1].args.contains(&"/usr/local/bin/shfmt".to_string()));
+    }
+
+    #[test]
+    fn install_tofu_macos() {
+        let steps = install_tofu("", "darwin");
+        assert_eq!(steps[0].command, "brew");
+        assert!(steps[0].args.contains(&"opentofu".to_string()));
+    }
+
+    #[test]
+    fn install_tofu_linux() {
+        let steps = install_tofu("", "linux");
+        assert_eq!(steps[0].command, "bash");
+        assert!(
+            steps[0]
+                .args
+                .iter()
+                .any(|a| a.contains("install-opentofu.sh"))
+        );
+    }
+
+    #[test]
+    fn parse_tofu_version_extracts() {
+        assert_eq!(
+            parse_tofu_version("OpenTofu v1.10.2\non darwin_arm64"),
+            "1.10.2"
+        );
+    }
+
+    #[test]
+    fn install_clang_format_macos() {
+        let steps = install_clang_format("", "darwin");
+        assert_eq!(steps[0].command, "brew");
+        assert!(steps[0].args.contains(&"clang-format".to_string()));
+    }
+
+    #[test]
+    fn install_clang_format_linux() {
+        let steps = install_clang_format("", "linux");
+        assert_eq!(steps[0].command, "sudo");
+        assert!(steps[0].args.contains(&"clang-format".to_string()));
     }
 }

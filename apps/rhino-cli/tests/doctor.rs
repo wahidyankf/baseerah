@@ -49,6 +49,9 @@ const STUB_TOOLS: &[(&str, &str)] = &[
     ("shellcheck", "version: 0.10.0"),
     ("hadolint", "Haskell Dockerfile Linter 2.12.0"),
     ("actionlint", "1.7.7"),
+    ("shfmt", "v3.13.1"),
+    ("tofu", "OpenTofu v1.10.2"),
+    ("clang-format", "clang-format version 18.1.0"),
     // npx playwright --version → "Version 1.58.0".
 ];
 
@@ -365,7 +368,7 @@ fn then_json_lists_tools(w: &mut DoctorWorld) {
         .get("tools")
         .and_then(|t| t.as_array())
         .expect("tools array");
-    assert_eq!(tools.len(), 13, "expected 13 tools, got {}", tools.len());
+    assert_eq!(tools.len(), 16, "expected 16 tools, got {}", tools.len());
     for t in tools {
         assert!(t.get("status").is_some(), "tool missing status: {t}");
     }

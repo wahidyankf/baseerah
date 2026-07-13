@@ -180,6 +180,29 @@ pub(super) fn parse_playwright_version(out: &str) -> String {
     parse_line_word(out, "Version ", 1, "")
 }
 
+/// Extracts the `clang-format` version from `clang-format --version` output.
+///
+/// Handles both the Xcode-bundled variant (e.g.
+/// `"Apple clang-format version 17.0.0 (clang-1700.0.13.3)"`) and the
+/// LLVM.org standalone variant (e.g. `"clang-format version 18.1.0"`) by
+/// locating the `"version"` token on the first matching line and returning
+/// the token that follows it. [`parse_line_word`] cannot be reused here
+/// because it requires the line to *start with* a fixed prefix, but the
+/// Xcode variant prepends `"Apple "` before `"clang-format version"`.
+pub(super) fn parse_clang_format_version(out: &str) -> String {
+    for line in out.split('\n') {
+        let words: Vec<&str> = line.split_whitespace().collect();
+        if let Some(v) = words
+            .iter()
+            .position(|w| *w == "version")
+            .and_then(|idx| words.get(idx + 1))
+        {
+            return (*v).to_string();
+        }
+    }
+    String::new()
+}
+
 // --- Comparators ---
 
 /// Compares two version strings for exact equality (after stripping a leading `v`).
@@ -546,6 +569,22 @@ mod tests {
     #[test]
     fn parse_playwright_word() {
         assert_eq!(parse_playwright_version("Version 1.58.2"), "1.58.2");
+    }
+
+    #[test]
+    fn parse_clang_format_xcode_variant() {
+        assert_eq!(
+            parse_clang_format_version("Apple clang-format version 17.0.0 (clang-1700.0.13.3)"),
+            "17.0.0"
+        );
+    }
+
+    #[test]
+    fn parse_clang_format_llvm_variant() {
+        assert_eq!(
+            parse_clang_format_version("clang-format version 18.1.0"),
+            "18.1.0"
+        );
     }
 
     #[test]

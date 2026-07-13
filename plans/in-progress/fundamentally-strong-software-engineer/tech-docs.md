@@ -608,13 +608,13 @@ polyglot samples stay consistently formatted at commit time. Formatters are grou
 
 - **Tier 1 — npm-installable, no extra runtime (wire directly into lint-staged):** Prettier (`*.md`,
   `*.yaml`/`*.yml`, `*.json`, `*.html`, `*.ts`/`*.tsx`/`*.js`), **StyLua** (`*.lua`),
-  `prettier-plugin-sql` (`*.sql`), **`clang-format`** npm wrapper (`*.c`/`*.h`), **`@bazel/buildifier`**
-  (`BUILD`/`*.bzl`). Dockerfiles have **no canonical formatter** — keep **hadolint** as the existing
-  lint gate.
+  `prettier-plugin-sql` (`*.sql`), **`@bazel/buildifier`** (`BUILD`/`*.bzl`). Dockerfiles have **no
+  canonical formatter** — keep **hadolint** as the existing lint gate.
 - **Tier 2 — single lightweight binary (install via `npm run doctor -- --fix`, invoke from a wrapper):**
   **Ruff** `ruff format` (`*.py`), **shfmt** (`*.sh`), **gofmt** (`*.go`), **rustfmt** (`*.rs`),
   **`tofu fmt`** (`*.tf`) — OpenTofu's MPL-2.0 formatter is preferred over `terraform fmt`, whose CLI is
-  **BUSL-1.1** (not OSI-approved) and would trip this repo's license-clean dependency policy.
+  **BUSL-1.1** (not OSI-approved) and would trip this repo's license-clean dependency policy —
+  **`clang-format`** (`*.c`/`*.h`).
 - **Tier 3 — heavy toolchain (deferred to CI / existing per-language lint gates, NOT pre-commit):**
   Elixir (`mix format`), Kotlin (ktlint), Swift (swift-format), Dart (`dart format`), C#
   (`dotnet format`/CSharpier), Java (google-java-format), F# (Fantomas), OCaml (ocamlformat), Haskell
@@ -626,7 +626,12 @@ polyglot samples stay consistently formatted at commit time. Formatters are grou
 
 Rationale: pre-commit formatting must be fast and universally installable; the tiering keeps the hook
 light while still guaranteeing every committed sample is formatted somewhere (hook or CI). Phase 0 wires
-this before any topic content lands. [User decision]
+this before any topic content lands. `clang-format` moved from Tier 1 to Tier 2 during Phase 0 execution
+(2026-07-13): the npm wrapper package's own `getNativeBinary()` fallback logic ships only a
+`darwin_x64` binary and runs it via Rosetta on Apple Silicon macOS, which throws `assertion failed
+[header->version <= kProjectSourceVersion]: runtime library is newer than runtime` — a confirmed,
+upstream-acknowledged limitation, not a config mistake — so it is now installed as a single binary via
+`npm run doctor -- --fix` instead, matching Ruff/shfmt/gofmt/rustfmt/`tofu fmt`. [User decision]
 
 ### DD-37 — Dedicated maker/checker/fixer trio + quality gate per learning format
 

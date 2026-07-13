@@ -47,9 +47,11 @@
     "npm": "11.11.0"
   },
   "devDependencies": {
+    "@bazel/buildifier": "8.2.1",
     "@commitlint/cli": "20.5.0",
     "@commitlint/config-conventional": "20.5.0",
     "@hey-api/openapi-ts": "0.94.2",
+    "@johnnymorganz/stylua-bin": "2.5.2",
     "@openapitools/openapi-generator-cli": "2.30.2",
     "@redocly/cli": "2.22.1",
     "@stoplight/spectral-cli": "6.15.0",
@@ -60,12 +62,15 @@
     "markdownlint-cli2": "0.21.0",
     "nx": "22.5.4",
     "prettier": "3.8.1",
+    "prettier-plugin-sql": "0.20.0",
     "prettier-plugin-tailwindcss": "0.7.2",
     "tsx": "4.21.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": "prettier --write",
     "*.json": "prettier --write",
+    "*.html": "prettier --write",
+    "*.sql": "prettier --write",
     "*.go": "gofmt -w",
     "*.fs": "fantomas",
     "*.{ex,exs}": "scripts/format-elixir.sh",
@@ -74,6 +79,9 @@
     "*.cs": "dotnet csharpier format",
     "*.clj": "cljfmt fix",
     "*.dart": "dart format",
+    "*.lua": "stylua",
+    "*.{c,h}": "clang-format -i",
+    "{BUILD,BUILD.bazel,*.bzl}": "buildifier",
     "*.md": [
       "prettier --write",
       "markdownlint-cli2",
@@ -85,7 +93,11 @@
     "*.{yml,yaml}": "prettier --write",
     ".github/workflows/*.{yml,yaml}": "actionlint",
     "*.{css,scss}": "prettier --write",
-    "*.sh": "shellcheck --severity=warning",
+    "*.sh": [
+      "shfmt -w",
+      "shellcheck --severity=warning"
+    ],
+    "*.tf": "tofu fmt",
     "**/Dockerfile*": "hadolint --failure-threshold warning",
     "*.{json,toml,ts,tsx,js,jsx,mjs,cjs,rs,go,py,cs,clj,dart,ex,exs,fs}": "cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- convention emoji validate",
     "*.feature": "cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- specs gherkin-cardinality validate",
