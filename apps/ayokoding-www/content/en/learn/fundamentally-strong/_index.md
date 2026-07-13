@@ -1,0 +1,12 @@
+---
+title: "Fundamentally Strong"
+date: 2026-07-14T00:00:00+07:00
+draft: false
+weight: 107
+---
+
+- [The Fundamentally Strong Software Engineer](/en/c/learn/fundamentally-strong/software-engineer)
+  - [Overview](/en/c/learn/fundamentally-strong/software-engineer/overview)
+  - [1 · Just Enough Nvim](/en/c/learn/fundamentally-strong/software-engineer/just-enough-nvim)
+  - [2 · Just Enough Lua](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua)
+  - [3 · Extending Neovim](/en/c/learn/fundamentally-strong/software-engineer/extending-neovim)
