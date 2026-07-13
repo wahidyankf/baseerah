@@ -290,16 +290,16 @@ completed after verifying; add discovered tasks immediately.
 ## AI Agents
 
 **Content Creation**: docs-{maker,tutorial-maker}, readme-maker, specs-maker,
-apps-ayokoding-www-{general,by-example,in-the-field}-maker, apps-ose-www-content-maker, swe-ui-maker,
+apps-ayokoding-www-{general,by-example,annotated-concept,primer,in-the-field}-maker, apps-ose-www-content-maker, swe-ui-maker,
 pr-review-maker
 
 **Validation**: docs-{checker,tutorial-checker,link-checker,software-engineering-separation-checker},
-readme-checker, specs-checker, apps-ayokoding-www-{general,by-example,in-the-field,facts,link}-checker,
+readme-checker, specs-checker, apps-ayokoding-www-{general,by-example,annotated-concept,primer,in-the-field,facts,link}-checker,
 apps-ose-www-content-checker, swe-{code,ui}-checker, ci-checker, web-researcher,
 repo-{rules,workflow,harness-compatibility}-checker
 
 **Fixing**: docs-{fixer,tutorial-fixer,software-engineering-separation-fixer,file-manager}, readme-fixer,
-specs-fixer, apps-ayokoding-www-{general,by-example,in-the-field,facts,link}-fixer,
+specs-fixer, apps-ayokoding-www-{general,by-example,annotated-concept,primer,in-the-field,facts,link}-fixer,
 apps-ose-www-content-fixer, swe-ui-fixer, ci-fixer, repo-{rules,workflow,harness-compatibility}-fixer,
 pr-review-fixer
 

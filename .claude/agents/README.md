@@ -11,6 +11,8 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[readme-maker](readme-maker.md)** - README file writer
 - **[apps-ayokoding-www-general-maker](apps-ayokoding-www-general-maker.md)** - General content for AyoKoding
 - **[apps-ayokoding-www-by-example-maker](apps-ayokoding-www-by-example-maker.md)** - By-example tutorials
+- **[apps-ayokoding-www-annotated-concept-maker](apps-ayokoding-www-annotated-concept-maker.md)** - Annotated-concept tutorials (concept-centric worked examples + diagrams; validated no-code sub-mode for leadership topics)
+- **[apps-ayokoding-www-primer-maker](apps-ayokoding-www-primer-maker.md)** - Primer ("Just Enough X") language/tool on-ramps
 - **[apps-ayokoding-www-in-the-field-maker](apps-ayokoding-www-in-the-field-maker.md)** - In-the-field tutorials for AyoKoding
 - **[apps-ose-www-content-maker](apps-ose-www-content-maker.md)** - OSE Platform content
 - **[pdf-to-md-maker](pdf-to-md-maker.md)** - PDF to verbatim Markdown conversion (text-based and image-only via OCR)
@@ -32,6 +34,8 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[readme-checker](readme-checker.md)** - README quality validation
 - **[apps-ayokoding-www-general-checker](apps-ayokoding-www-general-checker.md)** - General content validation
 - **[apps-ayokoding-www-by-example-checker](apps-ayokoding-www-by-example-checker.md)** - By-example validation
+- **[apps-ayokoding-www-annotated-concept-checker](apps-ayokoding-www-annotated-concept-checker.md)** - Annotated-concept validation (mode detection, worked-example/scenario density, diagram accessibility)
+- **[apps-ayokoding-www-primer-checker](apps-ayokoding-www-primer-checker.md)** - Primer validation (density, structure, scope discipline)
 - **[apps-ayokoding-www-in-the-field-checker](apps-ayokoding-www-in-the-field-checker.md)** - In-the-field content validation
 - **[apps-ayokoding-www-facts-checker](apps-ayokoding-www-facts-checker.md)** - Factual accuracy for AyoKoding
 - **[apps-ayokoding-www-link-checker](apps-ayokoding-www-link-checker.md)** - Link validation for AyoKoding
@@ -57,6 +61,8 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[readme-fixer](readme-fixer.md)** - Apply README fixes
 - **[apps-ayokoding-www-general-fixer](apps-ayokoding-www-general-fixer.md)** - Apply general content fixes
 - **[apps-ayokoding-www-by-example-fixer](apps-ayokoding-www-by-example-fixer.md)** - Apply by-example fixes
+- **[apps-ayokoding-www-annotated-concept-fixer](apps-ayokoding-www-annotated-concept-fixer.md)** - Apply Annotated-concept fixes
+- **[apps-ayokoding-www-primer-fixer](apps-ayokoding-www-primer-fixer.md)** - Apply Primer fixes
 - **[apps-ayokoding-www-in-the-field-fixer](apps-ayokoding-www-in-the-field-fixer.md)** - Fix in-the-field content issues
 - **[apps-ayokoding-www-facts-fixer](apps-ayokoding-www-facts-fixer.md)** - Apply factual corrections
 - **[apps-ayokoding-www-link-fixer](apps-ayokoding-www-link-fixer.md)** - Fix broken links

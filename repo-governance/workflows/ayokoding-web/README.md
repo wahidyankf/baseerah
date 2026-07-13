@@ -21,6 +21,8 @@ These workflows define **WHEN and HOW to validate ayokoding-web content**, orche
 
 - General content quality validation (facts, links)
 - By-example tutorial quality validation
+- Annotated-concept tutorial quality validation (standard and leadership no-code sub-mode)
+- Primer ("Just Enough X") tutorial quality validation
 - Multi-agent orchestration for ayokoding-web
 - Iterative check-fix-verify cycles
 
@@ -33,6 +35,8 @@ These workflows define **WHEN and HOW to validate ayokoding-web content**, orche
 ## Workflows
 
 - [AyoKoding Web By-Example Quality Gate](./ayokoding-web-swe-by-example-quality-gate.md) - Validate by-example tutorial quality (95% coverage through 75-90 examples) and apply fixes iteratively until EXCELLENT status
+- [AyoKoding Web Annotated-Concept Quality Gate](./ayokoding-web-annotated-concept-quality-gate.md) - Validate Annotated-concept tutorial quality (45-60 worked examples, or 20-30 scenarios for the leadership no-code sub-mode) and apply fixes iteratively until EXCELLENT status
+- [AyoKoding Web Primer Quality Gate](./ayokoding-web-primer-quality-gate.md) - Validate Primer ("Just Enough X") tutorial quality (75-85 examples authored at By-Example pace, scope discipline) and apply fixes iteratively until EXCELLENT status
 - [AyoKoding Web General Quality Gate](./ayokoding-web-general-quality-gate.md) - Validate all ayokoding-web content quality (factual accuracy, links), apply fixes iteratively until ZERO findings
 - [AyoKoding Web In-the-Field Quality Gate](./ayokoding-web-in-the-field-quality-gate.md) - Validate in-the-field production guide quality and apply fixes iteratively until EXCELLENT status
 
