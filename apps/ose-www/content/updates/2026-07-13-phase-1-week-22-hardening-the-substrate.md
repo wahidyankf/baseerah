@@ -210,9 +210,9 @@ Anthropic-backed Claude Code option for the hard work.
 ## `ose-infra`: On-Premise Clusters Move From Idea to Plan
 
 The infrastructure repo stayed in the planning-and-hardening lane it entered last month. The
-twin-k3s-cluster effort was sharpened into executable staging and production deploy plans:
-server VMs were bumped from 3 GB to 4 GB for Prometheus headroom, misleading vCPU and network figures
-were corrected against the real fleet, and SSH-over-Tailscale access was made explicit. A
+twin-k3s-cluster effort was sharpened into executable staging and production deploy plans: capacity
+was right-sized for the monitoring stack, inaccurate figures were corrected against the real fleet,
+and SSH-over-Tailscale access was made explicit. A
 **ci-runner-health-monitoring** backlog plan was added to watch the self-hosted runners. Following the
 Week-18 outage post-mortem, a second one landed this month — an **observer-side false-outage**
 (Mode C): a case where the monitoring vantage point reported an outage that was not real, disambiguated
@@ -262,7 +262,7 @@ What changed in roughly four weeks (2026-06-16 → 2026-07-13):
   bridge; OpenCode Go models refreshed to `glm-5.2` / `minimax-m3`.
 - **User-facing ship**: cost-of-living / salary calculator + IA navigation revamp went **live on
   ayokoding.com** (the education site), the first feature gated by the new browser-driven retest.
-- **`ose-infra`**: twin-k3s staging/prod deploy plans sharpened (4 GB VMs, Tailscale SSH),
+- **`ose-infra`**: twin-k3s staging/prod deploy plans sharpened (right-sized capacity, Tailscale SSH),
   ci-runner-health-monitoring plan added, Mode-C false-outage post-mortem, `coralpolyp` → Rust edition 2024.
 - **`ose-primer`**: polyglot demo CI restored across 11 backends + frontends, BDD brought to parity,
   Rust edition 2024, 103 orphaned docs resolved.
@@ -270,7 +270,7 @@ What changed in roughly four weeks (2026-06-16 → 2026-07-13):
 ## What's Next
 
 - **Actually ship a backend.** The pending item from Week 18 is unchanged and now unblocked by the
-  concrete k3s plans: bring up the twin staging/production clusters on the two-node on-premise fleet and
+  concrete k3s plans: bring up the twin staging/production clusters on the on-premise fleet and
   run `ose-be` / `organiclever-be` against a real staging environment instead of local-stack CI. Power
   remains the honest risk for on-premise hosting.
 - **Execute the "Fundamentally Strong Software Engineer" curriculum.** A large tutorial plan is in
