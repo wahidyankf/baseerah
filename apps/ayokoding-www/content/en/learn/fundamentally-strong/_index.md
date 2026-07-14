@@ -11,3 +11,4 @@ weight: 107
   - [2 · Just Enough Lua](/en/c/learn/fundamentally-strong/software-engineer/just-enough-lua)
   - [3 · Extending Neovim](/en/c/learn/fundamentally-strong/software-engineer/extending-neovim)
   - [Pass 0 Capstone · Forge-Ready](/en/c/learn/fundamentally-strong/software-engineer/capstone-forge-ready)
+  - [4 · Just Enough Python](/en/c/learn/fundamentally-strong/software-engineer/just-enough-python)
