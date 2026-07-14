@@ -19,3 +19,4 @@ weight: 107
   - [9 · Project Management](/en/c/learn/fundamentally-strong/software-engineer/project-management)
   - [10 · SQL Essentials](/en/c/learn/fundamentally-strong/software-engineer/sql-essentials)
   - [11 · Backend Essentials](/en/c/learn/fundamentally-strong/software-engineer/backend-essentials)
+  - [13 · Just Enough TypeScript](/en/c/learn/fundamentally-strong/software-engineer/just-enough-typescript)

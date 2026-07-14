@@ -43,3 +43,6 @@ weight: 1750
   - [Overview](/en/c/learn/fundamentally-strong/software-engineer/backend-essentials/overview)
   - [Learning](/en/c/learn/fundamentally-strong/software-engineer/backend-essentials/learning)
   - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/backend-essentials/drilling)
+- [13 · Just Enough TypeScript](/en/c/learn/fundamentally-strong/software-engineer/just-enough-typescript)
+  - [Learning](/en/c/learn/fundamentally-strong/software-engineer/just-enough-typescript/learning)
+  - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/just-enough-typescript/drilling)
