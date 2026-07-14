@@ -16135,6 +16135,16 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       10 inter-topic capstone folders present; no orphaned or mismatched weights.
 - [ ] **[AI]** Link check: run `apps-ayokoding-www-link-checker` across the new section. **Acceptance**: no
       broken internal/external links.
+- [ ] **[AI]** Rendered-link leak scan (added 2026-07-14 after a prod incident where prev/next nav broke
+      on a section-index page because in-body relative `.md` links weren't rewritten to real routes for
+      that page type — source-level link-checking alone did not catch it): after `npx nx run
+ayokoding-www:build`, start the built app (`npx nx run ayokoding-www:start` or equivalent), then for
+      every page under the fundamentally-strong section fetch the rendered HTML (`curl`) and grep for
+      `href="[^"]*\.md"` and unresolved raw relative hrefs (`href="\.\./`, `href="\./`) — both must find
+      zero matches, on leaf pages **and** section-index (`_index.md`) pages alike, since the two page
+      types resolve relative links differently (`isSection` context) and a fix validated only on one type
+      can still be broken on the other. **Acceptance**: zero matches repo-wide across the new section; any
+      match is a bug, fixed before proceeding (root cause, not a per-page patch).
 - [ ] **[AI]** Full lint + build: `npm run lint:md` and `npx nx run ayokoding-www:build`. **Acceptance**:
       both exit 0.
 - [ ] **[AI]** Affected quality gate: `nx affected -t typecheck lint test:quick specs:behavior:coverage`
@@ -16153,6 +16163,8 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 - [ ] [AI] Topic-first parity 94/94 (each topic has `learning/`, `learning/capstone/`, `drilling/`;
       topic wt `100 + 10 × index`; drill wt = learn wt + 100) and all 10 inter-topic capstones present.
 - [ ] [AI] Link-checker, markdown lint, and build all green.
+- [ ] [AI] Rendered-link leak scan finds zero `.md`/raw-relative hrefs across the new section, on both
+      leaf and section-index pages.
 - [ ] [AI] Affected quality gate (`typecheck`, `lint`, `test:quick`, `specs:behavior:coverage`) exits 0
       with zero remaining failures (including any pre-existing ones fixed).
 
@@ -16194,12 +16206,19 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 
 - [ ] **[AI]** Playwright smoke (per repo manual-behavioral-verification): start `npx nx dev ayokoding-www`,
       then use `browser_navigate` to open the section landing + one learning page + one intra-topic capstone + one drilling page, `browser_snapshot` to inspect each page's DOM, `browser_click` to expand a
-      `<details>` block and follow a nav link, and `browser_console_messages` to confirm zero errors.
+      `<details>` block, click the rendered **Previous** and **Next** links through to their destination
+      pages (added 2026-07-14 after a prod incident where prev/next nav silently broke — a generic
+      "follow a nav link" step had not caught it; clicking Previous/Next specifically, not just any link,
+      is the reproduction path for this bug class), and follow one in-body content link from a
+      section-index (`_index.md`) page specifically (not only from a leaf page — the two resolve relative
+      links differently), and `browser_console_messages` to confirm zero errors.
       Capture one `browser_take_screenshot` per page verified, save each to
       `evidence/phase-106-<page-slug>-en-1280px.png` (per the
       [Evidence Capture Convention](../../../repo-governance/development/quality/evidence-capture.md)), and
-      reference each screenshot inline here. **Acceptance**: four pages render; `<details>` toggles; nav
-      resolves; zero console errors; four screenshots exist under `evidence/` and are referenced here.
+      reference each screenshot inline here. **Acceptance**: four pages render; `<details>` toggles;
+      Previous/Next links navigate to the correct destination; the section-index page's in-body link
+      resolves correctly; zero console errors; four screenshots exist under `evidence/` and are referenced
+      here.
 - [ ] **[AI]** Rule-15 three-tester retest (per
       [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md)
       Rule 15 — a large set of new browser-rendered pages + 2 nav entries is a user-facing feature change,
