@@ -30,3 +30,6 @@ weight: 1750
   - [Overview](/en/c/learn/fundamentally-strong/software-engineer/data-structures-and-algorithms-essentials/overview)
   - [Learning](/en/c/learn/fundamentally-strong/software-engineer/data-structures-and-algorithms-essentials/learning)
   - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/data-structures-and-algorithms-essentials/drilling)
+- [9 · Project Management](/en/c/learn/fundamentally-strong/software-engineer/project-management)
+  - [Learning](/en/c/learn/fundamentally-strong/software-engineer/project-management/learning)
+  - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/project-management/drilling)
