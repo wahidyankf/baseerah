@@ -14,3 +14,4 @@ weight: 107
   - [4 · Just Enough Python](/en/c/learn/fundamentally-strong/software-engineer/just-enough-python)
   - [5 · Just Enough Bash](/en/c/learn/fundamentally-strong/software-engineer/just-enough-bash)
   - [6 · Version Control & Git](/en/c/learn/fundamentally-strong/software-engineer/version-control-and-git)
+  - [7 · Data Structures & Algorithms Essentials](/en/c/learn/fundamentally-strong/software-engineer/data-structures-and-algorithms-essentials)
