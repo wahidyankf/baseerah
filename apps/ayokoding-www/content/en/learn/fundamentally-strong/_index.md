@@ -12,3 +12,4 @@ weight: 107
   - [3 · Extending Neovim](/en/c/learn/fundamentally-strong/software-engineer/extending-neovim)
   - [Pass 0 Capstone · Forge-Ready](/en/c/learn/fundamentally-strong/software-engineer/capstone-forge-ready)
   - [4 · Just Enough Python](/en/c/learn/fundamentally-strong/software-engineer/just-enough-python)
+  - [5 · Just Enough Bash](/en/c/learn/fundamentally-strong/software-engineer/just-enough-bash)

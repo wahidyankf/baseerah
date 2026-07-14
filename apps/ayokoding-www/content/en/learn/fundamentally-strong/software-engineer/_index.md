@@ -20,3 +20,6 @@ weight: 1750
 - [4 · Just Enough Python](/en/c/learn/fundamentally-strong/software-engineer/just-enough-python)
   - [Learning](/en/c/learn/fundamentally-strong/software-engineer/just-enough-python/learning)
   - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/just-enough-python/drilling)
+- [5 · Just Enough Bash](/en/c/learn/fundamentally-strong/software-engineer/just-enough-bash)
+  - [Learning](/en/c/learn/fundamentally-strong/software-engineer/just-enough-bash/learning)
+  - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/just-enough-bash/drilling)
