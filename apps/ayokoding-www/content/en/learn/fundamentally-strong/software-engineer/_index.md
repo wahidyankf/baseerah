@@ -53,3 +53,7 @@ weight: 1750
 - [14 · Frontend Essentials](/en/c/learn/fundamentally-strong/software-engineer/frontend-essentials)
   - [Learning](/en/c/learn/fundamentally-strong/software-engineer/frontend-essentials/learning)
   - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/frontend-essentials/drilling)
+- [15 · Software Testing](/en/c/learn/fundamentally-strong/software-engineer/software-testing)
+  - [Overview](/en/c/learn/fundamentally-strong/software-engineer/software-testing/overview)
+  - [Learning](/en/c/learn/fundamentally-strong/software-engineer/software-testing/learning)
+  - [Drilling](/en/c/learn/fundamentally-strong/software-engineer/software-testing/drilling)
