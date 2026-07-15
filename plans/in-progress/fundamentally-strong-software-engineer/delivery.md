@@ -3443,7 +3443,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time. - _Date: 2026-07-16. Status: done. Notes: `gh pr merge 50 --squash
-    --delete-branch=false` executed successfully; PR #50 merged into `main` as commit
+--delete-branch=false` executed successfully; PR #50 merged into `main` as commit
       `2c0871135aea2ca0cf049f2af430f10a2d35dc2e` ("feat(ayokoding-www): add Security Essentials
       By-Example topic (Phase 18) (#50)"), confirmed as a real ancestor of `origin/main` via
       `git merge-base --is-ancestor` plus independent `gh pr view`/`gh api` checks; all quality gates
@@ -3461,10 +3461,14 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       (`63656e513`) pushed to the PR branch after the merge had already closed it is orphaned (never
       landed on `main`); this entry's checkbox updates were reapplied directly against latest `main`
       instead._
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
-      production as it completes.
+      production as it completes. - _Date: 2026-07-16. Status: done. Deploy executed directly by the orchestrator (not delegated to
+      `apps-ayokoding-www-deployer`, per this session's standing rule that production deploys are always
+      run by the top-level orchestrator itself): `main` pulled to `574bf9ba1`, force-pushed to
+      `prod-ayokoding-www`; verified via `git ls-remote` that `prod-ayokoding-www` and `main` both point
+      at `574bf9ba1c4821c54a3ef201db39545aa666d3f2`._
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
