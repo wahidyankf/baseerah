@@ -187,6 +187,16 @@ resizable side rail (e.g. VS Code side bar, Docusaurus/Nextra sidebars, `react-r
 handle semantics) to inform the divergent alternatives, returning `[Verified]`/`[Needs Verification]`
 cited findings. _Prior-art specifics: [Unverified] until the Phase 1 research step runs._
 
+**Sequencing note**: the three alternatives below and the Select/Justify decision were already
+directed by the user's own explicit choices during pre-write grilling (edge-handle drag + keyboard,
+`tech-docs.md` DD-1/DD-3/DD-4/DD-6/DD-7 — "per the user's decision, grill Q1–Q5c"), not invented
+blind by an agent. The Phase 1 `web-researcher` survey is therefore a **confirmatory/citation-only**
+pass: it grounds the already-directed design in named prior art (VS Code, Docusaurus/Nextra,
+`react-resizable-panels`) and records citations for `Justify`, but it does not reopen Select. If the
+survey surfaces a materially different pattern the user did not consider (e.g. a collapse-to-icon
+strip), that is logged as a new candidate in a follow-up plan rather than silently revising this
+plan's already-decided scope.
+
 ### Diverge — low-fidelity alternatives (≥ 2 named, genuinely different)
 
 **Option A — Edge drag handle (thin gutter on the rail's right border)** _(Selected)_
@@ -245,6 +255,12 @@ on hover. Powerful but a larger behavioral change (collapse state, hover-expand)
 ### Narrow — hi-fi finalists
 
 The two strongest alternatives carried to high fidelity as `.excalidraw.png` (produced in Phase 1):
+
+> **Status: NOT YET PRODUCED.** Neither `.excalidraw.png` file exists yet — the two `![]()`
+> references below are placeholders that will render as broken images until Phase 1 runs. This is a
+> deliberately deferred-but-gated Phase 1 deliverable, not a silently missing artefact:
+> `delivery.md` Phase 1's own gate (`test -f … .excalidraw.png` for both files) blocks Phase 2 from
+> starting until both files exist on disk.
 
 - **Finalist 1 — Option A (Edge drag handle)**: `![Hi-fi mockup of the edge drag-handle resizable docs sidebar on desktop and mobile](./assets/resizable-sidebar-option-a.excalidraw.png)`
 - **Finalist 2 — Option B (Rail footer control)**: `![Hi-fi mockup of the resizable docs sidebar with an explicit footer width control](./assets/resizable-sidebar-option-b.excalidraw.png)`

@@ -31,6 +31,33 @@ Work in `worktrees/ayokoding-resizable-docs-sidebar/`; open a draft PR against `
 PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before the `[HUMAN]` merge.
 "Done" = a green, fully-reviewed PR handed off; the human merges on their own schedule.
 
+## Phase Flow
+
+```mermaid
+%% Colour-blind-friendly palette: Blue #0173B2 (phase), Teal #029E73 (gate), Orange #DE8F05 (human)
+flowchart LR
+  P0["Phase 0<br/>Setup"]:::blue --> G0{"Gate 0"}:::teal
+  G0 --> P1["Phase 1<br/>Design funnel"]:::blue --> G1{"Gate 1"}:::teal
+  G1 --> P2["Phase 2<br/>Core model"]:::blue --> G2{"Gate 2"}:::teal
+  G2 --> P3["Phase 3<br/>Primitive"]:::blue --> G3{"Gate 3"}:::teal
+  G3 --> P4["Phase 4<br/>Desktop rail"]:::blue --> G4{"Gate 4"}:::teal
+  G4 --> P5["Phase 5<br/>Mobile presets"]:::blue --> G5{"Gate 5"}:::teal
+  G5 --> P6["Phase 6<br/>E2E + manual"]:::blue --> G6{"Gate 6"}:::teal
+  G6 --> P7["Phase 7<br/>PR review"]:::blue --> G7{"Gate 7"}:::teal
+  G7 --> P8["Phase 8<br/>Knowledge"]:::blue --> G8{"Gate 8"}:::teal
+  G8 --> AR["Archival<br/>(AI)"]:::blue --> M["HUMAN merge"]:::orange
+
+  classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+  classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+  classDef orange fill:#DE8F05,stroke:#000000,color:#000000,stroke-width:2px
+```
+
+Each `Gate N` node is that phase's `### Phase N Gate` must-pass checklist; Phase N+1 does not start
+while its predecessor's gate is red. `Archival` is the `[AI]`-executed Plan Archival sequence
+(`git mv`, README updates, commit, push, CI re-verify) that runs after Phase 8 Gate is green.
+`HUMAN merge` sits outside the AI done-boundary — it is the final step after Archival completes
+(see Phase 7 Gate's Pause Safety note).
+
 ---
 
 ## Phase 0: Environment Setup and Baseline
@@ -105,6 +132,11 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
       covering: clamp above max → 35% px, clamp below min → 15% px, inside band unchanged, parse
       "not-a-number" → undefined — command: `npx nx run web-ui:test:unit`
       — acceptance: test fails with "clampWidth is not defined"
+
+  **Gherkin (underpins) →** "Clamp a requested width above the maximum"; "Clamp a requested width
+  below the minimum"; "Keep a requested width already inside the band"; "Reject an unparseable
+  persisted value"
+
 - [ ] [AI] **GREEN**: implement `clampWidth(requestedPx, viewportPx, minPct, maxPct)` and
       `parsePersistedWidth(raw)` in `libs/web-ui/src/primitives/resizable-panel/width-model.ts`
       (_New file_) — command: `npx nx run web-ui:test:unit`
@@ -134,24 +166,107 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
       covering: initial width = default when `localStorage` empty; reads persisted value on mount;
       writes to key `ayokoding-sidebar-width` on resize-end — command: `npx nx run web-ui:test:unit`
       — acceptance: test fails with "useResizableWidth is not defined"
+
+  **Gherkin (underpins) →** "Persist the chosen width across a reload"
+
+  _Scope note_: narrowed to this one scenario — the hook's mount-read + resize-end write of the
+  persisted width is what it underpins; the drag/keyboard scenarios are separately and directly
+  bound in the 4 scenario-scoped cycles below (each carries its own `Gherkin (binds)` tag).
+
 - [ ] [AI] **GREEN**: implement the hook in
       `libs/web-ui/src/primitives/resizable-panel/use-resizable-width.ts` (_New file_) mirroring the
       mount-effect `localStorage` pattern of `theme-toggle.tsx`; delegate clamping to `width-model.ts`
       — command: `npx nx run web-ui:test:unit` — acceptance: hook tests pass
-- [ ] [AI] **RED**: write failing tests for the primitive in
-      `libs/web-ui/src/primitives/resizable-panel/resizable-panel.test.tsx` (_New file_, _New test_)
-      covering: handle has `role="separator"` + `aria-orientation="vertical"`; `ArrowRight` increases
-      width by the keyboard step and updates `aria-valuenow`; drag delta widens then clamps at max;
-      `vitest-axe` reports no violations — command: `npx nx run web-ui:test:unit`
+
+### Resizable panel + handle (4 scenario-scoped cycles)
+
+- [ ] [AI] **RED** (drag widen): write a failing test for "Widen the panel by dragging the handle
+      right" in `libs/web-ui/src/primitives/resizable-panel/resizable-panel.test.tsx` (_New file_,
+      _New test_) — command: `npx nx run web-ui:test:unit`
       — acceptance: test fails with "ResizablePanel is not defined"
-- [ ] [AI] **GREEN**: implement `ResizablePanel` + `ResizableHandle` in
+
+  **Gherkin (binds) →** "Widen the panel by dragging the handle right"
+
+  ```gherkin
+  Scenario: Widen the panel by dragging the handle right
+    Given a resizable panel rendered at 250 pixels with a 150 to 350 pixel band
+    When the user drags the separator handle 60 pixels to the right
+    Then the panel width becomes 310 pixels
+  ```
+
+- [ ] [AI] **GREEN** (drag widen): implement `ResizablePanel` + `ResizableHandle` in
       `libs/web-ui/src/primitives/resizable-panel/resizable-panel.tsx` (_New file_) using the
-      `radix-ui` + `cn` + CVA + `data-slot` pattern from `scroll-area.tsx`; handle is a focusable
-      `role="separator"` element with `aria-orientation`/`aria-valuemin`/`aria-valuemax`/`aria-valuenow`
-      and pointer + `ArrowLeft`/`ArrowRight` handlers — command: `npx nx run web-ui:test:unit`
-      — acceptance: all primitive tests + `vitest-axe` pass
-- [ ] [AI] **REFACTOR**: deduplicate drag/keyboard width-update paths through one `applyWidth` helper
-      — command: `npx nx run web-ui:test:unit` — acceptance: all tests still pass, no duplicate clamp logic
+      `radix-ui` + `cn` + CVA + `data-slot` pattern from `scroll-area.tsx`; wire pointer-drag delta to
+      `useResizableWidth`, delegating clamping to `width-model.ts`
+      — command: `npx nx run web-ui:test:unit` — acceptance: the drag-widen test passes
+- [ ] [AI] **REFACTOR** (drag widen): extract the pointer drag-delta math into a small named helper
+      in `resizable-panel.tsx` — command: `npx nx run web-ui:test:unit`
+      — acceptance: the drag-widen test still passes, no inline math duplication
+
+- [ ] [AI] **RED** (drag clamp): write a failing test for "Dragging past the maximum stops at the
+      maximum" in `resizable-panel.test.tsx` — command: `npx nx run web-ui:test:unit`
+      — acceptance: test fails (the drag handler does not yet clamp to the band maximum)
+
+  **Gherkin (binds) →** "Dragging past the maximum stops at the maximum"
+
+  ```gherkin
+  Scenario: Dragging past the maximum stops at the maximum
+    Given a resizable panel rendered at 340 pixels with a 150 to 350 pixel band
+    When the user drags the separator handle 100 pixels to the right
+    Then the panel width stops at 350 pixels
+  ```
+
+- [ ] [AI] **GREEN** (drag clamp): route the drag-delta result through `width-model.ts`'s
+      `clampWidth` before applying it — command: `npx nx run web-ui:test:unit`
+      — acceptance: both drag tests pass
+- [ ] [AI] **REFACTOR** (drag clamp): consolidate the widen and clamp drag paths into one
+      `applyWidth`-style helper in `resizable-panel.tsx` — command: `npx nx run web-ui:test:unit`
+      — acceptance: both drag tests still pass, no duplicate clamp logic
+
+- [ ] [AI] **RED** (keyboard): write a failing test for "Widen the panel with the ArrowRight key" in
+      `resizable-panel.test.tsx` — command: `npx nx run web-ui:test:unit`
+      — acceptance: test fails (no `ArrowRight` key handler exists yet)
+
+  **Gherkin (binds) →** "Widen the panel with the ArrowRight key"
+
+  ```gherkin
+  Scenario: Widen the panel with the ArrowRight key
+    Given the separator handle is focused on a panel at 250 pixels
+    When the user presses ArrowRight
+    Then the panel width increases by the keyboard step
+    And the handle exposes the new width via aria-valuenow
+  ```
+
+- [ ] [AI] **GREEN** (keyboard): add `ArrowLeft`/`ArrowRight` key handlers on the handle that adjust
+      width by a fixed keyboard step and update `aria-valuenow`
+      — command: `npx nx run web-ui:test:unit` — acceptance: the keyboard test passes
+- [ ] [AI] **REFACTOR** (keyboard): share the width-apply path between the drag and keyboard handlers
+      through the `applyWidth` helper from the drag-clamp cycle — command: `npx nx run web-ui:test:unit`
+      — acceptance: all tests still pass, no duplicate width-update logic
+
+- [ ] [AI] **RED** (separator semantics + a11y): write a failing test for "The handle exposes
+      separator semantics" plus a `vitest-axe` no-violations assertion in `resizable-panel.test.tsx`
+      — command: `npx nx run web-ui:test:unit`
+      — acceptance: test fails (the handle has no `role`/`aria-orientation` yet)
+
+  **Gherkin (binds) →** "The handle exposes separator semantics"
+
+  ```gherkin
+  Scenario: The handle exposes separator semantics
+    Given a resizable panel is rendered
+    When the accessibility tree is inspected
+    Then the handle has role "separator"
+    And the handle has aria-orientation "vertical"
+  ```
+
+- [ ] [AI] **GREEN** (separator semantics + a11y): set `role="separator"`,
+      `aria-orientation="vertical"`, `aria-valuemin`/`aria-valuemax`/`aria-valuenow`, and `tabIndex=0`
+      on the handle element — command: `npx nx run web-ui:test:unit`
+      — acceptance: the semantics test and `vitest-axe` both pass with zero violations
+- [ ] [AI] **REFACTOR** (separator semantics + a11y): tidy prop spreading and `data-slot` naming on
+      the handle to match `scroll-area.tsx`'s conventions — command: `npx nx run web-ui:test:unit`
+      — acceptance: all primitive tests + `vitest-axe` still pass
+
 - [ ] [AI] Export the primitive: add `export * from "./resizable-panel/resizable-panel";` to
       `libs/web-ui/src/primitives/index.ts` — command: `npx nx run web-ui:typecheck` — acceptance: exits 0
 - [ ] [AI] Add a Storybook story
@@ -161,16 +276,24 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
 
 ### Specs & Gherkin Delivery (web-ui)
 
+> `resizable-panel` is the first `libs/web-ui/src/primitives/` component to carry Gherkin coverage
+> (see `tech-docs.md` DD-1a). No per-component README is added here — matching every sibling
+> `components/` folder, the sole inventory lives in the top-level
+> `specs/libs/web-ui/behavior/README.md`, updated below.
+
 - [ ] [AI] **RED**: add
       `specs/libs/web-ui/behavior/gherkin/resizable-panel/resizable-panel.feature` (_New file_) with
-      the primitive drag/keyboard/a11y scenarios from `prd.md`, plus a feature-dir `README.md`
-      — command: `npx nx run web-ui:test:specs`
+      the primitive drag/keyboard/a11y scenarios from `prd.md` — command: `npx nx run web-ui:test:specs`
       — acceptance: coverage fails (scenarios present, no step defs yet)
   - _Suggested executor: `specs-maker`_
-- [ ] [AI] **GREEN**: implement the step definitions/tests consuming those scenarios
-      — command: `npx nx run web-ui:test:specs` — acceptance: exits 0
-- [ ] [AI] Update `specs/libs/web-ui/behavior/README.md` inventory to list `resizable-panel`
-      — acceptance: the component appears in the behavior README
+- [ ] [AI] **GREEN**: implement
+      `libs/web-ui/src/primitives/resizable-panel/resizable-panel.steps.tsx` (_New file_) consuming
+      those scenarios — command: `npx nx run web-ui:test:specs` — acceptance: exits 0
+- [ ] [AI] Update `specs/libs/web-ui/behavior/README.md`: list `resizable-panel` in the inventory and
+      amend the "Structure" note (currently "co-located with each component under
+      `libs/web-ui/src/components/`") to acknowledge `libs/web-ui/src/primitives/` MAY also carry
+      Gherkin coverage, citing `resizable-panel` as the precedent
+      — acceptance: the component appears in the behavior README and the note is updated
 
 ### Phase 3 Gate
 
@@ -208,8 +331,14 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
       horizontal scroll) — command: `npx nx run ayokoding-www:test:specs`
       — acceptance: coverage fails (scenarios present, no step defs yet)
   - _Suggested executor: `specs-maker`_
-- [ ] [AI] **GREEN**: implement the step definitions/tests consuming those scenarios
-      — command: `npx nx run ayokoding-www:test:specs` — acceptance: exits 0
+
+  **Gherkin (underpins) →** "Persist the chosen width across a reload"; "Hide the resizable rail
+  below the md breakpoint"; "Scroll the sidebar horizontally when a label overflows"
+
+- [ ] [AI] **GREEN**: implement the step definitions/tests consuming those scenarios in a new
+      `apps/ayokoding-www/src/features/navigation/shell/resizable-sidebar.test.tsx` (sibling to the
+      new `resizable-sidebar.tsx` wrapper) — command: `npx nx run ayokoding-www:test:specs`
+      — acceptance: exits 0
 - [ ] [AI] Update `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/README.md` to list
       the new feature — acceptance: the feature appears in the navigation README
 
@@ -234,6 +363,16 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
       `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/resizable-sidebar.feature`
       (the "Apply a preset width to the mobile nav drawer" scenario from `prd.md`)
       — command: `npx nx run ayokoding-www:test:specs` — acceptance: coverage fails (new scenario, no step def)
+
+  **Gherkin (binds) →** "Apply a preset width to the mobile nav drawer"
+
+  ```gherkin
+  Scenario: Apply a preset width to the mobile nav drawer
+    Given the mobile nav drawer is open at a 375 pixel viewport
+    When the reader selects the wider preset
+    Then the drawer renders at the wider preset width
+  ```
+
 - [ ] [AI] **GREEN**: edit `apps/ayokoding-www/src/features/app-shell/shell/mobile-nav.tsx`: replace
       the hardcoded `w-[280px]` on `SheetContent` with a preset-width control (default + wider preset)
       persisted to `localStorage` key `ayokoding-mobilenav-width` via `parsePersistedWidth`, and add
@@ -258,9 +397,41 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
 
 > _Suggested executor: `swe-e2e-dev`_
 
-- [ ] [AI] Add E2E specs in `apps/ayokoding-www-fe-e2e` covering: drag resize, keyboard resize,
-      persistence across reload, `< md` rail hidden, horizontal scroll, mobile preset
-      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: all new E2E specs pass
+- [ ] [AI] Add drag-resize E2E step defs consuming "Widen the panel by dragging the handle right"
+      into `apps/ayokoding-www-fe-e2e/src/steps/resizable-sidebar.steps.ts` (_New file_, matching the
+      sibling `navigation.steps.ts` pattern) — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the drag-resize E2E scenario passes
+  - **Gherkin (binds) →** "Widen the panel by dragging the handle right"
+- [ ] [AI] Add drag-clamp E2E step defs consuming "Dragging past the maximum stops at the maximum"
+      into `apps/ayokoding-www-fe-e2e/src/steps/resizable-sidebar.steps.ts`
+      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the drag-clamp E2E scenario passes
+  - **Gherkin (binds) →** "Dragging past the maximum stops at the maximum"
+- [ ] [AI] Add keyboard-resize E2E step defs consuming "Widen the panel with the ArrowRight key" into
+      `apps/ayokoding-www-fe-e2e/src/steps/resizable-sidebar.steps.ts`
+      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the keyboard-resize E2E scenario passes
+  - **Gherkin (binds) →** "Widen the panel with the ArrowRight key"
+- [ ] [AI] Add persistence-across-reload E2E step defs consuming "Persist the chosen width across a
+      reload" into `apps/ayokoding-www-fe-e2e/src/steps/resizable-sidebar.steps.ts`
+      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the persistence E2E scenario passes
+  - **Gherkin (binds) →** "Persist the chosen width across a reload"
+- [ ] [AI] Add `< md` rail-hidden E2E step defs consuming "Hide the resizable rail below the md
+      breakpoint" into `apps/ayokoding-www-fe-e2e/src/steps/resizable-sidebar.steps.ts`
+      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the rail-hidden E2E scenario passes
+  - **Gherkin (binds) →** "Hide the resizable rail below the md breakpoint"
+- [ ] [AI] Add horizontal-scroll E2E step defs consuming "Scroll the sidebar horizontally when a
+      label overflows" into `apps/ayokoding-www-fe-e2e/src/steps/resizable-sidebar.steps.ts`
+      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the horizontal-scroll E2E scenario passes
+  - **Gherkin (binds) →** "Scroll the sidebar horizontally when a label overflows"
+- [ ] [AI] Add mobile-preset E2E step defs consuming "Apply a preset width to the mobile nav drawer"
+      into `apps/ayokoding-www-fe-e2e/src/steps/resizable-sidebar.steps.ts`
+      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the mobile-preset E2E scenario passes
+  - **Gherkin (binds) →** "Apply a preset width to the mobile nav drawer"
 
 ### Manual UI Verification (Playwright MCP) — all locales × all breakpoints
 
@@ -270,8 +441,10 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
 - [ ] [AI] For EACH locale (`en`, `id`) × EACH breakpoint (375 / 768 / 1280 px): navigate to a
       locale-prefixed docs URL (`/en/...`, `/id/...`) via `browser_navigate` + `browser_resize`
       — acceptance: page renders; at 375 px the rail is hidden and the drawer is available
-- [ ] [AI] At 768/1280 px: drag the handle and press `ArrowLeft`/`ArrowRight`; verify width changes,
-      persists across a `browser_navigate` reload, and long labels scroll horizontally
+- [ ] [AI] At 768/1280 px: drag the handle via `browser_drag` (`startElement`/`startTarget` = the
+      separator handle's current position from `browser_snapshot`, `endElement`/`endTarget` = the
+      target position 60px right) and press `ArrowLeft`/`ArrowRight`; verify width changes, persists
+      across a `browser_navigate` reload, and long labels scroll horizontally
       — acceptance: observed behaviors match `prd.md` scenarios
 - [ ] [AI] Inspect DOM via `browser_snapshot`: verify `html[lang]` matches the locale, the handle has
       `role="separator"`, and no strings are untranslated — acceptance: correct lang + separator role
@@ -281,6 +454,12 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
       — acceptance: 6 files exist in `evidence/`
 - [ ] [AI] Document evidence in this checklist: reference each screenshot
       (`![resizable sidebar en 1280px](./evidence/...)`) and note console status per locale
+- [ ] [AI] **Visual-parity comparison**: compare each captured screenshot against the approved hi-fi
+      mockup `plans/in-progress/ayokoding-resizable-docs-sidebar/assets/resizable-sidebar-option-a.excalidraw.png`
+      (the "Selected" design from `prd.md §Select`) per breakpoint/locale, and record a pass/fail
+      sign-off line per screenshot in this checklist
+      — acceptance: every one of the 6 screenshots has a recorded parity sign-off; any mismatch is
+      fixed (or explicitly justified) before Phase 6 Gate
 
 ### Phase 6 Gate
 
@@ -289,9 +468,12 @@ PR-Review Maker→Fixer Cycle (default 3 sequential CI-gated cycles) runs before
 - [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` exits 0
 - [ ] [AI] `ls plans/in-progress/ayokoding-resizable-docs-sidebar/evidence/` lists 6 screenshots
       (2 locales × 3 breakpoints)
+- [ ] [AI] All 6 screenshots have a recorded visual-parity sign-off against
+      `assets/resizable-sidebar-option-a.excalidraw.png`, with zero unresolved mismatches
 
 > **Pause Safety**: behavior is verified end-to-end with committed evidence across all locales and
-> breakpoints. Safe to stop. To resume: re-run the E2E command.
+> breakpoints, and each screenshot is sign-off-compared against the approved mockup. Safe to stop.
+> To resume: re-run the E2E command.
 
 ---
 
@@ -410,11 +592,19 @@ _(Append EWT-###/UWT-###/DWT-### defect findings here as unchecked items; all mu
 - [ ] [AI] Verify ALL supported locales (`en`, `id`) were exercised in UI verification
 - [ ] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires
       explicit user permission (only when genuinely impossible); SG-### / USS-### may be triaged/deferred
-- [ ] [HUMAN] Merge the draft PR to `main` when ready — acceptance: PR merged; observable signal is
-      the merge commit on `origin/main` and the PR marked merged
+- [ ] [AI] Verify the visual-parity sign-off is recorded for all 6 Phase 6 screenshots against
+      `assets/resizable-sidebar-option-a.excalidraw.png` with zero unresolved mismatches
 - [ ] [AI] Move plan: `git mv plans/in-progress/ayokoding-resizable-docs-sidebar plans/done/2026-07-15__ayokoding-resizable-docs-sidebar`
       (use the completion date, NOT the creation date; the `evidence/` and `assets/` subfolders move with it)
 - [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
 - [ ] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`)
 - [ ] [AI] Commit the archival: `chore(plans): move ayokoding-resizable-docs-sidebar to done`
+- [ ] [AI] Push the archival commit to the PR branch (`ayokoding-resizable-docs-sidebar`)
+      — acceptance: branch updated on origin; the archival commit is part of the PR diff
+- [ ] [AI] Re-verify CI is green on the PR head after the archival-commit push:
+      `gh run view --json status,conclusion` — acceptance: all checks pass with the archival commit
+      included (per the PR-Review Quality Gate workflow's "Archival-in-PR is committed"
+      done-definition item)
+- [ ] [HUMAN] Merge the draft PR to `main` when ready — acceptance: PR merged (including the archival
+      commit); observable signal is the merge commit on `origin/main` and the PR marked merged

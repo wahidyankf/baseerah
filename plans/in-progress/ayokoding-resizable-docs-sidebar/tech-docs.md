@@ -75,6 +75,29 @@ Per the user's decision (grill Q4): the resize mechanic is a **new `libs/web-ui`
 `libs/web-ui/src/primitives/index.ts`) [Repo-grounded]. Rationale: reusable across future apps,
 tested and documented once. Trade-off: larger scope now (story + tests + specs) — accepted.
 
+### DD-1a — `resizable-panel` is the first `primitives/`-level component with Gherkin coverage (deliberate)
+
+**Repo-grounded gap**: all 12 existing `libs/web-ui/src/primitives/*` folders follow a
+`<name>.tsx` + `.test.tsx` + `.stories.tsx` triad with **zero** `.steps.tsx` files — Gherkin spec
+coverage (`.steps.tsx` co-located with the component, consumed by `nx run web-ui:test:specs`) is
+currently a `components/`-only convention (18 of the 22 `libs/web-ui/src/components/*` folders have
+a `.steps.tsx`; documented in `specs/libs/web-ui/behavior/README.md`). `resizable-panel` stays under
+`primitives/` per DD-1 (the user's explicit placement decision), so this plan deliberately makes it
+the **first primitive to carry Gherkin coverage** rather than relocating it to `components/`.
+
+**Consequences, declared explicitly** (resolves the `primitives/` vs `components/` spec-coverage
+mismatch):
+
+- New file `libs/web-ui/src/primitives/resizable-panel/resizable-panel.steps.tsx` — the step
+  definitions consuming `specs/libs/web-ui/behavior/gherkin/resizable-panel/resizable-panel.feature`
+  — is added to `File Impact` below.
+- Delivery Phase 3's "Specs & Gherkin Delivery" GREEN step names this file path explicitly.
+- Delivery Phase 3's `specs/libs/web-ui/behavior/README.md` update step (already present) must also
+  amend the README's "Structure" note — which currently reads "Every scenario is consumed at the
+  unit level via the matching `*.steps.tsx` file co-located with each component under
+  `libs/web-ui/src/components/`" — to acknowledge that `libs/web-ui/src/primitives/` MAY also carry
+  Gherkin coverage, citing `resizable-panel` as the precedent.
+
 ### DD-2 — ZERO new dependencies; everything hand-rolled from existing repo tooling (MANDATED, HARD)
 
 **Decision (user-mandated, HARD constraint): this plan adds NO new external npm package of any
@@ -152,7 +175,10 @@ free drag on the overlay drawer.
 - `libs/web-ui/src/primitives/resizable-panel/width-model.ts` — pure core (clamp/parse).
 - `libs/web-ui/src/primitives/resizable-panel/width-model.test.ts` — core unit tests.
 - `specs/libs/web-ui/behavior/gherkin/resizable-panel/resizable-panel.feature` — primitive specs.
-- `specs/libs/web-ui/behavior/gherkin/resizable-panel/README.md` — feature-dir README.
+- `libs/web-ui/src/primitives/resizable-panel/resizable-panel.steps.tsx` — Gherkin step definitions
+  consuming `resizable-panel.feature` (see DD-1a — first `primitives/`-level component with Gherkin
+  coverage; no per-component README, matching the `components/` convention where the sole inventory
+  lives in the top-level `specs/libs/web-ui/behavior/README.md`).
 - `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/resizable-sidebar.feature` — app specs.
 - `assets/resizable-sidebar-option-a.excalidraw.png`, `assets/resizable-sidebar-option-b.excalidraw.png`
   (plan funnel finalists).
