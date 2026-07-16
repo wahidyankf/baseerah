@@ -42,8 +42,8 @@ describeFeature(feature, ({ Scenario }) => {
     });
   });
 
-  Scenario(
-    "A successful copy swaps to the success icon and announces via a live region",
+  // prettier-ignore
+  Scenario("A successful copy swaps to the success icon and announces via a live region",
     ({ Given, When, Then, And }) => {
       let showsCheck = false;
       let announced = "";
