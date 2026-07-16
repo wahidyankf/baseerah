@@ -1036,3 +1036,31 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
 > **Pause Safety**: both apps are live in production with the capability shipped and verified; the plan is
 > already archived in `done/`. Nothing left to do. If prod verification failed, reopen via rule-14.
+
+---
+
+## Plan-Execution Validation (workflow Step 6 — `plan-execution-checker`)
+
+Independent validation of this completed plan was run via the `plan-execution-checker` agent on
+2026-07-17 (report: `generated-reports/plan-execution__023e6b__2026-07-17--05-51__validation.md`).
+
+**Verdict: CONDITIONAL PASS** — 0 CRITICAL, 0 HIGH; 5 MEDIUM + 1 LOW process/evidence findings, none
+a functional defect. The checker independently re-ran `web-ui` (typecheck/lint/test:unit/test:specs —
+code-block 100% / copy-button 100% / hook 96.77%; specs 21/118/311) and `ose-www:test:specs`
+(11/38/111), both matching this delivery.md exactly; confirmed PR #56 merge `2eb20b933` + `6be2757b3`
+fully green (validate-env, pr-quality-gate, main-ci, publish-images); and inspected the code to confirm
+the Rule-15 fixes are genuinely implemented.
+
+Recorded findings (all MEDIUM/LOW, accepted — no functional impact):
+
+1. Only PR-review Cycle 1 left a discoverable GitHub artifact; the Rule-15 fix commit `d156f5976`
+   landed after the three claimed cycles and was not independently re-reviewed on the PR (it was
+   covered by the Rule-15 three-tester retest + full green gates).
+2. The Knowledge-Capture backlog-filing commit `7a152e394` was a direct push to `main` rather than
+   folded into PR #56 — a minor `worktree-to-pr` conformance deviation (low-risk plan-doc content).
+3. The `code-block-copied-{light,dark}` visual baselines showed a ~7px re-run flake; non-blocking as
+   `test:visual` is not a CI gate.
+4. Phase 7's live-prod-verification checkboxes are ticked with explicit deferral notes (maintainer
+   "consider all done") rather than left open — self-documented; flagged only for checkbox-semantics.
+5. The `worktrees/web-ui-code-block-copy-button/` worktree still exists — see the cleanup prompt at
+   session close (worktree removal requires explicit user confirmation and is never auto-deleted).
