@@ -835,10 +835,11 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 - [x] [AI] Append each finding here as a new unchecked, source-attributed checkbox
       (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`); route each
       SG-###/USS-### into the specs steps - _2026-07-16 · Done — appended below._
-- [ ] [AI] Fix every rule-15 EWT/UWT/DWT defect finding before archival — deferral requires explicit user
+- [x] [AI] Fix every rule-15 EWT/UWT/DWT defect finding before archival — deferral requires explicit user
       permission (only when genuinely impossible); SG-###/USS-### may be triaged or deferred with rationale.
       **User directive 2026-07-16: "fix absolutely everything" — no deferrals; all EWT/UWT/DWT + SG/USS +
-      the two pre-existing/site-wide items (DWT-001, UWT-005) are being fixed inside this PR.**
+      the two pre-existing/site-wide items (DWT-001, UWT-005) were fixed inside this PR.** - _Done 2026-07-16._
+      All 12 findings fixed with TDD (`d156f5976`); gates + CI green.
 
 #### Rule-15 findings (all being fixed per user directive)
 
@@ -888,14 +889,15 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
       fixes; push follow-up commits to PR #56; wait for CI green - _Gates green 2026-07-16._ web-ui
       (typecheck/lint/test:unit 549/test:specs 118 scenarios/test:visual 8), ayokoding-www
       (typecheck/lint/test:quick 2606/test:specs), ose-www (typecheck/lint/test:quick 154/test:specs) all green;
-      the 3 min-role failures under `run-many` were dev-server starvation (0-fail isolated). Push + CI next.
+      the 3 min-role failures under `run-many` were dev-server starvation (0-fail isolated). Pushed
+      `d156f5976` to PR #56; CI green (validate-env + pr-quality-gate incl. TypeScript quality gate) 2026-07-16.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] Draft PR open; 3 review cycles complete; no unresolved CRITICAL/HIGH findings; PR CI green
-- [ ] [AI] All rule-15 defect findings fixed (ticked)
+- [x] [AI] Draft PR open; 3 review cycles complete; no unresolved CRITICAL/HIGH findings; PR CI green - _2026-07-16 · PR #56; cycles 1–3 done (D114–D116); CI green on head `d156f5976`._
+- [x] [AI] All rule-15 defect findings fixed (ticked) - _2026-07-16 · all 12 findings fixed + CI green._
 
 > **Pause Safety**: the change lives on a green, fully-reviewed PR branch; nothing is merged or deployed.
 > Safe to stop. To resume: re-verify PR CI is green, then proceed to Phase 5 (Knowledge Capture).
@@ -907,27 +909,33 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
 
-- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
+- [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
       catch it automatically next time; discard the rest with a one-line reason — acceptance: every entry
-      has a route or a discard reason
-- [ ] [AI] Apply the **secret/sensitivity gate** — sanitize any secret/credential/token/private hostname
-      to a `<placeholder>`, or discard if unsanitizable — acceptance: `learnings.md` contains no raw secret
-- [ ] [AI] Apply the **repo-relevance gate** — infra-private content stays out; public-governance content
-      may propagate via the parity loop — acceptance: no infra-private content in routed output
-- [ ] [AI] Route each surviving learning to exactly one durable home — non-code homes may land inline
+      has a route or a discard reason - _2026-07-16 · Done._ 3 candidate watch-items discarded with
+      reasons; 4 surfaced learnings triaged (1 kept → backlog, 3 discarded/already-homed with reasons).
+- [x] [AI] Apply the **secret/sensitivity gate** — sanitize any secret/credential/token/private hostname
+      to a `<placeholder>`, or discard if unsanitizable — acceptance: `learnings.md` contains no raw secret - _2026-07-16 · Done._ No secrets — entries are file paths, a regex, and CSS/utility names only.
+- [x] [AI] Apply the **repo-relevance gate** — infra-private content stays out; public-governance content
+      may propagate via the parity loop — acceptance: no infra-private content in routed output - _2026-07-16 · Done._ Routed learning targets public `apps/rhino-cli`; the Nx-flake entry is
+      local-ops (kept out of repo, homed in operator memory).
+- [x] [AI] Route each surviving learning to exactly one durable home — non-code homes may land inline
       (small) or as a `plans/backlog/` follow-up (large); code homes (`apps/`, `libs/`, tests) are ALWAYS
       filed as a separate `plans/backlog/<slug>/` plan, NEVER inline — acceptance: every entry records a
-      terminal routing state
-- [ ] [AI] If no generalizable learning surfaced, record `No generalizable learnings — <reason>` in
-      `learnings.md` — acceptance: `learnings.md` is never silently empty
+      terminal routing state - _2026-07-16 · Done._ The rhino scanner learning (code home) is filed as
+      `plans/backlog/2026-07-16__rhino-speccoverage-multiline-scenario-scan/`; every other entry is
+      terminal (discarded with reason, or already homed in operator memory).
+- [x] [AI] If no generalizable learning surfaced, record `No generalizable learnings — <reason>` in
+      `learnings.md` — acceptance: `learnings.md` is never silently empty - _2026-07-16 · N/A — a
+      generalizable learning surfaced (rhino scanner) and was routed to backlog; escape not needed._
 
 ### Phase 5 Gate
 
 > All checks below must pass before Phase 6.
 
-- [ ] [AI] Every `learnings.md` entry is terminal (routed inline, filed as backlog, or discarded with
-      reason), or the file records the explicit "none" escape
-- [ ] [AI] No code-homed learning landed inline in this plan's own commits/PR
+- [x] [AI] Every `learnings.md` entry is terminal (routed inline, filed as backlog, or discarded with
+      reason), or the file records the explicit "none" escape - _2026-07-16 · every entry terminal._
+- [x] [AI] No code-homed learning landed inline in this plan's own commits/PR - _2026-07-16 · the sole
+      code-homed learning (rhino scanner) is a `plans/backlog/` plan, not an inline code change._
 
 > **Pause Safety**: `learnings.md` is fully triaged; no future process depends on querying it later.
 > Safe to stop. To resume: re-read `learnings.md` and confirm every entry is terminal.
@@ -944,17 +952,17 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
 ### In-PR archival (on the PR branch)
 
-- [ ] [AI] Verify ALL Phase 0–5 checklist items are ticked (code, tests, review cycles, rule-15 fixes,
-      manual evidence in `evidence/`, both locales exercised, Knowledge Capture terminal)
-- [ ] [AI] Rename and move on the PR branch:
+- [x] [AI] Verify ALL Phase 0–5 checklist items are ticked (code, tests, review cycles, rule-15 fixes,
+      manual evidence in `evidence/`, both locales exercised, Knowledge Capture terminal) - _2026-07-16 · verified; only Phase 6/7 boxes remained open._
+- [x] [AI] Rename and move on the PR branch:
       `git mv plans/in-progress/web-ui-code-block-copy-button/ plans/done/2026-07-16__web-ui-code-block-copy-button/`
-      (use the actual completion date) — the `assets/` + `evidence/` subfolders move with the plan
-- [ ] [AI] Update `plans/in-progress/README.md` — remove this plan entry
-- [ ] [AI] Update `plans/done/README.md` — add this plan with completion date
-- [ ] [AI] Update any other READMEs referencing this plan
-- [ ] [AI] Commit + push the archival to the PR branch:
+      (use the actual completion date) — the `assets/` + `evidence/` subfolders move with the plan - _2026-07-16 · moved to `plans/done/2026-07-16__web-ui-code-block-copy-button/` (assets + evidence moved)._
+- [x] [AI] Update `plans/in-progress/README.md` — remove this plan entry - _2026-07-16 · removed._
+- [x] [AI] Update `plans/done/README.md` — add this plan with completion date - _2026-07-16 · added._
+- [x] [AI] Update any other READMEs referencing this plan - _2026-07-16 · swept; no other referencing READMEs._
+- [x] [AI] Commit + push the archival to the PR branch:
       `chore(plans): move web-ui-code-block-copy-button to done`
-      — acceptance: the archival commit is part of the PR
+      — acceptance: the archival commit is part of the PR - _2026-07-16 · archival commit on PR #56._
 - [ ] [AI] Re-verify PR CI is green on the new PR head after the archival push (poll `gh run view` every
       2 min) — acceptance: all checks pass with the archival commit included
 
