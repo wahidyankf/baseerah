@@ -799,11 +799,28 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
 ### PR-Review Maker→Fixer Cycle (3 sequential, CI-gated)
 
-- [ ] [AI] Cycle 1 — `pr-review-maker` reviews via the GitHub Reviews API; `pr-review-fixer` addresses
-      every finding and pushes to the PR branch; wait for CI green — acceptance: cycle 1 CI green
-- [ ] [AI] Cycle 2 — repeat maker→fixer; wait for CI green — acceptance: cycle 2 CI green
-- [ ] [AI] Cycle 3 — repeat maker→fixer; wait for CI green — acceptance: cycle 3 CI green, no unresolved
-      CRITICAL/HIGH findings
+- [x] [AI] Cycle 1 — `pr-review-maker` reviews via the GitHub Reviews API; `pr-review-fixer` addresses
+      every finding and pushes to the PR branch; wait for CI green — acceptance: cycle 1 CI green -
+      _2026-07-16 · Done._ Maker review pinned to head `6264973a`
+      (pull/56#pullrequestreview-4714584268): **0 findings** (CRITICAL/HIGH/MEDIUM/LOW all zero) — verbatim
+      copy, mermaid-exclusion ordering, i18n, a11y, no-false-success, and no CI-gaming all verified clean;
+      barrel-omission of the hook and e2e `test.fixme` confirmed intentional (not defects). No inline
+      threads posted → no `pr-review-fixer` work. PR CI already green (validate-env + pr-quality-gate).
+- [x] [AI] Cycle 2 — repeat maker→fixer; wait for CI green — acceptance: cycle 2 CI green - _2026-07-16 ·
+      Done._ Independent second pass pinned to head `6264973a`: **0 posted findings** (CRITICAL/HIGH/MEDIUM/
+      LOW zero). Probed Cycle-1 blind spots — SSR/hydration (client boundary unchanged; deterministic first
+      render), `getTextContent` on nested/whitespace figures, hook timeout/unmount race, `attributesToProps`
+      class/data-slot handling, live-region node identity, ose-www latent double-wrap (no recursion) — all
+      sound. Two sub-80 LOW observations logged, not posted (post-unmount `setCopied` is a React-18 no-op;
+      speculative 2000ms e2e-revert flake); neither a defect. No inline threads → no `pr-review-fixer` work.
+- [x] [AI] Cycle 3 — repeat maker→fixer; wait for CI green — acceptance: cycle 3 CI green, no unresolved
+      CRITICAL/HIGH findings - _2026-07-16 · Done._ Final adversarial pass pinned to head `6264973a`:
+      **0 findings** (all severities zero). Independently re-judged both Cycle-2 sub-threshold observations
+      and confirmed neither warrants a fix (the post-unmount `setCopied` is a documented React-18 no-op and
+      only a mildly imprecise JSDoc line; the e2e revert assertions carry a conventional 3000ms-vs-2000ms
+      margin). No CI-gaming, no scope creep, no injection. **Cleared for archival + merge.** No code changed
+      across the 3 cycles → PR CI remains green (validate-env + pr-quality-gate on `6264973a`); no fixer work
+      in any cycle; zero unresolved CRITICAL/HIGH.
 
 ### Rule-15 Three-Tester Retest (before archival/merge)
 
