@@ -675,10 +675,25 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 ## Phase 3: ose-www Wiring (latent, unit only)
 
 > _Suggested executor: `swe-typescript-dev`_
+>
+> **Phase 3 Execution Summary (2026-07-16).** ose-www's `markdown-renderer.tsx` gained the same
+> non-mermaid replace-case (verbatim Shiki figure wrapped in `CodeBlock`, English `Copy`/`Copied`
+> defaults — ose-www is English-only; mermaid path byte-unchanged, recursion-safe via
+> `attributesToProps`). Two `@unit` renderer scenarios authored + jsdom-bound. **Gate (no cache):**
+> `nx run-many -t typecheck lint test:quick test:specs -p ose-www` → **all green** (154 tests; coverage
+> 11 specs / 38 scenarios / 111 steps — all covered).
+>
+> **Config touch (one file beyond the plan's ose-www list, documented):** the 2 renderer scenarios are
+> genuinely unit-scope (ose-www ships **no** live non-mermaid fenced content — the wiring is latent), so
+> they are tagged `@unit`, not the platform-web-wide `@unit @e2e`. `ose-www-fe-e2e` uses playwright-bdd's
+> default `fail-on-gen` with no tag filter, which would refuse to generate while any globbed scenario
+> lacks an e2e step def. Added `tags: "@e2e"` to that project's `defineBddConfig` so pure-`@unit`
+> scenarios are excluded from e2e generation (a no-op for the 14 existing `@unit @e2e` scenarios, which
+> keep their `@e2e`). Verified via `bddgen`: the 14 still generate, the 2 content scenarios don't.
 
 ### Specs & Gherkin Delivery (RED first)
 
-- [ ] [AI] RED: author
+- [x] [AI] RED: author
       `specs/apps/ose/behavior/platform-web/gherkin/content/code-block-copy.feature` _New_ (ose-www's
       frontend surface is `platform-web`, per `apps/ose-www-fe-e2e/playwright.config.ts`) with the two
       ose-www `@unit` scenarios from `prd.md`
@@ -686,7 +701,7 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
 ### Cycle 3.1 — Renderer wraps a non-mermaid figure (builds the replace-case)
 
-- [ ] [AI] RED: add a failing unit test in the ose-www `markdown-renderer` test asserting a non-mermaid
+- [x] [AI] RED: add a failing unit test in the ose-www `markdown-renderer` test asserting a non-mermaid
       figure yields a `CodeBlock` with a copy button (English default label "Copy").
       **Gherkin (binds) →** "The renderer wraps a non-mermaid code figure in a CodeBlock"
 
@@ -700,16 +715,16 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
       — acceptance: `ose-www:test:unit` fails on the wrap test
 
-- [ ] [AI] GREEN: add the non-mermaid replace-case (ordered AFTER the mermaid guard) to
+- [x] [AI] GREEN: add the non-mermaid replace-case (ordered AFTER the mermaid guard) to
       `apps/ose-www/src/features/content/shell/markdown-renderer.tsx`, importing `CodeBlock` from
       `@open-sharia-enterprise/web-ui/primitives` and reusing `getTextContent(pre)` (no labels →
       English defaults) — acceptance: the wrap test passes; mermaid path unchanged
-- [ ] [AI] REFACTOR: confirm no `"use client"`/server-boundary change; add a comment noting the latent
+- [x] [AI] REFACTOR: confirm no `"use client"`/server-boundary change; add a comment noting the latent
       wiring (no live non-mermaid content today) — acceptance: `ose-www:test:quick` green
 
 ### Cycle 3.2 — Renderer leaves a mermaid figure as a diagram
 
-- [ ] [AI] RED: add a failing unit test asserting a mermaid figure renders as a diagram with NO copy
+- [x] [AI] RED: add a failing unit test asserting a mermaid figure renders as a diagram with NO copy
       button (the ose-www exclusion regression guard).
       **Gherkin (binds) →** "The renderer leaves a mermaid figure as a diagram"
 
@@ -723,13 +738,13 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
       — acceptance: `ose-www:test:unit` fails on the exclusion test
 
-- [ ] [AI] GREEN: confirm the new case runs only for `data-language !== "mermaid"` — acceptance: the
+- [x] [AI] GREEN: confirm the new case runs only for `data-language !== "mermaid"` — acceptance: the
       exclusion test passes; mermaid path unchanged
-- [ ] [AI] REFACTOR: none expected — acceptance: green
+- [x] [AI] REFACTOR: none expected — acceptance: green
 
 ### Gherkin step-def binding (GREEN the specs) — Phase 3
 
-- [ ] [AI] GREEN: implement step defs consuming the whole ose-www feature.
+- [x] [AI] GREEN: implement step defs consuming the whole ose-www feature.
       **Gherkin (aggregate binder) →** binds both scenarios in
       `specs/apps/ose/behavior/platform-web/gherkin/content/code-block-copy.feature` (whole-feature
       consumer for `test:specs`; not one-cycle-per-scenario per the aggregate-BDD-binder exception)
@@ -737,20 +752,21 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
 ### Local Quality Gates (Before Commit) — Phase 3
 
-- [ ] [AI] `npx nx run-many -t typecheck lint test:quick test:specs -p ose-www` — all green
-- [ ] [AI] Fix ALL failures (incl. preexisting) and re-run to confirm
+- [x] [AI] `npx nx run-many -t typecheck lint test:quick test:specs -p ose-www` — all green
+- [x] [AI] Fix ALL failures (incl. preexisting) and re-run to confirm
 
 ### Commit Guidelines — Phase 3
 
-- [ ] [AI] Commit, e.g.
+- [x] [AI] Commit, e.g.
       `feat(ose-www): wire copy button into content code blocks (latent, unit-tested)`
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `npx nx run-many -t typecheck lint test:quick test:specs -p ose-www` all green
-- [ ] [AI] ose-www mermaid figures still render as diagrams (exclusion test green)
+- [x] [AI] `npx nx run-many -t typecheck lint test:quick test:specs -p ose-www` all green - _2026-07-16 · Met (no cache)._ 154 tests pass; coverage 38 scenarios / 111 steps all covered.
+- [x] [AI] ose-www mermaid figures still render as diagrams (exclusion test green) - _2026-07-16 · Met._ The `@unit` exclusion scenario passes (mermaid figure → MermaidDiagram, no
+      `[data-slot="code-block-copy"]`); the non-mermaid branch is ordered strictly after the mermaid guard.
 
 > **Pause Safety**: all three projects (web-ui, ayokoding-www, ose-www) build and pass their gates on
 > the worktree branch; nothing is pushed. Safe to stop. To resume: re-run
