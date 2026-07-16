@@ -64,10 +64,12 @@ describe("CopyButton", () => {
     vi.useRealTimers();
   });
 
-  // Cycle 1.4
-  it("stays resting and announces nothing when the write rejects", async () => {
+  // Cycle 1.4 — the no-false-success invariant: a rejected write must never show success (Check
+  // icon / "Copied" announcement). It now shows an explicit error cue instead of a silent no-op
+  // (UWT-004), asserted separately below; here we only guard that it isn't a false success.
+  it("never shows a false success when the write rejects", async () => {
     stubClipboard(false);
-    render(<CopyButton value="npm install" />);
+    render(<CopyButton value="npm install" copiedLabel="Copied" />);
 
     fireEvent.click(getButton());
     // allow the rejected promise microtask to settle
@@ -75,9 +77,23 @@ describe("CopyButton", () => {
       await Promise.resolve();
     });
 
-    expect(hasCopyIcon(getButton())).toBe(true);
-    expect(getButton().getAttribute("aria-label")).toBe("Copy");
-    expect(screen.getByRole("status").textContent).toBe("");
+    expect(hasCheckIcon(getButton())).toBe(false);
+    expect(getButton().getAttribute("aria-label")).not.toBe("Copied");
+    expect(screen.getByRole("status").textContent).not.toBe("Copied");
+  });
+
+  // UWT-004 — a rejected write gives the visitor an explicit failure cue (error icon + label +
+  // polite announcement) rather than appearing to do nothing.
+  it("shows an error cue and announces it when the write rejects", async () => {
+    stubClipboard(false);
+    render(<CopyButton value="npm install" errorLabel="Copy failed" />);
+
+    fireEvent.click(getButton());
+    await waitFor(() => expect(getButton().querySelector(".lucide-x")).not.toBeNull());
+
+    expect(getButton().getAttribute("aria-label")).toBe("Copy failed");
+    expect(getButton().getAttribute("title")).toBe("Copy failed");
+    expect(screen.getByRole("status").textContent).toBe("Copy failed");
   });
 
   // Cycle 1.5

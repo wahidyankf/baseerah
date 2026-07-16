@@ -824,14 +824,71 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 
 ### Rule-15 Three-Tester Retest (before archival/merge)
 
-- [ ] [AI] Run the three live-site testers (`web-exploratory-tester` + `web-usability-tester` +
+- [x] [AI] Run the three live-site testers (`web-exploratory-tester` + `web-usability-tester` +
       `web-design-tester`) against the running ayokoding-www code-block pages across `en` and `id` —
-      acceptance: EWT/UWT/DWT findings + SG/USS spec-gaps recorded
-- [ ] [AI] Append each finding here as a new unchecked, source-attributed checkbox
+      acceptance: EWT/UWT/DWT findings + SG/USS spec-gaps recorded - _2026-07-16 · Done._ All three ran
+      against the live dev server (`localhost:3101`) with real Chromium/Playwright (clipboard-enabled),
+      `en` code-block page + `id` pages. **EWT: 0 defects** (extensive non-sampled attempt to break it —
+      40/40 blocks 1 button, 0/10 mermaid, byte-equal verbatim copy, timer-reset, retry-after-fail,
+      Enter+Space, 6 breakpoints, touch, horizontal-scroll pin). **UWT: 4 (all Sev 1–2).** **DWT: 3 (all
+      Trivial/Minor).** Findings enumerated below.
+- [x] [AI] Append each finding here as a new unchecked, source-attributed checkbox
       (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`); route each
-      SG-###/USS-### into the specs steps
+      SG-###/USS-### into the specs steps - _2026-07-16 · Done — appended below._
 - [ ] [AI] Fix every rule-15 EWT/UWT/DWT defect finding before archival — deferral requires explicit user
-      permission (only when genuinely impossible); SG-###/USS-### may be triaged or deferred with rationale
+      permission (only when genuinely impossible); SG-###/USS-### may be triaged or deferred with rationale.
+      **User directive 2026-07-16: "fix absolutely everything" — no deferrals; all EWT/UWT/DWT + SG/USS +
+      the two pre-existing/site-wide items (DWT-001, UWT-005) are being fixed inside this PR.**
+
+#### Rule-15 findings (all being fixed per user directive)
+
+> EWT filed **0 defects**. The items below are UWT/DWT defects + EWT/UWT spec-gaps, each fixed with TDD
+> (new/updated Gherkin scenario + binding where a behavior changed) and re-verified against gates + a
+> regenerated visual baseline where appearance changed.
+
+- [x] [AI] SG-001: Re-clicking during the success window resets the revert timer — add `@unit` scenario to
+      `copy-button.feature` + binding (behavior already correct; pin it) - _Done._ Fake-timer scenario proves
+      the revert is measured from the second click.
+- [x] [AI] SG-002: A retry after a failed clipboard write succeeds normally — add `@unit` scenario to
+      `copy-button.feature` + binding - _Done._ Reject-then-resolve scenario shows Check + "Copied" after retry.
+- [x] [AI] SG-003: The copy button is operable via the Space key — add `@unit` scenario to
+      `copy-button.feature` + binding - _Done._ `userEvent.keyboard(" ")` → clipboard receives the value.
+- [x] [AI] SG-004: The copy button stays pinned when the code content scrolls horizontally — add `@unit`
+      scenario to `code-block.feature` + binding - _Done._ Structural guard: button is a wrapper child, never a
+      descendant of the scrolling `<pre>`.
+- [x] [AI] UWT-001 / USS-002: Idle copy button is fully invisible on desktop (`opacity:0`) — give it a
+      subtle resting affordance that reveals fully on hover/focus; add scenario + regenerate baselines - _Done._
+      `opacity-60` at rest → `opacity-100` on hover/focus/touch; `code-block.feature` scenario + regenerated
+      light/dark resting baselines.
+- [x] [AI] UWT-002 / USS-003: Copy button can hide behind the sticky header when a block's top rests at the
+      viewport top — add `scroll-margin-top` to the CodeBlock wrapper; add scenario - _Done._ `scroll-mt-16`
+      on the wrapper + `code-block.feature` scenario.
+- [x] [AI] UWT-003: Icon-only button has no native `title`/tooltip — add a `title` reflecting the current
+      state; add scenario - _Done._ `title` mirrors the state label; `copy-button.feature` scenario.
+- [x] [AI] UWT-004 / USS-001: A failed clipboard write produces zero feedback — add an error state
+      (icon + `aria-label` + polite live-region announcement + localized label); add scenario + binding -
+      _Done._ Hook now exposes `error`; button shows the `X` icon + `errorLabel` + polite announcement;
+      `errorLabel` localized (`Copy failed`/`Gagal menyalin`) and wired through both renderers;
+      `copy-button.feature` error scenario + updated no-false-success scenario.
+- [x] [AI] UWT-005: "Skip to content" link doesn't move focus to `#main-content` — make the skip link
+      programmatically focus the target (pre-existing, site-wide; fixed per user directive) - _Done._
+      `<main tabIndex={-1}>` + skip link `focusMain` handler; new skip-link focus test.
+- [x] [AI] DWT-001: Live light-theme code background renders `#fff` instead of the documented `#f6f8fa` —
+      align the app shiki/rehype-pretty-code light surface site-wide (ayokoding + ose) - _Done._ Pinned the
+      light code surface to `#f6f8fa` in both apps' `globals.css` (the github-light inline `--shiki-light-bg:#fff`
+      had shadowed the fallback); dark surface untouched.
+- [x] [AI] DWT-002: `tailwind-merge` silently drops the button's `transition-colors`/`transition-all`,
+      leaving only `transition-opacity` — restore color/background transitions; regenerate baselines if needed -
+      _Done._ CodeBlock now passes the single `transition` utility so the merged transition-property animates
+      opacity **and** color/background.
+- [x] [AI] DWT-003: Light-theme "Copied" green (`text-green-600`) sits at the ~3.0:1 WCAG floor — darken to
+      a higher-contrast green token; regenerate baselines - _Done._ Light success is now `text-green-700`
+      (~4.5:1, matches tech-docs' documented `#1a7f37` intent); dark stays `green-500`; baselines regenerated.
+- [x] [AI] Re-run all affected gates (web-ui + ayokoding-www + ose-www, incl. `test:visual`) green after the
+      fixes; push follow-up commits to PR #56; wait for CI green - _Gates green 2026-07-16._ web-ui
+      (typecheck/lint/test:unit 549/test:specs 118 scenarios/test:visual 8), ayokoding-www
+      (typecheck/lint/test:quick 2606/test:specs), ose-www (typecheck/lint/test:quick 154/test:specs) all green;
+      the 3 min-role failures under `run-many` were dev-server starvation (0-fail isolated). Push + CI next.
 
 ### Phase 4 Gate
 

@@ -109,7 +109,7 @@ describeFeature(feature, ({ Scenario }) => {
   });
 
   Scenario("A failed clipboard write does not show a false success state", ({ Given, When, Then, And }) => {
-    let showsCopy = false;
+    let showsCheck = false;
     let announced = "unset";
 
     Given("a CopyButton rendered with a stubbed clipboard that rejects", () => {
@@ -119,21 +119,24 @@ describeFeature(feature, ({ Scenario }) => {
     When("the user clicks the button", async () => {
       cleanup();
       stubClipboard(false);
-      render(<CopyButton value="npm install" />);
+      render(<CopyButton value="npm install" copiedLabel="Copied" />);
       fireEvent.click(getButton());
       await act(async () => {
         await Promise.resolve();
       });
-      showsCopy = getButton().querySelector(".lucide-copy") !== null;
+      showsCheck = getButton().querySelector(".lucide-check") !== null;
       announced = screen.getByRole("status").textContent ?? "";
     });
 
-    Then("the button remains in the resting (Copy) state", () => {
-      expect(showsCopy).toBe(true);
+    Then("the button does not show the success (Check) icon", () => {
+      // No false success: the rejected write never flips to the Check icon (it shows the error cue
+      // instead — asserted by the dedicated error scenario).
+      expect(showsCheck).toBe(false);
     });
 
     And("no copied confirmation is announced", () => {
-      expect(announced).toBe("");
+      // The live region may carry the error label, but never the copied confirmation.
+      expect(announced).not.toBe("Copied");
     });
   });
 
@@ -238,6 +241,160 @@ describeFeature(feature, ({ Scenario }) => {
       // Button primitive applies: size-8 = 2rem = 32 CSS px, clearing WCAG 2.5.8's 24x24 minimum.
       expect(dataSize).toBe("icon-sm");
       expect(className).toContain("size-8");
+    });
+  });
+
+  Scenario("Re-clicking during the success window resets the revert timer", ({ Given, When, Then, And }) => {
+    let stillSuccessPastFirstWindow = false;
+    let revertedAfterSecondWindow = false;
+
+    Given("a CopyButton has just shown its success state from a first click", () => {
+      // first click + re-click + timer advances all happen together in the When step
+    });
+
+    When("the user clicks the button again before the revert timeout elapses", async () => {
+      cleanup();
+      vi.useFakeTimers();
+      stubClipboard(true);
+      render(<CopyButton value="npm install" resetMs={2000} />);
+      fireEvent.click(getButton());
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      // t=1000ms: still within the first success window; re-click resets the pending revert.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1000);
+      });
+      fireEvent.click(getButton());
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      // t=2500ms overall — past the FIRST click's 2000ms window. Still success ⇒ the first timer was
+      // cleared, not left to fire independently.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1500);
+      });
+      stillSuccessPastFirstWindow = getButton().querySelector(".lucide-check") !== null;
+      // Advance to 2000ms after the SECOND click ⇒ now it reverts.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(500);
+      });
+      revertedAfterSecondWindow = getButton().querySelector(".lucide-copy") !== null;
+      vi.useRealTimers();
+    });
+
+    Then("the button remains in the success (Check) state", () => {
+      expect(stillSuccessPastFirstWindow).toBe(true);
+    });
+
+    And("the revert timeout is measured from the second click, not the first", () => {
+      expect(revertedAfterSecondWindow).toBe(true);
+    });
+  });
+
+  Scenario("A retry after a failed clipboard write succeeds normally", ({ Given, When, Then, And }) => {
+    let showsCheck = false;
+    let announced = "";
+
+    Given("a CopyButton whose previous click failed to write to the clipboard", () => {
+      // the failing first click + the resolving retry happen together in the When step
+    });
+
+    When("the user clicks the button again and the clipboard write resolves", async () => {
+      cleanup();
+      // First attempt rejects → error state, no false success.
+      stubClipboard(false);
+      render(<CopyButton value="npm install" copiedLabel="Copied" />);
+      fireEvent.click(getButton());
+      await act(async () => {
+        await Promise.resolve();
+      });
+      // Retry now resolves.
+      stubClipboard(true);
+      fireEvent.click(getButton());
+      await waitFor(() => expect(getButton().querySelector(".lucide-check")).not.toBeNull());
+      showsCheck = getButton().querySelector(".lucide-check") !== null;
+      announced = screen.getByRole("status").textContent ?? "";
+    });
+
+    Then("the button shows the success (Check) icon", () => {
+      expect(showsCheck).toBe(true);
+    });
+
+    And("a polite live region announces the copied label", () => {
+      expect(announced).toBe("Copied");
+    });
+  });
+
+  Scenario("The copy button is operable by keyboard via the Space key", ({ Given, When, Then }) => {
+    let writeText: ReturnType<typeof vi.fn>;
+
+    Given("a CopyButton is focused", () => {
+      // render + focus + keypress happen together in the When step
+    });
+
+    When("the user presses Space", async () => {
+      cleanup();
+      // create the user session before installing our spy so `userEvent`'s own clipboard stub
+      // doesn't shadow the spy the button calls
+      const user = userEvent.setup();
+      writeText = stubClipboard(true);
+      render(<CopyButton value="npm install" />);
+      getButton().focus();
+      await user.keyboard(" ");
+    });
+
+    Then("the clipboard receives the button's value", () => {
+      expect(writeText).toHaveBeenCalledWith("npm install");
+    });
+  });
+
+  Scenario("A failed clipboard write shows an error cue and announces it", ({ Given, When, Then, And }) => {
+    let showsX = false;
+    let announced = "";
+
+    Given("a CopyButton rendered with a stubbed clipboard that rejects", () => {
+      // render + click happen together in the When step
+    });
+
+    When("the user clicks the button", async () => {
+      cleanup();
+      stubClipboard(false);
+      render(<CopyButton value="npm install" errorLabel="Copy failed" />);
+      fireEvent.click(getButton());
+      await waitFor(() => expect(getButton().querySelector(".lucide-x")).not.toBeNull());
+      showsX = getButton().querySelector(".lucide-x") !== null;
+      announced = screen.getByRole("status").textContent ?? "";
+    });
+
+    Then("the button shows the error (X) icon", () => {
+      expect(showsX).toBe(true);
+    });
+
+    And("a polite live region announces the error label", () => {
+      expect(announced).toBe("Copy failed");
+    });
+  });
+
+  Scenario("The copy button exposes a native tooltip title", ({ Given, When, Then }) => {
+    let title: string | null = null;
+    let accessibleName: string | null = null;
+
+    Given("a CopyButton rendered with the default labels", () => {
+      // render + inspection happen together in the When step
+    });
+
+    When("the button's attributes are inspected", () => {
+      cleanup();
+      stubClipboard(true);
+      render(<CopyButton value="npm install" />);
+      title = getButton().getAttribute("title");
+      accessibleName = getButton().getAttribute("aria-label");
+    });
+
+    Then("the button carries a title matching its accessible name", () => {
+      expect(title).toBe("Copy");
+      expect(title).toBe(accessibleName);
     });
   });
 });

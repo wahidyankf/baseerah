@@ -88,6 +88,7 @@ export function MarkdownRenderer({ html, locale }: MarkdownRendererProps) {
               code={getTextContent(pre)}
               copyLabel={t(locale as Locale, "copy")}
               copiedLabel={t(locale as Locale, "copied")}
+              errorLabel={t(locale as Locale, "copyFailed")}
             >
               <figure {...attributesToProps(domNode.attribs, domNode.name)}>
                 {domToReact(domNode.children as DOMNode[], options)}

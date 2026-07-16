@@ -21,4 +21,12 @@ describe("t — code-block copy button keys", () => {
   it("returns the Indonesian copied label", () => {
     expect(t("id", "copied")).toBe("Tersalin");
   });
+
+  it("returns the English copy-failed label", () => {
+    expect(t("en", "copyFailed")).toBe("Copy failed");
+  });
+
+  it("returns the Indonesian copy-failed label", () => {
+    expect(t("id", "copyFailed")).toBe("Gagal menyalin");
+  });
 });
