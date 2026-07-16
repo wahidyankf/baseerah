@@ -234,6 +234,10 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Resizable docs sidebar — drag/keyboard handle accessible name
     resizableSidebarHandleLabel: "Resize panel",
+
+    // Code-block copy button — CodeBlock's copyLabel/copiedLabel (English default)
+    copy: "Copy",
+    copied: "Copied",
   },
   id: {
     readMore: "Baca Selengkapnya",
@@ -474,6 +478,10 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Resizable docs sidebar — drag/keyboard handle accessible name
     resizableSidebarHandleLabel: "Ubah ukuran panel",
+
+    // Code-block copy button — CodeBlock's copyLabel/copiedLabel
+    copy: "Salin",
+    copied: "Tersalin",
   },
 };
 
