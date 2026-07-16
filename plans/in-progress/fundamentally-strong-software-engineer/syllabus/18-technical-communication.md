@@ -40,6 +40,16 @@ reader-review pass rather than a compiler.
 - 2026-07-12 — verified (GAP for plan owner): this is a no-code topic, so the "runnable" acceptance bar
   is reframed as a reader-review/comprehension pass — there is nothing to execute, and the shipped text
   reflects that.
+- 2026-07-16 — re-verified, no changes since 2026-07-12: RFC 2119 (rfc-editor.org/rfc/rfc2119, S.
+  Bradner, March 1997, BCP 14) remains unsuperseded and is only "Updated by" RFC 8174
+  (rfc-editor.org/rfc/rfc8174, May 2017), which still confirms the ALL-CAPS-only special meaning for
+  MUST/SHOULD/MAY — no obsoletion for either. Michael Nygard's ADR post
+  (cognitect.com/blog/2011/11/15/documenting-architecture-decisions) is still live and still cited by
+  adr.github.io as the origin of the context/decision/status/consequences format, with no competing
+  standard supplanting it as the default. c4model.com is still live, still authored by Simon Brown, and
+  still describes the same four levels (System Context, Container, Component, Code) as
+  "notation independent" and "tooling independent," with no breaking version change. All three claims:
+  still current.
 
 ## Concepts
 
@@ -184,9 +194,9 @@ compiler (DD-20/DD-30). Contiguous `ex-01..ex-25`.
   diagram (co-11, co-12) [ ] precise RFC 2119 keywords + edited, register-matched prose (co-13, co-14,
   co-15) [ ] proportional, close-to-code artifacts (co-16, co-17).
 - **Ordered steps**:
-  1. `.../learning/capstone/adr/` and `.../rfc.md` — the decision, options, trade-off, and open
-     questions. Verify a peer reviewer can restate the decision and its rationale from the document
-     alone.
+  1. `.../learning/capstone/adr-0006-notification-worker-idempotency-cache.md` and `.../rfc.md` — the
+     decision, options, trade-off, and open questions. Verify a peer reviewer can restate the
+     decision and its rationale from the document alone.
   2. `.../pr-description.md` — a real change described (what / why / how-verified / where-to-look).
      Verify a reviewer knows where to start within thirty seconds.
   3. `.../postmortem.md` + `.../context.md` (C4) — timeline, impact, root cause, follow-ups, and a
