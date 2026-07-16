@@ -782,15 +782,20 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
       Done._ New branch on origin (4 commits: web-ui primitives, ayokoding wiring, ose-www latent wiring, + a coverage-scanner fix single-lining one `Scenario(...)` call so its title is extracted). Pre-push
       affected gates green after warming the two heavy TS coverage caches (ayokoding-www/wahidyankf-www)
       that flake under 26-project parallel load — both verified 0-fail isolated (2603 & 173 tests).
-- [ ] [AI] Open a **draft PR** into `main` (title:
+- [x] [AI] Open a **draft PR** into `main` (title:
       `feat(web-ui): code-block copy button across ayokoding-www and ose-www`; body summarizes scope +
-      links this plan) — acceptance: PR number recorded
+      links this plan) — acceptance: PR number recorded - _2026-07-16 · Done._ Draft **PR #56**
+      (https://github.com/wahidyankf/ose-public/pull/56) into `main`; body summarizes web-ui/ayokoding/ose
+      scope, verbatim-copy behavior, testing, and the maintainer-directed AI-merge deviation.
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 2 min, one
-      `gh run view --json status,conclusion` per wakeup; no `gh run watch`)
-- [ ] [AI] Verify ALL CI checks pass — no exceptions; fix root causes and push follow-ups until green
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 2 min, one
+      `gh run view --json status,conclusion` per wakeup; no `gh run watch`) - _2026-07-16 · Done._ Two
+      workflows triggered on PR #56: `validate-env` and `pr-quality-gate`; polled to completion.
+- [x] [AI] Verify ALL CI checks pass — no exceptions; fix root causes and push follow-ups until green -
+      _2026-07-16 · Met._ `validate-env` → success (run 29503326352); `pr-quality-gate` → success
+      (run 29503326221). No failures; no follow-ups needed.
 
 ### PR-Review Maker→Fixer Cycle (3 sequential, CI-gated)
 
