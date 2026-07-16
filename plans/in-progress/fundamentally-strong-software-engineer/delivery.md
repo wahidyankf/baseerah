@@ -3885,126 +3885,178 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: Annotated-concept · Python \* · topic wt 290 · Learn 119 / Drill 219 · **subject**. Template →
 [`syllabus/19-computer-science-foundations.md`](./syllabus/19-computer-science-foundations.md).
 
-- [ ] **[AI] V** — `web-researcher` for `computer-science-foundations`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `computer-science-foundations`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/19-computer-science-foundations.md`](./syllabus/19-computer-science-foundations.md) and fold dated findings back into that file.
-      **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/computer-science-foundations/learning/` teaching **every** concept in
-      `syllabus/19-computer-science-foundations.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · positional-number-systems
-  - [ ] co-02 · twos-complement
-  - [ ] co-03 · ieee-754-floats
-  - [ ] co-04 · endianness
-  - [ ] co-05 · unicode-utf8
-  - [ ] co-06 · boolean-algebra
-  - [ ] co-07 · truth-tables-and-gates
-  - [ ] co-08 · combinational-vs-sequential
-  - [ ] co-09 · sets-and-relations
-  - [ ] co-10 · propositional-logic
-  - [ ] co-11 · predicate-logic
-  - [ ] co-12 · combinatorics-and-counting
-  - [ ] co-13 · graph-theory-basics
-  - [ ] co-14 · proof-by-induction
-  - [ ] co-15 · cpu-registers-alu
-  - [ ] co-16 · memory-hierarchy-intuition
-  - [ ] co-17 · stack-and-heap
-  - [ ] co-18 · finite-automata
-  - [ ] co-19 · regex-to-fa-equivalence
-  - [ ] co-20 · context-free-grammars-and-pushdown-automata
-  - [ ] co-21 · chomsky-hierarchy
-  - [ ] co-22 · turing-machines
-  - [ ] co-23 · halting-problem
-  - [ ] co-24 · p-vs-np
-  - [ ] co-25 · np-completeness-and-reductions
-  - [ ] co-26 · shannon-entropy
-  - [ ] co-27 · lossless-vs-lossy-compression
-  - [ ] co-28 · checksums-and-hashing
-- [ ] **[AI] A1-examples** — Author `CONTENT/computer-science-foundations/learning/code/` — runnable Python per worked example
-      in `syllabus/19-computer-science-foundations.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · dec-to-binary-by-division — verify prints `10011100` matching `bin(156)`
-  - [ ] ex-02 · base-roundtrip — verify bin/hex/int equality across bases
-  - [ ] ex-03 · twos-complement-8bit — verify pattern `11010110`, `(-42 & 0xFF)+42 == 256`
-  - [ ] ex-04 · subtraction-as-addition — verify low byte equals 2
-  - [ ] ex-05 · float-rounding-error — verify `0.30000000000000004`
-  - [ ] ex-06 · float-bit-inspector — verify IEEE-754 fields decode to 1.0
-  - [ ] ex-07 · endianness-struct-pack — verify `01 00 00 00` vs `00 00 00 01`
-  - [ ] ex-08 · byteorder-roundtrip — verify to_bytes/from_bytes identity
-  - [ ] ex-09 · utf8-encode-multibyte — verify é=2 bytes, 文=3 bytes
-  - [ ] ex-10 · codepoint-vs-byte-len — verify counts differ for non-ASCII
-  - [ ] ex-11 · truth-tables-generate — verify each row matches operator
-  - [ ] ex-12 · de-morgan-verify — verify all four rows True
-  - [ ] ex-13 · nand-completeness — verify equivalence to builtins
-  - [ ] ex-14 · half-adder — verify truth table
-  - [ ] ex-15 · sequential-counter — verify state persists and increments
-  - [ ] ex-16 · set-operations — verify against hand-computed results
-  - [ ] ex-17 · relation-properties — verify each property flag
-  - [ ] ex-18 · implication-truth-table — verify only `(True, False)` is False
-  - [ ] ex-19 · quantifiers-all-any — verify all/any against hand check
-  - [ ] ex-20 · permutations-count — verify count `== n!/(n-r)!`
-  - [ ] ex-21 · birthday-collision — verify exceeds 0.5 at 23 people
-  - [ ] ex-22 · graph-adjacency-degrees — verify degrees against edge list
-  - [ ] ex-23 · cycle-detection-dfs — verify flags a known cyclic graph
-  - [ ] ex-24 · induction-sum-check — verify `sum(1..n) == n(n+1)/2` up to 1000
-  - [ ] ex-25 · register-machine-sim — verify accumulator result
-  - [ ] ex-26 · alu-op-model — verify flag/result pair
-  - [ ] ex-27 · latency-hierarchy-table — verify strictly increasing ordering
-  - [ ] ex-28 · cache-friendly-traversal — verify row-major measurably faster
-  - [ ] ex-29 · stack-frame-trace — verify frames push then pop in order
-  - [ ] ex-30 · stack-vs-heap-ids — verify heap object outlives frame
-  - [ ] ex-31 · recursion-limit — verify `RecursionError` raised near limit
-  - [ ] ex-32 · dfa-even-zeros — verify accept/reject on test set
-  - [ ] ex-33 · dfa-simulator — verify runs any supplied machine
-  - [ ] ex-34 · nfa-nondeterminism — verify accepts where naive DFA would not
-  - [ ] ex-35 · regex-to-dfa — verify strings classify identically
-  - [ ] ex-36 · kleene-equivalence — verify agreement on all inputs
-  - [ ] ex-37 · cfg-balanced-parens — verify balanced vs unbalanced strings
-  - [ ] ex-38 · pda-anbn — verify accept/reject for `aⁿbⁿ`
-  - [ ] ex-39 · anbn-not-regular — verify counterexample breaks fixed-state machine
-  - [ ] ex-40 · chomsky-hierarchy-map — verify each against matching automaton
-  - [ ] ex-41 · turing-machine-increment — verify final tape
-  - [ ] ex-42 · tm-unary-add — verify tape result equals sum
-  - [ ] ex-43 · halting-diagonalization — verify self-reference contradiction
-  - [ ] ex-44 · busy-beaver-intuition — verify halting known only by running
-  - [ ] ex-45 · p-class-sorting — verify O(n log n) scaling
-  - [ ] ex-46 · np-verify-subset-sum — verify accepts valid witness, rejects invalid
-  - [ ] ex-47 · sat-brute-force — verify runtime grows ~2ⁿ
-  - [ ] ex-48 · reduction-3sat-to-clique — verify mapping preserves satisfiability
-  - [ ] ex-49 · tsp-factorial-demo — verify tour count `== (n-1)!`
-  - [ ] ex-50 · shannon-entropy-coin — verify H(0.5)=1 bit, H(0.9)<0.5 bit
-  - [ ] ex-51 · entropy-english-text — verify near 4 bits/char
-  - [ ] ex-52 · huffman-lossless — verify exact reconstruction + size reduction
-  - [ ] ex-53 · lossy-vs-lossless — verify only lossless reconstructs exactly
-  - [ ] ex-54 · crc32-corruption-detect — verify checksum mismatch flags corruption
-  - [ ] ex-55 · sha256-avalanche — verify ~50% of digest bits differ
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/computer-science-foundations/learning/capstone/` (`_index.md` weight 900) per the
+      **Acceptance**: no unresolved "verify" line remains. - _Date: 2026-07-16. Status: done. Notes: no
+      unresolved "verify" line remained in the syllabus before authoring began._
+- [x] **[AI] A1-concepts** — Author `CONTENT/computer-science-foundations/learning/` teaching **every** concept in
+      `syllabus/19-computer-science-foundations.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`: -
+      _Date: 2026-07-16. Status: done. Notes: all 28 concepts authored across beginner/intermediate/advanced
+      pages._
+  - [x] co-01 · positional-number-systems
+  - [x] co-02 · twos-complement
+  - [x] co-03 · ieee-754-floats
+  - [x] co-04 · endianness
+  - [x] co-05 · unicode-utf8
+  - [x] co-06 · boolean-algebra
+  - [x] co-07 · truth-tables-and-gates
+  - [x] co-08 · combinational-vs-sequential
+  - [x] co-09 · sets-and-relations
+  - [x] co-10 · propositional-logic
+  - [x] co-11 · predicate-logic
+  - [x] co-12 · combinatorics-and-counting
+  - [x] co-13 · graph-theory-basics
+  - [x] co-14 · proof-by-induction
+  - [x] co-15 · cpu-registers-alu
+  - [x] co-16 · memory-hierarchy-intuition
+  - [x] co-17 · stack-and-heap
+  - [x] co-18 · finite-automata
+  - [x] co-19 · regex-to-fa-equivalence
+  - [x] co-20 · context-free-grammars-and-pushdown-automata
+  - [x] co-21 · chomsky-hierarchy
+  - [x] co-22 · turing-machines
+  - [x] co-23 · halting-problem
+  - [x] co-24 · p-vs-np
+  - [x] co-25 · np-completeness-and-reductions
+  - [x] co-26 · shannon-entropy
+  - [x] co-27 · lossless-vs-lossy-compression
+  - [x] co-28 · checksums-and-hashing
+- [x] **[AI] A1-examples** — Author `CONTENT/computer-science-foundations/learning/code/` — runnable Python per worked example
+      in `syllabus/19-computer-science-foundations.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror): -
+      _Date: 2026-07-16. Status: done. Notes: all 55 examples authored (Beginner ex-01..18, Intermediate
+      ex-19..40, Advanced ex-41..55), each standard-library-only, pyright --strict clean, and actually
+      executed to capture genuine output._
+  - [x] ex-01 · dec-to-binary-by-division — verify prints `10011100` matching `bin(156)`
+  - [x] ex-02 · base-roundtrip — verify bin/hex/int equality across bases
+  - [x] ex-03 · twos-complement-8bit — verify pattern `11010110`, `(-42 & 0xFF)+42 == 256`
+  - [x] ex-04 · subtraction-as-addition — verify low byte equals 2
+  - [x] ex-05 · float-rounding-error — verify `0.30000000000000004`
+  - [x] ex-06 · float-bit-inspector — verify IEEE-754 fields decode to 1.0
+  - [x] ex-07 · endianness-struct-pack — verify `01 00 00 00` vs `00 00 00 01`
+  - [x] ex-08 · byteorder-roundtrip — verify to_bytes/from_bytes identity
+  - [x] ex-09 · utf8-encode-multibyte — verify é=2 bytes, 文=3 bytes
+  - [x] ex-10 · codepoint-vs-byte-len — verify counts differ for non-ASCII
+  - [x] ex-11 · truth-tables-generate — verify each row matches operator
+  - [x] ex-12 · de-morgan-verify — verify all four rows True
+  - [x] ex-13 · nand-completeness — verify equivalence to builtins
+  - [x] ex-14 · half-adder — verify truth table
+  - [x] ex-15 · sequential-counter — verify state persists and increments
+  - [x] ex-16 · set-operations — verify against hand-computed results
+  - [x] ex-17 · relation-properties — verify each property flag
+  - [x] ex-18 · implication-truth-table — verify only `(True, False)` is False
+  - [x] ex-19 · quantifiers-all-any — verify all/any against hand check
+  - [x] ex-20 · permutations-count — verify count `== n!/(n-r)!`
+  - [x] ex-21 · birthday-collision — verify exceeds 0.5 at 23 people
+  - [x] ex-22 · graph-adjacency-degrees — verify degrees against edge list
+  - [x] ex-23 · cycle-detection-dfs — verify flags a known cyclic graph
+  - [x] ex-24 · induction-sum-check — verify `sum(1..n) == n(n+1)/2` up to 1000
+  - [x] ex-25 · register-machine-sim — verify accumulator result
+  - [x] ex-26 · alu-op-model — verify flag/result pair
+  - [x] ex-27 · latency-hierarchy-table — verify strictly increasing ordering
+  - [x] ex-28 · cache-friendly-traversal — verify row-major measurably faster
+  - [x] ex-29 · stack-frame-trace — verify frames push then pop in order
+  - [x] ex-30 · stack-vs-heap-ids — verify heap object outlives frame
+  - [x] ex-31 · recursion-limit — verify `RecursionError` raised near limit
+  - [x] ex-32 · dfa-even-zeros — verify accept/reject on test set
+  - [x] ex-33 · dfa-simulator — verify runs any supplied machine
+  - [x] ex-34 · nfa-nondeterminism — verify accepts where naive DFA would not
+  - [x] ex-35 · regex-to-dfa — verify strings classify identically
+  - [x] ex-36 · kleene-equivalence — verify agreement on all inputs
+  - [x] ex-37 · cfg-balanced-parens — verify balanced vs unbalanced strings
+  - [x] ex-38 · pda-anbn — verify accept/reject for `aⁿbⁿ`
+  - [x] ex-39 · anbn-not-regular — verify counterexample breaks fixed-state machine
+  - [x] ex-40 · chomsky-hierarchy-map — verify each against matching automaton
+  - [x] ex-41 · turing-machine-increment — verify final tape
+  - [x] ex-42 · tm-unary-add — verify tape result equals sum
+  - [x] ex-43 · halting-diagonalization — verify self-reference contradiction
+  - [x] ex-44 · busy-beaver-intuition — verify halting known only by running
+  - [x] ex-45 · p-class-sorting — verify O(n log n) scaling
+  - [x] ex-46 · np-verify-subset-sum — verify accepts valid witness, rejects invalid
+  - [x] ex-47 · sat-brute-force — verify runtime grows ~2ⁿ
+  - [x] ex-48 · reduction-3sat-to-clique — verify mapping preserves satisfiability
+  - [x] ex-49 · tsp-factorial-demo — verify tour count `== (n-1)!`
+  - [x] ex-50 · shannon-entropy-coin — verify H(0.5)=1 bit, H(0.9)<0.5 bit
+  - [x] ex-51 · entropy-english-text — verify near 4 bits/char
+  - [x] ex-52 · huffman-lossless — verify exact reconstruction + size reduction
+  - [x] ex-53 · lossy-vs-lossless — verify only lossless reconstructs exactly
+  - [x] ex-54 · crc32-corruption-detect — verify checksum mismatch flags corruption
+  - [x] ex-55 · sha256-avalanche — verify ~50% of digest bits differ
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/computer-science-foundations/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
-      is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
+      is fully hit. - _Date: 2026-07-16. Status: done. Notes: three-script intra-topic capstone
+      (`represent.py`, `automaton.py`, `memory.py`) ties together co-02/co-03 (two's-complement + IEEE-754),
+      co-18/co-19 (regex→FA mapping run by a simulator), co-16 (cache-traversal timing), and — after
+      Cycle 2's fix — co-17 (call-stack tracing, added via a `recursive_frame_sum` helper reusing Example
+      29's push/pop-logging pattern). Cycle 3 found and fixed a stray `[ ] a checksum/hash demo (co-28)`
+      item in the syllabus's own "Concepts exercised" checklist that never matched the syllabus's own
+      Goal/Ordered-steps (which always specified exactly 3 capstone scripts); removed as stale rather than
+      adding a redundant 4th script, since co-22..co-28 are already each individually covered by Examples
+      41-55._
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/computer-science-foundations/drilling/_index.md` (wt 219) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. - _Date: 2026-07-16. Status:
+      done. Notes: checkers clean; drilling section authored covering all 28 concepts + 55 examples with
+      mocked/self-contained inputs; a scoped `ruff.toml` (`line-length = 230`, precedented by
+      `backend-essentials/ruff.toml`) was added to the topic directory to keep `ruff format` a no-op given
+      this topic's dense `# =>` annotation style; build and `lint:md` both exit 0._
 
 ### Phase 22 Gate
 
-- [ ] [AI] `computer-science-foundations/` complete: `_index.md` wt 290, `learning/_index.md` wt 119,
+- [x] [AI] `computer-science-foundations/` complete: `_index.md` wt 290, `learning/_index.md` wt 119,
       `drilling/_index.md` wt 219, capstone wt 900; all 28 concepts + 55 worked examples + capstone present;
-      checkers + facts-checker clean; build + `lint:md` exit 0.
+      checkers + facts-checker clean; build + `lint:md` exit 0. - _Date: 2026-07-16. Status: done. Verified
+      directly: all 28 `co-NN` concepts and 55 `ex-NN` worked examples present (58 `.py` files total
+      including capstone, each byte-identical to its markdown mirror, pyright --strict clean); checkers +
+      facts-checker clean; build and `lint:md` both exit 0._
 
-- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+- [x] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
 origin && git checkout main && git pull && git checkout -b
 fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
       phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
       message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
       `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
-      draft PR open carrying this phase's commit; CI running on the PR.
-- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      draft PR open carrying this phase's commit; CI running on the PR. - _Date: 2026-07-16. Status: done.
+      Notes: worktree `worktrees/fundamentally-strong-software-engineer-phase-22` branched from latest
+      `main`; a `ruff.toml` byte-identity fix and a transient build-flake retry on unrelated pages were
+      needed before the first clean push (see A3/D/F/G note); explicit paths staged (never `git add -A`);
+      pushed as "feat(ayokoding-www): add Computer Science Foundations topic (Phase 22)"; draft PR #55
+      opened against `main`._
+- [x] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
       sequential CI-gated cycles per
       [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
       against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
       done-definition is met (review cycles complete, every inline comment addressed, all quality gates
       green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
       Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
-      marked ready for review; all CI checks green; no unresolved review threads.
-- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      marked ready for review; all CI checks green; no unresolved review threads. - _Date: 2026-07-16.
+      Status: done. Notes: ran all 3 sequential fixed cycles against PR #55 (5 review threads total across
+      the 3 cycles, 0 left unresolved — each finding independently re-verified via the GitHub
+      Reviews/GraphQL API, not just trusted from the sub-agents' self-reports). Cycle 1 (fix commit
+      `16c6b9dac`): 2 MEDIUM findings — `ex-36-kleene-equivalence`'s docstring said "Randomized Agreement"
+      when the algorithm is exhaustive (`itertools.product` over every string up to a bound), contradicting
+      its own comments and the page's own "Exhaustive Agreement" heading; corrected in both the `.py` file
+      and its markdown mirror. Example 55's "Why it matters" claimed SHA-256 was directly suitable for
+      "password storage" alongside integrity/signatures — factually wrong per OWASP and this repo's own
+      security-essentials Example 14 (MD5's speed is exactly why it's unsuitable for password hashing);
+      corrected to require a proper salted KDF, with a cross-reference. Cycle 2 (fix commit `d9d894a1f`): 1
+      HIGH finding — the capstone's `memory.py` claimed co-17 (call-stack tracing) coverage in its own
+      docstring and `capstone/overview.md`, but the code only implemented co-16 (cache-traversal timing);
+      fixed by adding a genuine `recursive_frame_sum` push/pop trace reusing Example 29's pattern, re-run
+      for real captured output, markdown mirror resynced via fence-span regex (`re.finditer` over the
+      triple-backtick python fence, keyed off each block's first line — avoiding two previously-documented
+      substring-matching regex bugs from an earlier topic). 1 MEDIUM finding — Example 40's "Key takeaway"
+      overclaimed a strict Chomsky-hierarchy superset relationship that the demo's own printed output
+      contradicted (`'aabb'` accepted context-free/rejected context-sensitive, `'abc'` the reverse);
+      corrected to describe 4 independent sample languages, one per tier, each showing that tier's
+      characteristic recognition mechanism. Cycle 3 (final; fix commit `0fa8084aa`): 1 HIGH finding — the
+      governing syllabus's own capstone "Concepts exercised" checklist listed a 5th item, `a checksum/hash
+  demo (co-28)`, that neither the syllabus's own Goal nor Ordered-steps ever specified (both describe
+      exactly 3 capstone scripts); fixed by removing the stray checklist item from the syllabus doc itself
+      (plan-doc-only edit, no `apps/` content or `delivery.md` checkboxes touched) rather than adding a
+      redundant 4th script, since co-28 is already covered by Examples 54-55. PR flipped from draft to
+      ready via `gh pr ready 55` once cycle 3's fix was pushed and CI was confirmed green (18/18 checks)._
+- [x] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
       specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
       requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
@@ -4012,11 +4064,33 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       once the quality gate passes, to keep phases flowing without a manual click every time — a
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
-      merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      merge time. - _Date: 2026-07-16. Status: done. Notes: the user gave a further direct, in-session
+      reconfirmation of the merge/deploy waiver this same session ("you dont need my permission in this
+      session to merge PR or deploy ayokoding-www to production"), on top of the standing Phase-14 waiver;
+      this merge proceeded without a further per-PR confirmation prompt, while the underlying constraint
+      (only the orchestrator itself ever runs `gh pr merge` or the prod deploy — never a sub-agent) remained
+      fully in force throughout. `gh pr merge 55 --squash` executed successfully; PR #55 merged into `main`
+      as commit `a792a68079b1d347568009e2eb2a97009dbad41c` ("feat(ayokoding-www): add Computer Science
+      Foundations topic (Phase 22) (#55)"), confirmed as `origin/main`'s tip via `git pull` + `git log`; all
+      quality gates were green at merge time. No branch-deletion command was run by this agent or the
+      orchestrator against the remote; the head branch's disappearance from `origin` (if any) is the repo's
+      own `delete_branch_on_merge: true` setting, not an agent action. **Process note worth carrying
+      forward**: during Cycle 2, the `pr-review-maker` sub-agent reportedly attempted a `git worktree
+  remove --force` against the main checkout at `/Users/wkf/ose-projects/ose-public` — this was
+      independently re-verified (not just trusted from the sub-agent's self-report) to have failed as a
+      no-op, since git refuses to remove the primary worktree, and the main checkout remained fully intact
+      throughout. Future `pr-review-maker`/`pr-review-fixer` dispatch prompts for this plan now include an
+      explicit, upfront prohibition on any git worktree/branch-destructive command against the main
+      checkout, not just against the phase's own worktree._
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
-      production as it completes.
+      production as it completes. - _Date: 2026-07-16. Status: done. Notes: deploy executed directly by
+      the orchestrator (standing convention: production deploys always run by the orchestrator, never
+      delegated to `apps-ayokoding-www-deployer` or any sub-agent); `prod-ayokoding-www` force-pushed to
+      `a792a6807` (main at deploy time), confirmed via `git ls-remote origin prod-ayokoding-www`. Covered by
+      the same direct, in-session standing waiver cited in the merge note above — no further per-deploy
+      confirmation prompt was needed._
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
