@@ -3477,38 +3477,99 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Junction: Topics 04–17 (build → store → test → secure). Inter-Topic Capstone Phase Template; spec in
 `syllabus/17-security-essentials.md` (Pass-1 capstone section).
 
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+- [x] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
-      in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-first-working-software/` (`_index.md` `weight: 275`, + `code/`) per the cited capstone
+      in the spec. - _Date: 2026-07-16. Status: done. Notes: confirmed current, CVE-clean pins for every
+      dependency the capstone's `requirements.txt` uses: `fastapi==0.139.0`, `uvicorn==0.51.0`,
+      `pydantic==2.13.4`, `argon2-cffi==25.1.0`, `pytest==9.1.1`, `hypothesis==6.156.6`,
+      `httpx2==2.7.0`, `coverage==7.15.2`; also verified `pyright==1.1.407` (strict mode) and
+      `pip-audit==2.10.1` as dev-time tooling. `pip-audit` ran clean against the pinned set at
+      build time (re-confirmed again during the PR-review cycles below)._
+- [x] **[AI] A** — Author `CONTENT/capstone-first-working-software/` (`_index.md` `weight: 275`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/17-security-essentials.md`](./syllabus/17-security-essentials.md)). **Acceptance**: the
-      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end. - _Date: 2026-07-16.
+      Status: done. Files changed: `capstone-first-working-software/overview.md` (~1700 lines) +
+      `capstone-first-working-software/code/**` (a runnable FastAPI habit-tracker: `app/main.py`,
+      `app/auth.py` (HMAC-SHA256 signed tokens, argon2id password hashing), `app/repository.py`,
+      `app/domain.py`, `app/models.py`, `app/middleware.py` (security-header + token-scoping
+      middleware), `app/schema_v1.sql` + `migration_v2.sql` (SQLite, `PRAGMA user_version`
+      migrations), `setup.sh`, `requirements.txt`, `test_domain.py`, `test_habit_streak_property.py`
+      (Hypothesis property test), `test_app.py`, `attack_transcript.py`). Notes: mid-authoring, this
+      repo's pre-commit hook (`ruff format` + `prettier`/`prettier-plugin-sql` via lint-staged) silently
+      reformatted several real source files after the first commit, breaking the "doc listing
+      byte-identical to real file" invariant across 12 of 14 "(complete file)" listings in
+      `overview.md`. Root-caused (ruff's 88-char/bracket-triggered wrapping, prettier-plugin-sql's
+      markdown-embedding-context-sensitive splitting) and fixed via a follow-up re-sync commit plus a
+      scripted byte-for-byte verification (regex-extract every "(complete file)" fenced block, diff
+      against the real source) re-run repeatedly until zero drift remained. Full live verification
+      performed for real (not fabricated): `pytest`+`coverage`, `pyright --strict`, `pip-audit`,
+      `shellcheck`/`shfmt` on `setup.sh`, a live-booted server with every `curl` transcript on the page
+      replayed byte-for-byte, and the real `attack_transcript.py` (6/6 PASS)._
+- [x] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
-      commands exit 0.
+      commands exit 0. - _Date: 2026-07-16. Status: done. Notes: general-checker found 2 HIGH (a stray
+      `_parse_date()` helper in the `repository.py` doc listing not present in the real file; a
+      whitespace mismatch in `setup.sh`'s doc listing traced to markdownlint's MD010 collapsing a real
+      tab to one space inside the fence, fixed by restructuring `setup.sh` to a tab-free one-liner
+      guard) — both fixed and re-verified. facts-checker found 1 CRITICAL (`main.py` referenced as
+      "verbatim" but never shown on the page — fixed by adding the full listing) and 1 MEDIUM
+      (`@app.exception_handler` registered against FastAPI's `HTTPException` subclass instead of
+      Starlette's base class, missing internal 404/405 coverage — fixed by importing and registering
+      against `StarletteHTTPException`) — both fixed and re-verified (live-booted server, confirmed both
+      an unmatched route and a wrong-method request now flow through the handler). link-checker found 1
+      MEDIUM (Prerequisites prose mentioned "capstone" without a link) — fixed. `npx nx run
+  ayokoding-www:build` and `npm run lint:md` both exit 0._
 
 ### Phase 19 Gate
 
-- [ ] [AI] `capstone-first-working-software/` complete (wt 275, runnable end-to-end + web-verified); checker +
-      facts-checker clean; build + `lint:md` exit 0.
+- [x] [AI] `capstone-first-working-software/` complete (wt 275, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0. - _Date: 2026-07-16. Status: done. Verified
+      directly: weight 275 confirmed; end-to-end reproduction from a clean venv succeeded (`setup.sh` →
+      live server → every transcript on the page byte-identical); general-checker, facts-checker,
+      link-checker all clean after the fix round; `build` and `lint:md` both exit 0._
 
-- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+- [x] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
 origin && git checkout main && git pull && git checkout -b
 fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
       phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
       message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
       `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
-      draft PR open carrying this phase's commit; CI running on the PR.
-- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      draft PR open carrying this phase's commit; CI running on the PR. - _Date: 2026-07-16. Status:
+      done. Notes: worktree `worktrees/fundamentally-strong-software-engineer-phase-19` branched from
+      latest `main`; explicit paths staged (never `git add -A`) across two commits — `b408915ef`
+      ("feat(ayokoding-www): add Pass-1 Capstone: First Working Software topic (Phase 19)") and
+      `b3c11e6db` ("fix(ayokoding-www): re-sync capstone source readability after auto-formatter
+      drift", the pre-commit-hook-drift remediation described above); pushed; draft PR #51 opened
+      against `main`, CI running._
+- [x] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
       sequential CI-gated cycles per
       [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
       against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
       done-definition is met (review cycles complete, every inline comment addressed, all quality gates
       green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
       Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
-      marked ready for review; all CI checks green; no unresolved review threads.
-- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      marked ready for review; all CI checks green; no unresolved review threads. - _Date: 2026-07-16.
+      Status: done. Notes: ran all 3 sequential cycles against PR #51 (4 review threads total across the
+      3 cycles, 0 left unresolved — each finding independently re-verified by me directly, not just
+      trusted from the sub-agents' self-reports). Cycle 1: zero findings (clean review); I independently
+      re-ran the full byte-identity check myself (14/14 listings identical) before proceeding. Cycle 2
+      (fix commit `d86746513`): fixed 2 real findings — 3 of 4 "real, unedited" `curl -i` transcripts in
+      `overview.md` were missing the 3 security-response headers the shipped
+      `security_headers_middleware` actually stamps on every response (confirmed by replaying the exact
+      commands against a live server); and check-in/archive/delete had zero cross-user IDOR test
+      coverage despite making the same ownership-scoped claim as the one already-tested read endpoint
+      (added 3 new tests). Both independently reverified live before dispatching the fixer and again
+      after. Cycle 3 (fix commit `433f1bf67`): fixed 2 more real findings the first two cycles missed —
+      the register-409-username-conflict path had zero test coverage, and `resolve_token()`'s failure
+      branches (malformed token, tampered signature, malformed payload, expired token) were never
+      directly exercised (every existing 401 test omitted the `Authorization` header entirely, which
+      short-circuits before `resolve_token()` runs). Added 5 new tests total (test count went
+      26 -> 29 -> 34; coverage 96% -> 98% -> 99%); both findings independently reverified live before and
+      after the fix. PR flipped from draft to ready via `gh pr ready 51` once cycle 3's fixes were
+      pushed and CI was confirmed green (18/18 checks, .NET/Rust correctly skipping throughout, since
+      this phase touches neither)._
+- [x] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
       specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
       requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
@@ -3516,7 +3577,24 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       once the quality gate passes, to keep phases flowing without a manual click every time — a
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
-      merge time.
+      merge time. - _Date: 2026-07-16. Status: done. Notes: `gh pr merge 51 --squash
+  --delete-branch=false` executed successfully; PR #51 merged into `main` as commit
+      `87d20dc6855ee083e0d294e4502c11d6fc90e32a` ("feat(ayokoding-www): add Pass-1 Capstone: First
+      Working Software topic (Phase 19) (#51)"), confirmed as a real ancestor of `origin/main` via
+      `git merge-base --is-ancestor`; all quality gates (typecheck, lint, test:quick, specs:coverage,
+      CI, 3-cycle review) were green at merge time. **Transparency note on the remote branch**: despite
+      passing `--delete-branch=false`, the head branch
+      (`fundamentally-strong-software-engineer/phase-19-pass-1-capstone`) is gone from `origin` after
+      the merge. Root cause verified directly: this repository has `delete_branch_on_merge: true` set
+      at the GitHub repo-settings level (`gh api repos/wahidyankf/ose-public --jq
+  '.delete_branch_on_merge'`), which triggers a server-side auto-delete on every merge regardless of
+      the CLI flag passed to `gh pr merge` — the flag only controls whether `gh` itself issues an
+      explicit delete call, not whether GitHub's own merge webhook deletes the branch. No branch-deletion
+      command was run by this agent (no `git push origin --delete`, no `--delete-branch=true`). I
+      confirmed the identical outcome already happened for Phase 18's PR #50 (its head branch is also
+      gone from `origin`), meaning this repo-level setting has been silently overriding the
+      "preserve remote branch" expectation since before this session started, not something introduced
+      by this phase's work._
 - [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
