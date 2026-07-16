@@ -3722,84 +3722,123 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: Annotated-concept · ‡ no-code · topic wt 280 · Learn 118 / Drill 218 · **leadership/design artifact (no code)**. Template →
 [`syllabus/18-technical-communication.md`](./syllabus/18-technical-communication.md).
 
-- [ ] **[AI] V** — `web-researcher` for `technical-communication`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `technical-communication`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/18-technical-communication.md`](./syllabus/18-technical-communication.md) and fold dated findings back into that file.
-      **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/technical-communication/learning/` teaching **every** concept in
+      **Acceptance**: no unresolved "verify" line remains. - _Date: 2026-07-16. Status: done. Notes:
+      web-researcher re-verified RFC 2119/8174, Nygard's ADR format, and the C4 model are still current;
+      findings folded back into the syllabus._
+- [x] **[AI] A1-concepts** — Author `CONTENT/technical-communication/learning/` teaching **every** concept in
       `syllabus/18-technical-communication.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · reader-first-bluf
-  - [ ] co-02 · inverted-pyramid
-  - [ ] co-03 · thirty-second-skim-test
-  - [ ] co-04 · design-doc-rfc-structure
-  - [ ] co-05 · rfc-review-process
-  - [ ] co-06 · adr-one-decision-format
-  - [ ] co-07 · adr-lifecycle-status
-  - [ ] co-08 · adr-colocation-immutability
-  - [ ] co-09 · pr-description-structure
-  - [ ] co-10 · blameless-postmortem-structure
-  - [ ] co-11 · diagrams-as-communication
-  - [ ] co-12 · c4-model-levels
-  - [ ] co-13 · rfc2119-keyword-precision
-  - [ ] co-14 · editing-cut-hedging-filler
-  - [ ] co-15 · audience-register-match
-  - [ ] co-16 · doc-proportionality
-  - [ ] co-17 · doc-rot-close-to-code
-- [ ] **[AI] A1-examples** — Author `CONTENT/technical-communication/learning/artifacts/` — one worked scenario / communication artifact (prose + diagrams, no `code/` runtime; ‡ leadership DD-27) per worked example in `syllabus/18-technical-communication.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · bluf-rewrite — verify decision + ask in first sentence
-  - [ ] ex-02 · inverted-pyramid-restructure — verify reader stopping after 2 paragraphs still has answer
-  - [ ] ex-03 · thirty-second-skim-test — verify skimmed-only path yields decision + next action
-  - [ ] ex-04 · pr-description-what-why-verify — verify a reviewer knows where to start
-  - [ ] ex-05 · cut-hedging-and-filler — verify word count drops, every claim stands unhedged
-  - [ ] ex-06 · rfc2119-keyword-precision — verify each requirement's strength is unambiguous
-  - [ ] ex-07 · audience-register-match — verify each version matches its audience's vocabulary/detail
-  - [ ] ex-08 · title-and-tldr-first — verify the TL;DR alone conveys the outcome
-  - [ ] ex-09 · adr-one-decision — verify it records exactly one decision, not a treatise
-  - [ ] ex-10 · adr-status-lifecycle — verify old ADR marked superseded and links forward
-  - [ ] ex-11 · adr-colocated-immutable — verify decision record immutable + colocated in-repo, dated
-  - [ ] ex-12 · rfc-options-and-tradeoff — verify each option lists pros/cons; decision cites the trade-off
-  - [ ] ex-13 · rfc-review-process — verify every open question answered or deferred before "accepted"
-  - [ ] ex-14 · design-doc-open-questions — verify no undecided item stated as a decision
-  - [ ] ex-15 · doc-proportionality — verify low-stakes reversible decision gets a lightweight artifact
-  - [ ] ex-16 · pr-description-review-guidance — verify reviewer's attention directed to the risky diff
-  - [ ] ex-17 · c4-context-diagram — verify every external actor + system boundary appears
-  - [ ] ex-18 · c4-container-diagram — verify each container names its tech + how it talks to neighbors
-  - [ ] ex-19 · blameless-postmortem-timeline — verify every entry timestamped and actor-neutral
-  - [ ] ex-20 · postmortem-root-cause-and-followups — verify every follow-up owned; root cause systemic
-  - [ ] ex-21 · diagram-beats-prose — verify diagram conveys the flow faster than replaced paragraph
-  - [ ] ex-22 · diagram-prose-consistency — verify no component named in prose is missing from diagram
-  - [ ] ex-23 · doc-rot-close-to-code — verify doc now lives with the code it governs and is dated
-  - [ ] ex-24 · rfc-to-adr-distillation — verify ADR captures decision + consequence without deliberation
-  - [ ] ex-25 · reader-review-rubric-pass — verify a peer restates the decision from the doc alone
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/technical-communication/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] co-01 · reader-first-bluf
+  - [x] co-02 · inverted-pyramid
+  - [x] co-03 · thirty-second-skim-test
+  - [x] co-04 · design-doc-rfc-structure
+  - [x] co-05 · rfc-review-process
+  - [x] co-06 · adr-one-decision-format
+  - [x] co-07 · adr-lifecycle-status
+  - [x] co-08 · adr-colocation-immutability
+  - [x] co-09 · pr-description-structure
+  - [x] co-10 · blameless-postmortem-structure
+  - [x] co-11 · diagrams-as-communication
+  - [x] co-12 · c4-model-levels
+  - [x] co-13 · rfc2119-keyword-precision
+  - [x] co-14 · editing-cut-hedging-filler
+  - [x] co-15 · audience-register-match
+  - [x] co-16 · doc-proportionality
+  - [x] co-17 · doc-rot-close-to-code
+- [x] **[AI] A1-examples** — Author `CONTENT/technical-communication/learning/artifacts/` — one worked scenario / communication artifact (prose + diagrams, no `code/` runtime; ‡ leadership DD-27) per worked example in `syllabus/18-technical-communication.md` §Worked examples. One checkbox per `ex-NN` (1:1 mirror):
+  - [x] ex-01 · bluf-rewrite — verify decision + ask in first sentence
+  - [x] ex-02 · inverted-pyramid-restructure — verify reader stopping after 2 paragraphs still has answer
+  - [x] ex-03 · thirty-second-skim-test — verify skimmed-only path yields decision + next action
+  - [x] ex-04 · pr-description-what-why-verify — verify a reviewer knows where to start
+  - [x] ex-05 · cut-hedging-and-filler — verify word count drops, every claim stands unhedged
+  - [x] ex-06 · rfc2119-keyword-precision — verify each requirement's strength is unambiguous
+  - [x] ex-07 · audience-register-match — verify each version matches its audience's vocabulary/detail
+  - [x] ex-08 · title-and-tldr-first — verify the TL;DR alone conveys the outcome
+  - [x] ex-09 · adr-one-decision — verify it records exactly one decision, not a treatise
+  - [x] ex-10 · adr-status-lifecycle — verify old ADR marked superseded and links forward
+  - [x] ex-11 · adr-colocated-immutable — verify decision record immutable + colocated in-repo, dated
+  - [x] ex-12 · rfc-options-and-tradeoff — verify each option lists pros/cons; decision cites the trade-off
+  - [x] ex-13 · rfc-review-process — verify every open question answered or deferred before "accepted"
+  - [x] ex-14 · design-doc-open-questions — verify no undecided item stated as a decision
+  - [x] ex-15 · doc-proportionality — verify low-stakes reversible decision gets a lightweight artifact
+  - [x] ex-16 · pr-description-review-guidance — verify reviewer's attention directed to the risky diff
+  - [x] ex-17 · c4-context-diagram — verify every external actor + system boundary appears
+  - [x] ex-18 · c4-container-diagram — verify each container names its tech + how it talks to neighbors
+  - [x] ex-19 · blameless-postmortem-timeline — verify every entry timestamped and actor-neutral
+  - [x] ex-20 · postmortem-root-cause-and-followups — verify every follow-up owned; root cause systemic
+  - [x] ex-21 · diagram-beats-prose — verify diagram conveys the flow faster than replaced paragraph
+  - [x] ex-22 · diagram-prose-consistency — verify no component named in prose is missing from diagram
+  - [x] ex-23 · doc-rot-close-to-code — verify doc now lives with the code it governs and is dated
+  - [x] ex-24 · rfc-to-adr-distillation — verify ADR captures decision + consequence without deliberation
+  - [x] ex-25 · reader-review-rubric-pass — verify a peer restates the decision from the doc alone
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/technical-communication/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
-      is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
+      is fully hit. - _Date: 2026-07-16. Status: done. Notes: five-document intra-topic capstone (RFC →
+      ADR-0006 → PR description → blameless postmortem → C4 context diagram), one self-consistent
+      "Harborlight" incident narrative reused across all five documents; ADR numbered 0006 (continuing
+      after Scenario 24's own ADR-0005, avoiding the collision initially caught with Scenario 9's
+      ADR-0001) and flattened to `learning/capstone/adr-0006-notification-worker-idempotency-cache.md`
+      (one directory level shallower than first drafted, after the site's 2-level nav-index generator was
+      found to silently drop deeper-nested files)._
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/technical-communication/drilling/_index.md` (wt 218) covering the same Items with mocked/self-contained
-      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
+      inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. - _Date: 2026-07-16. Status:
+      done. Notes: annotated-concept-checker found and the fixer resolved 2 CRITICAL findings (nav drift
+      from the capstone-ADR flattening; the ADR-0001/ADR-0006 numbering collision with Scenario 9) plus 1
+      MEDIUM (numbering) and 1 LOW (stray "co-24" mislabel, should be "ex-24") during authoring; a fresh
+      re-verification pass found nothing new. `security-essentials/drilling/overview.md`'s footer updated
+      to link forward to this topic. Build hit transient flakiness under high system load (~28 load
+      average) on unrelated pre-existing pages, not this PR's content — resolved with a clean retry.
+      `npx nx run ayokoding-www:build` and `npm run lint:md` both exit 0._
 
 ### Phase 21 Gate
 
-- [ ] [AI] `technical-communication/` complete: `_index.md` wt 280, `learning/_index.md` wt 118,
+- [x] [AI] `technical-communication/` complete: `_index.md` wt 280, `learning/_index.md` wt 118,
       `drilling/_index.md` wt 218, capstone wt 900; all 17 concepts + 25 worked scenarios + capstone present;
-      checkers + facts-checker clean; build + `lint:md` exit 0.
+      checkers + facts-checker clean; build + `lint:md` exit 0. - _Date: 2026-07-16. Status: done. Verified
+      directly: weights confirmed (280 / 118 / 218 / 900); all 17 `co-NN` concepts and 25 `ex-NN` worked
+      scenarios present with standalone artifact twins; capstone's 5 documents present and internally
+      consistent; checkers + facts-checker clean; build and `lint:md` both exit 0._
 
-- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+- [x] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
 origin && git checkout main && git pull && git checkout -b
 fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
       phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
       message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
       `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
-      draft PR open carrying this phase's commit; CI running on the PR.
-- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      draft PR open carrying this phase's commit; CI running on the PR. - _Date: 2026-07-16. Status: done.
+      Notes: worktree `worktrees/fundamentally-strong-software-engineer-phase-21` branched from latest
+      `main` (agent self-corrected a missed `npm install` step in the fresh worktree before its first
+      build); explicit paths staged (never `git add -A`); pushed as
+      "feat(ayokoding-www): add Technical Communication topic (Phase 21)"; draft PR #54 opened against
+      `main`, CI running fully green (20/20 checks, .NET/Rust/TypeScript quality gates correctly skipping —
+      no code in those languages touched)._
+- [x] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
       sequential CI-gated cycles per
       [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
       against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
       done-definition is met (review cycles complete, every inline comment addressed, all quality gates
       green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
       Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
-      marked ready for review; all CI checks green; no unresolved review threads.
-- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      marked ready for review; all CI checks green; no unresolved review threads. - _Date: 2026-07-16.
+      Status: done. Notes: ran all 3 sequential fixed cycles against PR #54 (9 review threads total across
+      the 3 cycles, 0 left unresolved — each finding independently re-verified via the GitHub
+      Reviews/GraphQL API and independent tooling, not just trusted from the sub-agents' self-reports).
+      Cycle 1 (fix commit `a051f2619`): 3 distinct issues across 5 threads — a "roughly 40" vs "roughly
+      340" duplicate-message-count mismatch between a worked scenario and the capstone narrative; a
+      scenario claiming an idempotency fix already existed before the capstone that actually introduces
+      it (a continuity contradiction); a stale syllabus reference to the capstone ADR's since-flattened
+      file path. Cycle 2 (fix commit `1f5edc787`): 1 new finding — the capstone ADR's nav `weight` (2) put
+      it before the RFC's `weight` (3) in generated nav lists, contradicting the capstone's own narrated
+      build order (RFC deliberation happens first, ADR distills it a day later per their own Status
+      dates); weights swapped, nav indexes regenerated. Cycle 3 (final; fix commit `4065578d3`): 1 new
+      finding — an incident dated `2026-03-11` was narrated as "Tuesday" across three files, but
+      independently verified (`date -j` / Python `datetime`) that `2026-03-11` is actually a Wednesday;
+      every "Tuesday" reference corrected to "Wednesday" across all three files. PR flipped from draft to
+      ready via `gh pr ready 54` once cycle 3's fix was pushed and CI was confirmed green (17/17 checks)._
+- [x] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
       specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
       requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
@@ -3807,11 +3846,33 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       once the quality gate passes, to keep phases flowing without a manual click every time — a
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
-      merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      merge time. - _Date: 2026-07-16. Status: done. Notes: `main` had advanced past the branch's base
+      since it was cut, so the PR required a routine, non-destructive branch update
+      (`gh api .../pulls/54/update-branch`, a GitHub-side merge of `main` into the PR branch, producing
+      head commit `a90ada7e9`) before it was mergeable; CI re-ran and confirmed 17/17 green
+      (`mergeStateStatus: CLEAN`) on the updated head. Building on the merge/deploy permission-classifier
+      lesson from Phase 20 — where a relayed claim of authorization was correctly rejected by a
+      sub-agent's own classifier and a fresh, PR-specific `AskUserQuestion` confirmation was required — the
+      user this session gave a direct, standing, in-session waiver ("you dont need my permission in this
+      session to merge PR or deploy ayokoding-www to production"), so this merge proceeded without a
+      further per-PR confirmation prompt, while the underlying constraint (only the orchestrator itself
+      ever runs `gh pr merge` or the prod deploy — never a sub-agent, regardless of how much authorization
+      the user has granted upstream) remained fully in force. `gh pr merge 54 --squash` executed
+      successfully; PR #54 merged into `main` as commit
+      `32ad53172de280f4e0fd88e7425d01a6920695f6` ("feat(ayokoding-www): add Technical Communication topic
+      (Phase 21) (#54)"), confirmed as `origin/main`'s tip via `git pull` + `git log`; all quality gates
+      were green at merge time. No branch-deletion command was run by this agent or the orchestrator; the
+      head branch's disappearance from `origin` (if any) is the repo's own `delete_branch_on_merge: true`
+      setting, not an agent action._
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
-      production as it completes.
+      production as it completes. - _Date: 2026-07-16. Status: done. Notes: deploy executed directly by
+      the orchestrator (per this plan's standing convention: production deploys always run by the
+      orchestrator, never delegated to `apps-ayokoding-www-deployer` or any sub-agent); `prod-ayokoding-www`
+      force-pushed to `32ad53172` (main at deploy time), confirmed via
+      `git ls-remote origin prod-ayokoding-www`. Covered by the same direct, in-session standing waiver
+      cited in the merge note above — no further per-deploy confirmation prompt was needed._
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
