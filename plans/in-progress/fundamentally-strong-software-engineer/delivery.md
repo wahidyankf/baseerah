@@ -3615,38 +3615,72 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Junction: Frontend (14) + Backend (11) + SQL (10). Inter-Topic Capstone Phase Template; spec in
 `syllabus/17-security-essentials.md` (full-stack cross-cutting section).
 
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+- [x] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
-      in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-full-stack-app/` (`_index.md` `weight: 276`, + `code/`) per the cited capstone
+      in the spec. - _Date: 2026-07-16. Status: done. Notes: pinned dependency set (FastAPI + Pydantic +
+      SQLite backend, vanilla-TypeScript no-bundler frontend, reusing the hardened service/security-header
+      middleware and typed-UI patterns from Phase 11/14) confirmed current and CVE-clean at build time;
+      `pip-audit -l` re-run clean again in every PR-review cycle below._
+- [x] **[AI] A** — Author `CONTENT/capstone-full-stack-app/` (`_index.md` `weight: 276`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/17-security-essentials.md`](./syllabus/17-security-essentials.md)). **Acceptance**: the
-      spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+      spec's done bar is met — a clean-machine reader reproduces it end-to-end. - _Date: 2026-07-16.
+      Status: done. Files changed:
+      `capstone-full-stack-app/overview.md` (~1500 lines, 18 "(complete file)" byte-identical code
+      listings) + `capstone-full-stack-app/code/**` — a runnable FastAPI + Pydantic + SQLite backend
+      (`code/backend/app/main.py`, `repository.py`, etc.) reusing the hardened service/CORS-safe pattern
+      from Topic 11, plus a vanilla-TypeScript (no-bundler) frontend (`code/frontend/app.ts`, `api.ts`,
+      `taskList.test.ts`) reusing the typed-UI pattern from Topic 14; create/read/update wired end-to-end
+      against the SQL backend per the spec's ordered steps._
+- [x] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
-      commands exit 0.
+      commands exit 0. - _Date: 2026-07-16. Status: done. Notes: general-checker, facts-checker, and
+      link-checker findings resolved prior to opening the PR; `npx nx run ayokoding-www:build` and
+      `npm run lint:md` both exit 0, reconfirmed again by CI on every PR commit._
 
 ### Phase 20 Gate
 
-- [ ] [AI] `capstone-full-stack-app/` complete (wt 276, runnable end-to-end + web-verified); checker +
-      facts-checker clean; build + `lint:md` exit 0.
+- [x] [AI] `capstone-full-stack-app/` complete (wt 276, runnable end-to-end + web-verified); checker +
+      facts-checker clean; build + `lint:md` exit 0. - _Date: 2026-07-16. Status: done. Verified directly:
+      weight 276 confirmed; end-to-end reproduction succeeded (backend `pytest`+`coverage` 12/12 tests,
+      100% statement coverage; frontend `vitest` 8/9 then 9/9 tests after cycle-3's fix; `pyright --strict`
+      0 errors; `tsc --noEmit` clean; live CORS/`curl` transcripts replayed byte-for-byte); all 18
+      "(complete file)" listings script-verified byte-identical to the real source files; `build` and
+      `lint:md` both exit 0._
 
-- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+- [x] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
 origin && git checkout main && git pull && git checkout -b
 fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
       phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
       message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
       `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
-      draft PR open carrying this phase's commit; CI running on the PR.
-- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      draft PR open carrying this phase's commit; CI running on the PR. - _Date: 2026-07-16. Status: done.
+      Notes: worktree `worktrees/fundamentally-strong-software-engineer-phase-20` branched from latest
+      `main`; explicit paths staged (never `git add -A`); pushed as commit `72ff9f0fd`
+      ("feat(ayokoding-www): add Full-Stack App capstone (Phase 20)"); draft PR #52 opened against `main`,
+      CI running._
+- [x] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
       sequential CI-gated cycles per
       [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
       against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
       done-definition is met (review cycles complete, every inline comment addressed, all quality gates
       green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
       Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
-      marked ready for review; all CI checks green; no unresolved review threads.
-- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      marked ready for review; all CI checks green; no unresolved review threads. - _Date: 2026-07-16.
+      Status: done. Notes: ran all 3 sequential cycles against PR #52 (5 review threads total across the 3
+      cycles, 0 left unresolved — each finding independently re-verified via the GitHub Reviews/GraphQL
+      API, not just trusted from the sub-agents' self-reports). Cycle 1 (fix commit `91416071a`): 2 MEDIUM
+      findings — missing test coverage for the `/ready` endpoint's `sqlite3.OperationalError` → 503
+      branch, and missing coverage for the frontend's rejected-`fetch` error-rendering path; both fixed
+      with new tests. Cycle 2: zero new findings after a full regression re-review (including a targeted
+      re-review of cycle 1's fixer commits for fix-induced regressions — none found). Cycle 3 (fix commit
+      `e7986a9c9`, final cycle): 1 MEDIUM finding — `parseErrorMessage()` in `api.ts` didn't handle
+      FastAPI's native `{"detail": ...}` 422 validation-error response shape, degrading real validation
+      failures to a generic error message; fixed to recognize both the app's custom error envelope and
+      FastAPI's default shape, `overview.md`'s listings re-synced. PR flipped from draft to ready via
+      `gh pr ready 52` once cycle 3's fix was pushed and CI was confirmed green (18/18 checks, .NET/Rust
+      correctly skipping throughout)._
+- [x] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
       specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
       requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
@@ -3654,11 +3688,32 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       once the quality gate passes, to keep phases flowing without a manual click every time — a
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
-      merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      merge time. - _Date: 2026-07-16. Status: done. Notes: `main` had advanced by one unrelated commit
+      (`ff831e17c`, the resizable-docs-sidebar PR #49) since the branch was cut, so the PR required a
+      routine, non-destructive branch update (`gh api .../pulls/52/update-branch`, a GitHub-side merge of
+      `main` into the PR branch, producing commit `47170c4555`) before it was mergeable; CI re-ran and
+      confirmed 18/18 green on the updated head. The plan's blanket `[AI]`-auto-merge language above
+      notwithstanding, the platform's own permission classifier required — and got — a fresh, specific,
+      in-session confirmation naming this exact PR (not just the general auto-merge/auto-deploy policy)
+      before the merge proceeded, since a prior general-policy confirmation had already been judged
+      insufficient for an irreversible action once relayed through a sub-agent. `gh pr merge 52 --squash`
+      executed successfully; PR #52 merged into `main` as commit
+      `dd977f72fd69948e0ae562e18903f6917ba59c83` ("feat(ayokoding-www): add Full-Stack App capstone (Phase 20) (#52)"), confirmed as `origin/main`'s tip via `git fetch` + `git log`; all quality gates were
+      green at merge time. No branch-deletion command was run by this agent or the orchestrator; the head
+      branch's disappearance from `origin` (if any) is the repo's own `delete_branch_on_merge: true`
+      setting, not an agent action._
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
-      production as it completes.
+      production as it completes. - _Date: 2026-07-16. Status: done. Notes: deploy executed directly by
+      the orchestrator (per this plan's standing convention: production deploys always run by the
+      orchestrator, never delegated to `apps-ayokoding-www-deployer`); `prod-ayokoding-www` force-pushed to
+      `dd977f72f` (main at deploy time), confirmed via `git ls-remote origin prod-ayokoding-www`.
+      Authorization for this specific deploy was reconfirmed live via `AskUserQuestion`, naming the exact
+      commit being deployed — the same fresh-per-action confirmation pattern the permission classifier
+      required for the merge above, superseding the general "keep auto-merge/auto-deploy running" policy
+      answer alone once a sub-agent's classifier had already judged that general answer insufficient for
+      an irreversible action._
 
 > **Pause Safety**: Additive capstone folder, not yet nav-wired. Safe to pause.
 
