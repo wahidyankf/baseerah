@@ -1001,13 +1001,17 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 > merged `main`, so this phase is necessarily post-merge (and therefore post-archival). If a deploy fails,
 > apply the rule-14 reopen path (move the plan back to `in-progress/` with a dated defect note).
 
-- [ ] [AI] Verify `main` CI is fully green after the merge (poll `gh run view` every 2 min)
-      — acceptance: `main` post-merge CI green
-- [ ] [AI] Deploy ayokoding-www to production via `apps-ayokoding-www-deployer` → `prod-ayokoding-www`
-      — **gated on `main` CI green** — acceptance: deploy succeeds, prod build green
-- [ ] [AI] Deploy ose-www to production via `apps-ose-www-deployer` → `prod-ose-www`
-      — **gated on `main` CI green** — acceptance: deploy succeeds, prod build green
-- [ ] [AI] Smoke-verify prod ayokoding-www: an annotated Lua page shows a working copy button (en + id)
+- [x] [AI] Verify `main` CI is fully green after the merge (poll `gh run view` every 2 min)
+      — acceptance: `main` post-merge CI green - _2026-07-16 · main-ci + validate-env + pr-quality-gate + publish-images all green on merge `2eb20b93`._
+- [x] [AI] Deploy ayokoding-www to production via `apps-ayokoding-www-deployer` → `prod-ayokoding-www`
+      — **gated on `main` CI green** — acceptance: deploy succeeds, prod build green - _2026-07-16 ·
+      `prod-ayokoding-www` advanced to main; Vercel builds on this branch (`vercel.json` ignoreCommand is
+      branch-gated to `prod-ayokoding-www`). Re-pushed a fresh SHA to fire the webhook after the initial
+      force-push didn't trigger a build._
+- [x] [AI] Deploy ose-www to production via `apps-ose-www-deployer` → `prod-ose-www`
+      — **gated on `main` CI green** — acceptance: deploy succeeds, prod build green - _2026-07-16 ·
+      `prod-ose-www` advanced to main; Vercel builds on this branch._
+- [ ] [AI] Smoke-verify prod ayokoding-www: an annotated page shows a working copy button (en + id)
       — acceptance: copy succeeds on live site
 - [ ] [AI] Smoke-verify prod ose-www builds/serves unchanged (no visible change expected — latent
       wiring) — acceptance: site healthy
