@@ -963,8 +963,8 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 - [x] [AI] Commit + push the archival to the PR branch:
       `chore(plans): move web-ui-code-block-copy-button to done`
       — acceptance: the archival commit is part of the PR - _2026-07-16 · archival commit on PR #56._
-- [ ] [AI] Re-verify PR CI is green on the new PR head after the archival push (poll `gh run view` every
-      2 min) — acceptance: all checks pass with the archival commit included
+- [x] [AI] Re-verify PR CI is green on the new PR head after the archival push (poll `gh run view` every
+      2 min) — acceptance: all checks pass with the archival commit included - _2026-07-16 · validate-env + pr-quality-gate (incl. full PR-affected TypeScript quality gate) green on archival head `582dfa2bf`._
 
 ### AI Auto-Merge (maintainer-directed deviation, gated)
 
@@ -974,18 +974,20 @@ size="icon-sm"`), the `Copy`→`Check` swap, `aria-label`, and the
 > on the recent ayokoding plans (AI merges once CI is green and the review cycle is done). It is a
 > per-plan authorization, **not** a new codified Delivery Mode.
 
-- [ ] [AI] Mark the PR ready and **merge it** — **precondition (ALL must hold)**: (a) the 3 review
+- [x] [AI] Mark the PR ready and **merge it** — **precondition (ALL must hold)**: (a) the 3 review
       cycles are complete with no unresolved CRITICAL/HIGH findings, (b) all local quality gates green,
       (c) PR CI fully green **including the archival commit**, (d) all rule-15 defect findings fixed —
-      acceptance: PR merged into `main`
+      acceptance: PR merged into `main` - _2026-07-16 · user-authorized AI merge; PR #56 merged via merge
+      commit `2eb20b93` (all four preconditions held)._
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] Archival commit is part of the merged PR; `plans/done/2026-07-16__web-ui-code-block-copy-button/`
-      exists on `main`; `plans/in-progress/` no longer holds this plan
-- [ ] [AI] PR merged into `main`; 3 review cycles complete; no unresolved CRITICAL/HIGH; rule-15 fixed
+- [x] [AI] Archival commit is part of the merged PR; `plans/done/2026-07-16__web-ui-code-block-copy-button/`
+      exists on `main`; `plans/in-progress/` no longer holds this plan - _2026-07-16 · confirmed on `main`
+      after merge `2eb20b93` (archival commit `582dfa2bf` included)._
+- [x] [AI] PR merged into `main`; 3 review cycles complete; no unresolved CRITICAL/HIGH; rule-15 fixed - _2026-07-16 · PR #56 merged; all conditions held._
 
 > **Pause Safety**: the change (code + archival) is merged into `main` behind green CI; production is not
 > yet updated (deploys are a separate, safe, re-runnable step). Safe to stop. To resume: verify `main` CI
