@@ -7,6 +7,9 @@ Planned projects for future implementation.
 - [2026-07-16\_\_e2e-scenario-coverage-gap-detector](./2026-07-16__e2e-scenario-coverage-gap-detector/README.md) —
   detect Gherkin scenarios that silently lose E2E coverage under `playwright-bdd`'s
   `missingSteps: skip-scenario` config
+- [2026-07-16\_\_rhino-speccoverage-multiline-scenario-scan](./2026-07-16__rhino-speccoverage-multiline-scenario-scan/README.md) —
+  make rhino's `speccoverage` scenario-title extractor multi-line-aware so a prettier-wrapped
+  `Scenario(...)` call no longer reports a spurious coverage gap
 
 ## Instructions
 
