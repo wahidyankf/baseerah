@@ -463,7 +463,7 @@ on`). `git status --short` in all 3 worktrees confirms only the 5 (ose-public/-i
       `ose-public`'s current content verbatim (`ose-public` was the union-surface source, not a
       drift target), so `git status` on `apps/rhino-cli/src`/`tests` was clean throughout Phase 2 in
       this repo; there was nothing to stage or commit here. `git log origin/main..HEAD --
-  apps/rhino-cli/src apps/rhino-cli/tests` on this branch confirms zero commits touch those
+apps/rhino-cli/src apps/rhino-cli/tests` on this branch confirms zero commits touch those
       paths, consistent with that.
 - [x] [AI] Open a draft PR in each repo from its worktree branch:
       `gh pr create --draft --fill --base main --head rhino-cli-source-drift-reconciliation`
@@ -507,14 +507,15 @@ on`). `git status --short` in all 3 worktrees confirms only the 5 (ose-public/-i
 
 - [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
       catch it automatically next time; discard the rest with a one-line reason
-      — acceptance: every entry has either a route or a discard reason - _2026-07-17 · Done._ 5
-      per-file canonical decisions kept (they stay in the archived plan's own `learnings.md` — that
-      is their durable home). 2 "Discovered during execution" entries passed the litmus test (both
-      generalizable, both routed to durable governance docs — see Route task). No entry discarded.
+      — acceptance: every entry has either a route or a discard reason - _2026-07-17 · Done, corrected
+      during PR review (cycle 3)._ 5 per-file canonical decisions passed the litmus test but their
+      durable home is `tech-docs.md`, not `learnings.md` — see the corrected routing in the Route
+      task below. 4 "Discovered during execution" entries passed the litmus test (all generalizable,
+      all routed to durable governance docs — see Route task). No entry discarded.
 - [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
       credential, token, or private hostname to a `<placeholder>` token, or discard if unsanitizable
       — acceptance: `learnings.md` contains no raw secret - _2026-07-17 · Done._ Reviewed all
-      surviving entries (5 canonical decisions + 2 discovered-during-execution) — zero secrets,
+      surviving entries (5 canonical decisions + 4 discovered-during-execution) — zero secrets,
       credentials, tokens, or private hostnames present. No sanitization needed.
 - [x] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content stays
       in `ose-infra` only and is NEVER cross-routed into `ose-public`/`ose-primer`
@@ -526,11 +527,11 @@ on`). `git status --short` in all 3 worktrees confirms only the 5 (ose-public/-i
       carve-out is a bug/lint/test failure that blocks THIS plan's own scope — that is fixed inline as
       ordinary Root Cause Orientation work, not routed as a deferred learning.
       — acceptance: every code-homed learning has a corresponding `plans/backlog/` folder, or none
-      exists - _2026-07-17 · Done._ Neither surviving learning is `apps/`/`libs/`/tests-homed — the
-      `cargo test --lib` quirk routed to `docs/explanation/.../rust/testing-standards.md` and the
-      worktree relative-path/dependency-restore gaps routed to
-      `repo-governance/development/workflow/worktree-setup.md`, both governance-doc homes, not
-      apps/libs/tests. No `plans/backlog/` folder needed.
+      exists - _2026-07-17 · Done._ None of the surviving learnings is `apps/`/`libs/`/tests-homed —
+      the `cargo test --lib` quirk routed to `docs/explanation/.../rust/testing-standards.md`; the
+      sibling-repo relative-path, Elixir/F# dependency-restore, and tracking-doc divergence entries
+      routed to `repo-governance/` docs; the 5 canonical decisions routed to `tech-docs.md`. All
+      governance/docs homes, not apps/libs/tests. No `plans/backlog/` folder needed.
 - [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
       matrix; in particular, evaluate recommending a **standing tri-repo rhino-cli src-diff gate** as
       a follow-up idea in `plans/ideas.md`
