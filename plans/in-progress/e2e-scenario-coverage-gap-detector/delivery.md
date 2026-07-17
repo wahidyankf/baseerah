@@ -87,7 +87,7 @@ stateDiagram-v2
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] **Predecessor gate** — confirm [`rhino-cli-source-drift-reconciliation`](../rhino-cli-source-drift-reconciliation/README.md)
+- [ ] [AI] **Predecessor gate** — confirm [`rhino-cli-source-drift-reconciliation`](../../done/2026-07-17__rhino-cli-source-drift-reconciliation/README.md)
       has landed (rhino-cli byte-identity restored) before starting any rhino-cli work: from the
       parent dir of the three repos, run
       `for p in ose-primer ose-infra; do diff -rq ose-public/apps/rhino-cli/src "$p/apps/rhino-cli/src"; done`
