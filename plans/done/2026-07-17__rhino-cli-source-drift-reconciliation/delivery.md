@@ -312,9 +312,13 @@ stateDiagram-v2
       rhino-cli files (+ any `repo-config.yml`):
       `git add apps/rhino-cli/src apps/rhino-cli/tests && git commit -m "fix(rhino-cli): reconcile drifted src to canonical union surface"`
       — acceptance: one focused commit per repo; `git status` shows no unrelated staged files.
-- [ ] [AI] Open a draft PR in each repo from its worktree branch:
+- [x] [AI] Open a draft PR in each repo from its worktree branch:
       `gh pr create --draft --fill --base main --head rhino-cli-source-drift-reconciliation`
-      — acceptance: a draft PR URL is returned for `ose-public`, `ose-primer`, and `ose-infra`.
+      — acceptance: a draft PR URL is returned for `ose-public`, `ose-primer`, and `ose-infra` -
+      _2026-07-17 · Done._ All three URLs now exist: `ose-primer` #5, `ose-infra` #8, `ose-public`
+      #60 (opened after the Phase 5 KC + archival commits, per the P4.1 sequencing note above; a
+      transient GitHub GraphQL rate-limit exhaustion delayed the `ose-public` open by ~10 min,
+      resolved by waiting for `gh api rate_limit`'s reset timestamp).
 - [ ] [AI] Run the `pr-review-maker` → `pr-review-fixer` cycle on each PR (default 3 CI-gated cycles)
       — acceptance: no unresolved CRITICAL/HIGH review findings on any of the three PRs.
 - [ ] [AI] Push and verify CI per repo — poll every ~2 min (do NOT tight-loop, do NOT use
