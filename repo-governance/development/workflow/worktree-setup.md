@@ -121,14 +121,17 @@ themselves) but does not run _per-project_ dependency restoration for every poly
 the workspace. Most language ecosystems restore dependencies automatically as a side effect of
 their own build/test/typecheck invocation (Rust's `cargo`, TypeScript's package-manager-driven Nx
 executors, Go's module cache, Python's `uv`/`pip`), so this gap is invisible for them. Two
-ecosystems in this monorepo do NOT auto-restore and need an explicit one-time step in a freshly
-provisioned worktree:
+ecosystems do NOT auto-restore and need an explicit one-time step in a freshly provisioned
+worktree — this surfaced concretely in **ose-primer**'s polyglot demo-app fan-out (`ose-public`
+itself currently has no Elixir projects; its own F# apps, e.g. `ose-be`/`organiclever-be`, use
+per-domain names rather than the `*-fsharp-*` demo-app naming below and are unaffected by this
+specific glob):
 
 ```bash
 # Elixir projects — run once per affected libs/apps/*-elixir-* project
 mix deps.get
 
-# F#/.NET projects — run once per affected apps/*-fsharp-*/src and .../tests project
+# F#/.NET polyglot-demo projects — run once per affected apps/*-fsharp-*/src and .../tests project
 dotnet restore
 ```
 
@@ -137,7 +140,9 @@ Elixir projects with `Unchecked dependencies ... run "mix deps.get"`, or on F# p
 `NETSDK1004: Assets file ... not found. Run a NuGet package restore`, even though the toolchain
 itself (`mix`, `dotnet`) is correctly installed. Root-cause the failure to this gap before
 assuming a real regression — it reproduces on every freshly provisioned worktree that touches an
-Elixir or F# project, not just once.
+Elixir or F# polyglot-demo project, not just once. In a repo with no such projects in scope
+(`ose-public`, until it gains one), this section is a no-op to skip past, not a step to run
+blindly.
 
 ### Sibling-Repo Relative Paths From Inside a Worktree (Multi-Repo Plans)
 

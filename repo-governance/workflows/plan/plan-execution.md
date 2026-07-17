@@ -161,6 +161,7 @@ When execution begins (or re-begins in a new conversation), disk state wins:
 3. For every `- [ ]` — `TaskCreate` one task in reading order.
 4. If stale tasks from a prior run disagree with disk (e.g., task `completed` but checkbox `- [ ]`), delete the stale list and rebuild from current delivery.md.
 5. Flag any `- [x]` lacking implementation notes — possible silent batch-tick; the user may want to audit before continuing.
+6. **Resolve the plan path against the worktree, not the primary checkout.** For any plan whose delivery mode provisions a dedicated worktree (`worktree-to-pr`, `worktree-to-origin-main`), the worktree's copy of the plan folder is the ONLY authoritative on-disk location — it is the copy on the branch that becomes the PR. A same-named plan folder may still exist under the primary checkout's `plans/in-progress/` (e.g., left over from before the worktree was provisioned); reading or editing that copy instead is a silent-divergence trap — edits there never reach the branch, since the primary checkout isn't what gets pushed. If the same plan folder exists with uncommitted changes in BOTH the primary checkout and the worktree, treat it as a hard anomaly: stop, reconcile which content is accurate (verify independently against commit history / PR state, don't assume either copy), merge the genuinely-verified content into the worktree's copy, and flag the primary checkout's stray copy to the user for cleanup.
 
 ### Divergence handling
 
