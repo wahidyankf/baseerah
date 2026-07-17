@@ -395,10 +395,15 @@ stateDiagram-v2
 
 ### Archival-in-PR
 
-- [ ] [AI] Archive this plan folder in `ose-public` (the only repo that carries it):
+- [x] [AI] Archive this plan folder in `ose-public` (the only repo that carries it):
       `git mv plans/in-progress/rhino-cli-source-drift-reconciliation plans/done/2026-07-17__rhino-cli-source-drift-reconciliation`
       and commit inside the same PR
-      — acceptance: plan folder now under `plans/done/`; committed within the `ose-public` PR before merge.
+      — acceptance: plan folder now under `plans/done/`; committed within the `ose-public` PR before
+      merge - _2026-07-17 · Done._ `git mv` executed; also updated `plans/in-progress/README.md`
+      (removed entry, cross-referenced predecessor completion on the two remaining rhino-cli plans)
+      and `plans/done/README.md` (added completion entry at top, newest-first order). Confirmed no
+      other orphaned references to the old `plans/in-progress/rhino-cli-source-drift-reconciliation`
+      path exist repo-wide (`grep -rl`).
 
 ### Phase 5 Gate
 

@@ -4,6 +4,22 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-07-17: rhino-cli-source-drift-reconciliation](./2026-07-17__rhino-cli-source-drift-reconciliation/README.md) —
+  Reconciled pre-existing `apps/rhino-cli` `src/` drift across `ose-public`/`ose-primer`/`ose-infra`
+  back to a single canonical union, restoring the tri-repo byte-identity boundary. 4 drifted `src/`
+  files + `tests/doctor.rs` (found via manual tri-repo `diff` during unrelated research) reconciled
+  file-by-file via RED/GREEN/REFACTOR TDD cycles — 3 union-surface gaps
+  (`naming.rs`/`doctor/checker.rs`+`doctor/tools.rs`) and 1 pure stylistic swap
+  (`instruction_size.rs`), all adopting `ose-public`'s existing superset content and propagated
+  byte-for-byte to the two siblings; zero values needed a `repo-config.yml` move. Post-reconciliation
+  tri-repo `diff` verified zero output across `src/`, all manifest files, and the Gherkin behavior
+  tree. Knowledge Capture routed a `cargo test` filter gotcha (crates with `harness = false` test
+  binaries) to the Rust testing standards doc, and two worktree-provisioning gaps (sibling-repo
+  relative-path nesting; Elixir/F# per-project dependency restoration) to the worktree-setup
+  practice doc; filed a standing tri-repo src-diff gate idea and a `tests/` boundary question in
+  `plans/ideas.md`. **Predecessor** unblocking `e2e-scenario-coverage-gap-detector`. Three peer PRs
+  (`ose-public`, `ose-primer` #5, `ose-infra` #8), each independently 3-cycle PR-Review
+  Maker→Fixer reviewed and gated. Delivery Mode: `worktree-to-pr` (per repo). Completed 2026-07-17.
 - [2026-07-16: web-ui-code-block-copy-button](./2026-07-16__web-ui-code-block-copy-button/README.md) —
   Added a reusable `libs/web-ui` copy-to-clipboard primitive (`CopyButton` + `CodeBlock` +
   `useCopyToClipboard` hook) and wired it into the fenced-code-block rendering of `ayokoding-www`
