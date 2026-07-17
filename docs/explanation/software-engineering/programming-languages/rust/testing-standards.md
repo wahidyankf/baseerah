@@ -173,6 +173,31 @@ fn test_zakat_service_processes_eligible_transaction() {
 }
 ```
 
+## Filtering Tests in Crates with Custom `harness = false` Binaries
+
+A crate that declares one or more `[[test]]` entries with `harness = false` in `Cargo.toml` (a
+custom `main()` entry point, commonly a cucumber-style scenario runner) breaks the usual
+`cargo test <module-path>` filtering convention. `cargo test <filter>` forwards the positional
+filter argument to **every** compiled test binary, including the `harness = false` ones — a
+custom binary that parses its own CLI args (e.g. via `clap`) can reject the unrecognized filter
+and exit non-zero, aborting the whole `cargo test` invocation with a misleading exit code even
+though the actual library tests the filter targeted already ran and passed.
+
+**MUST** scope filtered test runs to the library target explicitly when the crate has any
+`harness = false` binaries:
+
+```bash
+# WRONG in a crate with harness = false binaries: exit code lies
+cargo test my_module::my_function
+
+# CORRECT: --lib scopes to the library test target only
+cargo test --lib my_module::my_function
+```
+
+Check `Cargo.toml` for `harness = false` entries before assuming a bare `cargo test <filter>`
+exit code reflects the filtered tests' actual pass/fail state — always confirm via exit code, not
+just by eyeballing filtered output for `FAILED`.
+
 ## Async Tests with tokio::test
 
 **MUST** use `#[tokio::test]` for all async test functions.

@@ -36,6 +36,18 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
 - Future plan: promote `tech-docs.md §4` (Rust crate structural checklist) to
   `repo-governance/development/quality/rust-crate-structural-checklist.md` once a second Rust crate
   is added to `ose-public`. Single-crate evidence is insufficient to validate the abstraction level.
+- Future plan (added 2026-07-17 as rhino-cli-source-drift-reconciliation after-action): add a
+  standing periodic (or CI-triggered) tri-repo `diff` gate over the `apps/rhino-cli` byte-identity
+  boundary (`src/`, `Cargo.toml`, `Cargo.lock`, `project.json`, `LICENSE`, and the Gherkin behavior
+  tree) across `ose-public`/`ose-primer`/`ose-infra`, so silent drift between the three repos is
+  caught automatically instead of by manual tri-repo audit. This plan found 4 drifted files by
+  manual `diff -rq` during unrelated research; a standing gate would have caught the drift the
+  moment it was introduced.
+- Open question (added 2026-07-17 as rhino-cli-source-drift-reconciliation after-action): should
+  `apps/rhino-cli/tests/` be pulled into the codified byte-identity boundary alongside `src/`? This
+  plan found `tests/doctor.rs` had drifted in lockstep with `src/application/doctor/tools.rs` (not
+  currently in the strict boundary per `docs/reference/sdlc-gate-standard.md`) and reconciled it as
+  a matter of course, but the boundary's own documentation doesn't require that.
 
 ### AyoKoding Web (added 2026-05-22 as ayokoding-web-learn-reorg after-action)
 
