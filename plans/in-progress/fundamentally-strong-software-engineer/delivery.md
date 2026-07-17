@@ -4298,22 +4298,28 @@ Row: By Example · C † · topic wt 300 · Learn 120 / Drill 220 · **subject**
       `drilling/_index.md`; by-example/link/facts checkers all clean after the one fixer dispatch above;
       `npx nx run ayokoding-www:build` and `npm run lint:md` both exit 0._
 
-- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+- [x] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
 origin && git checkout main && git pull && git checkout -b
 fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
       phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
       message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
       `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
-      draft PR open carrying this phase's commit; CI running on the PR.
-- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+      draft PR open carrying this phase's commit; CI running on the PR. - _Date: 2026-07-17. Status: done.
+      PR #57 opened, 4 commits (feat + clang-format fix + docs + Cycle-1 fixer's `.gitignore` fix), CI
+      green._
+- [x] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
       sequential CI-gated cycles per
       [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
       against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
       done-definition is met (review cycles complete, every inline comment addressed, all quality gates
       green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
       Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
-      marked ready for review; all CI checks green; no unresolved review threads.
-- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+      marked ready for review; all CI checks green; no unresolved review threads. - _Date: 2026-07-17.
+      Status: done. All 3 cycles complete (Cycle 1: 1 MEDIUM finding, fixed via `.gitignore` addition
+      commit `017945313`; Cycles 2-3: 0 new findings each, clean COMMENT reviews, including a from-scratch
+      Cycle-3 pass that recompiled and reran all 80 examples + capstone). Final GraphQL check: 1 total
+      review thread, 0 unresolved. PR flipped ready-for-review via `gh pr ready 57`._
+- [x] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
       specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
       requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
@@ -4321,11 +4327,22 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       once the quality gate passes, to keep phases flowing without a manual click every time — a
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
-      merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+      merge time. - _Date: 2026-07-17. Status: done. `main` had advanced 18 commits (unrelated PR #56 +
+      plan/docs chores) while PR #57 was in review, blocking merge ("head branch not up to date with
+      base"); resolved by merging `origin/main` into the PR branch (clean, no conflicts — disjoint files),
+      re-running the full local pre-push gate (typecheck/lint/2606 unit tests/94.97% coverage/specs
+      coverage/env validate/links/README audit — all green), and pushing. Fresh CI on the updated head
+      (`4f2bccd35`) went green (19/19 applicable checks). Squash-merged via `gh pr merge 57 --squash` at
+      merge commit `289633e69fa30dfd085c62eee422185427ea4d6c`._
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
-      production as it completes.
+      production as it completes. - _Date: 2026-07-17. Status: done. `apps-ayokoding-www-deployer`
+      force-pushed `main` to `prod-ayokoding-www`; independently re-verified via `git ls-remote` that both
+      `main` and `prod-ayokoding-www` point at `289633e69fa30dfd085c62eee422185427ea4d6c`. Phase-23
+      worktree removed locally post-merge (remote branch
+      `fundamentally-strong-software-engineer/phase-23-computer-architecture` retained per standing
+      never-delete-remote-branches rule)._
 
 > **Pause Safety**: Topic self-contained, not yet nav-wired. Safe to pause.
 
