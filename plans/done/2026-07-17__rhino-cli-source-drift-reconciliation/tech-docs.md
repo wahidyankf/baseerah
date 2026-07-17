@@ -49,8 +49,7 @@ Already **identical** across all three (verification targets only, not edit targ
 ### Per-file classification decision branches
 
 Each of the five drifted files is routed through the same decision tree in Phase 1; the concrete
-result for each file is recorded in `learnings.md` under `## Per-file canonical decisions`, not
-pre-decided here.
+result for each file is recorded immediately below, not pre-decided here.
 
 ```mermaid
 flowchart LR
@@ -67,6 +66,44 @@ flowchart LR
     style E fill:#029E73,color:#fff
     style F fill:#CA9161,color:#fff
 ```
+
+### Per-file canonical decisions (concrete results, Phase 1)
+
+> Decision-rationale content lives here per the
+> [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)
+> ("`learnings.md` is not a decision log... that is `tech-docs.md`'s job") — relocated from
+> `learnings.md` during PR review after `pr-review-maker` correctly flagged the original placement
+> as a convention mismatch.
+
+- `docs/naming.rs`: **Union-surface gap.** `ose-public` (2026-07-13) adds a `_index.md` naming
+  exemption for Hugo content-section pages (used by `apps/*-www` sites) plus its regression test;
+  `ose-primer`/`ose-infra` (byte-identical to each other, 2026-07-03) both lack it. Canonical =
+  `ose-public`'s current content — the exemption is a harmless no-op in repos without Hugo
+  `_index.md` trees (dormant, not absent), matching the existing union-command-surface pattern.
+- `doctor/checker.rs`: **Union-surface gap**, correlated with `doctor/tools.rs` below.
+  `ose-public` (2026-07-13) adds `parse_clang_format_version` (+2 tests), a parser feeding the
+  `clang-format` `ToolDef` in `tools.rs`; `ose-primer`/`ose-infra` (identical to each other,
+  2026-06-15) both lack it. Canonical = `ose-public`'s current content.
+- `doctor/tools.rs`: **Union-surface gap.** `ose-public` (2026-07-13) defines 3 extra formatter
+  tools — `shfmt`, `tofu` (OpenTofu), `clang-format` — with install steps, `parse_tofu_version`,
+  and the `tool_defs_formatters()` grouping fn wired into `build_tool_defs()` (16 tools vs. 13 in
+  the siblings, identical to each other, 2026-06-15). Canonical = `ose-public`'s current content —
+  repo-inapplicable tool checks stay dormant (the binaries are still checked, but absence only
+  fails `doctor --fix`, and all three are already present as global machine-level tools in this
+  dev environment per Phase 0 baseline).
+- `repo_governance/instruction_size.rs`: **Not a union gap or a per-repo value — pure stylistic
+  difference.** `ose-primer` (2026-07-04) has one test using `assert!(findings[0].path ==
+"AGENTS.md")` where `ose-public` (2026-07-13) and `ose-infra` (identical to `ose-public` here)
+  use `assert_eq!(findings[0].path, "AGENTS.md")` — functionally identical, `assert_eq!` gives
+  better failure diagnostics. Canonical = `assert_eq!` form (majority + more idiomatic).
+- `tests/doctor.rs`: **Union-surface gap, directly follows `doctor/tools.rs`.** `ose-public`
+  (2026-07-13) includes fixture entries and the `tools.len() == 16` expectation for `shfmt`,
+  `tofu`, `clang-format`; `ose-primer`/`ose-infra` (identical to each other, 2026-07-04) expect
+  `13`. Canonical = `ose-public`'s current content, propagated in lockstep with `tools.rs` (Cycle
+  3 and Cycle 5 in Phase 2 apply the same underlying feature).
+
+Zero of the 5 decisions required moving a value into `repo-config.yml` — every difference was
+either a union-surface gap (adopt `ose-public`'s superset) or a pure stylistic swap.
 
 ## Tri-repo verification command (canonical)
 
