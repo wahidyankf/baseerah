@@ -140,7 +140,10 @@ stateDiagram-v2
       gaps (`naming.rs` `_index.md` exemption; `checker.rs` `parse_clang_format_version`;
       `tools.rs` shfmt/tofu/clang-format defs; `tests/doctor.rs` following `tools.rs`) + 1 pure
       stylistic difference (`instruction_size.rs` `assert!`→`assert_eq!`). Zero values need
-      `repo-config.yml`.
+      `repo-config.yml`. _Updated 2026-07-17 (cycle 2 review): relocated to
+      [`tech-docs.md` § Per-file canonical decisions (concrete results, Phase 1)](./tech-docs.md#per-file-canonical-decisions-concrete-results-phase-1)
+      per `pr-review-maker` cycle 1's HIGH finding — `learnings.md` now holds only a pointer to that
+      section, not the decisions themselves._
 - [x] [AI] Draft the canonical union content for each file (superset of all three), keeping
       repo-inapplicable branches dormant (selected by `repo-config.yml` data)
       — acceptance: one canonical text per file, reviewed against all three inputs, losing no repo's applicable behavior - _2026-07-17 · Done._ For 4 of 5 files the canonical text
@@ -162,6 +165,10 @@ stateDiagram-v2
 - [x] [AI] `grep -A20 "## Per-file canonical decisions" learnings.md`
       — acceptance: shows one recorded decision (canonical form + classification) for each of the
       five drifted files - _2026-07-17 · Done._ Confirmed — all 5 decisions present and legible.
+      _Updated 2026-07-17 (cycle 2 review): the decisions now live in `tech-docs.md` (see the Phase 1
+      checklist item above), so the equivalent current command is
+      `grep -A20 "Per-file canonical decisions" tech-docs.md`; `learnings.md`'s heading is a pointer
+      to that section._
 - [x] [AI] Where a value moved to `repo-config.yml`:
       `cargo run --manifest-path apps/rhino-cli/Cargo.toml -- repo-config validate` in each of the
       three worktrees — acceptance: exits 0 in all three (skip this check if no value moved) -
@@ -169,8 +176,9 @@ stateDiagram-v2
       Gate green; proceeding to Phase 2.
 
 > **Pause Safety**: Safe to stop after Phase 1 — decisions drafted, no source overwritten yet. Resume
-> at Phase 2. Recovery: `grep -A20 "## Per-file canonical decisions" learnings.md` is the source of
-> truth for what to apply.
+> at Phase 2. Recovery: `grep -A20 "Per-file canonical decisions" tech-docs.md` is the source of
+> truth for what to apply (relocated from `learnings.md` during PR review — see the Phase 1 Gate
+> note above).
 
 ## Phase 2: Apply canonical form (TDD, per file, per repo)
 
@@ -413,8 +421,8 @@ application::repo_governance::instruction_size` (`--lib`-scoped, same fix as Cyc
       plan's rhino-cli changes. Per this line's own Root Cause Orientation clause, fixed rather than
       deferred: ran `mix deps.get` for the 3 elixir libs + `dotnet restore` for the F# project, then
       re-ran the full affected suite — confirmed **26/26 projects green** (`Successfully ran targets
-  typecheck, lint, test:quick, specs:behavior:coverage for 26 projects and 18 tasks they depend
-  on`). `git status --short` in all 3 worktrees confirms only the 5 (ose-public/-infra: 4)
+typecheck, lint, test:quick, specs:behavior:coverage for 26 projects and 18 tasks they depend
+on`). `git status --short` in all 3 worktrees confirms only the 5 (ose-public/-infra: 4)
       expected Phase-2 files are dirty — no stray artifacts.
 
 ### Phase 3 Gate
@@ -445,10 +453,18 @@ application::repo_governance::instruction_size` (`--lib`-scoped, same fix as Cyc
 > Propagation is the concrete byte-application done in Phase 2 (same file bytes in every repo), not a
 > workflow citation. Run the repos one at a time; the commands below are per-repo.
 
-- [ ] [AI] Commit thematically in each repo (Conventional Commits), staging only the reconciled
+- [x] [AI] Commit thematically in each repo (Conventional Commits), staging only the reconciled
       rhino-cli files (+ any `repo-config.yml`):
       `git add apps/rhino-cli/src apps/rhino-cli/tests && git commit -m "fix(rhino-cli): reconcile drifted src to canonical union surface"`
-      — acceptance: one focused commit per repo; `git status` shows no unrelated staged files.
+      — acceptance: one focused commit per repo; `git status` shows no unrelated staged files -
+      _2026-07-17 · Done (repo-specific)._ `ose-primer` and `ose-infra` each got a real reconciliation
+      commit (`af0019bdc`, `3075cf08e`) applying the canonical union bytes. **`ose-public` needed
+      none** — per Phase 1's per-file decisions above, all 5 canonical forms already matched
+      `ose-public`'s current content verbatim (`ose-public` was the union-surface source, not a
+      drift target), so `git status` on `apps/rhino-cli/src`/`tests` was clean throughout Phase 2 in
+      this repo; there was nothing to stage or commit here. `git log origin/main..HEAD --
+  apps/rhino-cli/src apps/rhino-cli/tests` on this branch confirms zero commits touch those
+      paths, consistent with that.
 - [x] [AI] Open a draft PR in each repo from its worktree branch:
       `gh pr create --draft --fill --base main --head rhino-cli-source-drift-reconciliation`
       — acceptance: a draft PR URL is returned for `ose-public`, `ose-primer`, and `ose-infra` -
