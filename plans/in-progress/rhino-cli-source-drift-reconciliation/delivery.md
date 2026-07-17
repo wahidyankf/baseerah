@@ -375,7 +375,7 @@ stateDiagram-v2
 ### Archival-in-PR
 
 - [ ] [AI] Archive this plan folder in `ose-public` (the only repo that carries it):
-      `git mv plans/backlog/2026-07-17__rhino-cli-source-drift-reconciliation plans/done/2026-07-17__rhino-cli-source-drift-reconciliation`
+      `git mv plans/in-progress/rhino-cli-source-drift-reconciliation plans/done/2026-07-17__rhino-cli-source-drift-reconciliation`
       and commit inside the same PR
       — acceptance: plan folder now under `plans/done/`; committed within the `ose-public` PR before merge.
 

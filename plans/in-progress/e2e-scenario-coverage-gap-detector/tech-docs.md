@@ -231,7 +231,7 @@ rollback is a straightforward revert at three independent granularities:
   `[Repo-grounded: docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary]`, a full
   revert of the `rhino-cli` source must land in all three repos to keep byte-identity intact — reverting
   only in `ose-public` would reintroduce drift identical in kind to the drift this plan's predecessor
-  ([`rhino-cli-source-drift-reconciliation`](../2026-07-17__rhino-cli-source-drift-reconciliation/README.md))
+  ([`rhino-cli-source-drift-reconciliation`](../rhino-cli-source-drift-reconciliation/README.md))
   exists to fix. The per-project baseline manifests and `project.json` e2e wiring are repo-specific
   (not part of the byte-identical set), so each sibling repo's own e2e wiring is reverted independently
   in that repo.

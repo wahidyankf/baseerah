@@ -54,7 +54,7 @@ This plan adds a **new `rhino-cli` subcommand + specs**, which must land byte-id
 [rhino-cli Byte-Identity Boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary).
 That guarantee assumes an already-identical `rhino-cli` source base. A tri-repo `diff` on 2026-07-17
 found pre-existing drift in four in-boundary `src/` files, so this plan is sequenced **after**
-[`rhino-cli-source-drift-reconciliation`](../2026-07-17__rhino-cli-source-drift-reconciliation/README.md),
+[`rhino-cli-source-drift-reconciliation`](../rhino-cli-source-drift-reconciliation/README.md),
 which restores byte-identity first. Do not begin this plan's `rhino-cli` work until that predecessor
 has landed and its tri-repo `diff` verification is green `[Judgment call: sequencing decided during planning]`.
 
@@ -143,5 +143,5 @@ flowchart TD
 - [BDD Spec-to-Test Mapping](../../../repo-governance/development/infra/bdd-spec-test-mapping.md)
 - [Nx Target Standards](../../../repo-governance/development/infra/nx-targets.md)
 - [SDLC Gate Standard — rhino-cli Byte-Identity Boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)
-- [rhino-cli-source-drift-reconciliation](../2026-07-17__rhino-cli-source-drift-reconciliation/README.md) — **predecessor**; restores tri-repo byte-identity before this plan's new subcommand lands
+- [rhino-cli-source-drift-reconciliation](../rhino-cli-source-drift-reconciliation/README.md) — **predecessor**; restores tri-repo byte-identity before this plan's new subcommand lands
 - [Related Repositories](../../../docs/reference/related-repositories.md)

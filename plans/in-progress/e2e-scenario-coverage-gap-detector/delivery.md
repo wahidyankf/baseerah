@@ -87,7 +87,7 @@ stateDiagram-v2
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] **Predecessor gate** — confirm [`rhino-cli-source-drift-reconciliation`](../2026-07-17__rhino-cli-source-drift-reconciliation/README.md)
+- [ ] [AI] **Predecessor gate** — confirm [`rhino-cli-source-drift-reconciliation`](../rhino-cli-source-drift-reconciliation/README.md)
       has landed (rhino-cli byte-identity restored) before starting any rhino-cli work: from the
       parent dir of the three repos, run
       `for p in ose-primer ose-infra; do diff -rq ose-public/apps/rhino-cli/src "$p/apps/rhino-cli/src"; done`
@@ -106,7 +106,7 @@ stateDiagram-v2
 - [ ] [AI] Resolve all preexisting failures before proceeding
       — acceptance: no preexisting failures remain unresolved
 - [ ] [AI] Confirm `learnings.md` exists in the plan folder (sibling to this file)
-      — acceptance: `test -f plans/backlog/2026-07-16__e2e-scenario-coverage-gap-detector/learnings.md` exits 0
+      — acceptance: `test -f plans/in-progress/e2e-scenario-coverage-gap-detector/learnings.md` exits 0
 
 ### Phase 0 Gate
 
@@ -821,7 +821,7 @@ defineBddConfig]`.
 - [ ] [AI] Verify the manual CLI verification evidence (pass + synthetic-gap fail output) is recorded
       in `learnings.md`
 - [ ] [AI] Move the plan folder to done with today's completion date:
-      `git mv plans/backlog/2026-07-16__e2e-scenario-coverage-gap-detector plans/done/YYYY-MM-DD__e2e-scenario-coverage-gap-detector`
+      `git mv plans/in-progress/e2e-scenario-coverage-gap-detector plans/done/YYYY-MM-DD__e2e-scenario-coverage-gap-detector`
       (use the actual completion date, NOT the 2026-07-16 creation date)
 - [ ] [AI] Update `plans/backlog/README.md` — remove the plan entry
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date

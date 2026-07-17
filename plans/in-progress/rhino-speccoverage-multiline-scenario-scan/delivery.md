@@ -60,8 +60,7 @@ lives in `ose-public` alone.
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Move the plan from backlog to in-progress (strip the date prefix):
-      `git mv plans/backlog/2026-07-16__rhino-speccoverage-multiline-scenario-scan plans/in-progress/rhino-speccoverage-multiline-scenario-scan`
+- [x] [AI] Plan already promoted from backlog to in-progress (date prefix stripped) during planning
       — acceptance: folder exists at `plans/in-progress/rhino-speccoverage-multiline-scenario-scan/`
 - [ ] [AI] Provision/enter the worktree per the `## Worktree` section above
       — acceptance: shell cwd is `worktrees/rhino-speccoverage-multiline-scenario-scan/`
