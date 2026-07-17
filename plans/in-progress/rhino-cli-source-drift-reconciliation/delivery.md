@@ -348,29 +348,50 @@ stateDiagram-v2
 > Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md).
 
-- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
+- [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
       catch it automatically next time; discard the rest with a one-line reason
-      — acceptance: every entry has either a route or a discard reason.
-- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
+      — acceptance: every entry has either a route or a discard reason - _2026-07-17 · Done._ 5
+      per-file canonical decisions kept (they stay in the archived plan's own `learnings.md` — that
+      is their durable home). 2 "Discovered during execution" entries passed the litmus test (both
+      generalizable, both routed to durable governance docs — see Route task). No entry discarded.
+- [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
       credential, token, or private hostname to a `<placeholder>` token, or discard if unsanitizable
-      — acceptance: `learnings.md` contains no raw secret.
-- [ ] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content stays
+      — acceptance: `learnings.md` contains no raw secret - _2026-07-17 · Done._ Reviewed all
+      surviving entries (5 canonical decisions + 2 discovered-during-execution) — zero secrets,
+      credentials, tokens, or private hostnames present. No sanitization needed.
+- [x] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content stays
       in `ose-infra` only and is NEVER cross-routed into `ose-public`/`ose-primer`
-      — acceptance: no infra-private content appears in this repo's routed output.
-- [ ] [AI] **Code-routing rule**: if a learning's home is `apps/`, `libs/`, or tests, file it as a
+      — acceptance: no infra-private content appears in this repo's routed output - _2026-07-17 ·
+      Done._ All surviving entries are generic (rhino-cli source reconciliation, cargo/worktree
+      tooling quirks) — none is `ose-infra`-private. Nothing withheld or cross-routed.
+- [x] [AI] **Code-routing rule**: if a learning's home is `apps/`, `libs/`, or tests, file it as a
       separate `plans/backlog/` plan — NEVER land it inline in this plan's commits/PR. The sole
       carve-out is a bug/lint/test failure that blocks THIS plan's own scope — that is fixed inline as
       ordinary Root Cause Orientation work, not routed as a deferred learning.
       — acceptance: every code-homed learning has a corresponding `plans/backlog/` folder, or none
-      exists.
-- [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
+      exists - _2026-07-17 · Done._ Neither surviving learning is `apps/`/`libs/`/tests-homed — the
+      `cargo test --lib` quirk routed to `docs/explanation/.../rust/testing-standards.md` and the
+      worktree relative-path/dependency-restore gaps routed to
+      `repo-governance/development/workflow/worktree-setup.md`, both governance-doc homes, not
+      apps/libs/tests. No `plans/backlog/` folder needed.
+- [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
       matrix; in particular, evaluate recommending a **standing tri-repo rhino-cli src-diff gate** as
       a follow-up idea in `plans/ideas.md`
       — acceptance: `learnings.md`'s Triage log records the terminal state (routed / filed / discarded)
-      of every entry.
-- [ ] [AI] If no generalizable learning surfaced beyond the routed entries, record the explicit escape
+      of every entry - _2026-07-17 · Done._ Routed: (1) `cargo test --lib` harness-quirk →
+      `docs/explanation/software-engineering/programming-languages/rust/testing-standards.md` new
+      "Filtering Tests in Crates with Custom `harness = false` Binaries" section; (2) sibling-repo
+      relative-path nesting + per-project polyglot dependency-restore gap (mix/dotnet) →
+      `repo-governance/development/workflow/worktree-setup.md` new "Known Gaps Beyond the Two-Step
+      Init" section; (3) standing tri-repo src-diff gate idea + tests/ boundary question → new
+      entries under `plans/ideas.md`'s "Rust Governance" heading. 5 per-file canonical decisions stay
+      in this plan's own (now-archived) `learnings.md` — their durable home is the plan record
+      itself. Full terminal-state list recorded in the Triage log below.
+- [x] [AI] If no generalizable learning surfaced beyond the routed entries, record the explicit escape
       in `learnings.md`: `No generalizable learnings — <one-line reason>`
-      — acceptance: `learnings.md`'s Triage log is never silently empty.
+      — acceptance: `learnings.md`'s Triage log is never silently empty - _2026-07-17 · N/A._
+      Generalizable learnings did surface and were routed (see task above); the explicit-escape
+      form does not apply. Triage log populated with real routing entries instead.
 
 ### Archival-in-PR
 

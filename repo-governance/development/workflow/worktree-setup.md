@@ -108,6 +108,59 @@ Without running both steps after worktree creation or entry, these failures can 
 
 Nx task caching, project graph resolution, and executor plugins all depend on a consistent `node_modules/` state in the workspace root. When `node_modules/` diverges from `package-lock.json`, the entire workspace behaves unpredictably — not just the files that changed.
 
+## Known Gaps Beyond the Two-Step Init
+
+Two further gaps have surfaced in practice that the two-step init above does not cover. Both are
+one-time, worktree-local, and require no source or config changes — but agents should account for
+them explicitly rather than rediscover them mid-task.
+
+### Per-Project Dependency Restoration for Some Language Ecosystems
+
+`npm run doctor -- --fix` converges the _toolchain_ (the `mix`, `dotnet`, `cargo`, etc. CLIs
+themselves) but does not run _per-project_ dependency restoration for every polyglot project in
+the workspace. Most language ecosystems restore dependencies automatically as a side effect of
+their own build/test/typecheck invocation (Rust's `cargo`, TypeScript's package-manager-driven Nx
+executors, Go's module cache, Python's `uv`/`pip`), so this gap is invisible for them. Two
+ecosystems in this monorepo do NOT auto-restore and need an explicit one-time step in a freshly
+provisioned worktree:
+
+```bash
+# Elixir projects — run once per affected libs/apps/*-elixir-* project
+mix deps.get
+
+# F#/.NET projects — run once per affected apps/*-fsharp-*/src and .../tests project
+dotnet restore
+```
+
+Symptom without this step: `nx affected -t typecheck lint test:quick specs:coverage` fails on
+Elixir projects with `Unchecked dependencies ... run "mix deps.get"`, or on F# projects with
+`NETSDK1004: Assets file ... not found. Run a NuGet package restore`, even though the toolchain
+itself (`mix`, `dotnet`) is correctly installed. Root-cause the failure to this gap before
+assuming a real regression — it reproduces on every freshly provisioned worktree that touches an
+Elixir or F# project, not just once.
+
+### Sibling-Repo Relative Paths From Inside a Worktree (Multi-Repo Plans)
+
+A delivery checklist command that references a sibling repo with a relative path (e.g.
+`../ose-primer/apps/rhino-cli`) resolves correctly only from each repo's **root checkout**. Plan
+execution runs inside a **worktree** (`ose-public/worktrees/<plan-id>/`), which is two directory
+levels deeper than the repo root, so a naively-written `../ose-primer` resolves to a nonexistent
+path. If the sibling repo's own work also happens inside a matching worktree (the common case for
+a tri-repo `worktree-to-pr` plan), the correct relative path has to account for BOTH the local and
+the sibling's worktree nesting:
+
+```bash
+# WRONG from inside ose-public/worktrees/<plan-id>/: resolves outside the checkout entirely
+../ose-primer/apps/rhino-cli
+
+# CORRECT: 3 levels up (out of the plan folder, out of worktrees/, out of ose-public/),
+# then into the sibling's OWN worktree for the same plan
+../../../ose-primer/worktrees/<plan-id>/apps/rhino-cli
+```
+
+Author (or review) multi-repo delivery-checklist commands with this nesting in mind before running
+them, rather than discovering the wrong path mid-execution.
+
 ## When This Applies
 
 Run both steps in the root worktree after any of the following:
