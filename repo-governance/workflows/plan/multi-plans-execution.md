@@ -1,8 +1,8 @@
 ---
 name: multi-plans-execution
 title: "multi-plans-execution"
-goal: Execute several project plans together — resolving their dependency order, parallelizing independent delivery steps up to a bounded concurrency, and driving each plan through its full per-plan lifecycle to archival
-termination: Every named plan reached its delivery-mode terminal state (archived to plans/done/ or a green reviewed PR handed off), or was quarantined with a reported reason
+goal: Execute several project plans together — resolving their dependency order, parallelizing independent delivery steps up to a bounded concurrency, driving each plan through its full per-plan lifecycle to archival, and solidifying the cross-plan learnings the executed plans produced together
+termination: Every named plan reached its delivery-mode terminal state (archived to plans/done/ or a green reviewed PR handed off) or was quarantined with a reported reason, AND cross-plan learnings were consolidated and routed to durable homes
 inputs:
   - name: plans
     type: selector
@@ -42,7 +42,7 @@ outputs:
   - name: final-report
     type: file
     pattern: generated-reports/multi-plans-execution__*__summary.md
-    description: Roll-up of every plan's outcome, quarantines, and preexisting fixes
+    description: Roll-up of every plan's outcome, quarantines, preexisting fixes, and the consolidated cross-plan learnings with their routing decisions
 ---
 
 # Multi-Plans Execution Workflow
@@ -56,7 +56,10 @@ what must be sequenced and what is safe to parallelize, (3) materializes one ver
 covering **every** delivery-checklist item across all plans, and (4) runs a bounded ready-queue
 scheduler that pulls independent delivery-step nodes and drives each plan through its full
 per-plan lifecycle (worktree → per-phase gates → post-push CI → validation → delivery-mode
-PR-review cycle → merge/handoff → archival), exactly as `plan-execution.md` does for one plan.
+PR-review cycle → merge/handoff → archival), exactly as `plan-execution.md` does for one plan, and
+(5) after all plans finish, runs one **cross-plan learnings solidification** pass so the recurring and
+portfolio-level signal the plans produced _together_ reaches a durable home instead of being stranded
+in each archived plan folder.
 
 **When to use**:
 
@@ -270,7 +273,7 @@ the ready set (C1) and refill (C2). Continue until every plan has reached a term
 which plans are in flight, nodes ticked / total per plan, and any preexisting fixes — so the parallel
 schedule is legible in real time.
 
-### Phase D — Per-Plan Full Lifecycle, Failure Isolation, and Finalization
+### Phase D — Per-Plan Full Lifecycle, Failure Isolation, Cross-Plan Knowledge Capture, and Finalization
 
 **D1. Full lifecycle per plan.** Each plan proceeds through the complete `plan-execution.md` arc:
 execute all `[AI]` items → validation via `plan-execution-checker` → iterate to zero findings → for a
@@ -288,11 +291,46 @@ issues including preexisting first — only a genuine hard blocker counts as fai
 record the reason. **Independent plans keep running** — one plan's blocker never halts the disjoint
 work. Never bypass a failing gate to keep a plan moving.
 
-**D4. Finalization.** When all plans have reached a terminal state, emit the summary report to
+**D4. Per-plan Knowledge Capture is inherited (not skipped).** Each plan still runs its own
+[Knowledge Capture pre-archival gate](./plan-execution.md#8-finalization-and-archival-sequential)
+before that plan archives — every entry in its `learnings.md` reaches a terminal state (routed
+inline, filed as a `plans/backlog/` follow-up, or discarded with a one-line reason), both safety
+gates applied. Multi-plan scheduling never lets a plan archive with an open, undecided `learnings.md`.
+
+**D5. Cross-plan learnings solidification (mandatory before the run reports `pass`).** After every
+plan has completed its own Knowledge Capture (D4), run one **consolidation pass over all plans
+executed in this run** so recurring and cross-cutting learnings reach a durable home instead of being
+stranded in individual archived plan folders:
+
+1. **Gather.** Read every executed plan's final `learnings.md` (including quarantined plans — a
+   quarantine reason is itself a learning) plus the DAG report (A7) and this workflow's own scheduling
+   observations (mis-inferred dependency edges, resource conflicts that surprised the schedule,
+   parallelism that had to be dialed back).
+2. **Cluster into cross-cutting themes.** Identify learnings that appear in **two or more** plans, or
+   that concern the multi-plan run itself (scheduling, byte-identity serialization, worktree
+   contention, shared-toolchain effects). A theme seen once in a single plan stays that plan's own
+   business — it was already routed in D4; do not double-file it.
+3. **Route each theme to a durable home**, applying the [Knowledge Capture
+   Convention](../../development/quality/knowledge-capture.md) rubric and **both safety gates** (the
+   secret/sensitivity gate and the repo-relevance gate) to every surviving item: a recurring
+   engineering insight → the relevant `repo-governance/` convention or development doc; a scheduling
+   or workflow insight → this workflow or `plan-execution.md`; a follow-up worth its own work → a new
+   `plans/backlog/` entry; anything that fails a gate or the litmus test → discarded with a one-line
+   reason. **Zero cross-cutting themes may be left in an open, undecided state.**
+4. **Record the consolidation** in the summary report (D6) — each theme, the plans it spanned, and its
+   terminal routing decision — so the solidification is auditable, not implicit.
+
+This is the multi-plan analogue of the per-plan Knowledge Capture gate: D4 ensures no single plan
+loses its learnings; D5 ensures the **portfolio-level** signal (what these plans taught _together_)
+is not lost when each plan's folder is archived in isolation.
+
+**D6. Finalization.** When all plans have reached a terminal state AND cross-plan learnings
+solidification (D5) is complete, emit the summary report to
 `generated-reports/multi-plans-execution__<uuid>__<timestamp>__summary.md`: per-plan terminal status
 (done / handed-off / quarantined / partial), the parallelism actually achieved, quarantines with
-reasons, and all preexisting fixes made. Report `partial` if any plan was quarantined or hit
-`max-iterations`; `pass` only when every plan reached its clean terminal state.
+reasons, all preexisting fixes made, and the **consolidated cross-plan learnings** with their routing
+decisions (D5.4). Report `partial` if any plan was quarantined or hit `max-iterations`; `pass` only
+when every plan reached its clean terminal state **and** cross-plan learnings were solidified.
 
 ## Iron Rules (Non-Negotiable)
 
@@ -316,11 +354,17 @@ plan, unchanged. The multi-plan additions:
    dependents); keep disjoint plans running; never bypass a gate.
 7. **Explicit `Depends-on` is authoritative.** Inference only fills gaps; it never overrides or
    relaxes a declared dependency.
+8. **Cross-plan learnings are solidified before `pass`.** Per-plan Knowledge Capture (D4) is
+   inherited unchanged, AND the run additionally runs the cross-plan consolidation (D5) over every
+   executed plan's `learnings.md` before reporting `pass`. No cross-cutting theme may archive
+   stranded in a single plan's folder; every theme reaches a durable home or is discarded with a
+   reason, both safety gates applied.
 
 ## Termination Criteria
 
 - **`pass`**: every named plan reached its clean terminal state (archived to `plans/done/`, or a
-  green fully-reviewed PR handed off for a `*-to-pr` plan whose human merge is pending).
+  green fully-reviewed PR handed off for a `*-to-pr` plan whose human merge is pending) **and**
+  cross-plan learnings were solidified (Phase D5 — every cross-cutting theme routed to a durable home).
 - **`partial`**: one or more plans were quarantined or hit their `max-iterations` while others
   completed.
 - **`fail`**: the schedule could not be built (cyclic `Depends-on`, a named plan missing, or all
@@ -390,6 +434,8 @@ Depends-on: [rhino-cli-source-drift-reconciliation]
 - **Quarantine, not cascade** — a blocker confines to its plan + dependents.
 - **Harness-cap respect** — effective concurrency never exceeds the platform agent limit.
 - **Disk-is-truth resume** — re-entry rebuilds the union Task list from every plan's `delivery.md`.
+- **Cross-plan learnings solidification** — a mandatory consolidation pass routes portfolio-level
+  learnings to durable homes before `pass`, so recurring signal survives per-plan archival.
 
 ## Related Workflows
 
@@ -422,6 +468,8 @@ Depends-on: [rhino-cli-source-drift-reconciliation]
   workflow file.
 - **[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)** —
   pre-execution grill on unresolved cross-plan ordering.
+- **[Knowledge Capture Convention](../../development/quality/knowledge-capture.md)** — the triage
+  rubric and both safety gates applied per plan (D4) and again in the cross-plan consolidation (D5).
 - **[Agent Workflow Orchestration](../../development/agents/agent-workflow-orchestration.md)** and
   **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)** —
   concurrency never self-promoted above the harness cap.
