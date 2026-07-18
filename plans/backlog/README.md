@@ -11,6 +11,10 @@ Planned projects for future implementation.
   the e2e-coverage gap detector's `@skip`/`@fixme` special-tag detection is scoped to
   `Scenario Outline` level only; `Rule:`/`Feature:`-level tags produce the same undetected shape one
   AST level up.
+- [2026-07-18\_\_rust-cargo-target-dir-sharing](./2026-07-18__rust-cargo-target-dir-sharing/README.md) —
+  Rust `target/` directories are duplicated per git worktree (~32 GB observed); share build output
+  across worktrees via a per-crate `target/` symlink created at repo init (local-dev-only, CI-guarded),
+  applied across all three repos.
 
 ## Instructions
 
