@@ -3,11 +3,12 @@
 ## Context
 
 `apps/rhino-cli/src/infrastructure/git/root.rs` contains a test,
-`find_root_from_worktree_returns_worktree_path` (~line 75), that exercises git-worktree root
-resolution. Its fixture setup hardcodes a `Test`/`test@test.com` git identity (lines 87, 92) and
-creates a real linked git worktree as part of test setup. Under parallel `nx affected`/`nx run-many`
-invocations (e.g. `test:quick` fanning out across ~25 projects), this test has repeatedly corrupted
-the **real** repository it runs inside, rather than staying isolated to a throwaway fixture.
+`find_root_from_worktree_returns_worktree_path` (line 76 [Repo-grounded]), that exercises
+git-worktree root resolution. Its fixture setup hardcodes a `Test`/`test@test.com` git identity
+(lines 87, 92 [Repo-grounded]) and creates a real linked git worktree as part of test setup. Under
+parallel `nx affected`/`nx run-many` invocations (e.g. `test:quick` fanning out across ~25 projects),
+this test has repeatedly corrupted the **real** repository it runs inside, rather than staying
+isolated to a throwaway fixture.
 
 ## Origin
 
@@ -27,8 +28,9 @@ originating plan's PR).
   repository's `.git`), with no possibility of registering a linked worktree or commit against the
   actual working tree regardless of concurrent test execution elsewhere in the same process/CI run.
 - Add a regression test that runs this fixture concurrently (e.g. via a loop or `cargo test` with
-  increased `--test-threads`) alongside another `CwdLock`-guarded git test, to prove the race is
-  closed.
+  increased `--test-threads`) with whatever operation Phase 1 identifies as the actual interacting
+  cause (a `CwdLock`-guarded git test, a `specs_coverage.rs` test run, or an `nx affected`-style
+  multi-process fanout — Phase 1 determines which), to prove the race is closed.
 - Audit `apps/rhino-cli/src/infrastructure/git/` for any other test using a similar real-worktree
   fixture pattern, and apply the same fix if found.
 

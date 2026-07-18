@@ -35,6 +35,12 @@ plan's PR-review cycles this session, each requiring careful manual verification
 - Not a general audit of every rhino-cli test's fixture isolation — scoped specifically to the
   `infrastructure/git/root.rs` fixture(s) implicated by this session's incidents (with a narrow,
   explicit audit of sibling tests in the same file/module, per the README's in-scope section).
+- `apps/rhino-cli/src/commands/specs_coverage.rs`'s own `CwdLock`-guarded `std::env::set_current_dir`
+  tests (`run_honors_exclude_source_dir_end_to_end` line 619,
+  `run_level_check_honors_exclude_source_dir_end_to_end` line 651) are provisionally out of scope, but
+  this is not a silent exclusion: `delivery.md` Phase 1 explicitly investigates whether they interact
+  with or are the true source of the race, and rules them in or out with a one-line reason in
+  `tech-docs.md` before Phase 3 begins.
 
 ## Business Risks and Mitigations
 

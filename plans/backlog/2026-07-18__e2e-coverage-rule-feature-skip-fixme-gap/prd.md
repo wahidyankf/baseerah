@@ -24,14 +24,18 @@ design-decision documentation for the shipped detector so it matches the current
 ```gherkin
 Feature: Rule/Feature-level skip/fixme detection
 
-  Scenario: AC-1 - Rule-level @skip tag is detected as unbound
+  # AC-1 — title kept verbatim-identical to the companion .feature scenario added in delivery.md
+  # Phase 2 (see the Gherkin-Tagged Delivery Steps HARD rule).
+  Scenario: A Rule-level @skip tag is detected as unbound
     Given a .feature file with a "Rule:" block tagged "@skip"
     And the Rule contains at least one Scenario
     And the file also has other, non-skipped content so it still generates
     When "specs e2e-coverage validate" runs
     Then every scenario nested under the skipped Rule is reported as unbound
 
-  Scenario: AC-2 - Feature-level @fixme tag is detected as unbound
+  # AC-2 — title kept verbatim-identical to the companion .feature scenario added in delivery.md
+  # Phase 2.
+  Scenario: A Feature-level @fixme tag is detected as unbound
     Given a .feature file whose top-level "Feature:" is tagged "@fixme"
     When "specs e2e-coverage validate" runs
     Then every scenario in the file is reported as unbound

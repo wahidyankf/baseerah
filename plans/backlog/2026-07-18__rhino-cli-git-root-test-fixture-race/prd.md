@@ -35,8 +35,10 @@ Feature: rhino-cli git-root test fixture isolation
   Scenario: AC-2 - fixture survives concurrent execution
     Given the git-root test suite is run with test-thread parallelism sufficient to reproduce the
       originally observed race
-    When "find_root_from_worktree_returns_worktree_path" runs concurrently with another
-      CwdLock-guarded git test in the same module
+    When "find_root_from_worktree_returns_worktree_path" runs concurrently with the operation
+      identified by Phase 1 as interacting with it (another CwdLock-guarded git test in the same
+      module, if hypothesis 1/2 is confirmed; the specs_coverage.rs test suite or an nx
+      affected-style multi-process fanout, if hypothesis 3 is confirmed)
     Then both tests pass
     And "git worktree list" and "git reflog" on the real repository show zero change before vs. after
       the run
