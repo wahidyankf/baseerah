@@ -22,15 +22,30 @@ propagated identically across the three OSE repositories:
    vacant/responsive as possible — bounded by the DAG (never force parallelism onto dependent nodes).
 9. **Status-update cadence**: while task-list items are active, the orchestrator updates the user
    every 3-5 minutes (not faster), tied to task-list-discipline.
-10. **Per-phase PR delivery + feature flags**: decompose plans so each applicable phase / independent
-    DAG node lands as its own PR (strict 1-PR ↔ 1-worktree), using feature flags to keep partial work
-    merged-but-dark on `main`; inseparable dependent phases stay one PR (DAG governs).
+10. **Per-phase PR delivery + feature flags**: the `worktree-to-pr` default binds at every plan path,
+    in two different ways — **creating/updating** a plan binds it as a **design obligation** (phases
+    must be authored to be independently PR-able; the authoring edit itself may push direct to
+    `main`), while **executing** a plan binds it as the actual delivery route. A new general
+    **plan-docs-only** carve-out (changes touching only `plans/**`, no `apps/`/`libs/` code, may push
+    direct to `main`) is introduced on its own footing, not derived from DD-11. Decompose plans so
+    each applicable phase / independent DAG node lands as its own PR (strict 1-PR ↔ 1-worktree),
+    **opened and merged as that phase completes**, never batched to plan end; the merge actor is
+    `[AI]` by default (see requirement 12). Feature-flagging is the
+    **default** for keeping partial work merged-but-dark on `main`; a phase lands unflagged only when
+    it ships no user-reachable behaviour change, and every flag carries a removal step in the plan's
+    final phase. Inseparable dependent phases stay one PR (DAG governs).
 11. **Surface-conditional UI / API tester gates**: UI-bearing plans run both UI gates
     (`ui/ui-quality-gate.md` static components + `web/web-ux-test-fixing-planning.md` running triad);
     API/BE-bearing plans run the **new** `api/api-quality-gate.md`; both → both; neither → an
     **explicitly stated** exemption. Binds during plan creation/update/execution AND as a merge
     precondition. Closes a verified gap: `api-exploratory-tester` exists as an agent but had no
     workflow gating it.
+12. **`[AI]` merge as the repo-wide default** (inverts the Delivery Mode convention): once a PR's
+    merge preconditions hold — CI green, clean 3-cycle review, 0 CRITICAL + 0 HIGH, branch up-to-date
+    with latest `origin/main`, surface-conditional tester gates satisfied — `[AI]` performs the merge.
+    A `[HUMAN]` merge gate applies **only** where a plan's own step states it explicitly; silence now
+    means `[AI]`. The merge **preconditions are unchanged** — only the actor is. This dissolves DD-10,
+    which existed solely to grant this plan a per-plan exception to the old `[HUMAN]` default.
 
 The "product" is the governance text and its wiring (indexes, `AGENTS.md`, `CLAUDE.md`, agent/skill/
 workflow surfaces, regenerated bindings) plus the `main-ci.yml` trigger change, consumed by AI agents
@@ -155,6 +170,23 @@ Scenario: Plan-end cleanup is mandatory but self-scoped and non-destructive to o
   And it treats the cleanup gate itself as non-destructive to other actors
 ```
 
+```gherkin
+Scenario: A worktree is checked for unlanded content before it is removed
+  Given a worktree whose pull request has been merged
+  When the cleanup gate evaluates that worktree for removal
+  Then merge state is tested with gh pr list rather than git merge-base --is-ancestor
+  And the worktree is checked for uncommitted changes and for commits never pushed
+  And any content found nowhere else is recovered to main before removal
+  And removal uses non-force git worktree remove so a dirty worktree refuses deletion
+```
+
+```gherkin
+Scenario: A worktree created by another session is left in place
+  Given a worktree on the shared machine that this plan did not create
+  When the cleanup gate evaluates that worktree for removal
+  Then the worktree is left in place unless there is positive evidence it is idle
+```
+
 ### DAG-first orchestration
 
 ```gherkin
@@ -191,10 +223,63 @@ Scenario: A plan is decomposed into per-phase PRs with a strict worktree mapping
 ```gherkin
 Scenario: Feature flags keep partially-built work merged-but-dark on main
   Given a multi-phase plan where later phases are not yet complete
-  When feature-flagging is applied wherever possible
+  When feature-flagging is applied by default
   Then partially-built work is merged to main early behind a feature flag
   And incomplete phases integrate continuously instead of accumulating in a long-lived branch
   And independent phases can review, gate, and merge in parallel with reduced conflict surface
+```
+
+```gherkin
+Scenario: The worktree-to-pr default binds as a design obligation when authoring a plan
+  Given a plan is being created or updated
+  When the plan's phases are laid out
+  Then the phases are authored so each can become its own pull request at execution time
+  And a plan that cannot be decomposed that way records why in tech-docs.md
+  And the authoring edit itself may push directly to main under the plan-docs-only carve-out
+```
+
+```gherkin
+Scenario: The plan-docs-only carve-out stands as a general convention in its own right
+  Given a change touches only plans and no apps or libs code
+  When the delivery route is chosen
+  Then the change may be committed and pushed directly to main
+  And the carve-out is stated on its own footing rather than derived from DD-11
+```
+
+```gherkin
+Scenario: Each phase PR is merged as that phase completes
+  Given a plan decomposed into per-phase pull requests
+  When a phase PR has green CI and a clean 3-cycle pr-review-maker to pr-review-fixer gate
+  Then that phase PR is merged rather than held for a batch merge at the end of the plan
+  And the merge actor is [AI] by default
+```
+
+### [AI] merge as the repo-wide default
+
+```gherkin
+Scenario: A green fully-reviewed PR is merged by [AI] without a human gate
+  Given a plan delivered under a worktree-to-pr mode
+  And its PR has green CI, a clean 3-cycle review, zero CRITICAL and zero HIGH findings
+  And the branch is up to date with the latest origin/main
+  When the merge preconditions are all satisfied
+  Then [AI] merges the PR without waiting for a human
+  And the merge preconditions themselves are unchanged by this rule
+```
+
+```gherkin
+Scenario: A human merge gate applies only where a plan states it explicitly
+  Given a plan whose step does not name a merge actor
+  When the PR reaches its merge preconditions
+  Then the merge is performed by [AI]
+  And a [HUMAN] merge gate applies only where that plan's own step says so explicitly
+```
+
+```gherkin
+Scenario: A phase lands unflagged only when it ships no user-reachable behaviour
+  Given a phase is being prepared for its own pull request
+  When the phase ships no user-reachable behaviour change
+  Then the phase may land unflagged and the step states which exemption applies
+  And every feature flag introduced carries a named removal step in the plan's final phase
 ```
 
 ### Background-slot preference and status cadence

@@ -179,6 +179,29 @@ fill — **especially plans that spin up multiple worktrees**. Hard safety cavea
 - Verify non-use before deleting; when in doubt, leave it.
 - Make cleanup a **mandatory plan-end gate** that is itself non-destructive to others.
 
+**Mandatory pre-removal checks before any `git worktree remove`** — each grounded in a live 2026-07-19
+incident during this session's own worktree audit, not hypothesised:
+
+1. **Test merge state with `gh pr list --head <branch> --state all --json number,state,mergedAt`, NOT
+   `git merge-base --is-ancestor`.** Every PR in these repos is **squash**-merged, which replays the
+   branch as one new commit, so the branch's own commits never become ancestors of `main`. The
+   ancestry test therefore reports `NOT-MERGED` for **every** merged branch. Observed live: all four
+   `ose-public` worktree branches reported NOT-MERGED while `gh` showed PRs #62/#66/#76/#77 all MERGED.
+2. **`git status --porcelain` the worktree and read any dirty diff before removing.** A merged PR
+   proves the _branch_ landed, not that the _working tree_ is empty — archival record-keeping in
+   particular is written last, after the merge, and is easily left uncommitted. Observed live: the
+   `rhino-speccoverage-multiline-scenario-scan` worktree held the plan's two terminal archival
+   checkboxes ticked with real evidence (commit SHAs, merge timestamp) that existed **nowhere else**;
+   every merge-state signal said "safe to delete". Recover such content to `main` first (plan-docs-only
+   changes may push direct), or discard it explicitly with a stated reason.
+3. **Check `git log origin/<branch>..<branch>`** for commits never pushed anywhere.
+4. **Always use non-force `git worktree remove`** — it refuses on a dirty worktree, which is the
+   backstop for when checks 1-3 are skipped. Never `rm -rf` a worktree.
+5. **Never remove a worktree you did not create** without positive evidence it is idle — on a shared
+   machine another session's live work is indistinguishable from stale state by path alone. Observed
+   live: of 11 worktrees across the three repos, one (`rhino-cli-source-drift-reconciliation`, 5 dirty
+   files) belonged to active work and was correctly left in place.
+
 **Local-parallelism grounding** (the git-endorsed shape for concurrent workstreams on one machine)
 [git-worktree(1), git-gc(1) §CONFIGURATION; Web-cited via web-researcher, access 2026-07-19 —
 <https://git-scm.com/docs/git-worktree>, <https://git-scm.com/docs/git-gc>]:
@@ -335,11 +358,39 @@ The cron `0 5,11,17,23 * * *` is UTC; UTC+7 gives 12:00/18:00/00:00 (next day)/0
 A planning-granularity rule for how plans are **decomposed**, landing in the plan-planning workflow +
 plan conventions:
 
-- **Per-phase / per-DAG-node PRs**: decompose a plan so each applicable phase (or independent DAG
-  node) lands as its **OWN pull request**, rather than accumulating many phases in one long-lived
-  branch.
-- **Feature flags wherever possible**: keep partially-built work **merged-but-dark on `main`** behind a
-  feature flag, so incomplete phases integrate early instead of piling up unmerged.
+- **The default binds at all three plan paths, but in two different ways** — this distinction is the
+  rule, not a caveat, because plan **creation** and **update** are by definition `plans/**`-only edits
+  and would otherwise be swallowed whole by the plan-docs carve-out below:
+  - **Creating / updating a plan** — binds as a **design obligation**, not a delivery route. The
+    authoring edit itself may push directly to `main` (see the carve-out below); what the default
+    requires is that the plan be **authored so its phases are independently PR-able** — phase
+    boundaries, DAG shape, and feature-flag placement are chosen so that each applicable phase can
+    become its own PR at execution time. A plan that genuinely cannot be decomposed this way must
+    record why in its `tech-docs.md`.
+  - **Executing a plan** — binds as the **actual delivery route**: `worktree-to-pr`, per-phase PRs,
+    merged per phase.
+- **Plan-docs-only carve-out (NEW general rule introduced by this plan)**: a change touching only
+  `plans/**`, with no `apps/`/`libs/` code, may be committed and pushed directly to `main` rather than
+  routed through a PR — authoring loops on documents that gate no runtime behaviour, where a PR
+  round-trip buys no safety. This is stated here as a **new general convention in its own right**; it
+  is **not** derived from DD-11. DD-11 is this plan's own narrow, self-scoped instance of the same
+  reasoning and explicitly disclaims being a general precedent, so it cannot serve as the authority
+  for a repo-wide rule. Once this convention lands, DD-11 becomes redundant with it rather than its
+  source.
+- **Per-phase / per-DAG-node PRs, merged per phase**: decompose a plan so each applicable phase (or
+  independent DAG node) lands as its **OWN pull request**, rather than accumulating many phases in one
+  long-lived branch. Each phase PR is **opened AND merged** as that phase completes — per-phase
+  merging is the point; opening a PR per phase but holding them all for a batch merge at the end
+  re-creates the long-lived-branch problem this rule exists to remove. **Merge actor**: `[AI]` merges
+  the phase PR once CI is green and the 3-cycle `pr-review-maker`→`pr-review-fixer` gate is clean —
+  see Delta 12, which inverts the repo-wide default. No phase stalls waiting on a human unless that
+  plan's own step explicitly says `[HUMAN]`.
+- **Feature flags by default**: keep partially-built work **merged-but-dark on `main`** behind a
+  feature flag, so incomplete phases integrate early instead of piling up unmerged. Flagging is the
+  default, not an optional nicety — the escape is explicit: a phase may land unflagged only when it
+  ships **no user-reachable behaviour change** (pure docs, governance, refactor, or test-only work),
+  and the phase step must say which. Every flag carries a named removal step in the plan's final
+  phase, so flags do not accumulate as permanent dead branches.
 - **Rationale**: smaller per-phase PRs + feature-flagging enable **safer and faster continuous
   integration** — work integrates into `main` early (behind a flag), shrinking merge conflicts and
   review surface, and letting independent phases proceed and merge **in parallel**.
@@ -442,6 +493,35 @@ applies to the new file names.
 **Wiring**: the conditional rule is stated in `plan/plan-execution.md` and `plan/plan-planning.md`
 (so plan authoring and execution both carry it), and `pr/pr-review-quality-gate.md` carries it as a
 merge precondition (Delta 8 clause d). Propagated to all three repos in Phases 6/7.
+
+### Delta 12 — `[AI]` merge becomes the repo-wide default (INVERTS the Delivery Mode convention)
+
+A maintainer directive (2026-07-19): **"by default, AI are allowed to merge the PR. Only wait for
+human when you are explicitly told so."** This inverts the standing default rather than adding
+another per-plan exception.
+
+- **New default**: on a `*-to-pr` plan, `[AI]` merges the PR once its merge preconditions hold — CI
+  green, the 3-cycle `pr-review-maker`→`pr-review-fixer` gate clean, 0 CRITICAL + 0 HIGH, branch
+  up-to-date with latest `origin/main`, and the surface-conditional tester gates (Delta 11) satisfied.
+  **The preconditions are unchanged; only the actor is.**
+- **`[HUMAN]` becomes the opt-in**: a plan gets a human merge gate only where its own step says so
+  explicitly. Silence now means `[AI]`, where it previously meant `[HUMAN]`.
+- **What this dissolves**: DD-10 existed solely to grant this plan a per-plan auto-merge exception,
+  and explicitly disclaimed amending the default for other plans. Once Delta 12 lands, DD-10 is
+  **redundant with the default** rather than a deviation from it — it is retained only as the
+  historical record of how the authorization arrived. Any other plan's identical carve-out is likewise
+  absorbed.
+- **What this does NOT change**: the merge _preconditions_, the 3-cycle review requirement, the
+  quality gates, or the `[HUMAN]`/`[AI]` tagging of any non-merge step. This is not a loosening of the
+  gate — it is a change in who performs the final click once the gate is already green.
+- **Rationale**: a green, fully-reviewed PR waiting on a human is pure latency in a per-phase-PR model
+  (Delta 10). With phases landing continuously, a human merge gate per phase would serialize the whole
+  point of incremental delivery back onto one person's availability.
+
+**Surfaces**: [Plans Organization Convention §Delivery Mode](../../../repo-governance/conventions/structure/plans.md#delivery-mode)
+(the definitional home of the `[HUMAN]`-merge default), `pr/pr-review-quality-gate.md` (the merge-gate
+done-definition), `plan/plan-execution.md` + `plan/plan-planning.md`, and every `*-to-pr` reference
+that currently hardcodes `[HUMAN]` merge. Propagated to all three repos in Phases 6/7.
 
 ## Surface inventory (the execution scope)
 

@@ -34,9 +34,19 @@ repositories. It ships **no** application or library code.
 - Add **DAG-first orchestration**: task lists and delivery checklists declare an explicit dependency
   DAG; independent nodes fan out up to N, dependent nodes serialize; cleanup is the terminal node.
 - Add **per-phase PR delivery + feature flags** with a strict **1-PR ↔ 1-worktree** mapping: each
-  applicable phase / independent DAG node lands as its own PR; feature-flag partial work merged-but-dark
-  on `main` for safer + faster continuous integration; inseparable dependent phases stay one PR
-  (DAG governs — never force-split).
+  applicable phase / independent DAG node lands as its own PR, **opened and merged as that phase
+  completes** (never batched to plan end); feature-flag partial work merged-but-dark on `main` for
+  safer + faster continuous integration; inseparable dependent phases stay one PR (DAG governs —
+  never force-split).
+- **Invert the merge default**: `[AI]` merges a PR once its preconditions hold (CI green, clean
+  3-cycle review, 0 CRITICAL + 0 HIGH, branch up-to-date, tester gates satisfied); a `[HUMAN]` gate
+  applies only where a plan says so explicitly. The preconditions are unchanged — only the actor is.
+- Bind the **`worktree-to-pr` default at every plan path**, in two distinct ways: **creating/updating**
+  a plan binds it as a **design obligation** (phases authored to be independently PR-able), while
+  **executing** binds it as the actual delivery route. Introduce a general **plan-docs-only** carve-out
+  (changes touching `plans/**`, no `apps/`/`libs/` code, may push directly to `main`) on its own
+  footing. Feature-flagging becomes a **default** with a named escape (no user-reachable behaviour
+  change) and a mandatory flag-removal step in the plan's final phase.
 - Add **background-slot preference** (fill background slots, keep the main thread vacant/responsive,
   bounded by the DAG) and a **3-5 minute bounded status-update cadence**.
 - Reinforce **`worktree-to-pr`** as the default; sharpen the **PR** (not just the worktree) as the

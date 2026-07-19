@@ -241,6 +241,17 @@ authorizing context, and its explicit non-precedential scope.
       shared cargo `target/` from the `rust-cargo-target-dir-sharing` plan as the canonical example),
       and the "cleanup is itself non-destructive to others" rule — acceptance: file exists;
       `grep -ci "shared cargo\|verify\|not in use\|self-created" worktree-and-artifact-cleanup.md` ≥ 3
+- [ ] [AI] Add the **five mandatory pre-removal checks** to `worktree-and-artifact-cleanup.md` (each
+      grounded in a live 2026-07-19 incident, per tech-docs §Delta 5): (1) test merge state with
+      `gh pr list --head <branch> --state all`, **never** `git merge-base --is-ancestor` — every PR
+      here is squash-merged, so ancestry false-negatives on every merged branch; (2) `git status
+--porcelain` the worktree and read any dirty diff, recovering content found nowhere else to
+      `main` before removal — a merged PR does not imply an empty working tree; (3) check
+      `git log origin/<branch>..<branch>` for unpushed commits; (4) always non-force
+      `git worktree remove`, never `rm -rf`; (5) never remove a worktree this plan did not create
+      without positive evidence it is idle — acceptance:
+      `grep -nic "gh pr list\|is-ancestor\|non-force\|did not create" worktree-and-artifact-cleanup.md`
+      returns ≥4
 - [ ] [AI] Cross-link the cleanup convention to `worktree-setup.md`, `temporary-files.md` (build-artifact
       taxonomy), and `no-destructive-git-operations.md` — acceptance: links present and resolve
 
@@ -291,12 +302,59 @@ authorizing context, and its explicit non-precedential scope.
       preconditions** — (a) 3 `pr-review-maker`→`pr-review-fixer` cycles, (b) branch up-to-date with
       latest `origin/main` at merge (non-destructive forward update if behind), (c) all gates green
       — acceptance: `grep -ni "up-to-date\|origin/main\|3 cycles" pr-review-quality-gate.md` present
+- [ ] [AI] **Delta 12 — invert the merge default in its definitional home**: edit
+      `repo-governance/conventions/structure/plans.md` §Delivery Mode so `[AI]` merge is the default
+      once merge preconditions hold, and a `[HUMAN]` merge gate applies **only** where a plan's own
+      step states it explicitly. State plainly that the **preconditions are unchanged — only the actor
+      is** — acceptance:
+      `grep -nic "\[AI\] merges\|only where.*explicitly\|only the actor" plans.md` returns ≥2 (the
+      same command returns **0** against the current pre-edit file)
+- [ ] [AI] Propagate the inverted default to `repo-governance/workflows/pr/pr-review-quality-gate.md`
+      (merge-gate done-definition), `plan/plan-execution.md`, and `plan/plan-planning.md` — acceptance:
+      `grep -rnic "\[HUMAN\] merge\|human merge" repo-governance/workflows/pr/pr-review-quality-gate.md repo-governance/workflows/plan/plan-execution.md repo-governance/workflows/plan/plan-planning.md`
+      shows every surviving `[HUMAN]`-merge mention rewritten as the explicit opt-in, not the default
+- [ ] [AI] Sweep every remaining hardcoded `[HUMAN]`-merge reference across `repo-governance/**`,
+      `.claude/agents/**`, and `.claude/skills/**`:
+      `grep -rniE "\[HUMAN\][^.]*merge" repo-governance .claude` — rewrite each as opt-in or delete if
+      it merely restated the old default — acceptance: every hit is either an explicit per-plan opt-in
+      or gone; the count is recorded in `learnings.md`
+- [ ] [AI] Mark **DD-10 as dissolved-by-Delta-12** in `tech-docs.md` — retained as historical record of
+      how the authorization arrived, no longer a deviation, since the default now matches it —
+      acceptance:
+      `sed -n '/^### DD-10/,/^### DD-11/p' tech-docs.md | grep -cic "dissolved by Delta 12"` returns ≥1
+      (scoped to DD-10's own section, since Delta 12's prose already contains the word "dissolves"
+      elsewhere in the file — a whole-file grep would pass vacuously)
 - [ ] [AI] Add the **per-phase-PR + feature-flag + strict 1-PR↔1-worktree** planning-granularity rule
       (Delta 10) to `repo-governance/workflows/plan/plan-planning.md` and cross-reference from
       `repo-governance/conventions/structure/plans.md`: each applicable phase / independent DAG node
       lands as its own PR (one worktree → one branch → one PR → one node), feature-flag partial work
       merged-but-dark on `main`, inseparable dependent phases stay one PR (DAG governs) — acceptance:
       `grep -ni "feature flag\|one PR\|per-phase\|1-PR" plan-planning.md` present
+- [ ] [AI] State in `plan-planning.md` how the `worktree-to-pr` default binds at each plan path:
+      **creating/updating** a plan binds it as a **design obligation** (the authoring edit may push
+      direct to `main`, but phases must be authored to be independently PR-able, and a plan that
+      cannot be so decomposed records why in its `tech-docs.md`); **executing** a plan binds it as the
+      actual delivery route. Introduce the **plan-docs-only** carve-out as a general convention in its
+      own right (a change touching only `plans/**`, no `apps/`/`libs/` code, may push direct to
+      `main`) — stated on its own footing, **not** derived from DD-11, which disclaims being a general
+      precedent — acceptance:
+      `grep -nic "design obligation\|independently PR-able\|plan-docs-only" plan-planning.md` returns
+      ≥3 (the same command returns **0** against the current pre-edit file — verified live, so the
+      clause discriminates a done step from an undone one)
+- [ ] [AI] Make **per-phase merging** explicit (not merely per-phase PR _opening_) in
+      `plan-planning.md` + `plan-execution.md`: each phase PR is opened **and merged** as that phase
+      completes and is **not** held for a batch merge at plan end. State the merge actor correctly —
+      `[HUMAN]` by the unchanged Delivery Mode default, `[AI]` only where the plan carries an explicit
+      maintainer auto-merge authorization — citing DD-10 as an **instance**, never as authority for a
+      general `[AI]`-merge rule — acceptance:
+      `grep -nic "batch merge\|merge actor\|auto-merge authorization" plan-planning.md plan-execution.md`
+      returns ≥3 (returns **0** against both current pre-edit files)
+- [ ] [AI] Encode the **feature-flag default + escape + removal** rule in `plan-planning.md`:
+      flagging is the default; a phase lands unflagged **only** when it ships no user-reachable
+      behaviour change (pure docs / governance / refactor / test-only) and the step names which
+      exemption applies; every flag introduced carries a named **removal step** in the plan's final
+      phase — acceptance: `grep -nic "unflagged\|user-reachable\|flag removal step" plan-planning.md`
+      returns ≥3 (returns **0** against the current pre-edit file)
 - [ ] [AI] Reflect the 1-PR↔1-worktree cleanup tie in `plan-execution.md` (the worktree is the unit
       cleaned up when its PR lands) — acceptance: `grep -ni "one worktree\|per-PR\|feature flag" plan-execution.md` present
 
