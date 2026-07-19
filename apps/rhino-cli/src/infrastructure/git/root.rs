@@ -20,7 +20,17 @@ pub fn find_root_from(cwd: Option<&std::path::Path>) -> std::result::Result<Path
     let mut cmd = Command::new("git");
     cmd.args(["rev-parse", "--show-toplevel"]);
     if let Some(dir) = cwd {
-        cmd.current_dir(dir);
+        // An explicit `cwd` means "the repository containing *this* directory".
+        // Git otherwise honours the ambient `GIT_DIR`/`GIT_WORK_TREE` ahead of
+        // the working directory, and git hooks export `GIT_DIR` — so without
+        // this scrub, every rhino-cli invocation from a pre-commit/pre-push hook
+        // resolves to the hook's repository rather than the requested path.
+        cmd.current_dir(dir)
+            .env_remove("GIT_DIR")
+            .env_remove("GIT_WORK_TREE")
+            .env_remove("GIT_INDEX_FILE")
+            .env_remove("GIT_OBJECT_DIRECTORY")
+            .env_remove("GIT_COMMON_DIR");
     }
     let output = cmd.output().context("failed to invoke git rev-parse")?;
     if !output.status.success() {
@@ -206,6 +216,11 @@ mod tests {
     ///   Then it succeeds, proving repo-root resolution is worktree-aware
     #[test]
     fn find_root_from_worktree_returns_worktree_path() {
+        // Serialized with the other git-spawning tests. `find_root_from` scrubs
+        // the ambient git discovery env when given an explicit cwd, so this
+        // measures worktree-awareness rather than a hook's exported GIT_DIR.
+        let _cwd = CwdLock::acquire();
+
         let main_repo = TempDir::new().expect("tempdir");
         let main = main_repo.path();
         let wt_dir = TempDir::new().expect("tempdir wt");

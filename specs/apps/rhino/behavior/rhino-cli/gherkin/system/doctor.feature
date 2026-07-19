@@ -58,3 +58,9 @@ Feature: Development Environment Health Check
     When the developer runs the doctor command with the fix flag
     Then the command exits successfully
     And the output reports nothing to fix
+
+  Scenario: A repo-config-declared tool is skipped from the check
+    Given a tool is listed under the doctor skip-tools section of repo-config.yml
+    When the developer runs the doctor command
+    Then the command exits successfully
+    And the output does not include the skipped tool

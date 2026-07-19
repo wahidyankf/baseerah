@@ -17,6 +17,8 @@ use std::path::Path;
 use std::process::Command;
 use std::time::Instant;
 
+use crate::application::repo_config;
+
 use super::tools::{ToolDef, build_tool_defs};
 use super::{
     CheckOptions, CommandOutput, CommandRunner, DoctorResult, Scope, ToolCheck, ToolStatus,
@@ -432,6 +434,12 @@ pub(super) fn run_one_def(runner: CommandRunner<'_>, def: &ToolDef) -> ToolCheck
 /// Runs all tool checks described in [`CheckOptions`] and returns aggregated results.
 ///
 /// When `opts.scope` is [`Scope::Minimal`], only the core tool set is checked.
+/// Tools named under `repo-config.yml`'s `doctor.skip-tools` are excluded
+/// regardless of scope — this is how a repo declares a tool from the full
+/// roster genuinely inapplicable to its own toolchain (dormant, not deleted;
+/// the byte-identical Rust check logic is unchanged, only that repo's own
+/// `repo-config.yml` values differ). A missing or unparsable `repo-config.yml`
+/// is treated as an empty skip list, not an error.
 /// The `opts.runner` field overrides the default [`real_runner`] for testing.
 pub fn check_all(opts: &CheckOptions<'_>) -> DoctorResult {
     let start = Instant::now();
@@ -442,6 +450,13 @@ pub fn check_all(opts: &CheckOptions<'_>) -> DoctorResult {
 
     if opts.scope == Scope::Minimal {
         defs.retain(|d| is_minimal_tool(&d.name));
+    }
+
+    let skip_tools = repo_config::load_or_default(&opts.repo_root)
+        .doctor
+        .skip_tools;
+    if !skip_tools.is_empty() {
+        defs.retain(|d| !skip_tools.iter().any(|s| s == &d.name));
     }
 
     let mut checks = Vec::with_capacity(defs.len());
@@ -668,5 +683,53 @@ mod tests {
         assert_eq!(r.checks.len(), 6);
         assert!(r.ok_count >= 2);
         assert!(r.missing_count >= 1);
+    }
+
+    #[test]
+    fn check_all_full_scope_respects_repo_config_skip_tools() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("package.json"), "{}").unwrap();
+        std::fs::write(
+            dir.path().join("repo-config.yml"),
+            "doctor:\n  skip-tools: [shfmt, tofu, clang-format]\n",
+        )
+        .unwrap();
+        let runner: CommandRunner = &|name, _args| match name {
+            "shfmt" | "tofu" | "clang-format" => {
+                panic!("skip-tools entry {name} must never be probed")
+            }
+            _ => Ok(("1.0.0\n".into(), String::new(), 0)),
+        };
+        let opts = CheckOptions {
+            repo_root: dir.path().to_path_buf(),
+            runner: Some(runner),
+            scope: Scope::Full,
+        };
+        let r = check_all(&opts);
+        assert!(
+            !r.checks
+                .iter()
+                .any(|c| ["shfmt", "tofu", "clang-format"].contains(&c.name.as_str())),
+            "skip-tools entries must be excluded from checks, got: {:?}",
+            r.checks.iter().map(|c| &c.name).collect::<Vec<_>>()
+        );
+        assert_eq!(r.checks.len(), 13, "16 known tools minus 3 skipped");
+    }
+
+    #[test]
+    fn check_all_full_scope_without_repo_config_checks_every_tool() {
+        // No repo-config.yml written — load_or_default() must fall back to an
+        // empty skip list rather than erroring, so a repo with no `doctor:`
+        // section keeps checking the full roster (today's ose-public behavior).
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("package.json"), "{}").unwrap();
+        let runner: CommandRunner = &|_, _| Ok(("1.0.0\n".into(), String::new(), 0));
+        let opts = CheckOptions {
+            repo_root: dir.path().to_path_buf(),
+            runner: Some(runner),
+            scope: Scope::Full,
+        };
+        let r = check_all(&opts);
+        assert_eq!(r.checks.len(), 16, "no skip-tools configured — full roster");
     }
 }

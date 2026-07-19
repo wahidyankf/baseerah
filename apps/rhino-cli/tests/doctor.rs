@@ -278,6 +278,21 @@ fn given_tool_mismatch(w: &mut DoctorWorld) {
     w.write_stubs();
 }
 
+#[given("a tool is listed under the doctor skip-tools section of repo-config.yml")]
+fn given_skip_tools(w: &mut DoctorWorld) {
+    w.write_config("24.11.1");
+    w.write_stubs();
+    // Deliberately remove the skipped tool's stub too: if `doctor` still
+    // probed it despite the skip-tools declaration, it would come back
+    // Missing and the exit-successfully assertion would catch it.
+    let _ = std::fs::remove_file(w.bin.path().join("shfmt"));
+    std::fs::write(
+        w.repo_path().join("repo-config.yml"),
+        "doctor:\n  skip-tools: [shfmt]\n",
+    )
+    .expect("write repo-config.yml");
+}
+
 // ===========================================================================
 // When
 // ===========================================================================
@@ -415,6 +430,12 @@ fn then_dry_run_preview(w: &mut DoctorWorld) {
 #[then("the output reports nothing to fix")]
 fn then_nothing_to_fix(w: &mut DoctorWorld) {
     assert!(w.stdout().contains("Nothing to fix"), "got: {}", w.stdout());
+}
+
+#[then("the output does not include the skipped tool")]
+fn then_skipped_tool_absent(w: &mut DoctorWorld) {
+    let out = w.stdout();
+    assert!(!out.contains("shfmt"), "got: {out}");
 }
 
 #[tokio::main]

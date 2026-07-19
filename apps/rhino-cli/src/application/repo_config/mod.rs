@@ -96,6 +96,21 @@ impl HarnessEntry {
     }
 }
 
+/// The `doctor:` section of `repo-config.yml`.
+#[derive(Debug, Clone, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
+pub struct DoctorConfig {
+    /// Tool names (from `doctor::tools::build_tool_defs`'s full roster) that
+    /// this repo's dev workflow does not need — e.g. a formatter binary this
+    /// repo's `lint-staged` config never invokes. Excluded from `doctor`'s
+    /// check so a plain `doctor` run stays dormant for tools genuinely
+    /// inapplicable to this repo instead of hard-failing on them. Mirrors the
+    /// `specs.domain-areas` allowlist pattern: the check logic is
+    /// byte-identical Rust; only this list's *values* differ per repo.
+    #[serde(rename = "skip-tools", default)]
+    pub skip_tools: Vec<String>,
+}
+
 /// Parsed `repo-config.yml` — the canonical schema, byte-identical across all
 /// three repos. Every top-level section is modeled here, and both this struct
 /// and its nested structs use `#[serde(deny_unknown_fields)]`: an unknown or
@@ -124,6 +139,9 @@ pub struct RepoConfig {
     /// Value-less injection manifest for `env validate` (manifest-consistency pass).
     #[serde(rename = "env-injection", default)]
     pub env_injection: Option<EnvInjectionManifest>,
+    /// Tools the `doctor` check should skip as inapplicable to this repo.
+    #[serde(default)]
+    pub doctor: DoctorConfig,
 }
 
 /// Load and parse `repo-config.yml` at `repo_root`.
