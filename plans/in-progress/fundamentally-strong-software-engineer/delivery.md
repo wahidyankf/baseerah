@@ -4518,7 +4518,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
@@ -4680,7 +4680,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
@@ -4845,7 +4845,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
@@ -4857,137 +4857,137 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: By Example · Python · topic wt 340 · Learn 124 / Drill 224 · **subject**. Template →
 [`syllabus/24-concurrency-and-parallelism.md`](./syllabus/24-concurrency-and-parallelism.md).
 
-- [ ] **[AI] V** — `web-researcher` for `concurrency-and-parallelism`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `concurrency-and-parallelism`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/24-concurrency-and-parallelism.md`](./syllabus/24-concurrency-and-parallelism.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/concurrency-and-parallelism/learning/` teaching **every** concept in
+- [x] **[AI] A1-concepts** — Author `CONTENT/concurrency-and-parallelism/learning/` teaching **every** concept in
       `syllabus/24-concurrency-and-parallelism.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · concurrency-vs-parallelism
-  - [ ] co-02 · processes-vs-threads
-  - [ ] co-03 · the-gil
-  - [ ] co-04 · free-threaded-cpython
-  - [ ] co-05 · io-bound-vs-cpu-bound
-  - [ ] co-06 · thread-creation-and-join
-  - [ ] co-07 · shared-mutable-state-hazard
-  - [ ] co-08 · race-condition
-  - [ ] co-09 · data-race-vs-race-condition
-  - [ ] co-10 · atomicity
-  - [ ] co-11 · locks-and-mutexes
-  - [ ] co-12 · reentrant-locks
-  - [ ] co-13 · semaphores
-  - [ ] co-14 · condition-variables
-  - [ ] co-15 · events-and-barriers
-  - [ ] co-16 · deadlock
-  - [ ] co-17 · livelock-and-starvation
-  - [ ] co-18 · lock-ordering-discipline
-  - [ ] co-19 · memory-visibility
-  - [ ] co-20 · message-passing-over-shared-state
-  - [ ] co-21 · thread-safe-queues
-  - [ ] co-22 · producer-consumer-pattern
-  - [ ] co-23 · thread-pools
-  - [ ] co-24 · process-pools
-  - [ ] co-25 · futures-and-async-results
-  - [ ] co-26 · async-await-and-the-event-loop
-  - [ ] co-27 · cooperative-vs-preemptive-scheduling
-  - [ ] co-28 · parallel-decomposition-and-amdahls-law
-  - [ ] co-29 · reactive-streams-and-backpressure
-  - [ ] co-30 · observables-and-operators
-  - [ ] co-31 · hot-vs-cold-streams
-  - [ ] co-32 · backpressure-strategies
-  - [ ] co-33 · reactive-manifesto-vs-frp
-- [ ] **[AI] A1-examples** — Author `CONTENT/concurrency-and-parallelism/learning/code/` (runnable sources, DD-20/DD-30) rendering
+  - [x] co-01 · concurrency-vs-parallelism
+  - [x] co-02 · processes-vs-threads
+  - [x] co-03 · the-gil
+  - [x] co-04 · free-threaded-cpython
+  - [x] co-05 · io-bound-vs-cpu-bound
+  - [x] co-06 · thread-creation-and-join
+  - [x] co-07 · shared-mutable-state-hazard
+  - [x] co-08 · race-condition
+  - [x] co-09 · data-race-vs-race-condition
+  - [x] co-10 · atomicity
+  - [x] co-11 · locks-and-mutexes
+  - [x] co-12 · reentrant-locks
+  - [x] co-13 · semaphores
+  - [x] co-14 · condition-variables
+  - [x] co-15 · events-and-barriers
+  - [x] co-16 · deadlock
+  - [x] co-17 · livelock-and-starvation
+  - [x] co-18 · lock-ordering-discipline
+  - [x] co-19 · memory-visibility
+  - [x] co-20 · message-passing-over-shared-state
+  - [x] co-21 · thread-safe-queues
+  - [x] co-22 · producer-consumer-pattern
+  - [x] co-23 · thread-pools
+  - [x] co-24 · process-pools
+  - [x] co-25 · futures-and-async-results
+  - [x] co-26 · async-await-and-the-event-loop
+  - [x] co-27 · cooperative-vs-preemptive-scheduling
+  - [x] co-28 · parallel-decomposition-and-amdahls-law
+  - [x] co-29 · reactive-streams-and-backpressure
+  - [x] co-30 · observables-and-operators
+  - [x] co-31 · hot-vs-cold-streams
+  - [x] co-32 · backpressure-strategies
+  - [x] co-33 · reactive-manifesto-vs-frp
+- [x] **[AI] A1-examples** — Author `CONTENT/concurrency-and-parallelism/learning/code/` (runnable sources, DD-20/DD-30) rendering
       **every** Worked example in `syllabus/24-concurrency-and-parallelism.md`. One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · concurrency-vs-parallelism-illustration — verify interleaving vs simultaneous execution
-  - [ ] ex-02 · process-vs-thread-address-space — verify the isolation (thread sees the change, process doesn't)
-  - [ ] ex-03 · gil-serializes-cpu-threads — verify wall-time ≈ serial
-  - [ ] ex-04 · free-threaded-build-check — verify GIL reported disabled on the t-build
-  - [ ] ex-05 · io-bound-threads-help — verify wall-time < the serial sum
-  - [ ] ex-06 · first-thread-start-join — verify the worker ran
-  - [ ] ex-07 · many-threads-join-all — verify every one completed
-  - [ ] ex-08 · shared-counter-no-lock — verify the total is wrong (lost updates)
-  - [ ] ex-09 · plus-equals-not-atomic — verify three bytecodes, not one
-  - [ ] ex-10 · race-nondeterministic-output — verify different totals across runs
-  - [ ] ex-11 · lock-fixes-counter — verify the total is exactly right
-  - [ ] ex-12 · lock-context-manager — verify equivalence and release-on-exception
-  - [ ] ex-13 · rlock-reentrant — verify no self-deadlock
-  - [ ] ex-14 · plain-lock-self-deadlocks — verify it blocks (with a timeout)
-  - [ ] ex-15 · semaphore-limits-concurrency — verify at most 2 in the section at once
-  - [ ] ex-16 · bounded-semaphore-guard — verify ValueError on over-release
-  - [ ] ex-17 · event-signal — verify the waiter proceeds
-  - [ ] ex-18 · barrier-rendezvous — verify none passes until all arrive
-  - [ ] ex-19 · condition-wait-notify — verify the consumer wakes
-  - [ ] ex-20 · queue-put-get — verify FIFO delivery
-  - [ ] ex-21 · producer-consumer-basic — verify all items consumed
-  - [ ] ex-22 · queue-sentinel-shutdown — verify clean termination
-  - [ ] ex-23 · threadpool-map — verify all results returned in order
-  - [ ] ex-24 · threadpool-submit-future — verify the value via .result()
-  - [ ] ex-25 · processpool-cpu — verify faster wall-time than threads
-  - [ ] ex-26 · future-done-callback — verify the callback ran
-  - [ ] ex-27 · asyncio-hello — verify a coroutine runs to completion
-  - [ ] ex-28 · asyncio-gather-sleep — verify concurrent overlap
-  - [ ] ex-29 · deadlock-two-locks — verify the reproduced hang
-  - [ ] ex-30 · deadlock-fix-lock-ordering — verify no hang
-  - [ ] ex-31 · deadlock-fix-timeout — verify progress instead of a hang
-  - [ ] ex-32 · livelock-demo — verify no progress
-  - [ ] ex-33 · starvation-demo — verify it rarely runs
-  - [ ] ex-34 · coffman-conditions — verify breaking one condition prevents the deadlock
-  - [ ] ex-35 · memory-visibility-flag — verify a lock/Event fixes visibility
-  - [ ] ex-36 · atomic-via-lock — verify no lost updates under load
-  - [ ] ex-37 · data-race-vs-logic-race — verify each fails differently
-  - [ ] ex-38 · bounded-queue-backpressure — verify the producer waits
-  - [ ] ex-39 · multi-producer-multi-consumer — verify the totals balance
-  - [ ] ex-40 · queue-task-done-join — verify the main thread waits for completion
-  - [ ] ex-41 · condition-bounded-buffer — verify wait/notify correctness
-  - [ ] ex-42 · threadpool-as-completed — verify out-of-order arrival
-  - [ ] ex-43 · threadpool-exception-propagates — verify the exception surfaces
-  - [ ] ex-44 · processpool-map-chunksize — verify the correct aggregate
-  - [ ] ex-45 · process-shared-state-fails — verify the isolation
-  - [ ] ex-46 · multiprocessing-queue-ipc — verify cross-process delivery
-  - [ ] ex-47 · multiprocessing-value-lock — verify the correct total
-  - [ ] ex-48 · pool-vs-serial-io — verify the pool wins
-  - [ ] ex-49 · pool-vs-serial-cpu-threads — verify time ≈ serial
-  - [ ] ex-50 · asyncio-tasks-create — verify overlap vs sequential await
-  - [ ] ex-51 · asyncio-timeout — verify TimeoutError
-  - [ ] ex-52 · asyncio-queue-producer-consumer — verify all items consumed cooperatively
-  - [ ] ex-53 · asyncio-semaphore-rate-limit — verify ≤N concurrent
-  - [ ] ex-54 · cooperative-blocking-hazard — verify starvation, fixed with asyncio.sleep
-  - [ ] ex-55 · run-in-executor — verify the loop stays responsive
-  - [ ] ex-56 · amdahl-speedup-estimate — verify measured ≈ the predicted ceiling
-  - [ ] ex-57 · map-reduce-decomposition — verify the combined result matches serial
-  - [ ] ex-58 · free-threaded-parallel-cpu — verify near-linear speedup vs the GIL build
-  - [ ] ex-59 · gil-vs-nogil-benchmark — verify only the t-build parallelizes
-  - [ ] ex-60 · thread-safe-singleton-double-checked — verify one instance under contention
-  - [ ] ex-61 · reader-writer-lock — verify the many-readers-or-one-writer invariant
-  - [ ] ex-62 · deadlock-detector-wait-for-graph — verify the cycle is found
-  - [ ] ex-63 · lock-free-counter-via-queue — verify correctness without a lock
-  - [ ] ex-64 · thread-local-storage — verify no cross-thread bleed
-  - [ ] ex-65 · future-cancellation — verify it never executes
-  - [ ] ex-66 · timeout-on-gather — verify the pending set is returned
-  - [ ] ex-67 · async-cancellation-cleanup — verify resources released
-  - [ ] ex-68 · async-taskgroup-vs-gather — verify one failure cancels siblings
-  - [ ] ex-69 · concurrent-fetch-aggregate-async — verify aggregate correct, ≤N concurrent
-  - [ ] ex-70 · pipeline-three-stages — verify throughput and ordering
-  - [ ] ex-71 · work-stealing-intuition — verify load balances
-  - [ ] ex-72 · process-pool-shared-memory — verify no copy, correct result
-  - [ ] ex-73 · async-to-thread — verify the loop stays responsive
-  - [ ] ex-74 · condition-predicate-loop — verify spurious-wakeup correctness
-  - [ ] ex-75 · barrier-parallel-phases — verify phase ordering
-  - [ ] ex-76 · benchmark-io-three-ways — verify both concurrent forms beat serial
-  - [ ] ex-77 · benchmark-cpu-three-ways — verify only processes beat serial (GIL build)
-  - [ ] ex-78 · graceful-shutdown-signal — verify all in-flight work completes
-  - [ ] ex-79 · deadlock-free-dining-philosophers — verify no deadlock, all eat
-  - [ ] ex-80 · race-detector-stress-test — verify it fails pre-fix, passes post-lock
-  - [ ] ex-81 · capstone-preview-concurrent-processor — verify all match serial + the expected speedup pattern
-  - [ ] ex-82 · observable-map-filter-rxpy — verify only transformed matching items reach the observer
-  - [ ] ex-83 · hot-vs-cold-subscription — verify late subscriber sees all items (cold) vs only later (hot)
-  - [ ] ex-84 · backpressure-buffer-vs-latest — verify buffer preserves all items, latest keeps only most recent
-  - [ ] ex-85 · reactive-pull-request-n — verify no item emitted beyond outstanding demand
-  - [ ] ex-86 · flow-publisher-subscriber-contract — verify demand accounting drives emission
-  - [ ] ex-87 · marble-diagram-operator-annotate — verify each operator's timing/value effect is labelled
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/concurrency-and-parallelism/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] ex-01 · concurrency-vs-parallelism-illustration — verify interleaving vs simultaneous execution
+  - [x] ex-02 · process-vs-thread-address-space — verify the isolation (thread sees the change, process doesn't)
+  - [x] ex-03 · gil-serializes-cpu-threads — verify wall-time ≈ serial
+  - [x] ex-04 · free-threaded-build-check — verify GIL reported disabled on the t-build
+  - [x] ex-05 · io-bound-threads-help — verify wall-time < the serial sum
+  - [x] ex-06 · first-thread-start-join — verify the worker ran
+  - [x] ex-07 · many-threads-join-all — verify every one completed
+  - [x] ex-08 · shared-counter-no-lock — verify the total is wrong (lost updates)
+  - [x] ex-09 · plus-equals-not-atomic — verify three bytecodes, not one
+  - [x] ex-10 · race-nondeterministic-output — verify different totals across runs
+  - [x] ex-11 · lock-fixes-counter — verify the total is exactly right
+  - [x] ex-12 · lock-context-manager — verify equivalence and release-on-exception
+  - [x] ex-13 · rlock-reentrant — verify no self-deadlock
+  - [x] ex-14 · plain-lock-self-deadlocks — verify it blocks (with a timeout)
+  - [x] ex-15 · semaphore-limits-concurrency — verify at most 2 in the section at once
+  - [x] ex-16 · bounded-semaphore-guard — verify ValueError on over-release
+  - [x] ex-17 · event-signal — verify the waiter proceeds
+  - [x] ex-18 · barrier-rendezvous — verify none passes until all arrive
+  - [x] ex-19 · condition-wait-notify — verify the consumer wakes
+  - [x] ex-20 · queue-put-get — verify FIFO delivery
+  - [x] ex-21 · producer-consumer-basic — verify all items consumed
+  - [x] ex-22 · queue-sentinel-shutdown — verify clean termination
+  - [x] ex-23 · threadpool-map — verify all results returned in order
+  - [x] ex-24 · threadpool-submit-future — verify the value via .result()
+  - [x] ex-25 · processpool-cpu — verify faster wall-time than threads
+  - [x] ex-26 · future-done-callback — verify the callback ran
+  - [x] ex-27 · asyncio-hello — verify a coroutine runs to completion
+  - [x] ex-28 · asyncio-gather-sleep — verify concurrent overlap
+  - [x] ex-29 · deadlock-two-locks — verify the reproduced hang
+  - [x] ex-30 · deadlock-fix-lock-ordering — verify no hang
+  - [x] ex-31 · deadlock-fix-timeout — verify progress instead of a hang
+  - [x] ex-32 · livelock-demo — verify no progress
+  - [x] ex-33 · starvation-demo — verify it rarely runs
+  - [x] ex-34 · coffman-conditions — verify breaking one condition prevents the deadlock
+  - [x] ex-35 · memory-visibility-flag — verify a lock/Event fixes visibility
+  - [x] ex-36 · atomic-via-lock — verify no lost updates under load
+  - [x] ex-37 · data-race-vs-logic-race — verify each fails differently
+  - [x] ex-38 · bounded-queue-backpressure — verify the producer waits
+  - [x] ex-39 · multi-producer-multi-consumer — verify the totals balance
+  - [x] ex-40 · queue-task-done-join — verify the main thread waits for completion
+  - [x] ex-41 · condition-bounded-buffer — verify wait/notify correctness
+  - [x] ex-42 · threadpool-as-completed — verify out-of-order arrival
+  - [x] ex-43 · threadpool-exception-propagates — verify the exception surfaces
+  - [x] ex-44 · processpool-map-chunksize — verify the correct aggregate
+  - [x] ex-45 · process-shared-state-fails — verify the isolation
+  - [x] ex-46 · multiprocessing-queue-ipc — verify cross-process delivery
+  - [x] ex-47 · multiprocessing-value-lock — verify the correct total
+  - [x] ex-48 · pool-vs-serial-io — verify the pool wins
+  - [x] ex-49 · pool-vs-serial-cpu-threads — verify time ≈ serial
+  - [x] ex-50 · asyncio-tasks-create — verify overlap vs sequential await
+  - [x] ex-51 · asyncio-timeout — verify TimeoutError
+  - [x] ex-52 · asyncio-queue-producer-consumer — verify all items consumed cooperatively
+  - [x] ex-53 · asyncio-semaphore-rate-limit — verify ≤N concurrent
+  - [x] ex-54 · cooperative-blocking-hazard — verify starvation, fixed with asyncio.sleep
+  - [x] ex-55 · run-in-executor — verify the loop stays responsive
+  - [x] ex-56 · amdahl-speedup-estimate — verify measured ≈ the predicted ceiling
+  - [x] ex-57 · map-reduce-decomposition — verify the combined result matches serial
+  - [x] ex-58 · free-threaded-parallel-cpu — verify near-linear speedup vs the GIL build
+  - [x] ex-59 · gil-vs-nogil-benchmark — verify only the t-build parallelizes
+  - [x] ex-60 · thread-safe-singleton-double-checked — verify one instance under contention
+  - [x] ex-61 · reader-writer-lock — verify the many-readers-or-one-writer invariant
+  - [x] ex-62 · deadlock-detector-wait-for-graph — verify the cycle is found
+  - [x] ex-63 · lock-free-counter-via-queue — verify correctness without a lock
+  - [x] ex-64 · thread-local-storage — verify no cross-thread bleed
+  - [x] ex-65 · future-cancellation — verify it never executes
+  - [x] ex-66 · timeout-on-gather — verify the pending set is returned
+  - [x] ex-67 · async-cancellation-cleanup — verify resources released
+  - [x] ex-68 · async-taskgroup-vs-gather — verify one failure cancels siblings
+  - [x] ex-69 · concurrent-fetch-aggregate-async — verify aggregate correct, ≤N concurrent
+  - [x] ex-70 · pipeline-three-stages — verify throughput and ordering
+  - [x] ex-71 · work-stealing-intuition — verify load balances
+  - [x] ex-72 · process-pool-shared-memory — verify no copy, correct result
+  - [x] ex-73 · async-to-thread — verify the loop stays responsive
+  - [x] ex-74 · condition-predicate-loop — verify spurious-wakeup correctness
+  - [x] ex-75 · barrier-parallel-phases — verify phase ordering
+  - [x] ex-76 · benchmark-io-three-ways — verify both concurrent forms beat serial
+  - [x] ex-77 · benchmark-cpu-three-ways — verify only processes beat serial (GIL build)
+  - [x] ex-78 · graceful-shutdown-signal — verify all in-flight work completes
+  - [x] ex-79 · deadlock-free-dining-philosophers — verify no deadlock, all eat
+  - [x] ex-80 · race-detector-stress-test — verify it fails pre-fix, passes post-lock
+  - [x] ex-81 · capstone-preview-concurrent-processor — verify all match serial + the expected speedup pattern
+  - [x] ex-82 · observable-map-filter-rxpy — verify only transformed matching items reach the observer
+  - [x] ex-83 · hot-vs-cold-subscription — verify late subscriber sees all items (cold) vs only later (hot)
+  - [x] ex-84 · backpressure-buffer-vs-latest — verify buffer preserves all items, latest keeps only most recent
+  - [x] ex-85 · reactive-pull-request-n — verify no item emitted beyond outstanding demand
+  - [x] ex-86 · flow-publisher-subscriber-contract — verify demand accounting drives emission
+  - [x] ex-87 · marble-diagram-operator-annotate — verify each operator's timing/value effect is labelled
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/concurrency-and-parallelism/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/concurrency-and-parallelism/drilling/_index.md` (wt 224) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5022,7 +5022,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
@@ -5034,125 +5034,125 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: By Example · Python · topic wt 350 · Learn 125 / Drill 225 · **subject**. Template →
 [`syllabus/25-advanced-algorithms.md`](./syllabus/25-advanced-algorithms.md).
 
-- [ ] **[AI] V** — `web-researcher` for `advanced-algorithms`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `advanced-algorithms`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/25-advanced-algorithms.md`](./syllabus/25-advanced-algorithms.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/advanced-algorithms/learning/` teaching **every** concept in
+- [x] **[AI] A1-concepts** — Author `CONTENT/advanced-algorithms/learning/` teaching **every** concept in
       `syllabus/25-advanced-algorithms.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · asymptotic-notation-theta-omega
-  - [ ] co-02 · amortized-analysis
-  - [ ] co-03 · recurrence-relations
-  - [ ] co-04 · master-theorem
-  - [ ] co-05 · space-time-tradeoff
-  - [ ] co-06 · divide-and-conquer
-  - [ ] co-07 · merge-sort-invariants
-  - [ ] co-08 · quicksort-partitioning
-  - [ ] co-09 · heapsort-and-binary-heaps
-  - [ ] co-10 · non-comparison-sorts
-  - [ ] co-11 · sort-stability
-  - [ ] co-12 · balanced-bst
-  - [ ] co-13 · tries
-  - [ ] co-14 · fenwick-tree
-  - [ ] co-15 · segment-tree
-  - [ ] co-16 · union-find
-  - [ ] co-17 · graph-traversal-deep
-  - [ ] co-18 · topological-sort
-  - [ ] co-19 · dijkstra-shortest-path
-  - [ ] co-20 · bellman-ford
-  - [ ] co-21 · minimum-spanning-tree
-  - [ ] co-22 · greedy-paradigm
-  - [ ] co-23 · dynamic-programming-1d
-  - [ ] co-24 · dynamic-programming-2d
-  - [ ] co-25 · backtracking
-  - [ ] co-26 · two-pointers-and-sliding-window
-  - [ ] co-27 · binary-search-on-answer
-  - [ ] co-28 · np-hardness-intuition
-- [ ] **[AI] A1-examples** — Author `CONTENT/advanced-algorithms/learning/code/` (runnable sources, DD-20/DD-30) rendering
+  - [x] co-01 · asymptotic-notation-theta-omega
+  - [x] co-02 · amortized-analysis
+  - [x] co-03 · recurrence-relations
+  - [x] co-04 · master-theorem
+  - [x] co-05 · space-time-tradeoff
+  - [x] co-06 · divide-and-conquer
+  - [x] co-07 · merge-sort-invariants
+  - [x] co-08 · quicksort-partitioning
+  - [x] co-09 · heapsort-and-binary-heaps
+  - [x] co-10 · non-comparison-sorts
+  - [x] co-11 · sort-stability
+  - [x] co-12 · balanced-bst
+  - [x] co-13 · tries
+  - [x] co-14 · fenwick-tree
+  - [x] co-15 · segment-tree
+  - [x] co-16 · union-find
+  - [x] co-17 · graph-traversal-deep
+  - [x] co-18 · topological-sort
+  - [x] co-19 · dijkstra-shortest-path
+  - [x] co-20 · bellman-ford
+  - [x] co-21 · minimum-spanning-tree
+  - [x] co-22 · greedy-paradigm
+  - [x] co-23 · dynamic-programming-1d
+  - [x] co-24 · dynamic-programming-2d
+  - [x] co-25 · backtracking
+  - [x] co-26 · two-pointers-and-sliding-window
+  - [x] co-27 · binary-search-on-answer
+  - [x] co-28 · np-hardness-intuition
+- [x] **[AI] A1-examples** — Author `CONTENT/advanced-algorithms/learning/code/` (runnable sources, DD-20/DD-30) rendering
       **every** Worked example in `syllabus/25-advanced-algorithms.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · big-o-empirical-timing — verify ratio tracks predicted growth
-  - [ ] ex-02 · theta-vs-o-classification — verify each assertion via doubling test
-  - [ ] ex-03 · recurrence-for-merge-sort — verify closed form is n log n
-  - [ ] ex-04 · master-theorem-cases — verify each stated bound
-  - [ ] ex-05 · merge-sort-implement — verify matches sorted()
-  - [ ] ex-06 · merge-invariant-check — verify invariant holds every merge
-  - [ ] ex-07 · quicksort-lomuto — verify correctness on random + sorted
-  - [ ] ex-08 · quicksort-worst-case — verify O(n²) blow-up empirically
-  - [ ] ex-09 · heap-push-pop — verify smallest emerges first
-  - [ ] ex-10 · heapsort-in-place — verify sorted + O(1) extra space
-  - [ ] ex-11 · counting-sort — verify O(n+k) and correct order
-  - [ ] ex-12 · radix-sort — verify against sorted()
-  - [ ] ex-13 · stable-vs-unstable — verify stability preserves equal-key order
-  - [ ] ex-14 · bst-insert-search — verify in-order traversal sorted
-  - [ ] ex-15 · bst-degenerates — verify degenerates to O(n) chain
-  - [ ] ex-16 · trie-insert-lookup — verify hit/miss + O(key-length)
-  - [ ] ex-17 · trie-prefix-count — verify counts on small dictionary
-  - [ ] ex-18 · adjacency-list-build — verify neighbor sets
-  - [ ] ex-19 · bfs-shortest-unweighted — verify distances on hand example
-  - [ ] ex-20 · dfs-recursive — verify reaches every reachable node
-  - [ ] ex-21 · dfs-discovery-finish-times — verify parenthesis nesting of intervals
-  - [ ] ex-22 · union-find-basic — verify connectivity queries
-  - [ ] ex-23 · two-pointer-pair-sum — verify O(n)
-  - [ ] ex-24 · sliding-window-max-sum — verify against brute force
-  - [ ] ex-25 · amortized-dynamic-array — verify amortized O(1) append
-  - [ ] ex-26 · amortized-accounting-method — verify credits never negative
-  - [ ] ex-27 · quicksort-random-pivot — verify sorted input no longer degrades
-  - [ ] ex-28 · quickselect-kth — verify against sorted()[k]
-  - [ ] ex-29 · closest-pair-divide-conquer — verify against brute force
-  - [ ] ex-30 · fenwick-prefix-sum — verify against running array
-  - [ ] ex-31 · segment-tree-range-min — verify against brute-force slices
-  - [ ] ex-32 · segment-tree-range-update — verify point reads after range updates
-  - [ ] ex-33 · union-find-optimized — verify near-constant amortized at scale
-  - [ ] ex-34 · connected-components — verify on graph with known components
-  - [ ] ex-35 · topological-sort-kahn — verify valid order on DAG
-  - [ ] ex-36 · topological-sort-dfs — verify equals valid order
-  - [ ] ex-37 · cycle-detection-directed — verify cyclic graph rejected
-  - [ ] ex-38 · dijkstra-heap — verify shortest paths on weighted graph
-  - [ ] ex-39 · dijkstra-unreachable — verify reports infinity, not crash
-  - [ ] ex-40 · bellman-ford-negative-edges — verify correct distances
-  - [ ] ex-41 · bellman-ford-negative-cycle — verify flags the cycle
-  - [ ] ex-42 · mst-kruskal — verify total weight matches known minimum
-  - [ ] ex-43 · mst-prim — verify same total weight as Kruskal
-  - [ ] ex-44 · greedy-interval-scheduling — verify optimality on hand example
-  - [ ] ex-45 · greedy-coin-change-fails — verify suboptimal answer
-  - [ ] ex-46 · dp-fib-memo-vs-tab — verify equal results, both O(n)
-  - [ ] ex-47 · dp-climbing-stairs — verify against a recurrence
-  - [ ] ex-48 · dp-coin-change-min — verify beats ex-45's answer
-  - [ ] ex-49 · dp-edit-distance — verify against known string pairs
-  - [ ] ex-50 · dp-lcs — verify length + reconstruction
-  - [ ] ex-51 · dp-knapsack-01 — verify optimal value on small instance
-  - [ ] ex-52 · binary-search-boundary — verify boundaries incl. absent target
-  - [ ] ex-53 · backtracking-n-queens — verify solution counts N=4..8
-  - [ ] ex-54 · backtracking-subsets — verify count 2ⁿ, no dups
-  - [ ] ex-55 · backtracking-permutations — verify count n!, all distinct
-  - [ ] ex-56 · backtracking-word-search — verify found/not-found cases
-  - [ ] ex-57 · backtracking-sudoku — verify solved board valid
-  - [ ] ex-58 · greedy-vs-dp-contrast — verify where greedy diverges from optimal
-  - [ ] ex-59 · dp-2d-grid-paths — verify against enumeration on small grids
-  - [ ] ex-60 · dp-longest-increasing-subsequence — verify equal lengths both methods
-  - [ ] ex-61 · dp-matrix-chain — verify minimal cost on known chain
-  - [ ] ex-62 · dp-space-optimized — verify same result as full table
-  - [ ] ex-63 · dijkstra-vs-bellman-tradeoff — verify speed/generality trade
-  - [ ] ex-64 · a-star-heuristic — verify matches Dijkstra cost, fewer nodes
-  - [ ] ex-65 · topo-sort-critical-path — verify on hand-computed schedule
-  - [ ] ex-66 · strongly-connected-components — verify components on known digraph
-  - [ ] ex-67 · segment-tree-vs-fenwick — verify equal answers, contrast cost
-  - [ ] ex-68 · avl-rotations — verify height stays O(log n)
-  - [ ] ex-69 · red-black-invariants — verify no red-red, equal black-heights
-  - [ ] ex-70 · two-pointer-three-sum — verify unique triplets vs brute force
-  - [ ] ex-71 · sliding-window-longest-substring — verify against brute force
-  - [ ] ex-72 · sliding-window-min-window — verify on known cases
-  - [ ] ex-73 · binary-search-on-answer — verify the boundary
-  - [ ] ex-74 · quickselect-median-of-medians — verify worst-case linearity
-  - [ ] ex-75 · np-hard-tsp-brute-vs-heuristic — verify heuristic fast but not optimal
-  - [ ] ex-76 · np-reduction-sketch — verify mapping preserves yes-instances
-  - [ ] ex-77 · amortized-potential-method — verify amortized O(1)
-  - [ ] ex-78 · complexity-stated-and-tested — verify claims hold via doubling tests
-  - [ ] ex-79 · benchmark-paradigm-shootout — verify paradigm crossover as n grows
-  - [ ] ex-80 · capstone-preview-scheduler — verify end-to-end on sample DAG
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-algorithms/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] ex-01 · big-o-empirical-timing — verify ratio tracks predicted growth
+  - [x] ex-02 · theta-vs-o-classification — verify each assertion via doubling test
+  - [x] ex-03 · recurrence-for-merge-sort — verify closed form is n log n
+  - [x] ex-04 · master-theorem-cases — verify each stated bound
+  - [x] ex-05 · merge-sort-implement — verify matches sorted()
+  - [x] ex-06 · merge-invariant-check — verify invariant holds every merge
+  - [x] ex-07 · quicksort-lomuto — verify correctness on random + sorted
+  - [x] ex-08 · quicksort-worst-case — verify O(n²) blow-up empirically
+  - [x] ex-09 · heap-push-pop — verify smallest emerges first
+  - [x] ex-10 · heapsort-in-place — verify sorted + O(1) extra space
+  - [x] ex-11 · counting-sort — verify O(n+k) and correct order
+  - [x] ex-12 · radix-sort — verify against sorted()
+  - [x] ex-13 · stable-vs-unstable — verify stability preserves equal-key order
+  - [x] ex-14 · bst-insert-search — verify in-order traversal sorted
+  - [x] ex-15 · bst-degenerates — verify degenerates to O(n) chain
+  - [x] ex-16 · trie-insert-lookup — verify hit/miss + O(key-length)
+  - [x] ex-17 · trie-prefix-count — verify counts on small dictionary
+  - [x] ex-18 · adjacency-list-build — verify neighbor sets
+  - [x] ex-19 · bfs-shortest-unweighted — verify distances on hand example
+  - [x] ex-20 · dfs-recursive — verify reaches every reachable node
+  - [x] ex-21 · dfs-discovery-finish-times — verify parenthesis nesting of intervals
+  - [x] ex-22 · union-find-basic — verify connectivity queries
+  - [x] ex-23 · two-pointer-pair-sum — verify O(n)
+  - [x] ex-24 · sliding-window-max-sum — verify against brute force
+  - [x] ex-25 · amortized-dynamic-array — verify amortized O(1) append
+  - [x] ex-26 · amortized-accounting-method — verify credits never negative
+  - [x] ex-27 · quicksort-random-pivot — verify sorted input no longer degrades
+  - [x] ex-28 · quickselect-kth — verify against sorted()[k]
+  - [x] ex-29 · closest-pair-divide-conquer — verify against brute force
+  - [x] ex-30 · fenwick-prefix-sum — verify against running array
+  - [x] ex-31 · segment-tree-range-min — verify against brute-force slices
+  - [x] ex-32 · segment-tree-range-update — verify point reads after range updates
+  - [x] ex-33 · union-find-optimized — verify near-constant amortized at scale
+  - [x] ex-34 · connected-components — verify on graph with known components
+  - [x] ex-35 · topological-sort-kahn — verify valid order on DAG
+  - [x] ex-36 · topological-sort-dfs — verify equals valid order
+  - [x] ex-37 · cycle-detection-directed — verify cyclic graph rejected
+  - [x] ex-38 · dijkstra-heap — verify shortest paths on weighted graph
+  - [x] ex-39 · dijkstra-unreachable — verify reports infinity, not crash
+  - [x] ex-40 · bellman-ford-negative-edges — verify correct distances
+  - [x] ex-41 · bellman-ford-negative-cycle — verify flags the cycle
+  - [x] ex-42 · mst-kruskal — verify total weight matches known minimum
+  - [x] ex-43 · mst-prim — verify same total weight as Kruskal
+  - [x] ex-44 · greedy-interval-scheduling — verify optimality on hand example
+  - [x] ex-45 · greedy-coin-change-fails — verify suboptimal answer
+  - [x] ex-46 · dp-fib-memo-vs-tab — verify equal results, both O(n)
+  - [x] ex-47 · dp-climbing-stairs — verify against a recurrence
+  - [x] ex-48 · dp-coin-change-min — verify beats ex-45's answer
+  - [x] ex-49 · dp-edit-distance — verify against known string pairs
+  - [x] ex-50 · dp-lcs — verify length + reconstruction
+  - [x] ex-51 · dp-knapsack-01 — verify optimal value on small instance
+  - [x] ex-52 · binary-search-boundary — verify boundaries incl. absent target
+  - [x] ex-53 · backtracking-n-queens — verify solution counts N=4..8
+  - [x] ex-54 · backtracking-subsets — verify count 2ⁿ, no dups
+  - [x] ex-55 · backtracking-permutations — verify count n!, all distinct
+  - [x] ex-56 · backtracking-word-search — verify found/not-found cases
+  - [x] ex-57 · backtracking-sudoku — verify solved board valid
+  - [x] ex-58 · greedy-vs-dp-contrast — verify where greedy diverges from optimal
+  - [x] ex-59 · dp-2d-grid-paths — verify against enumeration on small grids
+  - [x] ex-60 · dp-longest-increasing-subsequence — verify equal lengths both methods
+  - [x] ex-61 · dp-matrix-chain — verify minimal cost on known chain
+  - [x] ex-62 · dp-space-optimized — verify same result as full table
+  - [x] ex-63 · dijkstra-vs-bellman-tradeoff — verify speed/generality trade
+  - [x] ex-64 · a-star-heuristic — verify matches Dijkstra cost, fewer nodes
+  - [x] ex-65 · topo-sort-critical-path — verify on hand-computed schedule
+  - [x] ex-66 · strongly-connected-components — verify components on known digraph
+  - [x] ex-67 · segment-tree-vs-fenwick — verify equal answers, contrast cost
+  - [x] ex-68 · avl-rotations — verify height stays O(log n)
+  - [x] ex-69 · red-black-invariants — verify no red-red, equal black-heights
+  - [x] ex-70 · two-pointer-three-sum — verify unique triplets vs brute force
+  - [x] ex-71 · sliding-window-longest-substring — verify against brute force
+  - [x] ex-72 · sliding-window-min-window — verify on known cases
+  - [x] ex-73 · binary-search-on-answer — verify the boundary
+  - [x] ex-74 · quickselect-median-of-medians — verify worst-case linearity
+  - [x] ex-75 · np-hard-tsp-brute-vs-heuristic — verify heuristic fast but not optimal
+  - [x] ex-76 · np-reduction-sketch — verify mapping preserves yes-instances
+  - [x] ex-77 · amortized-potential-method — verify amortized O(1)
+  - [x] ex-78 · complexity-stated-and-tested — verify claims hold via doubling tests
+  - [x] ex-79 · benchmark-paradigm-shootout — verify paradigm crossover as n grows
+  - [x] ex-80 · capstone-preview-scheduler — verify end-to-end on sample DAG
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/advanced-algorithms/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/advanced-algorithms/drilling/_index.md` (wt 225) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5187,7 +5187,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
@@ -5199,130 +5199,130 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: By Example · SQL + Python † (PostgreSQL) · topic wt 360 · Learn 126 / Drill 226 · **subject**. Template →
 [`syllabus/26-advanced-sql-and-query-performance.md`](./syllabus/26-advanced-sql-and-query-performance.md).
 
-- [ ] **[AI] V** — `web-researcher` for `advanced-sql-and-query-performance`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `advanced-sql-and-query-performance`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/26-advanced-sql-and-query-performance.md`](./syllabus/26-advanced-sql-and-query-performance.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/advanced-sql-and-query-performance/learning/` teaching **every** concept in
+- [x] **[AI] A1-concepts** — Author `CONTENT/advanced-sql-and-query-performance/learning/` teaching **every** concept in
       `syllabus/26-advanced-sql-and-query-performance.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · subqueries-and-derived-tables
-  - [ ] co-02 · common-table-expressions
-  - [ ] co-03 · recursive-ctes
-  - [ ] co-04 · window-functions
-  - [ ] co-05 · window-frames-and-partitions
-  - [ ] co-06 · ranking-and-analytic-functions
-  - [ ] co-07 · set-operations
-  - [ ] co-08 · grouping-sets-rollup-cube
-  - [ ] co-09 · lateral-joins
-  - [ ] co-10 · conditional-aggregation
-  - [ ] co-11 · acid-properties
-  - [ ] co-12 · mvcc
-  - [ ] co-13 · isolation-levels
-  - [ ] co-14 · read-phenomena
-  - [ ] co-15 · serializable-snapshot-isolation
-  - [ ] co-16 · explicit-locking
-  - [ ] co-17 · database-deadlocks
-  - [ ] co-18 · btree-index-mechanics
-  - [ ] co-19 · composite-and-covering-indexes
-  - [ ] co-20 · specialized-indexes
-  - [ ] co-21 · partial-and-expression-indexes
-  - [ ] co-22 · index-cost-tradeoff
-  - [ ] co-23 · explain-and-explain-analyze
-  - [ ] co-24 · reading-a-query-plan
-  - [ ] co-25 · table-statistics-and-analyze
-  - [ ] co-26 · n-plus-1-diagnosis-and-fix
-  - [ ] co-27 · denormalization-and-materialized-views
-  - [ ] co-28 · partitioning-pooling-and-oltp-vs-olap
-- [ ] **[AI] A1-examples** — Author `CONTENT/advanced-sql-and-query-performance/learning/code/` (runnable against seeded PostgreSQL, DD-20/DD-30)
+  - [x] co-01 · subqueries-and-derived-tables
+  - [x] co-02 · common-table-expressions
+  - [x] co-03 · recursive-ctes
+  - [x] co-04 · window-functions
+  - [x] co-05 · window-frames-and-partitions
+  - [x] co-06 · ranking-and-analytic-functions
+  - [x] co-07 · set-operations
+  - [x] co-08 · grouping-sets-rollup-cube
+  - [x] co-09 · lateral-joins
+  - [x] co-10 · conditional-aggregation
+  - [x] co-11 · acid-properties
+  - [x] co-12 · mvcc
+  - [x] co-13 · isolation-levels
+  - [x] co-14 · read-phenomena
+  - [x] co-15 · serializable-snapshot-isolation
+  - [x] co-16 · explicit-locking
+  - [x] co-17 · database-deadlocks
+  - [x] co-18 · btree-index-mechanics
+  - [x] co-19 · composite-and-covering-indexes
+  - [x] co-20 · specialized-indexes
+  - [x] co-21 · partial-and-expression-indexes
+  - [x] co-22 · index-cost-tradeoff
+  - [x] co-23 · explain-and-explain-analyze
+  - [x] co-24 · reading-a-query-plan
+  - [x] co-25 · table-statistics-and-analyze
+  - [x] co-26 · n-plus-1-diagnosis-and-fix
+  - [x] co-27 · denormalization-and-materialized-views
+  - [x] co-28 · partitioning-pooling-and-oltp-vs-olap
+- [x] **[AI] A1-examples** — Author `CONTENT/advanced-sql-and-query-performance/learning/code/` (runnable against seeded PostgreSQL, DD-20/DD-30)
       rendering **every** Worked example in `syllabus/26-advanced-sql-and-query-performance.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · uncorrelated-subquery — verify equals join rewrite
-  - [ ] ex-02 · correlated-subquery — verify rows filtered
-  - [ ] ex-03 · derived-table-in-from — verify the summary
-  - [ ] ex-04 · simple-cte — verify equals inline
-  - [ ] ex-05 · multi-step-cte — verify final output
-  - [ ] ex-06 · recursive-cte-counter — verify series length
-  - [ ] ex-07 · recursive-cte-tree — verify all descendants
-  - [ ] ex-08 · window-running-total — verify cumulative
-  - [ ] ex-09 · window-partition-avg — verify per-group average
-  - [ ] ex-10 · row-number-rank — verify tie handling differs
-  - [ ] ex-11 · lag-lead-delta — verify delta column
-  - [ ] ex-12 · ntile-quartiles — verify four buckets
-  - [ ] ex-13 · union-vs-union-all — verify counts differ
-  - [ ] ex-14 · intersect-except — verify expected sets
-  - [ ] ex-15 · group-by-rollup — verify subtotal rows
-  - [ ] ex-16 · grouping-sets — verify each grouping present
-  - [ ] ex-17 · filter-aggregate — verify conditional count
-  - [ ] ex-18 · conditional-sum-case — verify pivoted columns
-  - [ ] ex-19 · begin-commit-rollback — verify rollback undoes both
-  - [ ] ex-20 · atomicity-failure — verify no partial write
-  - [ ] ex-21 · create-btree-index — verify exists via \d
-  - [ ] ex-22 · explain-basic — verify plan node prints
-  - [ ] ex-23 · explain-analyze-basic — verify actual vs estimate
-  - [ ] ex-24 · seq-scan-vs-index-scan — verify node becomes Index Scan
-  - [ ] ex-25 · analyze-refresh-stats — verify estimates improve
-  - [ ] ex-26 · for-update-row-lock — verify second session blocks
-  - [ ] ex-27 · read-committed-default — verify reread changes
-  - [ ] ex-28 · psql-timing — verify duration prints
-  - [ ] ex-29 · correlated-subquery-to-join — verify same result, better plan
-  - [ ] ex-30 · recursive-cte-graph-cycle — verify no infinite loop
-  - [ ] ex-31 · recursive-cte-bom — verify component counts
-  - [ ] ex-32 · window-moving-average — verify sliding window
-  - [ ] ex-33 · window-range-frame — verify RANGE vs ROWS differ
-  - [ ] ex-34 · window-first-last-value — verify edge values
-  - [ ] ex-35 · window-percent-rank — verify distribution stats
-  - [ ] ex-36 · top-n-per-group — verify N rows per group
-  - [ ] ex-37 · lateral-join-topn — verify per-parent limit
-  - [ ] ex-38 · lateral-vs-subquery — verify equivalence + plan diff
-  - [ ] ex-39 · cube-crosstab — verify all combinations
-  - [ ] ex-40 · composite-index-order — verify leading-column rule
-  - [ ] ex-41 · covering-index-only-scan — verify heap not touched
-  - [ ] ex-42 · partial-index — verify smaller index used
-  - [ ] ex-43 · expression-index — verify case-insensitive lookup
-  - [ ] ex-44 · hash-index — verify equality lookup uses it
-  - [ ] ex-45 · gin-index-jsonb — verify containment query uses it
-  - [ ] ex-46 · brin-index-timeseries — verify small size + range scan
-  - [ ] ex-47 · index-hurts-writes — verify write slowdown
-  - [ ] ex-48 · index-bloat-observe — verify size shrinks after REINDEX
-  - [ ] ex-49 · explain-nested-loop — verify node + when chosen
-  - [ ] ex-50 · explain-hash-join — verify build/probe phases
-  - [ ] ex-51 · explain-merge-join — verify node + sort children
-  - [ ] ex-52 · buffers-in-plan — verify cache behavior
-  - [ ] ex-53 · stale-stats-bad-plan — verify misjudge then fix after ANALYZE
-  - [ ] ex-54 · n-plus-1-reproduce — verify query count is N+1
-  - [ ] ex-55 · n-plus-1-fix-join — verify one query, same data
-  - [ ] ex-56 · n-plus-1-fix-in-clause — verify two queries total
-  - [ ] ex-57 · repeatable-read-anomaly — verify reread becomes stable
-  - [ ] ex-58 · phantom-read — verify appears then blocked
-  - [ ] ex-59 · write-skew — verify anomaly then SSI abort
-  - [ ] ex-60 · serialization-failure-retry — verify retry succeeds
-  - [ ] ex-61 · deadlock-reproduce — verify one killed with deadlock error
-  - [ ] ex-62 · deadlock-avoid-ordering — verify no deadlock
-  - [ ] ex-63 · advisory-lock — verify mutual exclusion
-  - [ ] ex-64 · materialized-view-refresh — verify fast reads + staleness
-  - [ ] ex-65 · recursive-cte-shortest-path — verify shortest cost
-  - [ ] ex-66 · window-sessionization — verify session boundaries
-  - [ ] ex-67 · window-vs-self-join-perf — verify same result, plan/timing diff
-  - [ ] ex-68 · lateral-cross-apply-report — verify correctness + plan
-  - [ ] ex-69 · covering-index-design — verify Index Only Scan + timing drop
-  - [ ] ex-70 · multicolumn-stats — verify estimate improves
-  - [ ] ex-71 · partition-by-range — verify partition pruning
-  - [ ] ex-72 · partition-pruning-explain — verify pruned partitions
-  - [ ] ex-73 · partition-vs-index-tradeoff — verify measured difference
-  - [ ] ex-74 · denormalization-measured — verify reads faster, writes costlier
-  - [ ] ex-75 · materialized-view-concurrent — verify reads not blocked
-  - [ ] ex-76 · connection-pooling-benchmark — verify throughput/latency gain
-  - [ ] ex-77 · isolation-level-matrix — verify anomalies each permits
-  - [ ] ex-78 · serializable-throughput-cost — verify correctness/throughput trade
-  - [ ] ex-79 · explain-buffers-io-tuning — verify shared reads drop
-  - [ ] ex-80 · planner-cost-constants — verify plan flips
-  - [ ] ex-81 · slow-query-log-triage — verify offender identified
-  - [ ] ex-82 · pg-stat-statements-topn — verify hottest queries surface
-  - [ ] ex-83 · olap-vs-oltp-schema — verify each fits its workload
-  - [ ] ex-84 · bulk-load-copy-vs-insert — verify COPY far faster
-  - [ ] ex-85 · capstone-preview-tuning — verify end-to-end on seed
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-sql-and-query-performance/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] ex-01 · uncorrelated-subquery — verify equals join rewrite
+  - [x] ex-02 · correlated-subquery — verify rows filtered
+  - [x] ex-03 · derived-table-in-from — verify the summary
+  - [x] ex-04 · simple-cte — verify equals inline
+  - [x] ex-05 · multi-step-cte — verify final output
+  - [x] ex-06 · recursive-cte-counter — verify series length
+  - [x] ex-07 · recursive-cte-tree — verify all descendants
+  - [x] ex-08 · window-running-total — verify cumulative
+  - [x] ex-09 · window-partition-avg — verify per-group average
+  - [x] ex-10 · row-number-rank — verify tie handling differs
+  - [x] ex-11 · lag-lead-delta — verify delta column
+  - [x] ex-12 · ntile-quartiles — verify four buckets
+  - [x] ex-13 · union-vs-union-all — verify counts differ
+  - [x] ex-14 · intersect-except — verify expected sets
+  - [x] ex-15 · group-by-rollup — verify subtotal rows
+  - [x] ex-16 · grouping-sets — verify each grouping present
+  - [x] ex-17 · filter-aggregate — verify conditional count
+  - [x] ex-18 · conditional-sum-case — verify pivoted columns
+  - [x] ex-19 · begin-commit-rollback — verify rollback undoes both
+  - [x] ex-20 · atomicity-failure — verify no partial write
+  - [x] ex-21 · create-btree-index — verify exists via \d
+  - [x] ex-22 · explain-basic — verify plan node prints
+  - [x] ex-23 · explain-analyze-basic — verify actual vs estimate
+  - [x] ex-24 · seq-scan-vs-index-scan — verify node becomes Index Scan
+  - [x] ex-25 · analyze-refresh-stats — verify estimates improve
+  - [x] ex-26 · for-update-row-lock — verify second session blocks
+  - [x] ex-27 · read-committed-default — verify reread changes
+  - [x] ex-28 · psql-timing — verify duration prints
+  - [x] ex-29 · correlated-subquery-to-join — verify same result, better plan
+  - [x] ex-30 · recursive-cte-graph-cycle — verify no infinite loop
+  - [x] ex-31 · recursive-cte-bom — verify component counts
+  - [x] ex-32 · window-moving-average — verify sliding window
+  - [x] ex-33 · window-range-frame — verify RANGE vs ROWS differ
+  - [x] ex-34 · window-first-last-value — verify edge values
+  - [x] ex-35 · window-percent-rank — verify distribution stats
+  - [x] ex-36 · top-n-per-group — verify N rows per group
+  - [x] ex-37 · lateral-join-topn — verify per-parent limit
+  - [x] ex-38 · lateral-vs-subquery — verify equivalence + plan diff
+  - [x] ex-39 · cube-crosstab — verify all combinations
+  - [x] ex-40 · composite-index-order — verify leading-column rule
+  - [x] ex-41 · covering-index-only-scan — verify heap not touched
+  - [x] ex-42 · partial-index — verify smaller index used
+  - [x] ex-43 · expression-index — verify case-insensitive lookup
+  - [x] ex-44 · hash-index — verify equality lookup uses it
+  - [x] ex-45 · gin-index-jsonb — verify containment query uses it
+  - [x] ex-46 · brin-index-timeseries — verify small size + range scan
+  - [x] ex-47 · index-hurts-writes — verify write slowdown
+  - [x] ex-48 · index-bloat-observe — verify size shrinks after REINDEX
+  - [x] ex-49 · explain-nested-loop — verify node + when chosen
+  - [x] ex-50 · explain-hash-join — verify build/probe phases
+  - [x] ex-51 · explain-merge-join — verify node + sort children
+  - [x] ex-52 · buffers-in-plan — verify cache behavior
+  - [x] ex-53 · stale-stats-bad-plan — verify misjudge then fix after ANALYZE
+  - [x] ex-54 · n-plus-1-reproduce — verify query count is N+1
+  - [x] ex-55 · n-plus-1-fix-join — verify one query, same data
+  - [x] ex-56 · n-plus-1-fix-in-clause — verify two queries total
+  - [x] ex-57 · repeatable-read-anomaly — verify reread becomes stable
+  - [x] ex-58 · phantom-read — verify appears then blocked
+  - [x] ex-59 · write-skew — verify anomaly then SSI abort
+  - [x] ex-60 · serialization-failure-retry — verify retry succeeds
+  - [x] ex-61 · deadlock-reproduce — verify one killed with deadlock error
+  - [x] ex-62 · deadlock-avoid-ordering — verify no deadlock
+  - [x] ex-63 · advisory-lock — verify mutual exclusion
+  - [x] ex-64 · materialized-view-refresh — verify fast reads + staleness
+  - [x] ex-65 · recursive-cte-shortest-path — verify shortest cost
+  - [x] ex-66 · window-sessionization — verify session boundaries
+  - [x] ex-67 · window-vs-self-join-perf — verify same result, plan/timing diff
+  - [x] ex-68 · lateral-cross-apply-report — verify correctness + plan
+  - [x] ex-69 · covering-index-design — verify Index Only Scan + timing drop
+  - [x] ex-70 · multicolumn-stats — verify estimate improves
+  - [x] ex-71 · partition-by-range — verify partition pruning
+  - [x] ex-72 · partition-pruning-explain — verify pruned partitions
+  - [x] ex-73 · partition-vs-index-tradeoff — verify measured difference
+  - [x] ex-74 · denormalization-measured — verify reads faster, writes costlier
+  - [x] ex-75 · materialized-view-concurrent — verify reads not blocked
+  - [x] ex-76 · connection-pooling-benchmark — verify throughput/latency gain
+  - [x] ex-77 · isolation-level-matrix — verify anomalies each permits
+  - [x] ex-78 · serializable-throughput-cost — verify correctness/throughput trade
+  - [x] ex-79 · explain-buffers-io-tuning — verify shared reads drop
+  - [x] ex-80 · planner-cost-constants — verify plan flips
+  - [x] ex-81 · slow-query-log-triage — verify offender identified
+  - [x] ex-82 · pg-stat-statements-topn — verify hottest queries surface
+  - [x] ex-83 · olap-vs-oltp-schema — verify each fits its workload
+  - [x] ex-84 · bulk-load-copy-vs-insert — verify COPY far faster
+  - [x] ex-85 · capstone-preview-tuning — verify end-to-end on seed
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/advanced-sql-and-query-performance/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/advanced-sql-and-query-performance/drilling/_index.md` (wt 226) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5357,7 +5357,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
@@ -5369,122 +5369,122 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: By Example · Python † · topic wt 370 · Learn 127 / Drill 227 · **subject**. Template →
 [`syllabus/27-data-access-orms-and-query-builders.md`](./syllabus/27-data-access-orms-and-query-builders.md).
 
-- [ ] **[AI] V** — `web-researcher` for `data-access-orms-and-query-builders`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `data-access-orms-and-query-builders`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/27-data-access-orms-and-query-builders.md`](./syllabus/27-data-access-orms-and-query-builders.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/data-access-orms-and-query-builders/learning/` teaching **every** concept in
+- [x] **[AI] A1-concepts** — Author `CONTENT/data-access-orms-and-query-builders/learning/` teaching **every** concept in
       `syllabus/27-data-access-orms-and-query-builders.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · data-access-spectrum
-  - [ ] co-02 · raw-sql-dbapi
-  - [ ] co-03 · query-builder-core
-  - [ ] co-04 · query-builder-library-contrast
-  - [ ] co-05 · parameterized-queries-and-emitted-sql
-  - [ ] co-06 · declarative-orm-mapping
-  - [ ] co-07 · active-record-vs-data-mapper
-  - [ ] co-08 · relationship-mapping
-  - [ ] co-09 · many-to-many-association
-  - [ ] co-10 · identity-map
-  - [ ] co-11 · session-object-states
-  - [ ] co-12 · unit-of-work
-  - [ ] co-13 · lazy-loading
-  - [ ] co-14 · eager-loading-strategies
-  - [ ] co-15 · n-plus-1-problem
-  - [ ] co-16 · raiseload-guard
-  - [ ] co-17 · orm-transactions
-  - [ ] co-18 · connection-pooling
-  - [ ] co-19 · migrations-alembic-workflow
-  - [ ] co-20 · autogenerate-migrations
-  - [ ] co-21 · migration-reversibility
-  - [ ] co-22 · cascade-delete-orm
-  - [ ] co-23 · bulk-operations
-  - [ ] co-24 · async-orm-session
-  - [ ] co-25 · orm-vs-raw-sql-tradeoff
-  - [ ] co-26 · query-builder-vs-orm-tradeoff
-  - [ ] co-27 · choosing-tier-per-workload
-- [ ] **[AI] A1-examples** — Author `CONTENT/data-access-orms-and-query-builders/learning/code/` (runnable Python sources over SQLAlchemy 2.0 / peewee / PyPika / Alembic, DD-20/DD-30/DD-34/DD-39)
+  - [x] co-01 · data-access-spectrum
+  - [x] co-02 · raw-sql-dbapi
+  - [x] co-03 · query-builder-core
+  - [x] co-04 · query-builder-library-contrast
+  - [x] co-05 · parameterized-queries-and-emitted-sql
+  - [x] co-06 · declarative-orm-mapping
+  - [x] co-07 · active-record-vs-data-mapper
+  - [x] co-08 · relationship-mapping
+  - [x] co-09 · many-to-many-association
+  - [x] co-10 · identity-map
+  - [x] co-11 · session-object-states
+  - [x] co-12 · unit-of-work
+  - [x] co-13 · lazy-loading
+  - [x] co-14 · eager-loading-strategies
+  - [x] co-15 · n-plus-1-problem
+  - [x] co-16 · raiseload-guard
+  - [x] co-17 · orm-transactions
+  - [x] co-18 · connection-pooling
+  - [x] co-19 · migrations-alembic-workflow
+  - [x] co-20 · autogenerate-migrations
+  - [x] co-21 · migration-reversibility
+  - [x] co-22 · cascade-delete-orm
+  - [x] co-23 · bulk-operations
+  - [x] co-24 · async-orm-session
+  - [x] co-25 · orm-vs-raw-sql-tradeoff
+  - [x] co-26 · query-builder-vs-orm-tradeoff
+  - [x] co-27 · choosing-tier-per-workload
+- [x] **[AI] A1-examples** — Author `CONTENT/data-access-orms-and-query-builders/learning/code/` (runnable Python sources over SQLAlchemy 2.0 / peewee / PyPika / Alembic, DD-20/DD-30/DD-34/DD-39)
       rendering **every** Worked example in `syllabus/27-data-access-orms-and-query-builders.md`, each with its expected output. One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · spectrum-same-query-three-ways — verify identical rows via dbapi/builder/orm
-  - [ ] ex-02 · dbapi-connect-cursor — verify cursor yields rows
-  - [ ] ex-03 · dbapi-parameterized — verify placeholder binds, no interpolation
-  - [ ] ex-04 · dbapi-row-to-dataclass — verify typed dataclass instances
-  - [ ] ex-05 · dbapi-executemany — verify batch insert count
-  - [ ] ex-06 · dbapi-transaction-commit — verify commit persists, rollback discards
-  - [ ] ex-07 · querybuilder-select — verify emitted SQL matches
-  - [ ] ex-08 · querybuilder-where-compose — verify composed predicates
-  - [ ] ex-09 · querybuilder-join — verify join SQL
-  - [ ] ex-10 · querybuilder-execute — verify rows returned
-  - [ ] ex-11 · querybuilder-vs-string-safety — verify params not interpolated
-  - [ ] ex-12 · sqlalchemy-core-table — verify table metadata registered
-  - [ ] ex-13 · sqlalchemy-core-select — verify select compiles + params
-  - [ ] ex-14 · declarative-model-basic — verify mapped class
-  - [ ] ex-15 · declarative-typed-columns — verify Mapped[] types
-  - [ ] ex-16 · orm-insert-object — verify row persisted after flush
-  - [ ] ex-17 · orm-query-select — verify object loaded
-  - [ ] ex-18 · orm-update-object — verify dirty flushed as UPDATE
-  - [ ] ex-19 · orm-delete-object — verify row deleted
-  - [ ] ex-20 · activerecord-peewee-model — verify .save() persists
-  - [ ] ex-21 · activerecord-vs-datamapper — verify persistence-API contrast
-  - [ ] ex-22 · relationship-one-to-many — verify parent.children populated
-  - [ ] ex-23 · relationship-back-populates — verify both sides sync
-  - [ ] ex-24 · foreign-key-mapping — verify FK column + relationship
-  - [ ] ex-25 · many-to-many-assoc-table — verify association rows
-  - [ ] ex-26 · many-to-many-navigate — verify both collections
-  - [ ] ex-27 · identity-map-same-object — verify same PK yields identical object
-  - [ ] ex-28 · session-lifecycle-begin — verify begin/commit boundary
-  - [ ] ex-29 · session-states-transient-pending — verify state transitions
-  - [ ] ex-30 · session-expire-refresh — verify reloaded attributes
-  - [ ] ex-31 · unit-of-work-flush-order — verify insert order by dependency
-  - [ ] ex-32 · unit-of-work-dirty-tracking — verify only changed cols in UPDATE
-  - [ ] ex-33 · unit-of-work-autoflush — verify query triggers flush
-  - [ ] ex-34 · lazy-loading-default — verify relationship SQL on access
-  - [ ] ex-35 · lazy-loading-detached-error — verify DetachedInstanceError
-  - [ ] ex-36 · n-plus-1-reproduce — verify N+1 query count
-  - [ ] ex-37 · eager-selectinload — verify 2 queries not N+1
-  - [ ] ex-38 · eager-joinedload — verify single joined query
-  - [ ] ex-39 · eager-subqueryload — verify subquery strategy
-  - [ ] ex-40 · eager-strategy-contrast — verify query counts differ
-  - [ ] ex-41 · raiseload-guard — verify raiseload raises on lazy access
-  - [ ] ex-42 · n-plus-1-count-assert — verify asserted query count
-  - [ ] ex-43 · orm-transaction-commit-rollback — verify rollback discards
-  - [ ] ex-44 · orm-nested-savepoint — verify savepoint partial rollback
-  - [ ] ex-45 · connection-pool-basics — verify pool reuse
-  - [ ] ex-46 · pool-exhaustion — verify timeout when exhausted
-  - [ ] ex-47 · pool-pre-ping — verify stale connection recycled
-  - [ ] ex-48 · alembic-init — verify env scaffolded
-  - [ ] ex-49 · alembic-first-migration — verify revision file emitted
-  - [ ] ex-50 · alembic-upgrade-downgrade — verify schema up then down
-  - [ ] ex-51 · alembic-autogenerate — verify diff-derived migration
-  - [ ] ex-52 · alembic-autogen-review — verify hand-edit needed
-  - [ ] ex-53 · migration-reversible-data — verify downgrade restores data
-  - [ ] ex-54 · migration-irreversible-guard — verify downgrade raises
-  - [ ] ex-55 · cascade-delete-orm — verify children deleted
-  - [ ] ex-56 · cascade-vs-db-fk — verify ORM cascade vs FK ondelete
-  - [ ] ex-57 · bulk-insert-orm — verify batch insert
-  - [ ] ex-58 · bulk-update-core — verify single UPDATE statement
-  - [ ] ex-59 · bulk-vs-orm-perf — verify timing delta
-  - [ ] ex-60 · async-engine-session — verify async session yields rows
-  - [ ] ex-61 · async-eager-loading — verify eager under async
-  - [ ] ex-62 · async-lazy-forbidden — verify lazy raises under async
-  - [ ] ex-63 · async-concurrent-sessions — verify concurrent queries
-  - [ ] ex-64 · orm-vs-raw-crud — verify equivalent CRUD both tiers
-  - [ ] ex-65 · orm-vs-raw-reporting — verify raw wins reporting
-  - [ ] ex-66 · querybuilder-vs-orm-dynamic — verify dynamic query build
-  - [ ] ex-67 · querybuilder-vs-orm-tradeoff — verify tradeoff articulated
-  - [ ] ex-68 · choosing-tier-crud — verify tier choice for CRUD
-  - [ ] ex-69 · choosing-tier-analytics — verify tier choice for analytics
-  - [ ] ex-70 · choosing-tier-hot-path — verify tier choice for hot path
-  - [ ] ex-71 · hybrid-orm-plus-raw — verify ORM + raw escape hatch
-  - [ ] ex-72 · identity-map-across-queries — verify same object across queries
-  - [ ] ex-73 · relationship-lazy-strategies-config — verify per-relationship strategy
-  - [ ] ex-74 · self-referential-relationship — verify tree self-join
-  - [ ] ex-75 · association-object-m2m — verify extra columns on association
-  - [ ] ex-76 · migration-zero-downtime — verify expand/contract steps
-  - [ ] ex-77 · connection-pool-tuning — verify pool-size params
-  - [ ] ex-78 · capstone-preview-three-tier — verify three-tier stack runs
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/data-access-orms-and-query-builders/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] ex-01 · spectrum-same-query-three-ways — verify identical rows via dbapi/builder/orm
+  - [x] ex-02 · dbapi-connect-cursor — verify cursor yields rows
+  - [x] ex-03 · dbapi-parameterized — verify placeholder binds, no interpolation
+  - [x] ex-04 · dbapi-row-to-dataclass — verify typed dataclass instances
+  - [x] ex-05 · dbapi-executemany — verify batch insert count
+  - [x] ex-06 · dbapi-transaction-commit — verify commit persists, rollback discards
+  - [x] ex-07 · querybuilder-select — verify emitted SQL matches
+  - [x] ex-08 · querybuilder-where-compose — verify composed predicates
+  - [x] ex-09 · querybuilder-join — verify join SQL
+  - [x] ex-10 · querybuilder-execute — verify rows returned
+  - [x] ex-11 · querybuilder-vs-string-safety — verify params not interpolated
+  - [x] ex-12 · sqlalchemy-core-table — verify table metadata registered
+  - [x] ex-13 · sqlalchemy-core-select — verify select compiles + params
+  - [x] ex-14 · declarative-model-basic — verify mapped class
+  - [x] ex-15 · declarative-typed-columns — verify Mapped[] types
+  - [x] ex-16 · orm-insert-object — verify row persisted after flush
+  - [x] ex-17 · orm-query-select — verify object loaded
+  - [x] ex-18 · orm-update-object — verify dirty flushed as UPDATE
+  - [x] ex-19 · orm-delete-object — verify row deleted
+  - [x] ex-20 · activerecord-peewee-model — verify .save() persists
+  - [x] ex-21 · activerecord-vs-datamapper — verify persistence-API contrast
+  - [x] ex-22 · relationship-one-to-many — verify parent.children populated
+  - [x] ex-23 · relationship-back-populates — verify both sides sync
+  - [x] ex-24 · foreign-key-mapping — verify FK column + relationship
+  - [x] ex-25 · many-to-many-assoc-table — verify association rows
+  - [x] ex-26 · many-to-many-navigate — verify both collections
+  - [x] ex-27 · identity-map-same-object — verify same PK yields identical object
+  - [x] ex-28 · session-lifecycle-begin — verify begin/commit boundary
+  - [x] ex-29 · session-states-transient-pending — verify state transitions
+  - [x] ex-30 · session-expire-refresh — verify reloaded attributes
+  - [x] ex-31 · unit-of-work-flush-order — verify insert order by dependency
+  - [x] ex-32 · unit-of-work-dirty-tracking — verify only changed cols in UPDATE
+  - [x] ex-33 · unit-of-work-autoflush — verify query triggers flush
+  - [x] ex-34 · lazy-loading-default — verify relationship SQL on access
+  - [x] ex-35 · lazy-loading-detached-error — verify DetachedInstanceError
+  - [x] ex-36 · n-plus-1-reproduce — verify N+1 query count
+  - [x] ex-37 · eager-selectinload — verify 2 queries not N+1
+  - [x] ex-38 · eager-joinedload — verify single joined query
+  - [x] ex-39 · eager-subqueryload — verify subquery strategy
+  - [x] ex-40 · eager-strategy-contrast — verify query counts differ
+  - [x] ex-41 · raiseload-guard — verify raiseload raises on lazy access
+  - [x] ex-42 · n-plus-1-count-assert — verify asserted query count
+  - [x] ex-43 · orm-transaction-commit-rollback — verify rollback discards
+  - [x] ex-44 · orm-nested-savepoint — verify savepoint partial rollback
+  - [x] ex-45 · connection-pool-basics — verify pool reuse
+  - [x] ex-46 · pool-exhaustion — verify timeout when exhausted
+  - [x] ex-47 · pool-pre-ping — verify stale connection recycled
+  - [x] ex-48 · alembic-init — verify env scaffolded
+  - [x] ex-49 · alembic-first-migration — verify revision file emitted
+  - [x] ex-50 · alembic-upgrade-downgrade — verify schema up then down
+  - [x] ex-51 · alembic-autogenerate — verify diff-derived migration
+  - [x] ex-52 · alembic-autogen-review — verify hand-edit needed
+  - [x] ex-53 · migration-reversible-data — verify downgrade restores data
+  - [x] ex-54 · migration-irreversible-guard — verify downgrade raises
+  - [x] ex-55 · cascade-delete-orm — verify children deleted
+  - [x] ex-56 · cascade-vs-db-fk — verify ORM cascade vs FK ondelete
+  - [x] ex-57 · bulk-insert-orm — verify batch insert
+  - [x] ex-58 · bulk-update-core — verify single UPDATE statement
+  - [x] ex-59 · bulk-vs-orm-perf — verify timing delta
+  - [x] ex-60 · async-engine-session — verify async session yields rows
+  - [x] ex-61 · async-eager-loading — verify eager under async
+  - [x] ex-62 · async-lazy-forbidden — verify lazy raises under async
+  - [x] ex-63 · async-concurrent-sessions — verify concurrent queries
+  - [x] ex-64 · orm-vs-raw-crud — verify equivalent CRUD both tiers
+  - [x] ex-65 · orm-vs-raw-reporting — verify raw wins reporting
+  - [x] ex-66 · querybuilder-vs-orm-dynamic — verify dynamic query build
+  - [x] ex-67 · querybuilder-vs-orm-tradeoff — verify tradeoff articulated
+  - [x] ex-68 · choosing-tier-crud — verify tier choice for CRUD
+  - [x] ex-69 · choosing-tier-analytics — verify tier choice for analytics
+  - [x] ex-70 · choosing-tier-hot-path — verify tier choice for hot path
+  - [x] ex-71 · hybrid-orm-plus-raw — verify ORM + raw escape hatch
+  - [x] ex-72 · identity-map-across-queries — verify same object across queries
+  - [x] ex-73 · relationship-lazy-strategies-config — verify per-relationship strategy
+  - [x] ex-74 · self-referential-relationship — verify tree self-join
+  - [x] ex-75 · association-object-m2m — verify extra columns on association
+  - [x] ex-76 · migration-zero-downtime — verify expand/contract steps
+  - [x] ex-77 · connection-pool-tuning — verify pool-size params
+  - [x] ex-78 · capstone-preview-three-tier — verify three-tier stack runs
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/data-access-orms-and-query-builders/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-by-example-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/data-access-orms-and-query-builders/drilling/_index.md` (wt 227) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5679,7 +5679,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
@@ -5692,106 +5692,106 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: Annotated-concept · Python \* · topic wt 390 · Learn 129 / Drill 229 · **subject**. Template →
 [`syllabus/29-advanced-networking.md`](./syllabus/29-advanced-networking.md).
 
-- [ ] **[AI] V** — `web-researcher` for `advanced-networking`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `advanced-networking`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/29-advanced-networking.md`](./syllabus/29-advanced-networking.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/advanced-networking/learning/` teaching **every** concept in `syllabus/29-advanced-networking.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · osi-tcpip-layering-and-encapsulation
-  - [ ] co-02 · link-layer-addressing-and-arp
-  - [ ] co-03 · ipv4-ipv6-addressing
-  - [ ] co-04 · cidr-and-subnetting
-  - [ ] co-05 · routing-basics
-  - [ ] co-06 · nat
-  - [ ] co-07 · tcp-handshake-and-teardown-internals
-  - [ ] co-08 · tcp-flow-control
-  - [ ] co-09 · tcp-congestion-control
-  - [ ] co-10 · nagle-and-delayed-ack
-  - [ ] co-11 · socket-options-and-nonblocking-io
-  - [ ] co-12 · dns-resolution-internals
-  - [ ] co-13 · dnssec
-  - [ ] co-14 · tls13-handshake-internals
-  - [ ] co-15 · http2-multiplexing
-  - [ ] co-16 · http3-and-quic
-  - [ ] co-17 · websockets-vs-sse
-  - [ ] co-18 · webtransport-and-webrtc
-  - [ ] co-19 · load-balancing-l4-vs-l7
-  - [ ] co-20 · reverse-proxies-and-cdns
-  - [ ] co-21 · network-namespaces
-  - [ ] co-22 · packet-capture-and-bpf-filters
-  - [ ] co-23 · latency-jitter-and-percentiles
-  - [ ] co-24 · firewalls-and-mtls
-  - [ ] co-25 · vpn-tunnels-and-overlays
-  - [ ] co-26 · wireguard
-  - [ ] co-27 · ipsec-vs-openvpn-vs-wireguard
-  - [ ] co-28 · nat-traversal-and-keepalive
-  - [ ] co-29 · mesh-overlay-vpns
-- [ ] **[AI] A1-examples** — Author `CONTENT/advanced-networking/learning/code/` — one runnable source/recipe per worked example in `syllabus/29-advanced-networking.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · osi-layer-mapping-curl-trace — verify `curl -v` transcript lines labeled by OSI layer
-  - [ ] ex-02 · encapsulation-headers-diagram — verify Mermaid encapsulation diagram renders
-  - [ ] ex-03 · view-local-mac — verify `ip link show` prints `link/ether` MAC
-  - [ ] ex-04 · arp-cache-inspect — verify `ip neigh show` lists IP→MAC entries
-  - [ ] ex-05 · ipv4-binary-anatomy — verify 4 binary octets correct
-  - [ ] ex-06 · ipv6-address-expand-compress — verify 8 full hextets then re-compressed form
-  - [ ] ex-07 · cidr-prefix-to-netmask — verify `/24`, `/26`, `/30` dotted-decimal netmasks correct
-  - [ ] ex-08 · subnet-calculator-script — verify `subnet.py` prints network/broadcast/host range
-  - [ ] ex-09 · view-routing-table — verify `ip route` shows `default via` line
-  - [ ] ex-10 · traceroute-hop-list — verify numbered hop list with per-hop latency
-  - [ ] ex-11 · private-vs-public-address-classify — verify each IP classified vs RFC 1918
-  - [ ] ex-12 · nat-translation-diagram — verify NAT translation diagram renders
-  - [ ] ex-13 · tcp-handshake-tcpdump-capture — verify `[S]`/`[S.]`/`[.]` handshake flags in trace
-  - [ ] ex-14 · tcp-teardown-tcpdump-capture — verify `[F.]`/`[.]` teardown flags in trace
-  - [ ] ex-15 · ss-show-tcp-states — verify ESTAB while open, TIME-WAIT/absent after close
-  - [ ] ex-16 · well-known-ports-review — verify ports table (DNS/53, HTTP/80, HTTPS/443…) complete
-  - [ ] ex-17 · tcp-window-scaling-tcpdump — verify `wscale` option located in SYN
-  - [ ] ex-18 · tcp-flow-control-window-shrink — verify receive window shrinks under slow reader
-  - [ ] ex-19 · congestion-window-slow-start-diagram — verify CUBIC slow-start diagram renders
-  - [ ] ex-20 · view-active-congestion-control — verify `sysctl`/`ss -tin` prints active cc algorithm
-  - [ ] ex-21 · bbr-vs-cubic-tradeoff-note — verify CUBIC-vs-BBR comparison note
-  - [ ] ex-22 · nagle-delayed-ack-stall-diagram — verify Nagle/delayed-ACK stall sequence diagram
-  - [ ] ex-23 · tcp-nodelay-socket-option — verify `TCP_NODELAY` set, small writes sent immediately
-  - [ ] ex-24 · so-reuseaddr-restart — verify immediate rebind, no "Address already in use"
-  - [ ] ex-25 · nonblocking-socket-select — verify nonblocking socket polled via `select`
-  - [ ] ex-26 · dns-resolution-chain-trace — verify `dig +trace` root→TLD→authoritative chain annotated
-  - [ ] ex-27 · dns-caching-ttl-observe — verify second-query TTL lower than first
-  - [ ] ex-28 · dnssec-validate-with-dig — verify `RRSIG` records present in `dig +dnssec`
-  - [ ] ex-29 · dnssec-chain-of-trust-diagram — verify DNSSEC trust-chain diagram renders
-  - [ ] ex-30 · tls13-handshake-curl-verbose — verify `* TLSv1.3` lines annotated
-  - [ ] ex-31 · tls13-1rtt-handshake-diagram — verify 1-RTT handshake sequence diagram renders
-  - [ ] ex-32 · tls13-session-resumption-0rtt — verify 0-RTT PSK resumption annotated
-  - [ ] ex-33 · http2-frame-inspect — verify `curl -v --http2` shows HTTP/2 frames
-  - [ ] ex-34 · http2-multiplexed-streams-diagram — verify multiplexed-streams diagram renders
-  - [ ] ex-35 · http2-vs-http11-connection-count — verify HTTP/2 one connection vs HTTP/1.1 multiple
-  - [ ] ex-36 · http3-quic-curl-attempt — verify `* using HTTP/3` (or `[Needs Verification]` fallback)
-  - [ ] ex-37 · quic-udp-vs-tcp-hol-blocking-diagram — verify HOL-blocking contrast diagram renders
-  - [ ] ex-38 · quic-connection-migration-note — verify connection-migration note
-  - [ ] ex-39 · websocket-handshake-upgrade — verify `Upgrade: websocket` + `101` status
-  - [ ] ex-40 · websocket-full-duplex-demo — verify concurrent send/receive
-  - [ ] ex-41 · sse-one-way-stream — verify `data:` SSE lines streamed and consumed
-  - [ ] ex-42 · websocket-vs-sse-decision-table — verify decision table maps use-cases
-  - [ ] ex-43 · webtransport-overview-diagram — verify WebTransport session diagram renders
-  - [ ] ex-44 · webrtc-peer-connection-diagram — verify WebRTC peer-connection diagram renders
-  - [ ] ex-45 · l4-load-balancer-diagram — verify L4 load-balancer diagram renders
-  - [ ] ex-46 · l7-load-balancer-diagram — verify L7 load-balancer diagram renders
-  - [ ] ex-47 · reverse-proxy-request-flow — verify local reverse-proxy forwards request
-  - [ ] ex-48 · cdn-cache-hit-miss-headers — verify `curl -I` cache-status header (HIT/MISS) shown
-  - [ ] ex-49 · network-namespace-isolated-stack — verify isolated netns has its own loopback
-  - [ ] ex-50 · bpf-filter-tcpdump-host-port — verify only host+port 443 packets captured
-  - [ ] ex-51 · bpf-filter-tcpdump-flags — verify only SYN packets shown
-  - [ ] ex-52 · latency-jitter-percentiles-measure — verify p50/p95/p99 computed
-  - [ ] ex-53 · bandwidth-vs-throughput-vs-latency-diagram — verify distinguishing diagram renders
-  - [ ] ex-54 · firewall-stateful-rule-diagram — verify stateful firewall reply-allow diagram renders
-  - [ ] ex-55 · mtls-mutual-auth-diagram — verify mutual-TLS handshake sequence diagram renders
-  - [ ] ex-56 · wireguard-two-peer-tunnel — verify peers reach each other over the encrypted link
-  - [ ] ex-57 · allowedips-crypto-routing — verify AllowedIPs acts as the crypto-routing table
-  - [ ] ex-58 · split-tunnel-vs-full-tunnel — verify which destinations egress the tunnel in each case
-  - [ ] ex-59 · persistentkeepalive-nat — verify NAT mapping stays open, NATed peer keeps receiving
-  - [ ] ex-60 · site-to-site-vs-remote-access-diagram — verify each topology's routed ranges are labelled
-  - [ ] ex-61 · mesh-overlay-tailscale-nebula-contrast — verify control-plane + trust model + license labelled
-  - [ ] ex-62 · wireguard-vs-openvpn-vs-ipsec-decision — verify each option's trade-off + license recorded
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/advanced-networking/learning/capstone/` (`_index.md` weight 900) per the
+- [x] **[AI] A1-concepts** — Author `CONTENT/advanced-networking/learning/` teaching **every** concept in `syllabus/29-advanced-networking.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [x] co-01 · osi-tcpip-layering-and-encapsulation
+  - [x] co-02 · link-layer-addressing-and-arp
+  - [x] co-03 · ipv4-ipv6-addressing
+  - [x] co-04 · cidr-and-subnetting
+  - [x] co-05 · routing-basics
+  - [x] co-06 · nat
+  - [x] co-07 · tcp-handshake-and-teardown-internals
+  - [x] co-08 · tcp-flow-control
+  - [x] co-09 · tcp-congestion-control
+  - [x] co-10 · nagle-and-delayed-ack
+  - [x] co-11 · socket-options-and-nonblocking-io
+  - [x] co-12 · dns-resolution-internals
+  - [x] co-13 · dnssec
+  - [x] co-14 · tls13-handshake-internals
+  - [x] co-15 · http2-multiplexing
+  - [x] co-16 · http3-and-quic
+  - [x] co-17 · websockets-vs-sse
+  - [x] co-18 · webtransport-and-webrtc
+  - [x] co-19 · load-balancing-l4-vs-l7
+  - [x] co-20 · reverse-proxies-and-cdns
+  - [x] co-21 · network-namespaces
+  - [x] co-22 · packet-capture-and-bpf-filters
+  - [x] co-23 · latency-jitter-and-percentiles
+  - [x] co-24 · firewalls-and-mtls
+  - [x] co-25 · vpn-tunnels-and-overlays
+  - [x] co-26 · wireguard
+  - [x] co-27 · ipsec-vs-openvpn-vs-wireguard
+  - [x] co-28 · nat-traversal-and-keepalive
+  - [x] co-29 · mesh-overlay-vpns
+- [x] **[AI] A1-examples** — Author `CONTENT/advanced-networking/learning/code/` — one runnable source/recipe per worked example in `syllabus/29-advanced-networking.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [x] ex-01 · osi-layer-mapping-curl-trace — verify `curl -v` transcript lines labeled by OSI layer
+  - [x] ex-02 · encapsulation-headers-diagram — verify Mermaid encapsulation diagram renders
+  - [x] ex-03 · view-local-mac — verify `ip link show` prints `link/ether` MAC
+  - [x] ex-04 · arp-cache-inspect — verify `ip neigh show` lists IP→MAC entries
+  - [x] ex-05 · ipv4-binary-anatomy — verify 4 binary octets correct
+  - [x] ex-06 · ipv6-address-expand-compress — verify 8 full hextets then re-compressed form
+  - [x] ex-07 · cidr-prefix-to-netmask — verify `/24`, `/26`, `/30` dotted-decimal netmasks correct
+  - [x] ex-08 · subnet-calculator-script — verify `subnet.py` prints network/broadcast/host range
+  - [x] ex-09 · view-routing-table — verify `ip route` shows `default via` line
+  - [x] ex-10 · traceroute-hop-list — verify numbered hop list with per-hop latency
+  - [x] ex-11 · private-vs-public-address-classify — verify each IP classified vs RFC 1918
+  - [x] ex-12 · nat-translation-diagram — verify NAT translation diagram renders
+  - [x] ex-13 · tcp-handshake-tcpdump-capture — verify `[S]`/`[S.]`/`[.]` handshake flags in trace
+  - [x] ex-14 · tcp-teardown-tcpdump-capture — verify `[F.]`/`[.]` teardown flags in trace
+  - [x] ex-15 · ss-show-tcp-states — verify ESTAB while open, TIME-WAIT/absent after close
+  - [x] ex-16 · well-known-ports-review — verify ports table (DNS/53, HTTP/80, HTTPS/443…) complete
+  - [x] ex-17 · tcp-window-scaling-tcpdump — verify `wscale` option located in SYN
+  - [x] ex-18 · tcp-flow-control-window-shrink — verify receive window shrinks under slow reader
+  - [x] ex-19 · congestion-window-slow-start-diagram — verify CUBIC slow-start diagram renders
+  - [x] ex-20 · view-active-congestion-control — verify `sysctl`/`ss -tin` prints active cc algorithm
+  - [x] ex-21 · bbr-vs-cubic-tradeoff-note — verify CUBIC-vs-BBR comparison note
+  - [x] ex-22 · nagle-delayed-ack-stall-diagram — verify Nagle/delayed-ACK stall sequence diagram
+  - [x] ex-23 · tcp-nodelay-socket-option — verify `TCP_NODELAY` set, small writes sent immediately
+  - [x] ex-24 · so-reuseaddr-restart — verify immediate rebind, no "Address already in use"
+  - [x] ex-25 · nonblocking-socket-select — verify nonblocking socket polled via `select`
+  - [x] ex-26 · dns-resolution-chain-trace — verify `dig +trace` root→TLD→authoritative chain annotated
+  - [x] ex-27 · dns-caching-ttl-observe — verify second-query TTL lower than first
+  - [x] ex-28 · dnssec-validate-with-dig — verify `RRSIG` records present in `dig +dnssec`
+  - [x] ex-29 · dnssec-chain-of-trust-diagram — verify DNSSEC trust-chain diagram renders
+  - [x] ex-30 · tls13-handshake-curl-verbose — verify `* TLSv1.3` lines annotated
+  - [x] ex-31 · tls13-1rtt-handshake-diagram — verify 1-RTT handshake sequence diagram renders
+  - [x] ex-32 · tls13-session-resumption-0rtt — verify 0-RTT PSK resumption annotated
+  - [x] ex-33 · http2-frame-inspect — verify `curl -v --http2` shows HTTP/2 frames
+  - [x] ex-34 · http2-multiplexed-streams-diagram — verify multiplexed-streams diagram renders
+  - [x] ex-35 · http2-vs-http11-connection-count — verify HTTP/2 one connection vs HTTP/1.1 multiple
+  - [x] ex-36 · http3-quic-curl-attempt — verify `* using HTTP/3` (or `[Needs Verification]` fallback)
+  - [x] ex-37 · quic-udp-vs-tcp-hol-blocking-diagram — verify HOL-blocking contrast diagram renders
+  - [x] ex-38 · quic-connection-migration-note — verify connection-migration note
+  - [x] ex-39 · websocket-handshake-upgrade — verify `Upgrade: websocket` + `101` status
+  - [x] ex-40 · websocket-full-duplex-demo — verify concurrent send/receive
+  - [x] ex-41 · sse-one-way-stream — verify `data:` SSE lines streamed and consumed
+  - [x] ex-42 · websocket-vs-sse-decision-table — verify decision table maps use-cases
+  - [x] ex-43 · webtransport-overview-diagram — verify WebTransport session diagram renders
+  - [x] ex-44 · webrtc-peer-connection-diagram — verify WebRTC peer-connection diagram renders
+  - [x] ex-45 · l4-load-balancer-diagram — verify L4 load-balancer diagram renders
+  - [x] ex-46 · l7-load-balancer-diagram — verify L7 load-balancer diagram renders
+  - [x] ex-47 · reverse-proxy-request-flow — verify local reverse-proxy forwards request
+  - [x] ex-48 · cdn-cache-hit-miss-headers — verify `curl -I` cache-status header (HIT/MISS) shown
+  - [x] ex-49 · network-namespace-isolated-stack — verify isolated netns has its own loopback
+  - [x] ex-50 · bpf-filter-tcpdump-host-port — verify only host+port 443 packets captured
+  - [x] ex-51 · bpf-filter-tcpdump-flags — verify only SYN packets shown
+  - [x] ex-52 · latency-jitter-percentiles-measure — verify p50/p95/p99 computed
+  - [x] ex-53 · bandwidth-vs-throughput-vs-latency-diagram — verify distinguishing diagram renders
+  - [x] ex-54 · firewall-stateful-rule-diagram — verify stateful firewall reply-allow diagram renders
+  - [x] ex-55 · mtls-mutual-auth-diagram — verify mutual-TLS handshake sequence diagram renders
+  - [x] ex-56 · wireguard-two-peer-tunnel — verify peers reach each other over the encrypted link
+  - [x] ex-57 · allowedips-crypto-routing — verify AllowedIPs acts as the crypto-routing table
+  - [x] ex-58 · split-tunnel-vs-full-tunnel — verify which destinations egress the tunnel in each case
+  - [x] ex-59 · persistentkeepalive-nat — verify NAT mapping stays open, NATed peer keeps receiving
+  - [x] ex-60 · site-to-site-vs-remote-access-diagram — verify each topology's routed ranges are labelled
+  - [x] ex-61 · mesh-overlay-tailscale-nebula-contrast — verify control-plane + trust model + license labelled
+  - [x] ex-62 · wireguard-vs-openvpn-vs-ipsec-decision — verify each option's trade-off + license recorded
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/advanced-networking/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/advanced-networking/drilling/_index.md` (wt 229) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5838,92 +5838,92 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: Annotated-concept · Python \* · topic wt 400 · Learn 130 / Drill 230 · **subject**. Template →
 [`syllabus/30-software-engineering-practices.md`](./syllabus/30-software-engineering-practices.md).
 
-- [ ] **[AI] V** — `web-researcher` for `software-engineering-practices`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `software-engineering-practices`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/30-software-engineering-practices.md`](./syllabus/30-software-engineering-practices.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/software-engineering-practices/learning/` teaching **every** concept in `syllabus/30-software-engineering-practices.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · trunk-based-vs-feature-branch
-  - [ ] co-02 · conventional-commits
-  - [ ] co-03 · semantic-versioning
-  - [ ] co-04 · changelog-discipline
-  - [ ] co-05 · code-review-etiquette
-  - [ ] co-06 · pr-hygiene-and-size
-  - [ ] co-07 · pr-workflow-with-gh-cli
-  - [ ] co-08 · ci-pipeline-stages
-  - [ ] co-09 · quality-gates
-  - [ ] co-10 · pre-commit-hooks
-  - [ ] co-11 · test-pyramid-as-practice
-  - [ ] co-12 · coverage-as-signal-not-target
-  - [ ] co-13 · systematic-debugging-practice
-  - [ ] co-14 · refactoring-cadence
-  - [ ] co-15 · boy-scout-rule
-  - [ ] co-16 · technical-debt-tracking
-  - [ ] co-17 · documentation-as-code
-  - [ ] co-18 · adr-as-engineering-practice
-  - [ ] co-19 · estimation-pitfalls-and-noestimates
-  - [ ] co-20 · pairing-and-mobbing
-  - [ ] co-21 · definition-of-done
-  - [ ] co-22 · feature-flags-as-a-release-decoupler
-  - [ ] co-23 · incident-hygiene-and-blameless-response
-- [ ] **[AI] A1-examples** — Author `CONTENT/software-engineering-practices/learning/code/` (runnable command sequences + CI/hook config) and `.../learning/artifacts/` (changelogs, ADRs, postmortems, memos) — one per worked example in `syllabus/30-software-engineering-practices.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · conventional-commit-fix — verify `git log -1 --pretty=%s` matches `type(scope): description`
-  - [ ] ex-02 · conventional-commit-feat-with-scope — verify `feat` maps to a MINOR bump
-  - [ ] ex-03 · conventional-commit-breaking-bang — verify `!` and `BREAKING CHANGE:` both signal MAJOR
-  - [ ] ex-04 · semver-bump-decision-table — verify each change assigned the correct SemVer bump
-  - [ ] ex-05 · changelog-entry-keepachangelog — verify entry uses one of the six categories under `[Unreleased]`
-  - [ ] ex-06 · changelog-vs-raw-commit-dump — verify changelog reads as intent, not raw history
-  - [ ] ex-07 · trunk-vs-feature-branch-decision — verify each pick cites cadence/team-size
-  - [ ] ex-08 · self-review-before-request — verify opened PR no longer contains the self-caught issue
-  - [ ] ex-09 · pr-create-with-gh — verify `gh pr view` shows title + base branch
-  - [ ] ex-10 · pr-size-under-100-lines — verify each split PR near the ~100-line bar
-  - [ ] ex-11 · pr-description-one-concern — verify single purpose stateable in one sentence
-  - [ ] ex-12 · request-review-with-gh — verify `gh pr view --comments` lists request-changes comment
-  - [ ] ex-13 · approve-with-gh — verify `gh pr view --comments` lists approval comment
-  - [ ] ex-14 · minimal-ci-pipeline-lint-test-build — verify diagram order matches pipeline job order
-  - [ ] ex-15 · required-check-blocks-merge — verify failing commit blocked from merge
-  - [ ] ex-16 · lint-warning-vs-blocking-gate — verify blocking gate reserved for production-protecting check
-  - [ ] ex-17 · install-pre-commit-framework — verify `git commit` triggers configured hooks
-  - [ ] ex-18 · pre-commit-run-all-files — verify per-hook pass/fail across whole repo
-  - [ ] ex-19 · pyramid-shape-check-in-review — verify comment names the violated pyramid shape
-  - [ ] ex-20 · coverage-number-without-assertions — verify high coverage, unverified behavior
-  - [ ] ex-21 · goodhart-coverage-target-memo — verify memo names assertion-free-test failure mode
-  - [ ] ex-22 · rubber-duck-explain-the-bug — verify narration surfaces wrong assumption pre-change
-  - [ ] ex-23 · hypothesis-before-fix — verify hypothesis confirmed/refuted by exactly one check
-  - [ ] ex-24 · bisect-as-workflow-decision — verify choice justified by logarithmic step count
-  - [ ] ex-25 · refactor-during-a-feature-pr — verify refactor commit separate from feature commit
-  - [ ] ex-26 · boy-scout-rule-applied — verify cleanup stays a tiny incidental diff
-  - [ ] ex-27 · refactoring-cadence-vs-big-bang — verify continuous option chosen with risk rationale
-  - [ ] ex-28 · tech-debt-log-entry — verify entry names its Fowler quadrant
-  - [ ] ex-29 · tech-debt-prioritization — verify ranking picks highest-friction, not newest
-  - [ ] ex-30 · docstring-to-api-doc — verify generated doc matches signature, no hand-duplication
-  - [ ] ex-31 · doc-in-same-pr-as-code — verify PR diff contains both code and doc update
-  - [ ] ex-32 · adr-trigger-decision — verify only the hard-to-reverse choice earns an ADR
-  - [ ] ex-33 · adr-cross-referenced-from-code — verify ADR and code point at each other
-  - [ ] ex-34 · estimation-pitfall-single-point — verify raw-hour estimate reads overconfident vs relative
-  - [ ] ex-35 · noestimates-alternative — verify alternative removes estimate step, keeps forecast
-  - [ ] ex-36 · pairing-driver-navigator — verify roles swap at interval, both explain diff
-  - [ ] ex-37 · mob-programming-session — verify every participant can explain the solution
-  - [ ] ex-38 · definition-of-done-checklist — verify PR done only once every item checked
-  - [ ] ex-39 · done-vs-done-done — verify DoD distinguishes merged vs deployed-and-monitored
-  - [ ] ex-40 · feature-flag-release-toggle — verify trunk build green with flag off
-  - [ ] ex-41 · feature-flag-kill-switch — verify feature off without redeploy, system up
-  - [ ] ex-42 · incident-detection-to-mitigation — verify timeline names mitigation before root-cause fix
-  - [ ] ex-43 · blameless-language-check — verify no sentence attributes incident to a person
-  - [ ] ex-44 · capstone-preview-commit-history-cleanup — verify `git log --oneline` shows typed+scoped commits
-  - [ ] ex-45 · semver-changelog-from-commits — verify derived bump matches highest-severity commit type
-  - [ ] ex-46 · quality-gate-pipeline-with-pre-commit — verify local hook failure fails pipeline identically
-  - [ ] ex-47 · coverage-plus-review-double-gate — verify unreviewed risky diff still blocked
-  - [ ] ex-48 · full-pr-review-cycle — verify request-changes comment then approval comment, in order
-  - [ ] ex-49 · debt-driven-refactor-with-flag — verify old+new paths coexist behind flag until verified
-  - [ ] ex-50 · postmortem-to-tracked-debt — verify follow-up item traces to the postmortem line
-  - [ ] ex-51 · adr-plus-definition-of-done — verify PR lacking a linked ADR fails the checklist
-  - [ ] ex-52 · review-etiquette-severity-labels — verify author can tell blocking from nit
-  - [ ] ex-53 · pairing-vs-solo-tradeoff-memo — verify memo cites risk/familiarity per choice
-  - [ ] ex-54 · systematic-debug-in-review — verify located commit matches a full `git bisect` result
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-engineering-practices/learning/capstone/` (`_index.md` weight 900) per the
+- [x] **[AI] A1-concepts** — Author `CONTENT/software-engineering-practices/learning/` teaching **every** concept in `syllabus/30-software-engineering-practices.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
+  - [x] co-01 · trunk-based-vs-feature-branch
+  - [x] co-02 · conventional-commits
+  - [x] co-03 · semantic-versioning
+  - [x] co-04 · changelog-discipline
+  - [x] co-05 · code-review-etiquette
+  - [x] co-06 · pr-hygiene-and-size
+  - [x] co-07 · pr-workflow-with-gh-cli
+  - [x] co-08 · ci-pipeline-stages
+  - [x] co-09 · quality-gates
+  - [x] co-10 · pre-commit-hooks
+  - [x] co-11 · test-pyramid-as-practice
+  - [x] co-12 · coverage-as-signal-not-target
+  - [x] co-13 · systematic-debugging-practice
+  - [x] co-14 · refactoring-cadence
+  - [x] co-15 · boy-scout-rule
+  - [x] co-16 · technical-debt-tracking
+  - [x] co-17 · documentation-as-code
+  - [x] co-18 · adr-as-engineering-practice
+  - [x] co-19 · estimation-pitfalls-and-noestimates
+  - [x] co-20 · pairing-and-mobbing
+  - [x] co-21 · definition-of-done
+  - [x] co-22 · feature-flags-as-a-release-decoupler
+  - [x] co-23 · incident-hygiene-and-blameless-response
+- [x] **[AI] A1-examples** — Author `CONTENT/software-engineering-practices/learning/code/` (runnable command sequences + CI/hook config) and `.../learning/artifacts/` (changelogs, ADRs, postmortems, memos) — one per worked example in `syllabus/30-software-engineering-practices.md` §Worked examples (DD-20/DD-30). One checkbox per `ex-NN` (1:1 mirror):
+  - [x] ex-01 · conventional-commit-fix — verify `git log -1 --pretty=%s` matches `type(scope): description`
+  - [x] ex-02 · conventional-commit-feat-with-scope — verify `feat` maps to a MINOR bump
+  - [x] ex-03 · conventional-commit-breaking-bang — verify `!` and `BREAKING CHANGE:` both signal MAJOR
+  - [x] ex-04 · semver-bump-decision-table — verify each change assigned the correct SemVer bump
+  - [x] ex-05 · changelog-entry-keepachangelog — verify entry uses one of the six categories under `[Unreleased]`
+  - [x] ex-06 · changelog-vs-raw-commit-dump — verify changelog reads as intent, not raw history
+  - [x] ex-07 · trunk-vs-feature-branch-decision — verify each pick cites cadence/team-size
+  - [x] ex-08 · self-review-before-request — verify opened PR no longer contains the self-caught issue
+  - [x] ex-09 · pr-create-with-gh — verify `gh pr view` shows title + base branch
+  - [x] ex-10 · pr-size-under-100-lines — verify each split PR near the ~100-line bar
+  - [x] ex-11 · pr-description-one-concern — verify single purpose stateable in one sentence
+  - [x] ex-12 · request-review-with-gh — verify `gh pr view --comments` lists request-changes comment
+  - [x] ex-13 · approve-with-gh — verify `gh pr view --comments` lists approval comment
+  - [x] ex-14 · minimal-ci-pipeline-lint-test-build — verify diagram order matches pipeline job order
+  - [x] ex-15 · required-check-blocks-merge — verify failing commit blocked from merge
+  - [x] ex-16 · lint-warning-vs-blocking-gate — verify blocking gate reserved for production-protecting check
+  - [x] ex-17 · install-pre-commit-framework — verify `git commit` triggers configured hooks
+  - [x] ex-18 · pre-commit-run-all-files — verify per-hook pass/fail across whole repo
+  - [x] ex-19 · pyramid-shape-check-in-review — verify comment names the violated pyramid shape
+  - [x] ex-20 · coverage-number-without-assertions — verify high coverage, unverified behavior
+  - [x] ex-21 · goodhart-coverage-target-memo — verify memo names assertion-free-test failure mode
+  - [x] ex-22 · rubber-duck-explain-the-bug — verify narration surfaces wrong assumption pre-change
+  - [x] ex-23 · hypothesis-before-fix — verify hypothesis confirmed/refuted by exactly one check
+  - [x] ex-24 · bisect-as-workflow-decision — verify choice justified by logarithmic step count
+  - [x] ex-25 · refactor-during-a-feature-pr — verify refactor commit separate from feature commit
+  - [x] ex-26 · boy-scout-rule-applied — verify cleanup stays a tiny incidental diff
+  - [x] ex-27 · refactoring-cadence-vs-big-bang — verify continuous option chosen with risk rationale
+  - [x] ex-28 · tech-debt-log-entry — verify entry names its Fowler quadrant
+  - [x] ex-29 · tech-debt-prioritization — verify ranking picks highest-friction, not newest
+  - [x] ex-30 · docstring-to-api-doc — verify generated doc matches signature, no hand-duplication
+  - [x] ex-31 · doc-in-same-pr-as-code — verify PR diff contains both code and doc update
+  - [x] ex-32 · adr-trigger-decision — verify only the hard-to-reverse choice earns an ADR
+  - [x] ex-33 · adr-cross-referenced-from-code — verify ADR and code point at each other
+  - [x] ex-34 · estimation-pitfall-single-point — verify raw-hour estimate reads overconfident vs relative
+  - [x] ex-35 · noestimates-alternative — verify alternative removes estimate step, keeps forecast
+  - [x] ex-36 · pairing-driver-navigator — verify roles swap at interval, both explain diff
+  - [x] ex-37 · mob-programming-session — verify every participant can explain the solution
+  - [x] ex-38 · definition-of-done-checklist — verify PR done only once every item checked
+  - [x] ex-39 · done-vs-done-done — verify DoD distinguishes merged vs deployed-and-monitored
+  - [x] ex-40 · feature-flag-release-toggle — verify trunk build green with flag off
+  - [x] ex-41 · feature-flag-kill-switch — verify feature off without redeploy, system up
+  - [x] ex-42 · incident-detection-to-mitigation — verify timeline names mitigation before root-cause fix
+  - [x] ex-43 · blameless-language-check — verify no sentence attributes incident to a person
+  - [x] ex-44 · capstone-preview-commit-history-cleanup — verify `git log --oneline` shows typed+scoped commits
+  - [x] ex-45 · semver-changelog-from-commits — verify derived bump matches highest-severity commit type
+  - [x] ex-46 · quality-gate-pipeline-with-pre-commit — verify local hook failure fails pipeline identically
+  - [x] ex-47 · coverage-plus-review-double-gate — verify unreviewed risky diff still blocked
+  - [x] ex-48 · full-pr-review-cycle — verify request-changes comment then approval comment, in order
+  - [x] ex-49 · debt-driven-refactor-with-flag — verify old+new paths coexist behind flag until verified
+  - [x] ex-50 · postmortem-to-tracked-debt — verify follow-up item traces to the postmortem line
+  - [x] ex-51 · adr-plus-definition-of-done — verify PR lacking a linked ADR fails the checklist
+  - [x] ex-52 · review-etiquette-severity-labels — verify author can tell blocking from nit
+  - [x] ex-53 · pairing-vs-solo-tradeoff-memo — verify memo cites risk/familiarity per choice
+  - [x] ex-54 · systematic-debug-in-review — verify located commit matches a full `git bisect` result
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/software-engineering-practices/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/software-engineering-practices/drilling/_index.md` (wt 230) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -5970,97 +5970,97 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: Annotated-concept · ‡ polyglot · topic wt 410 · Learn 131 / Drill 231 · **subject**. Template →
 [`syllabus/31-agentic-coding.md`](./syllabus/31-agentic-coding.md).
 
-- [ ] **[AI] V** — `web-researcher` for `agentic-coding`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `agentic-coding`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/31-agentic-coding.md`](./syllabus/31-agentic-coding.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/agentic-coding/learning/` teaching **every** concept in
+- [x] **[AI] A1-concepts** — Author `CONTENT/agentic-coding/learning/` teaching **every** concept in
       `syllabus/31-agentic-coding.md` §Concepts (DD-34 1:1 mirror; concepts before examples). One checkbox per `co-NN`:
-  - [ ] co-01 · what-is-agentic-coding
-  - [ ] co-02 · the-perceive-plan-act-observe-loop
-  - [ ] co-03 · context-window-fundamentals
-  - [ ] co-04 · context-management
-  - [ ] co-05 · prompting-for-code
-  - [ ] co-06 · instruction-files
-  - [ ] co-07 · tool-use-and-function-calling
-  - [ ] co-08 · mcp-model-context-protocol
-  - [ ] co-09 · plan-mode-vs-act-mode
-  - [ ] co-10 · subagents-and-orchestration
-  - [ ] co-11 · permissions-and-guardrails
-  - [ ] co-12 · sandboxing-and-reversibility
-  - [ ] co-13 · verification-discipline
-  - [ ] co-14 · test-driven-agent-workflows
-  - [ ] co-15 · diff-review
-  - [ ] co-16 · hallucination-awareness
-  - [ ] co-17 · trust-vs-verify-calibration
-  - [ ] co-18 · cost-and-token-budgeting
-  - [ ] co-19 · prompt-injection-risk
-  - [ ] co-20 · agent-skills
-  - [ ] co-21 · spec-driven-development
-  - [ ] co-22 · when-not-to-use-agents
-  - [ ] co-23 · iterative-refinement
-  - [ ] co-24 · human-in-the-loop
-- [ ] **[AI] A1-examples** — Author `CONTENT/agentic-coding/learning/code/` (runnable sources, DD-20) +
+  - [x] co-01 · what-is-agentic-coding
+  - [x] co-02 · the-perceive-plan-act-observe-loop
+  - [x] co-03 · context-window-fundamentals
+  - [x] co-04 · context-management
+  - [x] co-05 · prompting-for-code
+  - [x] co-06 · instruction-files
+  - [x] co-07 · tool-use-and-function-calling
+  - [x] co-08 · mcp-model-context-protocol
+  - [x] co-09 · plan-mode-vs-act-mode
+  - [x] co-10 · subagents-and-orchestration
+  - [x] co-11 · permissions-and-guardrails
+  - [x] co-12 · sandboxing-and-reversibility
+  - [x] co-13 · verification-discipline
+  - [x] co-14 · test-driven-agent-workflows
+  - [x] co-15 · diff-review
+  - [x] co-16 · hallucination-awareness
+  - [x] co-17 · trust-vs-verify-calibration
+  - [x] co-18 · cost-and-token-budgeting
+  - [x] co-19 · prompt-injection-risk
+  - [x] co-20 · agent-skills
+  - [x] co-21 · spec-driven-development
+  - [x] co-22 · when-not-to-use-agents
+  - [x] co-23 · iterative-refinement
+  - [x] co-24 · human-in-the-loop
+- [x] **[AI] A1-examples** — Author `CONTENT/agentic-coding/learning/code/` (runnable sources, DD-20) +
       `artifacts/` (prompt/session/config artifacts with no runnable code) — one per worked example in
       `syllabus/31-agentic-coding.md` §Worked examples, each rendered runnable/verifiable (DD-20/DD-30).
       One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · what-agentic-coding-is-not — verify session log shows multiple tool invocations autocomplete lacks
-  - [ ] ex-02 · trace-the-agent-loop — verify all four phases labeled in order across ≥2 iterations
-  - [ ] ex-03 · context-window-budget-check — verify reported count against documented context limit
-  - [ ] ex-04 · prune-irrelevant-context — verify pruned run stays on-topic where unpruned cites irrelevant file
-  - [ ] ex-05 · minimal-well-specified-prompt — verify first diff satisfies every acceptance-criteria bullet
-  - [ ] ex-06 · vague-vs-specific-prompt-contrast — verify specific prompt's first diff passes where vague fails
-  - [ ] ex-07 · author-a-project-instruction-file — verify agent runs declared test command unprompted
-  - [ ] ex-08 · instruction-file-precedence — verify which rule wins + cite documented precedence order
-  - [ ] ex-09 · first-tool-call-is-a-read — verify read precedes any write in the tool-call log
-  - [ ] ex-10 · tool-call-log-inspection — verify every entry records a tool name and its parameters
-  - [ ] ex-11 · plan-mode-first-pass — verify no file modified during the planning pass
-  - [ ] ex-12 · act-mode-after-plan-approval — verify edits appear only after the explicit approval step
-  - [ ] ex-13 · run-the-suite-before-accepting — verify a failing test blocks acceptance, logged as rejection
-  - [ ] ex-14 · reject-a-diff-on-inspection — verify rejection written with reason tied to the unrelated hunk
-  - [ ] ex-15 · spot-a-hallucinated-api — verify mismatch against real API reference before acceptance
-  - [ ] ex-16 · delegate-boilerplate-safely — verify review log shows a skim + why that was sufficient
-  - [ ] ex-17 · require-close-review-for-sensitive-code — verify line-by-line review precedes acceptance
-  - [ ] ex-18 · token-usage-per-turn-log — verify running total against a stated budget ceiling
-  - [ ] ex-19 · configure-an-mcp-server — verify agent's tool list includes new server's tools after restart
-  - [ ] ex-20 · call-a-tool-via-mcp — verify tool call + JSON-RPC result both appear in the transcript
-  - [ ] ex-21 · delegate-to-a-subagent — verify only a summary returns, not the raw exploration transcript
-  - [ ] ex-22 · parallel-subagent-fan-out — verify both complete + merge without cross-contaminating context
-  - [ ] ex-23 · deny-rule-permission-config — verify out-of-scope write is blocked and logged as denied
-  - [ ] ex-24 · allow-list-tool-scoping-for-review — verify no write/edit tool is invocable in the session
-  - [ ] ex-25 · sandboxed-shell-command — verify effect stays isolated from host outside the sandbox
-  - [ ] ex-26 · small-reversible-commit-steps — verify each commit independently revertible
-  - [ ] ex-27 · failing-test-as-tripwire — verify session log shows explicit red-to-green transition
-  - [ ] ex-28 · red-green-refactor-with-agent — verify three distinct diffs, one per phase
-  - [ ] ex-29 · diff-review-checklist — verify every checklist item explicitly checked before merge
-  - [ ] ex-30 · catch-silent-scope-creep — verify reviewer flags + trims out-of-scope hunk before acceptance
-  - [ ] ex-31 · budget-a-multi-turn-session — verify session halts or escalates when budget reached
-  - [ ] ex-32 · compare-cost-of-scoped-vs-open-prompt — verify scoped prompt's total cost is lower
-  - [ ] ex-33 · untrusted-content-injection-probe — verify guardrail blocks the injected instruction
-  - [ ] ex-34 · sanitize-tool-output-before-reuse — verify flagged suspicious payload is not acted on
-  - [ ] ex-35 · load-an-agent-skill — verify agent follows skill's documented steps, not improvised ones
-  - [ ] ex-36 · skill-vs-ad-hoc-instruction — verify skill run is repeatable where ad hoc varies
-  - [ ] ex-37 · write-a-spec-before-prompting — verify review maps each spec bullet to a diff line
-  - [ ] ex-38 · gherkin-spec-driving-agent-implementation — verify scenario steps pass against implementation
-  - [ ] ex-39 · iterate-on-a-failed-first-attempt — verify second diff passes where first did not
-  - [ ] ex-40 · multi-round-correction-loop — verify diff converges toward passing across rounds
-  - [ ] ex-41 · escalate-a-security-critical-change — verify documented human approval exists before merge
-  - [ ] ex-42 · when-not-to-delegate-a-novel-algorithm — verify written rationale records why delegation declined
-  - [ ] ex-43 · unverifiable-output-refusal — verify no diff merges without an accompanying verification path
-  - [ ] ex-44 · human-decision-gate-mid-session — verify session log shows a pause + explicit recorded approval
-  - [ ] ex-45 · context-managed-feature-loop — verify agent's diffs touch no file outside the scoped set
-  - [ ] ex-46 · mechanical-refactor-across-files — verify each file's diff carries a separate logged approval
-  - [ ] ex-47 · reject-a-confidently-wrong-refactor — verify behavior change caught via test regression + rejected
-  - [ ] ex-48 · trust-verify-decision-log — verify every risky change has a matching verify entry
-  - [ ] ex-49 · mcp-plus-subagent-research-task — verify main session receives only a cited summary
-  - [ ] ex-50 · prompt-injection-guardrail-config — verify rule fires against a crafted injection test case
-  - [ ] ex-51 · spec-driven-tdd-agent-session — verify spec bullets + red run + green run all present
-  - [ ] ex-52 · full-verify-first-feature-session — verify no diff reached final state unrun/unreviewed
-  - [ ] ex-53 · cost-bounded-iterative-refinement — verify session halts at budget + flags unresolved item
-  - [ ] ex-54 · post-mortem-a-bad-agent-merge — verify the fix closes the specific verification-loop gap
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/agentic-coding/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] ex-01 · what-agentic-coding-is-not — verify session log shows multiple tool invocations autocomplete lacks
+  - [x] ex-02 · trace-the-agent-loop — verify all four phases labeled in order across ≥2 iterations
+  - [x] ex-03 · context-window-budget-check — verify reported count against documented context limit
+  - [x] ex-04 · prune-irrelevant-context — verify pruned run stays on-topic where unpruned cites irrelevant file
+  - [x] ex-05 · minimal-well-specified-prompt — verify first diff satisfies every acceptance-criteria bullet
+  - [x] ex-06 · vague-vs-specific-prompt-contrast — verify specific prompt's first diff passes where vague fails
+  - [x] ex-07 · author-a-project-instruction-file — verify agent runs declared test command unprompted
+  - [x] ex-08 · instruction-file-precedence — verify which rule wins + cite documented precedence order
+  - [x] ex-09 · first-tool-call-is-a-read — verify read precedes any write in the tool-call log
+  - [x] ex-10 · tool-call-log-inspection — verify every entry records a tool name and its parameters
+  - [x] ex-11 · plan-mode-first-pass — verify no file modified during the planning pass
+  - [x] ex-12 · act-mode-after-plan-approval — verify edits appear only after the explicit approval step
+  - [x] ex-13 · run-the-suite-before-accepting — verify a failing test blocks acceptance, logged as rejection
+  - [x] ex-14 · reject-a-diff-on-inspection — verify rejection written with reason tied to the unrelated hunk
+  - [x] ex-15 · spot-a-hallucinated-api — verify mismatch against real API reference before acceptance
+  - [x] ex-16 · delegate-boilerplate-safely — verify review log shows a skim + why that was sufficient
+  - [x] ex-17 · require-close-review-for-sensitive-code — verify line-by-line review precedes acceptance
+  - [x] ex-18 · token-usage-per-turn-log — verify running total against a stated budget ceiling
+  - [x] ex-19 · configure-an-mcp-server — verify agent's tool list includes new server's tools after restart
+  - [x] ex-20 · call-a-tool-via-mcp — verify tool call + JSON-RPC result both appear in the transcript
+  - [x] ex-21 · delegate-to-a-subagent — verify only a summary returns, not the raw exploration transcript
+  - [x] ex-22 · parallel-subagent-fan-out — verify both complete + merge without cross-contaminating context
+  - [x] ex-23 · deny-rule-permission-config — verify out-of-scope write is blocked and logged as denied
+  - [x] ex-24 · allow-list-tool-scoping-for-review — verify no write/edit tool is invocable in the session
+  - [x] ex-25 · sandboxed-shell-command — verify effect stays isolated from host outside the sandbox
+  - [x] ex-26 · small-reversible-commit-steps — verify each commit independently revertible
+  - [x] ex-27 · failing-test-as-tripwire — verify session log shows explicit red-to-green transition
+  - [x] ex-28 · red-green-refactor-with-agent — verify three distinct diffs, one per phase
+  - [x] ex-29 · diff-review-checklist — verify every checklist item explicitly checked before merge
+  - [x] ex-30 · catch-silent-scope-creep — verify reviewer flags + trims out-of-scope hunk before acceptance
+  - [x] ex-31 · budget-a-multi-turn-session — verify session halts or escalates when budget reached
+  - [x] ex-32 · compare-cost-of-scoped-vs-open-prompt — verify scoped prompt's total cost is lower
+  - [x] ex-33 · untrusted-content-injection-probe — verify guardrail blocks the injected instruction
+  - [x] ex-34 · sanitize-tool-output-before-reuse — verify flagged suspicious payload is not acted on
+  - [x] ex-35 · load-an-agent-skill — verify agent follows skill's documented steps, not improvised ones
+  - [x] ex-36 · skill-vs-ad-hoc-instruction — verify skill run is repeatable where ad hoc varies
+  - [x] ex-37 · write-a-spec-before-prompting — verify review maps each spec bullet to a diff line
+  - [x] ex-38 · gherkin-spec-driving-agent-implementation — verify scenario steps pass against implementation
+  - [x] ex-39 · iterate-on-a-failed-first-attempt — verify second diff passes where first did not
+  - [x] ex-40 · multi-round-correction-loop — verify diff converges toward passing across rounds
+  - [x] ex-41 · escalate-a-security-critical-change — verify documented human approval exists before merge
+  - [x] ex-42 · when-not-to-delegate-a-novel-algorithm — verify written rationale records why delegation declined
+  - [x] ex-43 · unverifiable-output-refusal — verify no diff merges without an accompanying verification path
+  - [x] ex-44 · human-decision-gate-mid-session — verify session log shows a pause + explicit recorded approval
+  - [x] ex-45 · context-managed-feature-loop — verify agent's diffs touch no file outside the scoped set
+  - [x] ex-46 · mechanical-refactor-across-files — verify each file's diff carries a separate logged approval
+  - [x] ex-47 · reject-a-confidently-wrong-refactor — verify behavior change caught via test regression + rejected
+  - [x] ex-48 · trust-verify-decision-log — verify every risky change has a matching verify entry
+  - [x] ex-49 · mcp-plus-subagent-research-task — verify main session receives only a cited summary
+  - [x] ex-50 · prompt-injection-guardrail-config — verify rule fires against a crafted injection test case
+  - [x] ex-51 · spec-driven-tdd-agent-session — verify spec bullets + red run + green run all present
+  - [x] ex-52 · full-verify-first-feature-session — verify no diff reached final state unrun/unreviewed
+  - [x] ex-53 · cost-bounded-iterative-refinement — verify session halts at budget + flags unresolved item
+  - [x] ex-54 · post-mortem-a-bad-agent-merge — verify the fix closes the specific verification-loop gap
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/agentic-coding/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/agentic-coding/drilling/_index.md` (wt 231) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -6107,74 +6107,74 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: Annotated-concept · ‡ no-code · topic wt 420 · Learn 132 / Drill 232 · **leadership/design artifact (no code)**. Template →
 [`syllabus/32-software-product-engineering.md`](./syllabus/32-software-product-engineering.md).
 
-- [ ] **[AI] V** — `web-researcher` for `software-product-engineering`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `software-product-engineering`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/32-software-product-engineering.md`](./syllabus/32-software-product-engineering.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/software-product-engineering/learning/` teaching **every** concept in
+- [x] **[AI] A1-concepts** — Author `CONTENT/software-product-engineering/learning/` teaching **every** concept in
       `syllabus/32-software-product-engineering.md` §Concepts (DD-34 1:1 mirror; concepts before scenarios). One checkbox per `co-NN`:
-  - [ ] co-01 · outcome-vs-output
-  - [ ] co-02 · problem-before-solution
-  - [ ] co-03 · jobs-to-be-done
-  - [ ] co-04 · customer-discovery-interviewing
-  - [ ] co-05 · continuous-discovery-opportunity-solution-tree
-  - [ ] co-06 · riskiest-assumption-and-four-big-risks
-  - [ ] co-07 · rice-prioritization
-  - [ ] co-08 · moscow-prioritization
-  - [ ] co-09 · impact-effort-matrix
-  - [ ] co-10 · kano-model
-  - [ ] co-11 · cost-of-delay-and-wsjf
-  - [ ] co-12 · mvp-as-hypothesis-test
-  - [ ] co-13 · build-measure-learn-pivot-or-persevere
-  - [ ] co-14 · iterative-incremental-delivery
-  - [ ] co-15 · ab-experimentation-hypothesis-and-guardrail
-  - [ ] co-16 · feature-flag-toggle-taxonomy
-  - [ ] co-17 · north-star-and-input-metrics
-  - [ ] co-18 · aarrr-funnel
-  - [ ] co-19 · heart-framework
-  - [ ] co-20 · activation-and-retention
-  - [ ] co-21 · vanity-vs-actionable-metrics
-  - [ ] co-22 · goodhart-metric-gaming
-  - [ ] co-23 · writing-specs-and-pr-faq
-  - [ ] co-24 · dual-track-discovery-and-delivery
-  - [ ] co-25 · shaping-and-appetite
-  - [ ] co-26 · engineer-product-design-collaboration
-- [ ] **[AI] A1-scenarios** — Author `CONTENT/software-product-engineering/learning/artifacts/` (‡ no-code decision
+  - [x] co-01 · outcome-vs-output
+  - [x] co-02 · problem-before-solution
+  - [x] co-03 · jobs-to-be-done
+  - [x] co-04 · customer-discovery-interviewing
+  - [x] co-05 · continuous-discovery-opportunity-solution-tree
+  - [x] co-06 · riskiest-assumption-and-four-big-risks
+  - [x] co-07 · rice-prioritization
+  - [x] co-08 · moscow-prioritization
+  - [x] co-09 · impact-effort-matrix
+  - [x] co-10 · kano-model
+  - [x] co-11 · cost-of-delay-and-wsjf
+  - [x] co-12 · mvp-as-hypothesis-test
+  - [x] co-13 · build-measure-learn-pivot-or-persevere
+  - [x] co-14 · iterative-incremental-delivery
+  - [x] co-15 · ab-experimentation-hypothesis-and-guardrail
+  - [x] co-16 · feature-flag-toggle-taxonomy
+  - [x] co-17 · north-star-and-input-metrics
+  - [x] co-18 · aarrr-funnel
+  - [x] co-19 · heart-framework
+  - [x] co-20 · activation-and-retention
+  - [x] co-21 · vanity-vs-actionable-metrics
+  - [x] co-22 · goodhart-metric-gaming
+  - [x] co-23 · writing-specs-and-pr-faq
+  - [x] co-24 · dual-track-discovery-and-delivery
+  - [x] co-25 · shaping-and-appetite
+  - [x] co-26 · engineer-product-design-collaboration
+- [x] **[AI] A1-scenarios** — Author `CONTENT/software-product-engineering/learning/artifacts/` (‡ no-code decision
       scenarios/artifacts, DD-27/DD-30) covering **every** Worked scenario in `syllabus/32-software-product-engineering.md`.
       One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · outcome-vs-output-rewrite — verify each names a user behaviour change, not a feature
-  - [ ] ex-02 · problem-statement-from-request — verify names user + circumstance + outcome, withholds solution
-  - [ ] ex-03 · jtbd-job-story — verify names circumstance + motivation + expected progress
-  - [ ] ex-04 · mom-test-interview-script — verify every question asks past behaviour/specifics, none pitches
-  - [ ] ex-05 · mom-test-red-flag-audit — verify each flagged question asks opinion/hypothetical/future
-  - [ ] ex-06 · rice-score-single-feature — verify arithmetic = (R×I×C)÷E and units named
-  - [ ] ex-07 · moscow-bucketing — verify each "Won't" is scoped to this release, not rejected
-  - [ ] ex-08 · impact-effort-quadrant — verify quick wins sit high-impact/low-effort
-  - [ ] ex-09 · aarrr-funnel-map — verify each stage has ≥1 concrete event in correct order
-  - [ ] ex-10 · vanity-metric-audit — verify each flagged metric lacks a cause→effect decision tie
-  - [ ] ex-11 · rice-backlog-ranking — verify each score justified + ordering follows scores
-  - [ ] ex-12 · rice-vs-moscow-reconciliation — verify names why business necessity overrides the score
-  - [ ] ex-13 · kano-classification — verify each cites its presence-vs-satisfaction shape
-  - [ ] ex-14 · wsjf-sequencing — verify ordering matches computed Cost-of-Delay ÷ Duration ratios
-  - [ ] ex-15 · riskiest-assumption-triage — verify names the four risks + cheapest test of the chosen one
-  - [ ] ex-16 · mvp-scope-cut-with-engineering-input — verify MVP tests riskiest assumption + names cheaper feasible alternative
-  - [ ] ex-17 · build-measure-learn-pivot-or-persevere — verify states hypothesis, measurement, and pivot/persevere with reason
-  - [ ] ex-18 · release-slicing-increments — verify each slice ships value alone and returns a distinct signal
-  - [ ] ex-19 · opportunity-solution-tree — verify each solution traces up to an opportunity and the outcome
-  - [ ] ex-20 · ab-experiment-design — verify names exactly one hypothesis, one primary (OEC), ≥1 guardrail
-  - [ ] ex-21 · guardrail-metric-selection — verify each guardrail is a must-not-regress metric, not the primary
-  - [ ] ex-22 · feature-flag-toggle-classification — verify each classification cites the category's lifespan
-  - [ ] ex-23 · north-star-and-inputs — verify NSM measures delivered value + each input is a controllable lever, differs from OMTM
-  - [ ] ex-24 · heart-goals-signals-metrics — verify goal, signal, and metric all present and consistent
-  - [ ] ex-25 · activation-metric-definition — verify names the first genuine value moment, testable
-  - [ ] ex-26 · goodhart-guardrail-memo — verify names the gaming path + a concrete countermeasure
-  - [ ] ex-27 · discovery-vs-delivery-balance — verify names the riskiest-assumption-validated stop rule
-  - [ ] ex-28 · pr-faq-working-backwards — verify press release states customer problem + FAQ answers top risks
-  - [ ] ex-29 · shape-up-pitch — verify appetite is a fixed budget + circuit-breaker named
-  - [ ] ex-30 · full-product-brief-consistency — verify scope serves problem, metrics measure outcome, experiment tests hypothesis
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/software-product-engineering/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] ex-01 · outcome-vs-output-rewrite — verify each names a user behaviour change, not a feature
+  - [x] ex-02 · problem-statement-from-request — verify names user + circumstance + outcome, withholds solution
+  - [x] ex-03 · jtbd-job-story — verify names circumstance + motivation + expected progress
+  - [x] ex-04 · mom-test-interview-script — verify every question asks past behaviour/specifics, none pitches
+  - [x] ex-05 · mom-test-red-flag-audit — verify each flagged question asks opinion/hypothetical/future
+  - [x] ex-06 · rice-score-single-feature — verify arithmetic = (R×I×C)÷E and units named
+  - [x] ex-07 · moscow-bucketing — verify each "Won't" is scoped to this release, not rejected
+  - [x] ex-08 · impact-effort-quadrant — verify quick wins sit high-impact/low-effort
+  - [x] ex-09 · aarrr-funnel-map — verify each stage has ≥1 concrete event in correct order
+  - [x] ex-10 · vanity-metric-audit — verify each flagged metric lacks a cause→effect decision tie
+  - [x] ex-11 · rice-backlog-ranking — verify each score justified + ordering follows scores
+  - [x] ex-12 · rice-vs-moscow-reconciliation — verify names why business necessity overrides the score
+  - [x] ex-13 · kano-classification — verify each cites its presence-vs-satisfaction shape
+  - [x] ex-14 · wsjf-sequencing — verify ordering matches computed Cost-of-Delay ÷ Duration ratios
+  - [x] ex-15 · riskiest-assumption-triage — verify names the four risks + cheapest test of the chosen one
+  - [x] ex-16 · mvp-scope-cut-with-engineering-input — verify MVP tests riskiest assumption + names cheaper feasible alternative
+  - [x] ex-17 · build-measure-learn-pivot-or-persevere — verify states hypothesis, measurement, and pivot/persevere with reason
+  - [x] ex-18 · release-slicing-increments — verify each slice ships value alone and returns a distinct signal
+  - [x] ex-19 · opportunity-solution-tree — verify each solution traces up to an opportunity and the outcome
+  - [x] ex-20 · ab-experiment-design — verify names exactly one hypothesis, one primary (OEC), ≥1 guardrail
+  - [x] ex-21 · guardrail-metric-selection — verify each guardrail is a must-not-regress metric, not the primary
+  - [x] ex-22 · feature-flag-toggle-classification — verify each classification cites the category's lifespan
+  - [x] ex-23 · north-star-and-inputs — verify NSM measures delivered value + each input is a controllable lever, differs from OMTM
+  - [x] ex-24 · heart-goals-signals-metrics — verify goal, signal, and metric all present and consistent
+  - [x] ex-25 · activation-metric-definition — verify names the first genuine value moment, testable
+  - [x] ex-26 · goodhart-guardrail-memo — verify names the gaming path + a concrete countermeasure
+  - [x] ex-27 · discovery-vs-delivery-balance — verify names the riskiest-assumption-validated stop rule
+  - [x] ex-28 · pr-faq-working-backwards — verify press release states customer problem + FAQ answers top risks
+  - [x] ex-29 · shape-up-pitch — verify appetite is a fixed budget + circuit-breaker named
+  - [x] ex-30 · full-product-brief-consistency — verify scope serves problem, metrics measure outcome, experiment tests hypothesis
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/software-product-engineering/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/software-product-engineering/drilling/_index.md` (wt 232) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
@@ -6221,65 +6221,65 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Row: Annotated-concept · ‡ no-code · topic wt 430 · Learn 133 / Drill 233 · **leadership/design artifact (no code)**. Template →
 [`syllabus/33-engineering-management.md`](./syllabus/33-engineering-management.md).
 
-- [ ] **[AI] V** — `web-researcher` for `engineering-management`; resolve every Accuracy-notes "to verify" line in
+- [x] **[AI] V** — `web-researcher` for `engineering-management`; resolve every Accuracy-notes "to verify" line in
       [`syllabus/33-engineering-management.md`](./syllabus/33-engineering-management.md) and fold dated findings back into that file.
       **Acceptance**: no unresolved "verify" line remains.
-- [ ] **[AI] A1-concepts** — Author `CONTENT/engineering-management/learning/` teaching **every** concept in
+- [x] **[AI] A1-concepts** — Author `CONTENT/engineering-management/learning/` teaching **every** concept in
       `syllabus/33-engineering-management.md` §Concepts (DD-34 1:1 mirror; concepts before scenarios). One checkbox per `co-NN`:
-  - [ ] co-01 · ic-to-manager-transition
-  - [ ] co-02 · one-on-ones
-  - [ ] co-03 · feedback-sbi
-  - [ ] co-04 · coaching-vs-directing
-  - [ ] co-05 · growth-plans
-  - [ ] co-06 · competency-ladders
-  - [ ] co-07 · performance-management-and-calibration
-  - [ ] co-08 · delegation-and-context-setting
-  - [ ] co-09 · team-delivery-stewardship
-  - [ ] co-10 · prioritization-under-competing-demands
-  - [ ] co-11 · dora-metrics-as-outcome-lens
-  - [ ] co-12 · technical-strategy
-  - [ ] co-13 · roadmap-partnership-with-product
-  - [ ] co-14 · communicating-tradeoffs
-  - [ ] co-15 · culture-and-psychological-safety
-  - [ ] co-16 · hiring-intuition
-  - [ ] co-17 · influence-without-authority
-  - [ ] co-18 · org-design-and-team-topology
-  - [ ] co-19 · learning-as-a-team-norm
-  - [ ] co-20 · manager-vs-maker-tension
-- [ ] **[AI] A1-scenarios** — Author `CONTENT/engineering-management/learning/artifacts/` (‡ no-code decision
+  - [x] co-01 · ic-to-manager-transition
+  - [x] co-02 · one-on-ones
+  - [x] co-03 · feedback-sbi
+  - [x] co-04 · coaching-vs-directing
+  - [x] co-05 · growth-plans
+  - [x] co-06 · competency-ladders
+  - [x] co-07 · performance-management-and-calibration
+  - [x] co-08 · delegation-and-context-setting
+  - [x] co-09 · team-delivery-stewardship
+  - [x] co-10 · prioritization-under-competing-demands
+  - [x] co-11 · dora-metrics-as-outcome-lens
+  - [x] co-12 · technical-strategy
+  - [x] co-13 · roadmap-partnership-with-product
+  - [x] co-14 · communicating-tradeoffs
+  - [x] co-15 · culture-and-psychological-safety
+  - [x] co-16 · hiring-intuition
+  - [x] co-17 · influence-without-authority
+  - [x] co-18 · org-design-and-team-topology
+  - [x] co-19 · learning-as-a-team-norm
+  - [x] co-20 · manager-vs-maker-tension
+- [x] **[AI] A1-scenarios** — Author `CONTENT/engineering-management/learning/artifacts/` (‡ no-code decision
       scenarios/artifacts, DD-27/DD-30) covering **every** Worked scenario in `syllabus/33-engineering-management.md`.
       One checkbox per `ex-NN` (1:1 mirror):
-  - [ ] ex-01 · first-1-1-agenda — verify report's items lead, manager's last
-  - [ ] ex-02 · sbi-feedback-positive — verify names situation, behavior, impact (not "great job")
-  - [ ] ex-03 · sbi-feedback-corrective — verify behavior-focused + states the wanted "instead"
-  - [ ] ex-04 · coaching-question-vs-answer — verify coaching version supplies only questions
-  - [ ] ex-05 · growth-plan-artifact — verify every gap maps to an observable behavior
-  - [ ] ex-06 · ladder-behavior-mapping — verify each mapping cites the ladder's behavior text
-  - [ ] ex-07 · delegation-context-brief — verify a stranger could make the same call from it
-  - [ ] ex-08 · ic-to-manager-mindset-memo — verify names concrete IC habits given up
-  - [ ] ex-09 · manager-vs-maker-catch — verify names the bottleneck + one corrective habit
-  - [ ] ex-10 · prioritization-decision-record — verify states options, trade-off, decision, comms plan
-  - [ ] ex-11 · dora-diagnostic-memo — verify recommendation ties to the specific weak metric
-  - [ ] ex-12 · wip-unblock-triage — verify every item has a named owner + reason
-  - [ ] ex-13 · performance-calibration-note — verify cites ladder-level evidence for each
-  - [ ] ex-14 · difficult-feedback-conversation-script — verify opens with the pattern, ends with one next step
-  - [ ] ex-15 · roadmap-tradeoff-memo — verify states the specific trade-off product must accept
-  - [ ] ex-16 · psychological-safety-incident — verify names the safety failure + one norm change
-  - [ ] ex-17 · hiring-debrief-structured — verify every score cites observed interview evidence
-  - [ ] ex-18 · influence-without-authority-plan — verify names the shared incentive appealed to
-  - [ ] ex-19 · team-culture-norm-change — verify the mechanism outlasts the announcement
-  - [ ] ex-20 · technical-strategy-doc — verify every bet traces to a product outcome + explicit trade-off
-  - [ ] ex-21 · conways-law-reorg-memo — verify names Conway's Law + predicted new boundary
-  - [ ] ex-22 · dora-goodhart-guardrail — verify names the specific gaming risk guarded against
-  - [ ] ex-23 · autonomy-vs-alignment-calibration — verify each cites a specific readiness signal
-  - [ ] ex-24 · delivery-vs-growth-tradeoff-memo — verify states what is traded: speed vs capability
-  - [ ] ex-25 · learning-norm-institutionalization — verify names the mechanism that survives its owner
-  - [ ] ex-26 · succession-and-delegation-plan — verify names which decisions transfer first + the trigger signal
-  - [ ] ex-27 · full-leadership-decision-set — verify all three artifacts share one team context, no contradiction
-- [ ] **[AI] A2 (capstone)** — Author `CONTENT/engineering-management/learning/capstone/` (`_index.md` weight 900) per the
+  - [x] ex-01 · first-1-1-agenda — verify report's items lead, manager's last
+  - [x] ex-02 · sbi-feedback-positive — verify names situation, behavior, impact (not "great job")
+  - [x] ex-03 · sbi-feedback-corrective — verify behavior-focused + states the wanted "instead"
+  - [x] ex-04 · coaching-question-vs-answer — verify coaching version supplies only questions
+  - [x] ex-05 · growth-plan-artifact — verify every gap maps to an observable behavior
+  - [x] ex-06 · ladder-behavior-mapping — verify each mapping cites the ladder's behavior text
+  - [x] ex-07 · delegation-context-brief — verify a stranger could make the same call from it
+  - [x] ex-08 · ic-to-manager-mindset-memo — verify names concrete IC habits given up
+  - [x] ex-09 · manager-vs-maker-catch — verify names the bottleneck + one corrective habit
+  - [x] ex-10 · prioritization-decision-record — verify states options, trade-off, decision, comms plan
+  - [x] ex-11 · dora-diagnostic-memo — verify recommendation ties to the specific weak metric
+  - [x] ex-12 · wip-unblock-triage — verify every item has a named owner + reason
+  - [x] ex-13 · performance-calibration-note — verify cites ladder-level evidence for each
+  - [x] ex-14 · difficult-feedback-conversation-script — verify opens with the pattern, ends with one next step
+  - [x] ex-15 · roadmap-tradeoff-memo — verify states the specific trade-off product must accept
+  - [x] ex-16 · psychological-safety-incident — verify names the safety failure + one norm change
+  - [x] ex-17 · hiring-debrief-structured — verify every score cites observed interview evidence
+  - [x] ex-18 · influence-without-authority-plan — verify names the shared incentive appealed to
+  - [x] ex-19 · team-culture-norm-change — verify the mechanism outlasts the announcement
+  - [x] ex-20 · technical-strategy-doc — verify every bet traces to a product outcome + explicit trade-off
+  - [x] ex-21 · conways-law-reorg-memo — verify names Conway's Law + predicted new boundary
+  - [x] ex-22 · dora-goodhart-guardrail — verify names the specific gaming risk guarded against
+  - [x] ex-23 · autonomy-vs-alignment-calibration — verify each cites a specific readiness signal
+  - [x] ex-24 · delivery-vs-growth-tradeoff-memo — verify states what is traded: speed vs capability
+  - [x] ex-25 · learning-norm-institutionalization — verify names the mechanism that survives its owner
+  - [x] ex-26 · succession-and-delegation-plan — verify names which decisions transfer first + the trigger signal
+  - [x] ex-27 · full-leadership-decision-set — verify all three artifacts share one team context, no contradiction
+- [x] **[AI] A2 (capstone)** — Author `CONTENT/engineering-management/learning/capstone/` (`_index.md` weight 900) per the
       syllabus `## Capstone spec`. **Acceptance**: the done bar is met and the concepts-exercised checklist
       is fully hit.
-- [ ] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
+- [x] **[AI] A3/D/F/G** — `apps-ayokoding-www-annotated-concept-checker` + `apps-ayokoding-www-link-checker` +
       `apps-ayokoding-www-facts-checker` clean (resolve via matching fixer); author
       `CONTENT/engineering-management/drilling/_index.md` (wt 233) covering the same Items with mocked/self-contained
       inputs; `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
