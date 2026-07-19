@@ -291,9 +291,14 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       DAG rule, background-slot preference, 3-5 min status cadence, PR-as-independent-merge-point, and
       the hardened merge preconditions (3 cycles + up-to-date-with-origin-main + gates green)
       — acceptance: `grep -n "DAG\|up-to-date with .*origin/main\|3-5 min" AGENTS.md` present
-- [ ] [AI] Grep `CLAUDE.md` for any Claude-specific concurrency text
-      (`grep -n "concurrent\|background agent\|cap" CLAUDE.md`); update to the N+1 model if present,
-      else add nothing — acceptance: `CLAUDE.md` states no stale fixed cap; edits (if any) lint clean
+- [ ] [AI] Grep `CLAUDE.md` for any Claude-specific concurrency text using a **word-bounded** pattern:
+      `grep -niE "concurrent|background agent|\bcap(ped|s)?\b" CLAUDE.md`; update to the N+1 model if
+      present, else add nothing — acceptance: that word-bounded grep returns **0** (returns **0**
+      today, verified live, and must stay 0 unless an edit deliberately introduces N+1 wording).
+      **The unbounded pattern `grep -n "concurrent\|background agent\|cap" CLAUDE.md` MUST NOT be
+      used**: it returns **1** today via a false-positive substring match on "**cap**ability-tier
+      mapping" (line 54), which has nothing to do with concurrency — so any "no stale fixed cap"
+      reading of it is vacuous in both directions.
 - [ ] [AI] Add the two new conventions to `repo-governance/development/workflow/README.md` §Documents
       (link by name; respect Dynamic Collection References — no hardcoded counts) — acceptance: both
       links present in the Documents list and resolve
@@ -438,12 +443,12 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       §4b authoring edit**; §4b writes the rule into `plan-planning.md`, this checkbox verifies every
       _other_ plan workflow that references planning granularity now agrees with it — acceptance:
       `sh
-  for f in plan-execution multi-plans-execution plan-multi-repo-parity-planning \
-           plan-multi-repo-parity-planning-and-execution; do
-    [ "$(grep -ci "1-PR\|per-phase PR" repo-governance/workflows/plan/$f.md)" -ge 1 ] \
-      || echo "MISSING $f"
-  done
-  `
+for f in plan-execution multi-plans-execution plan-multi-repo-parity-planning \
+         plan-multi-repo-parity-planning-and-execution; do
+  [ "$(grep -ci "1-PR\|per-phase PR" repo-governance/workflows/plan/$f.md)" -ge 1 ] \
+    || echo "MISSING $f"
+done
+`
       prints nothing — i.e. each of these **four** delivery-executing workflows carries the rule
       (today it prints all four: every one returns **0**, verified live) — **and**
       `grep -rc "cap at 2\|3 total" repo-governance/workflows/plan/` returns 0 in every file.
