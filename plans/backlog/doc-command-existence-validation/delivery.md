@@ -68,9 +68,24 @@ Each `*-to-pr` PR runs the **PR-Review Maker→Fixer Cycle** (3 sequential CI-ga
       `npx nx show project rhino-cli --json` — acceptance: JSON captured in `learnings.md`;
       the resolved target list contains no `links:validation`, `mermaid:validation`, or
       `headings:hierarchy-validation`
+- [ ] [AI] **Promote this plan from `backlog/` to `in-progress/` BEFORE any other Phase 0 step
+      references an in-progress path.** The plan folder currently lives at
+      `plans/backlog/doc-command-existence-validation/`, but later steps (the `learnings.md` scaffold
+      below, Phase 3's grep acceptance, and Plan Archival's `git mv`) all address
+      `plans/in-progress/doc-command-existence-validation/`. Nothing else moves it, and
+      `plan-execution.md` performs no automatic move — so without this step Phase 0 creates an
+      orphaned duplicate `learnings.md` at the wrong path, Phase 3's grep fails on a missing file,
+      and archival dies with a fatal git error. Run
+      `git mv plans/backlog/doc-command-existence-validation plans/in-progress/doc-command-existence-validation`,
+      then update `plans/backlog/README.md` (remove the entry) and `plans/in-progress/README.md`
+      (add it) — acceptance: `test -d plans/in-progress/doc-command-existence-validation && test ! -d plans/backlog/doc-command-existence-validation`
+      exits 0, and `grep -c "doc-command-existence-validation" plans/in-progress/README.md` returns ≥1
+      (returns **0** pre-edit — verified live). No date prefix is added: `in-progress/` uses bare
+      slugs per the plans convention.
 - [ ] [AI] Create the Knowledge Capture running log at
       `plans/in-progress/doc-command-existence-validation/learnings.md` if absent — acceptance:
-      file exists with the scaffold header comments
+      file exists with the scaffold header comments **and an H1** (`# Learnings: doc-command-existence-validation`);
+      a scaffold of bare HTML comments fails markdownlint MD041 on the first commit
 - [ ] [AI] Establish the test baseline: `npx nx run rhino-cli:test:quick` — acceptance: baseline
       pass/fail count recorded in `learnings.md`; all preexisting failures documented
 - [ ] [AI] Resolve all preexisting failures before proceeding — acceptance: no preexisting
@@ -710,8 +725,16 @@ Scenario: Findings are emitted as machine-readable JSON on request
 
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
       — expected: exits 0, zero findings
-  - _Gherkin (binds) → "The repository corpus is clean after remediation"
-    (`prd.md §Regression guard for the motivating incident`)_
+      **Gherkin (binds) →** "The repository corpus is clean after remediation"
+
+```gherkin
+Scenario: The repository corpus is clean after remediation
+  Given the remediation phase has corrected every known citation of a nonexistent command
+  When the developer runs "rhino-cli md commands validate"
+  Then the command exits with status zero
+  And no findings are reported
+```
+
 - [ ] [AI] `npx nx show project rhino-cli --json` cross-checked against every row of the canonical
       targets table in `nx-targets.md` — expected: every listed target resolves
 - [ ] [AI] `sed -n '/Canonical governance and validation targets/,/^\*\*Rule\*\*/p' repo-governance/development/infra/nx-targets.md | grep -cE "specs:domain:coverage|links:validation|mermaid:validation|headings:hierarchy-validation|cross-vendor:parity-validation|harness:bindings-validation"`
@@ -759,8 +782,16 @@ Scenario: Findings are emitted as machine-readable JSON on request
 - [ ] [AI] Verify the hook fires end-to-end by temporarily adding a citation of
       `npx nx run rhino-cli:headings:hierarchy-validation` to a scratch tracked markdown file and
       attempting a push — acceptance: the push is rejected and the finding names the target
-  - _Gherkin (binds) → "Reintroducing an originally-cited nonexistent target is rejected"
-    (`prd.md §Regression guard for the motivating incident`)_
+      **Gherkin (binds) →** "Reintroducing an originally-cited nonexistent target is rejected"
+
+```gherkin
+Scenario: Reintroducing an originally-cited nonexistent target is rejected
+  Given a tracked markdown file containing the command "npx nx run rhino-cli:headings:hierarchy-validation"
+  When the developer runs "rhino-cli md commands validate"
+  Then the command exits with a nonzero status
+  And the finding names the target "headings:hierarchy-validation"
+```
+
 - [ ] [AI] Remove the scratch citation — acceptance: `git status` shows no scratch file
 - [ ] [AI] Measure the added pre-push cost:
       `time cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done`
