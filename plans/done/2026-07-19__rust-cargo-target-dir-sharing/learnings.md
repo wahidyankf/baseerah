@@ -3,7 +3,18 @@
 
 # Learnings: rust-cargo-target-dir-sharing
 
-## Baseline measurements (filled in during Phase 0 / Phase 3)
+## Triage (terminal): No generalizable learning surfaced
+
+The measurements below were captured in-flight during execution and PR review. None met the litmus
+test for a cross-plan, generalizable insight, so nothing was promoted to a durable home — but the
+raw records are retained here rather than discarded. The feature (per-crate `target/` sharing +
+worktree-aware cache GC folded into `rhino-cli doctor`, local-dev-only + CI-guarded) shipped
+byte-identically across all three repos via PR #77 (ose-public), #12 (ose-primer), #14 (ose-infra),
+squash-merged 2026-07-19. Per the
+[Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md),
+this explicit "none" record is the terminal KC state for this plan.
+
+### Baseline measurements (in-flight running log — not triaged as durable)
 
 - **Disk "before"** (Phase 0): the explicit per-worktree `du -sh` table was not captured at Phase 0
   (baseline left as a placeholder). The pre-change topology is unambiguous regardless: every rust
@@ -32,7 +43,11 @@
   still hits through the symlinks (rhino-cli 1/1 from cache; ayokoding-cli 2/2 on the no-change re-run);
   `rhino-cli:test:unit`/`test:quick` pass through the symlink.
 
-- **Three-way byte-identity `diff`** (Phase 6): _record the `diff -rq` result (expect 0) here._
+- **Three-way byte-identity** (Phase 6) — **PASS**: on the merged mains the rhino-cli boundary
+  subtrees are identical across all three repos — `apps/rhino-cli` tree = `178e8139…`,
+  `specs/apps/rhino/behavior/rhino-cli/gherkin` tree = `3c045f87…` (identical ×3). Git tree SHAs are
+  content-addressed, so equal SHA ⇒ byte-identical content; this supersedes the planned `diff -rq`
+  spot-check with a stronger whole-subtree guarantee.
 
 <!--
 Entry shape:

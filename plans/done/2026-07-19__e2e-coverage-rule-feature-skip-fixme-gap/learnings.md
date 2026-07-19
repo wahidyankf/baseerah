@@ -3,12 +3,12 @@
 
 # Learnings: e2e-coverage-rule-feature-skip-fixme-gap
 
-<!--
-Entry shape:
+## Triage (terminal): No generalizable learning surfaced
 
-## Learning: <one-line summary>
-
-- **Context**: what was being done when this surfaced
-- **Observation**: what was noticed (sanitized — real $HOME paths reduced to $HOME)
-- **Why it might generalize**: the litmus reasoning
--->
+No durable, generalizable learning surfaced during execution. The change was a bounded extension
+of the existing `e2e-coverage` gap detector — lifting `@skip`/`@fixme` special-tag detection from
+`Scenario Outline` level to also cover `Rule:`/`Feature:`-level tags one AST level up — delivered
+under the established TDD + 3-repo byte-identity workflow with no new cross-cutting insight. Merged
+via PR #76 (`e21f7a212`, 2026-07-19). Per the
+[Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md),
+this explicit "none" record is the terminal KC state for this plan.
