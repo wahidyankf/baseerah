@@ -583,11 +583,19 @@ carry `default: 2`; align each with the N+1 model:
 `workflows/README.md` (documents "Parallel execution limit - default: 2"), `meta/workflow-identifier.md`
 (defines the input schema), `plan/plan-execution.md`, `plan/plan-quality-gate.md`,
 `plan/multi-plans-execution.md`, `plan/plan-multi-repo-parity-planning.md`,
-`plan/plan-multi-repo-parity-planning-and-execution.md`, `pr/pr-review-quality-gate.md`,
-`docs/docs-quality-gate.md`, `docs/docs-software-engineering-separation-quality-gate.md`,
-`specs/specs-quality-gate.md`, `ui/ui-quality-gate.md`, `content/pdf-to-md-quality-gate.md`,
-`repo/repo-rules-quality-gate.md`, `repo/repo-harness-compatibility-quality-gate.md`, and the five
-`ayokoding-web/*-quality-gate.md` files.
+`plan/plan-multi-repo-parity-planning-and-execution.md`, `docs/docs-quality-gate.md`,
+`docs/docs-software-engineering-separation-quality-gate.md`, `specs/specs-quality-gate.md`,
+`ui/ui-quality-gate.md`, `content/pdf-to-md-quality-gate.md`, `repo/repo-rules-quality-gate.md`,
+`repo/repo-harness-compatibility-quality-gate.md`, and the five `ayokoding-web/*-quality-gate.md`
+files — fourteen named plus five ayokoding-web = **19 at `default: 2`**. The twentieth is
+`web/web-ux-test-fixing-planning.md` at `Default 1` (see the preservation note below).
+
+**`pr/pr-review-quality-gate.md` is NOT in this set.** It carries **zero** `max-concurrency`
+frontmatter — live-verified: `grep -c "max-concurrency" repo-governance/workflows/pr/pr-review-quality-gate.md`
+returns `0`, and the file states its cycle is "Strictly sequential, never parallel". An earlier
+revision of this inventory wrongly listed it, which would have sent §4c-ii to edit a field that
+does not exist. Its only edits in this plan are the Delta 8 merge preconditions (row 12) and the
+Delta 11 surface-conditional clause (row 25) — no concurrency frontmatter change.
 
 > **Preserve the deliberate exception**: `web/web-ux-test-fixing-planning.md` uses `Default 1` on
 > purpose — "the three testers run SEQUENTIALLY". That is a genuine DAG serialization point, NOT a

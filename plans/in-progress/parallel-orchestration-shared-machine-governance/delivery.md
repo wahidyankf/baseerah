@@ -312,7 +312,15 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
 - [ ] [AI] Edit `repo-governance/workflows/pr/pr-review-quality-gate.md`: add the **hardened merge
       preconditions** — (a) 3 `pr-review-maker`→`pr-review-fixer` cycles, (b) branch up-to-date with
       latest `origin/main` at merge (non-destructive forward update if behind), (c) all gates green
-      — acceptance: `grep -ni "up-to-date\|origin/main\|3 cycles" pr-review-quality-gate.md` present
+      — acceptance:
+      `grep -Fic "up-to-date with the latest" repo-governance/workflows/pr/pr-review-quality-gate.md`
+      **and** `grep -Fic "non-destructive forward update" repo-governance/workflows/pr/pr-review-quality-gate.md`
+      each return ≥1. **Both return 0 today, confirmed live.** The obvious pattern
+      `grep -ni "up-to-date\|origin/main\|3 cycles"` MUST NOT be used: it already matches the
+      pre-existing §Success Metrics sentence "within the default 3 cycles" (line 281) and so is
+      vacuously true before any edit — it cannot discriminate a completed edit in either direction.
+      The two `grep -F` literals above are distinctive phrases the Delta 8 text introduces and nothing
+      in the file carries today.
 - [ ] [AI] **Delta 12 — invert the merge default in its definitional home**: edit
       `repo-governance/conventions/structure/plans.md` §Delivery Mode so `[AI]` merge is the default
       once merge preconditions hold, and a `[HUMAN]` merge gate applies **only** where a plan's own
@@ -420,7 +428,14 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       phase-gate language, so it MUST NOT be used alone as the acceptance signal); no stale "cap at 2 /
       3 total" (confirmed absent both today and required to stay absent)
 - [ ] [AI] `repo-governance/workflows/plan/plan-planning.md` — per-phase PR + feature flags + strict
-      1-PR↔1-worktree (Delta 10) — acceptance: `grep -ni "feature flag\|per-phase\|1-PR" plan-planning.md` present
+      1-PR↔1-worktree (Delta 10) — **this is the §4c-i cross-workflow consistency pass, NOT a re-do of the
+      §4b authoring edit**; §4b writes the rule into `plan-planning.md`, this checkbox verifies every
+      _other_ plan workflow that references planning granularity now agrees with it — acceptance:
+      `grep -rLi "1-PR\|per-phase PR" repo-governance/workflows/plan/*.md` lists no file that
+      references PR granularity at all, **and** `grep -rc "cap at 2\|3 total" repo-governance/workflows/plan/`
+      returns 0 in every file. **A bare re-grep of `plan-planning.md` MUST NOT be used**: it is a
+      strict subset of §4b's own acceptance clause, so it flips to true the moment §4b completes and
+      can never discriminate whether this sweep actually ran.
 - [ ] [AI] `repo-governance/workflows/plan/plan-quality-gate.md` — align the `max-concurrency` frontmatter
       default/wording with N+1 **and** add the hardened merge preconditions (3 cycles + up-to-date with
       `origin/main` + all gates green) to its Delivery-Mode done-definition section — acceptance:
@@ -467,8 +482,12 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       today (non-zero pre-edit) and would ALSO still match post-edit (the word "cap" survives in
       plausible fixed phrasing too, e.g. "cap concurrent agents at N"), so it can never discriminate a
       completed edit from an incomplete one in either direction.
-- [ ] [AI] `repo-governance/workflows/pr/pr-review-quality-gate.md` — align its `max-concurrency` with
-      N+1 (merge preconditions already added in 4b) — acceptance: no stale fixed-2 assertion remains
+- [ ] [AI] `repo-governance/workflows/pr/pr-review-quality-gate.md` — **NO `max-concurrency` edit**.
+      This file carries zero `max-concurrency` frontmatter and declares its cycle "Strictly sequential,
+      never parallel"; its only edits in this plan are Delta 8 (§4b) and Delta 11 (§4c-ii) — acceptance:
+      `grep -c "max-concurrency" repo-governance/workflows/pr/pr-review-quality-gate.md` returns **0**
+      (returns **0** today, confirmed live, and must **stay** 0 — this checkbox exists to record that
+      the file was deliberately excluded from the 4c-ii sweep, not skipped by oversight)
 
 - [ ] [AI] Update every discovered `.claude/agents/*.md` and `.claude/skills/*/SKILL.md` that carries
       stale orchestration text to the N+1/DAG/main-vacant model — acceptance: re-run the 4c grep; only
@@ -683,10 +702,10 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       resolved** — for THIS PR the surface is neither UI nor API, so record the explicit exemption in the
       PR description rather than leaving it implicit. `[AI]` merges per Delta 12's default (DD-10
       records the pre-Delta-12 authorization; see its bootstrap-timing note) — acceptance:
-      `gh pr view --json mergeStateStatus` shows the branch current and mergeable; the PR body contains
-      the Delta-11 gate line (run-and-resolved, or explicit exempt); `gh pr view --json
-reviewDecision,mergeStateStatus` plus the review-cycle record show all five preconditions
-      satisfied; and the PR is merged
+      a single `gh pr view --json reviewDecision,mergeStateStatus,body` call shows the branch current
+      and mergeable, the review decision clean, and the PR body carrying the Delta-11 gate line
+      (run-and-resolved, or explicit exempt); that output plus the review-cycle record show all five
+      preconditions (a)-(e) satisfied; and the PR is merged
 - [ ] [AI] Since `main-ci.yml` is now schedule-only, trigger a confirmation run via
       `gh workflow run main-ci.yml` (or `workflow_dispatch`) and verify green — acceptance: dispatched main-ci run concludes success
 

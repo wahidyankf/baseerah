@@ -539,8 +539,12 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       — acceptance: `cargo build --manifest-path apps/rhino-cli/Cargo.toml` exits 0
 - [ ] [AI] Add the dispatch arm `MdCommands::Commands(cc) => …` to the router at
       `apps/rhino-cli/src/cli.rs` (match begins line ~707) — acceptance:
-      `cargo run --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --help`
-      exits 0 and prints the flag list
+      `cargo run --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done`
+      runs the validator (exit 0 or 1 — a real result, not clap's exit-2 "unrecognized subcommand").
+      **Do NOT use `--help` as the probe**: `--help` in this CLI is a custom global bool intercepted in
+      `run()` and routed to `print_help_and_exit()`, which always prints **root**-level help regardless
+      of subcommand depth — verified live, `md links validate --help` never prints its own real
+      `--exclude` flag
 - [ ] [AI] Register the module in `apps/rhino-cli/src/commands.rs` — acceptance: build exits 0
 
 **Gherkin (binds) →** "The validator participates in the aggregate md audit"
@@ -642,12 +646,20 @@ Scenario: Findings are emitted as machine-readable JSON on request
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --help`
-      — expected: exits 0, lists `--strict` and `--exclude` (the two subcommand-local flags), plus
-      the inherited global `-o`/`--output` flag. **No bespoke `--format` flag**: JSON output across
-      every rhino-cli validator comes from the single global `-o`/`--output` arg declared
-      `global = true` in `apps/rhino-cli/src/cli.rs`, which clap propagates to every subcommand
-      automatically — adding a per-subcommand format flag would violate DD-1
+- [ ] [AI] Verify the flag surface via **clap introspection**, not `--help`: add a unit test
+      `md_commands_validate_flag_surface` in `apps/rhino-cli/src/cli.rs` that walks
+      `<Cli as clap::CommandFactory>::command()` down to the `md commands validate` leaf and asserts
+      its argument ids are exactly `strict` and `exclude` (plus the inherited globals) and that **no
+      `format` arg exists** — command:
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml md_commands_validate_flag_surface`
+      — expected: exits 0.
+      **`--help` MUST NOT be used to check the flag list**: this CLI declares `--help` as a custom
+      global bool intercepted in `run()` (cli.rs lines ~602-604) and handled by `print_help_and_exit()`
+      (~882-887), which always prints **root**-level `Cli::command()` help regardless of subcommand
+      depth — live-verified, `md links validate --help` prints zero occurrences of its own real
+      `--exclude`. JSON output likewise comes from the single global `-o`/`--output` arg declared
+      `global = true` in `cli.rs` and propagated by clap to every subcommand; adding a per-subcommand
+      `--format` flag would violate DD-1
 - [ ] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml` — expected: exits 0
 - [ ] [AI] `npx nx run rhino-cli:specs:behavior:coverage` — expected: exits 0, every scenario in
       `docs-validate-commands.feature` is bound
