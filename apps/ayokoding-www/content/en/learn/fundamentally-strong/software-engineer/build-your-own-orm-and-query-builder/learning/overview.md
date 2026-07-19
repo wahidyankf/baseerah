@@ -315,7 +315,7 @@ Generics and explicit return-type annotations give the builder, the mapper, and 
 - [Example 51: The Mapper Checks the Identity Map Before Constructing a New Object](/en/c/learn/fundamentally-strong/software-engineer/build-your-own-orm-and-query-builder/learning/intermediate#example-51-the-mapper-checks-the-identity-map-before-constructing-a-new-object)
 - [Example 52: A Column's Registered Python Type Drives Its Coercer](/en/c/learn/fundamentally-strong/software-engineer/build-your-own-orm-and-query-builder/learning/intermediate#example-52-a-columns-registered-python-type-drives-its-coercer)
 - [Example 53: Compose a Builder Query, Execute It, Map Every Row to a Typed Object](/en/c/learn/fundamentally-strong/software-engineer/build-your-own-orm-and-query-builder/learning/intermediate#example-53-compose-a-builder-query-execute-it-map-every-row-to-a-typed-object)
-- [Example 54: A Generic session.get[T](pk) -> T API](/en/c/learn/fundamentally-strong/software-engineer/build-your-own-orm-and-query-builder/learning/intermediate#example-54-a-generic-sessiongettpk---t-api)
+- [Example 54: A Generic `session.get[T](pk) -> T` API](/en/c/learn/fundamentally-strong/software-engineer/build-your-own-orm-and-query-builder/learning/intermediate#example-54-a-generic-sessiongettpk---t-api)
 
 ### Advanced (Examples 55–78)
 

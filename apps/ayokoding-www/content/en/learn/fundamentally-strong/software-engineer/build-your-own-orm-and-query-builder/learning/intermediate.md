@@ -2912,7 +2912,7 @@ each one independently testable, exactly as this topic has tested them since Exa
 
 ---
 
-### Example 54: A Generic session.get[T](pk) -> T API
+### Example 54: A Generic `session.get[T](pk) -> T` API
 
 _ex-54 &middot; exercises co-25_
 
