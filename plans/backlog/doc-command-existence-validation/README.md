@@ -1,7 +1,7 @@
 # Doc Command Existence Validation
 
-> **Status**: Backlog — provisional design decisions pending user confirmation (see
-> [Open Design Decisions](#open-design-decisions)).
+> **Status**: Backlog — design decisions settled (see
+> [Design Decisions](#design-decisions)); ready for execution.
 
 A new `rhino-cli` validator — `md commands validate` — that mechanically detects
 **documentation-cited commands that do not exist**, closing a verified drift gap that produced
@@ -50,10 +50,13 @@ targets absent from the resolved graph, not three: [Repo-grounded]
 - `cross-vendor:parity-validation`
 - `harness:bindings-validation`
 
-That table is framed as a canonical claim but functions as an aspirational roadmap. This is the
-single most important input to the exemption-mechanism design: **without a deliberate escape
-hatch, the validator's first act would be to demand the fabrication of six tools that do not
-exist** — and the rational response would be to disable the validator.
+That table is framed as a canonical claim but functions as an aspirational roadmap. **Phase 3
+deletes all six rows outright** (maintainer decision, Q7 — see
+[Design Decisions](#design-decisions)), leaving the table asserting only targets verified
+to resolve against the live graph. No replacement "planned targets" table is created: a canonical
+reference doc asserts what exists, and roadmap intent belongs somewhere that is not load-bearing for
+execution. The six removed names, and the fact that none was ever implemented, are preserved in
+[learnings.md](./learnings.md) so the intent survives the deletion.
 
 Defect #2 is the sharpest evidence of harm: those citations were _verbatim executable gate
 acceptance criteria_. Two independent `plan-checker` runs flagged them CRITICAL. Left unfixed,
@@ -63,8 +66,8 @@ an executor would have stalled mid-gate running a command that cannot succeed.
 
 ### In scope
 
-- New `rhino-cli` subcommand `md commands validate` (provisional name — see
-  [Open Design Decisions](#open-design-decisions)) scanning tracked markdown.
+- New `rhino-cli` subcommand `md commands validate` (see
+  [Design Decisions](#design-decisions)) scanning tracked markdown.
 - Three detector families, each with an authoritative in-repo oracle:
   - **Nx targets** — `nx run <project>:<target>`, `npx nx run …`, `nx run-many -t <target>`,
     validated against the **resolved** project graph (inferred targets included, not just
@@ -110,17 +113,29 @@ net.
 - [delivery.md](./delivery.md) — phased delivery checklist
 - [learnings.md](./learnings.md) — Knowledge Capture running log
 
-## Open Design Decisions
+## Design Decisions
 
-Authored against the recommended option in each branch; all are cheap to change before execution
-starts. See the grill questions returned with this plan.
+All decisions below are **settled**. Q2, Q3, and Q7 were resolved by maintainer grill answers; the
+rest were authored against the recommended option and stand unless revisited.
 
-| #   | Decision                    | Provisional answer                                                     |
-| --- | --------------------------- | ---------------------------------------------------------------------- |
-| 1   | CLI shape                   | `md commands validate`                                                 |
-| 2   | Detector scope              | Nx targets + npm scripts + rhino-cli subcommands (shell/make deferred) |
-| 3   | Hook placement              | `pre-push` + CI `markdown-per-file`                                    |
-| 4   | Exemption mechanism         | Inline annotation **and** config path allowlist                        |
-| 5   | Precision/recall            | Conservative default, opt-in `--strict`                                |
-| 6   | Nx oracle                   | `nx show projects --json` snapshot via subprocess, cached per run      |
-| 7   | `nx-targets.md` remediation | Split the table into real vs. explicitly-aspirational                  |
+| #   | Decision                    | Settled answer                                                         | Source                                 |
+| --- | --------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
+| 1   | CLI shape                   | `md commands validate`                                                 | Recommended, unchallenged              |
+| 2   | Detector scope              | Nx targets + npm scripts + rhino-cli subcommands (shell/make deferred) | **Grill answer — as recommended**      |
+| 3   | Hook placement              | `pre-push` + CI `markdown-per-file`                                    | **Grill answer — as recommended**      |
+| 4   | Exemption mechanism         | Inline annotation **and** config path allowlist                        | Recommended, re-justified post-Q7      |
+| 5   | Precision/recall            | Conservative default, opt-in `--strict`                                | Recommended, unchallenged              |
+| 6   | Nx oracle                   | `nx show projects --json` snapshot via subprocess, cached per run      | Recommended, unchallenged              |
+| 7   | `nx-targets.md` remediation | **Delete the six nonexistent rows outright; no planned-targets table** | **Grill answer — maintainer override** |
+
+**Q7 is a maintainer override** of the recommended split-into-exists/planned approach. The
+recommendation was to preserve roadmap intent inside `nx-targets.md` via an explicitly-labelled
+"Planned targets" table; the maintainer chose outright deletion instead, so the canonical doc
+asserts only what exists. Roadmap intent is preserved out-of-band in
+[learnings.md](./learnings.md). See [tech-docs.md](./tech-docs.md) DD-6.
+
+**Q7 does not weaken Q4.** The exemption mechanism was originally justified in large part by the
+`nx-targets.md` case; that case is now gone. The two-tier design is re-justified on the remaining
+surfaces independently in [tech-docs.md](./tech-docs.md) DD-5 — frozen `plans/done/` trees,
+deliberately-malformed test fixtures, illustrative fences, and other-repo commands all still
+require an escape hatch.

@@ -579,20 +579,29 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 - [ ] [AI] Produce the full violation inventory:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures --format json > local-temp/doc-command-findings.json`
       — acceptance: file written; finding count recorded in `learnings.md`
-- [ ] [AI] Split the "Canonical governance and validation targets" table in
-      `repo-governance/development/infra/nx-targets.md` (~L146) into two tables: **Targets that
-      exist** (verified against `npx nx show project rhino-cli --json`) and **Planned targets**
-      (explicitly labelled aspirational) — acceptance: every row in the first table resolves in
-      the Nx graph
-- [ ] [AI] Add a `<!-- doc-command-exempt: planned target, not yet implemented -->` annotation to
-      each row of the Planned-targets table covering `specs:domain:coverage`,
-      `links:validation`, `mermaid:validation`, `headings:hierarchy-validation`,
-      `cross-vendor:parity-validation`, `harness:bindings-validation` — acceptance:
-      `grep -c "doc-command-exempt" repo-governance/development/infra/nx-targets.md` equals the
-      Planned-targets row count
+- [ ] [AI] Record the six to-be-deleted target names in `learnings.md` BEFORE touching the table,
+      so the roadmap intent survives the deletion (per DD-6; the entry already exists — confirm it
+      is present and accurate) — acceptance:
+      `grep -c "specs:domain:coverage" plans/in-progress/doc-command-existence-validation/learnings.md`
+      is at least 1
+- [ ] [AI] Delete the six nonexistent rows from the "Canonical governance and validation targets"
+      table in `repo-governance/development/infra/nx-targets.md` (~L146):
+      `specs:domain:coverage`, `links:validation`, `mermaid:validation`,
+      `headings:hierarchy-validation`, `cross-vendor:parity-validation`,
+      `harness:bindings-validation`. Do NOT create a replacement "Planned targets" table
+      — acceptance: `grep -cE "specs:domain:coverage|cross-vendor:parity-validation|harness:bindings-validation" repo-governance/development/infra/nx-targets.md`
+      returns 0
+- [ ] [AI] Verify every remaining row in that table resolves against the live graph by
+      cross-checking each against `npx nx show project rhino-cli --json` — acceptance: every listed
+      target appears in the resolved target list; no row remains that does not
+- [ ] [AI] Check prose elsewhere in `nx-targets.md` for references to the six deleted targets
+      (the surrounding paragraphs and the `{domain}:{work}` examples may cite them) — acceptance:
+      `grep -nE "links:validation|mermaid:validation|headings:hierarchy-validation" repo-governance/development/infra/nx-targets.md`
+      returns no line that asserts the target exists
 - [ ] [AI] Fix every remaining finding in `local-temp/doc-command-findings.json` — for each,
-      decide whether the doc is wrong (correct the citation) or the tooling is missing (annotate
-      as planned with a reason) — acceptance: each finding has a recorded disposition
+      decide whether the doc is wrong (correct the citation) or the citation is legitimately
+      unresolvable (apply a Tier-1 `<!-- doc-command-exempt: <reason> -->` annotation per DD-5)
+      — acceptance: each finding has a recorded disposition; no finding is left unaddressed
 - [ ] [AI] Re-run the validator against the full corpus:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
       — acceptance: exits 0 with zero findings
@@ -608,12 +617,16 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
       — expected: exits 0, zero findings
-- [ ] [AI] `npx nx show project rhino-cli --json` cross-checked against the "Targets that exist"
-      table in `nx-targets.md` — expected: every listed target resolves
+- [ ] [AI] `npx nx show project rhino-cli --json` cross-checked against every row of the canonical
+      targets table in `nx-targets.md` — expected: every listed target resolves
+- [ ] [AI] `grep -cE "specs:domain:coverage|cross-vendor:parity-validation|harness:bindings-validation" repo-governance/development/infra/nx-targets.md`
+      — expected: `0` (the six rows are gone and no planned-targets table reintroduced them)
+- [ ] [AI] The six deleted names are recorded in `learnings.md` — expected: present, so the
+      deletion did not silently destroy the roadmap information
 
-> **Pause Safety**: the repository corpus is clean and `nx-targets.md` now honestly separates real
-> from planned targets — an improvement that stands on its own even if the validator is never
-> wired up. Safe to stop. To resume: re-run the validator command above.
+> **Pause Safety**: the repository corpus is clean and `nx-targets.md` now asserts only targets that
+> actually exist — an improvement that stands on its own even if the validator is never wired up.
+> Safe to stop. To resume: re-run the validator command above.
 
 ---
 
@@ -676,7 +689,13 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       and `actionlint` both exit 0
 - [ ] [AI] Run the remediation sweep in `ose-primer`:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
-      — acceptance: exits 0 after fixing findings (expect `nx-targets.md` drift mirrored there)
+      — acceptance: exits 0 after fixing findings
+- [ ] [AI] Apply the DD-6 deletion to `ose-primer`'s own
+      `repo-governance/development/infra/nx-targets.md`, checking its table **independently**
+      against `ose-primer`'s live graph (`npx nx show project rhino-cli --json` run in that repo) —
+      do NOT assume the `ose-public` row set applies, since per-repo drift may differ
+      — acceptance: every remaining row resolves in `ose-primer`'s graph; any deleted name not
+      already listed in `learnings.md` is appended there
 - [ ] [AI] Provision polyglot dependencies before pushing (the `crud-*` demo apps depend on
       rhino-cli and a fresh worktree fails pre-push until F#/Elixir deps are fetched) —
       acceptance: `npm run doctor -- --fix` exits 0
@@ -713,7 +732,13 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       produces no output
 - [ ] [AI] Apply the equivalent hook and CI wiring adapted to `ose-infra`'s structure —
       acceptance: `sh -n .husky/pre-push` and `actionlint` both exit 0
-- [ ] [AI] Run the remediation sweep in `ose-infra` — acceptance: exits 0 after fixing findings
+- [ ] [AI] Run the remediation sweep in `ose-infra`:
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
+      — acceptance: exits 0 after fixing findings
+- [ ] [AI] Apply the DD-6 deletion to `ose-infra`'s own
+      `repo-governance/development/infra/nx-targets.md`, checking its table **independently**
+      against `ose-infra`'s live graph — do NOT assume the `ose-public` row set applies, since
+      per-repo drift may differ — acceptance: every remaining row resolves in `ose-infra`'s graph
 - [ ] [AI] Verify no infra-private content (real hostnames, inventories, Terraform state) leaked
       into any file copied back toward the public repos — acceptance: the propagation is
       strictly one-way, `ose-public` → `ose-infra`; no reverse copy occurred

@@ -178,16 +178,31 @@ losing the gate entirely is not. [Judgment call]
 
 ### DD-5 — Two-tier exemption, deliberately designed
 
+> **Justification note**: this design originally leaned heavily on the `nx-targets.md`
+> aspirational-table case. DD-6 now deletes that table's nonexistent rows outright, so that case is
+> gone. The justification below stands on the remaining surfaces alone — it does not depend on
+> `nx-targets.md` in any way.
+
 **Tier 1 — inline, per-occurrence, reason mandatory:**
 
 ```markdown
-<!-- doc-command-exempt: planned target, tracked in the toolchain roadmap -->
+<!-- doc-command-exempt: illustrative example, command intentionally fictional -->
 
-`npx nx run rhino-cli:specs:domain:coverage`
+`npx nx run <some-future-project>:some-future-target`
 ```
 
 Scoped to the **next citation only**. A bare `<!-- doc-command-exempt -->` without a reason is
 itself a finding — this is what keeps the escape hatch from degrading into a reflex.
+
+Tier 1 remains necessary for surfaces the conservative-mode heuristics (DD-4) cannot classify:
+
+- **Tutorial and how-to docs under `docs/`** that deliberately show a command the reader will
+  create later in the same tutorial — the command genuinely does not exist yet, and rightly so.
+- **Sibling-repo commands** cited in cross-repo governance docs (`ose-primer`, `ose-infra`), which
+  cannot resolve against this repo's oracles even though the citation is correct.
+- **Deliberately-wrong examples** in governance docs — this repository's conventions routinely
+  show a non-conforming example next to a conforming one, and a validator cannot distinguish
+  "wrong on purpose" from "wrong by accident" without an author signal.
 
 **Tier 2 — configured path exclusions**, restricted to structurally out-of-scope trees:
 `plans/done/` (historical record, deliberately frozen), `apps/rhino-cli/tests/fixtures/`
@@ -195,23 +210,42 @@ itself a finding — this is what keeps the escape hatch from degrading into a r
 matching the idiom already used by `md links validate --exclude plans/done` in `.husky/pre-push`.
 [Repo-grounded]
 
-The two tiers exist because they answer different questions. Tier 1 says _"this specific command
-is intentionally aspirational."_ Tier 2 says _"this tree is not a source of live claims."_
-Collapsing them into one mechanism would force either per-line annotation of thousands of frozen
-plan files, or blanket path exclusion of live governance docs.
+The two tiers exist because they answer different questions. Tier 1 says _"this specific command is
+intentionally unresolvable."_ Tier 2 says _"this tree is not a source of live claims."_ Collapsing
+them into one mechanism would force either per-line annotation of thousands of frozen plan files,
+or blanket path exclusion of live governance docs — the first is unworkable, the second is exactly
+the bypass-by-default failure the design exists to prevent.
 
-### DD-6 — `nx-targets.md` remediation: split, do not fabricate
+### DD-6 — `nx-targets.md` remediation: delete the nonexistent rows
 
-The canonical-targets table lists six targets absent from the resolved graph. [Repo-grounded] The
-remediation splits it into two tables:
+> **Maintainer override (Q7)**: the recommendation was to split the table into "exists" and
+> "planned". The maintainer chose outright deletion instead. This section records the decision as
+> made, not as recommended.
 
-- **Targets that exist** — verified against `npx nx show project rhino-cli --json`.
-- **Planned targets** — explicitly labelled aspirational, each carrying a Tier-1 exemption
-  annotation.
+The "Canonical governance and validation targets" table lists six targets absent from the resolved
+graph. [Repo-grounded] The remediation **deletes those six rows outright**, leaving a single table
+containing only targets verified to resolve. No "Planned targets" table replaces them.
 
-This is the honest reading of the current state. Inventing six tools to satisfy a doc would be
-the tail wagging the dog; silently deleting the aspirational rows would destroy roadmap
-information. Labelling preserves both truth and intent.
+Rows deleted: `specs:domain:coverage`, `links:validation`, `mermaid:validation`,
+`headings:hierarchy-validation`, `cross-vendor:parity-validation`, `harness:bindings-validation`.
+
+The principle: **a canonical reference doc asserts only what exists.** A table row is read as a
+claim of present fact, not as intent — that is precisely how these six caused the motivating
+incident, by being cited as runnable commands. Keeping them under any label preserves the risk that
+a future reader (or agent) skims the table and treats a row as real. Roadmap intent belongs
+somewhere that is not load-bearing for execution.
+
+Rejected alternatives:
+
+- **Split into exists/planned** (the original recommendation) — preserves intent in place, but
+  leaves aspirational commands sitting in the document readers treat as authoritative.
+- **Implement the six targets** — makes the doc true, but is the tail wagging the dog and a far
+  larger scope than this plan.
+
+**Intent preservation**: the six names, and the fact that none was ever implemented, are recorded
+in the plan's [learnings.md](./learnings.md) so the information survives the deletion and enters
+Knowledge Capture triage. If any of the six is later genuinely wanted, it enters through a plan
+rather than through a doc row that quietly asserts it already exists.
 
 ### DD-7 — Shell and `make` citations deferred
 
