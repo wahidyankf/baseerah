@@ -194,8 +194,12 @@ subagents capped per the orchestration convention). The main thread self-promote
       `assets/` per [prd.md §UI-Design-Funnel](./prd.md#ui-design-funnel-path-aware-navigation-screens)
       and confirm the embedded `![]()` links resolve — acceptance: **all six files exist on disk** —
       `for f in paths-hub-option-a paths-hub-option-b path-landing-option-a path-landing-option-b course-path-option-a course-path-option-b; do test -f "assets/$f.excalidraw.png" || echo "MISSING $f"; done`
-      prints nothing (today it prints all six: `assets/` does not exist yet — verified); AND each
-      screen records a selection with rationale (`grep -c "Selected:" prd.md` ≥ 3).
+      prints nothing (today it prints all six: `assets/` does not exist yet — verified); AND each of
+      the three screens' selection line is updated to name the finalist file it selects —
+      `grep -c "Selected: .*excalidraw" prd.md` returns ≥3 (returns **0** today, verified).
+      **The bare `grep -c "Selected:" prd.md` ≥ 3 MUST NOT be used**: it already returns **4** in the
+      unexecuted plan (three authored design-intent selections plus one meta-reference at line 115),
+      so it is pre-satisfied and contributes zero discriminating power to the conjunction.
       **Do not weaken this back to a `grep` over `prd.md`**: the prose already names the six files
       (`grep -c "excalidraw.png" prd.md` returns **8** and `grep -c "Selected:" prd.md` returns **4**
       in the current unexecuted state), so a prose-only check is pre-satisfied and can never go
@@ -528,6 +532,29 @@ subagents capped per the orchestration convention). The main thread self-promote
     And the redirect preserves any path context query parameter
   ```
 
+**Gherkin (binds) →** "The navigation feature meets accessibility requirements"
+
+```gherkin
+Scenario: The navigation feature meets accessibility requirements
+  Given a reader uses a keyboard and a screen reader on a course in path context
+  When they navigate the path banner, breadcrumb, prerequisite list, and prev/next
+  Then each is a labelled landmark reachable and operable by keyboard with visible focus
+  And the document language attribute matches the active locale
+```
+
+- [ ] [AI] **RED (a11y)** — write a failing e2e spec
+      `apps/ayokoding-www/tests/e2e/course-paths-a11y.spec.ts` asserting, on a course rendered in
+      path context: the path banner, path breadcrumb, prerequisite list, and prev/next controls are
+      each a labelled landmark reachable and operable by keyboard with a visible focus ring, the
+      current item carries `aria-current`, and `<html lang>` equals the active locale (`en`) —
+      command: `npx nx run ayokoding-www:test:e2e --grep course-paths-a11y`
+      — acceptance: fails (the path-aware navigation landmarks do not exist yet). This RED step
+      exists because the a11y scenario was previously bound only by the REFACTOR step below, which
+      gave it no prior failing state.
+- [ ] [AI] **GREEN (a11y)** — add the landmark roles, accessible labels, `aria-current`, focus
+      styling, and locale-correct `lang` attribute so the spec passes — command:
+      `npx nx run ayokoding-www:test:e2e --grep course-paths-a11y`
+      — acceptance: `course-paths-a11y` passes.
 - [ ] [AI] **GREEN (e2e fixtures)** — add a minimal fixture manifest (a few real course IDs with
       declared prerequisites) so the e2e specs exercise the real components — command:
       `npx nx run ayokoding-www:test:e2e` — acceptance: all `course-paths` e2e specs pass in `en`
@@ -739,7 +766,7 @@ deploy), applying the convention:
       manifest order and preserves `?path=interview-ready/software-engineer`; breadcrumb shows the path;
       course pages show their prerequisites — command: `npx nx run ayokoding-www:test:e2e` — acceptance:
       the path-walk e2e spec passes in `en` (this plan's content locale).
-- [ ] [AI] **Progression smoothness audit (interview-first, RD-16)** — walk the manifest order and
+- [ ] [AI] **Progression smoothness audit (interview-first, DD-16)** — walk the manifest order and
       confirm the levers hold (prereq-chaining with SF-1/SF-2 bridges; monotonic-ish difficulty;
       skip/fast-path affordances on the landing; refresh register in the four interview courses) per
       [tech-docs §Smoothness Architecture](./tech-docs.md#smoothness-architecture-per-path) —
@@ -789,7 +816,7 @@ deploy), applying the convention:
       `?path=immediately-effective/software-engineer`; a course shared with `interview-ready` shows the
       correct neighbor per active path — command: `npx nx run ayokoding-www:test:e2e` — acceptance:
       e2e passes in `en` (this plan's content locale); a shared course's prev/next differs by active path.
-- [ ] [AI] **Progression smoothness audit (shipping-first, RD-16)** — build-a-real-app precedes CS
+- [ ] [AI] **Progression smoothness audit (shipping-first, DD-16)** — build-a-real-app precedes CS
       depth; the "you shipped; now understand why" bridge is present on the landing; prereq-chaining
       holds — acceptance: levers verified; regressions fixed by soften/bridge, never reorder.
 
@@ -834,7 +861,7 @@ deploy), applying the convention:
       `?path=fundamentally-strong/software-engineer`; a course shared across paths shows the correct
       neighbor per active path — command: `npx nx run ayokoding-www:test:e2e` — acceptance: e2e passes
       in `en` (this plan's content locale); a shared course's prev/next differs by active path.
-- [ ] [AI] **Progression smoothness audit (fundamentals-first, RD-16)** — theory precedes application;
+- [ ] [AI] **Progression smoothness audit (fundamentals-first, DD-16)** — theory precedes application;
       the "why-before-how" bridges are present; prereq-chaining holds — acceptance: levers verified;
       regressions fixed by soften/bridge, never reorder.
 
@@ -1024,7 +1051,7 @@ deploy), applying the convention:
 - [ ] [AI] **Manifest-integrity + prerequisite-consistency sweep** — all three manifests: every
       `courseOrder` ID resolves; no dup ID; prereq-consistency holds; no forked body across paths —
       acceptance: integrity check reports zero violations across all three.
-- [ ] [AI] **All-path smoothness re-check (RD-16)** — re-verify the levers for each manifest in the
+- [ ] [AI] **All-path smoothness re-check (DD-16)** — re-verify the levers for each manifest in the
       landed content — acceptance: all three paths pass.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
