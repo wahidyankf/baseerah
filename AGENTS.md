@@ -59,9 +59,10 @@ for canonical target names, coverage thresholds, caching rules, and the three-le
 
 ## Markdown Quality
 
-All markdown auto-linted via Prettier (pre-commit), markdownlint-cli2 (pre-push),
-`rhino-cli:mermaid:validation`, `rhino-cli:links:validation`, and
-`rhino-cli:headings:hierarchy-validation` (pre-commit + CI). Quick fix: `npm run lint:md:fix`.
+All markdown auto-linted via Prettier (pre-commit), markdownlint-cli2 (pre-push), and rhino-cli's
+`md mermaid validate`, `md links validate`, and `md heading-hierarchy validate` subcommands (wired
+into pre-commit/pre-push hooks and CI as raw `cargo run` invocations — not Nx targets). Quick fix:
+`npm run lint:md:fix`.
 
 **See**: [repo-governance/development/quality/markdown.md](./repo-governance/development/quality/markdown.md),
 [repo-governance/development/quality/repository-validation.md](./repo-governance/development/quality/repository-validation.md)
