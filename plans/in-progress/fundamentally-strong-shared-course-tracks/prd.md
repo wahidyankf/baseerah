@@ -1,184 +1,205 @@
-# Product Requirements — Fundamentally Strong Shared Course Library, Two Tracks
+# Product Requirements — Fundamentally Strong Shared Course Library, Three Paths
 
 ## Product Overview
 
-The "Fundamentally Strong" curriculum becomes a **shared course library** (one canonical body per
-course, keyed by a stable course ID) consumed by **two learning paths**:
+The "Fundamentally Strong" curriculum becomes a **shared course library** (one canonical, path-neutral
+body per course, keyed by a stable course ID) composed by **three learning paths** that converge on the
+same deep mastery:
 
-- **`fundamentally-strong/software-engineer`** — the **shipping-first** arc: editor/tooling → one language end-to-end →
-  **build a real app first** → then CS fundamentals / data structures / algorithms / systems depth.
-- **`job-seeking/software-engineer`** — the **interview-first** arc for an experienced engineer
-  re-entering the job market.
+- **`interview-ready/software-engineer`** — the **interview/job-prep-first** arc for an experienced
+  engineer re-entering the market: interview prep FIRST → production-effective → deeper.
+- **`immediately-effective/software-engineer`** — the **immediately-effective** arc: editor/tooling →
+  one language end-to-end → **build a real app first** → then deepen.
+- **`fundamentally-strong/software-engineer`** — the **university-style, fundamentals-first** arc:
+  CS foundations / theory first → deeper.
 
-A **path is an ordered manifest** referencing course IDs. Courses are shared with **omit-or-create**
-semantics; no body is duplicated or forked per path. This plan also delivers the **ayokoding-www
-path-aware navigation UI** that makes one canonical course URL behave differently under each path's
-context. The library body is largely content (exempt from `specs:coverage`); the **navigation feature
-is app code** and carries a `specs/` Gherkin companion and three-level tests.
+A **path is an ordered manifest** composing a **curated subset** of course IDs — not every course is in
+every path, and each manifest must be a valid topological entry into the library's **prerequisite
+DAG**. Courses are shared with **omit-or-create** semantics; no body is duplicated or forked per path
+(a genuinely different teaching approach is met by a distinct **course variant**, not a body fork).
+This plan also delivers the **ayokoding-www path-aware navigation UI** that makes one canonical course
+URL behave differently under each path's context, under the `/en/c/learn` URL model. The library body
+is largely content (exempt from `specs:coverage`); the **navigation feature is app code** and carries a
+`specs/` Gherkin companion and three-level tests.
 
-The topic content of the 97 existing courses (94 topics + 3 existing capstones) is unchanged — they
-are **re-homed** (moved to
-`courses/<course-id>/` with redirects) and **re-framed** (referenced by two manifests), not rewritten.
-This plan additionally **authors fourteen NEW courses + three NEW capstones** the interview and
-productivity/harness/security clusters need.
+The topic content of the existing courses is unchanged — the 33 shipped topics (1–33) are **re-homed**
+(moved to `courses/<course-id>/` with redirects) and the 61 transferred topics (34–94) are authored
+**native** into `courses/`; all are **re-framed** (referenced by three manifests), not rewritten. This
+plan additionally **authors fourteen NEW courses + nine NEW capstones** (three original plus six
+DD-20 inter-topic capstones) the interview and productivity/harness/security clusters need, for a
+**121-course** baseline (0 merges).
 
-## Personas
+## Personas (one per path)
 
-- **Experienced engineer re-entering the job market (north-star for the `job-seeking/software-engineer` path)** —
-  recently laid off, returning from a gap/sabbatical, or an employed senior wanting to switch. Already
-  owns the editor workflow and deep fundamentals; needs to **refresh breadth fast, relearn interview
-  technique** at mid/senior/staff level, and handle a **layoff / employment-gap narrative** — without
-  walking a from-scratch curriculum.
-- **A builder who wants to be effective fast (north-star for the `fundamentally-strong/software-engineer` path)** — wants
-  "immediately effective" SWE: set up the editor, learn one language end-to-end, **ship a real app
-  early**, then deepen into CS fundamentals, DS&A, algorithms, and systems. Serves both a from-scratch
-  learner and a mid-career switcher.
+- **Experienced engineer re-entering the job market (north-star for the
+  `interview-ready/software-engineer` path)** — recently laid off, returning from a gap/sabbatical, or
+  an employed senior wanting to switch. Already owns the editor workflow and deep fundamentals; needs
+  to **refresh breadth fast, relearn interview technique** at mid/senior/staff level, and handle a
+  **layoff / employment-gap narrative** — without walking a from-scratch curriculum. Interview/job prep
+  FIRST.
+- **A builder who wants to be effective fast (north-star for the
+  `immediately-effective/software-engineer` path)** — wants "immediately effective" SWE: set up the
+  editor, learn one language end-to-end, **ship a real app early**, then deepen into CS fundamentals,
+  DS&A, algorithms, and systems. Serves both a from-scratch learner and a mid-career switcher.
+- **A university-style, fundamentals-first learner (north-star for the
+  `fundamentally-strong/software-engineer` path)** — wants the rigorous bottom-up route: CS
+  foundations, computer architecture, paradigms, and data structures & algorithms **before** building
+  apps at scale. Prefers to understand the machine and the theory first, then apply it.
 - **A reader who lands on a shared course by deep-link / share** — arrives at a course URL without a
-  path context and must get a coherent standalone view plus an obvious way to enter a path.
+  path context and must get a coherent standalone view (with its prerequisites surfaced) plus an
+  obvious way to enter a path.
 - **Maintainer (content strategist / frontend engineer / content author / reviewer)** — owns the
-  two-path architecture, builds the navigation feature, and authors the NEW courses via the ayokoding
+  three-path architecture, builds the navigation feature, and authors the NEW courses via the ayokoding
   maker agents.
 
 ## User Stories
 
-- As a **builder new to software engineering**, I want a shipping-first path that gets me productive
-  and shipping a real app fast before deep theory, so that I stay motivated and learn depth once I
-  feel the payoff.
-- As an **experienced engineer re-entering the market**, I want an interview-first path with real
-  technique modules and a layoff/gap-narrative section, so that I get interview-ready fast at my
-  level.
-- As a **reader on the shipping-first `fundamentally-strong/software-engineer` path who decides to job-hunt**, I want an
-  optional "ready to job-hunt?" bridge at the end of my path that flows me into the interview-technique
-  courses, so that I can pivot to interview prep without leaving my path or duplicating any course.
-- As a **reader on either path**, I want prev/next and the breadcrumb to follow **my path's order**,
-  so that "next" always means the next course in the arc I chose.
+- As a **builder new to software engineering**, I want an immediately-effective path that gets me
+  productive and shipping a real app fast before deep theory, so that I stay motivated and learn depth
+  once I feel the payoff.
+- As an **experienced engineer re-entering the market**, I want an interview-ready path with real
+  technique modules and a layoff/gap-narrative section, so that I get interview-ready fast at my level.
+- As a **university-style learner**, I want a fundamentally-strong path that teaches CS foundations,
+  architecture, paradigms, and DS&A before app-building, so that I understand the theory before I apply
+  it — the same endpoint, reached bottom-up.
+- As a **reader on any path**, I want prev/next and the breadcrumb to follow **my path's order**, so
+  that "next" always means the next course in the arc I chose.
+- As a **reader on any course page**, I want to see the course's **prerequisites**, so that I know what
+  to complete first regardless of which path (or no path) I entered from.
 - As a **reader who shares or deep-links a course**, I want the course to render coherently with no
   path context, so that a shared link never breaks — and to see which paths include this course.
-- As the **maintainer**, I want each course authored **once** and referenced by both paths, so that
-  a fix or update benefits both paths with zero duplication.
+- As the **maintainer**, I want each course authored **once**, path-neutral, and referenced by all
+  three paths, so that a fix or update benefits every path with zero duplication.
 - As the **maintainer**, I want a path to **omit** a course that does not fit and **create** a new
-  course only for a real gap, so that each path stays coherent without forking bodies.
+  course (or a distinct **variant** when a path needs a different teaching approach) only for a real
+  gap, so that each path stays coherent without forking bodies.
 - As a **reader targeting an AI-agent-infra or security codebase**, I want the async-Python/FastAPI,
-  CDP, MCP/harness, C++, and detection-engineering courses available in the library, so that either
-  path can lead me to the stack skills those codebases need.
-- As a **screen-reader / keyboard user**, I want the path banner, breadcrumb, and prev/next to be
-  fully accessible, so that path-aware navigation works without a mouse.
+  CDP, MCP/harness, C++, and detection-engineering courses available in the library, so that any path
+  can lead me to the stack skills those codebases need.
+- As a **screen-reader / keyboard user**, I want the path banner, breadcrumb, prerequisite list, and
+  prev/next to be fully accessible, so that path-aware navigation works without a mouse.
 
 ## UI-Design-Funnel (Path-Aware Navigation Screens)
 
 The path-aware navigation adds/changes **three user-facing screens** in `ayokoding-www` (a Next.js
-app). Each screen runs the diverge → narrow → select → justify funnel. Low-fidelity wireframes are
-authored below; the two high-fidelity finalists per screen are produced as `.excalidraw.png` assets
-under this plan's `assets/` during Group A (delivery steps emit them) and embedded here.
+app), all under the `/en/c/learn` URL model. Each screen runs the diverge → narrow → select → justify
+funnel. Low-fidelity wireframes are authored below; the two high-fidelity finalists per screen are
+produced as `.excalidraw.png` assets under this plan's `assets/` during Group A (delivery steps emit
+them) and embedded here.
 
-> **Pending assets note**: this plan is in `backlog/` — the six `![]()` hi-fi finalist image links
-> below (two per screen, Screens 1-3) intentionally do not resolve yet. `delivery.md` Phase 1
-> ("Produce hi-fi finalists") produces the `.excalidraw.png` files into `assets/` before Phase 2 code
-> work begins. A broken link here today is expected, not a mistake.
+> **Pending assets note**: hi-fi assets are produced during execution — the six `![]()` hi-fi finalist image links
+> below (two per screen, Screens 1-3) intentionally do not resolve yet. `delivery.md` Group A
+> ("Produce hi-fi finalists") produces the `.excalidraw.png` files into `assets/` before the code work
+> begins. A broken link here today is expected, not a mistake.
 
 **R5 grounding note (all screens)** — before drafting, survey the existing UI to reuse rather than
 reinvent: `libs/web-ui` component inventory + tokens + Storybook; the ayokoding app-shell
-(`apps/ayokoding-www/src/features/app-shell/`); the existing `sidebar-tree`, `breadcrumb`,
-`prev-next`, and `section-card` components [Repo-grounded —
-`apps/ayokoding-www/src/features/navigation/shell/` and `.../content/shell/section-card.tsx`].
-Reference the `swe-developing-frontend-ui` skill. **Net-new components**: `PathCard`, `PathLanding`,
-`PathBanner`, `PathCourseLinks` — all composed from existing `libs/web-ui` primitives; named in
+(`apps/ayokoding-www/src/features/app-shell/`); the existing `sidebar-tree`, `breadcrumb`, `prev-next`,
+and `section-card` components [Repo-grounded — `apps/ayokoding-www/src/features/navigation/shell/` and
+`.../content/shell/section-card.tsx`]. Reference the `swe-developing-frontend-ui` skill. **Net-new
+components**: `PathCard`, `PathLanding`, `PathBanner`, `PathCourseLinks`, `PrerequisiteList` — all
+composed from existing `libs/web-ui` primitives; named in
 [tech-docs §New feature: `course-paths`](./tech-docs.md#new-feature-course-paths-functional-core--imperative-shell).
 
-**R7 prior-art citation (all screens)** — consult, via `web-researcher` at Group-A authoring time,
-how comparable learning platforms present a "track/path over shared lessons" (e.g. roadmap.sh track
-pages, Exercism tracks, freeCodeCamp curriculum, Coursera specialization/path pages) so the
-alternatives are informed rather than invented. [Needs Verification — delegate before authoring.]
+**R7 prior-art citation (all screens)** — consult, via `web-researcher` at Group-A authoring time, how
+comparable learning platforms present a "path/track over shared lessons" and a "prerequisite graph"
+(e.g. roadmap.sh track pages, Exercism tracks, freeCodeCamp curriculum, Coursera specialization/path
+pages) so the alternatives are informed rather than invented. [Needs Verification — delegate before
+authoring.]
 
 > **Provisional-diverge note**: the R7 prior-art survey has **not** run yet — it is scheduled as a
-> `delivery.md` Phase 1 step (`delivery.md` §Phase 1, `web-researcher` delegation). The Screens 1-3
-> low-fi alternatives, selections, and rationales below were therefore drafted **without** prior-art
-> input and are **provisional**: Phase 1 re-runs the diverge/select stages against the R7 findings
-> before the hi-fi finalists are produced, and may replace an alternative, change the selection, or
-> add a new option if the survey surfaces a materially better pattern. Do not treat the "Selected:"
-> lines below as prior-art-informed until Phase 1's R7 sweep lands (with inline excerpt + URL +
-> access date per the Anti-Hallucination convention).
+> `delivery.md` Group A step (`web-researcher` delegation). The Screens 1-3 low-fi alternatives,
+> selections, and rationales below were therefore drafted **without** prior-art input and are
+> **provisional**: Group A re-runs the diverge/select stages against the R7 findings before the hi-fi
+> finalists are produced, and may replace an alternative, change the selection, or add a new option if
+> the survey surfaces a materially better pattern. Do not treat the "Selected:" lines below as
+> prior-art-informed until Group A's R7 sweep lands (with inline excerpt + URL + access date per the
+> Anti-Hallucination convention).
 
 ### Screen 1 · Paths hub ("choose your path")
 
-Entry screen at `/en/path` (the paths hub) offering the two paths.
+Entry screen at `/en/c/learn/paths` (the paths hub) offering the three paths.
 
-**Low-fi Option A — Two side-by-side path cards (Recommended)**
+**Low-fi Option A — Three side-by-side path cards (Recommended)**
 
 ```text
-┌───────────────────────── Fundamentally Strong ─────────────────────────┐
-│  Choose your path. Same course library, two orders.                     │
-│                                                                          │
-│  ┌───────────────────────────┐   ┌───────────────────────────┐          │
-│  │ Software Engineer          │   │ Job-Seeking Software Eng. │          │
-│  │ Shipping-first             │   │ Interview-first            │          │
-│  │ Ship a real app fast, then │   │ Get interview-ready fast   │          │
-│  │ go deep.                   │   │ (experienced re-entrant).  │          │
-│  │ ~N courses · 4 stages      │   │ ~N courses · prologue+3    │          │
-│  │ [ Start this path → ]      │   │ [ Start this path → ]      │          │
-│  └───────────────────────────┘   └───────────────────────────┘          │
-│                                                                          │
-│  Or browse the full course library →                                     │
-└──────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────── Fundamentally Strong · Learn ──────────────────────────┐
+│  Choose your path. Same course library, three orders, one endpoint.               │
+│                                                                                    │
+│  ┌────────────────────┐  ┌────────────────────┐  ┌────────────────────┐           │
+│  │ Interview-Ready SWE │  │ Immediately-Effect. │  │ Fundamentally Strong│          │
+│  │ Interview-first     │  │ Build-app-first     │  │ Fundamentals-first  │          │
+│  │ Get interview-ready │  │ Ship a real app     │  │ CS theory first,    │          │
+│  │ fast (re-entrant).  │  │ fast, then deepen.  │  │ then deepen.         │          │
+│  │ ~N courses          │  │ ~N courses          │  │ ~N courses           │          │
+│  │ [ Start → ]         │  │ [ Start → ]         │  │ [ Start → ]          │          │
+│  └────────────────────┘  └────────────────────┘  └────────────────────┘           │
+│                                                                                    │
+│  Or browse the full course library →                                               │
+└────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Low-fi Option B — Stacked comparison rows**
 
 ```text
-┌───────────────── Fundamentally Strong · Two Paths ─────────────────┐
-│ Software Engineer (shipping-first)   [ Start → ]  ~N courses        │
-│   editor → one language → BUILD APP → CS depth                     │
-│ ─────────────────────────────────────────────────────────────────  │
-│ Job-Seeking SWE (interview-first)    [ Start → ]  ~N courses        │
-│   prologue → interview prep → platforms → deepening                │
-└─────────────────────────────────────────────────────────────────────┘
+┌───────────────── Fundamentally Strong · Three Paths ─────────────────┐
+│ Interview-Ready SWE (interview-first) [ Start → ]  ~N courses         │
+│   interview prep → production-effective → deeper                      │
+│ ────────────────────────────────────────────────────────────────────│
+│ Immediately-Effective (build-app-first) [ Start → ]  ~N courses      │
+│   editor → one language → BUILD APP → deepen                         │
+│ ────────────────────────────────────────────────────────────────────│
+│ Fundamentally Strong (fundamentals-first) [ Start → ]  ~N courses    │
+│   CS foundations → architecture → paradigms → DS&A → build           │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
-**Responsive (mobile ↔ desktop)** — Option A shows two cards side-by-side at `lg` (≥1024px) and
-`md` (≥768px, two columns), and **stacks to one column** below `sm`. The "Start this path" CTA is a
-full-width tap target on mobile.
+**Responsive (mobile ↔ desktop)** — Option A shows three cards side-by-side at `lg` (≥1024px), two-up
+at `md` (≥768px), and **stacks to one column** below `sm`. The "Start" CTA is a full-width tap target
+on mobile.
 
 **Hi-fi finalists**: `![Paths hub — side-by-side cards](./assets/paths-hub-option-a.excalidraw.png)`
 and `![Paths hub — stacked comparison](./assets/paths-hub-option-b.excalidraw.png)`.
 
-**Selected: Option A — Two side-by-side path cards.**
+**Selected: Option A — Three side-by-side path cards.**
 
-| Design                    | Why it won / lost                                                                      |
-| ------------------------- | -------------------------------------------------------------------------------------- |
-| A — side-by-side cards ✅ | Two equal, scannable choices; reuses `section-card`; reflows cleanly to stacked mobile |
-| B — stacked comparison    | Denser, but buries the second path below the fold on mobile and reads as a ranking     |
+| Design                    | Why it won / lost                                                                        |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| A — side-by-side cards ✅ | Three equal, scannable choices; reuses `section-card`; reflows cleanly to stacked mobile |
+| B — stacked comparison    | Denser, but buries the third path below the fold on mobile and reads as a ranking        |
 
 ### Screen 2 · Path landing page
 
-At `/en/path/<path-id>` — the manifest rendered as an ordered, phase-grouped
-course list; every course link carries `?path=<path-id>`.
+At `/en/c/learn/paths/<path-id>` — the manifest rendered as an ordered, phase-grouped course list;
+every course link carries `?path=<path-id>`. The ordering is a valid topological entry into the
+prerequisite DAG.
 
 **Low-fi Option A — Phase-grouped numbered syllabus (Recommended)**
 
 ```text
-┌──────────── Job-Seeking Software Engineer · interview-first ────────────┐
+┌──────────── Interview-Ready Software Engineer · interview-first ─────────┐
 │ Experienced & job-hunting? Skip the prologue → jump to Phase 1.          │
 │                                                                          │
-│ Prologue · Editor Foundations (skippable)                                │
-│   1. Just Enough Nvim        2. Just Enough Lua     3. Extending Neovim   │
-│   ▸ Capstone · Forge-Ready                                                │
-│ Phase 1 · Interview Preparation                                          │
-│   4. Just Enough Python …  9. Coding Interview  … 16. Behavioral         │
-│   ▸ Capstone · Interview Loop                                            │
-│ Phase 2 · Multi-Platform Productivity …                                  │
-│ Phase 3 · Deepening …                                                    │
+│ Prologue · Editor Foundations (skippable)                               │
+│   1. Just Enough Nvim        2. Just Enough Lua     3. Extending Neovim  │
+│   ▸ Capstone · Forge-Ready                                               │
+│ Phase 1 · Interview Preparation                                         │
+│   4. Just Enough Python …  9. Coding Interview  … 16. Behavioral        │
+│   ▸ Capstone · Interview Loop                                           │
+│ Phase 2 · Production-Effective …                                        │
+│ Phase 3 · Deepening …                                                   │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Low-fi Option B — Collapsible phase accordion**
 
 ```text
-┌──────────── Software Engineer · shipping-first ────────────┐
-│ ▼ Stage 1 · Editor & tooling            (7 courses)         │
-│ ▼ Stage 2 · One language → BUILD A REAL APP  (11 courses)   │
-│ ▶ Stage 3 · CS fundamentals, DS&A, algorithms (collapsed)   │
-│ ▶ Stage 4 · Systems, data, security, ops (collapsed)        │
-└─────────────────────────────────────────────────────────────┘
+┌──────────── Fundamentally Strong SWE · fundamentals-first ──────────────┐
+│ ▼ Stage 1 · CS foundations & architecture       (N courses)             │
+│ ▼ Stage 2 · Paradigms, DS&A, algorithms          (N courses)            │
+│ ▶ Stage 3 · Build real software (collapsed)                             │
+│ ▶ Stage 4 · Systems, data, security, ops (collapsed)                    │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Responsive (mobile ↔ desktop)** — Option A renders the numbered list full-width single-column on
@@ -199,20 +220,22 @@ and `![Path landing — phase accordion](./assets/path-landing-option-b.excalidr
 ### Screen 3 · Course page in path context
 
 A shared course body rendered with the active path's affordances: a top **path banner** (path name +
-position), a path breadcrumb, and manifest-driven prev/next. Without `?path=` → canonical view.
+position), a path breadcrumb, a **prerequisite list**, and manifest-driven prev/next. Without `?path=`
+→ canonical view (which still surfaces prerequisites).
 
-**Low-fi Option A — Top path banner + path breadcrumb + bottom prev/next (Recommended)**
+**Low-fi Option A — Top path banner + path breadcrumb + prerequisites + bottom prev/next (Recommended)**
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ ▸ On path: Job-Seeking SWE · course 9 of N          [ view full path ]    │
-│ Home / Job-Seeking SWE / Coding Interview                                 │
+│ ▸ On path: Interview-Ready SWE · course 9 of N       [ view full path ]   │
+│ Home / Learn / Interview-Ready SWE / Coding Interview                     │
+│ Prerequisites: Data Structures & Algorithms · Advanced Algorithms         │
 │                                                                          │
 │ # Coding Interview                                                        │
-│ …course body (unchanged, canonical)…                                      │
+│ …course body (unchanged, canonical, path-neutral)…                        │
 │                                                                          │
 │ ← Prev: Advanced Algorithms        Next: Take-Home & Live Coding →        │
-│   (both links keep ?path=job-seeking/software-engineer)                    │
+│   (both links keep ?path=interview-ready/software-engineer)               │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -220,9 +243,11 @@ Canonical fallback (no `?path=`):
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ Home / Courses / Coding Interview                                          │
-│ # Coding Interview … body …                                               │
-│ This course is part of: [ Software Engineer ] · [ Job-Seeking SWE ]       │
+│ Home / Learn / Courses / Coding Interview                                 │
+│ Prerequisites: Data Structures & Algorithms · Advanced Algorithms         │
+│ # Coding Interview … body …                                              │
+│ This course is part of: [ Interview-Ready ] · [ Immediately-Effective ]   │
+│                          · [ Fundamentally Strong ]                       │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -230,21 +255,22 @@ Canonical fallback (no `?path=`):
 
 ```text
 ┌── Path rail ──┬────────────────────────────────────────────────┐
-│ Job-Seeking   │ Home / … / Coding Interview                     │
-│ ▸ 9 Coding ●  │ # Coding Interview … body …                     │
-│   10 Take-home│ ← Prev … Next → (?path kept)                    │
+│ Interview-Rdy │ Home / … / Coding Interview                     │
+│ ▸ 9 Coding ●  │ Prereqs: DS&A · Advanced Algorithms             │
+│   10 Take-home│ # Coding Interview … body …                     │
+│               │ ← Prev … Next → (?path kept)                    │
 └───────────────┴──────────────────────────────────────────────────┘
 ```
 
 **Responsive (mobile ↔ desktop)** — Option A's path banner is a full-width strip on all breakpoints;
 prev/next stack vertically below `sm` and sit left/right at `sm+` (mirrors the existing `PrevNext`
-component [Repo-grounded]). Option B's left rail is desktop-only and would need to collapse into a
-top sheet on mobile — extra complexity, so Option A wins on mobile-first grounds.
+component [Repo-grounded]). Option B's left rail is desktop-only and would need to collapse into a top
+sheet on mobile — extra complexity, so Option A wins on mobile-first grounds.
 
 **Hi-fi finalists**: `![Course in path — top banner](./assets/course-path-option-a.excalidraw.png)`
 and `![Course in path — left rail](./assets/course-path-option-b.excalidraw.png)`.
 
-**Selected: Option A — Top path banner + path breadcrumb + bottom prev/next.**
+**Selected: Option A — Top path banner + path breadcrumb + prerequisites + bottom prev/next.**
 
 | Design             | Why it won / lost                                                                              |
 | ------------------ | ---------------------------------------------------------------------------------------------- |
@@ -255,16 +281,40 @@ and `![Course in path — left rail](./assets/course-path-option-b.excalidraw.pn
 
 Navigation-feature scenarios are the source of the `specs/` Gherkin companion (app code). Content and
 path-ordering scenarios document behavior. Each scenario uses exactly one primary Given/When/Then;
-extras chain with And. The 14 scenarios below cover the `course-paths` navigation feature; 6 more
-course-specific acceptance scenarios appear further down, under
+extras chain with And. The scenarios below cover the `course-paths` navigation feature; course-specific
+acceptance scenarios appear further down, under
 [NEW Course & Capstone Specifications](#new-course--capstone-specifications).
 
 ```gherkin
 Scenario: A path landing page lists its courses in manifest order
-  Given the job-seeking/software-engineer path manifest is published
-  When a reader opens the path landing page
+  Given the interview-ready/software-engineer path manifest is published
+  When a reader opens the path landing page at /en/c/learn/paths/interview-ready/software-engineer
   Then the courses appear in the manifest's courseOrder
   And every course link carries the path context query parameter
+```
+
+```gherkin
+Scenario: A path manifest is a valid topological entry into the prerequisite DAG
+  Given a path manifest lists a courseOrder of course IDs
+  When the manifest-integrity check runs
+  Then no course appears before any of its declared prerequisites that are also in the manifest
+  And every listed course ID resolves to an existing course in the library
+```
+
+```gherkin
+Scenario: Every manifest course reference resolves to a real course
+  Given a path manifest lists a courseOrder of course IDs
+  When the manifest-integrity check runs
+  Then every listed course ID resolves to an existing course in the library
+  And no course ID appears more than once in the manifest
+```
+
+```gherkin
+Scenario: A course page surfaces its declared prerequisites
+  Given a course declares prerequisites in its canonical metadata
+  When a reader opens the course page with or without a path context
+  Then the page lists each prerequisite course with a link to its canonical URL
+  And the prerequisite list renders even in the canonical no-path view
 ```
 
 ```gherkin
@@ -279,15 +329,15 @@ Scenario: Prev and next follow the active path's order
 Scenario: The breadcrumb reflects the active path
   Given a reader is on a course with an active path context
   When the breadcrumb renders
-  Then it shows Home, the path title, and the course title
-  And the path crumb links to the path landing page /en/path/<path-id> with the path context preserved
+  Then it shows Home, Learn, the path title, and the course title
+  And the path crumb links to the path landing page /en/c/learn/paths/<path-id> with the path context preserved
 ```
 
 ```gherkin
 Scenario: A course deep-linked without path context renders the canonical view
-  Given a reader opens a course URL with no path context query parameter
+  Given a reader opens a course URL /en/c/learn/courses/<course-id> with no path context query parameter
   When the course page renders
-  Then the course body renders in full with the content-tree breadcrumb
+  Then the course body renders in full with the content-tree breadcrumb and its prerequisite list
   And a "this course is part of" affordance lists every path that includes the course
 ```
 
@@ -308,43 +358,59 @@ Scenario: A course omitted from a path shows no path nav for that path
 ```
 
 ```gherkin
-Scenario: An old software-engineer URL redirects to the canonical course URL
-  Given a re-homed course previously lived under the software-engineer content path
-  When a reader requests the old URL
-  Then the app redirects to the course's canonical /en/courses/<course-id> URL
+Scenario: A legacy fundamentally-strong URL redirects to the canonical course URL
+  Given a re-homed course previously lived under the legacy fundamentally-strong/software-engineer content path
+  When a reader requests the legacy URL
+  Then the app redirects to the course's canonical /en/c/learn/courses/<course-id> URL
   And the redirect preserves any path context query parameter
 ```
 
 ```gherkin
-Scenario: Both paths reference a shared course with no body duplication
-  Given a course appears in both path manifests
+Scenario: The legacy section-index browse still resolves after re-homing
+  Given the 33 shipped topics have been re-homed into the course library
+  When a reader browses the legacy fundamentally-strong software-engineer section index the old way
+  Then every section-index entry links to live content at its /en/c/learn/courses/<course-id> URL or via a redirect
+  And no legacy section-index entry resolves to a drained or missing location
+```
+
+```gherkin
+Scenario: Old-way and new-way navigation coexist
+  Given a course now lives at its canonical /en/c/learn/courses/<course-id> URL
+  When a reader reaches it via the legacy section-index browse
+  And another reader reaches it via a /en/c/learn/paths/<path-id> path landing
+  Then both navigations resolve to the same single canonical course body
+```
+
+```gherkin
+Scenario: All three paths reference a shared course with no body duplication
+  Given a course appears in all three path manifests
   When the course library is inspected
-  Then exactly one canonical body exists for that course
+  Then exactly one canonical path-neutral body exists for that course
   And each manifest references the course by its stable course ID
 ```
 
 ```gherkin
-Scenario: Every manifest course reference resolves to a real course
-  Given a path manifest lists a courseOrder of course IDs
-  When the manifest-integrity check runs
-  Then every listed course ID resolves to an existing course in the library
-  And no course ID appears more than once in the manifest
+Scenario: The interview-ready path ships before the other two paths
+  Given the interview-ready/software-engineer path is delivered end-to-end
+  When the immediately-effective and fundamentally-strong path work begins
+  Then the interview-ready path landing, courses, manifest, and nav are already live in production
+  And the other two paths reuse the shared courses without duplicating any body
 ```
 
 ```gherkin
-Scenario: The job-seeking/software-engineer path ships before the fundamentally-strong/software-engineer path
-  Given the job-seeking/software-engineer path is delivered end-to-end
-  When the fundamentally-strong/software-engineer path work begins
-  Then the job-seeking/software-engineer path landing, courses, manifest, and nav are already live in production
-  And the fundamentally-strong/software-engineer path reuses the shared courses without duplicating any body
-```
-
-```gherkin
-Scenario: The fundamentally-strong/software-engineer path is shipping-first
-  Given the fundamentally-strong/software-engineer path manifest is published
+Scenario: The immediately-effective path is build-app-first
+  Given the immediately-effective/software-engineer path manifest is published
   When a reader walks the path
   Then editor/tooling, one language end-to-end, and building a real app precede the CS-fundamentals and DS&A courses
   And the reader ships a real deployed app before any pure-theory course
+```
+
+```gherkin
+Scenario: The fundamentally-strong path is fundamentals-first
+  Given the fundamentally-strong/software-engineer path manifest is published
+  When a reader walks the path
+  Then CS foundations, computer architecture, paradigms, and DS&A precede the build-real-software courses
+  And the ordering is a valid topological entry into the prerequisite DAG
 ```
 
 ```gherkin
@@ -358,14 +424,14 @@ Scenario: The behavioral course covers the layoff and employment-gap narrative
 ```gherkin
 Scenario: The navigation feature meets accessibility requirements
   Given a reader uses a keyboard and a screen reader on a course in path context
-  When they navigate the path banner, breadcrumb, and prev/next
+  When they navigate the path banner, breadcrumb, prerequisite list, and prev/next
   Then each is a labelled landmark reachable and operable by keyboard with visible focus
   And the document language attribute matches the active locale
 ```
 
 ```gherkin
 Scenario: The app builds and validates green
-  Given the navigation feature and both paths are complete
+  Given the navigation feature and the interview-ready path are complete
   When nx run ayokoding-www:build, the three test tiers, and the link/heading validators run
   Then the build and all tiers succeed
   And link, heading-hierarchy, and markdownlint validation report no errors
@@ -373,13 +439,17 @@ Scenario: The app builds and validates green
 
 ## NEW Course & Capstone Specifications
 
-This plan authors **fourteen NEW courses + three NEW capstones** into the library. Each is a full
-page-bundle (learning track + drilling track) matching the sibling plan's per-topic anatomy and
-inheriting its cross-cutting authoring guarantees verbatim (accuracy-verified via `web-researcher`
-before authoring; follow-along-complete; typed-Python where Python; colocated runnable `code/`;
-exhaustive `co-NN`/`ex-NN` enumeration; prerequisites + navigation). Full per-course concept/example/
-capstone detail lives in the [syllabus](./syllabus/overview.md) detail files (one file per course ID);
-the specs below fix each course's purpose, register, and acceptance shape.
+This plan authors **fourteen NEW courses + nine NEW capstones** into the library (three original plus
+six DD-20 inter-topic capstones). Full specs for the three original capstones follow later in this
+section; the six DD-20 inter-topic capstones are specified inline within their host course files per
+`delivery.md` Phase 10, Band 8. Each course is a full page-bundle (learning track + drilling track)
+matching the sibling plan's per-topic anatomy and inheriting its cross-cutting authoring guarantees
+verbatim (accuracy-verified via `web-researcher` before authoring; follow-along-complete; typed-Python
+where Python; colocated runnable `code/`; exhaustive `co-NN`/`ex-NN` enumeration; `prerequisites`
+metadata + navigation). Every course declares its `prerequisites` so it takes its place in the
+library's prerequisite DAG. Full per-course concept/example/capstone detail lives in the
+[`syllabus/courses/` catalog](./syllabus/courses/README.md) (one file per course ID); the specs below
+fix each course's purpose, register, and acceptance shape.
 
 **Register.** The four interview-technique courses use a **refresh register** (assume prior
 professional experience; reload technique, do not teach from zero). The ten productivity/harness/
@@ -421,11 +491,15 @@ Scenario: Interview courses are written in a refresh register
 
 - **`async-python-and-fastapi-services`** (By Example · Python) — async Python, FastAPI/Uvicorn,
   Pydantic, `uv`/`ruff`/`pyright`/`pytest-asyncio` — the `remotebrowser` + FastAPI-backend stack.
+  Scoped tightly to the concrete framework + toolchain: async _concepts_ stay in
+  `concurrency-and-parallelism`, framework _internals_ in `build-your-own-web-framework` — cross-linked,
+  not re-derived.
 - **`self-hosting-essentials`** (By Example · ops/config) — **light** on-ramp: one box, containerize,
   reverse proxy + TLS, systemd/ports, env/secrets, backups, PaaS git-push. Strictly below
   `containers-and-orchestration` / `cloud-and-iac`; distinct from `bare-metal-virtualization`.
 - **`browser-automation-with-cdp`** (By Example · Python) — Chrome DevTools Protocol browser
-  automation (port 9222; nodriver/zendriver family) — the core `remotebrowser` skill.
+  automation (port 9222; nodriver/zendriver family) — the core `remotebrowser` skill. Distinct from
+  `software-testing`'s Playwright E2E: raw CDP automation, not a test runner.
 
 ```gherkin
 Scenario: The light self-hosting course stays below clusters and IaC
@@ -437,8 +511,11 @@ Scenario: The light self-hosting course stays below clusters and IaC
 
 ### Harness-engineering cluster (first-learn By-Example · Python)
 
-The five build-your-own-agentic-coding-tool courses; the MCP built in `agent-tools-and-mcp` is the
-same MCP `remotebrowser` exposes; all feed `capstone-build-your-own-coding-agent`.
+The five build-your-own-agentic-coding-tool courses; the MCP built in `agent-tools-and-mcp` is the same
+MCP `remotebrowser` exposes; all feed `capstone-build-your-own-coding-agent`. **AI-band scope-guard**:
+these build the primitives at build-your-own depth; the survey course `agentic-ai` (57) previews and
+**forward-links** each primitive here and does NOT re-teach at cluster depth, and
+`creating-ai-powered-apps` (56) stays at the _use-an-LLM-in-an-app_ altitude.
 
 - **`the-agent-loop`** — the LLM read-eval-act tool-use loop, streaming, stop conditions.
 - **`agent-tools-and-mcp`** — tool/function schema design; an MCP server + client; resources/prompts.
@@ -457,21 +534,30 @@ Scenario: The harness cluster builds a working agent from runnable code
   And each course names remotebrowser's bundled MCP or CDP browser only as an illustrative pickup
 ```
 
+```gherkin
+Scenario: The agentic-ai survey forward-links each primitive without re-teaching it
+  Given the agentic-ai survey course and the five harness-cluster courses are authored
+  When a reader reads the agentic-ai survey
+  Then it previews the agent loop, tools/MCP, memory/context, and evals and forward-links each to its cluster course
+  And it does not re-teach any primitive at build-your-own depth
+```
+
 ### Security & systems gap-closers
 
 - **`just-enough-cpp`** (Primer · C++) — systems-language principle on-ramp (RAII, templates/generics,
   STL, smart pointers, manual memory); prereq `just-enough-c`; Wazuh's C++ core is one illustration.
 - **`detection-engineering-and-siem-operations`** (By Example · XML/rules + config + Python) —
   decoders, correlation rules, log parsing/normalization, FP tuning, dashboards, alert triage; Wazuh
-  XML is the worked example; distinct from concept-level `defensive-security`; prereq
+  XML is the worked example. Distinct from `defensive-security` (which is **hands-on By-Example**
+  generalist blue-team breadth — Sigma/ELK + IR + hardening, **not** concept-level); prereq
   `defensive-security`.
 
 ```gherkin
-Scenario: Hands-on detection engineering stays distinct from concept-level defensive security
+Scenario: Hands-on detection engineering stays distinct from generalist defensive security
   Given the detection-engineering-and-siem-operations course is authored
-  When a reader compares it with the concept-level defensive-security course
-  Then it has the reader author working decoders, correlation rules, and a dashboard with false-positive tuning
-  And it uses the Wazuh XML ruleset only as the worked example, not the subject
+  When a reader compares it with the hands-on defensive-security course
+  Then it has the reader author working Wazuh decoders, correlation rules, and a dashboard with false-positive tuning
+  And defensive-security keeps the generalist Sigma/ELK breadth, IR, and hardening as its distinct scope
 ```
 
 ### NEW capstones
@@ -509,12 +595,17 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
 **In-scope features**:
 
 - The `course-paths` ayokoding-www feature: path manifests, path-aware prev/next + breadcrumb,
-  `?path=` context, graceful fallback, path landing pages, a paths hub, redirects, accessibility.
-- Re-homing the 94 existing topics + 3 existing capstones (97 existing courses) into
-  `courses/<course-id>/` with redirects.
-- The two path manifests (`job-seeking/software-engineer` interview-first,
-  `fundamentally-strong/software-engineer` shipping-first) as ordered course-ID lists over the library.
-- Fourteen NEW courses + three NEW capstones authored into the library (learning + drilling each).
+  `?path=` context, prerequisite display, graceful fallback, path landing pages, a paths hub,
+  redirects, accessibility — all under the `/en/c/learn` URL model.
+- Re-homing the 33 shipped topics (1–33) into `courses/<course-id>/` with redirects; native-authoring
+  the 61 transferred topics (34–94) into `courses/<course-id>/`.
+- The three path manifests (`interview-ready/software-engineer` interview-first,
+  `immediately-effective/software-engineer` build-app-first,
+  `fundamentally-strong/software-engineer` fundamentals-first) as ordered, prerequisite-consistent
+  course-ID lists over the library.
+- Fourteen NEW courses + nine NEW capstones (three original plus six DD-20 inter-topic capstones)
+  authored into the library (learning + drilling each), for a 121-course baseline.
+- Course variants authored on demand only, where a path needs a genuinely different teaching approach.
 - Three-level tests (unit/integration/e2e) + a `specs/` Gherkin companion for the nav feature.
 - Per-path progression-smoothness audits.
 
@@ -524,15 +615,20 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
 - Indonesian mirror of the section content.
 - Path progress persistence, accounts, or bookmarking.
 - Interactive flashcards.
+- Speculative enumeration of course variants (authored on demand only).
 
 ## Product-Level Risks
 
-- **Order/manifest drift**: a manifest references a missing/renamed course ID → broken nav. Mitigated
-  by a manifest-integrity check (gate + unit test) and stable course-ID slugs.
-- **Deep-link fallback gap**: a course without path context renders poorly. Mitigated by a
-  first-class canonical view + Gherkin scenario + e2e test.
+- **Order/manifest drift**: a manifest references a missing/renamed course ID, or orders a course
+  before its prerequisite → broken nav / invalid DAG entry. Mitigated by a manifest-integrity check
+  (gate + unit test) that validates both ID resolution and topological consistency, plus stable
+  course-ID slugs.
+- **Deep-link fallback gap**: a course without path context renders poorly. Mitigated by a first-class
+  canonical view (with prerequisites surfaced) + Gherkin scenario + e2e test.
 - **URL breakage on re-home**: mitigated by a redirect per re-homed course + redirect specs.
-- **Duplication creep**: a path forks a body for framing. Mitigated by callout-only framing + a
-  no-forked-body check.
+- **Duplication creep**: a path forks a body for framing. Mitigated by callout-only framing, a distinct
+  course variant for genuine pedagogy differences, and a no-forked-body check.
+- **AI-band duplication creep**: `agentic-ai` and the harness cluster re-teach the same primitives.
+  Mitigated by the AI-band scope-guard cross-reference contract.
 - **NEW-course quality**: interview modules must meet ayokoding pace/accuracy bars. Mitigated by the
   maker → checker → facts-checker → link-checker pipeline per course.

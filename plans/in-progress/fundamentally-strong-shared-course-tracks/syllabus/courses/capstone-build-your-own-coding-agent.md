@@ -97,10 +97,9 @@ web-verified.
 
 ## In which paths
 
-- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — AI & harness engineering
-  (marquee build-your-own track).
-- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
-  AI & harness engineering (marquee build-your-own track).
+- `interview-ready/software-engineer` — Go deeper · AI & harness engineering — optional deepening tail, not in the required spine.
+- `immediately-effective/software-engineer` — Deepening band · AI & harness engineering (marquee build-your-own track) — deepening band, deferred out of the early spine.
+- `fundamentally-strong/software-engineer` — Stage 12 · AI & harness engineering (marquee build-your-own track).
 
 ---
 

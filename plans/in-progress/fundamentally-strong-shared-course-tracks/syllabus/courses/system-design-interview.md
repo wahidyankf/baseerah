@@ -252,9 +252,9 @@ and a WCAG-accessible Mermaid architecture diagram per scenario. Grouped by them
 
 ## In which paths
 
-- `job-seeking/software-engineer` — Phase 1 · Interview Preparation (through senior).
-- `fundamentally-strong/software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses, RESOLVED
-  OQ-3).
+- `interview-ready/software-engineer` — Phase 1 · Interview preparation (through senior).
+- `immediately-effective/software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses) — optional deepening tail, not in the required spine.
+- `fundamentally-strong/software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses) — optional deepening tail, not in the required spine.
 
 ---
 

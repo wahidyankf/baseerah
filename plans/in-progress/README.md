@@ -4,15 +4,16 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [e2e-coverage-rule-feature-skip-fixme-gap](./e2e-coverage-rule-feature-skip-fixme-gap/README.md) —
-  the e2e-coverage gap detector's `@skip`/`@fixme` special-tag detection is scoped to
-  `Scenario Outline` level only; `Rule:`/`Feature:`-level tags produce the same undetected shape one
-  AST level up. Delivery Mode: `worktree-to-pr`.
-- [rust-cargo-target-dir-sharing](./rust-cargo-target-dir-sharing/README.md) —
-  Rust `target/` directories are duplicated per git worktree (~32 GB observed); share build output
-  across worktrees by folding a per-crate `target/` symlink + worktree-aware cache GC into
-  `rhino-cli doctor` (local-dev-only, CI-guarded), byte-identical across all three repos.
-  Delivery Mode: `worktree-to-pr`.
+- [fundamentally-strong-shared-course-tracks](./fundamentally-strong-shared-course-tracks/README.md)
+  — re-architects the fundamentally-strong curriculum into a shared, path-neutral course library
+  (`/en/c/learn/courses/<course-id>`) consumed by three converging path manifests at
+  `/en/c/learn/paths/<path-id>` — `interview-ready/software-engineer` (interview-first),
+  `immediately-effective/software-engineer` (build-fast-first), and
+  `fundamentally-strong/software-engineer` (theory-first, complete mastery). 121 courses composed
+  curated-and-converging (121/119/116 per path) over one prerequisite DAG; legacy `_index.md`
+  browse preserved additively. Delivery Mode: `worktree-to-pr`. PQG: strict double-zero.
+  Build work follows the governance plan below.
+- [parallel-orchestration-shared-machine-governance](./parallel-orchestration-shared-machine-governance/README.md) — Governance/docs change adopting the N+1 parallel-orchestration model, an explicit same-machine concurrent-actors assumption, a no-destructive-git-operations convention, and a safe self-scoped worktree/artifact cleanup convention; propagated across ose-public → ose-primer → ose-infra.
 
 ## Instructions
 

@@ -129,7 +129,7 @@ logs. Wazuh XML is the worked example; each also notes the portable (Sigma-style
 
 > **Volume-target floor**: this syllabus lists **52** of the required **≥75** (the 75–85 By-Example/
 > Primer band, floor not cap — see
-> [prd.md §Volume-target bands](../prd.md#new-course--capstone-specifications)).
+> [prd.md §Volume-target bands](../../prd.md#new-course--capstone-specifications)).
 > The maker adds **≥23** more `ex-NN` entries at authoring time, continuing the numbering and pattern
 > taxonomy below, before this topic passes its by-example quality gate.
 
@@ -280,9 +280,9 @@ logs. Wazuh XML is the worked example; each also notes the portable (Sigma-style
 
 ## In which paths
 
-- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Security suite.
-- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
-  Security suite.
+- `interview-ready/software-engineer` — Go deeper · Security suite — optional deepening tail, not in the required spine.
+- `immediately-effective/software-engineer` — Deepening band · Security suite — deepening band, deferred out of the early spine.
+- `fundamentally-strong/software-engineer` — Stage 13 · Security suite.
 
 ---
 

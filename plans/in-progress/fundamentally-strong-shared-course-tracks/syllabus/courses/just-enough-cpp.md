@@ -128,7 +128,7 @@ exercises. Concepts come before examples.
 
 > **Volume-target floor**: this syllabus lists **72** of the required **≥75** (the 75–85 Primer band,
 > floor not cap — see
-> [prd.md §Volume-target bands](../prd.md#new-course--capstone-specifications)).
+> [prd.md §Volume-target bands](../../prd.md#new-course--capstone-specifications)).
 > The maker adds **≥3** more `ex-NN` entries at authoring time, continuing the numbering and pattern
 > taxonomy below, before this topic passes its primer quality gate.
 
@@ -296,9 +296,9 @@ exercises. Concepts come before examples.
 
 ## In which paths
 
-- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Low-level systems.
-- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
-  Low-level systems.
+- `interview-ready/software-engineer` — Go deeper · Theory & low-level systems — optional deepening tail, not in the required spine.
+- `immediately-effective/software-engineer` — Deepening band · Concurrency & language breadth — deepening band, deferred out of the early spine.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems programming & OS internals.
 
 ---
 

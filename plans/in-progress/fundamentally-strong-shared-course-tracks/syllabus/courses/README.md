@@ -1,25 +1,37 @@
-# Syllabus — Fundamentally Strong Shared Course Library
+# Course Library Catalog — Fundamentally Strong Shared Course Library
 
-The **course library catalog** for the shared-library two-path model. Start with
-**[overview.md](./overview.md)** — it defines the architecture, the legend, the authoring guarantees,
-the capstone policy, and the per-course file template. The
-[tech-docs §Course Library Catalog](../tech-docs.md#course-library-catalog) is the single source of
+The **per-course-block detail layer**: the index of the **121-course catalog** and the folder that
+holds one **`<course-id>.md`** detail file per course. Start with the
+**[syllabus root README](../README.md)** for the shared-library-plus-three-paths architecture, the
+legend, the authoring guarantees, the capstone policy, and the per-course file template. The
+[tech-docs §Course Library Catalog](../../tech-docs.md#course-library-catalog) is the single source of
 truth for the course set, IDs, format, language, and short summary. **Order is NOT a catalog
-property** — it lives in the two path manifests:
+property** — it lives in the three [path manifests](../paths/README.md):
 
-- **[manifest-job-seeking-software-engineer.md](./manifest-job-seeking-software-engineer.md)** —
-  the interview-first ordered manifest (delivered first).
-- **[manifest-fundamentally-strong-software-engineer.md](./manifest-fundamentally-strong-software-engineer.md)** — the shipping-first ordered
-  manifest (delivered second, reusing the same courses reordered).
+- **[interview-ready/software-engineer](../paths/manifest-interview-ready-software-engineer.md)** — the
+  interview-first ordered manifest (ships first).
+- **[immediately-effective/software-engineer](../paths/manifest-immediately-effective-software-engineer.md)**
+  — the shipping-first ordered manifest.
+- **[fundamentally-strong/software-engineer](../paths/manifest-fundamentally-strong-software-engineer.md)**
+  — the university-style, fundamentals-first ordered manifest.
+
+Every manifest reuses the same course bodies reordered — **zero body duplication**.
 
 **Columns** — `Course ID` (stable slug; linked to its detail file), `Format`, `Language(s)`,
 `Short summary`. NEW = a course this plan authors; the rest are re-homed existing courses.
 
 > **Detail-file status**: the **fourteen NEW courses** and **five capstones** (the three NEW capstones
-> and the two existing capstones with substantial integration content) have full-detail files in this
-> folder (linked below and flagged **NEW** / **capstone**). The **95 existing courses** (94 existing
-> topics and `capstone-forge-ready`) keep their subject content from the sibling plan; their pointer
-> files are linked by course ID.
+> and the two existing capstones with substantial integration content) have full-content, standalone
+> `capstone-*.md` files in this folder (linked below and flagged **NEW** / **capstone**). The **95
+> existing courses** (94 existing topics and `capstone-forge-ready`) carry full-content, non-pointer
+> files inherited verbatim from the sibling plan, linked by course ID. **Seven additional inter-topic
+> capstones** (`capstone-solid-core`, `capstone-real-world-delivery`, `capstone-secure-service`,
+> `capstone-data-pipeline`, `capstone-concurrency-and-systems`, `capstone-concurrency-showdown`,
+> `capstone-lead-at-altitude`) do **not** have a standalone `capstone-*.md` file — each is a
+> full-detail spec (goal, integrated-concepts checklist, ordered steps, acceptance criteria, done bar)
+> embedded inside its host topic's file (`engineering-management.md`, `defensive-security.md` ×3,
+> `compilers-parsers-and-transpilers.md` ×2, `site-reliability-engineering.md`); see
+> [DD-20](../../tech-docs.md#design-decisions) for the reconciliation ruling.
 
 ## Editor & tooling foundations
 
@@ -185,13 +197,133 @@ property** — it lives in the two path manifests:
 | **[`capstone-build-your-own-coding-agent`](./capstone-build-your-own-coding-agent.md)** — NEW     | Harness milestone    | Python         | Build a working agentic coding tool                 |
 | **[`capstone-build-your-own-pentest-engine`](./capstone-build-your-own-pentest-engine.md)** — NEW | Security milestone   | TypeScript     | Build an agentic pentest engine                     |
 
+**Seven DD-20 inter-topic capstones** (added 2026-07-19; specs embedded in their host topic's file,
+no standalone `capstone-*.md`):
+
+| Course ID                                                                                                                                                          | Kind                    | Language(s)       | Short summary                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- | ----------------- | ----------------------------------------------------------------- |
+| [`capstone-solid-core`](./engineering-management.md#capstone-spec--inter-topic-capstone-solid-core-pass-2-boundary) — **live**                                     | Pass-boundary milestone | Python + TS       | Re-engineer the Pass-1 app to a SOLID/functional-core baseline    |
+| **[`capstone-real-world-delivery`](./defensive-security.md#capstone-spec--inter-topic-capstone-real-world-delivery-pass-3-boundary)** — NEW                        | Full-stack milestone    | Python + TS + IaC | Deploy-as-code, secured, observable delivery of the Pass-2 app    |
+| **[`capstone-secure-service`](./defensive-security.md#capstone-spec--inter-topic-capstone-secure-service-cross-cutting)** — NEW                                    | Security milestone      | Python + shell    | End-to-end secured HTTP service, red/blue-team validated          |
+| **[`capstone-data-pipeline`](./defensive-security.md#capstone-spec--inter-topic-capstone-data-pipeline-cross-cutting)** — NEW                                      | Data milestone          | SQL + Python      | Medallion pipeline → governed warehouse → RAG-grounded interface  |
+| **[`capstone-concurrency-and-systems`](./compilers-parsers-and-transpilers.md#capstone-spec--inter-topic-capstone-concurrency-and-systems-pass-4-boundary)** — NEW | Systems milestone       | Go or Elixir + C  | Concurrent, containerized, SRE-instrumented service               |
+| **[`capstone-concurrency-showdown`](./compilers-parsers-and-transpilers.md#capstone-spec--inter-topic-capstone-concurrency-showdown-cross-cutting)** — NEW         | Comparison milestone    | Go + Elixir       | Same problem solved CSP-Go vs actor-Elixir, compared head-to-head |
+| **[`capstone-lead-at-altitude`](./site-reliability-engineering.md#capstone-spec--inter-topic-capstone-lead-at-altitude-whole-journey)** — NEW                      | Whole-journey milestone | polyglot + prose  | Whole-journey leadership synthesis: SLOs, strategy, retrospective |
+
+See [DD-20](../../tech-docs.md#design-decisions) for the reconciliation ruling and placement rationale.
+
 ## Path manifests (orderings over this library)
 
-- **[manifest-job-seeking-software-engineer.md](./manifest-job-seeking-software-engineer.md)** —
-  interview-first order (delivered first).
-- **[manifest-fundamentally-strong-software-engineer.md](./manifest-fundamentally-strong-software-engineer.md)** — shipping-first order
-  (delivered second; zero body duplication — references the same course IDs reordered).
+The three [path manifests](../paths/README.md) each impose one ordering over this catalog:
+
+- **[interview-ready/software-engineer](../paths/manifest-interview-ready-software-engineer.md)** —
+  interview-first order (ships first).
+- **[immediately-effective/software-engineer](../paths/manifest-immediately-effective-software-engineer.md)**
+  — shipping-first order (build a real app first, then deepen).
+- **[fundamentally-strong/software-engineer](../paths/manifest-fundamentally-strong-software-engineer.md)**
+  — fundamentals-first, university-style order.
+
+Zero body duplication — every manifest references the same course IDs reordered.
+
+## How to read a course file
+
+Each `<course-id>.md` carries these sections in order:
+
+1. **Header** — title, course ID, format, language, scope note. **No single order index** (order is
+   per-path; see the three manifests).
+2. **Why this exists · the big idea** — the problem before the solution, the keep-forever mental model,
+   the cross-cutting big ideas.
+3. **Prerequisites** — prior **courses** (by ID) this builds on, tools & environment, assumed knowledge.
+   (Prereqs are course-level, not path-level; a path's order must respect them.)
+4. **Accuracy notes** — dated `web-researcher` findings; version-sensitive items `[Needs Verification]`.
+5. **Concepts** — the numbered `co-NN` enumeration (floor, not cap).
+6. **Tensions & trade-offs + Lineage** — judgment courses only.
+7. **Worked examples** — the numbered `ex-NN` enumeration; each cites the `co-NN` it demonstrates.
+8. **Capstone spec** — the course's intra-course capstone (and, in the six standalone capstone files
+   plus the seven DD-20 host-topic files, the full inter-course capstone spec).
+9. **In which paths** — which path manifests list this course, and where (order is path-dependent).
+
+## Legend (format markers)
+
+- **Primer** — a _Just Enough_ language on-ramp (fluency, not judgment).
+- **By Example** — worked-code subject course (Beginner / Intermediate / Advanced bands).
+- **Annotated-concept** — concept-centric course; code where it fits, prose + WCAG-accessible Mermaid
+  where it does not.
+- **— (concept, no code)** — leadership / governance / format courses: prose, worked scenarios,
+  artifacts, no runnable code.
+
+## Cross-cutting authoring guarantees
+
+- **Coverage is a floor, not a cap** — the `co-NN` / `ex-NN` counts are the minimum a course must reach
+  at authoring time; a maker may add more, never fewer, reaching the per-format volume band in
+  [prd.md §Volume-target bands](../../prd.md#new-course--capstone-specifications).
+- **Raw-form-first tooling** — Neovim + terminal build/run/test/debug/git on a macOS/Linux-compatible
+  environment; IDE-mandatory app domains called out in place.
+- **Free-to-use-and-teachable-first materials**; **CVE-free dependencies** pinned to exact clean
+  versions; **follow-along completeness**; **principle-first, not tutorial-first**.
+
+## Capstone policy
+
+Every subject course ships an **intra-course capstone**. The library additionally holds **thirteen
+inter-course capstones**: six with standalone files (`capstone-forge-ready`, `capstone-interview-loop`,
+`capstone-first-working-software`, `capstone-full-stack-app`, `capstone-build-your-own-coding-agent`,
+`capstone-build-your-own-pentest-engine`) and seven DD-20 inter-topic capstones whose specs are
+embedded in a host topic's file (`capstone-solid-core`, `capstone-real-world-delivery`,
+`capstone-secure-service`, `capstone-data-pipeline`, `capstone-concurrency-and-systems`,
+`capstone-concurrency-showdown`, `capstone-lead-at-altitude`) — each a course in its own right (a
+building block with a stable ID), placed by each path's manifest at the appropriate boundary. Each
+capstone spec states (a) goal/outcome, (b) a concepts-exercised checklist, (c) an ordered step outline
+(file + code + verify command), (d) testable acceptance criteria, and (e) the done bar = **runnable
+end-to-end + web-verified**.
+
+## Per-course file template
+
+```markdown
+# <Title> (<Format>, <Language>)
+
+**Course ID**: `<course-id>` · **Format**: <Format> · **Language**: <Language>.
+
+**Scope note**: <what this course covers; what it defers to a deeper course>.
+
+## Why this exists · the big idea
+
+- **The problem before the solution**: …
+- **Keep-this-if-you-forget-everything**: …
+- **Big ideas touched**: …
+
+## Prerequisites
+
+- **Prior courses**: <course-ids this builds on, or "none — entry point">.
+- **Tools & environment**: <pinned toolchain + OS/platform assumption>.
+- **Assumed knowledge**: …
+
+## Accuracy notes
+
+- <YYYY-MM-DD> — <finding, flagged [Needs Verification] until the pre-authoring sweep runs>.
+
+## Concepts
+
+1. **co-01 · <slug>** — <one-line claim>. … (floor ≥ 10 subject / ≥ 8 primer|leadership)
+
+## Worked examples
+
+1. **ex-01 · <slug>** — <one-line spec> — verify <observable>. (co-NN) … (contiguous)
+
+## Capstone spec — intra-course (<kind>)
+
+- **Goal**: … · **Concepts exercised**: [ ] … · **Ordered steps**: 1. `<file>` — <code> — verify `<cmd>`
+- **Acceptance criteria**: … · **Done bar**: runnable end-to-end + web-verified.
+
+## In which paths
+
+- `interview-ready/software-engineer` — <phase/position>. (Omit this bullet entirely if the course is
+  genuinely omitted from this path's manifest — see the actual course files for the established
+  convention.)
+- `immediately-effective/software-engineer` — <stage/position>. (Omit if genuinely omitted.)
+- `fundamentally-strong/software-engineer` — <stage/position>. (Never omitted — the complete-mastery
+  path includes every course.)
+```
 
 ---
 
-← Previous: [overview.md](./overview.md)
+← Back to the [syllabus root README](../README.md)

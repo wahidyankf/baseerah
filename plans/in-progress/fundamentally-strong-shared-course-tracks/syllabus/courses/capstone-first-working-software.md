@@ -88,10 +88,9 @@ Runnable end-to-end (clean-machine reproduction of the full vertical slice) + we
 
 ## In which paths
 
-- `job-seeking/software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile →
-  desktop) — Web sub-phase.
-- `fundamentally-strong/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the
-  "immediately effective" payoff).
+- `interview-ready/software-engineer` — Phase 2 · Production-effective (web → cloud).
+- `immediately-effective/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST.
+- `fundamentally-strong/software-engineer` — Stage 9 · Application & product development (build real things on the foundations).
 
 ---
 

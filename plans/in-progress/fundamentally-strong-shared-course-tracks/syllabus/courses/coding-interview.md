@@ -127,7 +127,7 @@ every concept is exercised by ≥ 1 example.
 
 > **Volume-target floor**: this syllabus lists **56** of the required **≥75** (the 75–85 By-Example/
 > Primer band, floor not cap — see
-> [prd.md §Volume-target bands](../prd.md#new-course--capstone-specifications)).
+> [prd.md §Volume-target bands](../../prd.md#new-course--capstone-specifications)).
 > The maker adds **≥19** more `ex-NN` entries at authoring time, continuing the numbering and pattern
 > taxonomy below, before this topic passes its by-example quality gate.
 
@@ -273,9 +273,9 @@ every concept is exercised by ≥ 1 example.
 
 ## In which paths
 
-- `job-seeking/software-engineer` — Phase 1 · Interview Preparation (through senior).
-- `fundamentally-strong/software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses, RESOLVED
-  OQ-3).
+- `interview-ready/software-engineer` — Phase 1 · Interview preparation (through senior).
+- `immediately-effective/software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses) — optional deepening tail, not in the required spine.
+- `fundamentally-strong/software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses) — optional deepening tail, not in the required spine.
 
 ---
 

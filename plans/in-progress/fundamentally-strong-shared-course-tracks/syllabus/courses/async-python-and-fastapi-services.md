@@ -131,7 +131,7 @@ Contiguous `ex-01..ex-54`. Every example cites the `co-NN` it exercises; every c
 
 > **Volume-target floor**: this syllabus lists **54** of the required **≥75** (the 75–85 By-Example/
 > Primer band, floor not cap — see
-> [prd.md §Volume-target bands](../prd.md#new-course--capstone-specifications)).
+> [prd.md §Volume-target bands](../../prd.md#new-course--capstone-specifications)).
 > The maker adds **≥21** more `ex-NN` entries at authoring time, continuing the numbering and pattern
 > taxonomy below, before this topic passes its by-example quality gate.
 
@@ -278,10 +278,9 @@ Contiguous `ex-01..ex-54`. Every example cites the `co-NN` it exercises; every c
 
 ## In which paths
 
-- `job-seeking/software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile →
-  desktop) — Web sub-phase.
-- `fundamentally-strong/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the
-  "immediately effective" payoff).
+- `interview-ready/software-engineer` — Phase 2 · Production-effective (web → cloud).
+- `immediately-effective/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST.
+- `fundamentally-strong/software-engineer` — Stage 9 · Application & product development (build real things on the foundations).
 
 ---
 
