@@ -734,7 +734,7 @@ deploy), applying the convention:
       — coverage acceptance: the learning track explicitly covers framing an employment gap, a layoff,
       and a re-entry story, and treats senior/staff/EM leadership rounds as core (not optional)
       material — verify with
-      `grep -ci 'employment gap|layoff|re-entry' <course>/**/*.md` (ERE alternation) returning ≥3 distinct lessons.
+      `grep -ciE 'employment gap|layoff|re-entry' <course>/**/*.md` (ERE alternation) returning ≥3 distinct lessons.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
 - [ ] [AI] `capstone-interview-loop` (Python + prose) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
@@ -938,7 +938,7 @@ deploy), applying the convention:
       — scope-boundary acceptance: the course teaches running one box, containerizing a service, a
       reverse proxy, and PaaS git-push deploy; and its overview **explicitly excludes** clusters,
       Terraform/Packer/Ansible IaC, and Proxmox — verify with
-      `grep -ci 'cluster|terraform|packer|ansible|proxmox' <course>/overview.md` (ERE alternation) returning ≥1
+      `grep -ciE 'cluster|terraform|packer|ansible|proxmox' <course>/overview.md` (ERE alternation) returning ≥1
       (the exclusions must be _stated_, not merely absent), and no lesson body teaching them.
 - [ ] [AI] `containers-and-orchestration` (By Example · YAML/CLI) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `cloud-and-iac` (Annotated-concept · HCL/YAML) — convention complete; checkers clean. _annotated-concept-maker_
