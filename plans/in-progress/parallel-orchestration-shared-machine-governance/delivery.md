@@ -583,12 +583,12 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       silent stale-content propagation in a structurally identical tri-repo plan.
 - [ ] [AI] Fetch and provision the worktree at the repo-local `worktrees/<name>/` path:
       `git -C /Users/wkf/ose-projects/ose-primer fetch origin main` then
-      `git -C /Users/wkf/ose-projects/ose-primer worktree add worktrees/parallel-orchestration-governance -b parallel-orchestration-governance origin/main`
+      `git -C /Users/wkf/ose-projects/ose-primer worktree add worktrees/parallel-orchestration-shared-machine-governance -b parallel-orchestration-shared-machine-governance origin/main`
       — acceptance: `git -C /Users/wkf/ose-projects/ose-primer worktree list` shows the new worktree
-      at `/Users/wkf/ose-projects/ose-primer/worktrees/parallel-orchestration-governance`, and
+      at `/Users/wkf/ose-projects/ose-primer/worktrees/parallel-orchestration-shared-machine-governance`, and
       `git -C <primer-worktree> rev-parse HEAD` equals `git -C /Users/wkf/ose-projects/ose-primer rev-parse origin/main`
       (proves it is branched from the LATEST origin/main, not a stale local ref)
-- [ ] [AI] Set `<primer-worktree>` = `/Users/wkf/ose-projects/ose-primer/worktrees/parallel-orchestration-governance`
+- [ ] [AI] Set `<primer-worktree>` = `/Users/wkf/ose-projects/ose-primer/worktrees/parallel-orchestration-shared-machine-governance`
       for every subsequent step in this phase; run `npm install && npm run doctor -- --fix` **inside
       that worktree** (`cd` into it — do not rely on the shell's inherited working directory)
       — acceptance: `git -C <primer-worktree> status --porcelain` is empty; toolchain converged
@@ -663,11 +663,11 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       §Sibling-Repo Relative Paths From Inside a Worktree.
 - [ ] [AI] Fetch and provision the worktree at the repo-local `worktrees/<name>/` path:
       `git -C /Users/wkf/ose-projects/ose-infra fetch origin main` then
-      `git -C /Users/wkf/ose-projects/ose-infra worktree add worktrees/parallel-orchestration-governance -b parallel-orchestration-governance origin/main`
+      `git -C /Users/wkf/ose-projects/ose-infra worktree add worktrees/parallel-orchestration-shared-machine-governance -b parallel-orchestration-shared-machine-governance origin/main`
       — acceptance: `git -C /Users/wkf/ose-projects/ose-infra worktree list` shows the new worktree
-      at `/Users/wkf/ose-projects/ose-infra/worktrees/parallel-orchestration-governance`, and
+      at `/Users/wkf/ose-projects/ose-infra/worktrees/parallel-orchestration-shared-machine-governance`, and
       `git -C <infra-worktree> rev-parse HEAD` equals `git -C /Users/wkf/ose-projects/ose-infra rev-parse origin/main`
-- [ ] [AI] Set `<infra-worktree>` = `/Users/wkf/ose-projects/ose-infra/worktrees/parallel-orchestration-governance`
+- [ ] [AI] Set `<infra-worktree>` = `/Users/wkf/ose-projects/ose-infra/worktrees/parallel-orchestration-shared-machine-governance`
       for every subsequent step in this phase; run `npm install && npm run doctor -- --fix` **inside
       that worktree** (`cd` into it — do not rely on the shell's inherited working directory)
       — acceptance: `git -C <infra-worktree> status --porcelain` is empty; toolchain converged
