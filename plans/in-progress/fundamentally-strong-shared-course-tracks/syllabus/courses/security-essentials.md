@@ -228,57 +228,17 @@ Backend-Essentials app with `curl` (DD-20/DD-30), fully type-annotated Python (D
   no secret is committed; `pip-audit` exits clean; the app still serves all endpoints.
 - **Done bar**: runnable end-to-end (attack transcript flips red→green) + web-verified.
 
-<!-- Inter-topic capstone spec block: this file anchors two milestone bundles -->
+## Formerly anchored two inter-topic capstone specs (now superseded)
 
-## Capstone spec — inter-topic: capstone-first-working-software (Pass-1 boundary)
-
-- **Weight**: `capstone-first-working-software/_index.md` = **275** (section root, after Pass 1 / topic 17). Kind:
-  **pass-boundary**, integrating Pass 1 topics 04–17 (build → store → test → secure).
-- **Goal**: ship one small but **complete, secure, tested working application** that a reader builds by
-  integrating everything in Pass 1: a Python HTTP JSON service (topic 11) over a normalized SQL database
-  (topic 10), driven by clean Python (04) with a Bash run/setup script (05), sound data structures (07)
-  and an OO domain model (08), a full test suite across the pyramid (15), and the security hardening from
-  this topic (17). Networking (12) and the TS/frontend slice (13/14) appear as the client/consumer side.
-- **Concepts integrated**: [ ] HTTP JSON API + validation (11) [ ] normalized DB + parameterized DAL (10)
-  [ ] domain model / OOP (08) [ ] apt data structures & algorithms (07) [ ] Bash setup/run script (05)
-  [ ] pytest + Hypothesis + integration tests (15) [ ] security hardening: hashed auth, injection-safe,
-  secrets in env, `pip-audit` clean (17) [ ] a `curl`/HTTP client walkthrough (12).
-- **Ordered steps**:
-  1. `capstone-first-working-software/code/` — scaffold the service (11) + schema/migrations (10) + a
-     `setup.sh` run script (05). Verify `./setup.sh` boots the app and `curl /health` returns 200.
-  2. Implement the domain model (08) + core CRUD with parameterized DAL (07/10). Verify `curl` round-trips
-     every resource and invalid input yields structured errors.
-  3. Add auth (argon2/bcrypt) + input validation + security headers + env secrets (17). Verify the Pass-1
-     attack transcript fails and `pip-audit` is clean.
-  4. Build the test suite (15): unit (pytest/Vitest where applicable), a Hypothesis property test, and an
-     integration test. Verify all green and coverage is generated.
-- **Acceptance criteria**: a reader on a clean machine runs `./setup.sh`, exercises every endpoint with
-  `curl`, passes the full test suite, and confirms the app is injection-safe with hashed auth and no
-  committed secrets — end to end, no hidden setup.
-- **Done bar**: runnable end-to-end (clean-machine reproduction) + web-verified.
-
-## Capstone spec — inter-topic: capstone-full-stack-app (cross-cutting)
-
-- **Weight**: `capstone-full-stack-app/_index.md` = **276** (section root, immediately after
-  first-working-software). Kind: **cross-cutting**, integrating Frontend (14) + Backend (11) + SQL (10).
-- **Goal**: connect a typed **frontend** (topic 14) to the **backend** (11) over **HTTP** (12), persisted
-  in **SQL** (10), so the reader sees a full vertical slice: an accessible UI that reads and writes real
-  data through a real API into a real database — the "it actually works, top to bottom" moment.
-- **Concepts integrated**: [ ] typed UI with loading/error/empty states (14/13) [ ] `fetch` to the API
-  over HTTP (12) [ ] backend endpoints + validation (11) [ ] SQL persistence (10) [ ] end-to-end request
-  path narrated (12) [ ] a Testing-Library UI test + an API integration test (15).
-- **Ordered steps**:
-  1. `capstone-full-stack-app/code/backend/` — reuse the hardened service (11/17) with a CORS-safe read
-     endpoint. Verify `curl` returns JSON from the DB.
-  2. `capstone-full-stack-app/code/frontend/` — a typed UI (14) that fetches and renders the list with
-     loading/error/empty states. Verify the UI shows live data and each state is reachable.
-  3. Wire a create/update form (14) posting to the API (11). Verify a UI action persists to the DB and the
-     list reflects it after refetch.
-  4. Add a Testing-Library test for the UI and an integration test for the endpoint (15). Verify both green.
-- **Acceptance criteria**: a reader runs the backend + frontend, performs a create/read/update from the UI,
-  confirms the change landed in the SQL DB, and both the UI test and API test pass — the whole stack works
-  together.
-- **Done bar**: runnable end-to-end (full vertical slice) + web-verified.
+This file previously embedded full inter-topic capstone specs for **`capstone-first-working-software`**
+and **`capstone-full-stack-app`**, reflecting this course's position as the last topic in the legacy
+Pass-1 numbering. Both capstones now have their own standalone, canonical spec files —
+[`capstone-first-working-software.md`](./capstone-first-working-software.md) and
+[`capstone-full-stack-app.md`](./capstone-full-stack-app.md) — which supersede the embedded copies
+formerly here (reconciled 2026-07-19; see [DD-20](../../tech-docs.md#design-decisions)). The canonical
+specs deliberately **defer** security hardening and the full test pyramid to the deepening arc, so this
+course is no longer part of either capstone's required integrated scope — see each file's own Scope
+note.
 
 ## Read more
 

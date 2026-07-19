@@ -92,6 +92,11 @@ Runnable end-to-end (clean-machine reproduction of the full vertical slice) + we
 - `immediately-effective/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST.
 - `fundamentally-strong/software-engineer` — Stage 9 · Application & product development (build real things on the foundations).
 
+> _The inter-topic capstone spec formerly embedded in `security-essentials.md` (`_index.md` weight
+> **275**) has been removed as a stale, conflicting duplicate (reconciled 2026-07-19) — this file is
+> the sole canonical spec. That embedded version required security hardening and a full test pyramid as
+> in-scope; this canonical spec explicitly defers both to the deepening arc (see the Scope note above)._
+
 ---
 
 ← Back to [README.md — course library catalog](./README.md)

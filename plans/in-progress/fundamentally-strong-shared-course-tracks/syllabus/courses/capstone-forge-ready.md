@@ -60,7 +60,9 @@ editing fluency + Lua + a real extended config.
 - `fundamentally-strong/software-engineer` — Prologue · Editor & reproducible forge (skippable).
 
 > _Content originated in the now-closed FS-SE plan (the `capstone-forge-ready` inter-topic capstone,
-> anchored in topic 3); it now lives here in full — this course block is self-contained._
+> anchored in topic 3); it now lives here in full — this course block is self-contained. The legacy
+> embedded spec (formerly in `extending-neovim.md`, `_index.md` weight **135**) has been removed as a
+> stale duplicate (reconciled 2026-07-19) — this file is the sole canonical spec._
 
 ---
 

@@ -84,6 +84,11 @@ Runnable end-to-end (full vertical slice, deployed to a reachable HTTPS URL) + w
 - `immediately-effective/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST.
 - `fundamentally-strong/software-engineer` — Stage 9 · Application & product development (build real things on the foundations).
 
+> _The inter-topic capstone spec formerly embedded in `security-essentials.md` (`_index.md` weight
+> **276**) has been removed as a stale duplicate (reconciled 2026-07-19) — this file is the sole
+> canonical spec. That embedded version had no deployment step; this canonical spec requires deploying
+> to a reachable HTTPS URL (see Acceptance criteria above)._
+
 ---
 
 ← Back to [README.md — course library catalog](./README.md)

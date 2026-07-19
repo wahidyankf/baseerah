@@ -407,32 +407,13 @@ snippetSupport = true) })` — verify every server reports `snippetSupport = tru
   function; `nvim --headless "+checkhealth" "+qa"` reports no missing required dependency.
 - **Done bar**: runnable end-to-end + web-verified.
 
-## Capstone spec — inter-topic: `capstone-forge-ready` (Pass-0 boundary)
+## Also feeds the `capstone-forge-ready` inter-topic capstone
 
-Anchored here (weight 135, section-root folder `capstone-forge-ready/` with colocated `code/`).
-Integrates topics 01–03: vanilla editing fluency + Lua + a real extended config.
-
-- **Goal**: stand up a complete, reproducible personal development **forge** from an empty machine
-  profile — a versioned Neovim config repo the reader can `git clone` and use to edit, navigate, search,
-  and run code with LSP + Treesitter — and prove editing fluency by driving a scripted refactor in it
-  with no mouse/arrow keys.
-- **Concepts exercised**: [ ] raw-form editing (01) [ ] Lua modules/closures/metatables (02) [ ] plugin
-  manager + LSP + Treesitter + user command + autocommand (03) [ ] a reproducible config repo layout
-  [ ] the `:terminal` build/run loop (DD-17).
-- **Ordered steps**:
-  1. `capstone-forge-ready/code/nvim-config/` — a self-contained config repo (init.lua + `lua/` tree +
-     pinned plugin lockfile). Verify a clean `XDG_CONFIG_HOME=$(mktemp -d) nvim --headless
-"+checkhealth" "+qa"` bootstraps and reports healthy.
-  2. `capstone-forge-ready/code/sample-project/` — a small Python project. Open it in the forge; verify
-     LSP diagnostics + Treesitter highlighting appear.
-  3. Drive a scripted, mouse-free refactor across the sample project using motions + macros + quickfix
-     (reusing the topic-01 workflow), recording the transcript. Verify the refactor lands identically
-     from the transcript.
-  4. Run the sample project's check from `:terminal` beside the source. Verify it passes.
-- **Acceptance criteria**: a reader on a clean machine reproduces the forge from the repo, opens the
-  sample project with working LSP+Treesitter, and replays the refactor transcript to the identical
-  result — end to end, no hidden setup.
-- **Done bar**: runnable end-to-end (clean-machine reproduction) + web-verified.
+Together with `just-enough-nvim` and `just-enough-lua`, this course feeds the inter-course capstone
+**[`capstone-forge-ready`](./capstone-forge-ready.md)** (Prologue milestone) — a reproducible personal
+dev forge. `capstone-forge-ready` now has its own standalone, canonical spec file; this topic file no
+longer embeds a duplicate copy (reconciled 2026-07-19 — the embedded spec formerly here had drifted
+from the canonical file and is superseded by it; see [DD-20](../../tech-docs.md#design-decisions)).
 
 ## Read more
 
