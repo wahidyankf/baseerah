@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — Concurrency.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Concurrency.
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Concurrency.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Concurrency.
 
 ---
 

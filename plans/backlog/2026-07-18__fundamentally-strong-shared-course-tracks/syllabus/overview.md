@@ -7,7 +7,7 @@ learning paths built over it. It has three parts:
    **course ID**, with one **`<course-id>.md`** detail file per course (concepts, worked examples,
    capstone spec). Courses have **no single order** here — order is a per-path property.
 2. **The two path manifests** — [manifest-job-seeking-software-engineer.md](./manifest-job-seeking-software-engineer.md)
-   (interview-first) and [manifest-software-engineer.md](./manifest-software-engineer.md)
+   (interview-first) and [manifest-fundamentally-strong-software-engineer.md](./manifest-fundamentally-strong-software-engineer.md)
    (shipping-first), each an **ordered list of course IDs** over the shared library.
 3. **This overview** — the architecture, the legend, the authoring guarantees, the capstone policy,
    and the per-course file template.
@@ -32,8 +32,8 @@ cannot hold: per course, the concrete **Concepts** (`co-NN`), **Worked examples*
 ```mermaid
 flowchart TD
     LIB["Course Library<br/>(one body per course-id)"]:::lib
-    JS["manifest ·<br/>job-seeking-software-engineer<br/>interview-first order"]:::js
-    SE["manifest ·<br/>software-engineer<br/>shipping-first order"]:::se
+    JS["manifest ·<br/>job-seeking/software-engineer<br/>interview-first order"]:::js
+    SE["manifest ·<br/>fundamentally-strong/<br/>software-engineer<br/>shipping-first order"]:::se
     JS -->|ordered course-ids| LIB
     SE -->|ordered course-ids| LIB
 
@@ -44,7 +44,7 @@ flowchart TD
 
 - **Course = building block, 1 topic = 1 course.** A course is a self-contained topic module
   (learning + drilling track) with a stable **course ID** (its kebab-case slug). One canonical body,
-  one canonical URL (`/fundamentally-strong/courses/<course-id>`), authored once, never forked.
+  one canonical URL (`/en/courses/<course-id>`), authored once, never forked.
 - **Path = ordered manifest.** A path lists course IDs in an order; a course page reads the active
   path context (`?path=<path-id>`) and its prev/next + breadcrumb follow that path's order. See
   [tech-docs §Path-Aware Navigation UI](../tech-docs.md#path-aware-navigation-ui-ayokoding-www).
@@ -54,16 +54,16 @@ flowchart TD
 
 ## The two paths
 
-- **`job-seeking-software-engineer` (interview-first)** — for an **experienced engineer re-entering
+- **`job-seeking/software-engineer` (interview-first)** — for an **experienced engineer re-entering
   the job market**. Order: Prologue · Editor Foundations (skippable) → Phase 1 · Interview Preparation
   (through senior) → Phase 2 · Multi-Platform Productivity (web → cloud → mobile → desktop) → Phase 3 ·
   Deepening (shallow → deep). Delivered **first**. Full order:
   [manifest-job-seeking-software-engineer.md](./manifest-job-seeking-software-engineer.md).
-- **`software-engineer` (shipping-first)** — for a **builder who wants to be effective fast**. Order:
+- **`fundamentally-strong/software-engineer` (shipping-first)** — for a **builder who wants to be effective fast**. Order:
   Stage 1 · Editor & tooling → Stage 2 · one language end-to-end + **build a real app first** → Stage 3
   · CS fundamentals, DS&A, algorithms → Stage 4 · systems / data / architecture / security / ops depth.
   Delivered **second**, reusing the same courses reordered (zero body duplication). Full order:
-  [manifest-software-engineer.md](./manifest-software-engineer.md).
+  [manifest-fundamentally-strong-software-engineer.md](./manifest-fundamentally-strong-software-engineer.md).
 
 ## Skip / fast-path affordances (per path)
 
@@ -173,8 +173,8 @@ web-verified**.
 
 ## In which paths
 
-- `job-seeking-software-engineer` — <phase/position, or "omitted">.
-- `software-engineer` — <stage/position, or "omitted">.
+- `job-seeking/software-engineer` — <phase/position, or "omitted">.
+- `fundamentally-strong/software-engineer` — <stage/position, or "omitted">.
 ```
 
 ## Scope of this folder (current task)

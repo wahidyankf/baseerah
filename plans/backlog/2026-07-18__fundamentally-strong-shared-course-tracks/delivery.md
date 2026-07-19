@@ -83,9 +83,9 @@ starts only after Group B has fully merged (job-seeking path live first).
 
 **Path constants** (referenced throughout):
 
-- `<COURSES>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/courses/`
-- `<PATHS>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/paths/`
-- `<SE_OLD>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`
+- `<COURSES>` = `apps/ayokoding-www/content/en/courses/`
+- `<PATHS>` = `apps/ayokoding-www/content/en/path/`
+- `<SE_OLD>` = `apps/ayokoding-www/.../fundamentally-strong/software-engineer/` (the sibling plan's old software-engineer content home; the migrate-from source)
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/`
 - `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`
 
@@ -251,13 +251,13 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
   Scenario: The breadcrumb reflects the active path
     Given a reader is on a course with an active path context
     When the breadcrumb renders
-    Then it shows Home, Fundamentally Strong, the path title, and the course title
+    Then it shows Home, the path title, and the course title
     And the path crumb links to the path landing page with the path context preserved
 
   Scenario: An old software-engineer URL redirects to the canonical course URL
     Given a re-homed course previously lived under the software-engineer content path
     When a reader requests the old URL
-    Then the app redirects to the course's canonical /courses/<course-id> URL
+    Then the app redirects to the course's canonical /en/courses/<course-id> URL
     And the redirect preserves any path context query parameter
   ```
 
@@ -287,7 +287,7 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
 > _Suggested executor: `swe-typescript-dev`._
 
 - [ ] [AI] **RED** — write failing integration tests for `<FEAT>shell/manifest-repository.ts` (loads and
-      validates each `<FEAT>manifests/<path-id>.yaml` data file into a `PathManifest[]` via the
+      validates each `<FEAT>manifests/**/*.yaml` data file into a `PathManifest[]` via the
       `schemas.ts` zod schema) — command:
       `npx nx run ayokoding-www:test:integration` — acceptance: tests fail (repository wiring absent).
 
@@ -328,9 +328,9 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
       [Dependency Bump Stability & Safety Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md)
       at authoring time (Path A: current LTS-compatible latest patch, CVE-clean) — acceptance:
       `js-yaml` appears in `apps/ayokoding-www/package.json` `dependencies` with an exact version; `npm
-  install` resolves with no peer-dependency warning for it.
+install` resolves with no peer-dependency warning for it.
 - [ ] [AI] **GREEN** — implement `<FEAT>shell/manifest-repository.ts` to read + parse each
-      `<FEAT>manifests/<path-id>.yaml` data file via the now-direct `js-yaml` dependency (RESOLVED: the
+      `<FEAT>manifests/**/*.yaml` data file via the now-direct `js-yaml` dependency (RESOLVED: the
       manifest data files are always `.yaml`; no JSON fallback); extend the content index to carry
       loaded manifests alongside `trees`/`prevNext`
       [Repo-grounded — `ContentIndex` in `apps/ayokoding-www/src/features/content/core/types.ts` and
@@ -371,7 +371,7 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
       `<FEAT>shell/path-course-links.tsx` ("this course is part of: …") consumed by the course page —
       command: `npx nx run ayokoding-www:test:unit` (component tests) — acceptance: tests pass.
 - [ ] [AI] **GREEN** — add redirects for re-homed courses: for every existing course, a redirect from
-      `.../software-engineer/<slug>` to `.../courses/<course-id>` in
+      `.../software-engineer/<slug>` to `/en/courses/<course-id>` in
       `apps/ayokoding-www/src/redirects/` [Repo-grounded — precedent
       `.../gherkin/navigation/learn-reorg-redirects.feature`] — command:
       `npx nx run ayokoding-www:test:integration` — acceptance: redirect resolution test passes.
@@ -406,7 +406,7 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
 - [ ] [AI] **RED (e2e)** — write failing Playwright e2e specs in the ayokoding e2e suite for: path
       landing lists courses in manifest order; prev/next walks the path and preserves `?path=`;
       breadcrumb shows the path; deep-link without `?path=` → canonical view; invalid `?path=` →
-      canonical view; old `software-engineer/<slug>` URL → redirect to `courses/<id>` — command:
+      canonical view; old `software-engineer/<slug>` URL → redirect to `/en/courses/<id>` — command:
       `npx nx run ayokoding-www:test:e2e` — acceptance: e2e specs fail (no published manifest/data yet).
   - _Suggested executor: `swe-e2e-dev`_
 
@@ -431,7 +431,7 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
   Scenario: The breadcrumb reflects the active path
     Given a reader is on a course with an active path context
     When the breadcrumb renders
-    Then it shows Home, Fundamentally Strong, the path title, and the course title
+    Then it shows Home, the path title, and the course title
     And the path crumb links to the path landing page with the path context preserved
 
   Scenario: A course deep-linked without path context renders the canonical view
@@ -449,7 +449,7 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
   Scenario: An old software-engineer URL redirects to the canonical course URL
     Given a re-homed course previously lived under the software-engineer content path
     When a reader requests the old URL
-    Then the app redirects to the course's canonical /courses/<course-id> URL
+    Then the app redirects to the course's canonical /en/courses/<course-id> URL
     And the redirect preserves any path context query parameter
   ```
 
@@ -491,7 +491,7 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
 - [ ] [AI] Update `<COURSES>_index.md` (library landing) to list the full catalog by course ID —
       acceptance: link-checker green; every catalog link resolves.
 - [ ] [AI] Sweep any intra-course cross-links that referenced the old `software-engineer/<slug>` path
-      and repoint them to `courses/<course-id>` (Root Cause Orientation) — command:
+      and repoint them to `/en/courses/<course-id>` (Root Cause Orientation) — command:
       `npx nx run rhino-cli:links:validation` — acceptance: zero broken links.
 
 ### Phase 5 Gate
@@ -500,7 +500,7 @@ pathId)` appending `?path=<pathId>` — command: `npx nx run ayokoding-www:test:
 - [ ] [AI] `npx nx run ayokoding-www:build` + link + heading validation green.
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: every existing course now lives at its canonical `courses/<id>` URL with a redirect
+> **Pause Safety**: every existing course now lives at its canonical `/en/courses/<id>` URL with a redirect
 > from its old URL; no manifest exists yet, so all courses render the canonical view. Safe to stop. To
 > resume: re-run link validation + `:build`.
 
@@ -606,17 +606,17 @@ in each path comes from the manifests (Phases 7 & 9), not from a body weight.
 
 ---
 
-## Phase 7: Author the `job-seeking-software-engineer` manifest + landing + wire + smoothness
+## Phase 7: Author the `job-seeking/software-engineer` manifest + landing + wire + smoothness
 
 > _Suggested executor: `apps-ayokoding-www-general-maker` (manifest/landing) + `web-researcher` (smoothness facts)._
 
-- [ ] [AI] Author the manifest **data file** `<FEAT>manifests/job-seeking-software-engineer.yaml`
-      (RESOLVED, OQ-2 — standalone data file, NOT `_index.md` frontmatter): `pathId`, `title`,
+- [ ] [AI] Author the manifest **data file** `<FEAT>manifests/job-seeking/software-engineer.yaml`
+      (RESOLVED, OQ-2 — standalone data file, NOT `_index.md` frontmatter): `pathId: job-seeking/software-engineer`, `title`,
       `description`, and the ordered `courseOrder` list = the interview-first arc from
-      [tech-docs §Path `job-seeking-software-engineer`](./tech-docs.md#path-job-seeking-software-engineer-interview-first)
+      [tech-docs §Path `job-seeking/software-engineer`](./tech-docs.md#path-job-seekingsoftware-engineer-interview-first)
       and [syllabus/manifest-job-seeking-software-engineer.md](./syllabus/manifest-job-seeking-software-engineer.md)
       — acceptance: the manifest loads + validates (`npx nx run ayokoding-www:test:integration` exits 0).
-- [ ] [AI] Author the thin landing anchor `<PATHS>job-seeking-software-engineer/_index.md` (prose/SEO
+- [ ] [AI] Author the thin landing anchor `<PATHS>job-seeking/software-engineer/_index.md` (prose/SEO
       only — no `courseOrder`); the ordered course list renders from the loaded manifest per
       [prd.md Screen 2](./prd.md#screen-2--path-landing-page) — acceptance: landing renders the
       manifest-ordered list (phase-grouped, fast-path callout, interview-loop-map).
@@ -624,7 +624,7 @@ in each path comes from the manifests (Phases 7 & 9), not from a body weight.
       appears twice; no forked body — command: `npx nx run ayokoding-www:test:integration` (integrity
       test) — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav end-to-end for this path: from the landing, prev/next walks the
-      manifest order and preserves `?path=job-seeking-software-engineer`; breadcrumb shows the path —
+      manifest order and preserves `?path=job-seeking/software-engineer`; breadcrumb shows the path —
       command: `npx nx run ayokoding-www:test:e2e` — acceptance: the path-walk e2e spec passes across locales.
 - [ ] [AI] **Progression smoothness audit (interview-first, RD-16)** — walk the manifest order and
       confirm the four levers hold (prereq-chaining with SF-1/SF-2 bridges present in the re-homed
@@ -640,7 +640,7 @@ in each path comes from the manifests (Phases 7 & 9), not from a body weight.
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:test:e2e` + `:specs:behavior:coverage` exit 0.
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: the job-seeking-software-engineer path is **live end-to-end** in production
+> **Pause Safety**: the job-seeking/software-engineer path is **live end-to-end** in production
 > (landing + manifest + path-aware nav + smoothness). This is a complete, shippable milestone. Safe to
 > stop indefinitely. To resume: re-run the path-walk e2e.
 
@@ -648,7 +648,7 @@ in each path comes from the manifests (Phases 7 & 9), not from a body weight.
 
 ## Group C — Software-Engineer path (shipping-first, reuses the library)
 
-## Phase 8: Author the `software-engineer` manifest + landing + smoothness (zero new bodies)
+## Phase 8: Author the `fundamentally-strong/software-engineer` manifest + landing + smoothness (zero new bodies)
 
 > _Suggested executor: `apps-ayokoding-www-general-maker`._
 > Group C starts only after Group B is fully merged (job-seeking path live). It adds **no new course
@@ -656,18 +656,18 @@ in each path comes from the manifests (Phases 7 & 9), not from a body weight.
 > (OQ-1), so the full 114-course library already exists and Group C only reorders it into the
 > shipping-first arc, the strongest proof of the shared-course-library architecture.
 
-- [ ] [AI] Author the manifest **data file** `<FEAT>manifests/software-engineer.yaml` (RESOLVED, OQ-2
-      — standalone data file, NOT `_index.md` frontmatter): `pathId: software-engineer`, `title`,
+- [ ] [AI] Author the manifest **data file** `<FEAT>manifests/fundamentally-strong/software-engineer.yaml` (RESOLVED, OQ-2
+      — standalone data file, NOT `_index.md` frontmatter): `pathId: fundamentally-strong/software-engineer`, `title`,
       `description`, and the ordered `courseOrder` = the shipping-first arc from
-      [tech-docs §Path `software-engineer`](./tech-docs.md#path-software-engineer-shipping-first) and
-      [syllabus/manifest-software-engineer.md](./syllabus/manifest-software-engineer.md) — the arc
+      [tech-docs §Path `fundamentally-strong/software-engineer`](./tech-docs.md#path-fundamentally-strongsoftware-engineer-shipping-first) and
+      [syllabus/manifest-fundamentally-strong-software-engineer.md](./syllabus/manifest-fundamentally-strong-software-engineer.md) — the arc
       places editor/tooling → one language end-to-end → **build a real app first** ahead of
       CS-fundamentals/DS&A/algorithms/systems depth, and **ends with the optional "ready to job-hunt?"
       bridge tail** (RESOLVED, OQ-3) referencing the four shared interview-technique courses +
       `capstone-interview-loop` by ID — acceptance: body duplication = 0 (references shared course IDs
       only, incl. the bridge tail); manifest loads + validates
       (`npx nx run ayokoding-www:test:integration` exits 0).
-- [ ] [AI] Author the thin landing anchor `<PATHS>software-engineer/_index.md` (prose/SEO only — no
+- [ ] [AI] Author the thin landing anchor `<PATHS>fundamentally-strong/software-engineer/_index.md` (prose/SEO only — no
       `courseOrder`); the ordered course list + the optional job-hunt bridge section render from the
       loaded manifest — acceptance: landing renders the manifest-ordered arc with the bridge tail
       visibly marked optional.
@@ -676,15 +676,15 @@ in each path comes from the manifests (Phases 7 & 9), not from a body weight.
 - [ ] [AI] **Manifest integrity + no-forked-body check** — every `courseOrder` ID resolves; no dup ID;
       no body duplicated between the two manifests (both reference by ID) — command:
       `npx nx run ayokoding-www:test:integration` — acceptance: exits 0.
-- [ ] [AI] Verify path-aware nav for the software-engineer path: prev/next walks the shipping-first
-      order and preserves `?path=software-engineer`; a course in **both** paths shows the correct
+- [ ] [AI] Verify path-aware nav for the fundamentally-strong/software-engineer path: prev/next walks the shipping-first
+      order and preserves `?path=fundamentally-strong/software-engineer`; a course in **both** paths shows the correct
       neighbor per active path — command: `npx nx run ayokoding-www:test:e2e` — acceptance: e2e passes
       across locales; a shared course's prev/next differs by active path.
-- [ ] [AI] **Optional job-hunt bridge check (RESOLVED, OQ-3)** — confirm the software-engineer manifest
+- [ ] [AI] **Optional job-hunt bridge check (RESOLVED, OQ-3)** — confirm the fundamentally-strong/software-engineer manifest
       ends with the optional "ready to job-hunt?" bridge tail referencing the four interview-technique
       courses + `capstone-interview-loop` **by ID** (the same shared bodies job-seeking uses, zero new
       bodies); the landing renders the tail visibly marked optional and links carry
-      `?path=software-engineer` — acceptance: bridge tail present in the data file; no new course body
+      `?path=fundamentally-strong/software-engineer` — acceptance: bridge tail present in the data file; no new course body
       created for the bridge; e2e walks into the bridge courses.
 - [ ] [AI] **Progression smoothness audit (shipping-first, RD-16)** — confirm the arc reads smoothly
       for the "productive fast" persona: build-a-real-app precedes CS depth; the Stage-2→Stage-3 bridge

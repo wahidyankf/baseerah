@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — AI & harness engineering (marquee build-your-own track).
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — AI & harness engineering (marquee build-your-own track).
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — AI & harness engineering (marquee build-your-own track).
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — AI & harness engineering (marquee build-your-own track).
 
 ---
 

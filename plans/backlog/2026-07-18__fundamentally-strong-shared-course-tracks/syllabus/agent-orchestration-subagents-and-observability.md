@@ -260,9 +260,9 @@ runnable code where a mechanism clarifies. Colocated under
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — AI & harness engineering
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — AI & harness engineering
   (marquee build-your-own track).
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
   AI & harness engineering (marquee build-your-own track).
 
 ---

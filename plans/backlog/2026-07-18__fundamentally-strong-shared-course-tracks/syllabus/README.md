@@ -9,7 +9,7 @@ property** — it lives in the two path manifests:
 
 - **[manifest-job-seeking-software-engineer.md](./manifest-job-seeking-software-engineer.md)** —
   the interview-first ordered manifest (delivered first).
-- **[manifest-software-engineer.md](./manifest-software-engineer.md)** — the shipping-first ordered
+- **[manifest-fundamentally-strong-software-engineer.md](./manifest-fundamentally-strong-software-engineer.md)** — the shipping-first ordered
   manifest (delivered second, reusing the same courses reordered).
 
 **Columns** — `Course ID` (stable slug; linked to its detail file), `Format`, `Language(s)`,
@@ -189,7 +189,7 @@ property** — it lives in the two path manifests:
 
 - **[manifest-job-seeking-software-engineer.md](./manifest-job-seeking-software-engineer.md)** —
   interview-first order (delivered first).
-- **[manifest-software-engineer.md](./manifest-software-engineer.md)** — shipping-first order
+- **[manifest-fundamentally-strong-software-engineer.md](./manifest-fundamentally-strong-software-engineer.md)** — shipping-first order
   (delivered second; zero body duplication — references the same course IDs reordered).
 
 ---

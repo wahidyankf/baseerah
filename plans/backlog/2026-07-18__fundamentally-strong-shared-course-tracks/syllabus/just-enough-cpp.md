@@ -296,8 +296,8 @@ exercises. Concepts come before examples.
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — Low-level systems.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Low-level systems.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
   Low-level systems.
 
 ---

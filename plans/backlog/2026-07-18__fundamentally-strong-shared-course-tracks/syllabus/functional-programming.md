@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — Theory foundations.
-- `software-engineer` — Stage 3 · Now go deep — CS fundamentals, DS&A, algorithms.
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Theory foundations.
+- `fundamentally-strong/software-engineer` — Stage 3 · Now go deep — CS fundamentals, DS&A, algorithms.
 
 ---
 

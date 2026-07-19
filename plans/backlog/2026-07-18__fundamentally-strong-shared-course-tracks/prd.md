@@ -5,9 +5,9 @@
 The "Fundamentally Strong" curriculum becomes a **shared course library** (one canonical body per
 course, keyed by a stable course ID) consumed by **two learning paths**:
 
-- **`software-engineer`** — the **shipping-first** arc: editor/tooling → one language end-to-end →
+- **`fundamentally-strong/software-engineer`** — the **shipping-first** arc: editor/tooling → one language end-to-end →
   **build a real app first** → then CS fundamentals / data structures / algorithms / systems depth.
-- **`job-seeking-software-engineer`** — the **interview-first** arc for an experienced engineer
+- **`job-seeking/software-engineer`** — the **interview-first** arc for an experienced engineer
   re-entering the job market.
 
 A **path is an ordered manifest** referencing course IDs. Courses are shared with **omit-or-create**
@@ -24,12 +24,12 @@ productivity/harness/security clusters need.
 
 ## Personas
 
-- **Experienced engineer re-entering the job market (north-star for the `job-seeking` path)** —
+- **Experienced engineer re-entering the job market (north-star for the `job-seeking/software-engineer` path)** —
   recently laid off, returning from a gap/sabbatical, or an employed senior wanting to switch. Already
   owns the editor workflow and deep fundamentals; needs to **refresh breadth fast, relearn interview
   technique** at mid/senior/staff level, and handle a **layoff / employment-gap narrative** — without
   walking a from-scratch curriculum.
-- **A builder who wants to be effective fast (north-star for the `software-engineer` path)** — wants
+- **A builder who wants to be effective fast (north-star for the `fundamentally-strong/software-engineer` path)** — wants
   "immediately effective" SWE: set up the editor, learn one language end-to-end, **ship a real app
   early**, then deepen into CS fundamentals, DS&A, algorithms, and systems. Serves both a from-scratch
   learner and a mid-career switcher.
@@ -47,7 +47,7 @@ productivity/harness/security clusters need.
 - As an **experienced engineer re-entering the market**, I want an interview-first path with real
   technique modules and a layoff/gap-narrative section, so that I get interview-ready fast at my
   level.
-- As a **reader on the shipping-first `software-engineer` path who decides to job-hunt**, I want an
+- As a **reader on the shipping-first `fundamentally-strong/software-engineer` path who decides to job-hunt**, I want an
   optional "ready to job-hunt?" bridge at the end of my path that flows me into the interview-technique
   courses, so that I can pivot to interview prep without leaving my path or duplicating any course.
 - As a **reader on either path**, I want prev/next and the breadcrumb to follow **my path's order**,
@@ -101,7 +101,7 @@ alternatives are informed rather than invented. [Needs Verification — delegate
 
 ### Screen 1 · Paths hub ("choose your path")
 
-Entry screen at `/fundamentally-strong` (or `/fundamentally-strong/paths`) offering the two paths.
+Entry screen at `/en/path` (the paths hub) offering the two paths.
 
 **Low-fi Option A — Two side-by-side path cards (Recommended)**
 
@@ -150,7 +150,7 @@ and `![Paths hub — stacked comparison](./assets/paths-hub-option-b.excalidraw.
 
 ### Screen 2 · Path landing page
 
-At `/fundamentally-strong/paths/<path-id>` — the manifest rendered as an ordered, phase-grouped
+At `/en/path/<path-id>` — the manifest rendered as an ordered, phase-grouped
 course list; every course link carries `?path=<path-id>`.
 
 **Low-fi Option A — Phase-grouped numbered syllabus (Recommended)**
@@ -206,13 +206,13 @@ position), a path breadcrumb, and manifest-driven prev/next. Without `?path=` �
 ```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ ▸ On path: Job-Seeking SWE · course 9 of N          [ view full path ]    │
-│ Home / Fundamentally Strong / Job-Seeking SWE / Coding Interview          │
+│ Home / Job-Seeking SWE / Coding Interview                                 │
 │                                                                          │
 │ # Coding Interview                                                        │
 │ …course body (unchanged, canonical)…                                      │
 │                                                                          │
 │ ← Prev: Advanced Algorithms        Next: Take-Home & Live Coding →        │
-│   (both links keep ?path=job-seeking-software-engineer)                    │
+│   (both links keep ?path=job-seeking/software-engineer)                    │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -220,7 +220,7 @@ Canonical fallback (no `?path=`):
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ Home / Fundamentally Strong / Courses / Coding Interview                   │
+│ Home / Courses / Coding Interview                                          │
 │ # Coding Interview … body …                                               │
 │ This course is part of: [ Software Engineer ] · [ Job-Seeking SWE ]       │
 └──────────────────────────────────────────────────────────────────────────┘
@@ -261,7 +261,7 @@ course-specific acceptance scenarios appear further down, under
 
 ```gherkin
 Scenario: A path landing page lists its courses in manifest order
-  Given the job-seeking-software-engineer path manifest is published
+  Given the job-seeking/software-engineer path manifest is published
   When a reader opens the path landing page
   Then the courses appear in the manifest's courseOrder
   And every course link carries the path context query parameter
@@ -279,8 +279,8 @@ Scenario: Prev and next follow the active path's order
 Scenario: The breadcrumb reflects the active path
   Given a reader is on a course with an active path context
   When the breadcrumb renders
-  Then it shows Home, Fundamentally Strong, the path title, and the course title
-  And the path crumb links to the path landing page with the path context preserved
+  Then it shows Home, the path title, and the course title
+  And the path crumb links to the path landing page /en/path/<path-id> with the path context preserved
 ```
 
 ```gherkin
@@ -311,7 +311,7 @@ Scenario: A course omitted from a path shows no path nav for that path
 Scenario: An old software-engineer URL redirects to the canonical course URL
   Given a re-homed course previously lived under the software-engineer content path
   When a reader requests the old URL
-  Then the app redirects to the course's canonical /courses/<course-id> URL
+  Then the app redirects to the course's canonical /en/courses/<course-id> URL
   And the redirect preserves any path context query parameter
 ```
 
@@ -332,16 +332,16 @@ Scenario: Every manifest course reference resolves to a real course
 ```
 
 ```gherkin
-Scenario: The job-seeking path ships before the software-engineer path
-  Given the job-seeking-software-engineer path is delivered end-to-end
-  When the software-engineer path work begins
-  Then the job-seeking path landing, courses, manifest, and nav are already live in production
-  And the software-engineer path reuses the shared courses without duplicating any body
+Scenario: The job-seeking/software-engineer path ships before the fundamentally-strong/software-engineer path
+  Given the job-seeking/software-engineer path is delivered end-to-end
+  When the fundamentally-strong/software-engineer path work begins
+  Then the job-seeking/software-engineer path landing, courses, manifest, and nav are already live in production
+  And the fundamentally-strong/software-engineer path reuses the shared courses without duplicating any body
 ```
 
 ```gherkin
-Scenario: The software-engineer path is shipping-first
-  Given the software-engineer path manifest is published
+Scenario: The fundamentally-strong/software-engineer path is shipping-first
+  Given the fundamentally-strong/software-engineer path manifest is published
   When a reader walks the path
   Then editor/tooling, one language end-to-end, and building a real app precede the CS-fundamentals and DS&A courses
   And the reader ships a real deployed app before any pure-theory course
@@ -512,8 +512,8 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
   `?path=` context, graceful fallback, path landing pages, a paths hub, redirects, accessibility.
 - Re-homing the 94 existing topics + 3 existing capstones (97 existing courses) into
   `courses/<course-id>/` with redirects.
-- The two path manifests (`job-seeking-software-engineer` interview-first,
-  `software-engineer` shipping-first) as ordered course-ID lists over the library.
+- The two path manifests (`job-seeking/software-engineer` interview-first,
+  `fundamentally-strong/software-engineer` shipping-first) as ordered course-ID lists over the library.
 - Fourteen NEW courses + three NEW capstones authored into the library (learning + drilling each).
 - Three-level tests (unit/integration/e2e) + a `specs/` Gherkin companion for the nav feature.
 - Per-path progression-smoothness audits.

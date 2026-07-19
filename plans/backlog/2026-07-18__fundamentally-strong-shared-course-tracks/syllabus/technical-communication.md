@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 1 · Interview Preparation (through senior).
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Quality / product / delivery.
+- `job-seeking/software-engineer` — Phase 1 · Interview Preparation (through senior).
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Quality / product / delivery.
 
 ---
 

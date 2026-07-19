@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — Architecture & distributed.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Architecture & distributed.
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Architecture & distributed.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Architecture & distributed.
 
 ---
 

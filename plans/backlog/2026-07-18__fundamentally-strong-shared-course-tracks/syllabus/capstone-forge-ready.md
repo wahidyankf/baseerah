@@ -26,8 +26,8 @@ See [overview.md](./overview.md) for the capstone policy and the shared-library 
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Prologue · Editor Foundations (skippable for the experienced).
-- `software-engineer` — Stage 1 · Editor & tooling (get set up fast).
+- `job-seeking/software-engineer` — Prologue · Editor Foundations (skippable for the experienced).
+- `fundamentally-strong/software-engineer` — Stage 1 · Editor & tooling (get set up fast).
 
 ---
 

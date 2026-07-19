@@ -6,10 +6,10 @@ Reframe the "Fundamentally Strong" curriculum as a **shared course library** con
 learning paths**, so one body of already-authored (and being-authored) content can serve two very
 different readers without duplication:
 
-- a **`software-engineer`** path that teaches SWE with an **"immediately effective"** principle —
+- a **`fundamentally-strong/software-engineer`** path that teaches SWE with an **"immediately effective"** principle —
   set up the editor, learn one language end-to-end, **build a real app first**, then deepen into CS
   fundamentals, data structures, algorithms, and systems; and
-- a **`job-seeking-software-engineer`** path — the **interview-first** arc for an experienced
+- a **`job-seeking/software-engineer`** path — the **interview-first** arc for an experienced
   engineer re-entering the job market.
 
 Each course is a **building block** (one topic = one course, stable ID, single canonical body); each
@@ -40,12 +40,12 @@ avoids that entirely:
 The maintainer's read of how the material is actually consumed identifies two distinct, high-value
 entry points [Judgment call]:
 
-- **The builder who wants to be effective fast** (`software-engineer`). This reader does not want a
+- **The builder who wants to be effective fast** (`fundamentally-strong/software-engineer`). This reader does not want a
   spiral or a theory-first march; they want to set up their editor, pick up one language, **ship a
   real working app early**, and only then go deep. Shipping-first sequencing matches how motivated
   self-learners actually stay engaged — momentum from a working artifact, then depth once the payoff
   is felt.
-- **The experienced engineer re-entering the job market** (`job-seeking-software-engineer`). This
+- **The experienced engineer re-entering the job market** (`job-seeking/software-engineer`). This
   reader lands days-to-weeks before a senior loop, already owns the editor workflow and the deep
   fundamentals, and needs to **refresh breadth fast, relearn interview technique, and get
   interview-ready** at mid/senior/staff level — including framing a layoff / employment-gap
@@ -82,7 +82,7 @@ unit/integration/e2e tests plus a `specs/` Gherkin companion.
   surface.
 - A reusable **course-library + path-manifest** capability in ayokoding-www that future tracks
   (e.g. a security track, a data track) can reuse for the marginal cost of one more manifest.
-- The interview track ships real technique modules; the software-engineer track ships a shipping-first
+- The interview track ships real technique modules; the fundamentally-strong/software-engineer track ships a shipping-first
   productive arc — each with a coherent, path-aware reading experience.
 
 ## Affected Roles
@@ -112,8 +112,8 @@ navigation UI feature.
   the `specs/` Gherkin companion.
 - **Job-seeking path ships first, end-to-end** (observable): the interview-first path — landing page,
   its NEW courses, its manifest, path-aware nav — is complete and deployed to production **before**
-  the software-engineer path begins.
-- **Software-engineer path is shipping-first** (observable): its manifest places editor/tooling → one
+  the fundamentally-strong/software-engineer path begins.
+- **`fundamentally-strong/software-engineer` path is shipping-first** (observable): its manifest places editor/tooling → one
   language end-to-end → **build a real app** ahead of CS-fundamentals/DS&A/algorithms/systems depth;
   it reuses the shared courses with zero body duplication.
 - **Interview coverage** (observable): the four NEW interview modules ship a learning + drilling
@@ -129,7 +129,7 @@ navigation UI feature.
   verified by a per-path smoothness audit before archival.
 - **No regressions** (observable): `nx run ayokoding-www:build` renders green; `test:unit` /
   `test:integration` / `test:e2e`, heading-hierarchy, markdownlint, and link validation pass across
-  the app and the section; old `software-engineer/<topic>` URLs redirect to `courses/<course-id>`.
+  the app and the section; old `software-engineer/<topic>` URLs redirect to `/en/courses/<course-id>`.
 
 ## Business-Scope Non-Goals
 
@@ -145,7 +145,7 @@ navigation UI feature.
 | Risk                                                                               | Mitigation                                                                                                                                                            |
 | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dependency not actually done — building over a partially-authored tree breaks nav. | Group A precondition gate hard-blocks until the sibling plan is confirmed DONE (all 94 topics + 3 capstones live). See [delivery.md](./delivery.md) Phase 0.          |
-| Re-homing bodies to `courses/` breaks live URLs.                                   | Every re-home lands with a redirect (`apps/ayokoding-www/src/redirects/`) from the old `software-engineer/<topic>` URL to the new `courses/<course-id>` URL.          |
+| Re-homing bodies to `courses/` breaks live URLs.                                   | Every re-home lands with a redirect (`apps/ayokoding-www/src/redirects/`) from the old `software-engineer/<topic>` URL to the new `/en/courses/<course-id>` URL.      |
 | Path context lost on share/deep-link degrades the reading experience.              | Graceful canonical fallback is a first-class design requirement + a Gherkin scenario + an e2e test; a course page always names the paths that include it.             |
 | Two manifests drift or reference a missing/renamed course ID.                      | A manifest-integrity check (every `courseOrder` ID resolves to a library course) runs as a phase gate and a unit test; course IDs are stable slugs, never renumbered. |
 | Duplication creeps in (a path forks a body for its framing).                       | Framing is limited to an optional intro/outro callout applied by the path layer; the body is never copied — enforced by review + a no-duplicate-body check.           |

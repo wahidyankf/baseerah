@@ -270,9 +270,9 @@ the `the-agent-loop`; a fake model keeps tests deterministic. Contiguous
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — AI & harness engineering
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — AI & harness engineering
   (marquee build-your-own track).
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
   AI & harness engineering (marquee build-your-own track).
 
 ---

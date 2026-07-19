@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — Quality / product / delivery.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Quality / product / delivery.
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Quality / product / delivery.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Quality / product / delivery.
 
 ---
 

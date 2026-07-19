@@ -11,8 +11,8 @@ a single canonical course URL plus client-side path context.
 ```mermaid
 flowchart TD
     LIB["Shared Course Library<br/>one canonical body per course<br/>(course-id = stable slug)"]:::lib
-    SE["Path · software-engineer<br/>shipping-first arc<br/>(productive fast, then deep)"]:::se
-    JS["Path ·<br/>job-seeking-software-engineer<br/>interview-first arc<br/>(experienced re-entrant)"]:::js
+    SE["Path ·<br/>fundamentally-strong/<br/>software-engineer<br/>shipping-first arc<br/>(productive fast, then deep)"]:::se
+    JS["Path ·<br/>job-seeking/software-engineer<br/>interview-first arc<br/>(experienced re-entrant)"]:::js
     SE -->|ordered manifest of course-ids| LIB
     JS -->|ordered manifest of course-ids| LIB
 
@@ -26,11 +26,11 @@ flowchart TD
   authored once, living at one canonical URL — never forked per path.
 - **Path = ordered manifest.** A "path" (a.k.a. track) is a data manifest that lists course IDs in a
   chosen order. Two paths ship:
-  - **`software-engineer`** — learn SWE with an "immediately effective" principle, then go deeper.
+  - **`fundamentally-strong/software-engineer`** — learn SWE with an "immediately effective" principle, then go deeper.
     The arc is **shipping-first**: editor/tooling → one language end-to-end → **build a real app
     FIRST** (productive fast) → **THEN** CS fundamentals / data structures / algorithms / systems
     depth.
-  - **`job-seeking-software-engineer`** — the **interview-first** arc for an experienced SWE
+  - **`job-seeking/software-engineer`** — the **interview-first** arc for an experienced SWE
     re-entering the job market (Editor Foundations → Interview Prep → Multi-Platform Productivity →
     Deepening), recently laid off, returning from a gap, or a senior wanting to switch.
 - **Shared building blocks, omit-or-create.** The two paths **share courses**. If a shared course
@@ -41,18 +41,19 @@ flowchart TD
 
 ## Course-ID and manifest model (summary)
 
-- **Canonical course home**: `apps/ayokoding-www/content/en/learn/fundamentally-strong/courses/<course-id>/`
+- **Canonical course home**: `apps/ayokoding-www/content/en/courses/<course-id>/`
   — one page-bundle per course (its `_index.md` + `overview.md` + `learning/` + `drilling/`).
   [Repo-grounded — the existing bundles live under
-  `.../fundamentally-strong/software-engineer/<slug>/` today; this plan re-homes them to
+  `.../fundamentally-strong/software-engineer/<slug>/` today; this plan re-homes them to the top-level
   `courses/<course-id>/` with redirects.]
-- **Canonical course URL**: `/{locale}/c/learn/fundamentally-strong/courses/<course-id>` — surfaced
-  as `/fundamentally-strong/courses/<course-id>`. One URL per course, path-independent.
-- **Path manifest**: a standalone data file at
-  `apps/ayokoding-www/src/features/course-paths/manifests/<path-id>.yaml` (the machine-consumed
-  source of truth) carrying `pathId`, display `title`, `description`, and an ordered `courseOrder`
-  list of course IDs. It is NOT frontmatter on a content `_index.md`; the path landing page renders
-  from the loaded manifest. The `syllabus/manifest-<path-id>.md` files are the human-readable mirror.
+- **Canonical course URL**: `/{locale}/c/courses/<course-id>` — surfaced
+  as `/en/courses/<course-id>`. One URL per course, path-independent.
+- **Path manifest**: a standalone data file under
+  `apps/ayokoding-www/src/features/course-paths/manifests/` (globbed `manifests/**/*.yaml`, nested to
+  mirror each slash path ID — the machine-consumed source of truth) carrying `pathId`, display
+  `title`, `description`, and an ordered `courseOrder` list of course IDs. It is NOT frontmatter on a
+  content `_index.md`; the path landing page renders from the loaded manifest. The flat
+  `syllabus/manifest-*.md` files are the human-readable mirror.
 - **Path context**: a course page reads `?path=<path-id>`; its prev/next and breadcrumb then follow
   **that path's manifest ordering**. With no path context the course renders its **canonical
   standalone view**. Full design in
@@ -75,15 +76,15 @@ are the [tech-docs §Path Manifests](./tech-docs.md#path-manifests).
 
 ## Build order (job-seeking path first)
 
-Delivery is sequenced in three groups; the **job-seeking-software-engineer path ships first,
-end-to-end**, before the software-engineer path begins. Shared courses are **retro-extracted into the
+Delivery is sequenced in three groups; the **job-seeking/software-engineer path ships first,
+end-to-end**, before the fundamentally-strong/software-engineer path begins. Shared courses are **retro-extracted into the
 formal `courses/` library incrementally**, as each path needs them.
 
 ```mermaid
 flowchart LR
     A["Group A · Architecture & UI<br/>library home · manifest format<br/>path-aware nav UI"]:::a
     B["Group B · job-seeking path<br/>delivered end-to-end first<br/>(new courses + manifest)"]:::b
-    C["Group C · software-engineer<br/>shipping-first arc<br/>(reorder shared courses)"]:::c
+    C["Group C ·<br/>fundamentally-strong/<br/>software-engineer<br/>shipping-first arc<br/>(reorder shared courses)"]:::c
     F["Finalization<br/>verify · retest · archive"]:::f
     A --> B --> C --> F
 
@@ -98,14 +99,14 @@ flowchart LR
   (routing, `?path=` context, manifest-driven prev/next + breadcrumb, graceful deep-link fallback,
   accessibility, path landing pages) with unit + integration + e2e tests and a `specs/` Gherkin
   companion.
-- **Group B — Job-seeking-software-engineer path (first)**: re-home **all ~97 existing courses** into
+- **Group B — `job-seeking/software-engineer` path (first)**: re-home **all ~97 existing courses** into
   `courses/` (the interview-first path spans the whole library), author the 17 NEW courses/capstones it
   needs, and
-  write its **interview-first manifest** as the `manifests/job-seeking-software-engineer.yaml` data
+  write its **interview-first manifest** as the `manifests/job-seeking/software-engineer.yaml` data
   file. Ship it end-to-end (landing page, path-aware nav, deployed) so it is fully usable before
   Group C.
-- **Group C — Software-engineer path (shipping-first)**: **zero new bodies** — write only the
-  `manifests/software-engineer.yaml` data file that reorders the already-re-homed library into the
+- **Group C — `fundamentally-strong/software-engineer` path (shipping-first)**: **zero new bodies** — write only the
+  `manifests/fundamentally-strong/software-engineer.yaml` data file that reorders the already-re-homed library into the
   shipping-first arc, ending with the optional "ready to job-hunt?" bridge tail into the shared
   interview courses. Pure manifest reuse — the strongest proof of the shared-library architecture.
 
@@ -114,19 +115,19 @@ Full phase list in [delivery.md](./delivery.md).
 ## Depends-on
 
 **Hard dependency**: [`plans/in-progress/fundamentally-strong-software-engineer/`](../../in-progress/fundamentally-strong-software-engineer/README.md)
-must be **fully DONE** — all 94 topics + 3 capstones authored and live under
-`apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/` — **before this plan
+must be **fully DONE** — all 94 topics + 3 capstones authored and live under the sibling plan's
+`.../fundamentally-strong/software-engineer/` content home — **before this plan
 executes**. [Judgment call] At authoring time (2026-07-18) the live content tree holds only the
 prologue through roughly topic 30 [Repo-grounded], so the dependency is **not yet satisfied** — the
 Group A precondition gate hard-blocks until the sibling plan is confirmed DONE.
 
 ## Primary personas
 
-- **`job-seeking-software-engineer` path — experienced SWE re-entering the job market (north-star for
+- **`job-seeking/software-engineer` path — experienced SWE re-entering the job market (north-star for
   path B)**: recently laid off, returning from a gap/sabbatical, or a senior switching. Wants to
   refresh breadth fast, relearn interview technique at mid/senior/staff level, and handle a
   layoff/gap narrative — without walking a from-scratch curriculum.
-- **`software-engineer` path — a builder who wants to be productive fast (north-star for path C)**:
+- **`fundamentally-strong/software-engineer` path — a builder who wants to be productive fast (north-star for path C)**:
   wants "immediately effective" SWE — set up the editor, learn one language end-to-end, **build a
   real app first**, and only then deepen into CS fundamentals, data structures, algorithms, and
   systems. A from-scratch learner and a mid-career switcher are both served by this arc.
@@ -161,19 +162,19 @@ The following are **decided** and drive the plan. The residual per-path ordering
 (which shared courses each path omits, exact shipping-first order) are resolved in the manifests
 (tech-docs) rather than re-grilled.
 
-- **DL-1 · Two paths, one shared library.** `software-engineer` (shipping-first) and
-  `job-seeking-software-engineer` (interview-first) share one canonical course library. **Decided.**
+- **DL-1 · Two paths, one shared library.** `fundamentally-strong/software-engineer` (shipping-first) and
+  `job-seeking/software-engineer` (interview-first) share one canonical course library. **Decided.**
 - **DL-2 · Course = building block; path = ordered manifest.** 1 topic = 1 course with a stable ID;
   a path references course IDs in order; zero body duplication, single source of truth. **Decided.**
 - **DL-3 · Omit-or-create semantics.** A path omits a shared course that does not fit, or creates a
   new course (added to the library, available to both). Optional per-path lightweight framing only;
   never a body fork. **Decided.**
-- **DL-4 · Library source.** The 94 existing published `software-engineer` topics + 3 existing
+- **DL-4 · Library source.** The 94 existing published `fundamentally-strong/software-engineer` topics + 3 existing
   capstones (97 existing courses) become canonical courses; the plan's 17 new courses/capstones are
   added; the library retains ALL 114. **Decided.**
-- **DL-5 · Build order.** Deliver the `job-seeking-software-engineer` path FIRST, end-to-end (its
+- **DL-5 · Build order.** Deliver the `job-seeking/software-engineer` path FIRST, end-to-end (its
   Group B re-homes **all ~97 existing courses** into the formal library, per OQ-1, and authors the 17
-  NEW courses/capstones directly); the `software-engineer` shipping-first path follows in Group C as a
+  NEW courses/capstones directly); the `fundamentally-strong/software-engineer` shipping-first path follows in Group C as a
   **zero-new-body** manifest over the same library. **Decided.**
 - **DL-6 · Path-aware navigation = a real ayokoding-www UI change.** Mechanic: single canonical
   course URL + client-side path context (`?path=<path-id>`); prev/next + breadcrumb follow that
@@ -198,18 +199,19 @@ All three open questions were resolved by the maintainer before execution.
   (default confirmed).** Group B re-homes **all ~97 existing courses** into `courses/<course-id>/`
   (the interview-first path spans the whole library, so its delivery re-homes every existing course)
   and authors the 17 NEW courses/capstones directly into `courses/` (never re-homed, since they have
-  no prior home); Group C (software-engineer) then adds **zero new bodies** — it is pure manifest
+  no prior home); Group C (fundamentally-strong/software-engineer) then adds **zero new bodies** — it is pure manifest
   reuse over the already-populated 114-course library, the strongest proof of the shared-library
   architecture.
 - **OQ-2 · Manifest storage form — RESOLVED (changed from default).** Each path manifest is a
-  **standalone data file in the feature** at
-  `apps/ayokoding-www/src/features/course-paths/manifests/<path-id>.yaml`, NOT `courseOrder`
-  frontmatter on a content `_index.md`. The feature core loads the data file; `?path=` selects which
-  manifest is active; prev/next resolves against it. The `syllabus/manifest-<path-id>.md` files are
-  the human-readable mirror; the data file is the machine-consumed source of truth.
-- **OQ-3 · Shipping-first exact ordering — RESOLVED (changed from default).** The software-engineer
+  **standalone data file in the feature** under
+  `apps/ayokoding-www/src/features/course-paths/manifests/` (globbed `manifests/**/*.yaml`, nested to
+  mirror each slash path ID), NOT `courseOrder` frontmatter on a content `_index.md`. The feature core
+  loads the data file; `?path=` selects which manifest is active; prev/next resolves against it. The
+  flat `syllabus/manifest-*.md` files are the human-readable mirror; the data file is the
+  machine-consumed source of truth.
+- **OQ-3 · Shipping-first exact ordering — RESOLVED (changed from default).** The fundamentally-strong/software-engineer
   path does **not** hard-omit the interview courses. It ends with an **optional "ready to job-hunt?"
   bridge tail** linking into the four interview-technique courses + `capstone-interview-loop` — the
-  same shared courses the job-seeking path uses (referenced by ID, zero new bodies) — for an SE-path
+  same shared courses the job-seeking/software-engineer path uses (referenced by ID, zero new bodies) — for an SE-path
   learner who decides to job-hunt. Full order in
-  [syllabus/manifest-software-engineer.md](./syllabus/manifest-software-engineer.md).
+  [syllabus/manifest-fundamentally-strong-software-engineer.md](./syllabus/manifest-fundamentally-strong-software-engineer.md).

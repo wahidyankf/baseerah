@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile → desktop) — Cloud / backend-at-scale sub-phase.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Cloud / scale depth (heavier than the Stage-2 self-hosting on-ramp).
+- `job-seeking/software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile → desktop) — Cloud / backend-at-scale sub-phase.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Cloud / scale depth (heavier than the Stage-2 self-hosting on-ramp).
 
 ---
 

@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — Internals builds.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Internals builds.
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Internals builds.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Internals builds.
 
 ---
 

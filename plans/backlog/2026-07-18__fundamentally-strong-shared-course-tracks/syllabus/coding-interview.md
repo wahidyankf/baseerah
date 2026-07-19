@@ -273,8 +273,8 @@ every concept is exercised by ≥ 1 example.
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 1 · Interview Preparation (through senior).
-- `software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses, RESOLVED
+- `job-seeking/software-engineer` — Phase 1 · Interview Preparation (through senior).
+- `fundamentally-strong/software-engineer` — Optional tail · Ready to job-hunt? (bridge into the interview courses, RESOLVED
   OQ-3).
 
 ---

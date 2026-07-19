@@ -1,16 +1,16 @@
-# Path Manifest — `job-seeking-software-engineer` (interview-first)
+# Path Manifest — `job-seeking/software-engineer` (interview-first)
 
 The **ordered manifest** for the interview-first path: an ordered list of **course IDs** over the
 [shared course library](./README.md). This is the authoritative reading order for this path; a course
-page under `?path=job-seeking-software-engineer` follows it for prev/next + breadcrumb. Delivered
+page under `?path=job-seeking/software-engineer` follows it for prev/next + breadcrumb. Delivered
 **first** (Group B). Persona: an **experienced engineer re-entering the job market**.
 
 This file is the **human-readable mirror** of the manifest. The **machine-consumed source of truth**
 is the standalone data file
-`apps/ayokoding-www/src/features/course-paths/manifests/job-seeking-software-engineer.yaml` (RESOLVED,
+`apps/ayokoding-www/src/features/course-paths/manifests/job-seeking/software-engineer.yaml` (RESOLVED,
 OQ-2 — a standalone YAML/JSON data file in the `course-paths` feature, NOT `courseOrder` frontmatter on
 any `_index.md`). Order rationale:
-[tech-docs §Path `job-seeking-software-engineer`](../tech-docs.md#path-job-seeking-software-engineer-interview-first).
+[tech-docs §Path `job-seeking/software-engineer`](../tech-docs.md#path-job-seekingsoftware-engineer-interview-first).
 
 ## Prologue · Editor Foundations (skippable for the experienced)
 

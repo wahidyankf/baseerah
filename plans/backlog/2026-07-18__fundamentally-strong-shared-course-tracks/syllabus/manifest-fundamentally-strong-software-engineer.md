@@ -1,17 +1,17 @@
-# Path Manifest — `software-engineer` (shipping-first)
+# Path Manifest — `fundamentally-strong/software-engineer` (shipping-first)
 
 The **ordered manifest** for the shipping-first path: an ordered list of **course IDs** over the
 [shared course library](./README.md). This is the authoritative reading order for this path; a course
-page under `?path=software-engineer` follows it for prev/next + breadcrumb. Delivered **second**
+page under `?path=fundamentally-strong/software-engineer` follows it for prev/next + breadcrumb. Delivered **second**
 (Group C), **reusing the same course bodies reordered** — zero body duplication. Persona: a **builder
 who wants to be effective fast** ("immediately effective", then go deep).
 
 This file is the **human-readable mirror** of the manifest. The **machine-consumed source of truth**
 is the standalone data file
-`apps/ayokoding-www/src/features/course-paths/manifests/software-engineer.yaml` (RESOLVED, OQ-2 — a
-standalone YAML/JSON data file in the `course-paths` feature, NOT `courseOrder` frontmatter on any
-`_index.md`). Order rationale:
-[tech-docs §Path `software-engineer`](../tech-docs.md#path-software-engineer-shipping-first).
+`apps/ayokoding-www/src/features/course-paths/manifests/fundamentally-strong/software-engineer.yaml`
+(RESOLVED, OQ-2 — a standalone YAML/JSON data file in the `course-paths` feature, NOT `courseOrder`
+frontmatter on any `_index.md`). Order rationale:
+[tech-docs §Path `fundamentally-strong/software-engineer`](../tech-docs.md#path-fundamentally-strongsoftware-engineer-shipping-first).
 
 ## Course selection for this path (RESOLVED, OQ-3)
 
@@ -185,9 +185,9 @@ Quality / product / delivery:
 ## Optional tail · Ready to job-hunt? (bridge into the interview courses, RESOLVED OQ-3)
 
 An **opt-in** tail for a shipping-first learner who decides to pursue a job. It references the **same
-shared courses** the `job-seeking-software-engineer` path uses — **by ID, zero new bodies** — so the
+shared courses** the `job-seeking/software-engineer` path uses — **by ID, zero new bodies** — so the
 learner flows straight into interview prep without leaving the path or duplicating content. The path
-landing marks this section clearly optional; links carry `?path=software-engineer`.
+landing marks this section clearly optional; links carry `?path=fundamentally-strong/software-engineer`.
 
 1. `coding-interview`
 2. `take-home-and-live-coding`
@@ -195,7 +195,7 @@ landing marks this section clearly optional; links carry `?path=software-enginee
 4. `behavioral-and-leadership-interviews`
 5. `capstone-interview-loop` — the full mock-loop capstone
 
-> These five appear in **both** manifests (interview-first arc for `job-seeking-software-engineer`,
+> These five appear in **both** manifests (interview-first arc for `job-seeking/software-engineer`,
 > optional job-hunt tail here). Both reference them by course ID — one canonical body, two orderings.
 
 ## Smoothness notes (RD-16)

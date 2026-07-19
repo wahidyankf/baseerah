@@ -280,8 +280,8 @@ logs. Wazuh XML is the worked example; each also notes the portable (Sigma-style
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 3 · Deepening (shallow → deep) — Security suite.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
+- `job-seeking/software-engineer` — Phase 3 · Deepening (shallow → deep) — Security suite.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) —
   Security suite.
 
 ---

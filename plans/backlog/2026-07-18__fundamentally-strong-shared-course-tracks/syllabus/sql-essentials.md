@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 1 · Interview Preparation (through senior).
-- `software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the "immediately effective" payoff).
+- `job-seeking/software-engineer` — Phase 1 · Interview Preparation (through senior).
+- `fundamentally-strong/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the "immediately effective" payoff).
 
 ---
 

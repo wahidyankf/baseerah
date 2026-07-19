@@ -6,8 +6,8 @@ This plan has two technical halves:
 
 1. **A content-architecture change** — turn the existing single-order "Fundamentally Strong"
    section into a **shared course library** (one canonical body per course, keyed by a stable
-   course ID) plus **two path manifests** (`software-engineer` shipping-first,
-   `job-seeking-software-engineer` interview-first) that each reference course IDs in a chosen order.
+   course ID) plus **two path manifests** (`fundamentally-strong/software-engineer` shipping-first,
+   `job-seeking/software-engineer` interview-first) that each reference course IDs in a chosen order.
    This includes authoring **fourteen NEW courses + three NEW capstones** and re-homing the existing
    published topics into a path-neutral `courses/` home with redirects.
 2. **A real ayokoding-www frontend change** — a `course-paths` feature that carries a client-side
@@ -35,29 +35,32 @@ UI-design-funnel lives in [prd.md](./prd.md#ui-design-funnel-path-aware-navigati
 
 ### Canonical course home + URL
 
-- **Home**: `apps/ayokoding-www/content/en/learn/fundamentally-strong/courses/<course-id>/`.
+- **Home**: `apps/ayokoding-www/content/en/courses/<course-id>/`.
 - **URL**: the app maps a content slug to `/{locale}/c/<slug>` [Repo-grounded —
   `apps/ayokoding-www/src/features/content/core/content-url.ts`], so a course resolves at
-  `/{locale}/c/learn/fundamentally-strong/courses/<course-id>` — surfaced in prose as
-  `/fundamentally-strong/courses/<course-id>`.
+  `/{locale}/c/courses/<course-id>` — surfaced in prose as
+  `/en/courses/<course-id>`.
 - **Migration**: existing bundles live at `.../fundamentally-strong/software-engineer/<slug>/` today
-  [Repo-grounded]. Re-homing each into `courses/<course-id>/` is a `git mv` of the folder plus a
-  redirect from the old URL (see [Redirects](#redirects)). The `software-engineer` name is freed to
-  become a **path ID**, so there is no folder/path name clash.
+  [Repo-grounded]. Re-homing each into the top-level `courses/<course-id>/` is a `git mv` of the folder
+  plus a redirect from the old URL (see [Redirects](#redirects)). The old `software-engineer/` section
+  name is freed, so the slash-form path IDs (`fundamentally-strong/software-engineer`,
+  `job-seeking/software-engineer`) never clash with a course folder name.
 
 ### Path = ordered manifest (manifest format)
 
 - A **path** (track) is a manifest: a **path ID**, a display **title**, a **description**, and an
   ordered **`courseOrder`** list of course IDs.
-- **Storage (RESOLVED, OQ-2)**: each manifest is a **standalone data file in the feature** at
-  `apps/ayokoding-www/src/features/course-paths/manifests/<path-id>.yaml`. This data file is the
+- **Storage (RESOLVED, OQ-2)**: each manifest is a **standalone data file in the feature** under
+  `apps/ayokoding-www/src/features/course-paths/manifests/` (the loader globs `manifests/**/*.yaml`; a
+  slash in a path ID becomes a nested directory, e.g.
+  `manifests/fundamentally-strong/software-engineer.yaml`). This data file is the
   **single machine-consumed source of truth** for the path — it is NOT stored as `courseOrder`
   frontmatter on any content `_index.md`. The path landing page renders _from_ this loaded manifest
   (see [Path landing + paths hub](#path-landing--paths-hub)):
 
   ```yaml
-  # apps/ayokoding-www/src/features/course-paths/manifests/job-seeking-software-engineer.yaml
-  pathId: job-seeking-software-engineer
+  # apps/ayokoding-www/src/features/course-paths/manifests/job-seeking/software-engineer.yaml
+  pathId: job-seeking/software-engineer
   title: "Job-Seeking Software Engineer"
   description: "Interview-first track for an experienced engineer re-entering the job market."
   courseOrder:
@@ -69,10 +72,11 @@ UI-design-funnel lives in [prd.md](./prd.md#ui-design-funnel-path-aware-navigati
     # … ordered course IDs …
   ```
 
-- **Human-readable mirror**: `syllabus/manifest-<path-id>.md` in this plan folder is the
-  human-readable ordering used during authoring/review. The machine-consumed source of truth is the
-  `manifests/<path-id>.yaml` data file above; the syllabus markdown is a documentation mirror, not
-  what the app loads.
+- **Human-readable mirror**: the flat `syllabus/manifest-*.md` files in this plan folder (the slash in
+  a path ID is flattened to a hyphen for the flat filename — `manifest-fundamentally-strong-software-engineer.md`,
+  `manifest-job-seeking-software-engineer.md`) are the human-readable orderings used during
+  authoring/review. The machine-consumed source of truth is the nested `manifests/**/*.yaml` data file
+  above; the syllabus markdown is a documentation mirror, not what the app loads.
 - **Course reference**: each `courseOrder` entry is a course ID string, optionally a mapping
   `{ id, framing?: { intro?, outro? } }` when the path adds a **lightweight per-course framing**
   callout (DL-3). The framing is rendered by the path layer around the shared body; the body itself
@@ -116,8 +120,8 @@ apps/ayokoding-www/src/features/course-paths/
 │   ├── path-context.ts        # parsePathContext(searchParams, manifests) -> pathId | null (validate)
 │   └── path-nav.test.ts       # unit tests for the pure resolver + context parser
 └── shell/                     # IO / React
-    ├── manifest-repository.ts # load manifests/*.yaml data files into PathManifest[] (fs)
-    ├── manifests/             # SOURCE OF TRUTH — one <path-id>.yaml manifest data file per path
+    ├── manifest-repository.ts # load manifests/**/*.yaml data files into PathManifest[] (fs)
+    ├── manifests/             # SOURCE OF TRUTH — one manifest data file per path (slash path ID → nested dir)
     ├── path-landing.tsx       # renders a path landing page from a manifest (ordered course list)
     ├── path-banner.tsx        # in-path affordance on a course page (path name + position + a11y)
     └── path-course-links.tsx  # "this course is part of: [path A] [path B]" affordance
@@ -129,7 +133,7 @@ apps/ayokoding-www/src/features/course-paths/
 - **`parsePathContext(searchParams, manifests)`** (pure, core): reads the `path` search param;
   returns the matching `pathId` only when it names a loaded manifest, else `null` (graceful
   fallback). This is the validation gate against invalid/renamed path IDs.
-- **`manifest-repository.ts`** (shell): reads each `manifests/<path-id>.yaml` data file, parses it,
+- **`manifest-repository.ts`** (shell): globs each `manifests/**/*.yaml` data file, parses it,
   and validates it through the `schemas.ts` zod schema into a `PathManifest`; manifests are cached in
   the content index alongside `trees`/`prevNext` [Repo-grounded — `ContentIndex` in
   `apps/ayokoding-www/src/features/content/core/types.ts`]. The `?path=` param selects which loaded
@@ -137,7 +141,7 @@ apps/ayokoding-www/src/features/course-paths/
 
 ### Routing + path context propagation
 
-- **Course pages** stay at their canonical `/{locale}/c/learn/fundamentally-strong/courses/<course-id>`
+- **Course pages** stay at their canonical `/{locale}/c/courses/<course-id>`
   URL; **path context rides in the `?path=<path-id>` query param**, never in the path segment. One
   canonical URL per course; the param is additive and shareable.
 - **`c/[...slug]/page.tsx`** [Repo-grounded] reads `searchParams.path`, calls
@@ -159,8 +163,9 @@ apps/ayokoding-www/src/features/course-paths/
 
 ### Breadcrumb
 
-- **With path context**: `Home / Fundamentally Strong / <Path Title> / <Course Title>` — the path
-  crumb links to the path landing page (carrying `?path=`).
+- **With path context**: `Home / <Path Title> / <Course Title>` — the path crumb links to the path
+  landing page `/en/path/<path-id>` (carrying `?path=`). The old middle "Fundamentally Strong" crumb is
+  dropped; the active Path Title stands in.
 - **Without path context**: the existing content-tree breadcrumb, unchanged
   [Repo-grounded — `apps/ayokoding-www/src/app/[locale]/(content)/c/[...slug]/page.tsx buildBreadcrumbs`].
 
@@ -176,13 +181,14 @@ apps/ayokoding-www/src/features/course-paths/
 
 ### Path landing + paths hub
 
-- **Path landing** (`paths/<path-id>/_index.md` route rendered by `path-landing.tsx`): the thin
-  content `_index.md` supplies only the landing prose/SEO anchor; the ordered course list is rendered
-  **from the loaded `manifests/<path-id>.yaml` manifest** (grouped by the path's phase headings), each
-  course link carrying `?path=`. Ordering never lives in the `_index.md` frontmatter.
-- **Paths hub** (`fundamentally-strong/paths/_index.md` or the `fundamentally-strong/_index.md`
-  landing): a "choose your path" screen with the two path cards, each card built from a loaded
-  manifest (title + description + course count). Design in the funnel (prd).
+- **Path landing** (`path/<path-id>/_index.md` route rendered by `path-landing.tsx`, surfaced at
+  `/en/path/<path-id>`): the thin content `_index.md` supplies only the landing prose/SEO anchor; the
+  ordered course list is rendered from the loaded manifest data file (`manifests/**/*.yaml`, grouped by
+  the path's phase headings), each course link carrying `?path=`. Ordering never lives in the
+  `_index.md` frontmatter.
+- **Paths hub** (`content/en/path/_index.md`, surfaced `/en/path`): a "choose your path" screen with
+  the two path cards, each card built from a loaded manifest (title + description + course count).
+  Design in the funnel (prd).
 
 ### Accessibility
 
@@ -194,8 +200,8 @@ apps/ayokoding-www/src/features/course-paths/
 
 ### Redirects
 
-Old `.../fundamentally-strong/software-engineer/<topic>` URLs redirect to
-`.../fundamentally-strong/courses/<course-id>` via the app's redirect layer
+Old `.../fundamentally-strong/software-engineer/<topic>` URLs redirect to the new canonical
+`/en/courses/<course-id>` via the app's redirect layer
 [Repo-grounded — `apps/ayokoding-www/src/redirects/`; precedent
 `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/learn-reorg-redirects.feature`]. One
 redirect per re-homed course; verified by the redirect specs + an e2e test.
@@ -205,7 +211,7 @@ redirect per re-homed course; verified by the redirect specs + an e2e test.
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC — WCAG-AA, CB-friendly.
 flowchart TD
-    REQ["Course page request<br/>/c/…/courses/&lt;id&gt;?path=&lt;p&gt;"]:::blue
+    REQ["Course page request<br/>/en/courses/&lt;id&gt;?path=&lt;p&gt;"]:::blue
     CTX["parsePathContext<br/>(core, pure)"]:::teal
     VALID{"valid path<br/>&amp; course in manifest?"}:::orange
     NAVP["resolvePathNav<br/>(manifest order)"]:::teal
@@ -231,7 +237,7 @@ test-first:
 - **Unit** (`test:unit`, pure core): `resolvePathNav` (prev/next at boundaries, missing course),
   `parsePathContext` (valid/invalid/missing param), manifest schema validation, `contentUrl` with
   `pathId`.
-- **Integration** (`test:integration`): the manifest repository loads `manifests/*.yaml` data files
+- **Integration** (`test:integration`): the manifest repository loads `manifests/**/*.yaml` data files
   into a validated `PathManifest[]`; the content service resolves a course + active path into
   path-aware prev/next; redirect resolution old-URL → new-URL.
 - **E2E** (`test:e2e`, Playwright): from a path landing page, walk the course order via prev/next
@@ -429,12 +435,12 @@ re-verified absent 2026-07-18].
 Each manifest is the **authoritative order** for one path. Both reference the same course IDs; a
 course listed in both appears **once** in the library. A manifest **omits** courses that do not fit;
 either path may **create** a new course (added to the catalog, available to both). The manifests are
-authored as standalone data files at
-`apps/ayokoding-www/src/features/course-paths/manifests/<path-id>.yaml` (RESOLVED, OQ-2) — the
-machine-consumed source of truth — with `syllabus/manifest-<path-id>.md` in this plan folder as the
-human-readable mirror.
+authored as standalone data files under
+`apps/ayokoding-www/src/features/course-paths/manifests/` (globbed `manifests/**/*.yaml`, nested to
+mirror each slash path ID) (RESOLVED, OQ-2) — the machine-consumed source of truth — with the flat
+`syllabus/manifest-*.md` mirrors in this plan folder as the human-readable mirror.
 
-### Path `job-seeking-software-engineer` (interview-first)
+### Path `job-seeking/software-engineer` (interview-first)
 
 The interview-first arc for an experienced re-entrant: **Editor Foundations → Interview Preparation →
 Multi-Platform Productivity → Deepening**. Delivered **first** (Group B).
@@ -465,7 +471,7 @@ Multi-Platform Productivity → Deepening**. Delivered **first** (Group B).
 This ordering is the interview-first arc the prior draft of this plan validated for smoothness; the
 full per-course list (with prereq-chaining + phase-boundary bridges) is the syllabus manifest file.
 
-### Path `software-engineer` (shipping-first)
+### Path `fundamentally-strong/software-engineer` (shipping-first)
 
 The "immediately effective" arc: **Editor & tooling → one language end-to-end → BUILD A REAL APP
 FIRST → THEN CS fundamentals / DS&A / algorithms / systems depth**. Delivered **second** (Group C),
@@ -493,17 +499,17 @@ reusing the same courses reordered — zero body duplication.
   the remaining platform courses (mobile/desktop) and `backend-at-scale` / `containers-and-orchestration`
   / `cloud-and-iac` / `build-automation-and-task-runners`.
 
-**Optional job-hunt bridge for the software-engineer path (RESOLVED, OQ-3)**: the shipping-first path
+**Optional job-hunt bridge for the `fundamentally-strong/software-engineer` path (RESOLVED, OQ-3)**: the shipping-first path
 does **not** hard-omit the interview-technique courses. It keeps the underlying DS&A, OOP, and
 system-design **depth** courses inline (general SWE skill), and **ends with an optional "ready to
 job-hunt?" bridge tail** — an opt-in section linking into the four interview-technique courses
 (`coding-interview`, `take-home-and-live-coding`, `system-design-interview`,
 `behavioral-and-leadership-interviews`) plus `capstone-interview-loop`. These are the **same shared
-courses** the `job-seeking-software-engineer` path uses (referenced by ID, zero new bodies); the
-bridge simply appends them to the software-engineer manifest's `courseOrder` under a clearly-labelled
-optional tail, so an SE-path learner who decides to job-hunt flows straight into the interview
-material. The full proposed per-course order, including the bridge tail, is in
-[syllabus/manifest-software-engineer.md](./syllabus/manifest-software-engineer.md).
+courses** the `job-seeking/software-engineer` path uses (referenced by ID, zero new bodies); the
+bridge simply appends them to the `fundamentally-strong/software-engineer` manifest's `courseOrder`
+under a clearly-labelled optional tail, so an SE-path learner who decides to job-hunt flows straight
+into the interview material. The full proposed per-course order, including the bridge tail, is in
+[syllabus/manifest-fundamentally-strong-software-engineer.md](./syllabus/manifest-fundamentally-strong-software-engineer.md).
 
 ## Design Decisions
 
@@ -512,8 +518,9 @@ material. The full proposed per-course order, including the bridge tail, is in
   order to the manifest is what enables the shared library. The body keeps a `weight` only for the
   canonical (no-path) sidebar/prev-next fallback and the library catalog sort.
 - **RD-2 · One canonical body + URL per course; re-home with redirects.** Existing bodies move from
-  `software-engineer/<slug>/` to `courses/<course-id>/`; old URLs redirect. Rationale: frees the
-  `software-engineer` name to be a path ID and gives every course one path-neutral home.
+  `software-engineer/<slug>/` to the top-level `courses/<course-id>/`; old URLs redirect. Rationale:
+  frees the old `software-engineer/` section name for the slash-form path IDs and gives every course
+  one path-neutral home.
 - **RD-3 · Path-aware nav via `?path=` client context, not per-path URLs.** A course has exactly one
   URL; the active path rides in a query param. Rationale: one canonical URL (no duplicate content /
   SEO split), shareable, with a clean fallback when the param is absent.
@@ -570,7 +577,7 @@ the four levers:
 4. **Refresh vs first-learn register** — the interview path's technique modules re-ground a working
    engineer; the shipping-first path uses the normal first-learn By-Example register.
 
-A **per-path smoothness-review gate** (Group B for job-seeking, Group C for software-engineer)
+A **per-path smoothness-review gate** (Group B for job-seeking/software-engineer, Group C for fundamentally-strong/software-engineer)
 re-verifies all four levers in the landed manifest + bodies before archival, so smoothness cannot
 silently regress. The inherited interview-first findings (SF-1/SF-2, C-1/C-2) and their in-place
 soften/bridge remediations carry over from the prior draft.
@@ -610,19 +617,19 @@ verified `wazuh` target.
 
 ## File Impact (by delivery group)
 
-`<COURSES>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/courses/`;
-`<PATHS>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/paths/`;
+`<COURSES>` = `apps/ayokoding-www/content/en/courses/`;
+`<PATHS>` = `apps/ayokoding-www/content/en/path/`;
 `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/`;
 `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`.
 
-| Group | Target                    | Change                           | Files                                                                                                                                                                                                                                                                                                         |
-| ----- | ------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A     | nav feature               | New app code (TDD)               | `<FEAT>core/{schemas,manifest,path-nav,path-context}.ts` + tests; `<FEAT>shell/{manifest-repository,path-landing,path-banner,path-course-links}.tsx`; edits to `content-url.ts`, `prev-next.tsx`, `breadcrumb.tsx`, `c/[...slug]/page.tsx`                                                                    |
-| A     | specs + redirects         | New Gherkin + redirect config    | `<SPECS>*.feature` + `README.md`; `apps/ayokoding-www/src/redirects/` entries for re-homed courses                                                                                                                                                                                                            |
-| A     | library + paths homes     | New content scaffolding          | `<COURSES>_index.md` (library landing); `<PATHS>_index.md` (paths hub / choose-a-path)                                                                                                                                                                                                                        |
-| B     | job-seeking path          | Re-home + new courses + manifest | `git mv` the shared subset into `<COURSES><id>/` (+ redirects); author the 14 NEW course bundles + 3 NEW capstones into `<COURSES>`; author `<FEAT>manifests/job-seeking-software-engineer.yaml` (manifest data file, source of truth) + thin `<PATHS>job-seeking-software-engineer/_index.md` landing anchor |
-| C     | software-engineer path    | Re-home remainder + manifest     | `git mv` the remaining shared courses into `<COURSES><id>/` (+ redirects); any shipping-first-only NEW course; author `<FEAT>manifests/software-engineer.yaml` (manifest data file, incl. optional job-hunt bridge tail) + thin `<PATHS>software-engineer/_index.md` landing anchor                           |
-| Final | verify / retest / archive | plan-side + evidence             | `evidence/…`; `learnings.md` triage; `git mv` plan → `plans/done/…`; README updates                                                                                                                                                                                                                           |
+| Group | Target                                 | Change                           | Files                                                                                                                                                                                                                                                                                                                         |
+| ----- | -------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A     | nav feature                            | New app code (TDD)               | `<FEAT>core/{schemas,manifest,path-nav,path-context}.ts` + tests; `<FEAT>shell/{manifest-repository,path-landing,path-banner,path-course-links}.tsx`; edits to `content-url.ts`, `prev-next.tsx`, `breadcrumb.tsx`, `c/[...slug]/page.tsx`                                                                                    |
+| A     | specs + redirects                      | New Gherkin + redirect config    | `<SPECS>*.feature` + `README.md`; `apps/ayokoding-www/src/redirects/` entries for re-homed courses                                                                                                                                                                                                                            |
+| A     | library + paths homes                  | New content scaffolding          | `<COURSES>_index.md` (library landing); `<PATHS>_index.md` (paths hub / choose-a-path)                                                                                                                                                                                                                                        |
+| B     | job-seeking/software-engineer          | Re-home + new courses + manifest | `git mv` the shared subset into `<COURSES><id>/` (+ redirects); author the 14 NEW course bundles + 3 NEW capstones into `<COURSES>`; author `<FEAT>manifests/job-seeking/software-engineer.yaml` (manifest data file, source of truth) + thin `<PATHS>job-seeking/software-engineer/_index.md` landing anchor                 |
+| C     | fundamentally-strong/software-engineer | Re-home remainder + manifest     | `git mv` the remaining shared courses into `<COURSES><id>/` (+ redirects); any shipping-first-only NEW course; author `<FEAT>manifests/fundamentally-strong/software-engineer.yaml` (manifest data file, incl. optional job-hunt bridge tail) + thin `<PATHS>fundamentally-strong/software-engineer/_index.md` landing anchor |
+| Final | verify / retest / archive              | plan-side + evidence             | `evidence/…`; `learnings.md` triage; `git mv` plan → `plans/done/…`; README updates                                                                                                                                                                                                                                           |
 
 **Net authored surface**: the `course-paths` feature (new app code) + 14 new course bundles + 3 new
 capstone bundles + 2 path manifests + the library/paths landing pages. Existing bodies are **moved**

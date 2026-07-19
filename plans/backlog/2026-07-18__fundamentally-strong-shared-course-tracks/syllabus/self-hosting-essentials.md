@@ -252,9 +252,9 @@ Contiguous `ex-01..ex-46`. Every example cites the `co-NN` it exercises.
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile →
+- `job-seeking/software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile →
   desktop) — Cloud / backend-at-scale sub-phase.
-- `software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the
+- `fundamentally-strong/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the
   "immediately effective" payoff).
 
 ---

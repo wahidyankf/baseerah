@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile → desktop) — Web sub-phase.
-- `software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Networking & data depth.
+- `job-seeking/software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile → desktop) — Web sub-phase.
+- `fundamentally-strong/software-engineer` — Stage 4 · Systems, data, architecture, security & ops depth (shallow → deep) — Networking & data depth.
 
 ---
 

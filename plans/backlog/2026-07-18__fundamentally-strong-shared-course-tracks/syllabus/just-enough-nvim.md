@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Prologue · Editor Foundations (skippable for the experienced).
-- `software-engineer` — Stage 1 · Editor & tooling (get set up fast).
+- `job-seeking/software-engineer` — Prologue · Editor Foundations (skippable for the experienced).
+- `fundamentally-strong/software-engineer` — Stage 1 · Editor & tooling (get set up fast).
 
 ---
 

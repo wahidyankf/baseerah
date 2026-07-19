@@ -80,9 +80,9 @@ Runnable end-to-end (full vertical slice, deployed to a reachable HTTPS URL) + w
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile →
+- `job-seeking/software-engineer` — Phase 2 · Multi-Platform Productivity (web → cloud → mobile →
   desktop) — Desktop sub-phase.
-- `software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the
+- `fundamentally-strong/software-engineer` — Stage 2 · One language end-to-end, then BUILD A REAL APP FIRST (the
   "immediately effective" payoff).
 
 ---

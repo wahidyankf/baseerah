@@ -22,8 +22,8 @@ summary are listed there verbatim).
 
 ## In which paths
 
-- `job-seeking-software-engineer` — Phase 1 · Interview Preparation (through senior).
-- `software-engineer` — Stage 1 · Editor & tooling (get set up fast).
+- `job-seeking/software-engineer` — Phase 1 · Interview Preparation (through senior).
+- `fundamentally-strong/software-engineer` — Stage 1 · Editor & tooling (get set up fast).
 
 ---
 
