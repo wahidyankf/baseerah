@@ -6326,30 +6326,30 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
 Junction: Topics 19–33 (CS depth + OO design + FP + concurrency + advanced SQL + practices + management). Inter-Topic Capstone Phase Template; spec in
 `syllabus/33-engineering-management.md` (Pass-2 capstone section).
 
-- [ ] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
+- [x] **[AI] V** — `web-researcher` confirms any versions/APIs this capstone reuses are still current and
       CVE-clean at build time; fold any updates into the spec. **Acceptance**: versions confirmed or updated
       in the spec.
-- [ ] **[AI] A** — Author `CONTENT/capstone-solid-core/` (`_index.md` `weight: 435`, + `code/`) per the cited capstone
+- [x] **[AI] A** — Author `CONTENT/capstone-solid-core/` (`_index.md` `weight: 435`, + `code/`) per the cited capstone
       spec's ordered steps (detail source: [`syllabus/33-engineering-management.md`](./syllabus/33-engineering-management.md)). **Acceptance**: the
       spec's done bar is met — a clean-machine reader reproduces it end-to-end.
-- [ ] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
+- [x] **[AI] Check/Fact/Build** — the matching format checker + `apps-ayokoding-www-facts-checker` +
       `apps-ayokoding-www-link-checker` clean (resolve via the fixers); `npx nx run ayokoding-www:build` +
       `npm run lint:md` exit 0. **Acceptance**: zero unresolved HIGH/CRITICAL, zero factual findings, both
       commands exit 0.
 
 ### Phase 37 Gate
 
-- [ ] [AI] `capstone-solid-core/` complete (wt 435, runnable end-to-end + web-verified); checker +
+- [x] [AI] `capstone-solid-core/` complete (wt 435, runnable end-to-end + web-verified); checker +
       facts-checker clean; build + `lint:md` exit 0.
 
-- [ ] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
+- [x] **[AI]** Sync the shared worktree to latest `origin/main`, branch for this phase (`git fetch
 origin && git checkout main && git pull && git checkout -b
 fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, then stage only this
       phase's paths (`git add <explicit paths>` — never `git add -A`), commit with a Conventional Commit
       message (`Co-Authored-By` trailer per repo policy), push the branch, and open a **draft PR** against
       `main` (`gh pr create --draft --base main ...`). **Acceptance**: branch created from latest `main`;
       draft PR open carrying this phase's commit; CI running on the PR.
-- [ ] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
+- [x] **[AI]** Run the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3
       sequential CI-gated cycles per
       [pr-review-quality-gate.md](../../../repo-governance/workflows/pr/pr-review-quality-gate.md))
       against the open PR, then flip it from draft to ready for review (`gh pr ready`) once the
@@ -6357,7 +6357,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       green locally and in CI). This wait happens **in parallel with authoring the next phase** (see
       Parallelization Model) — never block starting the next phase's branch on this. **Acceptance**: PR
       marked ready for review; all CI checks green; no unresolved review threads.
-- [ ] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
+- [x] **[AI]** Merge the PR once all quality gates are green (typecheck, lint, test:quick,
       specs:coverage, CI, the 3-cycle review). **DEVIATION FROM STANDING POLICY**: the repo's
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) normally
       requires per-instance `[HUMAN]` approval before every merge, with no blanket carve-out. For this
@@ -6366,7 +6366,7 @@ fundamentally-strong-software-engineer/<phase-slug>`), do this phase's work, the
       deliberate, plan-scoped override of the general rule, not a repo-wide change to
       `pr-merge-protocol.md` itself. **Acceptance**: PR merged into `main`; all gates were green at
       merge time.
-- [ ] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
+- [x] **[AI]** Once the PR is merged, dispatch `apps-ayokoding-www-deployer` to deploy ayokoding-www to
       the `prod-ayokoding-www` environment branch (Vercel auto-builds on push). **Acceptance**:
       `prod-ayokoding-www` is force-pushed to (at least) this phase's merge commit — each phase reaches
       production as it completes.
