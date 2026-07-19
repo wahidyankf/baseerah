@@ -724,7 +724,13 @@ immediately before "Plan Archival"; see the
 
 Create `learnings.md` in the plan folder (sibling to `delivery.md`) at plan-creation time as the
 transient running log the executor appends to during execution — an entry per generalizable
-learning, sanitized per the secret/sensitivity gate before it is ever written:
+learning, sanitized per the secret/sensitivity gate before it is ever written.
+
+The file MUST open with an H1 — `# Learnings: <plan-identifier>` (the plan's folder slug) — before
+any entries. markdownlint MD041 requires a top-level heading as the first content line, so a
+scaffold of bare HTML comments fails the pre-commit markdown gate on the plan's first commit.
+
+Entry shape:
 
 ```markdown
 ## Learning: <one-line summary>

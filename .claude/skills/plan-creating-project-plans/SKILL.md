@@ -823,7 +823,14 @@ Knowledge Capture phase itself into every new substantive plan by default.
 ```markdown
 <!-- Knowledge Capture running log — append entries during execution. -->
 <!-- Triage every entry (or record the explicit "none" escape) before archival. -->
+
+# Learnings: <plan-identifier>
 ```
+
+The `# Learnings: <plan-identifier>` H1 is **mandatory**, not decorative: markdownlint MD041 requires
+the first line of content to be a top-level heading, so a scaffold of bare HTML comments fails the
+pre-commit markdown gate the moment the plan folder is first committed. Substitute the plan's own
+folder slug for `<plan-identifier>`.
 
 **Entry shape** (append during execution, the moment something generalizable is noticed — not
 reconstructed from memory at the end):
