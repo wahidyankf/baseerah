@@ -313,17 +313,33 @@ authorizing context, and its explicit non-precedential scope.
       (merge-gate done-definition), `plan/plan-execution.md`, and `plan/plan-planning.md` — acceptance:
       `grep -rnic "\[HUMAN\] merge\|human merge" repo-governance/workflows/pr/pr-review-quality-gate.md repo-governance/workflows/plan/plan-execution.md repo-governance/workflows/plan/plan-planning.md`
       shows every surviving `[HUMAN]`-merge mention rewritten as the explicit opt-in, not the default
-- [ ] [AI] Sweep every remaining hardcoded `[HUMAN]`-merge reference across `repo-governance/**`,
-      `.claude/agents/**`, and `.claude/skills/**`:
-      `grep -rniE "\[HUMAN\][^.]*merge" repo-governance .claude` — rewrite each as opt-in or delete if
-      it merely restated the old default — acceptance: every hit is either an explicit per-plan opt-in
-      or gone; the count is recorded in `learnings.md`
+- [ ] [AI] **Update `AGENTS.md` §Git Workflow §Delivery Mode first** — it is the canonical
+      instruction file and states the default outright: "`worktree-to-pr` (worktree → draft PR →
+      `[HUMAN]` merge — **the default**)" at line 111, plus `main-to-pr`'s "`[HUMAN]` merge" at line
+      113 and "before the human merge" at line 115. Rewrite so `[AI]` merge is the default and
+      `[HUMAN]` is the explicit opt-in — acceptance: <code>grep -cF '`[HUMAN]` merge — \*\*the
+      default\*\*' AGENTS.md</code> returns **0** (returns **1** pre-edit) and
+      <code>grep -cF '`[AI]` merge' AGENTS.md</code> returns **≥1** (returns **0** pre-edit). Both
+      verified live in both directions. **Use `grep -F` on the literal string** — the surrounding
+      backticks are part of the text, and an unescaped `grep -E` pattern silently matches nothing.
+      **Leaving `AGENTS.md` stale would contradict the whole delta at the single most-loaded surface
+      in the repo.**
+- [ ] [AI] Sweep every remaining hardcoded `[HUMAN]`-merge reference across `AGENTS.md`, `CLAUDE.md`,
+      `repo-governance/**`, `.claude/agents/**`, and `.claude/skills/**`:
+      `grep -rniE "\[HUMAN\][^.]*merge" AGENTS.md CLAUDE.md repo-governance .claude` — **46 hits
+      pre-edit** (verified live; note the earlier figure of 44 omitted `AGENTS.md`/`CLAUDE.md`, which
+      is exactly why they are named explicitly here). Rewrite each as an explicit opt-in or delete it
+      where it merely restated the old default — acceptance: every surviving hit is an explicit
+      per-plan opt-in; the before/after counts are recorded in `learnings.md`
 - [ ] [AI] Mark **DD-10 as dissolved-by-Delta-12** in `tech-docs.md` — retained as historical record of
       how the authorization arrived, no longer a deviation, since the default now matches it —
       acceptance:
-      `sed -n '/^### DD-10/,/^### DD-11/p' tech-docs.md | grep -cic "dissolved by Delta 12"` returns ≥1
-      (scoped to DD-10's own section, since Delta 12's prose already contains the word "dissolves"
-      elsewhere in the file — a whole-file grep would pass vacuously)
+      `sed -n '/^- \*\*DD-10/,/^- \*\*DD-11/p' tech-docs.md | grep -ci "dissolved by Delta 12"`
+      returns ≥1. **Scoping rationale**: a whole-file grep would pass vacuously because Delta 12's own
+      prose already contains "dissolves". **Anchor rationale**: DD-10/DD-11 are flat `- **DD-NN`
+      bullets, NOT `### DD-NN` headings — a heading-anchored range matches nothing and could never
+      pass. Verified both directions against the live file: the range extracts a real 13-line block,
+      the grep returns **0** today and **2** against a simulated post-edit copy
 - [ ] [AI] Add the **per-phase-PR + feature-flag + strict 1-PR↔1-worktree** planning-granularity rule
       (Delta 10) to `repo-governance/workflows/plan/plan-planning.md` and cross-reference from
       `repo-governance/conventions/structure/plans.md`: each applicable phase / independent DAG node
@@ -607,9 +623,13 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       neither UI nor API, so record the explicit exemption in the PR description rather than leaving
       it implicit — acceptance: `gh pr view --json mergeStateStatus` shows the branch current and
       mergeable, and the PR body contains the Delta-11 gate line (run-and-resolved, or explicit exempt)
-- [ ] [AI] Merge the ose-public PR to `main` once the hardened preconditions hold (maintainer's standing
-      `[AI]` auto-merge preference for this plan — documented deviation, see **DD-10** in `tech-docs.md`
-      §Design decisions) — acceptance: PR merged
+- [ ] [AI] Merge the ose-public PR to `main` once **all five** hardened preconditions hold —
+      (a) 3 `pr-review-maker`→`pr-review-fixer` cycles complete, (b) **0 CRITICAL + 0 HIGH findings
+      outstanding**, (c) branch up-to-date with latest `origin/main` (non-destructive forward update
+      if behind), (d) all gates green, (e) the Delta-11 surface-conditional tester gates run-and-resolved
+      or explicitly exempted. `[AI]` merges per Delta 12's default (DD-10 records the pre-Delta-12
+      authorization; see its bootstrap-timing note) — acceptance: `gh pr view --json reviewDecision,mergeStateStatus`
+      plus the review-cycle record show all five satisfied, and the PR is merged
 - [ ] [AI] Since `main-ci.yml` is now schedule-only, trigger a confirmation run via
       `gh workflow run main-ci.yml` (or `workflow_dispatch`) and verify green — acceptance: dispatched main-ci run concludes success
 
@@ -685,14 +705,15 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       — acceptance: PR URL returned; PR shows as draft
 - [ ] [AI] Drive PR gates green: `gh pr checks <pr> --watch` (poll every 2 min, never `gh run watch`)
       — acceptance: all required checks report success
-- [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply the hardened merge
-      preconditions (3 cycles + up-to-date with `origin/main` via non-destructive forward update + gates
-      green; **(d) the Delta 11 surface-conditional tester gates have been run and their defect findings
+- [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply **all five** hardened merge
+      preconditions — (a) 3 cycles complete, (b) **0 CRITICAL + 0 HIGH findings outstanding**,
+      (c) up-to-date with `origin/main` via non-destructive forward update, (d) all gates green,
+      (e) **the Delta 11 surface-conditional tester gates have been run and their defect findings
       resolved** — for THIS PR the surface is neither UI nor API, so record the explicit exemption in
-      the PR description rather than leaving it implicit); merge (`[AI]` auto-merge — documented
-      deviation, see **DD-10** in `tech-docs.md` §Design decisions) — acceptance: PR merged; branch was
-      current at merge; the PR body contains the Delta-11 gate line (run-and-resolved, or explicit
-      exempt)
+      the PR description rather than leaving it implicit; then merge (`[AI]` merges per Delta 12's
+      default; DD-10 records the pre-Delta-12 authorization and its bootstrap-timing note) —
+      acceptance: PR merged; **0 CRITICAL + 0 HIGH confirmed outstanding-free**; branch was current at
+      merge; the PR body contains the Delta-11 gate line (run-and-resolved, or explicit exempt)
 
 ### Phase 6 Gate
 
@@ -762,14 +783,15 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       — acceptance: PR URL returned; PR shows as draft
 - [ ] [AI] Drive PR gates green: `gh pr checks <pr> --watch` (poll every 2 min, never `gh run watch`)
       — acceptance: all required checks report success
-- [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply the hardened merge
-      preconditions (3 cycles + up-to-date with `origin/main` via non-destructive forward update + gates
-      green; **(d) the Delta 11 surface-conditional tester gates have been run and their defect findings
+- [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply **all five** hardened merge
+      preconditions — (a) 3 cycles complete, (b) **0 CRITICAL + 0 HIGH findings outstanding**,
+      (c) up-to-date with `origin/main` via non-destructive forward update, (d) all gates green,
+      (e) **the Delta 11 surface-conditional tester gates have been run and their defect findings
       resolved** — for THIS PR the surface is neither UI nor API, so record the explicit exemption in
-      the PR description rather than leaving it implicit); merge (`[AI]` auto-merge — documented
-      deviation, see **DD-10** in `tech-docs.md` §Design decisions) — acceptance: PR merged; branch was
-      current at merge; the PR body contains the Delta-11 gate line (run-and-resolved, or explicit
-      exempt)
+      the PR description rather than leaving it implicit; then merge (`[AI]` merges per Delta 12's
+      default; DD-10 records the pre-Delta-12 authorization and its bootstrap-timing note) —
+      acceptance: PR merged; **0 CRITICAL + 0 HIGH confirmed outstanding-free**; branch was current at
+      merge; the PR body contains the Delta-11 gate line (run-and-resolved, or explicit exempt)
 
 ### Phase 7 Gate
 

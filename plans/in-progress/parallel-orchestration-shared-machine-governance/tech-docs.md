@@ -795,6 +795,14 @@ verbatim excerpts in the "Currency gap to flag" paragraph above.
   unless they carry the same explicit authorization. Applies to: the merge checkboxes in `delivery.md`
   Phase 5, Phase 6, and Phase 7 (each cross-references DD-10), and the `## Delivery Mode:
 worktree-to-pr` declaration at the top of `delivery.md`.
+  **Status: DISSOLVED BY DELTA 12 — bootstrap timing.** Delta 12 makes `[AI]` merge the repo-wide
+  default, so this per-plan exception stops being an exception the moment Phase 4 lands. The two
+  framings are **sequential, not contradictory**: this plan must merge its own Phase 5/6/7 PRs under
+  DD-10's per-plan authorization **because it is the very plan that installs the new default** — the
+  convention change is not yet in force while the plan that delivers it is still executing. Once
+  Phase 4's edit to the Delivery Mode convention lands, DD-10 is redundant with the default and is
+  retained only as the historical record of how the authorization arrived. Any later plan needs no
+  such deviation.
 - **DD-11 (DEVIATION — documented exception): Plan Archival is committed via direct push to `main`
   after all three repos' PRs merge, rather than folded into the delivering PR itself.** Rationale:
   this is a tri-repo-propagation plan whose plan-folder is tracked only in `ose-public`, and its
