@@ -39,14 +39,14 @@ Work happens in `worktrees/doc-command-existence-validation/`; changes land via 
 **Per-phase PR grouping** (each group is one PR from one worktree; PR-4 and PR-5 — Phases 5 and 6 —
 may run in parallel once PR-3, Phase 4, merges):
 
-| PR   | Phases                       | Worktree                                       |
-| ---- | ---------------------------- | ---------------------------------------------- |
-| PR-1 | 0-2 (core + detectors)       | `worktrees/doc-command-existence-validation/`  |
-| PR-2 | 3 (remediation)              | `worktrees/doc-command-existence-remediation/` |
-| PR-3 | 4 (wiring)                   | `worktrees/doc-command-existence-wiring/`      |
-| PR-4 | 5 (ose-primer propagation)   | sibling repo worktree                          |
-| PR-5 | 6 (ose-infra propagation)    | sibling repo worktree                          |
-| PR-6 | 7-8 (verification + capture) | `worktrees/doc-command-existence-verify/`      |
+| PR   | Phases                       | Worktree                                                 |
+| ---- | ---------------------------- | -------------------------------------------------------- |
+| PR-1 | 0-2 (core + detectors)       | `worktrees/doc-command-existence-validation/`            |
+| PR-2 | 3 (remediation)              | `worktrees/doc-command-existence-remediation/`           |
+| PR-3 | 4 (wiring)                   | `worktrees/doc-command-existence-wiring/`                |
+| PR-4 | 5 (ose-primer propagation)   | `ose-primer:worktrees/doc-command-existence-validation/` |
+| PR-5 | 6 (ose-infra propagation)    | `ose-infra:worktrees/doc-command-existence-validation/`  |
+| PR-6 | 7-8 (verification + capture) | `worktrees/doc-command-existence-verify/`                |
 
 Each `*-to-pr` PR runs the **PR-Review Maker→Fixer Cycle** (3 sequential CI-gated
 `pr-review-maker` → `pr-review-fixer` cycles) before the `[HUMAN]` merge. See the
@@ -710,6 +710,8 @@ Scenario: Findings are emitted as machine-readable JSON on request
 
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
       — expected: exits 0, zero findings
+  - _Gherkin (binds) → "The repository corpus is clean after remediation"
+    (`prd.md §Regression guard for the motivating incident`)_
 - [ ] [AI] `npx nx show project rhino-cli --json` cross-checked against every row of the canonical
       targets table in `nx-targets.md` — expected: every listed target resolves
 - [ ] [AI] `sed -n '/Canonical governance and validation targets/,/^\*\*Rule\*\*/p' repo-governance/development/infra/nx-targets.md | grep -cE "specs:domain:coverage|links:validation|mermaid:validation|headings:hierarchy-validation|cross-vendor:parity-validation|harness:bindings-validation"`
@@ -757,6 +759,8 @@ Scenario: Findings are emitted as machine-readable JSON on request
 - [ ] [AI] Verify the hook fires end-to-end by temporarily adding a citation of
       `npx nx run rhino-cli:headings:hierarchy-validation` to a scratch tracked markdown file and
       attempting a push — acceptance: the push is rejected and the finding names the target
+  - _Gherkin (binds) → "Reintroducing an originally-cited nonexistent target is rejected"
+    (`prd.md §Regression guard for the motivating incident`)_
 - [ ] [AI] Remove the scratch citation — acceptance: `git status` shows no scratch file
 - [ ] [AI] Measure the added pre-push cost:
       `time cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done`
@@ -810,10 +814,14 @@ Scenario: Findings are emitted as machine-readable JSON on request
       the LATEST `origin/main`, not a stale local ref)
 - [ ] [AI] Bind `<public>` = the **PR-3 worktree** at
       `/Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring` for every
-      `<public>`-referencing step in Phases 5, 6, and 7. This is the freshest fully-synced `ose-public`
-      checkout by this point (PR-3 has merged), and it is what the byte-identity diffs must compare
-      against — **not** the primary checkout at `/Users/wkf/ose-projects/ose-public`, which may lag
-      behind the merged rhino-cli source this plan just landed — acceptance:
+      `<public>`-referencing step in this phase and Phase 7 (Phase 6 restates this same binding
+      locally, under its own declared "may run in parallel with Phase 5" path). This is the freshest
+      fully-synced `ose-public` checkout by this point (PR-3 has merged), and it is what the
+      byte-identity diffs must compare against — **not** the primary checkout at
+      `/Users/wkf/ose-projects/ose-public`, which may lag behind the merged rhino-cli source this
+      plan just landed. Fetch the primary checkout's own `origin/main` ref before comparing (it may
+      not have been fetched since PR-1/PR-2/PR-3 merged):
+      `git -C /Users/wkf/ose-projects/ose-public fetch origin main` — acceptance:
       `git -C <public> rev-parse HEAD:apps/rhino-cli` equals
       `git -C /Users/wkf/ose-projects/ose-public rev-parse origin/main:apps/rhino-cli` (proves the
       bound checkout carries the merged rhino-cli subtree)
@@ -826,10 +834,11 @@ Scenario: Findings are emitted as machine-readable JSON on request
       `diff -rq --exclude=target --exclude=dist <public>/apps/rhino-cli <primer-worktree>/apps/rhino-cli`
       produces no output. Both `target/` and `dist/` are gitignored and untracked, and since
       `plans/done/2026-07-19__rust-cargo-target-dir-sharing/` merged the same day this plan was
-      authored, `apps/rhino-cli/target` is now a per-repo symlink into
-      `$HOME/.cache/ose-cargo-target/<repo-name>/rhino-cli` — it legitimately differs between
-      `ose-public` and `ose-primer`, so a plain `diff -r` would false-fail. Excluding both matches
-      the idiom established in that sibling plan's `delivery.md`
+      authored, `apps/rhino-cli/target` becomes a per-repo symlink into
+      `$HOME/.cache/ose-cargo-target/<repo-name>/rhino-cli` once `npm run doctor -- --fix` runs (as
+      this phase's own preceding toolchain-init step, above, already does) — post-`doctor`, it
+      legitimately differs between `ose-public` and `ose-primer`, so a plain `diff -r` would
+      false-fail. Excluding both matches the idiom established in that sibling plan's `delivery.md`
 - [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim into `<primer-worktree>` —
       acceptance:
       `diff -r <public>/specs/apps/rhino/behavior/rhino-cli/gherkin <primer-worktree>/specs/apps/rhino/behavior/rhino-cli/gherkin`
@@ -900,6 +909,16 @@ Scenario: Findings are emitted as machine-readable JSON on request
       `git -C <infra-worktree> rev-parse HEAD` equals
       `git -C /Users/wkf/ose-projects/ose-infra rev-parse origin/main` (proves it is branched from
       the LATEST `origin/main`, not a stale local ref)
+- [ ] [AI] Bind `<public>` = the **PR-3 worktree** at
+      `/Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring` for every
+      `<public>`-referencing step in this phase (same binding as Phase 5 — restated here so this
+      phase is self-contained under its own declared "may run in parallel with Phase 5" path, and
+      does not silently depend on a sibling phase's step list). Fetch the primary checkout's own
+      `origin/main` ref before comparing:
+      `git -C /Users/wkf/ose-projects/ose-public fetch origin main` — acceptance:
+      `git -C <public> rev-parse HEAD:apps/rhino-cli` equals
+      `git -C /Users/wkf/ose-projects/ose-public rev-parse origin/main:apps/rhino-cli` (proves the
+      bound checkout carries the merged rhino-cli subtree)
 - [ ] [AI] Set `<infra-worktree>` = `/Users/wkf/ose-projects/ose-infra/worktrees/doc-command-existence-validation`
       for every subsequent step in this phase; run `npm install && npm run doctor -- --fix`
       **inside that worktree** (`cd` into it — do not rely on the shell's inherited working
@@ -909,10 +928,11 @@ Scenario: Findings are emitted as machine-readable JSON on request
       `diff -rq --exclude=target --exclude=dist <public>/apps/rhino-cli <infra-worktree>/apps/rhino-cli`
       produces no output. Both `target/` and `dist/` are gitignored and untracked, and since
       `plans/done/2026-07-19__rust-cargo-target-dir-sharing/` merged the same day this plan was
-      authored, `apps/rhino-cli/target` is now a per-repo symlink into
-      `$HOME/.cache/ose-cargo-target/<repo-name>/rhino-cli` — it legitimately differs between
-      `ose-public` and `ose-infra`, so a plain `diff -r` would false-fail. Excluding both matches
-      the idiom established in that sibling plan's `delivery.md`
+      authored, `apps/rhino-cli/target` becomes a per-repo symlink into
+      `$HOME/.cache/ose-cargo-target/<repo-name>/rhino-cli` once `npm run doctor -- --fix` runs (as
+      this phase's own preceding toolchain-init step, above, already does) — post-`doctor`, it
+      legitimately differs between `ose-public` and `ose-infra`, so a plain `diff -r` would
+      false-fail. Excluding both matches the idiom established in that sibling plan's `delivery.md`
 - [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim into `<infra-worktree>` —
       acceptance:
       `diff -r <public>/specs/apps/rhino/behavior/rhino-cli/gherkin <infra-worktree>/specs/apps/rhino/behavior/rhino-cli/gherkin`
@@ -964,17 +984,33 @@ Scenario: Findings are emitted as machine-readable JSON on request
       **ose-public** = `/Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring`
       (the PR-3 worktree carrying the merged rhino-cli source — the primary checkout may lag);
       **ose-primer** = `/Users/wkf/ose-projects/ose-primer`; **ose-infra** =
-      `/Users/wkf/ose-projects/ose-infra`. The two siblings are **bare** repos, and
-      `git -C <bare-repo> rev-parse HEAD:<path>` resolves correctly against a bare root, so no
-      worktree is required for the SHA plumbing — acceptance: all three
-      `git -C <repo> rev-parse HEAD` invocations succeed and print a commit SHA
-- [ ] [AI] Capture the `apps/rhino-cli` tree SHA in each repo:
-      `git -C <repo> rev-parse HEAD:apps/rhino-cli` for `ose-public`, `ose-primer`, `ose-infra`
+      `/Users/wkf/ose-projects/ose-infra`. The two siblings are **bare** repos whose own `HEAD`
+      resolves to the bare root's **local** `main` branch, not `origin/main` — Phase 5/6's `fetch`
+      calls only ever advance a _worktree's_ ref namespace, never the bare root's own
+      `refs/heads/main`, so a bare-root `HEAD:<path>` read can silently return stale content (the
+      same failure class documented in
+      [Worktree Toolchain Initialization §Absolute Source Paths in Delivery-Checklist Commands](../../../repo-governance/development/workflow/worktree-setup.md#absolute-source-paths-in-delivery-checklist-commands-same-repo-worktree-vs-primary-checkout)).
+      Fetch each bare sibling root's `origin/main` explicitly, immediately before comparing, and
+      read `origin/main:<path>` on the two siblings — never bare `HEAD:<path>`:
+      `git -C /Users/wkf/ose-projects/ose-primer fetch origin main` and
+      `git -C /Users/wkf/ose-projects/ose-infra fetch origin main` — acceptance: both fetches exit
+      0, and `git -C /Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring rev-parse HEAD`,
+      `git -C /Users/wkf/ose-projects/ose-primer rev-parse origin/main`, and
+      `git -C /Users/wkf/ose-projects/ose-infra rev-parse origin/main` each succeed and print a
+      commit SHA
+- [ ] [AI] Capture the `apps/rhino-cli` tree SHA in each repo, reading `origin/main` — never bare
+      `HEAD` — on the two bare sibling roots:
+      `git -C /Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring rev-parse HEAD:apps/rhino-cli`,
+      `git -C /Users/wkf/ose-projects/ose-primer rev-parse origin/main:apps/rhino-cli`,
+      `git -C /Users/wkf/ose-projects/ose-infra rev-parse origin/main:apps/rhino-cli`
       — acceptance: all three SHAs recorded in `learnings.md`
 - [ ] [AI] Assert the three SHAs are identical — acceptance: identical content yields an identical
       tree SHA; any mismatch is a hard stop requiring reconciliation before proceeding
-- [ ] [AI] Capture and compare the Gherkin tree SHA in each repo:
-      `git -C <repo> rev-parse HEAD:specs/apps/rhino/behavior/rhino-cli/gherkin`
+- [ ] [AI] Capture and compare the Gherkin tree SHA in each repo, again reading `origin/main` — never
+      bare `HEAD` — on the two bare sibling roots:
+      `git -C /Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring rev-parse HEAD:specs/apps/rhino/behavior/rhino-cli/gherkin`,
+      `git -C /Users/wkf/ose-projects/ose-primer rev-parse origin/main:specs/apps/rhino/behavior/rhino-cli/gherkin`,
+      `git -C /Users/wkf/ose-projects/ose-infra rev-parse origin/main:specs/apps/rhino/behavior/rhino-cli/gherkin`
       — acceptance: all three SHAs identical
 - [ ] [AI] If any SHA differs, identify the diverging file via
       `diff -r` and reconcile toward the `ose-public` version — acceptance: SHAs converge
