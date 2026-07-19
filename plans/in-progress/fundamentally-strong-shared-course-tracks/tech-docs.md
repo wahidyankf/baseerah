@@ -931,8 +931,13 @@ re-home). No `project.json` target changes; no new npm packages beyond the exist
 - **Tooling**: Next.js build (`nx run ayokoding-www:build`), the three-level test targets
   (`test:unit` / `test:integration` / `test:e2e`) [Repo-grounded — `apps/ayokoding-www/project.json`],
   Playwright MCP for manual verification, the ayokoding maker/checker agents, and the markdown/link/
-  heading validators [Repo-grounded — `rhino-cli:links:validation`,
-  `rhino-cli:headings:hierarchy-validation`].
+  heading validators, which are invoked as **raw cargo commands, not Nx targets** —
+  `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate` and
+  `... -- md heading-hierarchy validate` [Repo-grounded — `apps/rhino-cli/src/cli.rs`; wired into the
+  pre-commit/pre-push hooks and CI per `AGENTS.md` §Markdown Quality]. **There are no
+  `rhino-cli:links:validation` or `rhino-cli:headings:hierarchy-validation` Nx targets** — an earlier
+  revision of this line cited both as `[Repo-grounded]`; neither appears among `project.json`'s real
+  targets. `delivery.md` already used the correct raw-cargo form throughout.
 
 ## Rollback
 

@@ -192,8 +192,15 @@ subagents capped per the orchestration convention). The main thread self-promote
 - [ ] [AI] **Produce hi-fi finalists** — author the 2 `.excalidraw.png` finalists per screen (paths
       hub with **three** path cards, path landing, course-in-path with **prerequisite display**) into
       `assets/` per [prd.md §UI-Design-Funnel](./prd.md#ui-design-funnel-path-aware-navigation-screens)
-      and confirm the embedded `![]()` links resolve — acceptance: `grep -c "excalidraw.png" prd.md` ≥ 6;
-      each selection + rationale present (`grep -c "Selected:" prd.md` ≥ 3).
+      and confirm the embedded `![]()` links resolve — acceptance: **all six files exist on disk** —
+      `for f in paths-hub-option-a paths-hub-option-b path-landing-option-a path-landing-option-b course-path-option-a course-path-option-b; do test -f "assets/$f.excalidraw.png" || echo "MISSING $f"; done`
+      prints nothing (today it prints all six: `assets/` does not exist yet — verified); AND each
+      screen records a selection with rationale (`grep -c "Selected:" prd.md` ≥ 3).
+      **Do not weaken this back to a `grep` over `prd.md`**: the prose already names the six files
+      (`grep -c "excalidraw.png" prd.md` returns **8** and `grep -c "Selected:" prd.md` returns **4**
+      in the current unexecuted state), so a prose-only check is pre-satisfied and can never go
+      false→true as a result of this step's actual work. The artifacts are the deliverable, so the
+      artifacts are what the acceptance must test.
 - [ ] [AI] **Library + paths content homes** — create `<COURSES>_index.md` (library landing, weight +
       title) and `<PATHS>_index.md` (paths hub / choose-a-path landing listing **all three** paths)
       mirroring an existing section `_index.md` — acceptance: `test -f <COURSES>_index.md` and
