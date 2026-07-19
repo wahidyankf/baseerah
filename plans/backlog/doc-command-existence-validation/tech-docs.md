@@ -147,7 +147,11 @@ confidence.
 hosts repo-wide cross-file gates (`md links validate`, `md readme-index validate`,
 `harness duplication validate`) and already invokes `npx nx affected` twice, so the Nx daemon is
 warm by the time this validator runs. [Repo-grounded] `pre-commit` is the wrong home: it runs
-dozens of times a day and is already documented in this repo as flake-prone under parallel load.
+dozens of times a day, and a subprocess-heavy Nx-graph-resolving check added to a hook that fires
+that often is expected to compound existing flakiness under concurrent/parallel hook load in this
+monorepo's toolchain. [Judgment call — no canonical repo doc makes a general "pre-commit is
+flake-prone under parallel load" claim; this is inferred from the hook's invocation frequency, not
+cited from a specific incident record]
 
 ### DD-3 — rhino-cli oracle: clap self-introspection
 

@@ -2,6 +2,12 @@
 
 > **Status**: Backlog — design decisions settled (see
 > [Design Decisions](#design-decisions)); ready for execution.
+>
+> **Naming note**: this folder intentionally omits the `YYYY-MM-DD__` date prefix that the current
+> [Plans Organization Convention](../../../repo-governance/conventions/structure/plans.md) still
+> documents for `backlog/`. The maintainer has directed that date prefixes be dropped from
+> `backlog/` and `in-progress/` (kept only in `done/`); the convention text update is tracked as
+> separate work. Do not "correct" this folder name back to a dated form.
 
 A new `rhino-cli` validator — `md commands validate` — that mechanically detects
 **documentation-cited commands that do not exist**, closing a verified drift gap that produced

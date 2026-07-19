@@ -75,8 +75,12 @@ Each `*-to-pr` PR runs the **PR-Review Maker→Fixer Cycle** (3 sequential CI-ga
 > All checks below must pass before starting Phase 1.
 
 - [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` baseline
-      recorded and every preexisting failure resolved (zero unresolved)
+- [ ] [AI] `npx nx run rhino-cli:test:quick` baseline recorded and every preexisting failure
+      resolved (zero unresolved). This single command satisfies the broader
+      `typecheck lint test:quick specs:behavior:coverage` check: `test:quick`'s `project.json`
+      chain already runs `typecheck` → `lint` → `test:unit` → `test:coverage` → `test:specs`, and
+      `test:specs` in turn runs `specs:structure-validation` and `specs:behavior:coverage`
+      — no separate `npx nx affected -t ...` invocation is needed
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no feature
 > work exists yet. Safe to stop indefinitely. To resume: re-run the baseline command and confirm
@@ -149,11 +153,22 @@ Scenario: The subcommand oracle is derived from the live clap tree rather than a
 - [ ] [AI] **REFACTOR**: replace ad-hoc string keys with newtypes `ProjectName` / `TargetName`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
       — acceptance: all tests still pass
-- [ ] [AI] Add the shell-side snapshot builder invoking `npx nx show projects --json` as a
-      subprocess in `apps/rhino-cli/src/commands/md_validate_commands.rs` _New file_, returning a
-      hard error (never a silent pass) when resolution fails — acceptance: a unit test
-      `nx_resolution_failure_is_hard_error` asserts a `Result::Err` when the subprocess exits
-      nonzero
+- [ ] [AI] **RED**: write a failing test `nx_resolution_failure_is_hard_error` in
+      `apps/rhino-cli/src/commands/md_validate_commands.rs` _New file_ asserting the shell-side
+      snapshot builder returns `Result::Err` when the `npx nx show projects --json` subprocess
+      exits nonzero
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: fails with "cannot find function" (the builder function does not exist yet)
+- [ ] [AI] **GREEN**: implement the shell-side snapshot builder invoking
+      `npx nx show projects --json` as a subprocess in
+      `apps/rhino-cli/src/commands/md_validate_commands.rs`, returning a hard error (never a
+      silent pass) when resolution fails
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: `nx_resolution_failure_is_hard_error` passes; no other test breaks
+- [ ] [AI] **REFACTOR**: extract the subprocess-invocation boilerplate into a small helper shared
+      with the other capability-oracle shell builders in this file
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: all tests still pass
 
 ### npm script oracle (TDD cycle)
 
@@ -502,13 +517,34 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       `cargo run --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --help`
       exits 0 and prints the flag list
 - [ ] [AI] Register the module in `apps/rhino-cli/src/commands.rs` — acceptance: build exits 0
-- [ ] [AI] Add the validator to the aggregate runner in
-      `apps/rhino-cli/src/commands/md_audit.rs` — acceptance: unit test
-      `md_audit_includes_command_existence` passes
+- [ ] [AI] **RED**: write a failing test `md_audit_includes_command_existence` in
+      `apps/rhino-cli/src/commands/md_audit.rs` asserting the aggregate `md audit` run invokes the
+      new command-existence validator
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml md_audit`
+      — acceptance: fails (the validator is not yet wired into the aggregate runner)
+- [ ] [AI] **GREEN**: add the new validator to the aggregate runner in
+      `apps/rhino-cli/src/commands/md_audit.rs`
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml md_audit`
+      — acceptance: `md_audit_includes_command_existence` passes
+- [ ] [AI] **REFACTOR**: align the new validator's aggregation call with the existing sibling
+      validators' call order and formatting in `md_audit.rs`
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml md_audit`
+      — acceptance: all tests still pass
 - [ ] [AI] Add the `commands:validation` target to `apps/rhino-cli/project.json` following the
       `{domain}:{work}` rule — acceptance:
       `npx nx show project rhino-cli --json` lists `commands:validation`
-- [ ] [AI] Implement `--format json` output consistent with sibling validators — acceptance:
+- [ ] [AI] **RED**: write a failing test `format_json_flag_produces_valid_json` in
+      `apps/rhino-cli/src/domain/doc_commands.rs` asserting `--format json` output parses as valid
+      JSON with the expected finding-list shape
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: fails (the `--format json` branch is unimplemented)
+- [ ] [AI] **GREEN**: implement `--format json` output consistent with sibling validators
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: `format_json_flag_produces_valid_json` passes
+- [ ] [AI] **REFACTOR**: share the JSON-serialization shape with the sibling validators'
+      `--format json` implementation to avoid divergence
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: all tests still pass; end-to-end check
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --format json | jq .`
       exits 0
 
@@ -589,8 +625,12 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       `specs:domain:coverage`, `links:validation`, `mermaid:validation`,
       `headings:hierarchy-validation`, `cross-vendor:parity-validation`,
       `harness:bindings-validation`. Do NOT create a replacement "Planned targets" table
-      — acceptance: `grep -cE "specs:domain:coverage|cross-vendor:parity-validation|harness:bindings-validation" repo-governance/development/infra/nx-targets.md`
-      returns 0
+      — acceptance: scoped to the table only (so legitimate mentions elsewhere in the file — e.g.
+      `specs:domain:coverage`, which IS a real target on `organiclever-be`/`ose-be` — cannot mask a
+      leftover row), all six names return 0:
+      `sed -n '/Canonical governance and validation targets/,/\*\*Rule\*\*:/p' repo-governance/development/infra/nx-targets.md | grep -cE "specs:domain:coverage|links:validation|mermaid:validation|headings:hierarchy-validation|cross-vendor:parity-validation|harness:bindings-validation"`
+      returns 0 (the same command returns 6 against the current unfixed file, so it is a real
+      before/after check rather than a vacuous one)
 - [ ] [AI] Verify every remaining row in that table resolves against the live graph by
       cross-checking each against `npx nx show project rhino-cli --json` — acceptance: every listed
       target appears in the resolved target list; no row remains that does not
@@ -619,8 +659,11 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       — expected: exits 0, zero findings
 - [ ] [AI] `npx nx show project rhino-cli --json` cross-checked against every row of the canonical
       targets table in `nx-targets.md` — expected: every listed target resolves
-- [ ] [AI] `grep -cE "specs:domain:coverage|cross-vendor:parity-validation|harness:bindings-validation" repo-governance/development/infra/nx-targets.md`
-      — expected: `0` (the six rows are gone and no planned-targets table reintroduced them)
+- [ ] [AI] `sed -n '/Canonical governance and validation targets/,/^\*\*Rule\*\*/p' repo-governance/development/infra/nx-targets.md | grep -cE "specs:domain:coverage|links:validation|mermaid:validation|headings:hierarchy-validation|cross-vendor:parity-validation|harness:bindings-validation"`
+      — expected: `0` (all six deleted rows are gone from the canonical table; the check is scoped
+      to that table section so it does not false-positive on `specs:domain:coverage`'s legitimate,
+      unrelated occurrences elsewhere in the file — e.g. the general Target Naming Standards table,
+      where it is a real target on other projects such as `organiclever-be`/`ose-be`)
 - [ ] [AI] The six deleted names are recorded in `learnings.md` — expected: present, so the
       deletion did not silently destroy the roadmap information
 
@@ -678,29 +721,58 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 > must be byte-identical across all three repos, zero carve-outs, per the
 > [SDLC Gate Standard](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)._
 
-- [ ] [AI] Provision a worktree in the `ose-primer` checkout for this propagation —
-      acceptance: `git -C <primer-worktree> status` reports a clean tree on the new branch
-- [ ] [AI] Copy `apps/rhino-cli/` from `ose-public` to `ose-primer` verbatim — acceptance:
-      `diff -r <public>/apps/rhino-cli <primer>/apps/rhino-cli` produces no output
-- [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim — acceptance:
-      `diff -r` on that tree produces no output
-- [ ] [AI] Apply the equivalent `.husky/pre-push` and `.github/workflows/main-ci.yml` wiring,
-      adapted to `ose-primer`'s hook and workflow structure — acceptance: `sh -n .husky/pre-push`
-      and `actionlint` both exit 0
-- [ ] [AI] Run the remediation sweep in `ose-primer`:
+- [ ] [AI] **Confirm the sibling's repo topology BEFORE anything else** —
+      `git -C /Users/wkf/ose-projects/ose-primer rev-parse --is-bare-repository`
+      — acceptance: prints `true`. **`ose-primer` is a BARE repo** (verified 2026-07-19): it has no
+      top-level working tree, so `git -C /Users/wkf/ose-projects/ose-primer status` fails with
+      `fatal: this operation must be run in a work tree`. All file work happens inside a worktree.
+      If this prints `false`, the topology changed — STOP and re-derive the commands below rather
+      than assuming (this repo's topology HAS changed before — `ose-infra` was non-bare on
+      2026-07-02). See [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md)
+      §Sibling-Repo Relative Paths From Inside a Worktree, which records a real prior incident of
+      silent stale-content propagation in a structurally identical tri-repo plan.
+- [ ] [AI] Fetch and provision the worktree at the repo-local `worktrees/<name>/` path:
+      `git -C /Users/wkf/ose-projects/ose-primer fetch origin main` then
+      `git -C /Users/wkf/ose-projects/ose-primer worktree add worktrees/doc-command-existence-validation -b doc-command-existence-validation origin/main`
+      — acceptance: `git -C /Users/wkf/ose-projects/ose-primer worktree list` shows the new worktree
+      at `/Users/wkf/ose-projects/ose-primer/worktrees/doc-command-existence-validation`, and
+      `git -C <primer-worktree> rev-parse HEAD` equals
+      `git -C /Users/wkf/ose-projects/ose-primer rev-parse origin/main` (proves it is branched from
+      the LATEST `origin/main`, not a stale local ref)
+- [ ] [AI] Set `<primer-worktree>` = `/Users/wkf/ose-projects/ose-primer/worktrees/doc-command-existence-validation`
+      for every subsequent step in this phase; run `npm install && npm run doctor -- --fix`
+      **inside that worktree** (`cd` into it — do not rely on the shell's inherited working
+      directory) — acceptance: `git -C <primer-worktree> status --porcelain` is empty; toolchain
+      converged
+- [ ] [AI] Copy `apps/rhino-cli/` from `ose-public` to `<primer-worktree>` verbatim — acceptance:
+      `diff -r <public>/apps/rhino-cli <primer-worktree>/apps/rhino-cli` produces no output
+- [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim into `<primer-worktree>` —
+      acceptance:
+      `diff -r <public>/specs/apps/rhino/behavior/rhino-cli/gherkin <primer-worktree>/specs/apps/rhino/behavior/rhino-cli/gherkin`
+      produces no output
+- [ ] [AI] Apply the equivalent `.husky/pre-push` and `.github/workflows/main-ci.yml` wiring
+      **inside `<primer-worktree>`**, adapted to `ose-primer`'s hook and workflow structure —
+      acceptance: `sh -n .husky/pre-push` and `actionlint .github/workflows/main-ci.yml` (both run
+      from inside `<primer-worktree>`) exit 0
+- [ ] [AI] Run the remediation sweep **from inside `<primer-worktree>`**:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
       — acceptance: exits 0 after fixing findings
-- [ ] [AI] Apply the DD-6 deletion to `ose-primer`'s own
+- [ ] [AI] Apply the DD-6 deletion to `<primer-worktree>`'s own
       `repo-governance/development/infra/nx-targets.md`, checking its table **independently**
-      against `ose-primer`'s live graph (`npx nx show project rhino-cli --json` run in that repo) —
-      do NOT assume the `ose-public` row set applies, since per-repo drift may differ
-      — acceptance: every remaining row resolves in `ose-primer`'s graph; any deleted name not
-      already listed in `learnings.md` is appended there
+      against `ose-primer`'s live graph (`npx nx show project rhino-cli --json` run from inside
+      `<primer-worktree>`) — do NOT assume the `ose-public` row set applies, since per-repo drift
+      may differ — acceptance: every remaining row resolves in `ose-primer`'s graph; any deleted
+      name not already listed in `learnings.md` is appended there
 - [ ] [AI] Provision polyglot dependencies before pushing (the `crud-*` demo apps depend on
       rhino-cli and a fresh worktree fails pre-push until F#/Elixir deps are fetched) —
-      acceptance: `npm run doctor -- --fix` exits 0
-- [ ] [AI] Run the local quality gates — acceptance: zero failures
-- [ ] [AI] Commit and push to the `ose-primer` PR branch
+      acceptance: `npm run doctor -- --fix` (run from inside `<primer-worktree>`) exits 0
+- [ ] [AI] Run the local quality gates (see the Phase 2 template), **from inside `<primer-worktree>`**
+      — acceptance: zero failures
+- [ ] [AI] Commit with explicit paths (never `git add -A` — the sibling repo carries unrelated WIP)
+      and push to the `ose-primer` PR branch:
+      `git -C <primer-worktree> add <explicit paths> && git -C <primer-worktree> commit && git -C <primer-worktree> push origin doc-command-existence-validation`
+      — acceptance: `git -C <primer-worktree> status --porcelain` shows no unintended files staged;
+      push succeeds; pre-push gates exit 0
 - [ ] [AI] Open the draft PR, monitor CI to green, run the 3-cycle PR-Review Maker→Fixer Cycle
       — acceptance: CI green, no unresolved review findings
 - [ ] [HUMAN] Merge the `ose-primer` PR — resume signal: `gh pr view <n> --json state` reports
@@ -710,9 +782,9 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `diff -r <public>/apps/rhino-cli <primer>/apps/rhino-cli` — expected: no output
+- [ ] [AI] `diff -r <public>/apps/rhino-cli <primer-worktree>/apps/rhino-cli` — expected: no output
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done`
-      in `ose-primer` — expected: exits 0
+      run from inside `<primer-worktree>` — expected: exits 0
 
 > **Pause Safety**: `ose-primer` matches `ose-public` and its gate is green. `ose-infra` is still
 > behind, which is a known divergence, not a breakage. Safe to stop. To resume: re-run the `diff -r`
@@ -724,26 +796,56 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 > _May run in parallel with Phase 5 — both depend only on Phase 4._
 
-- [ ] [AI] Provision a worktree in the `ose-infra` checkout — acceptance: clean tree on the new
-      branch
-- [ ] [AI] Copy `apps/rhino-cli/` verbatim from `ose-public` — acceptance: `diff -r` produces no
-      output
-- [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim — acceptance: `diff -r`
+- [ ] [AI] **Confirm the sibling's repo topology BEFORE anything else** —
+      `git -C /Users/wkf/ose-projects/ose-infra rev-parse --is-bare-repository`
+      — acceptance: prints `true`. **`ose-infra` is a BARE repo** (verified 2026-07-19): it has no
+      top-level working tree, so `git -C /Users/wkf/ose-projects/ose-infra status` fails with
+      `fatal: this operation must be run in a work tree`. All file work happens inside a worktree.
+      Note this repo's topology has CHANGED before (it was non-bare on 2026-07-02), so treat the
+      check as live state — if it prints `false`, STOP and re-derive the commands below rather than
+      assuming. See [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md)
+      §Sibling-Repo Relative Paths From Inside a Worktree, which records a real prior incident of
+      silent stale-content propagation in a structurally identical tri-repo plan.
+- [ ] [AI] Fetch and provision the worktree at the repo-local `worktrees/<name>/` path:
+      `git -C /Users/wkf/ose-projects/ose-infra fetch origin main` then
+      `git -C /Users/wkf/ose-projects/ose-infra worktree add worktrees/doc-command-existence-validation -b doc-command-existence-validation origin/main`
+      — acceptance: `git -C /Users/wkf/ose-projects/ose-infra worktree list` shows the new worktree
+      at `/Users/wkf/ose-projects/ose-infra/worktrees/doc-command-existence-validation`, and
+      `git -C <infra-worktree> rev-parse HEAD` equals
+      `git -C /Users/wkf/ose-projects/ose-infra rev-parse origin/main` (proves it is branched from
+      the LATEST `origin/main`, not a stale local ref)
+- [ ] [AI] Set `<infra-worktree>` = `/Users/wkf/ose-projects/ose-infra/worktrees/doc-command-existence-validation`
+      for every subsequent step in this phase; run `npm install && npm run doctor -- --fix`
+      **inside that worktree** (`cd` into it — do not rely on the shell's inherited working
+      directory) — acceptance: `git -C <infra-worktree> status --porcelain` is empty; toolchain
+      converged
+- [ ] [AI] Copy `apps/rhino-cli/` verbatim from `ose-public` into `<infra-worktree>` — acceptance:
+      `diff -r <public>/apps/rhino-cli <infra-worktree>/apps/rhino-cli` produces no output
+- [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim into `<infra-worktree>` —
+      acceptance:
+      `diff -r <public>/specs/apps/rhino/behavior/rhino-cli/gherkin <infra-worktree>/specs/apps/rhino/behavior/rhino-cli/gherkin`
       produces no output
-- [ ] [AI] Apply the equivalent hook and CI wiring adapted to `ose-infra`'s structure —
-      acceptance: `sh -n .husky/pre-push` and `actionlint` both exit 0
-- [ ] [AI] Run the remediation sweep in `ose-infra`:
+- [ ] [AI] Apply the equivalent hook and CI wiring **inside `<infra-worktree>`**, adapted to
+      `ose-infra`'s structure — acceptance: `sh -n .husky/pre-push` and
+      `actionlint .github/workflows/main-ci.yml` (both run from inside `<infra-worktree>`) exit 0
+- [ ] [AI] Run the remediation sweep **from inside `<infra-worktree>`**:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`
       — acceptance: exits 0 after fixing findings
-- [ ] [AI] Apply the DD-6 deletion to `ose-infra`'s own
+- [ ] [AI] Apply the DD-6 deletion to `<infra-worktree>`'s own
       `repo-governance/development/infra/nx-targets.md`, checking its table **independently**
-      against `ose-infra`'s live graph — do NOT assume the `ose-public` row set applies, since
-      per-repo drift may differ — acceptance: every remaining row resolves in `ose-infra`'s graph
+      against `ose-infra`'s live graph (`npx nx show project rhino-cli --json` run from inside
+      `<infra-worktree>`) — do NOT assume the `ose-public` row set applies, since per-repo drift may
+      differ — acceptance: every remaining row resolves in `ose-infra`'s graph
 - [ ] [AI] Verify no infra-private content (real hostnames, inventories, Terraform state) leaked
       into any file copied back toward the public repos — acceptance: the propagation is
       strictly one-way, `ose-public` → `ose-infra`; no reverse copy occurred
-- [ ] [AI] Run the local quality gates — acceptance: zero failures
-- [ ] [AI] Commit and push to the `ose-infra` PR branch
+- [ ] [AI] Run the local quality gates (see the Phase 2 template), **from inside `<infra-worktree>`**
+      — acceptance: zero failures
+- [ ] [AI] Commit with explicit paths (never `git add -A` — the sibling repo carries unrelated WIP)
+      and push to the `ose-infra` PR branch:
+      `git -C <infra-worktree> add <explicit paths> && git -C <infra-worktree> commit && git -C <infra-worktree> push origin doc-command-existence-validation`
+      — acceptance: `git -C <infra-worktree> status --porcelain` shows no unintended files staged;
+      push succeeds; pre-push gates exit 0
 - [ ] [AI] Open the draft PR, monitor CI to green, run the 3-cycle PR-Review Maker→Fixer Cycle
       — acceptance: CI green, no unresolved review findings
 - [ ] [HUMAN] Merge the `ose-infra` PR — resume signal: `gh pr view <n> --json state` reports
@@ -753,9 +855,9 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `diff -r <public>/apps/rhino-cli <infra>/apps/rhino-cli` — expected: no output
+- [ ] [AI] `diff -r <public>/apps/rhino-cli <infra-worktree>/apps/rhino-cli` — expected: no output
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done`
-      in `ose-infra` — expected: exits 0
+      run from inside `<infra-worktree>` — expected: exits 0
 
 > **Pause Safety**: all three repos carry the validator and all three gates are green. Safe to
 > stop. To resume: re-run the `diff -r` above.
@@ -850,3 +952,19 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
 - [ ] [AI] Update any other READMEs that reference this plan
 - [ ] [AI] Commit the archival: `chore(plans): move doc-command-existence-validation to done`
+- [ ] [AI] Push to origin `doc-command-existence-verify` (the PR-6 branch)
+- [ ] [AI] Open the draft PR for PR-6 against `main`
+- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 2 minutes with
+      one `gh run view --json status,conclusion` per wakeup; never `gh run watch`) — acceptance:
+      all CI checks report success
+- [ ] [AI] If any CI check fails, fix immediately and push a follow-up commit; repeat until ALL
+      GitHub Actions pass with zero failures
+- [ ] [AI] Run the 3-cycle PR-Review Maker→Fixer Cycle on PR-6:
+  - [ ] [AI] Cycle 1: run `pr-review-maker` on PR-6, then `pr-review-fixer` — acceptance: CI green
+        after the fixer's push
+  - [ ] [AI] Cycle 2: run `pr-review-maker`, then `pr-review-fixer` — acceptance: CI green
+  - [ ] [AI] Cycle 3: run `pr-review-maker`, then `pr-review-fixer` — acceptance: CI green and the
+        final maker pass reports no unresolved findings
+- [ ] [HUMAN] Merge PR-6 to `main` — the human merges on their own schedule; plan completion is not
+      blocked on the merge. Observable resume signal: `gh pr view <n> --json state` reports
+      `MERGED`
