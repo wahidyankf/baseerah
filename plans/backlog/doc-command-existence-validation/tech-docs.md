@@ -286,7 +286,7 @@ outcome DD-4 exists to protect. Revisit once the three core detectors have produ
 ## Dependencies
 
 No new crates anticipated. Existing rhino-cli dependencies cover the need: `clap` (already
-present, provides introspection), `serde_json` (already used for `--format json` across sibling
+present, provides introspection), `serde_json` (already used for `-o json` across sibling
 validators), and the existing markdown-walking utilities in `infrastructure/`. [Unverified — the
 exact shared walker module name must be confirmed by reading `md_validate_links.rs` during
 Phase 1; no new dependency is expected either way.]

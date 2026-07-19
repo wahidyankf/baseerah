@@ -575,24 +575,24 @@ Scenario: The validator participates in the aggregate md audit
 ```gherkin
 Scenario: Findings are emitted as machine-readable JSON on request
   Given a tracked markdown file citing a nonexistent Nx target
-  When the developer runs "rhino-cli md commands validate --format json"
+  When the developer runs "rhino-cli md commands validate -o json"
   Then the output parses as valid JSON
   And each finding object carries a file path, a line number, the cited command, and a reason
 ```
 
-- [ ] [AI] **RED**: write a failing test `format_json_flag_produces_valid_json` in
-      `apps/rhino-cli/src/domain/doc_commands.rs` asserting `--format json` output parses as valid
+- [ ] [AI] **RED**: write a failing test `output_json_flag_produces_valid_json` in
+      `apps/rhino-cli/src/domain/doc_commands.rs` asserting `-o json` output parses as valid
       JSON with the expected finding-list shape
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
-      — acceptance: fails (the `--format json` branch is unimplemented)
-- [ ] [AI] **GREEN**: implement `--format json` output consistent with sibling validators
+      — acceptance: fails (the `-o json` branch is unimplemented)
+- [ ] [AI] **GREEN**: implement `-o json` output consistent with sibling validators
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
-      — acceptance: `format_json_flag_produces_valid_json` passes
+      — acceptance: `output_json_flag_produces_valid_json` passes
 - [ ] [AI] **REFACTOR**: share the JSON-serialization shape with the sibling validators'
-      `--format json` implementation to avoid divergence
+      `-o json` implementation to avoid divergence
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
       — acceptance: all tests still pass; end-to-end check
-      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --format json | jq .`
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate -o json | jq .`
       exits 0
 
 ### Local Quality Gates (Before Push)
@@ -643,7 +643,11 @@ Scenario: Findings are emitted as machine-readable JSON on request
 > All checks below must pass before starting Phase 3.
 
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --help`
-      — expected: exits 0, lists `--strict`, `--exclude`, `--format`
+      — expected: exits 0, lists `--strict` and `--exclude` (the two subcommand-local flags), plus
+      the inherited global `-o`/`--output` flag. **No bespoke `--format` flag**: JSON output across
+      every rhino-cli validator comes from the single global `-o`/`--output` arg declared
+      `global = true` in `apps/rhino-cli/src/cli.rs`, which clap propagates to every subcommand
+      automatically — adding a per-subcommand format flag would violate DD-1
 - [ ] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml` — expected: exits 0
 - [ ] [AI] `npx nx run rhino-cli:specs:behavior:coverage` — expected: exits 0, every scenario in
       `docs-validate-commands.feature` is bound
@@ -676,7 +680,7 @@ Scenario: Findings are emitted as machine-readable JSON on request
       `git -C worktrees/doc-command-existence-remediation status --porcelain` is empty
 
 - [ ] [AI] Produce the full violation inventory:
-      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures --format json > local-temp/doc-command-findings.json`
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures -o json > local-temp/doc-command-findings.json`
       — acceptance: file written; finding count recorded in `learnings.md`
 - [ ] [AI] Record the six to-be-deleted target names in `learnings.md` BEFORE touching the table,
       so the roadmap intent survives the deletion (per DD-6; the entry already exists — confirm it

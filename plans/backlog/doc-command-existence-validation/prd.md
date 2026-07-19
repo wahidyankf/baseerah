@@ -248,7 +248,7 @@ Scenario: The validator participates in the aggregate md audit
 ```gherkin
 Scenario: Findings are emitted as machine-readable JSON on request
   Given a tracked markdown file citing a nonexistent Nx target
-  When the developer runs "rhino-cli md commands validate --format json"
+  When the developer runs "rhino-cli md commands validate -o json"
   Then the output parses as valid JSON
   And each finding object carries a file path, a line number, the cited command, and a reason
 ```
