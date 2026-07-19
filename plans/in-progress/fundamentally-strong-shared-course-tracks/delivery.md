@@ -479,7 +479,7 @@ subagents capped per the orchestration convention). The main thread self-promote
       breadcrumb shows the path; a course page shows its prerequisites; deep-link without `?path=` →
       canonical view; invalid `?path=` → canonical view; old
       `fundamentally-strong/software-engineer/<slug>` URL → redirect to `/en/c/learn/courses/<id>` —
-      command: `npx nx run ayokoding-www:test:e2e` — acceptance: e2e specs fail (no published manifest yet).
+      command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: e2e specs fail (no published manifest yet).
   - _Suggested executor: `swe-e2e-dev`_
 
   **Gherkin (binds) →** "A path landing page lists its courses in manifest order"; "Prev and next
@@ -542,37 +542,43 @@ Scenario: The navigation feature meets accessibility requirements
   And the document language attribute matches the active locale
 ```
 
-- [ ] [AI] **RED (a11y)** — write a failing e2e spec
-      `apps/ayokoding-www/tests/e2e/course-paths-a11y.spec.ts` asserting, on a course rendered in
-      path context: the path banner, path breadcrumb, prerequisite list, and prev/next controls are
-      each a labelled landmark reachable and operable by keyboard with a visible focus ring, the
-      current item carries `aria-current`, and `<html lang>` equals the active locale (`en`) —
-      command: `npx nx run ayokoding-www:test:e2e --grep course-paths-a11y`
-      — acceptance: fails (the path-aware navigation landmarks do not exist yet). This RED step
-      exists because the a11y scenario was previously bound only by the REFACTOR step below, which
-      gave it no prior failing state.
+- [ ] [AI] **RED (a11y)** — this suite is **playwright-bdd**, so the scenario above is authored as
+      Gherkin under `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/` and bound by a step
+      definition at `apps/ayokoding-www-fe-e2e/src/steps/course-paths-a11y.steps.ts` (follow the
+      existing `accessibility.steps.ts` pattern). The steps assert, on a course rendered in path
+      context: the path banner, path breadcrumb, prerequisite list, and prev/next controls are each a
+      labelled landmark reachable and operable by keyboard with a visible focus ring; the current item
+      carries `aria-current`; and `<html lang>` equals the active locale (`en`) — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the `course-paths-a11y` scenario fails (the path-aware navigation landmarks do not
+      exist yet). This RED step exists because the a11y scenario was previously bound only by the
+      REFACTOR step below, which gave it no prior failing state.
+      **Do NOT target `ayokoding-www:test:e2e`**: that target is `echo 'no-op: target not applicable
+  for this project'` and always exits 0, so any RED clause pointed at it can never fail. E2E for
+      this app lives entirely in the paired `ayokoding-www-fe-e2e` project (`npx bddgen && npx
+  playwright test`).
 - [ ] [AI] **GREEN (a11y)** — add the landmark roles, accessible labels, `aria-current`, focus
-      styling, and locale-correct `lang` attribute so the spec passes — command:
-      `npx nx run ayokoding-www:test:e2e --grep course-paths-a11y`
-      — acceptance: `course-paths-a11y` passes.
+      styling, and locale-correct `lang` attribute so the scenario passes — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the `course-paths-a11y` scenario passes.
 - [ ] [AI] **GREEN (e2e fixtures)** — add a minimal fixture manifest (a few real course IDs with
       declared prerequisites) so the e2e specs exercise the real components — command:
-      `npx nx run ayokoding-www:test:e2e` — acceptance: all `course-paths` e2e specs pass in `en`
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: all `course-paths` e2e specs pass in `en`
       (this plan's content locale; see [brd.md §Business-Scope Non-Goals](./brd.md#business-scope-non-goals)).
 - [ ] [AI] **REFACTOR** — ensure the landing + hub reuse `libs/web-ui` primitives (no bespoke CSS where
       a token exists); a11y pass (labels, focus, `aria-current`) — command:
-      `npx nx run ayokoding-www:test:e2e && :lint` — acceptance: green; a11y assertions pass.
+      `npx nx run ayokoding-www-fe-e2e:test:e2e && :lint` — acceptance: green; a11y assertions pass.
 
 ### Phase 4 Gate
 
 - [ ] [AI] Path landing + three-card paths hub render from a manifest; prerequisite display verified; all `course-paths` e2e specs green in `en` (this plan's content locale).
-- [ ] [AI] `npx nx run ayokoding-www:test:unit` + `:test:integration` + `:test:e2e` + `:build` + `:lint` + `:specs:behavior:coverage` exit 0.
+- [ ] [AI] `npx nx run ayokoding-www:test:unit` + `:build` + `:lint` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0. (`ayokoding-www:test:e2e` and `:test:integration` are both no-op echoes — e2e lives in the paired `ayokoding-www-fe-e2e` project, and the integration tier is deliberately unused for content apps.)
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
 > **Pause Safety**: the full path-aware navigation UI (incl. prerequisite display + three-card hub) is
 > implemented, tested (unit + integration + e2e + specs), and live — but no real path manifests are
 > published yet, so production still shows the canonical library. **Group A (the hard prerequisite) is
-> complete.** Safe to stop. To resume: `:test:e2e`.
+> complete.** Safe to stop. To resume: `npx nx run ayokoding-www-fe-e2e:test:e2e`.
 
 ---
 
@@ -618,7 +624,7 @@ wherever the content now lives.
       resolves end-to-end: from `.../fundamentally-strong/software-engineer/_index.md` (and the
       `fundamentally-strong/_index.md` parent + each per-topic `_index.md`), every listed entry link
       resolves to live content (the re-homed `/en/c/learn/courses/<course-id>` URL or a working
-      redirect) — command: `npx nx run ayokoding-www:test:e2e` — acceptance: the legacy-browse nav spec
+      redirect) — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the legacy-browse nav spec
       fails (links still point at drained `<SE_OLD>` locations).
 
   **Gherkin (binds) →** "The legacy section-index browse still resolves after re-homing"
@@ -634,7 +640,7 @@ wherever the content now lives.
 - [ ] [AI] **RED** — write a failing integration/e2e nav check asserting that a course reached via the
       legacy section-index browse and the same course reached via its
       `/en/c/learn/paths/<path-id>` path landing resolve to the identical canonical course body (same
-      rendered content, same canonical URL) — command: `npx nx run ayokoding-www:test:e2e` —
+      rendered content, same canonical URL) — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` —
       acceptance: the coexistence nav spec fails (no assertion yet ties the two navigation routes to
       the same canonical body).
 
@@ -660,7 +666,7 @@ wherever the content now lives.
       `fundamentally-strong/_index.md` parent) and update each so every entry it lists is re-pointed to
       the new `/en/c/learn/courses/<course-id>` URL (or via the redirect) — the legacy sections are
       preserved and ordered, no dead links, no orphaned section — command:
-      `npx nx run ayokoding-www:test:e2e` — acceptance: both the legacy-browse nav spec and the
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: both the legacy-browse nav spec and the
       coexistence nav spec now pass.
 - [ ] [AI] **REFACTOR** — run
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate` +
@@ -764,7 +770,7 @@ deploy), applying the convention:
       earlier in the ordering — command: `npx nx run ayokoding-www:test:integration` — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav end-to-end for this path: from the landing, prev/next walks the
       manifest order and preserves `?path=interview-ready/software-engineer`; breadcrumb shows the path;
-      course pages show their prerequisites — command: `npx nx run ayokoding-www:test:e2e` — acceptance:
+      course pages show their prerequisites — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance:
       the path-walk e2e spec passes in `en` (this plan's content locale).
 - [ ] [AI] **Progression smoothness audit (interview-first, DD-16)** — walk the manifest order and
       confirm the levers hold (prereq-chaining with SF-1/SF-2 bridges; monotonic-ish difficulty;
@@ -776,7 +782,7 @@ deploy), applying the convention:
 
 - [ ] [AI] `interview-ready/software-engineer` manifest published (seeded over the available library); integrity + prerequisite-consistency green; path-walk e2e + breadcrumb + prerequisite display green in `en` (this plan's content locale).
 - [ ] [AI] Smoothness audit passes (levers, SF-1/SF-2 bridges, refresh register).
-- [ ] [AI] `npx nx run ayokoding-www:build` + `:test:e2e` + `:specs:behavior:coverage` exit 0.
+- [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
 > **Pause Safety**: the `interview-ready/software-engineer` path is **live end-to-end** in production
@@ -814,7 +820,7 @@ deploy), applying the convention:
       manifests (all reference by ID) — command: `npx nx run ayokoding-www:test:integration` — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav: prev/next walks the immediately-effective order and preserves
       `?path=immediately-effective/software-engineer`; a course shared with `interview-ready` shows the
-      correct neighbor per active path — command: `npx nx run ayokoding-www:test:e2e` — acceptance:
+      correct neighbor per active path — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance:
       e2e passes in `en` (this plan's content locale); a shared course's prev/next differs by active path.
 - [ ] [AI] **Progression smoothness audit (shipping-first, DD-16)** — build-a-real-app precedes CS
       depth; the "you shipped; now understand why" bridge is present on the landing; prereq-chaining
@@ -825,7 +831,7 @@ deploy), applying the convention:
 - [ ] [AI] `immediately-effective/software-engineer` manifest published (zero duplicated bodies, seeded over the available library); paths hub shows both published paths.
 - [ ] [AI] Integrity + prerequisite-consistency + no-forked-body checks green; per-path prev/next differs correctly for shared courses.
 - [ ] [AI] Shipping-first smoothness audit passes.
-- [ ] [AI] `npx nx run ayokoding-www:build` + `:test:e2e` + `:specs:behavior:coverage` exit 0.
+- [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
 > **Pause Safety**: two paths are live over one shared library with zero body duplication. Safe to
@@ -859,7 +865,7 @@ deploy), applying the convention:
       manifests — command: `npx nx run ayokoding-www:test:integration` — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav: prev/next walks the fundamentals-first order and preserves
       `?path=fundamentally-strong/software-engineer`; a course shared across paths shows the correct
-      neighbor per active path — command: `npx nx run ayokoding-www:test:e2e` — acceptance: e2e passes
+      neighbor per active path — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: e2e passes
       in `en` (this plan's content locale); a shared course's prev/next differs by active path.
 - [ ] [AI] **Progression smoothness audit (fundamentals-first, DD-16)** — theory precedes application;
       the "why-before-how" bridges are present; prereq-chaining holds — acceptance: levers verified;
@@ -870,7 +876,7 @@ deploy), applying the convention:
 - [ ] [AI] `fundamentally-strong/software-engineer` manifest published (zero duplicated bodies, seeded over the available library); paths hub shows all three paths.
 - [ ] [AI] Integrity + prerequisite-consistency + no-forked-body checks green across all three manifests; per-path prev/next differs correctly for shared courses.
 - [ ] [AI] Fundamentals-first smoothness audit passes.
-- [ ] [AI] `npx nx run ayokoding-www:build` + `:test:e2e` + `:specs:behavior:coverage` exit 0.
+- [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
 > **Pause Safety**: all three paths are live over one shared library with zero body duplication (each
