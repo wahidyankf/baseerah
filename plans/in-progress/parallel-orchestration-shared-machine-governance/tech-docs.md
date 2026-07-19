@@ -285,18 +285,23 @@ Two orchestration-behavior rules folded into the same surfaces (`parallel-by-def
 
 ### Delta 8 — PR merge preconditions (NEW hardened done-gate)
 
-A PR merges ONLY when ALL hold: **(a)** it passed the `pr-review-maker`→`pr-review-fixer` cycle for
-**3 cycles**; **(b)** the branch is **up-to-date with the latest `origin/main`** at merge time — if
-BEHIND, bring it forward **non-destructively** (`git merge origin/main` or a forward-only
-update-branch; never a shared-history rewrite); **(c)** **all PR quality gates are green**;
-**(d)** the **surface-conditional tester gates of Delta 11 have been run and their defect findings
-resolved** — UI-bearing PR → UI gates; API/BE-bearing PR → API gate; both → both; neither →
-explicitly recorded as exempt. The "up-to-date with `origin/main` before merge" clause and clause
-**(d)** are both **NEW**. Encode into the
-[PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md) and
-the Delivery Mode **done-definition** (`AGENTS.md` §Git Workflow §Delivery Mode + the Plans
-Convention). Cross-links `git-push-safety.md` and the new `no-destructive-git-operations.md` for the
-non-destructive update requirement. [Repo-grounded — the workflow file exists]
+A PR merges ONLY when ALL **five** hold: **(a)** it passed the `pr-review-maker`→`pr-review-fixer`
+cycle for **3 cycles**; **(b)** **0 CRITICAL + 0 HIGH findings outstanding**; **(c)** the branch is
+**up-to-date with the latest `origin/main`** at merge time — if BEHIND, bring it forward
+**non-destructively** (`git merge origin/main` or a forward-only update-branch; never a shared-history
+rewrite); **(d)** **all PR quality gates are green**; **(e)** the **surface-conditional tester gates
+of Delta 11 have been run and their defect findings resolved** — UI-bearing PR → UI gates;
+API/BE-bearing PR → API gate; both → both; neither → explicitly recorded as exempt. The "up-to-date
+with `origin/main` before merge" clause and clause **(e)** are both **NEW**.
+
+> **Lettering is normative.** This (a)-(e) enumeration is the canonical one; `delivery.md`'s Phase
+> 5/6/7 merge checkboxes use the identical lettering. Any future edit must change both together — an
+> earlier revision let this list run (a)-(d) while `delivery.md` ran (a)-(e), so both cited "Delta 8"
+> while disagreeing on what (b), (c), and (d) meant. Encode into the
+> [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md) and
+> the Delivery Mode **done-definition** (`AGENTS.md` §Git Workflow §Delivery Mode + the Plans
+> Convention). Cross-links `git-push-safety.md` and the new `no-destructive-git-operations.md` for the
+> non-destructive update requirement. [Repo-grounded — the workflow file exists]
 
 ### Delta 9 — main-ci on a schedule, not per-push (NEW, all 3 repos)
 

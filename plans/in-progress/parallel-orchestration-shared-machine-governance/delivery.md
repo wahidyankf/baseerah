@@ -80,7 +80,11 @@ cycles + branch up-to-date with latest `origin/main` via non-destructive forward
 green). Git-mechanical steps (worktree add, commit, push to the PR branch, worktree remove) are `[AI]`.
 This `[AI]`-auto-merge deviation from the mode's default `[HUMAN]`-merge requirement is a documented,
 authorized exception — see **DD-10** in `tech-docs.md` §Design decisions for the rationale, the
-authorizing context, and its explicit non-precedential scope.
+authorizing context, and its explicit non-precedential scope. (DD-10 itself now also carries a
+"Status: DISSOLVED BY DELTA 12" note — that is deliberately **sequential, not contradictory**: this
+very plan must still cite DD-10 for its own Phase 5/6/7 merges because Delta 12 — this plan's own
+Phase 4 change inverting the repo-wide merge default — is not yet live in the target repos' `main`
+until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full argument.)
 
 > **Plan-doc authoring vs plan execution (distinct delivery paths)**: this `worktree-to-pr` mode
 > governs the plan's **execution** (the governance/config edits it applies). The **plan-doc artifacts
@@ -164,7 +168,10 @@ authorizing context, and its explicit non-precedential scope.
 - [ ] [AI] Add the **default-N rationale** to `agent-workflow-orchestration.md` + `parallel-by-default.md`:
       N=3 defaults specifically to bound token/compute-budget burn; raising N is deliberate + justified
       (independent work + capacity + budget headroom); lower under budget/runner/disk pressure
-      — acceptance: `grep -ni "token\|compute\|budget" agent-workflow-orchestration.md` returns the rationale
+      — acceptance: `grep -ci "bound token/compute-budget burn" agent-workflow-orchestration.md` returns
+      **≥1** (returns **0** today, confirmed live — the pre-existing "## Operating Budgets" section
+      elsewhere in the file matches the broader `token\|compute\|budget` pattern, so that broader
+      pattern is vacuously true pre-edit and MUST NOT be used as the acceptance signal)
 - [ ] [AI] Add the **DAG-first orchestration** rule to `agent-workflow-orchestration.md` +
       `parallel-by-default.md`: every non-trivial task list AND delivery checklist declares a dependency
       DAG (nodes=tasks/items, edges=blocks/blockedBy); independent nodes parallelize up to N, dependent
@@ -173,7 +180,11 @@ authorizing context, and its explicit non-precedential scope.
 - [ ] [AI] Add the **background-slot preference** to `parallel-by-default.md` +
       `subagent-orchestration.md` + `agent-workflow-orchestration.md`: fill background slots up to N,
       keep the main thread vacant/responsive (orchestrator not worker), bounded by the DAG — never force
-      parallelism onto dependent nodes — acceptance: `grep -ni "main thread.*vacant\|responsive\|background slot" parallel-by-default.md` present
+      parallelism onto dependent nodes — acceptance:
+      `grep -ci "main thread.*vacant\|background.slot.preference" parallel-by-default.md` returns **≥1**
+      (returns **0** today, confirmed live — the bare word "responsive" alone (an existing, unrelated
+      anti-pattern example about API latency) MUST NOT be used as the acceptance signal; it is already
+      present pre-edit)
 - [ ] [AI] Add the **vendor-neutral, capability-gated** paragraph to `agent-workflow-orchestration.md`
       verbatim from `tech-docs.md §Cross-harness compatibility` (no vendor names, no numeric caps in the
       prose — per the Governance Vendor-Independence Convention): background-capable harnesses fan out to
@@ -315,8 +326,8 @@ authorizing context, and its explicit non-precedential scope.
       shows every surviving `[HUMAN]`-merge mention rewritten as the explicit opt-in, not the default
 - [ ] [AI] **Update `AGENTS.md` §Git Workflow §Delivery Mode first** — it is the canonical
       instruction file and states the default outright: "`worktree-to-pr` (worktree → draft PR →
-      `[HUMAN]` merge — **the default**)" at line 111, plus `main-to-pr`'s "`[HUMAN]` merge" at line
-      113 and "before the human merge" at line 115. Rewrite so `[AI]` merge is the default and
+      `[HUMAN]` merge — **the default**)" at line 112, plus `main-to-pr`'s "`[HUMAN]` merge" at line
+      114 and "before the human merge" at line 116. Rewrite so `[AI]` merge is the default and
       `[HUMAN]` is the explicit opt-in — acceptance: <code>grep -cF '`[HUMAN]` merge — \*\*the
       default\*\*' AGENTS.md</code> returns **0** (returns **1** pre-edit) and
       <code>grep -cF '`[AI]` merge' AGENTS.md</code> returns **≥1** (returns **0** pre-edit). Both
@@ -331,15 +342,26 @@ authorizing context, and its explicit non-precedential scope.
       is exactly why they are named explicitly here). Rewrite each as an explicit opt-in or delete it
       where it merely restated the old default — acceptance: every surviving hit is an explicit
       per-plan opt-in; the before/after counts are recorded in `learnings.md`
-- [ ] [AI] Mark **DD-10 as dissolved-by-Delta-12** in `tech-docs.md` — retained as historical record of
-      how the authorization arrived, no longer a deviation, since the default now matches it —
-      acceptance:
-      `sed -n '/^- \*\*DD-10/,/^- \*\*DD-11/p' tech-docs.md | grep -ci "dissolved by Delta 12"`
-      returns ≥1. **Scoping rationale**: a whole-file grep would pass vacuously because Delta 12's own
-      prose already contains "dissolves". **Anchor rationale**: DD-10/DD-11 are flat `- **DD-NN`
-      bullets, NOT `### DD-NN` headings — a heading-anchored range matches nothing and could never
-      pass. Verified both directions against the live file: the range extracts a real 13-line block,
-      the grep returns **0** today and **2** against a simulated post-edit copy
+- [ ] [AI] Confirm DD-10's dissolved-by-Delta-12 status is genuinely wired, not merely textually
+      present: `tech-docs.md`'s DD-10 bullet already carries **"Status: DISSOLVED BY DELTA 12"**
+      (written at plan-authoring time as part of the bootstrap-timing fix for iteration-8's Finding 3 —
+      no further text edit is needed to DD-10 itself). **Scoping rationale**: a whole-file grep would
+      pass vacuously because Delta 12's own prose already contains "dissolves". **Anchor rationale**:
+      DD-10/DD-11 are flat `- **DD-NN` bullets, NOT `### DD-NN` headings — a heading-anchored range
+      matches nothing and could never pass. Because the text half is pre-authored (confirmed live: the
+      sed-range grep below already returns **1** today, not 0 — an earlier authoring pass wrote this
+      text ahead of its own checkbox), the ONLY genuinely-incomplete half of "dissolved" being an
+      accurate claim is whether the sibling **"Delta 12 — invert the merge default"** checkbox above
+      (§4b, editing `plans.md` §Delivery Mode) has actually landed — do not tick this box until it has
+      — acceptance (compound, BOTH required):
+      `sed -n '/^- \*\*DD-10/,/^- \*\*DD-11/p' tech-docs.md | grep -ci "dissolved by Delta 12"` returns
+      ≥1 (already **1** today, confirmed live — this half is pre-satisfied and stays 1 post-edit; it is
+      NOT the discriminating half) AND
+      `grep -nic "\[AI\] merges\|only where.*explicitly\|only the actor" repo-governance/conventions/structure/plans.md`
+      returns ≥2 (returns **0** today, confirmed live — this is the discriminating half; becomes ≥2 only
+      once the sibling Delta-12 checkbox above has actually executed, confirmed via a simulated post-edit
+      copy). **Overall compound clause is FALSE today (blocked by the plans.md half returning 0) and
+      becomes TRUE only after Delta 12 has actually landed — verified both directions live.**
 - [ ] [AI] Add the **per-phase-PR + feature-flag + strict 1-PR↔1-worktree** planning-granularity rule
       (Delta 10) to `repo-governance/workflows/plan/plan-planning.md` and cross-reference from
       `repo-governance/conventions/structure/plans.md`: each applicable phase / independent DAG node
@@ -385,24 +407,43 @@ authorizing context, and its explicit non-precedential scope.
 #### 4c-i. ALL SEVEN `repo-governance/workflows/plan/*` files (one checkbox each)
 
 - [ ] [AI] `repo-governance/workflows/plan/README.md` — update the plan-workflow index to reflect the
-      N+1/DAG model and link the two new conventions — acceptance: `grep -ni "N+1\|DAG" plan/README.md` present; new convention links resolve
+      N+1/DAG model and link the two new conventions — acceptance:
+      `grep -ci "N+1\|1 main thread + N background" plan/README.md` returns **≥1** (returns **0** today,
+      confirmed live — the bare `grep -ni "N+1\|DAG"` pattern is already **1** today via an unrelated
+      "dependency DAG" mention describing `multi-plans-execution.md`'s scheduler, so it MUST NOT be used
+      alone as the acceptance signal); new convention links resolve
 - [ ] [AI] `repo-governance/workflows/plan/plan-execution.md` — N+1 fan-out, DAG ordering, 1-PR↔1-worktree
-      cleanup tie, no-destructive-git, self-scoped cleanup — acceptance: `grep -ni "N+1\|DAG\|one worktree" plan-execution.md` present; no stale "cap at 2 / 3 total"
+      cleanup tie, no-destructive-git, self-scoped cleanup — acceptance:
+      `grep -ci "1 main thread + N background agents\|1-PR.*1-worktree" plan-execution.md` returns **≥1**
+      (returns **0** today, confirmed live — the bare `grep -ni "N+1\|DAG\|one worktree"` pattern is
+      already **1** today via a false-positive substring match on ordinary "do NOT start phase N+1"
+      phase-gate language, so it MUST NOT be used alone as the acceptance signal); no stale "cap at 2 /
+      3 total" (confirmed absent both today and required to stay absent)
 - [ ] [AI] `repo-governance/workflows/plan/plan-planning.md` — per-phase PR + feature flags + strict
       1-PR↔1-worktree (Delta 10) — acceptance: `grep -ni "feature flag\|per-phase\|1-PR" plan-planning.md` present
 - [ ] [AI] `repo-governance/workflows/plan/plan-quality-gate.md` — align the `max-concurrency` frontmatter
       default/wording with N+1 **and** add the hardened merge preconditions (3 cycles + up-to-date with
       `origin/main` + all gates green) to its Delivery-Mode done-definition section — acceptance:
-      `grep -ni "max-concurrency\|up-to-date\|3 cycles" plan-quality-gate.md` reflects the new model
+      `grep -ci "N+1\|1 main thread + N background" plan-quality-gate.md` returns **≥1** (returns **0**
+      today, confirmed live — the bare `grep -ni "max-concurrency\|up-to-date\|3 cycles"` pattern is
+      already **1** today via the file's own pre-existing `- name: max-concurrency` YAML frontmatter
+      field, so it MUST NOT be used alone as the acceptance signal)
 - [ ] [AI] `repo-governance/workflows/plan/multi-plans-execution.md` (**most affected** — governs running
       multiple plans at once): adopt N+1, background-slot-preference/main-vacant, DAG-first ordering,
       3-5 min status cadence, 1-PR↔1-worktree; **supersede** its "cap 3 concurrent / background cap 2
       never more" language — acceptance: `grep -n "cap 3\|cap at 2\|never more\|3 total" multi-plans-execution.md` returns nothing; N+1/DAG/cadence text present
 - [ ] [AI] `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md` — worktree-to-PR default,
       per-phase PR + feature flags, no-destructive-git, self-scoped cleanup, parallel propagation shape
-      (ose-public → ose-primer/ose-infra) — acceptance: `grep -ni "worktree-to-pr\|parallel propagation\|cleanup" plan-multi-repo-parity-planning.md` present
+      (ose-public → ose-primer/ose-infra) — acceptance:
+      `grep -ci "per-phase PR\|feature.flag\|no-destructive-git\|parallel propagation" plan-multi-repo-parity-planning.md`
+      returns **≥1** (returns **0** today, confirmed live — the file's 13 pre-existing, ordinary mentions
+      of "worktree-to-pr" as an already-documented delivery-mode name MUST NOT be used alone as the
+      acceptance signal; they predate this plan and are unrelated to the new per-phase-PR/feature-flag
+      content)
 - [ ] [AI] `repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md` — same
-      alignment as above for the execution half — acceptance: same grep clean on this file
+      alignment as above for the execution half — acceptance: same narrowed
+      `grep -ci "per-phase PR\|feature.flag\|no-destructive-git\|parallel propagation"` clause returns
+      **≥1** (returns **0** today, confirmed live, same root cause as the sibling file above)
 
 #### 4c-ii. Repo-wide `max-concurrency` frontmatter (20 files)
 
@@ -418,7 +459,14 @@ authorizing context, and its explicit non-precedential scope.
       file still reads `Default 1` **and** carries the new justification sentence
 - [ ] [AI] `repo-governance/workflows/repo/repo-dependency-bump-planning.md` — align its prose-level
       concurrency cap ("one agent per ecosystem batch") + Subagent-Orchestration cross-link with N+1
-      — acceptance: `grep -ni "N+1\|cap" repo-dependency-bump-planning.md` reflects the new model
+      — acceptance (compound, BOTH required):
+      `grep -ci "N+1\|1 main thread" repo-dependency-bump-planning.md` returns **≥1** (returns **0**
+      today, confirmed live) AND `grep -c "capped at 2 concurrent" repo-dependency-bump-planning.md`
+      returns **0** (returns **1** today, confirmed live — this is the literal stale text the edit
+      replaces). **The bare `grep -ni "N+1\|cap"` pattern MUST NOT be used alone**: it returns **4**
+      today (non-zero pre-edit) and would ALSO still match post-edit (the word "cap" survives in
+      plausible fixed phrasing too, e.g. "cap concurrent agents at N"), so it can never discriminate a
+      completed edit from an incomplete one in either direction.
 - [ ] [AI] `repo-governance/workflows/pr/pr-review-quality-gate.md` — align its `max-concurrency` with
       N+1 (merge preconditions already added in 4b) — acceptance: no stale fixed-2 assertion remains
 
@@ -553,6 +601,17 @@ authorizing context, and its explicit non-precedential scope.
 - [ ] [AI] **Repo-wide superseded-cap proof**: `grep -rn "cap at 2\|cap of 2\|cap 3 concurrent\|3 total\|2 background\|stricter cap of 2\|never more" repo-governance/ AGENTS.md CLAUDE.md .claude/agents .claude/skills`
       returns **zero** hits (or only hits explicitly annotated as superseded-historical) — proves no stale
       cap survives in ANY workflow, convention, agent, or skill doc
+- [ ] [AI] **Merge-actor `[HUMAN]`-merge sweep convergence proof** (re-verifies the widened 46-hit sweep,
+      §4b, actually converged rather than only partially completing): re-run
+      `grep -rniE "\[HUMAN\][^.]*merge" AGENTS.md CLAUDE.md repo-governance .claude | wc -l` and compare
+      the count against the "after" count recorded in `learnings.md` by the §4b sweep checkbox — they
+      MUST match (the count is 46 pre-edit, confirmed live; it will not generally reach zero, since
+      legitimate surviving opt-ins like DD-10 are expected to remain). Genuine completion here cannot be
+      captured by a single fixed-string grep (no literal "explicit opt-in" marker phrase is mandated by
+      this plan, so a `grep -v <marker>`-based zero-count check would be a fake acceptance signal) —
+      this is a **human-verifiable acceptance criterion**: individually re-read every surviving hit and
+      confirm each states an explicit per-plan opt-in with authorizing context and non-precedential
+      scope (DD-10's own wording is the model), never a restated `[HUMAN]`-is-the-default framing
 - [ ] [AI] All SEVEN `repo-governance/workflows/plan/*` files updated:
       `ls repo-governance/workflows/plan/` lists 7 files and each appears in this phase's completed 4c-i checkboxes
 - [ ] [AI] `grep -rl "max-concurrency" repo-governance/workflows/ | wc -l` returns 21 (the 20 preexisting + the new `api/api-quality-gate.md`), and `web/web-ux-test-fixing-planning.md` still reads
@@ -615,21 +674,19 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       fixes and pushes → CI green — acceptance: review comments addressed; CI green
 - [ ] [AI] Cycle 2: `pr-review-maker` → `pr-review-fixer` → CI green — acceptance: no new HIGH findings
 - [ ] [AI] Cycle 3: `pr-review-maker` → `pr-review-fixer` → CI green — acceptance: clean review; CI green
-- [ ] [AI] **Hardened merge preconditions** (Delta 8): before merge confirm ALL — (a) 3 review cycles
-      complete, (b) branch **up-to-date with latest `origin/main`** (if behind, bring forward
-      non-destructively: `git fetch origin && git merge --ff-only origin/main` or a forward merge — NEVER
-      `reset --hard`/force), (c) all PR quality gates green, **(d) the Delta 11 surface-conditional
-      tester gates have been run and their defect findings resolved** — for THIS PR the surface is
-      neither UI nor API, so record the explicit exemption in the PR description rather than leaving
-      it implicit — acceptance: `gh pr view --json mergeStateStatus` shows the branch current and
-      mergeable, and the PR body contains the Delta-11 gate line (run-and-resolved, or explicit exempt)
-- [ ] [AI] Merge the ose-public PR to `main` once **all five** hardened preconditions hold —
-      (a) 3 `pr-review-maker`→`pr-review-fixer` cycles complete, (b) **0 CRITICAL + 0 HIGH findings
-      outstanding**, (c) branch up-to-date with latest `origin/main` (non-destructive forward update
-      if behind), (d) all gates green, (e) the Delta-11 surface-conditional tester gates run-and-resolved
-      or explicitly exempted. `[AI]` merges per Delta 12's default (DD-10 records the pre-Delta-12
-      authorization; see its bootstrap-timing note) — acceptance: `gh pr view --json reviewDecision,mergeStateStatus`
-      plus the review-cycle record show all five satisfied, and the PR is merged
+- [ ] [AI] Merge the ose-public PR to `main` once **all five** hardened merge preconditions (Delta 8 +
+      the 0-CRITICAL/0-HIGH addendum) hold — (a) 3 `pr-review-maker`→`pr-review-fixer` cycles complete,
+      (b) **0 CRITICAL + 0 HIGH findings outstanding**, (c) branch **up-to-date with latest
+      `origin/main`** (if behind, bring forward non-destructively: `git fetch origin && git merge
+--ff-only origin/main` or a forward merge — NEVER `reset --hard`/force), (d) all PR quality gates
+      green, (e) **the Delta 11 surface-conditional tester gates have been run and their defect findings
+      resolved** — for THIS PR the surface is neither UI nor API, so record the explicit exemption in the
+      PR description rather than leaving it implicit. `[AI]` merges per Delta 12's default (DD-10
+      records the pre-Delta-12 authorization; see its bootstrap-timing note) — acceptance:
+      `gh pr view --json mergeStateStatus` shows the branch current and mergeable; the PR body contains
+      the Delta-11 gate line (run-and-resolved, or explicit exempt); `gh pr view --json
+reviewDecision,mergeStateStatus` plus the review-cycle record show all five preconditions
+      satisfied; and the PR is merged
 - [ ] [AI] Since `main-ci.yml` is now schedule-only, trigger a confirmation run via
       `gh workflow run main-ci.yml` (or `workflow_dispatch`) and verify green — acceptance: dispatched main-ci run concludes success
 
