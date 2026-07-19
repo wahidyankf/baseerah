@@ -20,8 +20,9 @@ Every course declares `prerequisites: [course-id, ...]` in its canonical metadat
 DAG. The catalog of 121 courses (0 merges), the course-ID + manifest schema, the path-aware-navigation
 UI design, and the three path orderings live in [tech-docs.md](./tech-docs.md) and the
 [syllabus detail layer](./syllabus/README.md); the UI-design-funnel and NEW-course specs live in
-[prd.md](./prd.md). The reconciled catalog baseline is
-[`local-temp/fs-shared-tracks-topic-reconciliation.md`](../../../local-temp/fs-shared-tracks-topic-reconciliation.md).
+[prd.md](./prd.md). The authoritative catalog baseline is the tracked
+[Course Library Catalog](./tech-docs.md#course-library-catalog) (121 rows); it was originally derived
+from a gitignored `local-temp/` scratch file, which must not be relied on during execution.
 
 > **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
 > `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
@@ -856,8 +857,10 @@ deploy), applying the convention:
 > **band** lands, **grow** the
 > three manifests (append the newly-available courses into whichever paths include them; re-run
 > integrity + prerequisite-consistency) — a serial sync point per band. Per-course detail:
-> [syllabus courses layer](./syllabus/courses/README.md) and
-> [reconciled catalog](../../../local-temp/fs-shared-tracks-topic-reconciliation.md).
+> [syllabus courses layer](./syllabus/courses/README.md) and the tracked
+> [Course Library Catalog](./tech-docs.md#course-library-catalog) (the authoritative 121-row table —
+> do **not** depend on any `local-temp/` scratch file here; those are gitignored and may be cleaned
+> before this phase runs).
 >
 > **Reconciliation rulings baked into authoring** (locked):
 >

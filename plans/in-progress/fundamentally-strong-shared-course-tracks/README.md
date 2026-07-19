@@ -101,9 +101,10 @@ The library retains **all 121** courses (see the reconciled catalog in
    `capstone-secure-service`, `capstone-data-pipeline`, `capstone-concurrency-and-systems`,
    `capstone-concurrency-showdown`, `capstone-lead-at-altitude`).
 
-**Reconciliation rulings (locked)** — verified against the reconciled catalog
-([`local-temp/fs-shared-tracks-topic-reconciliation.md`](../../../local-temp/fs-shared-tracks-topic-reconciliation.md),
-121 baseline including its 2026-07-19 addendum, 0 merges):
+**Reconciliation rulings (locked)** — the rulings below are themselves authoritative and are
+reproduced against the tracked [Course Library Catalog](./tech-docs.md#course-library-catalog)
+(121 baseline, 0 merges). They were originally derived in a gitignored `local-temp/` scratch file,
+which is not tracked and must not be consulted during execution:
 
 - **detection-engineering kept distinct.** `detection-engineering-and-siem-operations` (deep,
   Wazuh-specific decoder/rule/dashboard ops) stays distinct from topic 60 `defensive-security`

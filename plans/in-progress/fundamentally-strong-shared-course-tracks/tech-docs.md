@@ -23,11 +23,15 @@ UI-design-funnel lives in [prd.md](./prd.md#ui-design-funnel-path-aware-navigati
 **content** part remains exempt from `specs:coverage` (content under `content/**` is exempt), but the
 **navigation feature** is app code and carries a full `specs/` Gherkin companion.
 
-> **Authority note.** This document conforms to the locked rewrite spec
-> (`local-temp/shared-tracks-rewrite-spec.md`) and the reconciled 121-course catalog
-> (`local-temp/fs-shared-tracks-topic-reconciliation.md`, including its 2026-07-19 addendum and this
-> document's [DD-20](#design-decisions)). Where any earlier draft disagreed, the spec
-> wins: **three** paths (not two), `interview-ready` (was `job-seeking`), `immediately-effective` (was
+> **Authority note.** **This document and the tracked plan files are the authority** — specifically
+> the [Course Library Catalog](#course-library-catalog) (the 121-row table), the Decisions Locked
+> prose in [`README.md`](./README.md), and [DD-20](#design-decisions). The rulings were originally
+> derived in two scratch files (`local-temp/shared-tracks-rewrite-spec.md` and
+> `local-temp/fs-shared-tracks-topic-reconciliation.md` with its 2026-07-19 addendum); those are
+> **gitignored, untracked, and may be cleaned at any time**, so they are recorded here as historical
+> provenance only and **must not be consulted as a source of truth during execution**. Every ruling
+> they carried is reproduced in tracked files. Where any earlier draft disagreed, the rulings below
+> win: **three** paths (not two), `interview-ready` (was `job-seeking`), `immediately-effective` (was
 > the shipping-first `fundamentally-strong`), a **new** `fundamentally-strong` theory-first path, the
 > `/en/c/learn/…` URL namespace, and **`prerequisites` on every course**.
 
@@ -391,8 +395,8 @@ test-first:
 
 The library holds **all 121 courses**: **33 re-homed** (shipped topics 1–33) + **61 transferred-native**
 (FS-SE topics 34–94) + **4 existing capstones** + **23 new** (14 courses + 9 capstones). **Zero
-merges** — every overlap resolved keep-distinct per the reconciliation
-(`local-temp/fs-shared-tracks-topic-reconciliation.md`) and the **DD-20** inter-topic-capstone
+merges** — every overlap resolved keep-distinct per the reconciliation rulings recorded in
+[`README.md`](./README.md) and the **DD-20** inter-topic-capstone
 reconciliation below (seven inter-topic capstones — one already live on disk, six spec'd-but-unscheduled
 — promoted to first-class catalog/manifest entries; see [DD-20](#design-decisions)).
 
@@ -575,9 +579,8 @@ own DAG edges (`—` = entry point). Variants are added **on demand** and are no
 
 **Count check**: 33 re-homed (E) + 61 transferred-native (T) + 4 existing capstones (Ecap) + 23 new
 (N: 14 courses + 9 capstones) = **121**, zero merges. Full per-course detail (bodies + citations):
-`syllabus/courses/` and its README; verification source:
-`local-temp/fs-shared-tracks-topic-reconciliation.md` (2026-07-19 addendum) and
-[DD-20](#design-decisions) below.
+`syllabus/courses/` and its README; verify against the catalog table above, the reconciliation
+rulings in [`README.md`](./README.md), and [DD-20](#design-decisions) below — all tracked.
 
 ## Path Manifests
 
