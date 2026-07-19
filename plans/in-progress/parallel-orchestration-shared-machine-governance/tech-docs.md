@@ -418,7 +418,7 @@ Delivery-Mode/worktree guidance; cross-linked from the N+1 orchestration surface
 
 1. **During plan creation / update / execution** — the gate is emitted as delivery steps and run as
    part of the work, not discovered at the end.
-2. **As a pre-merge precondition** — folded into Delta 8 clause **(d)** alongside "3 review cycles +
+2. **As a pre-merge precondition** — folded into Delta 8 clause **(e)** alongside "3 review cycles +
    up-to-date-with-`origin/main` + all PR gates green".
 
 **Conditional by surface** — and the condition MUST be stated explicitly, never left implicit:
@@ -497,7 +497,7 @@ applies to the new file names.
 
 **Wiring**: the conditional rule is stated in `plan/plan-execution.md` and `plan/plan-planning.md`
 (so plan authoring and execution both carry it), and `pr/pr-review-quality-gate.md` carries it as a
-merge precondition (Delta 8 clause d). Propagated to all three repos in Phases 6/7.
+merge precondition (Delta 8 clause e). Propagated to all three repos in Phases 6/7.
 
 ### Delta 12 — `[AI]` merge becomes the repo-wide default (INVERTS the Delivery Mode convention)
 

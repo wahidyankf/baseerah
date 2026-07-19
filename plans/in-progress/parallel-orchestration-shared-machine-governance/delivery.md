@@ -310,9 +310,15 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       phases/steps as a **DAG** + a `## Parallelization Model` section (which items are concurrent vs
       serial; cleanup = terminal node) — acceptance: `grep -ni "DAG\|Parallelization Model" plans.md` present
 - [ ] [AI] Edit `repo-governance/workflows/pr/pr-review-quality-gate.md`: add the **hardened merge
-      preconditions** — (a) 3 `pr-review-maker`→`pr-review-fixer` cycles, (b) branch up-to-date with
-      latest `origin/main` at merge (non-destructive forward update if behind), (c) all gates green
-      — acceptance:
+      preconditions**, using the **normative (a)-(e) lettering of `tech-docs.md` §Delta 8 verbatim** —
+      **(a)** 3 `pr-review-maker`→`pr-review-fixer` cycles; **(b)** 0 CRITICAL + 0 HIGH findings
+      outstanding; **(c)** the branch is **up-to-date with the latest `origin/main`** at merge time,
+      brought forward by a **non-destructive forward update** if behind (never a shared-history
+      rewrite); **(d)** all PR quality gates green; **(e)** the Delta 11 surface-conditional tester
+      gates have been run and their defect findings resolved (or exemption explicitly recorded).
+      **Do not emit a shortened (a)-(d) list**: `tech-docs.md` declares this lettering normative, and
+      an earlier revision of this very plan shipped a 4-item enumeration that silently re-mapped
+      (b)/(c)/(d) — the exact bug the Delta 8 callout exists to prevent — acceptance:
       `grep -Fic "up-to-date with the latest" repo-governance/workflows/pr/pr-review-quality-gate.md`
       **and** `grep -Fic "non-destructive forward update" repo-governance/workflows/pr/pr-review-quality-gate.md`
       each return ≥1. **Both return 0 today, confirmed live.** The obvious pattern
@@ -431,11 +437,26 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       1-PR↔1-worktree (Delta 10) — **this is the §4c-i cross-workflow consistency pass, NOT a re-do of the
       §4b authoring edit**; §4b writes the rule into `plan-planning.md`, this checkbox verifies every
       _other_ plan workflow that references planning granularity now agrees with it — acceptance:
-      `grep -rLi "1-PR\|per-phase PR" repo-governance/workflows/plan/*.md` lists no file that
-      references PR granularity at all, **and** `grep -rc "cap at 2\|3 total" repo-governance/workflows/plan/`
-      returns 0 in every file. **A bare re-grep of `plan-planning.md` MUST NOT be used**: it is a
-      strict subset of §4b's own acceptance clause, so it flips to true the moment §4b completes and
-      can never discriminate whether this sweep actually ran.
+      `sh
+  for f in plan-execution multi-plans-execution plan-multi-repo-parity-planning \
+           plan-multi-repo-parity-planning-and-execution; do
+    [ "$(grep -ci "1-PR\|per-phase PR" repo-governance/workflows/plan/$f.md)" -ge 1 ] \
+      || echo "MISSING $f"
+  done
+  `
+      prints nothing — i.e. each of these **four** delivery-executing workflows carries the rule
+      (today it prints all four: every one returns **0**, verified live) — **and**
+      `grep -rc "cap at 2\|3 total" repo-governance/workflows/plan/` returns 0 in every file.
+      **Use the per-file `grep -c` form above, not `grep -L`**: `grep` in this environment is a shell
+      function routing to ripgrep, where `-L` means _follow symlinks_, not _files-without-match_ — a
+      `grep -L` clause silently returns empty and reads as passing no matter what.
+      **Scope rationale**: the set is deliberately **not** all 7 `plan/*.md`. `plan-planning.md` is
+      §4b's own target (including it would make this clause free-ride on §4b), and `README.md` +
+      `plan-quality-gate.md` have no checkbox in this plan prescribing the phrase — requiring it of
+      them would make the clause unreachable via the plan's own prescribed work.
+      **A bare re-grep of `plan-planning.md` MUST NOT be used**: it is a strict subset of §4b's own
+      acceptance clause, so it flips to true the moment §4b completes and can never discriminate
+      whether this sweep actually ran.
 - [ ] [AI] `repo-governance/workflows/plan/plan-quality-gate.md` — align the `max-concurrency` frontmatter
       default/wording with N+1 **and** add the hardened merge preconditions (3 cycles + up-to-date with
       `origin/main` + all gates green) to its Delivery-Mode done-definition section — acceptance:
@@ -589,7 +610,7 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       workflow files so nobody treats one gate as substituting for another — acceptance:
       `grep -ni "5k" repo-governance/workflows/plan/plan-execution.md` returns ≥ 1 hit
 - [ ] [AI] Add the conditional gate to `repo-governance/workflows/pr/pr-review-quality-gate.md` as
-      **merge precondition clause (d)**, alongside the Delta 8 clauses (3 cycles /
+      **merge precondition clause (e)** — the normative Delta 8 lettering — alongside clauses (a)-(d) (3 cycles / 0 CRITICAL+0 HIGH /
       up-to-date-with-`origin/main` / all gates green) — acceptance:
       `grep -ni "api-quality-gate\|surface-conditional" repo-governance/workflows/pr/pr-review-quality-gate.md`
       returns ≥ 1 hit
