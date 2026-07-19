@@ -255,6 +255,56 @@ Scenario: A markdown file citing a nonexistent Nx target fails validation
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
       — acceptance: all tests still pass
 
+**Gherkin (binds) →** "A markdown file citing an existing Nx target passes validation"
+
+```gherkin
+Scenario: A markdown file citing an existing Nx target passes validation
+  Given a tracked markdown file containing the command "npx nx run rhino-cli:test:quick"
+  And the resolved Nx project graph contains target "test:quick" on project "rhino-cli"
+  When the developer runs "rhino-cli md commands validate"
+  Then the command exits with status zero
+  And no finding is reported for that file
+```
+
+- [ ] [AI] **RED**: write failing test `existing_nx_target_produces_no_finding` in
+      `apps/rhino-cli/src/domain/doc_commands.rs`, asserting a citation of a real target on a real
+      project yields an empty finding list
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: fails (the detector reports every citation until the oracle is consulted)
+- [ ] [AI] **GREEN**: consult the Nx target oracle before emitting a finding, so a resolvable
+      project+target pair is passed over
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: `existing_nx_target_produces_no_finding` passes
+- [ ] [AI] **REFACTOR**: share the resolve-then-report branch with the other three resolver classes
+      so false-positive suppression is implemented once
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: all tests still pass
+
+**Gherkin (binds) →** "An inferred Nx target that is absent from project.json still passes validation"
+
+```gherkin
+Scenario: An inferred Nx target that is absent from project.json still passes validation
+  Given a tracked markdown file citing an Nx target present only via plugin inference
+  And the target is absent from the project's literal "project.json" targets map
+  When the developer runs "rhino-cli md commands validate"
+  Then the command exits with status zero
+  And no finding is reported for that target
+```
+
+- [ ] [AI] **RED**: write failing test `inferred_target_absent_from_project_json_produces_no_finding`
+      in `apps/rhino-cli/src/domain/doc_commands.rs`
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: fails (a `project.json`-only oracle reports the inferred target as missing).
+      **This is the load-bearing case for DD-2**: the oracle MUST read the _resolved_ graph
+      (`nx show project <p> --json`), not the literal `project.json`, or every plugin-inferred target
+      in the repo becomes a false positive.
+- [ ] [AI] **GREEN**: source the oracle from the resolved project graph so inferred targets resolve
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: `inferred_target_absent_from_project_json_produces_no_finding` passes
+- [ ] [AI] **REFACTOR**: cache the resolved graph across citations so the oracle is built once per run
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: all tests still pass
+
 **Gherkin (binds) →** "A citation naming a nonexistent Nx project is reported distinctly"
 
 ```gherkin
@@ -319,6 +369,31 @@ Scenario: A cargo-run citation of a nonexistent rhino-cli subcommand chain fails
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
       — acceptance: all tests still pass
 
+**Gherkin (binds) →** "A cargo-run citation of an existing rhino-cli subcommand chain passes validation"
+
+```gherkin
+Scenario: A cargo-run citation of an existing rhino-cli subcommand chain passes validation
+  Given a tracked markdown file citing "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate"
+  And the rhino-cli clap command tree resolves the chain "md links validate"
+  When the developer runs "rhino-cli md commands validate"
+  Then the command exits with status zero
+  And no finding is reported for that citation
+```
+
+- [ ] [AI] **RED**: write failing test `existing_cargo_run_subcommand_chain_produces_no_finding` in
+      `apps/rhino-cli/src/domain/doc_commands.rs`
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: fails (the chain resolver reports every cargo-run citation until the clap oracle
+      is consulted). Note the chain must be resolved **after** the `--` separator and walked level by
+      level (`md` → `links` → `validate`) against the built clap tree.
+- [ ] [AI] **GREEN**: resolve the post-`--` chain against the clap subcommand oracle before reporting
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: `existing_cargo_run_subcommand_chain_produces_no_finding` passes
+- [ ] [AI] **REFACTOR**: reuse the same chain walker for the nonexistent-chain case so both paths
+      share one traversal
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: all tests still pass
+
 **Gherkin (binds) →** "A citation of a nonexistent npm script fails validation"
 
 ```gherkin
@@ -341,6 +416,29 @@ Scenario: A citation of a nonexistent npm script fails validation
       — acceptance: all tests still pass
 
 ### False-positive suppression (TDD cycles)
+
+**Gherkin (binds) →** "A citation of an existing npm script passes validation"
+
+```gherkin
+Scenario: A citation of an existing npm script passes validation
+  Given a tracked markdown file containing the command "npm run lint:md:fix"
+  And the repository root "package.json" declares a script named "lint:md:fix"
+  When the developer runs "rhino-cli md commands validate"
+  Then the command exits with status zero
+  And no finding is reported for that citation
+```
+
+- [ ] [AI] **RED**: write failing test `existing_npm_script_produces_no_finding` in
+      `apps/rhino-cli/src/domain/doc_commands.rs`, using `lint:md:fix` — a script the root
+      `package.json` really declares (verified live)
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: fails (every `npm run` citation is reported until the script oracle is consulted)
+- [ ] [AI] **GREEN**: consult the root `package.json` scripts map before reporting
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: `existing_npm_script_produces_no_finding` passes
+- [ ] [AI] **REFACTOR**: load the scripts map once per run alongside the other oracles
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml doc_commands`
+      — acceptance: all tests still pass
 
 **Gherkin (binds) →** "A templated command containing an angle-bracket placeholder is ignored by default"
 
