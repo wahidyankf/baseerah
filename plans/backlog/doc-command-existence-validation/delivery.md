@@ -650,7 +650,14 @@ Scenario: Findings are emitted as machine-readable JSON on request
       `md_commands_validate_flag_surface` in `apps/rhino-cli/src/cli.rs` that walks
       `<Cli as clap::CommandFactory>::command()` down to the `md commands validate` leaf and asserts
       its argument ids are exactly `strict` and `exclude` (plus the inherited globals) and that **no
-      `format` arg exists** — command:
+      `format` arg exists**.
+      **You MUST call `.build()` on the root `Command` before walking to the leaf.** clap propagates
+      `global = true` args into a subcommand's own `get_arguments()` only inside `Command::build()`
+      (`clap_builder-4.6.0/src/builder/command.rs`, `_propagate_global_args`) — never automatically.
+      Empirically confirmed against the pinned `clap_builder 4.6.0` from `Cargo.lock`: without
+      `.build()` the leaf reports `["strict", "exclude"]`; with `.build()` it reports
+      `["strict", "exclude", "output"]`. A test written without `.build()` would fail its
+      inherited-globals assertion even though the CLI is correct — command:
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml md_commands_validate_flag_surface`
       — expected: exits 0.
       **`--help` MUST NOT be used to check the flag list**: this CLI declares `--help` as a custom
