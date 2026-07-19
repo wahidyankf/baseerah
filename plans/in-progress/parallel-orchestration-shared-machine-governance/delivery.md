@@ -599,7 +599,15 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       — acceptance: exit 0; bindings synced
 - [ ] [AI] Confirm no `apps/rhino-cli/**` surface changed (byte-identity guardrail):
       `git -C <primer-worktree> status --porcelain apps/rhino-cli` — acceptance: empty output
-- [ ] [AI] Commit (explicit paths), push to the ose-primer PR branch, open draft PR, drive PR gates green
+- [ ] [AI] Commit with explicit paths (never `git add -A` — the sibling repos carry unrelated WIP):
+      `git -C <primer-worktree> add <explicit paths> && git -C <primer-worktree> commit`
+      — acceptance: `git -C <primer-worktree> status --porcelain` shows no unintended files staged
+- [ ] [AI] Push to the ose-primer PR branch: `git -C <primer-worktree> push origin <branch>`
+      — acceptance: push succeeds; pre-push gates exit 0
+- [ ] [AI] Open the draft PR: `gh pr create --repo <ose-primer> --draft`
+      — acceptance: PR URL returned; PR shows as draft
+- [ ] [AI] Drive PR gates green: `gh pr checks <pr> --watch` (poll every 2 min, never `gh run watch`)
+      — acceptance: all required checks report success
 - [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply the hardened merge
       preconditions (3 cycles + up-to-date with `origin/main` via non-destructive forward update + gates
       green; **(d) the Delta 11 surface-conditional tester gates have been run and their defect findings
@@ -650,7 +658,15 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       ose-infra only; do NOT cross-route it into the public governance text
 - [ ] [AI] Confirm no `apps/rhino-cli/**` surface changed (byte-identity guardrail):
       `git -C <infra-worktree> status --porcelain apps/rhino-cli` — acceptance: empty output
-- [ ] [AI] Commit (explicit paths), push to the ose-infra PR branch, open draft PR, drive PR gates green
+- [ ] [AI] Commit with explicit paths (never `git add -A` — the sibling repos carry unrelated WIP):
+      `git -C <infra-worktree> add <explicit paths> && git -C <infra-worktree> commit`
+      — acceptance: `git -C <infra-worktree> status --porcelain` shows no unintended files staged
+- [ ] [AI] Push to the ose-infra PR branch: `git -C <infra-worktree> push origin <branch>`
+      — acceptance: push succeeds; pre-push gates exit 0
+- [ ] [AI] Open the draft PR: `gh pr create --repo <ose-infra> --draft`
+      — acceptance: PR URL returned; PR shows as draft
+- [ ] [AI] Drive PR gates green: `gh pr checks <pr> --watch` (poll every 2 min, never `gh run watch`)
+      — acceptance: all required checks report success
 - [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply the hardened merge
       preconditions (3 cycles + up-to-date with `origin/main` via non-destructive forward update + gates
       green; **(d) the Delta 11 surface-conditional tester gates have been run and their defect findings
