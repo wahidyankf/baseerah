@@ -142,7 +142,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 - [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift.
 - [ ] [AI] Establish baselines: `npx nx run ayokoding-www:build` and
-      `npx nx run ayokoding-www:test:unit` and `npx nx run ayokoding-www:test:integration`
+      `npx nx run ayokoding-www:test:unit`
       — acceptance: all exit 0; record pass state.
 - [ ] [AI] **Re-home source inventory (non-blocking snapshot)** — record the 33 shipped topics + 4
       existing capstones present under `<SE_OLD>` to `evidence/phase-0-snapshot.txt` via:
@@ -383,7 +383,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 
 - [ ] [AI] **RED** — write failing integration tests for `<FEAT>shell/manifest-repository.ts` (loads and
       validates each `<MANIFESTS>**/*.yaml` data file into a `PathManifest[]` via the `schemas.ts` zod
-      schema, keyed by the nested path id) — command: `npx nx run ayokoding-www:test:integration` —
+      schema, keyed by the nested path id) — command: `npx nx run ayokoding-www:test:unit` —
       acceptance: tests fail (repository wiring absent).
 
   **Gherkin (binds) →** "All three paths reference a shared course with no body duplication"
@@ -398,7 +398,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 
 - [ ] [AI] **RED** — write a failing integration test for the content service resolving
       `(courseId, activePath)` → path-aware prev/next — command:
-      `npx nx run ayokoding-www:test:integration` — acceptance: test fails (service wiring absent).
+      `npx nx run ayokoding-www:test:unit` — acceptance: test fails (service wiring absent).
 
   **Gherkin (binds) →** "Prev and next follow the active path's order"
 
@@ -423,7 +423,7 @@ subagents capped per the orchestration convention). The main thread self-promote
       per-course `prerequisites` alongside `trees`/`prevNext`
       [Repo-grounded — `ContentIndex` in `apps/ayokoding-www/src/features/content/core/types.ts` and
       the service in `.../content/shell/service.ts`] — command:
-      `npx nx run ayokoding-www:test:integration` — acceptance: the new integration tests pass. Wire
+      `npx nx run ayokoding-www:test:unit` — acceptance: the new integration tests pass. Wire
       `checkManifestIntegrity` + `checkPrerequisiteConsistency` into the repository so a load with any
       unresolved/duplicate ID or prerequisite-order violation throws at build time.
 - [ ] [AI] **GREEN** — wire the course route: in
@@ -444,23 +444,23 @@ subagents capped per the orchestration convention). The main thread self-promote
       `.../fundamentally-strong/software-engineer/<slug>` to
       `/en/c/learn/courses/<course-id>` in `apps/ayokoding-www/src/redirects/` [Repo-grounded —
       precedent `.../gherkin/navigation/learn-reorg-redirects.feature`] — command:
-      `npx nx run ayokoding-www:test:integration` — acceptance: redirect resolution test passes.
+      `npx nx run ayokoding-www:test:unit` — acceptance: redirect resolution test passes.
 - [ ] [AI] **GREEN (specs)** — implement the step bindings so the `<SPECS>` Gherkin scenarios execute —
       command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits 0.
 - [ ] [AI] **REFACTOR** — deduplicate breadcrumb/prev-next path-vs-canonical branches; keep `shell/`
       the only IO — command:
-      `npx nx run ayokoding-www:test:unit && :test:integration && :typecheck && :lint` — acceptance: all green.
+      `npx nx run ayokoding-www:test:unit && :typecheck && :lint` — acceptance: all green. (`:test:integration` is a no-op echo for this content app — the integration tier is deliberately unused; unit consumes the Gherkin mocked.)
 
 ### Phase 3 Gate
 
 - [ ] [AI] Manifest loading + path-aware route wiring + prerequisite display + redirects implemented; integration tests green.
 - [ ] [AI] `specs:behavior:coverage` green; canonical (no-path) nav unchanged (retained nav specs pass).
-- [ ] [AI] `npx nx run ayokoding-www:test:unit` + `:test:integration` + `:build` + `:typecheck` + `:lint` exit 0.
+- [ ] [AI] `npx nx run ayokoding-www:test:unit` + `:build` + `:typecheck` + `:lint` exit 0. (`:test:integration` is a no-op echo — omitted deliberately, not overlooked.)
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
 > **Pause Safety**: the feature resolves a manifest + path context + prerequisites end-to-end (no
 > manifests published yet, so the canonical view is what renders); redirects are in place. Safe to
-> stop. To resume: `:test:integration`.
+> stop. To resume: `npx nx run ayokoding-www:test:unit`.
 
 ---
 
@@ -554,9 +554,9 @@ Scenario: The navigation feature meets accessibility requirements
       exist yet). This RED step exists because the a11y scenario was previously bound only by the
       REFACTOR step below, which gave it no prior failing state.
       **Do NOT target `ayokoding-www:test:e2e`**: that target is `echo 'no-op: target not applicable
-  for this project'` and always exits 0, so any RED clause pointed at it can never fail. E2E for
+for this project'` and always exits 0, so any RED clause pointed at it can never fail. E2E for
       this app lives entirely in the paired `ayokoding-www-fe-e2e` project (`npx bddgen && npx
-  playwright test`).
+playwright test`).
 - [ ] [AI] **GREEN (a11y)** — add the landmark roles, accessible labels, `aria-current`, focus
       styling, and locale-correct `lang` attribute so the scenario passes — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e`
@@ -602,7 +602,7 @@ Scenario: The navigation feature meets accessibility requirements
       [prerequisite DAG](./tech-docs.md#prerequisite-dag-illustrative-excerpt) — command: `npx nx run ayokoding-www:build`
       — acceptance: every re-homed course declares `prerequisites` (empty list allowed for roots); build green.
 - [ ] [AI] Confirm each re-homed course has its redirect (Phase 3) old-URL → new-URL resolving —
-      command: `npx nx run ayokoding-www:test:integration` — acceptance: redirect specs green for all moved courses.
+      command: `npx nx run ayokoding-www:test:unit` — acceptance: redirect specs green for all moved courses.
 - [ ] [AI] Update `<COURSES>_index.md` (library landing) to list the re-homed catalog by course ID —
       acceptance: link-checker green; every catalog link resolves.
 - [ ] [AI] Sweep any intra-course cross-links that referenced the old
@@ -760,14 +760,14 @@ deploy), applying the convention:
       the ordered `courseOrder` = the interview-first arc from
       [tech-docs §Path `interview-ready/software-engineer`](./tech-docs.md#path-interview-readysoftware-engineer-interview-first)
       and [syllabus/paths/README.md](./syllabus/paths/README.md) — acceptance: the manifest loads +
-      validates (`npx nx run ayokoding-www:test:integration` exits 0); references only extant courses.
+      validates (`npx nx run ayokoding-www:test:unit` exits 0); references only extant courses.
 - [ ] [AI] Author the thin landing anchor `<PATHS>interview-ready/software-engineer/_index.md`
       (prose/SEO only — no `courseOrder`); the ordered course list renders from the loaded manifest per
       [prd.md Screen 2](./prd.md#screen-2--path-landing-page) — acceptance: landing renders the
       manifest-ordered list (phase-grouped, fast-path callout, interview-loop map).
 - [ ] [AI] **Manifest integrity + prerequisite-consistency check** — every `courseOrder` ID resolves
       under `<COURSES>`; no duplicate ID; every in-library prerequisite of each listed course appears
-      earlier in the ordering — command: `npx nx run ayokoding-www:test:integration` — acceptance: exits 0.
+      earlier in the ordering — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav end-to-end for this path: from the landing, prev/next walks the
       manifest order and preserves `?path=interview-ready/software-engineer`; breadcrumb shows the path;
       course pages show their prerequisites — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance:
@@ -808,7 +808,7 @@ deploy), applying the convention:
       and [syllabus/paths/README.md](./syllabus/paths/README.md) — the arc places editor/tooling → one
       language end-to-end → **build a real app first** ahead of CS-fundamentals/DS&A/systems depth —
       acceptance: body duplication = 0 (references shared course IDs only); references only extant
-      courses; manifest loads + validates (`npx nx run ayokoding-www:test:integration` exits 0).
+      courses; manifest loads + validates (`npx nx run ayokoding-www:test:unit` exits 0).
 - [ ] [AI] Author the thin landing anchor `<PATHS>immediately-effective/software-engineer/_index.md`
       (prose/SEO only — no `courseOrder`); the ordered course list renders from the loaded manifest —
       acceptance: landing renders the manifest-ordered arc.
@@ -817,7 +817,7 @@ deploy), applying the convention:
       — acceptance: hub shows both published paths.
 - [ ] [AI] **Manifest integrity + prerequisite-consistency + no-forked-body check** — every
       `courseOrder` ID resolves; no dup ID; prereq-consistency holds; no body duplicated across
-      manifests (all reference by ID) — command: `npx nx run ayokoding-www:test:integration` — acceptance: exits 0.
+      manifests (all reference by ID) — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav: prev/next walks the immediately-effective order and preserves
       `?path=immediately-effective/software-engineer`; a course shared with `interview-ready` shows the
       correct neighbor per active path — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance:
@@ -855,14 +855,14 @@ deploy), applying the convention:
       and [syllabus/paths/README.md](./syllabus/paths/README.md) — the arc places
       CS-foundations/computer-architecture/paradigms/DS&A/theory FIRST, then systems/architecture depth
       — acceptance: body duplication = 0 (references shared course IDs only); references only extant
-      courses; manifest loads + validates (`npx nx run ayokoding-www:test:integration` exits 0).
+      courses; manifest loads + validates (`npx nx run ayokoding-www:test:unit` exits 0).
 - [ ] [AI] Author the thin landing anchor `<PATHS>fundamentally-strong/software-engineer/_index.md`
       (prose/SEO only — no `courseOrder`); the ordered course list renders from the loaded manifest —
       acceptance: landing renders the fundamentals-first arc.
 - [ ] [AI] Update `<PATHS>_index.md` (paths hub) so **all three** path cards are present per
       [prd.md Screen 1](./prd.md#screen-1--paths-hub-choose-your-path) — acceptance: hub shows all three paths.
 - [ ] [AI] **Manifest integrity + prerequisite-consistency + no-forked-body check** across all three
-      manifests — command: `npx nx run ayokoding-www:test:integration` — acceptance: exits 0.
+      manifests — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav: prev/next walks the fundamentals-first order and preserves
       `?path=fundamentally-strong/software-engineer`; a course shared across paths shows the correct
       neighbor per active path — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: e2e passes
@@ -1022,7 +1022,7 @@ deploy), applying the convention:
 - [ ] [AI] After each band lands, append its newly-available courses into the three manifests
       (`<MANIFESTS>{interview-ready,immediately-effective,fundamentally-strong}/software-engineer.yaml`)
       per each path's arc, then re-run `checkManifestIntegrity` + `checkPrerequisiteConsistency` +
-      no-forked-body — command: `npx nx run ayokoding-www:test:integration` — acceptance: exits 0 after each growth.
+      no-forked-body — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0 after each growth.
 - [ ] [AI] After the final band, confirm all three manifests reference the intended full arcs (no
       omitted-by-mistake courses; omit-or-create honored) and the library holds the full **121-course**
       catalog — command: `npx nx run ayokoding-www:build` — acceptance: 121 course bundles resolve; all three manifests validate.
