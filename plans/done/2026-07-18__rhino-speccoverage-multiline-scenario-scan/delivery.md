@@ -737,6 +737,10 @@ lives in `ose-public` alone.
       link in `plans/done/2026-07-17__rhino-cli-source-drift-reconciliation/README.md` (pointed at
       the never-existent `plans/done/rhino-speccoverage-multiline-scenario-scan/`, now corrected to
       the actual archived path); `plans/README.md` and `plans/ideas.md` had no references
-- [ ] [AI] Commit the archival: `chore(plans): move rhino-speccoverage-multiline-scenario-scan to done`
-- [ ] [HUMAN] Merge the ose-public PR to `main` when ready — acceptance: PR shows MERGED (this sits
+- [x] [AI] Commit the archival: `chore(plans): move rhino-speccoverage-multiline-scenario-scan to done`
+      — done: `16033fb6d` (rename) + `e360366fd` (content), pushed
+- [x] [AI] Merge the ose-public PR to `main` when ready — acceptance: PR shows MERGED (this sits
       outside the plan's done-boundary; the plan is "done" once the PR is green and fully reviewed)
+      — done: merged per the standing session override (AI merges once gates are green, no human
+      wait) — branch updated against `main` first (`gh pr update-branch`), CI re-confirmed green
+      (20/20), squash-merged 2026-07-17T18:52:19Z, `gh pr view 62 --json state` → MERGED
