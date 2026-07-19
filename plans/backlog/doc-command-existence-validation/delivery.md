@@ -10,7 +10,7 @@
 
 ## Worktree
 
-Worktree path: `worktrees/doc-command-existence-validation/`
+Initial worktree path (PR-1, Phases 0-2): `worktrees/doc-command-existence-validation/`
 
 Optional manual pre-provisioning (run from repo root):
 
@@ -22,6 +22,12 @@ The plan-execution Step 0 gate enters this worktree by default: it auto-provisio
 `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before
 deleting the worktree after the plan is archived and pushed.
 
+Per the maintainer's standing rule — **1 PR ↔ 1 worktree** — this is only the _initial_ worktree.
+Phase 3 (PR-2), Phase 4 (PR-3), and Phase 8 (PR-6) each explicitly provision their own additional
+`worktrees/<name>/` directory, branched from the then-latest `origin/main`, at the start of the
+phase — mirroring the same `fetch` + `worktree add` + branch-point-verification discipline Phase 5
+and Phase 6 already use for the sibling-repo worktrees. The PR table below names every worktree.
+
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and
 [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
@@ -30,8 +36,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 Work happens in `worktrees/doc-command-existence-validation/`; changes land via draft PR against
 `main`; `[HUMAN]` merges. Per-phase PRs where the DAG allows, one PR per worktree.
 
-**Per-phase PR grouping** (each group is one PR from one worktree; groups 5 and 6 may run in
-parallel after group 4 merges):
+**Per-phase PR grouping** (each group is one PR from one worktree; PR-4 and PR-5 — Phases 5 and 6 —
+may run in parallel once PR-3, Phase 4, merges):
 
 | PR   | Phases                       | Worktree                                       |
 | ---- | ---------------------------- | ---------------------------------------------- |
@@ -50,7 +56,7 @@ Each `*-to-pr` PR runs the **PR-Review Maker→Fixer Cycle** (3 sequential CI-ga
 
 ## Phase 0: Environment Setup and Baseline
 
-> _Executor: repo-setup-manager_
+> _Suggested executor: `repo-setup-manager`_
 
 - [ ] [AI] Install dependencies in the root worktree: `npm install` — acceptance: exits 0,
       `node_modules/` synchronized
@@ -110,6 +116,8 @@ Each `*-to-pr` PR runs the **PR-Review Maker→Fixer Cycle** (3 sequential CI-ga
       — acceptance: exits 0
 
 ### rhino-cli clap oracle (TDD cycle)
+
+**Gherkin (underpins) →** the rhino-cli subcommand scenarios in `prd.md §rhino-cli subcommand detection`
 
 **Gherkin (binds) →** "The subcommand oracle is derived from the live clap tree rather than a hardcoded list"
 
@@ -171,6 +179,8 @@ Scenario: The subcommand oracle is derived from the live clap tree rather than a
       — acceptance: all tests still pass
 
 ### npm script oracle (TDD cycle)
+
+**Gherkin (underpins) →** the npm-script scenarios in `prd.md §npm script detection`
 
 - [ ] [AI] **RED**: write a failing test `npm_scripts_parsed_from_package_json` asserting
       `lint:md:fix` resolves and `ghost:script` does not, against a fixture `package.json`
@@ -517,6 +527,17 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       `cargo run --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --help`
       exits 0 and prints the flag list
 - [ ] [AI] Register the module in `apps/rhino-cli/src/commands.rs` — acceptance: build exits 0
+
+**Gherkin (binds) →** "The validator participates in the aggregate md audit"
+
+```gherkin
+Scenario: The validator participates in the aggregate md audit
+  Given a tracked markdown file citing a nonexistent Nx target
+  When the developer runs "rhino-cli md audit"
+  Then the command exits with a nonzero status
+  And the aggregated output includes the command-existence finding
+```
+
 - [ ] [AI] **RED**: write a failing test `md_audit_includes_command_existence` in
       `apps/rhino-cli/src/commands/md_audit.rs` asserting the aggregate `md audit` run invokes the
       new command-existence validator
@@ -533,6 +554,17 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 - [ ] [AI] Add the `commands:validation` target to `apps/rhino-cli/project.json` following the
       `{domain}:{work}` rule — acceptance:
       `npx nx show project rhino-cli --json` lists `commands:validation`
+
+**Gherkin (binds) →** "Findings are emitted as machine-readable JSON on request"
+
+```gherkin
+Scenario: Findings are emitted as machine-readable JSON on request
+  Given a tracked markdown file citing a nonexistent Nx target
+  When the developer runs "rhino-cli md commands validate --format json"
+  Then the output parses as valid JSON
+  And each finding object carries a file path, a line number, the cited command, and a reason
+```
+
 - [ ] [AI] **RED**: write a failing test `format_json_flag_produces_valid_json` in
       `apps/rhino-cli/src/domain/doc_commands.rs` asserting `--format json` output parses as valid
       JSON with the expected finding-list shape
@@ -612,6 +644,22 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 > _Suggested executor: `repo-rules-fixer`_
 
+### Provision the PR-2 worktree
+
+- [ ] [AI] Fetch and provision this phase's worktree at the repo-local `worktrees/<name>/` path:
+      `git fetch origin` then
+      `git worktree add worktrees/doc-command-existence-remediation -b doc-command-existence-remediation origin/main`
+      — acceptance: `git worktree list` shows the new worktree at
+      `worktrees/doc-command-existence-remediation`, and
+      `git -C worktrees/doc-command-existence-remediation rev-parse HEAD` equals
+      `git rev-parse origin/main` (proves it is branched from the LATEST `origin/main`, which by
+      this point includes PR-1's merged changes — not a stale ref)
+- [ ] [AI] Initialize the toolchain inside the new worktree and treat it as this phase's working
+      directory for every subsequent step (`cd worktrees/doc-command-existence-remediation` — do
+      not rely on the shell's inherited working directory):
+      `npm install && npm run doctor -- --fix` — acceptance: exits 0;
+      `git -C worktrees/doc-command-existence-remediation status --porcelain` is empty
+
 - [ ] [AI] Produce the full violation inventory:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done --exclude apps/rhino-cli/tests/fixtures --format json > local-temp/doc-command-findings.json`
       — acceptance: file written; finding count recorded in `learnings.md`
@@ -634,8 +682,13 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 - [ ] [AI] Verify every remaining row in that table resolves against the live graph by
       cross-checking each against `npx nx show project rhino-cli --json` — acceptance: every listed
       target appears in the resolved target list; no row remains that does not
-- [ ] [AI] Check prose elsewhere in `nx-targets.md` for references to the six deleted targets
-      (the surrounding paragraphs and the `{domain}:{work}` examples may cite them) — acceptance:
+- [ ] [AI] Check prose elsewhere in `nx-targets.md` for references to the three deleted targets
+      most likely to appear outside the table (the surrounding paragraphs and the `{domain}:{work}`
+      examples may cite them). `specs:domain:coverage` is deliberately excluded from this prose
+      check — it has legitimate, unrelated occurrences elsewhere in the file (it IS a real target on
+      other projects such as `organiclever-be`/`ose-be`); `cross-vendor:parity-validation` and
+      `harness:bindings-validation` are also excluded — both have zero occurrences anywhere in the
+      file outside the table itself, so checking them here would be a no-op — acceptance:
       `grep -nE "links:validation|mermaid:validation|headings:hierarchy-validation" repo-governance/development/infra/nx-targets.md`
       returns no line that asserts the target exists
 - [ ] [AI] Fix every remaining finding in `local-temp/doc-command-findings.json` — for each,
@@ -676,6 +729,22 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 ## Phase 4: Hook and CI Wiring
 
 > _Suggested executor: `ci-fixer`_
+
+### Provision the PR-3 worktree
+
+- [ ] [AI] Fetch and provision this phase's worktree at the repo-local `worktrees/<name>/` path:
+      `git fetch origin` then
+      `git worktree add worktrees/doc-command-existence-wiring -b doc-command-existence-wiring origin/main`
+      — acceptance: `git worktree list` shows the new worktree at
+      `worktrees/doc-command-existence-wiring`, and
+      `git -C worktrees/doc-command-existence-wiring rev-parse HEAD` equals
+      `git rev-parse origin/main` (proves it is branched from the LATEST `origin/main`, which by
+      this point includes PR-1 and PR-2's merged changes — not a stale ref)
+- [ ] [AI] Initialize the toolchain inside the new worktree and treat it as this phase's working
+      directory for every subsequent step (`cd worktrees/doc-command-existence-wiring` — do not
+      rely on the shell's inherited working directory):
+      `npm install && npm run doctor -- --fix` — acceptance: exits 0;
+      `git -C worktrees/doc-command-existence-wiring status --porcelain` is empty
 
 - [ ] [AI] Add the validator invocation to `.husky/pre-push` after the existing
       `md readme-index validate` line (currently line 12):
@@ -739,13 +808,28 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       `git -C <primer-worktree> rev-parse HEAD` equals
       `git -C /Users/wkf/ose-projects/ose-primer rev-parse origin/main` (proves it is branched from
       the LATEST `origin/main`, not a stale local ref)
+- [ ] [AI] Bind `<public>` = the **PR-3 worktree** at
+      `/Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring` for every
+      `<public>`-referencing step in Phases 5, 6, and 7. This is the freshest fully-synced `ose-public`
+      checkout by this point (PR-3 has merged), and it is what the byte-identity diffs must compare
+      against — **not** the primary checkout at `/Users/wkf/ose-projects/ose-public`, which may lag
+      behind the merged rhino-cli source this plan just landed — acceptance:
+      `git -C <public> rev-parse HEAD:apps/rhino-cli` equals
+      `git -C /Users/wkf/ose-projects/ose-public rev-parse origin/main:apps/rhino-cli` (proves the
+      bound checkout carries the merged rhino-cli subtree)
 - [ ] [AI] Set `<primer-worktree>` = `/Users/wkf/ose-projects/ose-primer/worktrees/doc-command-existence-validation`
       for every subsequent step in this phase; run `npm install && npm run doctor -- --fix`
       **inside that worktree** (`cd` into it — do not rely on the shell's inherited working
       directory) — acceptance: `git -C <primer-worktree> status --porcelain` is empty; toolchain
       converged
 - [ ] [AI] Copy `apps/rhino-cli/` from `ose-public` to `<primer-worktree>` verbatim — acceptance:
-      `diff -r <public>/apps/rhino-cli <primer-worktree>/apps/rhino-cli` produces no output
+      `diff -rq --exclude=target --exclude=dist <public>/apps/rhino-cli <primer-worktree>/apps/rhino-cli`
+      produces no output. Both `target/` and `dist/` are gitignored and untracked, and since
+      `plans/done/2026-07-19__rust-cargo-target-dir-sharing/` merged the same day this plan was
+      authored, `apps/rhino-cli/target` is now a per-repo symlink into
+      `$HOME/.cache/ose-cargo-target/<repo-name>/rhino-cli` — it legitimately differs between
+      `ose-public` and `ose-primer`, so a plain `diff -r` would false-fail. Excluding both matches
+      the idiom established in that sibling plan's `delivery.md`
 - [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim into `<primer-worktree>` —
       acceptance:
       `diff -r <public>/specs/apps/rhino/behavior/rhino-cli/gherkin <primer-worktree>/specs/apps/rhino/behavior/rhino-cli/gherkin`
@@ -782,7 +866,9 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `diff -r <public>/apps/rhino-cli <primer-worktree>/apps/rhino-cli` — expected: no output
+- [ ] [AI] `diff -rq --exclude=target --exclude=dist <public>/apps/rhino-cli <primer-worktree>/apps/rhino-cli`
+      — expected: no output (excludes the per-repo `target/` symlink and untracked `dist/`; see the
+      copy step above)
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done`
       run from inside `<primer-worktree>` — expected: exits 0
 
@@ -820,7 +906,13 @@ Scenario: A path in the configured exclusion allowlist is not scanned
       directory) — acceptance: `git -C <infra-worktree> status --porcelain` is empty; toolchain
       converged
 - [ ] [AI] Copy `apps/rhino-cli/` verbatim from `ose-public` into `<infra-worktree>` — acceptance:
-      `diff -r <public>/apps/rhino-cli <infra-worktree>/apps/rhino-cli` produces no output
+      `diff -rq --exclude=target --exclude=dist <public>/apps/rhino-cli <infra-worktree>/apps/rhino-cli`
+      produces no output. Both `target/` and `dist/` are gitignored and untracked, and since
+      `plans/done/2026-07-19__rust-cargo-target-dir-sharing/` merged the same day this plan was
+      authored, `apps/rhino-cli/target` is now a per-repo symlink into
+      `$HOME/.cache/ose-cargo-target/<repo-name>/rhino-cli` — it legitimately differs between
+      `ose-public` and `ose-infra`, so a plain `diff -r` would false-fail. Excluding both matches
+      the idiom established in that sibling plan's `delivery.md`
 - [ ] [AI] Copy `specs/apps/rhino/behavior/rhino-cli/gherkin/` verbatim into `<infra-worktree>` —
       acceptance:
       `diff -r <public>/specs/apps/rhino/behavior/rhino-cli/gherkin <infra-worktree>/specs/apps/rhino/behavior/rhino-cli/gherkin`
@@ -855,7 +947,9 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `diff -r <public>/apps/rhino-cli <infra-worktree>/apps/rhino-cli` — expected: no output
+- [ ] [AI] `diff -rq --exclude=target --exclude=dist <public>/apps/rhino-cli <infra-worktree>/apps/rhino-cli`
+      — expected: no output (excludes the per-repo `target/` symlink and untracked `dist/`; see the
+      copy step above)
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md commands validate --exclude plans/done`
       run from inside `<infra-worktree>` — expected: exits 0
 
@@ -866,6 +960,14 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 ## Phase 7: Three-Way Byte-Identity Verification
 
+- [ ] [AI] Bind `<repo>` for each of the three legs before running any comparison below:
+      **ose-public** = `/Users/wkf/ose-projects/ose-public/worktrees/doc-command-existence-wiring`
+      (the PR-3 worktree carrying the merged rhino-cli source — the primary checkout may lag);
+      **ose-primer** = `/Users/wkf/ose-projects/ose-primer`; **ose-infra** =
+      `/Users/wkf/ose-projects/ose-infra`. The two siblings are **bare** repos, and
+      `git -C <bare-repo> rev-parse HEAD:<path>` resolves correctly against a bare root, so no
+      worktree is required for the SHA plumbing — acceptance: all three
+      `git -C <repo> rev-parse HEAD` invocations succeed and print a commit SHA
 - [ ] [AI] Capture the `apps/rhino-cli` tree SHA in each repo:
       `git -C <repo> rev-parse HEAD:apps/rhino-cli` for `ose-public`, `ose-primer`, `ose-infra`
       — acceptance: all three SHAs recorded in `learnings.md`
@@ -898,6 +1000,22 @@ Scenario: A path in the configured exclusion allowlist is not scanned
 
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
+
+### Provision the PR-6 worktree
+
+- [ ] [AI] Fetch and provision this phase's worktree at the repo-local `worktrees/<name>/` path:
+      `git fetch origin` then
+      `git worktree add worktrees/doc-command-existence-verify -b doc-command-existence-verify origin/main`
+      — acceptance: `git worktree list` shows the new worktree at
+      `worktrees/doc-command-existence-verify`, and
+      `git -C worktrees/doc-command-existence-verify rev-parse HEAD` equals
+      `git rev-parse origin/main` (proves it is branched from the LATEST `origin/main`, which by
+      this point includes PR-1 through PR-3's ose-public-side merges — not a stale ref)
+- [ ] [AI] Initialize the toolchain inside the new worktree and treat it as the working directory
+      for the rest of Phase 8 and Plan Archival (`cd worktrees/doc-command-existence-verify` — do
+      not rely on the shell's inherited working directory):
+      `npm install && npm run doctor -- --fix` — acceptance: exits 0;
+      `git -C worktrees/doc-command-existence-verify status --porcelain` is empty
 
 - [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface
       would catch this automatically next time; discard the rest with a one-line reason
