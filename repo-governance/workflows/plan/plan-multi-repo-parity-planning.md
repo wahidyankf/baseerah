@@ -196,10 +196,11 @@ happens before plans land on `main`, mirroring the same rationale for the siblin
 below).
 
 **Note on ose-primer**: When `ose-primer` is a parity target, propagation to it can be delivered
-EITHER as a draft PR OR as a direct push to `ose-primer:main` — every mutation must flow through a
-worktree, but the delivery mode is the caller's per-run choice, independent of this workflow's own
-`worktree-to-pr` default. Selecting `main-to-origin-main` or `worktree-to-origin-main` for
-ose-primer is therefore a first-class delivery choice, not a deviation. The grilling in Step 3
+EITHER as a draft PR OR as a direct push to `ose-primer:main`. The delivery mode is the caller's
+per-run choice, independent of this workflow's own `worktree-to-pr` default, so selecting
+`worktree-to-origin-main` for ose-primer is a first-class choice, not a deviation. `ose-primer` is
+a **bare** repository with no primary checkout, so the two `main-to-*` modes are unavailable there
+— every ose-primer mutation flows through a worktree. The grilling in Step 3
 MUST surface the delivery-mode choice explicitly and record the invoker's decision before
 proceeding.
 
