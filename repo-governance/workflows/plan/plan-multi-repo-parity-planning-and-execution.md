@@ -15,10 +15,10 @@ inputs:
     default: "ose-public, ose-primer, ose-infra"
   - name: mode
     type: enum
-    values: [main-to-main, worktree-to-main]
+    values: [main-to-origin-main, worktree-to-origin-main]
     description: "Planning-phase delivery mode passed to plan-multi-repo-parity-planning. worktree-to-pr is NOT supported by this composite — execution cannot start on plans that are awaiting PR review (use the planning workflow alone for that)"
     required: false
-    default: worktree-to-main
+    default: worktree-to-origin-main
   - name: gate-mode
     type: enum
     values: [lax, normal, strict, ocd]
@@ -165,10 +165,10 @@ All of its steps apply unchanged: parity-set survey, deviation-matrix constructi
 - `stage` is fixed to `in-progress` — execution follows immediately, so plans must land in
   `plans/in-progress/<objective-slug>/` in each repo. A backlog parity run does not belong in
   this composite.
-- `mode` is restricted to the main-push modes (`main-to-main`, `worktree-to-main`). The
-  `worktree-to-pr` mode leaves plans unmerged and execution MUST NOT start on them; if the
-  invoker wants PR review, terminate after the planning phase and direct them to the standalone
-  workflows.
+- `mode` is restricted to the direct-push modes (`main-to-origin-main`,
+  `worktree-to-origin-main`). The `worktree-to-pr` mode leaves plans unmerged and execution MUST
+  NOT start on them; if the invoker wants PR review, terminate after the planning phase and
+  direct them to the standalone workflows.
 - Each authored plan MUST carry its `## Worktree` section (the planning workflow's plan-checker
   gate enforces this) — the execution phase depends on it.
 
