@@ -1,6 +1,6 @@
 ---
 title: "CI Post-Push Verification Convention"
-description: After pushing to origin main, manually trigger all related GitHub CI workflows and verify they pass before considering the work complete
+description: After pushing app or library code — to a PR branch under the default worktree-to-pr, or to origin main under the direct-push modes — manually trigger all related GitHub CI workflows and verify they pass before considering the work complete
 category: explanation
 subcategory: development
 tags:
@@ -13,7 +13,7 @@ tags:
 
 # CI Post-Push Verification Convention
 
-After pushing to `origin main`, you MUST manually trigger all related GitHub CI workflows and verify they pass before declaring the work done. A green pre-push hook is a necessary condition, not a sufficient one — it cannot run integration tests, end-to-end tests, or deployment workflows.
+After pushing app or library code, you MUST manually trigger all related GitHub CI workflows and verify they pass before declaring the work done. **This obligation is delivery-mode-independent**: it applies to a push to a PR branch under the default `worktree-to-pr` exactly as it applies to a push to `origin main` under the direct-push modes. Under `worktree-to-pr` it is what makes the PR green, which merge precondition (d) requires. A green pre-push hook is a necessary condition, not a sufficient one — it cannot run integration tests, end-to-end tests, or deployment workflows.
 
 ## Principles Implemented/Respected
 
@@ -31,13 +31,13 @@ This practice implements/respects the following development practices:
 
 - **[CI Blocker Resolution Convention](../quality/ci-blocker-resolution.md)**: When a CI workflow fails after push, the failure is treated as a CI blocker. Investigate the root cause and fix it properly per that convention. Never defer or bypass.
 
-- **[Trunk Based Development Convention](./trunk-based-development.md)**: TBD requires that `main` is always in a releasable state. A push that breaks CI leaves `main` in an unreleasable state. This convention closes that gap by mandating verification after every push to `main`.
+- **[Trunk Based Development Convention](./trunk-based-development.md)**: TBD requires that `main` is always in a releasable state. Work that breaks CI would leave `main` unreleasable once it lands. This convention closes that gap by mandating verification after every push — on the PR branch under the default `worktree-to-pr`, which catches the breakage _before_ it can reach `main`, and on `main` itself under the direct-push modes, where there is no earlier checkpoint.
 
-- **[Git Push Default Convention](./git-push-default.md)**: The default push is direct to `origin main`. Because there is no PR review buffer, CI post-push verification is the mechanism that catches what the pre-push hook missed.
+- **[Git Push Default Convention](./git-push-default.md)**: The default integration target is a PR branch (`worktree-to-pr`); the direct-push modes remain available where a plan declares them. Under the direct-push modes there is no PR review buffer at all, so CI post-push verification is the only mechanism that catches what the pre-push hook missed; under `worktree-to-pr` it is what makes the PR green before the merge preconditions can hold.
 
 ## The Rule
 
-After pushing app or library code to `origin main`, you MUST:
+After pushing app or library code — to the PR branch under `*-to-pr` modes, or to `origin main` under the direct-push modes — you MUST:
 
 1. **Identify which apps and libs were changed.** Use `git diff HEAD~1 --name-only` or `nx affected --base=HEAD~1` to determine the blast radius.
 2. **Trigger the relevant CI workflows.** Use `gh workflow run` for each workflow that covers the changed apps or libs.
@@ -93,7 +93,7 @@ gh run list --limit=10
 
 ## When This Convention Applies
 
-This convention applies after any push to `origin main` that touches:
+This convention applies after **any** push that touches the following, regardless of whether the target is a PR branch or `origin main`:
 
 - App source code under `apps/`
 - Library source code under `libs/`
@@ -130,11 +130,11 @@ The pre-push hook is fast and local. CI workflows are comprehensive and environm
 
 ## Agent Responsibilities
 
-| Agent / Workflow        | Responsibility                                                                                                                        |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| All AI agents           | After pushing app or lib code changes to `origin main`, trigger and monitor all relevant CI workflows before declaring work complete. |
-| plan-execution workflow | CI post-push verification is a required final step in any delivery that includes app or lib changes. It is not optional.              |
-| Developer (human)       | Same requirement as agents — trigger and verify CI workflows before declaring work done.                                              |
+| Agent / Workflow        | Responsibility                                                                                                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All AI agents           | After pushing app or lib code changes to the delivery target (PR branch or `origin main`, per the declared mode), trigger and monitor all relevant CI workflows before declaring work complete. |
+| plan-execution workflow | CI post-push verification is a required final step in any delivery that includes app or lib changes. It is not optional.                                                                        |
+| Developer (human)       | Same requirement as agents — trigger and verify CI workflows before declaring work done.                                                                                                        |
 
 ## Forbidden Actions
 
@@ -213,5 +213,5 @@ Result: All steps passed. Work is complete.
 - [CI Monitoring Convention](./ci-monitoring.md) — Safe monitoring mechanics: ScheduleWakeup every 2-5 min as default, `gh run watch` only for <5 min jobs, trigger discipline, rate-limit recovery.
 - [CI Blocker Resolution Convention](../quality/ci-blocker-resolution.md) — How to investigate and fix CI failures found during verification.
 - [Trunk Based Development Convention](./trunk-based-development.md) — Why `main` must remain releasable at all times.
-- [Git Push Default Convention](./git-push-default.md) — Default push behavior (direct to `origin main`, no PR buffer).
+- [Git Push Default Convention](./git-push-default.md) — Default push behavior (a PR branch under the default `worktree-to-pr`; direct to `origin main` under the explicitly-selected direct-push modes, which have no PR buffer).
 - [Code Quality Convention](../quality/code.md) — Pre-push hook quality gates that this convention extends.

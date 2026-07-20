@@ -26,9 +26,9 @@ inputs:
     default: 7
   - name: max-concurrency
     type: number
-    description: Maximum number of agents/tasks that can run concurrently during workflow execution
+    description: "Background agents run concurrently — the N in the N+1 model (1 main thread + N background agents = N+1 total). Raise only when independent work, machine capacity, and budget headroom all allow; lower under budget, runner, or disk pressure. Never self-promoted beyond the declared value."
     required: false
-    default: 2
+    default: 3
 outputs:
   - name: final-status
     type: enum
@@ -283,8 +283,16 @@ executing under a `*-to-pr` mode (`worktree-to-pr` or `main-to-pr`), full "done"
 actual delivery additionally requires satisfying the
 [PR-Review Maker→Fixer Cycle](../pr/pr-review-quality-gate.md)'s done-definition — N review
 cycles complete, every inline comment answered, all PR gates GREEN, archival committed inside the
-PR — before the `[HUMAN]` merge. The two gates sit at different lifecycle stages: this workflow
+PR — before the merge. The two gates sit at different lifecycle stages: this workflow
 gates the plan document pre-execution; the PR-review cycle gates the delivered change pre-merge.
+
+**The hardened merge preconditions** that gate that eventual merge — **all five** required: (a) 3
+`pr-review-maker` → `pr-review-fixer` cycles complete; (b) 0 CRITICAL + 0 HIGH findings outstanding;
+(c) the branch **up-to-date with the latest `origin/main`**, brought forward **non-destructively**
+if behind (never a shared-history rewrite); (d) all PR quality gates green; (e) the
+surface-conditional tester gates run and their defect findings resolved, or the exemption explicitly
+recorded. `[AI]` merges once they hold; a `[HUMAN]` merge gate applies only where a plan's own step
+says so explicitly, with identical preconditions either way.
 
 ## Example Usage
 
@@ -414,7 +422,10 @@ The plan-checker validates:
 - **Clarity**: Clear problem statements, well-defined scope, unambiguous requirements
 - **Operational Readiness** (CRITICAL): Plans must include all of the following:
   - **Local quality gates**: Steps to run affected tests, linting, typecheck locally before pushing (`nx affected -t typecheck lint test:quick specs:coverage`)
-  - **Post-push CI verification**: Steps to monitor and verify GitHub Actions/workflows pass after pushing to main, with instructions to fix failures immediately
+  - **Post-push CI verification**: Steps to monitor and verify GitHub Actions/workflows pass after
+    the push — against the plan's declared delivery target (the PR's check run under `*-to-pr`,
+    `origin main` under the direct-push modes) — with instructions to fix failures immediately. This
+    requirement is delivery-mode-independent; a `*-to-pr` plan is **not** exempt
   - **Development environment setup**: Steps to set up the dev environment for the features being built (dependencies, env vars, DB, dev server)
   - **Fix-all-issues instruction**: Explicit instruction to fix ALL failures found during quality gates — including preexisting issues not caused by the current changes (root cause orientation principle)
   - **Thematic commit guidance**: Instruction to commit changes thematically with Conventional Commits format, splitting different domains/concerns into separate commits
@@ -496,4 +507,4 @@ This workflow ensures plan quality and implementation readiness through iterativ
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: Workflow validates the five-document structure and worktree section per the convention
 - **[Plan Anti-Hallucination Convention](../../development/quality/plan-anti-hallucination.md)**: plan-checker's Step 5f enforces this convention's recipes, confidence labels, and Anti-Pattern Catalog
 - **[Multi-Harness Binding Convention](../../conventions/structure/multi-harness-binding.md)**: plan-checker's Step 5g (harness-neutrality scan) enforces this convention when the plan touches agents, skills, rules, or `repo-governance/` paths
-- **[Plans Organization Convention §Delivery Mode](../../conventions/structure/plans.md#delivery-mode)**: for plans resolving to a `*-to-pr` delivery mode, this workflow's `pass` status is a pre-execution gate, not a substitute for the [PR-Review Maker→Fixer Cycle](../pr/pr-review-quality-gate.md)'s done-definition that gates the eventual PR before the `[HUMAN]` merge
+- **[Plans Organization Convention §Delivery Mode](../../conventions/structure/plans.md#delivery-mode)**: for plans resolving to a `*-to-pr` delivery mode, this workflow's `pass` status is a pre-execution gate, not a substitute for the [PR-Review Maker→Fixer Cycle](../pr/pr-review-quality-gate.md)'s done-definition that gates the eventual PR before the merge

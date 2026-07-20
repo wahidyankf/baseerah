@@ -271,16 +271,16 @@ Every plan resolves to exactly one **delivery mode** before execution begins, de
 
 **The four modes** (full table and precedence algorithm: [Plans Organization Convention §Delivery Mode](../../../repo-governance/conventions/structure/plans.md#delivery-mode)):
 
-- **`worktree-to-pr`** — **the default** when no mode is otherwise specified. Work in `worktrees/<plan-identifier>/`, draft PR opened against `main`, `[HUMAN]` merges when ready.
+- **`worktree-to-pr`** — **the default** when no mode is otherwise specified. Work in `worktrees/<plan-identifier>/`, draft PR opened against `main`, `[AI]` merges once the hardened preconditions hold (a `[HUMAN]` merge gate applies only where the plan's own step says so).
 - **`worktree-to-origin-main`** — work in the worktree, direct push to `origin main`, `[AI]` pushes directly.
 - **`main-to-origin-main`** — primary checkout (no worktree), direct push to `origin main`, `[AI]` pushes directly.
-- **`main-to-pr`** — primary checkout (no worktree), PR opened against `main`, `[HUMAN]` merges when ready.
+- **`main-to-pr`** — primary checkout (no worktree), PR opened against `main`, `[AI]` merges once the hardened preconditions hold (a `[HUMAN]` merge gate applies only where the plan's own step says so).
 
 `worktree-to-pr` is the safest default absent a reason to pick another mode — it isolates work and routes it through review before it touches `main`.
 
 **Declare it explicitly**: `## Delivery Mode: worktree-to-pr` (or one of the other three modes), placed immediately alongside the `## Worktree` declaration. An unmarked plan resolves to the tier-3 default (`worktree-to-pr`) per the three-tier precedence algorithm (invocation argument → plan field → default).
 
-**`*-to-pr` modes run the PR-Review Maker→Fixer Cycle**: for `worktree-to-pr` and `main-to-pr`, the delivery checklist's finalization phase MUST emit the [PR-Review Maker→Fixer Cycle workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md) (a fixed N-cycle, default 3, sequential `pr-review-maker` → `pr-review-fixer` loop with a hard CI-green gate between cycles) before the PR is considered done. The `[HUMAN]` merge itself sits outside this done-boundary — the plan hands off a green, fully-reviewed PR and the human merges on their own schedule.
+**`*-to-pr` modes run the PR-Review Maker→Fixer Cycle**: for `worktree-to-pr` and `main-to-pr`, the delivery checklist's finalization phase MUST emit the [PR-Review Maker→Fixer Cycle workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md) (a fixed N-cycle, default 3, sequential `pr-review-maker` → `pr-review-fixer` loop with a hard CI-green gate between cycles) before the PR is considered done. The merge itself sits outside this done-boundary — `[AI]` merges by default once the hardened preconditions hold, and a `[HUMAN]` merge gate applies only where the plan's own step says so explicitly.
 
 **Invalid values are a finding, never silently coerced**: a delivery-mode value that is not one of the four modes above is a `plan-checker` HIGH finding, not a silent fallback to the default.
 
@@ -360,7 +360,7 @@ Every delivery checklist item MUST make clear **who can execute it**. Some work 
 
 **Default bias (prefer `[AI]`, HARD RULE)**: use `[AI]` as much as possible and `[HUMAN]` as little as possible. Reserve `[HUMAN]` for what is genuinely inevitable — impossible or unsafe for an agent, or requiring real-world authority or credentials an agent must not hold — OR for steps the user or plan has explicitly asked to keep `[HUMAN]`. A sanctioned channel that lets an agent do something seemingly human-only (e.g. copying a real secret via an `[AI]`-authored script through the `guard-env-file-access` path) stays `[AI]` — document the channel inline. When both an `[AI]` and a `[HUMAN]` path would accomplish the step, choose `[AI]`.
 
-**Git-mechanical steps are `[AI]` (HARD RULE)**: provision the worktree (`git worktree add …`), commit, push (to `origin main` for `*-to-origin-main` modes, or to the PR branch for `*-to-pr` modes), and remove the worktree (`git worktree remove …`) are git-mechanical steps the agent performs directly — always tag them `[AI]`, never `[HUMAN]`. For the default `worktree-to-pr` mode, do **not** author a `[HUMAN]` "review the diff and approve push" gate for the push itself — pushing to the PR branch is `[AI]`; only the final PR merge to `main` is `[HUMAN]` (per [Delivery Mode](#delivery-mode-mandatory--applies-to-all-plans) above), and only after the PR-Review Maker→Fixer Cycle has completed. See [Git Push Default Convention](../../../repo-governance/development/workflow/git-push-default.md).
+**Git-mechanical steps are `[AI]` (HARD RULE)**: provision the worktree (`git worktree add …`), commit, push (to `origin main` for `*-to-origin-main` modes, or to the PR branch for `*-to-pr` modes), and remove the worktree (`git worktree remove …`) are git-mechanical steps the agent performs directly — always tag them `[AI]`, never `[HUMAN]`. For the default `worktree-to-pr` mode, do **not** author a `[HUMAN]` "review the diff and approve push" gate for the push itself — pushing to the PR branch is `[AI]`, and so is the final PR merge to `main`, once the hardened preconditions hold and the PR-Review Maker→Fixer Cycle has completed (per [Delivery Mode](#delivery-mode-mandatory--applies-to-all-plans) above). Author a `[HUMAN]` merge step only where the plan explicitly opts into that gate. See [Git Push Default Convention](../../../repo-governance/development/workflow/git-push-default.md).
 
 **Execution semantics**: the [plan-execution workflow](../../../repo-governance/workflows/plan/plan-execution.md) STOPS at a `[HUMAN]` item, surfaces it with the acceptance criterion, and waits for the human to confirm before continuing. This is a legitimate stop that overrides "never stop between phases".
 
@@ -522,17 +522,17 @@ And their session is created with correct permissions
 
 ## Git Workflow in Plans
 
-**Trunk Based Development (Default)**:
+**`worktree-to-pr` (Default)**:
 
-- Work on `main` branch directly
-- Small, frequent commits
-- No feature branches (99% of plans)
+- Short-lived plan branch in a disposable worktree
+- Draft PR against `main`; PR-Review Maker→Fixer Cycle before merge
+- Small, frequent commits; merge `[AI]` once the hardened preconditions hold
 
-**Branch-Based (Exceptional)**:
+**Direct-push modes (`worktree-to-origin-main`, `main-to-origin-main`)**:
 
-- Only for experiments, compliance, external contributions
-- Must justify in Git Workflow section
-- Requires explicit user approval
+- For small, obviously-safe changes where a PR adds no review value
+- Declare the mode explicitly in `## Delivery Mode` — never assume it
+- No separate approval gate: declaring the mode IS the decision
 
 ## Plan Lifecycle
 
@@ -691,8 +691,8 @@ Every plan must include steps to verify CI after pushing:
 ```markdown
 ### Post-Push Verification
 
-- [ ] Push changes to `main`
-- [ ] Monitor GitHub Actions workflows for the push
+- [ ] Push changes to the delivery target for the declared Delivery Mode (the PR branch under `worktree-to-pr` / `main-to-pr`; `origin main` under the direct-push modes)
+- [ ] Monitor GitHub Actions workflows for that push — the PR's check run under `*-to-pr`
 - [ ] Verify all CI checks pass
 - [ ] If any CI check fails, fix immediately and push a follow-up commit
 - [ ] Do NOT proceed to next delivery phase until CI is green
@@ -971,7 +971,7 @@ Every delivery plan MUST end with a plan archival section:
 - [Test-Driven Development Convention](../../../repo-governance/development/workflow/test-driven-development.md) - Mandates TDD (Red→Green→Refactor) for all code changes; defines the required RED/GREEN/REFACTOR three-substep shape for delivery checklists; includes HARD RULE against combining phases into one checkbox
 - [Plan Anti-Hallucination Convention](../../../repo-governance/development/quality/plan-anti-hallucination.md) - Pre-write verification recipes, repo-grounding rule, refuse-on-uncertainty, anti-pattern catalog (AP-1 through AP-10), specialized-executor annotation
 - [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md) - Git workflow (all development targets `main`; see [Delivery Mode](#delivery-mode-mandatory--applies-to-all-plans) above for how a plan reaches `main` — `worktree-to-pr` is the default, direct push is one of the other three modes)
-- [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) - Explicit approval required, all quality gates must pass
+- [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) - `[AI]` merges by default once the five hardened preconditions hold; a `[HUMAN]` merge gate is an explicit per-plan opt-in; all quality gates must pass before merge
 - [Feature Change Completeness](../../../repo-governance/development/quality/feature-change-completeness.md) - Specs, contracts, and tests must update with every feature change
 - [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md) - The mandatory final `learnings.md` triage phase: open-ended principle-based routing rubric, the code-routing rule (code-homed learnings always become a separate `plans/backlog/` plan), and the two safety gates (secret/sensitivity, repo-relevance)
 - [Manual Behavioral Verification](../../../repo-governance/development/quality/manual-behavioral-verification.md) - Playwright MCP for UI, curl for API; ALL locales for multi-locale apps

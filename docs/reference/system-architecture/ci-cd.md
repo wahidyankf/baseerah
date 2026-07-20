@@ -127,7 +127,7 @@ graph LR
 
 **File**: `.github/workflows/pr-quality-gate.yml`
 
-**Trigger**: Pull request opened, synchronized, or reopened
+**Trigger**: Pull request opened, synchronized, or reopened, or push to `main`
 
 **Steps:**
 
@@ -145,11 +145,26 @@ validation, and repo-wide markdown link check
 validators (mermaid, heading-hierarchy, markdownlint) now run via lint-staged at commit time; the
 repo-wide `md links validate` check runs as the `md-links` job in this workflow.
 
+### Main CI Workflow
+
+**File**: `.github/workflows/main-ci.yml`
+
+**Trigger**: Scheduled (4x/day: 06:00/12:00/18:00/00:00 WIB) or manual `workflow_dispatch` — no push
+trigger; `pr-quality-gate.yml` already covers push-to-`main`
+
+**Steps:** Same quality gate as the PR workflow — typecheck, lint, `test:quick`,
+`compat:min-version`, naming, instruction-size, specs, env/repo-config validation, md-links,
+harness-duplication, governance validation — but across **all** projects
+(`nx run-many --all`) rather than only affected ones
+
+**Purpose**: Catches drift that affected-only PR checks can miss, by re-running the full gate
+against the entire monorepo on a fixed cadence independent of any single PR
+
 ### AyoKoding Web Test + Deploy Workflow
 
 **File**: `.github/workflows/ayokoding-www-test-local-deploy-prod.yml`
 
-**Trigger**: Push to `main` branch (CRON twice daily + manual dispatch)
+**Trigger**: Scheduled (6 AM and 6 PM WIB daily) or manual `workflow_dispatch` — no push trigger
 
 **Steps**: Full local-stack test pipeline via `_reusable-www-test-local-deploy.yml` (lint, typecheck, test:quick, E2E), then "deploy" by force-pushing `main` to `prod-ayokoding-www`; Vercel auto-builds.
 
@@ -217,11 +232,24 @@ repo-wide `md links validate` check runs as the `md-links` job in this workflow.
 
 **Purpose**: Continuous gated health check of the staging deployment. Despite the `-deploy-prod` name slot reserved for the future promote step, this workflow currently **stops on pass without promoting** — production CD is deferred. It never deploys today.
 
+### Web UI Storybook Deploy Workflow
+
+**File**: `.github/workflows/web-ui-build-deploy-prod.yml`
+
+**Trigger**: Scheduled (daily at 00:00 UTC) or manual `workflow_dispatch`
+
+**Steps:**
+
+1. Build the shared `web-ui` lib's Storybook (`nx run web-ui:build-storybook`)
+2. Force-push `HEAD` to `prod-web-ui`
+
+**Purpose**: Publish the `web-ui` component library's Storybook to the `prod-web-ui` branch on a fixed daily cadence, independent of any single PR — the same scheduled-CD pattern as the `*-www-test-local-deploy-prod.yml` workflows above, but for the shared component-library Storybook rather than an app.
+
 ### PR Quality Gate Workflow (duplicate entry)
 
 **File**: `.github/workflows/pr-quality-gate.yml`
 
-**Trigger**: Pull request opened, synchronized, or reopened
+**Trigger**: Pull request opened, synchronized, or reopened, or push to `main`
 
 **Purpose**: Runs affected tests and quality checks for pull requests (see primary entry above)
 
@@ -286,21 +314,24 @@ repo-wide `md links validate` check runs as the `md-links` job in this workflow.
    - Commit-msg hook validates format
    - Commit created
 
-4. **Push to Remote**:
+4. **Push to Remote** — target follows the declared Delivery Mode:
 
    ```bash
+   # Default (`worktree-to-pr`): push the short-lived plan branch
+   git push origin <plan-branch>
+
+   # Direct-push modes, when explicitly declared:
    git push origin main
    ```
 
-   - Pre-push hook runs:
+   - Pre-push hook runs (on any push target):
      - Tests affected projects
      - Lints markdown
 
-5. **Create Pull Request** (if using PR workflow):
-   - GitHub Actions run:
-     - Format check
-     - Link validation
-   - Review and merge
+5. **Open a Pull Request** — the default path (`worktree-to-pr`); skip only under a declared direct-push mode:
+   - GitHub Actions run the full quality gate on every PR event
+   - PR-Review Maker→Fixer Cycle runs before the merge
+   - Merge once the five hardened merge preconditions hold — `[AI]` by default
 
 6. **Deploy** (for Vercel-deployed apps):
 

@@ -69,7 +69,7 @@ Workflows support two execution modes (see [Workflow Execution Mode Convention](
 All workflows support standard input parameters:
 
 - **mode**: Quality threshold (lax/normal/strict/ocd) - default: strict (for workflows that have a `mode` parameter)
-- **max-concurrency**: Parallel execution limit - default: 2
+- **max-concurrency**: Background agents run concurrently — the N in the N+1 model (`1 main thread + N background agents = N+1 total`) - default: 3
 - **min-iterations**: Minimum check-fix cycles - optional
 - **max-iterations**: Maximum check-fix cycles - optional
 
@@ -81,6 +81,7 @@ All workflows support standard input parameters:
 - [infra/README.md](infra/README.md) — Infrastructure and environment setup workflows
 - [meta/README.md](meta/README.md) — Workflow system reference documentation
 - [content/README.md](content/README.md) — Content conversion and fidelity validation workflows (PDF-to-Markdown)
+- [api/README.md](api/README.md) — Live REST/GraphQL API quality workflows
 - [pr/pr-review-quality-gate.md](pr/pr-review-quality-gate.md) — PR review maker→fixer cycle workflow (single-file directory, no category `README.md` yet)
 - [plan/README.md](plan/README.md) — Project planning workflows
 - [repo/README.md](repo/README.md) — Repository governance workflows
@@ -109,6 +110,7 @@ All workflows support standard input parameters:
 | [Documentation Software Engineering Separation Quality Gate](docs/README.md) | Validate software engineering documentation separation between OSE Platform style guides and AyoKoding educational content, apply fixes iteratively until ZERO findings                                                                                                                                                                                                                                                                                                                                           | docs-software-engineering-separation-checker, docs-software-engineering-separation-fixer                                                                                | Medium     |
 | [Specs Validation](specs/README.md)                                          | Validate specs/ directory for structural completeness, content accuracy, cross-spec consistency, and C4 diagram correctness, apply fixes iteratively until ZERO findings                                                                                                                                                                                                                                                                                                                                          | specs-checker, specs-fixer                                                                                                                                              | Medium     |
 | [UI Quality Gate](ui/README.md)                                              | Validate UI component quality (tokens, accessibility, patterns, dark mode, responsive), apply fixes iteratively until ZERO findings                                                                                                                                                                                                                                                                                                                                                                               | swe-ui-checker, swe-ui-fixer                                                                                                                                            | Medium     |
+| [API Quality Gate](api/README.md)                                            | Exercise a live REST/GraphQL API against its contract and specs, fix findings, re-test until the defect set is empty                                                                                                                                                                                                                                                                                                                                                                                              | api-exploratory-tester, `swe-*-dev`                                                                                                                                     | Medium     |
 | [CI Quality Gate](ci/README.md)                                              | Validate all projects conform to CI/CD standards (Nx targets, coverage, Docker, Gherkin, workflows), apply fixes iteratively until ZERO findings                                                                                                                                                                                                                                                                                                                                                                  | ci-checker, ci-fixer                                                                                                                                                    | Medium     |
 | [PDF-to-Markdown Quality Gate](content/README.md)                            | Convert PDF to verbatim Markdown and validate conversion fidelity (text completeness, tables, figures, Mermaid, OCR) iteratively until ZERO findings on two consecutive checks                                                                                                                                                                                                                                                                                                                                    | pdf-to-md-maker, pdf-to-md-checker, pdf-to-md-fixer                                                                                                                     | Medium     |
 | [Development Environment Setup](infra/README.md)                             | Install and verify all 18+ polyglot toolchains required for development, testing, and git hooks across all projects                                                                                                                                                                                                                                                                                                                                                                                               | (manual orchestration — developer-guided)                                                                                                                               | High       |
@@ -175,6 +177,14 @@ Workflows for UI component quality:
 
 - **ui**: UI component quality validation (tokens, accessibility, patterns, dark mode, responsive)
 
+### API Workflows
+
+Workflows for live REST/GraphQL API quality:
+
+- **api-quality-gate**: Exercise a running API against its contract (OpenAPI 3.x / GraphQL SDL) and
+  existing Gherkin, fix findings, re-test until none remain. Tester-driven
+  (`api-exploratory-tester` → `swe-*-dev`), not a checker/fixer pair
+
 ### CI/CD Workflows
 
 Workflows for CI/CD standards compliance:
@@ -202,12 +212,12 @@ Workflows that test a live running website and turn findings into a fix plan:
 
 ### PR Review Workflows
 
-Workflows for reviewing and finishing off pull requests before a `[HUMAN]` merge:
+Workflows for reviewing and finishing off pull requests before the merge:
 
 - **pr-review-quality-gate**: Strictly sequential N-cycle (default 3) `pr-review-maker` →
   `pr-review-fixer` loop against a PR — line-anchored findings via the GitHub Reviews API, per-thread
   triage and resolution, CI-green gate between cycles — mandatory before archival and the
-  `[HUMAN]` merge for the `worktree-to-pr` and `main-to-pr` delivery modes
+  merge for the `worktree-to-pr` and `main-to-pr` delivery modes
 
 ### Repository Governance Workflows
 

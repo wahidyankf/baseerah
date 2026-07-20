@@ -32,9 +32,9 @@ inputs:
     default: 10
   - name: max-concurrency
     type: number
-    description: Maximum concurrent agents during gate runs
+    description: "Background agents run concurrently — the N in the N+1 model (1 main thread + N background agents = N+1 total). Raise only when independent work, machine capacity, and budget headroom all allow; lower under budget, runner, or disk pressure. Never self-promoted beyond the declared value."
     required: false
-    default: 2
+    default: 3
   - name: execution-order
     type: string
     description: "Repo execution order for the execution phase; confirmed in the pre-execution grill"
@@ -241,8 +241,8 @@ Every plan-execution rule applies unchanged, including:
   distinct from this composite's own `mode` input, which governs only the planning-phase delivery
   of the plan **documents** (Step 1). A repo whose plan resolves to a `*-to-pr` delivery mode
   additionally runs the [PR-Review Maker→Fixer Cycle](../pr/pr-review-quality-gate.md) inside
-  plan-execution's Step 8 before that repo's `[HUMAN]` merge — its "done" for that repo is a green,
-  fully-reviewed, archival-included PR handed off to the human, not a direct push to `origin main`.
+  plan-execution's Step 8 before that repo's merge — its "done" for that repo is a green,
+  fully-reviewed, archival-included PR, not a direct push to `origin main`.
   See [plan-execution.md Step 8](./plan-execution.md).
 - **Step 0 worktree gate**: enter the plan's designated worktree (provision from the latest
   `origin/main` if missing), sync it with `origin/main` before any implementation.
@@ -268,6 +268,30 @@ Every plan-execution rule applies unchanged, including:
 **Sequencing rule**: one repo at a time. Repo N+1's execution does not start until repo N reaches
 `pass` (archived, pushed, CI green) — or, under a continue-on-failure policy from Step 3, until
 repo N is explicitly recorded as `partial`/`fail` and the invoker's policy says continue.
+
+**Parallel propagation shape (when the invoker opts out of strict sequencing)**: the repos form a
+fan-out, not a chain — `ose-public` is the source of truth, and `ose-primer` / `ose-infra` are
+**independent downstream nodes** that read from it without reading each other. Once `ose-public`
+reaches `pass`, the two downstream repos may run as concurrent DAG nodes under the N+1 model
+(`1 main thread + N background agents`, default **N=3**) rather than serialized behind one another.
+
+Two constraints override that fan-out and force strict serialization:
+
+- **`apps/rhino-cli` byte-identity** across all three repos — a plan touching it propagates one repo
+  at a time, never concurrently.
+- **Any node writing what another node reads** — the general DAG independence test. Sequence is not
+  dependency, but a shared write target is.
+
+**Per-repo delivery shape**: each repo's phases land as **per-phase PRs** under the strict
+**one worktree → one branch → one PR → one node** mapping, merged as each phase completes rather
+than batched at composite end, with partial work merged-but-dark behind a **feature flag**. See
+[plan-planning §Planning Granularity](./plan-planning.md#planning-granularity).
+
+**Shared-machine safety**: all three repos share one machine's disk and git object store, and two of
+them are bare repos driven through worktrees. The **no-destructive-git** rule binds every git action
+here — never discard a concurrent actor's uncommitted work, never remove a worktree or branch you
+did not create. See
+[No Destructive Git Operations](../../development/workflow/no-destructive-git-operations.md).
 
 **Output per repo**: plan-execution `final-status`, `iterations-completed`, final validation
 report.
@@ -316,7 +340,7 @@ repo depending on that repo's resolved
 [`## Delivery Mode`](../../conventions/structure/plans.md#delivery-mode) — a direct push of the
 archival commit to `origin main` for the direct-push modes (`worktree-to-origin-main`,
 `main-to-origin-main`), or a green, fully-reviewed PR with the archival move committed inside it,
-awaiting the `[HUMAN]` merge outside the AI done-boundary, for the `*-to-pr` modes
+awaiting the merge outside the AI done-boundary, for the `*-to-pr` modes
 (`worktree-to-pr`, `main-to-pr`) — see the
 [PR-Review Maker→Fixer Cycle](../pr/pr-review-quality-gate.md) done-definition. Because each
 repo resolves its delivery mode independently, a single composite run may end with some repos

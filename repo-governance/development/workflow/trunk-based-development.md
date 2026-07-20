@@ -42,7 +42,7 @@ This practice implements/respects the following conventions:
 
 - **[Commit Message Convention](./commit-messages.md)**: TBD workflow requires small, frequent commits with clear conventional commit messages to maintain navigable history.
 
-- **[Code Quality Convention](../quality/code.md)**: Pre-push hooks run affected tests before pushing to main, enforcing quality gates in the TBD workflow.
+- **[Code Quality Convention](../quality/code.md)**: Pre-push hooks run affected tests before **any** push — to a PR branch or to `main` — enforcing quality gates in the TBD workflow.
 
 ## What is Trunk Based Development?
 
@@ -68,7 +68,7 @@ lands on `main` therefore does not contradict TBD; it is one of TBD's recognized
 
 This repository's **repo-wide default delivery mode is `worktree-to-pr`**: a short-lived plan branch
 inside a disposable git worktree, pushed to a PR, driven to a green and fully-reviewed state, then
-merged by a human. Pure direct-commit-to-`main` remains a fully supported alternative mode. See
+merged once the hardened preconditions hold -- `[AI]` by default, `[HUMAN]` only where a plan says so. Pure direct-commit-to-`main` remains a fully supported alternative mode. See
 [Default Push and Worktree Execution](#default-push-and-worktree-execution) below for the mechanics of
 all four delivery modes, and the
 [Plans Organization Convention — Delivery Mode](../../conventions/structure/plans.md#delivery-mode) for
@@ -171,7 +171,8 @@ gh pr create --draft --base main --title "feat(auth): implement login endpoint"
 
 # Get review within hours (not days), run the PR-Review Maker->Fixer Cycle
 
-# When the done-definition is met, flip to ready and let a human merge via GitHub
+# When the done-definition is met, flip to ready and merge once the hardened
+# preconditions hold -- [AI] by default, [HUMAN] only where a plan says so
 # (squash or rebase merge -- never a local `git merge`, to preserve linear history):
 gh pr ready
 
@@ -252,7 +253,7 @@ if (betaUsers.includes(currentUser.email)) {
 
 ### Continuous Integration
 
-**Every commit to `main` triggers CI/CD**:
+**Every push triggers CI/CD** — on the PR under `*-to-pr` modes, and on `main` for direct pushes and after any merge:
 
 1. **Automated tests** run on every push
 2. **Build verification** ensures code compiles
@@ -301,7 +302,7 @@ FAIL: **Bad large changes**:
 **How to break down work**:
 
 1. **Identify smallest deliverable**: What's the tiniest useful piece?
-2. **Commit that piece**: Push to `main`
+2. **Commit that piece**: push it to the delivery target for the declared mode (the PR branch by default)
 3. **Repeat**: Build on top of previous work
 4. **Use feature flags**: Hide incomplete full features
 
@@ -336,14 +337,15 @@ that vocabulary — it explains how each mode plays out for TBD and for worktree
 **The repo-wide default for all development -- including when running from a git worktree -- is
 `worktree-to-pr`: a short-lived, single-purpose plan branch inside a disposable git worktree, pushed
 to a draft PR opened against `main`, driven through review and CI to a fully green state, then merged
-by a human.**
+once the hardened preconditions hold -- `[AI]` by default, `[HUMAN]` only where a plan says so.**
 
 - **Work location**: `worktrees/<plan-identifier>/`, on a plan-scoped branch.
 - **Integration target**: a PR opened against `main` (opened as a GitHub **draft**; see Why Draft below).
-- **Merge authority**: `[HUMAN]` -- the AI drives the branch, the push, the review cycle, and the
-  quality gates; a human performs the actual merge, on their own schedule. This mirrors the
-  [PR Merge Protocol](./pr-merge-protocol.md) done-boundary: the AI hands off a green, fully-reviewed
-  PR; "done" (for the AI) is not "merged".
+- **Merge authority**: `[AI]` by default -- the AI drives the branch, the push, the review cycle, and
+  the quality gates, then merges once the hardened preconditions hold. A `[HUMAN]` merge gate applies
+  **only where a plan's own step says so explicitly**; the preconditions are identical either way and
+  only the actor differs. This mirrors the [PR Merge Protocol](./pr-merge-protocol.md) done-boundary:
+  the merge sits outside it, so "done" is still not the same as "merged".
 - Quality gates run on every push to the PR branch via the pre-push hook (typecheck, lint, test:quick,
   specs:coverage) AND on the PR itself via CI.
 - `*-to-pr` deliveries additionally run the **PR-Review Maker→Fixer Cycle**
@@ -370,7 +372,8 @@ gh pr create --draft --base main --title "feat(auth): add email validation"
 
 # When the done-definition is met (see PR Merge Protocol), flip to ready:
 gh pr ready
-# A human reviews and merges -- outside the AI's done-boundary
+# Merge once the hardened preconditions hold -- [AI] by default,
+# [HUMAN] only where the plan says so. The merge is outside the done-boundary either way.
 ```
 
 ### Why Draft, Not Ready-for-Review, on Open
@@ -404,8 +407,9 @@ including the linear-history and rebase requirements.
 
 **Plan delivery checklist tagging**: the git-mechanical lifecycle steps -- create worktree, commit,
 push (to the PR branch or to `origin main`, depending on mode), open/flip the PR, and remove worktree
--- MUST be tagged `[AI]`, never `[HUMAN]`, in plan delivery checklists. The one step that is
-legitimately `[HUMAN]` under `*-to-pr` modes is the merge itself. See
+-- MUST be tagged `[AI]`, never `[HUMAN]`, in plan delivery checklists. Under `*-to-pr` modes the
+merge itself is `[AI]` by default too; a `[HUMAN]` merge gate applies only where a plan's own step
+says so explicitly. See
 [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
 and the [Git Push Default Convention §Examples](./git-push-default.md#examples) for the FAIL/PASS
 examples.
@@ -545,7 +549,7 @@ The `apps/ayokoding-www/` project uses a production deployment branch:
 When creating project plans in `plans/` folder:
 
 - PASS: **Default assumption**: `worktree-to-pr` (repo-wide default) -- a short-lived plan branch in a
-  disposable worktree, pushed to a draft PR, merged by a human after the done-definition is met.
+  disposable worktree, pushed to a draft PR, merged -- `[AI]` by default -- after the done-definition is met.
 - PASS: **Declare the mode explicitly** using a `## Delivery Mode` field only when overriding the
   default (see the [Plans Organization Convention — Delivery Mode](../../conventions/structure/plans.md#delivery-mode)
   for the field syntax and the three-tier precedence).
@@ -570,7 +574,7 @@ All implementation happens on a `worktree-to-pr` plan branch (the repo-wide defa
 2. Phase 2: Add payment API (flag OFF)
 3. Phase 3: Add payment UI (flag OFF)
 4. Phase 4: Integration testing (flag ON in staging)
-5. Phase 5: Production rollout (flag ON in production) -- PR merged by a human once green
+5. Phase 5: Production rollout (flag ON in production) -- PR merged once green and the hardened preconditions hold (`[AI]` by default)
 ```
 
 ### When Plans Override the Default Mode
@@ -640,11 +644,11 @@ If you're used to feature-branch workflows (GitFlow, GitHub Flow), here's how to
 
 ### Transition Steps
 
-1. **Start small**: Pick a simple task, commit directly to `main`
-2. **Use feature flags**: Hide incomplete work, not branches
-3. **Commit frequently**: Push to `main` multiple times per day
+1. **Start small**: Pick a simple task and take it through one short-lived branch and PR end to end
+2. **Use feature flags**: Hide incomplete work, so no branch stays open to hide it
+3. **Integrate frequently**: Land work multiple times per day; measure branch _lifespan_, not count
 4. **Keep CI green**: Fix failures immediately
-5. **Review old habits**: Notice when you create unnecessary branches
+5. **Review old habits**: Notice when a branch starts outliving its plan
 
 ### Common Concerns Addressed
 
@@ -681,9 +685,9 @@ TBD works best when combined with:
 - **Automated Testing**: High test coverage enables confident commits
 - **Small Commits**: [Conventional Commits](./commit-messages.md)
 - **Pair/Mob Programming**: Real-time collaboration and review
-- **PR Merge Protocol**: [PR Merge Protocol](./pr-merge-protocol.md) - Required approval workflow, PR-Review Maker→Fixer Cycle, and done-boundary for `worktree-to-pr` PRs
+- **PR Merge Protocol**: [PR Merge Protocol](./pr-merge-protocol.md) - The five hardened merge preconditions (`[AI]` merges by default; `[HUMAN]` is an explicit per-plan opt-in), the PR-Review Maker→Fixer Cycle, and the done-boundary for `worktree-to-pr` PRs
 - **Git Push Default Convention**: [Git Push Default Convention](./git-push-default.md) — Defines the PR-branch-as-default push target and the direct-push modes as explicit selections; governs plan-maker, plan-checker, plan-fixer, and the plan-execution workflow behavior
-- **CI Post-Push Verification**: [CI Post-Push Verification Convention](./ci-post-push-verification.md) — Mandatory verification step after every push to main covering integration tests, E2E tests, and deployment workflows
+- **CI Post-Push Verification**: [CI Post-Push Verification Convention](./ci-post-push-verification.md) — Mandatory verification step after every push — to a PR branch or to `main`, per the declared mode covering integration tests, E2E tests, and deployment workflows
 - **Worktree Toolchain Initialization**: [Worktree Toolchain Initialization](./worktree-setup.md) - Mandatory two-step init (`npm install` + `npm run doctor -- --fix`) after creating or entering a worktree
 
 ## References and Further Reading

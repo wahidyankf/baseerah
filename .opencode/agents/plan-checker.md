@@ -124,7 +124,7 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 - **TDD phase separation (HARD RULE)**: RED, GREEN, and REFACTOR must each be their own `- [ ]` checkbox. A single checkbox that combines multiple phases (e.g., `- [ ] Write test, implement, and refactor feature X`) is a HARD RULE violation. Flag as **HIGH**. See [TDD Shape for Delivery Checklists](../../repo-governance/development/workflow/test-driven-development.md#tdd-shape-for-delivery-checklists).
 - **Non-code step format**: Steps that do NOT ship code (doc edits, config changes, file creation, governance updates) must use the direct action + acceptance criterion format (`[Action verb] [file] — acceptance: [outcome]`) instead of RED/GREEN/REFACTOR. Flag misapplied TDD shape on non-code steps as **MEDIUM**.
 - **Execution-grade clarity (HARD RULE)**: every checkbox MUST name explicit file path(s) (or maximum-possible-detail target when path is unknowable), verbatim shell command(s) when applicable, and a concrete acceptance criterion. Flag as **HIGH** any checkbox whose action is not unambiguously executable by a sonnet-tier agent without consulting additional context — bare "implement X", "set up Y", "configure Z", "add caching" are violations. See [Plans Organization Convention §Execution-Grade Clarity](../../repo-governance/conventions/structure/plans.md#execution-grade-clarity-hard-rule).
-- **Executor tagging (HARD RULE)**: every checkbox declares `[AI]` / `[HUMAN]` / `[HUMAN → AI]` (unmarked = `[AI]`), with a legend at the top of the checklist. Flag any untagged or `[AI]`-tagged human-only step (physical acts, hardware/BIOS, external auth) as **HIGH**. Validated in detail by Step 5h (rule 14).
+- **Executor tagging (HARD RULE)**: every checkbox declares `[AI]` / `[HUMAN]` / `[AI+HUMAN]` (unmarked = `[AI]`), with a legend at the top of the checklist. Flag any untagged or `[AI]`-tagged human-only step (physical acts, hardware/BIOS, external auth) as **HIGH**. Validated in detail by Step 5h (rule 14).
 - **Phase gate & natural pause (HARD RULE)**: every phase ends with a `### Phase N Gate` (must-pass checklist + Pause Safety note) and reaches a safe-to-stop state. Flag a phase missing its gate as **HIGH**; a non-pause phase that should be merged as **MEDIUM**. Validated in detail by Step 5i (rule 15).
 - **Specs & Gherkin delivery (per Two Paths)**: a plan that creates, modifies, or deletes observable behavior in `apps/`, `libs/`, or `specs/` MUST include delivery steps that add/update the companion `specs/` Gherkin `.feature` files and run `specs:coverage`. Validated in detail by Step 5j (rule 16). See [Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md).
 - **Gherkin-tagged TDD steps (one scenario per cycle)**: every behavior-implementing RED→GREEN→REFACTOR cycle MUST target **exactly one** Gherkin scenario — the RED step carries a single-scenario `**Gherkin (binds) →** "<title>"` tag and embeds that scenario's complete `Given/When/Then` inline as a fenced ` ```gherkin ` block, verbatim-equal to the companion `.feature`. Flag as **HIGH**: a behavior RED step whose `binds` tag lists **more than one** scenario (must be split one-cycle-per-scenario), a behavior step missing its Gherkin tag, or a step whose inline `Given/When/Then` is absent or not verbatim-equal to the `.feature`. Two exceptions keep a multi-scenario `;`-list tag and are NOT split: pure-core (`**Gherkin (underpins) →**`) data/calc unit tests, and aggregate BDD binders (a feature-consuming unit test or `playwright-bdd` step-def file consuming the whole `.feature` for `specs:coverage`/E2E). Pure refactors, no-behavior-change bumps, and docs/governance-only steps are exempt. See [Gherkin-Tagged Delivery Steps](../../repo-governance/development/workflow/test-driven-development.md#gherkin-tagged-delivery-steps).
@@ -141,7 +141,7 @@ Authoritative source: [Plans Organization Convention §Delivery Mode](../../repo
 A PR creation step (`- [ ] Create PR`, `- [ ] Open PR`, or equivalent) is **expected and correct**
 when the plan's resolved Delivery Mode is `worktree-to-pr` (the default) or `main-to-pr` — no
 separate authorization is needed beyond the mode declaration itself; validate it via Step 5m
-instead (PR-Review Maker→Fixer Cycle present, `[HUMAN]` merge tag correct).
+instead (PR-Review Maker→Fixer Cycle present, merge tag correct).
 
 Flag as **HIGH** a PR creation step on a plan whose resolved Delivery Mode is
 `worktree-to-origin-main` or `main-to-origin-main` (a direct-push mode) — an unsolicited PR step
@@ -357,7 +357,7 @@ After validating delivery checklist structure (Step 5), verify the plan includes
    - Must include linting and typecheck steps
 
 2. **Post-Push CI/CD Verification**
-   - Plan MUST include steps to manually verify related GitHub Actions/workflows pass after pushing to main
+   - Plan MUST include steps to manually verify related GitHub Actions/workflows pass after the push — against the plan's declared delivery target (the PR's check run under `*-to-pr`; `origin main` under the direct-push modes). A plan that hardcodes `main` while declaring a `*-to-pr` mode is itself a finding
    - Must specify WHICH workflows to monitor (not just "check CI")
    - Must include instructions to watch for failures and fix them before moving on
 
@@ -492,7 +492,14 @@ For each `- [ ]` line:
 
 1. Identify whether the action involves (a) editing a file, (b) running a command, (c) verifying an outcome.
 2. Check that the checkbox text names the file path(s) for (a), the verbatim command for (b), and the acceptance criterion for (c).
-3. Treat every missing element as a separate **HIGH** finding (one finding per missing element per checkbox is acceptable — plan-fixer batch-resolves).
+3. **Exempt the final PR-merge step from (b) and (c)** — the single checkbox whose action _is_
+   merging the PR (per rule 19 / Step 5m). It is a governance gate, not an action item; its
+   acceptance criterion is the PR Merge Protocol's five preconditions, and a scripted `gh pr merge`
+   is not an improvement. `plan-fixer` is required to refuse such a finding, so it can only generate
+   churn. This exemption does **not** extend to (a), and does **not** extend to phase-gate or
+   verification checkboxes that merely _mention_ merging (e.g. "PR `[AI]`-merged; deployed") — those
+   are ordinary action items and remain fully subject to (b) and (c).
+4. Treat every missing element as a separate **HIGH** finding (one finding per missing element per checkbox is acceptable — plan-fixer batch-resolves).
 
 #### Finding Severity
 
@@ -501,6 +508,7 @@ For each `- [ ]` line:
 - Command placeholder without verbatim invocation (e.g., `run tests`): **HIGH**
 - Missing acceptance criterion on a checkbox whose action could complete partially without external proof: **HIGH**
 - Multiple missing elements on the same checkbox: still ONE finding (the fixer rewrites the line as a whole)
+- Final PR-merge step missing (b) or (c): **not a finding** — see How to Audit step 3
 
 ### 12. Anti-Hallucination Scan (Step 5f — MANDATORY HARD RULE)
 
@@ -615,30 +623,41 @@ physically impossible action.
 #### What to Validate
 
 1. **Legend present** — `delivery.md` (or a single-file plan's `## Delivery Checklist` section) defines an
-   executor-tag legend (`[AI]` / `[HUMAN]` / `[HUMAN → AI]`) at the top. Missing legend: **HIGH**.
+   executor-tag legend (`[AI]` / `[HUMAN]` / `[AI+HUMAN]`) at the top. Missing legend: **HIGH**.
 2. **Human-only steps are tagged `[HUMAN]`** — scan every checkbox for actions an agent cannot perform with
    its tools: physical acts (unplug/replug, insert USB, press power, move hardware), BIOS/firmware/hardware
    changes, external vendor-portal/console actions needing human auth/2FA/biometrics, account creation, or
    any real-world-presence step. An untagged human-only step is **HIGH** (an execution agent would stall or
    hallucinate success).
 3. **`[AI]` steps are genuinely AI-executable** — a step tagged `[AI]` (or unmarked, which defaults to
-   `[AI]`) that actually requires a human is **HIGH**. `[HUMAN → AI]` is the correct tag when a human
-   supplies a value an agent then consumes.
+   `[AI]`) that actually requires a human is **HIGH**. A step where a human must first supply a value an
+   agent then consumes is not a single blended tag — split it into its own `[HUMAN]` checkbox (supply the
+   value) followed by a separate `[AI]` checkbox (consume it); flag a merged single-checkbox attempt at
+   this shape as **MEDIUM** (imprecise granularity) rather than inventing a fourth tag. `[HUMAN → AI]` is
+   not this repo's vocabulary — see [Plans Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule),
+   which defines exactly three tags.
 4. **Tagging is orthogonal to suggested-executor** — do NOT conflate `[AI]`/`[HUMAN]` with
    `_Suggested executor: <agent>_`; both may appear on one step. Confusing the two is **MEDIUM**.
 5. **Git-mechanical steps must be `[AI]`** — three recurring steps are git-mechanical and an agent performs
-   them directly: provisioning the worktree (`git worktree add …`), committing and pushing to `origin main`,
-   and removing the worktree (`git worktree remove …`). A `[HUMAN]`-tagged worktree-create, worktree-remove,
-   or push-to-main step is a **HIGH** mis-tag — including a `[HUMAN]` "review the diff and approve push to
-   main" gate, which imports a PR approval the repo does not use by default. Exception (not a finding): the
-   user's prompt or the plan explicitly requested a PR or an out-of-band sign-off for that change. See the
+   them directly: provisioning the worktree (`git worktree add …`), committing and pushing (to the PR
+   branch under the default `worktree-to-pr`, or to `origin main` under the direct-push modes), and
+   removing the worktree (`git worktree remove …`). A `[HUMAN]`-tagged worktree-create, worktree-remove,
+   or push step is a **HIGH** mis-tag — including a `[HUMAN]` "review the diff and approve push" gate,
+   which imports an approval the repo does not require: pushing to a PR branch is not a merge. Exception
+   (not a finding): the user's prompt or the plan explicitly requested an out-of-band sign-off for that
+   change. See the
    [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md).
+
+   **This rule governs the push, NEVER the merge.** The PR merge is a separate step, `[AI]` by default,
+   and a plan may explicitly opt into a `[HUMAN]` merge gate. A `[HUMAN]`-tagged **merge** step is
+   therefore **not** a finding under this rule — see rule 19 (Step 5m), which governs merge tagging.
+   Flagging a declared `[HUMAN]` merge opt-in as a mis-tag is itself a false positive.
 
 #### Finding Severity
 
 - Missing executor-tag legend: **HIGH**
 - Untagged (or `[AI]`-tagged) human-only step: **HIGH** per occurrence
-- `[HUMAN]`-tagged git-mechanical step (worktree create/remove, push to `main`) absent an explicit PR/sign-off request: **HIGH** per occurrence
+- `[HUMAN]`-tagged git-mechanical step (worktree create/remove, push) absent an explicit sign-off request: **HIGH** per occurrence. Does **not** apply to a `[HUMAN]`-tagged PR **merge** step — that is a valid per-plan opt-in governed by rule 19.
 - Executor-tag / suggested-executor conflation: **MEDIUM**
 
 ### 15. Phase-Gate & Natural-Pause Validation (Step 5i — MANDATORY HARD RULE)
@@ -828,17 +847,23 @@ mode additionally fixes the integration target and merge authority.
    `worktree-to-pr` or `main-to-pr`, `delivery.md` MUST emit the PR-Review Maker→Fixer Cycle steps
    (strictly sequential maker→fixer cycles, default 3, CI-green-gated) per the
    [PR Review Quality Gate workflow](../../repo-governance/workflows/pr/pr-review-quality-gate.md),
-   positioned before the `[HUMAN]` PR-merge step. A `*-to-pr` plan whose checklist jumps straight
-   from PR creation to `[HUMAN]` merge with no review-cycle steps is missing required steps.
-4. **`[HUMAN]` merge tagging matches mode** — for `*-to-pr` modes, the final PR-merge step MUST be
-   tagged `[HUMAN]` (never `[AI]`); for `*-to-origin-main` modes, the final push MUST be tagged
+   positioned before the PR-merge step. A `*-to-pr` plan whose checklist jumps straight
+   from PR creation to the merge with no review-cycle steps is missing required steps.
+4. **Merge tagging matches mode** — for `*-to-pr` modes, the final PR-merge step defaults to
+   `[AI]`, the actor once the hardened preconditions hold. A `[HUMAN]` tag on that step IS the
+   plan's opt-in into human merge judgment, per
+   [Delivery Mode](../../repo-governance/conventions/structure/plans.md#delivery-mode) — the tag
+   itself is the complete, sufficient declaration; there is no separate opt-in field or prose
+   declaration to look for. A `[HUMAN]`-tagged merge step under a `*-to-pr` mode is therefore
+   **NEVER** a defect on that basis and MUST NOT be flagged or retagged. The only defect on the
+   merge step is an invalid tag value (anything other than `[AI]`, `[HUMAN]`, or `[AI+HUMAN]`).
+   For `*-to-origin-main` modes, the final push MUST be tagged
    `[AI]` (never gated behind an unrequested `[HUMAN]` approval step, per the existing
    [PR Step Authorization Check](#pr-step-authorization-check) —
    that check's "unsolicited PR step" framing now applies only to `*-to-origin-main`-mode plans,
    since a PR step is expected and correct under `*-to-pr` modes).
 5. **"Done" is not "merged"** — a `*-to-pr` plan's own completion/Gate criteria MUST NOT require the
-   PR to actually be merged; a green, fully-reviewed PR awaiting `[HUMAN]` merge on their own
-   schedule is a valid done state. Flag a plan that conflates the two.
+   PR to actually be merged; a green, fully-reviewed PR awaiting its merge is a valid done state. Flag a plan that conflates the two.
 6. **Archival-in-PR present** — for `*-to-pr` modes (where the plan folder is tracked in the
    repo being delivered), the checklist MUST include an archival step — `git mv` the plan folder
    to `plans/done/`, plus README/index updates — committed **inside the delivering PR** itself
@@ -850,8 +875,9 @@ mode additionally fixes the integration target and merge authority.
 #### Finding Severity
 
 - Invalid non-empty `## Delivery Mode` value: **HIGH**
-- `*-to-pr` mode missing the PR-Review Maker→Fixer Cycle steps before `[HUMAN]` merge: **HIGH**
-- `[HUMAN]`/`[AI]` merge-tag mismatch with the resolved mode: **HIGH**
+- `*-to-pr` mode missing the PR-Review Maker→Fixer Cycle steps before the merge: **HIGH**
+- Merge step tagged with anything other than `[AI]`, `[HUMAN]`, or `[AI+HUMAN]`: **HIGH** (a
+  `[HUMAN]`-tagged merge step is always valid and is never itself a finding — the tag is the opt-in)
 - Plan completion criteria conflating "done" with "merged" on a `*-to-pr` plan: **MEDIUM**
 - Missing or post-merge-deferred archival-in-PR step on an applicable `*-to-pr` plan: **HIGH**
 - Freshly-authored plan missing the `## Delivery Mode` declaration entirely: **LOW**

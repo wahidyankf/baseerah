@@ -16,12 +16,12 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 
 ## PR and repo-wide gates
 
-| Workflow              | Trigger        | Role                                                                                                                              |
-| --------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `pr-quality-gate.yml` | Pull request   | Typecheck, lint, `test:quick`, `compat:min-version`, naming, md-links, harness-duplication, governance validation (all languages) |
-| `validate-env.yml`    | PR + push      | Environment-variable contract validation                                                                                          |
-| `main-ci.yml`         | Push to `main` | Same as PR gate but runs across all projects (`nx run-many --all`)                                                                |
-| `deps-audit.yml`      | Nightly CRON   | Language-native dependency audit (npm audit, cargo deny, dotnet vulnerable) — CRON-only                                           |
+| Workflow              | Trigger                | Role                                                                                                                              |
+| --------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `pr-quality-gate.yml` | PR + push              | Typecheck, lint, `test:quick`, `compat:min-version`, naming, md-links, harness-duplication, governance validation (all languages) |
+| `validate-env.yml`    | PR + push              | Environment-variable contract validation                                                                                          |
+| `main-ci.yml`         | 4x/day CRON + dispatch | Same as PR gate but runs across all projects (`nx run-many --all`) — no push trigger                                              |
+| `deps-audit.yml`      | Nightly CRON           | Language-native dependency audit (npm audit, cargo deny, dotnet vulnerable) — CRON-only                                           |
 
 ## www tier — direct deploy (scheduled callers of `_reusable-www-test-local-deploy.yml`)
 
@@ -48,3 +48,9 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 | `publish-images.yml`                    | Build and push `organiclever-be` / `ose-be` images to GHCR (deployed by the ose-infra k3s plans, not Vercel) — transitional |
 | `organiclever-be-build-deploy-stag.yml` | Build the `organiclever-be` image and push it to GHCR; triggered on `stag-organiclever-be` push                             |
 | `ose-be-build-deploy-stag.yml`          | Build the `ose-be` image and push it to GHCR; triggered on `stag-ose-be` push                                               |
+
+## web-ui — Storybook (scheduled deploy)
+
+| Workflow                       | Trigger                           | Role                                                                          |
+| ------------------------------ | --------------------------------- | ----------------------------------------------------------------------------- |
+| `web-ui-build-deploy-prod.yml` | Daily CRON (00:00 UTC) + dispatch | Build the `web-ui` lib's Storybook and force-push the output to `prod-web-ui` |

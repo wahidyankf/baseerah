@@ -219,7 +219,8 @@ Plan executor: Delivering governance convention update via the default mode.
   git push origin git-push-default-update
   gh pr create --draft --base main --title "feat(governance): update git push default convention"
 
-Draft PR opened. Iterating until the done-definition is met, then handing off for human merge.
+Draft PR opened. Iterating until the done-definition is met, then merging once the hardened
+preconditions hold -- `[AI]` by default; `[HUMAN]` only where this plan opts into that gate.
 ```
 
 ### FAIL: Incorrect behavior — pushing directly without an explicit mode selection
@@ -283,13 +284,13 @@ User prompt: "Plan a feature for Z." (default `worktree-to-pr` mode applies; no 
 - [ ] [HUMAN] Remove the worktree: `git worktree remove worktrees/feature-z`
 ```
 
-All three are plain git-mechanical steps an agent performs directly. Under `worktree-to-pr`, the only
-step that is legitimately `[HUMAN]` is the final PR merge itself — everything up to and including
-opening/flipping the PR is `[AI]`. These are mis-tags per
+All three are plain git-mechanical steps an agent performs directly. Under `worktree-to-pr`, every
+step — including the final PR merge — is `[AI]` by default; a `[HUMAN]` merge gate applies only
+where a plan's own step says so explicitly. These are mis-tags per
 [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule).
 `plan-checker` flags them; `plan-fixer` retags them `[AI]`.
 
-### PASS: Correct plan-maker behavior — git-mechanical steps tagged `[AI]`, merge tagged `[HUMAN]`
+### PASS: Correct plan-maker behavior — git-mechanical steps and the merge both tagged `[AI]`
 
 ```markdown
 <!-- In delivery.md — RIGHT -->
@@ -297,7 +298,7 @@ opening/flipping the PR is `[AI]`. These are mis-tags per
 - [ ] [AI] Create worktree: `git worktree add worktrees/feature-z -b feature-z`
 - [ ] [AI] Commit, push, and open a draft PR against `main`
 - [ ] [AI] Run the PR-Review Maker→Fixer Cycle until the done-definition is met, then flip to ready
-- [ ] [HUMAN] Merge the PR
+- [ ] [AI] Merge the PR once the hardened preconditions hold
 - [ ] [AI] Remove the worktree: `git worktree remove worktrees/feature-z`
 ```
 
@@ -330,7 +331,8 @@ finds:
 ```
 
 Correct behavior: retag the step `[AI]`, route it through the default `worktree-to-pr` flow (branch,
-PR, review cycle, human merge), and include the fix in the same commit as the plan work.
+PR, review cycle, `[AI]` merge once the hardened preconditions hold), and include the fix in the
+same commit as the plan work.
 
 ## Agent Responsibilities
 

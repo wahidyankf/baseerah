@@ -202,7 +202,7 @@ After assessing code quality (Step 5), verify that the executor followed ALL ope
    - If ANY failure exists, report as CRITICAL finding
 
 2. **Post-Push CI Passed**
-   - Check if GitHub Actions workflows passed for the latest commits on main
+   - Check if GitHub Actions workflows passed for the latest commits on the plan's delivery target — the PR branch under `*-to-pr` modes, `main` under the direct-push modes (resolve the mode first; do not assume `main`)
    - If CI status is not all-green, report as CRITICAL finding
    - This includes workflows that may have been failing before the plan execution
 
@@ -619,8 +619,8 @@ require the PR to be merged.
      lives only in `ose-public` while the same plan also touches `ose-primer`/`ose-infra`). Missing
      or post-merge-deferred archival on an applicable repo: **HIGH**.
    - **Completion does not require merge** — do NOT file a finding solely because the PR is still
-     open/unmerged; a green, fully-reviewed, archival-committed PR awaiting `[HUMAN]` merge on their
-     own schedule is the correct terminal state for this mode.
+     open/unmerged; a green, fully-reviewed, archival-committed PR awaiting its merge is the correct
+     terminal state for this mode.
 3. **For `worktree-to-origin-main` / `main-to-origin-main`**: confirm no PR-review-cycle evidence is
    expected (its absence is correct, not a finding) and that the final push landed directly on
    `origin main` with CI green — this reuses Step 5d/5e's existing plain-`main` checks unchanged.

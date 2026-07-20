@@ -28,13 +28,34 @@ skills:
 
 - **Role**: Fixer (yellow)
 
+## Merge Steps Are Out of Scope for Every Recipe (READ FIRST)
+
+**Before any recipe below, regardless of which finding brought you here**: if the line you are about
+to change is a **merge step**, stop. A merge step is a governance gate, not an action item, and its
+executor tag **is** the plan's human-gate opt-in.
+
+You may not remove it, retag it, reword it into a scripted command, split it, absorb it into another
+step, or delete it to resolve an unverified claim inside it — in any Delivery Mode, at any confidence
+level, under any finding type, by any verb. If a finding appears to require one of those, the finding
+is a false positive on this line: classify MEDIUM and report it. The only section that may alter a
+merge step's tag is [How to Fix a Merge-Tag Mismatch](#how-to-fix-a-merge-tag-mismatch), and that
+section never retags a merge step away from `[HUMAN]` — its only tag change is one the user
+explicitly selects when the existing tag is unrecognized.
+
+This rule is stated here, ahead of every recipe, on purpose. It was previously stated only inside the
+merge-tag section, and five consecutive defects reached a merge step through recipes that never
+mention merging — each guard was correct on the axis it named and open on an axis nobody had named.
+A guard belongs at the point of entry, not in the section a fixer reaches only if it already
+suspected the hazard.
+
 ## Confidence Assessment (Re-validation Required)
 
 **Before Applying Any Fix**:
 
 1. **Read audit report finding**
-2. **Verify issue still exists** (file may have changed since audit)
-3. **Assess confidence**:
+2. **Verify the line is not a merge step** (see the hard rule above — this check precedes all others)
+3. **Verify issue still exists** (file may have changed since audit)
+4. **Assess confidence**:
    - **HIGH**: Issue confirmed, fix unambiguous → Auto-apply
    - **MEDIUM**: Issue exists but fix uncertain → Skip, manual review
    - **FALSE_POSITIVE**: Issue doesn't exist → Skip, report to checker
@@ -105,7 +126,7 @@ When the audit reports misplaced content per the [Content-Placement Rules](../..
 
 After moving content, update any cross-references that pointed at the old location and verify both files still satisfy the per-file required-sections list.
 
-#### Unsolicited PR Step Removal (per [Plans Organization Convention §Delivery Mode](../../repo-governance/conventions/structure/plans.md#delivery-mode))
+#### PR Step / Delivery Mode Reconciliation (per [Plans Organization Convention §Delivery Mode](../../repo-governance/conventions/structure/plans.md#delivery-mode))
 
 When plan-checker flags a HIGH finding for a PR step under a direct-push Delivery Mode, resolve it
 by reconciling the mode and the step rather than reflexively deleting the step:
@@ -121,6 +142,15 @@ by reconciling the mode and the step rather than reflexively deleting the step:
   the plan mode-inconsistent.
 - A `*-to-pr` plan's PR step is never itself a finding — only its absence (missing review-cycle
   steps) or a mismatched mode declaration is.
+- **Never apply the "remove the line" action above to a merge step, under any Delivery Mode.** "PR
+  creation step" means the step that opens the PR — never the step that merges it. A merge step is
+  out of scope for this recipe entirely and stays governed exclusively by
+  [How to Fix a Merge-Tag Mismatch](#how-to-fix-a-merge-tag-mismatch) and the structural guard it
+  states, which never removes, retags, or otherwise weakens a merge step's human gate. "Or
+  equivalent" above resolves only to other PR-_creation_ phrasings (e.g. "Raise PR", "Start PR
+  review") — it never extends to a merge phrasing (`- [ ] Merge PR`, `- [ ] [HUMAN] Merge …`), and a
+  direct-push Delivery Mode does not loosen that boundary: a stray merge step under a direct-push
+  mode is a separate finding to surface, not license to delete it here.
 
 ### 4. Fix Report Generation
 
@@ -259,8 +289,8 @@ Add after the push step:
 ```markdown
 ### Post-Push Verification
 
-- [ ] Push changes to `main`
-- [ ] Monitor GitHub Actions workflows for the push (list specific workflow names if known)
+- [ ] Push changes to the delivery target for the declared Delivery Mode (the PR branch under `worktree-to-pr` / `main-to-pr`; `origin main` under the direct-push modes)
+- [ ] Monitor GitHub Actions workflows for that push — the PR's check run under `*-to-pr` (list specific workflow names if known)
 - [ ] Verify all CI checks pass
 - [ ] If any CI check fails, fix immediately and push a follow-up commit
 - [ ] Do NOT proceed to next delivery phase until CI is green
@@ -565,11 +595,16 @@ for the authoritative mode table and precedence rule.
 ### Confidence Assessment
 
 - **HIGH Confidence**: section is entirely missing on a freshly-authored plan, OR a `*-to-pr` plan
-  is missing its PR-Review Maker→Fixer Cycle steps, OR the `[HUMAN]`/`[AI]` merge tag doesn't match
-  the declared mode. Fix is mechanical once the intended mode is known.
-- **MEDIUM Confidence → grill first**: the declared value is invalid/unrecognized. Do NOT guess
-  which of the four modes was intended — surface it as a grill question (per `grill-me`) with the
-  four modes as options, `worktree-to-pr` marked `(Recommended)`, before writing a value.
+  is missing its PR-Review Maker→Fixer Cycle steps. Fix is mechanical once the intended mode is
+  known. A `[HUMAN]`-tagged merge step is never itself a finding — the tag is its own opt-in — so it
+  is never in scope for this fix, and neither is any other merge-step tag value (see below).
+- **MEDIUM Confidence → grill first**: the declared Delivery Mode value is invalid/unrecognized, OR
+  the merge step carries a tag other than `[AI]`, `[HUMAN]`, or `[AI+HUMAN]`. Do NOT guess which of
+  the four modes (or which of the three tags) was intended — surface it as a grill question (per
+  `grill-me`) with the valid options (four modes, `worktree-to-pr` marked `(Recommended)`; or the
+  three tags, plus the standing blank-state/"chat about this" options), before writing a value. A
+  merge step's tag is never mechanically retagged, at any confidence level — see
+  [How to Fix a Merge-Tag Mismatch](#how-to-fix-a-merge-tag-mismatch) below.
 
 ### How to Fix a Missing `## Delivery Mode` Section
 
@@ -588,19 +623,52 @@ then write whichever mode they select.
 ### How to Fix a `*-to-pr` Plan Missing the PR-Review Maker→Fixer Cycle
 
 Insert the cycle steps (strictly sequential maker→fixer, default N=3, each cycle CI-green-gated)
-immediately before the `[HUMAN]` PR-merge step, sourced verbatim in structure from the
+immediately before the PR-merge step, sourced verbatim in structure from the
 [PR Review Quality Gate workflow](../../repo-governance/workflows/pr/pr-review-quality-gate.md):
 one `- [ ] [AI] Invoke pr-review-maker on $PR` / `- [ ] [AI] Invoke pr-review-fixer on $PR` pair per
 cycle, a loop-exit condition (N cycles complete, or a cycle with zero new findings), and — where
 the plan folder is tracked in this repo — an archival-in-PR step (`git mv` to `plans/done/` +
-README updates) committed inside the same PR, before the final `- [ ] [HUMAN] Merge PR` step.
+README updates) committed inside the same PR, before the final merge step — whatever tag that step
+already carries. Never retag it while scaffolding; see the structural guard in
+[How to Fix a Merge-Tag Mismatch](#how-to-fix-a-merge-tag-mismatch).
 
 ### How to Fix a Merge-Tag Mismatch
 
-- `*-to-pr` mode with the merge step tagged `[AI]` → retag `[HUMAN]`.
+**Structural guard (HARD RULE — states what it protects, not a tag/verb/mode enumeration): no
+recipe in this file, present or future, may remove, retag, or otherwise weaken a merge step's human
+gate — in ANY Delivery Mode, by ANY verb (write, delete, replace, rewrite, or merge into an
+unrelated recipe's output), under ANY confidence level including HIGH.** A merge step's tag is the
+plan's sole opt-in declaration for a human-gated merge — there is no separate field recording that
+intent — so anything that makes the gate disappear defeats it, regardless of which verb did it or
+which Delivery Mode the recipe fired under. This is deliberately stated by what it protects (the
+human gate) rather than by enumerating tags, verbs, or modes: two prior cycles were each defeated by
+a guard that was correct on the single axis it named — a tag-value set, or a `*-to-pr` mode
+condition — and silently open on an axis nobody had named — a delete instead of a retag, or a
+direct-push mode the guard's wording didn't reach. Enumerating axes is how this bug keeps
+recurring; every recipe in this file that could touch a merge step is scoped by this guard first,
+and a recipe's own confidence table (however "mechanical" or "HIGH confidence" it claims to be) is
+a narrower check layered on top, never a substitute. Concretely:
+
+- `*-to-pr` mode with the merge step carrying a tag other than `[AI]`, `[HUMAN]`, or `[AI+HUMAN]` →
+  do NOT retag it. Surface it as a MEDIUM-confidence grill question (per the Confidence Assessment
+  above) offering the three valid tags plus the standing blank-state/"chat about this" options, and
+  apply only whichever tag the user selects. An unrecognized tag may carry human-actor semantics
+  this agent must not silently strip — never assume it is safe to overwrite.
+- **Never retag, delete, or otherwise remove a `[HUMAN]`- or `[AI+HUMAN]`-tagged merge step, in any
+  Delivery Mode.** Per [Delivery Mode](../../repo-governance/conventions/structure/plans.md#delivery-mode),
+  the tag on the merge step IS the plan's opt-in — there is no separate "explicit opt-in"
+  declaration to check for, so a merge step tagged `[HUMAN]` and a merge step that "explicitly
+  declares" a `[HUMAN]` gate describe the identical input. This is not limited to `*-to-pr` mode: a
+  direct-push mode plan with a `[HUMAN]`-tagged merge step (or a recipe elsewhere in this file that
+  would delete a merge step as a side effect of an unrelated fix, e.g. a mode/PR-step reconciliation)
+  is exactly as unsafe as retagging one under `*-to-pr`, because the observable outcome — the gate
+  is gone — is identical either way. There is no fix action for a `[HUMAN]`- or
+  `[AI+HUMAN]`-tagged merge step — leave it alone unconditionally, regardless of which recipe or
+  Delivery Mode brought the fixer to that line.
 - `*-to-origin-main` mode with the final push gated behind an unrequested `[HUMAN]` approval step →
   retag `[AI]` and remove the approval-gate framing (the push itself needs no sign-off under a
-  direct-push mode).
+  direct-push mode). This is the push, not the merge, so the structural guard above does not apply
+  here — see the git-mechanical guard below.
 
 ## Execution-Grade Clarity Fixes (HARD RULE)
 
@@ -628,6 +696,12 @@ shape (add file path + verbatim command + observable acceptance criterion) to th
 checkbox.
 
 After rewriting, re-read the checkbox and confirm a sonnet-tier agent could execute it without consulting any other section of the plan. If the rewrite still requires lookups, repeat until the checkbox is self-contained.
+
+**Never apply this rewrite to a merge step.** A merge step missing a verbatim command or acceptance
+criterion is out of scope here and stays governed by
+[How to Fix a Merge-Tag Mismatch](#how-to-fix-a-merge-tag-mismatch). Supplying a scripted
+`gh pr merge` command must never become the mechanism that converts a `[HUMAN]` gate to `[AI]` —
+a merge step is a governance gate, not an under-specified action item, and its tag is the gate.
 
 ## Executor-Tagging and Phase-Gate Fixes (Step 5h Findings)
 
@@ -664,10 +738,18 @@ The three git-mechanical lifecycle steps are the most common over-tags — retag
 confidence**:
 
 - `[HUMAN] Create worktree: git worktree add …` → `[AI]`
-- `[HUMAN] Review the diff and approve push to main` → rewrite as `[AI] Commit and push to origin main` (direct push is the repo default — drop the approve-push gate)
+- `[HUMAN] Review the diff and approve push …` → rewrite as `[AI] Commit and push to origin <pr-branch>` under the default `worktree-to-pr`, or `[AI] Commit and push to origin main` under a direct-push mode. Drop the approve-push gate either way — pushing to a PR branch is not a merge.
 - `[HUMAN] Remove the worktree: git worktree remove …` → `[AI]`
 
-**FALSE_POSITIVE** only when the user's prompt or the plan explicitly requested a PR or an out-of-band
+**Never apply this recipe to a merge step.** The PR merge is a separate step from the push. `[AI]` is
+its default actor; a `[HUMAN]` tag on the merge step is itself the legitimate opt-in — the tag IS the
+declaration, with no separate field to check. See
+[How to Fix a Merge-Tag Mismatch](#how-to-fix-a-merge-tag-mismatch) above, which governs merge tags
+and never retags a `[HUMAN]`-tagged merge step under any condition. Retagging a declared `[HUMAN]`
+merge step to `[AI]` — or worse, rewriting it into a direct push to `origin main` — would strip a
+deliberate gate and bypass the PR entirely.
+
+**FALSE_POSITIVE** only when the user's prompt or the plan explicitly requested an out-of-band
 sign-off for that change. See the
 [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md).
 
@@ -699,6 +781,11 @@ classify **MEDIUM**.
 
 ### 6. Add Missing Handoff / Resume Signal to a `[HUMAN]` Step
 
+> **A merge step is exempt.** It has no resume signal by design — its human gate _is_ the signal —
+> so it is a guaranteed hit for this recipe. Adding one must never become the route by which a merge
+> step acquires a scripted git command, which is the documented pressure toward `[AI]`. Leave merge
+> steps alone here; see the hard rule at the top of this file.
+
 Every `[HUMAN]` step MUST contain:
 
 - **(a) What the human does** — described unambiguously.
@@ -727,8 +814,8 @@ When any `[HUMAN]` marker exists in `delivery.md` (or the single-file delivery s
 > **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
 > `[HUMAN]`: reserved for steps only a human can perform — physical/hardware actions,
 > out-of-band approvals (sign a contract, pay an invoice), or interactive credential/SSO gates
-> an agent cannot script. Every `[HUMAN]` step states what the human does and the observable
-> signal the agent checks to resume.
+> an agent cannot script. `[AI+HUMAN]`: agent prepares, human approves or finishes. Every
+> `[HUMAN]` step states what the human does and the observable signal the agent checks to resume.
 >
 > **Phase Gate** — every phase ends with a `### Phase N Gate`: a must-pass verification
 > checklist plus a **Pause Safety** note (the safe-to-stop state after the phase and the
@@ -816,6 +903,14 @@ The fixer's refusal options when verification fails:
 4. **Convert to placeholder** — `_Unknown — verify before authoring_` with a delivery item under Open Questions.
 
 Forbidden: replacing one hallucination with a more plausible-sounding hallucination. The fixer's job is to ground claims in repo or web evidence, not to make broken plans look polished.
+
+**Never apply refusal option 1 — or any option here — to a merge step.** Removing a merge step's
+line to resolve an unverified claim inside it deletes the plan's human-gate opt-in as a side effect
+of an unrelated fix. Merge steps commonly carry a relative link to the PR Merge Protocol, and plan
+folders sit deep enough that such links break routinely, so this path is reached in normal operation
+rather than in theory. On a merge step, fix the claim in place or classify MEDIUM; never remove the
+line. See the hard rule at the top of this file and
+[How to Fix a Merge-Tag Mismatch](#how-to-fix-a-merge-tag-mismatch).
 
 ## Knowledge Capture Phase Scaffolding Fixes
 

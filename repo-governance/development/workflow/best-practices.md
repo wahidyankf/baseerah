@@ -27,43 +27,46 @@ Provide actionable guidance for:
 
 ## Best Practices
 
-### Practice 1: Commit Directly to Main
+### Practice 1: Integrate Continuously via Short-Lived Branches
 
-**Principle**: Default to committing on main branch, use branches only when necessary.
+**Principle**: keep every branch short-lived and single-purpose. TBD forbids _long-lived_ branches, not branches — a plan branch that opens, integrates, and is deleted within a day or two is exactly the shape TBD wants.
 
 **Good Example:**
 
 ```bash
-# Work on main
-git checkout main
-git pull origin main
-
-# Make small change
+# Default: short-lived plan branch in a disposable worktree
+git worktree add worktrees/add-email-validation -b add-email-validation
 # ... edit files ...
 npm test
-
-# Commit to main
-git add .
 git commit -m "feat(auth): add email validation"
+git push origin add-email-validation
+gh pr create --draft --base main
+# Review cycle + CI, then merge once the preconditions hold; branch deleted
+```
+
+**Also correct — a declared direct-push mode for a trivial change:**
+
+```bash
+# Plan declares `## Delivery Mode: main-to-origin-main`
+git commit -m "fix(docs): correct a typo"
 git push origin main
 ```
 
 **Bad Example:**
 
 ```bash
-# Creating branch for every task (unnecessary)
-git checkout -b feature/tiny-typo-fix
-# ... fix typo ...
-git commit -m "fix typo"
-# Wait days for PR review for one-line change
+# A branch that outlives its purpose (DO NOT DO THIS)
+git checkout -b feature/big-redesign
+# ... three weeks of commits, never integrated ...
+# Diverges from main; the merge becomes a project of its own
 ```
 
 **Rationale:**
 
-- Simplifies workflow
-- Faster integration
-- No merge conflicts from long-lived branches
-- Continuous integration by default
+- Frequent integration is what TBD protects — the branch's _lifespan_ is the risk, not its existence
+- The PR is where review and the hardened merge preconditions attach
+- Feature flags hide incomplete work so a branch never needs to stay open to hide it
+- Long-lived branches produce exactly the merge conflicts TBD exists to prevent
 
 ### Practice 2: Make Small, Frequent Commits
 
@@ -741,33 +744,46 @@ git rebase --abort
 git pull origin main  # Use merge instead
 ```
 
-### Practice 12: Use Direct Push by Default; Create PRs Only When Explicitly Requested
+### Practice 12: Default to `worktree-to-pr`; Select a Direct-Push Mode Deliberately
 
-**Principle**: PRs are opt-in, not the default. Push directly to `main` unless the user prompt or plan document explicitly requests a PR.
+**Principle**: the repo-wide default delivery mode is `worktree-to-pr` — a short-lived plan branch in a disposable worktree, pushed to a draft PR against `main`, driven green, then merged. The direct-push modes remain fully supported, but they are an explicit selection declared in the plan, not the assumed path.
 
 **Good Example:**
 
 ```bash
-# Complete a feature with direct push (no PR needed)
+# Default: plan branch in a worktree, draft PR
+git worktree add worktrees/my-plan -b my-plan
 git commit -m "feat(auth): add email validation"
+git push origin my-plan
+gh pr create --draft --base main --title "feat(auth): add email validation"
+# Review cycle + CI run; merge once the hardened preconditions hold
+```
+
+**Also correct — a deliberately declared direct-push mode:**
+
+```bash
+# Plan declares `## Delivery Mode: main-to-origin-main` for a one-line doc fix
+git commit -m "docs(readme): fix broken anchor"
 git push origin main
 ```
 
 **Bad Example:**
 
 ```bash
-# Opening a PR for every commit "for safety" (DO NOT DO THIS)
-gh pr create --title "feat: add email validation" --body "..."
-# Unnecessary friction; blocks trunk-based integration
+# Pushing straight to main because no mode was considered at all (DO NOT DO THIS)
+git commit -m "feat(auth): rewrite session handling"
+git push origin main
+# Skips review on a substantial change; the mode was never declared
 ```
 
 **Rationale:**
 
-- Direct push is the TBD default — PRs add friction without safety benefit for routine commits
-- PRs are appropriate only for worktree-based flows, external contributions, or when explicitly requested
-- Plan delivery checklists must not include unsolicited PR steps
+- Short-lived branch via PR is a recognized TBD flavor — TBD forbids long-lived branches, not branches
+- The PR is where the review cycle and the hardened merge preconditions attach; skipping it on a substantial change removes the only review buffer
+- Direct push stays valuable for small, obviously-safe changes — declare the mode so the trade is visible
+- The push itself is always `[AI]`; no "review the diff and approve push" gate belongs in a checklist, because pushing to a PR branch is not a merge
 
-See [Git Push Default Convention](./git-push-default.md) for complete rules.
+See [Git Push Default Convention](./git-push-default.md) for complete rules and the [PR Merge Protocol](./pr-merge-protocol.md) for the merge preconditions.
 
 ## Related Documentation
 
@@ -776,16 +792,16 @@ See [Git Push Default Convention](./git-push-default.md) for complete rules.
 - [Implementation Workflow Convention](./implementation.md) - Three-stage methodology
 - [Reproducible Environments Convention](./reproducible-environments.md) - Environment practices
 - [Anti-Patterns](./anti-patterns.md) - Common mistakes to avoid
-- [Git Push Default Convention](./git-push-default.md) - PR opt-in rules for AI agents and plans
+- [Git Push Default Convention](./git-push-default.md) - The PR-branch-as-default push target, and the direct-push modes as explicit selections
 
 ## Summary
 
 Following these best practices ensures:
 
-1. Commit directly to main
+1. Integrate continuously via short-lived branches
 2. Make small, frequent commits
 3. Use Conventional Commits
-4. Use feature flags instead of branches
+4. Use feature flags instead of long-lived branches
 5. Implement in three stages (work → right → fast)
 6. Pin dependencies for reproducibility
 7. Keep CI green at all times
@@ -793,7 +809,7 @@ Following these best practices ensures:
 9. Split commits by domain
 10. Test before committing
 11. Pull with rebase before pushing (linear history for TBD)
-12. Use direct push by default; create PRs only when explicitly requested
+12. Default to `worktree-to-pr`; select a direct-push mode deliberately
 
 Workflows built following these practices are efficient, predictable, and high-quality.
 
