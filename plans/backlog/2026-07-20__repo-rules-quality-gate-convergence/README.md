@@ -955,3 +955,22 @@ structural safeguards" while four are listed [Repo-grounded — verified during 
 **DECIDED**: the delivery step adds the safeguard **by name**, never by ordinal, and additionally
 corrects the pre-existing "three structural safeguards" miscount to a countless phrasing while the
 file is open — a Root Cause Orientation fix for a defect encountered during the work, not scope creep.
+
+### DECISION 19 — The PR merge is `[AI]`; this plan takes no `[HUMAN]` merge opt-in
+
+While this rework was in progress, `origin/main` advanced with the merge-default inversion
+(`60d53119b`): under `*-to-pr` Delivery Modes the merge is now `[AI]` by default once the hardened
+preconditions hold, and a `[HUMAN]` merge gate is a legitimate **explicit per-plan opt-in** that must
+not be "corrected" away. Both plans were drafted under the prior default and carried `[HUMAN]` merge
+steps by inheritance, not by deliberate choice.
+
+**DECIDED**: retag every merge step in both plans to `[AI]`, and record here that neither plan
+exercises the `[HUMAN]` opt-in. The reasoning is the plan's own thesis applied to itself — a human
+merge gate contributes no additional defect detection beyond the review cycles and CI that already
+gate it, while adding unbounded wall-clock latency. Under the disposition test every mechanism in
+these plans must pass, it neither reduces rounds nor raises quality, so it is cut. This is a
+deliberate non-exercise of a permitted opt-in, not an oversight, and a future reader must not
+re-derive the gate from the convention's "opt-in is legitimate" clause without new evidence.
+
+This decision is recorded identically as DECISION 13 in the sibling plan
+([`plans/backlog/2026-07-20__plan-quality-gate-convergence/README.md`](../2026-07-20__plan-quality-gate-convergence/README.md)).

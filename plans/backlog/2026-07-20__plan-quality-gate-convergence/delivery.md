@@ -47,7 +47,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 Work happens in `worktrees/plan-quality-gate-convergence/`; each phase group lands as a draft PR
 against `main`; `[AI]` commits and pushes to the PR branch; the PR-Review Maker→Fixer Cycle (3
-sequential CI-gated cycles) runs before the `[HUMAN]` merge. See the
+sequential CI-gated cycles) runs before the `[AI]` merge, which proceeds once the hardened merge
+preconditions hold (DECISION 13). See the
 [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md).
 
 ## Parallelization
@@ -866,9 +867,10 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
       — acceptance: every inline comment answered; CI green before Cycle 3 starts
 - [ ] [AI] Cycle 3: `pr-review-maker` review, then `pr-review-fixer` remediation
       — acceptance: every inline comment answered; CI green
-- [ ] [HUMAN] Merge the PR to `main`
-      — the human merges on their own schedule once all three cycles are complete and CI is green;
-      observable resume signal for the agent: `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] Merge the PR to `main` once the hardened merge preconditions hold
+      — acceptance: all review cycles complete, CI green, no unresolved review thread;
+      `gh pr view <n> --json state` reports `MERGED`. Per DECISION 13 this plan takes no `[HUMAN]`
+      merge opt-in: a human gate here would reintroduce the wall-clock stall the plan exists to remove.
 
 ### Phase 7 Gate
 
@@ -878,7 +880,7 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
 - [ ] [AI] AC-16 inventory comparison passes — no validation step was removed
 - [ ] [AI] `npm run generate:bindings` exits 0 and sync validation reports no drift
 - [ ] [AI] All three PR-review cycles complete with CI green
-- [ ] [HUMAN] PR merged — `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] PR merged — `gh pr view <n> --json state` reports `MERGED`
 
 > **Pause Safety**: `ose-public` carries the complete, self-consistent change set and CI is green on
 > `main`. The two sibling repos are simply not yet updated, which is a normal steady state for this
@@ -894,7 +896,8 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
       ([tech-docs.md §Surface Inventory](./tech-docs.md#surface-inventory)) as byte-identical text
       where the repos do not legitimately diverge
       — acceptance: `test -f repo-governance/development/quality/plan-acceptance-defect-classes.md`
-      succeeds in `ose-primer` and its eight-class count clause returns 8
+      succeeds in `ose-primer` and its class-count clause returns 9 — the same value Phase 1's
+      clause returns in `ose-public`; a mismatch means the port dropped a class
 - [ ] [AI] Port `apps/rhino-cli` changes **byte-identically** per the
       [SDLC Gate Standard](../../../docs/reference/sdlc-gate-standard.md)
       — acceptance: `diff -r` between the two repos' `apps/rhino-cli` reports no differences
@@ -902,13 +905,14 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
       — acceptance: exits 0 with no drift
 - [ ] [AI] Run local quality gates, then commit and push to `origin <pr-branch>`; open a draft PR
 - [ ] [AI] Run the three PR-review cycles with CI green between each
-- [ ] [HUMAN] Merge the `ose-primer` PR — resume signal: `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] Merge the `ose-primer` PR once the hardened preconditions hold — acceptance:
+      `gh pr view <n> --json state` reports `MERGED`
 
 ### Phase 8 Gate
 
 - [ ] [AI] `diff -r` on `apps/rhino-cli` between `ose-public` and `ose-primer` reports no differences
 - [ ] [AI] `ose-primer` CI green on `main`
-- [ ] [HUMAN] PR merged
+- [ ] [AI] PR merged
 
 > **Pause Safety**: `ose-primer` matches `ose-public`; `ose-infra` remains on the prior state, which
 > is independently coherent. Safe to stop. To resume: re-run the `diff -r` byte-identity check.
@@ -922,20 +926,22 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
 - [ ] [AI] Port surfaces 1-7 and 11, applying the repo-relevance gate — no infra-private content
       flows outward, and no `ose-public` content that is meaningless in `ose-infra` is force-fitted
       — acceptance: `test -f repo-governance/development/quality/plan-acceptance-defect-classes.md`
-      succeeds in `ose-infra` and its eight-class count clause returns 8
+      succeeds in `ose-infra` and its class-count clause returns 9 — the same value Phase 1's
+      clause returns in `ose-public`; a mismatch means the port dropped a class
 - [ ] [AI] Port `apps/rhino-cli` byte-identically
       — acceptance: `diff -r` between `ose-public` and `ose-infra` `apps/rhino-cli` reports no
       differences
 - [ ] [AI] Regenerate bindings: `npm run generate:bindings` — acceptance: exits 0 with no drift
 - [ ] [AI] Run local quality gates, then commit and push to `origin <pr-branch>`; open a draft PR
 - [ ] [AI] Run the three PR-review cycles with CI green between each
-- [ ] [HUMAN] Merge the `ose-infra` PR — resume signal: `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] Merge the `ose-infra` PR once the hardened preconditions hold — acceptance:
+      `gh pr view <n> --json state` reports `MERGED`
 
 ### Phase 9 Gate
 
 - [ ] [AI] `diff -r` on `apps/rhino-cli` across all three repos reports no differences
 - [ ] [AI] `ose-infra` CI green on `main`
-- [ ] [HUMAN] PR merged
+- [ ] [AI] PR merged
 
 > **Pause Safety**: all three repos are converged. Safe to stop. To resume: re-run the tri-repo
 > byte-identity check.

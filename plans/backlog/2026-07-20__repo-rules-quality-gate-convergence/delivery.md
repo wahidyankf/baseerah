@@ -68,7 +68,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 Work happens in `worktrees/repo-rules-quality-gate-convergence/`; each phase group lands as a draft
 PR against `main`; `[AI]` commits and pushes to the PR branch; the PR-Review Maker→Fixer Cycle (3
-sequential CI-gated cycles) runs before the `[HUMAN]` merge. See the
+sequential CI-gated cycles) runs before the `[AI]` merge, which proceeds once the hardened merge
+preconditions hold (DECISION 19). See the
 [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md).
 
 ## Parallelization
@@ -911,9 +912,10 @@ authoritative]`
       — acceptance: every inline comment answered; CI green before Cycle 3 starts
 - [ ] [AI] Cycle 3: `pr-review-maker` review, then `pr-review-fixer` remediation
       — acceptance: every inline comment answered; CI green
-- [ ] [HUMAN] Merge the PR to `main`
-      — the human merges on their own schedule once all three cycles are complete and CI is green;
-      observable resume signal for the agent: `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] Merge the PR to `main` once the hardened merge preconditions hold
+      — acceptance: all review cycles complete, CI green, no unresolved review thread;
+      `gh pr view <n> --json state` reports `MERGED`. Per DECISION 19 this plan takes no `[HUMAN]`
+      merge opt-in: a human gate here would reintroduce the wall-clock stall the plan exists to remove.
 
 ### Phase 6 Gate
 
@@ -923,7 +925,7 @@ authoritative]`
 - [ ] [AI] AC-15 inventory comparison passes — no validation step was removed
 - [ ] [AI] `npm run generate:bindings` exits 0 and sync validation reports no drift
 - [ ] [AI] All three PR-review cycles complete with CI green
-- [ ] [HUMAN] PR merged — `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] PR merged — `gh pr view <n> --json state` reports `MERGED`
 
 > **Pause Safety**: `ose-public` carries the complete, self-consistent change set and CI is green on
 > `main`. The two sibling repos are simply not yet updated, which is a normal steady state for this
@@ -948,14 +950,15 @@ authoritative]`
       — acceptance: exits 0 with no drift
 - [ ] [AI] Run local quality gates, then commit and push to `origin <pr-branch>`; open a draft PR
 - [ ] [AI] Run the three PR-review cycles with CI green between each
-- [ ] [HUMAN] Merge the `ose-primer` PR — resume signal: `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] Merge the `ose-primer` PR once the hardened preconditions hold — acceptance:
+      `gh pr view <n> --json state` reports `MERGED`
 
 ### Phase 7 Gate
 
 - [ ] [AI] `diff -r` on `apps/rhino-cli` between `ose-public` and `ose-primer` reports no differences
 - [ ] [AI] `diff -r` on the rhino Gherkin tree between the two repos reports no differences
 - [ ] [AI] `ose-primer` CI green on `main`
-- [ ] [HUMAN] PR merged
+- [ ] [AI] PR merged
 
 > **Pause Safety**: `ose-primer` matches `ose-public`; `ose-infra` remains on the prior state, which
 > is independently coherent. Safe to stop. To resume: re-run the `diff -r` byte-identity check.
@@ -976,14 +979,15 @@ authoritative]`
 - [ ] [AI] Regenerate bindings: `npm run generate:bindings` — acceptance: exits 0 with no drift
 - [ ] [AI] Run local quality gates, then commit and push to `origin <pr-branch>`; open a draft PR
 - [ ] [AI] Run the three PR-review cycles with CI green between each
-- [ ] [HUMAN] Merge the `ose-infra` PR — resume signal: `gh pr view <n> --json state` reports `MERGED`
+- [ ] [AI] Merge the `ose-infra` PR once the hardened preconditions hold — acceptance:
+      `gh pr view <n> --json state` reports `MERGED`
 
 ### Phase 8 Gate
 
 - [ ] [AI] `diff -r` on `apps/rhino-cli` across all three repos reports no differences
 - [ ] [AI] `diff -r` on the rhino Gherkin tree across all three repos reports no differences
 - [ ] [AI] `ose-infra` CI green on `main`
-- [ ] [HUMAN] PR merged
+- [ ] [AI] PR merged
 
 > **Pause Safety**: all three repos are converged. Safe to stop. To resume: re-run the tri-repo
 > byte-identity check.
