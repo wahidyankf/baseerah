@@ -1,17 +1,23 @@
-# Fundamentally Strong — Shared Course Library, Three Learning Paths
+# Fundamentally Strong — Shared Course Library, Four Learning Paths
 
-Turn the "Fundamentally Strong" curriculum into a **shared course library** composed by **three
+Turn the "Fundamentally Strong" curriculum into a **shared course library** composed by **four
 learning paths**. One canonical body per course (a path-neutral "building block"); each path is an
 **ordered, prerequisite-consistent manifest** that composes a **curated subset** of course IDs in a
 chosen order. Zero body duplication, single source of truth per course. This plan also builds the
 **real ayokoding-www UI change** that makes path-aware navigation work — one canonical course URL
 plus client-side path context — under the `/en/c/learn` URL model.
 
-## Three paths, one library, one converging endpoint
+## Four paths, one library, per-role convergence
 
-All three paths end at the **same deep mastery**; only the **entry point**, the **journey ordering**,
-and the **teaching emphasis** differ. Each is a fresh, bespoke ordering authored over the one library
-and over the one prerequisite DAG the library forms.
+Paths converge **within a role**, not globally — the library now serves **more than one endpoint**.
+The three `software-engineer` paths (`interview-ready`, `immediately-effective/software-engineer`,
+`fundamentally-strong/software-engineer`) end at the same software-engineering **deep mastery**; only
+their entry point, journey ordering, and teaching emphasis differ. The fourth path,
+`immediately-effective/software-engineer-to-ai-engineer`, converges on a distinct **AI-engineering**
+deep mastery — it assumes an already-working software engineer and does not aim at the three other
+paths' endpoint. Each path is a fresh, bespoke ordering authored over the one library and over the one
+prerequisite DAG the library forms. See
+[tech-docs.md DD-22](./tech-docs.md#design-decisions) for the full amendment record.
 
 ```mermaid
 flowchart TD
@@ -19,20 +25,28 @@ flowchart TD
     IR["Path 1 ·<br/>interview-ready/<br/>software-engineer<br/>interview prep FIRST<br/>→ production → deeper"]:::ir
     IE["Path 2 ·<br/>immediately-effective/<br/>software-engineer<br/>editor → one language<br/>→ ship an app → deeper"]:::ie
     FS["Path 3 ·<br/>fundamentally-strong/<br/>software-engineer<br/>CS theory FIRST<br/>→ deeper"]:::fs
-    GOAL((one converging<br/>endpoint:<br/>deep mastery)):::goal
+    AI["Path 4 ·<br/>immediately-effective/<br/>software-engineer-<br/>to-ai-engineer<br/>assumes a working SWE<br/>→ build AI systems"]:::ai
+    SWEGOAL(("SWE endpoint:<br/>deep mastery")):::goal
+    AIGOAL{{"AI-engineer endpoint:<br/>deep mastery"}}:::goal
     IR -->|ordered manifest of course-ids| LIB
     IE -->|ordered manifest of course-ids| LIB
     FS -->|ordered manifest of course-ids| LIB
-    IR --> GOAL
-    IE --> GOAL
-    FS --> GOAL
+    AI -->|short AI-specific manifest<br/>links prereqs, not included| LIB
+    IR --> SWEGOAL
+    IE --> SWEGOAL
+    FS --> SWEGOAL
+    AI --> AIGOAL
 
     classDef lib fill:#0072B2,stroke:#000,color:#fff
     classDef ir fill:#E69F00,stroke:#000,color:#000
     classDef ie fill:#009E73,stroke:#000,color:#fff
     classDef fs fill:#CC79A7,stroke:#000,color:#000
+    classDef ai fill:#D55E00,stroke:#000,color:#fff
     classDef goal fill:#56B4E9,stroke:#000,color:#000
 ```
+
+The two endpoint nodes differ by **shape and label**, not only fill color, so the per-role split reads
+correctly for color-blind viewers: `SWEGOAL` is a circle, `AIGOAL` is a hexagon.
 
 - **Course = standalone, path-neutral building block.** Each self-contained topic module is a
   **course** with a stable **course ID** (its kebab-case slug, e.g. `coding-interview`). Its canonical
@@ -44,18 +58,30 @@ flowchart TD
   course IDs in a chosen order. It references a **curated subset** of the library — **not every course
   is in every path**. A path freely **omits** courses that do not fit its arc (omit-or-create) and
   every manifest must be **prerequisite-consistent** (a valid topological entry into the DAG).
-- **`fundamentally-strong` is both the library/section brand and path #3's id.** The three path
-  landings live at **`/en/c/learn/paths/<path-id>`**:
+- **`fundamentally-strong` is both the library/section brand and path #3's id.** The four path
+  landings live at **`/en/c/learn/paths/<first-segment>/<second-segment>`**. The first segment is the
+  arc style (`interview-ready` / `immediately-effective` / `fundamentally-strong`). The second segment
+  names either a **role** (`software-engineer`, for the first three paths) or, as of path #4, a **role
+  transition or subject** — the convention is now stated explicitly as
+  `<role-transition-or-subject>` rather than left as an accident of the first three paths sharing
+  `software-engineer` (see [tech-docs.md DD-23](./tech-docs.md#design-decisions)):
   1. `interview-ready/software-engineer` — an experienced SWE re-entering the market: interview/job
      prep FIRST → production-effective → deeper. (renamed from `job-seeking`)
   2. `immediately-effective/software-engineer` — the immediately-effective principle: editor → one
      language → **build a real app FIRST** → then deepen. (renamed from the old shipping-first
      `fundamentally-strong` path)
   3. `fundamentally-strong/software-engineer` — university-style: fundamentals / CS-theory FIRST →
-     deeper. (**NEW** path)
-- **All three are FRESH manifests.** None maps cleanly to the existing built spiral order; each is a
-  bespoke ordering authored over the library. The three paths are **three different entry points and
-  orderings into the one DAG** that converges on the same endpoint.
+     deeper.
+  4. `immediately-effective/software-engineer-to-ai-engineer` — an already-working software engineer
+     transitioning to AI engineering: assumes SWE competence (prerequisites are **linked, not
+     included**), teaches **building** AI systems rather than driving them (`agentic-coding` stays a
+     separate, unrelated axis), and converges on a **distinct AI-engineering endpoint**. (**NEW** path,
+     2026-07-20 grilling session)
+- **All four are FRESH manifests.** None maps cleanly to the existing built spiral order; each is a
+  bespoke ordering authored over the library. The first three paths are **three different entry points
+  and orderings into the one DAG** that converges on the shared software-engineering endpoint; the
+  fourth path converges on its own AI-engineering endpoint — see
+  [tech-docs.md DD-22](./tech-docs.md#design-decisions).
 
 ## Course-block & manifest model (summary)
 
@@ -83,10 +109,15 @@ flowchart TD
   pedagogy — and paths pick the fitting variant. Variants are added on demand, never enumerated
   speculatively.
 
-## Course library source (baseline 121, 0 merges)
+## Course library source (baseline 121 → 127, course surgery now permitted)
 
-The library retains **all 121** courses (see the reconciled catalog in
-[`syllabus/courses/`](./syllabus/courses/README.md)):
+The library retains **all 121** of its original software-engineer-role courses (see the reconciled
+catalog in [`syllabus/courses/`](./syllabus/courses/README.md)) and adds **6 net-new AI-specific
+courses** for the fourth path, for a **127-course catalog**. Course surgery (update / merge / split /
+create) is now **permitted** — see [tech-docs.md DD-28](./tech-docs.md#design-decisions) — superseding
+the original "pure manifest reuse, zero new bodies" invariant. Because courses are shared, any surgery
+is a **four-path change**: each surgery states its blast radius across all four manifests, and every
+affected manifest is re-verified prerequisite-consistent afterward.
 
 1. **33 shipped topics (1–33)** — live today at legacy
    `content/en/learn/fundamentally-strong/software-engineer/<slug>/`. These are **re-homed** into
@@ -99,12 +130,19 @@ The library retains **all 121** courses (see the reconciled catalog in
    build-your-own-pentest-engine capstone, and (per **DL-14**) `capstone-solid-core` (existing, already
    live on disk) plus six new inter-topic capstones (`capstone-real-world-delivery`,
    `capstone-secure-service`, `capstone-data-pipeline`, `capstone-concurrency-and-systems`,
-   `capstone-concurrency-showdown`, `capstone-lead-at-altitude`).
+   `capstone-concurrency-showdown`, `capstone-lead-at-altitude`). This is the **121-course baseline**.
+4. **6 net-new AI-specific courses** (2026-07-20 grilling session) — a light eval gate, a deep evals
+   course, a statistics-for-evals course, a product-patterns-for-probabilistic-systems course, an
+   inference-serving-and-model-deployment course, and a fine-tuning-and-adaptation course — authored
+   for the fourth path (`immediately-effective/software-engineer-to-ai-engineer`), available to any
+   path thereafter. Brings the catalog to **127**. See
+   [tech-docs.md DD-25, DD-26, DD-28](./tech-docs.md#design-decisions).
 
 **Reconciliation rulings (locked)** — the rulings below are themselves authoritative and are
 reproduced against the tracked [Course Library Catalog](./tech-docs.md#course-library-catalog)
-(121 baseline, 0 merges). They were originally derived in a gitignored `local-temp/` scratch file,
-which is not tracked and must not be consulted during execution:
+(121 software-engineer-role baseline; 127 with the fourth path's six net-new AI courses, DD-28). They
+were originally derived in a gitignored `local-temp/` scratch file, which is not tracked and must not
+be consulted during execution:
 
 - **detection-engineering kept distinct.** `detection-engineering-and-siem-operations` (deep,
   Wazuh-specific decoder/rule/dashboard ops) stays distinct from topic 60 `defensive-security`
@@ -117,22 +155,25 @@ which is not tracked and must not be consulted during execution:
   subsystem at a time). The scope-guard cross-reference contract is baked into the cluster authoring.
 
 The full per-course detail (every course + ID, format, language, one-line scope) is the
-[`syllabus/courses/` catalog](./syllabus/courses/README.md); the three path orderings are the
-[`syllabus/paths/` manifests](./syllabus/paths/README.md).
+[`syllabus/courses/` catalog](./syllabus/courses/README.md); the four path orderings are the
+[`syllabus/paths/` manifests](./syllabus/paths/README.md) (the fourth path's manifest lands per the
+build order below).
 
-## Build order (locked)
+## Build order (locked, amended 2026-07-20)
 
 ```mermaid
 flowchart TD
     A["Group A · Architecture & UI<br/>library home · manifest loader<br/>path-aware nav"]:::a
-    B["interview-ready MVP<br/>(ships FIRST)<br/>re-home 1–33 · interviews"]:::b
-    C["immediately-effective<br/>manifest"]:::c
-    D["fundamentally-strong<br/>manifest"]:::d
+    B["interview-ready MVP<br/>(architecture smoke test ONLY)<br/>topics 1–33, already live"]:::b
+    F["software-engineer-<br/>to-ai-engineer<br/>(authoring priority #1)"]:::f
+    C["immediately-effective/<br/>software-engineer manifest"]:::c
+    D["fundamentally-strong/<br/>software-engineer manifest"]:::d
     E["Backfill 34–94<br/>native + new courses"]:::e
-    A --> B --> C --> D --> E
+    A --> B --> F --> C --> D --> E
 
     classDef a fill:#0072B2,stroke:#000,color:#fff
     classDef b fill:#E69F00,stroke:#000,color:#000
+    classDef f fill:#D55E00,stroke:#000,color:#fff
     classDef c fill:#009E73,stroke:#000,color:#fff
     classDef d fill:#CC79A7,stroke:#000,color:#000
     classDef e fill:#56B4E9,stroke:#000,color:#000
@@ -144,14 +185,31 @@ flowchart TD
    path IDs); manifest-driven prev/next + breadcrumb; **prerequisite display** on the course page;
    graceful canonical fallback; path landing pages; accessibility. Unit + integration + e2e +
    `specs/` Gherkin.
-2. **interview-ready MVP (ships first).** Re-home topics 1–33 into `courses/`; author the 4 interview
-   courses + `capstone-interview-loop`; write `manifests/interview-ready/software-engineer.yaml`; ship
-   end-to-end (landing page, path-aware nav, deploy).
-3. **immediately-effective manifest.** Compose the editor → one-language → build-a-real-app-first arc
-   over the courses that have landed.
-4. **fundamentally-strong manifest.** Compose the university-style fundamentals/CS-theory-first arc.
-5. **Backfill topics 34–94** native into `courses/` (+ the remaining new courses) as the library
+2. **interview-ready MVP — architecture smoke test ONLY (ships first, amended 2026-07-20).** Re-home
+   topics 1–33 (already live on disk) into `courses/`; write
+   `manifests/interview-ready/software-engineer.yaml` over that already-live content; ship
+   end-to-end (landing page, path-aware nav, deploy). This step's sole job is to **prove the
+   architecture** — routing, manifest loading, `?path` context, prev/next, breadcrumb, prerequisite
+   display — against real content, in days not months. Authoring the 4 NEW interview courses +
+   `capstone-interview-loop` is **no longer bundled into this MVP gate** — it is real authoring work,
+   and step 2's whole point is to ship before that work is done. Those NEW courses land whenever the
+   interview-ready path's remaining authoring is scheduled, without blocking steps 3–5.
+3. **`software-engineer-to-ai-engineer` — authoring priority #1.** The AI path (six net-new courses +
+   manifest, see [tech-docs.md DD-25, DD-26, DD-28](./tech-docs.md#design-decisions)) gets first claim
+   on all authoring effort once Group A and the MVP are done.
+4. **`immediately-effective/software-engineer` manifest.** Compose the editor → one-language →
+   build-a-real-app-first arc over the courses that have landed.
+5. **`fundamentally-strong/software-engineer` manifest.** Compose the university-style
+   fundamentals/CS-theory-first arc.
+6. **Backfill topics 34–94** native into `courses/` (+ the remaining new courses) as the library
    fills; each path's manifest grows as its courses land.
+
+**Why the AI path jumps ahead of the other two manifests.** Nothing in the AI path exists on disk yet
+(~17 courses). Making it literally first — ahead of even the MVP — would mean nothing ships until all
+17 are authored, with the UI architecture unvalidated the entire time. Ordering it after an
+architecture-smoke-test MVP (step 2, proven cheaply against topics 1–33 that already exist) gives the
+AI path first claim on every unit of real authoring effort while keeping the architecture proven early
+against content that already exists. See [tech-docs.md DD-27](./tech-docs.md#design-decisions).
 
 Full phase list in [delivery.md](./delivery.md).
 
@@ -177,21 +235,29 @@ and the native authoring of the 61 transferred topics — it does not wait on an
 - **`fundamentally-strong/software-engineer` — a university-style, fundamentals-first learner.** Wants
   the theory foundation first: CS foundations, computer architecture, paradigms, data structures and
   algorithms **before** building apps at scale — the rigorous, bottom-up route to the same mastery.
+- **`immediately-effective/software-engineer-to-ai-engineer` — an already-working software engineer
+  transitioning to AI engineering.** Owns the editor workflow and SWE fundamentals already; wants to
+  become **immediately effective** at **building** AI systems (not at driving coding agents — that
+  stays `agentic-coding`'s separate axis). The manifest is a short, AI-specific spine: prerequisite
+  courses are **linked, not included** — fast because it assumes competence, not because it skips
+  depth. Converges on a distinct AI-engineering endpoint, not the other three paths' shared
+  software-engineering endpoint. See
+  [tech-docs.md DD-21, DD-22, DD-24](./tech-docs.md#design-decisions).
 
 ## Navigation
 
-- [Business Requirements (brd.md)](./brd.md) — WHY the three-path shared-library model, who it serves.
-- [Product Requirements (prd.md)](./prd.md) — the model as product spec, the three personas, user
+- [Business Requirements (brd.md)](./brd.md) — WHY the four-path shared-library model, who it serves.
+- [Product Requirements (prd.md)](./prd.md) — the model as product spec, the four personas, user
   stories, Gherkin acceptance criteria (path-aware nav, `?path` context, prerequisite display,
   canonical fallback), the NEW-course specs, and the **UI-design-funnel** for the path-aware
   navigation screens against the `/en/c/learn` URL model.
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — the shared-course-library architecture, the
   course-ID + manifest schema, the prerequisite DAG, the ayokoding-www path-aware-navigation UI
-  design, the course library catalog, and the three path manifests.
+  design, the course library catalog, and the four path manifests.
 - [Delivery Checklist (delivery.md)](./delivery.md) — phased executable checklist.
 - [Syllabus](./syllabus/README.md) — the per-course detail layer: the
-  [`courses/` catalog](./syllabus/courses/README.md) (the 121 courses) and the
-  [`paths/` manifests](./syllabus/paths/README.md) (the three orderings over it).
+  [`courses/` catalog](./syllabus/courses/README.md) (the 127-course catalog) and the
+  [`paths/` manifests](./syllabus/paths/README.md) (the four orderings over it).
 - [Learnings (learnings.md)](./learnings.md) — knowledge-capture running log.
 
 ## Delivery Mode: worktree-to-pr
@@ -210,34 +276,43 @@ The following are **decided** and drive the plan. Residual per-path ordering jud
 courses each path curates, exact orderings) are resolved in the manifests (tech-docs +
 [`syllabus/paths/`](./syllabus/paths/README.md)) rather than re-grilled.
 
-- **DL-1 · Three paths, one shared library, one converging endpoint.**
-  `interview-ready/software-engineer` (interview-first), `immediately-effective/software-engineer`
-  (build-app-first), and `fundamentally-strong/software-engineer` (theory-first) compose one canonical
-  course library. All three end at the same deep mastery; only entry point, journey ordering, and
-  teaching emphasis differ. **Decided.**
+- **DL-1 · Four paths, one shared library, per-role convergence (amended 2026-07-20 — see DL-15 /
+  tech-docs DD-22).** `interview-ready/software-engineer` (interview-first),
+  `immediately-effective/software-engineer` (build-app-first), `fundamentally-strong/software-engineer`
+  (theory-first), and `immediately-effective/software-engineer-to-ai-engineer` (AI-transition-first)
+  compose one canonical course library. The three `software-engineer` paths end at the same
+  software-engineering deep mastery; the fourth path converges on a distinct AI-engineering endpoint.
+  Convergence is a per-role property, not a library-wide axiom — only entry point, journey ordering,
+  and teaching emphasis differ **within a role**. **Decided; amended 2026-07-20.**
 - **DL-2 · Course = path-neutral building block; path = ordered manifest over a curated subset.**
   1 topic = 1 course with a stable ID; a path references a curated subset of course IDs in order and
   freely omits courses that do not fit; zero body duplication, single source of truth. **Decided.**
-- **DL-3 · All three manifests are FRESH.** None maps to the existing built spiral order; each is a
-  bespoke ordering authored over the library. **Decided.**
+- **DL-3 · All manifests are FRESH.** None maps to the existing built spiral order; each is a
+  bespoke ordering authored over the library. **Decided; now four manifests as of DL-15.**
 - **DL-4 · Prerequisite DAG.** Every course declares `prerequisites: [course-id, ...]` in its
   canonical metadata; the library forms one prerequisite DAG; the canonical course page surfaces its
-  prerequisites; every path manifest MUST be a valid topological entry into the DAG. The three paths
-  are three different entry points into the one DAG. **Decided.**
+  prerequisites; every path manifest MUST be a valid topological entry into the DAG. The four paths
+  (as of DL-15) are four different entry points into the one DAG. **Decided.**
 - **DL-5 · Omit-or-create + variant policy.** A path omits a shared course that does not fit, or a new
   course is created (added to the library, available to all paths). The default is one shared,
   path-neutral block; a **separate course variant** (same topic, distinct course ID, distinct
   pedagogy) is authored **only** when a path needs a genuinely different teaching approach. Optional
   per-path lightweight framing (intro/outro callout) only; never a body fork. Variants added on
   demand, not enumerated speculatively. **Decided.**
-- **DL-6 · Library source & catalog (baseline 121, 0 merges).** 33 shipped topics (1–33) re-homed
-  into `courses/` **with redirects**; 61 transferred topics (34–94) authored **NATIVE** into
-  `courses/` (no re-home); 4 existing capstones + 23 net-new courses. The library retains all 121
-  (see **DL-14** for the seven DD-20 inter-topic capstones folded into this baseline). **Decided.**
-- **DL-7 · Build order — interview-ready ships first.** Deliver Group A (architecture + UI) first as a
-  hard prerequisite; then the `interview-ready/software-engineer` path end-to-end (re-homing topics
-  1–33, authoring the interview cluster); then the `immediately-effective` manifest; then the
-  `fundamentally-strong` manifest; then backfill topics 34–94 native as the library fills. **Decided.**
+- **DL-6 · Library source & catalog (baseline 121 → 127, course surgery now permitted — amended
+  2026-07-20, see DL-15 / tech-docs DD-28).** 33 shipped topics (1–33) re-homed into `courses/` **with
+  redirects**; 61 transferred topics (34–94) authored **NATIVE** into `courses/` (no re-home); 4
+  existing capstones + 23 net-new courses (see **DL-14** for the seven DD-20 inter-topic capstones
+  folded into this 121 baseline). Plus, as of 2026-07-20, 6 net-new AI-specific courses for the fourth
+  path, bringing the catalog to **127**; update / merge / split / create course surgery is now
+  permitted, superseding the original zero-new-bodies invariant, subject to the four-path blast-radius
+  rule. **Decided; amended 2026-07-20.**
+- **DL-7 · Build order — amended 2026-07-20, see DL-15 / tech-docs DD-27.** Deliver Group A
+  (architecture + UI) first as a hard prerequisite; then an **interview-ready MVP that is an
+  architecture smoke test only** (shipped against already-live topics 1–33, not the full interview
+  cluster); then `immediately-effective/software-engineer-to-ai-engineer` (authoring priority #1); then
+  the `immediately-effective/software-engineer` manifest; then the `fundamentally-strong/software-engineer`
+  manifest; then backfill topics 34–94 native as the library fills. **Decided; amended 2026-07-20.**
 - **DL-8 · URL model.** Courses at `/en/c/learn/courses/<course-id>` and path landings at
   `/en/c/learn/paths/<path-id>`, both via the existing `/c/[...slug]` content route; `?path=<path-id>`
   carries path context. (Renamed from the prior `/en/courses/<id>` + `/en/path/...` forms.) **Decided.**
@@ -263,13 +338,15 @@ courses each path curates, exact orderings) are resolved in the manifests (tech-
 - **DL-12 · FS-SE hard dependency REMOVED.** The sibling FS-SE plan is closed; its Passes 3–5 scope is
   absorbed here as the native-authored backfill of topics 34–94. This plan waits on no other plan.
   **Decided.**
-- **DL-13 · Path composition = "curated + converge" (not all-comprehensive).** Not every course is in
-  every path. `fundamentally-strong` = the complete-mastery path (all 121, theory-first);
-  `interview-ready` = interview + core + production spine that OMITS deep-systems/OS/kernel/niche
-  courses from its spine (offered as an optional "go deeper" tail); `immediately-effective` = build-first
-  spine that DEFERS heavy theory into a later deepening band. All three still converge on the same deep
-  endpoint; each manifest is prerequisite-consistent. Supersedes the earlier all-comprehensive draft.
-  **Decided 2026-07-19.**
+- **DL-13 · Path composition = "curated + converge" (not all-comprehensive; scoped to the three
+  `software-engineer` paths).** Not every course is in every path. `fundamentally-strong/software-engineer`
+  = the complete-mastery path (all 121 software-engineer-role courses, theory-first); `interview-ready`
+  = interview + core + production spine that OMITS deep-systems/OS/kernel/niche courses from its spine
+  (offered as an optional "go deeper" tail); `immediately-effective/software-engineer` = build-first
+  spine that DEFERS heavy theory into a later deepening band. These three still converge on the same
+  software-engineering deep endpoint; each manifest is prerequisite-consistent. Supersedes the earlier
+  all-comprehensive draft. The fourth path (DL-15) is a different, curated-only composition against a
+  distinct endpoint and is not claimed to converge with these three. **Decided 2026-07-19.**
 - **DL-14 · Seven orphaned inter-topic capstones promoted to first-class library courses (baseline
   114 → 121, still 0 merges).** Audit found seven capstones fully specced but absent from the catalog
   tables and path manifests: `capstone-solid-core` (already **live on disk**, embedded in
@@ -284,3 +361,15 @@ courses each path curates, exact orderings) are resolved in the manifests (tech-
   position (none is genuinely omitted, verified machine-checked topologically-consistent in all
   three); never fold any into a parent course's intra-course capstone or cut it. Mirrors
   [tech-docs DD-20](./tech-docs.md#design-decisions). **Decided 2026-07-19.**
+- **DL-15 · Fourth path added — `immediately-effective/software-engineer-to-ai-engineer`
+  (2026-07-20 grilling session).** Summary of the full decision record, folded into
+  [tech-docs.md DD-21 through DD-28](./tech-docs.md#design-decisions): the path teaches **building**
+  AI systems, not driving them (`agentic-coding` stays a separate axis, DD-21); the convergence axiom
+  is amended to a per-role property — the library now serves more than one endpoint (DD-22, amends
+  DL-1); the path's ID and the second-URL-segment convention are registered explicitly (DD-23); its
+  entry point assumes an already-working software engineer, with prerequisites linked rather than
+  included (DD-24); evals are split into an early light gate and a later deep-evals course (DD-25); a
+  scoped statistics-for-evals course is authored (DD-26); the locked build order is amended so the path
+  is authoring priority #1 behind an architecture-smoke-test MVP (DD-27, amends DL-7); and course
+  surgery is now permitted, with six net-new AI courses bringing the catalog to 127 (DD-28, amends
+  DL-6). **Decided 2026-07-20.**

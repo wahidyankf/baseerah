@@ -113,6 +113,15 @@ and the deep counterpart to the user-side `agentic-coding` and `agentic-ai`.
   state, `agent-permissions-and-sandboxing` constrains it,
   and `agent-orchestration-subagents-and-observability`
   scales it — culminating in the [coding-agent capstone](./capstone-build-your-own-coding-agent.md).
+- **What the industry calls this cluster**: from late 2025 the discipline of building the machinery
+  around a model — this loop, its tools, its context, its guardrails, its observability — began to be
+  called **harness engineering** (Anthropic 2025-11-26; OpenAI; Böckeler/Thoughtworks 2026-04-02). The
+  term is **~5 months old and contested** — OpenAI and Anthropic treat the harness as the umbrella
+  containing context management, while HumanLayer treats it as a subset of context engineering — so this
+  cluster **names the term and cites the disagreement without adopting a side, and renames nothing**.
+  The full treatment, including the contested evidence on whether harness quality measurably matters,
+  is in the [coding-agent capstone](./capstone-build-your-own-coding-agent.md).
+  `[Needs Verification]`: confirm dates and attributions at authoring; treat the vocabulary as volatile.
 
 ## Worked examples
 

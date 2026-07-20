@@ -1,14 +1,17 @@
-# Delivery Checklist — Fundamentally Strong Shared Course Library, Three Paths
+# Delivery Checklist — Fundamentally Strong Shared Course Library, Four Paths
 
-This checklist delivers a **shared course library + three composing paths** over the existing ayokoding
+This checklist delivers a **shared course library + four composing paths** over the existing ayokoding
 `/c/[...slug]` content route. A **course** is a standalone, path-neutral building block served at
 `/en/c/learn/courses/<course-id>`; a **path** is an ordered manifest composing a curated subset of
-course-ids, landing at `/en/c/learn/paths/<path-id>`. The three paths all converge on the same deep
-mastery — only the entry point, ordering, and teaching emphasis differ:
+course-ids, landing at `/en/c/learn/paths/<path-id>`. **Convergence is now a per-role property, not a
+library-wide axiom (DD-22, amends DD-5)**: the three `software-engineer` paths converge on one shared
+software-engineering deep-mastery endpoint; the fourth path converges on a **distinct AI-engineering**
+endpoint:
 
 1. `interview-ready/software-engineer` — experienced SWE re-entering the market: interview/job prep FIRST → production-effective → deeper.
 2. `immediately-effective/software-engineer` — editor → one language → build a real app FIRST → then deepen.
 3. `fundamentally-strong/software-engineer` — university-style: fundamentals/CS-theory FIRST → deeper.
+4. `immediately-effective/software-engineer-to-ai-engineer` (fourth path, added 2026-07-20, DD-21–DD-28) — role-transition, immediately-effective arc: assumes an **already-working software engineer**; prerequisite software-engineer courses are **linked, not included** (DD-24); teaches **building** AI systems (models, agents, evals, inference serving), not driving them (`agentic-coding` stays a separate, unrelated axis, DD-21).
 
 Navigation is **additive** — after re-homing, a reader can still browse the material **the old way**
 (the legacy hand-curated, spiral-ordered `_index.md` section tree, re-pointed to the new course URLs)
@@ -17,12 +20,17 @@ canonical course pages); both coexist (§5a, enforced in Phase 5).
 
 Every course declares `prerequisites: [course-id, ...]` in its canonical metadata, forming a
 **prerequisite DAG**; every path manifest is a valid prerequisite-consistent ordering/entry into that
-DAG. The catalog of 121 courses (0 merges), the course-ID + manifest schema, the path-aware-navigation
-UI design, and the three path orderings live in [tech-docs.md](./tech-docs.md) and the
-[syllabus detail layer](./syllabus/README.md); the UI-design-funnel and NEW-course specs live in
-[prd.md](./prd.md). The authoritative catalog baseline is the tracked
-[Course Library Catalog](./tech-docs.md#course-library-catalog) (121 rows); it was originally derived
-from a gitignored `local-temp/` scratch file, which must not be relied on during execution.
+DAG. The catalog is **127 courses** (121 software-engineer-role baseline + the fourth path's 6 net-new
+AI-engineering courses, DD-28; zero merges among the original 121; course surgery — update/merge/split/
+create — is now permitted subject to a four-path blast-radius statement per surgery, DD-28). The
+course-ID + manifest schema, the path-aware-navigation UI design, and all four path orderings live in
+[tech-docs.md](./tech-docs.md) and the [syllabus detail layer](./syllabus/README.md); the
+UI-design-funnel and NEW-course specs live in [prd.md](./prd.md). The authoritative catalog baseline is
+the tracked [Course Library Catalog](./tech-docs.md#course-library-catalog) (127-course total; the six
+AI-engineering courses are catalogued there by name only until Group F authors them — see
+[Design Decisions DD-28](./tech-docs.md#design-decisions) — Phase 7 below adds their table rows). It was
+originally derived from a gitignored `local-temp/` scratch file, which must not be relied on during
+execution.
 
 > **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
 > `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
@@ -104,18 +112,27 @@ subagents capped per the orchestration convention). The main thread self-promote
 
 - **Group A (Phases 1–4)** is **serial** — each phase builds on the prior feature slice (schema →
   core → shell/route → landing/e2e). Group A is the **hard prerequisite** for every path.
-- **interview-ready MVP (Phases 5–7)** is mostly serial (re-home is a sync point; the manifest depends
-  on the courses existing) EXCEPT Phase 6's **five NEW interview bodies**, which are content-independent
-  (each writes only its own `courses/<id>/` subtree) and **pipeline concurrently** through review,
-  bounded by the cap.
-- **immediately-effective manifest (Phase 8)** and **fundamentally-strong manifest (Phase 9)** are
+- **interview-ready MVP (Phases 5–6)** is serial (re-home is a sync point; the manifest depends on the
+  courses existing). Per **DD-27**, this MVP is now an **architecture smoke test only** — it ships
+  against the topics already re-homed in Phase 5, with no NEW course authoring inside this group; the
+  four interview-technique courses + `capstone-interview-loop` are **deferred** to Group E (Backfill,
+  Band 9) so they never block the AI path's authoring start.
+- **AI path (Phases 7–9, Group F — authoring priority #1, DD-27)** runs immediately after the MVP and
+  ahead of Groups C/D. Phase 7's **six net-new AI courses** are content-independent (each writes only
+  its own `courses/<id>/` subtree) and **pipeline concurrently** through review, bounded by the cap.
+  Phase 8 (course-surgery scope contract) and Phase 9 (manifest + landing) are serial sync points.
+- **immediately-effective manifest (Phase 10)** and **fundamentally-strong manifest (Phase 11)** are
   serial manifest+landing sync points authored over the currently-available library.
-- **Backfill (Phase 10)** authors the 61 transferred topics + 10 remaining new courses + 8 remaining
-  capstones (2 original + 6 DD-20 inter-topic capstones) **natively**; these bodies are mutually
-  content-independent and **pipeline concurrently**
-  through review (bounded by the cap). Each landed band **grows** the three manifests (append + re-run
-  prerequisite-consistency + integrity) as a serial sync point.
-- **Finalization (Phases 11–15)** is serial.
+- **Backfill (Phase 12)** authors the 61 transferred topics + 10 remaining new courses + 8 remaining
+  capstones (2 original + 6 DD-20 inter-topic capstones) + the **deferred 4 interview courses +
+  `capstone-interview-loop`** (Band 9, DD-27) **natively**; these bodies are mutually content-independent
+  and **pipeline concurrently** through review (bounded by the cap). Each landed band **grows** the
+  affected manifests (append + re-run prerequisite-consistency + integrity) as a serial sync point —
+  Bands 1–8 grow the three software-engineer-role manifests; Band 9 grows only `interview-ready` and
+  `fundamentally-strong` (the two arcs whose ordering includes the interview-technique band per
+  [tech-docs.md's path manifests](./tech-docs.md#path-manifests)); the AI path's manifest does **not**
+  grow here (DD-24 — its spine is fixed at Phase 9).
+- **Finalization (Phases 13–17)** is serial.
 
 **Path constants** (referenced throughout):
 
@@ -125,7 +142,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/`
 - `<MANIFESTS>` = `<FEAT>manifests/` (standalone YAML data files, nested to mirror slash path ids — `<MANIFESTS><path-id>.yaml`)
 - `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`
-- Path ids: `interview-ready/software-engineer`, `immediately-effective/software-engineer`, `fundamentally-strong/software-engineer`
+- Path ids: `interview-ready/software-engineer`, `immediately-effective/software-engineer`, `fundamentally-strong/software-engineer`, `immediately-effective/software-engineer-to-ai-engineer` (fourth path, manifest at `<MANIFESTS>immediately-effective/software-engineer-to-ai-engineer.yaml`)
 
 ---
 
@@ -192,7 +209,8 @@ subagents capped per the orchestration convention). The main thread self-promote
       a track/path over shared lessons **with prerequisites** (roadmap.sh, Exercism, freeCodeCamp,
       Coursera) — acceptance: cited findings folded into `prd.md` funnel notes; no `[Unverified]` claim.
 - [ ] [AI] **Produce hi-fi finalists** — author the 2 `.excalidraw.png` finalists per screen (paths
-      hub with **three** path cards, path landing, course-in-path with **prerequisite display**) into
+      hub with a **2×2 grid of four** path cards per [prd.md Screen 1's selected design](./prd.md#screen-1--paths-hub-choose-your-path),
+      path landing, course-in-path with **prerequisite display**) into
       `assets/` per [prd.md §UI-Design-Funnel](./prd.md#ui-design-funnel-path-aware-navigation-screens)
       and confirm the embedded `![]()` links resolve — acceptance: **all six files exist on disk** —
       `for f in paths-hub-option-a paths-hub-option-b path-landing-option-a path-landing-option-b course-path-option-a course-path-option-b; do test -f "assets/$f.excalidraw.png" || echo "MISSING $f"; done`
@@ -208,9 +226,9 @@ subagents capped per the orchestration convention). The main thread self-promote
       false→true as a result of this step's actual work. The artifacts are the deliverable, so the
       artifacts are what the acceptance must test.
 - [ ] [AI] **Library + paths content homes** — create `<COURSES>_index.md` (library landing, weight +
-      title) and `<PATHS>_index.md` (paths hub / choose-a-path landing listing **all three** paths)
-      mirroring an existing section `_index.md` — acceptance: `test -f <COURSES>_index.md` and
-      `test -f <PATHS>_index.md`; build green.
+      title) and `<PATHS>_index.md` (paths hub / choose-a-path landing whose 2×2-grid layout has room
+      for **all four** paths, populated as each ships) mirroring an existing section `_index.md` —
+      acceptance: `test -f <COURSES>_index.md` and `test -f <PATHS>_index.md`; build green.
 - [ ] [AI] **Course-prerequisite metadata contract** — document the canonical course metadata field
       `prerequisites: [course-id, ...]` (declared in each course `_index.md` frontmatter) in
       [tech-docs §Prerequisite DAG](./tech-docs.md#prerequisite-dag-illustrative-excerpt) — acceptance: contract documented;
@@ -221,12 +239,14 @@ subagents capped per the orchestration convention). The main thread self-promote
       [tech-docs §Path = ordered manifest](./tech-docs.md#path--ordered-manifest-manifest-format)
       — acceptance: schema compiles (`npx nx run ayokoding-www:typecheck` exits 0).
 - [ ] [AI] **Manifest data-file directory** — create `<MANIFESTS>` (the standalone-data-file home,
-      source of truth) with a `README.md` note that nested `<path-id>.yaml` files land here in Phases
-      7–10 — acceptance: `test -d <MANIFESTS>` and `test -f <MANIFESTS>README.md`.
+      source of truth) with a `README.md` note that nested `<path-id>.yaml` files land here in Phase 6
+      (interview-ready MVP) and Phases 9–11 (the AI, immediately-effective, and fundamentally-strong
+      manifests — the latter three each grown further as Phase 12 backfill lands) — acceptance:
+      `test -d <MANIFESTS>` and `test -f <MANIFESTS>README.md`.
 
 ### Phase 1 Gate
 
-- [ ] [AI] Funnel finalists (three-path hub + prerequisite display) + selections + rationale present in `prd.md`; assets resolve.
+- [ ] [AI] Funnel finalists (2×2-grid four-path hub + prerequisite display) + selections + rationale present in `prd.md`; assets resolve.
 - [ ] [AI] `<COURSES>_index.md` + `<PATHS>_index.md` created; prerequisite metadata contract documented; `PathManifest` schema compiles; `<MANIFESTS>` exists.
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:typecheck` exit 0.
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
@@ -388,11 +408,14 @@ subagents capped per the orchestration convention). The main thread self-promote
       schema, keyed by the nested path id) — command: `npx nx run ayokoding-www:test:unit` —
       acceptance: tests fail (repository wiring absent).
 
-  **Gherkin (binds) →** "All three paths reference a shared course with no body duplication"
+  **Gherkin (binds) →** "The three software-engineer paths reference a shared course with no body
+  duplication" — scoped to the three `software-engineer`-role paths only; the fourth path
+  (`immediately-effective/software-engineer-to-ai-engineer`) links to shared courses rather than
+  including them in its manifest (DD-24), so it is deliberately excluded from this scenario.
 
   ```gherkin
-  Scenario: All three paths reference a shared course with no body duplication
-    Given a course appears in all three path manifests
+  Scenario: The three software-engineer paths reference a shared course with no body duplication
+    Given a course appears in all three of the interview-ready, immediately-effective/software-engineer, and fundamentally-strong/software-engineer manifests
     When the course library is inspected
     Then exactly one canonical path-neutral body exists for that course
     And each manifest references the course by its stable course ID
@@ -466,7 +489,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 
 ---
 
-## Phase 4: Path landing + paths hub (three cards) + e2e
+## Phase 4: Path landing + paths hub (2×2-grid, four cards) + e2e
 
 > _Suggested executor: `swe-typescript-dev` + `swe-e2e-dev`._
 
@@ -475,7 +498,9 @@ subagents capped per the orchestration convention). The main thread self-promote
       `<PATHS>_index.md` / `<PATHS><path-id>/_index.md`, per
       [prd.md Screen 1/2 selected designs](./prd.md#ui-design-funnel-path-aware-navigation-screens) —
       command: `npx nx run ayokoding-www:build` — acceptance: build green; components render; the hub
-      supports **three** path cards.
+      supports a **2×2 grid of up to four** path cards (only the interview-ready card is populated once
+      Phase 6 ships; the other three cards populate as Phases 9/10/11 land — no manifest is published
+      yet at this point in Group A).
 - [ ] [AI] **RED (e2e)** — write failing Playwright e2e specs in the ayokoding e2e suite for: path
       landing lists courses in manifest order; prev/next walks the path and preserves `?path=`;
       breadcrumb shows the path; a course page shows its prerequisites; deep-link without `?path=` →
@@ -573,11 +598,11 @@ playwright test`).
 
 ### Phase 4 Gate
 
-- [ ] [AI] Path landing + three-card paths hub render from a manifest; prerequisite display verified; all `course-paths` e2e specs green in `en` (this plan's content locale).
+- [ ] [AI] Path landing + 2×2-grid paths hub (up to four cards) render from a manifest; prerequisite display verified; all `course-paths` e2e specs green in `en` (this plan's content locale).
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` + `:build` + `:lint` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0. (`ayokoding-www:test:e2e` and `:test:integration` are both no-op echoes — e2e lives in the paired `ayokoding-www-fe-e2e` project, and the integration tier is deliberately unused for content apps.)
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: the full path-aware navigation UI (incl. prerequisite display + three-card hub) is
+> **Pause Safety**: the full path-aware navigation UI (incl. prerequisite display + the 2×2-grid hub) is
 > implemented, tested (unit + integration + e2e + specs), and live — but no real path manifests are
 > published yet, so production still shows the canonical library. **Group A (the hard prerequisite) is
 > complete.** Safe to stop. To resume: `npx nx run ayokoding-www-fe-e2e:test:e2e`.
@@ -592,7 +617,7 @@ playwright test`).
 > redirect wiring — `docs-file-manager` is scoped to `docs/` only and does not cover app content).
 > Only the **shipped** legacy bodies move here (33 topics 1–33 + 4 existing capstones, incl.
 > `capstone-solid-core` per **DD-20**). Topics 34–94 have no legacy home and are authored NATIVE in
-> Phase 10.
+> Phase 12.
 
 - [ ] [AI] For **every** shipped topic + existing capstone, `git mv <SE_OLD><slug>/ <COURSES><slug>/`
       (course-id = slug; no rename), preserving the full page-bundle (`_index.md` + `overview.md` +
@@ -691,26 +716,129 @@ wherever the content now lives.
 
 ---
 
-## Phase 6: Author the four interview courses + `capstone-interview-loop` into the library
+## Phase 6: Author the `interview-ready/software-engineer` manifest + landing + wire + smoothness (architecture smoke test — MVP ships, DD-27)
 
-> Each NEW course is authored as a full page-bundle into `<COURSES><course-id>/`. These five bodies are
+> _Suggested executor: `apps-ayokoding-www-general-maker` (manifest/landing) + `web-researcher` (smoothness facts)._
+> **Amended 2026-07-20 (D7/DD-27).** This phase is now an **architecture smoke test only** — it ships
+> against the 33 topics + 4 capstones already re-homed in Phase 5, proving routing, manifest loading,
+> `?path` context propagation, prev/next, breadcrumb, and prerequisite display against real content,
+> quickly (days, not months). The four interview-technique courses (`coding-interview`,
+> `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`) plus
+> `capstone-interview-loop` are **no longer bundled into this MVP gate** — they are deferred to Phase 12
+> Band 9 and inserted into this same `courseOrder`, in their correct topological position, when they
+> land, growing this manifest without blocking the AI path's authoring start in Phase 7.
+
+- [ ] [AI] Author the manifest **data file** `<MANIFESTS>interview-ready/software-engineer.yaml`
+      (standalone data file): `pathId: interview-ready/software-engineer`, `title`, `description`, and
+      the ordered `courseOrder` = the interview-first arc from
+      [tech-docs §Path `interview-ready/software-engineer`](./tech-docs.md#path-interview-readysoftware-engineer-interview-first)
+      and [syllabus/paths/README.md](./syllabus/paths/README.md), **restricted to the 33 shipped topics + 4 existing capstones already live under `<COURSES>`** (the five deferred interview-technique
+      bodies are inserted later, DD-27) — acceptance: the manifest loads + validates (`npx nx run
+ayokoding-www:test:unit` exits 0); references only extant courses; the five deferred course IDs
+      are absent from the published `courseOrder` right now —
+      `grep -E "coding-interview|take-home-and-live-coding|system-design-interview|behavioral-and-leadership-interviews|capstone-interview-loop" <MANIFESTS>interview-ready/software-engineer.yaml`
+      returns nothing (falsifiable both ways: after Phase 12 Band 9 lands and grows this manifest, the
+      same command must return all five lines).
+- [ ] [AI] Author the thin landing anchor `<PATHS>interview-ready/software-engineer/_index.md`
+      (prose/SEO only — no `courseOrder`); the ordered course list renders from the loaded manifest per
+      [prd.md Screen 2](./prd.md#screen-2--path-landing-page) — acceptance: landing renders the
+      manifest-ordered list over the smoke-test-scoped `courseOrder` (phase-grouped, fast-path callout;
+      the interview-loop map is added when Phase 12 Band 9 lands).
+- [ ] [AI] **Manifest integrity + prerequisite-consistency check** — every `courseOrder` ID resolves
+      under `<COURSES>`; no duplicate ID; every in-library prerequisite of each listed course appears
+      earlier in the ordering — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
+- [ ] [AI] **Architecture smoke test** — verify, against this real manifest, the six things D7/DD-27
+      names: routing resolves, the manifest loads, `?path=interview-ready/software-engineer` context
+      propagates, prev/next walks the manifest order, the breadcrumb shows the path, and course pages
+      show their prerequisites — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the
+      path-walk e2e spec passes in `en` (this plan's content locale).
+
+  **Gherkin (binds) →** "The interview-ready MVP proves the architecture before other path work begins"
+
+  ```gherkin
+  Scenario: The interview-ready MVP proves the architecture before other path work begins
+    Given the interview-ready/software-engineer MVP (an architecture smoke test over already-live topics 1-33) is delivered end-to-end
+    When the software-engineer-to-ai-engineer path's authoring begins
+    Then the interview-ready MVP's landing page, manifest, and path-aware nav are already live in production
+    And the interview cluster's remaining NEW courses are not required for that MVP to be considered shipped
+  ```
+
+- [ ] [AI] **Progression smoothness audit (interview-first, DD-16, smoke-test-scoped)** — walk the
+      published `courseOrder` and confirm the levers hold (prereq-chaining with SF-1/SF-2 bridges;
+      monotonic-ish difficulty; skip/fast-path affordances on the landing) per
+      [tech-docs §Smoothness Architecture](./tech-docs.md#smoothness-architecture-per-path) —
+      acceptance: every lever assessable over the current `courseOrder` verified; any regression fixed
+      by soften/bridge in place, never reorder. The **refresh-register** lever lives inside the four
+      deferred interview courses and is **not yet assessable** — it is audited as part of Phase 12 Band
+      9's manifest-growth step, not fabricated here.
+
+### Phase 6 Gate
+
+- [ ] [AI] `interview-ready/software-engineer` manifest published (smoke-test-scoped over the 33 topics + 4 capstones); integrity + prerequisite-consistency green; path-walk e2e + breadcrumb + prerequisite display green in `en` (this plan's content locale).
+- [ ] [AI] Smoothness audit passes for every lever assessable at this stage (levers, SF-1/SF-2 bridges); refresh-register lever explicitly deferred to Phase 12 Band 9.
+- [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
+- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
+
+> **Pause Safety**: the `interview-ready/software-engineer` path is **live end-to-end** in production
+> (landing + manifest + path-aware nav + prerequisites + smoothness) over its smoke-test-scoped
+> `courseOrder` — the **architecture is proven against real content; the interview-ready MVP has
+> shipped** (DD-27). The path is not yet content-complete (the five interview-technique bodies land in
+> Phase 12 Band 9) — this is a deliberate, documented gap, not an oversight. Safe to stop indefinitely.
+> To resume: re-run the path-walk e2e.
+
+---
+
+## Group F — `immediately-effective/software-engineer-to-ai-engineer` (authoring priority #1, DD-27)
+
+> Runs immediately after the interview-ready architecture smoke test and ahead of Groups C/D (D7/DD-27):
+> nothing in this path exists on disk yet (~17 courses' worth of harness-cluster + AI-band content, of
+> which six are entirely NEW), so ordering it first gives it first claim on every unit of authoring
+> effort while the architecture is already proven against real content (Phase 6). See
+> [tech-docs §Path `immediately-effective/software-engineer-to-ai-engineer`](./tech-docs.md#path-immediately-effectivesoftware-engineer-to-ai-engineer-fourth-path-added-2026-07-20)
+> and [prd.md's AI-engineering specialization courses](./prd.md#ai-engineering-specialization-courses-software-engineer-to-ai-engineer-path-added-2026-07-20).
+
+## Phase 7: Author the six net-new AI courses
+
+> Each NEW course is authored as a full page-bundle into `<COURSES><course-id>/`. These six bodies are
 > content-independent (each writes only its own subtree) and **pipeline concurrently** through review
 > (bounded by the cap). Author each per the **NEW-course authoring convention** below; per-course
-> concept/example detail is in the [syllabus courses layer](./syllabus/courses/README.md) and the
-> [prd.md spec](./prd.md#new-course--capstone-specifications).
+> concept/example detail is in
+> [prd.md's AI-engineering specialization courses](./prd.md#ai-engineering-specialization-courses-software-engineer-to-ai-engineer-path-added-2026-07-20)
+> — every format / primary-language / prerequisite-chain cell there is explicitly labeled
+> `[Judgment call]` (first-pass authoring guidance, not a locked catalog row); this delivery checklist
+> does not restate or firm up those specifics — the author finalizes them against the
+> `syllabus/courses/` catalog conventions at authoring time, per that same DD-27 note in `prd.md`.
+>
+> Every course below is split into a **stable spine** and **dated accuracy-note sidebars** (volatile
+> SDK/model/pricing/framework specifics), matching the pattern the existing AI-band courses already use
+> (DD-28's durability constraint) — this is an explicit authoring requirement, not optional polish.
 
-**NEW-course authoring convention** (apply to each course/capstone sub-phase):
+**NEW-course authoring convention** (apply to each course sub-phase; identical in shape to the
+convention this plan uses for every other NEW course — restated here since it first appears in this
+phase, Phase 6's predecessor "Author the four interview courses" step having been deferred to Phase 12
+Band 9, DD-27):
 
 1. [AI] **V (accuracy pre-verify)** — spot-check version-pinned / market / pre-1.0-stack facts via
-   `web-researcher`; the two `vacti` repos stay unverified (never written as version-pinned facts) —
-   acceptance: no version-pinned claim written `[Unverified]`.
+   `web-researcher`; per DD-28's durability constraint this applies with extra weight here — volatile
+   SDK/model/pricing/framework facts belong ONLY in dated accuracy-note sidebars, never the stable
+   spine — acceptance: no version-pinned claim written `[Unverified]`; every volatile fact sits in an
+   accuracy-note sidebar, not the spine.
 2. [AI] **Skeleton** — create `<COURSES><course-id>/` (`_index.md` with `prerequisites: [...]` +
    `overview.md` + `learning/_index.md` + `drilling/_index.md`), mirroring the matching sibling bundle
-   shape — acceptance: `test -d` passes for folder + `learning/` + `drilling/`; `prerequisites` declared.
+   shape [Judgment call: exact `course-id` slug and prerequisite-linking targets are finalized at
+   authoring time against `syllabus/courses/`, per prd.md's AI-engineering specialization courses note —
+   not fabricated here] — acceptance: `test -d` passes for folder + `learning/` + `drilling/`;
+   `prerequisites` declared (the shared software-engineer-fundamentals prerequisites this path assumes
+   are **linked, not included** in the manifest per DD-24 — that constraint governs Phase 9, not this
+   skeleton step).
 3. [AI] **Author learning track** — `overview.md` (purpose + `## Prerequisites` naming only earlier
-   library courses + register per prd), concept coverage (≥ floor `co-NN`), example/scenario pages
-   (volume band `ex-NN`) + colocated `code/` where code-bearing, and `learning/capstone/` — acceptance:
-   `grep -oh 'co-[0-9]\{2\}' … | sort -u | wc -l` ≥ floor; `ex-NN` count in band.
+   library courses + register per prd), concept coverage, example/scenario pages + colocated `code/`
+   where code-bearing, and `learning/capstone/` [Judgment call: exact concept-coverage floor and
+   example-volume band are decided at authoring time, per this plan's usual per-course floor convention
+   — not invented here since these six courses have no locked catalog row yet] — acceptance: the
+   course's own `overview.md` states its scope boundary against any sibling AI-band course it could be
+   confused with (deep evals vs. light eval gate; statistics-for-evals vs.
+   `analytics-and-experimentation`).
 4. [AI] **Author drilling track** — `drilling/<course-id>.md` + `drilling/overview.md` in the fixed
    five-section order — acceptance: all five sections present.
 5. [AI] **Run content checkers** — run the matching learning checker, `apps-ayokoding-www-facts-checker`,
@@ -725,88 +853,233 @@ wherever the content now lives.
 Each course below is its own sub-phase (own branch → draft PR → 3-cycle review → `[AI]` merge →
 deploy), applying the convention:
 
-- [ ] [AI] `coding-interview` (By Example · Python) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
+- [ ] [AI] Light eval gate [Judgment call: By Example, Python, per prd.md] — sits right after the first
+      working LLM call, before RAG/agents; answers "how will you know this works?" (D5/DD-25) —
+      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM; its
+      overview states the scope boundary against the deep-evals course.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] `take-home-and-live-coding` (By Example · Python) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
+- [ ] [AI] Deep evals [Judgment call: By Example, Python, per prd.md] — sits after agents; error
+      analysis, task-specific criteria, LLM-as-judge with measured human agreement, CI gating,
+      judge-scope reliability (D5/DD-25) — acceptance: all 7 convention steps complete; checkers report
+      zero CRITICAL/HIGH/MEDIUM; its overview states the scope boundary against the light eval gate.
+
+  **Gherkin (binds) →** "The light eval gate and deep evals course do not overlap"
+
+  ```gherkin
+  Scenario: The light eval gate and deep evals course do not overlap
+    Given the light-eval-gate course and the deep-evals course are authored
+    When a reader compares their overviews
+    Then each overview states an explicit scope boundary against the other
+    And neither course re-teaches the material the other owns
+  ```
+
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] `system-design-interview` (Annotated-concept · no code; forward-links `system-design`) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
+
+- [ ] [AI] Statistics for evals [Judgment call: Annotated-concept, code-bearing, Python, per prd.md] —
+      scoped tightly to what evals demand (judge concordance, significance testing), not a general
+      statistics survey (D6/DD-26) — acceptance: all 7 convention steps complete; checkers report zero
+      CRITICAL/HIGH/MEDIUM.
+
+  **Gherkin (binds) →** "The statistics-for-evals course stays scoped to what evals demand"
+
+  ```gherkin
+  Scenario: The statistics-for-evals course stays scoped to what evals demand
+    Given the statistics-for-evals course is authored
+    When a reader compares it with analytics-and-experimentation
+    Then it covers judge concordance and significance testing for evals only
+    And it does not re-teach general product A/B testing, which stays analytics-and-experimentation's scope
+  ```
+
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
-- [ ] [AI] `behavioral-and-leadership-interviews` (Annotated-concept · no code) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
-      **Gherkin (binds) →** "The behavioral course covers the layoff and employment-gap narrative"
-      — coverage acceptance: the learning track explicitly covers framing an employment gap, a layoff,
-      and a re-entry story, and treats senior/staff/EM leadership rounds as core (not optional)
-      material — verify with
-      `grep -ciE 'employment gap|layoff|re-entry' <course>/**/*.md` (ERE alternation) returning ≥3 distinct lessons.
+
+- [ ] [AI] Product patterns for probabilistic systems [Judgment call: Annotated-concept, no code, per
+      prd.md] — product design patterns for probabilistic (not deterministic) outputs; no course owns
+      this today (DD-28) — acceptance: all 7 convention steps complete; checkers report zero
+      CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
-- [ ] [AI] `capstone-interview-loop` (Python + prose) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
+- [ ] [AI] Inference serving and model deployment [Judgment call: By Example, Python, per prd.md] —
+      vLLM/TGI, KV-cache, batching, GPU considerations; entirely absent from the library today (DD-28) —
+      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-
-### Phase 6 Gate
-
-- [ ] [AI] All 4 interview courses + `capstone-interview-loop` live under `<COURSES>` with declared prerequisites; each passed its checker + facts + link checkers.
-- [ ] [AI] `<COURSES>_index.md` catalog updated to include the five new bodies.
-- [ ] [AI] `npx nx run ayokoding-www:build` + link + heading + markdownlint green.
-- [ ] [AI] Every NEW-course sub-phase PR is `[AI]`-merged and deployed.
-
-> **Pause Safety**: the library now holds the 33 shipped topics + 4 existing capstones (incl.
-> `capstone-solid-core`) + the 5 interview-technique bodies, all at canonical URLs; no manifest
-> published yet, so all render the canonical view. Safe to stop. To resume: re-run the section build +
-> link validation.
-
----
-
-## Phase 7: Author the `interview-ready/software-engineer` manifest + landing + wire + smoothness (MVP ships)
-
-> _Suggested executor: `apps-ayokoding-www-general-maker` (manifest/landing) + `web-researcher` (smoothness facts)._
-> This is the **first shippable path**. It is authored over the currently-available library (33 topics
-> plus 4 capstones plus 5 interview bodies) and **grows** during Phase 10 backfill as deeper courses
-> land.
-
-- [ ] [AI] Author the manifest **data file** `<MANIFESTS>interview-ready/software-engineer.yaml`
-      (standalone data file): `pathId: interview-ready/software-engineer`, `title`, `description`, and
-      the ordered `courseOrder` = the interview-first arc from
-      [tech-docs §Path `interview-ready/software-engineer`](./tech-docs.md#path-interview-readysoftware-engineer-interview-first)
-      and [syllabus/paths/README.md](./syllabus/paths/README.md) — acceptance: the manifest loads +
-      validates (`npx nx run ayokoding-www:test:unit` exits 0); references only extant courses.
-- [ ] [AI] Author the thin landing anchor `<PATHS>interview-ready/software-engineer/_index.md`
-      (prose/SEO only — no `courseOrder`); the ordered course list renders from the loaded manifest per
-      [prd.md Screen 2](./prd.md#screen-2--path-landing-page) — acceptance: landing renders the
-      manifest-ordered list (phase-grouped, fast-path callout, interview-loop map).
-- [ ] [AI] **Manifest integrity + prerequisite-consistency check** — every `courseOrder` ID resolves
-      under `<COURSES>`; no duplicate ID; every in-library prerequisite of each listed course appears
-      earlier in the ordering — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
-- [ ] [AI] Verify path-aware nav end-to-end for this path: from the landing, prev/next walks the
-      manifest order and preserves `?path=interview-ready/software-engineer`; breadcrumb shows the path;
-      course pages show their prerequisites — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance:
-      the path-walk e2e spec passes in `en` (this plan's content locale).
-- [ ] [AI] **Progression smoothness audit (interview-first, DD-16)** — walk the manifest order and
-      confirm the levers hold (prereq-chaining with SF-1/SF-2 bridges; monotonic-ish difficulty;
-      skip/fast-path affordances on the landing; refresh register in the four interview courses) per
-      [tech-docs §Smoothness Architecture](./tech-docs.md#smoothness-architecture-per-path) —
-      acceptance: all levers verified; any regression fixed by soften/bridge in place, never reorder.
+- [ ] [AI] Fine-tuning and adaptation [Judgment call: By Example, Python, per prd.md] —
+      fine-tuning/LoRA/PEFT versus RAG as a foil (DD-28) — acceptance: all 7 convention steps complete;
+      checkers report zero CRITICAL/HIGH/MEDIUM.
+  - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
+- [ ] [AI] **Add catalog rows** — replace `tech-docs.md`'s Course Library Catalog by-name-only
+      placeholder for these six courses with real rows (course-id · origin `N` · format · primary
+      language · prerequisites · one-line scope) and update `<COURSES>_index.md` to list all six —
+      acceptance: six new rows present in
+      [tech-docs §Course Library Catalog](./tech-docs.md#course-library-catalog); `<COURSES>_index.md`
+      link-checker green.
 
 ### Phase 7 Gate
 
-- [ ] [AI] `interview-ready/software-engineer` manifest published (seeded over the available library); integrity + prerequisite-consistency green; path-walk e2e + breadcrumb + prerequisite display green in `en` (this plan's content locale).
-- [ ] [AI] Smoothness audit passes (levers, SF-1/SF-2 bridges, refresh register).
+- [ ] [AI] All six AI courses live under `<COURSES>` with declared prerequisites; each passed its checker + facts + link checkers; each states its scope boundary against any course it could be confused with.
+- [ ] [AI] Every course's volatile facts sit in dated accuracy-note sidebars, not the stable spine (DD-28 durability constraint).
+- [ ] [AI] Six new rows added to `tech-docs.md`'s Course Library Catalog; `<COURSES>_index.md` updated.
+- [ ] [AI] `npx nx run ayokoding-www:build` + link + heading + markdownlint green.
+- [ ] [AI] Every course sub-phase PR is `[AI]`-merged and deployed.
+
+> **Pause Safety**: the library now holds the 33 shipped topics + 4 existing capstones + the six new AI
+> courses, all at canonical URLs; no AI-path manifest published yet, so all render the canonical view.
+> Safe to stop. To resume: re-run the section build + link validation.
+
+---
+
+## Phase 8: Course surgery — evals scope contract, D9 naming/citation, D11 concept additions (four-path blast-radius)
+
+> **Sequencing note (follows directly from D7/DD-27's own build order, not invented here):** the evals
+> donor courses (`creating-ai-powered-apps`, `agentic-ai`,
+> `agent-orchestration-subagents-and-observability`) and the D9/D11 target courses (the harness cluster:
+> `the-agent-loop`, `agent-tools-and-mcp`, `agent-context-and-memory`,
+> `agent-permissions-and-sandboxing`, `agent-orchestration-subagents-and-observability`, plus
+> `capstone-build-your-own-coding-agent`) are **not yet authored anywhere in `apps/ayokoding-www/content`
+> at this point in the build order** (verified by direct search: zero hits) — they are native-authored in
+> Phase 12 Band 5 (the harness cluster + the evals donors) and Band 8
+> (`capstone-build-your-own-coding-agent`, which assembles the harness cluster). DD-28's "trim the three
+> donors to forward-links" therefore cannot be a file-edit
+> action here; there is nothing yet to edit. This phase instead **locks the contract** those future
+> authoring steps must honor, and **bakes its acceptance criteria into Phase 12 Band 5** (see that
+> phase's bullets below) so the surgery is applied by construction — authored correctly from the start —
+> rather than as a later retrofit.
+
+- [ ] [AI] **State the four-path blast radius (DD-28 binding rule)** — for the evals extraction (D8),
+      the D9 naming/citation additions, and the D11 concept additions, name every course and every
+      manifest each touches: the evals extraction touches `deep-evals` (this plan, Phase 7, done) plus
+      the three not-yet-authored donor courses (Phase 12 Band 5), and the `fundamentally-strong` and
+      `immediately-effective` manifests that will carry those donors once grown (the AI path's own
+      manifest already carries `deep-evals` from Phase 9); the D9/D11 additions touch only the harness
+      cluster (Phase 12 Band 5) + `capstone-build-your-own-coding-agent` (Phase 12 Band 8) and the same
+      two software-engineer-role manifests — acceptance: the blast radius is written into this delivery
+      checklist (the two clauses above) before any of the three surgeries is considered "applied".
+- [ ] [AI] **Lock the evals forward-link contract** — record, for Phase 12 Band 5's authoring of
+      `creating-ai-powered-apps`, `agentic-ai`, and `agent-orchestration-subagents-and-observability`,
+      that each course's evals-adjacent material MUST forward-link to the `deep-evals` course rather than
+      re-teaching it, in the style of the existing AI-band scope-guard (DD-11) — acceptance: this
+      requirement is added as an explicit acceptance criterion on each of the three courses' Phase 12
+      Band 5 checklist items; `grep -c "deep-evals" <course>/overview.md` returns **0** today for all
+      three (none authored yet — falsifiable both ways: each must return ≥1 once Band 5 lands that
+      course).
+- [ ] [AI] **Lock the D9 naming/citation contract** — record, for Phase 12 Band 5's authoring of
+      `agent-context-and-memory`, that it MUST include a naming/lineage line citing Lütke (2025-06-19),
+      Karpathy (2025-06-25), Willison (2025-06-27), and Anthropic's Effective Context Engineering
+      methodology (2025-09-29); and for the harness cluster (Band 5) + `capstone-build-your-own-coding-agent`
+      (Band 8), that they MUST include the harness-engineering equivalent citing Anthropic (2025-11-26),
+      OpenAI, and Böckeler/Thoughtworks (2026-04-02) — **no course is renamed** (D9 is explicit: "harness
+      engineering" is unsettled terminology; cite the disagreement, do not resolve it or adopt a side as
+      structure) — acceptance: these citation requirements are added as explicit acceptance criteria on
+      the relevant Phase 12 Band 5 and Band 8 checklist items.
+- [ ] [AI] **Lock the D11 concept-addition contract** — record, for Phase 12 Band 5's authoring, the four
+      concept-level additions: cache-aware prefix ordering (framed as a general stable-before-variable
+      principle, not tied to one vendor's mechanism) → `agent-context-and-memory`; tool-count degradation + tool-result token efficiency → `agent-tools-and-mcp`; train-vs-production permission asymmetry
+      (framed as a risk distinction, not a capability distinction) → `agent-permissions-and-sandboxing`
+      — acceptance: each concept is added as an explicit acceptance criterion on the relevant Phase 12
+      Band 5 checklist item, naming the concept and its target course.
+- [ ] [AI] **Re-verify manifests prerequisite-consistent to date** — re-run `checkManifestIntegrity` +
+      `checkPrerequisiteConsistency` across every manifest published so far
+      (`interview-ready/software-engineer` from Phase 6) — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: exits 0; no violation introduced by this phase's contract-locking, which is
+      documentation-only (no manifest file changes here). The AI path's own manifest (Phase 9, not yet
+      authored) is re-verified in that phase's own gate.
+
+### Phase 8 Gate
+
+- [ ] [AI] Four-path blast radius stated for all three surgeries (evals extraction, D9, D11); forward-link, citation, and concept-addition contracts locked as explicit Phase 12 Band 5 acceptance criteria.
+- [ ] [AI] "Harness engineering" is cited, not adopted as structure — no course renamed (D9).
+- [ ] [AI] `npx nx run ayokoding-www:test:unit` exits 0 (manifest integrity unaffected by this documentation-only phase).
+- [ ] [AI] Draft PR opened (this phase's PR touches only this delivery checklist's own text — no app content changes); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed (no-op).
+
+> **Pause Safety**: the evals/D9/D11 contracts are locked and will be enforced when Phase 12 Band 5
+> authors their target courses; no app content changed in this phase. Safe to stop. To resume: re-read
+> this phase's four bullets and confirm Phase 12 Band 5 still carries the matching acceptance criteria.
+
+---
+
+## Phase 9: Author the `immediately-effective/software-engineer-to-ai-engineer` manifest + landing + wire + smoothness (AI path ships)
+
+> _Suggested executor: `apps-ayokoding-www-general-maker` (manifest/landing) + `web-researcher` (smoothness facts)._
+> Authored **behind** the interview-ready MVP and **ahead of** Groups C/D (D7/DD-27) — this is the
+> second shippable path. `courseOrder` is the **six net-new AI courses only**, ordered per D5/D7's
+> authoring order (light eval gate → deep evals → statistics for evals → product patterns for
+> probabilistic systems → inference serving and model deployment → fine-tuning and adaptation)
+> [Judgment call: this authoring order is prd.md's/tech-docs.md's own stated ordering guidance; the
+>
+> > exact `courseOrder` and prerequisite-linking targets are finalized at authoring time, per DD-27 — not
+> > fabricated here]. The shared software-engineer-fundamentals prerequisites this path assumes are
+> > **linked, not included** (DD-24) — they never appear in `courseOrder`.
+
+- [ ] [AI] Author the manifest **data file**
+      `<MANIFESTS>immediately-effective/software-engineer-to-ai-engineer.yaml`: `pathId:
+immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`, and the ordered
+      `courseOrder` = the six new AI courses per
+      [tech-docs §Path `immediately-effective/software-engineer-to-ai-engineer`](./tech-docs.md#path-immediately-effectivesoftware-engineer-to-ai-engineer-fourth-path-added-2026-07-20)
+      — acceptance: the manifest loads + validates (`npx nx run ayokoding-www:test:unit` exits 0); NO
+      shared software-engineer-fundamentals course ID (e.g. `just-enough-typescript`,
+      `backend-essentials`, `api-design`) appears anywhere in `courseOrder` —
+      `grep -cE "just-enough-typescript|backend-essentials|api-design" <MANIFESTS>immediately-effective/software-engineer-to-ai-engineer.yaml`
+      returns **0** (falsifiable both ways: a manifest that mistakenly included one of these would make
+      this return ≥1).
+- [ ] [AI] Author the thin landing anchor
+      `<PATHS>immediately-effective/software-engineer-to-ai-engineer/_index.md` (prose/SEO only — no
+      `courseOrder`); the ordered course list renders from the loaded manifest, and the landing narrative
+      **links out** to the canonical pages of the prerequisite software-engineer courses this path
+      assumes (DD-24) — acceptance: landing renders the manifest-ordered six-course list; at least one
+      outbound link to a canonical `/en/c/learn/courses/<id>` page for a prerequisite software-engineer
+      course is present in the landing prose.
+
+  **Gherkin (binds) →** "The software-engineer-to-ai-engineer path links prerequisites instead of
+  including them"
+
+  ```gherkin
+  Scenario: The software-engineer-to-ai-engineer path links prerequisites instead of including them
+    Given the immediately-effective/software-engineer-to-ai-engineer path manifest is published
+    When a reader inspects its courseOrder
+    Then no shared software-engineering-fundamentals course from the other three manifests is included in courseOrder
+    And the path landing page links out to those prerequisite courses' canonical pages instead
+  ```
+
+- [ ] [AI] Update `<PATHS>_index.md` (paths hub) so the fourth card (`SWE → AI Engineer`) is present in
+      the 2×2 grid alongside `interview-ready`, per
+      [prd.md Screen 1](./prd.md#screen-1--paths-hub-choose-your-path) — acceptance: hub shows both
+      published paths (two of the four cards populated).
+- [ ] [AI] **Manifest integrity + prerequisite-consistency check** — every `courseOrder` ID resolves
+      under `<COURSES>`; no duplicate ID; every declared prerequisite among the six new courses that is
+      also in `courseOrder` appears earlier in the ordering — command:
+      `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
+- [ ] [AI] Verify path-aware nav end-to-end for this path: from the landing, prev/next walks the
+      manifest order and preserves `?path=immediately-effective/software-engineer-to-ai-engineer`;
+      breadcrumb shows the path; course pages show their prerequisites — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the path-walk e2e spec passes in `en`
+      (this plan's content locale).
+- [ ] [AI] **Progression smoothness audit (AI-transition-first, DD-16)** — walk the manifest order and
+      confirm the levers hold (prereq-chaining; monotonic-ish difficulty; the light-eval-gate/deep-evals
+      scope boundary from Phase 7 doesn't itself constitute a smoothness break) per
+      [tech-docs §Smoothness Architecture](./tech-docs.md#smoothness-architecture-per-path) —
+      acceptance: all levers verified; any regression fixed by soften/bridge in place, never reorder.
+
+### Phase 9 Gate
+
+- [ ] [AI] `immediately-effective/software-engineer-to-ai-engineer` manifest published (six-course spine, prerequisites linked not included); integrity + prerequisite-consistency green; path-walk e2e + breadcrumb + prerequisite display green in `en` (this plan's content locale).
+- [ ] [AI] Paths hub shows two of four cards; smoothness audit passes.
+- [ ] [AI] Re-run `checkManifestIntegrity` + `checkPrerequisiteConsistency` across all published manifests to date (`interview-ready`, `immediately-effective/software-engineer-to-ai-engineer`) — exits 0 (closes out Phase 8's deferred cross-manifest check).
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: the `interview-ready/software-engineer` path is **live end-to-end** in production
-> (landing + manifest + path-aware nav + prerequisites + smoothness) — the **interview-ready MVP is
-> shipped**. This is a complete, shippable milestone. Safe to stop indefinitely. To resume: re-run the
-> path-walk e2e.
+> **Pause Safety**: the `immediately-effective/software-engineer-to-ai-engineer` path is **live
+> end-to-end** in production (landing + manifest + path-aware nav + prerequisites + smoothness) — **the
+> AI path has shipped** (DD-27's authoring priority #1 is delivered). **Group F is complete.** Safe to
+> stop indefinitely. To resume: re-run the path-walk e2e.
 
 ---
 
 ## Group C — immediately-effective manifest
 
-## Phase 8: Author the `immediately-effective/software-engineer` manifest + landing + smoothness (zero new bodies)
+## Phase 10: Author the `immediately-effective/software-engineer` manifest + landing + smoothness (zero new bodies)
 
 > _Suggested executor: `apps-ayokoding-www-general-maker`._
 > Adds **no new course body** — it composes existing library courses into the immediately-effective
 > arc (editor → one language → **build a real app first** → then deepen). Authored over the
-> currently-available library and **grows** during Phase 10 backfill as deeper courses land.
+> currently-available library and **grows** during Phase 12 backfill as deeper courses land.
 
 - [ ] [AI] Author the manifest **data file** `<MANIFESTS>immediately-effective/software-engineer.yaml`:
       `pathId: immediately-effective/software-engineer`, `title`, `description`, and the ordered
@@ -820,8 +1093,9 @@ deploy), applying the convention:
       (prose/SEO only — no `courseOrder`); the ordered course list renders from the loaded manifest —
       acceptance: landing renders the manifest-ordered arc.
 - [ ] [AI] Update `<PATHS>_index.md` (paths hub) so the `immediately-effective` card is present
-      alongside `interview-ready` per [prd.md Screen 1](./prd.md#screen-1--paths-hub-choose-your-path)
-      — acceptance: hub shows both published paths.
+      alongside `interview-ready` and `SWE → AI Engineer` per
+      [prd.md Screen 1](./prd.md#screen-1--paths-hub-choose-your-path) — acceptance: hub shows three of
+      the four published paths.
 - [ ] [AI] **Manifest integrity + prerequisite-consistency + no-forked-body check** — every
       `courseOrder` ID resolves; no dup ID; prereq-consistency holds; no body duplicated across
       manifests (all reference by ID) — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
@@ -833,27 +1107,27 @@ deploy), applying the convention:
       depth; the "you shipped; now understand why" bridge is present on the landing; prereq-chaining
       holds — acceptance: levers verified; regressions fixed by soften/bridge, never reorder.
 
-### Phase 8 Gate
+### Phase 10 Gate
 
-- [ ] [AI] `immediately-effective/software-engineer` manifest published (zero duplicated bodies, seeded over the available library); paths hub shows both published paths.
+- [ ] [AI] `immediately-effective/software-engineer` manifest published (zero duplicated bodies, seeded over the available library); paths hub shows three of the four published paths.
 - [ ] [AI] Integrity + prerequisite-consistency + no-forked-body checks green; per-path prev/next differs correctly for shared courses.
 - [ ] [AI] Shipping-first smoothness audit passes.
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: two paths are live over one shared library with zero body duplication. Safe to
-> stop. To resume: re-run both path-walk e2e specs.
+> **Pause Safety**: three of the four paths are live over one shared library with zero body
+> duplication. Safe to stop. To resume: re-run all path-walk e2e specs published so far.
 
 ---
 
 ## Group D — fundamentally-strong manifest
 
-## Phase 9: Author the `fundamentally-strong/software-engineer` manifest + landing + smoothness (zero new bodies)
+## Phase 11: Author the `fundamentally-strong/software-engineer` manifest + landing + smoothness (zero new bodies)
 
 > _Suggested executor: `apps-ayokoding-www-general-maker`._
 > The NEW university-style path (fundamentals/CS-theory FIRST → deeper). Adds **no new course body** —
 > composes existing library courses. Authored over the currently-available library and **grows** during
-> Phase 10 backfill.
+> Phase 12 backfill.
 
 - [ ] [AI] Author the manifest **data file** `<MANIFESTS>fundamentally-strong/software-engineer.yaml`:
       `pathId: fundamentally-strong/software-engineer`, `title`, `description`, and the ordered
@@ -866,10 +1140,13 @@ deploy), applying the convention:
 - [ ] [AI] Author the thin landing anchor `<PATHS>fundamentally-strong/software-engineer/_index.md`
       (prose/SEO only — no `courseOrder`); the ordered course list renders from the loaded manifest —
       acceptance: landing renders the fundamentals-first arc.
-- [ ] [AI] Update `<PATHS>_index.md` (paths hub) so **all three** path cards are present per
-      [prd.md Screen 1](./prd.md#screen-1--paths-hub-choose-your-path) — acceptance: hub shows all three paths.
-- [ ] [AI] **Manifest integrity + prerequisite-consistency + no-forked-body check** across all three
-      manifests — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
+- [ ] [AI] Update `<PATHS>_index.md` (paths hub) so **all four** path cards are present, completing the
+      2×2 grid, per [prd.md Screen 1](./prd.md#screen-1--paths-hub-choose-your-path) — acceptance: hub
+      shows all four paths.
+- [ ] [AI] **Manifest integrity + prerequisite-consistency + no-forked-body check** across all four
+      manifests (the three software-engineer-role manifests share bodies by ID; the AI path's manifest
+      links rather than includes shared bodies per DD-24, so it never triggers a forked-body finding) —
+      command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0.
 - [ ] [AI] Verify path-aware nav: prev/next walks the fundamentals-first order and preserves
       `?path=fundamentally-strong/software-engineer`; a course shared across paths shows the correct
       neighbor per active path — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: e2e passes
@@ -878,36 +1155,42 @@ deploy), applying the convention:
       the "why-before-how" bridges are present; prereq-chaining holds — acceptance: levers verified;
       regressions fixed by soften/bridge, never reorder.
 
-### Phase 9 Gate
+### Phase 11 Gate
 
-- [ ] [AI] `fundamentally-strong/software-engineer` manifest published (zero duplicated bodies, seeded over the available library); paths hub shows all three paths.
-- [ ] [AI] Integrity + prerequisite-consistency + no-forked-body checks green across all three manifests; per-path prev/next differs correctly for shared courses.
+- [ ] [AI] `fundamentally-strong/software-engineer` manifest published (zero duplicated bodies, seeded over the available library); paths hub shows all four paths.
+- [ ] [AI] Integrity + prerequisite-consistency + no-forked-body checks green across all four manifests; per-path prev/next differs correctly for shared courses.
 - [ ] [AI] Fundamentals-first smoothness audit passes.
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: all three paths are live over one shared library with zero body duplication (each
-> seeded over the currently-available courses). The three-path product skeleton is complete. Safe to
-> stop. To resume: re-run the three path-walk e2e specs.
+> **Pause Safety**: all four paths are live over one shared library (zero body duplication among the
+> three software-engineer-role paths; the AI path links rather than duplicates). The four-path product
+> skeleton is complete. Safe to stop. To resume: re-run all four path-walk e2e specs.
 
 ---
 
 ## Group E — Backfill (topics 34–94 native + remaining new courses)
 
-## Phase 10: Author the 61 transferred topics + 10 remaining new courses + 8 remaining capstones NATIVE; grow all three manifests
+## Phase 12: Author the 61 transferred topics + 10 remaining new courses + 8 remaining capstones + 5 deferred interview-technique bodies NATIVE; grow the three software-engineer-role manifests
 
 > Each body is authored NATIVE into `<COURSES><course-id>/` (no legacy home, no re-home) per the
-> **NEW-course authoring convention** from Phase 6 (V → skeleton with `prerequisites` → learning →
-> drilling → content checkers → content fixers → re-verify — see Phase 6's convention note on why
-> this uses maker-checker-fixer labels, not RED/GREEN/REFACTOR). These 79 bodies are
-> content-independent and **pipeline concurrently** through review (bounded by the cap). As each
-> **band** lands, **grow** the
-> three manifests (append the newly-available courses into whichever paths include them; re-run
-> integrity + prerequisite-consistency) — a serial sync point per band. Per-course detail:
-> [syllabus courses layer](./syllabus/courses/README.md) and the tracked
-> [Course Library Catalog](./tech-docs.md#course-library-catalog) (the authoritative 121-row table —
-> do **not** depend on any `local-temp/` scratch file here; those are gitignored and may be cleaned
-> before this phase runs).
+> **NEW-course authoring convention** from Phase 7 (V → skeleton with `prerequisites` → learning →
+> drilling → content checkers → content fixers → re-verify — see Phase 7's convention note on why
+> this uses maker-checker-fixer labels, not RED/GREEN/REFACTOR). These 84 bodies (the original 79 —
+> 61 transferred + 10 remaining new courses + 8 remaining capstones — plus **Band 9's 5 deferred
+> interview-technique bodies**, DD-27) are content-independent and **pipeline concurrently** through
+> review (bounded by the cap). As each **band** lands, **grow** the affected manifests (append the
+> newly-available courses into whichever paths include them; re-run integrity +
+> prerequisite-consistency) — a serial sync point per band; Bands 1–8 grow all three
+> software-engineer-role manifests, Band 9 grows only `interview-ready` and `fundamentally-strong` (see
+> Band 9's own growth step below). Per-course detail: [syllabus courses layer](./syllabus/courses/README.md)
+> and the tracked [Course Library Catalog](./tech-docs.md#course-library-catalog) (the 127-course total;
+> Bands 1–9 below author their table rows as part of "convention complete" — do **not** depend on any
+> `local-temp/` scratch file here; those are gitignored and may be cleaned before this phase runs).
+>
+> This phase also **applies** the three contracts Phase 8 locked (evals forward-link, D9 naming/
+> citation, D11 concept additions) — see each contract's target course in Band 5 below, now carrying an
+> explicit acceptance criterion sourced from that phase.
 >
 > **Reconciliation rulings baked into authoring** (locked):
 >
@@ -977,14 +1260,14 @@ deploy), applying the convention:
 - [ ] [AI] `distributed-systems` (By Example · Python) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `build-your-own-web-framework` (By Example · Python) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `build-your-own-reactive-ui` (By Example · TypeScript) — convention complete; checkers clean. _by-example-maker_
-- [ ] [AI] `creating-ai-powered-apps` (By Example · Python; use-an-LLM scope) — convention complete; checkers clean. _by-example-maker_
-- [ ] [AI] `agentic-ai` (By Example · Python; survey + forward-links, no build-your-own depth) — convention complete; checkers clean. _by-example-maker_
+- [ ] [AI] `creating-ai-powered-apps` (By Example · Python; use-an-LLM scope) — convention complete; checkers clean; **Phase 8 evals forward-link contract applied**: `grep -c "deep-evals" creating-ai-powered-apps/overview.md` returns ≥1 (its evals material forward-links to `deep-evals` rather than re-teaching it, DD-25/DD-28). _by-example-maker_
+- [ ] [AI] `agentic-ai` (By Example · Python; survey + forward-links, no build-your-own depth) — convention complete; checkers clean; **Phase 8 evals forward-link contract applied**: `grep -c "deep-evals" agentic-ai/overview.md` returns ≥1. _by-example-maker_
 - [ ] [AI] `browser-automation-with-cdp` (By Example · Python/CDP) — convention complete; checkers clean. _by-example-maker_
-- [ ] [AI] `the-agent-loop` (By Example · Python) — convention complete; checkers clean. _by-example-maker_
-- [ ] [AI] `agent-tools-and-mcp` (By Example · Python) — convention complete; checkers clean. _by-example-maker_
-- [ ] [AI] `agent-context-and-memory` (Annotated-concept · Python) — convention complete; checkers clean. _annotated-concept-maker_
-- [ ] [AI] `agent-permissions-and-sandboxing` (By Example · Python) — convention complete; checkers clean. _by-example-maker_
-- [ ] [AI] `agent-orchestration-subagents-and-observability` (Annotated-concept · Python) — convention complete; checkers clean. _annotated-concept-maker_
+- [ ] [AI] `the-agent-loop` (By Example · Python) — convention complete; checkers clean; **Phase 8 D9 citation contract applied**: harness-engineering naming/lineage line present, citing Anthropic (2025-11-26), OpenAI, and Böckeler/Thoughtworks (2026-04-02) — no rename. _by-example-maker_
+- [ ] [AI] `agent-tools-and-mcp` (By Example · Python) — convention complete; checkers clean; **Phase 8 D9 + D11 contracts applied**: harness-engineering citation line present; concept coverage includes tool-count degradation (Berkeley Function-Calling Leaderboard + GeoEngine 46-vs-19-tool evidence) and tool-result token efficiency. _by-example-maker_
+- [ ] [AI] `agent-context-and-memory` (Annotated-concept · Python) — convention complete; checkers clean; **Phase 8 D9 + D11 contracts applied**: context-engineering naming/lineage line present, citing Lütke (2025-06-19), Karpathy (2025-06-25), Willison (2025-06-27), and Anthropic's Effective Context Engineering methodology (2025-09-29); concept coverage includes cache-aware prefix ordering framed as a general stable-before-variable principle, not tied to one vendor's mechanism. _annotated-concept-maker_
+- [ ] [AI] `agent-permissions-and-sandboxing` (By Example · Python) — convention complete; checkers clean; **Phase 8 D11 contract applied**: concept coverage includes the train-vs-production permission asymmetry, framed as a risk distinction, not a capability distinction. _by-example-maker_
+- [ ] [AI] `agent-orchestration-subagents-and-observability` (Annotated-concept · Python) — convention complete; checkers clean; **Phase 8 evals forward-link contract applied**: `grep -c "deep-evals" agent-orchestration-subagents-and-observability/overview.md` returns ≥1. _annotated-concept-maker_
 
 **Band 6 — Low-level systems, JVM & languages, internals builds (T + N):**
 
@@ -1026,7 +1309,7 @@ deploy), applying the convention:
 
 **Band 8 — Remaining capstones (N, incl. six DD-20 inter-topic capstones):**
 
-- [ ] [AI] `capstone-build-your-own-coding-agent` (Python; assembles the harness cluster) — convention complete; checkers clean. _by-example-maker_
+- [ ] [AI] `capstone-build-your-own-coding-agent` (Python; assembles the harness cluster) — convention complete; checkers clean; **Phase 8 D9 citation contract applied**: harness-engineering naming/lineage line present, citing Anthropic (2025-11-26), OpenAI, and Böckeler/Thoughtworks (2026-04-02) — no rename. _by-example-maker_
 - [ ] [AI] `capstone-build-your-own-pentest-engine` (TypeScript; swarm + MCP + CDP + security chaining) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `capstone-real-world-delivery` (Python + TS + IaC; DD-20 — embedded spec in `defensive-security.md`) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `capstone-secure-service` (Python + shell; DD-20 — embedded spec in `defensive-security.md`) — convention complete; checkers clean. _by-example-maker_
@@ -1035,33 +1318,75 @@ deploy), applying the convention:
 - [ ] [AI] `capstone-concurrency-showdown` (Go + Elixir; DD-20 — embedded spec in `compilers-parsers-and-transpilers.md`) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `capstone-lead-at-altitude` (polyglot + prose; DD-20 — embedded spec in `site-reliability-engineering.md`) — convention complete; checkers clean. _annotated-concept-maker_
 
+**Band 9 — Deferred interview-technique courses (deferred from the interview-ready MVP gate, DD-27):**
+
+- [ ] [AI] `coding-interview` (By Example · Python) — convention complete; checkers clean. _by-example-maker_
+- [ ] [AI] `take-home-and-live-coding` (By Example · Python) — convention complete; checkers clean. _by-example-maker_
+- [ ] [AI] `system-design-interview` (Annotated-concept · no code; forward-links `system-design`) — convention complete; checkers clean. _annotated-concept-maker_
+- [ ] [AI] `behavioral-and-leadership-interviews` (Annotated-concept · no code) — convention complete; checkers clean.
+
+  **Gherkin (binds) →** "The behavioral course covers the layoff and employment-gap narrative"
+  — coverage acceptance: the learning track explicitly covers framing an employment gap, a layoff, and
+  a re-entry story, and treats senior/staff/EM leadership rounds as core (not optional) material —
+  verify with `grep -ciE 'employment gap|layoff|re-entry' <course>/**/*.md` (ERE alternation) returning
+  ≥3 distinct lessons.
+  - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
+
+- [ ] [AI] `capstone-interview-loop` (Python + prose) — convention complete; checkers clean. _by-example-maker_
+
 **Manifest growth (serial sync point after each band):**
 
-- [ ] [AI] After each band lands, append its newly-available courses into the three manifests
+- [ ] [AI] After each of Bands 1–8 lands, append its newly-available courses into the three
+      software-engineer-role manifests
       (`<MANIFESTS>{interview-ready,immediately-effective,fundamentally-strong}/software-engineer.yaml`)
       per each path's arc, then re-run `checkManifestIntegrity` + `checkPrerequisiteConsistency` +
-      no-forked-body — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0 after each growth.
-- [ ] [AI] After the final band, confirm all three manifests reference the intended full arcs (no
-      omitted-by-mistake courses; omit-or-create honored) and the library holds the full **121-course**
-      catalog — command: `npx nx run ayokoding-www:build` — acceptance: 121 course bundles resolve; all three manifests validate.
+      no-forked-body — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0 after each
+      growth.
+- [ ] [AI] **Band 9 manifest growth (interview-ready + fundamentally-strong only)** — insert the five
+      landed interview-technique courses into `<MANIFESTS>interview-ready/software-engineer.yaml`
+      (closing the gap the Phase 6 smoke test deliberately left open) and
+      `<MANIFESTS>fundamentally-strong/software-engineer.yaml` (its own trailing optional interview
+      band, per
+      [tech-docs §Path `fundamentally-strong/software-engineer`](./tech-docs.md#path-fundamentally-strongsoftware-engineer-theory-first)),
+      each in its correct topological position; `immediately-effective/software-engineer` does **not**
+      grow here — that path omits the interview-technique band from its `courseOrder` by design (its
+      reader reaches these courses via their canonical pages, not the manifest) — command:
+      `npx nx run ayokoding-www:test:unit` — acceptance: exits 0; the falsifiable check Phase 6 opened
+      now closes the other way —
+      `grep -E "coding-interview|take-home-and-live-coding|system-design-interview|behavioral-and-leadership-interviews|capstone-interview-loop" <MANIFESTS>interview-ready/software-engineer.yaml`
+      now returns all five lines; the same command against
+      `<MANIFESTS>immediately-effective/software-engineer.yaml` still returns nothing.
+- [ ] [AI] **Interview-ready smoothness re-audit (refresh-register lever, closes Phase 6's deferral)** —
+      with the five interview-technique courses now in `courseOrder`, re-run the
+      [smoothness audit](./tech-docs.md#smoothness-architecture-per-path)'s refresh-register lever that
+      Phase 6 explicitly deferred — acceptance: the lever verified; any regression fixed by soften/bridge
+      in place, never reorder.
+- [ ] [AI] After the final band, confirm all three software-engineer-role manifests reference the
+      intended full arcs (no omitted-by-mistake courses; omit-or-create honored) and the library holds
+      the full **127-course** catalog (121 software-engineer-role baseline + the 6 AI courses authored in
+      Phase 7) — command: `npx nx run ayokoding-www:build` — acceptance: 127 course bundles resolve; all
+      four manifests validate (the AI path's own manifest, authored in Phase 9, is unaffected by this
+      backfill and re-validated here only as a regression check).
 
-### Phase 10 Gate
+### Phase 12 Gate
 
-- [ ] [AI] All 61 transferred topics + 10 remaining new courses + 8 remaining capstones (2 original + 6 DD-20 inter-topic capstones) authored NATIVE under `<COURSES>` with declared prerequisites; each passed its checker + facts + link checkers.
-- [ ] [AI] Reconciliation rulings applied (defensive-security By-Example label; AI-band scope-guard; async-fastapi scope note).
-- [ ] [AI] All three manifests grown to their full arcs; integrity + prerequisite-consistency + no-forked-body green; full 121-course library resolves.
-- [ ] [AI] `<COURSES>_index.md` catalog updated to the full 121; `npx nx run ayokoding-www:build` + link + heading + markdownlint green.
+- [ ] [AI] All 61 transferred topics + 10 remaining new courses + 8 remaining capstones (2 original + 6 DD-20 inter-topic capstones) + the 5 deferred interview-technique bodies (Band 9, DD-27) authored NATIVE under `<COURSES>` with declared prerequisites; each passed its checker + facts + link checkers.
+- [ ] [AI] Reconciliation rulings applied (defensive-security By-Example label; AI-band scope-guard; async-fastapi scope note); Phase 8's three locked contracts (evals forward-link, D9 citation, D11 concept additions) applied and verified on their target Band 5/Band 8 courses.
+- [ ] [AI] The three software-engineer-role manifests grown to their full arcs (interview-ready and fundamentally-strong now carry Band 9's five interview-technique courses; immediately-effective does not); integrity + prerequisite-consistency + no-forked-body green; full 127-course library resolves.
+- [ ] [AI] Interview-ready's refresh-register smoothness lever, deferred at Phase 6, now verified.
+- [ ] [AI] `<COURSES>_index.md` catalog updated to the full 127; `npx nx run ayokoding-www:build` + link + heading + markdownlint green.
 - [ ] [AI] Every band/course sub-phase PR is `[AI]`-merged and deployed.
 
-> **Pause Safety**: the full 121-course library exists and all three path manifests are complete over
-> one shared library with zero body duplication. The whole three-path product is content-complete. Safe
-> to stop. To resume: re-run the section build + integrity checks.
+> **Pause Safety**: the full 127-course library exists and all four path manifests are complete over
+> one shared library (zero body duplication among the three software-engineer-role paths; the AI path
+> links rather than duplicates). The whole four-path product is content-complete. Safe to stop. To
+> resume: re-run the section build + integrity checks.
 
 ---
 
 ## Group Finalization
 
-## Phase 11: Section & App Verification
+## Phase 13: Section & App Verification
 
 - [ ] [AI] Run affected quality gates from the worktree:
       `npx nx affected -t typecheck lint test:quick test:unit test:integration test:e2e specs:behavior:coverage`
@@ -1072,27 +1397,28 @@ deploy), applying the convention:
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate` +
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate` + `npm run lint:md` (the actual mechanism — not `nx run` targets; both `md` subcommands also run
       automatically pre-commit via `lint-staged` for every staged `.md` file) — acceptance: all green.
-- [ ] [AI] **Manifest-integrity + prerequisite-consistency sweep** — all three manifests: every
-      `courseOrder` ID resolves; no dup ID; prereq-consistency holds; no forked body across paths —
-      acceptance: integrity check reports zero violations across all three.
+- [ ] [AI] **Manifest-integrity + prerequisite-consistency sweep** — all four manifests: every
+      `courseOrder` ID resolves; no dup ID; prereq-consistency holds; no forked body across the three
+      software-engineer-role paths (the AI path links rather than shares bodies, DD-24) —
+      acceptance: integrity check reports zero violations across all four.
 - [ ] [AI] **All-path smoothness re-check (DD-16)** — re-verify the levers for each manifest in the
-      landed content — acceptance: all three paths pass.
+      landed content — acceptance: all four paths pass.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
 > (Root Cause Orientation). Commit preexisting fixes separately with conventional-commit messages.
 
-### Phase 11 Gate
+### Phase 13 Gate
 
 - [ ] [AI] Affected `typecheck/lint/test:quick/test:unit/test:integration/test:e2e/specs:behavior:coverage` exit 0.
 - [ ] [AI] Build + link + heading + markdown validation green; manifest integrity + prerequisite-consistency + all-path smoothness pass.
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: the whole three-path product passes all automated gates. Safe to stop. To resume:
+> **Pause Safety**: the whole four-path product passes all automated gates. Safe to stop. To resume:
 > re-run the affected quality gates + build.
 
 ---
 
-## Phase 12: Manual UI Verification + Rule-15 Three-Tester Retest
+## Phase 14: Manual UI Verification + Rule-15 Three-Tester Retest
 
 > Path-aware navigation is a user-facing change, so a live-site retest is required before archival.
 > **Locale scope**: this plan's course/path content is authored `en`-only — per
@@ -1107,17 +1433,19 @@ deploy), applying the convention:
       exists; no sibling `id/learn/courses` directory is expected or required.
 - [ ] [AI] Start dev server: `npx nx dev ayokoding-www` — acceptance: server up.
 - [ ] [AI] For `en` × breakpoints (375 / 768 / 1280 px), via Playwright MCP: open the paths hub
-      (three cards), each of the three path landings, walk 2–3 courses via prev/next (confirm `?path=`
-      persists + order + breadcrumb), open a course and confirm its **prerequisite display**, deep-link
-      a course without `?path=` (canonical view + "part of paths" affordance), hit an invalid `?path=`
-      (canonical view), and an old `fundamentally-strong/software-engineer/<slug>` URL (redirect to
-      `/en/c/learn/courses/<id>`). Verify `html[lang]` is `en` and `browser_console_messages` is
-      clean — acceptance: all behaviors correct; zero console errors.
+      (2×2 grid, four cards), each of the four path landings, walk 2–3 courses via prev/next (confirm
+      `?path=` persists + order + breadcrumb), open a course and confirm its **prerequisite display**,
+      deep-link a course without `?path=` (canonical view + "part of paths" affordance), hit an invalid
+      `?path=` (canonical view), and an old `fundamentally-strong/software-engineer/<slug>` URL (redirect
+      to `/en/c/learn/courses/<id>`). For the AI path landing specifically, confirm the outbound links to
+      prerequisite software-engineer courses' canonical pages resolve (DD-24). Verify `html[lang]` is
+      `en` and `browser_console_messages` is clean — acceptance: all behaviors correct; zero console
+      errors.
 - [ ] [AI] Capture one screenshot per screen per breakpoint to
-      `evidence/phase-12-<screen>-en-<breakpoint>px.png` — acceptance: files exist in `evidence/`.
+      `evidence/phase-14-<screen>-en-<breakpoint>px.png` — acceptance: files exist in `evidence/`.
 - [ ] [AI] Run the three live-site testers (the `web-ux-test-fixing-planning` workflow:
       `web-exploratory-tester` + `web-usability-tester` + `web-design-tester`) against the running
-      paths hub, all three path landings, and sample courses (`en` content) — acceptance: EWT/UWT/DWT
+      paths hub, all four path landings, and sample courses (`en` content) — acceptance: EWT/UWT/DWT
       findings + spec-gaps recorded.
 - [ ] [AI] Append each finding below as a new unchecked checkbox, source-attributed
       (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`); append
@@ -1129,19 +1457,19 @@ deploy), applying the convention:
       archival; deferral of a defect requires explicit user permission and only when genuinely
       impossible; SG-###/USS-### may be triaged or deferred with rationale)_
 
-### Phase 12 Gate
+### Phase 14 Gate
 
-- [ ] [AI] All screens (three-card hub + three landings + sample courses + prerequisite display) verified in `en` across all breakpoints; screenshots in `evidence/`; console clean.
+- [ ] [AI] All screens (2×2-grid four-card hub + four landings + sample courses + prerequisite display) verified in `en` across all breakpoints; screenshots in `evidence/`; console clean.
 - [ ] [AI] All rule-15 EWT/UWT/DWT defect findings fixed (ticked) or explicitly permitted to defer.
 - [ ] [AI] Draft PR opened (retest evidence + any fixes); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: the three-path UI is verified live and defect-clean in `en` (this plan's content
+> **Pause Safety**: the four-path UI is verified live and defect-clean in `en` (this plan's content
 > locale; the nav mechanism itself is locale-neutral). Safe to stop. To resume: re-run the three
 > testers against the running app.
 
 ---
 
-## Phase 13: Final `origin/main` Integration & CI Verification
+## Phase 15: Final `origin/main` Integration & CI Verification
 
 - [ ] [AI] Confirm no plan PR is still open: every prior phase branch has been `[AI]`-merged to `main`
       (`gh pr list --search "fundamentally-strong-shared-course-tracks" --state open` returns zero) —
@@ -1151,22 +1479,22 @@ deploy), applying the convention:
 - [ ] [AI] Monitor the final `main` CI run (poll every ~2 min; one `gh run view --json
 status,conclusion` per wakeup; never `gh run watch`) — acceptance: all GitHub Actions green; fix root
       causes and push follow-ups (own PR → review → `[AI]` merge) until green.
-- [ ] [AI] Confirm `prod-ayokoding-www` serves all three paths + the full library; re-dispatch
+- [ ] [AI] Confirm `prod-ayokoding-www` serves all four paths + the full 127-course library; re-dispatch
       `apps-ayokoding-www-deployer` if any earlier deploy lagged — acceptance: production serves the
-      three-path product.
+      four-path product.
 
-### Phase 13 Gate
+### Phase 15 Gate
 
 - [ ] [AI] Zero open plan PRs; every prior phase merged to `main`.
 - [ ] [AI] Full affected suite + build green on integrated `main`; final `main` CI run green.
-- [ ] [AI] `prod-ayokoding-www` serving all three paths + the full library.
+- [ ] [AI] `prod-ayokoding-www` serving all four paths + the full 127-course library.
 
 > **Pause Safety**: the whole plan is integrated on `main`, green in CI, and live in production. Safe
 > to stop. To resume: re-run the affected suite on `main` and check CI/prod status.
 
 ---
 
-## Phase 14: Knowledge Capture
+## Phase 16: Knowledge Capture
 
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
@@ -1186,7 +1514,7 @@ status,conclusion` per wakeup; never `gh run watch`) — acceptance: all GitHub 
 - [ ] [AI] If no generalizable learning surfaced, record `No generalizable learnings — <reason>` in
       `learnings.md` — acceptance: `learnings.md` is never silently empty.
 
-### Phase 14 Gate
+### Phase 16 Gate
 
 - [ ] [AI] Every `learnings.md` entry is terminal (routed inline / filed as backlog / discarded) or the "none" escape is present.
 - [ ] [AI] No code-homed learning landed inline in this plan's own commits/PR.
@@ -1197,14 +1525,14 @@ status,conclusion` per wakeup; never `gh run watch`) — acceptance: all GitHub 
 
 ---
 
-## Phase 15: Plan Archival
+## Phase 17: Plan Archival
 
 - [ ] [AI] Verify ALL delivery checklist items are ticked.
 - [ ] [AI] Verify the Knowledge Capture phase is complete (every entry terminal or explicit "none" escape; both safety gates applied).
 - [ ] [AI] Verify ALL quality gates pass (local + CI) and the build is green.
 - [ ] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `evidence/`; the `en` content locale exercised (per brd.md's Indonesian-mirror-deferred non-goal).
 - [ ] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit user permission (only when genuinely impossible); SG-###/USS-### may be triaged/deferred.
-- [ ] [AI] Verify all three path manifests are published, all three landings live, the paths hub shows all three paths, and the library holds the full 121 courses; every prior-phase PR `[AI]`-merged and deployed (Phase 13 checkpoint green).
+- [ ] [AI] Verify all four path manifests are published, all four landings live, the paths hub shows all four paths (2×2 grid), and the library holds the full 127-course catalog (121 software-engineer-role baseline + 6 AI-specific); every prior-phase PR `[AI]`-merged and deployed (Phase 15 checkpoint green).
 - [ ] [AI] Move: `git mv plans/in-progress/fundamentally-strong-shared-course-tracks/
 plans/done/YYYY-MM-DD__fundamentally-strong-shared-course-tracks/` using today's completion date (the
       `evidence/` subfolder moves with it).
@@ -1213,7 +1541,7 @@ plans/done/YYYY-MM-DD__fundamentally-strong-shared-course-tracks/` using today's
 - [ ] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`, `plans/backlog/README.md`).
 - [ ] [AI] Commit the archival: `chore(plans): move fundamentally-strong-shared-course-tracks to done`.
 
-### Phase 15 Gate
+### Phase 17 Gate
 
 - [ ] [AI] Plan folder is under `plans/done/YYYY-MM-DD__...`; all READMEs updated; archival committed.
 - [ ] [AI] Draft PR opened (archival move); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed (no-op).
@@ -1244,6 +1572,6 @@ plans/done/YYYY-MM-DD__fundamentally-strong-shared-course-tracks/` using today's
 ### Note: plan location at archival time
 
 This plan was promoted from `backlog/` to `in-progress/fundamentally-strong-shared-course-tracks/`
-(date prefix stripped) on 2026-07-19, per the plan lifecycle. The `git mv` in Phase 15 therefore
+(date prefix stripped) on 2026-07-19, per the plan lifecycle. The `git mv` in Phase 17 therefore
 archives from that `in-progress/` path to `done/YYYY-MM-DD__fundamentally-strong-shared-course-tracks/`
 using the completion date.

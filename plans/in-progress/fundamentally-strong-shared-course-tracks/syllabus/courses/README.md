@@ -1,6 +1,6 @@
 # Course Library Catalog — Fundamentally Strong Shared Course Library
 
-The **per-course-block detail layer**: the index of the **121-course catalog** and the folder that
+The **per-course-block detail layer**: the index of the **127-course catalog** and the folder that
 holds one **`<course-id>.md`** detail file per course. Start with the
 **[syllabus root README](../README.md)** for the shared-library-plus-three-paths architecture, the
 legend, the authoring guarantees, the capstone policy, and the per-course file template. The
@@ -122,25 +122,31 @@ Every manifest reuses the same course bodies reordered — **zero body duplicati
 
 ## Architecture, distributed & AI/harness
 
-| Course ID                                                                                                           | Format            | Language(s)         | Short summary                                       |
-| ------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------- | --------------------------------------------------- |
-| [`software-architecture`](./software-architecture.md)                                                               | Annotated-concept | Python              | Architectural styles, tradeoffs, structuring        |
-| [`domain-driven-design`](./domain-driven-design.md)                                                                 | By Example        | Python              | Bounded contexts, ubiquitous language, modeling     |
-| [`system-design`](./system-design.md)                                                                               | Annotated-concept | Python              | Designing systems for scale, availability           |
-| [`event-driven-architecture`](./event-driven-architecture.md)                                                       | By Example        | Python              | Events, message brokers, event-driven design        |
-| [`distributed-systems`](./distributed-systems.md)                                                                   | By Example        | Python              | Consensus, replication, partitions, CAP             |
-| [`build-your-own-web-framework`](./build-your-own-web-framework.md)                                                 | By Example        | Python              | Routing, middleware, a web framework core           |
-| [`build-your-own-reactive-ui`](./build-your-own-reactive-ui.md)                                                     | By Example        | TypeScript          | Reactive UI library with a virtual DOM              |
-| [`software-engineering-practices`](./software-engineering-practices.md)                                             | Annotated-concept | Python              | Code review, CI, quality gates, team practice       |
-| [`agentic-coding`](./agentic-coding.md)                                                                             | Annotated-concept | polyglot            | Driving AI coding agents to plan, generate, verify  |
-| [`creating-ai-powered-apps`](./creating-ai-powered-apps.md)                                                         | By Example        | Python              | Integrating LLMs, embeddings, RAG into apps         |
-| [`agentic-ai`](./agentic-ai.md)                                                                                     | By Example        | Python              | Autonomous agents with tools, memory, planning      |
-| **[`browser-automation-with-cdp`](./browser-automation-with-cdp.md)** — NEW                                         | By Example        | Python (CDP client) | Chrome DevTools Protocol browser automation         |
-| **[`the-agent-loop`](./the-agent-loop.md)** — NEW                                                                   | By Example        | Python              | LLM tool-use loop, read-eval-act, streaming, stops  |
-| **[`agent-tools-and-mcp`](./agent-tools-and-mcp.md)** — NEW                                                         | By Example        | Python              | Tool/function schemas; MCP server + client          |
-| **[`agent-context-and-memory`](./agent-context-and-memory.md)** — NEW                                               | Annotated-concept | Python              | Context budgeting, compaction, retrieval, memory    |
-| **[`agent-permissions-and-sandboxing`](./agent-permissions-and-sandboxing.md)** — NEW                               | By Example        | Python              | Approval models, sandboxed execution, guardrails    |
-| **[`agent-orchestration-subagents-and-observability`](./agent-orchestration-subagents-and-observability.md)** — NEW | Annotated-concept | Python              | Sub-agents, background tasks, hooks/skills, tracing |
+| Course ID                                                                                                           | Format            | Language(s)          | Short summary                                       |
+| ------------------------------------------------------------------------------------------------------------------- | ----------------- | -------------------- | --------------------------------------------------- |
+| [`software-architecture`](./software-architecture.md)                                                               | Annotated-concept | Python               | Architectural styles, tradeoffs, structuring        |
+| [`domain-driven-design`](./domain-driven-design.md)                                                                 | By Example        | Python               | Bounded contexts, ubiquitous language, modeling     |
+| [`system-design`](./system-design.md)                                                                               | Annotated-concept | Python               | Designing systems for scale, availability           |
+| [`event-driven-architecture`](./event-driven-architecture.md)                                                       | By Example        | Python               | Events, message brokers, event-driven design        |
+| [`distributed-systems`](./distributed-systems.md)                                                                   | By Example        | Python               | Consensus, replication, partitions, CAP             |
+| [`build-your-own-web-framework`](./build-your-own-web-framework.md)                                                 | By Example        | Python               | Routing, middleware, a web framework core           |
+| [`build-your-own-reactive-ui`](./build-your-own-reactive-ui.md)                                                     | By Example        | TypeScript           | Reactive UI library with a virtual DOM              |
+| [`software-engineering-practices`](./software-engineering-practices.md)                                             | Annotated-concept | Python               | Code review, CI, quality gates, team practice       |
+| [`agentic-coding`](./agentic-coding.md)                                                                             | Annotated-concept | polyglot             | Driving AI coding agents to plan, generate, verify  |
+| [`creating-ai-powered-apps`](./creating-ai-powered-apps.md)                                                         | By Example        | Python               | Integrating LLMs, embeddings, RAG into apps         |
+| [`agentic-ai`](./agentic-ai.md)                                                                                     | By Example        | Python               | Autonomous agents with tools, memory, planning      |
+| **[`browser-automation-with-cdp`](./browser-automation-with-cdp.md)** — NEW                                         | By Example        | Python (CDP client)  | Chrome DevTools Protocol browser automation         |
+| **[`the-agent-loop`](./the-agent-loop.md)** — NEW                                                                   | By Example        | Python               | LLM tool-use loop, read-eval-act, streaming, stops  |
+| **[`agent-tools-and-mcp`](./agent-tools-and-mcp.md)** — NEW                                                         | By Example        | Python               | Tool/function schemas; MCP server + client          |
+| **[`agent-context-and-memory`](./agent-context-and-memory.md)** — NEW                                               | Annotated-concept | Python               | Context budgeting, compaction, retrieval, memory    |
+| **[`agent-permissions-and-sandboxing`](./agent-permissions-and-sandboxing.md)** — NEW                               | By Example        | Python               | Approval models, sandboxed execution, guardrails    |
+| **[`agent-orchestration-subagents-and-observability`](./agent-orchestration-subagents-and-observability.md)** — NEW | Annotated-concept | Python               | Sub-agents, background tasks, hooks/skills, tracing |
+| **[`evaluating-ai-output-essentials`](./evaluating-ai-output-essentials.md)** — NEW                                 | Annotated-concept | Python               | Light eval gate: dataset, scorers, pass rate        |
+| **[`evaluating-ai-systems-in-depth`](./evaluating-ai-systems-in-depth.md)** — NEW                                   | By Example        | Python               | Error analysis, validated judges, CI eval gating    |
+| **[`statistics-for-evaluation`](./statistics-for-evaluation.md)** — NEW                                             | Annotated-concept | Python               | Agreement, sampling, intervals, significance        |
+| **[`product-patterns-for-probabilistic-systems`](./product-patterns-for-probabilistic-systems.md)** — NEW           | Annotated-concept | — (concept, no code) | UX for uncertainty, human review, ship/rollback     |
+| **[`inference-serving-and-model-deployment`](./inference-serving-and-model-deployment.md)** — NEW                   | By Example        | Python               | KV cache, batching, GPU capacity, self-hosting      |
+| **[`fine-tuning-and-adaptation`](./fine-tuning-and-adaptation.md)** — NEW                                           | By Example        | Python               | SFT, LoRA/PEFT, datasets, when to avoid it          |
 
 ## Low-level systems, JVM & languages, internals builds
 
@@ -214,7 +220,9 @@ See [DD-20](../../tech-docs.md#design-decisions) for the reconciliation ruling a
 
 ## Path manifests (orderings over this library)
 
-The three [path manifests](../paths/README.md) each impose one ordering over this catalog:
+The [path manifests](../paths/README.md) each impose one ordering over this catalog. The three
+software-engineer-role paths order the software-engineer-role courses; the AI-engineer-transition
+path composes a short AI-specific spine (linked prerequisites, not included):
 
 - **[interview-ready/software-engineer](../paths/manifest-interview-ready-software-engineer.md)** —
   interview-first order (ships first).
@@ -222,6 +230,9 @@ The three [path manifests](../paths/README.md) each impose one ordering over thi
   — shipping-first order (build a real app first, then deepen).
 - **[fundamentally-strong/software-engineer](../paths/manifest-fundamentally-strong-software-engineer.md)**
   — fundamentals-first, university-style order.
+- **[immediately-effective/software-engineer-to-ai-engineer](../paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md)**
+  — AI-engineer transition spine (converges on the AI-engineer endpoint, per-role, not the
+  software-engineer one).
 
 Zero body duplication — every manifest references the same course IDs reordered.
 
@@ -230,7 +241,7 @@ Zero body duplication — every manifest references the same course IDs reordere
 Each `<course-id>.md` carries these sections in order:
 
 1. **Header** — title, course ID, format, language, scope note. **No single order index** (order is
-   per-path; see the three manifests).
+   per-path; see the path manifests).
 2. **Why this exists · the big idea** — the problem before the solution, the keep-forever mental model,
    the cross-cutting big ideas.
 3. **Prerequisites** — prior **courses** (by ID) this builds on, tools & environment, assumed knowledge.

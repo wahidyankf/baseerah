@@ -20,8 +20,11 @@ A **curated spine** — interview + core + production — with an explicit optio
 - **Go deeper** (optional tail): theory, low-level systems, concurrency/JVM breadth, data depth, architecture/distributed/internals, mobile/CLI, AI & harness, security, and ops/quality — reachable but never required for interview-readiness.
 - **Genuinely omitted** (curriculum judgment — present only in `fundamentally-strong`): `lisp`, `windows-os`, `just-enough-csharp`, `windows-app-development`, `linux-app-development`. None is a prerequisite of any included course, so the manifest stays prerequisite-closed.
 - **Created**: the four interview courses + `capstone-interview-loop` (Group B); the rest reuse existing library courses by ID. **Prerequisite-consistent** (machine-verified).
-- **Composition total**: **116 of 121** courses (114 + the 7 DD-20 inter-topic capstones, minus the 5
-  genuinely-omitted above = 121 − 5 = 116).
+- **Composition total**: **116 of the 121 software-engineer-role courses** (114 + the 7 DD-20 inter-topic
+  capstones, minus the 5 genuinely-omitted above = 121 − 5 = 116). This denominator is the
+  **software-engineer-role baseline**, not the **127-course library** total: the six AI-engineer-role
+  courses this plan added are outside this path's scope and compose only the fourth,
+  `immediately-effective/software-engineer-to-ai-engineer` path (per-role convergence, D2).
 - **DD-20 addendum (2026-07-19)**: the seven DD-20 inter-topic capstones are all included (none is
   genuinely omitted), placed at their earliest prerequisite-safe position in the Go-deeper tail —
   `capstone-concurrency-showdown` (end of "Go deeper · Concurrency, JVM & languages"),
@@ -31,6 +34,20 @@ A **curated spine** — interview + core + production — with an explicit optio
   Ops, platform, quality & product", right after `site-reliability-engineering`), and
   `capstone-lead-at-altitude` (the manifest's final item, closing that same last section). See
   [tech-docs DD-20](../../tech-docs.md#design-decisions).
+
+> **Surgery forward-reference ([surgery.md §S1](../courses/surgery.md#s1--extract-evals-into-a-single-owner))**:
+> [`creating-ai-powered-apps`](../courses/creating-ai-powered-apps.md),
+> [`agentic-ai`](../courses/agentic-ai.md), and
+> [`agent-orchestration-subagents-and-observability`](../courses/agent-orchestration-subagents-and-observability.md)
+> — all carried in the "Go deeper · AI & harness engineering" section below — are the three eval donors
+> S1 trims. Once S1 lands, their scattered evaluation material is extracted into the two new eval courses
+> ([`evaluating-ai-output-essentials`](../courses/evaluating-ai-output-essentials.md),
+> [`evaluating-ai-systems-in-depth`](../courses/evaluating-ai-systems-in-depth.md)), which this
+> software-engineer-role path does **not** compose (per-role scoping, D2). The **composition count is
+> unchanged by S1** — the donors stay in this manifest; no course is added or removed — but this path
+> then ships **without dedicated eval-depth coverage**, the accepted, documented consequence recorded in
+> S1's blast-radius table (S1 flags this as its sharpest risk for the interview-ready manifest).
+> Re-verify prerequisite consistency here after S1 executes.
 
 ## Prologue · Editor foundations (skippable for the experienced)
 

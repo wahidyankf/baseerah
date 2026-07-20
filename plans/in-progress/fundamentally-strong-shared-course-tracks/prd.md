@@ -1,10 +1,12 @@
-# Product Requirements — Fundamentally Strong Shared Course Library, Three Paths
+# Product Requirements — Fundamentally Strong Shared Course Library, Four Paths
 
 ## Product Overview
 
 The "Fundamentally Strong" curriculum becomes a **shared course library** (one canonical, path-neutral
-body per course, keyed by a stable course ID) composed by **three learning paths** that converge on the
-same deep mastery:
+body per course, keyed by a stable course ID) composed by **four learning paths**. The three
+`software-engineer` paths converge on the same software-engineering deep mastery; the fourth path
+converges on a distinct AI-engineering deep mastery — convergence is a **per-role** property, not a
+library-wide axiom (see [tech-docs.md DD-22](./tech-docs.md#design-decisions)):
 
 - **`interview-ready/software-engineer`** — the **interview/job-prep-first** arc for an experienced
   engineer re-entering the market: interview prep FIRST → production-effective → deeper.
@@ -12,22 +14,30 @@ same deep mastery:
   one language end-to-end → **build a real app first** → then deepen.
 - **`fundamentally-strong/software-engineer`** — the **university-style, fundamentals-first** arc:
   CS foundations / theory first → deeper.
+- **`immediately-effective/software-engineer-to-ai-engineer`** (added 2026-07-20) — the
+  **immediately-effective** arc applied to a **role transition**: assumes an already-working software
+  engineer; prerequisite courses are **linked, not included**; teaches **building** AI systems (models,
+  agents, evals, inference serving), not driving them (`agentic-coding` stays a separate, unrelated
+  axis).
 
 A **path is an ordered manifest** composing a **curated subset** of course IDs — not every course is in
 every path, and each manifest must be a valid topological entry into the library's **prerequisite
-DAG**. Courses are shared with **omit-or-create** semantics; no body is duplicated or forked per path
-(a genuinely different teaching approach is met by a distinct **course variant**, not a body fork).
-This plan also delivers the **ayokoding-www path-aware navigation UI** that makes one canonical course
-URL behave differently under each path's context, under the `/en/c/learn` URL model. The library body
-is largely content (exempt from `specs:coverage`); the **navigation feature is app code** and carries a
-`specs/` Gherkin companion and three-level tests.
+DAG**. Courses are shared with **omit-or-create** semantics, and — as of 2026-07-20 — **course surgery**
+(update/merge/split/create) is also permitted, subject to a four-path blast-radius statement per
+surgery (see [tech-docs.md DD-28](./tech-docs.md#design-decisions)); a genuinely different teaching
+approach is still met by a distinct **course variant**, not a body fork. This plan also delivers the
+**ayokoding-www path-aware navigation UI** that makes one canonical course URL behave differently under
+each path's context, under the `/en/c/learn` URL model. The library body is largely content (exempt
+from `specs:coverage`); the **navigation feature is app code** and carries a `specs/` Gherkin companion
+and three-level tests.
 
 The topic content of the existing courses is unchanged — the 33 shipped topics (1–33) are **re-homed**
 (moved to `courses/<course-id>/` with redirects) and the 61 transferred topics (34–94) are authored
-**native** into `courses/`; all are **re-framed** (referenced by three manifests), not rewritten. This
+**native** into `courses/`; all are **re-framed** (referenced by four manifests), not rewritten. This
 plan additionally **authors fourteen NEW courses + nine NEW capstones** (three original plus six
-DD-20 inter-topic capstones) the interview and productivity/harness/security clusters need, for a
-**121-course** baseline (0 merges).
+DD-20 inter-topic capstones) the interview and productivity/harness/security clusters need, plus **six
+further NEW AI-specific courses** (2026-07-20) the fourth path needs, for a **127-course** catalog
+(121 software-engineer-role baseline + 6 AI-specific; course surgery permitted per DD-28).
 
 ## Personas (one per path)
 
@@ -45,11 +55,17 @@ DD-20 inter-topic capstones) the interview and productivity/harness/security clu
   `fundamentally-strong/software-engineer` path)** — wants the rigorous bottom-up route: CS
   foundations, computer architecture, paradigms, and data structures & algorithms **before** building
   apps at scale. Prefers to understand the machine and the theory first, then apply it.
+- **An already-working software engineer transitioning to AI engineering (north-star for the
+  `immediately-effective/software-engineer-to-ai-engineer` path, added 2026-07-20)** — already owns the
+  SWE fundamentals the other three paths teach; wants to become immediately effective at **building**
+  AI systems (models, agents, evals, inference serving), not at driving coding agents. Prerequisite
+  courses are **linked, not included** in this path's manifest. Converges on a distinct AI-engineering
+  endpoint, not the other three paths' shared software-engineering endpoint.
 - **A reader who lands on a shared course by deep-link / share** — arrives at a course URL without a
   path context and must get a coherent standalone view (with its prerequisites surfaced) plus an
   obvious way to enter a path.
 - **Maintainer (content strategist / frontend engineer / content author / reviewer)** — owns the
-  three-path architecture, builds the navigation feature, and authors the NEW courses via the ayokoding
+  four-path architecture, builds the navigation feature, and authors the NEW courses via the ayokoding
   maker agents.
 
 ## User Stories
@@ -61,18 +77,24 @@ DD-20 inter-topic capstones) the interview and productivity/harness/security clu
   technique modules and a layoff/gap-narrative section, so that I get interview-ready fast at my level.
 - As a **university-style learner**, I want a fundamentally-strong path that teaches CS foundations,
   architecture, paradigms, and DS&A before app-building, so that I understand the theory before I apply
-  it — the same endpoint, reached bottom-up.
+  it — the same software-engineering endpoint the other two SWE paths reach, reached bottom-up.
+- As an **already-working software engineer**, I want a path into AI engineering that **links** rather
+  than re-teaches the SWE fundamentals I already have, so that I get straight to **building** AI
+  systems without walking material I've already mastered.
 - As a **reader on any path**, I want prev/next and the breadcrumb to follow **my path's order**, so
   that "next" always means the next course in the arc I chose.
 - As a **reader on any course page**, I want to see the course's **prerequisites**, so that I know what
   to complete first regardless of which path (or no path) I entered from.
 - As a **reader who shares or deep-links a course**, I want the course to render coherently with no
   path context, so that a shared link never breaks — and to see which paths include this course.
-- As the **maintainer**, I want each course authored **once**, path-neutral, and referenced by all
-  three paths, so that a fix or update benefits every path with zero duplication.
+- As the **maintainer**, I want each course authored **once**, path-neutral, and referenced by every
+  path that needs it, so that a fix or update benefits every referencing path with zero duplication.
 - As the **maintainer**, I want a path to **omit** a course that does not fit and **create** a new
   course (or a distinct **variant** when a path needs a different teaching approach) only for a real
   gap, so that each path stays coherent without forking bodies.
+- As the **maintainer**, I want to perform **course surgery** (update/merge/split/create) on a shared
+  course when needed, stating its blast radius across all four manifests up front, so that the library
+  stays coherent as it grows without silently breaking another path.
 - As a **reader targeting an AI-agent-infra or security codebase**, I want the async-Python/FastAPI,
   CDP, MCP/harness, C++, and detection-engineering courses available in the library, so that any path
   can lead me to the stack skills those codebases need.
@@ -118,22 +140,32 @@ authoring.]
 
 ### Screen 1 · Paths hub ("choose your path")
 
-Entry screen at `/en/c/learn/paths` (the paths hub) offering the three paths.
+Entry screen at `/en/c/learn/paths` (the paths hub) offering the four paths. The fourth path converges
+on a different endpoint than the other three (per-role convergence, DD-22), so the hub's copy states
+"converging within your role" rather than the earlier single-endpoint framing.
 
-**Low-fi Option A — Three side-by-side path cards (Recommended)**
+**Low-fi Option A — Path cards, 2×2 grid (Recommended)**
 
 ```text
 ┌────────────────────────── Fundamentally Strong · Learn ──────────────────────────┐
-│  Choose your path. Same course library, three orders, one endpoint.               │
+│  Choose your path. One library, converging within your role.                      │
 │                                                                                    │
-│  ┌────────────────────┐  ┌────────────────────┐  ┌────────────────────┐           │
-│  │ Interview-Ready SWE │  │ Immediately-Effect. │  │ Fundamentally Strong│          │
-│  │ Interview-first     │  │ Build-app-first     │  │ Fundamentals-first  │          │
-│  │ Get interview-ready │  │ Ship a real app     │  │ CS theory first,    │          │
-│  │ fast (re-entrant).  │  │ fast, then deepen.  │  │ then deepen.         │          │
-│  │ ~N courses          │  │ ~N courses          │  │ ~N courses           │          │
-│  │ [ Start → ]         │  │ [ Start → ]         │  │ [ Start → ]          │          │
-│  └────────────────────┘  └────────────────────┘  └────────────────────┘           │
+│  ┌────────────────────┐  ┌────────────────────┐                                   │
+│  │ Interview-Ready SWE │  │ Immediately-Effect. │                                  │
+│  │ Interview-first     │  │ Build-app-first     │                                  │
+│  │ Get interview-ready │  │ Ship a real app     │                                  │
+│  │ fast (re-entrant).  │  │ fast, then deepen.  │                                  │
+│  │ ~N courses          │  │ ~N courses          │                                  │
+│  │ [ Start → ]         │  │ [ Start → ]         │                                  │
+│  └────────────────────┘  └────────────────────┘                                   │
+│  ┌────────────────────┐  ┌────────────────────┐                                   │
+│  │ Fundamentally Strong│  │ SWE → AI Engineer   │                                  │
+│  │ Fundamentals-first  │  │ AI-transition-first │                                  │
+│  │ CS theory first,    │  │ Already a SWE? Build│                                  │
+│  │ then deepen.        │  │ AI systems, fast.    │                                 │
+│  │ ~N courses          │  │ ~N courses           │                                 │
+│  │ [ Start → ]         │  │ [ Start → ]          │                                 │
+│  └────────────────────┘  └────────────────────┘                                   │
 │                                                                                    │
 │  Or browse the full course library →                                               │
 └────────────────────────────────────────────────────────────────────────────────────┘
@@ -142,7 +174,7 @@ Entry screen at `/en/c/learn/paths` (the paths hub) offering the three paths.
 **Low-fi Option B — Stacked comparison rows**
 
 ```text
-┌───────────────── Fundamentally Strong · Three Paths ─────────────────┐
+┌───────────────── Fundamentally Strong · Four Paths ──────────────────┐
 │ Interview-Ready SWE (interview-first) [ Start → ]  ~N courses         │
 │   interview prep → production-effective → deeper                      │
 │ ────────────────────────────────────────────────────────────────────│
@@ -151,22 +183,25 @@ Entry screen at `/en/c/learn/paths` (the paths hub) offering the three paths.
 │ ────────────────────────────────────────────────────────────────────│
 │ Fundamentally Strong (fundamentals-first) [ Start → ]  ~N courses    │
 │   CS foundations → architecture → paradigms → DS&A → build           │
+│ ────────────────────────────────────────────────────────────────────│
+│ SWE → AI Engineer (AI-transition-first) [ Start → ]  ~N courses      │
+│   already a SWE → build AI systems (models, agents, evals) fast      │
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
-**Responsive (mobile ↔ desktop)** — Option A shows three cards side-by-side at `lg` (≥1024px), two-up
-at `md` (≥768px), and **stacks to one column** below `sm`. The "Start" CTA is a full-width tap target
-on mobile.
+**Responsive (mobile ↔ desktop)** — Option A shows a **2×2 grid** of four cards at `lg` (≥1024px),
+two-up at `md` (≥768px), and **stacks to one column** below `sm`. The "Start" CTA is a full-width tap
+target on mobile.
 
-**Hi-fi finalists**: `![Paths hub — side-by-side cards](./assets/paths-hub-option-a.excalidraw.png)`
+**Hi-fi finalists**: `![Paths hub — 2×2 card grid](./assets/paths-hub-option-a.excalidraw.png)`
 and `![Paths hub — stacked comparison](./assets/paths-hub-option-b.excalidraw.png)`.
 
-**Selected: Option A — Three side-by-side path cards.**
+**Selected: Option A — Path cards, 2×2 grid.**
 
-| Design                    | Why it won / lost                                                                        |
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| A — side-by-side cards ✅ | Three equal, scannable choices; reuses `section-card`; reflows cleanly to stacked mobile |
-| B — stacked comparison    | Denser, but buries the third path below the fold on mobile and reads as a ranking        |
+| Design                 | Why it won / lost                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------ |
+| A — 2×2 card grid ✅   | Four equal, scannable choices; reuses `section-card`; reflows cleanly to stacked mobile    |
+| B — stacked comparison | Denser, but buries the fourth path further below the fold on mobile and reads as a ranking |
 
 ### Screen 2 · Path landing page
 
@@ -250,6 +285,11 @@ Canonical fallback (no `?path=`):
 │                          · [ Fundamentally Strong ]                       │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
+
+`coding-interview` shows only three badges because the `software-engineer-to-ai-engineer` path
+**links** rather than includes SWE-fundamentals courses in its manifest (DD-24); the affordance
+generically renders **one badge per path whose `courseOrder` actually lists the course**, so an
+AI-specific course would instead show a single `[ SWE → AI Engineer ]` badge.
 
 **Low-fi Option B — Left path rail replacing the sidebar**
 
@@ -382,19 +422,27 @@ Scenario: Old-way and new-way navigation coexist
 ```
 
 ```gherkin
-Scenario: All three paths reference a shared course with no body duplication
-  Given a course appears in all three path manifests
+Scenario: The three software-engineer paths reference a shared course with no body duplication
+  Given a course appears in all three of the interview-ready, immediately-effective/software-engineer, and fundamentally-strong/software-engineer manifests
   When the course library is inspected
   Then exactly one canonical path-neutral body exists for that course
   And each manifest references the course by its stable course ID
 ```
 
 ```gherkin
-Scenario: The interview-ready path ships before the other two paths
-  Given the interview-ready/software-engineer path is delivered end-to-end
-  When the immediately-effective and fundamentally-strong path work begins
-  Then the interview-ready path landing, courses, manifest, and nav are already live in production
-  And the other two paths reuse the shared courses without duplicating any body
+Scenario: The interview-ready MVP proves the architecture before other path work begins
+  Given the interview-ready/software-engineer MVP (an architecture smoke test over already-live topics 1-33) is delivered end-to-end
+  When the software-engineer-to-ai-engineer path's authoring begins
+  Then the interview-ready MVP's landing page, manifest, and path-aware nav are already live in production
+  And the interview cluster's remaining NEW courses are not required for that MVP to be considered shipped
+```
+
+```gherkin
+Scenario: The AI path is authored before the other two manifests are composed
+  Given the interview-ready MVP has shipped
+  When authoring effort is allocated across the remaining paths
+  Then the software-engineer-to-ai-engineer path's six net-new courses and manifest are authored first
+  And the immediately-effective/software-engineer and fundamentally-strong/software-engineer manifests are composed only afterward
 ```
 
 ```gherkin
@@ -411,6 +459,14 @@ Scenario: The fundamentally-strong path is fundamentals-first
   When a reader walks the path
   Then CS foundations, computer architecture, paradigms, and DS&A precede the build-real-software courses
   And the ordering is a valid topological entry into the prerequisite DAG
+```
+
+```gherkin
+Scenario: The software-engineer-to-ai-engineer path links prerequisites instead of including them
+  Given the immediately-effective/software-engineer-to-ai-engineer path manifest is published
+  When a reader inspects its courseOrder
+  Then no shared software-engineering-fundamentals course from the other three manifests is included in courseOrder
+  And the path landing page links out to those prerequisite courses' canonical pages instead
 ```
 
 ```gherkin
@@ -439,21 +495,28 @@ Scenario: The app builds and validates green
 
 ## NEW Course & Capstone Specifications
 
-This plan authors **fourteen NEW courses + nine NEW capstones** into the library (three original plus
-six DD-20 inter-topic capstones). Full specs for the three original capstones follow later in this
-section; the six DD-20 inter-topic capstones are specified inline within their host course files per
-`delivery.md` Phase 10, Band 8. Each course is a full page-bundle (learning track + drilling track)
-matching the sibling plan's per-topic anatomy and inheriting its cross-cutting authoring guarantees
-verbatim (accuracy-verified via `web-researcher` before authoring; follow-along-complete; typed-Python
-where Python; colocated runnable `code/`; exhaustive `co-NN`/`ex-NN` enumeration; `prerequisites`
-metadata + navigation). Every course declares its `prerequisites` so it takes its place in the
-library's prerequisite DAG. Full per-course concept/example/capstone detail lives in the
+This plan authors **twenty NEW courses + nine NEW capstones** into the library — the original
+fourteen (interview + productivity/harness/security clusters) plus **six further NEW AI-specific
+courses** added 2026-07-20 for the `software-engineer-to-ai-engineer` path — plus nine capstones
+(three original plus six DD-20 inter-topic capstones). Full specs for the three original capstones
+follow later in this section; the six DD-20 inter-topic capstones are specified inline within their
+host course files per `delivery.md` Phase 10, Band 8. Each course is a full page-bundle (learning
+track + drilling track) matching the sibling plan's per-topic anatomy and inheriting its cross-cutting
+authoring guarantees verbatim (accuracy-verified via `web-researcher` before authoring;
+follow-along-complete; typed-Python where Python; colocated runnable `code/`; exhaustive
+`co-NN`/`ex-NN` enumeration; `prerequisites` metadata + navigation). Every course declares its
+`prerequisites` so it takes its place in the library's prerequisite DAG. Full per-course
+concept/example/capstone detail lives in the
 [`syllabus/courses/` catalog](./syllabus/courses/README.md) (one file per course ID); the specs below
 fix each course's purpose, register, and acceptance shape.
 
 **Register.** The four interview-technique courses use a **refresh register** (assume prior
 professional experience; reload technique, do not teach from zero). The ten productivity/harness/
-security courses use the normal **first-learn By-Example register**; `just-enough-cpp` is primer scope.
+security courses and the six AI-specific courses (2026-07-20) use the normal **first-learn By-Example
+register**; `just-enough-cpp` is primer scope. The AI-specific courses additionally use the
+**links-not-included** entry model: they assume the reader already has the SWE fundamentals the other
+three paths teach (DD-24) — the courses themselves teach AI material only, they do not re-teach the
+linked prerequisites.
 
 **Principle-first framing (HARD).** Every course teaches a durable **principle**; target codebases
 (`remotebrowser`, `wazuh`, `vacti*`, the ose family) are **illustrative worked-examples**, never the
@@ -542,6 +605,57 @@ Scenario: The agentic-ai survey forward-links each primitive without re-teaching
   And it does not re-teach any primitive at build-your-own depth
 ```
 
+### AI-engineering specialization courses (`software-engineer-to-ai-engineer` path, added 2026-07-20)
+
+Six NEW courses for the fourth path, teaching **building** AI systems (not driving coding agents —
+`agentic-coding` stays a separate axis, DD-21). Each is split into a **stable spine** (durable
+principles) and **dated accuracy-note sidebars** (volatile SDK/model/pricing/framework specifics),
+matching the pattern the existing AI-band courses already use (DD-28). Exact prerequisite chains,
+formats, and primary languages below are **[Judgment call]** — first-pass authoring guidance, not a
+locked catalog row; the author finalizes them against the `syllabus/courses/` catalog conventions at
+authoring time (per DD-27's build order, this is authoring priority #1 behind the interview-ready
+MVP).
+
+- **Light eval gate** [Judgment call: By Example, Python] — a small, early course sitting right after
+  the first working LLM call and before RAG/agents; answers "how will you know this works?" (DD-25).
+- **Deep evals** [Judgment call: By Example, Python] — sits after agents; error analysis, task-specific
+  criteria, LLM-as-judge with measured human agreement, CI gating, judge-scope reliability. Absorbs the
+  three scattered evals treatments in `creating-ai-powered-apps`, `agentic-ai`, and
+  `agent-orchestration-subagents-and-observability`, which are trimmed to forward-links rather than
+  duplicating a fourth treatment (DD-25, DD-28).
+- **Statistics for evals** [Judgment call: Annotated-concept, code-bearing, Python] — scoped tightly to
+  what evals demand (judge concordance, significance testing), not a general statistics survey;
+  `analytics-and-experimentation` (classical product A/B testing) stays a scope mismatch and a
+  candidate sibling/prerequisite rather than a merge target (DD-26).
+- **Product patterns for probabilistic systems** [Judgment call: Annotated-concept, no code] — product
+  design patterns for systems whose outputs are probabilistic rather than deterministic; no course
+  owns this today (DD-28).
+- **Inference serving and model deployment** [Judgment call: By Example, Python] — vLLM/TGI, KV-cache,
+  batching, GPU considerations; entirely absent from the library today (DD-28).
+- **Fine-tuning and adaptation** [Judgment call: By Example, Python] — fine-tuning/LoRA/PEFT versus
+  RAG as a foil; `fine-tun*` appears once library-wide today, as a RAG comparison point, never its own
+  course (DD-28).
+
+The scope boundary between the light eval gate and deep evals is stated explicitly in both courses'
+overviews, in the style of the existing AI-band scope-guard (DD-10/DD-11), to avoid reproducing that
+cluster's overlap problem.
+
+```gherkin
+Scenario: The light eval gate and deep evals course do not overlap
+  Given the light-eval-gate course and the deep-evals course are authored
+  When a reader compares their overviews
+  Then each overview states an explicit scope boundary against the other
+  And neither course re-teaches the material the other owns
+```
+
+```gherkin
+Scenario: The statistics-for-evals course stays scoped to what evals demand
+  Given the statistics-for-evals course is authored
+  When a reader compares it with analytics-and-experimentation
+  Then it covers judge concordance and significance testing for evals only
+  And it does not re-teach general product A/B testing, which stays analytics-and-experimentation's scope
+```
+
 ### Security & systems gap-closers
 
 - **`just-enough-cpp`** (Primer · C++) — systems-language principle on-ramp (RAII, templates/generics,
@@ -599,13 +713,19 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
   redirects, accessibility — all under the `/en/c/learn` URL model.
 - Re-homing the 33 shipped topics (1–33) into `courses/<course-id>/` with redirects; native-authoring
   the 61 transferred topics (34–94) into `courses/<course-id>/`.
-- The three path manifests (`interview-ready/software-engineer` interview-first,
+- The four path manifests (`interview-ready/software-engineer` interview-first,
   `immediately-effective/software-engineer` build-app-first,
-  `fundamentally-strong/software-engineer` fundamentals-first) as ordered, prerequisite-consistent
-  course-ID lists over the library.
-- Fourteen NEW courses + nine NEW capstones (three original plus six DD-20 inter-topic capstones)
-  authored into the library (learning + drilling each), for a 121-course baseline.
-- Course variants authored on demand only, where a path needs a genuinely different teaching approach.
+  `fundamentally-strong/software-engineer` fundamentals-first, and
+  `immediately-effective/software-engineer-to-ai-engineer` AI-transition-first, added 2026-07-20) as
+  ordered, prerequisite-consistent course-ID lists over the library. The first three converge on the
+  same software-engineering endpoint; the fourth converges on a distinct AI-engineering endpoint
+  (DD-22).
+- Twenty NEW courses (the original fourteen plus six AI-specific, 2026-07-20) + nine NEW capstones
+  (three original plus six DD-20 inter-topic capstones) authored into the library (learning + drilling
+  each), for a **127-course catalog** (121 software-engineer-role baseline + 6 AI-specific).
+- Course variants authored on demand only, where a path needs a genuinely different teaching approach;
+  **course surgery** (update/merge/split/create, added 2026-07-20) permitted subject to a four-path
+  blast-radius statement per surgery (DD-28).
 - Three-level tests (unit/integration/e2e) + a `specs/` Gherkin companion for the nav feature.
 - Per-path progression-smoothness audits.
 
@@ -616,6 +736,8 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
 - Path progress persistence, accounts, or bookmarking.
 - Interactive flashcards.
 - Speculative enumeration of course variants (authored on demand only).
+- Teaching how to **drive** AI coding agents — that stays `agentic-coding`'s existing, unrelated scope
+  (DD-21).
 
 ## Product-Level Risks
 
@@ -632,3 +754,12 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
   Mitigated by the AI-band scope-guard cross-reference contract.
 - **NEW-course quality**: interview modules must meet ayokoding pace/accuracy bars. Mitigated by the
   maker → checker → facts-checker → link-checker pipeline per course.
+- **Per-role convergence confusion** (added 2026-07-20): a reader or a future author assumes the
+  fourth path converges with the other three, since the plan previously asserted one global endpoint.
+  Mitigated by the explicit DD-22 amendment record, cross-referenced from every prose and diagram site
+  that made the original single-endpoint claim.
+- **Course-surgery blast radius** (added 2026-07-20): a surgery on a shared course (e.g. trimming
+  `creating-ai-powered-apps`'s evals section to a forward-link) silently breaks another path's manifest
+  or prerequisite chain. Mitigated by DD-28's binding rule: every surgery states its blast radius
+  across all four manifests before it is applied, and every affected manifest is re-verified
+  prerequisite-consistent afterward.

@@ -1,4 +1,4 @@
-# Technical Docs — Fundamentally Strong Shared Course Library, Three Paths
+# Technical Docs — Fundamentally Strong Shared Course Library, Four Paths
 
 ## Overview
 
@@ -6,12 +6,12 @@ This plan has two technical halves:
 
 1. **A content-architecture change** — replace the single-order "Fundamentally Strong" section with a
    **shared course library**: one canonical, path-neutral body per course (keyed by a stable
-   **course ID**), plus **three ordered path manifests** that each compose a **curated subset** of
-   those course blocks in a chosen order. This includes authoring **fourteen NEW courses + nine NEW
-   capstones** (three original plus six DD-20 inter-topic capstones), re-homing the 33 already-shipped
-   topics into a path-neutral `courses/` home with
-   redirects, and authoring the 61 transferred topics (FS-SE 34–94) **native** into `courses/` as the
-   library fills.
+   **course ID**), plus **four ordered path manifests** that each compose a **curated subset** of
+   those course blocks in a chosen order. This includes authoring **twenty NEW courses** (the original
+   fourteen plus six further NEW AI-specific courses added 2026-07-20) **+ nine NEW capstones** (three
+   original plus six DD-20 inter-topic capstones), re-homing the 33 already-shipped topics into a
+   path-neutral `courses/` home with redirects, and authoring the 61 transferred topics (FS-SE 34–94)
+   **native** into `courses/` as the library fills.
 2. **A real ayokoding-www frontend change** — a **new** `course-paths` feature (it does not exist yet;
    **Group A builds it**) that carries a client-side **path context** (`?path=<path-id>`) so a course
    page's prev/next, breadcrumb, and **prerequisite display** follow the active path's manifest, with a
@@ -24,20 +24,26 @@ UI-design-funnel lives in [prd.md](./prd.md#ui-design-funnel-path-aware-navigati
 **navigation feature** is app code and carries a full `specs/` Gherkin companion.
 
 > **Authority note.** **This document and the tracked plan files are the authority** — specifically
-> the [Course Library Catalog](#course-library-catalog) (the 121-row table), the Decisions Locked
-> prose in [`README.md`](./README.md), and [DD-20](#design-decisions). The rulings were originally
-> derived in two scratch files (`local-temp/shared-tracks-rewrite-spec.md` and
-> `local-temp/fs-shared-tracks-topic-reconciliation.md` with its 2026-07-19 addendum); those are
+> the [Course Library Catalog](#course-library-catalog) (the 121-software-engineer-role-row table,
+> 127 with the fourth path's six AI-specific courses), the Decisions Locked prose in
+> [`README.md`](./README.md), and [DD-20](#design-decisions) plus [DD-21 through DD-28](#design-decisions)
+> (2026-07-20). The rulings were originally derived in two scratch files
+> (`local-temp/shared-tracks-rewrite-spec.md` and
+> `local-temp/fs-shared-tracks-topic-reconciliation.md` with its 2026-07-19 addendum), plus a third
+> (`local-temp-decisions.md`, 2026-07-20, the fourth-path grilling session); all three are
 > **gitignored, untracked, and may be cleaned at any time**, so they are recorded here as historical
 > provenance only and **must not be consulted as a source of truth during execution**. Every ruling
 > they carried is reproduced in tracked files. Where any earlier draft disagreed, the rulings below
-> win: **three** paths (not two), `interview-ready` (was `job-seeking`), `immediately-effective` (was
-> the shipping-first `fundamentally-strong`), a **new** `fundamentally-strong` theory-first path, the
-> `/en/c/learn/…` URL namespace, and **`prerequisites` on every course**.
+> win: **four** paths as of 2026-07-20 (originally three, originally two before that),
+> `interview-ready` (was `job-seeking`), `immediately-effective` (was the shipping-first
+> `fundamentally-strong`), a `fundamentally-strong` theory-first path, a fourth
+> `software-engineer-to-ai-engineer` path (2026-07-20), the `/en/c/learn/…` URL namespace,
+> **`prerequisites` on every course**, and **per-role convergence** (not one global endpoint,
+> DD-22) as of 2026-07-20.
 
 ## Shared-Course-Library Architecture
 
-### Core model — one library, three composing paths, one converging endpoint
+### Core model — one library, four composing paths, per-role convergence
 
 - **Course = standalone, path-neutral building block.** Its canonical body is authored **once**, lives
   at `apps/ayokoding-www/content/en/learn/courses/<course-id>/`, and renders at
@@ -45,18 +51,28 @@ UI-design-funnel lives in [prd.md](./prd.md#ui-design-funnel-path-aware-navigati
 - **Path = ordered manifest composing course IDs.** A path references a **curated subset** of course
   blocks in a chosen order. **Not every course is in every path** — a path freely **omits** courses
   that do not fit its arc (omit-or-create), and any path may **create** a new shared course for a
-  genuine gap (available to all paths thereafter).
-- **Three paths, one library, one converging endpoint.** All three end at the **same deep mastery**
-  (the internals-builds + harness cluster + distributed-systems + security-capstone tail); only the
-  **entry point + journey ordering + teaching emphasis** differ. Path landings live at
-  **`/en/c/learn/paths/<path-id>`**:
+  genuine gap (available to all paths thereafter). As of 2026-07-20, **course surgery**
+  (update/merge/split/create) is also permitted, subject to a four-path blast-radius statement per
+  surgery (DD-28).
+- **Four paths, one library, per-role convergence (amended 2026-07-20, DD-22).** The founding claim
+  that all paths end at the same deep mastery is corrected: paths converge **within a role**, not
+  globally — the library now serves **more than one endpoint**. The three `software-engineer` paths
+  end at the **same** software-engineering deep mastery (the internals-builds + harness cluster +
+  distributed-systems + security-capstone tail); only their **entry point + journey ordering +
+  teaching emphasis** differ. The fourth path converges on a **distinct** AI-engineering deep mastery.
+  Path landings live at **`/en/c/learn/paths/<first-segment>/<second-segment>`** (the second segment's
+  convention is redefined from `<role>` to `<role-transition-or-subject>`, DD-23):
   1. `interview-ready/software-engineer` — experienced SWE re-entering the market: interview/job prep
      **first** → production-effective → deeper. (was `job-seeking`)
   2. `immediately-effective/software-engineer` — editor → one language → **build a real app first** →
      then deepen. (was the shipping-first `fundamentally-strong` path)
   3. `fundamentally-strong/software-engineer` — university-style: **CS-theory / fundamentals first** →
-     deeper. (NEW path)
-- All three are **fresh manifests** — none maps cleanly to the old single spiral order; each is a
+     deeper.
+  4. `immediately-effective/software-engineer-to-ai-engineer` (2026-07-20) — assumes an already-working
+     software engineer (prerequisites **linked, not included**, DD-24); teaches **building** AI systems
+     (not driving them — `agentic-coding` stays a separate axis, DD-21); converges on the fourth,
+     distinct AI-engineering endpoint.
+- All four are **fresh manifests** — none maps cleanly to the old single spiral order; each is a
   bespoke ordering authored over the library.
 - **`fundamentally-strong`** is BOTH the library/section brand AND path #3's ID.
 
@@ -79,8 +95,10 @@ Additional rules:
   body's own honest dependency statement.
 - **Manifests must be prerequisite-consistent.** Every path's `courseOrder` must be a **valid
   topological ordering** (a valid entry into the DAG): no course precedes any of its prerequisites
-  **within that path's order**. The three paths are three different entry points/orderings into the
-  **one** DAG that converges on the same endpoint. This is a machine-checkable gate (see
+  **within that path's order**. The four paths are four different entry points/orderings into the
+  **one** DAG; the three `software-engineer` paths converge on the shared software-engineering
+  endpoint, and the fourth path converges on its own AI-engineering endpoint (per-role convergence,
+  DD-22). This is a machine-checkable gate (see
   [Manifest integrity invariants](#manifest-integrity-invariants-verified-as-gates--unit-tests)).
 - **Per-path framing is a callout, never a body fork.** A path may attach an optional lightweight
   intro/outro framing callout around a shared block; the shared body itself is never modified per path.
@@ -125,7 +143,9 @@ flowchart TD
     classDef purple fill:#CC78BC,stroke:#000,color:#fff,stroke-width:2px
 ```
 
-Each of the three path manifests is a distinct topological walk over this DAG that respects every edge.
+Each of the four path manifests is a distinct topological walk over this DAG that respects every edge.
+The fourth path's walk is short and AI-specific — it links to, rather than walks, most of this
+software-engineer-focused excerpt (DD-24).
 
 ### Canonical course home + URL
 
@@ -146,9 +166,13 @@ Each of the three path manifests is a distinct topological walk over this DAG th
 - **Storage**: each manifest is a standalone data file under
   `apps/ayokoding-www/src/features/course-paths/manifests/` — the loader globs `manifests/**/*.yaml`
   and a **slash in a path ID becomes a nested directory** (e.g.
-  `manifests/interview-ready/software-engineer.yaml`). This data file is the **single
-  machine-consumed source of truth** for the path — it is NOT `courseOrder` frontmatter on any content
-  `_index.md`. The path landing page renders _from_ this loaded manifest.
+  `manifests/interview-ready/software-engineer.yaml`, and, as of 2026-07-20,
+  `manifests/immediately-effective/software-engineer-to-ai-engineer.yaml`). This data file is the
+  **single machine-consumed source of truth** for the path — it is NOT `courseOrder` frontmatter on
+  any content `_index.md`. The path landing page renders _from_ this loaded manifest. The path ID's
+  second segment names either a **role** (`software-engineer`) or, as of the fourth path, a **role
+  transition or subject** — `<role-transition-or-subject>` is now the explicit convention for that
+  segment (DD-23), not an accident of the first three paths sharing `software-engineer`.
 
   ```yaml
   # apps/ayokoding-www/src/features/course-paths/manifests/interview-ready/software-engineer.yaml
@@ -172,9 +196,16 @@ Each of the three path manifests is a distinct topological walk over this DAG th
   `{ id, framing?: { intro?, outro? } }` when the path adds a **lightweight per-course framing**
   callout (DD-7). The framing is rendered by the path layer around the shared body; the body itself is
   never modified.
-- **Omit-or-create**: a path lists only the courses that fit its arc (others are omitted). A path that
-  needs something no course covers triggers creation of a new course in the library (available to all
-  paths thereafter).
+- **Omit-or-create; course surgery permitted (amended 2026-07-20).** A path lists only the courses that
+  fit its arc (others are omitted). A path that needs something no course covers triggers creation of a
+  new course in the library (available to all paths thereafter). As of 2026-07-20, **course surgery**
+  (update/merge/split/create against an _existing_ course) is also permitted — superseding the original
+  zero-new-bodies invariant — subject to the four-path blast-radius rule (DD-28): each surgery states
+  its blast radius across all four manifests before it is applied, and every affected manifest is
+  re-verified prerequisite-consistent afterward.
+- **Links-not-included prerequisites (the fourth path, DD-24).** Unlike the first three paths, the
+  fourth path's `courseOrder` does not include the shared SWE-fundamentals courses it depends on —
+  it **links** to their canonical pages instead, keeping the manifest a short, AI-specific spine.
 
 ### Manifest integrity invariants (verified as gates + unit tests)
 
@@ -183,6 +214,9 @@ Each of the three path manifests is a distinct topological walk over this DAG th
 - **Prerequisite-consistency**: for every course in a manifest, all of its declared `prerequisites`
   that are **also present in that manifest** appear **before** it. (A path may omit a prerequisite only
   if it also omits every course that needs it — enforced as a gate.)
+- **Course-surgery blast-radius statement (added 2026-07-20, DD-28)**: any course surgery names every
+  manifest it touches before it lands, and each named manifest is re-verified against the invariants
+  above afterward.
 - No course body is duplicated per path (all manifests reference courses **by ID**, never copy a
   body) — a "no forked body" check.
 - Course IDs are stable slugs; a re-home changes a body's URL (with a redirect) but never its ID.
@@ -201,7 +235,7 @@ route and `content-url.ts`.
 Today, reading order is a single global property carried by `weight` frontmatter:
 `computePrevNext` groups pages by parent slug and sorts siblings by `weight`, path-independently
 [Repo-grounded — `apps/ayokoding-www/src/features/content/core/tree-builder.ts`]. One body cannot
-encode three orders. The new model **moves order out of the body and into the manifest**, and makes
+encode four orders. The new model **moves order out of the body and into the manifest**, and makes
 prev/next + breadcrumb + prerequisite display **resolve against the active path**.
 
 ### New feature: `course-paths` (functional core + imperative shell)
@@ -220,7 +254,8 @@ apps/ayokoding-www/src/features/course-paths/          # NEW feature — Group A
     ├── manifests/             # SOURCE OF TRUTH — one data file per path (slash path ID → nested dir)
     │   ├── interview-ready/software-engineer.yaml
     │   ├── immediately-effective/software-engineer.yaml
-    │   └── fundamentally-strong/software-engineer.yaml
+    │   ├── fundamentally-strong/software-engineer.yaml
+    │   └── immediately-effective/software-engineer-to-ai-engineer.yaml  # added 2026-07-20
     ├── path-landing.tsx       # renders a path landing page from a manifest (ordered course list)
     ├── path-banner.tsx        # in-path affordance on a course page (path name + position + a11y)
     ├── prerequisites.tsx      # renders a course's prerequisites (links to canonical course pages)
@@ -297,8 +332,8 @@ apps/ayokoding-www/src/features/course-paths/          # NEW feature — Group A
   (`manifests/**/*.yaml`, grouped by the path's phase headings), each course link carrying `?path=`.
   Ordering never lives in the `_index.md` frontmatter.
 - **Paths hub** (`content/en/learn/paths/_index.md`, surfaced `/en/c/learn/paths`): a "choose your path"
-  screen with **three** path cards, each built from a loaded manifest (title + description + course
-  count). Design in the funnel (prd).
+  screen with **four** path cards (2×2 grid, amended 2026-07-20, DD-23), each built from a loaded
+  manifest (title + description + course count). Design in the funnel (prd).
 
 ### Accessibility
 
@@ -337,7 +372,7 @@ pages). Both navigations resolve, side by side.
   the legacy `_index.md` tree and the new manifest-driven paths both **link to that same canonical
   course page** (the legacy tree via its updated ordered entries, the paths via `courseOrder` +
   `?path=`). Because order lives outside the body (DD-1), the legacy spiral order (carried by the
-  `_index.md` tree + `weight`) and the three manifest orders coexist without conflict: a course URL
+  `_index.md` tree + `weight`) and the four manifest orders coexist without conflict: a course URL
   without `?path=` renders the canonical view that both the legacy tree and a deep-link reach; the same
   URL with `?path=` renders the path-aware view. No body is forked to serve the two navigations.
 - **Enforced as a re-home gate.** delivery.md carries an explicit step in the re-home phase to
@@ -393,18 +428,29 @@ test-first:
 
 ## Course Library Catalog
 
-The library holds **all 121 courses**: **33 re-homed** (shipped topics 1–33) + **61 transferred-native**
-(FS-SE topics 34–94) + **4 existing capstones** + **23 new** (14 courses + 9 capstones). **Zero
-merges** — every overlap resolved keep-distinct per the reconciliation rulings recorded in
-[`README.md`](./README.md) and the **DD-20** inter-topic-capstone
-reconciliation below (seven inter-topic capstones — one already live on disk, six spec'd-but-unscheduled
-— promoted to first-class catalog/manifest entries; see [DD-20](#design-decisions)).
+The library holds **127 courses** (amended 2026-07-20, DD-28 — was 121; see
+[Count reconciliation](#design-decisions) at DD-28): **33 re-homed** (shipped topics 1–33) + **61
+transferred-native** (FS-SE topics 34–94) + **4 existing capstones** + **29 new** (20 courses + 9
+capstones). The **29 new** breaks down as the original **14 courses** + the **fourth path's six
+net-new AI-engineering courses** (light eval gate, deep evals, statistics for evals, product patterns
+for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — see
+[prd.md's AI-engineering specialization courses](./prd.md#new-course--capstone-specifications) for
+the `[Judgment call]`-labeled specifics; full catalog rows below land when the AI path is authored,
+DD-27) + **9 capstones**. **Zero merges among the original 121** — every overlap resolved keep-distinct
+per the reconciliation rulings recorded in [`README.md`](./README.md) and the **DD-20**
+inter-topic-capstone reconciliation below (seven inter-topic capstones — one already live on disk, six
+spec'd-but-unscheduled — promoted to first-class catalog/manifest entries; see
+[DD-20](#design-decisions)). Course surgery against the original 121 is now permitted (DD-28) and,
+when applied, replaces "zero merges" with an explicit blast-radius statement for that surgery.
 
 Each row lists **course-id · origin · format · primary language · prerequisites · one-line scope**.
 **Origin**: `E` = existing shipped (1–33, re-homed), `T(n)` = transferred FS-SE topic n
-(authored native), `Ecap` = existing capstone, `N` = one of the 23 new. **Order is NOT a catalog
-property** — it lives in the three [Path Manifests](#path-manifests). `prerequisites` are the course's
-own DAG edges (`—` = entry point). Variants are added **on demand** and are not enumerated here.
+(authored native), `Ecap` = existing capstone, `N` = one of the 29 new. **Order is NOT a catalog
+property** — it lives in the four [Path Manifests](#path-manifests). `prerequisites` are the course's
+own DAG edges (`—` = entry point). Variants are added **on demand** and are not enumerated here. The
+six net-new AI courses are catalogued here by name only until the AI path is authored (DD-27); no
+rows are added to the tables below in this pass to avoid inventing course-ids, exact prerequisites, or
+scope lines not yet settled.
 
 ### Editor & tooling foundations
 
@@ -578,20 +624,29 @@ own DAG edges (`—` = entry point). Variants are added **on demand** and are no
 | `capstone-lead-at-altitude`              | N      | Whole-journey milestone | polyglot + prose  | `capstone-concurrency-and-systems`, `capstone-real-world-delivery`, `site-reliability-engineering`, `software-product-engineering`, `engineering-management`                                              | Whole-journey leadership synthesis: SLOs, strategy, prioritization, a six-pass retrospective (DD-20; embedded spec in `site-reliability-engineering.md`)                                                                                      |
 
 **Count check**: 33 re-homed (E) + 61 transferred-native (T) + 4 existing capstones (Ecap) + 23 new
-(N: 14 courses + 9 capstones) = **121**, zero merges. Full per-course detail (bodies + citations):
-`syllabus/courses/` and its README; verify against the catalog table above, the reconciliation
-rulings in [`README.md`](./README.md), and [DD-20](#design-decisions) below — all tracked.
+(N: 14 courses + 9 capstones) = **121** among the original software-engineer-role baseline, zero
+merges (D8/DD-28 permits course surgery against this 121 going forward, replacing "zero merges" with
+an explicit per-surgery blast-radius statement). Plus the fourth path's **6 net-new AI-engineering
+courses** (D4/D5/D6, DD-24/DD-25/DD-26) = **127** total catalog (amended 2026-07-20, DD-28). Full
+per-course detail (bodies + citations): `syllabus/courses/` and its README; verify against the catalog
+table above, the reconciliation rulings in [`README.md`](./README.md), and [DD-20](#design-decisions)
+below — all tracked.
 
 ## Path Manifests
 
 Each manifest is the **authoritative order** for one path: a **curated, prerequisite-consistent subset
-ordering** over the catalog. All three reference the same course IDs (each course lives once); a path
-**omits** courses that do not fit and may **create** a new shared course for a genuine gap. The
-manifests are the machine-consumed data files under
+ordering** over the catalog. **Amended 2026-07-20 (DD-22, DD-24) — convergence is now per role, not
+global.** The three `software-engineer` paths (`interview-ready`, `immediately-effective`,
+`fundamentally-strong`) all reference the same software-engineer-role course IDs (each course lives
+once); each of those three **omits** courses that do not fit and may **create** a new shared course for
+a genuine gap, and all three **converge on the same software-engineer deep-mastery endpoint** (the
+internals-builds + harness cluster + distributed-systems + security-capstone tail). The **fourth path**
+(`immediately-effective/software-engineer-to-ai-engineer`) is a **separate, shorter manifest** that
+**links to** (does not walk) most of that software-engineer-role tail — its own courses converge on a
+distinct AI-engineer endpoint (DD-24). The manifests are the machine-consumed data files under
 `apps/ayokoding-www/src/features/course-paths/manifests/**/*.yaml` (nested to mirror each slash path
-ID); the human-readable orderings live in `syllabus/paths/`. All three are **fresh orderings** — none
-inherits the old single spiral — and all three **converge on the same deep-mastery endpoint** (the
-internals-builds + harness cluster + distributed-systems + security-capstone tail).
+ID); the human-readable orderings live in `syllabus/paths/`. All four are **fresh orderings** — none
+inherits the old single spiral.
 
 > Every ordering below is a **valid topological walk** over the prerequisite DAG in the
 > [catalog](#course-library-catalog): no course precedes any of its listed prerequisites. Phase-level
@@ -667,7 +722,8 @@ Deepening band). **Genuinely omitted** (curriculum judgment, present only in `fu
   `programming-paradigms` → `functional-programming`.
 - **Deepening band · Concurrency, systems, data, architecture, mobile/desktop, AI/harness, security,
   ops** — the full remaining library ordered shallow → deep, converging on the same endpoint tail as
-  the other paths: concurrency & language breadth (incl. `compilers-parsers-and-transpilers` →
+  the other two software-engineer paths (DD-22): concurrency & language breadth (incl.
+  `compilers-parsers-and-transpilers` →
   **`capstone-concurrency-showdown`**, DD-20) → data depth → architecture/distributed/internals builds
   → scale/cloud/platform ops, incl. `site-reliability-engineering` →
   **`capstone-concurrency-and-systems`** (DD-20) → mobile & desktop platforms → the AI band + harness
@@ -717,10 +773,45 @@ University-style. Arc: **CS-theory / fundamentals first → apply → deeper.** 
   of Stage 3's language/concurrency breadth). Full order:
   [syllabus/paths/manifest-fundamentally-strong-software-engineer.md](./syllabus/paths/manifest-fundamentally-strong-software-engineer.md).
 
+### Path `immediately-effective/software-engineer-to-ai-engineer` (fourth path, added 2026-07-20)
+
+Role-transition principle, not an arc over the software-engineer-role baseline. Assumes an
+**already-working software engineer** (D4/DD-24) — the manifest is a **short, AI-specific spine**;
+prerequisite software-engineer courses it depends on are **linked to their canonical pages, not
+included** in `courseOrder`. Delivered as **authoring priority #1** (Group F, immediately after the
+`interview-ready` architecture-smoke-test MVP — D7/DD-27), ahead of the `immediately-effective` and
+`fundamentally-strong` manifests, because none of its six courses exist on disk yet.
+
+Converges on a **distinct AI-engineer endpoint** (D2/DD-22) — not the software-engineer deep-mastery
+tail the other three paths share.
+
+- **Spine (six net-new courses, authoring order per D5/D7)**: [Judgment call: exact `courseOrder`
+  and prerequisite-linking targets are decided at authoring time, not fabricated here] — a light eval
+  gate early (right after a first working LLM call, before RAG/agents, D5/DD-25) → deep evals after
+  agents (absorbing the three scattered evals treatments in `creating-ai-powered-apps`, `agentic-ai`,
+  and `agent-orchestration-subagents-and-observability`, D5/DD-25) → statistics for evals, scoped
+  tightly to what evals demand (D6/DD-26) → product patterns for probabilistic systems → inference
+  serving and model deployment → fine-tuning and adaptation (as a foil against RAG). Full specs (format
+  - primary language `[Judgment call]` labels) are in
+    [prd.md's AI-engineering specialization courses](./prd.md#new-course--capstone-specifications).
+- **Linked, not included**: the shared software-engineer-fundamentals courses this path assumes
+  (editor/tooling, one language end-to-end, backend/API basics) are **not** in this manifest's
+  `courseOrder` — they are referenced via canonical-page links from the path landing narrative
+  (D4/DD-24), keeping the spine short.
+- **Relationship to the harness-engineering cluster**: the existing harness cluster
+  (`the-agent-loop`, `agent-tools-and-mcp`, `agent-context-and-memory`,
+  `agent-permissions-and-sandboxing`, `agent-orchestration-subagents-and-observability`) already
+  builds AI-agent internals at a software-engineering level (DD-13); whether this path's manifest
+  walks that cluster directly or links to it is decided at authoring time (DD-27), not fixed here.
+
+Full order: not yet authored — lands as
+`syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md` when Group F
+ships (D7/DD-27).
+
 ## Design Decisions
 
 - **DD-1 · Order lives in the manifest, not the body.** Reading order is a per-path property carried by
-  `courseOrder`, not by a global `weight`. One body cannot encode three orders; moving order to the
+  `courseOrder`, not by a global `weight`. One body cannot encode four orders; moving order to the
   manifest is what enables the shared library. The body keeps a `weight` only for the canonical
   (no-path) sidebar/prev-next fallback and the catalog sort.
 - **DD-2 · One canonical body + URL per course; re-home with redirects.** Bodies live at
@@ -733,18 +824,25 @@ University-style. Arc: **CS-theory / fundamentals first → apply → deeper.** 
 - **DD-4 · Graceful canonical fallback is first-class.** A course without path context renders a full
   standalone view + prerequisite list + a "part of paths" affordance. Deep-links and shares must never
   break; the canonical view is the existing, already-correct behavior.
-- **DD-5 · Three paths, one library, one converging endpoint.** `interview-ready`,
-  `immediately-effective`, and `fundamentally-strong` differ only in entry point + ordering + emphasis;
-  all end at the same deep mastery. Serving one persona per path without forking any body is exactly
-  what the shared library buys.
+- **DD-5 · Three software-engineer paths, one library, one converging endpoint (amended 2026-07-20 by
+  DD-22 — see below).** `interview-ready/software-engineer`, `immediately-effective/software-engineer`,
+  and `fundamentally-strong/software-engineer` differ only in entry point + ordering + emphasis; all
+  end at the same deep mastery. Serving one persona per path without forking any body is exactly what
+  the shared library buys. **DD-22 amends the founding claim itself**: convergence is now a per-role
+  property, not a single global endpoint — this DD-5 statement still holds for the three
+  software-engineer paths, but the library as a whole now serves more than one endpoint.
 - **DD-6 · Every course declares `prerequisites` → a prerequisite DAG.** The union of all
   `prerequisites` edges is the library DAG; each manifest must be a valid topological ordering of it
-  (a machine-checkable gate); the course page surfaces its prerequisites. The three paths are three
-  entry points into the one DAG. This is the structural guarantee that replaces ad-hoc "does this order
-  read smoothly?" judgement with a checkable invariant.
-- **DD-7 · Omit-or-create; per-path framing is a callout, never a body fork.** A path omits a course
-  that does not fit and creates a new shared course only for a genuine gap; per-path framing is a
-  lightweight intro/outro callout around the shared body. Single source of truth per course.
+  (a machine-checkable gate); the course page surfaces its prerequisites. The four paths are four
+  entry points into the one DAG (amended 2026-07-20 — was three; see DD-22, DD-24). This is the
+  structural guarantee that replaces ad-hoc "does this order read smoothly?" judgement with a
+  checkable invariant.
+- **DD-7 · Omit-or-create; per-path framing is a callout, never a body fork (amended 2026-07-20 by
+  DD-28 — see below).** A path omits a course that does not fit and creates a new shared course only
+  for a genuine gap; per-path framing is a lightweight intro/outro callout around the shared body.
+  Single source of truth per course. **DD-28 supersedes the "create-only, never modify existing"
+  half of this invariant**: course surgery (update/merge/split against an _existing_ course) is now
+  permitted, subject to a mandatory four-path blast-radius statement.
 - **DD-8 · Variant policy — separate course only when pedagogy must differ.** Default is one shared,
   path-neutral block. Author a distinct course-id variant (same topic, different teaching approach)
   only when a path genuinely needs a different pedagogy; paths pick the fitting variant. Variants are
@@ -771,16 +869,22 @@ University-style. Arc: **CS-theory / fundamentals first → apply → deeper.** 
     its prerequisite. Explicit scope lines drawn in both bodies.
 - **DD-13 · Harness-engineering cluster as a marquee build-your-own track.** The five harness courses +
   `capstone-build-your-own-coding-agent`, in **Python** (matching `remotebrowser`), sit after the AI
-  band so prerequisites precede them. Available to all three paths; central to the converging endpoint.
+  band so prerequisites precede them. Available to all four paths; central to the three
+  software-engineer paths' converging endpoint, and directly relevant to the fourth path's
+  build-AI-systems scope (D1/DD-21) — the AI path's own manifest composition, including whether it
+  walks or links to this cluster, is decided during that path's authoring (DD-27).
 - **DD-14 · Two-altitude splits + gap-closers (retained, all keep-distinct).** Light
   `self-hosting-essentials` vs full-depth `bare-metal-virtualization`; `defensive-security` vs
   `detection-engineering-and-siem-operations` (DD-12); dedicated `just-enough-cpp` on-ramp (prereq
   `just-enough-c`); the `capstone-build-your-own-pentest-engine` security flagship. All are library
   courses; every path decides whether to include them.
-- **DD-15 · Build order (locked).** Group A (architecture + `course-paths` UI — hard prerequisite) →
-  `interview-ready` MVP ships first (re-home 1–33, author the 4 interview courses +
-  `capstone-interview-loop`, one manifest, deploy) → `immediately-effective` manifest →
-  `fundamentally-strong` manifest → backfill topics 34–94 native into `courses/` as the library fills.
+- **DD-15 · Build order (locked; amended 2026-07-20 by DD-27 — see below).** Group A (architecture +
+  `course-paths` UI — hard prerequisite) → `interview-ready` MVP ships first (re-home 1–33, author the
+  4 interview courses + `capstone-interview-loop`, one manifest, deploy) → `immediately-effective`
+  manifest → `fundamentally-strong` manifest → backfill topics 34–94 native into `courses/` as the
+  library fills. **DD-27 amends steps 2 onward**: the MVP is narrowed to an architecture smoke test
+  only (interview-course authoring is no longer bundled into it), and the fourth path is inserted as
+  authoring priority #1 immediately after the MVP.
 - **DD-16 · Prerequisite-consistency is the audited smoothness property.** Each manifest is a verified
   topological ordering (DD-6); the old ad-hoc SF-1/SF-2 in-body forward-references are **eliminated** by
   making `just-enough-c` a prerequisite of `computer-architecture` and the language primers
@@ -790,7 +894,8 @@ University-style. Arc: **CS-theory / fundamentals first → apply → deeper.** 
   3–5 scope (topics 34–94 authoring) is **absorbed here** as the Group-E backfill.
 - **DD-18 · Proof-of-transfer outcome-anchor (principles, not repo-specifics).** Courses teach durable
   **principles**; the target codebases are **evidence the principles transfer**, never subject matter.
-  Path-independent — it justifies the **library**; all three paths inherit it. See
+  Path-independent — it justifies the **library**; all four paths inherit it (amended 2026-07-20 — was
+  three). See
   [Productive in Target Codebases](#productive-in-target-codebases-proof-of-transfer-outcome-anchor).
 - **DD-19 · Additive model — preserve the "old-way" `_index.md` browse.** The new library/paths nav is
   additive: the legacy spiral-ordered section browse under
@@ -820,6 +925,150 @@ University-style. Arc: **CS-theory / fundamentals first → apply → deeper.** 
   native-authoring scope (for the other six). Corrected baseline: **114 → 121 courses, still 0
   merges**. Never fold into a parent course's intra-course capstone or cut — each is a genuine,
   independently-valuable building block with its own stable ID. **Decided 2026-07-19.**
+
+**The following eight decisions (DD-21 through DD-28) were made in the 2026-07-20 fourth-path grilling
+session and are folded in verbatim from the session's decision record (`local-temp-decisions.md`,
+scratch file, not part of this plan's tracked docs).**
+
+- **DD-21 · Scope: the AI path teaches building AI systems, not driving them (D1).** The fourth path,
+  `immediately-effective/software-engineer-to-ai-engineer`, teaches learners to **build** AI systems.
+  `agentic-coding` (the practice of using an AI agent to write code faster — the user's side of the
+  agent relationship) stays exactly where it is in the library, unchanged, and is explicitly **not**
+  the subject of this path — a separate, unrelated axis.
+- **DD-22 · Convergence axiom amended: paths converge per role, not globally (D2, amends DD-5).** The
+  plan's founding claim — all paths end at the same deep mastery — no longer holds globally. Paths now
+  converge **within a role**: the three `software-engineer` paths (`interview-ready`,
+  `immediately-effective`, `fundamentally-strong`) still converge on one shared software-engineer
+  deep-mastery endpoint (DD-5 continues to hold for those three); the fourth path converges on a
+  separate AI-engineer endpoint. The library now serves **more than one endpoint**, and this axiom
+  leaves room for future roles without requiring another founding-claim change. Touches (and was
+  applied to): `README.md` prose + the paths mermaid diagram, `brd.md`, `prd.md` (including the
+  UI-Design-Funnel mockups), `tech-docs.md`, and every other diagram or prose site asserting one
+  global endpoint.
+- **DD-23 · Path ID registered; second URL segment redefined from `<role>` to
+  `<role-transition-or-subject>` (D3).** The fourth path's ID is
+  `immediately-effective/software-engineer-to-ai-engineer`
+  (`/en/c/learn/paths/immediately-effective/software-engineer-to-ai-engineer`; manifest at
+  `apps/ayokoding-www/src/features/course-paths/manifests/immediately-effective/software-engineer-to-ai-engineer.yaml`).
+  Registering a role-to-role transition ID surfaced that the second URL segment was never actually
+  `<role>` in general — it was `<role>` by accident because only one role existed. The convention is
+  now **stated explicitly**: `/en/c/learn/paths/<first-segment>/<role-or-role-transition>`, where the
+  first segment is the arc style (`interview-ready` / `immediately-effective` / `fundamentally-strong`)
+  and the second segment is either a role (`software-engineer`) or a role-to-role transition
+  (`software-engineer-to-ai-engineer`) that names the transition explicitly.
+- **DD-24 · Fourth path's entry point: linked, not included, prerequisites (D4).** The manifest assumes
+  an **already-working software engineer** and is a **short, AI-specific spine** — prerequisite
+  software-engineer courses are **linked** to their canonical pages from the path landing narrative,
+  never duplicated into `courseOrder`. This is what "immediately effective" means for a specialization:
+  fast because it assumes competence already exists, not because it skips depth.
+- **DD-25 · Evals split: an early light gate plus a later deep-evals course (D5).** Resolves a genuine
+  ordering disagreement (Huyen-style "evals first" vs. bootcamp-style "evals after building") rather
+  than silently picking a side. A **light eval gate** lands early — immediately after a learner's first
+  working LLM call, before RAG and agents — answering only "how will you know this works?" A separate
+  **deep evals course** lands after agents, covering error analysis, task-specific criteria,
+  LLM-as-judge with measured human agreement, CI gating, and judge-scope reliability; it absorbs the
+  three scattered evals treatments currently duplicated across `creating-ai-powered-apps` (co-19),
+  `agentic-ai` (co-25/co-26), and `agent-orchestration-subagents-and-observability` (Theme D), which
+  are trimmed to forward-links rather than gaining a fourth treatment. The scope boundary between the
+  two courses is explicit, in the style of the library's existing AI-band scope-guard (DD-11).
+- **DD-26 · Statistics-for-evals course authored, scoped tightly (D6).** No statistics or ML course
+  exists anywhere in the (pre-amendment) 121-course library. Research verdict: "no ML background
+  needed" is credible for training theory (backprop, architectures) but oversold for statistics — judge
+  concordance and significance testing are irreducibly statistical. The new course is scoped to exactly
+  what evals demand, not a general statistics course; `analytics-and-experimentation` (classical
+  product A/B testing) remains a distinct, keep-separate course and may become a sibling or
+  prerequisite rather than being merged.
+- **DD-27 · Build order amended: the fourth path is authoring priority #1, behind an
+  architecture-smoke-test-only MVP (D7, amends DD-15).** Locked order: **Group A** (architecture + UI,
+  unchanged hard prerequisite) → **`interview-ready` MVP, narrowed to an architecture smoke test only**
+  (ships against topics 1–33, already live on disk; proves routing, manifest loading, `?path` context,
+  prev/next, breadcrumb, and prerequisite display against real content, in days not months —
+  authoring the 4 NEW interview courses + `capstone-interview-loop` is **no longer bundled into this
+  MVP gate**) → **`software-engineer-to-ai-engineer`** (authoring priority #1 for all authoring effort)
+  → **`immediately-effective/software-engineer`** manifest → **`fundamentally-strong/software-engineer`**
+  manifest → **backfill topics 34–94**. Rationale (preserved from the original build-order decision):
+  nothing in the AI path exists on disk (~17 courses); making it literally first — ahead of even the
+  MVP — would mean nothing ships until all 17 are authored, with the UI architecture unvalidated the
+  entire time. Ordering it immediately after an architecture-smoke-test MVP gives the AI path first
+  claim on every unit of real authoring effort while keeping the architecture proven early against
+  content that already exists.
+- **DD-28 · Course surgery (update / merge / split / create) now permitted; six net-new AI courses
+  bring the catalog to 127 (D8, amends the create-only half of DD-7).** Supersedes the "pure manifest
+  reuse, zero new bodies beyond genuine gaps" invariant: course surgery against an **existing** course
+  is now permitted, not only creation for a genuine gap. **Binding rule — course surgery is a
+  four-path change.** Courses are shared; any edit, split, or merge to a course ripples to every
+  manifest carrying that course ID. Each surgery **must state its blast radius** across all four
+  manifests before it is applied, and every affected manifest must be **re-verified
+  prerequisite-consistent** afterward (enforced as a gate — see
+  [Manifest integrity invariants](#manifest-integrity-invariants-verified-as-gates--unit-tests)).
+  Concretely: the library's evals content, currently triple-taught with no single owner
+  (`creating-ai-powered-apps` co-19, `agentic-ai` co-25/co-26,
+  `agent-orchestration-subagents-and-observability` Theme D), is extracted into the new owned
+  deep-evals course (DD-25) and the three donor courses are trimmed to forward-links — a surgery, not a
+  fourth treatment. `agent-permissions-and-sandboxing` (guardrails) is explicitly **not** a surgery
+  target — it already has a clear owner and is the library's strongest area. Six net-new courses are
+  agreed for the fourth path (light eval gate, deep evals, statistics for evals, product patterns for
+  probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — DD-25/
+  DD-26), bringing the catalog from the original 121 (114 authored + 7 DD-20 capstones catalogued) to
+  **127**. See [Course Library Catalog](#course-library-catalog) for the corrected count breakdown, and
+  [Manifest arithmetic sites needing update](#manifest-arithmetic-sites-needing-update-not-edited-here)
+  for the `syllabus/paths/` sites this plan-doc pass could not touch (owned separately).
+
+**The following four decisions (DD-29 through DD-32) were added later in the same 2026-07-20
+fourth-path grilling session and are folded in verbatim from the session's decision record
+(`local-temp-decisions.md`, scratch file, not part of this plan's tracked docs).**
+
+- **DD-29 · Context and harness engineering: name and cite in existing courses, do not add or rename
+  any course (D9).** Research verdict, verified against the actual course files: both disciplines are
+  already taught, concept-for-concept, by the existing library — they are simply never named.
+  `agent-context-and-memory` maps onto what the industry began calling **context engineering** in June
+  2025 (Lütke 2025-06-19, Karpathy 2025-06-25, Willison 2025-06-27, and Anthropic's Effective Context
+  Engineering methodology, 2025-09-29); the six-course harness cluster (`the-agent-loop`,
+  `agent-tools-and-mcp`, `agent-context-and-memory`, `agent-permissions-and-sandboxing`,
+  `agent-orchestration-subagents-and-observability`, `capstone-build-your-own-coding-agent`) satisfies
+  all four necessary conditions in the only academic definition of an agent harness (arXiv 2606.10106),
+  which the industry began calling **harness engineering** from late 2025 (Anthropic 2025-11-26;
+  OpenAI; Böckeler/Thoughtworks 2026-04-02). A naming/lineage line citing this is added to
+  `agent-context-and-memory` and to the harness cluster + `capstone-build-your-own-coding-agent`, so a
+  learner connects the material to job-market vocabulary. The OpenAI/Anthropic-vs-HumanLayer
+  containment dispute (whether harness is the umbrella containing context management, or the reverse)
+  is cited as **unresolved**, not resolved or adopted as structure. **No course is renamed and no
+  course is added** — "harness engineering" is roughly five months old and contested among named
+  practitioners; building durable course structure on terminology this unsettled ages the curriculum
+  badly.
+- **DD-30 · The capstone teaches the METR-vs-Scale-AI dispute as durable epistemic content (D10).**
+  `capstone-build-your-own-coding-agent` teaches the contested evidence on whether harness quality even
+  matters, as content that survives whatever happens to the vocabulary: **METR** (independent, no
+  vendor stake, 2026-02-13) found Claude Code ahead of a generic ReAct scaffold in 50.7% of bootstrap
+  samples on Opus 4.5 — a coin flip; **Scale AI / SWE-bench Pro** reports large scaffold-driven swings,
+  with native scaffolds exploring roughly 1.5-2× more; the **competence-floor reconciliation** — METR
+  compared against a competently built generic baseline while Scale compared against naive ones,
+  implying harness quality matters enormously below a competence floor and then flattens — is
+  explicitly labelled a **synthesis no single source makes**, not a finding either source reports. The
+  unsourced 42%→78% scaffold-swing claim is a **do-not-cite**: it traces to no primary source.
+- **DD-31 · Four concept-level additions land inside existing courses, never as new courses (D11).**
+  Verified absent by direct file read at decision time, now confirmed present as `co-NN` entries in the
+  corresponding course files (each already had mandated example/concept headroom): **cache-aware prefix
+  ordering** → `agent-context-and-memory` co-23 (order context by staleness, not logical grouping —
+  framed as the vendor-neutral stable-before-variable principle, not tied to Anthropic's explicit
+  breakpoints or OpenAI's automatic threshold); **tool-count degradation** → `agent-tools-and-mcp`
+  co-23 (tool-selection accuracy declines as available tool count rises, per the Berkeley
+  Function-Calling Leaderboard and a GeoEngine benchmark finding a model failing at 46 tools and
+  succeeding at 19 — governs when to split a tool surface across subagents); **tool-result token
+  efficiency** → `agent-tools-and-mcp` co-24 (a tool's result shape is a context-budget decision;
+  promotes the prior unquantified ex-27 aside to a named concept); **train-vs-production permission
+  asymmetry** → `agent-permissions-and-sandboxing` co-23 (a training/exploration harness is permissive,
+  a production harness restrictive — the distinction is about risk, not model capability, which is why
+  it stays durable as models improve). None of the four introduces a new course.
+- **DD-32 · Net-new course list locked at exactly 6; context and harness engineering add zero (D12,
+  confirms DD-28).** Unchanged from the list DD-28 already catalogs (light eval gate, deep evals,
+  statistics for evals, product patterns for probabilistic systems, inference serving and model
+  deployment, fine-tuning and adaptation). DD-29 through DD-31 are naming, citation, and concept-level
+  work **inside existing courses** — they add zero courses on top. This locks the arithmetic DD-28
+  established: **127-course catalog** (121 + 6), not subject to further growth from the context/harness
+  naming work. See [Course Library Catalog](#course-library-catalog) and the
+  [File Impact](#file-impact-by-delivery-group) Group F row, both of which already state the six-course,
+  127-catalog figure consistent with this lock.
 
 ## Smoothness Architecture (per-path)
 
@@ -851,7 +1100,8 @@ regress.
 
 **Philosophy.** The library teaches durable **PRINCIPLES**; the target codebases are **evidence the
 principles transfer**, never subject matter. No course is "about" a target repo. This anchor is
-path-independent — it justifies the **library**, and all three paths inherit it.
+path-independent — it justifies the **library**, and all four paths inherit it (DD-18, amended
+2026-07-20 — was three).
 
 The target codebases and the principle-modules that build each stack skill (the gap-filling NEW courses
 — `async-python-and-fastapi-services`, `browser-automation-with-cdp`, the harness cluster,
@@ -883,20 +1133,52 @@ target.
 ## syllabus/ folder structure
 
 Per the rewrite spec §6, this plan's `syllabus/` directory carries the human-readable mirror of the
-library and the three paths:
+library and the four paths (amended 2026-07-20, DD-23/DD-28 — was three paths / 121 courses; the
+`syllabus/` files themselves are owned and updated separately from this plan-doc pass — see
+[Manifest arithmetic sites needing update](#manifest-arithmetic-sites-needing-update-not-edited-here)):
 
-- `syllabus/README.md` — overview of the library + the three paths.
-- `syllabus/courses/` + `syllabus/courses/README.md` — the per-course-block detail layer (the 121
-  catalog, one file per course-id, each stating origin, format, primary language, `prerequisites`, and
-  scope — the human-readable mirror of the [catalog](#course-library-catalog)). Seven of the 121
-  (the DD-20 inter-topic capstones) are cataloged with their spec embedded inside a host topic's file
-  rather than a standalone `capstone-*.md` file — see [DD-20](#design-decisions).
-- `syllabus/paths/` + `syllabus/paths/README.md` — the three path manifests as human-readable orderings
+- `syllabus/README.md` — overview of the library + the four paths.
+- `syllabus/courses/` + `syllabus/courses/README.md` — the per-course-block detail layer (121 on disk
+  today; 127 once the fourth path's six net-new AI courses land, DD-28), one file per course-id, each
+  stating origin, format, primary language, `prerequisites`, and scope — the human-readable mirror of
+  the [catalog](#course-library-catalog). Seven of the 121 (the DD-20 inter-topic capstones) are
+  cataloged with their spec embedded inside a host topic's file rather than a standalone `capstone-*.md`
+  file — see [DD-20](#design-decisions).
+- `syllabus/paths/` + `syllabus/paths/README.md` — the four path manifests as human-readable orderings
   over the courses (`interview-ready-software-engineer.md`,
-  `immediately-effective-software-engineer.md`, `fundamentally-strong-software-engineer.md`).
+  `immediately-effective-software-engineer.md`, `fundamentally-strong-software-engineer.md`, and —
+  once authored per the amended build order, DD-27 — `immediately-effective-software-engineer-to-ai-engineer.md`).
 
 These markdown files are documentation mirrors; the machine-consumed source of truth for each path is
 the nested `manifests/**/*.yaml` data file in the `course-paths` feature.
+
+### Manifest arithmetic sites needing update (not edited here)
+
+Recorded here so the count reconciliation (121 → 127, DD-28) stays traceable. Each **per-path
+composition total** below is scoped to the **software-engineer-role baseline specifically** (correct,
+since the fourth path's six net-new AI courses are not software-engineer-role courses, D1/DD-21) and
+therefore keeps its **"121" denominator**; the **library-level catalog references** in the same files
+now read **127** (the fourth path has landed, so the reconciliation is applied, not pending):
+
+- `syllabus/paths/manifest-interview-ready-software-engineer.md` — "Composition total: 116 of the 121
+  software-engineer-role courses (114 + the 7 DD-20 inter-topic capstones, minus the 5
+  genuinely-omitted = 121 − 5 = 116)." (per-path denominator, kept)
+- `syllabus/paths/manifest-immediately-effective-software-engineer.md` — "Composition total: 119 of
+  the 121 software-engineer-role courses (114 + the 7 DD-20 inter-topic capstones, minus the 2
+  genuinely-omitted = 121 − 2 = 119)." (per-path denominator, kept)
+- `syllabus/paths/manifest-fundamentally-strong-software-engineer.md` — "it includes **all 121
+  software-engineer-role courses** in a **theory-first** ordering… the only software-engineer-role path
+  that omits nothing." (per-path denominator, kept)
+- `syllabus/paths/README.md` — per-path "all 121 software-engineer-role courses" (kept); the
+  library-level reference now reads "the 127-course catalog includes seven inter-topic capstones".
+- `syllabus/README.md` — the library-level reference now reads "127-course catalog".
+- `syllabus/courses/README.md` — the library-level reference now reads "the index of the 127-course
+  catalog".
+
+When the fourth path's manifest (`immediately-effective/software-engineer-to-ai-engineer.md`) is
+authored, it needs its own composition-total line scoped to the AI-specific spine (short; prerequisites
+linked, not included, DD-24) — not a "121"/"127" fraction, since it does not walk the
+software-engineer-role baseline.
 
 ## File Impact (by delivery group)
 
@@ -905,23 +1187,25 @@ the nested `manifests/**/*.yaml` data file in the `course-paths` feature.
 `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/` (**new feature**);
 `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`.
 
-| Group | Target                                    | Change                                                             | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A     | nav feature (`course-paths`)              | New app code (TDD)                                                 | `<FEAT>core/{schemas,manifest,path-nav,path-context,prerequisites}.ts` + tests; `<FEAT>shell/{manifest-repository,path-landing,path-banner,prerequisites,path-course-links}.tsx`; edits to `content-url.ts`, `prev-next.tsx`, `breadcrumb.tsx`, `c/[...slug]/page.tsx`                                                                                                                                                                                                                                                                                                                                                                                    |
-| A     | specs + redirects                         | New Gherkin + redirect config                                      | `<SPECS>*.feature` + `README.md`; `apps/ayokoding-www/src/redirects/learn-reorg.ts` entries for re-homed courses                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| A     | library + paths homes                     | New content scaffolding                                            | `<COURSES>_index.md` (library landing); `<PATHS>_index.md` (paths hub / choose-a-path, three cards)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| B     | `interview-ready/software-engineer` (MVP) | Re-home 1–33 + 4 existing capstones + interview courses + manifest | `git mv` shipped topics 1–33 + the 4 existing capstones (incl. `capstone-solid-core`, DD-20) into `<COURSES><id>/` (+ redirects); **update** legacy `content/en/learn/fundamentally-strong/**/_index.md` section indexes to re-point every entry to the re-homed course URLs (old-way browse still resolves — additive model); author `coding-interview`, `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`, `capstone-interview-loop`; author `<FEAT>manifests/interview-ready/software-engineer.yaml` + thin `<PATHS>interview-ready/software-engineer/_index.md` landing anchor; ship end-to-end + deploy |
-| C     | `immediately-effective/software-engineer` | Manifest over the library                                          | Author `<FEAT>manifests/immediately-effective/software-engineer.yaml` + thin `<PATHS>immediately-effective/software-engineer/_index.md`; author any build-fast-only NEW course as needed                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| D     | `fundamentally-strong/software-engineer`  | Manifest over the library                                          | Author `<FEAT>manifests/fundamentally-strong/software-engineer.yaml` + thin `<PATHS>fundamentally-strong/software-engineer/_index.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| E     | Backfill topics 34–94                     | Author native into `courses/`                                      | Author the 61 transferred bodies + remaining NEW courses/capstones into `<COURSES>`; grow each manifest's `courseOrder` as courses land                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Final | verify / retest / archive                 | plan-side + evidence                                               | `evidence/…`; `learnings.md` triage; `git mv` plan → `plans/done/…`; README updates                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Group | Target                                                                                                                          | Change                                                                                                        | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A     | nav feature (`course-paths`)                                                                                                    | New app code (TDD)                                                                                            | `<FEAT>core/{schemas,manifest,path-nav,path-context,prerequisites}.ts` + tests; `<FEAT>shell/{manifest-repository,path-landing,path-banner,prerequisites,path-course-links}.tsx`; edits to `content-url.ts`, `prev-next.tsx`, `breadcrumb.tsx`, `c/[...slug]/page.tsx`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| A     | specs + redirects                                                                                                               | New Gherkin + redirect config                                                                                 | `<SPECS>*.feature` + `README.md`; `apps/ayokoding-www/src/redirects/learn-reorg.ts` entries for re-homed courses                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| A     | library + paths homes                                                                                                           | New content scaffolding                                                                                       | `<COURSES>_index.md` (library landing); `<PATHS>_index.md` (paths hub / choose-a-path, **four** cards, 2×2 grid — amended 2026-07-20, DD-23)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| B     | `interview-ready/software-engineer` (MVP)                                                                                       | Re-home 1–33 + 4 existing capstones + manifest — **architecture smoke test ONLY (amended 2026-07-20, DD-27)** | `git mv` shipped topics 1–33 + the 4 existing capstones (incl. `capstone-solid-core`, DD-20) into `<COURSES><id>/` (+ redirects); **update** legacy `content/en/learn/fundamentally-strong/**/_index.md` section indexes to re-point every entry to the re-homed course URLs (old-way browse still resolves — additive model); author `<FEAT>manifests/interview-ready/software-engineer.yaml` + thin `<PATHS>interview-ready/software-engineer/_index.md` landing anchor; ship end-to-end + deploy. Authoring `coding-interview`, `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`, `capstone-interview-loop` is **no longer bundled into this group** (DD-27) — those NEW courses land whenever the `interview-ready` path's remaining authoring is scheduled, without blocking groups F/C/D below |
+| F     | `immediately-effective/software-engineer-to-ai-engineer` — **authoring priority #1 (new group, added 2026-07-20, DD-24/DD-27)** | Six net-new AI courses + manifest                                                                             | Author the six net-new courses (light eval gate, deep evals, statistics for evals, product patterns for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — DD-25/DD-26/DD-28; full catalog rows land at authoring time, see [Course Library Catalog](#course-library-catalog)) into `<COURSES>`; author `<FEAT>manifests/immediately-effective/software-engineer-to-ai-engineer.yaml` (short, AI-specific spine — prerequisites **linked, not included**, DD-24) + thin `<PATHS>immediately-effective/software-engineer-to-ai-engineer/_index.md` landing anchor                                                                                                                                                                                                                                          |
+| C     | `immediately-effective/software-engineer`                                                                                       | Manifest over the library                                                                                     | Author `<FEAT>manifests/immediately-effective/software-engineer.yaml` + thin `<PATHS>immediately-effective/software-engineer/_index.md`; author any build-fast-only NEW course as needed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| D     | `fundamentally-strong/software-engineer`                                                                                        | Manifest over the library                                                                                     | Author `<FEAT>manifests/fundamentally-strong/software-engineer.yaml` + thin `<PATHS>fundamentally-strong/software-engineer/_index.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| E     | Backfill topics 34–94                                                                                                           | Author native into `courses/`                                                                                 | Author the 61 transferred bodies + remaining NEW courses/capstones (incl. the deferred 4 interview courses + `capstone-interview-loop`, DD-27) into `<COURSES>`; grow each manifest's `courseOrder` as courses land                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Final | verify / retest / archive                                                                                                       | plan-side + evidence                                                                                          | `evidence/…`; `learnings.md` triage; `git mv` plan → `plans/done/…`; README updates                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
-**Net authored surface**: the `course-paths` feature (new app code) + 14 new course bundles + 9 new
-capstone bundles (3 original + 6 DD-20 inter-topic capstones) + 3 path manifests + the library/paths
-landing pages. The 33 shipped bodies + `capstone-solid-core` (DD-20) are **moved** (not rewritten) into
-`courses/`; the 61 transferred bodies are authored **native** into `courses/` (no legacy home, no
-re-home). No `project.json` target changes; no new npm packages beyond the existing content/nav stack
-(zod is already used [Repo-grounded — `apps/ayokoding-www` schemas use zod]).
+**Net authored surface** (amended 2026-07-20 — six net-new AI courses + a fourth manifest added, DD-28):
+the `course-paths` feature (new app code) + 20 new course bundles (the original 14 + the six net-new AI
+courses) + 9 new capstone bundles (3 original + 6 DD-20 inter-topic capstones) + 4 path manifests + the
+library/paths landing pages. The 33 shipped bodies + `capstone-solid-core` (DD-20) are **moved** (not
+rewritten) into `courses/`; the 61 transferred bodies are authored **native** into `courses/` (no legacy
+home, no re-home). No `project.json` target changes; no new npm packages beyond the existing content/nav
+stack (zod is already used [Repo-grounded — `apps/ayokoding-www` schemas use zod]).
 
 ## Dependencies
 
@@ -946,7 +1230,7 @@ re-home). No `project.json` target changes; no new npm packages beyond the exist
 - **Feature revert (Group A)**: the `course-paths` feature is additive; reverting it restores
   weight-based nav (canonical view) with no content loss. Re-homed courses keep working because the
   redirects and `courses/` bodies revert together.
-- **Manifest revert (Group B/C/D)**: a path manifest is one file; reverting it removes that path's
+- **Manifest revert (Group B/F/C/D)**: a path manifest is one file; reverting it removes that path's
   landing + `?path=` nav without touching any course body.
 - **Re-home revert**: because each re-home is a `git mv` + redirect, reverting restores the old
   `fundamentally-strong/software-engineer/<slug>/` location and drops the redirect atomically.

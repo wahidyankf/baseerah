@@ -45,6 +45,17 @@ Verification]`: the exact current spec revision (a dated schema is published) an
   provider — build tools against an adapter and pin the SDK versions at authoring.
 - 2026-07-18 — `[Needs Verification]`: the chosen MCP library's API (`fastmcp` vs reference SDK) and its
   version — pin and re-verify at authoring.
+- 2026-07-20 — **co-23 evidence, durability split**. The **effect** is durable spine: selection accuracy
+  declines as tool count rises, so tool-surface size is a design constraint. The **measurements** are
+  dated and belong here only. Reported evidence: the **Berkeley Function-Calling Leaderboard** shows a
+  universal decline across evaluated models as tool count increases; a **GeoEngine** benchmark reports a
+  model failing a task with **46 tools** available and succeeding with **19**. `[Needs Verification]`:
+  re-verify both sources, their exact figures, and the model set evaluated before authoring — leaderboard
+  contents and benchmark revisions change. Never place a specific tool-count threshold in the spine; the
+  transferable claim is the direction of the effect, not a number.
+- 2026-07-20 — **co-24 durability**: that tool results consume recurring context budget is architectural
+  and durable. Any per-provider cost, truncation default, or context-window figure used to quantify it is
+  volatile — read it from configuration and re-verify at authoring.
 
 ## Concepts
 
@@ -92,6 +103,17 @@ Verification]`: the exact current spec revision (a dated schema is published) an
 22. **co-22 · exposing-a-service-as-mcp** — wrapping an existing service (e.g. the
     [browser service](./browser-automation-with-cdp.md)) as an MCP server makes it usable by any agent
     — the `remotebrowser` pattern.
+23. **co-23 · tool-count-degradation** — tool-selection accuracy **declines as the number of available
+    tools rises**, and the decline is measurable rather than anecdotal. This is the quantified form of
+    the granularity aside in Tensions & trade-offs: it is not merely that fifty micro-tools "confuse"
+    the model, it is that every additional tool in the schema costs selection accuracy across models.
+    This is the governing constraint on when to **split a tool surface across subagents** or **filter
+    the advertised tool set per turn** rather than advertising everything the agent could ever call.
+24. **co-24 · tool-result-token-efficiency** — a tool's **result shape is a context-budget decision**.
+    Tool results enter the model's context and are re-read on every subsequent turn, so a verbose result
+    is a recurring cost, not a one-off one. Returning the fields the model needs — rather than a
+    service's full response payload — is a first-class part of tool design, alongside the name,
+    description, and argument schema.
 
 ## Tensions & trade-offs — when NOT to reach for this
 
@@ -102,7 +124,14 @@ Verification]`: the exact current spec revision (a dated schema is published) an
   damage a wrong call does. Powerful tools demand the validation and permission machinery of
   `agent-permissions-and-sandboxing` — do not ship a raw shell tool ungated.
 - **Granularity**: one giant "do anything" tool is unusable by the model; fifty micro-tools bloat the
-  schema and confuse it. The design skill is carving tools at the joints of the task.
+  schema and confuse it. The design skill is carving tools at the joints of the task. This is not only a
+  judgment call — the degradation is measurable (co-23), which turns "how many tools is too many" from a
+  matter of taste into something you can test on your own suite and act on by filtering per turn or
+  splitting across subagents.
+- **Capability vs recurring context cost**: every tool you advertise costs schema tokens on every turn,
+  and every tool result costs context for the rest of the session (co-24). A tool surface is not free
+  just because it is unused — reach for the smallest surface that covers the task, not the largest one
+  you can assemble.
 
 ## Lineage — why it beat the alternative
 
@@ -113,17 +142,25 @@ Verification]`: the exact current spec revision (a dated schema is published) an
   reusable across harnesses by exposing an MCP server. This module gives the [agent
   loop](./the-agent-loop.md) its capabilities; `agent-permissions-and-sandboxing` constrains them and
   `agent-orchestration-subagents-and-observability` composes them.
+- **What the industry calls this cluster**: from late 2025 this body of work — the loop, its tools, its
+  context, its guardrails, its observability — began to be called **harness engineering** (Anthropic
+  2025-11-26; OpenAI; Böckeler/Thoughtworks 2026-04-02). The term is **~5 months old and contested** —
+  OpenAI and Anthropic treat the harness as the umbrella containing context management, while HumanLayer
+  treats it as a subset of context engineering — so this cluster **names the term and cites the
+  disagreement without adopting a side, and renames nothing**. Full treatment in the
+  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Needs Verification]`: confirm
+  dates and attributions at authoring; treat the vocabulary as volatile.
 
 ## Worked examples
 
 Colocated under `agent-tools-and-mcp/learning/code/`. Tools + MCP servers/clients in Python, wired to
 the `the-agent-loop`; a fake model keeps tests deterministic. Contiguous
-`ex-01..ex-50`. Every example cites the `co-NN` it exercises.
+`ex-01..ex-54`. Every example cites the `co-NN` it exercises.
 
-> **Volume-target floor**: this syllabus lists **50** of the required **≥75** (the 75–85 By-Example/
+> **Volume-target floor**: this syllabus lists **54** of the required **≥75** (the 75–85 By-Example/
 > Primer band, floor not cap — see
 > [prd.md §Volume-target bands](../../prd.md#new-course--capstone-specifications)).
-> The maker adds **≥25** more `ex-NN` entries at authoring time, continuing the numbering and pattern
+> The maker adds **≥21** more `ex-NN` entries at authoring time, continuing the numbering and pattern
 > taxonomy below, before this topic passes its by-example quality gate.
 
 ### Beginner (ex 01–16)
@@ -200,7 +237,7 @@ the `the-agent-loop`; a fake model keeps tests deterministic. Contiguous
 18. **ex-34 · mcp-inspector-check** — inspect a server's advertised capabilities with a tooling client —
     verify tools/resources/prompts are listed. (co-09, co-17)
 
-### Advanced (ex 35–50)
+### Advanced (ex 35–54)
 
 1. **ex-35 · browser-mcp-server** — wrap the [CDP browser service](./browser-automation-with-cdp.md)
    as an MCP server exposing navigate/evaluate/screenshot tools — verify a client drives the browser via
@@ -233,9 +270,22 @@ the `the-agent-loop`; a fake model keeps tests deterministic. Contiguous
     verify portability. (co-08, co-16)
 15. **ex-49 · end-to-end-mcp-agent** — an agent using multiple MCP servers to complete a multi-tool task
     with validation + error handling — verify the goal. (co-16, co-18, co-21)
-16. **ex-50 · capstone-tool-provider** — a complete MCP server (tools + resources + prompts, validated,
-    versioned, bounded) plus a client-integrated agent that uses it — verify the agent completes a task
-    entirely through the server. (co-01–co-22)
+16. **ex-50 · tool-count-degradation-curve** — run the same task suite with 5, 19, and 46 tools
+    advertised — verify selection accuracy declines as the count rises, and that the decline is measured
+    on the learner's own suite rather than quoted from a benchmark. (co-23, co-07)
+17. **ex-51 · filter-tools-per-turn** — advertise only the tools plausibly relevant to the current turn
+    instead of the whole registry — verify selection accuracy recovers at the same total capability.
+    (co-23, co-17)
+18. **ex-52 · split-tool-surface-across-subagents** — partition a large tool surface across two
+    specialized agents rather than exposing all of it to one — verify each agent's smaller surface
+    outperforms the combined one. (co-23, co-21)
+19. **ex-53 · trim-a-tool-result** — return only the fields the model needs instead of the service's full
+    response payload — verify identical task success at materially fewer context tokens, and that the
+    saving recurs on every subsequent turn. (co-24, co-06)
+20. **ex-54 · capstone-tool-provider** — a complete MCP server (tools + resources + prompts, validated,
+    versioned, bounded, token-efficient results, and a per-turn-filtered advertised surface) plus a
+    client-integrated agent that uses it — verify the agent completes a task entirely through the server.
+    (co-01–co-24)
 
 ## Capstone spec — intra-topic (subject → full runnable)
 
@@ -246,7 +296,8 @@ the `the-agent-loop`; a fake model keeps tests deterministic. Contiguous
 - **Concepts exercised**: [ ] tool schema + description design (co-01–co-04, co-07) [ ] function-calling
   contract + result shape (co-05, co-06) [ ] MCP server: tools + resources + prompts (co-09–co-14)
   [ ] MCP client + discovery + loop integration (co-15–co-17) [ ] boundary validation + security (co-18,
-  co-19) [ ] service-as-MCP (co-22).
+  co-19) [ ] service-as-MCP (co-22) [ ] a tool surface sized against measured selection degradation
+  (co-23) [ ] token-efficient tool results (co-24).
 - **Ordered steps**:
   1. `agent-tools-and-mcp/learning/capstone/server/` — an MCP server exposing 3+ validated tools + a
      resource + a prompt. Verify a test client lists + calls each capability.

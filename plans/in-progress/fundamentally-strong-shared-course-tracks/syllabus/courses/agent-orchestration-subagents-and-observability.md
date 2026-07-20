@@ -115,6 +115,14 @@ call, a hook, a trace span) clarifies. Caps the cluster built across
   test-suite discipline to stochastic systems, because you cannot improve what you cannot measure. This
   module caps the harness cluster (`the-agent-loop` through `agent-permissions-and-sandboxing`) and is the immediate prerequisite
   for the [build-your-own-coding-agent capstone](./capstone-build-your-own-coding-agent.md).
+- **What the industry calls this cluster**: from late 2025 this body of work — the loop, its tools, its
+  context, its guardrails, its observability — began to be called **harness engineering** (Anthropic
+  2025-11-26; OpenAI; Böckeler/Thoughtworks 2026-04-02). The term is **~5 months old and contested** —
+  OpenAI and Anthropic treat the harness as the umbrella containing context management, while HumanLayer
+  treats it as a subset of context engineering — so this cluster **names the term and cites the
+  disagreement without adopting a side, and renames nothing**. Full treatment in the
+  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Needs Verification]`: confirm
+  dates and attributions at authoring; treat the vocabulary as volatile.
 
 ## Worked examples
 

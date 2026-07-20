@@ -61,6 +61,44 @@ This capstone integrates the cluster's concepts; it introduces none of its own:
       (`agent-orchestration-subagents-and-observability`).
 - [ ] (Optional bonus) The `browser-automation-with-cdp` service exposed over MCP for web research.
 
+## Lineage & vocabulary — what the industry calls this, and whether it matters
+
+- **The name the industry converged on**: what this cluster builds — the loop, the tools, the context
+  management, the guardrails, the observability — began to be called **harness engineering** from late 2025. Anthropic used the framing on **2025-11-26**, OpenAI adopted it in its own agent material, and
+  Birgitta Böckeler's Thoughtworks write-up (**2026-04-02**) gave it wider currency. The only academic
+  definition of an **agent harness** (arXiv **2606.10106**) states four necessary conditions, and this
+  cluster satisfies all four. `[Needs Verification]`: confirm every date, attribution, and the arXiv
+  identifier against the primary source at authoring.
+- **The term is contested — teach the disagreement, do not resolve it**. At time of writing the term is
+  roughly five months old and named practitioners use it in **mutually contradictory** ways. OpenAI and
+  Anthropic treat the **harness as the umbrella**, with context management as one component inside it.
+  HumanLayer inverts the containment, treating the **harness as a subset of context engineering**. These
+  are not compatible readings, and no authority has settled it. This course therefore **names the term
+  and cites the disagreement** rather than adopting a side, and **nothing in this cluster is renamed
+  after it** — building durable course structure on five-month-old contested vocabulary ages badly, and
+  the material is stable in a way the vocabulary demonstrably is not. Note the adjacent precedent: the
+  same cluster's context-management course records "prompt engineering" giving way to "context
+  engineering" within 2025. The vocabulary in this field has already turned over once.
+- **Does harness quality even matter? The evidence is genuinely contested.** Having just built one, the
+  reader is well placed to weigh the dispute over whether it was worth building:
+  - **METR** (independent, no vendor stake, **2026-02-13**) compared Claude Code against a generic ReAct
+    scaffold and found Claude Code ahead in **50.7% of bootstrap samples** on Opus 4.5 — a coin flip.
+    Codex beat Triframe in **14.5%** of samples.
+  - **Scale AI / SWE-bench Pro** reports **large scaffold-driven swings**, with native scaffolds
+    exploring substantially more than generic ones.
+  - **A reconciliation — labelled as a synthesis, not a finding.** One way to hold both results together
+    is that METR compared against a **competently built** generic baseline while Scale compared against
+    **naive** ones, implying harness quality matters enormously **below a competence floor** and then
+    flattens. **No single source makes this claim** — it is an inference across two bodies of evidence,
+    and it is presented here as a synthesis the reader should interrogate, not as a result to memorize.
+  - `[Needs Verification]`: re-verify both studies, their dates, the specific percentages, and the model
+    versions evaluated at authoring. Benchmark results are revised and superseded.
+  - **Do NOT cite the widely circulated 42%→78% scaffold claim.** It traces to no primary source.
+- **Why this is durable content**: the vocabulary may turn over again and the benchmark numbers will be
+  superseded, but the skill being taught here — weighing contested, vendor-interested evidence about a
+  system you have just built yourself — survives both. That is the reason this section exists in a
+  capstone rather than in a reading list.
+
 ## Ordered steps
 
 1. `capstone-build-your-own-coding-agent/code/core/` — the provider-adapter loop (with a fake for tests)
@@ -78,6 +116,13 @@ This capstone integrates the cluster's concepts; it introduces none of its own:
 6. (Optional bonus) Expose the `browser-automation-with-cdp` service as an MCP server and let the agent
    research a docs page before implementing. Verify the agent completes a task that required web
    research, driven over MCP.
+7. **Weigh the evidence on your own build.** Benchmark the finished agent against a deliberately generic
+   ReAct-style scaffold on the same task set, then write a short assessment reconciling your own result
+   with the METR and Scale AI findings in the Lineage section above. Verify the write-up states which of
+   the two your measurement resembles, identifies whether your generic baseline was competently or naively
+   built (the variable the synthesis turns on), and distinguishes what your measurement can support from
+   what it cannot — including whether it can distinguish the competence-floor synthesis from the
+   alternative that harness quality simply matters less than assumed.
 
 ## Acceptance criteria
 
@@ -89,6 +134,12 @@ This capstone integrates the cluster's concepts; it introduces none of its own:
   additionally has the agent research the web over the browser MCP server before implementing. The
   deterministic test suite passes with no live model calls; no secret is ever committed or placed in the
   model's context.
+- The reader additionally produces a written assessment of the contested evidence on whether harness
+  quality matters, benchmarked against their own generic-scaffold baseline. It must name the
+  competence-floor reconciliation **as a synthesis rather than as a finding any single source reports**,
+  state the limits of the reader's own measurement, and cite neither the 42%→78% scaffold claim nor any
+  harness-engineering definition as settled — the term's containment relationship is recorded as
+  disputed, not resolved.
 
 ## Done bar
 

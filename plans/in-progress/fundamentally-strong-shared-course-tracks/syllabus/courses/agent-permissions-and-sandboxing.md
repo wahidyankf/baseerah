@@ -92,6 +92,18 @@ draws on `security-essentials` forward-referenced from Phase 1 fundamentals.
     capability mid-session.
 22. **co-22 · failure-safe-defaults** — when a permission decision is ambiguous, default to deny/ask, not
     allow.
+23. **co-23 · train-vs-production-permission-asymmetry** — a **training or exploration** harness and a
+    **production** harness should have deliberately different permission postures. Exploration is
+    permissive: a wide action space is the point, because the agent must be able to discover what works,
+    and over-constraining it produces an agent that never learns the capability. Production is
+    restrictive: the action space is narrowed to what the deployed task provably needs. The distinction
+    is grounded in **risk, not model capability** — the exploration harness runs against disposable
+    state under observation, while the production harness runs against real systems, real data, and real
+    users. That is why the asymmetry is **durable as models improve**: a more capable model does not make
+    an irreversible production action less consequential, so a capability argument for collapsing the two
+    postures is a category error. The failure mode this concept exists to prevent is shipping the
+    exploration harness's permission set to production because "it worked in testing" — the permissions
+    are a property of the deployment context, not of the agent.
 
 ## Tensions & trade-offs — when NOT to reach for this
 
@@ -113,17 +125,27 @@ draws on `security-essentials` forward-referenced from Phase 1 fundamentals.
   This is the safety layer that makes the [agent loop](./the-agent-loop.md) and its
   [tools](./agent-tools-and-mcp.md) deployable, and it is the security discipline the
   [pentest-engine capstone](./capstone-build-your-own-pentest-engine.md) must itself embody.
+- **What the industry calls this cluster**: from late 2025 this body of work — the loop, its tools, its
+  context, its guardrails, its observability — began to be called **harness engineering** (Anthropic
+  2025-11-26; OpenAI; Böckeler/Thoughtworks 2026-04-02). The term is **~5 months old and contested** —
+  OpenAI and Anthropic treat the harness as the umbrella containing context management, while HumanLayer
+  treats it as a subset of context engineering — so this cluster **names the term and cites the
+  disagreement without adopting a side, and renames nothing**. Full treatment in the
+  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Needs Verification]`: confirm
+  dates and attributions at authoring; treat the vocabulary as volatile. Note that co-23's
+  train-versus-production asymmetry is durable **precisely because** it rests on risk rather than on any
+  of this vocabulary.
 
 ## Worked examples
 
 Colocated under `agent-permissions-and-sandboxing/learning/code/`. Each constrains a tool-equipped agent
-and proves the constraint holds against a hostile case. Contiguous `ex-01..ex-48`. Every example cites
+and proves the constraint holds against a hostile case. Contiguous `ex-01..ex-52`. Every example cites
 the `co-NN` it exercises.
 
-> **Volume-target floor**: this syllabus lists **48** of the required **≥75** (the 75–85 By-Example/
+> **Volume-target floor**: this syllabus lists **52** of the required **≥75** (the 75–85 By-Example/
 > Primer band, floor not cap — see
 > [prd.md §Volume-target bands](../../prd.md#new-course--capstone-specifications)).
-> The maker adds **≥27** more `ex-NN` entries at authoring time, continuing the numbering and pattern
+> The maker adds **≥23** more `ex-NN` entries at authoring time, continuing the numbering and pattern
 > taxonomy below, before this topic passes its by-example quality gate.
 
 ### Beginner (ex 01–16)
@@ -197,7 +219,7 @@ the `co-NN` it exercises.
 18. **ex-34 · policy-driven-permissions** — a declarative permission policy file — verify swapping
     policies changes what is allowed. (co-03, co-05, co-06)
 
-### Advanced (ex 35–48)
+### Advanced (ex 35–52)
 
 1. **ex-35 · fully-sandboxed-coding-agent** — the [coding agent](./the-agent-loop.md) running with
    all tools sandboxed + gated — verify it completes a task without host access. (co-05, co-10–co-14)
@@ -225,9 +247,23 @@ the `co-NN` it exercises.
     it still completes its task. (co-20, co-05)
 13. **ex-47 · injection-guardrail-suite** — a test suite of injection payloads against the guardrails —
     verify all are blocked. (co-16, co-17)
-14. **ex-48 · capstone-guarded-agent** — a coding agent with deny/ask/allow permissions, sandboxed +
-    egress-controlled execution, injection defenses, secret hygiene, and a full audit log — verify it
-    completes a task while every guardrail provably holds against a red-team pass. (co-01–co-22)
+14. **ex-48 · two-permission-profiles-one-agent** — the same agent run under an exploration profile and a
+    production profile — verify the exploration profile permits actions the production profile denies,
+    and that the agent code is identical between them. (co-23, co-03)
+15. **ex-49 · exploration-profile-shipped-to-production** — deploy the permissive profile to a
+    production-shaped target — verify the specific irreversible action it permits that the production
+    profile would have gated. (co-23, co-15)
+16. **ex-50 · risk-not-capability** — argue the asymmetry from blast radius rather than from model
+    ability, then re-run with a more capable model — verify the production constraint is still justified
+    and that the capability argument does not survive contact with an irreversible action. (co-23, co-01)
+17. **ex-51 · profile-promotion-checklist** — a written gate an exploration profile must pass to become a
+    production profile, action by action — verify every permitted action has a stated justification and a
+    named blast radius. (co-23, co-20, co-21)
+18. **ex-52 · capstone-guarded-agent** — a coding agent with deny/ask/allow permissions, sandboxed +
+    egress-controlled execution, injection defenses, secret hygiene, a full audit log, and separate
+    exploration and production permission profiles — verify it completes a task while every guardrail
+    provably holds against a red-team pass, and that the production profile denies actions the
+    exploration profile allows. (co-01–co-23)
 
 ## Capstone spec — intra-topic (subject → full runnable)
 
@@ -238,7 +274,8 @@ the `co-NN` it exercises.
 - **Concepts exercised**: [ ] deny/ask/allow + harness-enforced (co-03, co-04) [ ] tool scoping +
   allow-lists (co-05, co-06) [ ] plan/act + dry-run + human gate (co-07–co-09) [ ] sandbox + filesystem +
   egress + resource limits (co-10–co-14) [ ] injection defense (co-16, co-17) [ ] secret hygiene + audit
-  (co-18, co-19) [ ] least privilege + failsafe defaults (co-20, co-22).
+  (co-18, co-19) [ ] least privilege + failsafe defaults (co-20, co-22) [ ] separate exploration and
+  production permission profiles justified by risk (co-23).
 - **Ordered steps**:
   1. `agent-permissions-and-sandboxing/learning/capstone/code/` — a deny/ask/allow permission layer over
      the agent's tools with an audit log. Verify a denied tool is blocked and logged.

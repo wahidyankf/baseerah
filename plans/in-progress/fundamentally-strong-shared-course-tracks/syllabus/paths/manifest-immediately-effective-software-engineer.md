@@ -20,8 +20,11 @@ A **build-first spine** followed by a **Deepening band**. The spine gets a build
 - **Deepening band** (deferred, not in the early spine): CS fundamentals & DS&A, concurrency/systems/JVM breadth, data depth, architecture/distributed/internals, scale/ops, mobile/desktop, AI & harness, security, and quality/product — plus an optional interview tail.
 - **Genuinely omitted** (curriculum judgment — present only in `fundamentally-strong`): `lisp`, `windows-os`. Neither is a prerequisite of any included course, so the manifest stays prerequisite-closed.
 - **Created**: none — pure manifest reuse over the library. **Prerequisite-consistent** (machine-verified).
-- **Composition total**: **119 of 121** courses (114 + the 7 DD-20 inter-topic capstones, minus the 2
-  genuinely-omitted above = 121 − 2 = 119).
+- **Composition total**: **119 of the 121 software-engineer-role courses** (114 + the 7 DD-20 inter-topic
+  capstones, minus the 2 genuinely-omitted above = 121 − 2 = 119). This denominator is the
+  **software-engineer-role baseline**, not the **127-course library** total: the six AI-engineer-role
+  courses this plan added are outside this path's scope and compose only the fourth,
+  `immediately-effective/software-engineer-to-ai-engineer` path (per-role convergence, D2).
 - **DD-20 addendum (2026-07-19)**: the seven DD-20 inter-topic capstones are all included (none is
   genuinely omitted), placed at their earliest prerequisite-safe position in the Deepening band —
   `capstone-concurrency-showdown` (end of "Deepening band · Concurrency & language breadth"),
@@ -31,6 +34,19 @@ A **build-first spine** followed by a **Deepening band**. The spine gets a build
   Security suite", right after `defensive-security`), and `capstone-lead-at-altitude` (the end of
   "Deepening band · Quality, product, delivery & leadership", right before the optional interview
   tail). See [tech-docs DD-20](../../tech-docs.md#design-decisions).
+
+> **Surgery forward-reference ([surgery.md §S1](../courses/surgery.md#s1--extract-evals-into-a-single-owner))**:
+> [`creating-ai-powered-apps`](../courses/creating-ai-powered-apps.md),
+> [`agentic-ai`](../courses/agentic-ai.md), and
+> [`agent-orchestration-subagents-and-observability`](../courses/agent-orchestration-subagents-and-observability.md)
+> — all carried in the "Deepening band · AI & harness engineering" section below — are the three eval
+> donors S1 trims. Once S1 lands, their scattered evaluation material is extracted into the two new eval
+> courses ([`evaluating-ai-output-essentials`](../courses/evaluating-ai-output-essentials.md),
+> [`evaluating-ai-systems-in-depth`](../courses/evaluating-ai-systems-in-depth.md)), which this
+> software-engineer-role path does **not** compose (per-role scoping, D2). The **composition count is
+> unchanged by S1** — the donors stay in this manifest; no course is added or removed — but this path
+> then ships **without dedicated eval-depth coverage**, the accepted, documented consequence recorded in
+> S1's blast-radius table. Re-verify prerequisite consistency here after S1 executes.
 
 ## Stage 1 · Editor & tooling (get set up fast)
 

@@ -44,6 +44,13 @@ history is the raw context) and draws on `creating-ai-powered-apps` (embeddings/
 - 2026-07-18 — `[Needs Verification]`: the chosen embedding model + vector store versions and APIs — pin
   at authoring; the "lost-in-the-middle" degradation is a documented, evolving research finding — cite
   the source read at authoring.
+- 2026-07-20 — **co-23 durability split**. The **principle** is durable spine: order context
+  stable-before-variable so a reusable prefix survives across calls. The **mechanism** is volatile and
+  belongs only in this note — providers differ, and at time of writing Anthropic uses **explicit cache
+  breakpoints** the caller places, while OpenAI applies an **automatic threshold reported as 1,024
+  tokens**. `[Needs Verification]`: both mechanisms, the threshold figure, and any discount or TTL
+  numbers are vendor-specific and change — re-verify against primary provider documentation at
+  authoring, and never state co-23 in terms of one vendor's mechanism.
 
 ## Concepts
 
@@ -89,6 +96,12 @@ history is the raw context) and draws on `creating-ai-powered-apps` (embeddings/
     an economic decision, not only a quality one.
 22. **co-22 · privacy-and-memory** — persisted memory can hold sensitive data; what is stored must
     respect privacy and the no-secrets rule.
+23. **co-23 · cache-aware-prefix-ordering** — order context by **staleness, not by logical grouping**:
+    put the parts that rarely change first and the parts that change every turn last, so the stable
+    prefix stays reusable across calls. The principle is stable-before-variable and is
+    provider-independent; only the mechanism that exploits it differs (see the accuracy note). Logical
+    grouping — "all the tool definitions here, all the user context there" — feels tidier and destroys
+    the reusable prefix by interleaving volatile content into stable regions.
 
 ## Tensions & trade-offs — when NOT to reach for this
 
@@ -112,13 +125,33 @@ history is the raw context) and draws on `creating-ai-powered-apps` (embeddings/
   `search-and-information-retrieval` and `creating-ai-powered-apps`. It feeds
   `agent-orchestration-subagents-and-observability`, where subagents are a
   context-isolation strategy.
+- **What the industry calls this**: in **June 2025** this discipline acquired a name — **context
+  engineering** — as practitioners converged on the observation that curating what the model sees had
+  become the dominant lever, displacing "prompt engineering" as the framing. Tobi Lütke used the term on
+  **2025-06-19**, Andrej Karpathy on **2025-06-25**, and Simon Willison wrote it up on **2025-06-27**;
+  Anthropic published an **Effective Context Engineering** methodology on **2025-09-29**. The course you
+  are reading teaches that discipline concept-for-concept and predates the label — the material did not
+  change when the vocabulary did, which is exactly why the spine is organized around budgeting,
+  compaction, retrieval, and memory rather than around a term. The name is given here so a learner can
+  connect this material to the job-market vocabulary they will meet.
+  `[Needs Verification]`: confirm each date and attribution against the primary source at authoring, and
+  treat the vocabulary itself as volatile — it shifted once within 2025 and may shift again.
+- **And what the industry calls the surrounding cluster**: from late 2025 the wider body of work — the
+  loop, its tools, this course's context management, the guardrails, the observability — began to be
+  called **harness engineering** (Anthropic 2025-11-26; OpenAI; Böckeler/Thoughtworks 2026-04-02). That
+  term is **~5 months old and contested**, and the disagreement bears directly on this course: OpenAI and
+  Anthropic treat the harness as the **umbrella containing** context management, while HumanLayer treats
+  the harness as a **subset of** context engineering — an inverted containment relationship that no
+  authority has settled. This cluster therefore **names both terms and cites the disagreement without
+  adopting a side, and renames nothing**. Full treatment in the
+  [coding-agent capstone](./capstone-build-your-own-coding-agent.md).
 
 ## Worked examples
 
 No fixed Beginner/Intermediate/Advanced bands (Annotated-concept); grouped by theme. Code where it
 clarifies (token counting, retrieval, compaction), diagrams where architecture is the point. Colocated
 under `agent-context-and-memory/learning/code/` (runnable) and `.../artifacts/` (diagrams). Contiguous
-`ex-01..ex-46`. Every example cites the `co-NN` it exercises.
+`ex-01..ex-48`. Every example cites the `co-NN` it exercises.
 
 ### Theme A · The context budget (ex 01–12)
 
@@ -194,7 +227,7 @@ under `agent-context-and-memory/learning/code/` (runnable) and `.../artifacts/` 
 12. **ex-34 · retrieval-architecture-diagram** — a Mermaid diagram of the RAG pipeline (chunk → embed →
     store → retrieve → rerank → context) — verify each stage. (co-09, co-12, co-13)
 
-### Theme D · Memory: short-term & long-term (ex 35–46)
+### Theme D · Memory: short-term & long-term, and cache-aware assembly (ex 35–48)
 
 1. **ex-35 · short-term-scratchpad** — an explicit scratchpad the agent writes intermediate notes to —
    verify it persists within a session. (co-14, co-19)
@@ -218,9 +251,18 @@ under `agent-context-and-memory/learning/code/` (runnable) and `.../artifacts/` 
     - rolling history, budgeted — verify it always fits + is relevant. (co-20, co-03)
 11. **ex-45 · memory-audit** — audit what an agent has stored for staleness + privacy — verify the audit
     report. (co-18, co-22)
-12. **ex-46 · capstone-context-managed-agent** — an agent with budgeting, compaction, retrieval, and
+12. **ex-46 · order-by-staleness-not-grouping** — reorder a logically-grouped context into
+    stable-before-variable order (system + tools + retrieved corpus first, recent turns + live tool
+    results last) — verify the reusable prefix is longer and byte-identical across consecutive turns.
+    (co-23, co-20)
+13. **ex-47 · one-volatile-field-destroys-the-prefix** — inject a timestamp near the top of an otherwise
+    stable prefix, then move it to the tail — verify the prefix reuse collapses and is restored, and
+    annotate the provider-mechanism difference from the accuracy note without depending on either.
+    (co-23, co-21)
+14. **ex-48 · capstone-context-managed-agent** — an agent with budgeting, compaction, retrieval, and
     memory completing a long multi-session task — verify it stays within budget, retrieves relevant
-    knowledge, and recalls memory across sessions. (co-01–co-22)
+    knowledge, recalls memory across sessions, and assembles context in stable-before-variable order.
+    (co-01–co-23)
 
 ## Capstone spec — intra-topic (concept → full runnable)
 
@@ -231,7 +273,7 @@ under `agent-context-and-memory/learning/code/` (runnable) and `.../artifacts/` 
 - **Concepts exercised**: [ ] token budgeting + overflow guard (co-01, co-02) [ ] compaction + rolling
   window (co-06, co-08) [ ] retrieval + vector store + reranking (co-09–co-13) [ ] short-term + long-term
   memory + policies (co-14–co-17) [ ] staleness/conflict + privacy (co-18, co-22) [ ] budgeted assembly
-  pipeline (co-20).
+  pipeline (co-20) [ ] cache-aware stable-before-variable ordering (co-23).
 - **Ordered steps**:
   1. `agent-context-and-memory/learning/capstone/code/` — a token-budgeted context assembler with an
      overflow guard. Verify it never exceeds the window.
@@ -241,9 +283,13 @@ under `agent-context-and-memory/learning/code/` (runnable) and `.../artifacts/` 
      turn.
   4. Add short-term + long-term memory with write/retrieval policies + a privacy gate. Verify recall
      across a session boundary and that a secret is never persisted.
+  5. Order the assembled context stable-before-variable so the prefix is reusable across turns. Verify
+     the prefix is byte-identical between consecutive turns and that moving one volatile field into it
+     measurably shortens the reusable region.
 - **Acceptance criteria**: the agent completes a long, multi-session task; context always fits the
   budget; compaction preserves decisions; retrieval surfaces relevant knowledge; memory recalls across
-  sessions; no secret/PII is persisted.
+  sessions; no secret/PII is persisted; and context is assembled staleness-ordered so a reusable prefix
+  survives across consecutive turns.
 - **Done bar**: runnable end-to-end + web-verified.
 
 ## Read more

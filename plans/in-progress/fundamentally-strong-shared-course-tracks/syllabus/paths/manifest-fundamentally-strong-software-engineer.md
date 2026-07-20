@@ -14,7 +14,7 @@ Path landing served at `/en/c/learn/paths/fundamentally-strong/software-engineer
 
 ## Composition (curated + converge, LOCKED 2026-07-19)
 
-This is the **complete-mastery** path — it includes **all 121** courses in a **theory-first** ordering, and it is the only path that omits nothing. Its distinctive move is to front-load **CS theory and fundamentals** (foundations, architecture, paradigms, DS&A, OO design) before any application/product work — the university sequence. The two curated paths (`interview-ready`, `immediately-effective`) reach the same deep endpoint through a smaller spine plus an optional tail / deepening band; this path teaches the whole library in one arc.
+This is the **complete-mastery** path for the software-engineer role — it includes **all 121 software-engineer-role courses** in a **theory-first** ordering, and it is the only software-engineer-role path that omits none of them. It no longer "includes all library courses": the six **AI-engineer-role** courses this plan added (the eval split `evaluating-ai-output-essentials` / `evaluating-ai-systems-in-depth`, plus `statistics-for-evaluation`, `product-patterns-for-probabilistic-systems`, `inference-serving-and-model-deployment`, and `fine-tuning-and-adaptation`) are outside this path's role scope and compose only the fourth, `immediately-effective/software-engineer-to-ai-engineer` path — paths converge **per role, not globally** (D2). Its distinctive move is to front-load **CS theory and fundamentals** (foundations, architecture, paradigms, DS&A, OO design) before any application/product work — the university sequence. The two curated software-engineer paths (`interview-ready`, `immediately-effective`) reach the same deep endpoint through a smaller spine plus an optional tail / deepening band; this path teaches the whole software-engineer-role library in one arc.
 
 - **Created**: none — a pure manifest ordering over the shared library. **Zero new bodies.**
 - **Prerequisite-consistent**: a valid topological entry into the library's prerequisite DAG. Every course appears after all of its prerequisites (verified). `just-enough-c` is taught in Stage 1 so `computer-architecture` never forward-references C; the minimal web slice in Stage 5 (`backend-essentials`, `sql-essentials`, `api-design`) precedes the data-depth and architecture courses that declare it as a prerequisite.
@@ -25,6 +25,20 @@ This is the **complete-mastery** path — it includes **all 121** courses in a *
   `capstone-secure-service` / `capstone-data-pipeline` (Stage 13, right after `defensive-security`),
   and `capstone-lead-at-altitude` (end of Stage 14, the manifest's whole-journey close). See
   [tech-docs DD-20](../../tech-docs.md#design-decisions).
+
+> **Surgery forward-reference ([surgery.md §S1](../courses/surgery.md#s1--extract-evals-into-a-single-owner))**:
+> [`creating-ai-powered-apps`](../courses/creating-ai-powered-apps.md),
+> [`agentic-ai`](../courses/agentic-ai.md), and
+> [`agent-orchestration-subagents-and-observability`](../courses/agent-orchestration-subagents-and-observability.md)
+> — all carried in "Stage 12 · AI & harness engineering" below — are the three eval donors S1 trims. Once
+> S1 lands, their scattered evaluation material is extracted into the two new eval courses
+> ([`evaluating-ai-output-essentials`](../courses/evaluating-ai-output-essentials.md),
+> [`evaluating-ai-systems-in-depth`](../courses/evaluating-ai-systems-in-depth.md)), which this
+> software-engineer-role path does **not** compose (per-role scoping, D2). The **composition count is
+> unchanged by S1** — the donors stay in this manifest; no course is added or removed — but this path
+> then ships **without dedicated eval-depth coverage**, the accepted, documented consequence recorded in
+> S1's blast-radius table (S1 flags a fundamentals-first path losing measurement rigor as the worst of
+> the three). Re-verify prerequisite consistency here after S1 executes.
 
 ## Prologue · Editor & reproducible forge (skippable)
 
