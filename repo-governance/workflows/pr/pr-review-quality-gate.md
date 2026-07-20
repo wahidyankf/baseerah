@@ -180,7 +180,7 @@ line nor resolve a thread.
   (`CRITICAL` / `HIGH`), never by the review's STATE field. Consumers MUST parse severity from
   comment text. This limitation disappears only when a dedicated bot/GitHub App identity is
   provisioned — see
-  [`plans/backlog/2026-07-20__pr-review-bot-identity/`](../../../plans/backlog/2026-07-20__pr-review-bot-identity/README.md).
+  [`plans/backlog/pr-review-bot-identity/`](../../../plans/backlog/pr-review-bot-identity/README.md).
 - **List unresolved threads**: a `gh api graphql` query using `reviewThreads(isResolved: false)` — the
   fixer never relies on top-level PR comments for state, only on review-thread resolution status.
   Each thread's comment `databaseId` maps to the REST `comment_id` used when replying.

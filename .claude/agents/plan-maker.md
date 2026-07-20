@@ -101,15 +101,15 @@ All open questions should already be resolved by the Step 1 grill — do not re-
 
 ### Step 3: Create Plan Folder
 
-New plans start in `backlog/` with a creation-date prefix, then move to `in-progress/` WITHOUT
-the date prefix when work begins.
+New plans start in `backlog/` WITHOUT a date prefix, then move to `in-progress/` (also no
+date prefix) when work begins.
 
 ```bash
-# Create plan folder in backlog (creation date prefix)
-mkdir -p plans/backlog/YYYY-MM-DD__project-identifier
+# Create plan folder in backlog (no date prefix)
+mkdir -p plans/backlog/project-identifier
 
-# When starting work: move to in-progress and strip the date prefix
-git mv plans/backlog/YYYY-MM-DD__project-identifier plans/in-progress/project-identifier
+# When starting work: move to in-progress (pure move — no date prefix on either)
+git mv plans/backlog/project-identifier plans/in-progress/project-identifier
 ```
 
 ### Step 4: Write Requirements (BRD + PRD)
@@ -570,7 +570,7 @@ Every plan MUST declare its worktree path before the delivery checklist begins. 
 - **Multi-file plans**: top-level `## Worktree` section in `delivery.md`, placed before any phase heading.
 - **Single-file plans**: top-level `## Worktree` section in `README.md`, placed before `## Delivery Checklist`.
 
-**Path format**: `worktrees/<plan-identifier>/` where `<plan-identifier>` is the slug portion of the folder name (strip the `YYYY-MM-DD__` prefix when present). Example: `backlog/2026-05-15__auth-rewrite/` or `in-progress/auth-rewrite/` → worktree path `worktrees/auth-rewrite/`.
+**Path format**: `worktrees/<plan-identifier>/` where `<plan-identifier>` is the slug portion of the folder name (strip the `YYYY-MM-DD__` prefix when present). Example: `done/2026-05-15__auth-rewrite/` or `in-progress/auth-rewrite/` → worktree path `worktrees/auth-rewrite/`.
 
 **Required content**: insert the verbatim `## Worktree` template (path declaration, optional
 `claude --worktree <plan-identifier>` pre-provisioning block, and the Step-0-gate note) from the

@@ -23,11 +23,15 @@ For detailed information on plans organization, structure, naming conventions, a
 
 ## Plan Folder Naming
 
+Stage-aware — see the [Plans Organization Convention](../repo-governance/conventions/structure/plans.md#plan-folder-naming):
+
 ```
-YYYY-MM-DD__[project-identifier]/
+backlog/[project-identifier]/            # no date prefix
+in-progress/[project-identifier]/        # no date prefix
+done/YYYY-MM-DD__[project-identifier]/   # completion-date prefix
 ```
 
-Examples: `2025-11-24__init-monorepo/`, `2025-12-01__auth-system/`
+Examples: `backlog/init-monorepo/`, `in-progress/auth-system/`, `done/2025-12-01__auth-system/`
 
 ## Related Documentation
 

@@ -285,10 +285,10 @@ Priority definitions:
 Table columns (use this exact structure):
 
 ```markdown
-| #   | Action                                                     | Owner      | Priority | Ticket                                          | Status |
-| --- | ---------------------------------------------------------- | ---------- | -------- | ----------------------------------------------- | ------ |
-| 1   | Add generated binding dirs to .prettierignore              | Maintainer | P0       | plans/backlog/2026-06-05\_\_prettierignore-fix/ | Open   |
-| 2   | Document generated-artifact exclusion pattern in AGENTS.md | Maintainer | P1       | —                                               | Open   |
+| #   | Action                                                     | Owner      | Priority | Ticket                            | Status |
+| --- | ---------------------------------------------------------- | ---------- | -------- | --------------------------------- | ------ |
+| 1   | Add generated binding dirs to .prettierignore              | Maintainer | P0       | plans/backlog/prettierignore-fix/ | Open   |
+| 2   | Document generated-artifact exclusion pattern in AGENTS.md | Maintainer | P1       | —                                 | Open   |
 ```
 
 `Ticket` must be a `plans/` folder reference or an issue id. Use `—` only if the item has not
@@ -393,11 +393,11 @@ WCAG AA hex codes: `#0173B2` (blue), `#DE8F05` (orange), `#029E73` (teal), `#CC7
 PASS — well-formed action item table:
 
 ```markdown
-| #   | Action                                                               | Owner      | Priority | Ticket                                          | Status |
-| --- | -------------------------------------------------------------------- | ---------- | -------- | ----------------------------------------------- | ------ |
-| 1   | Add generated binding dirs to .prettierignore                        | Maintainer | P0       | plans/backlog/2026-06-05\_\_prettierignore-fix/ | Open   |
-| 2   | Add parity-guard smoke test to pre-push hook for .amazonq/ artifacts | Maintainer | P1       | —                                               | Open   |
-| 3   | Evaluate rhino-cli emit-bindings idempotency on re-run               | Maintainer | P2       | —                                               | Open   |
+| #   | Action                                                               | Owner      | Priority | Ticket                            | Status |
+| --- | -------------------------------------------------------------------- | ---------- | -------- | --------------------------------- | ------ |
+| 1   | Add generated binding dirs to .prettierignore                        | Maintainer | P0       | plans/backlog/prettierignore-fix/ | Open   |
+| 2   | Add parity-guard smoke test to pre-push hook for .amazonq/ artifacts | Maintainer | P1       | —                                 | Open   |
+| 3   | Evaluate rhino-cli emit-bindings idempotency on re-run               | Maintainer | P2       | —                                 | Open   |
 ```
 
 FAIL — action item anti-patterns:

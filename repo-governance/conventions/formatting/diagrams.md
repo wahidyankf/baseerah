@@ -552,7 +552,7 @@ Two consequences bind any author or checker working on state diagrams:
    would block on a defect it cannot actually detect, across a corpus this large.
 
 A candidate `rhino-cli` WARN-level rule is tracked at
-[`plans/backlog/2026-07-20__mermaid-state-label-render-clipping-warn/`](../../../plans/backlog/2026-07-20__mermaid-state-label-render-clipping-warn/README.md).
+[`plans/backlog/mermaid-state-label-render-clipping-warn/`](../../../plans/backlog/mermaid-state-label-render-clipping-warn/README.md).
 
 ### Mermaid Best Practices
 

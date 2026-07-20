@@ -372,7 +372,7 @@ it before evaluating — never guess which plan to write into.
 This is the default when `output-mode` is omitted. (When the caller passes `plan-stage: in-progress`,
 write the folder under `plans/in-progress/<slug>/` with no date prefix instead of `plans/backlog/`.)
 
-Create `plans/backlog/<YYYY-MM-DD>__<slug>/` where the date is today (`Bash date +%F`) and `<slug>` is a
+Create `plans/backlog/<slug>/` where `<slug>` is a
 kebab-case identifier derived from the target + design goal (e.g.
 `organiclever-pricing-design-findings`). Follow the
 [Plans Organization Convention](../../repo-governance/conventions/structure/plans.md) and the

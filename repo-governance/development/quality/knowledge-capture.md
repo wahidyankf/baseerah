@@ -165,7 +165,7 @@ does not get to bypass them:
 - **[Test-Driven Development](../workflow/test-driven-development.md)**: Red → Green → Refactor
   governs the code change itself.
 
-Because these gates apply, a code-routed learning is filed as its own `plans/backlog/YYYY-MM-DD__<slug>/`
+Because these gates apply, a code-routed learning is filed as its own `plans/backlog/<slug>/`
 plan (which then carries its own specs/Gherkin, regression-test, and TDD obligations when executed) —
 never smuggled into the current governance/docs plan's PR.
 
@@ -185,7 +185,7 @@ Timing has a hard boundary determined by **destination**, not by convenience:
 - **Non-code homes** (`docs/`, `repo-governance/`, `.claude/agents/`, `.claude/skills/`,
   `post-mortems/`, and any other non-code home): a **small** edit MAY land **inline** in the current
   plan's own commit/PR. A learning implying **large new work** becomes a tracked
-  `plans/backlog/YYYY-MM-DD__<slug>/` follow-up plan instead. The `learnings.md` entry records which
+  `plans/backlog/<slug>/` follow-up plan instead. The `learnings.md` entry records which
   path was taken (and the backlog path, if filed).
 - **Code homes** (`apps/`, `libs/`, tests): per the code-routing downstream rule above, **always** a
   separate `plans/backlog/` plan — **never** inline, no exceptions besides the Iron Rule 3
@@ -353,7 +353,7 @@ INLINE, landed in commit `abc1234` of this plan.
   it is not — the system would not catch this without a code fix.
 
 **Routing**: `apps/rhino-cli` (code) — ALWAYS filed as backlog. Filed at
-`plans/backlog/2026-07-05__fix-doctor-silent-tool-failure/`. NOT landed inline in this plan's PR.
+`plans/backlog/fix-doctor-silent-tool-failure/`. NOT landed inline in this plan's PR.
 ```
 
 ### PASS: Learning discarded (fails the litmus)

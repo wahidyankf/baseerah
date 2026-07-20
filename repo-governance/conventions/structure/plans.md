@@ -30,18 +30,18 @@ This convention implements the following core principles:
 
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Flat structure with three clear states (backlog, in-progress, done). No complex nested hierarchies or status tracking systems.
 
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The stage-aware naming convention makes chronological order and lifecycle state explicit. `backlog/` uses a creation-date prefix; `in-progress/` uses no date (the plan is live, not yet stamped); `done/` uses a completion-date prefix. File location (backlog/, in-progress/, done/) indicates status — no hidden metadata or databases required.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The stage-aware naming convention makes lifecycle state explicit. `backlog/` and `in-progress/` use no date prefix; `done/` uses a completion-date prefix (added only at archival). File location (backlog/, in-progress/, done/) indicates status — no hidden metadata or databases required.
 
 ## Purpose
 
-This convention establishes the organizational structure for project planning documents in the `plans/` directory. It defines how to organize ideas, backlog, in-progress work, and completed projects using date-based folder naming and standardized lifecycle stages.
+This convention establishes the organizational structure for project planning documents in the `plans/` directory. It defines how to organize ideas, backlog, in-progress work, and completed projects using stage-aware folder naming and standardized lifecycle stages.
 
 ## Scope
 
 ### What This Convention Covers
 
 - **Plans directory structure** - ideas.md, backlog/, in-progress/, done/ organization
-- **Folder naming pattern** - stage-aware: date prefix in `backlog/` (creation date) and `done/` (completion date); no date prefix in `in-progress/`
+- **Folder naming pattern** - stage-aware: no date prefix in `backlog/` or `in-progress/`; completion-date prefix in `done/` only
 - **File organization** - What files belong in each folder
 - **Lifecycle stages** - How plans move from ideas → backlog → in-progress → done
 - **Project identifiers** - How to name projects consistently
@@ -135,7 +135,7 @@ Quick ideas and todos that haven't been formalized into plans yet.
 
 When an idea is ready for formal planning:
 
-1. Create a new plan folder in `backlog/` with `YYYY-MM-DD__[project-identifier]/` format
+1. Create a new plan folder in `backlog/` with `[project-identifier]/` format (no date prefix)
 2. Create the standard plan files (README.md or multi-file structure)
 3. Remove or check off the idea from `ideas.md`
 4. The idea now has a structured plan with requirements, technical docs, and delivery timeline
@@ -144,13 +144,13 @@ When an idea is ready for formal planning:
 
 Naming differs by lifecycle stage. Each stage has its own rule.
 
-### backlog/ — creation date prefix
+### backlog/ — NO date prefix
 
 ```
-YYYY-MM-DD__[project-identifier]/
+[project-identifier]/
 ```
 
-The date is the day the plan folder was created.
+Backlog plans carry no date prefix. A date is added only when the plan is archived to `done/`.
 
 ### in-progress/ — NO date prefix
 
@@ -159,7 +159,7 @@ The date is the day the plan folder was created.
 ```
 
 Active plans carry no date prefix at all. The date is added only when the plan is archived to
-`done/`. When moving a plan from `backlog/` to `in-progress/`, strip the date prefix.
+`done/`. Moving a plan from `backlog/` to `in-progress/` is a pure move — neither stage carries a date prefix, so no rename is needed.
 
 ### done/ — completion date prefix
 
@@ -172,8 +172,8 @@ archiving from `in-progress/`, add the completion date prefix.
 
 ### Naming Rules (all stages)
 
-- **Date Format**: ISO 8601 (`YYYY-MM-DD`)
-- **Separator**: Double underscore `__` separates date from identifier
+- **Date Format** (`done/` only): ISO 8601 (`YYYY-MM-DD`)
+- **Separator** (`done/` only): Double underscore `__` separates the completion date from the identifier
 - **Identifier**: Kebab-case (lowercase with hyphens)
 - **No Spaces**: Use hyphens instead of spaces
 - **No Special Characters**: Only alphanumeric and hyphens in identifier
@@ -182,9 +182,9 @@ archiving from `in-progress/`, add the completion date prefix.
 
 **Good (backlog/)**:
 
-- `backlog/2025-11-24__init-monorepo/`
-- `backlog/2025-12-01__auth-system/`
-- `backlog/2025-12-05__payment-integration/`
+- `backlog/init-monorepo/`
+- `backlog/auth-system/`
+- `backlog/payment-integration/`
 
 **Good (in-progress/)**:
 
@@ -199,6 +199,7 @@ archiving from `in-progress/`, add the completion date prefix.
 
 **Bad**:
 
+- `backlog/2026-01-15__auth-system/` (date prefix in backlog — WRONG)
 - `in-progress/2026-01-15__mobile-app-redesign/` (date prefix in in-progress — WRONG)
 - `2025-11-24_init-monorepo/` (single underscore)
 - `2025-11-24__Init Monorepo/` (capital letters, spaces)
@@ -522,9 +523,9 @@ Every plan MUST declare the worktree path in its content so the executor can ver
 
 **Worktree path format**: `worktrees/<plan-identifier>/` where `<plan-identifier>` is the slug portion of the folder name (strip the `YYYY-MM-DD__` prefix when present).
 
-- `backlog/2026-05-15__auth-rewrite/` → worktree path `worktrees/auth-rewrite/`
+- `backlog/auth-rewrite/` → worktree path `worktrees/auth-rewrite/` (no prefix to strip)
 - `in-progress/auth-rewrite/` → worktree path `worktrees/auth-rewrite/` (no prefix to strip)
-- `backlog/2026-03-01__add-user-search/` → worktree path `worktrees/add-user-search/`
+- `done/2026-03-01__add-user-search/` → worktree path `worktrees/add-user-search/` (strip the completion-date prefix)
 
 **Provisioning command** (optional manual pre-provisioning, run from repo root):
 
@@ -659,7 +660,7 @@ Plans differ from `docs/` in several important ways:
 
 1. **Start with an idea**: Capture quick idea in `ideas.md` (1-3 lines)
 2. **Formalize when ready**: Create plan folder in `backlog/` when idea is mature
-3. **Follow naming convention**: Use `YYYY-MM-DD__[project-identifier]/` format with the creation date
+3. **Follow naming convention**: Use `[project-identifier]/` format (no date prefix in `backlog/`)
 4. **Choose structure**: Default to the five-document multi-file layout (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery.md`). Collapse to single-file only when all four exception criteria in the Structure Decision section are met simultaneously.
 5. **Resolve design decisions via structured grilling**: Before writing plan content, resolve all
    open design decisions using the
@@ -673,7 +674,7 @@ Plans differ from `docs/` in several important ways:
 
 1. **Provision worktree** (optional — the plan-execution Step 0 gate auto-provisions from the latest `origin/main` when missing): Run `claude --worktree <plan-identifier>` from the repo root — this creates `worktrees/<plan-identifier>/` in the repo root (not `.claude/worktrees/`). See [Worktree Path Convention](./worktree-path.md).
 2. **Initialize toolchain**: In the root worktree, run `npm install && npm run doctor -- --fix`. See [Worktree Toolchain Initialization](../../development/workflow/worktree-setup.md).
-3. **Move and rename folder**: Move plan folder from `backlog/YYYY-MM-DD__[identifier]/` to `in-progress/[identifier]/` — strip the date prefix when moving to `in-progress/`.
+3. **Move folder**: Move plan folder from `backlog/[identifier]/` to `in-progress/[identifier]/` — a pure move; neither stage carries a date prefix.
 4. **Update index**: Update both `backlog/README.md` and `in-progress/README.md`
 5. **Git commit**: Commit the move with appropriate message
 6. **Begin execution**: Start implementing according to delivery checklist
@@ -798,7 +799,7 @@ For complete diagram standards, see [Diagram and Schema Convention](../formattin
 
 ## Relative Link Paths in Plan Files
 
-Plan files sit three directory levels deep from the repository root: `plans/` → `in-progress/` (or `backlog/` or `done/`) → `[identifier]/` (in-progress) or `YYYY-MM-DD__identifier/` (backlog and done). Any markdown file inside a plan folder must use `../../../` to reach root-level directories such as `repo-governance/`, `docs/`, `apps/`, or `libs/`.
+Plan files sit three directory levels deep from the repository root: `plans/` → `in-progress/` (or `backlog/` or `done/`) → `[identifier]/` (backlog and in-progress) or `YYYY-MM-DD__identifier/` (done). Any markdown file inside a plan folder must use `../../../` to reach root-level directories such as `repo-governance/`, `docs/`, `apps/`, or `libs/`.
 
 ### Correct Path Depth
 

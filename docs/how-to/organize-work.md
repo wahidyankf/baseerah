@@ -75,7 +75,7 @@ flowchart TD
 
 - **Lifecycle:** Temporary, moves between states, archived when done
 - **Structure:** Three states (backlog, in-progress, done) plus ideas.md for quick captures
-- **File Naming:** Folder names use `YYYY-MM-DD__[identifier]`
+- **File Naming:** Stage-aware — `backlog/` and `in-progress/` use `[identifier]`; `done/` uses `YYYY-MM-DD__[identifier]`
 - **Diagram Format:** ASCII art
 - **Audience:** Project team, stakeholders tracking progress
 
@@ -116,7 +116,7 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
 **Examples:**
 
 - "Quick idea: Add OAuth2 authentication" → `plans/ideas.md`
-- "I want to plan the monorepo migration" → `plans/backlog/2025-11-24__init-monorepo/`
+- "I want to plan the monorepo migration" → `plans/backlog/init-monorepo/`
 
 ### Use docs/ when you're
 
@@ -155,7 +155,7 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
    When the idea is ready for formal planning:
 
    ```
-   plans/backlog/2025-11-25__notification-system/
+   plans/backlog/notification-system/
    ├── README.md
    ├── brd.md
    ├── prd.md
@@ -170,13 +170,13 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
 3. **Move to in-progress/** (Execution Phase)
 
    ```
-   mv plans/backlog/2025-11-25__notification-system/ plans/in-progress/
+   mv plans/backlog/notification-system/ plans/in-progress/
    ```
 
 4. **Complete and archive**
 
    ```
-   mv plans/in-progress/2025-11-25__notification-system/ plans/done/
+   mv plans/in-progress/notification-system/ plans/done/
    ```
 
 ### Workflow 2: Brand Strategy Plan
@@ -188,7 +188,7 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
 1. **Create plan in plans/backlog/** (Planning Phase)
 
    ```
-   plans/backlog/2025-11-24__brand-strategy/
+   plans/backlog/brand-strategy/
    ├── README.md           # Overview of brand strategy
    ├── brd.md              # Brand goals, business impact, affected roles
    ├── prd.md              # Target audience personas, brand user stories, Gherkin acceptance criteria
@@ -202,7 +202,7 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
 2. **Move to in-progress/** (Execution Phase)
 
    ```
-   mv plans/backlog/2025-11-24__brand-strategy/ plans/in-progress/
+   mv plans/backlog/brand-strategy/ plans/in-progress/
    ```
 
    - Update README status to "In Progress"
@@ -235,7 +235,7 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
 1. **Plan in plans/backlog/**
 
    ```
-   plans/backlog/2025-11-25__auth-system/
+   plans/backlog/auth-system/
    ```
 
    - Create structured plan with requirements
@@ -245,7 +245,7 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
 2. **Execute (move to in-progress/)**
 
    ```
-   plans/in-progress/2025-11-25__auth-system/
+   plans/in-progress/auth-system/
    ```
 
    - Implement the feature
@@ -299,7 +299,7 @@ See [AGENTS.md Plans Organization](../../AGENTS.md#plans) for full details.
 
 **How:**
 
-1. Create new plan folder: `plans/backlog/YYYY-MM-DD__[project-name]/`
+1. Create new plan folder: `plans/backlog/[project-name]/`
 2. Structure ideas into `brd.md`, `prd.md`, `tech-docs.md`, `delivery.md` (multi-file default) or a single `README.md` (trivially small)
 3. Remove or check off the idea from `plans/ideas.md`
 
@@ -336,7 +336,7 @@ This project is complete. See the following documentation:
 | If you're doing...                         | Use folder...        | Example                                         |
 | ------------------------------------------ | -------------------- | ----------------------------------------------- |
 | Quick project ideas (1-3 liners)           | `plans/ideas.md`     | "Add OAuth2 authentication"                     |
-| Planning a feature                         | `plans/backlog/`     | `2025-11-24__auth-system/`                      |
+| Planning a feature                         | `plans/backlog/`     | `auth-system/`                                  |
 | Working on a project                       | `plans/in-progress/` | Move from backlog when starting                 |
 | Archiving completed project                | `plans/done/`        | Move from in-progress when done                 |
 | Writing a tutorial                         | `docs/tutorials/`    | `getting-started.md`                            |

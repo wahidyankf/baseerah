@@ -402,7 +402,7 @@ a second copy.
 - The governance change that supplied the evidence (the merge-default inversion) — it is evidence,
   not a target. This plan does not revisit it.
 - The sibling `plan-quality-gate` loop — treated by
-  [`plans/backlog/2026-07-20__plan-quality-gate-convergence/`](../2026-07-20__plan-quality-gate-convergence/README.md),
+  [`plans/backlog/plan-quality-gate-convergence/`](../plan-quality-gate-convergence/README.md),
   which shares this plan's shape. Coordination is DECISION 6.
 - The `repo-harness-compatibility-quality-gate` and `repo-workflow` gates — same shape, no evidence
   chain mined. DECISION 5.
@@ -973,4 +973,4 @@ deliberate non-exercise of a permitted opt-in, not an oversight, and a future re
 re-derive the gate from the convention's "opt-in is legitimate" clause without new evidence.
 
 This decision is recorded identically as DECISION 13 in the sibling plan
-([`plans/backlog/2026-07-20__plan-quality-gate-convergence/README.md`](../2026-07-20__plan-quality-gate-convergence/README.md)).
+([`plans/backlog/plan-quality-gate-convergence/README.md`](../plan-quality-gate-convergence/README.md)).

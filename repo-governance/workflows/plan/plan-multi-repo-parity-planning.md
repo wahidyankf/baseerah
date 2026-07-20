@@ -430,7 +430,7 @@ in each target repo per the
 **Stage-aware folder naming**:
 
 - `stage=in-progress` → `plans/in-progress/<objective-slug>/` (no date prefix)
-- `stage=backlog` → `plans/backlog/<YYYY-MM-DD>__<objective-slug>/` (creation-date prefix)
+- `stage=backlog` → `plans/backlog/<objective-slug>/` (no date prefix)
 
 **Agent**: `plan-maker` (invoked per repo via the Agent tool)
 
@@ -630,7 +630,7 @@ User: "Run plan-multi-repo-parity-planning for objective: align agent catalogs
        mode: worktree-to-origin-main stage: backlog"
 ```
 
-Creates three backlog plans at `plans/backlog/<YYYY-MM-DD>__align-agent-catalogs/`, gates
+Creates three backlog plans at `plans/backlog/align-agent-catalogs/`, gates
 each, and pushes each plan directly to its repo's `origin main` via worktrees instead of opening
 a PR. Useful when the invoker wants to skip the formal review step for low-risk plan documents.
 
@@ -705,8 +705,9 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
   `plan-multi-repo-parity-planning` — scope `plan`, qualifiers `multi-repo` + `parity`, type
   `planning` (surveys repo state, produces plans, never implements).
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: Five-document
-  multi-file layout; stage-aware folder naming (`backlog/` with `YYYY-MM-DD__` prefix,
-  `in-progress/` without); worktree specification in each plan's `delivery.md`.
+  multi-file layout; stage-aware folder naming (no date prefix in `backlog/` or
+  `in-progress/`; completion-date prefix in `done/` only); worktree specification in each plan's
+  `delivery.md`.
 - **[Worktree Path Convention](../../conventions/structure/worktree-path.md)**: Worktrees land
   at `worktrees/<objective-slug>/` in the repo root.
 - **[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)**:

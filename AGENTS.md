@@ -399,7 +399,7 @@ details. Staging branches: `stag-organiclever-app-web`, `stag-ose-app-web`.
 
 ## Plans
 
-`plans/` folder: `ideas.md` (1-3 liner ideas), `backlog/` (future; `YYYY-MM-DD__[id]/`),
+`plans/` folder: `ideas.md` (1-3 liner ideas), `backlog/` (future; `[id]/`),
 `in-progress/` (active; `[id]/`), `done/` (completed; `YYYY-MM-DD__[id]/`).
 
 **See**: [repo-governance/conventions/structure/plans.md](./repo-governance/conventions/structure/plans.md)

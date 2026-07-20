@@ -365,28 +365,28 @@ a reason**.
 
 ## Triage Summary
 
-| #   | Learning                                     | Terminal state        | Home                                                                                                            |
-| --- | -------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------- |
-| 1   | Enumeration-based guards fail open           | Routed inline         | `development/agents/anti-patterns.md` (AP-10)                                                                   |
-| 2   | Zero-result search is not evidence           | Routed inline         | `development/quality/plan-anti-hallucination.md` (AP-11)                                                        |
-| 3   | Completeness-diff finds what search cannot   | Routed inline         | same (AP-12)                                                                                                    |
-| 4   | "Threads resolved" ≠ "findings fixed"        | Routed inline         | `workflows/pr/pr-review-quality-gate.md` + `pr-review-fixer.md`                                                 |
-| 5   | `REQUEST_CHANGES` structurally unavailable   | Routed inline + filed | same + `pr-review-maker.md`; backlog `2026-07-20__pr-review-bot-identity`                                       |
-| 6   | Fixed cycle count is the wrong rule          | Routed inline         | `workflows/pr/pr-review-quality-gate.md`                                                                        |
-| 7   | Verification prompts must license a negative | Routed inline         | `development/agents/anti-patterns.md` (AP-11)                                                                   |
-| 8   | Source-correct, render-wrong                 | Routed inline + filed | `conventions/formatting/diagrams.md`; backlog `2026-07-20__mermaid-state-label-render-clipping-warn`            |
-| 9   | Size budget forced an unsafe trim            | Routed inline + filed | `conventions/structure/instruction-file-size-budget.md`; backlog `2026-07-20__agents-md-progressive-disclosure` |
-| A   | Index/README staleness                       | Routed inline         | `plan-anti-hallucination.md` §concept sweeps, rule 6                                                            |
-| B   | Silent checkbox no-op                        | Routed inline         | `workflows/plan/plan-execution.md` §Atomic Sync Ritual                                                          |
-| C   | Instruction-size warning trend               | Filed                 | backlog `2026-07-20__agents-md-progressive-disclosure`                                                          |
-| D   | A whole convention as stale surface          | Routed inline         | `plan-anti-hallucination.md` §concept sweeps, "hardest case"                                                    |
-| E   | Vendor-audit does not know "Kiro"            | Filed                 | backlog `2026-07-20__vendor-audit-kiro-term`                                                                    |
-| F   | Fixed-term-order regex blind spot            | Routed inline         | `plan-anti-hallucination.md` (AP-13)                                                                            |
-| G   | "Generative source" ≠ the rule               | Routed inline         | same, concept-sweep rule 5                                                                                      |
-| H   | Three regexes, three blind spots             | Routed inline         | same (AP-13)                                                                                                    |
-| I   | Round four — the paraphrase                  | Routed inline         | same, concept-sweep rule 6                                                                                      |
-| J   | Check the real invocation                    | Routed inline         | same (AP-14)                                                                                                    |
-| K   | Phase 0/4c/4c-ii sweeps, baseline SHAs       | Discarded             | execution artifacts — see below                                                                                 |
+| #   | Learning                                     | Terminal state        | Home                                                                                                |
+| --- | -------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------- |
+| 1   | Enumeration-based guards fail open           | Routed inline         | `development/agents/anti-patterns.md` (AP-10)                                                       |
+| 2   | Zero-result search is not evidence           | Routed inline         | `development/quality/plan-anti-hallucination.md` (AP-11)                                            |
+| 3   | Completeness-diff finds what search cannot   | Routed inline         | same (AP-12)                                                                                        |
+| 4   | "Threads resolved" ≠ "findings fixed"        | Routed inline         | `workflows/pr/pr-review-quality-gate.md` + `pr-review-fixer.md`                                     |
+| 5   | `REQUEST_CHANGES` structurally unavailable   | Routed inline + filed | same + `pr-review-maker.md`; backlog `pr-review-bot-identity`                                       |
+| 6   | Fixed cycle count is the wrong rule          | Routed inline         | `workflows/pr/pr-review-quality-gate.md`                                                            |
+| 7   | Verification prompts must license a negative | Routed inline         | `development/agents/anti-patterns.md` (AP-11)                                                       |
+| 8   | Source-correct, render-wrong                 | Routed inline + filed | `conventions/formatting/diagrams.md`; backlog `mermaid-state-label-render-clipping-warn`            |
+| 9   | Size budget forced an unsafe trim            | Routed inline + filed | `conventions/structure/instruction-file-size-budget.md`; backlog `agents-md-progressive-disclosure` |
+| A   | Index/README staleness                       | Routed inline         | `plan-anti-hallucination.md` §concept sweeps, rule 6                                                |
+| B   | Silent checkbox no-op                        | Routed inline         | `workflows/plan/plan-execution.md` §Atomic Sync Ritual                                              |
+| C   | Instruction-size warning trend               | Filed                 | backlog `agents-md-progressive-disclosure`                                                          |
+| D   | A whole convention as stale surface          | Routed inline         | `plan-anti-hallucination.md` §concept sweeps, "hardest case"                                        |
+| E   | Vendor-audit does not know "Kiro"            | Filed                 | backlog `vendor-audit-kiro-term`                                                                    |
+| F   | Fixed-term-order regex blind spot            | Routed inline         | `plan-anti-hallucination.md` (AP-13)                                                                |
+| G   | "Generative source" ≠ the rule               | Routed inline         | same, concept-sweep rule 5                                                                          |
+| H   | Three regexes, three blind spots             | Routed inline         | same (AP-13)                                                                                        |
+| I   | Round four — the paraphrase                  | Routed inline         | same, concept-sweep rule 6                                                                          |
+| J   | Check the real invocation                    | Routed inline         | same (AP-14)                                                                                        |
+| K   | Phase 0/4c/4c-ii sweeps, baseline SHAs       | Discarded             | execution artifacts — see below                                                                     |
 
 ---
 
@@ -483,7 +483,7 @@ the binding that makes the rule fire, not a second home.
 **Routing**: `repo-governance/workflows/pr/pr-review-quality-gate.md` — **ROUTED INLINE** (Step 1
 output, GitHub Reviews API Mechanics, frontmatter `termination`), with the corresponding correction
 in `.claude/agents/pr-review-maker.md`. The underlying capability gap is **FILED** at
-`plans/backlog/2026-07-20__pr-review-bot-identity/`.
+`plans/backlog/pr-review-bot-identity/`.
 
 **Justification**: two-part routing because the learning has two parts. The factual correction is a
 small non-code doc edit and lands inline; provisioning a GitHub App identity is infrastructure work
@@ -537,7 +537,7 @@ authored.
 **Routing**: `repo-governance/conventions/formatting/diagrams.md` — **ROUTED INLINE** as a
 "Render-Fidelity Caveat" subsection under the existing State Diagram Width and Label Constraints
 section. The candidate validator rule is **FILED** at
-`plans/backlog/2026-07-20__mermaid-state-label-render-clipping-warn/`.
+`plans/backlog/mermaid-state-label-render-clipping-warn/`.
 
 **Justification**: the convention already had a state-diagram label section asserting a ≤ 30
 character rule; leaving that unqualified would keep a proxy masquerading as a guarantee, so the
@@ -596,7 +596,7 @@ workflow. Both of the entry's candidate fixes are implemented verbatim.
 
 ### C. This plan structurally worsens a preexisting instruction-size warning
 
-**Routing**: **FILED** at `plans/backlog/2026-07-20__agents-md-progressive-disclosure/`.
+**Routing**: **FILED** at `plans/backlog/agents-md-progressive-disclosure/`.
 
 **Justification**: the entry itself declined to fix this in-plan for correct reasons (a substantial
 refactor of the canonical instruction file, outside scope). Re-measured during triage: `AGENTS.md` is
@@ -617,7 +617,7 @@ places and drifting apart.
 
 ### E. The vendor-audit scanner does not know the term "Kiro"
 
-**Routing**: **FILED** at `plans/backlog/2026-07-20__vendor-audit-kiro-term/`.
+**Routing**: **FILED** at `plans/backlog/vendor-audit-kiro-term/`.
 
 **Justification**: the fix touches `apps/rhino-cli/**` — a **code** home inside the tri-repo
 byte-identity boundary, therefore a mandatory backlog plan, never inline. The plan additionally
@@ -686,8 +686,8 @@ is safe to delete once the plan is archived.
 
 **Backlog plans filed by this triage** (five):
 
-- `plans/backlog/2026-07-20__contributing-md-trunk-guidance-and-naming-exemption/`
-- `plans/backlog/2026-07-20__pr-review-bot-identity/`
-- `plans/backlog/2026-07-20__mermaid-state-label-render-clipping-warn/`
-- `plans/backlog/2026-07-20__agents-md-progressive-disclosure/`
-- `plans/backlog/2026-07-20__vendor-audit-kiro-term/`
+- `plans/backlog/contributing-md-trunk-guidance-and-naming-exemption/`
+- `plans/backlog/pr-review-bot-identity/`
+- `plans/backlog/mermaid-state-label-render-clipping-warn/`
+- `plans/backlog/agents-md-progressive-disclosure/`
+- `plans/backlog/vendor-audit-kiro-term/`

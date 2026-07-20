@@ -72,6 +72,6 @@ This set of conventions implements/respects the following core principles:
 
 - **[Documentation First](../../principles/content/documentation-first.md)**: The Diataxis Framework establishes a systematic four-category documentation structure, making documentation a primary deliverable rather than an afterthought. Plans Organization convention ensures planning work is documented in structured, discoverable locations.
 
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Plans naming patterns (`YYYY-MM-DD__identifier/`) make lifecycle stage and date explicit in folder names. File Naming Convention uses descriptive kebab-case names so a filename clearly communicates the content without abbreviation lookups.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Plans naming patterns (stage-aware: `identifier/` in backlog/in-progress, `YYYY-MM-DD__identifier/` in done) make lifecycle stage explicit in folder names. File Naming Convention uses descriptive kebab-case names so a filename clearly communicates the content without abbreviation lookups.
 
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: The four Diataxis categories provide a complete, minimal taxonomy that covers all documentation types without overlap or excessive granularity. File naming uses a single simple kebab-case rule with no prefix encoding to memorize.

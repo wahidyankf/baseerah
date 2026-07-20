@@ -24,8 +24,8 @@ inputs:
     description: >
       Which plans/ stage the finished plan lands in. `in-progress` (default) creates an immediately
       active plan at plans/in-progress/<identifier>/ (no date prefix). `backlog` creates a
-      proposed-but-not-yet-scheduled plan at plans/backlog/YYYY-MM-DD__<identifier>/ (creation-date
-      prefix per the Plans Organization Convention). Both stages stop at plan creation — neither
+      proposed-but-not-yet-scheduled plan at plans/backlog/<identifier>/ (no date prefix, per the
+      Plans Organization Convention). Both stages stop at plan creation — neither
       executes the plan.
     required: false
     default: in-progress
@@ -34,7 +34,7 @@ outputs:
     type: string
     description: >
       Path to the created plan in the resolved target stage (plans/in-progress/<identifier>/ or
-      plans/backlog/<YYYY-MM-DD>__<identifier>/)
+      plans/backlog/<identifier>/)
   - name: final-status
     type: enum
     values: [pass, partial, fail]
@@ -59,13 +59,13 @@ steps below, `<plan-dir>` resolves as:
 
 - **`target-stage=in-progress`** (default): `plans/in-progress/<identifier>/` — no date prefix;
   the plan is immediately active.
-- **`target-stage=backlog`**: `plans/backlog/<YYYY-MM-DD>__<identifier>/` — creation-date prefix
-  per the [Plans Organization Convention](../../conventions/structure/plans.md); the plan is a
-  proposal awaiting promotion. `<YYYY-MM-DD>` is the date the plan is created.
+- **`target-stage=backlog`**: `plans/backlog/<identifier>/` — no date prefix, per the
+  [Plans Organization Convention](../../conventions/structure/plans.md); the plan is a
+  proposal awaiting promotion.
 
 Both stages stop at plan creation. **Neither stage executes the plan** — execution is a separate
 concern handled later by the [Plan Execution workflow](./plan-execution.md) after a backlog plan
-is promoted to `in-progress/` (date prefix stripped on promotion).
+is promoted to `in-progress/` (a pure move — neither stage carries a date prefix).
 
 **When to use**:
 
@@ -266,7 +266,7 @@ Resolve ALL of the following:
    tool dependencies
 5. **Plan identifier**: What slug should the plan folder use (e.g., `add-foo-convention`)?
 6. **Target stage**: Confirm `target-stage` (default `in-progress`). If `backlog`, the plan lands
-   at `plans/backlog/<YYYY-MM-DD>__<identifier>/`; if `in-progress`, at
+   at `plans/backlog/<identifier>/`; if `in-progress`, at
    `plans/in-progress/<identifier>/`. Skip this question if the caller already passed
    `target-stage` explicitly (e.g., a parent workflow). Record — resolves `<plan-dir>` for all
    later steps.
@@ -369,7 +369,7 @@ Delegate via the Agent tool. Provide a self-contained handoff prompt containing 
 7. **Explicit instruction**: write the plan directly to the resolved `<plan-dir>` inside the
    worktree at `worktrees/<identifier>/`. For `target-stage=in-progress` this is
    `plans/in-progress/<identifier>/` (no date prefix); for `target-stage=backlog` this is
-   `plans/backlog/<YYYY-MM-DD>__<identifier>/` (creation-date prefix). Do NOT place an
+   `plans/backlog/<identifier>/` (also no date prefix). Do NOT place an
    `in-progress` plan under `backlog/` or vice versa.
 
 `plan-maker` emits the final Knowledge Capture phase in `delivery.md` plus a `learnings.md`
@@ -470,8 +470,8 @@ resolution.
 ## Conventions Implemented/Respected
 
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: Creates plans in
-  `plans/in-progress/` (default) or `plans/backlog/<YYYY-MM-DD>__<identifier>/` (when
-  `target-stage=backlog`) with correct identifier format and worktree specification
+  `plans/in-progress/` (default) or `plans/backlog/<identifier>/` (when
+  `target-stage=backlog`, also no date prefix) with correct identifier format and worktree specification
 - **[Governance Vendor-Independence Convention](../../conventions/structure/governance-vendor-independence.md)**:
   Step 1 grill includes an explicit harness-neutrality checkpoint for plans touching agents,
   skills, or `repo-governance/` paths

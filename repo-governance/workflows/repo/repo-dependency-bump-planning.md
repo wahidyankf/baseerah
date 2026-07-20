@@ -8,7 +8,7 @@ goal: >
   backlog plan that — when later executed — updates those dependencies. The deliverable is the
   plan, never the dependency edits.
 termination: >
-  A grill-validated plan exists at plans/backlog/<YYYY-MM-DD>__<identifier>/, passes
+  A grill-validated plan exists at plans/backlog/<identifier>/, passes
   plan-quality-gate at strict mode, and a dependency clearance report is written to
   generated-reports/. No dependency manifest or lockfile is modified by this workflow.
 inputs:
@@ -51,7 +51,7 @@ outputs:
     description: Inventory + Security & Functional Clearance Status table + cutoff computation. Always written.
   - name: plan-path
     type: string
-    description: Path to the created backlog plan in plans/backlog/<YYYY-MM-DD>__<identifier>/
+    description: Path to the created backlog plan in plans/backlog/<identifier>/
   - name: final-status
     type: enum
     values: [pass, partial, fail]
@@ -225,7 +225,7 @@ bumps here.
 
 Invoke the [plan-planning workflow](../plan/plan-planning.md) with:
 
-- **Input** `target-stage`: `backlog` (lands at `plans/backlog/<YYYY-MM-DD>__<identifier>/`).
+- **Input** `target-stage`: `backlog` (lands at `plans/backlog/<identifier>/`).
 - **Input** `push-target`: forwarded from this workflow's input.
 - **Input** `prompt`: a self-contained handoff containing the full inventory, the approved bump
   table, the Security & Functional Clearance Status, the recorded cutoff date, a link to the
@@ -261,7 +261,7 @@ Scenario: Planning sweep produces a backlog plan without touching manifests
   Given the ose-public working tree is clean
   When the workflow runs to completion
   Then a clearance report appears under generated-reports/repo-dependency-bump-planning__*__report.md
-  And a plan exists at plans/backlog/<YYYY-MM-DD>__dependency-bump/
+  And a plan exists at plans/backlog/dependency-bump/
   And the backlog plan passes plan-quality-gate at strict mode
   And no package.json, Cargo.toml, rust-toolchain.toml, go.mod, *.fsproj, Dockerfile, docker-compose*.yml, .github/ action.yml/workflow, or lockfile is modified
 
@@ -299,7 +299,7 @@ Scenario: User declines at the checkpoint
 ## Conventions Implemented/Respected
 
 - **[Workflow Naming Convention](../../conventions/structure/workflow-naming.md)**: Basename `repo-dependency-bump-planning` parses as scope=`repo`, qualifier=`dependency-bump`, type=`planning`.
-- **[Plans Organization Convention](../../conventions/structure/plans.md)**: The backlog plan uses the `YYYY-MM-DD__<identifier>/` creation-date-prefixed folder form.
+- **[Plans Organization Convention](../../conventions/structure/plans.md)**: The backlog plan uses the `<identifier>/` folder form (no date prefix).
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**: Version/CVE/yank research delegated to `web-researcher`.
 - **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: Research agents fan out under the N+1 model — `1 main thread + N background agents = N+1 total`, default N=3 — with the main thread kept vacant as orchestrator and N never self-promoted beyond the declared value.
 - **[Linking Convention](../../conventions/formatting/linking.md)**: Cross-references use GitHub-compatible markdown with `.md` extensions.

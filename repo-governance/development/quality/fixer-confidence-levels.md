@@ -199,7 +199,7 @@ The three confidence levels (HIGH, MEDIUM, FALSE_POSITIVE) are universal. Each a
 - Missing required section verified by heading search (Introduction, Requirements, Technical Documentation)
 - Broken internal link to codebase file verified by file existence check
 - Format violation verified (frontmatter YAML, acceptance criteria format)
-- Naming convention violation verified (folder name doesn't match `YYYY-MM-DD__identifier`)
+- Naming convention violation verified (a `done/` folder name doesn't match `YYYY-MM-DD__identifier`, or a `backlog/`/`in-progress/` folder carries a date prefix)
 - File structure mismatch verified (single-file vs multi-file convention)
 
 **Common Pattern:** HIGH confidence issues are **objective, measurable, and verifiable** - they either exist or they don't.

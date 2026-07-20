@@ -72,7 +72,7 @@ concurrency cap (2 background subagents, 3 total including the main thread) per
       — acceptance: exits 0 with no unresolved drift
 - [ ] [AI] Record the baseline commit SHA into `learnings.md` in exactly this literal format —
       `Baseline SHA: <full-40-char-sha>` — obtained via `git rev-parse HEAD`
-      — acceptance: `command grep -ohE '^Baseline SHA: [0-9a-f]{40}$' plans/backlog/2026-07-20__plan-quality-gate-convergence/learnings.md | sort -u | wc -l`
+      — acceptance: `command grep -ohE '^Baseline SHA: [0-9a-f]{40}$' plans/backlog/plan-quality-gate-convergence/learnings.md | sort -u | wc -l`
       returns exactly 1 (returns 0 before this step)
 - [ ] [AI] Record the **pre-change `plan-checker` validation-step inventory** into `learnings.md` as a
       list of every `### <n>. … (Step 5x …)` heading, obtained via
@@ -146,7 +146,7 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
 > _Suggested executor: `repo-rules-maker`, with `swe-rust-dev` for the harness_
 >
 > **Idempotency contract** — this phase is authored **identically** in
-> [`plans/backlog/2026-07-20__repo-rules-quality-gate-convergence/delivery.md`](../2026-07-20__repo-rules-quality-gate-convergence/delivery.md).
+> [`plans/backlog/repo-rules-quality-gate-convergence/delivery.md`](../repo-rules-quality-gate-convergence/delivery.md).
 > Whichever plan executes it first applies every item; the second detects each item already present
 > and records "already landed" in `learnings.md`. Every clause below is therefore falsifiable in
 > **both** directions by construction: absent → apply, present → skip. See
@@ -504,7 +504,7 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
       — acceptance: `npx nx run rhino-cli:plan:acceptance-validation --help` exits 0
 - [ ] [AI] Run the validator against this plan's own folder — the plan must pass its own validator
       — acceptance: the validator reports 0 findings against
-      `plans/backlog/2026-07-20__plan-quality-gate-convergence/`
+      `plans/backlog/plan-quality-gate-convergence/`
 - [ ] [AI] Run the validator against fixture files reproducing each seed class
       — acceptance: each fixture yields at least 1 finding of its own class, and the corrected form
       of each fixture yields 0 — falsifiable in both directions

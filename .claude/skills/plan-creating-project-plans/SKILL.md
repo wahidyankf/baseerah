@@ -1,6 +1,6 @@
 ---
 name: plan-creating-project-plans
-description: Comprehensive project planning standards for plans/ directory including folder structure (ideas.md, backlog/, in-progress/, done/), stage-aware naming convention (backlog/done use YYYY-MM-DD__identifier/, in-progress uses identifier/ with no date prefix), five-document file organization (README.md, brd.md, prd.md, tech-docs.md, delivery.md for multi-file default; single README.md for trivially-small single-file exception), BRD/PRD content-placement rules, Gherkin acceptance criteria, and the mandatory structured multiple-choice grilling gates (pre-write and post-write) for resolving design decisions with the user. Essential for creating structured, executable project plans.
+description: Comprehensive project planning standards for plans/ directory including folder structure (ideas.md, backlog/, in-progress/, done/), stage-aware naming convention (done uses YYYY-MM-DD__identifier/; backlog and in-progress use identifier/ with no date prefix), five-document file organization (README.md, brd.md, prd.md, tech-docs.md, delivery.md for multi-file default; single README.md for trivially-small single-file exception), BRD/PRD content-placement rules, Gherkin acceptance criteria, and the mandatory structured multiple-choice grilling gates (pre-write and post-write) for resolving design decisions with the user. Essential for creating structured, executable project plans.
 ---
 
 # Creating Project Plans
@@ -83,16 +83,16 @@ Naming is **stage-aware** — each lifecycle stage has its own rule:
 
 | Stage          | Format                            | Date meaning    |
 | -------------- | --------------------------------- | --------------- |
-| `backlog/`     | `YYYY-MM-DD__project-identifier/` | Creation date   |
+| `backlog/`     | `project-identifier/`             | No date prefix  |
 | `in-progress/` | `project-identifier/`             | No date prefix  |
 | `done/`        | `YYYY-MM-DD__project-identifier/` | Completion date |
 
 **Rules** (identifier part, all stages):
 
-- Separator between date and identifier: Double underscore (`__`)
+- Separator between the completion date and identifier (`done/` only): Double underscore (`__`)
 - Identifier: Lowercase, hyphen-separated, descriptive
 - Trailing slash indicates directory
-- Strip the date prefix when moving from `backlog/` → `in-progress/`
+- Moving from `backlog/` → `in-progress/` is a pure move (neither carries a date prefix)
 - Add the completion date prefix when moving from `in-progress/` → `done/`
 
 ## Mermaid Diagrams in Plans
@@ -859,7 +859,7 @@ Plan Archival):
 - [ ] [AI] Route each surviving entry to exactly one durable home. The rubric is open-ended —
       route to whichever surface owns that kind of knowledge (`repo-governance/`, `docs/`,
       `.claude/agents/`, `.claude/skills/`, a post-mortem, or any other durable home), landing a
-      small non-code edit inline or filing a `plans/backlog/YYYY-MM-DD__<slug>/` follow-up plan for
+      small non-code edit inline or filing a `plans/backlog/<slug>/` follow-up plan for
       larger non-code work.
 - [ ] [AI] **Code-routing rule**: if a learning's home is `apps/`, `libs/`, or tests, file it as a
       separate `plans/backlog/` plan — NEVER land it inline in this plan's commits/PR. The sole

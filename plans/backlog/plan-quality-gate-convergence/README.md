@@ -578,7 +578,7 @@ deliberate non-exercise of a permitted opt-in, not an oversight, and a future re
 re-derive the gate from the convention's "opt-in is legitimate" clause without new evidence.
 
 This decision is recorded identically as DECISION 19 in the sibling plan
-([`plans/backlog/2026-07-20__repo-rules-quality-gate-convergence/README.md`](../2026-07-20__repo-rules-quality-gate-convergence/README.md)).
+([`plans/backlog/repo-rules-quality-gate-convergence/README.md`](../repo-rules-quality-gate-convergence/README.md)).
 
 ## Sequencing with the sibling plan
 

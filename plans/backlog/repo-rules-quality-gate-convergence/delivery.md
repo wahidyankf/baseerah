@@ -93,7 +93,7 @@ on Phase 5 and is not parallelizable with it. Respect the repo's concurrency cap
       — acceptance: exits 0 with no unresolved drift
 - [ ] [AI] Record the baseline commit SHA into `learnings.md` in exactly this literal format —
       `Baseline SHA: <full-40-char-sha>` — obtained via `git rev-parse HEAD`
-      — acceptance: `command grep -ohE '^Baseline SHA: [0-9a-f]{40}$' plans/backlog/2026-07-20__repo-rules-quality-gate-convergence/learnings.md | sort -u | wc -l`
+      — acceptance: `command grep -ohE '^Baseline SHA: [0-9a-f]{40}$' plans/backlog/repo-rules-quality-gate-convergence/learnings.md | sort -u | wc -l`
       returns exactly 1 (returns 0 before this step)
 - [ ] [AI] Record the **pre-change `repo-rules-checker` validation-step inventory** into
       `learnings.md` as the list of every `### Step <n>` heading, obtained via
@@ -175,7 +175,7 @@ brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt,
 > _Suggested executor: `repo-rules-maker`, with `swe-rust-dev` for the harness_
 >
 > **Idempotency contract** — this phase is authored **identically** in
-> [`plans/backlog/2026-07-20__plan-quality-gate-convergence/delivery.md`](../2026-07-20__plan-quality-gate-convergence/delivery.md).
+> [`plans/backlog/plan-quality-gate-convergence/delivery.md`](../plan-quality-gate-convergence/delivery.md).
 > Whichever plan executes it first applies every item; the second detects each item already present
 > and records "already landed" in `learnings.md`. Every clause below is therefore falsifiable in
 > **both** directions by construction: absent → apply, present → skip. See
@@ -318,7 +318,7 @@ authoritative]`
       `command grep -ohE 'governance-sweep-blind-spots' <file> | sort -u | wc -l` returns 1; a return
       of 0 means Phase S did not complete and this phase must not proceed
 - [ ] [AI] Cross-link the registry from the sibling acceptance-clause registry created by
-      [`plans/backlog/2026-07-20__plan-quality-gate-convergence/`](../2026-07-20__plan-quality-gate-convergence/README.md)
+      [`plans/backlog/plan-quality-gate-convergence/`](../plan-quality-gate-convergence/README.md)
       **only if that plan has already landed** (DECISION 6 keeps the two registries separate but
       cross-linked)
       — acceptance: if
@@ -1009,11 +1009,11 @@ authoritative]`
       `repo-governance/development/quality/governance-sweep-blind-spots.md`, or `learnings.md`
       records the explicit reason none was found
 - [ ] [AI] **File the sibling-gate adoption follow-up** (DECISION 5) as a
-      `plans/backlog/YYYY-MM-DD__<slug>/` plan covering
+      `plans/backlog/<slug>/` plan covering
       `repo-harness-compatibility-quality-gate` and the `repo-workflow` gate
       — acceptance: the backlog folder exists and its README names both gates; the path is recorded
       in `learnings.md`
-- [ ] [AI] **File the gap-D2 follow-up** (DECISION 13) as a `plans/backlog/YYYY-MM-DD__<slug>/` plan:
+- [ ] [AI] **File the gap-D2 follow-up** (DECISION 13) as a `plans/backlog/<slug>/` plan:
       `pr-review-maker` cannot post `REQUEST_CHANGES` because `gh` authenticates as the PR author and
       GitHub rejects self-review state changes, so reviews post as `COMMENT` with a blocking banner
       and any gate reading GitHub's review **state** sees the PR as unblocked; the fix is a
