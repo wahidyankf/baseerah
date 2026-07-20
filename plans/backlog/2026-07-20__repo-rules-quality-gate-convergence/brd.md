@@ -77,9 +77,16 @@ document rather than the chain.
 - **Sweeping by a stable key.** Inbound link targets do not paraphrase themselves; prose does.
   [Judgment call] — classes 1, 3 and 4 all follow from keyword-shaped searching, and commit
   `39500d0a2` is the one controlled comparison available, but a single chain is one data point.
-- **A zero that survives an adversarial round.** Requiring the checker to argue against its own zero
-  before accepting it targets the exact failure the chain exhibited: confident termination on an
-  incomplete search.
+- **Several classes discovered per round instead of one.** The chain surfaced roughly one blind-spot
+  class per round because one lens iterating can only surface what that lens's shape permits. Running
+  operationally-disjoint lenses in parallel changes the shape per round rather than the count of
+  rounds — the largest expected effect, and the one with the clearest mechanism.
+  [Web-cited — via the 2026-07-20 research brief]
+- **A zero that survives an adversarial round, without paying for one on every run.** Requiring the
+  checker to argue against its own zero targets the exact failure the chain exhibited — confident
+  termination on an incomplete search — while gating the round on a non-empty never-touched set means
+  a trivial change no longer buys a mandatory extra invocation whose agenda arithmetic has already
+  emptied.
 - **A mechanism that reaches what no search reaches.** Completeness-diff against ground truth found
   three classes; every text-shaped mechanism in the plan found zero of them.
 - **Guards that bind on every entry path.** Placing a guard at the point of rewrite, and verifying
@@ -120,8 +127,19 @@ Stated as observable checks, not fabricated numbers.
    and **zero** against a fixture reproducing the post-`c30ac344e` state. Falsifiable both ways.
 2. **Sweep scope is auditable.** An audit or fix report produced by the changed agents contains the
    verbatim sweep command and its exclusion set. Observable by reading the report.
-3. **Termination is defined adversarially.** The workflow's termination criteria name the adversarial
-   round and the never-touched precondition. Observable by grep against the workflow file.
+3. **Termination is defined by saturation.** The workflow's termination criteria name the flattened
+   new-class discovery curve, the disjoint-lens requirement, the never-touched precondition, and the
+   adversarial round **with its gating condition** — and no longer rest on a round count. Observable
+   by grep against the workflow file.
+   3b. **The adversarial round is skipped when its precondition is disproven.** A run whose
+   mechanically-computed never-touched set is empty spends no checker invocation on the round and
+   records the empty agenda with its derivation. Observable in the final report; falsifiable both
+   ways, since a non-empty set must produce a round.
+   3c. **The discovery curve is recorded.** Each chain records its per-round count of **new** blind-spot
+   classes, so termination rests on visible flattening rather than on a counter. Observable by reading
+   the final report; a chain terminating without a recorded curve is itself a finding.
+   3d. **Every lens declares its artifact set.** The roster is auditable for disjointness, and a lens
+   whose declared set is a subset of another's is rejected. Observable by reading the roster.
 4. **No check was removed.** The count of validation steps in `repo-rules-checker.md` does not
    decrease. Observable by comparing the Step inventory recorded in Phase 0 against the post-change
    inventory.
@@ -155,18 +173,20 @@ next few chains are the measurement.
 
 ## Business Risks and Mitigations
 
-| Risk                                                                                            | Mitigation                                                                                                                                      |
-| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **The never-touched set is enormous and unusable** — most repo files are legitimately unrelated | The set is scoped to _candidate_ files: those linking to, or linked from, the changed governing document, plus its declared blast radius (DD-3) |
-| **The adversarial round becomes a rubber stamp** — the checker argues against itself pro forma  | The round must consume the mechanical never-touched set as its agenda, not free-form doubt; an empty agenda is itself reported                  |
-| **The exclusion-justification requirement invites boilerplate** justifications                  | Exclusions are enumerated as literal globs in the report, so a reviewer sees the actual scope rather than prose about it                        |
-| **The BSCR ossifies** — entries added once, never revisited                                     | Every entry carries a git-commit proof that stays checkable; Knowledge Capture obliges appending any newly surfaced class                       |
-| **Tri-repo propagation drift** — `ose-primer` / `ose-infra` diverge from `ose-public`           | Byte-identity check for `apps/rhino-cli` per the SDLC Gate Standard; per-repo propagation phases with their own gates                           |
-| **Scope creep** — the plan grows to fix every maker-checker-fixer gate                          | Explicitly out of scope; recorded as DECISION 5 with a Knowledge Capture follow-up                                                              |
-| **Completeness-diff has no bounded ground truth** — "everything the doc should mention" is open | Each contract instance names its ground-truth source explicitly (a directory, `git branch -r`, an agent roster); an unnamed source is a finding |
-| **The guard-placement rule is read as "add more guards"**                                       | Stated as the enumeration-fails-open rule with its four-failure evidence, so the reader sees why a longer enumeration is the rejected option    |
-| **The control-probe requirement becomes ceremonial** — a probe that always passes               | The probe must target a known-positive control for the same pattern and tree, so a passing probe with a zero result is a real signal            |
-| **D2 stays unfixed indefinitely** — the review-state hole outlives the follow-up plan           | Filed with its evidence during Knowledge Capture (DECISION 13); until then, merge preconditions gate on finding text, never on review state     |
+| Risk                                                                                            | Mitigation                                                                                                                                                                                                                      |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **The never-touched set is enormous and unusable** — most repo files are legitimately unrelated | The set is scoped to _candidate_ files: those linking to, or linked from, the changed governing document, plus its declared blast radius (DD-3)                                                                                 |
+| **The adversarial round becomes a rubber stamp** — the checker argues against itself pro forma  | The round must consume the mechanical never-touched set as its agenda, not free-form doubt; and it is **gated** on that set being non-empty, so it never runs pro forma against nothing                                         |
+| **The adversarial round is pure overhead on the modal change**                                  | The gating condition is exactly this mitigation. Previously the round ran unconditionally, so a one-line convention typo fix paid for a mandatory extra checker invocation with a near-zero a-priori yield (README DECISION 14) |
+| **Parallel lenses collapse into relabels of one procedure**                                     | The documented PBR-replication failure mode. Each lens declares the artifact set it reads; a lens whose set is a subset of another's is rejected as a relabel rather than admitted (prd AC-27)                                  |
+| **The exclusion-justification requirement invites boilerplate** justifications                  | Exclusions are enumerated as literal globs in the report, so a reviewer sees the actual scope rather than prose about it                                                                                                        |
+| **The BSCR ossifies** — entries added once, never revisited                                     | Every entry carries a git-commit proof that stays checkable; Knowledge Capture obliges appending any newly surfaced class                                                                                                       |
+| **Tri-repo propagation drift** — `ose-primer` / `ose-infra` diverge from `ose-public`           | Byte-identity check for `apps/rhino-cli` per the SDLC Gate Standard; per-repo propagation phases with their own gates                                                                                                           |
+| **Scope creep** — the plan grows to fix every maker-checker-fixer gate                          | Explicitly out of scope; recorded as DECISION 5 with a Knowledge Capture follow-up                                                                                                                                              |
+| **Completeness-diff has no bounded ground truth** — "everything the doc should mention" is open | Each contract instance names its ground-truth source explicitly (a directory, `git branch -r`, an agent roster); an unnamed source is a finding                                                                                 |
+| **The guard-placement rule is read as "add more guards"**                                       | Stated as the enumeration-fails-open rule with its four-failure evidence, so the reader sees why a longer enumeration is the rejected option                                                                                    |
+| **The control-probe requirement becomes ceremonial** — a probe that always passes               | The probe must target a known-positive control for the same pattern and tree, so a passing probe with a zero result is a real signal                                                                                            |
+| **D2 stays unfixed indefinitely** — the review-state hole outlives the follow-up plan           | Filed with its evidence during Knowledge Capture (DECISION 13); until then, merge preconditions gate on finding text, never on review state                                                                                     |
 
 ## Related
 

@@ -75,6 +75,35 @@ As the **workflow orchestrator**, I want the loop to run a deterministic lens, t
 semantic lens, then a single non-looping latent sweep, so that expensive passes run last and only
 once.
 
+### US-10 — Parallel disjoint lenses instead of sequential rounds
+
+As the **workflow orchestrator**, I want each round to run several operationally-disjoint lenses in
+parallel rather than one lens repeatedly, so that a chain discovers several defect classes per round
+instead of at most one — which is the structural reason the archived chain needed 17 rounds.
+
+### US-11 — A terminal verdict backed by evidence of exhaustion
+
+As the **maintainer**, I want termination to require a flattened new-class discovery curve across
+disjoint lenses rather than a round count, so that a `pass` means the search is exhausted rather than
+that a counter reached its limit.
+
+### US-12 — Latent findings bound to a mechanism, not to a ticket
+
+As the **maintainer**, I want every deferred latent finding routed into the unconditional
+deterministic pre-flight or the registry, so that scope discipline never depends on a follow-up
+backlog plan that reliably evaporates.
+
+### US-13 — Verified means verifiable
+
+As the **maintainer**, I want a fixer claiming a verified fix to paste the literal command output, so
+that I can re-execute it and diff the result rather than take the claim on trust.
+
+### US-14 — One substrate, built once
+
+As the **maintainer**, I want the machinery both convergence plans share built once and landed
+idempotently, so that two plans do not pay the tri-repo byte-identity cost twice for the same two
+lines of subcommand registration.
+
 ## Acceptance Criteria
 
 Every scenario below binds to at least one RED delivery step in [delivery.md](./delivery.md).
@@ -207,15 +236,32 @@ Scenario: Checker labels every finding in-surface or latent
   And any CRITICAL finding is treated as in-surface regardless of provenance
 ```
 
-### AC-13 — Termination is evaluated on the bounded set
+### AC-13 — Termination is evaluated on a flattened discovery curve, not a round count
+
+Replaces the previous draft's criterion, which made `pass` conditional on a follow-up backlog plan
+existing on disk. That is a deferral, not a terminator — see
+[README DECISION 3](./README.md#decision-3-was-q3--how-aggressive-should-the-latentin-surface-split-be).
 
 ```gherkin
-Scenario: The loop terminates on in-surface findings while latent work remains
-  Given two consecutive validations report zero in-surface threshold-level findings
+Scenario: The loop terminates when new-class discovery has flattened across disjoint lenses
+  Given a chain whose cumulative new-defect-class discovery curve is recorded per round
   When the workflow evaluates termination
-  Then the workflow reports pass only if a follow-up backlog plan capturing every latent finding exists on disk
-  And the final report lists every latent finding in full
-  And the absence of the follow-up plan blocks the pass status
+  Then the workflow reports pass only if the curve has flattened across rounds whose lenses are operationally disjoint
+  And a round count alone never satisfies the termination criterion
+  And a round structurally narrower than its predecessor does not contribute flattening evidence unless the narrowed-out region was covered by a different lens
+  And the final report records the per-round new-class counts that evidence the flattening
+```
+
+### AC-13b — Every latent finding reaches a binding that cannot evaporate
+
+```gherkin
+Scenario: A latent finding routes to a mechanism rather than to a ticket
+  Given the checker has classified a finding as latent
+  When the chain reaches termination
+  Then a latent finding instantiating a registry class is recorded as re-detected by the unconditional deterministic pre-flight on the next invocation
+  And a latent finding instantiating a new class is appended to the registry during Knowledge Capture
+  And any remaining latent finding is closed as explicitly accepted risk with its rationale recorded in the audit report
+  And no latent finding's disposition is the mere existence of a follow-up backlog plan
 ```
 
 ### AC-14 — Scope discipline cannot hide a known-broken checkbox
@@ -268,6 +314,85 @@ Scenario: The validator lands byte-identical across all three repositories
   And the Gherkin behavior tree under the rhino specs path is byte-identical across all three
 ```
 
+### AC-19 — The bracket-expression class is catalogued and detected
+
+```gherkin
+Scenario: A backslash inside a bracket expression is flagged as engine-dependent
+  Given an acceptance clause whose regex contains a backslash inside a bracket expression
+  When the deterministic pre-flight pass evaluates the clause
+  Then the pass reports a finding stating the class means "not backslash and not that literal character" under POSIX rules
+  And the finding notes that BSD grep truncates while GNU grep and ripgrep do not, so the clause means different things in different environments
+  And the finding names the end-of-line-anchored substitute as the fix
+  And the corrected clause yields zero findings
+```
+
+### AC-20 — Verified fix claims carry a literal transcript
+
+```gherkin
+Scenario: A fix report claiming verification without a transcript is rejected
+  Given a fix report marking a rewritten acceptance clause as APPLIED (verified)
+  When the report is evaluated
+  Then the report contains the observed command output as a literal fenced shell transcript
+  And a report claiming verified status without a transcript block is reported as an incomplete-evidence finding
+  And a re-validating checker can re-execute the recorded command and diff its output against the recorded transcript
+```
+
+### AC-21 — Class closure is a deterministic count-diff, not a re-derivation
+
+```gherkin
+Scenario: A partially swept class is caught by replaying the registry entry's own command
+  Given plan-fixer reports a class sweep for a registry defect class
+  When the registry-replay harness re-runs that entry's recorded detection command against the whole plan
+  Then the harness reports the instance count before and after the claimed sweep
+  And a non-zero post-sweep count is reported as a class-closure failure
+  And the verification does not depend on the checker re-deriving the enumeration by reading
+```
+
+### AC-22 — Lenses are verified operationally disjoint
+
+```gherkin
+Scenario: A relabelled lens is rejected from the roster
+  Given a proposed validation lens declaring the artifact set it reads
+  When the lens roster is verified
+  Then each lens in the roster declares an artifact set
+  And a lens whose declared artifact set is a subset of another lens's set is rejected as a relabel rather than admitted as a lens
+  And the roster records, for each admitted lens, the question it asks and the artifacts it reads
+```
+
+### AC-23 — The shared substrate lands exactly once
+
+```gherkin
+Scenario: The second plan to reach Phase S detects the substrate already present
+  Given the sibling convergence plan has already landed the shared substrate
+  When this plan executes Phase S
+  Then each shared item is detected as already present and recorded as "already landed"
+  And no shared item is applied a second time or duplicated
+  And executing Phase S against a repository where the substrate is absent applies every shared item
+```
+
+### AC-24 — The split convention gains the new category
+
+```gherkin
+Scenario: The deterministic-vs-AI split convention lists the new validator
+  Given the new deterministic category has been implemented
+  When a reader opens the split convention's Split table
+  Then the table contains a row naming the new category with Deterministic as its owner and a stated rationale
+  And the category satisfies the convention's deterministic implementation contract for coverage, Gherkin, unit and integration tests, and byte-determinism
+  And the convention is listed in this plan's Surface Inventory
+```
+
+### AC-25 — Detectors are invariants, and fixtures score both error directions
+
+```gherkin
+Scenario: Each detector ships paired fixtures scoring false negatives and false positives
+  Given a detector implementing a registry defect class
+  When the detector's fixtures are executed
+  Then the detector is expressed as an invariant asserted over every clause in scope rather than as a list of forbidden patterns
+  And a violating fixture yields at least one finding of that class
+  And a conforming look-alike fixture that resembles the violation without instantiating it yields zero findings
+  And the plan records that author-written fixtures validate intent rather than unimagined blind spots
+```
+
 ## Product Scope
 
 ### In scope
@@ -276,23 +401,39 @@ Scenario: The validator lands byte-identical across all three repositories
 - A deterministic pre-flight validator with a Gherkin behavior tree
 - Authoring-time and fix-time empirical simulation requirements
 - Class-level remediation and class-closure verification contracts
-- In-surface / latent partition with anti-loophole guards
+- In-surface / latent partition with anti-loophole guards, restated as invariants
 - Workflow step-model, termination-criteria and convergence-target rewrite
+- Parallel operationally-disjoint lenses with a declared roster and a disjointness check
+- The shared substrate: the split-convention row, the shared subcommand plumbing, both governance
+  index rows, and the registry-replay harness — landed idempotently with the sibling plan
 - Binding regeneration and tri-repo propagation
 
 ### Out of scope
 
 - Editing the audited plan that supplied the evidence
-- The PR-review quality gate (open question Q5)
+- The PR-review quality gate — **resolved**, the sibling plan covers it
+  ([DECISION 5](./README.md#decision-5-was-q5--does-the-same-treatment-propagate-to-pr-review-quality-gatemd))
 - Any relaxation of a check, threshold or criticality level
-- Retroactive sweeps of existing `plans/in-progress/` plans (open question Q6)
+- Retroactive sweeps of existing in-progress plans
+  ([DECISION 6](./README.md#decision-6-was-q6--should-the-dcr-be-enforced-retroactively-against-plans-already-in-progress))
+- **μSE-style mutation testing of the detectors** — recorded in the registry as the escalation path
+  when hand fixtures stop finding anything, explicitly **not** executed by this plan, and explicitly
+  flagged as having no citable precedent for prose or markdown linters
+  ([XD-7](./README.md#xd-7--control-probes-and-seeded-fixtures-are-standing-practice-mutation-is-the-escalation))
+- **Contradiction detection by the deterministic validator** — the prose-tooling boundary; validators
+  catch lexical and structural violations, and "document A contradicts document B" stays with the AI
+  checker ([DD-2b](./tech-docs.md#dd-2b--what-the-validator-must-not-try-to-detect))
 
 ## Product Risks
 
-| Risk                                                               | Severity | Handling                                                                                     |
-| ------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------------- |
-| Validator false positives add noise                                | Medium   | Existing FALSE_POSITIVE skip-list machinery applies; validator findings are checker-mediated |
-| Latent classification is abused                                    | High     | Four guards in tech-docs DD-5; provenance must be cited; CRITICAL never exempt               |
-| Agent files grow past the instruction-size budget                  | Medium   | Registry content lives in the governance file; agents link rather than inline                |
-| The registry's proof commands rot as tooling changes               | Low      | Proofs are re-run by the registry's own delivery gate                                        |
-| Tri-repo propagation partially applied, leaving repos inconsistent | Medium   | Per-repo phases with their own gates; byte-identity check is a gate item                     |
+| Risk                                                               | Severity | Handling                                                                                                                                                               |
+| ------------------------------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Validator false positives add noise                                | Medium   | Existing FALSE_POSITIVE skip-list machinery applies; validator findings are checker-mediated                                                                           |
+| Latent classification is abused                                    | High     | Four guards in tech-docs DD-5, restated as invariants; provenance must be cited; CRITICAL never exempt; every latent finding routes to a mechanism, never to a ticket  |
+| Provenance citation is itself performed by a fatigued checker      | Medium   | Uncitable defaults to in-surface (safe failure direction); a mis-classified latent finding is still re-detected by the unconditional pre-flight next invocation (DD-5) |
+| Parallel lenses degenerate into relabels of one procedure          | High     | Each lens declares its artifact set; a subset declaration is rejected as a relabel (AC-22) — the PBR replication's documented failure mode                             |
+| Author-written fixtures validate intent, not blind spots           | Medium   | Recorded as an explicit limit, not papered over; μSE mutation named as the escalation path, with its lack of prose-domain precedent flagged                            |
+| The shared substrate is applied twice by concurrent plans          | Medium   | Phase S is idempotent and first-writer-wins; acceptance clauses falsifiable in both directions (AC-23)                                                                 |
+| Agent files grow past the instruction-size budget                  | Medium   | Registry content lives in the governance file; agents link rather than inline                                                                                          |
+| The registry's proof commands rot as tooling changes               | Low      | Proofs are re-run by the registry's own delivery gate                                                                                                                  |
+| Tri-repo propagation partially applied, leaving repos inconsistent | Medium   | Per-repo phases with their own gates; byte-identity check is a gate item                                                                                               |

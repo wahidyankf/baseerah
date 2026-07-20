@@ -129,3 +129,40 @@
   found a real defect elsewhere; a prompt without that license manufactures agreement. Recorded as
   DECISIONs 12 and 13 / DD-12 and DD-13; the `REQUEST_CHANGES` gap is filed as a separate backlog
   plan during Knowledge Capture.
+
+## Learning: the plan installing search-tool discipline carried a silent search-tool defect
+
+- **Context**: the 2026-07-20 goal-alignment audit, reproduced live against the real
+  `.claude/agents/repo-rules-checker.md` on this host.
+- **Observation**: two acceptance clauses in this plan's own `delivery.md` used `[^\n]` inside a
+  bracket expression, where POSIX treats `\` as a literal — so the class meant "not backslash and not
+  `n`" and every match truncated before the first lowercase `n`. The plan applied enormous rigor to
+  the ugrep `--glob` trap (DECISION 10) and none to this one, in the same file, in the very clauses
+  authored to demonstrate the new discipline. It **passed by luck**: `sort -u | wc -l` returned the
+  correct count only because no two truncated prefixes happened to collide, so a future heading
+  rename sharing a truncated prefix would silently undercount and let AC-15's "no check was removed"
+  invariant pass after a check really had been removed. Corrected to `.*$` at both sites.
+- **Why it might generalize**: rigor is not transferable by intention. A plan can install a discipline
+  and violate a neighbouring instance of the same discipline in the same file, because the discipline
+  was applied to the _trap that had been named_ rather than asserted as an _invariant over every
+  clause_. This is the enumeration-fails-open rule applied to the plan's own authoring, and it is the
+  strongest available argument for stating guards as invariants (XD-5) rather than as denylists.
+  Catalogued as DC-8 in the sibling plan's acceptance-clause registry.
+
+## Learning: an unconditional "extra round of rigor" is overhead, not rigor
+
+- **Context**: the same audit, evaluating the adversarial round against the plan's stated goal of
+  converging faster without lowering quality.
+- **Observation**: the adversarial round was written to run on **every** invocation with no skip
+  branch, even though AC-13 already anticipated that most runs would find its agenda empty — the
+  mitigation offered was only that the emptiness be _recorded_, so the round still ran. For the
+  archived pathological chain it is a clear win; for a one-line convention typo fix it is a guaranteed
+  extra checker invocation with a near-zero a-priori yield. The deterministic layer computes the
+  never-touched set _before_ the round would run, so an empty set is a mechanical disproof of the
+  round's own precondition.
+- **Why it might generalize**: a mechanism that only ever adds work must be gated on a cheap,
+  mechanically-computable precondition, or it silently converts a goal of "faster without quality
+  loss" into "slower with the same quality". The general form is a disposition test — every mechanism
+  states whether it REDUCES ROUNDS, RAISES QUALITY, or BOTH, and anything scoring neither is cut.
+  Recorded as DECISION 14 and as the disposition tables now binding both plans. Strong candidate for
+  the maker-checker-fixer pattern convention.

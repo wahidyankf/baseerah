@@ -15,6 +15,21 @@
 > block indented to its list item's content column. Every stated pre-edit value was **measured on
 > `main` at `a207b66e7` during authoring**.
 >
+> **DC-8 — this plan's own self-caught defect (DECISION 15)** — two clauses in this file previously
+> used `[^\n]` inside a bracket expression, where a backslash is **not** an escape, so the class
+> meant "not `\` and not `n`" and every match truncated at the first literal lowercase `n` under BSD
+> grep. Reproduced live against the real agent file, then corrected to `.*$` at both sites. It
+> **passed by luck** — `sort -u | wc -l` still returned the right count only because no two truncated
+> prefixes happened to collide. The class is catalogued as **DC-8** in the sibling plan's registry and
+> is retained here as worked evidence: it is exactly the environment-dependent tool fragility
+> DECISION 10 exists to prevent, and it was sitting inside the checklist that installs DECISION 10.
+>
+> **Mechanism disposition (binds every phase)** — every mechanism this plan installs carries an
+> explicit REDUCES ROUNDS / RAISES QUALITY / BOTH disposition in
+> [README §Approach](./README.md#approach). A step implementing a mechanism with no recorded
+> disposition is a defect: the goal is faster convergence **without** lower quality, and a mechanism
+> that does neither is overhead wearing the costume of rigor.
+>
 > **Search-tool validity (DECISION 10 — binds every clause in this file)** — in this environment
 > `grep` resolves to **ugrep**, which REJECTS ripgrep's `--glob`; with `2>/dev/null` appended, a hard
 > failure is indistinguishable from a clean zero (measured: broken form 0 hits, POSIX `--include`
@@ -81,7 +96,7 @@ on Phase 5 and is not parallelizable with it. Respect the repo's concurrency cap
       returns exactly 1 (returns 0 before this step)
 - [ ] [AI] Record the **pre-change `repo-rules-checker` validation-step inventory** into
       `learnings.md` as the list of every `### Step <n>` heading, obtained via
-      `command grep -ohE '^### Step [0-9.]+[^\n]*' .claude/agents/repo-rules-checker.md | sort -u`
+      `command grep -ohE '^### Step [0-9.]+.*$' .claude/agents/repo-rules-checker.md | sort -u`
       — acceptance: the recorded inventory is non-empty; this is the AC-15 baseline
 - [ ] [AI] **Resolve the evidence-branch availability question** (README DECISION 8): run
       `git cat-file -t c30ac344e` and record in `learnings.md` whether the twelve corrective SHAs
@@ -105,6 +120,31 @@ on Phase 5 and is not parallelizable with it. Respect the repo's concurrency cap
       confirming the ugrep `--glob` trap is live in this worktree. If the first is non-zero, the
       environment differs from the authoring environment and this is recorded in `learnings.md`
       before any later sweep is trusted
+- [ ] [AI] **Reproduce the DC-8 bracket-expression trap** (README DECISION 15) against the real
+      `.claude/agents/repo-rules-checker.md`, confirming the defect this plan's own checklist carried
+      is live in the execution environment rather than inherited from an audit report
+      — acceptance: `command grep -ohE '^### Step [0-9.]+[^\n]*' .claude/agents/repo-rules-checker.md | sort -u`
+      emits **truncated** headings (each cut before its first lowercase `n`) while the corrected form
+      `command grep -ohE '^### Step [0-9.]+.*$' .claude/agents/repo-rules-checker.md | sort -u`
+      emits the full headings — falsifiable in both directions; if the two outputs are identical, the
+      host's grep does not exhibit the trap and DC-8's environment-dependence claim is amended in the
+      sibling registry rather than asserted
+- [ ] [AI] **Re-verify the research citations** underpinning XD-3, XD-4, XD-5, XD-6 and XD-7 —
+      delegate to `web-researcher` to confirm each primary source and record URL, access date, and a
+      quoted excerpt per finding in `learnings.md`
+      — acceptance: every citation currently labelled `[Web-cited — via the 2026-07-20 research
+brief]` is either upgraded to a full `[Web-cited]` label with an inline excerpt, or downgraded
+      to `[Unverified]` and removed from any gate text that depends on it
+  - _Suggested executor: `web-researcher`_
+- [ ] [AI] **Fetch the paywalled multi-agent-audit paper** (arXiv 2605.12280 / MDPI _Software_ 2026,
+      Calboreanu) and record whether its stopping criteria support or contradict XD-3's saturation
+      rule. Only its round data (15, 8, 12, 2, 8, 1, 4, 1, 0 across 9 rounds) is confirmed, from the
+      abstract; its stopping criteria and recommendations are paywalled
+      — acceptance: either the full text is obtained and its stopping criteria recorded in
+      `learnings.md`, or the failure to obtain it is recorded and every reference beyond the
+      abstract's round data stays marked `[Needs Verification]`; no gate text may depend on the
+      unverified portion either way
+  - _Suggested executor: `web-researcher`_
 - [ ] [AI] Establish the test baseline: `npx nx affected -t typecheck lint test:quick specs:coverage`
       — acceptance: baseline pass/fail counts recorded in `learnings.md`; every preexisting failure
       documented
@@ -126,6 +166,92 @@ on Phase 5 and is not parallelizable with it. Respect the repo's concurrency cap
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no plan work
 > exists yet. Safe to stop indefinitely. To resume: re-run
 > `npx nx affected -t typecheck lint test:quick specs:coverage` and confirm it is still clean.
+
+---
+
+## Phase S: Shared Substrate (idempotent, shared with the sibling plan)
+
+> _Suggested executor: `repo-rules-maker`, with `swe-rust-dev` for the harness_
+>
+> **Idempotency contract** — this phase is authored **identically** in
+> [`plans/backlog/2026-07-20__plan-quality-gate-convergence/delivery.md`](../2026-07-20__plan-quality-gate-convergence/delivery.md).
+> Whichever plan executes it first applies every item; the second detects each item already present
+> and records "already landed" in `learnings.md`. Every clause below is therefore falsifiable in
+> **both** directions by construction: absent → apply, present → skip. See
+> [README XD-2](./README.md#xd-2--one-shared-substrate-built-once-landed-idempotently).
+
+- [ ] [AI] Add a row for the new deterministic category to The Split table in
+      `repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md`, naming
+      `plan-acceptance-validation` with owner `Deterministic` and its one-line rationale
+      — control probe: `command grep -ohE 'layer-coherence' repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md | sort -u | wc -l`
+      returns 1, proving the file and the tool both work
+      — acceptance: `command grep -ohE 'plan-acceptance-validation' repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md | sort -u | wc -l`
+      returns 1 (returns **0** before this step — verified on `main` during this rework); if it
+      already returns 1, record "already landed by the sibling plan" in `learnings.md` and skip
+- [ ] [AI] Add the sibling plan's row (`sweep-completeness`, owner `Deterministic`) to the same table
+      in the same edit, so the shared file is opened once rather than twice
+      — acceptance: `command grep -ohE 'sweep-completeness' repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md | sort -u | wc -l`
+      returns 1 (returns 0 today); already-present is recorded and skipped
+- [ ] [AI] Register **both** plans' subcommands in `apps/rhino-cli/src/cli.rs` and
+      `apps/rhino-cli/src/commands.rs` in one edit — `plan validate-acceptance <path>` and
+      `repo-governance sweep-completeness validate`
+      — acceptance: `command grep -ohE 'validate-acceptance|validate_acceptance' -r apps/rhino-cli/src | sort -u | wc -l`
+      returns at least 2 **and**
+      `command grep -ohE 'sweep-completeness|sweep_completeness' -r apps/rhino-cli/src | sort -u | wc -l`
+      returns at least 2 (both return 0 today, verified during authoring); already-present is
+      recorded and skipped
+- [ ] [AI] Add the registry-replay harness at
+      `apps/rhino-cli/src/commands/governance_registry_replay.rs` as
+      `governance registry-replay <registry-file> <entry-id> <target-path>`: it reads the entry's
+      recorded detection command, re-runs it against the target, and emits before/after instance
+      counts in the canonical envelope shape
+      — acceptance: `test -f apps/rhino-cli/src/commands/governance_registry_replay.rs` succeeds
+      (fails today); already-present is recorded and skipped
+- [ ] [AI] Register both new convention documents in
+      `repo-governance/development/quality/README.md` and `repo-governance/development/README.md`
+      — acceptance: **per file** (a union count across both files would return 1 whether one or both
+      were updated — a DC-6 non-discriminating clause), for each of the two READMEs:
+      `test -f <file>` succeeds and
+      `command grep -ohE 'plan-acceptance-defect-classes|governance-sweep-blind-spots' <file> | sort -u | wc -l`
+      returns 2 (returns 0 today for both files, verified during authoring)
+- [ ] [AI] Promote the **single shared termination doctrine** (XD-3) into
+      `repo-governance/development/pattern/maker-checker-fixer.md` §Preventing Iteration Loops:
+      saturation-based termination, the disjoint-lens requirement, and the narrowing rule — added
+      **by name, never by ordinal** (a "fifth safeguard" phrasing would hardcode a count of a
+      dynamic collection)
+      — control probe: `command grep -ohE 'Preventing Iteration Loops' repo-governance/development/pattern/maker-checker-fixer.md | sort -u | wc -l`
+      returns at least 1
+      — acceptance: `command grep -ohEi 'saturation|discovery curve|operationally disjoint' repo-governance/development/pattern/maker-checker-fixer.md | sort -u | wc -l`
+      returns at least 2 (returns 0 today, verified during this rework); if already present, verify
+      the text is **identical** to the sibling plan's copy and record "already landed" — appending a
+      second copy is a defect
+- [ ] [AI] While that file is open, correct its pre-existing hardcoded miscount: the section says it
+      "defines the three structural safeguards" while four are listed
+      — control probe: the `Preventing Iteration Loops` probe above returns at least 1
+      — acceptance: `command grep -ohE 'three structural safeguards' repo-governance/development/pattern/maker-checker-fixer.md | sort -u | wc -l`
+      returns 0 after the edit (returns **1** today — verified during this rework), and the
+      replacement phrasing states no count
+
+### Phase S Gate
+
+> All checks below must pass before starting Phase 1.
+
+- [ ] [AI] Both Split-table rows present — each of the two count clauses returns 1
+- [ ] [AI] Both subcommands registered — each of the two count clauses returns at least 2
+- [ ] [AI] `test -f apps/rhino-cli/src/commands/governance_registry_replay.rs` succeeds
+- [ ] [AI] Both governance index READMEs each return 2 for the two-registry reference clause
+- [ ] [AI] The XD-3 doctrine is present in `maker-checker-fixer.md` exactly once, and byte-identical
+      to the sibling plan's copy if that plan landed it first — verified by reading both
+- [ ] [AI] The "three structural safeguards" miscount clause returns 0
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` reports zero failures
+
+> **Pause Safety**: the shared substrate is additive — new table rows, new subcommand registrations
+> with no callers yet, and a new harness module nothing invokes. The repo builds and tests clean with
+> all of it present and unused, and the sibling plan can land its own phases against it
+> independently. Safe to stop indefinitely. To resume: re-run the six acceptance clauses above and
+> confirm each reports "present".
+
+---
 
 ---
 
@@ -182,14 +308,14 @@ authoritative]`
       and catching form in one scannable table
       — acceptance: `command grep -ohE 'Sweep forms' repo-governance/development/quality/governance-sweep-blind-spots.md | sort -u | wc -l`
       returns 1 (returns 0 today)
-- [ ] [AI] Register the new convention in `repo-governance/development/quality/README.md` and in
-      `repo-governance/development/README.md` index tables
+- [ ] [AI] Confirm the registry is registered in both governance index READMEs — this was landed by
+      **Phase S** and is verified, not re-applied, here
       — acceptance: **per file** (a union count across both files would return 1 whether one or both
       were updated — a non-discriminating clause), for each of
       `repo-governance/development/quality/README.md` and `repo-governance/development/README.md`:
       `test -f <file>` succeeds and
-      `command grep -ohE 'governance-sweep-blind-spots' <file> | sort -u | wc -l` returns 1 — each returns 0
-      today, verified on `main` during authoring
+      `command grep -ohE 'governance-sweep-blind-spots' <file> | sort -u | wc -l` returns 1; a return
+      of 0 means Phase S did not complete and this phase must not proceed
 - [ ] [AI] Cross-link the registry from the sibling acceptance-clause registry created by
       [`plans/backlog/2026-07-20__plan-quality-gate-convergence/`](../2026-07-20__plan-quality-gate-convergence/README.md)
       **only if that plan has already landed** (DECISION 6 keeps the two registries separate but
@@ -300,10 +426,10 @@ authoritative]`
 
 ### Wiring
 
-- [ ] [AI] Register the subcommand in `apps/rhino-cli/src/cli.rs` and
-      `apps/rhino-cli/src/commands.rs` as `repo-governance sweep-completeness validate`
+- [ ] [AI] Confirm the subcommand registration from **Phase S** is present — `cli.rs` and
+      `commands.rs` are shared with the sibling plan and are verified, not re-applied, here
       — acceptance: `command grep -ohE 'sweep-completeness|sweep_completeness' -r apps/rhino-cli/src | sort -u | wc -l`
-      returns at least 2 (returns 0 today in both files, verified on `main` during authoring)
+      returns at least 2; a return of 0 means Phase S did not complete and this phase must not proceed
 - [ ] [AI] Register `sweep-completeness` as the **fifth category** in the `repo-governance audit`
       orchestrator at `apps/rhino-cli/src/commands/governance_audit.rs`, alongside the existing
       `layer-coherence`, `traceability-audit`, `vendor-audit` and `instruction-size`
@@ -321,11 +447,28 @@ authoritative]`
 
 ### Phase 2 Gate
 
-> All checks below must pass before starting Phase 4.
+> All checks below must pass before starting Phase 4. The bar is the **existing** deterministic
+> implementation contract from
+> [`deterministic-vs-ai-validation-split.md`](../../../repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md)
+> §Deterministic owner — implementation contract, not an ad hoc "tests pass" criterion. Every other
+> deterministic category in this repo already meets it; holding this one to less would be a silent
+> exemption ([XD-1](./README.md#xd-1--extend-the-existing-deterministic-vs-ai-split-convention-rather-than-re-derive-it)).
 
 - [ ] [AI] `npx nx run rhino-cli:test:unit` exits 0
+- [ ] [AI] **≥90% line coverage** on the validator's implementation files — the contract's bar
+- [ ] [AI] The Gherkin feature carries **both** happy-path and failure-path scenarios — the
+      contract's bar; a feature with only happy-path scenarios fails this gate
+- [ ] [AI] **Unit tests AND integration tests** against real temp-dir fixtures both present and green
+      — the contract's bar
+- [ ] [AI] The validator is **byte-deterministic** given a fixed clock — same input, byte-identical
+      output, verified across repeated runs
+- [ ] [AI] Findings carry a stable composite key in the canonical envelope shape, per the
+      convention's JSON envelope contract
 - [ ] [AI] `npx nx run rhino-cli:specs:behavior:coverage` exits 0
 - [ ] [AI] Validator yields ≥1 finding against the BS-12 fixture and 0 against its corrected form
+- [ ] [AI] Every conforming look-alike fixture yields **0** findings — false positives scored, not
+      only false negatives (the OWASP Benchmark pattern per
+      [XD-7](./README.md#xd-7--control-probes-and-seeded-fixtures-are-standing-practice-mutation-is-the-escalation))
 - [ ] [AI] `repo-governance audit -o json` emits five categories and still validates against the
       unchanged schema
 - [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` reports zero failures
@@ -342,9 +485,16 @@ authoritative]`
 > _Suggested executor: `agent-maker`_
 
 - [ ] [AI] Add an **Inbound-Link Sweep (Primary)** section to `.claude/agents/repo-rules-checker.md`
-      requiring the checker to derive its sweep set from documents linking to the changed governing
-      document, its outbound links, and the declared blast radius (DD-3), with keyword phrasing
-      search demoted to a secondary lens ranking within that set; link the registry
+      requiring the checker to **consume the inbound-link set computed by the Phase 2 validator**
+      rather than re-deriving it by hand, with keyword phrasing search demoted to a secondary lens
+      ranking within that set; link the registry. Per README DECISION 16, set construction is pure
+      regex-extraction-plus-set-comparison — the identical shape the split convention already lists
+      as the **deterministic** `layer-coherence` category — so the checker spends its budget on
+      judging whether a passage in that set is stale, which is the part that genuinely requires
+      reading
+      — acceptance (in addition to the clause below):
+      `command grep -ohEi 'computed by the validator|consumes the computed set|sweep-completeness' .claude/agents/repo-rules-checker.md | sort -u | wc -l`
+      returns at least 1 (returns 0 today, verified on `main`)
       — acceptance: `command grep -ohEi 'inbound link|inbound-link|secondary lens' .claude/agents/repo-rules-checker.md | sort -u | wc -l`
       returns at least 2 (returns 0 today, verified on `main`) **and**
       `command grep -ohE 'governance-sweep-blind-spots' .claude/agents/repo-rules-checker.md | sort -u | wc -l`
@@ -361,9 +511,19 @@ authoritative]`
       returns at least 1 (returns 0 today)
 - [ ] [AI] Add a **Class-Wide Remediation** section to `.claude/agents/repo-rules-fixer.md`: a
       finding instantiating a registry class obliges the fixer to enumerate every instance of that
-      class across the sweep set in one pass and list each site with its disposition in the fix report
+      class across the sweep set in one pass and list each site with its disposition in the fix
+      report, with closure verified by invoking the **Phase S registry-replay harness** on the
+      registry entry rather than by re-deriving the enumeration by reading (README DECISION 17)
       — acceptance: `command grep -ohEi 'class-wide|enumerate every instance|whole-class' .claude/agents/repo-rules-fixer.md | sort -u | wc -l`
-      returns at least 2 (returns 0 today, verified on `main`)
+      returns at least 2 (returns 0 today, verified on `main`) **and**
+      `command grep -ohE 'registry-replay' .claude/agents/repo-rules-fixer.md | sort -u | wc -l`
+      returns 1 (returns 0 today)
+- [ ] [AI] Wire the same harness into the checker side: `.claude/agents/repo-rules-checker.md`
+      verifies class closure and the completeness-diff contract via
+      `governance registry-replay`, so both mechanisms share one implementation and closure becomes a
+      count-diff rather than a trust-based re-derivation
+      — acceptance: `command grep -ohE 'registry-replay' .claude/agents/repo-rules-checker.md | sort -u | wc -l`
+      returns 1 (returns 0 today)
 - [ ] [AI] Add a **Self-Inflicted Drift Re-Check** section to `.claude/agents/repo-rules-fixer.md`
       (closes BS-11): after applying its commits, the fixer re-examines every document it changed for
       claims its own edits falsified, and lists each site with its disposition
@@ -374,10 +534,19 @@ authoritative]`
       — acceptance: `command grep -ohE 'governance-sweep-blind-spots' .claude/agents/repo-rules-maker.md | sort -u | wc -l`
       returns 1 (returns 0 today)
 - [ ] [AI] Add the sweep methodology to
-      `repo-governance/development/pattern/maker-checker-fixer.md` §Preventing Iteration Loops as a
-      fifth safeguard, so the pattern convention (not just the agents) carries it
+      `repo-governance/development/pattern/maker-checker-fixer.md` §Preventing Iteration Loops
+      **by name** — as the "Sweep Methodology" safeguard — so the pattern convention (not just the
+      agents) carries it. Do **not** number it "the fifth safeguard": that hardcodes a count of a
+      dynamic collection, forbidden by the
+      [Dynamic Collection References Convention](../../../repo-governance/conventions/writing/dynamic-collection-references.md),
+      and the target section's own prose is already wrong on exactly this point — Phase S corrects it
+      (README DECISION 18)
+      — control probe: `command grep -ohE 'Preventing Iteration Loops' repo-governance/development/pattern/maker-checker-fixer.md | sort -u | wc -l`
+      returns at least 1
       — acceptance: `command grep -ohEi 'inbound link|inbound-link|sweep transcript' repo-governance/development/pattern/maker-checker-fixer.md | sort -u | wc -l`
-      returns at least 1 (returns 0 today, verified on `main`)
+      returns at least 1 (returns 0 today, verified on `main`) **and**
+      `command grep -ohEi 'fifth safeguard' repo-governance/development/pattern/maker-checker-fixer.md | sort -u | wc -l`
+      returns **0**
 - [ ] [AI] Verify no vendor-specific content entered any `repo-governance/` file edited in this phase
       per the [Governance Vendor-Independence Convention](../../../repo-governance/conventions/structure/governance-vendor-independence.md)
       — acceptance: `npx nx run rhino-cli:governance:vendor-audit-validation` exits 0
@@ -467,17 +636,41 @@ authoritative]`
       computation is already covered and must not AI-re-derive it
       — acceptance: `command grep -ohE 'sweep-completeness' .claude/agents/repo-rules-checker.md | sort -u | wc -l`
       returns 1 (returns 0 today)
-- [ ] [AI] Insert the **Adversarial Round** as an explicit workflow step between the double-zero check
-      and finalization: its agenda is the mechanical never-touched candidate set, it runs exactly
-      once, and a non-zero result routes back to the fixer
+- [ ] [AI] Insert the **Adversarial Round** as an explicit workflow step between the termination check
+      and finalization, **gated on the mechanically-computed never-touched candidate set being
+      non-empty** (README DECISION 14): its agenda is that set, it runs at most once, and a non-zero
+      result routes back to the fixer. When the set is **empty**, the deterministic layer has already
+      disproven the round's own precondition, so the round is **skipped** and the emptiness recorded
+      with its derivation. Running an AI round against an agenda arithmetic has proven empty is
+      ceremony, not rigor — and it was the plan's only speed-negative mechanism on the modal case
       — acceptance: `command grep -ohEi 'adversarial' repo-governance/workflows/repo/repo-rules-quality-gate.md | sort -u | wc -l`
-      returns at least 1 (returns 0 today, verified on `main`)
-- [ ] [AI] Rewrite §Termination Criteria so `pass` requires: two consecutive zero threshold-level
-      validations, **plus** a zero adversarial round, **plus** an empty never-touched candidate set —
-      and so that an empty adversarial agenda is recorded explicitly with its derivation
+      returns at least 1 (returns 0 today, verified on `main`) **and** the workflow's control flow
+      contains an explicit branch skipping the round on an empty candidate set — verified by reading
+      the step, since a branch is structural rather than lexical
+- [ ] [AI] Add the matching **skip branch** to the target-loop description and to
+      `.claude/agents/repo-rules-checker.md`, so the agent and the workflow describe the same control
+      flow and neither implies the round is unconditional
+      — acceptance: `command grep -ohEi 'empty candidate set|empty never-touched|skip the adversarial' .claude/agents/repo-rules-checker.md | sort -u | wc -l`
+      returns at least 1 (returns 0 today)
+- [ ] [AI] Rewrite §Termination Criteria so `pass` requires: a **flattened cumulative new-class
+      discovery curve** across operationally-disjoint lenses (the single shared doctrine promoted in
+      Phase S per [XD-3](./README.md#xd-3--one-termination-doctrine-saturation-not-round-counting)),
+      zero threshold-level findings, an empty never-touched candidate set, and — **only when that set
+      was non-empty** — a zero adversarial round. An empty adversarial agenda is still recorded
+      explicitly with its derivation, so "nothing to challenge" stays distinguishable from "the
+      computation never ran", which was AC-13's actual purpose
       — acceptance: `command grep -ohEi 'never-touched|adversarial' repo-governance/workflows/repo/repo-rules-quality-gate.md | sort -u | wc -l`
-      returns at least 2, and the Termination Criteria section names all three preconditions —
-      verified by reading the section
+      returns at least 2 **and**
+      `command grep -ohEi 'discovery curve|saturation|flatten' repo-governance/workflows/repo/repo-rules-quality-gate.md | sort -u | wc -l`
+      returns at least 2 (returns 0 today, verified during this rework), and the Termination Criteria
+      section names every precondition including the adversarial round's gating condition — verified
+      by reading the section
+- [ ] [AI] Require the **per-round new-class count** to be recorded in the final report, so the
+      flattening is readable evidence rather than an assertion — a bare round counter is not a
+      stopping rule, and a round structurally narrower than its predecessor contributes no flattening
+      evidence unless its narrowed-out region was covered by a different lens
+      — acceptance: `command grep -ohEi 'new-class|new class count' repo-governance/workflows/repo/repo-rules-quality-gate.md | sort -u | wc -l`
+      returns at least 1 (returns 0 today)
 - [ ] [AI] Update the `termination` frontmatter field in the same workflow to describe the
       adversarial rule
       — acceptance: the frontmatter `termination:` value names the adversarial round — verified by
@@ -502,9 +695,13 @@ authoritative]`
 
 > All checks below must pass before starting Phase 5B.
 
-- [ ] [AI] Adversarial round present in the workflow and ordered before finalization
-- [ ] [AI] Termination criteria name all three preconditions (double zero, adversarial zero, empty
-      never-touched set)
+- [ ] [AI] Adversarial round present in the workflow, ordered before finalization, and **gated** on a
+      non-empty never-touched candidate set — the skip branch is present and explicit
+- [ ] [AI] The workflow and `.claude/agents/repo-rules-checker.md` describe the **same** control flow;
+      neither implies the round is unconditional
+- [ ] [AI] Termination criteria name the flattened discovery curve, zero threshold-level findings, the
+      empty never-touched set, and the adversarial round **with its gating condition**
+- [ ] [AI] The per-round new-class count is required in the final report
 - [ ] [AI] **Control probe first** (DECISION 10 — both clauses below assert a ZERO, so the search
       tool must be proven working before its zero is trusted):
       `command grep -ohE 'Preventing Iteration Loops' repo-governance/development/pattern/maker-checker-fixer.md | sort -u | wc -l`
@@ -665,7 +862,7 @@ authoritative]`
       on-disk table, and a run that enumerates only on-disk artifacts is confirmed to MISS it —
       falsifiable in both directions
 - [ ] [AI] Verify the AC-15 no-check-removed invariant: re-derive the `repo-rules-checker` step
-      inventory via `command grep -ohE '^### Step [0-9.]+[^\n]*' .claude/agents/repo-rules-checker.md | sort -u`
+      inventory via `command grep -ohE '^### Step [0-9.]+.*$' .claude/agents/repo-rules-checker.md | sort -u`
       and compare against the Phase 0 baseline recorded in `learnings.md`
       — acceptance: every Phase 0 baseline step is still present and the post-change count is greater
       than or equal to the baseline count

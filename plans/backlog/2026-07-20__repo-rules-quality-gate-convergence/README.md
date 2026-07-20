@@ -15,11 +15,19 @@ and `grep -c "after 5 iterations"` returning 1). The workflow's own `max-iterati
 defaults to **7** with an escalation warning at 5 [Repo-grounded].
 
 On 2026-07-20 a real governance-change chain — inverting the plan merge default from `[HUMAN]` to
-`[AI]` and hardening the merge preconditions — required **14 sequential checker rounds**, 13 of
-which found genuine survivors. The first twelve distinct blind-spot classes below were all
-discovered in the first thirteen rounds; the fourteenth found two further survivors
+`[AI]` and hardening the merge preconditions — required **14 sequential checker rounds in its first
+session**, 13 of which found genuine survivors. The first twelve distinct blind-spot classes below
+were all discovered in the first thirteen rounds; the fourteenth found two further survivors
 (`CONTRIBUTING.md` and a sibling plan's DN-11 note) but **no new class** — both were BS-12 misses,
 in files no prior commit had ever touched.
+
+**What "14" counts, precisely**: 14 is the **first-session checker-round** count, and every use of it
+in this plan means that. It is not the total effort against this governance change. A second session
+(the PR-review maker→fixer cycles described below) added a further 3-5 productive passes, so the
+end-to-end total across both sessions is roughly 17-19 rounds when the review cycles are counted in.
+Both the 15-class total and the 13-round original-chain framing used elsewhere in this plan are
+consistent readings of the same evidence at different scopes; this paragraph exists so the three
+numbers are not read as contradicting one another.
 
 A **second session**, running the PR-review maker→fixer cycle on the resulting PR, surfaced **three
 further classes** (BS-13, BS-14, BS-15) plus the plan's central new finding: enumeration-based
@@ -253,9 +261,67 @@ on. Use `find -print0`.
 This becomes a normative rule (DECISION 10): **a sweep's zero is evidence only if the command could
 have produced a non-zero result**, proven by a known-positive control probe.
 
+## Why sequential rounds could never have converged
+
+The 14-round first session is not evidence that the checker was careless — every round found real
+stale text. It is evidence that **one lens, iterated, is structurally incapable of converging**, and
+the research base says so directly.
+
+- **Capture-recapture defect estimation** (Petersson et al.; the IEEE TSE "Comprehensive Evaluation
+  of Capture-Recapture Models" study) estimates residual defects from overlap between reviewers, but
+  requires **4+ genuinely independent** reviewers; too few causes substantial underestimation. One
+  checker iterating over its own prior output violates independence by construction, so the
+  double-zero rule was never estimating residual defects — it was observing one lens agree with
+  itself twice. [Web-cited — via the 2026-07-20 research brief; see DECISION 12 of the sibling plan
+  for the shared re-verification step]
+- **Perspective-Based Reading** (Basili et al., plus the Springer replication) shows reviewers
+  applying **genuinely different lenses** find largely **non-overlapping** defect sets — with the
+  replication's decisive caveat that reviewers given merely differently-**labelled** perspectives
+  converge on the same defects. Relabelling one procedure is not a second lens.
+  [Web-cited — via the 2026-07-20 research brief]
+
+This is the mechanistic explanation for the central observation this plan is built on — that **every
+round surfaced a new blind-spot class the prior round's sweep had structurally missed**. That is
+exactly what one lens iterating produces: each round discovers at most the one class its own shape
+lets it see, so fifteen classes cost roughly fifteen rounds. It equally explains the five-axis
+guard-hole sequence, where four consecutive fixes were each correct on the axis named and open on an
+axis nobody had named.
+
+Adding rounds adds observations of the same shape. Adding **lenses** adds shapes. See
+[XD-4](#xd-4--parallel-operationally-disjoint-lenses-replace-sequential-rounds).
+
 ## Approach
 
-Nine mechanisms, ordered cheapest-first:
+Every mechanism below carries an explicit **disposition** — whether it REDUCES ROUNDS, RAISES
+QUALITY, or BOTH. A mechanism that does neither is cut, not kept for tidiness. This table is the
+plan's guard against reintroducing overhead disguised as rigor, and `plan-checker` treats a mechanism
+with no disposition as a HIGH finding.
+
+| #   | Mechanism                                                                                                      | Disposition    | Why                                                                                                                |
+| --- | -------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 1   | **Blind-Spot Class Registry (BSCR)**                                                                           | BOTH           | Each class is paid for once repo-wide (rounds) and stops recurring at new sites (quality)                          |
+| 2   | **Deterministic sweep-completeness validator**                                                                 | BOTH           | Never-touched arithmetic replaces a semantic round (rounds); contradicts a false completeness claim (quality)      |
+| 3   | **Inbound-link-target sweep, mechanized** (DECISION 16)                                                        | BOTH           | Set computed not re-derived (rounds); selects by stable key so paraphrases stop escaping (quality)                 |
+| 4   | **Sweep transcript contract**                                                                                  | RAISES QUALITY | Enabling, not a speedup — it is what makes scope claims falsifiable and lens-disjointness checkable                |
+| 5   | **Evidence-grounding contract**                                                                                | RAISES QUALITY | Prevents a false alarm manufacturing work inside a three-repo byte-identity boundary                               |
+| 6   | **Adversarial round, gated on a non-empty candidate set** (DECISION 14)                                        | REDUCES ROUNDS | Skipped when arithmetic has already disproven its precondition; full protection retained on the pathological case  |
+| 7   | **Completeness-diff contract**                                                                                 | BOTH           | Reaches three classes no text search reaches at all (quality); reaches them in one pass rather than never (rounds) |
+| 8   | **Guard placement contract**                                                                                   | BOTH           | Ends the four-consecutive-failure axis sequence (rounds); closes the hole each enumeration left open (quality)     |
+| 9   | **Search-tool validity contract**                                                                              | RAISES QUALITY | Enabling — it is what stops every other mechanism reporting a fabricated zero                                      |
+| 10  | **Parallel disjoint lenses** ([XD-4](#xd-4--parallel-operationally-disjoint-lenses-replace-sequential-rounds)) | BOTH           | N lenses in one round instead of N rounds (rounds); non-overlapping discovery per PBR (quality)                    |
+| 11  | **Saturation-based termination** ([XD-3](#xd-3--one-termination-doctrine-saturation-not-round-counting))       | BOTH           | Stops on evidence of exhaustion rather than fatigue (rounds); a zero means the curve flattened (quality)           |
+
+**Cut or gated from the previous draft** — each failed the disposition test as written:
+
+- **The unconditional adversarial round.** Not cut, but **gated** on the mechanically-computed
+  never-touched set being non-empty ([DECISION 14](#decision-14--the-adversarial-round-is-gated-on-a-non-empty-candidate-set)).
+  As written it added a mandatory round to every invocation including trivial ones, which is the
+  literal opposite of the stated goal on the modal case.
+- **Mechanisms 4, 5 and 9 re-justified as enabling, not as speedups.** They were previously presented
+  alongside round-reducers; they are preconditions that make the round-reducers trustworthy, and
+  saying so plainly is what stops the next reader mistaking documentation overhead for convergence.
+
+The mechanisms below retain their original numbering and descriptions:
 
 1. **Blind-Spot Class Registry (BSCR)** — a governance catalogue of the fifteen observed classes,
    each with its inline evidence, the sweep form that misses it, and the sweep form that catches it.
@@ -282,8 +348,32 @@ Nine mechanisms, ordered cheapest-first:
    command is recorded, stderr is not suppressed, the tool is invoked in a form it accepts, and a
    known-positive control probe returns non-zero. See DECISION 10.
 
-Mechanisms 2, 6 and 7 are the actual terminators. Mechanisms 1, 3, 4, 5, 8 and 9 reduce how much
-work reaches them — and mechanism 9 is what keeps the others from reporting a fabricated zero.
+**The terminator is mechanism 11 — saturation** ([XD-3](#xd-3--one-termination-doctrine-saturation-not-round-counting)),
+the single doctrine now shared with the sibling plan. Mechanisms 2, 6 and 7 are what make a
+saturation verdict **trustworthy**, by supplying the disjoint lenses whose flattening curve the
+doctrine reads; the previous draft called them "the actual terminators", which conflated the evidence
+for stopping with the rule for stopping. Mechanisms 1, 3 and 8 reduce how much work reaches them, and
+mechanisms 4, 5 and 9 keep any of them from reporting a fabricated zero.
+
+## Sequencing with the sibling plan
+
+Both plans may execute concurrently — that is the point of XD-2's idempotent Phase S. Two ordering
+constraints apply and are stated here so neither plan discovers them at merge time:
+
+1. **Phase S is first-writer-wins.** Whichever plan reaches Phase S first lands the shared substrate
+   (the Split-table rows, the shared `cli.rs` / `commands.rs` registration, both governance index
+   rows, and the registry-replay harness); the other detects it present and records "already landed".
+   Both plans' Phase S acceptance clauses are falsifiable in both directions on exactly this basis.
+2. **`repo-governance/workflows/pr/pr-review-quality-gate.md` belongs to this plan alone.** The
+   sibling plan previously left it as an open question, deferring it to "a separate backlog plan"
+   while this plan was already landing two concrete edits to it. That question is now resolved in the
+   sibling's DECISION 5 to "do nothing; this plan covers it", so there is no race and no duplicate
+   follow-up. Gap D2 remains this plan's own Knowledge Capture follow-up and must not be re-filed by
+   the sibling.
+
+The shared `maker-checker-fixer.md` termination text (XD-3) is likewise idempotent: both plans carry
+the identical block, and the second writer verifies it is present and identical rather than appending
+a second copy.
 
 ## Scope
 
@@ -291,8 +381,14 @@ work reaches them — and mechanism 9 is what keeps the others from reporting a 
 
 - `repo-governance/workflows/repo/repo-rules-quality-gate.md` — step model, termination criteria
 - New `repo-governance/development/quality/governance-sweep-blind-spots.md` — the BSCR
+- `repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md` — **extended, not
+  re-derived**: one new row in The Split table, and its existing implementation contract adopted as
+  this plan's Phase 2 Gate bar ([XD-1](#xd-1--extend-the-existing-deterministic-vs-ai-split-convention-rather-than-re-derive-it))
 - `repo-governance/development/pattern/maker-checker-fixer.md` — the falsified 1-3 / escalate-at-5
-  convergence claim, plus the sweep-methodology additions to §Preventing Iteration Loops
+  convergence claim, the single shared termination doctrine
+  ([XD-3](#xd-3--one-termination-doctrine-saturation-not-round-counting)), plus the
+  sweep-methodology additions to §Preventing Iteration Loops — all landed idempotently with the
+  sibling plan ([XD-2](#xd-2--one-shared-substrate-built-once-landed-idempotently))
 - `.claude/agents/repo-rules-checker.md`, `repo-rules-fixer.md`, `repo-rules-maker.md`
 - `repo-governance/workflows/pr/pr-review-quality-gate.md` — the two termination gaps only
   (fix-committed-not-thread-resolved, and evidence-based rather than count-based cycles). See
@@ -320,11 +416,194 @@ work reaches them — and mechanism 9 is what keeps the others from reporting a 
 - [delivery.md](./delivery.md) — phased, gated checklist
 - [learnings.md](./learnings.md) — Knowledge Capture running log
 
-## Decisions taken without a grill (review before Phase 1)
+## Cross-plan decisions (XD) — shared verbatim with the sibling plan
 
-This plan was authored without an interactive grill — the user was mid-session on another task. Each
-decision below was made with stated reasoning and is genuinely open. Review each before Phase 1
-begins; every one is reversible without restructuring the plan.
+These seven decisions bind **both** convergence plans, referred to below by their folder slugs:
+
+- **`plan-quality-gate-convergence`** — the acceptance-clause / plan-document gate.
+- **`repo-rules-quality-gate-convergence`** — the governance-sweep gate.
+
+The block is authored **verbatim-identically** in both plans' READMEs and contains no
+"this plan" / "the sibling" phrasing, so the two copies are byte-comparable; a divergence between
+them is a defect in whichever copy drifted. The decisions were taken during the 2026-07-20
+goal-alignment rework, without a grill, each with stated reasoning and each reversible.
+
+### XD-1 — Extend the existing deterministic-vs-AI split convention rather than re-derive it
+
+[`repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md`](../../../repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md)
+**already exists** [Repo-grounded — read in full during this rework] and already codifies: the
+owner-selection decision tree ("can the rule be encoded as an exact predicate? → Deterministic"), the
+deterministic implementation contract (≥90% line coverage, a Gherkin feature with both happy- and
+failure-path scenarios, unit **and** integration tests, byte-determinism), and the process for adding
+a category ("propose a new deterministic subcommand in a plan").
+
+Both plans' DD-2 sections re-derived that decision tree from scratch, and neither plan's Surface
+Inventory contained the convention. **DECIDED**: cite it as the authority, add each new category as a
+row to its Split table, and adopt its implementation contract as the Phase 2 Gate bar — replacing the
+weaker ad hoc "`nx run rhino-cli:test:unit` exits 0" criterion, which is below what the convention
+already requires of every other deterministic category.
+
+**This omission was itself an instance of the blind-spot classes
+`repo-rules-quality-gate-convergence` catalogues.** The
+convention's Split table is exactly a **BS-10 definition block** (sweep the usage sites, miss the
+glossary block defining the term) reached only through **BS-2 generative-source-only scope** (fix the
+doc that generates the rule, leave the convention sibling stale). Two plans that spent nine phases
+each cataloguing those classes committed both of them, in the document whose entire purpose is being
+the canonical answer to the question they were re-deriving. Recording that here is not
+self-flagellation — it is the registry's own evidence that a catalogue nobody consults is inert, which
+is why XD-2 makes consultation mechanical rather than advisory.
+
+### XD-2 — One shared substrate, built once, landed idempotently
+
+Both plans independently edit `apps/rhino-cli/src/cli.rs` and `commands.rs`, and both add a row to the
+same two governance index READMEs. Because `apps/rhino-cli/**` must stay byte-identical across
+`ose-public`, `ose-primer` and `ose-infra`, two independent copies of that plumbing cost **six**
+propagation PRs for what is two small additions to the same two files.
+
+**DECIDED**: a **Phase S (Shared Substrate)** is authored **identically and idempotently in both
+plans**. Whichever plan executes first lands it; the second detects it already present and records
+"already landed". Idempotency is what preserves the repo's parallel-by-default posture — neither plan
+waits on the other, and neither does the work twice. Phase S contains exactly four items, all shared:
+
+1. Both new categories added as rows to the XD-1 Split table.
+2. Both new subcommands registered in `cli.rs` / `commands.rs` in one edit.
+3. Both governance index README rows.
+4. The **registry-replay harness** — a generic `rhino-cli governance registry-replay` that re-runs a
+   registry entry's recorded detection command against a target and diffs before/after. Both
+   registries already store runnable commands per entry, so this converts class-closure verification
+   from a trust-based AI re-derivation into a deterministic count-diff, for both plans, from one
+   implementation.
+
+### XD-3 — One termination doctrine: saturation, not round-counting
+
+The two plans previously installed **opposite** doctrines into structurally identical loops —
+`plan-quality-gate-convergence` shrank the required-fix target, `repo-rules-quality-gate-convergence`
+raised the confidence required for a zero — and only the latter promoted its half into the shared
+[`maker-checker-fixer.md`](../../../repo-governance/development/pattern/maker-checker-fixer.md)
+§Preventing Iteration Loops, which every maker-checker-fixer family reads. A third gate adopting "the
+convention" later would have silently inherited one doctrine with no signpost that a competing one
+existed.
+
+**DECIDED**: reconcile into **one** doctrine, promoted once (idempotently, per XD-2):
+
+> **Saturation-based termination.** A gate terminates when the cumulative **new-category discovery
+> curve** has visibly flattened across rounds whose lenses are **operationally disjoint**. A round
+> count is not a stopping rule. If round N+1 is structurally **narrower** than round N, two clean
+> rounds prove the **lens** is exhausted, not the artifact — so a narrowing is legal only when it is
+> recorded and the narrowed-out region is covered by a different lens.
+
+This is where "two consecutive clean rounds" is formally documented — thematic saturation in
+qualitative research (PLOS ONE 2020, PMC7200005) — but **only** as valid alongside a tracked
+cumulative new-category discovery curve that has flattened. A bare round counter is not a stopping
+rule. [Web-cited — via the 2026-07-20 research brief]
+
+Supporting evidence for dropping round-count rules entirely: the Chromium OS security-defect
+case-control study (ICSE 2021, arXiv 2102.06909, AUC 0.91) found that **broader review scope and
+higher reviewer workload predict missed defects, while round count does not** — which supports scoped
+re-validation over broad re-sweeps and removes the last justification for counting.
+[Web-cited — via the 2026-07-20 research brief]
+
+Under this single doctrine, both plans' halves become corollaries rather than competitors:
+
+- `plan-quality-gate-convergence`'s **in-surface/latent split is a scope narrowing**, legal only
+  because the narrowed-out latent region is covered by its own disjoint lens (the single non-looping
+  latent sweep) and the narrowing is recorded.
+- `repo-rules-quality-gate-convergence`'s **adversarial round adds a disjoint lens** so the curve's
+  flattening is trustworthy rather than an artefact of one shape repeating.
+
+Same rule, applied at two points in the same loop. Only this text lands in the shared convention.
+
+### XD-4 — Parallel operationally-disjoint lenses replace sequential rounds
+
+**DECIDED** — this is the primary speed lever in both plans, and it raises quality rather than
+trading against it.
+
+Per round, the gate runs its lenses **in parallel** (subject to the repo's concurrency cap of 2
+background subagents, 3 total including the main thread), instead of discovering one class per
+sequential round. A lens qualifies only if it is **operationally disjoint**: it asks a different
+question **and** consults a different artifact set. Each lens declares the artifacts it reads, and
+overlap in that declared set is the disjointness metric — a lens whose artifact set is a subset of
+another's is a relabel, not a lens, and the PBR replication is explicit that relabelled perspectives
+converge on the same defects rather than partitioning them.
+
+**Disposition: BOTH.** N lenses in one round instead of N rounds (reduces rounds); non-overlapping
+discovery per PBR, approaching the reviewer independence capture-recapture actually requires (raises
+quality).
+
+Triage precedes the multi-lens spend rather than applying uniform rigor to everything: Meta's RADAR
+risk-triage-before-review study (arXiv 2605.30208, 535K+ diffs) reports median time-to-close cut by
+more than 330%, with one third the revert rate and one fiftieth the incident rate. Uniform rigor on
+everything is the wrong shape — multi-lens rigor is spent on the high-risk stratum.
+[Web-cited — via the 2026-07-20 research brief]
+
+Consistent with this, lightweight review beats heavyweight formal inspection: the Cisco/SmartBear
+study (2,500 reviews, 3.2M LOC) found lightweight review substantially more defect-productive per hour
+than formal inspection, with effectiveness degrading above roughly 400 LOC of scope per review. Cite
+the **qualitative** finding only — that study is from 2006, used human reviewers, and examined code
+rather than prose, so its per-hour rates do not transfer.
+[Web-cited — via the 2026-07-20 research brief]
+
+### XD-5 — Guards are invariants, not enumerations
+
+`repo-rules-quality-gate-convergence`'s enumeration-fails-open rule (its DECISION 9) is correct and
+now carries standards backing: the OWASP Developer Guide's security principles and NIST SP 800-207 / SP 800-167 both rest on
+the same asymmetry — **denylists fail open and silently; allowlists and default-deny fail closed and
+loudly**. A loud failure is catchable on the next round; a silent one is not, which is precisely why
+the five-axis guard sequence failed four consecutive times without anyone noticing until the fifth.
+[Web-cited — via the 2026-07-20 research brief]
+
+**DECIDED**: every guard in both plans is expressed as an **invariant** — "assert I holds for every
+file/clause/step in scope" — never as a list of forbidden patterns. The constructive form is
+**metamorphic testing** (Chen et al. 1998; the MST-wi catalogue, arXiv 2208.09505, 22 system-agnostic
+metamorphic relations): assert relations that must hold across transformed inputs, instead of
+enumerating expected outputs one at a time. [Web-cited — via the 2026-07-20 research brief]
+
+`plan-quality-gate-convergence` restates its defect-class detectors in invariant form;
+`repo-rules-quality-gate-convergence` restates its blind-spot sweep forms the same way.
+
+### XD-6 — Every proposed validator passes the Tricorder inclusion criterion
+
+Because every `apps/rhino-cli/**` addition carries tri-repo byte-identity cost, no detector is added
+on the grounds that it is merely computable.
+
+**DECIDED**: adopt Google Tricorder's criterion (ICSE 2015) — mechanize only where **the problem is
+obvious and the fix is clear**, ideally with an auto-generated fix. Tricorder explicitly **rejected**
+computable-but-unactionable checks such as complexity warnings and fault-prediction scores, and notes
+that analyses flagging **missing** content cannot be auto-fixed and consequently earn low developer
+trust. [Web-cited — via the 2026-07-20 research brief]
+
+The boundary this criterion enforces is real and both plans respect it: prose tooling
+(Vale / textlint / markdownlint, per the published Datadog and GitLab docs-as-code writeups) reliably
+catches **lexical and structural** violations and **cannot** detect that document A contradicts
+document B. Contradiction detection stays with the AI checker; only lexical/structural predicates
+become validators. [Web-cited — via the 2026-07-20 research brief]
+
+### XD-7 — Control probes and seeded fixtures are standing practice; mutation is the escalation
+
+**DECIDED**: every detector ships **paired valid/invalid fixtures**, scoring both false negatives and
+false positives — the OWASP Benchmark pattern (2,740 test cases combining real vulnerabilities with
+non-exploitable look-alikes), and the submission requirement already enforced by ESLint's `RuleTester`
+and Semgrep's `--test`. Every zero-asserting acceptance clause in both plans carries a known-positive
+control probe. [Web-cited — via the 2026-07-20 research brief]
+
+**The honest limit is recorded with the practice**: fixtures authored by the rule's own author
+validate the author's **intent**, not the author's **unimagined blind spots** — which is the same
+failure the five-axis guard sequence demonstrates. When hand fixtures stop finding anything, the
+escalation is **Mutation-based Soundness Evaluation** (μSE, arXiv 2102.06829; and arXiv 1806.09761):
+systematically mutate inputs along axes the guard does **not** name and measure the catch rate. μSE
+empirically falsified real static analyzers' own coverage claims, which makes it the direct answer to
+the five-axis failure.
+
+**Flagged honestly**: there is **no citable precedent for applying mutation testing to a prose or
+markdown linter**. Applying μSE here is a reasonable extrapolation from code-domain work, **not**
+off-the-shelf practice, and neither plan may present it as established. It is scoped as an escalation
+path recorded in the registries, not as a phase either plan executes.
+
+## Decisions (this plan)
+
+This plan was authored without an interactive grill. Each decision below was made with stated
+reasoning and every one is reversible without restructuring the plan. `DECISION 1`-`DECISION 13`
+predate the 2026-07-20 goal-alignment rework; `DECISION 14` onward were taken during it.
 
 ### DECISION 1 — Where does the deterministic sweep-completeness pass live?
 
@@ -548,3 +827,131 @@ text edits landing on surfaces this plan already opens (`maker-checker-fixer.md`
 edits to the PR-review workflow). D2 needs a credential decision this plan is not positioned to
 make. Recording the reasoning matters more than the split itself — a future reader seeing D2 absent
 should find why, not infer it was missed.
+
+---
+
+The decisions below were taken during the 2026-07-20 goal-alignment rework, after an audit found
+that this plan was speed-negative on the common case despite being quality-positive throughout.
+
+### DECISION 14 — The adversarial round is gated on a non-empty candidate set
+
+As previously written, the adversarial round ran on **every** invocation of the gate, unconditionally,
+with no branch that could skip it. For the archived pathological chain that is a clear win — it is
+exactly the mechanism that would have caught BS-12 eleven rounds earlier. But the stated goal is about
+the **general** loop, and for a one-line convention typo fix that sweeps its correct inbound-link set
+on the first try, the round was one guaranteed extra checker invocation with an a-priori near-zero
+probability of finding anything. AC-13 already conceded this by planning for the empty-agenda case:
+the plan anticipated that most runs would have nothing for the round to do, and offered only that the
+emptiness be **recorded**. The round still ran.
+
+- **A. Unconditional, as previously written** — **REJECTED** on the disposition test: pure overhead on
+  the modal case, cushioned only by rarely preventing a pathological chain.
+- **B. Gate the round on the mechanically-computed never-touched candidate set being non-empty** —
+  **DECIDED**.
+- **C. Drop the adversarial round entirely** — loses 100% of the protection on the pathological case,
+  which is the case the plan exists for.
+
+**Reasoning for B**: mechanism 2 already computes the never-touched set deterministically, at zero
+token cost, before the round would run. If that set is **empty**, the deterministic layer has already
+disproven the round's own precondition — there is, mechanically, nothing disjoint left to argue about.
+Running an AI round against an agenda arithmetic has proven empty is not rigor, it is ceremony. The
+round therefore converts from "always runs, usually finds nothing" to "runs exactly when the
+mechanical layer says there is something to argue about", recovering the common-case speed while
+keeping the pathological-case protection intact.
+
+The emptiness is still **reported** with its derivation (AC-13 survives unchanged in that respect), so
+"nothing to challenge" remains distinguishable from "the computation never ran" — which was AC-13's
+actual purpose. Under [XD-3](#xd-3--one-termination-doctrine-saturation-not-round-counting) this is
+principled rather than merely cheaper: an empty never-touched set means the disjoint lens has no
+disjoint region to inspect, so running it would add an observation of an already-covered shape — the
+precise failure mode saturation-based termination exists to avoid. **Disposition: REDUCES ROUNDS**
+(strictly, on the modal case, with no quality change on any case).
+
+### DECISION 15 — This plan's own acceptance clauses are corrected for the DC-8 bracket-expression trap
+
+The 2026-07-20 audit reproduced a live defect in this plan's own delivery checklist. Two acceptance
+clauses used `command grep -ohE '^### Step [0-9.]+[^\n]*'`. Inside a POSIX bracket expression a
+backslash is **not** an escape, so `[^\n]` means "not the literal `\` and not the literal `n`" rather
+than "not a newline". Reproduced on this host against the real
+`.claude/agents/repo-rules-checker.md`, every match truncated at the first literal lowercase `n`:
+
+```text
+### Step 0: I
+### Step 0.5: Co
+### Step 1: Core Repository Validatio
+### Step 4: Skill-to-Skill Co
+### Step 7: Rules Gover
+### Step 9: Fi
+```
+
+**DECIDED**: replace both occurrences with `'^### Step [0-9.]+.*$'`. Under `grep -o`, `.` does not
+match a newline by construction on any grep implementation, so the corrected form sidesteps the
+bracket-escaping ambiguity entirely rather than working around it. Verified live: the corrected form
+returns all eleven headings in full and untruncated.
+
+This defect is retained in the plan as **worked evidence**, not merely fixed, for three reasons:
+
+1. It is the exact class of environment-dependent tool fragility **DECISION 10 exists to prevent**,
+   and it was sitting inside the very delivery checklist that installs DECISION 10. The plan applied
+   enormous rigor to the ugrep `--glob` trap and none to this one, in the same file, at the moment it
+   authored the clauses meant to demonstrate the new discipline.
+2. **It passed by luck.** `sort -u | wc -l` still returned the correct count in the current repo
+   state because no two truncated prefixes happened to collide. A future heading rename sharing a
+   truncated prefix with a sibling would silently **undercount** through the `sort -u` dedup, letting
+   the AC-15 "no check was removed" invariant pass even if a step really had been dropped — the exact
+   failure DECISION 10 exists to prevent, reintroduced by the checklist installing it.
+3. It is a textbook [XD-5](#xd-5--guards-are-invariants-not-enumerations) case: the clause enumerated
+   what to **exclude** (`[^\n]`) instead of asserting an invariant, and the enumeration failed open —
+   silently, exactly as the OWASP/NIST asymmetry predicts.
+
+The class is catalogued as **DC-8** in the sibling plan's registry (the registry that owns
+acceptance-clause traps, per DECISION 6's separation), and cross-referenced from this plan's registry
+as a worked instance of the enumeration-fails-open rule.
+
+### DECISION 16 — Inbound-link-set construction is mechanized, not left as a prose obligation
+
+Mechanism 3 (sweep by inbound link target) was the plan's single most avoidable under-mechanization:
+it was left as an AI checker's prose obligation even though the
+[deterministic-vs-AI split convention](../../../repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md)
+already lists an identical operation — `layer-coherence`, "Regex extraction + cross-doc set
+comparison" — as an existing **deterministic** category. The evidence base's own strongest controlled
+comparison (the inbound-link sweep catching survivors four prior keyword-shaped rounds had missed) is
+precisely a mechanical regex-extraction-plus-set-comparison, textually identical in shape to something
+this repo already runs deterministically.
+
+**DECIDED**: the inbound-link set is computed by the Phase 2 validator, not re-derived by the checker.
+The checker consumes the computed set and spends its budget on judging whether a passage in that set
+is stale — which is the part that genuinely requires reading. This satisfies
+[XD-6](#xd-6--every-proposed-validator-passes-the-tricorder-inclusion-criterion): the problem is
+obvious (the set is wrong or incomplete), the fix is clear (use the computed set), and the check is
+pure set arithmetic. **Disposition: BOTH.**
+
+### DECISION 17 — Class closure and completeness-diff share the XD-2 registry-replay harness
+
+Two mechanisms in this plan re-derive enumerations that are mechanical by construction: class-wide
+sweep closure, and the completeness-diff contract. Both registries already store runnable commands per
+entry.
+
+**DECIDED**: both consume the [XD-2](#xd-2--one-shared-substrate-built-once-landed-idempotently)
+registry-replay harness rather than each growing its own re-derivation. The harness re-runs a registry
+entry's recorded detection command and diffs before/after, which turns "the checker independently
+re-runs the enumeration" into a deterministic count-diff for both mechanisms, from one implementation
+shared with the sibling plan. **Disposition: BOTH** — it removes the recurrence rounds and removes the
+trust assumption.
+
+The completeness-diff contract keeps its **rider** unchanged and it remains load-bearing: ground truth
+is sometimes **not a file on disk** (BS-15's was `git branch -r`), so every harness invocation names
+its authoritative source, and an unnamed source stays a finding per AC-20.
+
+### DECISION 18 — The "fifth safeguard" count is removed from the shared convention edit
+
+The previous draft's Phase 3 instructed the fixer to add the sweep methodology to
+`maker-checker-fixer.md` §Preventing Iteration Loops "as a fifth safeguard". That is a hardcoded count
+of a dynamic collection, forbidden by the
+[Dynamic Collection References Convention](../../../repo-governance/conventions/writing/dynamic-collection-references.md),
+and it is already wrong in the target file: that section's own prose says it "defines the three
+structural safeguards" while four are listed [Repo-grounded — verified during this rework].
+
+**DECIDED**: the delivery step adds the safeguard **by name**, never by ordinal, and additionally
+corrects the pre-existing "three structural safeguards" miscount to a countless phrasing while the
+file is open — a Root Cause Orientation fix for a defect encountered during the work, not scope creep.

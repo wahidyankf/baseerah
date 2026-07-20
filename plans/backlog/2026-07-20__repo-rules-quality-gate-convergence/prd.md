@@ -244,25 +244,44 @@ Scenario: A finding instantiating a registry blind-spot class triggers a whole-c
   And no instance of that class remains unaddressed in the sweep set
 ```
 
-### AC-12 — Termination requires an adversarial round
+### AC-12 — A non-empty never-touched set requires an adversarial round
 
 ```gherkin
-Scenario: A zero verdict is challenged before it is accepted
+Scenario: A zero verdict over a non-empty never-touched set is challenged before it is accepted
   Given a validation round reports zero threshold-level findings
+  And the mechanically-computed never-touched candidate set is non-empty
   When the workflow evaluates termination
-  Then the workflow runs one adversarial round whose agenda is the mechanical never-touched candidate set
+  Then the workflow runs one adversarial round whose agenda is that never-touched candidate set
   And the workflow reports pass only if that adversarial round also reports zero
   And the final report records the never-touched set that the adversarial round consumed
 ```
 
-### AC-13 — An empty adversarial agenda is itself reported
+### AC-13 — An empty never-touched set skips the round and reports the emptiness
+
+Replaces the previous draft's criterion, under which the round ran unconditionally and merely
+recorded that its agenda was empty. See
+[README DECISION 14](./README.md#decision-14--the-adversarial-round-is-gated-on-a-non-empty-candidate-set).
 
 ```gherkin
-Scenario: The adversarial round reports its agenda even when empty
-  Given the mechanical never-touched candidate set is empty at termination
-  When the adversarial round runs
-  Then the round records the empty agenda explicitly in the final report
-  And the report states the candidate-set derivation used, so an empty set can be distinguished from an unrun computation
+Scenario: The adversarial round is skipped when arithmetic has disproven its precondition
+  Given the mechanically-computed never-touched candidate set is empty at termination
+  When the workflow evaluates termination
+  Then the workflow skips the adversarial round rather than running it against an empty agenda
+  And the final report records the empty agenda explicitly together with the candidate-set derivation used
+  And an empty set remains distinguishable from an unrun computation
+  And no additional checker invocation is spent on the skipped round
+```
+
+### AC-13b — Termination is evaluated on a flattened discovery curve
+
+```gherkin
+Scenario: The loop terminates when new-class discovery has flattened across disjoint lenses
+  Given a chain whose cumulative new-blind-spot-class discovery curve is recorded per round
+  When the workflow evaluates termination
+  Then the workflow reports pass only if the curve has flattened across rounds whose lenses are operationally disjoint
+  And a round count alone never satisfies the termination criterion
+  And a round structurally narrower than its predecessor does not contribute flattening evidence unless the narrowed-out region was covered by a different lens
+  And the final report records the per-round new-class counts that evidence the flattening
 ```
 
 ### AC-14 — The falsified convergence claim is corrected, not deleted
@@ -408,6 +427,62 @@ Scenario: A resolved thread over an uncommitted fix does not satisfy the merge p
   And the count of unresolved threads is not accepted as evidence that findings were fixed
 ```
 
+### AC-27 — Lenses are verified operationally disjoint
+
+```gherkin
+Scenario: A relabelled lens is rejected from the roster
+  Given a proposed validation lens declaring the artifact set it reads
+  When the lens roster is verified
+  Then each lens in the roster declares the question it asks and the artifact set it reads
+  And a lens whose declared artifact set is a subset of another lens's set is rejected as a relabel rather than admitted as a lens
+  And the semantic lenses admitted to the roster run in parallel within a round subject to the repository concurrency cap
+```
+
+### AC-28 — The shared substrate lands exactly once
+
+```gherkin
+Scenario: The second plan to reach Phase S detects the substrate already present
+  Given the sibling convergence plan has already landed the shared substrate
+  When this plan executes Phase S
+  Then each shared item is detected as already present and recorded as "already landed"
+  And no shared item is applied a second time or duplicated
+  And executing Phase S against a repository where the substrate is absent applies every shared item
+```
+
+### AC-29 — The split convention gains the new category
+
+```gherkin
+Scenario: The deterministic-vs-AI split convention lists the sweep-completeness validator
+  Given the new deterministic category has been implemented
+  When a reader opens the split convention's Split table
+  Then the table contains a row naming sweep-completeness with Deterministic as its owner and a stated rationale
+  And the category satisfies the convention's deterministic implementation contract for coverage, Gherkin, unit and integration tests, and byte-determinism
+  And the convention is listed in this plan's Surface Inventory
+```
+
+### AC-30 — Class closure and completeness-diff share one replay harness
+
+```gherkin
+Scenario: Closure is a deterministic count-diff rather than a re-derivation
+  Given repo-rules-fixer reports a class-wide sweep for a registry blind-spot class
+  When the registry-replay harness re-runs that entry's recorded detection command against the sweep set
+  Then the harness reports the instance count before and after the claimed sweep
+  And a non-zero post-sweep count is reported as a class-closure failure
+  And the completeness-diff contract consumes the same harness rather than a separate re-derivation
+```
+
+### AC-31 — Sweep forms are stated as invariants, and fixtures score both error directions
+
+```gherkin
+Scenario: Each detector ships paired fixtures scoring false negatives and false positives
+  Given a detector implementing a registry blind-spot class
+  When the detector's fixtures are executed
+  Then the sweep form is expressed as an invariant asserted over the whole sweep set rather than as a list of forbidden phrasings
+  And a violating fixture yields at least one finding of that class
+  And a conforming look-alike fixture that resembles the violation without instantiating it yields zero findings
+  And the plan records that author-written fixtures validate intent rather than unimagined blind spots
+```
+
 ## Product Scope
 
 ### In scope
@@ -418,7 +493,11 @@ Scenario: A resolved thread over an uncommitted fix does not satisfy the merge p
 - Inbound-link-primary sweep, sweep transcript, and enumerated-exclusion contracts
 - Evidence-grounding and validator-flag-parity contracts
 - Class-wide remediation and self-inflicted-drift re-check contracts
-- Workflow termination rewrite with the adversarial round, plus the corrected convergence guidance
+- Workflow termination rewrite with the **gated** adversarial round, the saturation doctrine, and the
+  corrected convergence guidance
+- Parallel operationally-disjoint lenses with a declared roster and a disjointness check
+- The shared substrate: the split-convention row, the shared subcommand plumbing, both governance
+  index rows, and the registry-replay harness — landed idempotently with the sibling plan
 - The completeness-diff contract, including non-filesystem ground truth (DECISION 11)
 - The guard-placement contract and entry-path verification (DECISION 9)
 - The search-tool-validity contract with its control-probe requirement (DECISION 10)
@@ -435,19 +514,30 @@ Scenario: A resolved thread over an uncommitted fix does not satisfy the merge p
   recorded in DECISION 13.
 - Any relaxation of a check, threshold or criticality level
 - Retroactive re-sweeps of governance changes already landed
+- **μSE-style mutation testing of the detectors** — recorded in the registry as the escalation path
+  when hand fixtures stop finding anything, explicitly **not** executed by this plan, and explicitly
+  flagged as having no citable precedent for prose or markdown linters
+  ([XD-7](./README.md#xd-7--control-probes-and-seeded-fixtures-are-standing-practice-mutation-is-the-escalation))
+- **Contradiction detection by the deterministic validator** — the prose-tooling boundary; validators
+  compute set arithmetic and emit enumerated diffs, while "this passage is stale" stays with the AI
+  checker ([DD-2b](./tech-docs.md#dd-2b--what-the-validator-must-not-try-to-detect))
 
 ## Product Risks
 
-| Risk                                                               | Severity | Handling                                                                                              |
-| ------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------- |
-| Never-touched set is too large to act on                           | High     | Scoped to candidate files by inbound/outbound link plus declared blast radius (tech-docs DD-3)        |
-| Adversarial round degenerates into a formality                     | High     | Its agenda is the mechanical set, not free-form doubt; an empty agenda is reported explicitly (AC-13) |
-| Validator false positives add noise                                | Medium   | Existing FALSE_POSITIVE skip-list machinery applies; validator findings are checker-mediated          |
-| Agent files grow past the instruction-size budget                  | Medium   | Registry content lives in the governance file; agents link rather than inline                         |
-| Exclusion justifications become boilerplate                        | Low      | Exclusions recorded as literal globs, so the reviewer reads scope rather than prose about scope       |
-| Tri-repo propagation partially applied, leaving repos inconsistent | Medium   | Per-repo phases with their own gates; byte-identity check is a gate item                              |
-| Completeness-diff ground truth is unbounded or unnamed             | High     | Each contract instance names its authoritative source; an unnamed source is itself a finding (AC-20)  |
-| Guard-placement rule read as "write more guards"                   | Medium   | Stated as the enumeration-fails-open rule with its four-failure evidence; AC-23 verifies entry paths  |
-| Control probes become ceremonial and always pass trivially         | Medium   | The probe targets a known-positive control for the same pattern and tree (AC-24)                      |
-| Evidence-based cycles never terminate on a noisy reviewer          | Medium   | Termination requires a cycle with no **new** finding; repeat findings do not extend the loop (AC-25)  |
-| D2 review-state hole persists until its follow-up lands            | Medium   | Merge preconditions gate on finding text and committed diffs, never on GitHub review state (AC-26)    |
+| Risk                                                               | Severity | Handling                                                                                                                                                                                  |
+| ------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Never-touched set is too large to act on                           | High     | Scoped to candidate files by inbound/outbound link plus declared blast radius (tech-docs DD-3)                                                                                            |
+| Adversarial round degenerates into a formality                     | High     | Its agenda is the mechanical set, not free-form doubt; and it is **gated** on that set being non-empty, so it never runs against an agenda arithmetic has already emptied (AC-12, AC-13)  |
+| Adversarial round becomes pure overhead on trivial changes         | High     | The gating condition is exactly this mitigation — the previously unconditional round added a mandatory checker invocation to every run including one-line typo fixes (README DECISION 14) |
+| Parallel lenses degenerate into relabels of one procedure          | High     | The documented PBR-replication failure mode. Each lens declares its artifact set; a subset declaration is rejected as a relabel (AC-27)                                                   |
+| Author-written fixtures validate intent, not blind spots           | Medium   | Recorded as an explicit limit, not papered over; μSE mutation named as the escalation path, with its lack of prose-domain precedent flagged (AC-31)                                       |
+| The shared substrate is applied twice by concurrent plans          | Medium   | Phase S is idempotent and first-writer-wins; acceptance clauses falsifiable in both directions (AC-28)                                                                                    |
+| Validator false positives add noise                                | Medium   | Existing FALSE_POSITIVE skip-list machinery applies; validator findings are checker-mediated                                                                                              |
+| Agent files grow past the instruction-size budget                  | Medium   | Registry content lives in the governance file; agents link rather than inline                                                                                                             |
+| Exclusion justifications become boilerplate                        | Low      | Exclusions recorded as literal globs, so the reviewer reads scope rather than prose about scope                                                                                           |
+| Tri-repo propagation partially applied, leaving repos inconsistent | Medium   | Per-repo phases with their own gates; byte-identity check is a gate item                                                                                                                  |
+| Completeness-diff ground truth is unbounded or unnamed             | High     | Each contract instance names its authoritative source; an unnamed source is itself a finding (AC-20)                                                                                      |
+| Guard-placement rule read as "write more guards"                   | Medium   | Stated as the enumeration-fails-open rule with its four-failure evidence; AC-23 verifies entry paths                                                                                      |
+| Control probes become ceremonial and always pass trivially         | Medium   | The probe targets a known-positive control for the same pattern and tree (AC-24)                                                                                                          |
+| Evidence-based cycles never terminate on a noisy reviewer          | Medium   | Termination requires a cycle with no **new** finding; repeat findings do not extend the loop (AC-25)                                                                                      |
+| D2 review-state hole persists until its follow-up lands            | Medium   | Merge preconditions gate on finding text and committed diffs, never on GitHub review state (AC-26)                                                                                        |

@@ -43,3 +43,36 @@
   taken as fact and would have justified skipping a detector. Tooling-coverage claims need the same
   empirical verification as any other factual claim, and the repo currently has a real, unguarded gap
   for a defect class that consumed two full iterations of the archived chain.
+
+## Learning: inside a bracket expression, a backslash is not an escape (DC-8)
+
+- **Context**: the 2026-07-20 goal-alignment audit of this plan and its sibling, reproduced live on
+  this host against the real `.claude/agents/repo-rules-checker.md`.
+- **Observation**: `command grep -ohE '^### Step [0-9.]+[^\n]*'` truncates every match before the
+  first literal lowercase `n` (`Initialize`→`I`, `Validation`→`Validatio`, `Governance`→`Gover`),
+  because POSIX bracket expressions treat `\` as a literal, so `[^\n]` means "not backslash and not
+  `n`". BSD grep enforces this; GNU grep and ripgrep extend `\n` and do not truncate. The corrected
+  `'^### Step [0-9.]+.*$'` returns all headings in full on every engine. Critically, the broken form
+  **passed by luck**: `sort -u | wc -l` still returned the right count only because no two truncated
+  prefixes collided, so a future heading rename could silently undercount and let a
+  "no check was removed" invariant pass after a check really was removed.
+- **Why it might generalize**: this is the second self-caught entry in this registry (after DC-2b),
+  and it was found in a plan authored specifically to install search-tool discipline. It is a direct
+  instance of the enumeration-fails-open rule — the clause enumerated what to exclude instead of
+  asserting an invariant, and the enumeration failed open silently. Seeded as DC-8 with the invariant
+  form "every clause's regex means the same thing under the BSD, GNU and ripgrep engines".
+
+## Learning: a catalogue nobody consults is inert — both plans re-derived an existing convention
+
+- **Context**: the same audit found that `deterministic-vs-ai-validation-split.md` already codified
+  the decision tree and implementation contract both plans re-derived independently.
+- **Observation**: this plan contained zero references to that convention, and neither plan added its
+  new category to the convention's Split table — the one document whose entire purpose is being the
+  canonical answer to "is category X deterministic or AI-judged". The omission is simultaneously a
+  BS-10 (definition block missed while usage sites were swept) and a BS-2 (generative-source-only
+  scope) instance, committed by the pair of plans that catalogue those exact classes.
+- **Why it might generalize**: knowing a blind-spot class exists does not prevent instantiating it;
+  only a mechanism does. This is the strongest available argument for XD-2's position that shared
+  substrate should be _built and consulted mechanically_ rather than _documented and remembered_.
+  Candidate rule for the plan-anti-hallucination convention: before authoring a design-decision
+  section, grep the conventions tree for an existing convention owning that decision.

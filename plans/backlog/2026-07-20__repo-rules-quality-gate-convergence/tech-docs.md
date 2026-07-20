@@ -34,20 +34,40 @@ flowchart LR
   P[rhino-cli preflight<br/>+ sweep-completeness] --> Q{never-touched<br/>candidates > 0?}
   Q -- yes --> R[repo-rules-fixer<br/>class-wide sweep<br/>+ self-drift recheck]
   R --> P
-  Q -- no --> S[repo-rules-checker<br/>inbound-link sweep<br/>+ transcript]
-  S --> T{in-scope<br/>findings > 0?}
+  Q -- no --> TR[risk triage:<br/>select lens subset]
+  TR --> S1[lens: inbound<br/>link sweep]
+  TR --> S2[lens: completeness<br/>diff]
+  TR --> S3[lens: self<br/>drift]
+  S1 --> T{in-scope<br/>findings > 0?}
+  S2 --> T
+  S3 --> T
   T -- yes --> R
-  T -- no --> U[adversarial round<br/>agenda = never-touched set]
+  T -- no --> N{curve flat AND<br/>never-touched empty?}
+  N -- curve not flat --> TR
+  N -- set non-empty --> U[adversarial round<br/>gated, runs once]
   U --> V{adversarial<br/>zero?}
   V -- no --> R
   V -- yes --> W[pass]
+  N -- both satisfied --> W
 
   style P fill:#56B4E9,stroke:#04395E,color:#000000
-  style S fill:#0072B2,stroke:#04395E,color:#FFFFFF
+  style TR fill:#E69F00,stroke:#7A5200,color:#000000
+  style S1 fill:#0072B2,stroke:#04395E,color:#FFFFFF
+  style S2 fill:#0072B2,stroke:#04395E,color:#FFFFFF
+  style S3 fill:#0072B2,stroke:#04395E,color:#FFFFFF
   style R fill:#D55E00,stroke:#7A3600,color:#FFFFFF
   style U fill:#CC79A7,stroke:#6B2F55,color:#000000
   style W fill:#009E73,stroke:#006147,color:#FFFFFF
 ```
+
+Three changes from the previous draft's loop, each load-bearing:
+
+- **The semantic lenses fan out in parallel** rather than one lens iterating (DD-14). This is the
+  primary round-reducer.
+- **The adversarial round is gated**, not unconditional (DD-6). When the mechanically-computed
+  never-touched set is empty, arithmetic has already disproven the round's precondition, so the loop
+  passes straight through and records the empty agenda with its derivation.
+- **Termination reads a flattening discovery curve**, not a consecutive-zero counter (XD-3).
 
 ### Sweep-set derivation
 
@@ -166,7 +186,8 @@ flowchart LR
 ```mermaid
 %% Phase progression with gates
 flowchart LR
-  P0[Phase 0<br/>baseline] --> P1[Phase 1<br/>registry]
+  P0[Phase 0<br/>baseline] --> PS[Phase S<br/>shared substrate<br/>idempotent]
+  PS --> P1[Phase 1<br/>registry]
   P1 --> P2[Phase 2<br/>validator]
   P1 --> P3[Phase 3<br/>sweep contracts]
   P2 --> P4[Phase 4<br/>evidence grounding]
@@ -180,14 +201,20 @@ flowchart LR
   P8 --> P9
 
   style P0 fill:#009E73,stroke:#006147,color:#FFFFFF
+  style PS fill:#E69F00,stroke:#7A5200,color:#000000
   style P5B fill:#E69F00,stroke:#7A5200,color:#000000
   style P6 fill:#0072B2,stroke:#04395E,color:#FFFFFF
   style P9 fill:#CC79A7,stroke:#6B2F55,color:#000000
 ```
 
 Phases 2 and 3 are independent of each other and may run in parallel (subject to the repo's
-concurrency cap); Phases 7 and 8 likewise. Phase 5B carries the three mechanisms added from the
-PR-review session (DECISIONs 9, 10, 12 and 13) and depends on Phase 5's termination rewrite.
+concurrency cap); Phases 7 and 8 likewise. Phase 5B carries the mechanisms added from the PR-review
+session (DECISIONs 9, 10, 12 and 13) and depends on Phase 5's termination rewrite.
+
+**Phase S is idempotent and shared with the sibling plan** (XD-2). Whichever plan reaches it first
+lands the shared substrate; the other detects it present and records "already landed". That
+idempotency is what lets both plans run concurrently without either waiting on the other and without
+either paying the tri-repo byte-identity cost twice for the same subcommand registration.
 
 ## Blind-Spot Class Registry — seed content
 
@@ -332,12 +359,54 @@ The orchestrator today runs exactly four categories — `layer-coherence`, `trac
 `sweep-completeness` as a fifth means the checker consumes it through the Step 0.5 JSON envelope it
 already parses, with no new plumbing and no new invocation for an agent to skip.
 
+**The owner-selection reasoning is not re-derived here.** It is already codified in
+[`deterministic-vs-ai-validation-split.md`](../../../repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md)
+§Adding a new validation category, whose decision tree puts an exact-predicate rule in the
+deterministic layer. The never-touched-set computation is pure `git` and link arithmetic, so the
+convention selects the deterministic layer without further argument. An earlier draft cited that
+convention once, in passing, while omitting it from the Surface Inventory and leaving its Split table
+unextended — a self-inflicted BS-2/BS-10 instance recorded in
+[README XD-1](./README.md#xd-1--extend-the-existing-deterministic-vs-ai-split-convention-rather-than-re-derive-it).
+What this plan adds is the **row**, not the reasoning.
+
+**The convention's implementation contract is adopted verbatim as the Phase 2 Gate bar**, replacing
+the weaker ad hoc "`nx run rhino-cli:test:unit` exits 0" criterion: ≥90% line coverage, a Gherkin
+feature with **both** happy- and failure-path scenarios, unit **and** integration tests, and
+byte-determinism given a fixed clock.
+
 Cost: `apps/rhino-cli` must stay byte-identical across all three repos per the
 [SDLC Gate Standard](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary),
 so this adds a Gherkin behavior tree under `specs/apps/rhino/behavior/rhino-cli/gherkin/` and
-tri-repo propagation weight. This is the plan's largest reversible commitment (DECISION 1); Phase 2
-is authored to be separable — dropping it degrades the plan to mechanisms 1 and 3-6 without
-restructuring any other phase.
+tri-repo propagation weight. Two things bound that cost:
+[XD-2](./README.md#xd-2--one-shared-substrate-built-once-landed-idempotently) shares the subcommand
+plumbing with the sibling plan so it is registered once rather than twice, and
+[XD-6](./README.md#xd-6--every-proposed-validator-passes-the-tricorder-inclusion-criterion) admits a
+detector only when the problem is obvious and the fix is clear.
+
+This is the plan's largest reversible commitment (DECISION 1); Phase 2 is authored to be separable —
+dropping it degrades the plan to mechanisms 1 and 3-6 without restructuring any other phase.
+
+### DD-2b — what the validator must NOT try to detect
+
+The Tricorder criterion cuts as well as admits, and the cut boundary is recorded here so a future
+contributor does not re-propose across it. Google's Tricorder deployment explicitly **rejected**
+computable-but-unactionable analyses — complexity warnings, fault-prediction scores — because a
+finding a developer cannot act on erodes trust in every other finding the tool emits. It further notes
+that analyses flagging **missing** content cannot be auto-fixed and consequently earn low trust, which
+is directly relevant here: BS-13 and BS-14 are both missing-content classes.
+[Web-cited — via the 2026-07-20 research brief]
+
+The independent boundary from the prose-tooling domain: Vale, textlint and markdownlint reliably catch
+**lexical and structural** violations and **cannot** determine that document A contradicts document B.
+[Web-cited — via the 2026-07-20 research brief]
+
+Applied to this plan: the never-touched computation, directory-scope detection, inbound-link-set
+construction and the completeness-diff **enumeration** are all set arithmetic with obvious problems
+and clear fixes, and are built. Judging whether a passage in the resulting candidate set is **stale**
+is a contradiction judgement on the far side of the boundary and stays with the AI checker. The
+missing-content classes are handled by keeping the validator's output an **enumerated diff** the
+checker acts on — the diff names exactly what to add, which is the actionability Tricorder requires,
+rather than a bare "something is missing" signal.
 
 ### DD-3 — the candidate set is bounded by links and declared blast radius
 
@@ -369,13 +438,86 @@ flagged the validator's own negative fixtures. CI invokes it with
 entry uses the bare form [Repo-grounded — both verified on `main` during authoring]. The two rules
 ship together because both failures are "trusted the wrong artifact as evidence".
 
-### DD-6 — termination is adversarial, not merely repeated
+### DD-6 — termination is saturation-based; the adversarial round is a **gated** disjoint lens
 
-Two consecutive zeros from the same search shape is one observation repeated, not two observations.
-The adversarial round changes the shape: its agenda is the mechanically derived never-touched set,
-so it interrogates exactly the region the semantic rounds structurally could not see. An empty
-agenda is reported explicitly (AC-13) so that "nothing to challenge" is distinguishable from "the
-computation never ran".
+Two consecutive zeros from the same search shape is one observation repeated, not two observations —
+which is the correct diagnosis the previous draft made, and it now sits inside the single shared
+doctrine rather than beside a competing one.
+
+Under [XD-3](./README.md#xd-3--one-termination-doctrine-saturation-not-round-counting), termination
+requires a **flattened cumulative new-class discovery curve across operationally-disjoint lenses**.
+The adversarial round's role is to **supply a disjoint lens**: its agenda is the mechanically derived
+never-touched set, so it interrogates exactly the region the semantic rounds structurally could not
+see, which is what makes the curve's flattening trustworthy rather than an artefact of one shape
+repeating.
+
+**The round is gated, not unconditional** (README DECISION 14). As previously written it ran on every
+invocation with no skip branch, which made it pure overhead on the modal case — a one-line convention
+typo fix paid for a guaranteed extra checker invocation with an a-priori near-zero yield. When the
+mechanically-computed never-touched set is **empty**, the deterministic layer has already disproven
+the round's own precondition: there is no disjoint region for the disjoint lens to inspect, so running
+it would add an observation of an already-covered shape — precisely the failure saturation-based
+termination exists to avoid. The round therefore runs **exactly when arithmetic says there is
+something to argue about**.
+
+An empty agenda is still reported explicitly with its derivation (AC-13 survives in substance) so that
+"nothing to challenge" stays distinguishable from "the computation never ran" — which was AC-13's
+actual purpose. What changed is that the report replaces the round rather than accompanying it.
+
+**A round counter is not a stopping rule**, and a round structurally **narrower** than its predecessor
+contributes no flattening evidence unless its narrowed-out region is covered by a different lens. The
+final report records the per-round new-class count so the flattening is readable evidence rather than
+an assertion.
+
+### DD-14 — parallel disjoint lenses, and the lens roster
+
+[XD-4](./README.md#xd-4--parallel-operationally-disjoint-lenses-replace-sequential-rounds) is the
+plan's primary speed lever, and the reason the fifteen classes cost roughly fifteen rounds: one lens
+iterating discovers at most the one class its own shape permits. Each lens declares the question it
+asks and the artifact set it reads; a lens whose declared set is a **subset** of another's is rejected
+as a relabel, because the PBR replication found that differently-**labelled** perspectives converge on
+the same defects rather than partitioning them. The roster:
+
+| Lens                    | Question it asks                                                          | Artifacts it reads                                         |
+| ----------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Deterministic**       | Which candidate files has no corrective commit touched?                   | The git commit range, the link graph                       |
+| **Inbound-link**        | Does any document linking to the changed rule still state the old one?    | The computed candidate set's document bodies               |
+| **Completeness-diff**   | Does the ground truth contain members the document omits?                 | Filesystem enumerations, workflow `on:` blocks, git refs   |
+| **Self-drift**          | Did this chain's own commits falsify a claim elsewhere?                   | The chain's own diff, read against the documents it names  |
+| **Adversarial (gated)** | What does the never-touched region contain that no lens has yet examined? | The never-touched set — the complement of everything above |
+
+No two rows share an artifact set, and no row's set is a subset of another's. The completeness-diff
+lens is the sharpest illustration of why disjointness matters: **it reads sources that are not in the
+document tree at all** (`git branch -r` for BS-15), which is why it found three classes every
+text-shaped lens missed by construction.
+
+**Triage precedes the spend.** The full roster is not run against every governance change; per the
+RADAR risk-triage finding, multi-lens rigor goes to the high-risk stratum while a low-risk change runs
+the deterministic lens plus whichever single semantic lens its blast radius indicates.
+[Web-cited — via the 2026-07-20 research brief]
+
+### DD-15 — the enumeration-fails-open rule, with standards backing
+
+DD-9's rule was derived from this repo's own evidence and is correct. It now also carries external
+grounding, which matters because it makes the rule citable to a future reader who has not lived
+through the five-axis sequence: the OWASP Developer Guide's security principles and NIST SP 800-207 /
+SP 800-167 rest on the same asymmetry — **denylists fail open and silently; allowlists and default-deny
+fail closed and loudly**. [Web-cited — via the 2026-07-20 research brief]
+
+That asymmetry is exactly why the five-axis sequence went unnoticed for four consecutive fixes: each
+enumeration failed **silently** on the axis nobody named, and a silent failure is not catchable on the
+next round while a loud one is.
+
+The **constructive** form is metamorphic testing (Chen et al. 1998; the MST-wi catalogue, arXiv
+2208.09505, 22 system-agnostic metamorphic relations): assert relations that must hold across
+transformed inputs rather than enumerating expected outputs one at a time. Applied here, a sweep's
+correctness is asserted as a relation — "the candidate set computed from the link graph is invariant
+under rewording of the target document" — instead of as a list of phrasings to search for. That
+relation is what the inbound-link sweep already exploits; naming it makes the property explicit rather
+than incidental. [Web-cited — via the 2026-07-20 research brief]
+
+Every sweep form in the BSCR is therefore restated as an invariant over the whole sweep set, never as
+a list of forbidden phrasings.
 
 ### DD-7 — the falsified convergence claim is corrected, not deleted
 
@@ -543,21 +685,23 @@ the validator's tests are written before its implementation; each RED step in
 
 ## Surface Inventory
 
-| #   | Surface                                                                  | Change                                                          | Grounding                    |
-| --- | ------------------------------------------------------------------------ | --------------------------------------------------------------- | ---------------------------- |
-| 1   | `repo-governance/development/quality/governance-sweep-blind-spots.md`    | **Create** — the BSCR                                           | [Repo-grounded] absent today |
-| 2   | `repo-governance/workflows/repo/repo-rules-quality-gate.md`              | Step model, termination criteria, adversarial round             | [Repo-grounded] exists       |
-| 3   | `repo-governance/development/pattern/maker-checker-fixer.md`             | Corrected convergence guidance; sweep methodology               | [Repo-grounded] exists       |
-| 4   | `.claude/agents/repo-rules-checker.md`                                   | Inbound-link sweep, transcript, evidence grounding, adversarial | [Repo-grounded] exists       |
-| 5   | `.claude/agents/repo-rules-fixer.md`                                     | Class-wide sweep, self-drift recheck, transcript                | [Repo-grounded] exists       |
-| 6   | `.claude/agents/repo-rules-maker.md`                                     | BSCR link; start propagation from the inbound-link set          | [Repo-grounded] exists       |
-| 7   | `apps/rhino-cli/src/commands/governance_sweep_completeness.rs`           | **Create** — the validator                                      | [Repo-grounded] dir exists   |
-| 8   | `apps/rhino-cli/src/cli.rs`, `commands.rs`, `governance_audit.rs`        | Register the fifth audit category                               | [Repo-grounded] all exist    |
-| 9   | `specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/`           | **Create** — `repo-governance-sweep-completeness.feature`       | [Repo-grounded] dir exists   |
-| 10  | `repo-governance/development/quality/README.md`, `development/README.md` | Register the new convention in the index tables                 | [Repo-grounded] exist        |
-| 11  | `.opencode/`, `.amazonq/`                                                | **Regenerated only** — never hand-edited                        | Generated artifacts          |
-| 12  | `repo-governance/workflows/pr/pr-review-quality-gate.md`                 | Evidence-based cycle termination; committed-fix precondition    | [Repo-grounded] exists       |
-| 13  | `ose-primer`, `ose-infra`                                                | Propagation of surfaces 1-10 and 12                             | Sibling repos                |
+| #   | Surface                                                                         | Change                                                                                                                           | Grounding                    |
+| --- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| 0   | `repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md` | **Extend (shared, idempotent)** — one row in The Split table; its implementation contract adopted as the Phase 2 Gate bar (XD-1) | [Repo-grounded] exists       |
+| 0b  | `apps/rhino-cli/src/commands/governance_registry_replay.rs`                     | **Create (shared, idempotent)** — the registry-replay harness serving class closure and completeness-diff for both plans (XD-2)  | [Repo-grounded] dir exists   |
+| 1   | `repo-governance/development/quality/governance-sweep-blind-spots.md`           | **Create** — the BSCR                                                                                                            | [Repo-grounded] absent today |
+| 2   | `repo-governance/workflows/repo/repo-rules-quality-gate.md`                     | Step model, termination criteria, adversarial round                                                                              | [Repo-grounded] exists       |
+| 3   | `repo-governance/development/pattern/maker-checker-fixer.md`                    | Corrected convergence guidance; sweep methodology                                                                                | [Repo-grounded] exists       |
+| 4   | `.claude/agents/repo-rules-checker.md`                                          | Inbound-link sweep, transcript, evidence grounding, adversarial                                                                  | [Repo-grounded] exists       |
+| 5   | `.claude/agents/repo-rules-fixer.md`                                            | Class-wide sweep, self-drift recheck, transcript                                                                                 | [Repo-grounded] exists       |
+| 6   | `.claude/agents/repo-rules-maker.md`                                            | BSCR link; start propagation from the inbound-link set                                                                           | [Repo-grounded] exists       |
+| 7   | `apps/rhino-cli/src/commands/governance_sweep_completeness.rs`                  | **Create** — the validator                                                                                                       | [Repo-grounded] dir exists   |
+| 8   | `apps/rhino-cli/src/cli.rs`, `commands.rs`, `governance_audit.rs`               | Register the fifth audit category                                                                                                | [Repo-grounded] all exist    |
+| 9   | `specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/`                  | **Create** — `repo-governance-sweep-completeness.feature`                                                                        | [Repo-grounded] dir exists   |
+| 10  | `repo-governance/development/quality/README.md`, `development/README.md`        | Register the new convention in the index tables                                                                                  | [Repo-grounded] exist        |
+| 11  | `.opencode/`, `.amazonq/`                                                       | **Regenerated only** — never hand-edited                                                                                         | Generated artifacts          |
+| 12  | `repo-governance/workflows/pr/pr-review-quality-gate.md`                        | Evidence-based cycle termination; committed-fix precondition                                                                     | [Repo-grounded] exists       |
+| 13  | `ose-primer`, `ose-infra`                                                       | Propagation of surfaces 1-10 and 12                                                                                              | Sibling repos                |
 
 ## Dependencies
 
