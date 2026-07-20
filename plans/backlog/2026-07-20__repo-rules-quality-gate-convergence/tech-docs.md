@@ -122,15 +122,26 @@ flowchart TD
 ```mermaid
 %% A single stale passage's states from introduction to closure
 stateDiagram-v2
-  [*] --> Stale: governing rule changed elsewhere
-  Stale --> InCandidateSet: selected by inbound link or blast radius
-  Stale --> Invisible: missed by keyword-shaped search
-  Invisible --> InCandidateSet: stable-key sweep adopted
-  InCandidateSet --> ClassSwept: fixer sweeps whole class
-  ClassSwept --> ClosureVerified: adversarial round finds no residue
+  [*] --> Stale: rule changed
+  Stale --> InCandidateSet: link sweep
+  Stale --> Invisible: keyword miss
+  Invisible --> InCandidateSet: stable key
+  InCandidateSet --> ClassSwept: class swept
+  ClassSwept --> ClosureVerified: no residue
   ClosureVerified --> [*]: closed
-  ClosureVerified --> Stale: fixer's own commit falsified another claim
+  ClosureVerified --> Stale: self-inflicted
 ```
+
+Edge labels are kept short deliberately — `stateDiagram-v2` transition labels clip in GitHub's
+renderer, and a clipped label is a silently wrong diagram. The full transitions read:
+
+- **`[*] --> Stale`** — the governing rule changed somewhere else, stranding this passage.
+- **`Stale --> InCandidateSet`** — selected by inbound-link sweep or blast-radius analysis.
+- **`Stale --> Invisible`** — missed entirely by keyword-shaped search (BS-4, BS-13, BS-14).
+- **`Invisible --> InCandidateSet`** — reached once a stable-key or completeness-diff sweep is adopted.
+- **`InCandidateSet --> ClassSwept`** — the fixer sweeps the whole class, not the single instance.
+- **`ClassSwept --> ClosureVerified`** — an adversarial round finds no residue.
+- **`ClosureVerified --> Stale`** — the fixer's own commit falsified another claim.
 
 The `ClosureVerified --> Stale` edge is blind-spot class 11 — the self-inflicted drift loop that
 commit `362c23aab` had to close.
