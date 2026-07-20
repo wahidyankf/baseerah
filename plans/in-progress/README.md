@@ -13,7 +13,6 @@ Active project plans currently being worked on.
   curated-and-converging (121/119/116 per path) over one prerequisite DAG; legacy `_index.md`
   browse preserved additively. Delivery Mode: `worktree-to-pr`. PQG: strict double-zero.
   Build work follows the governance plan below.
-- [parallel-orchestration-shared-machine-governance](./parallel-orchestration-shared-machine-governance/README.md) — Governance/docs change adopting the N+1 parallel-orchestration model, an explicit same-machine concurrent-actors assumption, a no-destructive-git-operations convention, and a safe self-scoped worktree/artifact cleanup convention; propagated across ose-public → ose-primer → ose-infra.
 
 ## Instructions
 

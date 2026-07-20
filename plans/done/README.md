@@ -4,6 +4,19 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-07-20: parallel-orchestration-shared-machine-governance](./2026-07-20__parallel-orchestration-shared-machine-governance/README.md) —
+  Inverted the PR merge default to `[AI]`-merges-by-default (`[HUMAN]` becomes an explicit per-plan
+  opt-in, preconditions identical either way), adopted the N+1 orchestration model
+  (`1 main thread + N background agents`, default N=3), made the same-machine concurrent-actors
+  assumption explicit, added the no-destructive-git-operations and worktree-and-artifact-cleanup
+  conventions, moved `main-ci.yml` to a 4x/day schedule with no push trigger, and added
+  surface-conditional tester gates with a new `repo-governance/workflows/api/` category. Merged via
+  PR #78 (squash, `60d53119b`); propagated to ose-primer PR #13 and ose-infra PR #15 with
+  `apps/rhino-cli` byte-identity verified across all three (643 tracked files, zero drift).
+  Convergence cost 14 checker rounds plus 3 PR-review cycles and 3 verification passes, each
+  surfacing a **new** blind-spot class — 15 classes catalogued, and the guard-placement lesson
+  (enumeration fails open; a guard belongs at the point of entry) routed to
+  `development/agents/anti-patterns.md`. Delivery Mode: `worktree-to-pr`. Completed 2026-07-20.
 - [2026-07-19: rust-cargo-target-dir-sharing](./2026-07-19__rust-cargo-target-dir-sharing/README.md) —
   Rust `target/` directories were duplicated per git worktree (~32 GB observed); shares build output
   across worktrees by folding a per-crate `target/` symlink + worktree-aware cache GC into
