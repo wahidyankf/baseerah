@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --hue-terracotta: oklch(65% 0.16 30);
+        --hue-honey: oklch(76% 0.15 75);
+        --hue-sage: oklch(70% 0.1 150);
+        --hue-teal: oklch(66% 0.1 200);
+        --hue-sky: oklch(68% 0.11 230);
+        --hue-plum: oklch(60% 0.12 305);
+        --hue-terracotta-ink: oklch(40% 0.13 30);
+        --hue-honey-ink: oklch(44% 0.12 75);
+        --hue-sage-ink: oklch(37% 0.09 150);
+        --hue-teal-ink: oklch(37% 0.09 200);
+        --hue-sky-ink: oklch(39% 0.1 230);
+        --hue-plum-ink: oklch(37% 0.1 305);
+        --hue-terracotta-wash: oklch(95% 0.04 30);
+        --hue-honey-wash: oklch(96% 0.05 75);
+        --hue-sage-wash: oklch(95% 0.03 150);
+        --hue-teal-wash: oklch(95% 0.03 200);
+        --hue-sky-wash: oklch(95% 0.03 230);
+        --hue-plum-wash: oklch(95% 0.03 305);
+        --warm-0: oklch(99% 0.006 85);
+        --warm-50: oklch(97% 0.009 85);
+        --warm-100: oklch(94% 0.012 85);
+        --warm-200: oklch(88% 0.014 85);
+        --warm-300: oklch(78% 0.016 85);
+        --warm-400: oklch(62% 0.016 85);
+        --warm-500: oklch(48% 0.018 80);
+        --warm-700: oklch(32% 0.018 75);
+        --warm-800: oklch(24% 0.018 70);
+        --warm-900: oklch(18% 0.016 70);
+        --background: var(--warm-0);
+        --foreground: var(--warm-900);
+        --card: #fff;
+        --card-foreground: var(--warm-900);
+        --primary: var(--hue-honey);
+        --primary-foreground: #fff;
+        --secondary: var(--warm-100);
+        --secondary-foreground: var(--warm-900);
+        --muted: var(--warm-100);
+        --muted-foreground: var(--warm-500);
+        --accent: var(--hue-terracotta-wash);
+        --accent-foreground: var(--hue-terracotta-ink);
+        --border: var(--warm-200);
+        --ring: var(--hue-honey);
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.25rem;
+        --shadow-sm: 0 1px 3px 0 oklch(20% 0.02 75/0.08), 0 1px 2px -1px oklch(20% 0.02 75/0.06);
+        --shadow-md: 0 4px 8px -2px oklch(20% 0.02 75/0.08), 0 2px 4px -2px oklch(20% 0.02 75/0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--background);
+        color: var(--foreground);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+      }
+      .frame {
+        width: 900px;
+        background: var(--background);
+      }
+      .cap {
+        font-size: 12px;
+        color: var(--muted-foreground);
+        margin-bottom: 14px;
+        letter-spacing: 0.02em;
+      }
+      .cap b {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+      .win {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        background: var(--card);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+      }
+      .bar {
+        display: flex;
+        gap: 7px;
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--warm-50);
+      }
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .url {
+        margin-left: 10px;
+        font-size: 11px;
+        color: var(--muted-foreground);
+        align-self: center;
+      }
+      .body {
+        padding: 36px 40px 44px;
+      }
+      h1 {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .sub {
+        margin-top: 10px;
+        color: var(--muted-foreground);
+        font-size: 15px;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        line-height: 1.6;
+      }
+      .badge.sec {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        border-color: transparent;
+      }
+
+      .rows {
+        list-style: none;
+        margin-top: 28px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+      }
+      .crow {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 20px 22px;
+        background: var(--card);
+      }
+      .crow + .crow {
+        border-top: 1px solid var(--border);
+      }
+      .cbar {
+        width: 4px;
+        align-self: stretch;
+        border-radius: 4px;
+        background: var(--h);
+      }
+      .cmain {
+        flex: 1;
+      }
+      .chead {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .cname {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .badge.kind {
+        background: var(--w);
+        color: var(--i);
+        border-color: transparent;
+      }
+      .carc {
+        font-size: 13px;
+        color: var(--muted-foreground);
+        margin-top: 5px;
+      }
+      .cside {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .start {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--primary);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="cap">Screen 1 · Paths hub — <b>Option B: stacked comparison rows</b> · /en/c/learn/paths</div>
+      <div class="win">
+        <div class="bar">
+          <span class="dot" style="background: var(--hue-terracotta)"></span>
+          <span class="dot" style="background: var(--hue-honey)"></span>
+          <span class="dot" style="background: var(--hue-sage)"></span>
+          <span class="url">ayokoding.com/en/c/learn/paths</span>
+        </div>
+        <div class="body">
+          <h1>Four paths, one library</h1>
+          <p class="sub">Each path is an ordered route through the shared courses.</p>
+          <ul class="rows">
+            <li class="crow" style="--h: var(--hue-honey); --w: var(--hue-honey-wash); --i: var(--hue-honey-ink)">
+              <div class="cbar"></div>
+              <div class="cmain">
+                <div class="chead">
+                  <span class="cname">Interview-Ready Software Engineer</span>
+                  <span class="badge kind">interview-first</span>
+                </div>
+                <div class="carc">interview prep → production-effective → deeper</div>
+              </div>
+              <div class="cside">
+                <span class="badge sec">~119 courses</span>
+                <span class="start"
+                  >Start
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M13 6l6 6-6 6" /></svg
+                ></span>
+              </div>
+            </li>
+            <li class="crow" style="--h: var(--hue-teal); --w: var(--hue-teal-wash); --i: var(--hue-teal-ink)">
+              <div class="cbar"></div>
+              <div class="cmain">
+                <div class="chead">
+                  <span class="cname">Immediately-Effective Software Engineer</span>
+                  <span class="badge kind">build-app-first</span>
+                </div>
+                <div class="carc">editor → one language → build a real app → deepen</div>
+              </div>
+              <div class="cside">
+                <span class="badge sec">~116 courses</span>
+                <span class="start"
+                  >Start
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M13 6l6 6-6 6" /></svg
+                ></span>
+              </div>
+            </li>
+            <li class="crow" style="--h: var(--hue-sage); --w: var(--hue-sage-wash); --i: var(--hue-sage-ink)">
+              <div class="cbar"></div>
+              <div class="cmain">
+                <div class="chead">
+                  <span class="cname">Fundamentally Strong Software Engineer</span>
+                  <span class="badge kind">fundamentals-first</span>
+                </div>
+                <div class="carc">CS foundations → architecture → paradigms → DS&A → build</div>
+              </div>
+              <div class="cside">
+                <span class="badge sec">~121 courses</span>
+                <span class="start"
+                  >Start
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M13 6l6 6-6 6" /></svg
+                ></span>
+              </div>
+            </li>
+            <li class="crow" style="--h: var(--hue-plum); --w: var(--hue-plum-wash); --i: var(--hue-plum-ink)">
+              <div class="cbar"></div>
+              <div class="cmain">
+                <div class="chead">
+                  <span class="cname">Software Engineer → AI Engineer</span>
+                  <span class="badge kind">AI-transition-first</span>
+                </div>
+                <div class="carc">already a SWE → build AI systems (models, agents, evals) fast</div>
+              </div>
+              <div class="cside">
+                <span class="badge sec">~15 courses</span>
+                <span class="start"
+                  >Start
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M13 6l6 6-6 6" /></svg
+                ></span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

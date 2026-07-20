@@ -106,15 +106,19 @@ further NEW AI-specific courses** (2026-07-20) the fourth path needs, for a **12
 The path-aware navigation adds/changes **three user-facing screens** in `ayokoding-www` (a Next.js
 app), all under the `/en/c/learn` URL model. Each screen runs the diverge → narrow → select → justify
 funnel. Low-fidelity wireframes are authored below; the two high-fidelity finalists per screen are
-produced as `.excalidraw.png` assets under this plan's `assets/` during Group A (delivery steps emit
-them) and embedded here. Repo-grounded **textual** hi-fi specifications for each chosen screen are
-authored in [Hi-Fi Specifications](#hi-fi-specifications-textual-repo-grounded) below and are the
-source of truth those PNGs render.
+rendered as `.png` assets under this plan's [`assets/`](./assets/) and embedded inline here.
+Repo-grounded **textual** hi-fi specifications for each chosen screen are authored in
+[Hi-Fi Specifications](#hi-fi-specifications-textual-repo-grounded) below and are the source of truth
+those PNGs render.
 
-> **Pending assets note**: hi-fi assets are produced during execution — the six `![]()` hi-fi finalist image links
-> below (two per screen, Screens 1-3) intentionally do not resolve yet. `delivery.md` Group A
-> ("Produce hi-fi finalists") produces the `.excalidraw.png` files into `assets/` before the code work
-> begins. A broken link here today is expected, not a mistake.
+> **Assets note**: the six hi-fi finalist PNGs (two per screen, Screens 1-3) are **already produced**
+> and embedded below. They are rendered from self-contained HTML mockups (kept alongside as
+> [`assets/src/*.html`](./assets/src/)) styled with the **exact AyoKoding token palette**
+> (`libs/web-ui-token/src/ayokoding.css` — the same `oklch` hues, `--warm-*` neutral scale, radius,
+> and shadow tokens the running app uses), so the mockups are colour- and spacing-accurate rather than
+> sketches. To regenerate: serve `assets/src/` over HTTP and full-page-screenshot each page. During
+> Group A the diverge/select stages may still re-pin a selection per the R7 caveat below; if a
+> selection changes, its mockup is re-rendered from the updated HTML source.
 
 **R5 grounding note (all screens)** — before drafting, survey the existing UI to reuse rather than
 reinvent: `libs/web-ui` component inventory + tokens + Storybook; the ayokoding app-shell
@@ -195,8 +199,11 @@ on a different endpoint than the other three (per-role convergence, DD-22), so t
 two-up at `md` (≥768px), and **stacks to one column** below `sm`. The "Start" CTA is a full-width tap
 target on mobile.
 
-**Hi-fi finalists**: `![Paths hub — 2×2 card grid](./assets/paths-hub-option-a.excalidraw.png)`
-and `![Paths hub — stacked comparison](./assets/paths-hub-option-b.excalidraw.png)`.
+**Hi-fi finalists** (rendered from the token-accurate HTML mockups):
+
+![Paths hub, Option A — four equal path cards in a 2×2 grid, each with a hue-coded top border, a kind badge, the path name, its one-line arc, a course-count badge, and a Start call-to-action](./assets/paths-hub-option-a.png)
+
+![Paths hub, Option B — the four paths as stacked full-width comparison rows, each with a hue accent bar, name, kind badge, arc summary, course count, and Start action](./assets/paths-hub-option-b.png)
 
 **Selected: Option A — Path cards, 2×2 grid.**
 
@@ -244,8 +251,11 @@ mobile (each course a full-width row) and a comfortable reading column on deskto
 callout stays pinned at the top. Phase headings are sticky sub-headers on desktop, inline on mobile.
 Option B's accordion collapses all but the first stage on mobile to keep the list short.
 
-**Hi-fi finalists**: `![Path landing — numbered syllabus](./assets/path-landing-option-a.excalidraw.png)`
-and `![Path landing — phase accordion](./assets/path-landing-option-b.excalidraw.png)`.
+**Hi-fi finalists** (rendered from the token-accurate HTML mockups):
+
+![Path landing, Option A — a hue strip header with the path title and arc, an info callout to skip the prologue, then phase-grouped sections each rendering a numbered ordered list of course rows where the number is the path order, with capstone markers](./assets/path-landing-option-a.png)
+
+![Path landing, Option B — the syllabus as collapsible phase accordions, the first two stages expanded to show course rows and the remaining stages collapsed with course counts](./assets/path-landing-option-b.png)
 
 **Selected: Option A — Phase-grouped numbered syllabus.**
 
@@ -309,8 +319,11 @@ prev/next stack vertically below `sm` and sit left/right at `sm+` (mirrors the e
 component [Repo-grounded]). Option B's left rail is desktop-only and would need to collapse into a top
 sheet on mobile — extra complexity, so Option A wins on mobile-first grounds.
 
-**Hi-fi finalists**: `![Course in path — top banner](./assets/course-path-option-a.excalidraw.png)`
-and `![Course in path — left rail](./assets/course-path-option-b.excalidraw.png)`.
+**Hi-fi finalists** (rendered from the token-accurate HTML mockups):
+
+![Course in path, Option A — a hue-washed top path banner reading On path with course position and a view-full-path link, a path breadcrumb, an inline prerequisites line with linked prerequisites, the unchanged course body, and a manifest-driven prev/next pair that keeps the path query parameter](./assets/course-path-option-a.png)
+
+![Course in path, Option B — a desktop-only left path rail listing the path's ordered courses with the current one highlighted, replacing the generic sidebar, alongside the course body, breadcrumb, prerequisites, and prev/next](./assets/course-path-option-b.png)
 
 **Selected: Option A — Top path banner + path breadcrumb + prerequisites + bottom prev/next.**
 

@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --hue-terracotta: oklch(65% 0.16 30);
+        --hue-honey: oklch(76% 0.15 75);
+        --hue-sage: oklch(70% 0.1 150);
+        --hue-teal: oklch(66% 0.1 200);
+        --hue-sky: oklch(68% 0.11 230);
+        --hue-plum: oklch(60% 0.12 305);
+        --hue-terracotta-ink: oklch(40% 0.13 30);
+        --hue-honey-ink: oklch(44% 0.12 75);
+        --hue-sage-ink: oklch(37% 0.09 150);
+        --hue-teal-ink: oklch(37% 0.09 200);
+        --hue-sky-ink: oklch(39% 0.1 230);
+        --hue-plum-ink: oklch(37% 0.1 305);
+        --hue-terracotta-wash: oklch(95% 0.04 30);
+        --hue-honey-wash: oklch(96% 0.05 75);
+        --hue-sage-wash: oklch(95% 0.03 150);
+        --hue-teal-wash: oklch(95% 0.03 200);
+        --hue-sky-wash: oklch(95% 0.03 230);
+        --hue-plum-wash: oklch(95% 0.03 305);
+        --warm-0: oklch(99% 0.006 85);
+        --warm-50: oklch(97% 0.009 85);
+        --warm-100: oklch(94% 0.012 85);
+        --warm-200: oklch(88% 0.014 85);
+        --warm-300: oklch(78% 0.016 85);
+        --warm-400: oklch(62% 0.016 85);
+        --warm-500: oklch(48% 0.018 80);
+        --warm-700: oklch(32% 0.018 75);
+        --warm-800: oklch(24% 0.018 70);
+        --warm-900: oklch(18% 0.016 70);
+        --background: var(--warm-0);
+        --foreground: var(--warm-900);
+        --card: #fff;
+        --card-foreground: var(--warm-900);
+        --primary: var(--hue-honey);
+        --primary-foreground: #fff;
+        --secondary: var(--warm-100);
+        --secondary-foreground: var(--warm-900);
+        --muted: var(--warm-100);
+        --muted-foreground: var(--warm-500);
+        --accent: var(--hue-terracotta-wash);
+        --accent-foreground: var(--hue-terracotta-ink);
+        --border: var(--warm-200);
+        --ring: var(--hue-honey);
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.25rem;
+        --shadow-sm: 0 1px 3px 0 oklch(20% 0.02 75/0.08), 0 1px 2px -1px oklch(20% 0.02 75/0.06);
+        --shadow-md: 0 4px 8px -2px oklch(20% 0.02 75/0.08), 0 2px 4px -2px oklch(20% 0.02 75/0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--background);
+        color: var(--foreground);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+      }
+      .frame {
+        width: 820px;
+        background: var(--background);
+      }
+      .cap {
+        font-size: 12px;
+        color: var(--muted-foreground);
+        margin-bottom: 14px;
+        letter-spacing: 0.02em;
+      }
+      .cap b {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+      .win {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        background: var(--card);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+      }
+      .bar {
+        display: flex;
+        gap: 7px;
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--warm-50);
+      }
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .url {
+        margin-left: 10px;
+        font-size: 11px;
+        color: var(--muted-foreground);
+        align-self: center;
+      }
+      .body {
+        padding: 36px 40px 44px;
+      }
+      h1 {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .sub {
+        margin-top: 10px;
+        color: var(--muted-foreground);
+        font-size: 15px;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .muted {
+        color: var(--muted-foreground);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        line-height: 1.6;
+      }
+      .badge.sec {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        border-color: transparent;
+      }
+
+      .crumb {
+        font-size: 12.5px;
+        color: var(--muted-foreground);
+        margin-bottom: 16px;
+      }
+      .crumb b {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+      .hero {
+        border-left: 4px solid var(--hue-honey);
+        background: var(--hue-honey-wash);
+        border-radius: var(--radius-md);
+        padding: 16px 18px;
+        margin-bottom: 6px;
+      }
+      .hero h1 {
+        font-size: 27px;
+      }
+      .hero .sub {
+        margin-top: 6px;
+        color: var(--hue-honey-ink);
+        opacity: 0.9;
+      }
+      .alert {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        margin: 22px 0 4px;
+        padding: 12px 15px;
+        border: 1px solid var(--hue-sky);
+        background: var(--hue-sky-wash);
+        color: var(--hue-sky-ink);
+        border-radius: var(--radius-md);
+        font-size: 13.5px;
+      }
+      .reading {
+        max-width: 640px;
+      }
+      .ph {
+        margin-top: 26px;
+      }
+      .phh {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .clist {
+        list-style: none;
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .crs {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 8px 10px;
+        border-radius: var(--radius-sm);
+      }
+      .crs:hover {
+        background: var(--accent);
+      }
+      .num {
+        width: 26px;
+        height: 26px;
+        flex: none;
+        border-radius: 7px;
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        font-size: 12.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cname {
+        font-size: 14.5px;
+        flex: 1;
+      }
+      .chev {
+        color: var(--muted-foreground);
+      }
+      .capstone {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        margin-top: 2px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--hue-honey-ink);
+      }
+      .tri {
+        color: var(--hue-honey);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="cap">
+        Screen 2 · Path landing — <b>Option A: phase-grouped numbered syllabus (Selected)</b> ·
+        /en/c/learn/paths/interview-ready/software-engineer
+      </div>
+      <div class="win">
+        <div class="bar">
+          <span class="dot" style="background: var(--hue-terracotta)"></span>
+          <span class="dot" style="background: var(--hue-honey)"></span>
+          <span class="dot" style="background: var(--hue-sage)"></span>
+          <span class="url">ayokoding.com/en/c/learn/paths/interview-ready/software-engineer</span>
+        </div>
+        <div class="body">
+          <div class="crumb"><b>Home</b> / Learn / Interview-Ready SWE</div>
+          <div class="hero">
+            <h1>Interview-Ready Software Engineer</h1>
+            <div class="sub">interview-first · interview prep → production-effective → deeper</div>
+          </div>
+          <div class="reading">
+            <div class="alert">
+              <span>ℹ</span><span>Experienced &amp; job-hunting? Skip the prologue → jump to Phase 1.</span>
+            </div>
+            <section class="ph" style="opacity: 0.62">
+              <h2 class="phh">Prologue · Editor Foundations <span class="badge sec">skippable</span></h2>
+              <ol class="clist">
+                <li class="crs">
+                  <span class="num">1</span><span class="cname">Just Enough Nvim</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">2</span><span class="cname">Just Enough Lua</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">3</span><span class="cname">Extending Neovim</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="capstone"><span class="tri">▸</span>Capstone · Forge-Ready</li>
+              </ol>
+            </section>
+            <section class="ph">
+              <h2 class="phh">Phase 1 · Interview Preparation</h2>
+              <ol class="clist">
+                <li class="crs">
+                  <span class="num">4</span><span class="cname">Just Enough Python</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">5</span><span class="cname">Data Structures & Algorithms</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">6</span><span class="cname">Advanced Algorithms</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">9</span><span class="cname">Coding Interview</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">16</span><span class="cname">Behavioral & System Design</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="capstone"><span class="tri">▸</span>Capstone · Interview Loop</li>
+              </ol>
+            </section>
+            <section class="ph">
+              <h2 class="phh">Phase 2 · Production-Effective</h2>
+              <ol class="clist">
+                <li class="crs">
+                  <span class="num">17</span><span class="cname">Version Control at Scale</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">19</span><span class="cname">Testing & CI/CD</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">22</span><span class="cname">Observability Basics</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+              </ol>
+            </section>
+            <section class="ph">
+              <h2 class="phh">Phase 3 · Deepening</h2>
+              <ol class="clist">
+                <li class="crs">
+                  <span class="num">23</span><span class="cname">Distributed Systems</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+                <li class="crs">
+                  <span class="num">25</span><span class="cname">Performance Engineering</span
+                  ><svg
+                    class="chev"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </li>
+              </ol>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
