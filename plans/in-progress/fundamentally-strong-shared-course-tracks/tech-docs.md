@@ -432,11 +432,13 @@ The library holds **127 courses** (amended 2026-07-20, DD-28 — was 121; see
 [Count reconciliation](#design-decisions) at DD-28): **33 re-homed** (shipped topics 1–33) + **61
 transferred-native** (FS-SE topics 34–94) + **4 existing capstones** + **29 new** (20 courses + 9
 capstones). The **29 new** breaks down as the original **14 courses** + the **fourth path's six
-net-new AI-engineering courses** (light eval gate, deep evals, statistics for evals, product patterns
-for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — see
-[prd.md's AI-engineering specialization courses](./prd.md#new-course--capstone-specifications) for
-the `[Judgment call]`-labeled specifics; full catalog rows below land when the AI path is authored,
-DD-27) + **9 capstones**. **Zero merges among the original 121** — every overlap resolved keep-distinct
+net-new AI-engineering courses** (light eval gate, statistics for evals, deep evals, product patterns
+for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — their
+concept/example/prerequisite/capstone specs are already **settled** in
+[`syllabus/courses/`](./syllabus/courses/README.md); see
+[prd.md's AI-engineering specialization courses](./prd.md#new-course--capstone-specifications) for the
+narrative summary drawn from those settled files) + **9 capstones**. **Zero merges among the original
+121** — every overlap resolved keep-distinct
 per the reconciliation rulings recorded in [`README.md`](./README.md) and the **DD-20**
 inter-topic-capstone reconciliation below (seven inter-topic capstones — one already live on disk, six
 spec'd-but-unscheduled — promoted to first-class catalog/manifest entries; see
@@ -448,9 +450,10 @@ Each row lists **course-id · origin · format · primary language · prerequisi
 (authored native), `Ecap` = existing capstone, `N` = one of the 29 new. **Order is NOT a catalog
 property** — it lives in the four [Path Manifests](#path-manifests). `prerequisites` are the course's
 own DAG edges (`—` = entry point). Variants are added **on demand** and are not enumerated here. The
-six net-new AI courses are catalogued here by name only until the AI path is authored (DD-27); no
-rows are added to the tables below in this pass to avoid inventing course-ids, exact prerequisites, or
-scope lines not yet settled.
+six net-new AI courses are catalogued here by name only — their course-ids, prerequisites, formats, and
+scope are already **settled** in [`syllabus/courses/`](./syllabus/courses/README.md) (one complete spec
+file per course); full catalog rows are added to the tables below as a Phase 7 delivery step, authored
+directly from those already-settled specs (DD-27), not invented at that time.
 
 ### Editor & tooling foundations
 
@@ -642,8 +645,10 @@ once); each of those three **omits** courses that do not fit and may **create** 
 a genuine gap, and all three **converge on the same software-engineer deep-mastery endpoint** (the
 internals-builds + harness cluster + distributed-systems + security-capstone tail). The **fourth path**
 (`immediately-effective/software-engineer-to-ai-engineer`) is a **separate, shorter manifest** that
-**links to** (does not walk) most of that software-engineer-role tail — its own courses converge on a
-distinct AI-engineer endpoint (DD-24). The manifests are the machine-consumed data files under
+**links to** (does not walk) the shared software-engineer-**fundamentals** tail (DD-24), but **walks**
+the existing 9-course AI/harness cluster directly, alongside the six new AI-engineer-role courses —
+**15 courses total** (DD-33) — its own courses converge on a distinct AI-engineer endpoint. The
+manifests are the machine-consumed data files under
 `apps/ayokoding-www/src/features/course-paths/manifests/**/*.yaml` (nested to mirror each slash path
 ID); the human-readable orderings live in `syllabus/paths/`. All four are **fresh orderings** — none
 inherits the old single spiral.
@@ -777,36 +782,52 @@ University-style. Arc: **CS-theory / fundamentals first → apply → deeper.** 
 
 Role-transition principle, not an arc over the software-engineer-role baseline. Assumes an
 **already-working software engineer** (D4/DD-24) — the manifest is a **short, AI-specific spine**;
-prerequisite software-engineer courses it depends on are **linked to their canonical pages, not
-included** in `courseOrder`. Delivered as **authoring priority #1** (Group F, immediately after the
-`interview-ready` architecture-smoke-test MVP — D7/DD-27), ahead of the `immediately-effective` and
-`fundamentally-strong` manifests, because none of its six courses exist on disk yet.
+prerequisite software-engineer-**fundamentals** courses it depends on are **linked** to their canonical
+pages, not included in `courseOrder` (DD-24 scopes this to SWE-fundamentals only — the AI/harness
+cluster is **walked**, not linked; see DD-33). Delivered as **authoring priority #1** (Group F,
+immediately after the `interview-ready` architecture-smoke-test MVP — D7/DD-27), ahead of the
+`immediately-effective` and `fundamentally-strong` manifests, because none of its six net-new courses
+exist on disk yet.
 
 Converges on a **distinct AI-engineer endpoint** (D2/DD-22) — not the software-engineer deep-mastery
 tail the other three paths share.
 
-- **Spine (six net-new courses, authoring order per D5/D7)**: [Judgment call: exact `courseOrder`
-  and prerequisite-linking targets are decided at authoring time, not fabricated here] — a light eval
-  gate early (right after a first working LLM call, before RAG/agents, D5/DD-25) → deep evals after
-  agents (absorbing the three scattered evals treatments in `creating-ai-powered-apps`, `agentic-ai`,
-  and `agent-orchestration-subagents-and-observability`, D5/DD-25) → statistics for evals, scoped
-  tightly to what evals demand (D6/DD-26) → product patterns for probabilistic systems → inference
-  serving and model deployment → fine-tuning and adaptation (as a foil against RAG). Full specs (format
-  - primary language `[Judgment call]` labels) are in
-    [prd.md's AI-engineering specialization courses](./prd.md#new-course--capstone-specifications).
-- **Linked, not included**: the shared software-engineer-fundamentals courses this path assumes
-  (editor/tooling, one language end-to-end, backend/API basics) are **not** in this manifest's
-  `courseOrder` — they are referenced via canonical-page links from the path landing narrative
-  (D4/DD-24), keeping the spine short.
-- **Relationship to the harness-engineering cluster**: the existing harness cluster
+- **Spine (15 courses: the 9-course AI/harness cluster WALKED + the 6 new AI-engineer-role courses,
+  DD-33)**: settled order, matching the already-authored
+  [manifest mirror](./syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md)
+  — `creating-ai-powered-apps` → a **light eval gate** early (right after the first working LLM call,
+  before RAG/agents, D5/DD-25) → `agentic-ai` → `browser-automation-with-cdp` → the harness cluster
+  (`the-agent-loop` → `agent-tools-and-mcp` → `agent-context-and-memory` →
+  `agent-permissions-and-sandboxing` → `agent-orchestration-subagents-and-observability`) →
+  `capstone-build-your-own-coding-agent` → **statistics for evals**, scoped tightly to what evals
+  demand (D6/DD-26 — a **hard prerequisite** of the next course) → **deep evals** after agents
+  (absorbing the three scattered evals treatments in `creating-ai-powered-apps`, `agentic-ai`, and
+  `agent-orchestration-subagents-and-observability`, D5/DD-25) → product patterns for probabilistic
+  systems → inference serving and model deployment → fine-tuning and adaptation (as a foil against
+  RAG). The six new courses' full specs (concepts, worked examples, prerequisites, capstone) are
+  already **settled** in [`syllabus/courses/`](./syllabus/courses/README.md) — not a first-pass
+  judgment call; see also
+  [prd.md's AI-engineering specialization courses](./prd.md#new-course--capstone-specifications) for
+  the narrative summary.
+- **Linked, not included (SWE-fundamentals only, DD-24)**: the shared software-engineer-**fundamentals**
+  courses this path assumes (editor/tooling, one language end-to-end, backend/API basics) are **not**
+  in this manifest's `courseOrder` — they are referenced via canonical-page links from the path landing
+  narrative (D4/DD-24), keeping the spine focused. This exclusion never applied to the AI/harness
+  cluster (DD-33).
+- **Relationship to the harness-engineering cluster (RESOLVED, DD-33)**: the existing harness cluster
   (`the-agent-loop`, `agent-tools-and-mcp`, `agent-context-and-memory`,
   `agent-permissions-and-sandboxing`, `agent-orchestration-subagents-and-observability`) already
-  builds AI-agent internals at a software-engineering level (DD-13); whether this path's manifest
-  walks that cluster directly or links to it is decided at authoring time (DD-27), not fixed here.
+  builds AI-agent internals at a software-engineering level (DD-13); this path's manifest **walks** that
+  cluster directly (plus `creating-ai-powered-apps`, `agentic-ai`, `browser-automation-with-cdp`, and
+  `capstone-build-your-own-coding-agent`) rather than linking to it — DD-33 settles what DD-27 had left
+  open at authoring time.
 
-Full order: not yet authored — lands as
-`syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md` when Group F
-ships (D7/DD-27).
+Full order: the human-readable mirror already exists at
+[`syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md`](./syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md)
+(15 courses, DD-33) and is authoritative. The **machine-consumed** `courseOrder` YAML data file lands
+when Phase 9 executes — **smoke-test-scoped** to the six new courses (the only spine members whose
+bodies exist by Phase 9) and **grown** to the full 15 when Phase 12 Band 5/Band 8 land the
+harness-cluster bodies (see DD-33 below).
 
 ## Design Decisions
 
@@ -1007,7 +1028,7 @@ scratch file, not part of this plan's tracked docs).**
   deep-evals course (DD-25) and the three donor courses are trimmed to forward-links — a surgery, not a
   fourth treatment. `agent-permissions-and-sandboxing` (guardrails) is explicitly **not** a surgery
   target — it already has a clear owner and is the library's strongest area. Six net-new courses are
-  agreed for the fourth path (light eval gate, deep evals, statistics for evals, product patterns for
+  agreed for the fourth path (light eval gate, statistics for evals, deep evals, product patterns for
   probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — DD-25/
   DD-26), bringing the catalog from the original 121 (114 authored + 7 DD-20 capstones catalogued) to
   **127**. See [Course Library Catalog](#course-library-catalog) for the corrected count breakdown, and
@@ -1036,6 +1057,31 @@ fourth-path grilling session and are folded in verbatim from the session's decis
   course is added** — "harness engineering" is roughly five months old and contested among named
   practitioners; building durable course structure on terminology this unsettled ages the curriculum
   badly.
+  - **Citations** (added by fixer pass, matching the sourcing style used throughout
+    `syllabus/courses/`):
+    - [Web-cited] Tobi Lütke, X/Twitter, 2025-06-19 — "I really like the term 'context engineering'
+      over prompt engineering… the art of providing all the context for the task to be plausibly
+      solvable by the LLM." <https://x.com/tobi/status/1935533422589399127> (accessed 2026-07-21).
+    - [Web-cited] Andrej Karpathy, X/Twitter, 2025-06-25 — "+1 for 'context engineering' over 'prompt
+      engineering'…" <https://x.com/karpathy/status/1937902205765607626> (accessed 2026-07-21).
+    - [Web-cited] Simon Willison, "Context engineering," 2025-06-27.
+      <https://simonwillison.net/2025/jun/27/context-engineering/> (accessed 2026-07-21).
+    - [Web-cited] Anthropic, "Effective context engineering for AI agents."
+      <https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents> (accessed
+      2026-07-21; the specific 2025-09-29 publication date cited above was not independently
+      re-verified against the live page in this fixer pass).
+    - [Web-cited] arXiv 2606.10106, "What makes a harness a harness: necessary and sufficient
+      conditions for an agent harness" — confirmed real via WebSearch during the audit that produced
+      this finding.
+    - [Web-cited] Anthropic, "Effective harnesses for long-running agents," 2025-11-26.
+      <https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents> (accessed
+      2026-07-21).
+    - [Web-cited] Birgitta Böckeler / Thoughtworks (via martinfowler.com), "Harness Engineering — first
+      thoughts," 2026-04-02.
+      <https://martinfowler.com/articles/exploring-gen-ai/harness-engineering-memo.html> (accessed
+      2026-07-21).
+    - [Unverified] "OpenAI" — no specific OpenAI publication was identified during this fixer pass to
+      support this attribution; treat as unsourced until a specific OpenAI URL is supplied.
 - **DD-30 · The capstone teaches the METR-vs-Scale-AI dispute as durable epistemic content (D10).**
   `capstone-build-your-own-coding-agent` teaches the contested evidence on whether harness quality even
   matters, as content that survives whatever happens to the vocabulary: **METR** (independent, no
@@ -1046,6 +1092,20 @@ fourth-path grilling session and are folded in verbatim from the session's decis
   implying harness quality matters enormously below a competence floor and then flattens — is
   explicitly labelled a **synthesis no single source makes**, not a finding either source reports. The
   unsourced 42%→78% scaffold-swing claim is a **do-not-cite**: it traces to no primary source.
+  - **Citations** (added by fixer pass, matching the sourcing style used throughout
+    `syllabus/courses/`):
+    - [Web-cited] METR, "Measuring Time Horizon using Claude Code and Codex," 2026-02-13.
+      <https://metr.org/notes/2026-02-13-measuring-time-horizon-using-claude-code-and-codex/> (accessed
+      2026-07-21) — confirms Claude Code beats a ReAct scaffold in 50.7% of bootstrap samples on
+      Opus 4.5.
+    - [Web-cited] Scale AI, "SWE-Bench Pro: Raising the Bar for Agentic Coding."
+      <https://scale.com/blog/swe-bench-pro> (accessed 2026-07-21) — supports the native-scaffold
+      exploration-multiplier claim; the precise 1.5-2× figure was not independently re-derived from the
+      primary report in this fixer pass — re-verify the exact multiplier before citing it in course
+      content.
+    - The 42%→78% scaffold-swing figure remains a **do-not-cite** per this DD's own text — no primary
+      source was found for it during this fixer pass either, consistent with the "traces to no primary
+      source" finding.
 - **DD-31 · Four concept-level additions land inside existing courses, never as new courses (D11).**
   Verified absent by direct file read at decision time, now confirmed present as `co-NN` entries in the
   corresponding course files (each already had mandated example/concept headroom): **cache-aware prefix
@@ -1069,6 +1129,35 @@ fourth-path grilling session and are folded in verbatim from the session's decis
   naming work. See [Course Library Catalog](#course-library-catalog) and the
   [File Impact](#file-impact-by-delivery-group) Group F row, both of which already state the six-course,
   127-catalog figure consistent with this lock.
+- **DD-33 · Fourth path's manifest WALKS the AI/harness cluster; spine is 15 courses, not 6 (D13,
+  resolves the DD-24/DD-27 open item).** DD-24 scopes "linked, not included" to the shared
+  **software-engineer-fundamentals** courses only (`just-enough-python`, `software-testing`,
+  `cicd-and-release-engineering`, `backend-at-scale`, `containers-and-orchestration`,
+  `computer-architecture`, `site-reliability-engineering`, `data-engineering`,
+  `data-structures-and-algorithms-essentials`, `software-product-engineering`, `frontend-essentials`) —
+  it never said to link out the AI/harness cluster. The fourth path's `courseOrder` **walks** the
+  existing 9-course AI/harness cluster (`creating-ai-powered-apps`, `agentic-ai`,
+  `browser-automation-with-cdp`, `the-agent-loop`, `agent-tools-and-mcp`, `agent-context-and-memory`,
+  `agent-permissions-and-sandboxing`, `agent-orchestration-subagents-and-observability`,
+  `capstone-build-your-own-coding-agent`) **plus** the six new AI-engineer-role courses — **15 courses
+  total** — matching
+  `syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md` (already
+  authoritative) and `syllabus/paths/README.md`'s "15 courses" summary. **Rationale**: (a) the user
+  explicitly required context- and harness-engineering to be **included** in this path — walking puts
+  them in the reading order; linking hides them; (b) an AI-engineer onramp whose walk omits the
+  agent-building courses would contradict DD-21's own scope (teach **building** AI systems, not just
+  using an LLM in an app); (c) DD-24's own text only ever excluded SWE-fundamentals, never the
+  AI/harness cluster — treating it as excluded was an overreach of DD-24, not a restatement of it.
+  **Build-order consequence**: the 9 harness-cluster course bodies are authored in Phase 12 Band 5
+  (Group E, evals donors + harness cluster) and Band 8 (`capstone-build-your-own-coding-agent`) — both
+  **after** Group F's Phase 9 ships the AI path. Phase 9 therefore ships the manifest
+  **smoke-test-scoped** to the `courseOrder` entries whose bodies exist by Phase 9 (the six new AI
+  courses authored in Phase 7), and the manifest **grows** to the full 15 when Phase 12 Band 5/Band 8
+  land the harness-cluster bodies — mirroring the same partial-ship-then-grow pattern Group B's
+  `interview-ready` manifest already uses for its own deferred interview-technique courses (Phase 6
+  smoke test → Phase 12 Band 9 growth). This does **not** delay the AI path's Phase 9 ship — DD-27's
+  "authoring priority #1" stands; only the manifest's _published_ subset differs from its long-run full
+  composition until Band 5/8 land.
 
 ## Smoothness Architecture (per-path)
 
@@ -1176,9 +1265,11 @@ now read **127** (the fourth path has landed, so the reconciliation is applied, 
   catalog".
 
 When the fourth path's manifest (`immediately-effective/software-engineer-to-ai-engineer.md`) is
-authored, it needs its own composition-total line scoped to the AI-specific spine (short; prerequisites
-linked, not included, DD-24) — not a "121"/"127" fraction, since it does not walk the
-software-engineer-role baseline.
+authored, it needs its own composition-total line scoped to the AI-specific spine (SWE-fundamentals
+prerequisites linked, not included, DD-24; the 9-course AI/harness cluster **walked**, not linked, plus
+the 6 new AI-engineer-role courses, for **15 courses total**, DD-33) — not a "121"/"127" fraction, since
+it does not walk the software-engineer-role baseline. Phase 9 ships this line smoke-test-scoped at 6;
+it reads 15 once Phase 12 Band 5/8 land the harness-cluster bodies (DD-33).
 
 ## File Impact (by delivery group)
 
@@ -1193,7 +1284,7 @@ software-engineer-role baseline.
 | A     | specs + redirects                                                                                                               | New Gherkin + redirect config                                                                                 | `<SPECS>*.feature` + `README.md`; `apps/ayokoding-www/src/redirects/learn-reorg.ts` entries for re-homed courses                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | A     | library + paths homes                                                                                                           | New content scaffolding                                                                                       | `<COURSES>_index.md` (library landing); `<PATHS>_index.md` (paths hub / choose-a-path, **four** cards, 2×2 grid — amended 2026-07-20, DD-23)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | B     | `interview-ready/software-engineer` (MVP)                                                                                       | Re-home 1–33 + 4 existing capstones + manifest — **architecture smoke test ONLY (amended 2026-07-20, DD-27)** | `git mv` shipped topics 1–33 + the 4 existing capstones (incl. `capstone-solid-core`, DD-20) into `<COURSES><id>/` (+ redirects); **update** legacy `content/en/learn/fundamentally-strong/**/_index.md` section indexes to re-point every entry to the re-homed course URLs (old-way browse still resolves — additive model); author `<FEAT>manifests/interview-ready/software-engineer.yaml` + thin `<PATHS>interview-ready/software-engineer/_index.md` landing anchor; ship end-to-end + deploy. Authoring `coding-interview`, `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`, `capstone-interview-loop` is **no longer bundled into this group** (DD-27) — those NEW courses land whenever the `interview-ready` path's remaining authoring is scheduled, without blocking groups F/C/D below |
-| F     | `immediately-effective/software-engineer-to-ai-engineer` — **authoring priority #1 (new group, added 2026-07-20, DD-24/DD-27)** | Six net-new AI courses + manifest                                                                             | Author the six net-new courses (light eval gate, deep evals, statistics for evals, product patterns for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — DD-25/DD-26/DD-28; full catalog rows land at authoring time, see [Course Library Catalog](#course-library-catalog)) into `<COURSES>`; author `<FEAT>manifests/immediately-effective/software-engineer-to-ai-engineer.yaml` (short, AI-specific spine — prerequisites **linked, not included**, DD-24) + thin `<PATHS>immediately-effective/software-engineer-to-ai-engineer/_index.md` landing anchor                                                                                                                                                                                                                                          |
+| F     | `immediately-effective/software-engineer-to-ai-engineer` — **authoring priority #1 (new group, added 2026-07-20, DD-24/DD-27)** | Six net-new AI courses + manifest, smoke-test-scoped                                                          | Author the six net-new courses (light eval gate, statistics for evals, deep evals, product patterns for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — DD-25/DD-26/DD-28; full catalog rows land at authoring time, see [Course Library Catalog](#course-library-catalog)) into `<COURSES>`; author `<FEAT>manifests/immediately-effective/software-engineer-to-ai-engineer.yaml` (SWE-fundamentals prerequisites **linked, not included**, DD-24; smoke-test-scoped to these 6 courses at ship, **grows to 15** — walking the existing 9-course AI/harness cluster — at Phase 12 Band 5/8, DD-33) + thin `<PATHS>immediately-effective/software-engineer-to-ai-engineer/_index.md` landing anchor                                                                                                    |
 | C     | `immediately-effective/software-engineer`                                                                                       | Manifest over the library                                                                                     | Author `<FEAT>manifests/immediately-effective/software-engineer.yaml` + thin `<PATHS>immediately-effective/software-engineer/_index.md`; author any build-fast-only NEW course as needed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | D     | `fundamentally-strong/software-engineer`                                                                                        | Manifest over the library                                                                                     | Author `<FEAT>manifests/fundamentally-strong/software-engineer.yaml` + thin `<PATHS>fundamentally-strong/software-engineer/_index.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | E     | Backfill topics 34–94                                                                                                           | Author native into `courses/`                                                                                 | Author the 61 transferred bodies + remaining NEW courses/capstones (incl. the deferred 4 interview courses + `capstone-interview-loop`, DD-27) into `<COURSES>`; grow each manifest's `courseOrder` as courses land                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |

@@ -610,31 +610,36 @@ Scenario: The agentic-ai survey forward-links each primitive without re-teaching
 Six NEW courses for the fourth path, teaching **building** AI systems (not driving coding agents —
 `agentic-coding` stays a separate axis, DD-21). Each is split into a **stable spine** (durable
 principles) and **dated accuracy-note sidebars** (volatile SDK/model/pricing/framework specifics),
-matching the pattern the existing AI-band courses already use (DD-28). Exact prerequisite chains,
-formats, and primary languages below are **[Judgment call]** — first-pass authoring guidance, not a
-locked catalog row; the author finalizes them against the `syllabus/courses/` catalog conventions at
-authoring time (per DD-27's build order, this is authoring priority #1 behind the interview-ready
-MVP).
+matching the pattern the existing AI-band courses already use (DD-28). **These six courses' specs are
+now settled** — full concept (`co-NN`), worked-example (`ex-NN`), prerequisite-chain, and capstone
+specs exist at [`syllabus/courses/`](./syllabus/README.md) (one 295-425-line file per course); the
+format/language/prerequisite summaries below are drawn from those settled files, not first-pass
+guesses. Author each course body **from** its `syllabus/courses/<id>.md` spec (per DD-27's build
+order, this is authoring priority #1 behind the interview-ready MVP).
 
-- **Light eval gate** [Judgment call: By Example, Python] — a small, early course sitting right after
-  the first working LLM call and before RAG/agents; answers "how will you know this works?" (DD-25).
-- **Deep evals** [Judgment call: By Example, Python] — sits after agents; error analysis, task-specific
-  criteria, LLM-as-judge with measured human agreement, CI gating, judge-scope reliability. Absorbs the
-  three scattered evals treatments in `creating-ai-powered-apps`, `agentic-ai`, and
-  `agent-orchestration-subagents-and-observability`, which are trimmed to forward-links rather than
+- **Light eval gate** (`evaluating-ai-output-essentials` — Annotated-concept, Python) — a small, early
+  course sitting right after the first working LLM call and before RAG/agents; answers "how will you
+  know this works?" (DD-25).
+- **Statistics for evals** (`statistics-for-evaluation` — Annotated-concept, code-bearing, Python) —
+  scoped tightly to what evals demand (judge concordance, significance testing), not a general
+  statistics survey; `analytics-and-experimentation` (classical product A/B testing) stays a scope
+  mismatch and a candidate sibling/prerequisite rather than a merge target (DD-26). Declared a **hard
+  prerequisite** of deep evals, so it is authored/placed before that course (see the manifest mirror at
+  `syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md`).
+- **Deep evals** (`evaluating-ai-systems-in-depth` — By Example, Python) — sits after agents; error
+  analysis, task-specific criteria, LLM-as-judge with measured human agreement, CI gating, judge-scope
+  reliability. Absorbs the three scattered evals treatments in `creating-ai-powered-apps`, `agentic-ai`,
+  and `agent-orchestration-subagents-and-observability`, which are trimmed to forward-links rather than
   duplicating a fourth treatment (DD-25, DD-28).
-- **Statistics for evals** [Judgment call: Annotated-concept, code-bearing, Python] — scoped tightly to
-  what evals demand (judge concordance, significance testing), not a general statistics survey;
-  `analytics-and-experimentation` (classical product A/B testing) stays a scope mismatch and a
-  candidate sibling/prerequisite rather than a merge target (DD-26).
-- **Product patterns for probabilistic systems** [Judgment call: Annotated-concept, no code] — product
-  design patterns for systems whose outputs are probabilistic rather than deterministic; no course
-  owns this today (DD-28).
-- **Inference serving and model deployment** [Judgment call: By Example, Python] — vLLM/TGI, KV-cache,
-  batching, GPU considerations; entirely absent from the library today (DD-28).
-- **Fine-tuning and adaptation** [Judgment call: By Example, Python] — fine-tuning/LoRA/PEFT versus
-  RAG as a foil; `fine-tun*` appears once library-wide today, as a RAG comparison point, never its own
-  course (DD-28).
+- **Product patterns for probabilistic systems** (`product-patterns-for-probabilistic-systems` —
+  Annotated-concept, no code) — product design patterns for systems whose outputs are probabilistic
+  rather than deterministic; no course owns this today (DD-28).
+- **Inference serving and model deployment** (`inference-serving-and-model-deployment` — By Example,
+  Python) — vLLM/TGI, KV-cache, batching, GPU considerations; entirely absent from the library today
+  (DD-28).
+- **Fine-tuning and adaptation** (`fine-tuning-and-adaptation` — By Example, Python) —
+  fine-tuning/LoRA/PEFT versus RAG as a foil; `fine-tun*` appears once library-wide today, as a RAG
+  comparison point, never its own course (DD-28).
 
 The scope boundary between the light eval gate and deep evals is stated explicitly in both courses'
 overviews, in the style of the existing AI-band scope-guard (DD-10/DD-11), to avoid reproducing that

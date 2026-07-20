@@ -130,8 +130,11 @@ subagents capped per the orchestration convention). The main thread self-promote
   affected manifests (append + re-run prerequisite-consistency + integrity) as a serial sync point —
   Bands 1–8 grow the three software-engineer-role manifests; Band 9 grows only `interview-ready` and
   `fundamentally-strong` (the two arcs whose ordering includes the interview-technique band per
-  [tech-docs.md's path manifests](./tech-docs.md#path-manifests)); the AI path's manifest does **not**
-  grow here (DD-24 — its spine is fixed at Phase 9).
+  [tech-docs.md's path manifests](./tech-docs.md#path-manifests)); **Band 5 (plus Band 8 for
+  `capstone-build-your-own-coding-agent`) additionally grows the fourth path's
+  (`immediately-effective/software-engineer-to-ai-engineer`) manifest** from its Phase-9
+  smoke-test-scoped six-course spine to its full **15-course** composition (DD-33) — the
+  harness-cluster bodies these bands land are exactly the nine courses that manifest walks.
 - **Finalization (Phases 13–17)** is serial.
 
 **Path constants** (referenced throughout):
@@ -801,13 +804,18 @@ ayokoding-www:test:unit` exits 0); references only extant courses; the five defe
 
 > Each NEW course is authored as a full page-bundle into `<COURSES><course-id>/`. These six bodies are
 > content-independent (each writes only its own subtree) and **pipeline concurrently** through review
-> (bounded by the cap). Author each per the **NEW-course authoring convention** below; per-course
-> concept/example detail is in
+> (bounded by the cap). Author each per the **NEW-course authoring convention** below. Per-course
+> concept/example/prerequisite/capstone detail is **already settled** in
+> [`syllabus/courses/`](./syllabus/courses/README.md) — each of the six courses has a complete,
+> 295-425-line spec file (`evaluating-ai-output-essentials.md`, `evaluating-ai-systems-in-depth.md`,
+> `statistics-for-evaluation.md`, `product-patterns-for-probabilistic-systems.md`,
+> `inference-serving-and-model-deployment.md`, `fine-tuning-and-adaptation.md`) with concrete `co-NN`
+> concept enumeration, `ex-NN` worked examples, a concrete prerequisite chain, and a capstone spec —
+> these are the **source of truth** for authoring the actual
+> `apps/ayokoding-www/content/en/learn/courses/<id>/` bundle; author each course body **from** its
+> `syllabus/courses/<id>.md` spec, not from a fresh judgment call.
 > [prd.md's AI-engineering specialization courses](./prd.md#ai-engineering-specialization-courses-software-engineer-to-ai-engineer-path-added-2026-07-20)
-> — every format / primary-language / prerequisite-chain cell there is explicitly labeled
-> `[Judgment call]` (first-pass authoring guidance, not a locked catalog row); this delivery checklist
-> does not restate or firm up those specifics — the author finalizes them against the
-> `syllabus/courses/` catalog conventions at authoring time, per that same DD-27 note in `prd.md`.
+> retains a narrative summary drawn from those same settled specs.
 >
 > Every course below is split into a **stable spine** and **dated accuracy-note sidebars** (volatile
 > SDK/model/pricing/framework specifics), matching the pattern the existing AI-band courses already use
@@ -825,20 +833,19 @@ Band 9, DD-27):
    accuracy-note sidebar, not the spine.
 2. [AI] **Skeleton** — create `<COURSES><course-id>/` (`_index.md` with `prerequisites: [...]` +
    `overview.md` + `learning/_index.md` + `drilling/_index.md`), mirroring the matching sibling bundle
-   shape [Judgment call: exact `course-id` slug and prerequisite-linking targets are finalized at
-   authoring time against `syllabus/courses/`, per prd.md's AI-engineering specialization courses note —
-   not fabricated here] — acceptance: `test -d` passes for folder + `learning/` + `drilling/`;
+   shape; the `course-id` slug and prerequisite-linking targets are **settled** — use the exact
+   course-id and prerequisite chain declared in the matching `syllabus/courses/<id>.md` spec file, not
+   a fresh decision — acceptance: `test -d` passes for folder + `learning/` + `drilling/`;
    `prerequisites` declared (the shared software-engineer-fundamentals prerequisites this path assumes
    are **linked, not included** in the manifest per DD-24 — that constraint governs Phase 9, not this
    skeleton step).
 3. [AI] **Author learning track** — `overview.md` (purpose + `## Prerequisites` naming only earlier
    library courses + register per prd), concept coverage, example/scenario pages + colocated `code/`
-   where code-bearing, and `learning/capstone/` [Judgment call: exact concept-coverage floor and
-   example-volume band are decided at authoring time, per this plan's usual per-course floor convention
-   — not invented here since these six courses have no locked catalog row yet] — acceptance: the
-   course's own `overview.md` states its scope boundary against any sibling AI-band course it could be
-   confused with (deep evals vs. light eval gate; statistics-for-evals vs.
-   `analytics-and-experimentation`).
+   where code-bearing, and `learning/capstone/`; the concept-coverage floor and example volume are
+   **settled** in the matching `syllabus/courses/<id>.md` spec file's `co-NN`/`ex-NN` enumeration —
+   author from that spec, not a fresh judgment call — acceptance: the course's own `overview.md` states
+   its scope boundary against any sibling AI-band course it could be confused with (deep evals vs.
+   light eval gate; statistics-for-evals vs. `analytics-and-experimentation`).
 4. [AI] **Author drilling track** — `drilling/<course-id>.md` + `drilling/overview.md` in the fixed
    five-section order — acceptance: all five sections present.
 5. [AI] **Run content checkers** — run the matching learning checker, `apps-ayokoding-www-facts-checker`,
@@ -853,15 +860,18 @@ Band 9, DD-27):
 Each course below is its own sub-phase (own branch → draft PR → 3-cycle review → `[AI]` merge →
 deploy), applying the convention:
 
-- [ ] [AI] Light eval gate [Judgment call: By Example, Python, per prd.md] — sits right after the first
-      working LLM call, before RAG/agents; answers "how will you know this works?" (D5/DD-25) —
-      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM; its
-      overview states the scope boundary against the deep-evals course.
-  - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] Deep evals [Judgment call: By Example, Python, per prd.md] — sits after agents; error
-      analysis, task-specific criteria, LLM-as-judge with measured human agreement, CI gating,
-      judge-scope reliability (D5/DD-25) — acceptance: all 7 convention steps complete; checkers report
-      zero CRITICAL/HIGH/MEDIUM; its overview states the scope boundary against the light eval gate.
+- [ ] [AI] Light eval gate (`evaluating-ai-output-essentials` — Annotated-concept, Python, settled per
+      [`syllabus/courses/evaluating-ai-output-essentials.md`](./syllabus/courses/evaluating-ai-output-essentials.md))
+      — sits right after the first working LLM call, before RAG/agents; answers "how will you know this
+      works?" (D5/DD-25) — acceptance: all 7 convention steps complete; checkers report zero
+      CRITICAL/HIGH/MEDIUM; its overview states the scope boundary against the deep-evals course.
+  - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
+- [ ] [AI] Deep evals (`evaluating-ai-systems-in-depth` — By Example, Python, settled per
+      [`syllabus/courses/evaluating-ai-systems-in-depth.md`](./syllabus/courses/evaluating-ai-systems-in-depth.md))
+      — sits after agents; error analysis, task-specific criteria, LLM-as-judge with measured human
+      agreement, CI gating, judge-scope reliability (D5/DD-25); declares `statistics-for-evaluation` a
+      **hard prerequisite** — acceptance: all 7 convention steps complete; checkers report zero
+      CRITICAL/HIGH/MEDIUM; its overview states the scope boundary against the light eval gate.
 
   **Gherkin (binds) →** "The light eval gate and deep evals course do not overlap"
 
@@ -875,10 +885,13 @@ deploy), applying the convention:
 
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 
-- [ ] [AI] Statistics for evals [Judgment call: Annotated-concept, code-bearing, Python, per prd.md] —
-      scoped tightly to what evals demand (judge concordance, significance testing), not a general
-      statistics survey (D6/DD-26) — acceptance: all 7 convention steps complete; checkers report zero
-      CRITICAL/HIGH/MEDIUM.
+- [ ] [AI] Statistics for evals (`statistics-for-evaluation` — Annotated-concept, code-bearing, Python,
+      settled per
+      [`syllabus/courses/statistics-for-evaluation.md`](./syllabus/courses/statistics-for-evaluation.md))
+      — scoped tightly to what evals demand (judge concordance, significance testing), not a general
+      statistics survey (D6/DD-26); is a **hard prerequisite** of `evaluating-ai-systems-in-depth`, so
+      it must be authored before (or in the same review cycle as) the deep-evals course —
+      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
 
   **Gherkin (binds) →** "The statistics-for-evals course stays scoped to what evals demand"
 
@@ -892,18 +905,23 @@ deploy), applying the convention:
 
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
 
-- [ ] [AI] Product patterns for probabilistic systems [Judgment call: Annotated-concept, no code, per
-      prd.md] — product design patterns for probabilistic (not deterministic) outputs; no course owns
-      this today (DD-28) — acceptance: all 7 convention steps complete; checkers report zero
+- [ ] [AI] Product patterns for probabilistic systems (`product-patterns-for-probabilistic-systems` —
+      Annotated-concept, no code, settled per
+      [`syllabus/courses/product-patterns-for-probabilistic-systems.md`](./syllabus/courses/product-patterns-for-probabilistic-systems.md))
+      — product design patterns for probabilistic (not deterministic) outputs; no course owns this
+      today (DD-28) — acceptance: all 7 convention steps complete; checkers report zero
       CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
-- [ ] [AI] Inference serving and model deployment [Judgment call: By Example, Python, per prd.md] —
-      vLLM/TGI, KV-cache, batching, GPU considerations; entirely absent from the library today (DD-28) —
-      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
+- [ ] [AI] Inference serving and model deployment (`inference-serving-and-model-deployment` — By
+      Example, Python, settled per
+      [`syllabus/courses/inference-serving-and-model-deployment.md`](./syllabus/courses/inference-serving-and-model-deployment.md))
+      — vLLM/TGI, KV-cache, batching, GPU considerations; entirely absent from the library today
+      (DD-28) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] Fine-tuning and adaptation [Judgment call: By Example, Python, per prd.md] —
-      fine-tuning/LoRA/PEFT versus RAG as a foil (DD-28) — acceptance: all 7 convention steps complete;
-      checkers report zero CRITICAL/HIGH/MEDIUM.
+- [ ] [AI] Fine-tuning and adaptation (`fine-tuning-and-adaptation` — By Example, Python, settled per
+      [`syllabus/courses/fine-tuning-and-adaptation.md`](./syllabus/courses/fine-tuning-and-adaptation.md))
+      — fine-tuning/LoRA/PEFT versus RAG as a foil (DD-28) — acceptance: all 7 convention steps
+      complete; checkers report zero CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] **Add catalog rows** — replace `tech-docs.md`'s Course Library Catalog by-name-only
       placeholder for these six courses with real rows (course-id · origin `N` · format · primary
@@ -949,9 +967,11 @@ deploy), applying the convention:
       the three not-yet-authored donor courses (Phase 12 Band 5), and the `fundamentally-strong` and
       `immediately-effective` manifests that will carry those donors once grown (the AI path's own
       manifest already carries `deep-evals` from Phase 9); the D9/D11 additions touch only the harness
-      cluster (Phase 12 Band 5) + `capstone-build-your-own-coding-agent` (Phase 12 Band 8) and the same
-      two software-engineer-role manifests — acceptance: the blast radius is written into this delivery
-      checklist (the two clauses above) before any of the three surgeries is considered "applied".
+      cluster (Phase 12 Band 5) + `capstone-build-your-own-coding-agent` (Phase 12 Band 8) and every
+      manifest that carries those course IDs — the same two software-engineer-role manifests, plus the
+      fourth path's manifest once Band 5/8 grow it to include the harness cluster (DD-33) — acceptance:
+      the blast radius is written into this delivery checklist (the two clauses above) before any of
+      the three surgeries is considered "applied".
 - [ ] [AI] **Lock the evals forward-link contract** — record, for Phase 12 Band 5's authoring of
       `creating-ai-powered-apps`, `agentic-ai`, and `agent-orchestration-subagents-and-observability`,
       that each course's evals-adjacent material MUST forward-link to the `deep-evals` course rather than
@@ -999,20 +1019,31 @@ deploy), applying the convention:
 
 > _Suggested executor: `apps-ayokoding-www-general-maker` (manifest/landing) + `web-researcher` (smoothness facts)._
 > Authored **behind** the interview-ready MVP and **ahead of** Groups C/D (D7/DD-27) — this is the
-> second shippable path. `courseOrder` is the **six net-new AI courses only**, ordered per D5/D7's
-> authoring order (light eval gate → deep evals → statistics for evals → product patterns for
-> probabilistic systems → inference serving and model deployment → fine-tuning and adaptation)
-> [Judgment call: this authoring order is prd.md's/tech-docs.md's own stated ordering guidance; the
->
-> > exact `courseOrder` and prerequisite-linking targets are finalized at authoring time, per DD-27 — not
-> > fabricated here]. The shared software-engineer-fundamentals prerequisites this path assumes are
-> > **linked, not included** (DD-24) — they never appear in `courseOrder`.
+> second shippable path. Per **DD-33**, this path's full manifest composition is **15 courses**: the
+> existing 9-course AI/harness cluster **walked** directly, plus the six new AI-engineer-role courses.
+> The 9 harness-cluster course bodies are not authored until Phase 12 Band 5/Band 8 (Group E), so this
+> phase ships the manifest **smoke-test-scoped** to `courseOrder` = **the six new AI courses only**
+> (the only spine members whose bodies exist by this phase) — mirroring the same partial-ship pattern
+> Group B's Phase 6 already uses for its own deferred courses. The manifest **grows** to the full 15 at
+> Phase 12 Band 5/Band 8 (see that phase's growth step). The six new courses' settled order — light
+> eval gate → statistics for evals → deep evals → product patterns for probabilistic systems →
+> inference serving and model deployment → fine-tuning and adaptation — is per the already-authored
+> [`syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md`](./syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md),
+> which also fixes the eventual full 15-course ordering. The shared software-engineer-**fundamentals**
+> prerequisites this path assumes are **linked, not included** (DD-24 — scoped to SWE-fundamentals
+> only, not the harness cluster, DD-33) — they never appear in `courseOrder`.
 
 - [ ] [AI] Author the manifest **data file**
       `<MANIFESTS>immediately-effective/software-engineer-to-ai-engineer.yaml`: `pathId:
 immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`, and the ordered
-      `courseOrder` = the six new AI courses per
+      `courseOrder` = the six new AI courses, smoke-test-scoped (DD-33 — the harness-cluster courses
+      this path's full 15-course composition also walks are not authored until Phase 12 Band 5/8),
+      ordered per the settled order in
       [tech-docs §Path `immediately-effective/software-engineer-to-ai-engineer`](./tech-docs.md#path-immediately-effectivesoftware-engineer-to-ai-engineer-fourth-path-added-2026-07-20)
+      and the already-authored
+      [manifest mirror](./syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md)
+      (light eval gate → statistics for evals → deep evals → product patterns for probabilistic
+      systems → inference serving and model deployment → fine-tuning and adaptation)
       — acceptance: the manifest loads + validates (`npx nx run ayokoding-www:test:unit` exits 0); NO
       shared software-engineer-fundamentals course ID (e.g. `just-enough-typescript`,
       `backend-essentials`, `api-design`) appears anywhere in `courseOrder` —
@@ -1059,7 +1090,7 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
 
 ### Phase 9 Gate
 
-- [ ] [AI] `immediately-effective/software-engineer-to-ai-engineer` manifest published (six-course spine, prerequisites linked not included); integrity + prerequisite-consistency green; path-walk e2e + breadcrumb + prerequisite display green in `en` (this plan's content locale).
+- [ ] [AI] `immediately-effective/software-engineer-to-ai-engineer` manifest published (smoke-test-scoped six-course spine — grows to its full 15-course composition at Phase 12 Band 5/8, DD-33; SWE-fundamentals prerequisites linked, not included); integrity + prerequisite-consistency green; path-walk e2e + breadcrumb + prerequisite display green in `en` (this plan's content locale).
 - [ ] [AI] Paths hub shows two of four cards; smoothness audit passes.
 - [ ] [AI] Re-run `checkManifestIntegrity` + `checkPrerequisiteConsistency` across all published manifests to date (`interview-ready`, `immediately-effective/software-engineer-to-ai-engineer`) — exits 0 (closes out Phase 8's deferred cross-manifest check).
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0 (e2e lives in the paired `ayokoding-www-fe-e2e` project — `ayokoding-www:test:e2e` is a no-op echo and can never fail).
@@ -1361,26 +1392,41 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
       [smoothness audit](./tech-docs.md#smoothness-architecture-per-path)'s refresh-register lever that
       Phase 6 explicitly deferred — acceptance: the lever verified; any regression fixed by soften/bridge
       in place, never reorder.
+- [ ] [AI] **AI-path manifest growth (Band 5 + Band 8, DD-33)** — once Band 5 lands the harness cluster
+      (`creating-ai-powered-apps`, `agentic-ai`, `browser-automation-with-cdp`, `the-agent-loop`,
+      `agent-tools-and-mcp`, `agent-context-and-memory`, `agent-permissions-and-sandboxing`,
+      `agent-orchestration-subagents-and-observability`) and Band 8 lands
+      `capstone-build-your-own-coding-agent`, insert all nine into
+      `<MANIFESTS>immediately-effective/software-engineer-to-ai-engineer.yaml` in their correct
+      topological position (per the already-authored
+      [manifest mirror](./syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md)),
+      growing the manifest from its Phase-9 smoke-test-scoped six-course spine to its full **15-course**
+      composition — command: `npx nx run ayokoding-www:test:unit` — acceptance: exits 0; the Phase 9
+      falsifiable check now closes the other way —
+      `grep -cE "the-agent-loop|agent-tools-and-mcp|agent-context-and-memory|agent-permissions-and-sandboxing|agent-orchestration-subagents-and-observability|capstone-build-your-own-coding-agent" <MANIFESTS>immediately-effective/software-engineer-to-ai-engineer.yaml`
+      returns **0** before Band 5/8 land and returns **6** once they do.
 - [ ] [AI] After the final band, confirm all three software-engineer-role manifests reference the
       intended full arcs (no omitted-by-mistake courses; omit-or-create honored) and the library holds
       the full **127-course** catalog (121 software-engineer-role baseline + the 6 AI courses authored in
       Phase 7) — command: `npx nx run ayokoding-www:build` — acceptance: 127 course bundles resolve; all
-      four manifests validate (the AI path's own manifest, authored in Phase 9, is unaffected by this
-      backfill and re-validated here only as a regression check).
+      four manifests validate (the AI path's own manifest has grown to its full 15-course composition by
+      Band 5/Band 8, DD-33, and is re-validated here as the final confirmation).
 
 ### Phase 12 Gate
 
 - [ ] [AI] All 61 transferred topics + 10 remaining new courses + 8 remaining capstones (2 original + 6 DD-20 inter-topic capstones) + the 5 deferred interview-technique bodies (Band 9, DD-27) authored NATIVE under `<COURSES>` with declared prerequisites; each passed its checker + facts + link checkers.
 - [ ] [AI] Reconciliation rulings applied (defensive-security By-Example label; AI-band scope-guard; async-fastapi scope note); Phase 8's three locked contracts (evals forward-link, D9 citation, D11 concept additions) applied and verified on their target Band 5/Band 8 courses.
 - [ ] [AI] The three software-engineer-role manifests grown to their full arcs (interview-ready and fundamentally-strong now carry Band 9's five interview-technique courses; immediately-effective does not); integrity + prerequisite-consistency + no-forked-body green; full 127-course library resolves.
+- [ ] [AI] The fourth path's (`immediately-effective/software-engineer-to-ai-engineer`) manifest grown from its Phase 9 six-course smoke-test spine to its full 15-course composition (Band 5 harness cluster + Band 8 capstone, DD-33); integrity + prerequisite-consistency green.
 - [ ] [AI] Interview-ready's refresh-register smoothness lever, deferred at Phase 6, now verified.
 - [ ] [AI] `<COURSES>_index.md` catalog updated to the full 127; `npx nx run ayokoding-www:build` + link + heading + markdownlint green.
 - [ ] [AI] Every band/course sub-phase PR is `[AI]`-merged and deployed.
 
 > **Pause Safety**: the full 127-course library exists and all four path manifests are complete over
-> one shared library (zero body duplication among the three software-engineer-role paths; the AI path
-> links rather than duplicates). The whole four-path product is content-complete. Safe to stop. To
-> resume: re-run the section build + integrity checks.
+> one shared library (zero body duplication among any of the four paths — the AI path walks the shared
+> AI/harness cluster by ID (DD-33) and links out only its SWE-fundamentals prerequisites, DD-24). The
+> whole four-path product is content-complete. Safe to stop. To resume: re-run the section build +
+> integrity checks.
 
 ---
 

@@ -20,7 +20,7 @@ Every manifest reuses the same course bodies reordered — **zero body duplicati
 **Columns** — `Course ID` (stable slug; linked to its detail file), `Format`, `Language(s)`,
 `Short summary`. NEW = a course this plan authors; the rest are re-homed existing courses.
 
-> **Detail-file status**: the **fourteen NEW courses** and **five capstones** (the three NEW capstones
+> **Detail-file status**: the **twenty NEW courses** and **five capstones** (the three NEW capstones
 > and the two existing capstones with substantial integration content) have full-content, standalone
 > `capstone-*.md` files in this folder (linked below and flagged **NEW** / **capstone**). The **95
 > existing courses** (94 existing topics and `capstone-forge-ready`) carry full-content, non-pointer

@@ -131,12 +131,14 @@ affected manifest is re-verified prerequisite-consistent afterward.
    live on disk) plus six new inter-topic capstones (`capstone-real-world-delivery`,
    `capstone-secure-service`, `capstone-data-pipeline`, `capstone-concurrency-and-systems`,
    `capstone-concurrency-showdown`, `capstone-lead-at-altitude`). This is the **121-course baseline**.
-4. **6 net-new AI-specific courses** (2026-07-20 grilling session) — a light eval gate, a deep evals
-   course, a statistics-for-evals course, a product-patterns-for-probabilistic-systems course, an
-   inference-serving-and-model-deployment course, and a fine-tuning-and-adaptation course — authored
-   for the fourth path (`immediately-effective/software-engineer-to-ai-engineer`), available to any
-   path thereafter. Brings the catalog to **127**. See
-   [tech-docs.md DD-25, DD-26, DD-28](./tech-docs.md#design-decisions).
+4. **6 net-new AI-specific courses** (2026-07-20 grilling session) — a light eval gate, a
+   statistics-for-evals course, a deep evals course, a product-patterns-for-probabilistic-systems
+   course, an inference-serving-and-model-deployment course, and a fine-tuning-and-adaptation
+   course — authored for the fourth path (`immediately-effective/software-engineer-to-ai-engineer`),
+   which **walks** these 6 plus the existing 9-course AI/harness cluster for a **15-course spine**
+   (DD-33); the 6 new courses are available to any path thereafter. Brings the shared library to
+   **127**. See
+   [tech-docs.md DD-25, DD-26, DD-28, DD-33](./tech-docs.md#design-decisions).
 
 **Reconciliation rulings (locked)** — the rulings below are themselves authoritative and are
 reproduced against the tracked [Course Library Catalog](./tech-docs.md#course-library-catalog)
