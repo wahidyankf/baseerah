@@ -128,3 +128,27 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
   the running app — deliberately not attempted blind in the same pass as the port-conflict fix. Needs
   a dedicated follow-up (ideally with `npx nx run ayokoding-www:serve` + browser automation to verify
   each step against the real UI, not just written from reading the `.feature` file).
+
+### Bare-repo delivery-mode governance hardening (added 2026-07-21 by shared-course-library parity work)
+
+Surfaced while merging the ose-primer/ose-infra governance-propagation PRs (#13/#15) and scoping the
+ose-public parity delta. All three are governance-doc refinements, not urgent — file for later:
+
+- **Impossible delivery modes in the canonical table.** The Delivery Mode table in
+  `repo-governance/conventions/structure/plans.md` (~L576-582) lists `main-to-origin-main` /
+  `main-to-pr` unconditionally, but a bare repo with no primary checkout (ose-primer, ose-infra)
+  cannot use any `main-to-*` mode — every mutation flows through a worktree. The table should note the
+  bare-repo restriction, and `plan-multi-repo-parity-planning.md`'s option A parenthetical (~L345)
+  still lists `main-to-origin-main` for a bare repo, contradicting its own L202 note.
+- **Property-bind the bare-repo grill question.** `plan-multi-repo-parity-planning.md` meta-question #1
+  (~L341 "If ose-primer is in the parity set") is name-scoped; generalize to "any bare repo with no
+  primary checkout" so it fires for ose-infra too.
+- **Codify a bareness-verification method (absent from all three repos).** Wherever a doc instructs
+  checking whether a repo is bare, prescribe `git config --file <common-dir>/config core.bare` on the
+  common dir and explicitly forbid `git rev-parse --is-bare-repository`, which returns `false` from a
+  linked worktree — the exact trap that made a scoping agent misread ose-primer's merged main as
+  un-merged. Would then propagate public → siblings.
+- **Optional inline saturation qualifier.** `pr-merge-protocol.md` clause (a) at its two enumeration
+  sites (~L46, ~L169) says "(default 3)"; the floor-not-a-ceiling saturation concept already lives in
+  `pr-review-quality-gate.md` L328-330 but is not mirrored inline at those two sites. Free stylistic
+  add (no AGENTS.md byte-budget constraint on this file).
