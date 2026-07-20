@@ -341,3 +341,353 @@ never to reflog-relative syntax such as `origin/main@{1}`.
 - ose-public: a207b66e7e59bc6fafd1f650480718fcae02f7e5
 - ose-primer: 1728a6e751980289753bf93934d446b998161741
 - ose-infra: edbb604e49a1c84f00bd01ea547bbd126b87b29c
+
+---
+
+## Triage Pass (Phase 8 — Knowledge Capture)
+
+Run in the primary checkout on `main` after the plan merged as `60d53119b`. Every entry above, plus
+nine further learnings that surfaced during execution and were not written to this log at the time,
+reaches a terminal state below: **routed inline**, **filed as a backlog plan**, or **discarded with
+a reason**.
+
+## Safety Gates (both applied to every entry)
+
+- **Secret/sensitivity gate — PASS**: no entry contains a credential, token, API key, private
+  IP/hostname, or insecure implementation detail. The only concrete host paths recorded are local
+  tool paths (`/opt/homebrew/bin/rg`), which are not sensitive. Commit SHAs and public branch names
+  are already public in this repo.
+- **Repo-relevance gate — PASS**: every routed entry is public-governance content (conventions,
+  workflow docs, agent definitions). No infra-private content (Terraform, k3s, Proxmox,
+  `coralpolyp`, real hostnames or inventories) appears anywhere in this log, so nothing is scoped to
+  `ose-infra` alone. All routed content is eligible to propagate `ose-public` → `ose-primer` through
+  the normal parity loop.
+
+## Triage Summary
+
+| #   | Learning                                     | Terminal state        | Home                                                                                                            |
+| --- | -------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 1   | Enumeration-based guards fail open           | Routed inline         | `development/agents/anti-patterns.md` (AP-10)                                                                   |
+| 2   | Zero-result search is not evidence           | Routed inline         | `development/quality/plan-anti-hallucination.md` (AP-11)                                                        |
+| 3   | Completeness-diff finds what search cannot   | Routed inline         | same (AP-12)                                                                                                    |
+| 4   | "Threads resolved" ≠ "findings fixed"        | Routed inline         | `workflows/pr/pr-review-quality-gate.md` + `pr-review-fixer.md`                                                 |
+| 5   | `REQUEST_CHANGES` structurally unavailable   | Routed inline + filed | same + `pr-review-maker.md`; backlog `2026-07-20__pr-review-bot-identity`                                       |
+| 6   | Fixed cycle count is the wrong rule          | Routed inline         | `workflows/pr/pr-review-quality-gate.md`                                                                        |
+| 7   | Verification prompts must license a negative | Routed inline         | `development/agents/anti-patterns.md` (AP-11)                                                                   |
+| 8   | Source-correct, render-wrong                 | Routed inline + filed | `conventions/formatting/diagrams.md`; backlog `2026-07-20__mermaid-state-label-render-clipping-warn`            |
+| 9   | Size budget forced an unsafe trim            | Routed inline + filed | `conventions/structure/instruction-file-size-budget.md`; backlog `2026-07-20__agents-md-progressive-disclosure` |
+| A   | Index/README staleness                       | Routed inline         | `plan-anti-hallucination.md` §concept sweeps, rule 6                                                            |
+| B   | Silent checkbox no-op                        | Routed inline         | `workflows/plan/plan-execution.md` §Atomic Sync Ritual                                                          |
+| C   | Instruction-size warning trend               | Filed                 | backlog `2026-07-20__agents-md-progressive-disclosure`                                                          |
+| D   | A whole convention as stale surface          | Routed inline         | `plan-anti-hallucination.md` §concept sweeps, "hardest case"                                                    |
+| E   | Vendor-audit does not know "Kiro"            | Filed                 | backlog `2026-07-20__vendor-audit-kiro-term`                                                                    |
+| F   | Fixed-term-order regex blind spot            | Routed inline         | `plan-anti-hallucination.md` (AP-13)                                                                            |
+| G   | "Generative source" ≠ the rule               | Routed inline         | same, concept-sweep rule 5                                                                                      |
+| H   | Three regexes, three blind spots             | Routed inline         | same (AP-13)                                                                                                    |
+| I   | Round four — the paraphrase                  | Routed inline         | same, concept-sweep rule 6                                                                                      |
+| J   | Check the real invocation                    | Routed inline         | same (AP-14)                                                                                                    |
+| K   | Phase 0/4c/4c-ii sweeps, baseline SHAs       | Discarded             | execution artifacts — see below                                                                                 |
+
+---
+
+## Entries 1–9: learnings surfaced during execution, triaged here
+
+### 1. Enumeration-based guards fail open; placement beats enumeration
+
+- **Context**: hardening the `[HUMAN]` merge-gate guard in `.claude/agents/plan-fixer.md`.
+- **Observation**: five consecutive guards each protected the merge step correctly on the axis it
+  named — tag value, then verb (write vs. delete), then delivery mode, then confidence level, then
+  finding type — and each left open the next axis nobody had named. The sixth hole (deletion
+  justified as removing an unverified claim) was open for the same structural reason. The durable
+  fix was hoisting the invariant to the top of the file, ahead of every recipe and wired into step 2
+  of Confidence Assessment, stated by WHAT IT PROTECTS rather than what it enumerates.
+- **Why it generalizes**: a guard-authoring defect class, not a `plan-fixer` bug. A guard reachable
+  only once the hazard is already suspected is not a guard. Standards backing: OWASP Developer Guide
+  security principles (fail securely, positive security model) and NIST SP 800-207 / SP 800-167
+  (deny-by-default) — denylists fail open and silently, allowlists fail closed and loudly.
+
+**Routing**: `repo-governance/development/agents/anti-patterns.md` — **ROUTED INLINE** as
+Anti-Pattern 10 plus a summary-table row.
+
+**Justification**: the learning is about how agent instruction files are authored, which is exactly
+what this existing catalog owns. `plan-fixer.md` already carries the applied instance. A new
+convention would have duplicated a file that exists for this purpose.
+
+### 2. A zero-result search is evidence only if the command could have produced non-zero
+
+- **Context**: running absence sweeps across the governance tree during verification passes.
+- **Observation**: `grep` here resolves to **`ugrep`**, which REJECTS ripgrep's `--glob`. Combined
+  with `2>/dev/null`, a hard tool failure was textually indistinguishable from a clean sweep.
+  Measured on one query in one tree: `--glob` + suppressed stderr → **0** hits; POSIX `--include` →
+  **377**; `/opt/homebrew/bin/rg` → **69** files. Related: `ls` output carries hyperlink escapes
+  that corrupt catalogue diffs — use `find -print0`.
+- **Why it generalizes**: any agent citing "zero occurrences found" is exposed. Record the verbatim
+  command, never suppress stderr, inspect exit status, and run a known-positive control probe before
+  trusting any zero.
+
+**Routing**: `repo-governance/development/quality/plan-anti-hallucination.md` — **ROUTED INLINE** as
+a new "Absence and Completeness Claims (HARD)" section plus catalog entry **AP-11**, with the
+convention's Scope broadened to bind any validating agent, not only the four plan agents.
+
+**Justification**: this convention already owns verification rituals and the anti-pattern catalog for
+agent claims; an absence claim is a claim. Its Repo-Grounding Rule covers presence claims, so the
+absence/completeness mirror belongs beside it rather than in a new convention.
+
+**Confirmed live during this very triage**: `cat learnings.md` through the command wrapper returned
+only the file's scaffold header, and `ls -la` reported 487 bytes, for a file that actually held 344
+lines. Re-reading with a direct file read exposed the truth. Had the triage trusted the first
+result, every entry above would have been silently destroyed by an overwrite.
+
+### 3. Completeness-diff finds what text search cannot
+
+- **Context**: hunting blind spots in governance documents that claim to enumerate a set.
+- **Observation**: three blind-spot classes (BS-13/14/15) were found ONLY by enumerating ground truth
+  and diffing it against the doc claiming to describe it — never by searching text. Crucially,
+  BS-15's ground truth was **not a file on disk**: it was `git branch -r`.
+- **Why it generalizes**: text search finds what you thought to look for; it cannot find omissions. A
+  completeness contract that assumes on-disk artifacts reproduces the very class it means to catch.
+
+**Routing**: `repo-governance/development/quality/plan-anti-hallucination.md` — **ROUTED INLINE**
+into the same new section (completeness half) plus catalog entry **AP-12**, including a table of
+authoritative enumeration commands for non-on-disk ground truth.
+
+**Justification**: same class as entry 2 — a completeness claim is an absence claim about a set.
+Splitting them across two homes would separate a rule from its mirror image.
+
+### 4. "All threads resolved" is not "all findings fixed"
+
+- **Context**: PR review cycles on the delivering PR.
+- **Observation**: a fixer correctly declined to modify a file it had been told to leave alone,
+  replied to the thread, and resolved it — while the actual fix sat **uncommitted** in the working
+  tree. GitHub showed 0 unresolved threads on a PR that still carried a blocking defect.
+- **Why it generalizes**: thread state and fix state are independent. Any merge precondition reading
+  thread counts measures the wrong thing.
+
+**Routing**: `repo-governance/workflows/pr/pr-review-quality-gate.md` — **ROUTED INLINE**;
+done-definition item 2 now requires each fix to be COMMITTED AND PUSHED, verified against the PR's
+head with `git status --porcelain`, `git log origin/<branch> -1`, and `gh pr diff`. Enforcement wired
+into `.claude/agents/pr-review-fixer.md` (never resolve a `fix` thread until the fix is in the PR
+diff; a declined-to-touch file is a `defer`/`reject`, never a `fix`).
+
+**Justification**: the workflow owns the done-definition, so the rule lives there. The agent edit is
+the binding that makes the rule fire, not a second home.
+
+### 5. `pr-review-maker` structurally cannot post `REQUEST_CHANGES`
+
+- **Context**: posting blocking findings during the review cycle.
+- **Observation**: `gh` authenticates as the PR author and GitHub rejects `REQUEST_CHANGES` on one's
+  own PR, so blocking reviews post with STATE `COMMENT`. Anyone gating on review STATE rather than
+  finding text reads a blocked PR as unblocked. Both the workflow doc and the agent definition
+  previously documented `REQUEST_CHANGES` as available — a factual error.
+
+**Routing**: `repo-governance/workflows/pr/pr-review-quality-gate.md` — **ROUTED INLINE** (Step 1
+output, GitHub Reviews API Mechanics, frontmatter `termination`), with the corresponding correction
+in `.claude/agents/pr-review-maker.md`. The underlying capability gap is **FILED** at
+`plans/backlog/2026-07-20__pr-review-bot-identity/`.
+
+**Justification**: two-part routing because the learning has two parts. The factual correction is a
+small non-code doc edit and lands inline; provisioning a GitHub App identity is infrastructure work
+well beyond this plan's scope, so it becomes a tracked backlog plan.
+
+### 6. Three review cycles was not enough, and a fixed count is the wrong rule
+
+- **Context**: the `*-to-pr` review-cycle gate on this plan's PR.
+- **Observation**: all 3 cycles found blocking defects, and 3 further verification passes after cycle
+  3 each found another. A count never once exhausted without a finding is not evidence of
+  convergence.
+- **Why it generalizes**: capture-recapture (Petersson et al., IEEE TSE) estimates residual defects
+  but requires 4+ genuinely INDEPENDENT reviewers; one checker iterating violates independence by
+  construction. Perspective-Based Reading (Basili et al., plus the Springer replication) shows
+  disjoint lenses find non-overlapping defects, but merely differently-LABELED perspectives converge.
+  Thematic saturation (PLOS ONE 2020, PMC7200005) validates "two consecutive clean rounds" ONLY
+  alongside a tracked cumulative new-category discovery curve that has flattened.
+
+**Routing**: `repo-governance/workflows/pr/pr-review-quality-gate.md` — **ROUTED INLINE** as a new
+"Saturation, Not a Fixed Count (Loop Exit)" section: `{input.cycles}` becomes a floor, the exit
+condition becomes two consecutive cycles with zero new finding CATEGORIES on a flattened tracked
+discovery curve, with a per-cycle tracking table and the three research citations.
+
+**Justification**: the workflow owns the loop-exit rule. This replaces the existing "fixed N by
+design" framing at its source rather than bolting a caveat on elsewhere.
+
+### 7. A verification prompt must license a negative finding
+
+- **Context**: an independent verification pass over a prior fix.
+- **Observation**: told to assume a prior fix had introduced a defect, one reviewer investigated,
+  reported the hypothesis **WRONG**, and found a real defect elsewhere — explicitly naming agreement
+  as the failure mode it was avoiding.
+- **Why it generalizes**: a prompt that presupposes its conclusion measures compliance, not
+  correctness. Applies to every re-review, self-check, and fixer re-validation prompt.
+
+**Routing**: `repo-governance/development/agents/anti-patterns.md` — **ROUTED INLINE** as
+Anti-Pattern 11 plus a summary-table row.
+
+**Justification**: same home as entry 1, for the same reason — a defect in how agent prompts are
+authored.
+
+### 8. Source-correct, render-wrong is invisible to text validation
+
+- **Context**: `stateDiagram-v2` diagrams in governance documents.
+- **Observation**: edge labels clip in GitHub's renderer, so a diagram can be correct in source and
+  silently wrong as displayed. No text-based validator can see this. The threshold is NOT a simple
+  character count — clipping observed at **30** and **33** characters while a **40**-character label
+  rendered fine. Blast radius: 31 labels over 40 chars, 202 in 31–40, 983 in 26–30, ~11,800 at or
+  under 25.
+
+**Routing**: `repo-governance/conventions/formatting/diagrams.md` — **ROUTED INLINE** as a
+"Render-Fidelity Caveat" subsection under the existing State Diagram Width and Label Constraints
+section. The candidate validator rule is **FILED** at
+`plans/backlog/2026-07-20__mermaid-state-label-render-clipping-warn/`.
+
+**Justification**: the convention already had a state-diagram label section asserting a ≤ 30
+character rule; leaving that unqualified would keep a proxy masquerading as a guarantee, so the
+caveat belongs there. The validator half routes to `apps/rhino-cli/` — a **code** home, therefore a
+mandatory backlog plan under the code-routing downstream rule, never inline. The blast-radius numbers
+are what force WARN over FAIL, so they are recorded in the plan.
+
+### 9. The instruction-size budget forced a trim that broke a safety rule
+
+- **Context**: compressing `AGENTS.md` under its 30,000-byte fail threshold.
+- **Observation**: the trim replaced an inline environment-branch enumeration with a pointer to a
+  table that was **not complete**, leaving three deploy targets uncovered by a "never commit
+  directly" rule — one of which an agent force-pushes to. Progressive disclosure is the mandated
+  remedy, but pointing at an incomplete target is a live hazard, not a compression.
+- **Why it generalizes**: every `See`-link replacement carries this risk. It looks like progressive
+  disclosure and is rule deletion in disguise.
+
+**Routing**: `repo-governance/conventions/structure/instruction-file-size-budget.md` — **ROUTED
+INLINE** as Forbidden Anti-Fix 4 ("Point at an incomplete target"), with the
+diff-against-ground-truth recipe, the pattern-over-enumeration fix, and an explicit "never compress a
+safety guardrail to save bytes" rule covering the secrets/`.env`, Git Identity, and
+environment-branch guardrails.
+
+**Justification**: that convention already names progressive disclosure as the sole sanctioned
+remediation and already carries a Forbidden Anti-Fixes list; this failure is a fourth member of it.
+`AGENTS.md` itself already carries the applied fix — a pattern-based rule naming `git branch -r` as
+authoritative — which is both complete and shorter than the enumeration it replaced. **Verified
+during this triage** by diffing `git branch -r` against the rule: all 7 `prod-*` and 4 `stag-*` refs
+are covered, including `prod-web-ui`, `stag-ose-be`, and `stag-organiclever-be`, which the Web Sites
+table still omits.
+
+---
+
+## Entries A–K: triage of the running-log entries above
+
+### A. A plan's surface inventory can miss an index that describes the file being changed
+
+**Routing**: `repo-governance/development/quality/plan-anti-hallucination.md` — **ROUTED INLINE** as
+concept-sweep rule 6 plus the index-staleness paragraph: expand every inventory entry `X` with "every
+index or README that links to and characterizes `X`", derived mechanically from inbound links rather
+than the author's recall.
+
+**Justification**: the entry's own candidate fix names `plan-maker`/`plan-checker` as the enforcers,
+and this convention is the one both agents consume for verification rituals. Writing the rule into
+each agent separately would have created two copies of one rule — the exact defect entry G names.
+
+### B. Appending implementation notes is not the same edit as ticking the checkbox
+
+**Routing**: `repo-governance/workflows/plan/plan-execution.md` §Atomic Sync Ritual — **ROUTED
+INLINE**. Step 1 now requires the tick to be its own `Edit` anchored on the literal `- [ ]` marker so
+a mis-anchored edit fails loudly, plus a per-gate `count('- [x]') == count(completed tasks)`
+assertion and the evidence-checked repair procedure.
+
+**Justification**: the Atomic Sync Ritual is the rule this defect violates, and it lives in this
+workflow. Both of the entry's candidate fixes are implemented verbatim.
+
+### C. This plan structurally worsens a preexisting instruction-size warning
+
+**Routing**: **FILED** at `plans/backlog/2026-07-20__agents-md-progressive-disclosure/`.
+
+**Justification**: the entry itself declined to fix this in-plan for correct reasons (a substantial
+refactor of the canonical instruction file, outside scope). Re-measured during triage: `AGENTS.md` is
+**29,995 bytes against a 30,000-byte fail threshold** — five bytes of headroom, so the next
+governance addition of any size fails the gate. The plan carries entry 9's constraints as binding
+execution rules so the refactor cannot reproduce the incomplete-target hazard.
+
+### D. A whole convention can be the stale surface, and a grep-count sweep will not reveal it
+
+**Routing**: `repo-governance/development/quality/plan-anti-hallucination.md` — **ROUTED INLINE** as
+the concept-sweep section's "hardest case" paragraph: when a delta inverts an existing rule, require
+an explicit inventory entry for every convention whose title or `description:` frontmatter names that
+rule — those files need reading, not grepping.
+
+**Justification**: same home and same section as A, F, G, H, I. These six entries are one rule
+observed six times; routing them to one section is what keeps the rule from being restated in six
+places and drifting apart.
+
+### E. The vendor-audit scanner does not know the term "Kiro"
+
+**Routing**: **FILED** at `plans/backlog/2026-07-20__vendor-audit-kiro-term/`.
+
+**Justification**: the fix touches `apps/rhino-cli/**` — a **code** home inside the tri-repo
+byte-identity boundary, therefore a mandatory backlog plan, never inline. The plan additionally
+raises the denylist-versus-allowlist redesign question, because this gap is entry 1's
+enumeration-fails-open pattern in its canonical form: a term list that fails open on every vendor
+nobody has added yet. Confirmed no live leak (`grep -rn "Kiro" repo-governance/` returns nothing), so
+the gap is preventive.
+
+### F, H. Sweep-regex blind spots (fixed term order; three rounds, three patterns)
+
+**Routing**: `repo-governance/development/quality/plan-anti-hallucination.md` — **ROUTED INLINE** as
+**AP-13** plus the four-round blind-spot table and the six-point concept-sweep discipline. The entry's
+own candidate durable fix is implemented as a HARD acceptance-criterion rule: an acceptance criterion
+whose only evidence is the same regex the delivery step used to make its edits is invalid.
+
+**Justification**: as with entry 2, this convention owns the anti-pattern catalog that
+`plan-checker` scans against, so a rule stated here is one `plan-checker` already consumes.
+
+### G. Fixing "the generative source" is not the same as fixing the rule
+
+**Routing**: same file — **ROUTED INLINE** as concept-sweep rule 5, including the entry's sharpest
+observation: a stale **fixer** copy is strictly worse than a stale convention copy, because prose
+misleads a reader while a fixer recipe rewrites the repo unattended at HIGH confidence.
+
+**Justification**: see D.
+
+### I. Round four — the paraphrase, where no shared vocabulary exists to search for
+
+**Routing**: same file — **ROUTED INLINE** as concept-sweep rule 6, stated as the only instrument
+that finds paraphrases: sweep by inbound link, not by phrasing, because link targets are stable where
+phrasing is not.
+
+**Justification**: see D. This entry supplies the rule's decisive argument — no regex over the old
+rule's vocabulary can ever match a paraphrase of it — so it is quoted in the convention text.
+
+### J. Check the real invocation before calling a validator failure a defect
+
+**Routing**: `repo-governance/development/quality/plan-anti-hallucination.md` — **ROUTED INLINE** as
+**AP-14** plus a short subsection, recording both failure directions: a missing flag invents
+failures, and a no-op Nx target invents passes.
+
+**Justification**: same catalog, same consumer (`plan-checker` Step 5f). The entry explicitly ties
+itself to the already-known no-op-Nx-target trap, so stating both directions in one place keeps the
+pair together.
+
+### K. Phase 0 baseline, Phase 4c and 4c-ii sweep inventories, plan-start baseline SHAs
+
+**Routing**: **DISCARDED — not generalizable.**
+
+**Reason**: these are execution artifacts of this specific plan — a hit-count table for one grep, two
+candidate-file inventories for one sweep, and three baseline SHAs. They were load-bearing during
+execution and are inert now; no durable surface would change behavior by routing them. The one
+genuinely transferable observation embedded in the 4c-ii note — that a bulk edit whose loop silently
+fails to iterate looks identical to a loop with nothing to do, so verify after every bulk edit — is
+already covered by concept-sweep rule 4 ("read the hits; never count them") and by AP-11's
+control-probe requirement. Discarding the surrounding data avoids a third copy of that rule.
+
+---
+
+## Terminal-State Confirmation
+
+Every entry in this file is now routed inline, filed as a backlog plan, or discarded with a reason.
+Nothing remains in an open state, and nothing that matters survives only in this file — per the
+[transient-log caveat](../../../repo-governance/development/quality/knowledge-capture.md), this file
+is safe to delete once the plan is archived.
+
+**Backlog plans filed by this triage** (five):
+
+- `plans/backlog/2026-07-20__contributing-md-trunk-guidance-and-naming-exemption/`
+- `plans/backlog/2026-07-20__pr-review-bot-identity/`
+- `plans/backlog/2026-07-20__mermaid-state-label-render-clipping-warn/`
+- `plans/backlog/2026-07-20__agents-md-progressive-disclosure/`
+- `plans/backlog/2026-07-20__vendor-audit-kiro-term/`

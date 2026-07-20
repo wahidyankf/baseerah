@@ -143,6 +143,40 @@ The following approaches **must not** be used:
 3. **Split into another auto-loaded file**: Creating a second `AGENTS.md` or adding a new
    harness-auto-loaded file merely moves bytes without reducing the resolved-tree total — and
    may exceed per-file harness limits.
+4. **Point at an incomplete target**: Replacing an inline enumeration with a `See` link to a
+   document, table, or section that does not in fact cover every case the inline text covered.
+   This looks like progressive disclosure and is actually **rule deletion in disguise** — the cases
+   missing from the target silently lose their rule.
+
+   **Observed failure**: compressing `AGENTS.md` under its 30,000-byte limit replaced an inline
+   environment-branch enumeration with a pointer to a table that was not complete. Three deploy
+   targets ended up uncovered by a "never commit directly" rule — and an agent force-pushes to one
+   of them.
+
+   **Before every `See`-link replacement, diff the target against ground truth** (per the
+   [Absence and Completeness Claims](../../development/quality/plan-anti-hallucination.md#absence-and-completeness-claims-hard)
+   rules — text search cannot find omissions):
+
+   ```bash
+   # ground truth from its owning authority (often NOT a file on disk)
+   git branch -r | sed 's#^ *origin/##' | command grep -E '^(prod|stag)-' | sort > /tmp/truth.txt
+   # what the See-link target actually covers
+   command grep -oE '(prod|stag)-[a-z0-9-]+' <target-doc>.md | sort -u > /tmp/covered.txt
+   comm -23 /tmp/truth.txt /tmp/covered.txt   # non-empty = incomplete target, DO NOT link to it
+   ```
+
+   **When the target is incomplete, the correct fixes are** (in order of preference): make the
+   target complete first, then link to it; or restate the inline rule **as a pattern rather than
+   an enumeration** so completeness is structural rather than maintained — e.g. "every `prod-*`
+   and `stag-*` ref is a deploy target — never commit directly; `git branch -r` is authoritative",
+   which is both shorter than the enumeration it replaces and immune to new branches appearing.
+   Stating a guard by **what it protects** rather than by what it enumerates is the general form of
+   this fix — see
+   [Anti-Pattern 10: Enumeration-Based Guards](../../development/agents/anti-patterns.md#anti-pattern-10-enumeration-based-guards-denylist-guards-that-fail-open).
+
+**Never compress a safety guardrail to save bytes.** The secrets/`.env` rules, the Git Identity
+Guardrail, and the environment-branch rule are trimmed **last and only via a complete target** —
+never by dropping cases, and never by dense-prose compression.
 
 If none of the above remediation approaches is applicable, open a plan and request a threshold
 adjustment with a documented rationale and harness source citation.

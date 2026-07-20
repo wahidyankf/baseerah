@@ -2,7 +2,7 @@
 name: pr-review-quality-gate
 title: "pr-review-quality-gate"
 goal: Run a strictly sequential N-cycle pr-review-maker to pr-review-fixer loop against a pull request until the *-to-pr done-definition is satisfied
-termination: N review cycles complete (default 3), every inline review comment answered, and CI green on the PR after each cycle
+termination: at least N review cycles complete (default 3 minimum) AND saturation reached (two consecutive cycles with zero new finding categories on a flattened discovery curve), every inline review comment answered with its fix committed and pushed, and CI green on the PR after each cycle
 inputs:
   - name: pr
     type: string
@@ -116,8 +116,9 @@ sequenceDiagram
 - **Args**: PR reference, pinned head SHA (`gh pr view <PR> --json headRefOid`), `prior` findings and
   resolution state fed from previous cycles
 - **Output**: Line-anchored review comments posted via the GitHub Reviews API (see
-  [GitHub Reviews API Mechanics](#github-reviews-api-mechanics) below); a `REQUEST_CHANGES` or
-  `COMMENT` review verdict
+  [GitHub Reviews API Mechanics](#github-reviews-api-mechanics) below). The review STATE is always
+  `COMMENT` — `REQUEST_CHANGES` is structurally unavailable here; blocking status lives in each
+  finding's severity label, never in the review STATE
 - **Depends on**: Step 0 (cycle 1); the previous cycle's CI-green gate (cycle > 1)
 - **Condition**: Runs once per cycle, for `cycle` in `1..={input.cycles}`
 - **Success criteria**: Every finding posted carries confidence ≥ 80, cited evidence (blob URL + SHA
@@ -169,8 +170,17 @@ line nor resolve a thread.
 - **Pin one head SHA per pass**: `gh pr view <PR> --json headRefOid` before posting, so every finding
   in a cycle anchors to the same commit.
 - **Post findings**: `gh api` (REST) or `gh api graphql` (GraphQL) to create a pull request review
-  with one or more line-anchored comments, each an independently resolvable thread. A
-  `REQUEST_CHANGES` review is used for any blocking/CRITICAL finding; `COMMENT` otherwise.
+  with one or more line-anchored comments, each an independently resolvable thread.
+- **`REQUEST_CHANGES` is structurally unavailable to `pr-review-maker` (HARD — do not gate on
+  review STATE)**: `gh` authenticates as the PR author under this repo's current identity posture,
+  and GitHub rejects `REQUEST_CHANGES` on one's own pull request. Every review this workflow posts
+  therefore lands with STATE `COMMENT`, including reviews that carry CRITICAL blocking findings.
+  **Any gate that reads GitHub's review state instead of the finding text will read a blocked PR as
+  unblocked.** Blocking status is carried by the finding's severity label in the comment body
+  (`CRITICAL` / `HIGH`), never by the review's STATE field. Consumers MUST parse severity from
+  comment text. This limitation disappears only when a dedicated bot/GitHub App identity is
+  provisioned — see
+  [`plans/backlog/2026-07-20__pr-review-bot-identity/`](../../../plans/backlog/2026-07-20__pr-review-bot-identity/README.md).
 - **List unresolved threads**: a `gh api graphql` query using `reviewThreads(isResolved: false)` — the
   fixer never relies on top-level PR comments for state, only on review-thread resolution status.
   Each thread's comment `databaseId` maps to the REST `comment_id` used when replying.
@@ -193,9 +203,22 @@ line nor resolve a thread.
 
 A `*-to-pr` delivery (`worktree-to-pr` or `main-to-pr`) is **done** when ALL of the following hold:
 
-1. **N review cycles complete** (default 3).
-2. **Every inline review comment is answered** — a fix applied and pushed, or a reasoned reject, on
-   every thread.
+1. **N review cycles complete** (default 3 minimum — but see
+   [Saturation, Not a Fixed Count](#saturation-not-a-fixed-count-loop-exit)).
+2. **Every inline review comment is answered AND every accepted fix is COMMITTED AND PUSHED** —
+   thread state is not fix state. A thread may be legitimately replied to and resolved while the
+   corresponding fix sits uncommitted in the working tree; GitHub then reports zero unresolved
+   threads on a PR that still carries the blocking defect. Before this item is satisfied, verify
+   against the PR's head commit — not against the resolved-thread count:
+
+   ```bash
+   git status --porcelain          # MUST be empty of fix-related paths
+   git log origin/<pr-branch> -1   # the fix commit MUST be present on the pushed branch
+   gh pr diff <PR>                 # the fix MUST appear in the PR's own diff
+   ```
+
+   "All threads resolved" is never sufficient evidence that all findings are fixed.
+
 3. **All PR quality gates are GREEN** — both the local gates and CI on the PR, as of the PR's current
    head commit.
 4. **Archival-in-PR is committed** _(applicable when this workflow is invoked from
@@ -278,8 +301,46 @@ PRs in sibling repos with no plan folder use items 1–3 as their complete done-
   status is `escalated`, not `done` — the caller (e.g., `plan-execution.md` Step 8) MUST NOT proceed
   to the merge until resolved — this applies whether the merge actor is `[AI]` (the default) or a plan-declared `[HUMAN]` gate.
 - **No silent early exit**: the loop does not stop early merely because zero new findings appear in a
-  cycle — the cycle count is fixed at `{input.cycles}`, not "until zero findings" (that pattern
-  belongs to the `*-quality-gate` workflows, not this one).
+  single cycle — `{input.cycles}` is a **floor**, and the saturation rule below is the ceiling.
+
+## Saturation, Not a Fixed Count (Loop Exit)
+
+**`{input.cycles}` (default 3) is a MINIMUM, not a sufficient stopping condition.** Observed in
+practice: all 3 cycles found blocking defects, and 3 further verification passes after cycle 3 each
+found another. A count that a run has never once exhausted without finding something is not
+evidence of convergence — it is evidence the count is too low.
+
+**Exit condition**: the loop may stop when **two consecutive cycles produce zero new finding
+CATEGORIES** _and_ the tracked cumulative new-category discovery curve has visibly **flattened**.
+Both halves are required — two clean rounds without a tracked curve is a coincidence, not
+saturation.
+
+**Track this per cycle** (a running table in the PR or the plan's `delivery.md`):
+
+| Cycle | New findings | New finding CATEGORIES | Cumulative categories |
+| ----- | ------------ | ---------------------- | --------------------- |
+
+New _categories_, not raw counts, is the signal — a cycle that finds six more instances of an
+already-known category has not discovered anything new.
+
+**Why a fixed count cannot work** (research grounding, `[Web-cited]` at authoring time):
+
+- **Capture-recapture defect estimation** (Petersson et al., IEEE Transactions on Software
+  Engineering) estimates residual defects from overlap between reviewers, but requires **4+
+  genuinely INDEPENDENT** reviewers. One checker iterating over its own prior findings violates
+  independence by construction — its cycles are correlated, so no residual estimate is derivable
+  from them.
+- **Perspective-Based Reading** (Basili et al., plus the Springer replication studies) shows
+  reviewers reading through genuinely **disjoint lenses** find non-overlapping defects. The
+  practical trap: merely differently-**LABELED** perspectives converge on the same findings. Only a
+  materially different reading procedure buys independence.
+- **Thematic saturation** (PLOS ONE 2020, PMC7200005) documents "two consecutive clean rounds" as a
+  valid stopping rule **only** when paired with a tracked cumulative new-category discovery curve
+  that has flattened — which is precisely the two-part condition above.
+
+**Escalation**: if the saturation condition has not been met by `{input.cycles}`, do NOT silently
+extend and do NOT declare done — surface the cycle table to the human and let them set the cap, per
+the extension rule in [Notes](#notes).
 
 ## Applicability
 
@@ -323,8 +384,10 @@ Track across executions:
 
 - **Strictly sequential, never parallel**: this is a hard requirement — the loop's dedup logic and
   the CI-green gate both depend on each cycle observing the previous cycle's fully-settled state.
-- **Fixed N, not until-zero-findings**: unlike the `*-quality-gate` workflows, this loop runs a fixed
-  number of cycles by design — see [Loop-Exit and Escalation Rules](#loop-exit-and-escalation-rules).
+- **N is a floor, saturation is the ceiling**: unlike the `*-quality-gate` workflows' pure
+  until-zero-findings loop, this loop runs at least `{input.cycles}` cycles and then stops on
+  tracked saturation — see
+  [Saturation, Not a Fixed Count](#saturation-not-a-fixed-count-loop-exit).
 - **AI-attribution, not a distinct bot identity**: both agents currently post under the existing
   personal `gh` identity with an explicit AI-attribution footer per comment/reply, because no
   dedicated bot/GitHub App identity is provisioned in this environment. This is a pragmatic fallback,

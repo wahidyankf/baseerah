@@ -328,19 +328,117 @@ readme-maker.md
 - Easy discovery
 - Self-documenting
 
+### Anti-Pattern 10: Enumeration-Based Guards (Denylist Guards That Fail Open)
+
+**Problem**: A safety guard is written as a list of the specific cases it forbids, and is placed in
+a section the agent only reaches once it already suspects the hazard. Every axis the guard does not
+enumerate is silently permitted, and the guard never fires for an agent that never got to that
+section. Each time a hole is discovered, another enumerated clause is appended — and the next
+unnamed axis is still open.
+
+**Bad Example** (five consecutive guards, each correct on its own axis, each leaving another open):
+
+```markdown
+## Confidence Assessment
+
+...
+
+### Recipe: applying a finding
+
+- Never auto-apply a fix to a step tagged `[HUMAN]`. <!-- axis: tag value -->
+- Never DELETE a merge step, only rewrite it. <!-- axis: verb -->
+- Never touch merge steps in `*-to-pr` mode. <!-- axis: delivery mode -->
+- Never auto-apply at MEDIUM confidence. <!-- axis: confidence level -->
+- Never act on a "stale reference" finding here. <!-- axis: finding type -->
+```
+
+Nothing in this list protects a merge step against a finding type nobody thought to name — for
+example, deletion justified as removing an unverified claim.
+
+**Solution**: Hoist the invariant to the **point of entry** — ahead of every recipe, and wired into
+the first assessment step the agent runs — and state it by **what it protects**, not by what it
+enumerates:
+
+```markdown
+# plan-fixer
+
+## Invariant (read before any recipe below)
+
+The `[HUMAN]` merge gate is the human's sole authority boundary in a `*-to-pr` delivery. NO
+finding, of any type, at any confidence, in any delivery mode, may cause this agent to weaken,
+delete, retag, or bypass it. Any change that would touch it escalates to the human instead.
+
+...
+
+## Confidence Assessment
+
+1. Re-verify the finding against the current file.
+2. Check the change against the Invariant above. If it touches the merge gate — escalate, stop.
+3. ...
+```
+
+**Rationale:**
+
+- **Placement beats enumeration**: a guard reached only when the hazard was already suspected is
+  not a guard. Entry-point placement removes the "did the agent read far enough?" failure mode.
+- **Allowlists fail closed and loudly; denylists fail open and silently**. This mirrors established
+  security guidance — see the OWASP Developer Guide's security principles (fail securely, positive
+  security model) and NIST SP 800-207 / SP 800-167 (deny-by-default policy enforcement).
+- **Stated by what it protects**, an invariant covers axes that do not exist yet. Stated by
+  enumeration, it covers only the axes already known to have failed.
+
+**Detection heuristic**: if the fix for a guard hole is "add one more clause to the list", the guard
+is enumeration-based and the next hole is already open. Rewrite it as a protected invariant instead.
+
+### Anti-Pattern 11: Verification Prompts That Presuppose Their Conclusion
+
+**Problem**: A verification or re-review prompt asserts the answer it wants confirmed. The reviewing
+agent, having no license to disagree, manufactures consensus — it finds evidence for the stated
+hypothesis and stops looking.
+
+**Bad Example:**
+
+```markdown
+The previous fix to `plan-fixer.md` introduced a regression in the merge-gate guard.
+Confirm the regression and describe it.
+```
+
+**Solution**: State the hypothesis as a hypothesis, explicitly license the negative finding, and
+name agreement itself as a failure mode:
+
+```markdown
+Hypothesis (may be WRONG — treat it as a lead, not a conclusion): the previous fix to
+`plan-fixer.md` introduced a regression in the merge-gate guard.
+
+Investigate independently. Reporting "the hypothesis is wrong, and here is the evidence" is a
+FULLY VALID and equally valuable outcome. Reflexive agreement is the failure mode being guarded
+against — if the guard is sound, say so and cite why, then keep looking for defects elsewhere.
+```
+
+**Rationale:**
+
+- A prompt that presupposes its conclusion measures compliance, not correctness.
+- Explicitly licensing the negative finding is what makes an independent verification pass
+  independent — observed in practice to redirect a reviewer from a false lead onto a real defect
+  elsewhere in the same file.
+- This applies to every re-review, self-check, and fixer re-validation prompt, not only to
+  formal review cycles.
+
 ## Summary of Anti-Patterns
 
-| Anti-Pattern                   | Problem                          | Solution                           |
-| ------------------------------ | -------------------------------- | ---------------------------------- |
-| **God Agent**                  | Too many responsibilities        | Decompose into focused agents      |
-| **Excessive Tool Permissions** | Requesting unused tools          | Request only necessary tools       |
-| **Vague Descriptions**         | Unclear purpose                  | Clear, actionable descriptions     |
-| **Hardcoded Paths**            | Breaks in different environments | Use relative paths                 |
-| **No Error Handling Guidance** | Unclear error behavior           | Document error handling            |
-| **Missing Tool Usage Docs**    | Unclear how tools are used       | Document tool usage                |
-| **Wrong Model Selection**      | Cost/performance mismatch        | Match model to task complexity     |
-| **No Testing**                 | Production issues                | Test edge cases before deployment  |
-| **Generic Names**              | Hard to discover and categorize  | Use descriptive, categorized names |
+| Anti-Pattern                   | Problem                                       | Solution                                                |
+| ------------------------------ | --------------------------------------------- | ------------------------------------------------------- |
+| **God Agent**                  | Too many responsibilities                     | Decompose into focused agents                           |
+| **Excessive Tool Permissions** | Requesting unused tools                       | Request only necessary tools                            |
+| **Vague Descriptions**         | Unclear purpose                               | Clear, actionable descriptions                          |
+| **Hardcoded Paths**            | Breaks in different environments              | Use relative paths                                      |
+| **No Error Handling Guidance** | Unclear error behavior                        | Document error handling                                 |
+| **Missing Tool Usage Docs**    | Unclear how tools are used                    | Document tool usage                                     |
+| **Wrong Model Selection**      | Cost/performance mismatch                     | Match model to task complexity                          |
+| **No Testing**                 | Production issues                             | Test edge cases before deployment                       |
+| **Generic Names**              | Hard to discover and categorize               | Use descriptive, categorized names                      |
+| **Enumeration-Based Guards**   | Denylist guard fails open on any unnamed axis | Hoist an invariant to entry, stated by what it protects |
+| **Presupposing Verification**  | Prompt asserts its own conclusion             | State a hypothesis; license the negative finding        |
 
 ## Related Documentation
 

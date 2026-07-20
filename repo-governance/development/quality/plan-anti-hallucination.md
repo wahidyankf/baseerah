@@ -46,6 +46,10 @@ This convention exists to:
 - All remediation performed by `plan-fixer`.
 - Every step of the `plan-quality-gate` and `plan-execution` workflows.
 - The pre-execution gate that refuses to start when claims are unverifiable.
+- **Absence and completeness claims made by any validating agent** — the
+  [Absence and Completeness Claims](#absence-and-completeness-claims-hard) rules bind every checker
+  or fixer that reports "zero occurrences found" or "this list is complete", not only the four plan
+  agents.
 
 ### What This Convention Does NOT Cover
 
@@ -122,6 +126,158 @@ If any verification fails, the author has three valid responses:
 3. **Refuse the claim** — write `[Unverified]` and flag for follow-up, or omit entirely.
 
 The forbidden response is to write the unverified claim as if it were a fact.
+
+## Absence and Completeness Claims (HARD)
+
+The Repo-Grounding Rule above governs **presence** claims ("this file exists"). The mirror-image
+claims — **absence** ("no file does X") and **completeness** ("this doc lists every Y") — fail in a
+different and more dangerous way: the verification command returns a clean-looking result while
+having verified nothing at all. These rules bind every agent that asserts absence or completeness —
+`plan-maker`, `plan-checker`, `plan-execution-checker`, `plan-fixer`, and any checker or fixer agent
+reporting "zero occurrences found" or "the list is complete".
+
+### A zero-result search is evidence only if the command could have produced a non-zero result
+
+A search that fails to run reports the same thing as a search that ran and found nothing. Before a
+zero result may be cited as evidence of absence, all four of the following MUST hold:
+
+1. **The verbatim command is recorded** — in the plan, the audit report, or the delivery note. A
+   zero result without its command is unfalsifiable and carries no evidentiary weight.
+2. **stderr is NOT suppressed** — `2>/dev/null` on a search command converts a hard tool failure
+   into an indistinguishable clean zero. Never append it to a search whose zero result will be
+   cited.
+3. **The exit status is inspected** — distinguish "ran, matched nothing" (grep exit 1) from "failed
+   to run" (exit 2, or a tool-specific usage error).
+4. **A known-positive control probe passes** — run the same command shape against a pattern that
+   MUST match, in the same tree, and confirm it returns non-zero. Only then does the real query's
+   zero mean absence.
+
+**Measured example from this repository** — one query, one tree, three commands:
+
+| Command                                         | Result   | What it actually means          |
+| ----------------------------------------------- | -------- | ------------------------------- |
+| `grep -r <pat> --glob '*.md' . 2>/dev/null`     | 0 hits   | Tool rejected the flag and died |
+| `command grep -rn --include='*.md' <pat> .`     | 377 hits | Ran correctly                   |
+| `/opt/homebrew/bin/rg -l --glob '*.md' <pat> .` | 69 files | Ran correctly (file counts)     |
+
+The cause: in this environment `grep` resolves to **`ugrep`**, which REJECTS ripgrep's `--glob`
+flag. Combined with `2>/dev/null`, a hard failure was indistinguishable from a clean sweep. Related
+tool traps documented elsewhere in this repo: `grep -L` means _follow symlinks_, not
+_files-without-match_, so a `grep -L` acceptance clause reads as passing unconditionally.
+
+**Verification recipe** (run BEFORE citing any zero result):
+
+```bash
+# Prefer an absolute path to the tool whose flag syntax you are using
+/opt/homebrew/bin/rg -n --glob '*.md' 'Delivery Mode' repo-governance/   # rg syntax
+command grep -rn --include='*.md' 'Delivery Mode' repo-governance/       # POSIX syntax
+# Never: grep -r --glob '*.md' ... 2>/dev/null
+
+# Known-positive control probe: this MUST return non-zero before a zero result is trusted
+command grep -rn --include='*.md' 'Delivery Mode' repo-governance/ | head -1
+
+# Do not parse `ls` — its output can carry hyperlink escapes that corrupt catalogue diffs
+find repo-governance -name '*.md' -print0 | xargs -0 -n1 basename | sort
+```
+
+### A completeness claim requires a diff against enumerated ground truth, not a text search
+
+Text search finds what you thought to look for. It cannot find what a document **omits**. To assert
+that a document enumerates all of something, enumerate the ground truth independently and **diff**
+the two sets. Three blind-spot classes in the plan that authored this rule were found only this
+way — never by searching text.
+
+**Ground truth is frequently NOT a file on disk.** A completeness contract that assumes on-disk
+artifacts reproduces the exact class of gap it means to catch. Enumerate from whatever authority
+actually owns the set:
+
+| Set being claimed complete  | Authoritative enumeration command          |
+| --------------------------- | ------------------------------------------ |
+| Deploy/environment branches | `git branch -r`                            |
+| Agents                      | `find .claude/agents -name '*.md' -print0` |
+| Nx targets on a project     | `nx show project <name> --json`            |
+| Declared dependencies       | `jq` over `package.json` / `Cargo.toml`    |
+| Committed files of a kind   | `git ls-files '<pattern>'`                 |
+
+**Recipe**:
+
+```bash
+# 1. Enumerate ground truth from its owning authority
+git branch -r | sed 's#^ *origin/##' | command grep -E '^(prod|stag)-' | sort > /tmp/truth.txt
+# 2. Enumerate what the document claims
+command grep -oE '(prod|stag)-[a-z0-9-]+' AGENTS.md | sort -u > /tmp/claimed.txt
+# 3. Diff — anything in truth but not claimed is an uncovered case
+comm -23 /tmp/truth.txt /tmp/claimed.txt
+```
+
+A non-empty left column is a completeness violation, regardless of how many text searches returned
+"looks fine".
+
+### A concept sweep validated by its own regex measures phrasing, never coverage
+
+When a plan changes a **rule** (who merges, what the default is, which cap applies), the sweep that
+proves the change landed everywhere is a **concept** sweep, not a string search. One regex is a
+single sampling instrument with known blind spots — it is never an acceptance criterion. Inverting
+one merge default in this repository took **four** corrective rounds; each round the edits were
+right and the search was wrong, in a different way:
+
+| Round | Sweep used                        | Blind spot it could not see                                                              |
+| ----- | --------------------------------- | ---------------------------------------------------------------------------------------- |
+| 1     | `\[HUMAN\][^.]*merge`             | Fixed term order — missed `merged by a human` and every markdown **table cell**          |
+| 2     | Only the "generative source" file | The identical boilerplate lived in the convention **and** its maker/checker/fixer copies |
+| 3     | `\[HUMAN\][^.]{0,40}merge`        | Assumed a bracketed tag and a plural noun — missed unbracketed singular "human merge"    |
+| 4     | Any vocabulary-bound pattern      | **Paraphrases** stating the old rule in words the old rule never used                    |
+
+Round 4 is the decisive one: two survivors read
+`- [PR Merge Protocol](...) - Explicit user approval required` — containing neither "human" nor
+"merge" as the actor phrase. **No regex over the old rule's vocabulary can ever match a paraphrase
+of it.**
+
+**Minimum discipline for a concept sweep** (all six; the last two are the ones that actually work):
+
+1. Search **both term orders** — `A.*B` and `B.*A`.
+2. Search each term **alone**, unbracketed and case-insensitively, accepting the noise.
+3. Grep the **worked examples and code comments** specifically — a stale `PASS:` example teaches the
+   wrong rule more forcefully than stale prose states it.
+4. **Read the hits; never count them.** A count is not a signal here: correctly-framed opt-in
+   sentences added by the fix legitimately make the count **rise**, so neither a falling nor a rising
+   count proves anything.
+5. **Enumerate every copy of the rule and treat them as one atomic edit** — the convention plus its
+   `*-maker` / `*-checker` / `*-fixer` copies plus any skill that summarizes it. Fixing only the
+   "generative source" leaves a checker that flags correct new work as defective and a fixer that
+   silently rewrites it. A stale **fixer** copy is strictly worse than a stale convention copy:
+   prose misleads a reader, a fixer recipe rewrites the repo unattended at HIGH confidence.
+6. **Sweep by inbound link, not by phrasing** — enumerate every file that links to the changed
+   document and re-read each referring sentence regardless of its wording. Link targets are stable
+   where phrasing is not; this is the only instrument that finds paraphrases.
+
+Rule 6 also covers the related **index-staleness** case: a surface inventory is naturally built from
+files that _state_ a rule, while parent index READMEs, catalog tables, and "Related Documentation"
+blurbs merely _summarize_ it — and go stale identically. Expand every inventory entry `X` with
+"every index or README that links to and characterizes `X`", derived mechanically from inbound
+links rather than from the author's recall.
+
+**Hardest case — a competing convention**: an entire document whose _thesis_ is the old default
+contributes only a couple of matching lines, so by hit-count it looks like a minor sweep target.
+Most of its text never contains the swept literal at all. When a delta **inverts** an existing rule,
+require an explicit inventory entry for every convention whose title or `description:` frontmatter
+names that rule — those files need **reading**, not grepping.
+
+**Acceptance-criterion rule (HARD)**: an acceptance criterion whose only evidence is the same regex
+the delivery step used to make its edits is invalid. Something other than the editing instrument
+MUST confirm convergence.
+
+### Check the real invocation before calling a validator result evidence
+
+A validator run in isolation may be missing the flags that make it meaningful. Running
+`rhino-cli md mermaid validate` bare returns exit 1 on the validator's own deliberately-invalid
+negative fixtures; CI invokes it with `--exclude apps/rhino-cli/tests/fixtures`. Treating the bare
+run as a preexisting defect would have manufactured a three-repo parity plan for a non-problem.
+
+Before citing any validator result — pass or fail — read how CI and the git hooks actually invoke
+it. **Both failure directions are real**: a missing flag invents failures, and a no-op target
+invents passes (this repo has `test:e2e` / `test:integration` targets that are `echo` stubs; read
+`options.command` before citing a target as evidence).
 
 ## Refuse-on-Uncertainty Rule
 
@@ -217,6 +373,40 @@ Behavior claims need either a repo-doc reference, an inline `[Web-cited]` excerp
 
 Resolve the relative path and confirm the file exists before linking.
 
+### AP-11: Citing a zero-result search as proof of absence
+
+> "Grepped the whole repo — no other file references the old target name."
+
+If the command was not recorded, stderr was suppressed, the exit status was not inspected, or no
+known-positive control probe was run, the zero proves nothing. See
+[Absence and Completeness Claims](#absence-and-completeness-claims-hard). A failed search and a
+clean search are textually identical.
+
+### AP-12: Asserting completeness from a text search
+
+> "Checked — the convention lists every environment branch."
+
+Text search cannot find omissions. A completeness claim requires enumerating ground truth from its
+owning authority (which is often not a file on disk — `git branch -r`, `nx show project`, `git
+ls-files`) and diffing it against what the document claims. See
+[Absence and Completeness Claims](#absence-and-completeness-claims-hard).
+
+### AP-13: A concept sweep whose acceptance criterion is its own regex
+
+> "Swept `\[HUMAN\][^.]*merge` — every surviving hit is correct opt-in framing."
+
+The pattern that produced the edits cannot also be the evidence they are complete; it re-confirms
+the author's own assumption about what the target text looks like. See
+[A concept sweep validated by its own regex](#a-concept-sweep-validated-by-its-own-regex-measures-phrasing-never-coverage).
+`plan-checker` rejects any acceptance criterion of this shape.
+
+### AP-14: Citing a validator result without checking its real invocation
+
+> "`md mermaid validate` exits 1 — there is a preexisting defect to fix."
+
+Read how CI and the git hooks actually invoke the validator first. A missing flag invents failures;
+a no-op target invents passes.
+
 ## Specialized-Agent Delegation (Hallucination Reduction)
 
 Domain-specialized agents hallucinate less than generic orchestration because they carry deeper context about their language, framework, and conventions. `plan-maker` SHOULD annotate each delivery checkbox with a suggested executor agent when a domain-specialized agent fits better than the default plan-execution Agent Selection rules.
@@ -298,7 +488,7 @@ The author refused to write a fabricated billing flow. A follow-up research item
 To validate a plan complies with this convention:
 
 1. **Confidence labels present**: every non-trivial factual claim has `[Repo-grounded]` / `[Web-cited]` / `[Judgment call]` / `[Unverified]` or is contained in a quoted code-fence whose source is unambiguous.
-2. **No Anti-Pattern hits**: `plan-checker` Step 5f scan reports zero AP-1 through AP-10 violations.
+2. **No Anti-Pattern hits**: `plan-checker` Step 5f scan reports zero AP-1 through AP-14 violations.
 3. **Repo-grounding verifiable**: every internal reference (file path, Nx target, agent, skill) resolves on the current commit.
 4. **External citations complete**: every `[Web-cited]` claim includes URL + access date + excerpt inline.
 5. **No bare KPIs**: every numeric percentage / duration / count is either an observable check, a citation, or `[Judgment call]` — never an unlabeled fact.

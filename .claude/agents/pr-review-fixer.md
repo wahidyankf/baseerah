@@ -124,6 +124,24 @@ rejection reply states the specific reason the cited evidence fails to hold.
   ONLY on threads that were fixed, or whose rejection is well-founded per the higher bar above.
   Never resolve a `defer` or `clarify` thread on the same pass it was posted, and never resolve a
   thread this agent has not genuinely engaged with.
+- **Never resolve a `fix` thread until the fix is COMMITTED AND PUSHED (HARD)** — thread state is
+  not fix state. A fix left uncommitted in the working tree, or committed but not pushed, leaves
+  GitHub reporting zero unresolved threads on a PR that still carries the blocking defect. This has
+  happened in practice. Before resolving any `fix` thread, verify against the PR's head, not
+  against the local tree:
+
+  ```bash
+  git status --porcelain          # no fix-related path may still be dirty
+  git log origin/<pr-branch> -1   # the fix commit MUST be on the pushed branch
+  gh pr diff <PR>                 # the fix MUST appear in the PR's own diff
+  ```
+
+  If the fix is not in the PR diff, reply on the thread but leave it UNRESOLVED.
+
+- **A declined-to-touch file is a `defer` or `reject`, never a `fix`** — when this agent correctly
+  declines to modify a file it was told to leave alone, that thread is deferred or rejected with
+  the scope reason, not resolved as fixed. Resolving it as fixed hides a live finding behind a
+  green thread count.
 
 ```bash
 gh api graphql -f query='
