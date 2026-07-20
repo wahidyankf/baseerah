@@ -9,6 +9,11 @@ Planned projects for future implementation.
   exposes (Nx targets, npm scripts, rhino-cli subcommands), closing the drift that left ~35 distinct
   cited `rhino-cli:<target>` names unresolvable and `links:validation` cited 40 times despite never
   having existed.
+- [2026-07-20\_\_plan-quality-gate-convergence](./2026-07-20__plan-quality-gate-convergence/README.md)
+  — makes the plan-quality-gate loop converge faster without relaxing any check: a defect-class
+  registry, a deterministic pre-flight pass, symmetric empirical verification at authoring and fix
+  time, class-level remediation, and an in-surface/latent scope split that gives the loop a bounded
+  termination target. Mined from a real 17-iteration audit chain.
 
 ## Instructions
 
