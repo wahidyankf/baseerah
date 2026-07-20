@@ -22,7 +22,7 @@ This practice respects the following core principles:
 
 - **[Deliberate Problem-Solving](../../principles/general/deliberate-problem-solving.md)**: The declared N is a deliberate, pre-decided constraint — not a reactive limit set after hitting errors, and not a number an agent infers mid-batch from how fast things feel. Acting from a bounded model prevents speculative over-parallelism and the cascading failures it causes.
 
-- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: One number — three — governs all parallel work. No adaptive scheduling, no per-task caps, no context-dependent arithmetic. A single fixed cap is simple enough to apply consistently without thought.
+- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: One number — N, defaulting to three — governs all parallel work. No adaptive scheduling, no per-task caps, no context-dependent arithmetic. N is declared up front and may be adjusted per-plan or along the way when independent work, machine capacity, and budget headroom allow; what stays simple is that a single declared number governs, and an agent never self-promotes beyond it.
 
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Running independent tool calls in a single turn, or independent subagents in background, automates what would otherwise require manually sequenced round-trips. Parallel-by-default is the automated form of efficient execution.
 

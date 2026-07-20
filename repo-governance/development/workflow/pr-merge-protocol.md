@@ -157,11 +157,25 @@ from the preconditions, never from the agent's own judgment that the PR looks fi
 
 ### Before Merging
 
-Before merging, the agent must:
+Before merging, the agent must confirm **all five** hardened preconditions (a)-(e) hold, as stated in
+[The Rule](#the-rule) above and defined normatively in
+[the PR Review Quality Gate](../../workflows/pr/pr-review-quality-gate.md#hardened-merge-preconditions).
+Do not substitute the shorter list that used to live here.
 
-1. Verify all CI checks have completed (not still running).
-2. Check for unresolved review comments or requested changes.
-3. Confirm the branch is up to date with the target branch (no merge conflicts).
+1. **(a)** The review cycles are complete.
+2. **(b)** 0 CRITICAL and 0 HIGH findings outstanding, verified against the PR's own diff rather than
+   against thread-resolution state.
+3. **(c)** The branch is non-destructively up to date with the target branch (no merge conflicts).
+4. **(d)** All quality gates are green — local gates and CI — as of the PR's current head commit.
+5. **(e)** The surface-conditional tester gates have been run and their findings resolved, or a
+   no-reachable-behavior exemption is explicitly recorded.
+
+> **Why this list is spelled out in full.** It previously carried only three items — CI completed,
+> review comments checked, branch up to date — because it ran immediately before a **human approval
+> prompt**, and the human was the backstop for whatever the list omitted. Now that `[AI]` merges by
+> default, that backstop is gone and this is the last checklist an autonomous merge passes through.
+> An enumeration that was merely incomplete has become the thing standing in for a reviewer. Any
+> future edit must keep it congruent with (a)-(e); never shorten it.
 
 ### The Precondition Summary
 

@@ -241,12 +241,24 @@ following hold:
   [No Destructive Git Operations Convention](../../development/workflow/no-destructive-git-operations.md)
   and the [Git Push Safety Convention](../../development/workflow/git-push-safety.md)).
 - **(d)** **All PR quality gates are green** — local gates and CI on the PR, as of its current head.
-- **(e)** The **surface-conditional tester gates have been run and their defect findings resolved** —
-  a UI-bearing PR runs **both** UI gates ([`ui/ui-quality-gate.md`](../ui/ui-quality-gate.md) static
-  and [`web/web-ux-test-fixing-planning.md`](../web/web-ux-test-fixing-planning.md) running triad),
-  an API/BE-bearing PR runs [`api/api-quality-gate.md`](../api/api-quality-gate.md), a PR bearing
-  both runs both, and a PR bearing neither records that exemption **explicitly** rather than leaving
-  it implicit.
+- **(e)** The **surface-conditional tester gates have been run and their defect findings resolved.**
+  The rule this clause enforces is: **every PR that changes behavior a user or caller can reach must
+  be exercised through that behavior before it merges.** The surface list below is a routing table for
+  that rule, never its boundary — a surface absent from the list does not become exempt by omission.
+  - a UI-bearing PR runs **both** UI gates ([`ui/ui-quality-gate.md`](../ui/ui-quality-gate.md)
+    static and [`web/web-ux-test-fixing-planning.md`](../web/web-ux-test-fixing-planning.md) running
+    triad);
+  - an API/BE-bearing PR runs [`api/api-quality-gate.md`](../api/api-quality-gate.md);
+  - a PR bearing several of these runs each one.
+
+  **When a PR changes reachable behavior on a surface with no gate listed above** — a CLI such as
+  `apps/rhino-cli/**`, a library under `libs/`, a hook, or a CI workflow — it is **not** exempt. The
+  author exercises the changed behavior through its own interface (for a CLI: invoke the affected
+  subcommands and record the observed output; for a library: exercise it through a consuming caller,
+  not only its unit tests) and records what was run and what was observed. Exemption is available
+  **only** for a PR that changes no reachable behavior at all — docs, comments, or a pure refactor
+  with no behavioral delta — and that claim is recorded **explicitly**, with its justification,
+  rather than left implicit.
 
 > **This (a)-(e) lettering is normative.** The delivery checklists that cite these preconditions use
 > the identical letters, and any future edit must change both together. An earlier revision let one
