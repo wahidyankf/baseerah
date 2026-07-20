@@ -202,11 +202,11 @@ Task-notification messages from the harness signal completion (or kill). These a
 
 ### Running Background Work Serially
 
-**Problem**: The main agent runs background subagents one at a time — waiting for the first to finish before launching the second — even when two independent units of work are ready simultaneously.
+**Problem**: The main agent runs background subagents one at a time — waiting for the first to finish before launching the second — even when independent units of work are ready simultaneously.
 
-**Why it fails**: Serial execution wastes available throughput. If two units are independent and a second background slot is free, holding it empty doubles elapsed time for no benefit.
+**Why it fails**: Serial execution wastes available throughput. If the units are independent and a background slot is free, holding it empty multiplies elapsed time for no benefit.
 
-**Fix**: Keep all background slots full up to the cap of two. When a slot frees and independent work is waiting, launch immediately.
+**Fix**: Keep all background slots full up to the declared **N** (the N+1 model: 1 main thread + N background agents, **default N=3**). When a slot frees and independent work is waiting, launch immediately. Never split dependent work merely to fill a slot, and never self-promote beyond the declared N.
 
 ### Monolithic Chunks Assigned to Single Agents
 

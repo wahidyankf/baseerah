@@ -302,9 +302,21 @@ PRs in sibling repos with no plan folder use items 1–3 as their complete done-
   passing after every cycle, and the [done-definition](#done-definition-for--to-pr-modes) is
   satisfied — status `done`.
 - **Escalation on repeated rejection**: if the SAME `pr-review-maker` finding is rejected by
-  `pr-review-fixer` across 2 or more consecutive cycles, the loop does not silently keep looping — it
-  surfaces the finding and both rejection justifications to the human for a decision, rather than
-  auto-suppressing it.
+  `pr-review-fixer` across 2 or more consecutive cycles, the loop does not silently keep looping —
+  status is **`escalated`, not `done`**, and the caller **MUST NOT proceed to the merge** until a
+  human decides. This applies whether the merge actor is `[AI]` (the default) or a plan-declared
+  `[HUMAN]` gate. The loop surfaces the finding and both rejection justifications for that decision
+  rather than auto-suppressing it.
+
+  > **Why this carries an explicit merge block.** A repeatedly-rejected finding leaves no other
+  > trace: the fixer resolves the thread when it rejects with reason, so nothing is unresolved; the
+  > cycle-exhaustion rule below excludes it by name ("not a reasoned reject"); and precondition (b)
+  > is satisfiable because the fixer asserted the finding does not hold — which is precisely the
+  > disputed claim the escalation exists to adjudicate. Without this clause the loop exits `done` and
+  > an `[AI]` merge proceeds on the strength of one side of an unsettled argument. The neighbouring
+  > stuck-CI rule is safe only incidentally, because precondition (d) independently blocks a red
+  > gate; repeated rejection has no such independent backstop.
+
 - **Escalation on stuck CI**: if the CI-green gate (Step 3) does not clear after 3 fix-and-push
   attempts within a single cycle, escalate to the human rather than exhausting further cycles on the
   same failure.
