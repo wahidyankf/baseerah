@@ -17,8 +17,13 @@ drift.
 
 ## Source of Truth for This Plan
 
-`generated-reports/harness-compat__3b8a20__2026-07-20--19-09__audit.md`, committed alongside this
-plan so the evidence outlives the report directory.
+[`findings.md`](./findings.md) in this folder — a verbatim copy of the audit report originally
+written to `generated-reports/harness-compat__3b8a20__2026-07-20--19-09__audit.md`.
+
+The copy exists because `generated-reports/` is gitignored (`.gitignore:85`) by the
+[Temporary Files convention](../../../repo-governance/development/infra/temporary-files.md) — audit
+reports there are deliberately ephemeral. Referencing the original path alone would have left this
+plan pointing at evidence that vanishes on the next clean.
 
 **Read the report, not a summary of it.** The agent's own closing summary and the report body
 disagree in at least one place: the summary presented JetBrains Junie as a HIGH finding, while the
