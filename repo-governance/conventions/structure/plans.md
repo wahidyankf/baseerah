@@ -585,9 +585,10 @@ the PR is considered done.
 
 **[AI] merges by default.** A `[HUMAN]` merge gate applies only where a plan's own step says so explicitly.
 The **preconditions are unchanged — only the actor is.** A PR still merges only when
-all five hardened merge preconditions hold (3 review cycles, 0 CRITICAL + 0 HIGH outstanding, branch
-up-to-date with the latest `origin/main` via a non-destructive forward update, all quality gates
-green, and the surface-conditional tester gates run-and-resolved or explicitly exempt — see the
+all five hardened merge preconditions hold (3 review cycles complete **and the review loop not
+exited `escalated`**, 0 CRITICAL + 0 HIGH outstanding, branch up-to-date with the latest
+`origin/main` via a non-destructive forward update, all quality gates green, and the
+surface-conditional tester gates run-and-resolved or explicitly exempt — see the
 [PR Review Quality Gate workflow](../../workflows/pr/pr-review-quality-gate.md)). Inverting the
 default does not weaken any gate; it removes a queueing step that added latency without adding a
 check, since a human merging a PR that has already satisfied all five is performing a click, not a

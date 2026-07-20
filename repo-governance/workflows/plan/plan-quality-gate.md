@@ -287,7 +287,8 @@ PR — before the merge. The two gates sit at different lifecycle stages: this w
 gates the plan document pre-execution; the PR-review cycle gates the delivered change pre-merge.
 
 **The hardened merge preconditions** that gate that eventual merge — **all five** required: (a) 3
-`pr-review-maker` → `pr-review-fixer` cycles complete; (b) 0 CRITICAL + 0 HIGH findings outstanding;
+`pr-review-maker` → `pr-review-fixer` cycles complete **and the loop not exited `escalated`**;
+(b) 0 CRITICAL + 0 HIGH findings outstanding;
 (c) the branch **up-to-date with the latest `origin/main`**, brought forward **non-destructively**
 if behind (never a shared-history rewrite); (d) all PR quality gates green; (e) the
 surface-conditional tester gates run and their defect findings resolved, or the exemption explicitly

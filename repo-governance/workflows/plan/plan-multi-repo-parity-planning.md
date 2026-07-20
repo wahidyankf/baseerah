@@ -338,8 +338,8 @@ as the research-needed flag (yes / no). This flag governs whether Step 4 runs or
 **Mandatory meta-questions** (surface these explicitly regardless of mode):
 
 1. If ose-primer is in the parity set: "The ose-primer sync convention allows EITHER a draft PR
-   OR a direct push to `ose-primer:main` for every mutation — neither is the default, so a
-   delivery mode must be chosen explicitly. The selected parity mode implies
+   OR a direct push to `ose-primer:main` for every mutation — that per-destination choice is not
+   settled by this workflow's own `worktree-to-pr` default, so it must be chosen explicitly. The selected parity mode implies
    {draft PR | direct push to main}. Please confirm the delivery mode for ose-primer."
    Options: (A) Direct push to `main` (`main-to-origin-main` / `worktree-to-origin-main`).
    (B) Draft PR (`worktree-to-pr`). Record the chosen mode.

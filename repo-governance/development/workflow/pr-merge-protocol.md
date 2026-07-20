@@ -44,7 +44,11 @@ This practice implements/respects the following conventions:
 
 A PR merges only when **all five** hold:
 
-- **(a)** the configured `pr-review-maker` → `pr-review-fixer` cycles are complete (default 3);
+- **(a)** the configured `pr-review-maker` → `pr-review-fixer` cycles are complete (default 3) **and
+  the review loop did not exit `escalated`** — see
+  [Loop-Exit and Escalation Rules](../../workflows/pr/pr-review-quality-gate.md#loop-exit-and-escalation-rules).
+  An `escalated` exit blocks the merge on its own, for **any** merge actor, and no combination of the
+  other four preconditions discharges it;
 - **(b)** 0 CRITICAL and 0 HIGH findings are outstanding;
 - **(c)** the branch is up-to-date with the latest `origin/main`, brought forward
   **non-destructively** if behind (never a shared-history rewrite);
@@ -162,7 +166,8 @@ Before merging, the agent must confirm **all five** hardened preconditions (a)-(
 [the PR Review Quality Gate](../../workflows/pr/pr-review-quality-gate.md#hardened-merge-preconditions).
 Do not substitute the shorter list that used to live here.
 
-1. **(a)** The review cycles are complete.
+1. **(a)** The review cycles are complete **and the loop did not exit `escalated`** — an escalated
+   exit blocks the merge by itself, whatever the other four preconditions say.
 2. **(b)** 0 CRITICAL and 0 HIGH findings outstanding, verified against the PR's own diff rather than
    against thread-resolution state.
 3. **(c)** The branch is non-destructively up to date with the target branch (no merge conflicts).
