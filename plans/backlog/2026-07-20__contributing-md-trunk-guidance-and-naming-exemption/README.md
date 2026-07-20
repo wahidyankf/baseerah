@@ -22,7 +22,8 @@ Two coupled problems, discovered while executing the parallel-orchestration plan
 ```
 
 This contradicts [AGENTS.md §Git Workflow §Delivery Mode](../../../AGENTS.md), where
-`worktree-to-pr` (worktree → draft PR → `[HUMAN]` merge) is **the default**, and direct push to
+`worktree-to-pr` (worktree → draft PR → `[AI]` merge by default, with `[HUMAN]` only where a plan's
+own step declares that gate) is **the default**, and direct push to
 `main` is an explicit per-plan selection rather than the assumed path. A new contributor reading
 `CONTRIBUTING.md` gets the opposite instruction from every other governance surface.
 

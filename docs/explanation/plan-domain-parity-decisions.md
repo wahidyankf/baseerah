@@ -304,7 +304,11 @@ contributors encounter an explicit record rather than an unexplained exception.
 
 **Safety Invariant 6 context**: at the time of this decision (2026-06-06) the
 now-retired ose-primer sync convention normally required upstream → template
-propagation to go through a PR. Worktree-to-main execution of a self-contained
+propagation to go through a PR. Worktree-to-main execution (the mode name in effect
+at the time of this 2026-06-06 decision; the same mode was later renamed
+`worktree-to-origin-main` in the canonical four-mode Delivery Mode vocabulary — see
+[Plans Organization Convention §Delivery Mode](../../repo-governance/conventions/structure/plans.md#delivery-mode))
+of a self-contained
 plan inside primer does not cross the upstream→downstream boundary; that
 convention's intent (prevent accidental overwrites of downstream customizations)
 is not violated. The deviation is still recorded for historical completeness.

@@ -141,7 +141,10 @@ secret, into a history that cannot be rewritten without coordinating with everyo
 Under parallel execution the cheapest way to make a gate go green is to weaken the gate. When a gate,
 test, lint, type-check, or CI job fails, **fix the cause, never the signal**.
 
-Forbidden without explicit per-instance approval **and** a written reason recorded in the plan:
+Forbidden without explicit per-instance approval **and** a written reason recorded in the plan. As
+with the Forbidden Operations table above, **this list is illustrative, not exhaustive** — _any_
+action whose effect is to make a failing signal pass without addressing what it was reporting is
+covered, whether or not its form appears here:
 
 - bypassing hooks (`--no-verify`) or skipping a declared quality gate
 - deleting, skipping, `.only`-narrowing, or loosening a failing test instead of fixing the code

@@ -163,8 +163,16 @@ iteration 5 that the loop is approaching its ceiling.
 ## Relationship to Other Gates
 
 This gate is **surface-conditional**: it applies to a plan that ships an API or backend surface. A
-UI-bearing plan runs the two UI gates instead; a plan bearing both runs both; a plan bearing neither
-**states that exemption explicitly** in its `tech-docs.md` rather than leaving it implicit.
+UI-bearing plan runs the two UI gates instead; a plan bearing both runs both.
+
+A plan bearing neither of those two surfaces is **not thereby exempt** — that is the routing table
+running out, not the rule ending. If it still changes behavior a user or caller can reach (a CLI, a
+library, a hook, a CI workflow), it exercises that behavior through its own interface and records
+what was run. Exemption belongs only to a plan with no reachable behavioral delta at all, and it
+**states that exemption explicitly** in its `tech-docs.md` rather than leaving it implicit. See
+[precondition (e)](../pr/pr-review-quality-gate.md#hardened-merge-preconditions) and
+[Surface-Conditional Tester Gates](../plan/plan-planning.md#surface-conditional-tester-gates), which
+this paragraph must stay congruent with.
 
 It is also a **merge precondition** — clause (e) of the hardened preconditions in the
 [PR Review Quality Gate](../pr/pr-review-quality-gate.md).
