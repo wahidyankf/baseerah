@@ -242,8 +242,12 @@ fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" se
     [plan-planning §Surface-Conditional Tester Gates](../../workflows/plan/plan-planning.md#surface-conditional-tester-gates),
     re-applied at execution, and enforced as **merge precondition clause (e)** in the
     [PR Review Quality Gate](../../workflows/pr/pr-review-quality-gate.md). A plan bearing neither
-    surface states that exemption explicitly in `tech-docs.md`. These surfaces are meant to agree —
-    if this rule and the workflow mapping ever diverge, the workflow mapping is the one to fix.
+    of those two surfaces is **not thereby exempt** — if it still changes behavior a user or caller
+    can reach (a CLI, a library, a hook, a CI workflow) it exercises that behavior through its own
+    interface and records what was run; only a plan with no reachable behavioral delta at all is
+    exempt, and it states that exemption explicitly in `tech-docs.md`. These surfaces are meant to
+    agree — if this rule and the workflow mapping ever diverge, the workflow mapping is the one to
+    fix.
 
 ## Examples
 

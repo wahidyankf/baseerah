@@ -143,7 +143,11 @@ and again as a merge precondition — clause (e) of the
 - **UI-bearing plan** → run **both** [`ui/ui-quality-gate.md`](../ui/ui-quality-gate.md) (static)
   and [`web/web-ux-test-fixing-planning.md`](../web/web-ux-test-fixing-planning.md) (running triad).
 - **API- or backend-bearing plan** → run [`api/api-quality-gate.md`](../api/api-quality-gate.md).
-- **Both** → run both sets. **Neither** → the plan MUST state the exemption explicitly in
+- **Several of these** → run each set.
+- **A reachable surface with no gate listed above** (a CLI, a library under `libs/`, a hook, a CI
+  workflow) → **not exempt**. Exercise the changed behavior through its own interface and record what
+  was run.
+- **Genuinely no reachable behavior** → the plan MUST state the exemption explicitly in
   `tech-docs.md`; an executor that finds no such statement treats it as a gap, not as a pass.
 
 **The three UI gates are complementary, never substitutes**: `plan-checker` **Step 5k** gates the
