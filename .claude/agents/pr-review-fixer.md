@@ -72,7 +72,12 @@ gh api graphql -f query='
 Filter the returned nodes to `isResolved: false` client-side if the schema does not expose a direct
 argument. Each thread's leading comment carries a `databaseId` — this is the exact value the REST
 API calls `comment_id`, and it is what this agent uses when replying via
-`gh api repos/{owner}/{repo}/pulls/comments/{comment_id}/replies` (or the GraphQL equivalent).
+`gh api repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies` (or the GraphQL
+equivalent). **The `{pull_number}` segment is required** — the path without it returns 404, confirmed
+live against PR #13 in `ose-primer` on 2026-07-20. It is easy to omit because the sibling _read_
+endpoint for a single review comment genuinely is
+`repos/{owner}/{repo}/pulls/comments/{comment_id}`, with no pull number; only the reply sub-resource
+is nested under the pull.
 
 **[Unverified] spot-check reminder**: the precise GraphQL field casing for `reviewThreads` filtering
 and for the `resolveReviewThread` mutation (see below) should be spot-checked against live GitHub
