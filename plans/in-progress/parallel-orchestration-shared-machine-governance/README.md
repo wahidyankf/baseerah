@@ -61,8 +61,13 @@ repositories. It ships **no** application or library code.
   distinction between `plan-checker` Step 5k (design funnel), `ui-quality-gate` (built components),
   and the tester triad (running UI) so nobody conflates them.
 - Make the **same-machine, concurrent-actors assumption** explicit across the orchestration surface.
-- Add a **no-destructive-git-operations** convention (local/shared-machine destructiveness).
-- Add a **worktree-and-artifact cleanup** convention (safe, self-scoped disk hygiene at plan end).
+- Add a **no-destructive-git-operations** convention (local/shared-machine destructiveness), carrying
+  two further parallel-safety rules: **whole-tree staging is forbidden as a shape** (`git add -A`,
+  `--all`, `git add .`, whole-tree `-u`, `git commit -a`, or any stage-everything wrapper — name paths
+  explicitly instead) and **no corner-cutting** (a failing gate is root-caused, never bypassed,
+  weakened, or deferred).
+- Add a **worktree-and-artifact cleanup** convention (safe, self-scoped disk hygiene at plan end)
+  covering three artifact classes: worktrees, merged branches (local + remote), and build output.
 - Move **`main-ci.yml` to a pure 4×/day schedule** (drop the push-to-main trigger) in all three repos.
 - Fold in the **Amazon Q Developer → Kiro CLI** platform-binding catalog succession.
 - Write the orchestration governance **vendor-neutrally and capability-gated** (background-capable

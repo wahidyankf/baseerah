@@ -104,7 +104,16 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
   `git branch -D` on shared branches, force-push, shared-branch history rewrite,
   `git worktree remove --force` on worktrees you did not create, work-swallowing `git stash`, or
   shared-object-store pruning. Operate only within this plan's own worktrees.
-- **Explicit-path staging**: stage named paths only; never `git add -A`.
+- **Explicit-path staging**: stage named paths only. No whole-tree staging in any spelling —
+  `git add -A`, `git add --all`, `git add .`, whole-tree `git add -u`, `git commit -a`, or any
+  stage-everything wrapper. Run `git status --porcelain` first and leave every line you cannot account
+  for unstaged (the sibling repos and shared worktrees carry other actors' WIP); use
+  `git -C <worktree>` when acting on another tree.
+- **No corner-cutting**: every failing gate, test, lint, type-check, or CI job is root-caused. No
+  `--no-verify`, no skipped gate, no deleted/narrowed failing test, no weakened acceptance criterion
+  or threshold, no checkbox ticked without its required evidence, no suppressed error, no deferred
+  preexisting failure. A blocker that is genuinely out of scope is escalated and recorded in
+  `learnings.md` with what was tried — never silently worked around.
 - **rhino-cli byte-identity**: do NOT touch `apps/rhino-cli/**` or the rhino gherkin tree
   (`specs/apps/rhino/behavior/rhino-cli/gherkin/**`). If any rhino-cli surface is unavoidably touched,
   it MUST remain byte-identical across all three repos.
@@ -126,6 +135,17 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
 - [ ] [AI] Record the pre-change grep baseline of the old cap phrasing:
       `grep -rn "cap at 2\|3 total\|Cap at Three\|stricter cap of 2\|2 concurrent background\|capped at \*\*3 concurrent\*\*" AGENTS.md CLAUDE.md repo-governance/`
       — acceptance: hit list captured in `learnings.md` as the "surfaces to update" baseline
+- [ ] [AI] Record the **plan-start baseline SHA** for each of the three repos —
+      `git -C <repo> rev-parse origin/main` for `ose-public`, `ose-primer`, `ose-infra` — and write the
+      three SHAs into `learnings.md` under a `## Plan-start baseline SHAs` heading, one per line, in
+      exactly this literal format (plain bullet, no bold, repo name then colon then full SHA):
+      `- ose-public: <sha>` / `- ose-primer: <sha>` / `- ose-infra: <sha>`. Every later
+      "commits this plan authored" check anchors to these SHAs (`<baseline-sha>..origin/main`), never
+      to reflog-relative syntax such as `origin/main@{1}`, which resolves only on a checkout with local
+      reflog history and silently drifts on every fetch — acceptance:
+      `grep -Ec '^- \*{0,2}(ose-public|ose-primer|ose-infra)\*{0,2}: [0-9a-f]{7,40}' learnings.md`
+      returns 3 (the `\*{0,2}` tolerates a bolded repo name so a correctly-executed step cannot fail
+      on formatting alone); returns 0 before this step runs
 - [ ] [AI] Establish the docs quality baseline: `npm run lint:md:fix` then
       `npx nx affected -t lint` — acceptance: baseline pass/fail recorded; preexisting failures documented
 - [ ] [AI] Resolve all preexisting failures before proceeding — acceptance: no preexisting failures remain
@@ -136,6 +156,9 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
 
 - [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
 - [ ] [AI] The old-cap grep baseline is recorded in `learnings.md` and markdown lint baseline is clean
+- [ ] [AI] The three plan-start baseline SHAs are recorded in `learnings.md` — acceptance:
+      `grep -Ec '^- \*{0,2}(ose-public|ose-primer|ose-infra)\*{0,2}: [0-9a-f]{7,40}' learnings.md`
+      returns 3
 
 > **Pause Safety**: only the local toolchain and the grep baseline were established — no governance
 > edits exist yet. Safe to stop indefinitely. To resume: re-run the grep baseline and confirm it
@@ -224,9 +247,43 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       shared branches, history rewrite on shared branches, worktree remove --force on others'
       worktrees, work-swallowing stash, shared-object-store pruning), the additive/own-worktree
       preference, explicit-path staging, principles/conventions cross-links, and a companion link to
-      `git-push-safety.md` (remote side) — acceptance: file exists; `grep -c "reset --hard\|clean -fd\|git add -A" no-destructive-git-operations.md` ≥ 3
-- [ ] [AI] Cross-link the new convention from the stage-explicit-paths guidance and from
-      `git-push-safety.md` (bidirectional "see also") — acceptance: both files link each other; links resolve
+      `git-push-safety.md` (remote side) — acceptance: file exists; count DISTINCT matched terms, not
+      matching lines (`grep -c` counts lines, so prose that packs several terms into one paragraph
+      would undercount):
+      `grep -oE 'reset --hard|clean -fd|git add -A' no-destructive-git-operations.md | sort -u | wc -l`
+      returns ≥ 3, regardless of how the prose is line-wrapped
+- [ ] [AI] Add the **whole-tree-staging prohibition** to `no-destructive-git-operations.md` as a shape
+      rather than one flag spelling (per tech-docs §Delta 4): forbid `git add -A`, `git add --all`,
+      `git add .`, whole-tree `git add -u`/`--update`, `git commit -a`/`--all`, and any wrapper whose
+      net effect is "stage everything"; require naming every path explicitly, using `git -C <worktree>`
+      when acting on another tree, and running `git status --porcelain` first so unaccounted-for lines
+      (another actor's work) stay unstaged; state the parallel-safety rationale — acceptance:
+      count DISTINCT matched terms, not matching lines (`grep -c` counts lines, so prose that packs
+      several terms into one paragraph would undercount):
+      `grep -oEi 'add --all|add \.|commit -a|status --porcelain' repo-governance/development/workflow/no-destructive-git-operations.md | sort -u | wc -l`
+      returns 0 immediately before this edit (the file exists from the previous checkbox but carries
+      only the `-A` spelling) and ≥ 4 after it, regardless of how the prose is line-wrapped
+- [ ] [AI] Add the **no-corner-cutting / root-cause** rule to `no-destructive-git-operations.md` (per
+      tech-docs §Delta 4): when a gate, test, lint, type-check, or CI job fails, fix the cause not the
+      signal; forbid `--no-verify`, skipping a declared gate, deleting/skipping/`.only`-narrowing a
+      failing test, weakening an acceptance criterion or threshold, ticking a checkbox without its
+      required evidence, suppressing an error in place of fixing it, and deferring a discovered
+      preexisting failure; require that a genuinely out-of-scope blocker be escalated and recorded in
+      the plan with what was tried — acceptance: match on phrases this rule alone introduces, not on
+      generic vocabulary the file already carries (its `## Principles Implemented/Respected` section
+      cites Root Cause Orientation, as every file in that directory does, so a bare `root.?cause`
+      pattern would already be non-zero):
+      `grep -oEi 'no-verify|weakening an acceptance criterion|escalated and recorded' repo-governance/development/workflow/no-destructive-git-operations.md | sort -u | wc -l`
+      (distinct matched terms, not matching lines) returns 0 immediately before this edit and ≥ 3
+      after it, regardless of how the prose is line-wrapped
+- [ ] [AI] Cross-link the new convention from the stage-explicit-paths guidance, and edit
+      `git-push-safety.md`'s `## Related Documentation` section (lines 188-194) to add the reciprocal
+      "see also" link to `no-destructive-git-operations.md` (the new convention already links to
+      `git-push-safety.md` per the previous checkbox's companion link) — acceptance:
+      `grep -c "no-destructive-git-operations" repo-governance/development/workflow/git-push-safety.md`
+      returns ≥1 (returns **0** today, confirmed live) and
+      `grep -c "git-push-safety" repo-governance/development/workflow/no-destructive-git-operations.md`
+      returns ≥1; both links resolve
 
 ### Phase 2 Gate
 
@@ -234,7 +291,10 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
 
 - [ ] [AI] `npm run lint:md:fix` and `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
       (real invocation — mirrors `.husky/pre-push`; no `rhino-cli:links:validation` Nx target exists) — exit 0
-- [ ] [AI] New convention exists and lists the full forbidden-op set
+- [ ] [AI] New convention exists and lists the full forbidden-op set, the whole-tree-staging shape
+      prohibition, and the no-corner-cutting / root-cause rule — acceptance:
+      `grep -oEi 'add --all|commit -a|no-verify|weakening an acceptance criterion' repo-governance/development/workflow/no-destructive-git-operations.md | sort -u | wc -l`
+      returns ≥ 4 (distinct matched terms, not matching lines)
 
 > **Pause Safety**: the new convention is a standalone, lint-clean file with resolving links; no index
 > depends on it yet (wired in Phase 4). Safe to stop. To resume: re-run link validation.
@@ -250,8 +310,10 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       the self-created-only + verify-not-in-use rules, the artifact taxonomy (`target/`, `dist/`,
       `.next/`, build caches), the HARD caveat that shared caches must never be deleted (naming the
       shared cargo `target/` from the `rust-cargo-target-dir-sharing` plan as the canonical example),
-      and the "cleanup is itself non-destructive to others" rule — acceptance: file exists;
-      `grep -ci "shared cargo\|verify\|not in use\|self-created" worktree-and-artifact-cleanup.md` ≥ 3
+      and the "cleanup is itself non-destructive to others" rule — acceptance: file exists; count
+      DISTINCT matched terms, not matching lines:
+      `grep -oEi 'shared cargo|verify|not in use|self-created' worktree-and-artifact-cleanup.md | sort -u | wc -l`
+      returns ≥ 3, regardless of how the prose is line-wrapped
 - [ ] [AI] Add the **five mandatory pre-removal checks** to `worktree-and-artifact-cleanup.md` (each
       grounded in a live 2026-07-19 incident, per tech-docs §Delta 5): (1) test merge state with
       `gh pr list --head <branch> --state all`, **never** `git merge-base --is-ancestor` — every PR
@@ -260,11 +322,35 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       `main` before removal — a merged PR does not imply an empty working tree; (3) check
       `git log origin/<branch>..<branch>` for unpushed commits; (4) always non-force
       `git worktree remove`, never `rm -rf`; (5) never remove a worktree this plan did not create
-      without positive evidence it is idle — acceptance:
-      `grep -nic "gh pr list\|is-ancestor\|non-force\|did not create" worktree-and-artifact-cleanup.md`
-      returns ≥4
+      without positive evidence it is idle — acceptance: count DISTINCT matched terms, not matching
+      lines, one term per check so that check 1's own two commands legitimately co-locating in a
+      single sentence cannot undercount:
+      `grep -oEi 'gh pr list|--porcelain|unpushed commits|non-force|did not create' worktree-and-artifact-cleanup.md | sort -u | wc -l`
+      returns ≥ 5 (one distinct term per mandatory check), regardless of how the prose is line-wrapped
+- [ ] [AI] Add the **branch-cleanup rules** to `worktree-and-artifact-cleanup.md` as the third artifact
+      class alongside worktrees and build output (per tech-docs §Delta 5 "Branch cleanup"): delete only
+      branches this plan created and only after the check-1 `gh pr list` merge-state test reports
+      MERGED; local deletion via `git branch -d` (merged-check retained),
+      **never** `git branch -D`; if `-d` refuses on a PR-MERGED branch, confirm the content landed via
+      `git log origin/main..<branch>` and delete with a stated reason rather than reaching for `-D`;
+      remote deletion via `git push origin --delete <branch>` only post-merge and never for `main` or
+      any environment branch this repo defines (e.g. `prod-*`/`stag-*` in `ose-public`; check each
+      repo's own environment-branch set rather than assuming this exact pattern is universal); run
+      `git worktree prune` after removals; never `gc`/`prune` the object
+      store as part of cleanup (shared-machine serialization point) — acceptance:
+      `grep -oE 'branch -d|push origin --delete|worktree prune' repo-governance/development/workflow/worktree-and-artifact-cleanup.md | sort -u | wc -l`
+      returns ≥ 3 (distinct matched terms, not matching lines — `branch -d` is case-sensitive here so
+      it does not also match the forbidden `-D`), and
+      `grep -c 'branch -D' repo-governance/development/workflow/worktree-and-artifact-cleanup.md`
+      returns ≥ 1 (the prohibition is stated, not omitted)
 - [ ] [AI] Cross-link the cleanup convention to `worktree-setup.md`, `temporary-files.md` (build-artifact
-      taxonomy), and `no-destructive-git-operations.md` — acceptance: links present and resolve
+      taxonomy), `git-push-safety.md` (remote-side companion for the `--delete` rule), and
+      `no-destructive-git-operations.md` — acceptance:
+      run `grep -oE 'worktree-setup|temporary-files|git-push-safety|no-destructive-git-operations' repo-governance/development/workflow/worktree-and-artifact-cleanup.md | sort -u | wc -l`
+      — counts distinct matched filenames, not matching lines. This checkbox runs after checkboxes 1-3
+      have already created the convention file, so it returns `0` immediately before this edit (file
+      exists, no cross-links yet) and ≥ 4 after it, one distinct term per target file; all four links
+      resolve
 
 ### Phase 3 Gate
 
@@ -273,6 +359,10 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
 - [ ] [AI] `npm run lint:md:fix` and `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
       (real invocation — mirrors `.husky/pre-push`; no `rhino-cli:links:validation` Nx target exists) — exit 0
 - [ ] [AI] Cleanup convention exists with the shared-cargo-target carve-out explicit
+- [ ] [AI] Cleanup convention covers all three artifact classes — worktrees, branches (local + remote,
+      merged-only, `-d` never `-D`), and build output — acceptance:
+      `grep -oE 'worktree remove|branch -d|target/' repo-governance/development/workflow/worktree-and-artifact-cleanup.md | sort -u | wc -l`
+      returns ≥ 3 (distinct matched terms, not matching lines)
 
 > **Pause Safety**: both new conventions exist and lint clean; the concurrency edits are stable. Safe
 > to stop. To resume: re-run link validation on the two new files.
@@ -336,13 +426,25 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       `repo-governance/conventions/structure/plans.md` §Delivery Mode so `[AI]` merge is the default
       once merge preconditions hold, and a `[HUMAN]` merge gate applies **only** where a plan's own
       step states it explicitly. State plainly that the **preconditions are unchanged — only the actor
-      is** — acceptance:
-      `grep -nic "\[AI\] merges\|only where.*explicitly\|only the actor" plans.md` returns ≥2 (the
-      same command returns **0** against the current pre-edit file)
+      is** — acceptance: count DISTINCT matched terms, not matching lines:
+      `grep -oEi '\[AI\] merges|only where.*explicitly|only the actor' plans.md | sort -u | wc -l`
+      returns ≥ 2 (the same command returns **0** against the current pre-edit file), regardless of
+      how the prose is line-wrapped
 - [ ] [AI] Propagate the inverted default to `repo-governance/workflows/pr/pr-review-quality-gate.md`
       (merge-gate done-definition), `plan/plan-execution.md`, and `plan/plan-planning.md` — acceptance:
-      `grep -rnic "\[HUMAN\] merge\|human merge" repo-governance/workflows/pr/pr-review-quality-gate.md repo-governance/workflows/plan/plan-execution.md repo-governance/workflows/plan/plan-planning.md`
-      shows every surviving `[HUMAN]`-merge mention rewritten as the explicit opt-in, not the default
+      the pattern must discriminate pre- from post-edit, and `-c` must not be used (it suppresses the
+      matched text this check needs to read). Verified live pre-edit with
+      `grep -oEi '\[HUMAN\][^.]{0,40}merge|human merges' <file> | wc -l`:
+      `pr-review-quality-gate.md` = **8**, `plan-execution.md` = **8**, `plan-planning.md` = **0** (it
+      states no merge actor, so it needs no edit — do not invent one). Rewrite so `[AI]` merge is the
+      stated default in both non-zero files — acceptance: run
+      `grep -rnoEi '\[HUMAN\][^.]{0,40}merge|human merges' repo-governance/workflows/pr/pr-review-quality-gate.md repo-governance/workflows/plan/plan-execution.md`
+      and confirm **every** line it prints sits within a sentence marking `[HUMAN]` merge as an
+      explicit per-plan opt-in (never as the default), AND
+      <code>grep -rlF '`[AI]` merge' repo-governance/workflows/pr/pr-review-quality-gate.md repo-governance/workflows/plan/plan-execution.md | wc -l</code>
+      returns **2** post-edit — one file each — and returns **0** pre-edit (verified live; neither file
+      mentions `[AI]` merge today). **Use `grep -F`** on the literal string: the backticks are part of
+      the text, and this counts FILES containing it, so it cannot be gamed by repetition in one file.
 - [ ] [AI] **Update `AGENTS.md` §Git Workflow §Delivery Mode first** — it is the canonical
       instruction file and states the default outright: "`worktree-to-pr` (worktree → draft PR →
       `[HUMAN]` merge — **the default**)" at line 112, plus `main-to-pr`'s "`[HUMAN]` merge" at line
@@ -363,8 +465,8 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       per-plan opt-in; the before/after counts are recorded in `learnings.md`
 - [ ] [AI] Confirm DD-10's dissolved-by-Delta-12 status is genuinely wired, not merely textually
       present: `tech-docs.md`'s DD-10 bullet already carries **"Status: DISSOLVED BY DELTA 12"**
-      (written at plan-authoring time as part of the bootstrap-timing fix for iteration-8's Finding 3 —
-      no further text edit is needed to DD-10 itself). **Scoping rationale**: a whole-file grep would
+      (written at plan-authoring time during an earlier bootstrap-timing fix — no further text edit is
+      needed to DD-10 itself). **Scoping rationale**: a whole-file grep would
       pass vacuously because Delta 12's own prose already contains "dissolves". **Anchor rationale**:
       DD-10/DD-11 are flat `- **DD-NN` bullets, NOT `### DD-NN` headings — a heading-anchored range
       matches nothing and could never pass. Because the text half is pre-authored (confirmed live: the
@@ -376,11 +478,12 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       `sed -n '/^- \*\*DD-10/,/^- \*\*DD-11/p' tech-docs.md | grep -ci "dissolved by Delta 12"` returns
       ≥1 (already **1** today, confirmed live — this half is pre-satisfied and stays 1 post-edit; it is
       NOT the discriminating half) AND
-      `grep -nic "\[AI\] merges\|only where.*explicitly\|only the actor" repo-governance/conventions/structure/plans.md`
+      `grep -oEi '\[AI\] merges|only where.*explicitly|only the actor' repo-governance/conventions/structure/plans.md | sort -u | wc -l`
       returns ≥2 (returns **0** today, confirmed live — this is the discriminating half; becomes ≥2 only
       once the sibling Delta-12 checkbox above has actually executed, confirmed via a simulated post-edit
-      copy). **Overall compound clause is FALSE today (blocked by the plans.md half returning 0) and
-      becomes TRUE only after Delta 12 has actually landed — verified both directions live.**
+      copy), counting distinct matched terms not matching lines, regardless of how the prose is
+      line-wrapped. **Overall compound clause is FALSE today (blocked by the plans.md half returning 0)
+      and becomes TRUE only after Delta 12 has actually landed — verified both directions live.**
 - [ ] [AI] Add the **per-phase-PR + feature-flag + strict 1-PR↔1-worktree** planning-granularity rule
       (Delta 10) to `repo-governance/workflows/plan/plan-planning.md` and cross-reference from
       `repo-governance/conventions/structure/plans.md`: each applicable phase / independent DAG node
@@ -394,24 +497,34 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       actual delivery route. Introduce the **plan-docs-only** carve-out as a general convention in its
       own right (a change touching only `plans/**`, no `apps/`/`libs/` code, may push direct to
       `main`) — stated on its own footing, **not** derived from DD-11, which disclaims being a general
-      precedent — acceptance:
-      `grep -nic "design obligation\|independently PR-able\|plan-docs-only" plan-planning.md` returns
-      ≥3 (the same command returns **0** against the current pre-edit file — verified live, so the
-      clause discriminates a done step from an undone one)
+      precedent — acceptance: count DISTINCT matched terms, not matching lines:
+      `grep -oEi 'design obligation|independently PR-able|plan-docs-only' plan-planning.md | sort -u | wc -l`
+      returns ≥3 (the same command returns **0** against the current pre-edit file — verified live, so
+      the clause discriminates a done step from an undone one), regardless of how the prose is
+      line-wrapped
 - [ ] [AI] Make **per-phase merging** explicit (not merely per-phase PR _opening_) in
       `plan-planning.md` + `plan-execution.md`: each phase PR is opened **and merged** as that phase
-      completes and is **not** held for a batch merge at plan end. State the merge actor correctly —
-      `[HUMAN]` by the unchanged Delivery Mode default, `[AI]` only where the plan carries an explicit
-      maintainer auto-merge authorization — citing DD-10 as an **instance**, never as authority for a
-      general `[AI]`-merge rule — acceptance:
-      `grep -nic "batch merge\|merge actor\|auto-merge authorization" plan-planning.md plan-execution.md`
-      returns ≥3 (returns **0** against both current pre-edit files)
+      completes and is **not** held for a batch merge at plan end. State the merge actor per **Delta
+      12's inverted default**: `[AI]` merges once the preconditions hold, and `[HUMAN]` applies **only**
+      where a plan's own step states it explicitly. Do **not** write the pre-Delta-12 framing
+      ("`[HUMAN]` by the unchanged Delivery Mode default") — it would contradict the §4b edit two
+      checkboxes above and fail this phase's own Gate convergence-proof check. DD-10 is **dissolved by
+      Delta 12**; cite it only as history, never as authority for the merge actor — acceptance: count
+      DISTINCT matched terms across both files combined
+      (`-h` suppresses the per-file `filename:` prefix so `sort -u`/`wc -l` see one comparable stream —
+      plain `grep -c` on two files prints one `filename:count` line per file, which is not a single
+      comparable number):
+      `grep -ohEi 'batch merge|merge actor|opened and merged' plan-planning.md plan-execution.md | sort -u | wc -l`
+      returns ≥3 (returns **0** against both current pre-edit files — verified live; the terms track
+      the content this checkbox actually mandates, none of them the dropped pre-Delta-12 phrasing)
 - [ ] [AI] Encode the **feature-flag default + escape + removal** rule in `plan-planning.md`:
       flagging is the default; a phase lands unflagged **only** when it ships no user-reachable
       behaviour change (pure docs / governance / refactor / test-only) and the step names which
       exemption applies; every flag introduced carries a named **removal step** in the plan's final
-      phase — acceptance: `grep -nic "unflagged\|user-reachable\|flag removal step" plan-planning.md`
-      returns ≥3 (returns **0** against the current pre-edit file)
+      phase — acceptance: count DISTINCT matched terms, not matching lines:
+      `grep -oEi 'unflagged|user-reachable|flag removal step' plan-planning.md | sort -u | wc -l`
+      returns ≥3 (returns **0** against the current pre-edit file), regardless of how the prose is
+      line-wrapped
 - [ ] [AI] Reflect the 1-PR↔1-worktree cleanup tie in `plan-execution.md` (the worktree is the unit
       cleaned up when its PR lands) — acceptance: `grep -ni "one worktree\|per-PR\|feature flag" plan-execution.md` present
 
@@ -442,26 +555,30 @@ until this plan's PR merges. See DD-10's bootstrap-timing paragraph for the full
       1-PR↔1-worktree (Delta 10) — **this is the §4c-i cross-workflow consistency pass, NOT a re-do of the
       §4b authoring edit**; §4b writes the rule into `plan-planning.md`, this checkbox verifies every
       _other_ plan workflow that references planning granularity now agrees with it — acceptance:
-      `sh
-for f in plan-execution multi-plans-execution plan-multi-repo-parity-planning \
-         plan-multi-repo-parity-planning-and-execution; do
-  [ "$(grep -ci "1-PR\|per-phase PR" repo-governance/workflows/plan/$f.md)" -ge 1 ] \
-    || echo "MISSING $f"
-done
-`
-      prints nothing — i.e. each of these **four** delivery-executing workflows carries the rule
-      (today it prints all four: every one returns **0**, verified live) — **and**
-      `grep -rc "cap at 2\|3 total" repo-governance/workflows/plan/` returns 0 in every file.
-      **Use the per-file `grep -c` form above, not `grep -L`**: `grep` in this environment is a shell
-      function routing to ripgrep, where `-L` means _follow symlinks_, not _files-without-match_ — a
-      `grep -L` clause silently returns empty and reads as passing no matter what.
-      **Scope rationale**: the set is deliberately **not** all 7 `plan/*.md`. `plan-planning.md` is
-      §4b's own target (including it would make this clause free-ride on §4b), and `README.md` +
-      `plan-quality-gate.md` have no checkbox in this plan prescribing the phrase — requiring it of
-      them would make the clause unreachable via the plan's own prescribed work.
-      **A bare re-grep of `plan-planning.md` MUST NOT be used**: it is a strict subset of §4b's own
-      acceptance clause, so it flips to true the moment §4b completes and can never discriminate
-      whether this sweep actually ran.
+      run the loop below and confirm it prints nothing:
+
+  ```sh
+  for f in plan-execution multi-plans-execution plan-multi-repo-parity-planning \
+           plan-multi-repo-parity-planning-and-execution; do
+    [ "$(grep -ci "1-PR\|per-phase PR" repo-governance/workflows/plan/$f.md)" -ge 1 ] \
+      || echo "MISSING $f"
+  done
+  ```
+
+  Printing nothing — i.e. each of these **four** delivery-executing workflows carries the rule
+  (today it prints all four: every one returns **0**, verified live) — **and**
+  `grep -rc "cap at 2\|3 total" repo-governance/workflows/plan/` returns 0 in every file.
+  **Use the per-file `grep -c` form above, not `grep -L`**: `grep` in this environment is a shell
+  function routing to ripgrep, where `-L` means _follow symlinks_, not _files-without-match_ — a
+  `grep -L` clause silently returns empty and reads as passing no matter what.
+  **Scope rationale**: the set is deliberately **not** all 7 `plan/*.md`. `plan-planning.md` is
+  §4b's own target (including it would make this clause free-ride on §4b), and `README.md` +
+  `plan-quality-gate.md` have no checkbox in this plan prescribing the phrase — requiring it of
+  them would make the clause unreachable via the plan's own prescribed work.
+  **A bare re-grep of `plan-planning.md` MUST NOT be used**: it is a strict subset of §4b's own
+  acceptance clause, so it flips to true the moment §4b completes and can never discriminate
+  whether this sweep actually ran.
+
 - [ ] [AI] `repo-governance/workflows/plan/plan-quality-gate.md` — align the `max-concurrency` frontmatter
       default/wording with N+1 **and** add the hardened merge preconditions (3 cycles + up-to-date with
       `origin/main` + all gates green) to its Delivery-Mode done-definition section — acceptance:
@@ -617,8 +734,12 @@ done
 - [ ] [AI] Add the conditional gate to `repo-governance/workflows/pr/pr-review-quality-gate.md` as
       **merge precondition clause (e)** — the normative Delta 8 lettering — alongside clauses (a)-(d) (3 cycles / 0 CRITICAL+0 HIGH /
       up-to-date-with-`origin/main` / all gates green) — acceptance:
-      `grep -ni "api-quality-gate\|surface-conditional" repo-governance/workflows/pr/pr-review-quality-gate.md`
-      returns ≥ 1 hit
+      `grep -c "api-quality-gate" repo-governance/workflows/pr/pr-review-quality-gate.md` returns ≥ 1
+      (returns **0** today, verified live). **Do NOT add `surface-conditional` as an alternative** —
+      the §4b checkbox above already writes that literal string into this same file when it copies
+      Delta 8's `(a)-(e)` lettering, so an OR'd pattern would pass vacuously whether or not this
+      checkbox's own work happened. The concrete `api-quality-gate` reference is the discriminating
+      signal the Phase 4 Gate actually requires.
 - [ ] [AI] Cross-link Rule 15 (web triad) and Rule 16 (AET) in
       `repo-governance/development/quality/user-facing-delivery-hardening.md` to the new conditional
       rule and the new `api/` workflow, so the two surfaces agree rather than drift — acceptance:
@@ -807,15 +928,24 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       — acceptance: PR URL returned; PR shows as draft
 - [ ] [AI] Drive PR gates green: `gh pr checks <pr> --watch` (poll every 2 min, never `gh run watch`)
       — acceptance: all required checks report success
-- [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply **all five** hardened merge
-      preconditions — (a) 3 cycles complete, (b) **0 CRITICAL + 0 HIGH findings outstanding**,
-      (c) up-to-date with `origin/main` via non-destructive forward update, (d) all gates green,
-      (e) **the Delta 11 surface-conditional tester gates have been run and their defect findings
-      resolved** — for THIS PR the surface is neither UI nor API, so record the explicit exemption in
-      the PR description rather than leaving it implicit; then merge (`[AI]` merges per Delta 12's
-      default; DD-10 records the pre-Delta-12 authorization and its bootstrap-timing note) —
-      acceptance: PR merged; **0 CRITICAL + 0 HIGH confirmed outstanding-free**; branch was current at
-      merge; the PR body contains the Delta-11 gate line (run-and-resolved, or explicit exempt)
+
+### PR-Review Maker→Fixer Cycle (default 3, CI-gated)
+
+- [ ] [AI] Cycle 1: `pr-review-maker` reviews the ose-primer PR via the GitHub Reviews API →
+      `pr-review-fixer` applies fixes and pushes → CI green — acceptance: review comments addressed;
+      CI green
+- [ ] [AI] Cycle 2: `pr-review-maker` → `pr-review-fixer` → CI green — acceptance: no new HIGH findings
+- [ ] [AI] Cycle 3: `pr-review-maker` → `pr-review-fixer` → CI green — acceptance: clean review; CI green
+- [ ] [AI] Merge the ose-primer PR once **all five** hardened merge preconditions hold — (a) 3
+      `pr-review-maker`→`pr-review-fixer` cycles complete, (b) **0 CRITICAL + 0 HIGH findings
+      outstanding**, (c) branch up-to-date with `origin/main` via non-destructive forward update,
+      (d) all PR quality gates green, (e) **the Delta 11 surface-conditional tester gates have been run
+      and their defect findings resolved** — for THIS PR the surface is neither UI nor API, so record
+      the explicit exemption in the PR description rather than leaving it implicit; then merge (`[AI]`
+      merges per Delta 12's default; DD-10 records the pre-Delta-12 authorization and its
+      bootstrap-timing note) — acceptance: PR merged; **0 CRITICAL + 0 HIGH confirmed
+      outstanding-free**; branch was current at merge; the PR body contains the Delta-11 gate line
+      (run-and-resolved, or explicit exempt)
 
 ### Phase 6 Gate
 
@@ -885,15 +1015,24 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       — acceptance: PR URL returned; PR shows as draft
 - [ ] [AI] Drive PR gates green: `gh pr checks <pr> --watch` (poll every 2 min, never `gh run watch`)
       — acceptance: all required checks report success
-- [ ] [AI] Run the 3-cycle `pr-review-maker`→`pr-review-fixer` cycle; apply **all five** hardened merge
-      preconditions — (a) 3 cycles complete, (b) **0 CRITICAL + 0 HIGH findings outstanding**,
-      (c) up-to-date with `origin/main` via non-destructive forward update, (d) all gates green,
-      (e) **the Delta 11 surface-conditional tester gates have been run and their defect findings
-      resolved** — for THIS PR the surface is neither UI nor API, so record the explicit exemption in
-      the PR description rather than leaving it implicit; then merge (`[AI]` merges per Delta 12's
-      default; DD-10 records the pre-Delta-12 authorization and its bootstrap-timing note) —
-      acceptance: PR merged; **0 CRITICAL + 0 HIGH confirmed outstanding-free**; branch was current at
-      merge; the PR body contains the Delta-11 gate line (run-and-resolved, or explicit exempt)
+
+### PR-Review Maker→Fixer Cycle (default 3, CI-gated)
+
+- [ ] [AI] Cycle 1: `pr-review-maker` reviews the ose-infra PR via the GitHub Reviews API →
+      `pr-review-fixer` applies fixes and pushes → CI green — acceptance: review comments addressed;
+      CI green
+- [ ] [AI] Cycle 2: `pr-review-maker` → `pr-review-fixer` → CI green — acceptance: no new HIGH findings
+- [ ] [AI] Cycle 3: `pr-review-maker` → `pr-review-fixer` → CI green — acceptance: clean review; CI green
+- [ ] [AI] Merge the ose-infra PR once **all five** hardened merge preconditions hold — (a) 3
+      `pr-review-maker`→`pr-review-fixer` cycles complete, (b) **0 CRITICAL + 0 HIGH findings
+      outstanding**, (c) branch up-to-date with `origin/main` via non-destructive forward update,
+      (d) all PR quality gates green, (e) **the Delta 11 surface-conditional tester gates have been run
+      and their defect findings resolved** — for THIS PR the surface is neither UI nor API, so record
+      the explicit exemption in the PR description rather than leaving it implicit; then merge (`[AI]`
+      merges per Delta 12's default; DD-10 records the pre-Delta-12 authorization and its
+      bootstrap-timing note) — acceptance: PR merged; **0 CRITICAL + 0 HIGH confirmed
+      outstanding-free**; branch was current at merge; the PR body contains the Delta-11 gate line
+      (run-and-resolved, or explicit exempt)
 
 ### Phase 7 Gate
 
@@ -946,9 +1085,25 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
       for active processes) — acceptance: each target worktree confirmed self-created + idle
 - [ ] [AI] Remove only this plan's own worktrees with the non-forced command
       `git worktree remove <path>` (NEVER `--force`, NEVER a worktree you did not create) — acceptance: only this plan's worktrees removed; others intact
+- [ ] [AI] Run `git worktree prune` in each of the three repos after the removals — acceptance: exits 0;
+      `git worktree list` shows no stale administrative entries for this plan's removed paths
+- [ ] [AI] Delete this plan's own **local** branches — in this plan's case, one per repo (Phases 0-5
+      are one inseparable PR for ose-public; Phase 6 and Phase 7 are each a single PR) — only after confirming
+      MERGED via `gh pr list --head <branch> --state all --json number,state,mergedAt` — use
+      `git branch -d` (NEVER `git branch -D`); if `-d` refuses on a PR-MERGED branch, confirm the
+      content landed via `git log origin/main..<branch>` before deleting with a stated reason —
+      acceptance: only this plan's merged branches deleted; every other local branch still listed by
+      `git branch --list` in each repo
+- [ ] [AI] Delete this plan's own **remote** branches with `git push origin --delete <branch>` for the
+      same MERGED-confirmed set only — acceptance: `git ls-remote --heads origin` no longer lists this
+      plan's branches, and `main` plus every environment branch that repo defines is still listed
+      (`ose-public` defines `prod-*`/`stag-*`; `ose-primer` and `ose-infra` define none today, so the
+      check is vacuously satisfied there — confirm each repo's own set with `git branch -a` rather than
+      assuming this exact pattern)
 - [ ] [AI] Purge only the build artifacts THIS plan created (any `target/`, `dist/`, `.next/`, build
       caches produced inside this plan's worktrees), after verifying non-use — acceptance: self-created artifacts removed
-- [ ] [AI] Explicitly SKIP the shared cargo `target/` and any shared cache other sessions depend on —
+- [ ] [AI] Explicitly SKIP the shared cargo `target/` and any shared cache other sessions depend on,
+      and run no `git gc` / `git prune` on the object store (shared-machine serialization point) —
       acceptance: shared caches confirmed present and untouched; note recorded in `learnings.md`
 
 ### Phase 9 Gate
@@ -956,7 +1111,28 @@ opencode + amazonq`) — acceptance: separate cohesive commits; no `git add -A` 
 > All checks below must pass before Plan Archival.
 
 - [ ] [AI] Only self-created, verified-idle worktrees/artifacts were removed; the shared cargo `target/` and all shared caches are intact
-- [ ] [AI] No destructive git operation and no `git add -A` was used anywhere in this plan
+- [ ] [AI] Every branch this plan created is gone locally and on `origin` in all three repos, and every
+      branch it did not create survives — acceptance: `git branch --list` and
+      `git ls-remote --heads origin` per repo list none of this plan's branches and still list `main`
+      plus all environment branches that repo defines (`prod-*`/`stag-*` for `ose-public`; `ose-primer`
+      and `ose-infra` define no environment branches today — verified per repo, not assumed uniform)
+- [ ] [AI] No destructive git operation and no whole-tree staging in any spelling (`git add -A`,
+      `--all`, `git add .`, whole-tree `-u`, `git commit -a`) was used anywhere in this plan —
+      acceptance: no commit authored by this plan contains a file outside its declared surface
+      inventory; verify per repo with
+      `git -C <repo> log --name-only --pretty=format:'--- %h %s' <baseline-sha>..origin/main`
+      using that repo's Phase 0 plan-start baseline SHA (never `origin/main@{1}` — reflog-relative
+      revisions resolve only where local reflog history exists and drift on every fetch), and confirm
+      every listed path appears in the tech-docs.md Surface Inventory or is a plan-doc path under
+      `plans/in-progress/parallel-orchestration-shared-machine-governance/`
+- [ ] [AI] No gate was bypassed, skipped, weakened, or deferred anywhere in this plan; every failure
+      encountered was root-caused, and any out-of-scope blocker is recorded in `learnings.md` with
+      what was tried — acceptance:
+      `git -C <repo> log --format=%B <baseline-sha>..origin/main` (that repo's Phase 0 baseline SHA)
+      contains no `--no-verify` / `skip ci` / `[skip actions]` marker; every phase PR reports a passing
+      rollup via `gh pr view <n> --json statusCheckRollup --jq '[.statusCheckRollup[].conclusion] | unique'`
+      returning only `SUCCESS`/`NEUTRAL`/`SKIPPED`; and every `learnings.md` entry describing a blocker
+      names what was tried
 
 > **Pause Safety**: the shared disk is reclaimed of this plan's own artifacts only; every other
 > actor's worktrees, WIP, and shared caches are untouched. Safe to stop. To resume: re-run

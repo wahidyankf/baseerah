@@ -155,20 +155,60 @@ no tool-specific command spellings):
 > command over raw delete; a new revert commit over rewriting shared history; dry-run before bulk
 > deletes; lock a worktree before a long unattended session.
 
-Prefer additive/non-destructive operations; **stage explicit paths, never `git add -A`**; operate only
-within your **own** worktree. Cross-links the existing
+Prefer additive/non-destructive operations; **stage explicit paths only** (see the whole-tree-staging
+rule below); operate only within your **own** worktree. Cross-links the existing
 [Git Push Safety Convention](../../../repo-governance/development/workflow/git-push-safety.md) as the
 remote-side companion (this new rule owns the local/shared-machine side) and the stage-explicit-paths
 guidance.
+
+**Whole-tree staging is forbidden — the parallel-safety rule.** On a shared machine another actor's
+uncommitted work, scratch files, and half-finished edits sit in the same tree; a whole-tree stage
+sweeps them into _your_ commit, which is both a correctness bug and a disclosure risk (it is how an
+unrelated `.env`-adjacent or scratch file gets committed by accident). The rule is therefore stated as
+a **shape**, not a single flag spelling — every one of these is forbidden without explicit
+per-instance approval:
+
+- `git add -A` and its long form `git add --all`
+- `git add .` (and any bare-directory add that pulls in paths you did not author)
+- `git add -u` / `--update` across the whole tree
+- `git commit -a` / `--all` (stages every tracked modification implicitly)
+- any wrapper, alias, or agent shortcut whose net effect is "stage everything"
+
+**Required instead**: name every path explicitly (`git add <path> [<path>...]`), and in a sibling repo
+or another worktree use the `-C <worktree>` form so the operation cannot leak into the wrong tree.
+Before staging, run `git status --porcelain` and stage only lines you can account for; anything you
+cannot account for belongs to another actor and stays unstaged. [Repo-grounded — `AGENTS.md`
+§Important Notes already forbids staging/committing without instruction; this delta supplies the
+parallel-safety rationale and the full forbidden-shape list.]
+
+**No corner-cutting — root-cause orientation is binding, not aspirational.** Under parallel execution
+the cheapest way to make a gate go green is to weaken the gate, and nothing in the orchestration rules
+previously forbade it. The convention therefore states: when a gate, test, lint, type-check, or CI job
+fails, **fix the cause**, never the signal. Forbidden without explicit per-instance approval and a
+written reason recorded in the plan:
+
+- bypassing hooks (`--no-verify`) or skipping a declared quality gate
+- deleting, skipping, `.only`-narrowing, or loosening a failing test instead of fixing the code
+- weakening an acceptance criterion, threshold, or lint rule so a failing check passes
+- ticking a delivery checkbox without the evidence its acceptance criterion demands
+- suppressing an error (broad catch, ignore-comment, silenced warning) in place of a fix
+- deferring a discovered preexisting failure instead of fixing it in-scope
+
+A blocker that genuinely cannot be root-caused in scope is **escalated and recorded** — named in the
+plan with what was tried and why it is out of scope — never silently worked around. [Repo-grounded —
+`AGENTS.md` §Conventions "Root Cause Orientation: Fix root causes, not symptoms; proactively fix
+preexisting errors encountered during work (do not mention and defer)" and §Manual Verification & CI
+Blockers "never bypass"; this delta binds those principles to the orchestration and merge surface.]
 
 **[Needs Verification]** at execution time: the exact concurrent-fetch ref-lock mechanics (transient
 "cannot lock ref" contention vs. corruption) — do not overclaim in the convention prose.
 
 ### Delta 5 — worktree-and-artifact cleanup convention (NEW)
 
-A new convention requiring, at plan end, removal of the worktrees the plan created and purge of the
-build artifacts it created (`target/`, `dist/`, `.next/`, build caches) so the shared disk does not
-fill — **especially plans that spin up multiple worktrees**. Hard safety caveat:
+A new convention requiring, at plan end, removal of the worktrees the plan created, deletion of the
+branches it created (local + remote, merged-only), and purge of the build artifacts it created
+(`target/`, `dist/`, `.next/`, build caches) so the shared disk and the ref namespace do not fill —
+**especially plans that spin up multiple worktrees**. Hard safety caveat:
 
 - Delete only artifacts/worktrees **you created** AND that **no other session/worktree/process is
   currently using**.
@@ -201,6 +241,39 @@ incident during this session's own worktree audit, not hypothesised:
    machine another session's live work is indistinguishable from stale state by path alone. Observed
    live: of 11 worktrees across the three repos, one (`rhino-cli-source-drift-reconciliation`, 5 dirty
    files) belonged to active work and was correctly left in place.
+
+**Branch cleanup — the third artifact class** (alongside worktrees and build output). Removing a
+worktree leaves its branch behind; under the 1-PR ↔ 1-worktree mapping of Delta 2, a multi-phase plan
+accumulates one branch per phase per repo, so a plan that cleans worktrees but not refs still leaves
+stale local and remote branches on every repo it touched. The convention therefore requires, after
+each worktree removal:
+
+- **Delete only branches this plan created**, and only after the branch's PR is confirmed MERGED by
+  the same `gh pr list --head <branch> --state all --json number,state,mergedAt` test used in check 1
+  above (squash-merge makes ancestry tests useless here — same reason).
+- **Local deletion uses `git branch -d`** (merged-check retained), **never `git branch -D`** — `-D` is
+  already on the forbidden list in Delta 4. `-d` refuses on an unmerged branch, which is the intended
+  backstop. If `-d` refuses on a branch whose PR reports MERGED, that is the squash-merge shape rather
+  than lost work: confirm via `git log origin/main..<branch>` that the content landed, then delete
+  with an explicit stated reason — do not reflexively reach for `-D`.
+- **Remote deletion (`git push origin --delete <branch>`) only after the PR is MERGED**, and only for
+  branches this plan pushed. Never delete `main` or any environment branch this repo defines
+  ([Repo-grounded] — `prod-*`/`stag-*` exist in `ose-public` today per `AGENTS.md` §Web Sites; live-verified
+  `ose-primer` and `ose-infra` currently define none, so the rule is vacuously satisfied there — check
+  each repo's own environment-branch set rather than assuming this exact pattern is universal).
+- **Jurisdiction note**: `git push origin --delete <branch>` is remote-ref deletion, not
+  history-rewriting force-push; it is deliberately **outside** the
+  [Git Push Safety Convention](../../../repo-governance/development/workflow/git-push-safety.md)'s
+  explicit-per-instance-approval gate (which is scoped to `--force`/`--force-with-lease`/`--no-verify`
+  only — see its Covered Operations table), and is instead safety-gated by **this convention's own**
+  merged-check requirement above. This is the single authority for remote branch deletion; Delta 4's
+  forbidden-operations table (local-side only) and `git-push-safety.md` (force-push/`--no-verify` only)
+  both explicitly defer to this convention for `git push origin --delete`.
+- **Run `git worktree prune`** after removals so administrative worktree metadata does not accumulate;
+  it touches only already-removed entries and is safe alongside other sessions.
+- **Never `gc`/`prune` the object store** as part of cleanup — history maintenance is a serialization
+  point on a shared machine (see the local-parallelism grounding below), so it stays out of the
+  cleanup gate entirely.
 
 **Local-parallelism grounding** (the git-endorsed shape for concurrent workstreams on one machine)
 [git-worktree(1), git-gc(1) §CONFIGURATION; Web-cited via web-researcher, access 2026-07-19 —
@@ -557,8 +630,9 @@ that currently hardcodes `[HUMAN]` merge. Propagated to all three repos in Phase
 | 22  | `repo-governance/workflows/api/README.md`                                                                                  | **NEW index** (Delta 11) — mirrors `ui/README.md` frontmatter + Available-Workflows table                                                                                                                                | _New file_                                   |
 | 23  | `repo-governance/workflows/README.md`                                                                                      | Register the new `api/` category alongside `ui/` in the workflows index (no hardcoded counts)                                                                                                                            | [Repo-grounded] file exists                  |
 | 24  | `repo-governance/workflows/plan/plan-execution.md` + `plan/plan-planning.md` (Delta 11 pass)                               | State the surface-conditional UI/API gate rule + the explicit-exemption requirement + the three-way 5k / ui-quality-gate / triad distinction                                                                             | [Repo-grounded] both files exist             |
-| 25  | `repo-governance/workflows/pr/pr-review-quality-gate.md` (Delta 11 pass)                                                   | Add the surface-conditional gate as merge precondition clause (d)                                                                                                                                                        | [Repo-grounded] file exists                  |
+| 25  | `repo-governance/workflows/pr/pr-review-quality-gate.md` (Delta 11 pass)                                                   | Add the surface-conditional gate as merge precondition clause (e) — Delta 8's normative lettering, where (a)-(d) are the existing four preconditions                                                                     | [Repo-grounded] file exists                  |
 | 26  | `repo-governance/development/quality/user-facing-delivery-hardening.md`                                                    | Cross-link Rule 15 (web triad) / Rule 16 (AET) to the new conditional gate rule and the new `api/` workflow so the two surfaces agree                                                                                    | [Repo-grounded] file exists                  |
+| 27  | `repo-governance/development/workflow/git-push-safety.md` §Related Documentation                                           | Add the reciprocal "see also" link to the new `no-destructive-git-operations.md` convention (Delta 4's remote-side companion, per DD-2) — closes the bidirectional link the new convention already establishes           | [Repo-grounded] lines 188-194                |
 
 `npm run generate:bindings` = `cargo run --release --quiet --manifest-path apps/rhino-cli/...`
 [Repo-grounded] (`package.json` line 30). Do NOT hand-edit `.opencode/` or `.amazonq/`.
@@ -676,7 +750,11 @@ flowchart TB
   C -- yes/unknown --> LEAVE
   C -- no --> D{Is it a shared cache<br/>e.g. shared cargo target?}
   D -- yes --> LEAVE
-  D -- no --> DEL[Safe to delete]:::del
+  D -- no --> E{Is it a branch?}
+  E -- no --> DEL[Safe to delete]:::del
+  E -- yes --> F{PR MERGED per gh pr list,<br/>and not main/env branch?}
+  F -- no --> LEAVE
+  F -- yes --> DELB[Delete: git branch -d<br/>+ push origin --delete<br/>never -D]:::del
   classDef q fill:#0072B2,color:#fff
   classDef leave fill:#E69F00,color:#000
   classDef del fill:#009E73,color:#fff

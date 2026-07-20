@@ -10,8 +10,10 @@ propagated identically across the three OSE repositories:
 2. **`worktree-to-pr`** reinforced as the default delivery mode and the parallelism mechanism, with
    the **PR** (not just the worktree) sharpened as the independent merge point.
 3. **Same-machine, concurrent-actors assumption** made explicit across the orchestration surface.
-4. **No-destructive-git-operations** convention (local/shared-machine destructiveness) +
-   **worktree-and-artifact cleanup** convention (safe, self-scoped disk hygiene).
+4. **No-destructive-git-operations** convention (local/shared-machine destructiveness, the
+   whole-tree-staging prohibition, and the no-corner-cutting / root-cause rule) +
+   **worktree-and-artifact cleanup** convention (safe, self-scoped disk hygiene across worktrees,
+   merged branches, and build output).
 5. **DAG-first orchestration**: every non-trivial task list and delivery checklist declares an
    explicit dependency DAG; independent nodes parallelize up to N, dependent nodes serialize.
 6. **PR merge preconditions** (hardened done-gate): 3 review cycles + branch up-to-date with latest
@@ -68,8 +70,9 @@ note placeholder in [tech-docs.md](./tech-docs.md)).
   available machine capacity without guessing at an asymmetric fixed cap.
 - As a **background subagent**, I want an explicit list of forbidden destructive git operations so
   that I never wipe out a concurrent actor's uncommitted work on the shared machine.
-- As a **plan executor**, I want a mandatory, safe cleanup gate so that the worktrees and build
-  artifacts my plan created do not fill the shared disk — without ever deleting shared caches.
+- As a **plan executor**, I want a mandatory, safe cleanup gate so that the worktrees, branches, and
+  build artifacts my plan created do not fill the shared disk or the ref namespace — without ever
+  deleting shared caches, shared branches, or another actor's work.
 - As a **governance author**, I want the same rule text in all three repos so that agents behave
   identically regardless of which repo they operate in.
 - As a **human maintainer**, I want the same-machine assumption stated explicitly so that all
@@ -150,6 +153,28 @@ Scenario: Local destructive git operations are forbidden on shared state
 ```
 
 ```gherkin
+Scenario: Whole-tree staging is forbidden as a shape, not as one flag spelling
+  Given a shared machine where another actor's uncommitted work sits in the same tree
+  When an agent stages changes for a commit
+  Then the convention forbids git add -A, git add --all, git add ., whole-tree git add -u, and
+    git commit -a, plus any wrapper whose net effect is staging everything
+  And it requires naming every path explicitly and using git -C when acting on another worktree
+  And it requires running git status --porcelain first so unaccounted-for lines stay unstaged
+```
+
+```gherkin
+Scenario: A failing gate is root-caused rather than worked around
+  Given a delivery step whose gate, test, lint, type-check, or CI job fails
+  When the agent responds to that failure
+  Then the convention requires fixing the cause rather than the signal
+  And it forbids --no-verify, skipping a declared gate, deleting or narrowing a failing test,
+    weakening an acceptance criterion or threshold, ticking a checkbox without its required
+    evidence, suppressing an error in place of a fix, and deferring a preexisting failure
+  And a blocker that cannot be root-caused in scope is escalated and recorded in the plan with
+    what was tried, never silently worked around
+```
+
+```gherkin
 Scenario: The local rule complements the existing remote-push safety rule
   Given the existing git-push-safety convention covering force-push and --no-verify
   When the new no-destructive-git-operations convention is added
@@ -178,6 +203,25 @@ Scenario: A worktree is checked for unlanded content before it is removed
   And the worktree is checked for uncommitted changes and for commits never pushed
   And any content found nowhere else is recovered to main before removal
   And removal uses non-force git worktree remove so a dirty worktree refuses deletion
+```
+
+```gherkin
+Scenario: Merged branches are deleted alongside their worktrees
+  Given a plan that created one branch per phase pull request in each repository
+  When the cleanup gate runs after those pull requests have merged
+  Then each branch's merged state is confirmed with gh pr list before any deletion
+  And local deletion uses git branch -d with its merged-check, never git branch -D
+  And remote deletion uses git push origin --delete only for those merged branches
+  And git worktree prune is run so no stale administrative entries remain
+```
+
+```gherkin
+Scenario: Shared and unmerged branches survive the cleanup gate
+  Given branches this plan did not create, including main and any environment branches this repo
+    defines (prod-* and stag-* exist in ose-public today; ose-primer and ose-infra define none)
+  When the cleanup gate deletes this plan's own merged branches
+  Then every branch the plan did not create is still present locally and on the remote
+  And no git gc or git prune is run against the shared object store
 ```
 
 ```gherkin
