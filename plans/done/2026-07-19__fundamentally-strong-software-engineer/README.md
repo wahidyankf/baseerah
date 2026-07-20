@@ -3,7 +3,7 @@
 > **Status: CLOSED — delivered-as-descoped (2026-07-19).** Passes 0–2 (Phases 0–37, topics 1–33 +
 > capstones) delivered, live, and **deployed to production**. Passes 3–5 (topics 34–94) **transferred**
 > to the successor plan
-> [`fundamentally-strong-shared-course-tracks`](../../in-progress/fundamentally-strong-shared-course-tracks/README.md)
+> [`shared-course-library-and-learning-paths`](../../in-progress/shared-course-library-and-learning-paths/README.md)
 > (shared course library + two path manifests: `interview-ready` / `immediately-effective`). Not
 > abandoned. See [delivery.md §Terminal Status](./delivery.md#terminal-status--closed-delivered-as-descoped-2026-07-19).
 

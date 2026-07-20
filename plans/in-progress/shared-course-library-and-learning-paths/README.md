@@ -264,7 +264,7 @@ and the native authoring of the 61 transferred topics — it does not wait on an
 
 ## Delivery Mode: worktree-to-pr
 
-`worktree-to-pr` (the repo default): work in `worktrees/fundamentally-strong-shared-course-tracks/`,
+`worktree-to-pr` (the repo default): work in `worktrees/shared-course-library-and-learning-paths/`,
 open a draft PR per phase against `main`, run the PR-Review Maker→Fixer Cycle (3 sequential CI-gated
 cycles), then `[AI]` merges automatically once the review and all quality gates are green — a
 plan-scoped confirmation of the repo-default `[AI]` merge, which this plan does not opt out of (see

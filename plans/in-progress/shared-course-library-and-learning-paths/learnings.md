@@ -1,4 +1,4 @@
-# Learnings: fundamentally-strong-shared-course-tracks
+# Learnings: shared-course-library-and-learning-paths
 
 None yet.
 

@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [fundamentally-strong-shared-course-tracks](./fundamentally-strong-shared-course-tracks/README.md)
+- [shared-course-library-and-learning-paths](./shared-course-library-and-learning-paths/README.md)
   — re-architects the fundamentally-strong curriculum into a shared, path-neutral course library
   (`/en/c/learn/courses/<course-id>`) consumed by three converging path manifests at
   `/en/c/learn/paths/<path-id>` — `interview-ready/software-engineer` (interview-first),

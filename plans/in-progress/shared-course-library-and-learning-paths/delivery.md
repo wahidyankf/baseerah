@@ -47,12 +47,12 @@ execution.
 
 One **shared worktree** for the whole plan (one checkout, many branches, many PRs):
 
-Worktree path: `worktrees/fundamentally-strong-shared-course-tracks/`
+Worktree path: `worktrees/shared-course-library-and-learning-paths/`
 
 Optional manual pre-provisioning (run from repo root):
 
 ```bash
-claude --worktree fundamentally-strong-shared-course-tracks
+claude --worktree shared-course-library-and-learning-paths
 ```
 
 The plan-execution Step 0 gate enters this shared worktree by default: it auto-provisions from the
@@ -61,7 +61,7 @@ deleting the worktree after the plan is archived and pushed.
 
 Every phase branches from the **latest `origin/main`** inside this one shared worktree
 (`git fetch origin && git checkout main && git pull && git checkout -b
-fundamentally-strong-shared-course-tracks/<phase-slug>`), authors its work there, commits, pushes that
+shared-course-library-and-learning-paths/<phase-slug>`), authors its work there, commits, pushes that
 branch, and opens **its own draft PR**.
 
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and
@@ -93,7 +93,7 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
 
 1. [AI] Sync the shared worktree to latest `origin/main` and branch:
    `git fetch origin && git checkout main && git pull && git checkout -b
-fundamentally-strong-shared-course-tracks/<phase-slug>`.
+shared-course-library-and-learning-paths/<phase-slug>`.
 2. [AI] Stage only this phase's paths (`git add <explicit paths>` — never `git add -A`), commit
    thematically (Conventional Commits, imperative, no period), push the branch, open a **draft PR**
    against `main` (`gh pr create --draft --base main ...`) — CI runs on the PR.
@@ -1518,7 +1518,7 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
 ## Phase 15: Final `origin/main` Integration & CI Verification
 
 - [ ] [AI] Confirm no plan PR is still open: every prior phase branch has been `[AI]`-merged to `main`
-      (`gh pr list --search "fundamentally-strong-shared-course-tracks" --state open` returns zero) —
+      (`gh pr list --search "shared-course-library-and-learning-paths" --state open` returns zero) —
       acceptance: no open plan PRs remain.
 - [ ] [AI] Sync the shared worktree to latest `origin/main` and run the full affected suite:
       `npx nx affected -t typecheck lint test:quick test:unit test:integration test:e2e specs:behavior:coverage` + `npx nx run ayokoding-www:build` — acceptance: all exit 0 on the integrated `main`.
@@ -1579,13 +1579,13 @@ status,conclusion` per wakeup; never `gh run watch`) — acceptance: all GitHub 
 - [ ] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `evidence/`; the `en` content locale exercised (per brd.md's Indonesian-mirror-deferred non-goal).
 - [ ] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit user permission (only when genuinely impossible); SG-###/USS-### may be triaged/deferred.
 - [ ] [AI] Verify all four path manifests are published, all four landings live, the paths hub shows all four paths (2×2 grid), and the library holds the full 127-course catalog (121 software-engineer-role baseline + 6 AI-specific); every prior-phase PR `[AI]`-merged and deployed (Phase 15 checkpoint green).
-- [ ] [AI] Move: `git mv plans/in-progress/fundamentally-strong-shared-course-tracks/
-plans/done/YYYY-MM-DD__fundamentally-strong-shared-course-tracks/` using today's completion date (the
+- [ ] [AI] Move: `git mv plans/in-progress/shared-course-library-and-learning-paths/
+plans/done/YYYY-MM-DD__shared-course-library-and-learning-paths/` using today's completion date (the
       `evidence/` subfolder moves with it).
 - [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
 - [ ] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`, `plans/backlog/README.md`).
-- [ ] [AI] Commit the archival: `chore(plans): move fundamentally-strong-shared-course-tracks to done`.
+- [ ] [AI] Commit the archival: `chore(plans): move shared-course-library-and-learning-paths to done`.
 
 ### Phase 17 Gate
 
@@ -1617,7 +1617,7 @@ plans/done/YYYY-MM-DD__fundamentally-strong-shared-course-tracks/` using today's
 
 ### Note: plan location at archival time
 
-This plan was promoted from `backlog/` to `in-progress/fundamentally-strong-shared-course-tracks/`
+This plan was promoted from `backlog/` to `in-progress/shared-course-library-and-learning-paths/`
 (date prefix stripped) on 2026-07-19, per the plan lifecycle. The `git mv` in Phase 17 therefore
-archives from that `in-progress/` path to `done/YYYY-MM-DD__fundamentally-strong-shared-course-tracks/`
+archives from that `in-progress/` path to `done/YYYY-MM-DD__shared-course-library-and-learning-paths/`
 using the completion date.
