@@ -21,6 +21,11 @@ Planned projects for future implementation.
   — corrects `CONTRIBUTING.md`, which still tells contributors to work directly on `main` despite
   `worktree-to-pr` being the default delivery mode, and lands the naming exemption that currently
   makes any edit to that file unlandable at pre-commit.
+- [2026-07-20\_\_harness-binding-catalog-drift](./2026-07-20__harness-binding-catalog-drift/README.md)
+  — triages the external-drift findings from the 2026-07-20 harness-compatibility audit (Windsurf's
+  rebrand to Devin Desktop, the Codex CLI custom-agent declaration move, Copilot's MCP and skills
+  surfaces), each to be re-verified before acting since several are MEDIUM confidence. Phase 0
+  parity was clean; this is entirely external drift.
 - [2026-07-20\_\_pr-review-bot-identity](./2026-07-20__pr-review-bot-identity/README.md)
   — provisions a dedicated GitHub App / CI-scoped identity for `pr-review-maker`, so blocking
   reviews can post as `REQUEST_CHANGES` instead of landing as `COMMENT` and reading as unblocked.
