@@ -107,7 +107,9 @@ The path-aware navigation adds/changes **three user-facing screens** in `ayokodi
 app), all under the `/en/c/learn` URL model. Each screen runs the diverge → narrow → select → justify
 funnel. Low-fidelity wireframes are authored below; the two high-fidelity finalists per screen are
 produced as `.excalidraw.png` assets under this plan's `assets/` during Group A (delivery steps emit
-them) and embedded here.
+them) and embedded here. Repo-grounded **textual** hi-fi specifications for each chosen screen are
+authored in [Hi-Fi Specifications](#hi-fi-specifications-textual-repo-grounded) below and are the
+source of truth those PNGs render.
 
 > **Pending assets note**: hi-fi assets are produced during execution — the six `![]()` hi-fi finalist image links
 > below (two per screen, Screens 1-3) intentionally do not resolve yet. `delivery.md` Group A
@@ -316,6 +318,142 @@ and `![Course in path — left rail](./assets/course-path-option-b.excalidraw.pn
 | ------------------ | ---------------------------------------------------------------------------------------------- |
 | A — top banner ✅  | Minimal change to the existing content layout; reuses `breadcrumb` + `prev-next`; mobile-first |
 | B — left path rail | Rich, but a desktop-only pattern that fights the existing sidebar and needs a mobile sheet     |
+
+### Hi-Fi Specifications (Textual, Repo-Grounded)
+
+These **textual hi-fi specifications** complement the deferred `.excalidraw.png` finalists (produced
+in Group A) — they pin the chosen **Option A** of each screen to concrete, existing design-system
+facts so both the hi-fi PNGs and the Group-A/B build have an unambiguous target. Every primitive,
+token, and class named below is **repo-grounded** in `@open-sharia-enterprise/web-ui` (barrel) /
+`@open-sharia-enterprise/web-ui/primitives` and the AyoKoding token layer (`libs/web-ui-token`,
+`apps/ayokoding-www/src/app/globals.css`), verified against the existing `prev-next`, `breadcrumb`,
+and `section-card` components — nothing here invents a primitive or token. The provisional-diverge and
+R7 caveats above still apply: if the R7 sweep changes a selection, the matching spec below is re-pinned
+before its PNG is drawn.
+
+#### Shared design legend (all three screens)
+
+- **Import surface**: `@open-sharia-enterprise/web-ui` (composite `Button`, `Badge`, `Card*`,
+  `Alert*`) and `@open-sharia-enterprise/web-ui/primitives` where a primitive is required — **not**
+  `ts-web-ui`.
+- **Color tokens** (Tailwind classes): surfaces `bg-background` / `bg-card` / `bg-accent`; text
+  `text-foreground` / `text-muted-foreground` / `text-card-foreground` / `text-primary`; borders
+  `border-border`; focus `ring-ring`. AyoKoding brand primary is **honey/amber**
+  (`--color-primary: var(--hue-honey)`).
+- **Per-path accent hue** (the 6-hue system with `-wash` fill / `-ink` text variants): interview-ready
+  → `honey`, immediately-effective → `teal`, fundamentally-strong → `sage`,
+  swe→ai-engineer → `plum` — used as `bg-[var(--hue-<h>-wash)]` fills and `text-[var(--hue-<h>-ink)]`
+  accents so the four paths are colour-coded consistently across hub, landing, and banner. Hue is
+  **never the sole signal** (always paired with the path name/number/icon); the final hue↔path map is
+  confirmed at draw time and must hold WCAG-AA for `-ink` text on `-wash`.
+- **Radius / elevation**: cards `rounded-xl` (20px on the AyoKoding scale); insets `rounded-lg`;
+  `shadow-sm` at rest → `shadow-md` on hover.
+- **Breakpoints**: `sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280 — the only prefixes this app uses. The
+  content column stays fluid `flex-1 px-6 py-8 lg:px-8` inside the `max-w-screen-2xl` content shell;
+  the right TOC rail (`w-[200px]`, `hidden xl:block`) and resizable sidebar (`hidden md:block`) are
+  untouched.
+- **A11y baseline** (mirrors existing components): each new navigation region is a
+  `<nav aria-label="…">`; lists are semantic `<ol>`/`<ul>` (this app uses semantic lists, not
+  `role="list"`); the canonical focus ring is `focus-visible:ring-2 focus-visible:ring-ring`; the
+  current location uses `aria-current="page"`; the global skip-link → `#main-content` is unchanged.
+
+#### Screen 1 hi-fi — Paths hub (`/en/c/learn/paths`), Option A (2×2 card grid)
+
+- **Container**: content column; inner `<section className="mx-auto max-w-6xl px-6 py-8 lg:px-8">`.
+  Header: `<h1 className="text-4xl font-extrabold tracking-tight">` "Choose your path" +
+  `<p className="mt-2 text-muted-foreground">` "One library, converging within your role."
+- **Grid**: `<ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">` — one column `<md`, **2×2** at
+  `md+`; four `<li>`.
+- **`PathCard`** (net-new, composes the existing **`SectionCard` pattern** — the whole card is a single
+  `<Link className="group block focus-visible:outline-none">`, so there is **no** nested button and no
+  link-in-link trap): wraps `Card`
+  (`h-full rounded-xl transition-colors hover:bg-accent hover:shadow-md group-focus-visible:ring-2 group-focus-visible:ring-ring`).
+  Contents — a kind `Badge` (`variant="outline"` + `hue`), `CardTitle` (`text-lg font-semibold`) = path
+  name, `CardDescription` (`text-sm text-muted-foreground`) = the one-line arc
+  ("interview prep → production-effective → deeper"), a course-count `Badge`
+  (`variant="secondary" size="sm"`) "~N courses", and the `meta` affordance "Start →"
+  (`text-sm font-medium text-primary` + lucide `ArrowRight h-3.5 w-3.5`) exactly as `SectionCard`.
+- **States**: default (`bg-card border-border shadow-sm`); hover (`bg-accent shadow-md`, arrow nudges
+  `group-hover:translate-x-0.5`); focus-visible (`ring-2 ring-ring` on the card). The fourth card is
+  never visually de-ranked — equal weight is why Option A beat B.
+- **Below the grid**: a tertiary
+  `<a className="mt-6 inline-flex text-sm text-muted-foreground hover:text-foreground">` "Browse the
+  full course library →" → `/en/c/learn/courses`.
+- **Responsive**: 2×2 `md+`; single column `<md` (full-width cards, comfortable tap height; the "Start"
+  affordance lives inside the full-card tap target).
+- **A11y**: `<ul>`/`<li>`; each card `<a aria-label="Start the {path} path — {N} courses">`; the hue is
+  decorative (path name carries the meaning).
+
+#### Screen 2 hi-fi — Path landing (`/en/c/learn/paths/<path-id>`), Option A (phase-grouped numbered syllabus)
+
+- **Container**: content column `flex-1 px-6 py-8 lg:px-8`; inner reading column `max-w-3xl`. A
+  path-aware `Breadcrumb` (`Home / Learn / <Path Title>`), `<h1 className="text-4xl font-extrabold tracking-tight">`
+  = path title, `<p className="text-muted-foreground">` = arc summary, framed by a hue strip
+  (`bg-[var(--hue-<h>-wash)]`) matching the path's hub card.
+- **Fast-path callout** (interview-ready etc.): `Alert variant="info"` above the list — "Experienced &
+  job-hunting? Skip the prologue → jump to Phase 1." with an in-page anchor.
+- **Syllabus**: each phase is a `<section>` with heading
+  `<h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-muted-foreground">`
+  (`lg:sticky lg:top-16` on desktop, inline on mobile). Courses are a **semantic ordered list**
+  `<ol className="mt-3 space-y-1">` where the visible number **is** the path order; each row is a
+  `<Link>` (carrying `?path=<path-id>`) styled like the sidebar-tree link
+  (`rounded-md px-2 py-1 text-sm hover:bg-accent hover:text-foreground`). Capstone rows carry a `▸`
+  marker + a `Badge variant="outline" hue` "Capstone".
+- **States**: rows are **stateless links** (no per-user progress store in scope); the skippable prologue
+  phase is dimmed (`text-muted-foreground`) with a `Badge size="sm"` "skippable".
+- **Responsive**: full-width single column `<lg`; `max-w-3xl` reading column `lg+`; phase headings
+  sticky only where there is vertical room (`lg+`).
+- **A11y**: `<nav aria-label="{Path} syllabus">` around the phases; each phase an `<ol>` so reading
+  order and "course k of N" are programmatically derivable — numbers are list semantics, not decoration.
+
+#### Screen 3 hi-fi — Course page in path context, Option A (banner + breadcrumb + prereqs + prev/next)
+
+The **unchanged, path-neutral course body** renders as today (`article className="min-w-0 flex-1 px-6 py-8 lg:px-8"`,
+`h1 text-4xl font-extrabold`, `MarkdownRenderer`) with four affordances layered around it.
+
+- **`PathBanner`** (net-new, above the breadcrumb, only when `?path=` is present): full-width strip
+  `<div className="mb-4 flex items-center justify-between rounded-lg bg-[var(--hue-<h>-wash)] px-4 py-2 text-sm">`
+  — left `▸ On path: <Path> · course <k> of <N>` (`text-[var(--hue-<h>-ink)] font-medium`), right a
+  "view full path" `<Link>` (`underline-offset-2 hover:underline`) → the path landing.
+- **Path-aware `Breadcrumb`**: `Home / Learn / <Path Title> / <Course Title>` (the `<Path Title>` crumb
+  links to the landing with `?path=`), via the extended component below.
+- **`PrerequisiteList`** (net-new, shown in **both** path and canonical views):
+  `<p className="text-sm text-muted-foreground"><span className="font-medium text-foreground">Prerequisites:</span> …</p>`
+  where each prerequisite is a `<Link>` (carrying `?path=` in path context) separated by `·`. **Empty
+  state**: the whole line is omitted when the course has no prerequisites (never an empty
+  "Prerequisites:").
+- **`PrevNext` (path-aware)**: existing component, markup unchanged; `prev`/`next` come from the
+  **manifest** (not `weight`) and both hrefs keep `?path=<path-id>`; bottom of article as today
+  (`mt-12 border-t pt-6`).
+- **Canonical fallback (no `?path=`)**: no banner; breadcrumb `Home / Learn / Courses / <Course Title>`;
+  `PrerequisiteList` still shows; and a **`PathCourseLinks`** (net-new) affordance renders below the
+  body: `<div className="mt-8 text-sm"><span className="text-muted-foreground">This course is part of:</span> …</div>`
+  with **one `Badge` link per path whose manifest `courseOrder` actually lists this course** (hue per
+  path, `variant="outline"`, wrapped in a `<Link>` to that path's landing). A course a path only
+  **links** (not includes) shows no badge for it (DD-24) — `coding-interview` shows three badges; an
+  AI-specific course shows a single `SWE → AI Engineer` badge.
+- **States**: with-path (banner + path breadcrumb + manifest prev/next); without-path (canonical
+  breadcrumb + `PathCourseLinks` + canonical neighbours or omitted prev/next); no-prereq (list
+  omitted); single-path course (one `PathCourseLinks` badge).
+- **Responsive**: banner full-width at all breakpoints; `PrevNext` stacks `<sm`, left/right `sm+`
+  (unchanged); `PathCourseLinks` badges wrap.
+- **A11y**: banner is a `<nav aria-label="Path position">`; "course k of N" is real text; prerequisite
+  and path-course affordances are semantic inline link lists; hue badges always carry the path name as
+  text.
+
+#### Extended existing components (additive props, no fork)
+
+- **`PrevNext`** (`apps/ayokoding-www/src/features/navigation/shell/prev-next.tsx`): markup unchanged
+  (`<nav aria-label="Page navigation">`, `ChevronLeft/Right`, eyebrow + title). Change is
+  **data-source only** — `prev`/`next` resolve from the active path manifest and both `<Link>` hrefs
+  append `?path=<path-id>`; with no path context they fall back to canonical neighbours (or render
+  `null` when both are null, as today).
+- **`Breadcrumb`** (`.../navigation/shell/breadcrumb.tsx`): reuse `segments` + `contentHrefs` as-is; add
+  optional path context so a `<Path Title>` segment is injected (linking to the landing with `?path=`)
+  and downstream `href`s carry `?path=`. `showCurrent` / `aria-current="page"` behaviour unchanged.
+- **`contentUrl()`** (`.../content/core/content-url.ts`): add an optional `pathId` that appends
+  `?path=<path-id>`, so breadcrumb, prev/next, and prerequisite link builders all produce
+  path-preserving URLs from one place.
 
 ## Acceptance Criteria (Gherkin)
 
