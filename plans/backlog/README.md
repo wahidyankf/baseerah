@@ -11,6 +11,11 @@ that genuinely need a full plan's depth to answer.
   (`/en/c/learn/courses/<course-id>`) consumed by converging path manifests at
   `/en/c/learn/paths/<path-id>` (`interview-ready`, `immediately-effective`, `fundamentally-strong`
   software-engineer paths). Delivery Mode: `worktree-to-pr`; strict double-zero PQG.
+- [bare-repo-governance-hardening](./bare-repo-governance-hardening/README.md) — authors the
+  previously-undocumented base-worktree landing method, fixes the local-`main`-lags-`origin` drift it
+  causes, and closes four bare-repo/delivery-mode governance-doc gaps (including the
+  `git rev-parse --is-bare-repository` trap), then propagates all of it to `ose-primer` and
+  `ose-infra`. Promoted from two two-pagers. Delivery Mode: `worktree-to-pr`.
 
 Other candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md); promote one
 here when it is ripe.
