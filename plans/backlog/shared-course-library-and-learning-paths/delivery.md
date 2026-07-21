@@ -1617,7 +1617,8 @@ plans/done/YYYY-MM-DD__shared-course-library-and-learning-paths/` using today's 
 
 ### Note: plan location at archival time
 
-This plan was promoted from `backlog/` to `in-progress/shared-course-library-and-learning-paths/`
-(date prefix stripped) on 2026-07-19, per the plan lifecycle. The `git mv` in Phase 17 therefore
-archives from that `in-progress/` path to `done/YYYY-MM-DD__shared-course-library-and-learning-paths/`
-using the completion date.
+This plan was promoted from `backlog/` to `in-progress/` on 2026-07-19, then relegated back to
+`backlog/shared-course-library-and-learning-paths/` on 2026-07-21. When work resumes it is
+re-promoted to `in-progress/shared-course-library-and-learning-paths/` (date prefix stripped) per the
+plan lifecycle; the `git mv` in Phase 17 then archives from that `in-progress/` path to
+`done/YYYY-MM-DD__shared-course-library-and-learning-paths/` using the completion date.

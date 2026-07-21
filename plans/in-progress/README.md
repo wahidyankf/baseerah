@@ -4,15 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [shared-course-library-and-learning-paths](./shared-course-library-and-learning-paths/README.md)
-  — re-architects the fundamentally-strong curriculum into a shared, path-neutral course library
-  (`/en/c/learn/courses/<course-id>`) consumed by three converging path manifests at
-  `/en/c/learn/paths/<path-id>` — `interview-ready/software-engineer` (interview-first),
-  `immediately-effective/software-engineer` (build-fast-first), and
-  `fundamentally-strong/software-engineer` (theory-first, complete mastery). 121 courses composed
-  curated-and-converging (121/119/116 per path) over one prerequisite DAG; legacy `_index.md`
-  browse preserved additively. Delivery Mode: `worktree-to-pr`. PQG: strict double-zero.
-  Build work follows the governance plan below.
+_None currently active._ Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md);
+promote one here when work begins.
 
 ## Instructions
 

@@ -6,8 +6,14 @@ that genuinely need a full plan's depth to answer.
 
 ## Planned Projects
 
-_None currently queued._ Candidate work lives as two-pager idea briefs in
-[`../ideas/`](../ideas/README.md); promote one here when it is ripe.
+- [shared-course-library-and-learning-paths](./shared-course-library-and-learning-paths/README.md)
+  — re-architects the fundamentally-strong curriculum into a shared, path-neutral course library
+  (`/en/c/learn/courses/<course-id>`) consumed by converging path manifests at
+  `/en/c/learn/paths/<path-id>` (`interview-ready`, `immediately-effective`, `fundamentally-strong`
+  software-engineer paths). Delivery Mode: `worktree-to-pr`; strict double-zero PQG.
+
+Other candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md); promote one
+here when it is ripe.
 
 ## Instructions
 
