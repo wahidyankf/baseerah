@@ -40,7 +40,7 @@ This convention establishes the organizational structure for project planning do
 
 ### What This Convention Covers
 
-- **Plans directory structure** - ideas.md, backlog/, in-progress/, done/ organization
+- **Plans directory structure** - ideas/, backlog/, in-progress/, done/ organization
 - **Folder naming pattern** - stage-aware: no date prefix in `backlog/` or `in-progress/`; completion-date prefix in `done/` only
 - **File organization** - What files belong in each folder
 - **Lifecycle stages** - How plans move from ideas → backlog → in-progress → done
@@ -72,13 +72,19 @@ The `plans/` folder is organized into four main components:
 
 ```
 plans/
-├── ideas.md         # Quick 1-3 liner ideas not yet formalized into plans
+├── ideas/           # Two-pager idea briefs not yet formalized into full plans
 ├── backlog/         # Planned projects for future implementation
 ├── in-progress/     # Active plans currently being worked on
 └── done/            # Completed and archived plans
 ```
 
 ### Subfolder Purposes
+
+**ideas/** - Idea Briefs (Two-Pagers)
+
+- Contains **two-pagers**: shortened, promotable idea briefs — richer than a one-line todo, but NOT full five-document plans
+- Each idea is one `<slug>.md` file; the folder has a `README.md` index
+- The first lifecycle stage: ripe two-pagers are promoted to `backlog/` as full plans (see [Ideas Folder (Two-Pagers)](#ideas-folder-two-pagers) below)
 
 **backlog/** - Planning Queue
 
@@ -100,45 +106,129 @@ plans/
 - Serves as historical record of project evolution
 - Each subfolder has a `README.md` listing all completed plans
 
-## Ideas File
+## Ideas Folder (Two-Pagers)
 
-**Location**: `plans/ideas.md` (root level of plans/ folder)
+**Location**: `plans/ideas/` (folder at the root of `plans/`)
 
-**Purpose**: Capture quick ideas and todos that haven't been formalized into full plan documents yet.
+**Purpose**: Capture pre-plan ideas as **two-pagers** — shortened, promotable idea briefs that are
+richer than a one-line todo but deliberately **NOT** the full five-document plan. Each idea is its own
+file; the folder carries a `README.md` index. `ideas/` is the first stage of the plan lifecycle:
 
-### Characteristics
-
-- **Lightweight**: Simple markdown file with bullet points or numbered lists
-- **Quick Capture**: Each idea should be 1-3 lines maximum
-- **No Structure**: No formal plan structure required
-- **Brainstorming**: Ideas that need more thought before becoming formal plans
-
-### Format
-
-```markdown
-# Ideas
-
-Quick ideas and todos that haven't been formalized into plans yet.
-
-- Add OAuth2 authentication system with Google and GitHub providers
-- Implement real-time notification system using WebSockets
-- Create admin dashboard for user management and analytics
-- Optimize database queries for better performance
+```text
+ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 ```
+
+### Why a Two-Pager (Not a One-Liner, Not a Full Plan)
+
+A two-pager sits between a throwaway one-line todo and a full backlog plan: short enough to write in
+one sitting and triage at a glance, yet structured enough that a reader can decide whether to promote
+it. The format is a synthesis of the common denominator across established short-proposal formats —
+Amazon's PR/FAQ, Basecamp's Shape Up "pitch", Architecture Decision Records (ADR), Google's "mini
+design doc", and the Rust RFC — all of which name the problem, sketch a solution at a level that
+invites debate rather than forecloses it, state what is explicitly out of scope, name the open
+questions, and define what success looks like, inside a one-to-two-page ceiling (ADR: _"the whole
+document should be one or two pages long"_; Google's mini design doc: _"1-3 pages"_). The full
+five-document plan is the deliberately-longer sibling the two-pager is promoted into.
+
+### File Layout
+
+- **`plans/ideas/README.md`** — index of current two-pagers (one bulleted link + one-line hook each),
+  a short statement of this convention, and the promotion criteria. Mirrors the shape of
+  `backlog/README.md`.
+- **`plans/ideas/<slug>.md`** — one two-pager per idea. Kebab-case slug, **no date prefix** (like
+  `backlog/` and `in-progress/`; only `done/` carries a date prefix).
+
+### Integrate Before You Add (No Duplicate Two-Pagers)
+
+Before creating a new two-pager, **scan `plans/ideas/` first** (start with its `README.md` index) for
+an existing brief that already covers the same problem or area — and **fold the new thought into that
+brief** rather than adding a near-duplicate file. Two two-pagers about the same underlying problem
+should be one. Consolidate related briefs when they converge on the same idea; split a brief only when
+it is genuinely two separable ideas.
+
+This applies equally when the [Knowledge Capture phase](#the-knowledge-capture-phase-final-phase-before-archival)
+routes a learning here: check for an existing home before opening a new file. The goal is a folder of
+distinct, non-overlapping ideas — not a pile that repeats itself.
+
+### Two-Pager Template
+
+Each `plans/ideas/<slug>.md` has an H1 title plus ~7 short sections, targeting ≤ ~2 printed pages:
+
+1. **`# <Idea title>` + one-line summary** — one sentence a stranger understands, telling a reader
+   whether reading on is worth it (the "abstract test"). When the idea originated from a plan, add a
+   provenance note: `> Surfaced YYYY-MM-DD during <plan-slug> execution.` or, for a standalone idea,
+   `> Idea, added YYYY-MM-DD.`
+2. **Problem / context** — a single specific example of why the status quo doesn't work, plus what
+   prompted it — not an abstract pain point. **Ground it in concrete data points** where they exist:
+   counts, sizes, measurements (e.g. "83 missing step definitions", "AGENTS.md at 29,983 B against a
+   30,000 B limit", "4 files drifted"). A data-pointed problem is promotable; a vague one is not.
+3. **Why now** — the urgency, dependency, or opportunity window that makes this timely.
+4. **Proposed direction (sketch)** — the core elements at a level a reader _immediately_ grasps; cap
+   to roughly three elements. **Explicitly NOT** wireframes, file paths, API signatures, or Gherkin —
+   that detail is the backlog plan's job (Shape Up: _"we don't want to over-specify the design with
+   wireframes or high-fidelity mocks"_).
+5. **Rough scope & non-goals** — in-scope bullets, plus an explicit **Out of scope (for now)** list.
+   Non-goals name things a reader would _reasonably expect_ in scope and deliberately exclude them
+   ("ACID compliance", not "the system shouldn't crash").
+6. **Risks & open questions** — rabbit holes worth flagging now, plus named unknowns that block
+   promotion. Zero open questions is a smell: the idea is either over-specified or under-thought.
+7. **What success looks like + promotion signal** — the condition that would make the idea worth
+   having pursued (observable fact / cited+dated number / explicitly-labeled judgment call — **never a
+   fabricated KPI**), and what "ready to become a `backlog/` plan" means for _this_ idea.
+
+### Two-Page Discipline
+
+- **One paragraph per section, full sentences** — not bullet sprawl; length is enforced by _omission_,
+  never by font size or margins.
+- **The solution stays "immediately understandable", never wireframe- or file-level** — naming
+  specific files, functions, or exact layouts means you've drifted into full-plan territory.
+- **No BRD/PRD/tech-docs/delivery split, no Gherkin, no delivery checklist, no phase gates** — those
+  belong to the five-document backlog plan.
+- **Ground the problem in data points** — cite the concrete count, size, or measurement that
+  evidences it. If no baseline exists, say so plainly (_"no baseline measured"_) rather than inventing
+  one — an honestly-unquantified problem is fine; a fabricated number is not.
+- **No fabricated metrics** — state success as an observable fact, a cited number with source + access
+  date, or an explicitly-labeled judgment call (_"Judgment call: we expect X; no baseline measured"_).
+  This inherits the [BRD success-metric rule](#content-placement-rules-brdmd-vs-prdmd).
+- **The summary compresses the whole document**, it does not restate the problem paragraph.
+- **No secrets** — the folder is committed and world-readable; the [No Secrets in Git](../security/no-secrets-in-committed-files.md) hard rule applies in full.
 
 ### Difference from backlog/
 
-- **ideas.md**: 1-3 liner quick captures without detailed structure
-- **backlog/**: Full plan folders with structured requirements, tech-docs, and delivery files
+- **`ideas/` two-pager**: a promotable idea brief — problem, sketch, scope, open questions — with no
+  BRD/PRD/tech-docs/delivery split and no delivery checklist.
+- **`backlog/`**: a full plan folder with structured requirements, tech-docs, and delivery files,
+  ready to execute.
 
-### Promoting an Idea to a Plan
+### Promoting a Two-Pager to a Full Plan
 
-When an idea is ready for formal planning:
+Promotion is a **completeness gate, not a perfection gate**: an idea is ripe to promote when every
+section holds a real answer — _including honest open questions_ — and the remaining open questions are
+ones that genuinely need the full plan's deeper design/research to answer. "Not promoted yet" is a
+distinct, legitimate state from "rejected" (timing and fit are separate axes from brief quality).
 
-1. Create a new plan folder in `backlog/` with `[project-identifier]/` format (no date prefix)
-2. Create the standard plan files (README.md or multi-file structure)
-3. Remove or check off the idea from `ideas.md`
-4. The idea now has a structured plan with requirements, technical docs, and delivery timeline
+When a two-pager is ripe:
+
+1. Create a new plan folder in `backlog/` with `[project-identifier]/` format (no date prefix) —
+   default to the five-document multi-file layout (see [Structure Decision](#structure-decision)).
+2. Carry the two-pager's problem, scope, and open questions forward into the plan's `brd.md` / `prd.md`.
+3. **Delete** the two-pager and remove its line from `plans/ideas/README.md` (the idea now lives as a
+   plan).
+
+### Ideas as a Home for Execution Learnings
+
+The [Knowledge Capture phase](#the-knowledge-capture-phase-final-phase-before-archival) routes some
+plan-execution learnings here: a **future-work idea** that is richer than a one-liner but not yet
+plan-ready becomes a two-pager in `plans/ideas/`, rather than being filed straight as a backlog plan
+or discarded. The [Knowledge Capture Convention](../../development/quality/knowledge-capture.md)'s
+routing matrix names `plans/ideas/` as one of its candidate durable homes.
+
+### Worked Examples
+
+Two illustrative short-proposal artifacts already live in the repo's teaching content and are useful
+models for the two-pager's shape: a Shape Up pitch
+(`apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/software-product-engineering/learning/artifacts/ex-29-shape-up-pitch.md`)
+and a product brief (`…/ex-30-full-product-brief-consistency.md`).
 
 ## Plan Folder Naming
 
@@ -658,8 +748,8 @@ Plans differ from `docs/` in several important ways:
 
 ### Creating Plans
 
-1. **Start with an idea**: Capture quick idea in `ideas.md` (1-3 lines)
-2. **Formalize when ready**: Create plan folder in `backlog/` when idea is mature
+1. **Start with an idea**: Capture the idea as a two-pager in `plans/ideas/<slug>.md` (see [Ideas Folder (Two-Pagers)](#ideas-folder-two-pagers))
+2. **Formalize when ready**: Promote the two-pager to a full plan folder in `backlog/` when it is ripe
 3. **Follow naming convention**: Use `[project-identifier]/` format (no date prefix in `backlog/`)
 4. **Choose structure**: Default to the five-document multi-file layout (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery.md`). Collapse to single-file only when all four exception criteria in the Structure Decision section are met simultaneously.
 5. **Resolve design decisions via structured grilling**: Before writing plan content, resolve all
@@ -810,6 +900,11 @@ Plan files sit three directory levels deep from the repository root: `plans/` �
 | `apps/organiclever-be/README.md`                 | `../../../`    |
 | Sibling file in the same plan folder             | `./`           |
 
+**Two-pagers are one level shallower.** A two-pager lives directly at `plans/ideas/<slug>.md`
+(two levels deep, not three like a `plans/<stage>/<slug>/` plan file), so it reaches
+`repo-governance/...` with `../../` — not `../../../`. Sibling two-pagers and the folder README
+resolve with `./`.
+
 ### Example
 
 A plan at `plans/in-progress/my-feature/README.md` links to the AI Agents Convention:
@@ -879,12 +974,13 @@ another gitignored file.
 - Check off deliverables as completed
 - Add notes about challenges or learnings
 
-### Use Ideas File Liberally
+### Use the Ideas Folder Liberally
 
-- Capture ideas quickly without overthinking
-- Don't worry about perfect wording
-- Review ideas periodically and promote mature ones to plans
-- Archive or delete ideas that are no longer relevant
+- Before adding a new two-pager, scan `plans/ideas/` for an existing brief on the same problem and fold it in — don't repeat yourself (see [Integrate Before You Add](#integrate-before-you-add-no-duplicate-two-pagers))
+- Capture an idea as a two-pager as soon as it is worth more than a passing thought — one file per _distinct_ idea
+- Keep it a brief, not a plan: fill each section with a real answer, including honest open questions
+- Review two-pagers periodically and promote ripe ones to full `backlog/` plans
+- Delete two-pagers that are no longer relevant (they carry no history worth keeping — that is what `done/` is for)
 
 ### Maintain Indices
 
@@ -957,28 +1053,45 @@ How to confirm done...
 └── delivery.md              # ~200 lines (phased rollout plan)
 ```
 
-### Example: Ideas File
+### Example: Two-Pager Idea Brief
+
+A single `plans/ideas/<slug>.md`, e.g. `plans/ideas/api-rate-limiting.md`:
 
 ```markdown
-# Ideas
+# API rate limiting
 
-Quick ideas and todos that haven't been formalized into plans yet.
+One-line summary: cap per-client request rates so a single caller cannot degrade the API for everyone.
 
-## Authentication & Security
+> Surfaced 2026-03-14 during load-testing-hardening execution.
 
-- Add OAuth2 support for Google and GitHub
-- Implement API rate limiting
-- Add 2FA support for admin accounts
+## Problem / context
 
-## Performance
+During load testing one misconfigured client sent ~40 req/s and drove p99 latency for all other
+callers above 2s. Nothing in the stack bounds a single client's request rate today.
 
-- Optimize database queries with proper indexing
-- Add Redis caching layer
-- Implement CDN for static assets
+## Why now
 
-## User Experience
+We are about to expose the API to third-party integrators, so an abusive or buggy caller stops being
+hypothetical.
 
-- Add dark mode toggle
-- Implement keyboard shortcuts
-- Add progressive web app support
+## Proposed direction (sketch)
+
+- A token-bucket limiter keyed by API key, enforced at the edge.
+- Return `429` with a `Retry-After` header when the bucket is empty.
+- Per-key limits configurable; a sane default applies when unset.
+
+## Rough scope & non-goals
+
+In scope: per-key request-rate limiting and the `429` response.
+Out of scope (for now): per-endpoint quotas, billing/usage metering, distributed limiter state.
+
+## Risks & open questions
+
+- Where does limiter state live so it survives multiple API instances? (open)
+- What default rate is generous enough not to break normal integrators? (open — needs a baseline)
+
+## What success looks like + promotion signal
+
+Success: one abusive key can no longer raise other callers' p99. Ready to promote once the state-store
+question is answered well enough to design against — the rest is full-plan work.
 ```

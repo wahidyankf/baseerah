@@ -144,7 +144,7 @@ the whole run** (never re-expanded later — a plan added to `plans/backlog/` mi
   there, `plans/backlog/`). Fail fast with a clear error if a named plan does not exist.
 - **Set-selector** — enumerate the named bucket's folders: `all-in-progress` → every folder directly
   under `plans/in-progress/`; `all-backlog` → every folder directly under `plans/backlog/`; `all` →
-  both. Skip non-plan entries (`README.md`, `ideas.md`, `.gitkeep`).
+  both. Skip non-plan entries (`README.md`, the `ideas/` folder, `.gitkeep`).
 - **Exclusion (`except …`)** — subtract every named plan from the resolved set. Each excluded name
   MUST match a plan actually in the set; a no-op exclusion (name not in scope) is a caller error —
   report it rather than silently ignoring, so a typo'd exclusion never fails open into executing a

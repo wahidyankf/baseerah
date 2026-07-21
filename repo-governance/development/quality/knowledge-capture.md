@@ -124,16 +124,17 @@ resolves to **exactly one** home, or is discarded.
 
 ### Candidate Durable Homes (including but not limited to)
 
-| Home                                           | Route a learning here when...                                                                                                                                                              |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `repo-governance/` (rules / conventions / dev) | It is a **rule or standard** — something that should be required, forbidden, or standardized going forward.                                                                                |
-| `docs/` (Diátaxis)                             | It is a durable **fact, how-to, tutorial, or explanation** a future reader would search for.                                                                                               |
-| `.claude/agents/`                              | It changes **what a specific agent checks, makes, or fixes** — its instructions or behavior.                                                                                               |
-| `.claude/skills/`                              | It is **procedural know-how** an agent should load on-demand to perform a task well.                                                                                                       |
-| `apps/` and `libs/` **source code**            | It is an actual **bug fix, refactor, or new feature** — codebase behavior itself must change.                                                                                              |
-| **tests**                                      | It needs a **new regression test or added coverage** so the failure cannot recur unnoticed.                                                                                                |
-| `docs/explanation/post-mortems/`               | It is a **failure/incident** learning — route to a post-mortem (cross-reference; do not duplicate content). See the [Post-Mortem Convention](../../conventions/structure/post-mortems.md). |
-| `discard — not generalizable`                  | It fails the litmus: the system would **not** catch this automatically next time even if routed. Log a one-line reason.                                                                    |
+| Home                                           | Route a learning here when...                                                                                                                                                                                                                                                                                            |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `repo-governance/` (rules / conventions / dev) | It is a **rule or standard** — something that should be required, forbidden, or standardized going forward.                                                                                                                                                                                                              |
+| `docs/` (Diátaxis)                             | It is a durable **fact, how-to, tutorial, or explanation** a future reader would search for.                                                                                                                                                                                                                             |
+| `.claude/agents/`                              | It changes **what a specific agent checks, makes, or fixes** — its instructions or behavior.                                                                                                                                                                                                                             |
+| `.claude/skills/`                              | It is **procedural know-how** an agent should load on-demand to perform a task well.                                                                                                                                                                                                                                     |
+| `apps/` and `libs/` **source code**            | It is an actual **bug fix, refactor, or new feature** — codebase behavior itself must change.                                                                                                                                                                                                                            |
+| **tests**                                      | It needs a **new regression test or added coverage** so the failure cannot recur unnoticed.                                                                                                                                                                                                                              |
+| `docs/explanation/post-mortems/`               | It is a **failure/incident** learning — route to a post-mortem (cross-reference; do not duplicate content). See the [Post-Mortem Convention](../../conventions/structure/post-mortems.md).                                                                                                                               |
+| `plans/ideas/` (a two-pager idea brief)        | It is a **future-work idea** — richer than a one-liner, not yet plan-ready — that needs its own pitch/triage before it can become a full plan. Fold it into an existing two-pager if one already covers the same area (see the [Ideas Folder convention](../../conventions/structure/plans.md#ideas-folder-two-pagers)). |
+| `discard — not generalizable`                  | It fails the litmus: the system would **not** catch this automatically next time even if routed. Log a one-line reason.                                                                                                                                                                                                  |
 
 This list is not exhaustive. A learning may route to any durable surface that owns its kind of
 knowledge — these are simply the homes that recur most often in this repository.
@@ -187,6 +188,14 @@ Timing has a hard boundary determined by **destination**, not by convenience:
   plan's own commit/PR. A learning implying **large new work** becomes a tracked
   `plans/backlog/<slug>/` follow-up plan instead. The `learnings.md` entry records which
   path was taken (and the backlog path, if filed).
+- **`plans/ideas/` two-pager** (a non-code home): a **future-work idea that is not yet plan-ready**
+  becomes a two-pager filed **inline** in the current plan's own commit/PR (creating one
+  `plans/ideas/<slug>.md` is a small doc edit). Distinguish from `backlog/`: a learning that is
+  **already plan-ready** goes straight to a `plans/backlog/<slug>/` follow-up plan; a
+  promising-but-unripe idea that still needs its own pitch/triage goes to `plans/ideas/`. Fold into an
+  existing two-pager rather than duplicating. This routes the **pre-plan brief only** — any eventual
+  code work still flows through a full backlog plan when the two-pager is promoted, carrying the
+  code-routing gates above in full.
 - **Code homes** (`apps/`, `libs/`, tests): per the code-routing downstream rule above, **always** a
   separate `plans/backlog/` plan — **never** inline, no exceptions besides the Iron Rule 3
   current-plan-blocker carve-out.

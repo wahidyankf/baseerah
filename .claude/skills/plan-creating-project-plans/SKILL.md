@@ -1,6 +1,6 @@
 ---
 name: plan-creating-project-plans
-description: Comprehensive project planning standards for plans/ directory including folder structure (ideas.md, backlog/, in-progress/, done/), stage-aware naming convention (done uses YYYY-MM-DD__identifier/; backlog and in-progress use identifier/ with no date prefix), five-document file organization (README.md, brd.md, prd.md, tech-docs.md, delivery.md for multi-file default; single README.md for trivially-small single-file exception), BRD/PRD content-placement rules, Gherkin acceptance criteria, and the mandatory structured multiple-choice grilling gates (pre-write and post-write) for resolving design decisions with the user. Essential for creating structured, executable project plans.
+description: Comprehensive project planning standards for plans/ directory including folder structure (ideas/, backlog/, in-progress/, done/), stage-aware naming convention (done uses YYYY-MM-DD__identifier/; backlog and in-progress use identifier/ with no date prefix), five-document file organization (README.md, brd.md, prd.md, tech-docs.md, delivery.md for multi-file default; single README.md for trivially-small single-file exception), BRD/PRD content-placement rules, Gherkin acceptance criteria, and the mandatory structured multiple-choice grilling gates (pre-write and post-write) for resolving design decisions with the user. Essential for creating structured, executable project plans.
 ---
 
 # Creating Project Plans
@@ -68,9 +68,9 @@ for the authoritative rule, validation checklist, and examples. Invoke via the `
 
 ```
 plans/
-├── ideas.md                              # 1-3 line ideas (brainstorming)
+├── ideas/                                # Two-pager idea briefs (one file per idea)
 ├── backlog/                              # Future work
-│   └── YYYY-MM-DD__project-name/        # Planned but not started
+│   └── project-name/                   # Planned but not started (no date prefix)
 ├── in-progress/                          # Active work
 │   └── project-name/                    # Currently executing (no date prefix)
 └── done/                                 # Completed work
@@ -536,15 +536,15 @@ And their session is created with correct permissions
 
 ## Plan Lifecycle
 
-### 1. Ideation (ideas.md)
+### 1. Ideation (ideas/)
 
-**Format**: One-liner to 3-line description
+**Format**: A two-pager idea brief — one `plans/ideas/<slug>.md` per idea, ~7 short sections
+(problem, why-now, direction sketch, scope & non-goals, risks & open questions, success/promotion),
+≤ ~2 pages. Not a full plan. See the [Ideas Folder (Two-Pagers) convention](../../../repo-governance/conventions/structure/plans.md#ideas-folder-two-pagers).
+Scan `plans/ideas/` first and fold into an existing brief rather than duplicating.
 
-**Example**:
-
-```markdown
-- **Rules Consolidation**: Fix Skills naming to gerund form, add References sections, create 7 new Skills for complete agent coverage
-```
+**Example**: `plans/ideas/rules-consolidation.md` — a brief pitching Skills-naming fixes, References
+sections, and new Skills for agent coverage, with its open questions and promotion signal.
 
 ### 2. Planning (backlog/)
 
@@ -553,7 +553,7 @@ any plan content. See [Mandatory Pre-Write and Post-Write Grilling](#mandatory-p
 
 **Actions**:
 
-- Create folder with date\_\_identifier
+- Create folder with the slug identifier (no date prefix)
 - Write requirements and acceptance criteria
 - Define technical approach
 - Outline delivery phases

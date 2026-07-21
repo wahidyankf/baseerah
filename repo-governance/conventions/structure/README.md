@@ -29,7 +29,7 @@ This directory contains standards for how documentation is organized, named, and
 - [File Naming Convention](./file-naming.md) - Kebab-case filename rules for docs/, repo-governance/, and plans/ directories
 - [Instruction-File Size Budget Convention](./instruction-file-size-budget.md) - Per-surface byte thresholds for auto-loaded instruction files (`AGENTS.md`, `CLAUDE.md`, harness-specific surfaces). Enforced by `rhino-cli harness instruction-size validate` at pre-push, pre-commit, CI, and as `repo-governance audit` category 4. Sole sanctioned remediation: progressive disclosure.
 - [Per-Directory Licensing](./licensing.md) - Standards for the per-directory licensing strategy using MIT for all code in this repository
-- [Plans Organization](./plans.md) - Standards for organizing project planning documents in plans/ folder including structure (ideas.md, backlog/, in-progress/, done/), naming patterns (YYYY-MM-DD\_\_identifier/), lifecycle stages, and project identifiers
+- [Plans Organization](./plans.md) - Standards for organizing project planning documents in plans/ folder including structure (ideas/, backlog/, in-progress/, done/), naming patterns (YYYY-MM-DD\_\_identifier/), lifecycle stages, and project identifiers
 - [Post-Mortem Convention](./post-mortems.md) - Standards for blameless incident post-mortems: location (`docs/explanation/post-mortems/`), `YYYY-MM-DD-<system>-<short-failure>.md` naming, mandatory sections, the authoritative Sev-1..Sev-4 severity scale, action-item tracking, and `doc_status` lifecycle. Software-incident framing (CI/CD, Vercel outages, dependency-bump and parity-guard regressions)
 - [Programming Language Documentation Separation](./programming-language-docs-separation.md) - Establishes clear separation between repository-specific programming language style guides (docs/explanation/) and educational content (ayokoding-www). Defines scope boundaries, prerequisite requirements, cross-referencing patterns, and DRY principle application
 - [Specs Directory Structure](./specs-directory-structure.md) - Canonical C4-aware five-folder directory structure for `specs/apps/<app-family>/` — `product/`, `system-context/`, `containers/`, `components/`, `behavior/`. Defines per-surface variants (full-stack, web-only, CLI-only, multi-CLI), Gherkin domain subdirectory rules, migration path from flat-root layouts, and deterministic validation via `rhino-cli specs` commands. Cross-links to [App README vs Specs Convention](./app-readme-vs-specs.md) as the combined source of truth.
@@ -56,7 +56,7 @@ Files use kebab-case names describing their content (e.g., `getting-started.md`,
 ### Plans Lifecycle
 
 ```
-ideas.md → backlog/ → in-progress/ → done/
+ideas/ → backlog/ → in-progress/ → done/
 ```
 
 ## Related Documentation

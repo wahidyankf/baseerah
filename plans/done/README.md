@@ -259,7 +259,8 @@ Archived plans and completed project planning documents.
 
 ## Instructions
 
-**Quick Idea Capture**: For 1-3 liner ideas not ready for formal planning, use `../ideas.md`.
+**Idea Capture**: For ideas not ready for formal planning, write a two-pager in
+[`../ideas/`](../ideas/README.md) — not here.
 
 When archiving a plan:
 

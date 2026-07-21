@@ -41,8 +41,9 @@ const testDir = defineBddConfig({
   // unrelated preexisting features — the same per-scenario bookkeeping `skip-scenario` already
   // does automatically via `test.fixme`, done by hand, and a far larger unrelated-scope change
   // than this plan's own resizable-sidebar work. `skip-scenario` is deliberately project-wide
-  // because the gap it papers over is already project-wide; the follow-up (`plans/ideas.md`
-  // "ayokoding-www-fe-e2e") is to burn the ~104 scenarios down and revert to `fail-on-gen`.
+  // because the gap it papers over is already project-wide; the follow-up
+  // (`plans/ideas/ayokoding-www-e2e-coverage-gaps.md`) is to burn the ~104 scenarios down and
+  // revert to `fail-on-gen`.
   missingSteps: "skip-scenario",
 });
 

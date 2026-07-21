@@ -551,8 +551,8 @@ Two consequences bind any author or checker working on state diagrams:
    the 26–30 band, and roughly **11,800** at or under 25. A failing gate on a heuristic threshold
    would block on a defect it cannot actually detect, across a corpus this large.
 
-A candidate `rhino-cli` WARN-level rule is tracked at
-[`plans/backlog/mermaid-state-label-render-clipping-warn/`](../../../plans/backlog/mermaid-state-label-render-clipping-warn/README.md).
+A candidate `rhino-cli` WARN-level rule is tracked as a two-pager idea brief at
+[`plans/ideas/mermaid-state-label-render-clipping-warn.md`](../../../plans/ideas/mermaid-state-label-render-clipping-warn.md).
 
 ### Mermaid Best Practices
 
