@@ -116,8 +116,10 @@ or a restatement finds them.
   course, so that the corpus is trustworthy in exactly the places where being wrong is expensive.
 - As the **maintainer**, I want the manifest to be published early and grown in recorded stages, so
   that a truncated path cannot pass as complete and plan 07 is unblocked at the earliest safe moment.
-- As the **maintainer of plan 07**, I want a complete, five-field stage signal for each stage, so that
-  I can start ERP work against a verified prerequisite rather than a guess.
+- As the **maintainer, when later working on plan 07**, I want a complete, five-field
+  human/audit-readable record for each stage, so that I can quickly confirm accounting readiness
+  before starting ERP work — even though plan 07's own gates verify it independently via `test -d`
+  checks against `origin/main` and do not read this record.
 - As a **screen-reader or keyboard user**, I want the landing's ramp statement and the ordered course
   list to be fully navigable without a mouse, so that path selection works without pointing.
 
@@ -228,7 +230,7 @@ Scenario: The accounting path builds and validates green
   When the app build, the affected test tiers, and the link and heading validators run
   Then the build and every affected tier succeed
   And manifest integrity and prerequisite consistency report zero violations for the accounting manifest
-  And the manifests directory contains exactly one file this plan owns
+  And the manifests directory contains exactly one data file plus its co-located unit test this plan owns
 ```
 
 ## Product Scope
@@ -246,7 +248,8 @@ Scenario: The accounting path builds and validates green
   page bundle in the established anatomy.
 - Population of this path's card in the paths-hub / skills-category surfaces that plans 01 and 03
   own, as content only.
-- Three stage-completion signals recorded in `delivery.md` for plan 07's consumption.
+- Three stage-completion signals recorded in `delivery.md` as a human/audit-readable handoff record;
+  plan 07's own gates verify readiness independently and do not read this file.
 - Manifest integrity, prerequisite-consistency, ownership-boundary and ramp verification at every
   phase gate.
 

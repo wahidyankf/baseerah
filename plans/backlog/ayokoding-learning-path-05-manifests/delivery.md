@@ -132,12 +132,26 @@ acceptance clause below degrades to an unresolvable placeholder.
 - `<NAVSPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/` (existing domain — the three-bucket Gherkin lands beside `content-namespace-redirects.feature`)
 - Path ids: `careers/interview-ready/software-engineer`, `careers/immediately-effective/software-engineer`, `careers/fundamentally-strong/software-engineer`, `careers/immediately-effective/ai-engineer` (fourth path, manifest at `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml`)
 
-One additional constant is owned by this plan: `<MANIFESTS>published-manifests.unit.test.ts` — the
-unit-test file that asserts every published `careers/` manifest's shape, integrity, and growth state.
-It lives directly inside `<MANIFESTS>` (the unscoped root, not `<MANIFESTS>careers/`) and is **shared**
-once `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` add
-their own assertions alongside — see
-[tech-docs.md's File Impact table](./tech-docs.md#file-impact).
+One additional constant is owned by this plan: `<MANIFESTS>careers/careers-manifests.unit.test.ts` —
+the unit-test file that asserts every published `careers/` manifest's shape, integrity, and growth
+state. It lives inside `<MANIFESTS>careers/`, alongside the manifests it covers.
+
+> **It is NOT shared, and no sibling appends to it (ruled 2026-07-21).** Each plan owns its own
+> manifest **and that manifest's test**, mirroring the manifest-ownership invariant exactly:
+> `ayokoding-learning-path-06-skills-accounting` owns
+> `<MANIFESTS>skills/accounting-manifest.unit.test.ts` and `ayokoding-learning-path-07-skills-erp`
+> owns `<MANIFESTS>skills/erp-manifest.unit.test.ts`.
+>
+> An earlier draft declared a single root-level `published-manifests.unit.test.ts` shared by all
+> three plans. That was overturned for two reasons. First, it puts a file on a **three-way
+> cross-plan seam** — three independent PRs appending to one file conflict on merge, and this plan's
+> own gates would have to tolerate foreign assertions they cannot account for. Second, the sibling
+> plans had encoded it as a **conditional** ("append if the file exists, otherwise create your own"),
+> which makes the resulting file layout depend on **merge order** — a nondeterministic repository
+> structure. The name `published-manifests` also implied a scope wider than `careers/`, which is the
+> ambiguity that produced the conflict; the current name states its scope.
+
+See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 
 ---
 
@@ -240,7 +254,7 @@ their own assertions alongside — see
 
 ### 1.1 · TDD cycle A — publish the manifest data file
 
-- [ ] [AI] **RED** — create `<MANIFESTS>published-manifests.unit.test.ts` _(new file; lives in the
+- [ ] [AI] **RED** — create `<MANIFESTS>careers/careers-manifests.unit.test.ts` _(new file; lives in the
       unscoped `<MANIFESTS>` root and is shared with `ayokoding-learning-path-06-skills-accounting`
       and `ayokoding-learning-path-07-skills-erp`, see
       the path constants section above)_ with a failing assertion that
@@ -279,7 +293,7 @@ their own assertions alongside — see
       return **5**.
 - [ ] [AI] **REFACTOR** — align the YAML's key order and comment style with the schema plan's
       documented example, and factor the shared load-and-validate helper in
-      `<MANIFESTS>published-manifests.unit.test.ts` so each later manifest adds one line rather than a
+      `<MANIFESTS>careers/careers-manifests.unit.test.ts` so each later manifest adds one line rather than a
       copied block — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint`
       — acceptance: both exit 0 and no assertion was weakened (the deferred-ID check still returns 0).
 
@@ -406,7 +420,7 @@ their own assertions alongside — see
 
 ### 2.1 · TDD cycle — publish the manifest data file
 
-- [ ] [AI] **RED** — extend `<MANIFESTS>published-manifests.unit.test.ts` with a failing assertion
+- [ ] [AI] **RED** — extend `<MANIFESTS>careers/careers-manifests.unit.test.ts` with a failing assertion
       that `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml` loads, zod-validates, and
       contains the shared SWE-fundamentals prerequisite course IDs **at the head of** `courseOrder`
       (present, not absent — inverted 2026-07-21, DD-35) — command:
@@ -558,7 +572,7 @@ their own assertions alongside — see
 
 ### 3.1 · TDD cycle — publish the manifest data file
 
-- [ ] [AI] **RED** — extend `<MANIFESTS>published-manifests.unit.test.ts` with a failing assertion
+- [ ] [AI] **RED** — extend `<MANIFESTS>careers/careers-manifests.unit.test.ts` with a failing assertion
       that `<MANIFESTS>careers/immediately-effective/software-engineer.yaml` loads, zod-validates, passes both
       integrity gates, and places the build-a-real-app capstone before every pure-theory course —
       command: `npx nx run ayokoding-www:test:unit`
@@ -653,7 +667,7 @@ their own assertions alongside — see
 
 ### 4.1 · TDD cycle A — publish the manifest data file
 
-- [ ] [AI] **RED** — extend `<MANIFESTS>published-manifests.unit.test.ts` with a failing assertion
+- [ ] [AI] **RED** — extend `<MANIFESTS>careers/careers-manifests.unit.test.ts` with a failing assertion
       that `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml` loads, zod-validates, and places
       CS foundations / computer architecture / paradigms / DS&A before the build-real-software courses
       — command: `npx nx run ayokoding-www:test:unit`
@@ -693,7 +707,7 @@ their own assertions alongside — see
 ### 4.2 · TDD cycle B — no forked body across the three software-engineer paths
 
 - [ ] [AI] **RED** — add the shared-course scenario to `<SPECS>path-composition.feature` and a failing
-      assertion in `<MANIFESTS>published-manifests.unit.test.ts` that every course ID appearing in
+      assertion in `<MANIFESTS>careers/careers-manifests.unit.test.ts` that every course ID appearing in
       more than one of the three software-engineer manifests resolves to **exactly one** directory
       under `<COURSES>` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion **fails** before the check is implemented.

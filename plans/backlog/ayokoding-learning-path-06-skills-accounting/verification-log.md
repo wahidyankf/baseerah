@@ -45,10 +45,14 @@ OI-4: OPEN
   governance mechanics, adoption relationships, effective dates. Sources to check: the three fetched
   indexes plus **Bank Negara Malaysia's Shariah Governance Policy 2019**. Blocks courses #17, #18 and
   #20.
-- **OI-4** open, **cross-plan** — plan 02's doc-level rule _"A path may omit a prerequisite only if it
-  also omits every course that needs it"_ reads as forbidding this plan's link-don't-walk manifest.
-  Plan 02's **implemented** `checkPrerequisiteConsistency` already permits it, so only the prose needs
-  a cross-domain carve-out. Routed in Phase 0, never edited from here. Blocks nothing mechanically.
+- **OI-4** routed, **already answered** — plan 02's doc-level rule _"A path may omit a prerequisite
+  only if it also omits every course that needs it"_ used to read as forbidding this plan's
+  link-don't-walk manifest. Plan 02 has since published a dated ruling resolving it —
+  `tech-docs.md §"Link-don't-walk: prerequisite omission is permitted (OI-4 ruling, 2026-07-21)"` —
+  which rules Direction A **PERMITTED** and names this plan's OI-4 explicitly. Plan 02's
+  **implemented** `checkPrerequisiteConsistency` already permitted it even before the ruling; the
+  ruling brings the prose in line. Phase 0 confirms and records the ruling in the status line above
+  (never edited from here). Blocks nothing mechanically.
 
 ## Verified facts carried in (do not re-litigate, do re-confirm at authoring)
 

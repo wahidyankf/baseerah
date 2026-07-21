@@ -568,10 +568,13 @@ concurrently, bounded by the cap.
 
 ### 2.2a · TDD cycle — the manifest records its arc
 
-- [ ] [AI] **RED** — add the ERP manifest assertions to `"${MANIFESTS}published-manifests.unit.test.ts"`
-      _(existing file, owned by `ayokoding-learning-path-05-manifests` — append only)_; **if that file
-      does not exist**, create `"${MANIFESTS}skills/erp-manifest.unit.test.ts"` _(new file)_ scoped to
-      this manifest alone. The assertion: `"${ERPMAN}"` loads, zod-validates against
+- [ ] [AI] **RED** — create `"${MANIFESTS}skills/erp-manifest.unit.test.ts"` _(new file, owned by this
+      plan)_ scoped to this manifest alone. **Do not append to any sibling plan's test file** — each
+      plan owns its own manifest and that manifest's test (ruled 2026-07-21). An earlier draft made
+      this step conditional on whether a shared root-level `published-manifests.unit.test.ts` already
+      existed, which made the resulting file layout depend on **merge order** across three
+      independent PRs; that conditional is removed and this file is created unconditionally. The
+      assertion: `"${ERPMAN}"` loads, zod-validates against
       `"${FEAT}core/schemas.ts"`, and carries `pathId: skills/enterprise-resource-planning` (the
       **full** string including the category segment — no separate `category` field, DD-21) and
       `arc: immediately-effective` (the separate required field, DD-7) — command:

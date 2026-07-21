@@ -254,9 +254,13 @@ the variable-depth ruling; and it emits the Stage-1 signal that unblocks ERP #7 
 
 ### Stage-signal contract (the handoff to plan 07)
 
-Plan 07 does not wait for this plan to archive. It consumes three **stage-completion signals**, each
-recorded in this plan's `delivery.md` at the closing gate of its authoring phase. Modelled on
-`ayokoding-learning-path-04-course-authoring`'s band-completion signal; five fields, same shape.
+Plan 07 does not wait for this plan to archive. Its own Wave B/C/D gates verify readiness
+**independently** — a direct `test -d <COURSES>$course_id` check against `origin/main` for every
+course its `ACCT_GATE_*` arrays name — and they never read this plan's `delivery.md`. This plan still
+records three **stage-completion signals** in `delivery.md` at the closing gate of each authoring
+phase, as a **human/audit-readable handoff note**: modelled on
+`ayokoding-learning-path-04-course-authoring`'s band-completion signal shape (five fields), but not a
+machine contract plan 07 parses.
 
 | Signal      | Emitted at | `LANDED_COURSE_IDS` includes                                                                                                                           | Unblocks in plan 07                               |
 | ----------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
@@ -264,8 +268,9 @@ recorded in this plan's `delivery.md` at the closing gate of its authoring phase
 | **Stage 2** | Phase 3    | `inventory-and-cogs-accounting`, `consolidation-and-multi-entity-accounting`, `audit-controls-and-compliance`, `payroll-and-tax-accounting-essentials` | ERP #8, #13, #14, #15                             |
 | **Stage 3** | Phase 5    | `sharia-accounting-and-aaoifi-standards`, `islamic-contract-modeling-for-systems`, `capstone-build-a-general-ledger-system`                            | ERP #19, #20                                      |
 
-An incomplete signal is **rejected** by plan 07 rather than guessed at — the same discipline plan 05
-applies to plan 04's band signals. Full field list in
+Landing these course IDs on `origin/main` genuinely unblocks the named ERP work — that dependency is
+real and load-bearing — but plan 07 confirms it by checking the filesystem itself, never by parsing
+or rejecting this record. Full detail in
 [tech-docs §Stage-signal contract](./tech-docs.md#stage-signal-contract-the-plan-07-handoff).
 
 ## Verification status carried forward (never laundered)
@@ -276,12 +281,12 @@ this plan's own documents as **open items with named primary sources and named r
 they are not restated as fact anywhere, and Phase 4 exists to close them before the Sharia stage is
 authored.
 
-| ID       | Status                 | Item                                                                                                                                          | Resolves in                      |
-| -------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| **OI-1** | `[Needs Verification]` | Indonesian PSAK numbering — "PSAK 59 / SIFAS 101-109" vs "PSAK 101-110"                                                                       | Phase 4                          |
-| **OI-2** | `[Needs Verification]` | Riba doctrinal basis — currently Wikipedia-sourced only, not a primary source                                                                 | Phase 4                          |
-| **OI-3** | `[Unverified]`         | The three-jurisdiction model claim beyond the three fetched indexes                                                                           | Phase 4                          |
-| **OI-4** | open, cross-plan       | Plan 02's doc-level "a path may omit a prerequisite only if it omits every course that needs it" rule vs this plan's link-don't-walk manifest | Phase 0 (routed, not fixed here) |
+| ID       | Status                   | Item                                                                                                                                                                                                                                                                                        | Resolves in                                                   |
+| -------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **OI-1** | `[Needs Verification]`   | Indonesian PSAK numbering — "PSAK 59 / SIFAS 101-109" vs "PSAK 101-110"                                                                                                                                                                                                                     | Phase 4                                                       |
+| **OI-2** | `[Needs Verification]`   | Riba doctrinal basis — currently Wikipedia-sourced only, not a primary source                                                                                                                                                                                                               | Phase 4                                                       |
+| **OI-3** | `[Unverified]`           | The three-jurisdiction model claim beyond the three fetched indexes                                                                                                                                                                                                                         | Phase 4                                                       |
+| **OI-4** | routed, already answered | Plan 02's doc-level "a path may omit a prerequisite only if it omits every course that needs it" rule vs this plan's link-don't-walk manifest — already resolved by plan 02's dated ruling, `tech-docs.md §"Link-don't-walk: prerequisite omission is permitted (OI-4 ruling, 2026-07-21)"` | Phase 0 (confirms and records the ruling, does not negotiate) |
 
 Full detail, primary sources, and the exact resolution steps:
 [tech-docs §Open verification items](./tech-docs.md#open-verification-items-oi-1-through-oi-4).

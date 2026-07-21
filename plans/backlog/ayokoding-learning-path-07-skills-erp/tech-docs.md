@@ -567,26 +567,36 @@ transition.
 
 ## File impact
 
-| Path                                                           | Change | Note                                                                                       |
-| -------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
-| `<SYL>README.md` + `<SYL><id>.md` × 20                         | new    | this plan's own syllabus corpus (DD-2)                                                     |
-| `<SYLPATHS>manifest-skills-enterprise-resource-planning.md`    | new    | the manifest mirror this plan's courseOrder is transcribed from (DD-22)                    |
-| `<ERPMAN>`                                                     | new    | the single manifest; grown four times                                                      |
-| `<ERPLANDING>`                                                 | new    | the path landing (DD-15)                                                                   |
-| `<COURSES><erp-course-id>/` × 20                               | new    | course bundles, four authoring waves                                                       |
-| `<PATHS>_index.md`                                             | edit   | add one ERP card — populate only                                                           |
-| `<PATHS>skills/_index.md`                                      | edit   | add one ERP card — populate only                                                           |
-| `<COURSES>_index.md`                                           | edit   | add twenty catalog rows — populate only; file created by plan 01                           |
-| `<SPECS>skills-erp-path.feature`                               | new    | this plan's Gherkin                                                                        |
-| `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-path.steps.ts` | new    | step bindings; created by this plan, pairing 1:1 with its own `skills-erp-path.feature`    |
-| `<MANIFESTS>published-manifests.unit.test.ts`                  | edit   | add the ERP manifest assertions; file owned by plan 05 — additive only, see the note below |
+| Path                                                           | Change | Note                                                                                    |
+| -------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------- |
+| `<SYL>README.md` + `<SYL><id>.md` × 20                         | new    | this plan's own syllabus corpus (DD-2)                                                  |
+| `<SYLPATHS>manifest-skills-enterprise-resource-planning.md`    | new    | the manifest mirror this plan's courseOrder is transcribed from (DD-22)                 |
+| `<ERPMAN>`                                                     | new    | the single manifest; grown four times                                                   |
+| `<ERPLANDING>`                                                 | new    | the path landing (DD-15)                                                                |
+| `<COURSES><erp-course-id>/` × 20                               | new    | course bundles, four authoring waves                                                    |
+| `<PATHS>_index.md`                                             | edit   | add one ERP card — populate only                                                        |
+| `<PATHS>skills/_index.md`                                      | edit   | add one ERP card — populate only                                                        |
+| `<COURSES>_index.md`                                           | edit   | add twenty catalog rows — populate only; file created by plan 01                        |
+| `<SPECS>skills-erp-path.feature`                               | new    | this plan's Gherkin                                                                     |
+| `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-path.steps.ts` | new    | step bindings; created by this plan, pairing 1:1 with its own `skills-erp-path.feature` |
+| `<MANIFESTS>skills/erp-manifest.unit.test.ts`                  | new    | ERP manifest assertions; owned by this plan, scoped to its own manifest                 |
 
-**The one shared code file.** The published-manifest unit test is created and owned by
-`ayokoding-learning-path-05-manifests`. This plan **appends** its ERP assertions to it rather than
-creating a parallel test file, because two files asserting "every published manifest is valid" would
-drift. If that file does not exist when this plan runs — plan 05 is not a `blockedBy` — this plan
-creates `<MANIFESTS>skills/erp-manifest.unit.test.ts` scoped to its own manifest instead, and the
-Phase-2 step states both branches explicitly.
+**No shared code file (ruled 2026-07-21).** Each plan owns its own manifest **and that manifest's
+test**, mirroring the manifest-ownership invariant: plan 05 owns
+`<MANIFESTS>careers/careers-manifests.unit.test.ts`, plan 06 owns
+`<MANIFESTS>skills/accounting-manifest.unit.test.ts`, and this plan owns
+`<MANIFESTS>skills/erp-manifest.unit.test.ts`.
+
+An earlier draft had this plan **append** to a single root-level `published-manifests.unit.test.ts`
+owned by plan 05, falling back to its own file when that one was absent. Two defects killed it.
+First, a file on a **three-way cross-plan seam**: three independent PRs appending to one file
+conflict on merge, and plan 05's own gates would have to tolerate foreign assertions. Second, the
+fallback made the resulting layout depend on **merge order**, so the repository's structure would
+differ according to which PR landed first.
+
+The drift the shared file was meant to prevent — several tests each claiming to assert "every
+published manifest is valid" — is instead prevented by **scope**: no test here claims to cover every
+manifest. This one asserts the ERP manifest alone, and its name says so.
 
 ## Rollback
 

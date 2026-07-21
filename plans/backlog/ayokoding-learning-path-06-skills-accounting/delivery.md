@@ -114,6 +114,10 @@ concurrency limit: 3 in Phase 2, 13 in Phase 3, 4 in Phase 5, and 1 everywhere e
 - `<MTEST>` = `<MANIFESTS>skills/accounting-manifest.unit.test.ts` _(new file; matches the vitest
   `unit` project's `**/*.unit.{test,spec}.{ts,tsx}` include)_
 - `<SPEC>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/courses/`
+- `<EVID>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/evidence/` — this plan's
+  committed evidence dir (baseline SHA, tool snapshots, Phase 7 screenshots). Repo-root-relative, so
+  every clause below resolves identically no matter which directory it is run from. **Phase 0 creates
+  it**; shell redirection (`>`) does not create parent directories.
 - `<SPECPATHS>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/paths/`
 - `<MIRROR>` = `<SPECPATHS>manifest-skills-accounting.md` — filename fixed by plan 02's ruling; a bare
   `manifest-accounting.md` is **not** acceptable
@@ -225,13 +229,28 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
       self-check above has passed.)_
 - [ ] [AI] **Baseline: no accounting manifest exists** — `test -f <MANIFEST>`
       — acceptance: exits **non-zero**; exits 0 after Phase 2.
+- [ ] [AI] **Capture the plan-start baseline SHA** — record the `origin/main` commit this plan starts
+      from, so Phase 6's cumulative ownership checks can diff against a fixed pre-plan point instead
+      of the by-then-already-advanced `origin/main` that Phases 2, 3 and 5 will each have merged their
+      own PRs into before Phase 6 branches (a diff against the literal `origin/main` at that point
+      would be empty by construction and could not detect a violation merged in an earlier phase):
+      `mkdir -p <EVID> && git rev-parse origin/main > <EVID>phase-0-baseline-sha.txt`
+      — the `mkdir -p` is **required, not defensive**: `<EVID>` does not exist on the current tree
+      and shell redirection does not create parent directories, so the bare `git rev-parse ... >` form
+      fails with `no such file or directory` (exit 1) on a clean checkout
+      — acceptance: `test -s <EVID>phase-0-baseline-sha.txt` exits 0, AND
+      `git cat-file -e "$(cat <EVID>phase-0-baseline-sha.txt)^{commit}"` exits 0. Falsifiable both
+      ways: a missing or empty file fails the first check; a corrupted or placeholder SHA fails
+      `git cat-file -e`.
 - [ ] [AI] Establish tool baselines: `npx nx run ayokoding-www:build`,
       `npx nx run ayokoding-www:test:unit`, and `npx nx run ayokoding-www-fe-e2e:test:e2e`
-      — acceptance: all exit 0; record pass counts in `evidence/phase-0-snapshot.txt`.
-- [ ] [AI] **Route OI-4** — record the plan-02 wording seam (its doc-level prerequisite-omission rule
-      versus this plan's link-don't-walk manifest) in `<VLOG>` by changing the `OI-4:` line from
-      `OPEN` to `ROUTED`, with a one-line note naming plan 02's `tech-docs.md §Manifest integrity
-invariants` as the sentence needing a cross-domain carve-out. **Do not edit plan 02's folder.**
+      — acceptance: all exit 0; record pass counts in `<EVID>phase-0-snapshot.txt`.
+- [ ] [AI] **Route OI-4** — plan 02 has already published a dated ruling resolving this wording seam:
+      `tech-docs.md` §"Link-don't-walk: prerequisite omission is permitted (OI-4 ruling,
+      2026-07-21)", which names this plan's manifest and rules Direction A **PERMITTED**. This step
+      confirms and records that ruling rather than negotiating a new one: change the `OI-4:` line in
+      `<VLOG>` from `OPEN` to `ROUTED`, with a one-line note citing plan 02's ruling section by name.
+      **Do not edit plan 02's folder.**
       — acceptance: `grep -oE '^OI-4: ROUTED' <VLOG> | wc -l` returns **1** (returns **0** before this
       step).
 - [ ] [AI] Resolve every preexisting failure before proceeding — acceptance: zero unresolved failures
@@ -250,8 +269,11 @@ invariants` as the sentence needing a cross-domain carve-out. **Do not edit plan
       `test -f <PATHS>skills/_index.md` exits 0.
 - [ ] [AI] The twenty-course PRESENT count is **0** and `test -f <MANIFEST>` exits non-zero — the
       baseline is genuinely empty.
+- [ ] [AI] `<EVID>phase-0-baseline-sha.txt` exists, is non-empty, and its recorded SHA passes
+      `git cat-file -e <sha>^{commit}` — the fixed point Phase 6's cumulative ownership checks diff
+      against.
 - [ ] [AI] `ayokoding-www:build` + `:test:unit` + `ayokoding-www-fe-e2e:test:e2e` baselines recorded
-      green in `evidence/phase-0-snapshot.txt`; zero preexisting failures unresolved.
+      green in `<EVID>phase-0-snapshot.txt`; zero preexisting failures unresolved.
 - [ ] [AI] `grep -oE '^OI-4: ROUTED' <VLOG> | wc -l` returns **1**.
 - [ ] [AI] Draft PR opened; CI triggered; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged;
       `ayokoding-www` deployed (no-op redeploy).
@@ -298,8 +320,13 @@ invariants` as the sentence needing a cross-domain carve-out. **Do not edit plan
       `find <SPECPATHS> -name 'manifest-*.md' | grep -vF 'manifest-skills-accounting.md' | wc -l`
       returns **0** (returns **1** if a bare or otherwise-named mirror is created alongside it), AND
       `grep -F -q 'skills/accounting' <MIRROR>` exits 0, AND `grep -F -q 'immediately-effective' <MIRROR>`
-      exits 0. All four exit non-zero / return non-zero before this step, since `<SPECPATHS>` does not
-      exist.
+      exits 0. Before this step `<SPECPATHS>` does not exist, so the three `test -f` / `grep -F -q`
+      sub-clauses all exit **non-zero**. The `find … | wc -l` sub-clause is the exception and is
+      **not** a before/after signal: it returns **0** both before this step (no files to list) and
+      after a correct execution (only the canonical mirror exists). It is a **violation detector**
+      only — it returns **1** if a bare `manifest-accounting.md` or any other non-canonical
+      `manifest-*.md` is created alongside the canonical one. The composite AND-clause therefore
+      still fails before this step, on the strength of the other three.
   - _Suggested executor: `apps-ayokoding-www-general-maker`_
 - [ ] [AI] **Canonical prefixed path-id check** — every path id this plan writes uses the full
       `skills/accounting` form, never a bare `accounting`. Plan 02's 121 existing course specs still
@@ -427,6 +454,10 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
       exits 0 (the linked edge is declared) **and**
       `grep -F -q 'sql-essentials' "<COURSES>chart-of-accounts-and-data-modeling/overview.md"` exits 0
       (the scope boundary against it is stated — this course models ledgers, it does not teach SQL).
+      Presence of the `sql-essentials` token alone is **not** sufficient for the linked-library
+      boundary clause bound at Phase 5 — verify by reading that the overview stops at modelling a
+      chart of accounts as a schema and does not itself teach relational modelling or query
+      performance as its own subject (that is `sql-essentials`'s territory).
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] Course #3 `financial-statements-and-close-cycle` (By Example; prerequisite: #2) — **the
       cross-plan hard edge**: ERP #7 `record-to-report-systems` is unblocked by this course and
@@ -456,7 +487,7 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
       `skills/accounting.yaml`. A failure for any other reason (a missing `schemas.ts` import, say)
       means a start precondition was not honoured — stop and re-check Phase 0.
 
-  **Gherkin (binds) →** "A two-segment skills path ID resolves end to end"
+  **Gherkin (underpins) →** "A two-segment skills path ID resolves end to end"
 
   ```gherkin
   Scenario: A two-segment skills path ID resolves end to end
@@ -466,6 +497,11 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
     And the ?path=skills/accounting context persists across every course in the walk
     And no resolver assumes a three-segment path ID
   ```
+
+  This RED step supplies only the manifest-field half (`pathId`/`arc` values, `safeParse` rejection of
+  a malformed id) — it does not assert the scenario's landing/prev-next/breadcrumb clauses, so it
+  **underpins** rather than **binds** the scenario. The 2.4 RED step below carries the `binds` tag and
+  is the cycle whose GREEN step actually makes the full scenario pass.
 
 - [ ] [AI] **GREEN** — author `<MANIFEST>` _(new file)_ with `pathId: skills/accounting`,
       `arc: immediately-effective`, a title, a description, and a 3-entry `courseOrder` **transcribed
@@ -490,7 +526,7 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
       exits 0 — acceptance: both hold. Falsifiable both ways: walking either ID into `courseOrder`
       makes the first clause ≥ 1; dropping the frontmatter edge makes the second exit 1.
 
-  **Gherkin (binds) →** "The accounting manifest links its software-engineering prerequisites instead of walking them"
+  **Gherkin (underpins) →** "The accounting manifest links its software-engineering prerequisites instead of walking them"
 
   ```gherkin
   Scenario: The accounting manifest links its software-engineering prerequisites instead of walking them
@@ -501,6 +537,13 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
     And the general-ledger capstone declares backend-essentials in its prerequisites frontmatter
     And the landing links both prerequisite courses at their canonical /en/learn/courses/ URLs
   ```
+
+  This step supplies only the courseOrder-omission clause and the chart-of-accounts frontmatter
+  clause — course #19 `capstone-build-a-general-ledger-system` (the "general-ledger capstone") is not
+  authored until Phase 5 and the landing is not authored until §2.3 below, so the capstone-frontmatter
+  and landing-links clauses are both provably false at this point. It **underpins** rather than
+  **binds** the scenario; the genuine `binds` tag sits at Phase 5's course #19 step, the earliest
+  point all four clauses hold.
 
 ### 2.3 · The landing (content — maker-checker-fixer, not TDD)
 
@@ -544,11 +587,31 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
 
 - [ ] [AI] **RED** — add `<SPECS>skills-path-composition.feature` _(new file)_ carrying the
       two-segment-`pathId` scenario, plus a failing e2e step in
-      `apps/ayokoding-www-fe-e2e/src/steps/course-paths.steps.ts` _(existing file, created by
-      `ayokoding-learning-path-03-navigation-ui`)_ that opens `/en/learn/paths/skills/accounting`,
-      walks all three courses via prev/next, and asserts `?path=skills/accounting` persists
+      `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts` _(new file, created by
+      this plan, pairing 1:1 with its own `skills-path-composition.feature`)_ that opens
+      `/en/learn/paths/skills/accounting`, walks all three courses via prev/next, asserts
+      `?path=skills/accounting` persists, asserts the breadcrumb resolves the two-segment path ID at
+      every step of the walk, and asserts a deliberately over-segmented id
+      (`?path=skills/accounting/extra`) is hard-rejected rather than resolved — covering all three
+      outcome clauses of the bound scenario below (breadcrumb resolution, `?path=` persistence, and
+      the anti-arity rejection) in the automated e2e layer, so Phase 7's manual retest is a
+      re-verification rather than the only place the anti-arity and breadcrumb clauses are checked
       — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
-      — acceptance: the new spec **fails** because the landing does not yet render an ordered list.
+      — acceptance: the new spec **fails**, because the landing does not yet render an ordered list,
+      the breadcrumb does not yet resolve the two-segment id, and the over-segmented id is not yet
+      rejected — no assertion in the new spec passes.
+
+  **Gherkin (binds) →** "A two-segment skills path ID resolves end to end"
+
+  ```gherkin
+  Scenario: A two-segment skills path ID resolves end to end
+    Given the manifest declares pathId skills/accounting and arc immediately-effective
+    When a reader walks the path from its landing
+    Then the landing, the prev and next controls, and the breadcrumb all resolve against the two-segment path ID
+    And the ?path=skills/accounting context persists across every course in the walk
+    And no resolver assumes a three-segment path ID
+  ```
+
 - [ ] [AI] **GREEN** — implement the step bindings against the published manifest and live landing
       — command:
       `npx nx run ayokoding-www:specs:behavior:coverage && npx nx run ayokoding-www-fe-e2e:test:e2e`
@@ -563,10 +626,17 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
 - [ ] [AI] **Record the Stage-1 signal** in this file, with all five fields from
       [tech-docs §Stage-signal contract](./tech-docs.md#stage-signal-contract-the-plan-07-handoff):
       `STAGE: 1`, `PLAN: ayokoding-learning-path-06-skills-accounting`, `LANDED_COURSE_IDS:` the
-      three Stage-1 IDs, `UNBLOCKS_ERP_COURSES: 7`, `MERGED_COMMIT:` the real merge SHA
-      — acceptance: the signal block is present with all five fields populated and
-      `git cat-file -e <sha>^{commit}` exits 0. Falsifiable both ways: a placeholder SHA fails
-      `git cat-file -e`.
+      three Stage-1 IDs, `UNBLOCKS_ERP_COURSES: 7`, `MERGED_COMMIT:` the real merge SHA. Record it in
+      the **exact literal shape** given in
+      [tech-docs §Stage-signal contract — Recording format](./tech-docs.md#stage-signal-contract-the-plan-07-handoff):
+      each field on its own line, the field name anchored at column 0, outside any table, bullet, or
+      blockquote — never as a bulleted list, a table row, or an inline-code span inside prose
+      — acceptance: the signal block is present with all five fields populated, each field anchored
+      at column 0, and `git cat-file -e <sha>^{commit}` exits 0. Falsifiable both ways: a placeholder
+      SHA fails `git cat-file -e`, and a block recorded as a bulleted list or table row fails Phase 8's
+      `grep -oE '^STAGE: [123]$'` even though this step's own acceptance text would read as satisfied.
+      This is a human/audit-readable record only — plan 07's own gates verify readiness independently
+      and never read this file.
 
 ### Phase 2 Gate
 
@@ -626,7 +696,7 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
       returns **0** (returns **13** before this phase, and returns **1** if a single body drops the
       section).
 
-  **Gherkin (binds) →** "Every post-foundations course names what still balances while being wrong"
+  **Gherkin (underpins) →** "Every post-foundations course names what still balances while being wrong"
 
   ```gherkin
   Scenario: Every post-foundations course names what still balances while being wrong
@@ -635,6 +705,11 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
     Then it contains an explicit section naming at least one outcome that still balances while being substantively wrong
     And that section names the observable signal, if any, that would reveal the error
   ```
+
+  This scenario quantifies over **every** course from #4 onward — all 17 (`ACCT_SILENT`), per
+  DD-609. This check loops only `ACCT_S2` (13, #4–#16), so it covers 13 of the 17 instances the
+  scenario asserts. It **underpins** rather than **binds** the scenario; the genuine `binds` tag sits
+  at Phase 5's silent-failure check, which loops the full `ACCT_SILENT` array once all 17 exist.
 
 - [ ] [AI] **Scope-boundary check against the library and ERP** — the three highest-risk bodies state
       their boundary explicitly: #13 `audit-controls-and-compliance` against `it-governance-grc`
@@ -645,7 +720,7 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
       exits 0, and both other bodies state their boundary in prose (verified by reading, since
       DD-620's ERP-token check forbids naming the ERP course IDs).
 
-  **Gherkin (binds) →** "The accounting corpus never re-teaches a linked library course"
+  **Gherkin (underpins) →** "The accounting corpus never re-teaches a linked library course"
 
   ```gherkin
   Scenario: The accounting corpus never re-teaches a linked library course
@@ -654,6 +729,15 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
     Then the course states its scope boundary against that library course explicitly
     And no accounting course teaches relational modelling, query performance, or HTTP service construction as its own subject
   ```
+
+  This scenario is about boundaries against the **linked library prerequisites** (course #2 versus
+  `sql-essentials`, course #19 versus `backend-essentials`), not against `it-governance-grc` or the
+  ERP courses this check actually verifies — that is a legitimate separate sweep against different
+  siblings, not this scenario. The scenario's negative clause ("no accounting course teaches
+  relational modelling, query performance, or HTTP service construction as its own subject") is
+  checked nowhere by this step. It **underpins** the corpus's general boundary-discipline habit but
+  does not **bind** this scenario; the genuine `binds` tag sits at Phase 5, once both course #2 and
+  course #19 exist, spanning both.
 
 - [ ] [AI] Append the 13 catalog rows to `<COURSES>_index.md` — acceptance:
       `for c in "${ACCT_S2[@]}"; do grep -F -q "$c" <COURSES>_index.md || echo "MISSING $c"; done | wc -l`
@@ -665,6 +749,21 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
       and contains all 13 Stage-2 IDs in catalog order after the three Stage-1 IDs
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion **fails**, reporting an actual length of **3**.
+
+  **Gherkin (underpins) →** "The manifest grows in recorded stages rather than shipping truncated"
+
+  ```gherkin
+  Scenario: The manifest grows in recorded stages rather than shipping truncated
+    Given the manifest is first published with only the three Stage 1 courses
+    When each later authoring stage completes
+    Then the manifest grows to sixteen and then to twenty course IDs
+    And every deferred course ID is recorded as absent at publication and asserted present after its growth step
+  ```
+
+  This cycle supplies only the growth-to-sixteen half of the scenario's "Then" clause — it
+  **underpins** rather than **binds**. The 5.1 cycle below, whose growth step reaches the full twenty,
+  carries the `binds` tag because its GREEN step is what completes the scenario.
+
 - [ ] [AI] **GREEN** — append the 13 Stage-2 IDs to `<MANIFEST>` in catalog order
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0, AND `grep -E '^  - [a-z0-9-]+$' <MANIFEST> | wc -l` returns **16**, AND
@@ -680,8 +779,12 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
 
 - [ ] [AI] **Record the Stage-2 signal** in this file with all five fields — `STAGE: 2`,
       `LANDED_COURSE_IDS:` the 13 Stage-2 IDs, `UNBLOCKS_ERP_COURSES: 8, 13, 14, 15`,
-      `MERGED_COMMIT:` the real merge SHA — acceptance: all five fields populated and
-      `git cat-file -e <sha>^{commit}` exits 0.
+      `MERGED_COMMIT:` the real merge SHA. Record it in the same **exact literal shape** as Phase 2.5
+      (see [tech-docs §Stage-signal contract — Recording format](./tech-docs.md#stage-signal-contract-the-plan-07-handoff)):
+      each field on its own line, anchored at column 0, outside any table, bullet, or blockquote
+      — acceptance: all five fields populated, each anchored at column 0, and
+      `git cat-file -e <sha>^{commit}` exits 0. Human/audit-readable record only — plan 07's own
+      gates verify readiness independently.
 
 ### Phase 3 Gate
 
@@ -817,7 +920,18 @@ date> — <the numbering that is current>`, **or** as
       trading transaction — a receivable and revenue from a sale, **not** interest income
       — acceptance: all 7 convention steps complete;
       `for t in murabaha ijara mudaraba musharaka; do grep -F -q "$t" "<COURSES>islamic-contract-modeling-for-systems/overview.md" || echo "MISSING $t"; done | wc -l`
-      returns **0** (returns **4** before this step).
+      returns **0** (returns **4** before this step); the three-model clause below holds for this
+      course; the four-token presence check in that clause is **not** sufficient on its own — verify
+      by reading that the overview states Malaysia's absence from AAOIFI's mandatory-adoption list
+      and Indonesia's basis-not-adoption relationship in full sentences. **Also verify by reading —
+      these are the bound scenario's own claims, and no token check establishes any of them**: that
+      the course sets a murabaha receivable schedule beside a conventional amortising loan schedule
+      and states they can look numerically similar while being modelled differently; that the markup
+      is presented as **fixed and disclosed at the point of sale**, in a trade with an underlying
+      asset changing hands; and that the recognition is presented as a **receivable and revenue from
+      a sale, never as interest income**. Falsifiable both ways: a draft that names the four contract
+      types but books the markup as interest income passes the token check above and **fails** this
+      one.
 
   **Gherkin (binds) →** "A murabaha is modelled as a trade rather than as a loan"
 
@@ -839,10 +953,68 @@ date> — <the numbering that is current>`, **or** as
       exits 0 (the linked edge is declared) **and**
       `grep -F -q 'backend-essentials' "<COURSES>capstone-build-a-general-ledger-system/overview.md"`
       exits 0 (the scope boundary is stated — this capstone builds a ledger, it does not teach HTTP
-      services).
+      services). Presence of the `backend-essentials` token alone is **not** sufficient for the
+      linked-library boundary clause bound below — verify by reading that the overview stops at
+      building the ledger itself and does not itself teach HTTP service construction as its own
+      subject (that is `backend-essentials`'s territory).
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
+
+- [ ] [AI] **Link-don't-walk full check (DD-602, all four clauses)** — both linked prerequisite
+      courses (#2 and #19) and the landing now exist, so re-assert the complete scenario in one
+      place: `grep -oE 'sql-essentials|backend-essentials' <MANIFEST> | wc -l` returns **0** (neither
+      ID ever entered `courseOrder`), AND
+      `grep -F -q 'sql-essentials' "<COURSES>chart-of-accounts-and-data-modeling/_index.md"` exits 0
+      (the chart-of-accounts frontmatter edge, §2.1), AND
+      `grep -F -q 'backend-essentials' "<COURSES>capstone-build-a-general-ledger-system/_index.md"`
+      exits 0 (the general-ledger capstone frontmatter edge, this plan's own step just above), AND
+      `for u in '/en/learn/courses/sql-essentials' '/en/learn/courses/backend-essentials'; do grep -F -q "$u" <LANDING>_index.md || echo "MISSING $u"; done | wc -l`
+      returns **0** (the landing links both at their canonical URLs, first asserted at §2.3 and
+      re-confirmed here now that both linked prerequisite courses actually exist)
+      — acceptance: all four hold. Falsifiable both ways: walking either ID into `courseOrder`, or
+      dropping either frontmatter edge, or dropping either landing link, makes the corresponding
+      clause fail.
+
+  **Gherkin (binds) →** "The accounting manifest links its software-engineering prerequisites instead of walking them"
+
+  ```gherkin
+  Scenario: The accounting manifest links its software-engineering prerequisites instead of walking them
+    Given the accounting path manifest is published
+    When a reader inspects its courseOrder
+    Then neither sql-essentials nor backend-essentials appears in courseOrder
+    And the chart-of-accounts course declares sql-essentials in its prerequisites frontmatter
+    And the general-ledger capstone declares backend-essentials in its prerequisites frontmatter
+    And the landing links both prerequisite courses at their canonical /en/learn/courses/ URLs
+  ```
+
+- [ ] [AI] **Library-course boundary check (linked prerequisites, all clauses)** — the scenario below
+      is about boundaries against the **linked library prerequisites**, distinct from the Phase 3
+      sweep against `it-governance-grc` and the ERP courses. Course #2's and course #19's own steps
+      above (§2.1 and this phase) already carry the "verify by reading" instruction for their
+      respective boundary — this step exists to bind the scenario in one place now that both exist
+      — acceptance: this is a **reading check, stated plainly as one**: confirm by reading that
+      neither `chart-of-accounts-and-data-modeling/overview.md` teaches relational modelling or query
+      performance as its own subject, nor `capstone-build-a-general-ledger-system/overview.md` teaches
+      HTTP service construction as its own subject — both instead state the boundary against
+      `sql-essentials` / `backend-essentials` explicitly. Falsifiable both ways: a body that starts
+      teaching SQL joins or HTTP routing in depth, as its own subject rather than a named boundary,
+      fails this reading check; the current bodies (scoped per §2.1's and this phase's own boundary
+      acceptance) pass it.
+
+  **Gherkin (binds) →** "The accounting corpus never re-teaches a linked library course"
+
+  ```gherkin
+  Scenario: The accounting corpus never re-teaches a linked library course
+    Given the accounting corpus is authored
+    When a course's scope is compared with the library course it links as a prerequisite
+    Then the course states its scope boundary against that library course explicitly
+    And no accounting course teaches relational modelling, query performance, or HTTP service construction as its own subject
+  ```
+
 - [ ] [AI] Course #20 `capstone-sharia-compliant-ledger` (By Example; prerequisites: #18, #19) — the
-      terminal capstone — acceptance: all 7 convention steps complete; the three-model clause holds.
+      terminal capstone — acceptance: all 7 convention steps complete; the three-model clause holds;
+      the token presence check in that clause is **not** sufficient on its own — verify by reading
+      that the overview states Malaysia's absence from AAOIFI's mandatory-adoption list and
+      Indonesia's basis-not-adoption relationship in full sentences.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] **Three-model clause (DD-608)** — each of #17, #18 and #20 names all three jurisdictional
       models — acceptance:
@@ -868,9 +1040,24 @@ date> — <the numbering that is current>`, **or** as
     And each states that Indonesia uses AAOIFI as a basis rather than adopting it
   ```
 
-- [ ] [AI] **Silent-failure section present in every Stage-3 body (DD-609)** — acceptance:
-      `for c in "${ACCT_S3[@]}"; do grep -F -q '## What still balances while being wrong' "<COURSES>$c/overview.md" || echo "MISSING $c"; done | wc -l`
-      returns **0** (returns **4** before this phase).
+- [ ] [AI] **Silent-failure section present in every post-foundations body, all 17 (DD-609)** — now
+      that all 17 courses from #4 onward exist, re-assert the complete scenario against the full
+      `ACCT_SILENT` array rather than only the four Stage-3 bodies — acceptance:
+      `for c in "${ACCT_SILENT[@]}"; do grep -F -q '## What still balances while being wrong' "<COURSES>$c/overview.md" || echo "MISSING $c"; done | wc -l`
+      returns **0** (returns **4** immediately before this phase's four bodies land — Stages 1's
+      three exempt courses carry no section and Stage 2's 13 already carry theirs from Phase 3, so
+      only the four Stage-3 bodies are still missing at that point).
+
+  **Gherkin (binds) →** "Every post-foundations course names what still balances while being wrong"
+
+  ```gherkin
+  Scenario: Every post-foundations course names what still balances while being wrong
+    Given a course from number four onward is authored
+    When its overview is inspected
+    Then it contains an explicit section naming at least one outcome that still balances while being substantively wrong
+    And that section names the observable signal, if any, that would reveal the error
+  ```
+
 - [ ] [AI] Append the four catalog rows to `<COURSES>_index.md` — acceptance:
       `for c in "${ACCT_S3[@]}"; do grep -F -q "$c" <COURSES>_index.md || echo "MISSING $c"; done | wc -l`
       returns **0**.
@@ -881,12 +1068,6 @@ date> — <the numbering that is current>`, **or** as
       **length 20** and contains all four Stage-3 IDs in catalog order after the sixteen
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion **fails**, reporting an actual length of **16**.
-- [ ] [AI] **GREEN** — append the four Stage-3 IDs to `<MANIFEST>` in catalog order
-      — command: `npx nx run ayokoding-www:test:unit`
-      — acceptance: exits 0, AND `grep -E '^  - [a-z0-9-]+$' <MANIFEST> | wc -l` returns **20**, AND
-      `grep -oE "$ACCT_S3_ALT" <MANIFEST> | sort -u | wc -l` returns **4** (returned **0** at the
-      Phase 3 gate), AND `grep -oE 'sql-essentials|backend-essentials' <MANIFEST> | wc -l` still
-      returns **0**.
 
   **Gherkin (binds) →** "The manifest grows in recorded stages rather than shipping truncated"
 
@@ -898,6 +1079,12 @@ date> — <the numbering that is current>`, **or** as
     And every deferred course ID is recorded as absent at publication and asserted present after its growth step
   ```
 
+- [ ] [AI] **GREEN** — append the four Stage-3 IDs to `<MANIFEST>` in catalog order
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: exits 0, AND `grep -E '^  - [a-z0-9-]+$' <MANIFEST> | wc -l` returns **20**, AND
+      `grep -oE "$ACCT_S3_ALT" <MANIFEST> | sort -u | wc -l` returns **4** (returned **0** at the
+      Phase 3 gate), AND `grep -oE 'sql-essentials|backend-essentials' <MANIFEST> | wc -l` still
+      returns **0**.
 - [ ] [AI] **REFACTOR** — remove any assertion the table-driven form made redundant, without
       weakening coverage — command:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck && npx nx run ayokoding-www:lint`
@@ -906,12 +1093,25 @@ date> — <the numbering that is current>`, **or** as
 ### 5.2 · Stage-3 signal and the full-ramp confirmation
 
 - [ ] [AI] **Record the Stage-3 signal** with all five fields — `STAGE: 3`, `LANDED_COURSE_IDS:` the
-      four Stage-3 IDs, `UNBLOCKS_ERP_COURSES: 19, 20`, `MERGED_COMMIT:` the real merge SHA
-      — acceptance: all five fields populated and `git cat-file -e <sha>^{commit}` exits 0.
+      four Stage-3 IDs, `UNBLOCKS_ERP_COURSES: 19, 20`, `MERGED_COMMIT:` the real merge SHA. Record it
+      in the same **exact literal shape** as Phase 2.5
+      (see [tech-docs §Stage-signal contract — Recording format](./tech-docs.md#stage-signal-contract-the-plan-07-handoff)):
+      each field on its own line, anchored at column 0, outside any table, bullet, or blockquote
+      — acceptance: all five fields populated, each anchored at column 0, and
+      `git cat-file -e <sha>^{commit}` exits 0. Human/audit-readable record only — plan 07's own gates
+      verify readiness independently.
 - [ ] [AI] **Full-ramp confirmation** — all twenty bodies resolve and the landing's three boundaries
       now each describe a reachable state — acceptance:
       `for c in "${ACCT_ALL[@]}"; do test -d "<COURSES>$c" || echo "MISSING $c"; done | wc -l` returns **0**
-      (returned **20** at Phase 0), and the landing still carries all three `Dangerous N` markers.
+      (returned **20** at Phase 0), and the landing still carries all three `Dangerous N` markers, AND
+      the landing enumerates the **Dangerous 1 ceiling** the bound scenario names — not merely the
+      boundary label:
+      `for t in 'revenue recognition' 'inventory costing' lease consolidat IFRS; do grep -F -q -i "$t" <LANDING>_index.md || echo "MISSING $t"; done | wc -l`
+      returns **0** (returns **5** before the landing is authored). The token check is a floor, not a
+      ceiling — **also verify by reading** that these five appear as things the reader **cannot yet
+      safely do after course #3**, not merely as later-course titles in the list. Falsifiable both
+      ways: a landing that lists the five only as catalog rows passes the token check and **fails**
+      the reading check.
 
   **Gherkin (binds) →** "The first ramp boundary is reachable in three courses"
 
@@ -930,8 +1130,12 @@ date> — <the numbering that is current>`, **or** as
 - [ ] [AI] All 20 bodies exist; the miss-count clause returns **0**.
 - [ ] [AI] `grep -E '^  - [a-z0-9-]+$' <MANIFEST> | wc -l` returns **20**; the Stage-3 alternation
       returns **4**; the linked-prerequisite clause still returns **0**.
-- [ ] [AI] The three-model clause returns **0** and the "the standard" prohibition returns **0**.
-- [ ] [AI] Every Stage-3 `overview.md` carries `## What still balances while being wrong`.
+- [ ] [AI] The three-model clause returns **0** and the "the standard" prohibition returns **0**; the
+      Malaysia/Indonesia facts were verified by reading for #17, #18 and #20.
+- [ ] [AI] Every post-foundations `overview.md` (all 17, `ACCT_SILENT`) carries
+      `## What still balances while being wrong`.
+- [ ] [AI] The link-don't-walk full check (all four clauses) and the library-course boundary reading
+      check both hold.
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` + `:build` + `:specs:behavior:coverage` +
       `npx nx run ayokoding-www-fe-e2e:test:e2e` all exit 0.
 - [ ] [AI] The Stage-3 signal is recorded with a real `MERGED_COMMIT`; plan 07's ERP #19 and #20 are
@@ -970,7 +1174,7 @@ validate` takes **no positional path**, so the exclude form above is the only me
     When the app build, the affected test tiers, and the link and heading validators run
     Then the build and every affected tier succeed
     And manifest integrity and prerequisite consistency report zero violations for the accounting manifest
-    And the manifests directory contains exactly one file this plan owns
+    And the manifests directory contains exactly one data file plus its co-located unit test this plan owns
   ```
 
 - [ ] [AI] **Manifest integrity + prerequisite-consistency sweep** — every `courseOrder` ID resolves;
@@ -978,17 +1182,26 @@ validate` takes **no positional path**, so the exclude form above is the only me
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: zero violations reported.
 - [ ] [AI] **Ownership boundary check — manifests.** Confirm this plan's commits touched exactly one
-      file under `<MANIFESTS>`:
-      `git diff --name-only origin/main...HEAD -- <MANIFESTS> | grep -vF 'skills/accounting.yaml' | wc -l`
-      — acceptance: returns **0**. Falsifiable both ways: a step that touched `manifests/careers/**`
-      or plan 07's ERP manifest makes it ≥ 1. _(A count of all `.yaml` files under `<MANIFESTS>` is
-      deliberately **not** used: plans 05 and 07 land their own manifests concurrently, so a fixed
-      total would be a false failure.)_
+      data file (`<MANIFEST>`) plus its co-located unit test (`<MTEST>`, created alongside it in
+      §2.2) under `<MANIFESTS>`, diffed against the **Phase 0 baseline SHA**
+      (`<EVID>phase-0-baseline-sha.txt`) rather than the literal `origin/main`: by the time Phase 6
+      branches, `origin/main` already contains every prior phase's own merged PR, so a diff against it
+      is empty by construction and cannot detect a violation already merged in Phase 2, 3 or 5 —
+      diffing against the fixed pre-Phase-0 baseline instead spans the plan's whole footprint:
+      `git diff --name-only "$(cat <EVID>phase-0-baseline-sha.txt)"...HEAD -- <MANIFESTS> | grep -vE 'skills/accounting\.yaml|skills/accounting-manifest\.unit\.test\.ts' | wc -l`
+      — acceptance: returns **0**. Falsifiable both ways: a step in **any** phase of this plan —
+      including one already merged before Phase 6 branched — that touched `manifests/careers/**` or
+      plan 07's ERP manifest makes it ≥ 1 (neither of those paths matches the two-way exclusion
+      pattern above, so either still trips the check). _(A count of all `.yaml` files under
+      `<MANIFESTS>` is deliberately **not** used: plans 05 and 07 land their own manifests
+      concurrently, so a fixed total would be a false failure.)_
 - [ ] [AI] **Ownership boundary check — `<PATHS>`.** Confirm this plan created no structural
-      `_index.md` (A3):
-      `git diff --name-only origin/main...HEAD -- <PATHS> | grep -vF 'paths/skills/accounting/_index.md' | wc -l`
-      — acceptance: returns **0**. Falsifiable both ways: creating `paths/skills/_index.md` makes it
-      **1**.
+      `_index.md` (A3), diffed against the same **Phase 0 baseline SHA** for the same reason (Phase 1
+      through Phase 5 have each already merged their own PR into `origin/main` by the time Phase 6
+      branches, so a literal `origin/main` diff would be empty and vacuous):
+      `git diff --name-only "$(cat <EVID>phase-0-baseline-sha.txt)"...HEAD -- <PATHS> | grep -vF 'paths/skills/accounting/_index.md' | wc -l`
+      — acceptance: returns **0**. Falsifiable both ways: creating `paths/skills/_index.md` in **any**
+      phase — including one already merged before Phase 6 branched — makes it **1**.
 - [ ] [AI] **Ramp-smoothness audit** — walk the published `courseOrder` and confirm the three
       boundaries hold against the landed content: #1–#3 genuinely produce a balancing ledger, #16
       genuinely covers conventional systems, and every course from #4 onward names its silent failure
@@ -1057,23 +1270,28 @@ validate` takes **no positional path**, so the exclude form above is the only me
       `_index.md` here (A3).
 - [ ] [AI] Deep-link course #2 with **no** `?path=` and confirm the canonical view renders with its
       prerequisites surfaced and an obvious way into the path. Then exercise **hard rejection** of a
-      malformed id: hit `?path=skills/nonexistent` (unresolvable) and `?path=accounting` (missing the
-      category segment) and confirm each is **rejected outright** — no manifest resolves, **no
-      coercion to `skills/accounting`, no alias, no normalization, no nearest-match fallback** — and
-      the course falls back to its own canonical no-path view with no error — acceptance: all three
-      hold. Falsifiable both ways: if either malformed id renders the accounting path context, the
-      resolver is lenient and that is a defect to raise against plan 02, not to accept here.
+      malformed id in **both directions** — under-segmented and over-segmented, since this plan's own
+      headline defect class is a resolver that silently assumes a fixed segment count: hit
+      `?path=skills/nonexistent` (unresolvable, 2 segments), `?path=accounting` (under-segmented,
+      missing the category segment), and `?path=skills/accounting/extra` (over-segmented, a spurious
+      third segment) and confirm each of the three is **rejected outright** — no manifest resolves,
+      **no coercion to `skills/accounting`, no alias, no normalization, no nearest-match fallback** —
+      and the course falls back to its own canonical no-path view with no error — acceptance: all
+      four hold (the no-`?path=` canonical render plus the three rejections). Falsifiable both ways:
+      if any of the three malformed ids renders the accounting path context, the resolver is lenient
+      and that is a defect to raise against plan 02, not to accept here.
 - [ ] [AI] Confirm the landing's two outbound prerequisite links resolve — acceptance:
       `/en/learn/courses/sql-essentials` and `/en/learn/courses/backend-essentials` both return 200.
 - [ ] [AI] Verify `html[lang]` is `en` and `browser_console_messages` is clean on every screen —
       acceptance: correct lang attribute; **zero** console errors.
 - [ ] [AI] Capture one screenshot per screen per breakpoint via `browser_take_screenshot` to
-      `evidence/phase-7-<screen>-en-<breakpoint>px.png`, for 5 screens (the landing, the skills
+      `<EVID>phase-7-<screen>-en-<breakpoint>px.png`, for 5 screens (the landing, the skills
       category index, and courses #1, #2, #4) — acceptance:
-      `find evidence -name 'phase-7-*-en-*px.png' | wc -l` returns **15** (5 screens × 3 breakpoints).
+      `find <EVID> -name 'phase-7-*-en-*px.png' | wc -l` returns **15** (5 screens × 3 breakpoints).
       Falsifiable both ways: a missed breakpoint or screen returns fewer.
 - [ ] [AI] Document the evidence in this checklist: reference each screenshot
-      (`![alt](./evidence/...)`) and note the console/network status per screen.
+      (`![alt](./evidence/...)` — a plan-folder-relative markdown link, not the `<EVID>` shorthand)
+      and note the console/network status per screen.
 - [ ] [AI] Run the three live-site testers (the `web-ux-test-fixing-planning` workflow:
       `web-exploratory-tester` + `web-usability-tester` + `web-design-tester`) against the running
       landing, the skills category index, and a sample walk of the first four courses in path context.
@@ -1098,7 +1316,7 @@ validate` takes **no positional path**, so the exclude form above is the only me
       375 / 768 / 1280 px; console clean on every screen.
 - [ ] [AI] The arc promise and all three ramp boundaries render above the ordered course list at every
       breakpoint.
-- [ ] [AI] `find evidence -name 'phase-7-*-en-*px.png' | wc -l` returns **15**; each screenshot is
+- [ ] [AI] `find <EVID> -name 'phase-7-*-en-*px.png' | wc -l` returns **15**; each screenshot is
       referenced from this checklist.
 - [ ] [AI] Every rule-15 EWT/UWT/DWT defect finding is fixed and ticked, or explicitly permitted to
       defer by the user.
@@ -1126,8 +1344,9 @@ validate` takes **no positional path**, so the exclude form above is the only me
 - [ ] [AI] Confirm `prod-ayokoding-www` serves `/en/learn/paths/skills/accounting` with all twenty
       courses; re-dispatch `apps-ayokoding-www-deployer` if any earlier deploy lagged — acceptance:
       production serves the complete path.
-- [ ] [AI] **Confirm all three stage signals are readable in this file** with real merged SHAs, so
-      plan 07 can consume them without asking — acceptance:
+- [ ] [AI] **Confirm all three stage signals are readable in this file** with real merged SHAs, as
+      the human/audit-readable record of the handoff (plan 07's own gates verify readiness
+      independently via `test -d` checks against `origin/main` and never read this file) — acceptance:
       `grep -oE '^STAGE: [123]$' delivery.md | wc -l` returns **3**, and each block's `MERGED_COMMIT`
       passes `git cat-file -e <sha>^{commit}`.
 
@@ -1171,9 +1390,12 @@ validate` takes **no positional path**, so the exclude form above is the only me
 - [ ] [AI] **Two routing candidates to expect from this plan specifically** (record whichever
       actually surfaced, discard the other): the **cross-domain linked-prerequisite pattern** (a
       subject path linking rather than walking library prerequisites) is a candidate for
-      `repo-governance/`; and the **OI-4 wording seam** in plan 02's prerequisite-omission rule is a
-      candidate for a `plans/backlog/` follow-up if it was never amended — acceptance: each is either
-      routed or discarded with a reason.
+      `repo-governance/`; and the **OI-4 wording seam** in plan 02's prerequisite-omission rule —
+      already answered by plan 02's published ruling
+      (`tech-docs.md` §"Link-don't-walk: prerequisite omission is permitted (OI-4 ruling,
+      2026-07-21)"), so the expected disposition is **discard with that ruling as the reason**, and a
+      `plans/backlog/` follow-up is warranted only if plan 02's ruling has since been withdrawn —
+      acceptance: each is either routed or discarded with a reason.
 - [ ] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
       `No generalizable learnings — <one-line reason>` — acceptance: `learnings.md` is never silently
       empty.
@@ -1203,7 +1425,7 @@ validate` takes **no positional path**, so the exclude form above is the only me
       both the secret/sensitivity gate and the repo-relevance gate were applied to every surviving
       entry.
 - [ ] [AI] Verify ALL quality gates pass (local + CI) and the build is green.
-- [ ] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `evidence/`;
+- [ ] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `<EVID>`;
       the `en` content locale was exercised across all three breakpoints (the `id` deferral is a
       recorded non-goal, not a skipped locale).
 - [ ] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires
@@ -1221,14 +1443,16 @@ validate` takes **no positional path**, so the exclude form above is the only me
       `grep -oE 'sql-essentials|backend-essentials' <MANIFEST> | wc -l` returns **0**, AND
       `npx nx run ayokoding-www:test:unit` exits 0 — acceptance: all four hold. **No global
       `<COURSES>` directory count is asserted** (DD-618): plan 04 authors concurrently, so the total
-      is a moving target and the 127-course figure remains the careers-only catalog total.
+      is a moving target and the 121-course figure — the same software-engineering library total
+      cited in `brd.md` and `README.md` — remains the pre-existing catalog total, separate from this
+      plan's own twenty.
 - [ ] [AI] **Scoped cross-plan link check** — re-run the Phase 6 filtered link validation and confirm
       it still finds no line naming this plan's folder. If any upstream plan has archived since,
       confirm every cross-plan reference in this folder points at its `plans/done/YYYY-MM-DD__…` path
       — acceptance: the filtered `grep` exits 1 and the repo-wide filtered validator prints
       `All links valid! No broken links found.`
 - [ ] [AI] Move: `git mv plans/in-progress/ayokoding-learning-path-06-skills-accounting plans/done/YYYY-MM-DD__ayokoding-learning-path-06-skills-accounting`
-      using today's completion date (the `evidence/`, `syllabus/` and `verification-log.md` artefacts
+      using today's completion date (the `<EVID>`, `syllabus/` and `verification-log.md` artefacts
       move with it).
 - [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with its completion date.
