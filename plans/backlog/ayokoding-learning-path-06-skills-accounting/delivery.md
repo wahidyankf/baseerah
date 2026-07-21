@@ -201,8 +201,9 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
 > **Why loops and derived alternations rather than `grep -c <pattern>` or `grep -L`**: `grep` in this
 > repo is **ugrep**. `grep -c <pattern>` counts **matching lines**, not matches, and `grep -L` means
 > files-**without**-match and exits 0 — neither is safe as a match count in an acceptance clause. On a
-> **missing** file ugrep exits **2**, not 1. (`--glob` _is_ supported by this ugrep — measured
-> 2026-07-22 — so where `--exclude-dir` appears below it is a preference, not a workaround.) No clause
+> **missing** file ugrep exits **2**, not 1. (`--glob` is supported by this ugrep, but **only in the `--glob=VALUE` form** — the
+> space-separated `--glob VALUE` dies with `ugrep: missing argument for --glob`, and paired with
+> `2>/dev/null` that becomes a silent zero-result. `--exclude-dir` below avoids the question.) No clause
 > below uses `find -newermt` either, which is GNU syntax and fails on this BSD `find`.
 > No course ID is a substring of another, which is what makes the alternation counts sound.
 >

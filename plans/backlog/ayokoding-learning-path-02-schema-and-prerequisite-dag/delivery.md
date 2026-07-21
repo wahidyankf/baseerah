@@ -223,8 +223,10 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 >
 > **Two traps asserted by an earlier draft were withdrawn on measurement (2026-07-22).** A BRE `\|`
 > alternation containing literal parens was said to be a parse error exiting 2; in fact
-> `grep -n "it(\|describe("` exits **0** and prints its matches. `--glob` was said to be unavailable;
-> in fact `grep --glob='*.ts' -c it <file>` exits **0**. Both spellings below are therefore choices,
+> `grep -n "it(\|describe("` exits **0** and prints its matches. `--glob` was said to be unavailable; in fact
+> `grep --glob='*.ts' -c it <file>` exits **0**. The real constraint is narrower: `--glob` works
+> **only in the `--glob=VALUE` form**, and `--glob VALUE` fails with `ugrep: missing argument for
+--glob` — a failure that `2>/dev/null` would hide as a clean zero. Both spellings below are therefore choices,
 > not workarounds, and neither is load-bearing.
 >
 > **`git` here is routed through RTK, and its `git diff` filter rewrites the output in _two_ ways —
@@ -1608,8 +1610,8 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       **Two properties of this command are load-bearing.** (i) `--exclude-dir` takes the **bare
       folder name**, so it excludes this plan's folder from whichever stage it currently sits in
       (`plans/backlog/` or `plans/in-progress/`) without the command needing to know which.
-      (`--glob` is also supported by this ugrep — measured 2026-07-22 — so `--exclude-dir` is the
-      chosen spelling, not the only one.) (ii) The
+      (`--glob=VALUE` also works here — though the space-separated `--glob VALUE` does not —
+      so `--exclude-dir` is the chosen spelling, not the only one.) (ii) The
       exclusion is what makes 7.3's assertion satisfiable at all: after the `git mv` this plan's
       folder is under `plans/done/`, outside the search roots, so its self-references can never be
       counted again.
