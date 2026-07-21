@@ -917,7 +917,23 @@ deleted), re-pointing each entry to wherever the content now lives.
       remaining three-bucket scenarios are verified at unit, e2e, or phase-gate level per that same
       table, not as `.feature` scenarios — command: `npx nx run ayokoding-www:specs:behavior:coverage`
       — acceptance: fails (no step bindings yet for either scenario in the file).
+
+  **Gherkin (binds) →** "A relocated legacy domain URL redirects to its legacy address"
+
+  ```gherkin
+  Scenario: A relocated legacy domain URL redirects to its legacy address
+    Given a page previously lived at a learn-section domain that is not a course or a path
+    When a reader requests that page's old URL
+    Then the app permanently redirects to the same page under the legacy bucket
+    And the rest of the path after the domain segment is preserved unchanged
+  ```
+
+  This step carries **one** binding, not two, even though it authors a file holding two scenarios.
+  The other scenario it writes — "The learn section exposes exactly three structural buckets" — is
+  already bound, as a binding declaration, on the §3.2 step that regenerates the derived artifacts;
+  binding it twice would double-count it against the traceability table.
   - _Suggested executor: `specs-maker`_
+
 - [ ] [AI] **RED (e2e)** — write failing Playwright specs in the paired `ayokoding-www-fe-e2e` project
       asserting: one relocated URL per domain 308s to its `legacy/` address in **both** inbound forms
       (bare `/en/learn/<domain>/…` in one hop, and a stale `/c`-bookmark `/en/c/learn/<domain>/…` in
@@ -1011,35 +1027,63 @@ deleted), re-pointing each entry to wherever the content now lives.
       [prd.md's low-fi wireframes](./prd.md#low-fi-option-a--indexed-with-a-landing-notice--a-per-page-banner-recommended-q-d-option-a)
       for that option (a design change surfaced during Phases 0–3), edit the source to match before
       re-rendering.
-- [ ] [AI] Verify/refresh `assets/legacy-landing-option-a-mobile.png` — acceptance:
-      `test -f assets/legacy-landing-option-a-mobile.png` exits 0 AND
-      `test -f assets/src/legacy-landing-option-a-mobile.html` exits 0 (fails loudly on a missing or
-      mistyped source path — a bare `find` against a nonexistent path errors only to stderr and would
-      otherwise read as a silent pass) AND
-      `[ -z "$(find assets/src/legacy-landing-option-a-mobile.html -newer assets/legacy-landing-option-a-mobile.png)" ]`
-      exits 0 (source is not newer than its render — falsifiable both ways: editing the source after
-      the render makes the inner `find` print the file path, so this test fails with a non-zero exit;
-      a missing/mistyped source instead fails the preceding `test -f`, so it can never be misread as
-      "nothing newer"). If stale, re-render: open the HTML at 375 px width in a browser (or
-      Playwright) and take a full-page screenshot to the same path; the render shows a single-column
-      domain list with the per-page banner above the H1.
-- [ ] [AI] Verify/refresh `assets/legacy-landing-option-a-tablet.png` — acceptance: same three-part
-      check as above (render exists, source exists, source not newer) against
-      `assets/src/legacy-landing-option-a-tablet.html` at 768 px; if stale, re-render — the render
-      shows a two-column domain list with the sidebar column present.
-- [ ] [AI] Verify/refresh `assets/legacy-landing-option-a-desktop.png` — acceptance: same three-part
-      check as above (render exists, source exists, source not newer) against
-      `assets/src/legacy-landing-option-a-desktop.html` at 1280 px; if stale, re-render.
-- [ ] [AI] Verify/refresh `assets/legacy-landing-option-b-mobile.png` — acceptance: same three-part
-      check as above (render exists, source exists, source not newer) against
-      `assets/src/legacy-landing-option-b-mobile.html` at 375 px; if stale, re-render — the relocated
-      page shows **no** banner (the option's defining absence).
-- [ ] [AI] Verify/refresh `assets/legacy-landing-option-b-tablet.png` — acceptance: same three-part
-      check as above (render exists, source exists, source not newer) against
-      `assets/src/legacy-landing-option-b-tablet.html` at 768 px; if stale, re-render.
-- [ ] [AI] Verify/refresh `assets/legacy-landing-option-b-desktop.png` — acceptance: same three-part
-      check as above (render exists, source exists, source not newer) against
-      `assets/src/legacy-landing-option-b-desktop.html` at 1280 px; if stale, re-render.
+
+  > **Render all six unconditionally — do not gate on a pre-render mtime comparison.** An earlier
+  > draft made each of these steps conditional on `find <html> -newer <png>` printing nothing
+  > beforehand. That is not a staleness signal here: **git does not track mtime**, so a fresh checkout
+  > stamps every file with its checkout time in whatever order git wrote them. Reproduced live on this
+  > plan 2026-07-22 via a real `git worktree add`: **all six** pairs landed with the `.html` ordered
+  > newer than its `.png`, so every one of these clauses reported staleness on the plan's own default
+  > execution path — this plan's Delivery Mode is `worktree-to-pr`, which means a fresh worktree is the
+  > normal case, not the exception. The pre-render reading is therefore meaningless and is asserted
+  > nowhere below. The check that _is_ meaningful runs **after** the render, where the ordering is
+  > deterministic and an unrendered file fails loudly.
+  >
+  > **The mtime check is necessary but not sufficient** — a blank, broken, or wrong-viewport render
+  > also satisfies an mtime comparison. Confirm at least one render visually before ticking these off.
+
+- [ ] [AI] **Re-render `assets/legacy-landing-option-a-mobile.png`** — acceptance: three checks, in this order.
+      (a) `test -f assets/src/legacy-landing-option-a-mobile.html` exits 0 (a mistyped source path errors only to
+      stderr and would otherwise read as a silent pass). (b) Render it: open that HTML at
+      375 px width in a browser or Playwright and screenshot full-page to
+      `assets/legacy-landing-option-a-mobile.png`. (c) **After** rendering,
+      `[ -z "$(find assets/src/legacy-landing-option-a-mobile.html -newer assets/legacy-landing-option-a-mobile.png)" ]` exits 0.
+      The render shows a single-column domain list with the per-page banner above the H1.
+- [ ] [AI] **Re-render `assets/legacy-landing-option-a-tablet.png`** — acceptance: three checks, in this order.
+      (a) `test -f assets/src/legacy-landing-option-a-tablet.html` exits 0 (a mistyped source path errors only to
+      stderr and would otherwise read as a silent pass). (b) Render it: open that HTML at
+      768 px width in a browser or Playwright and screenshot full-page to
+      `assets/legacy-landing-option-a-tablet.png`. (c) **After** rendering,
+      `[ -z "$(find assets/src/legacy-landing-option-a-tablet.html -newer assets/legacy-landing-option-a-tablet.png)" ]` exits 0.
+      The render shows a two-column domain list with the sidebar column present.
+- [ ] [AI] **Re-render `assets/legacy-landing-option-a-desktop.png`** — acceptance: three checks, in this order.
+      (a) `test -f assets/src/legacy-landing-option-a-desktop.html` exits 0 (a mistyped source path errors only to
+      stderr and would otherwise read as a silent pass). (b) Render it: open that HTML at
+      1280 px width in a browser or Playwright and screenshot full-page to
+      `assets/legacy-landing-option-a-desktop.png`. (c) **After** rendering,
+      `[ -z "$(find assets/src/legacy-landing-option-a-desktop.html -newer assets/legacy-landing-option-a-desktop.png)" ]` exits 0.
+      The render shows the full-width desktop layout.
+- [ ] [AI] **Re-render `assets/legacy-landing-option-b-mobile.png`** — acceptance: three checks, in this order.
+      (a) `test -f assets/src/legacy-landing-option-b-mobile.html` exits 0 (a mistyped source path errors only to
+      stderr and would otherwise read as a silent pass). (b) Render it: open that HTML at
+      375 px width in a browser or Playwright and screenshot full-page to
+      `assets/legacy-landing-option-b-mobile.png`. (c) **After** rendering,
+      `[ -z "$(find assets/src/legacy-landing-option-b-mobile.html -newer assets/legacy-landing-option-b-mobile.png)" ]` exits 0.
+      The relocated page shows **no** banner (the option's defining absence).
+- [ ] [AI] **Re-render `assets/legacy-landing-option-b-tablet.png`** — acceptance: three checks, in this order.
+      (a) `test -f assets/src/legacy-landing-option-b-tablet.html` exits 0 (a mistyped source path errors only to
+      stderr and would otherwise read as a silent pass). (b) Render it: open that HTML at
+      768 px width in a browser or Playwright and screenshot full-page to
+      `assets/legacy-landing-option-b-tablet.png`. (c) **After** rendering,
+      `[ -z "$(find assets/src/legacy-landing-option-b-tablet.html -newer assets/legacy-landing-option-b-tablet.png)" ]` exits 0.
+      The relocated page shows no banner at the two-column width.
+- [ ] [AI] **Re-render `assets/legacy-landing-option-b-desktop.png`** — acceptance: three checks, in this order.
+      (a) `test -f assets/src/legacy-landing-option-b-desktop.html` exits 0 (a mistyped source path errors only to
+      stderr and would otherwise read as a silent pass). (b) Render it: open that HTML at
+      1280 px width in a browser or Playwright and screenshot full-page to
+      `assets/legacy-landing-option-b-desktop.png`. (c) **After** rendering,
+      `[ -z "$(find assets/src/legacy-landing-option-b-desktop.html -newer assets/legacy-landing-option-b-desktop.png)" ]` exits 0.
+      The relocated page shows no banner at desktop width.
 - [ ] [AI] **Verify all six are embedded in `prd.md`'s Screen 4 funnel** with viewport-specific
       descriptive alt text (each naming what differs at that width, never a copy of the desktop
       text) — acceptance:
@@ -1056,12 +1100,31 @@ deleted), re-pointing each entry to wherever the content now lives.
       confirmation. If it IS overturned, update `prd.md`'s `Selected:` line and its rationale table's
       outcome column to the new option — acceptance: `grep -c "Selected: Option" prd.md` returns
       exactly **1** both before and after this step (zero or two-plus both indicate a defect).
-- [ ] [AI] Apply the ruled Q-D treatment: under option A, add the `Alert`-based "legacy / superseded"
-      notice to `<LEGACY>_index.md` and the per-page banner affordance; under option C instead set
-      `robots: noindex` metadata for the bucket. Reuse the existing composite `Alert` primitive — **no
-      net-new component** (DD-44) — acceptance: the ruled treatment is present, `grep -rF "Alert"`
-      finds the reused primitive rather than a new component file, and
-      `npx nx run ayokoding-www:build` exits 0.
+- [ ] [AI] Apply the ruled Q-D treatment, reusing the existing composite `Alert` primitive — **no
+      net-new component** (DD-44). Under **option A** the treatment has two parts that land in
+      different places: the bucket landing notice is authored into `<LEGACY>_index.md`, while the
+      **per-page banner is rendered from the route layout**
+      (`apps/ayokoding-www/src/app/[locale]/(content)/layout.tsx`, conditioned on the slug sitting
+      under `legacy/`) and **never** by editing the relocated pages. Under **option C** instead set
+      `robots: noindex` metadata for the bucket.
+      **Why the banner cannot be per-file**: option A's name ("a per-page banner") describes the
+      rendered result, not the mechanism. Writing a banner into each relocated page would edit content
+      files, which DD-41 forbids — `brd.md` fixes the edited-content set at exactly
+      `en/learn/overview.md` plus the new `legacy/_index.md` — and would falsify the binding scenario
+      "The relocation rewrites no page content" (`prd.md`, bound at §3.2). Rendering from the layout
+      satisfies the design intent and the move discipline at once.
+      Acceptance — four checks, all required. (a) `grep -cF "Alert" <LEGACY>_index.md` returns **1 or
+      more**. (b) The banner is wired in the layout —
+      `grep -cF "legacy" "apps/ayokoding-www/src/app/[locale]/(content)/layout.tsx"` returns **1 or
+      more** (quote the path: the brackets and parens are shell globbing characters). (c) **No
+      net-new component file was added** — the count of files matching `alert*.tsx` under
+      `libs/web-ui/src` and `apps/ayokoding-www/src` is **unchanged** from the Phase 0 baseline
+      recorded in `<PLAN>/evidence/phase-0-baseline.txt`. (d) `npx nx run ayokoding-www:build`
+      exits 0.
+      **The superseded form of this acceptance was a bare `grep -rF "Alert"` with no target path**,
+      which is vacuous: `Alert` already resolves in **1** file under `apps/ayokoding-www/src` and
+      **5** under `libs/web-ui/src` [Repo-grounded — measured 2026-07-22], so it passed before this
+      plan ran and could not distinguish "reused the primitive" from "did nothing at all".
 
 ### 3.5 · Manual verification (`en`, all breakpoints)
 
