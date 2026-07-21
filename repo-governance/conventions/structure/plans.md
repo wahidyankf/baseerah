@@ -230,6 +230,10 @@ When a two-pager is ripe:
 4. **Delete** the two-pager and remove its line from `plans/ideas/README.md` (the idea now lives as a
    plan).
 
+The [plan-idea-promotion-planning workflow](../../workflows/plan/plan-idea-promotion-planning.md)
+orchestrates these four steps end to end — ripeness gate, the deep prior-art study, the
+`plan-planning` hand-off, and the two-pager retirement.
+
 ### Ideas as a Home for Execution Learnings
 
 The [Knowledge Capture phase](#the-knowledge-capture-phase-final-phase-before-archival) routes some
