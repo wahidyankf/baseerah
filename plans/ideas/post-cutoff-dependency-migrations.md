@@ -18,6 +18,17 @@ dependency-update two-pager; add to this one.
 Soak windows elapse continuously — several deferred bumps may already be eligible (e.g. TypeScript 6.0
 was eligible after ~2026-05-23) and should be picked up before they fall further behind.
 
+## Prior art / precedents
+
+- **Dependency Bump Stability & Safety Policy** — the repo's Path A/B/C soak-window gate each deferred
+  bump is re-evaluated against. [dependency-bump-policy](../../repo-governance/development/workflow/dependency-bump-policy.md)
+- **Renovate** — established tool that automates exactly this "track deferred bumps, promote as they
+  clear" problem via scheduled PRs. [docs.renovatebot.com](https://docs.renovatebot.com/)
+- **Dependabot** — GitHub's automated version-update tool for keeping pending dependency upgrades
+  tracked. [GitHub docs](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/about-dependabot-version-updates)
+- **Semantic Versioning** — the MAJOR.MINOR.PATCH scheme framing which of these bumps are breaking.
+  [semver.org](https://semver.org/)
+
 ## Proposed direction (sketch)
 
 Promote each to a dependency-bump plan as it clears its gate. The current deferred set:

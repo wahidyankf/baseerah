@@ -27,6 +27,19 @@ rename silently invalidates an unknown number of citations across all three repo
 Only a mechanical check against the running system closes this, and the sibling `md * validate`
 family already establishes the exact pattern to extend.
 
+## Prior art / precedents
+
+- **rhino-cli `md * validate` family** — the existing link/heading/mermaid validators this new
+  `md commands validate` extends.
+  [markdown quality](../../repo-governance/development/quality/markdown.md)
+- **Rust doctests** — prior art for verifying documentation claims (code examples) against the real
+  system, the same principle applied to cited commands.
+  [doctests](https://doc.rust-lang.org/rustdoc/write-documentation/documentation-tests.html)
+- **markdownlint** — established mechanical validation of documentation against declared rules.
+  [markdownlint](https://github.com/DavidAnson/markdownlint)
+- **Nx targets reference** — the canonical target doc that itself drifted, motivating a check
+  against the running project graph. [nx-targets](../../repo-governance/development/infra/nx-targets.md)
+
 ## Proposed direction (sketch)
 
 - A new `rhino-cli` subcommand `md commands validate` scanning tracked markdown, in the existing

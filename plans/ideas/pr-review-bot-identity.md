@@ -24,6 +24,20 @@ The maker→fixer cycle is the default gate for every `*-to-pr` delivery, so thi
 on every PR. The longer STATE stays untrustworthy, the more automation gets built to parse severity
 from comment text — accreting workaround dependence that a later fix then has to unwind.
 
+## Prior art / precedents
+
+- **GitHub Apps** — first-class bot identities that authenticate with least-privilege scopes, the
+  mechanism for giving the reviewer its own posting identity.
+  [github apps](https://docs.github.com/en/apps/overview)
+- **PR-Review Quality Gate workflow** — the maker→fixer cycle where the untrustworthy review STATE
+  is currently worked around in text.
+  [pr-review-quality-gate](../../repo-governance/workflows/pr/pr-review-quality-gate.md)
+- **pr-review-maker agent** — the agent that structurally cannot post `REQUEST_CHANGES` today and
+  would be rewired to the new identity.
+  [pr-review-maker](../../.claude/agents/pr-review-maker.md)
+- **Git Identity Guardrail** — the repo rule scoping this to `gh`/API posting identity, distinct
+  from commit-push identity. [AGENTS.md](../../AGENTS.md)
+
 ## Proposed direction (sketch)
 
 - Provision a dedicated GitHub App or CI-scoped bot identity with minimal write scope: create review,

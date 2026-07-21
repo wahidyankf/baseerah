@@ -37,15 +37,16 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 
 A two-pager sits between a throwaway one-liner and a full backlog plan: short enough to write in one
 sitting and triage at a glance, yet structured enough to decide whether to promote it. Target ≤ ~2
-printed pages, ~7 short sections:
+printed pages, ~8 short sections:
 
 1. **Title + one-line summary** (plus a provenance note when it came from a plan)
 2. **Problem / context** — a specific example of why the status quo doesn't work, with concrete data points (counts/sizes/measurements; never fabricated)
 3. **Why now** — the urgency, dependency, or opportunity window
-4. **Proposed direction (sketch)** — core elements only; **not** wireframes, file paths, or Gherkin
-5. **Rough scope & non-goals** — in-scope bullets + an explicit out-of-scope list
-6. **Risks & open questions** — rabbit holes + the unknowns that block promotion
-7. **What success looks like + promotion signal**
+4. **Prior art / precedents** — 2-5 named precedents (tool/pattern/standard/prior plan) with links; lightweight at capture, deep `web-researcher` study deferred to promotion
+5. **Proposed direction (sketch)** — core elements only; **not** wireframes, file paths, or Gherkin
+6. **Rough scope & non-goals** — in-scope bullets + an explicit out-of-scope list
+7. **Risks & open questions** — rabbit holes + the unknowns that block promotion
+8. **What success looks like + promotion signal**
 
 Keep it a brief, not a plan: one paragraph per section, no fabricated metrics, no secrets, and no
 BRD/PRD/tech-docs/delivery split (that is the backlog plan's job).

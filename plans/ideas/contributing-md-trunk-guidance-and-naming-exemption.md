@@ -25,6 +25,17 @@ be corrected without first resolving the exemption. A new contributor reading `C
 gets the opposite instruction from the rest of the repo, and every day it stays that way is another
 contributor onboarded against the wrong workflow.
 
+## Prior art / precedents
+
+- **GitHub CONTRIBUTING.md convention** — the ecosystem-standard uppercase root file GitHub resolves by
+  name, which is why renaming is out of scope and an exemption is needed instead. [GitHub docs](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors)
+- **Trunk Based Development** — the workflow the stale "work directly on `main`" line contradicts and the
+  correction restores. [trunkbaseddevelopment.com](https://trunkbaseddevelopment.com/)
+- **File Naming convention (exempt set)** — the existing precedent for exempting conventional uppercase
+  root files (`README.md`, `AGENTS.md`) that Route B extends. [file-naming](../../repo-governance/conventions/structure/file-naming.md)
+- **AGENTS.md §Delivery Mode** — the governance surface the corrected trunk guidance must agree with.
+  [AGENTS.md](../../AGENTS.md)
+
 ## Proposed direction (sketch)
 
 - Pick one of two exemption routes: **Route A** adds `--exempt "CONTRIBUTING.md"` to the one

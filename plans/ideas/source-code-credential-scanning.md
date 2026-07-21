@@ -18,6 +18,21 @@ just as gitleaks itself has gone feature-frozen with an unresolved entropy false
 ([#1830](https://github.com/gitleaks/gitleaks/issues/1830)) that misfires on Rust config struct field
 names — so the incumbent tool is not a good fit for this repo's Rust-heavy source.
 
+## Prior art / precedents
+
+- **gitleaks** — the incumbent pre-commit + CI secret scanner; its entropy false-positive
+  regression is the exact reason this idea seeks an alternative.
+  [gitleaks #1830](https://github.com/gitleaks/gitleaks/issues/1830)
+- **TruffleHog** — a maintained pre-commit/CI credential detector, a candidate to evaluate
+  alongside Betterleaks. [trufflehog](https://github.com/trufflesecurity/trufflehog)
+- **detect-secrets** — a pre-commit secret detector with a tuned false-positive posture, relevant
+  to the Rust-source precision concern. [detect-secrets](https://github.com/Yelp/detect-secrets)
+- **Betterleaks** — the MIT gitleaks successor this idea proposes evaluating (no stable public URL
+  verified).
+- **Secrets and Env Standards convention** — the repo's existing no-secrets-in-git policy this gate
+  would reinforce pre-push.
+  [convention](../../repo-governance/conventions/security/secrets-and-env-standards.md)
+
 ## Proposed direction (sketch)
 
 - Once Betterleaks reaches stable production use, evaluate it for pre-commit + CI credential detection

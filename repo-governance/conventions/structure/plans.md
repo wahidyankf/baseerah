@@ -152,7 +152,7 @@ distinct, non-overlapping ideas — not a pile that repeats itself.
 
 ### Two-Pager Template
 
-Each `plans/ideas/<slug>.md` has an H1 title plus ~7 short sections, targeting ≤ ~2 printed pages:
+Each `plans/ideas/<slug>.md` has an H1 title plus ~8 short sections, targeting ≤ ~2 printed pages:
 
 1. **`# <Idea title>` + one-line summary** — one sentence a stranger understands, telling a reader
    whether reading on is worth it (the "abstract test"). When the idea originated from a plan, add a
@@ -163,16 +163,23 @@ Each `plans/ideas/<slug>.md` has an H1 title plus ~7 short sections, targeting �
    counts, sizes, measurements (e.g. "83 missing step definitions", "AGENTS.md at 29,983 B against a
    30,000 B limit", "4 files drifted"). A data-pointed problem is promotable; a vague one is not.
 3. **Why now** — the urgency, dependency, or opportunity window that makes this timely.
-4. **Proposed direction (sketch)** — the core elements at a level a reader _immediately_ grasps; cap
+4. **Prior art / precedents** — a short survey of who has already tackled this and how: two to five
+   named precedents (a tool, pattern, standard, or prior plan), each with a link. _Nothing new under
+   the sun_ — most substantial ideas have precedent, and naming it kills reinvention and sharpens
+   _Why now_. Keep it **lightweight at capture**: author-supplied links and a clause each, not a
+   research report — the deep [`web-researcher`](../../development/agents/ai-agents.md) prior-art
+   study is deferred to promotion (see [Promoting a Two-Pager](#promoting-a-two-pager-to-a-full-plan)).
+   Zero prior art on a substantial idea is a smell: you probably haven't looked.
+5. **Proposed direction (sketch)** — the core elements at a level a reader _immediately_ grasps; cap
    to roughly three elements. **Explicitly NOT** wireframes, file paths, API signatures, or Gherkin —
    that detail is the backlog plan's job (Shape Up: _"we don't want to over-specify the design with
    wireframes or high-fidelity mocks"_).
-5. **Rough scope & non-goals** — in-scope bullets, plus an explicit **Out of scope (for now)** list.
+6. **Rough scope & non-goals** — in-scope bullets, plus an explicit **Out of scope (for now)** list.
    Non-goals name things a reader would _reasonably expect_ in scope and deliberately exclude them
    ("ACID compliance", not "the system shouldn't crash").
-6. **Risks & open questions** — rabbit holes worth flagging now, plus named unknowns that block
+7. **Risks & open questions** — rabbit holes worth flagging now, plus named unknowns that block
    promotion. Zero open questions is a smell: the idea is either over-specified or under-thought.
-7. **What success looks like + promotion signal** — the condition that would make the idea worth
+8. **What success looks like + promotion signal** — the condition that would make the idea worth
    having pursued (observable fact / cited+dated number / explicitly-labeled judgment call — **never a
    fabricated KPI**), and what "ready to become a `backlog/` plan" means for _this_ idea.
 
@@ -184,6 +191,10 @@ Each `plans/ideas/<slug>.md` has an H1 title plus ~7 short sections, targeting �
   specific files, functions, or exact layouts means you've drifted into full-plan territory.
 - **No BRD/PRD/tech-docs/delivery split, no Gherkin, no delivery checklist, no phase gates** — those
   belong to the five-document backlog plan.
+- **Prior art stays lightweight at capture** — the _Prior art_ section is author-supplied links and a
+  clause each, never a research report; a thin idea keeps it short but never omits it. The deep
+  `web-researcher` prior-art study runs at promotion, where the full plan can afford it — capturing an
+  idea must stay cheap.
 - **Ground the problem in data points** — cite the concrete count, size, or measurement that
   evidences it. If no baseline exists, say so plainly (_"no baseline measured"_) rather than inventing
   one — an honestly-unquantified problem is fine; a fabricated number is not.
@@ -211,8 +222,12 @@ When a two-pager is ripe:
 
 1. Create a new plan folder in `backlog/` with `[project-identifier]/` format (no date prefix) —
    default to the five-document multi-file layout (see [Structure Decision](#structure-decision)).
-2. Carry the two-pager's problem, scope, and open questions forward into the plan's `brd.md` / `prd.md`.
-3. **Delete** the two-pager and remove its line from `plans/ideas/README.md` (the idea now lives as a
+2. **Run the deep prior-art study** — commission a [`web-researcher`](../../development/agents/ai-agents.md)
+   survey of precedents, standards, and existing solutions for the idea, and fold the findings into
+   the plan's `brd.md` / `prd.md` as design input. The two-pager's _Prior art_ section was a
+   lightweight starting point; at promotion the full plan can afford the real research.
+3. Carry the two-pager's problem, scope, and open questions forward into the plan's `brd.md` / `prd.md`.
+4. **Delete** the two-pager and remove its line from `plans/ideas/README.md` (the idea now lives as a
    plan).
 
 ### Ideas as a Home for Execution Learnings

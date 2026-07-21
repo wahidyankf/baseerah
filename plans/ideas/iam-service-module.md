@@ -17,6 +17,15 @@ against. This is a placeholder for a real need that has not yet materialized.
 Not yet. This idea is deliberately early and mostly open questions; it is captured so the need is not
 forgotten, not because it is ready to build.
 
+## Prior art / precedents
+
+- **OpenID Connect / OAuth 2.0** — the standard authentication protocol a shared IAM would likely adopt
+  rather than reinvent. [openid.net](https://openid.net/developers/how-connect-works/)
+- **Keycloak** — established open-source IAM providing the auth(n/z) the "build vs. adopt an IdP" open
+  question weighs. [keycloak.org](https://www.keycloak.org/)
+- **Monorepo Structure reference** — frames the open "`apps/` service vs. `libs/` module" placement
+  question. [monorepo-structure](../../docs/reference/monorepo-structure.md)
+
 ## Proposed direction (sketch)
 
 - A dedicated IAM capability handling authentication and authorization, consumed by multiple products

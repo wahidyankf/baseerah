@@ -538,8 +538,8 @@ And their session is created with correct permissions
 
 ### 1. Ideation (ideas/)
 
-**Format**: A two-pager idea brief — one `plans/ideas/<slug>.md` per idea, ~7 short sections
-(problem, why-now, direction sketch, scope & non-goals, risks & open questions, success/promotion),
+**Format**: A two-pager idea brief — one `plans/ideas/<slug>.md` per idea, ~8 short sections
+(problem, why-now, prior art, direction sketch, scope & non-goals, risks & open questions, success/promotion),
 ≤ ~2 pages. Not a full plan. See the [Ideas Folder (Two-Pagers) convention](../../../repo-governance/conventions/structure/plans.md#ideas-folder-two-pagers).
 Scan `plans/ideas/` first and fold into an existing brief rather than duplicating.
 

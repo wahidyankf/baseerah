@@ -16,6 +16,17 @@ complexity is unquantified (no audit has been run yet; no baseline measured).
 rhino-cli has grown into the shared CLI backbone, so the boundary between it and the per-domain CLIs is
 worth revisiting before more logic accretes in the wrong place.
 
+## Prior art / precedents
+
+- **Simplicity Over Complexity principle** — the repo value directly motivating trimming accreted
+  CLI surface.
+  [principle](../../repo-governance/principles/general/simplicity-over-complexity.md)
+- **rhino-cli byte-identity boundary** — the shared CLI backbone into which genuinely-shared
+  per-domain logic would fold. [sdlc-gate-standard](../../docs/reference/sdlc-gate-standard.md)
+- **Rule of three** — the refactoring guideline for when duplicated logic across CLIs is worth
+  consolidating into one place.
+  [rule of three](<https://en.wikipedia.org/wiki/Rule_of_three_(computer_programming)>)
+
 ## Proposed direction (sketch)
 
 - Audit what `ayokoding-cli` and `ose-cli` actually do today and who invokes them.

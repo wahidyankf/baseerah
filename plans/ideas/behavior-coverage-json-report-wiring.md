@@ -20,6 +20,17 @@ fail-on-skip grep-bans in each project's `test:unit` / `test:quick`.
 The discrepancy between the overclaimed Final Gate and the actual wiring is documented but unresolved;
 wiring the mechanism for real would make the claim true and add a genuine third cross-check.
 
+## Prior art / precedents
+
+- **Cucumber JSON run reports** — established prior art for emitting machine-readable test-run
+  reports that downstream tooling ingests, the exact mechanism this idea wires.
+  [cucumber reporting](https://cucumber.io/docs/cucumber/reporting/)
+- **Specs & feature-change-completeness gate** — the repo's existing anti-hollow-spec guarantee this
+  cross-check would add a third mechanism to.
+  [feature-change-completeness](../../repo-governance/development/quality/feature-change-completeness.md)
+- **Nx targets & specs coverage** — the canonical target model the `--*-report` flags must thread
+  through across the ~59 projects. [nx-targets](../../repo-governance/development/infra/nx-targets.md)
+
 ## Proposed direction (sketch)
 
 - Decide which test tier emits which report format, per language/tool.

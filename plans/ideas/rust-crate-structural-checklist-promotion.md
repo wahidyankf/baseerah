@@ -17,6 +17,18 @@ happens to do", not a generalized standard.
 Not yet — this idea is deliberately **gated** on a second Rust crate being added to `ose-public`.
 Promoting it now would codify single-crate evidence as if it were general.
 
+## Prior art / precedents
+
+- **Rule of three** — the guideline against abstracting from a single instance, exactly why this
+  promotion is gated on a second crate.
+  [rule of three](<https://en.wikipedia.org/wiki/Rule_of_three_(computer_programming)>)
+- **Cargo package layout** — the language-level standard crate structure any generalized checklist
+  would reconcile against.
+  [cargo layout](https://doc.rust-lang.org/cargo/guide/project-layout.html)
+- **Rust coding standards** — the repo's existing Rust governance where a validated structural
+  checklist would live.
+  [rust standards](../../docs/explanation/software-engineering/programming-languages/rust/coding-standards.md)
+
 ## Proposed direction (sketch)
 
 - When a second Rust crate lands, promote the checklist to

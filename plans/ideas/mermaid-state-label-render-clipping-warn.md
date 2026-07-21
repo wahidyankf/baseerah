@@ -24,6 +24,15 @@ valid-but-clipped diagram shipped unnoticed. Every state diagram authored across
 another chance to reintroduce it, and today there is no signal at all — the gap is silent by
 construction.
 
+## Prior art / precedents
+
+- **Mermaid stateDiagram-v2 transition labels** — the exact label construct whose rendered clipping the
+  WARN rule targets. [mermaid.js.org](https://mermaid.js.org/syntax/stateDiagram.html)
+- **GitHub native Mermaid rendering** — the specific renderer whose clipping no text validator can
+  observe. [GitHub blog](https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/)
+- **Diagrams convention (§Render-Fidelity Caveat)** — the repo doc the shipped rule would be pointed at.
+  [diagrams](../../repo-governance/conventions/formatting/diagrams.md)
+
 ## Proposed direction (sketch)
 
 - Derive the threshold empirically: render a calibration sweep of `stateDiagram-v2` labels, observe

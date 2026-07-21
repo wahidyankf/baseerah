@@ -18,6 +18,17 @@ doc warns against.
 The defects are fresh and concrete (one already caused a misread), and all four are cheap
 documentation fixes that then propagate public → siblings before the next parity cycle repeats them.
 
+## Prior art / precedents
+
+- **git worktree (bare repos + linked worktrees)** — the tool whose `--is-bare-repository` returns
+  `false` from a linked worktree, the exact trap item 3 codifies against. [git-scm](https://git-scm.com/docs/git-worktree)
+- **Plans Organization convention §Delivery Mode** — the table (item 1) that lists the impossible
+  `main-to-*` modes for bare repos. [plans](../../repo-governance/conventions/structure/plans.md)
+- **PR Merge Protocol** — the enumeration sites item 4 mirrors the saturation-qualifier note into.
+  [pr-merge-protocol](../../repo-governance/development/workflow/pr-merge-protocol.md)
+- **plan-multi-repo-parity-planning workflow** — carries the name-scoped bare-repo grill question
+  (item 2) to be property-bound. [parity-planning](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
+
 ## Proposed direction (sketch)
 
 Four data-pointed fixes:

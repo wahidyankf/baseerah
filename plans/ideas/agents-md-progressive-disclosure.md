@@ -24,6 +24,20 @@ The file is under 20 bytes from its ceiling; the next rule addition is blocked. 
 `parallel-orchestration-shared-machine-governance`, and every future governance plan hits the same
 wall until headroom is restored.
 
+## Prior art / precedents
+
+- **Instruction-File Size Budget Convention** — the gate that fails `AGENTS.md` over threshold and
+  names progressive disclosure as the sole sanctioned remediation.
+  [budget convention](../../repo-governance/conventions/structure/instruction-file-size-budget.md)
+- **Progressive Disclosure principle** — the repo principle this refactor applies to the
+  most-loaded instruction surface.
+  [principle](../../repo-governance/principles/content/progressive-disclosure.md)
+- **Progressive disclosure (Nielsen Norman)** — the origin UX concept of showing summaries and
+  deferring detail behind a request.
+  [nngroup](https://www.nngroup.com/articles/progressive-disclosure/)
+- **AGENTS.md standard** — the open instruction-file format this file implements, whose size is
+  under refactor. [agents.md](https://agents.md/)
+
 ## Proposed direction (sketch)
 
 - Identify the highest-byte inline-expanded sections that already have a complete canonical home in

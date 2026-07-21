@@ -22,6 +22,14 @@ CLI as the named successor), and the scanner is blind to it today. This is the c
 enumeration-based-guard failure mode — a denylist that fails open on every term nobody has added yet —
 so it is cheapest to close before the first mention lands, not after.
 
+## Prior art / precedents
+
+- **Governance Vendor-Independence convention** — the rule the scanner enforces and whose companion term
+  table must stay in sync with the denylist. [vendor-independence](../../repo-governance/conventions/structure/governance-vendor-independence.md)
+- **OWASP allowlist-over-denylist guidance** — the security principle behind the "denylist fails open on
+  every unnamed term" critique in the out-of-scope redesign. [OWASP Input Validation](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
+- **Kiro (AWS)** — the Amazon Q successor tool whose term the scanner must learn to catch. [kiro.dev](https://kiro.dev/)
+
 ## Proposed direction (sketch)
 
 - Add `\bKiro\b` and the `.kiro/` path prefix to the vendor-term list in `vendor_audit.rs`, with

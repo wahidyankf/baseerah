@@ -17,6 +17,16 @@ and there is no recent confirmation the demo apps still conform.
 Standards have shifted materially since the extraction (toolchain-parity, lint-safety-parity,
 three-tier testing). Drift, if any, is easiest to catch before it compounds.
 
+## Prior art / precedents
+
+- **standardize-repo-toolchain-parity plan (done)** — the standards shift the extracted demo apps may
+  now lag behind. [toolchain-parity](../done/2026-06-13__standardize-repo-toolchain-parity/README.md)
+- **lint-safety-parity plan (done)** — companion parity work whose lint gates the demo apps must now
+  meet. [lint-safety-parity](../done/2026-06-12__lint-safety-parity/README.md)
+- **Related Repositories reference** — documents ose-primer as authoritative for the extracted demo
+  apps, framing the repo-ownership open question. [related-repositories](../../docs/reference/related-repositories.md)
+- **ci-checker** — the conformance-check agent to run against the demo apps. [ci-checker agent](../../.claude/agents/ci-checker.md)
+
 ## Proposed direction (sketch)
 
 - Run the current standard checks (lint, test tiers, specs coverage, CI) against the demo apps in

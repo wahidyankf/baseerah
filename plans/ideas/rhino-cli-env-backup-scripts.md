@@ -17,6 +17,17 @@ baseline measured — the failure simply hasn't been counted).
 The env-file-access guardrails make ad-hoc manual copying awkward (agents cannot touch real `.env*`),
 so a sanctioned scripted path is the clean way to make backups routine.
 
+## Prior art / precedents
+
+- **Secrets and Env Standards convention** — the no-secrets-in-git policy that makes `.env*`
+  gitignored and therefore unrecoverable, the gap this idea fills.
+  [convention](../../repo-governance/conventions/security/secrets-and-env-standards.md)
+- **Reproducible Environments practice** — `.env.example` plus lockfile pinning already give
+  reproducibility for everything except the real secret values a backup would cover.
+  [reproducible-environments](../../repo-governance/development/workflow/reproducible-environments.md)
+- **SOPS** — prior art for safely storing and recovering `.env`-style secret files, the heavier
+  secrets-manager approach this idea deliberately scopes out. [sops](https://github.com/getsops/sops)
+
 ## Proposed direction (sketch)
 
 - A script under `scripts/` (exempt from the agent env-file guardrail) that backs up and restores

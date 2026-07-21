@@ -34,6 +34,19 @@ directly into a first-class mechanism, and it composes with the tri-repo byte-id
 `ose-infra`. Building this alongside the sibling `plan-quality-gate-convergence` plan shares the
 substrate cost.
 
+## Prior art / precedents
+
+- **Fagan inspection** — the classic formal review process establishing that structured
+  defect-finding beats ad-hoc iteration.
+  [fagan inspection](https://en.wikipedia.org/wiki/Fagan_inspection)
+- **repo-rules-quality-gate workflow** — the sweep whose 1-3-round convergence expectation this
+  idea makes trustworthy.
+  [repo-rules-quality-gate](../../repo-governance/workflows/repo/repo-rules-quality-gate.md)
+- **Maker-Checker-Fixer pattern** — the three-stage substrate the disjoint-lens redesign extends.
+  [pattern](../../repo-governance/development/pattern/maker-checker-fixer.md)
+- **Sibling plan-quality-gate-convergence idea** — the structurally-identical gate this shares a
+  parallel-disjoint-lenses substrate with. [sibling idea](./plan-quality-gate-convergence.md)
+
 ## Proposed direction (sketch)
 
 - A **Blind-Spot Class Registry** of the 15 observed classes, each with inline evidence (the SHAs are

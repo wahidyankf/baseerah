@@ -19,6 +19,14 @@ if any, is unmeasured until re-audited (no baseline).
 The parity work is recent enough that the residual (if any) is small and cheap to find now, before new
 drift accumulates on top of a mostly-standardized baseline.
 
+## Prior art / precedents
+
+- **standardize-repo-toolchain-parity plan (done)** — the mega-plan (7 workstreams A–G) that absorbed
+  the bulk of CI drift; this idea audits only its residual. [toolchain-parity](../done/2026-06-13__standardize-repo-toolchain-parity/README.md)
+- **lint-safety-parity plan (done)** — companion parity work also folded into the standardized baseline.
+  [lint-safety-parity](../done/2026-06-12__lint-safety-parity/README.md)
+- **ci-checker** — the CI-standards validator agent that performs the residual audit. [ci-checker agent](../../.claude/agents/ci-checker.md)
+
 ## Proposed direction (sketch)
 
 - Audit current CI workflows across apps and repos against the parity baseline the toolchain-parity

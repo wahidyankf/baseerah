@@ -17,6 +17,15 @@ been sitting there silently since it was introduced.
 Drift has already happened once and went undetected until a coincidental manual audit. Every rhino-cli
 change across the three repos is another chance to reintroduce it, and there is no automatic backstop.
 
+## Prior art / precedents
+
+- **SDLC Gate Standard §rhino-cli byte-identity boundary** — codifies the exact `src/`/`Cargo.*`/Gherkin
+  boundary this gate would diff. [sdlc-gate-standard](../../docs/reference/sdlc-gate-standard.md)
+- **Related Repositories reference** — documents the three repos (one private, two bare) across which
+  byte-identity must hold, framing the run-location question. [related-repositories](../../docs/reference/related-repositories.md)
+- **plan-multi-repo-parity-planning workflow** — the parity process this standing gate would back up
+  with continuous detection. [parity-planning](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
+
 ## Proposed direction (sketch)
 
 - A standing gate (periodic or CI-triggered) that diffs the codified byte-identity boundary — `src/`,

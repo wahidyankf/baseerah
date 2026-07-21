@@ -18,6 +18,20 @@ tree has 4 required parts and 0 checkers currently enforce the shape; of the 3 c
 The canonical shape now exists as a convention, so the gap between "documented shape" and "enforced
 shape" is live — every new topic is an opportunity to drift.
 
+## Prior art / precedents
+
+- **Existing AyoKoding structural checkers** — the `by-example` and `in-the-field` checkers already
+  validate per-track content shape; this extends that idea to the canonical topic tree.
+  [by-example-checker](../../.claude/agents/apps-ayokoding-www-by-example-checker.md)
+- **Maker-Checker-Fixer pattern** — the repo's standard three-stage quality workflow a
+  shape-enforcement checker plugs into.
+  [pattern](../../repo-governance/development/pattern/maker-checker-fixer.md)
+- **Diátaxis framework convention** — establishes a documented content shape as the thing checkers
+  enforce, exactly the "documented vs enforced" gap this idea closes.
+  [diataxis](../../repo-governance/conventions/structure/diataxis-framework.md)
+- **markdownlint** — prior art for mechanically validating documentation structure against declared
+  rules. [markdownlint](https://github.com/DavidAnson/markdownlint)
+
 ## Proposed direction (sketch)
 
 - Add canonical-shape enforcement rules to `apps-ayokoding-www-by-example-checker` and

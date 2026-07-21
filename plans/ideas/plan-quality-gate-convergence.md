@@ -32,6 +32,18 @@ of the same shape; adding lenses adds shapes. A structurally identical sibling g
 (`repo-rules-quality-gate-convergence`) hit the same wall in the same week, so the fix is a shared
 substrate worth building once rather than a one-off tweak.
 
+## Prior art / precedents
+
+- **Fagan inspection** — the classic formal software-inspection process showing structured review
+  finds defects that sequential re-reading misses.
+  [fagan inspection](https://en.wikipedia.org/wiki/Fagan_inspection)
+- **plan-quality-gate workflow** — the maker-checker-fixer loop whose 3-5-iteration target this idea
+  aims to actually hit. [plan-quality-gate](../../repo-governance/workflows/plan/plan-quality-gate.md)
+- **Maker-Checker-Fixer pattern** — the three-stage substrate the parallel-lens redesign builds on.
+  [pattern](../../repo-governance/development/pattern/maker-checker-fixer.md)
+- **Sibling repo-rules-quality-gate-convergence idea** — the structurally-identical gate sharing the
+  same convergence substrate. [sibling idea](./repo-rules-quality-gate-convergence.md)
+
 ## Proposed direction (sketch)
 
 - A **Defect-Class Registry** of catalogued acceptance-clause traps (grep semantics, CommonMark

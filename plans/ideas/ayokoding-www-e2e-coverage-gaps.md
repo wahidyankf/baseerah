@@ -20,6 +20,15 @@ genuine ~2-week-old content gap, not work-in-progress.
 skips** instead of failing the suite. The safer `fail-on-gen` default cannot return until the backlog
 of uncovered scenarios is burned down.
 
+## Prior art / precedents
+
+- **Playwright test annotations** — `test.fixme`/`test.skip` is the exact mechanism marking the
+  uncovered scenarios that this idea burns down. [Playwright](https://playwright.dev/docs/test-annotations)
+- **Gherkin step definitions (Cucumber)** — the `.feature`-to-step-definition model whose missing
+  bindings are the coverage gap. [Cucumber](https://cucumber.io/docs/gherkin/)
+- **Specs & Gherkin Completeness convention** — the repo rule requiring companion Gherkin coverage that
+  this backlog violates. [feature-change-completeness](../../repo-governance/development/quality/feature-change-completeness.md)
+
 ## Proposed direction (sketch)
 
 - Implement the missing step defs against the running app (`nx run ayokoding-www:serve` + browser

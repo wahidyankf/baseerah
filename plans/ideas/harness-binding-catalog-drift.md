@@ -27,6 +27,17 @@ Harness conventions move continuously and each stale row is a latent mis-emit. T
 done and copied to `findings.md` in the folder (the `generated-reports/` original is gitignored and
 vanishes on clean), so the evidence exists now but decays as vendors keep changing.
 
+## Prior art / precedents
+
+- **AGENTS.md standard** — the open cross-vendor instruction format the binding catalog resolves each
+  harness against. [agents.md](https://agents.md/)
+- **Multi-Harness Binding convention** — defines the two-tier binding model and no-shadowing rule the
+  catalog implements. [multi-harness-binding](../../repo-governance/conventions/structure/multi-harness-binding.md)
+- **Platform Bindings reference** — the catalog document itself, the primary artifact this triage
+  reconciles. [platform-bindings](../../docs/reference/platform-bindings.md)
+- **repo-harness-compatibility-checker** — the agent whose 2026-07-20 run produced the drift findings
+  being triaged. [checker agent](../../.claude/agents/repo-harness-compatibility-checker.md)
+
 ## Proposed direction (sketch)
 
 - Triage each Phase 1 finding, deciding per row: update the catalog, update the emitted binding files,
