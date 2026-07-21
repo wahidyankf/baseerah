@@ -551,19 +551,27 @@ stateDiagram-v2
     state parallel_processing {
         [*] --> validation
         [*] --> fraud_check
-
-        state validation {
-            [*] --> validating
-            validating --> validated
-        }
-
-        state fraud_check {
-            [*] --> checking
-            checking --> cleared
-        }
     }
 
     parallel_processing --> completed: both complete
+```
+
+The two regions run concurrently and independently. `validation`:
+
+```mermaid
+%% Color Palette: Teal #029E73
+stateDiagram-v2
+    [*] --> validating
+    validating --> validated
+```
+
+`fraud_check`:
+
+```mermaid
+%% Color Palette: Teal #029E73
+stateDiagram-v2
+    [*] --> checking
+    checking --> cleared
 ```
 
 ### Parallel States

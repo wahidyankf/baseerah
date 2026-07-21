@@ -203,11 +203,6 @@ graph LR
     D -->|"First success"| F["✅ Promise.any()<br/>(Ignore failures)"]:::purple
     D -->|"First complete"| G["✅ Promise.race()<br/>(Success or failure)"]:::purple
 
-    C --> C1["All succeed → array<br/>One fails → reject"]
-    E --> E1["All settle → array<br/>{status, value/reason}"]
-    F --> F1["One succeeds → value<br/>All fail → AggregateError"]
-    G --> G1["First complete → value/error"]
-
     Ex1["Example: Fetch 3 donations<br/>Need all or none"]:::blue --> C
     Ex2["Example: Check all records<br/>Want all results"]:::blue --> E
     Ex3["Example: Fetch from mirrors<br/>First success wins"]:::blue --> F
@@ -215,6 +210,20 @@ graph LR
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff
     classDef orange fill:#DE8F05,stroke:#000,color:#000
+    classDef teal fill:#029E73,stroke:#000,color:#fff
+    classDef purple fill:#CC78BC,stroke:#000,color:#000
+```
+
+What each combinator resolves to:
+
+```mermaid
+%% Color Palette: Teal #029E73, Purple #CC78BC
+graph LR
+    C["✅ Promise.all()"]:::teal --> C1["All succeed → array<br/>One fails → reject"]
+    E["✅ Promise.allSettled()"]:::teal --> E1["All settle → array<br/>{status, value/reason}"]
+    F["✅ Promise.any()"]:::purple --> F1["One succeeds → value<br/>All fail → AggregateError"]
+    G["✅ Promise.race()"]:::purple --> G1["First complete → value/error"]
+
     classDef teal fill:#029E73,stroke:#000,color:#fff
     classDef purple fill:#CC78BC,stroke:#000,color:#000
 ```
@@ -554,7 +563,6 @@ async function fetchDonationUnsafe(id: string): Promise<Donation> {
 
 graph LR
     A["Queue of Tasks<br/>(1000 items)"]:::blue --> B["Rate Limiter"]:::orange
-
     B --> C["Concurrent Batch<br/>(max 10 at once)"]:::teal
 
     C --> T1["Task 1"]:::teal
@@ -563,18 +571,26 @@ graph LR
     C --> T4["..."]:::teal
     C --> T10["Task 10"]:::teal
 
-    T1 --> Complete1["Complete"]:::purple
-    T2 --> Complete1
-    T3 --> Complete1
-    T4 --> Complete1
-    T10 --> Complete1
-
-    Complete1 --> Next["Start Next Batch<br/>(Task 11-20)"]:::orange
-    Next --> C
-
     Note1["Rate Limiting:<br/>- Prevents API throttling<br/>- Controls resource usage<br/>- Maintains system stability"]
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff
+    classDef orange fill:#DE8F05,stroke:#000,color:#000
+    classDef teal fill:#029E73,stroke:#000,color:#fff
+```
+
+Each batch then completes and the next one starts, until the queue drains:
+
+```mermaid
+%% Color Palette: Teal #029E73, Purple #CC78BC, Orange #DE8F05
+graph LR
+    T1["Task 1"]:::teal --> Complete1["Batch complete"]:::purple
+    T2["Task 2"]:::teal --> Complete1
+    T3["Task 3"]:::teal --> Complete1
+    T4["..."]:::teal --> Complete1
+    T10["Task 10"]:::teal --> Complete1
+
+    Complete1 --> Next["Start Next Batch<br/>(Task 11-20)"]:::orange
+
     classDef orange fill:#DE8F05,stroke:#000,color:#000
     classDef teal fill:#029E73,stroke:#000,color:#fff
     classDef purple fill:#CC78BC,stroke:#000,color:#000

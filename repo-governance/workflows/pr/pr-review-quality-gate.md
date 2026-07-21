@@ -275,7 +275,7 @@ flowchart LR
   B["comments answered"]:::teal --> D
   C["gates GREEN"]:::teal --> D
   E["archival in PR"]:::teal --> D
-  D --> H["AI merges once preconditions hold"]:::orange
+  D --> H["AI merges once<br/>preconditions hold"]:::orange
 
   classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF
   classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF

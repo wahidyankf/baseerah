@@ -126,7 +126,7 @@ use this when agent delegation is unavailable.
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px'}}}%%
 graph TB
-    A[Maker: Create/Update Worked Examples] -- maker or manual --> B[Checker: Detect Mode + Validate Quality]
+    A[Maker: Create/Update<br/>Worked Examples] -- maker or manual --> B[Checker: Detect Mode<br/>+ Validate Quality]
     B -- checker --> C{User Review}
     C -- Issues found --> D[Fixer: Apply Fixes]
     D -- re-check --> E[Re-validate Quality]

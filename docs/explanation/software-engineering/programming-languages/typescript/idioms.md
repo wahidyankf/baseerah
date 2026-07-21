@@ -416,17 +416,25 @@ graph LR
     G --> I
     H --> I
 
-    I --> I1["• API updates (Partial)"]
-    I --> I2["• Immutability (Readonly)"]
-    I --> I3["• Subset types (Pick/Omit)"]
-    I --> I4["• Union filtering (Extract)"]
-
-    Note["Combine utilities:<br/>Partial<Pick<T, K>>"]
+    Note["Combine utilities:<br/>Partial&lt;Pick&lt;T,K&gt;&gt;"]
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff
     classDef orange fill:#DE8F05,stroke:#000,color:#000
     classDef teal fill:#029E73,stroke:#000,color:#fff
     classDef purple fill:#CC78BC,stroke:#000,color:#000
+```
+
+Where those common uses show up:
+
+```mermaid
+%% Color Palette: Teal #029E73
+graph LR
+    I["Common Uses"]:::teal --> I1["• API updates (Partial)"]
+    I --> I2["• Immutability (Readonly)"]
+    I --> I3["• Subset types (Pick/Omit)"]
+    I --> I4["• Union filtering (Extract)"]
+
+    classDef teal fill:#029E73,stroke:#000,color:#fff
 ```
 
 **Common Utility Types**:
@@ -848,23 +856,24 @@ graph LR
     D -->|"Rename Keys"| I["✅ Key Remapping<br/>[P as NewKey]"]:::purple
     D -->|"Filter Keys"| J["✅ Conditional Mapping<br/>[P as Condition ? P : never]"]:::purple
 
-    E --> K["Transformed Type"]:::teal
-    F --> K
-    G --> K
-    H --> K
-    I --> K
-    J --> K
-
-    K --> K1["All properties affected"]
-    K --> K2["Type-safe transformation"]
-    K --> K3["Compiler enforced"]
-
     Note["Built-in Utilities:<br/>Partial, Required,<br/>Readonly, Pick, Omit<br/>cover common cases"]
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff
     classDef orange fill:#DE8F05,stroke:#000,color:#000
     classDef teal fill:#029E73,stroke:#000,color:#fff
     classDef purple fill:#CC78BC,stroke:#000,color:#000
+```
+
+Every branch above converges on the same guarantees:
+
+```mermaid
+%% Color Palette: Teal #029E73
+graph LR
+    K["Transformed Type"]:::teal --> K1["All properties affected"]
+    K --> K2["Type-safe transformation"]
+    K --> K3["Compiler enforced"]
+
+    classDef teal fill:#029E73,stroke:#000,color:#fff
 ```
 
 **Key Principles**:

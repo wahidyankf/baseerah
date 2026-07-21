@@ -7,13 +7,21 @@ Pages are Server Components by default. Client Components are used only where br
 is needed (search dialog, theme toggle, mobile navigation, Mermaid rendering). There is no i18n
 layer — the site is English only.
 
+The component graph is presented as three views of the same architecture, one per hop: entry
+(visitor to pages), composition (pages to layout and renderers), and integration (header to search,
+theme, mobile nav, and the tRPC API).
+
+## View 1 — Visitor to Pages
+
+A visitor reaches four navigable routes. Two further routes (`/sitemap.xml`, `/feed.xml`) are
+machine-facing and are not entered through the browser navigation.
+
 ```mermaid
 %% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
 graph LR
     VISITOR("Visitor<br/>Desktop / Tablet / Mobile"):::actor
 
     subgraph SPA["Next.js UI"]
-
         subgraph LAYER1["Pages (Server Components)"]
             HP["Home Page<br/>────────────────<br/>/<br/>Hero, mission<br/>Social links"]:::page
             AP["About Page<br/>────────────────<br/>/about/<br/>Platform info"]:::page
@@ -22,6 +30,34 @@ graph LR
             SP["Sitemap<br/>────────────────<br/>/sitemap.xml<br/>All pages"]:::page
             FP["RSS Feed<br/>────────────────<br/>/feed.xml<br/>Update posts"]:::page
         end
+    end
+
+    %% Visitor → Pages
+    VISITOR -->|"browser"| HP
+    VISITOR -->|"browser"| AP
+    VISITOR -->|"browser"| UL
+    VISITOR -->|"browser"| UD
+
+    classDef actor fill:#DE8F05,stroke:#000000,color:#000000,stroke-width:2px
+    classDef page fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
+## View 2 — Pages to Layout Components and Content Renderers
+
+Each page composes layout components, and the two markdown-backed pages additionally drive the
+content renderers.
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph LR
+    subgraph SPA["Next.js UI"]
+
+        subgraph LAYER1["Pages (Server Components)"]
+            HP["Home Page<br/>────────────────<br/>/<br/>Hero, mission<br/>Social links"]:::page
+            AP["About Page<br/>────────────────<br/>/about/<br/>Platform info"]:::page
+            UL["Updates Listing<br/>────────────────<br/>/updates/<br/>All update posts"]:::page
+            UD["Update Detail<br/>────────────────<br/>/updates/[slug]/<br/>Single update"]:::page
+        end
 
         subgraph LAYER2["Layout Components"]
             HEADER["Header<br/>────────────────<br/>Logo, search trigger<br/>Theme toggle<br/>Nav links"]:::layout
@@ -29,7 +65,6 @@ graph LR
             BREAD["Breadcrumb<br/>────────────────<br/>Path segments<br/>Current page"]:::layout
             TOC["Table of Contents<br/>────────────────<br/>Page headings<br/>Scroll tracking"]:::layout
             PREVNEXT["Prev/Next Nav<br/>────────────────<br/>Sequential nav<br/>Between updates"]:::layout
-            MOBILE["Mobile Nav<br/>────────────────<br/>Hamburger menu<br/>Sheet drawer"]:::layout
         end
 
         subgraph LAYER3["Content Renderers"]
@@ -37,24 +72,7 @@ graph LR
             MERMAID["Mermaid<br/>────────────────<br/>Client-side render<br/>Diagram support"]:::renderer
         end
 
-        subgraph LAYER4["Search (Client Component)"]
-            SD["SearchDialog<br/>────────────────<br/>Cmd+K trigger<br/>Live results<br/>Navigate on select"]:::search
-            SP2["SearchProvider<br/>────────────────<br/>Context provider<br/>tRPC query hook"]:::search
-        end
-
-        subgraph LAYER5["Theme"]
-            TT["ThemeToggle<br/>────────────────<br/>Dark / Light<br/>next-themes"]:::theme
-        end
-
     end
-
-    API["tRPC API<br/>(Server-side)"]:::external
-
-    %% Visitor → Pages
-    VISITOR -->|"browser"| HP
-    VISITOR -->|"browser"| AP
-    VISITOR -->|"browser"| UL
-    VISITOR -->|"browser"| UD
 
     %% Pages use Layout
     HP --> HEADER
@@ -75,6 +93,44 @@ graph LR
     UD --> MDR
     MDR --> MERMAID
 
+    classDef page fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef layout fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef renderer fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
+```
+
+## View 3 — Header, Search, Theme, and the tRPC API
+
+The header mounts the three client-interactive pieces, and both the search provider and the two
+content-backed pages call the server-side tRPC API.
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph LR
+    subgraph SPA["Next.js UI"]
+
+        subgraph LAYER1["Pages (Server Components)"]
+            UL["Updates Listing<br/>────────────────<br/>/updates/<br/>All update posts"]:::page
+            UD["Update Detail<br/>────────────────<br/>/updates/[slug]/<br/>Single update"]:::page
+        end
+
+        subgraph LAYER2["Layout Components"]
+            HEADER["Header<br/>────────────────<br/>Logo, search trigger<br/>Theme toggle<br/>Nav links"]:::layout
+            MOBILE["Mobile Nav<br/>────────────────<br/>Hamburger menu<br/>Sheet drawer"]:::layout
+        end
+
+        subgraph LAYER4["Search (Client Component)"]
+            SD["SearchDialog<br/>────────────────<br/>Cmd+K trigger<br/>Live results<br/>Navigate on select"]:::search
+            SP2["SearchProvider<br/>────────────────<br/>Context provider<br/>tRPC query hook"]:::search
+        end
+
+        subgraph LAYER5["Theme"]
+            TT["ThemeToggle<br/>────────────────<br/>Dark / Light<br/>next-themes"]:::theme
+        end
+
+    end
+
+    API["tRPC API<br/>(Server-side)"]:::external
+
     %% Header → Search + Theme
     HEADER --> SD
     HEADER --> TT
@@ -86,10 +142,8 @@ graph LR
     UD -->|"content.getBySlug"| API
     UL -->|"content.listUpdates"| API
 
-    classDef actor fill:#DE8F05,stroke:#000000,color:#000000,stroke-width:2px
     classDef page fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef layout fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
-    classDef renderer fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
     classDef search fill:#CA9161,stroke:#000000,color:#000000,stroke-width:2px
     classDef theme fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef external fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px,stroke-dasharray:5 5

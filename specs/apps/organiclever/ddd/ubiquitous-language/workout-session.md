@@ -45,7 +45,7 @@ stateDiagram-v2
     active_exercising --> active_resting : LOG_SET (rest > 0)
     active_exercising --> active_exercising : LOG_SET (rest = 0) / TICK
     active_exercising --> active_confirming : END_WORKOUT
-    active_resting --> active_exercising : TICK (rest expired) / SKIP_REST
+    active_resting --> active_exercising : TICK (rest over) / SKIP_REST
     active_resting --> active_resting : TICK (rest > 0)
     active_resting --> active_confirming : END_WORKOUT
     active_confirming --> active_exercising : KEEP_GOING

@@ -10,6 +10,14 @@ execute inside the same `web` container's Next.js server.
 All tRPC procedures are public (no authentication). The content pipeline reads markdown files,
 parses frontmatter, renders HTML with syntax highlighting, and builds a FlexSearch index.
 
+The component structure is presented as four views of one graph, split by hop so each view stays
+readable. Together they carry every component and every relationship.
+
+## View 1: Client → Router → Procedures
+
+The Next.js client (or Playwright in E2E runs) issues tRPC calls to a single App Router route
+handler, which dispatches to the six public procedures.
+
 ```mermaid
 %% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
 graph LR
@@ -30,6 +38,73 @@ graph LR
             ML["meta.languages<br/>────────────────<br/>Available locales"]:::procedure
         end
 
+    end
+
+    %% Client → Router → Procedures
+    CLIENT -->|"tRPC calls"| ROUTER
+    ROUTER --> CP
+    ROUTER --> CL
+    ROUTER --> CT
+    ROUTER --> SQ
+    ROUTER --> MH
+    ROUTER --> ML
+
+    classDef actor fill:#DE8F05,stroke:#000000,color:#000000,stroke-width:2px
+    classDef handler fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef procedure fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
+## View 2: Procedures → Content Services and Search
+
+Content procedures reach into the content services; `search.query` reaches the search index.
+`meta.health` and `meta.languages` have no service dependencies and therefore appear only in View 1.
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph LR
+
+    subgraph LAYER2["tRPC Procedures"]
+        CP["content.getBySlug<br/>────────────────<br/>Fetch page by slug<br/>Returns HTML + meta"]:::procedure
+        CL["content.listChildren<br/>────────────────<br/>List section children<br/>Sorted by weight"]:::procedure
+        CT["content.getTree<br/>────────────────<br/>Full nav tree<br/>Per locale"]:::procedure
+        SQ["search.query<br/>────────────────<br/>Full-text search<br/>Scoped to locale"]:::procedure
+    end
+
+    subgraph LAYER3["Content Services"]
+        CI["Content Index<br/>────────────────<br/>readAllContent()<br/>In-memory cache<br/>All metadata"]:::service
+        CR["Content Reader<br/>────────────────<br/>readFileContent()<br/>gray-matter parse<br/>Frontmatter + body"]:::service
+        MP["Markdown Parser<br/>────────────────<br/>unified pipeline<br/>remark → rehype<br/>shiki highlighting<br/>Heading extraction"]:::service
+    end
+
+    subgraph LAYER4["Search"]
+        SI["Search Index<br/>────────────────<br/>FlexSearch<br/>Per-locale index<br/>Title + stripped body"]:::search
+    end
+
+    %% Procedures → Services
+    CP --> CI
+    CP --> CR
+    CP --> MP
+    CL --> CI
+    CT --> CI
+    SQ --> SI
+
+    classDef procedure fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef service fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef search fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
+```
+
+## View 3: Service Internals → Content Directory
+
+Inside the service layer, the search index reads the content index and the plain-text stripper, the
+content index delegates file reads to the content reader, the reader is the only component that
+touches the content directory, and the markdown parser hands shortcodes to the shortcode processor.
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph LR
+
+    subgraph SERVER["web container — tRPC API surface"]
+
         subgraph LAYER3["Content Services"]
             CI["Content Index<br/>────────────────<br/>readAllContent()<br/>In-memory cache<br/>All metadata"]:::service
             CR["Content Reader<br/>────────────────<br/>readFileContent()<br/>gray-matter parse<br/>Frontmatter + body"]:::service
@@ -42,41 +117,47 @@ graph LR
             SM["stripMarkdown()<br/>────────────────<br/>Remove code blocks<br/>Remove formatting<br/>Plain text output"]:::service
         end
 
-        subgraph LAYER5["Schemas"]
-            FS["Frontmatter Schema<br/>────────────────<br/>Zod validation<br/>title, weight, date<br/>description, tags"]:::schema
-            NS["Navigation Schema<br/>────────────────<br/>Zod validation<br/>TreeNode type<br/>Recursive children"]:::schema
-            SS["Search Schema<br/>────────────────<br/>Zod validation<br/>Query input<br/>Result output"]:::schema
-        end
-
     end
 
     CONTENT[("Content Directory<br/>content/en/, content/id/")]:::datastore
 
-    %% Client → Router → Procedures
-    CLIENT -->|"tRPC calls"| ROUTER
-    ROUTER --> CP
-    ROUTER --> CL
-    ROUTER --> CT
-    ROUTER --> SQ
-    ROUTER --> MH
-    ROUTER --> ML
-
-    %% Procedures → Services
-    CP --> CI
-    CP --> CR
-    CP --> MP
-    CL --> CI
-    CT --> CI
-    SQ --> SI
+    %% Search → Content
+    SI --> CI
+    SI --> SM
 
     %% Services → Content
     CI --> CR
     CR --> CONTENT
     MP --> SC
 
-    %% Search → Content
-    SI --> CI
-    SI --> SM
+    classDef service fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef search fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
+    classDef datastore fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
+## View 4: Zod Schemas
+
+Schemas validate procedure input and output plus the frontmatter the content index parses.
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph LR
+
+    subgraph LAYER2["tRPC Procedures"]
+        CP["content.getBySlug<br/>────────────────<br/>Fetch page by slug<br/>Returns HTML + meta"]:::procedure
+        CT["content.getTree<br/>────────────────<br/>Full nav tree<br/>Per locale"]:::procedure
+        SQ["search.query<br/>────────────────<br/>Full-text search<br/>Scoped to locale"]:::procedure
+    end
+
+    subgraph LAYER3["Content Services"]
+        CI["Content Index<br/>────────────────<br/>readAllContent()<br/>In-memory cache<br/>All metadata"]:::service
+    end
+
+    subgraph LAYER5["Schemas"]
+        FS["Frontmatter Schema<br/>────────────────<br/>Zod validation<br/>title, weight, date<br/>description, tags"]:::schema
+        NS["Navigation Schema<br/>────────────────<br/>Zod validation<br/>TreeNode type<br/>Recursive children"]:::schema
+        SS["Search Schema<br/>────────────────<br/>Zod validation<br/>Query input<br/>Result output"]:::schema
+    end
 
     %% Schemas validate input/output
     CP --> FS
@@ -84,13 +165,9 @@ graph LR
     CT --> NS
     SQ --> SS
 
-    classDef actor fill:#DE8F05,stroke:#000000,color:#000000,stroke-width:2px
-    classDef handler fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef procedure fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef service fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
-    classDef search fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
     classDef schema fill:#CA9161,stroke:#000000,color:#000000,stroke-width:2px
-    classDef datastore fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
 ```
 
 ## Gherkin Coverage by Component

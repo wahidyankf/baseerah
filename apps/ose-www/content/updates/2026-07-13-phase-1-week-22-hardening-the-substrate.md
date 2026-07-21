@@ -96,16 +96,29 @@ turned that around across **every project in all three repos**. The work had thr
   `test:specs`) now runs with a guard that turns a silently-skipped scenario into a hard failure. A
   scenario can no longer quietly opt out of running.
 
+The first half of the chain is authoring: a scenario declares what it covers, and that declaration
+resolves to a real step implementation on a real runner.
+
 ```mermaid
 %% Color Palette: Blue #0173B2 (spec), Orange #DE8F05 (link), Teal #029E73 (impl), Purple #CC78BC (gate)
 graph LR
     G[".feature<br/>Gherkin scenario"]:::spec --> C["@covers marker<br/>→ code symbol"]:::link
     C --> S["real step impl<br/>(cucumber-rs, vitest-cucumber,<br/>TickSpec, Kaocha, cabbage)"]:::impl
-    S --> X["rhino-cli runtime<br/>cross-check"]:::gate
-    X --> K["fail-on-skip guard<br/>per test tier"]:::gate
 
     classDef spec fill:#0173B2,stroke:#000,color:#FFF,stroke-width:2px
     classDef link fill:#DE8F05,stroke:#000,color:#FFF,stroke-width:2px
+    classDef impl fill:#029E73,stroke:#000,color:#FFF,stroke-width:2px
+```
+
+The second half is enforcement: that step implementation is checked at runtime, and the per-tier
+guard turns any silent skip into a hard failure.
+
+```mermaid
+%% Color Palette: Blue #0173B2 (spec), Orange #DE8F05 (link), Teal #029E73 (impl), Purple #CC78BC (gate)
+graph LR
+    S["real step impl<br/>(cucumber-rs, vitest-cucumber,<br/>TickSpec, Kaocha, cabbage)"]:::impl --> X["rhino-cli runtime<br/>cross-check"]:::gate
+    X --> K["fail-on-skip guard<br/>per test tier"]:::gate
+
     classDef impl fill:#029E73,stroke:#000,color:#FFF,stroke-width:2px
     classDef gate fill:#CC78BC,stroke:#000,color:#FFF,stroke-width:2px
 ```

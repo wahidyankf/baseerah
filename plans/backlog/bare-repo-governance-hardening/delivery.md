@@ -77,7 +77,10 @@ The DAG is **fully serial**:
 
 ```mermaid
 %% Color palette: Blue #0173B2, Orange #DE8F05, Teal #029E73
-flowchart LR
+%% TD required: the phase spine is 8 nodes deep; as LR that depth is the checked
+%% horizontal axis and exceeds MaxWidth=4. TD keeps depth on the unchecked
+%% vertical axis (Diagrams Convention, Flowchart Width Constraints).
+graph TD
     P0["Phase 0<br/>Baseline"] --> P1["Phase 1<br/>Retire briefs (C7)"]
     P1 --> P2["Phase 2<br/>Author C1 + C2 + indexes"]
     P2 --> P3["Phase 3<br/>C3-C6 + ose-public PR"]

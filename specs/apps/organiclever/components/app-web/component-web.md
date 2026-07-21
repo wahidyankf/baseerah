@@ -23,13 +23,20 @@ No authenticated screens today. The frontend is structured around 9 DDD bounded 
 
 ## Component Architecture
 
+The architecture is presented as three views of one graph, split by hop so each view stays readable.
+Together they carry every component and every relationship.
+
+### View 1: Routing — End User → App Router → Bounded Contexts
+
+Thin App Router page and layout wrappers dispatch into the nine bounded contexts; no business logic
+lives in the router itself.
+
 ```mermaid
 %% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
-graph TD
+graph LR
     EU("End User<br/>Desktop / Mobile"):::actor
 
     subgraph FE["Next.js 16 Frontend Container"]
-        direction TB
 
         ROUTER["App Router<br/>────────────────<br/>Thin page+layout wrappers<br/>(no business logic)"]:::router
 
@@ -59,14 +66,7 @@ graph TD
             ROUTING["routing<br/>────────────────<br/>404 guards<br/>presentation only"]:::context_ui
             HEALTH["health<br/>────────────────<br/>BE diagnostic<br/>infrastructure only"]:::context_infra
         end
-
-        subgraph SHARED["Shared Runtime (src/shared/)"]
-            PGLITE[("PGlite<br/>────────────────<br/>Postgres-WASM<br/>IndexedDB-backed")]:::storage
-            EFFECT["Effect TS · PgliteService<br/>────────────────<br/>Layer + Tag<br/>Sequences IO"]:::runtime
-        end
     end
-
-    BE["F#/Giraffe Backend<br/>REST API"]:::external
 
     EU --> ROUTER
     ROUTER --> APPSHELL
@@ -79,17 +79,6 @@ graph TD
     ROUTER --> ROUTING
     ROUTER --> HEALTH
 
-    JOURNAL --> EFFECT
-    ROUTINE --> EFFECT
-    SETTINGS --> EFFECT
-    EFFECT --> PGLITE
-
-    STATS -. "reads" .-> JOURNAL
-    WORKOUT -. "persists via app barrel" .-> JOURNAL
-    WORKOUT -. "reads templates" .-> ROUTINE
-
-    HEALTH -- "server-side fetch" --> BE
-
     classDef actor fill:#DE8F05,stroke:#000000,color:#000000,stroke-width:2px
     classDef router fill:#CA9161,stroke:#000000,color:#000000,stroke-width:2px
     classDef context fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
@@ -97,8 +86,88 @@ graph TD
     classDef context_ro fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef context_ui fill:#CA9161,stroke:#000000,color:#000000,stroke-width:2px
     classDef context_infra fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
+### View 2: Persistence — Contexts → Shared Runtime → PGlite
+
+Only the three contexts with an `infrastructure` layer persist. They all go through the shared
+Effect TS runtime, which is the single owner of the PGlite handle.
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph LR
+
+    subgraph FE["Next.js 16 Frontend Container"]
+
+        subgraph SOR["System of Record"]
+            JOURNAL["journal<br/>────────────────<br/>Append-only event log<br/>journalMachine (XState)<br/>4 layers"]:::context_data
+        end
+
+        subgraph TEMPLATES["Templates &amp; Preferences"]
+            ROUTINE["routine<br/>────────────────<br/>Workout templates<br/>4 layers"]:::context_data
+            SETTINGS["settings<br/>────────────────<br/>Dark mode · Language<br/>4 layers"]:::context_data
+        end
+
+        subgraph SHARED["Shared Runtime (src/shared/)"]
+            PGLITE[("PGlite<br/>────────────────<br/>Postgres-WASM<br/>IndexedDB-backed")]:::storage
+            EFFECT["Effect TS · PgliteService<br/>────────────────<br/>Layer + Tag<br/>Sequences IO"]:::runtime
+        end
+    end
+
+    JOURNAL --> EFFECT
+    ROUTINE --> EFFECT
+    SETTINGS --> EFFECT
+    EFFECT --> PGLITE
+
+    classDef context_data fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef runtime fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef storage fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
+```
+
+### View 3: Cross-context Reads and the Backend Probe
+
+Dotted edges are cross-context reads through the target context's public barrel. The health context
+is the only component that talks to the backend.
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph LR
+
+    subgraph FE["Next.js 16 Frontend Container"]
+
+        subgraph DERIVED["Read-only Projections"]
+            STATS["stats<br/>────────────────<br/>History · Progress<br/>3 layers (no infra)"]:::context_ro
+        end
+
+        subgraph SESSION["Active Session"]
+            WORKOUT["workout-session<br/>────────────────<br/>workoutSessionMachine (XState)<br/>3 layers (no infra)"]:::context
+        end
+
+        subgraph SOR["System of Record"]
+            JOURNAL["journal<br/>────────────────<br/>Append-only event log<br/>journalMachine (XState)<br/>4 layers"]:::context_data
+        end
+
+        subgraph TEMPLATES["Templates &amp; Preferences"]
+            ROUTINE["routine<br/>────────────────<br/>Workout templates<br/>4 layers"]:::context_data
+        end
+
+        subgraph SURFACE["Static Surface &amp; Diagnostics"]
+            HEALTH["health<br/>────────────────<br/>BE diagnostic<br/>infrastructure only"]:::context_infra
+        end
+    end
+
+    BE["F#/Giraffe Backend<br/>REST API"]:::external
+
+    STATS -. "reads" .-> JOURNAL
+    WORKOUT -. "persists via app barrel" .-> JOURNAL
+    WORKOUT -. "reads templates" .-> ROUTINE
+
+    HEALTH -- "server-side fetch" --> BE
+
+    classDef context fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef context_data fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef context_ro fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef context_infra fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef external fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px,stroke-dasharray:5 5
 ```
 

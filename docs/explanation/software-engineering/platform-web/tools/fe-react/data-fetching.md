@@ -42,8 +42,10 @@ Data fetching is essential for React applications. This guide covers fetch API, 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
-
-graph LR
+%% TD required: this decision chain is 5 levels deep; as LR that depth is the
+%% checked horizontal axis and exceeds MaxWidth=4. TD keeps depth on the
+%% unchecked vertical axis (Diagrams Convention, Flowchart Width Constraints).
+graph TD
     A[Need Data Fetching?] --> B{Complexity?}
 
     B -->|Simple| C{Caching Needed?}
@@ -55,23 +57,31 @@ graph LR
     F -->|Yes| G[SWR]
     F -->|No| D
 
-    D --> H[Query Basics]
-    D --> I[Mutations]
-    D --> J[Optimistic Updates]
-
-    E --> K[Loading States]
-    E --> L[Error Handling]
-
-    G --> M[Stale-While-Revalidate]
-    G --> N[Auto Background Sync]
-
     style A fill:#0173B2
     style D fill:#029E73
     style E fill:#DE8F05
     style G fill:#CC78BC
-    style H fill:#029E73
-    style I fill:#029E73
-    style J fill:#029E73
+```
+
+What each choice brings with it:
+
+```mermaid
+%% Color Palette: Teal #029E73, Orange #DE8F05, Purple #CC78BC
+%% LR keeps this two-level fan-out shallow; depth is the checked axis in LR and is 2 here.
+graph LR
+    D[TanStack Query] --> H[Query Basics]
+    D --> I[Mutations]
+    D --> J[Optimistic Updates]
+
+    E[useEffect + fetch] --> K[Loading States]
+    E --> L[Error Handling]
+
+    G[SWR] --> M[Stale-While-Revalidate]
+    G --> N[Auto Background Sync]
+
+    style D fill:#029E73
+    style E fill:#DE8F05
+    style G fill:#CC78BC
 ```
 
 **Recommendations**:

@@ -9,17 +9,19 @@ ordered correctly, and a three-repo propagation sequence in which two targets ar
 ### Document graph — what changes and how the pieces link
 
 ```mermaid
-%% Color palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
+%% Color palette: Blue #0173B2, Orange #DE8F05, Teal #029E73
+%% Node labels are shortened for mobile rendering (max 30 chars per line);
+%% the full repository-relative paths are in the Path Constants table above.
 flowchart LR
     C1["C1 NEW<br/>bare-repo-landing-method.md"]
-    ND["C2 edit<br/>no-destructive-git-operations.md"]
-    WC["worktree-and-artifact-cleanup.md<br/>(unchanged)"]
-    PL["C3 edit<br/>conventions/structure/plans.md"]
-    PP["C4 edit<br/>plan-multi-repo-parity-planning.md"]
+    ND["C2 edit<br/>no-destructive-git-ops.md"]
+    WC["worktree cleanup<br/>(unchanged)"]
+    PL["C3 edit<br/>structure/plans.md"]
+    PP["C4 edit<br/>multi-repo-parity-planning"]
     PM["C5 edit<br/>pr-merge-protocol.md"]
     QG["pr-review-quality-gate.md<br/>(source note, unchanged)"]
-    SD["C6 edit<br/>docs/reference/sdlc-gate-standard.md"]
-    IP["C6 edit<br/>plan-idea-promotion-planning.md"]
+    SD["C6 edit<br/>sdlc-gate-standard.md"]
+    IP["C6 edit<br/>idea-promotion-planning"]
     IX["index edits<br/>development/README.md<br/>workflow/README.md"]
 
     ND -->|links to| C1
@@ -67,16 +69,19 @@ sequenceDiagram
 
 ```mermaid
 %% Color palette: Blue #0173B2, Orange #DE8F05, Teal #029E73
-flowchart LR
+%% TD required: this decision chain is 7 nodes deep; as LR that depth is the
+%% checked horizontal axis and exceeds MaxWidth=4. TD keeps depth on the
+%% unchecked vertical axis (Diagrams Convention, Flowchart Width Constraints).
+graph TD
     Q["Need repository topology?"] --> A["git worktree list<br/>look for the (bare) marker"]
     A --> S{"Scriptable answer needed?"}
-    S -->|"Yes"| C["git config --file<br/>$(git rev-parse --git-common-dir)/config core.bare"]
+    S -->|"Yes"| C["git config --file<br/>common-dir/config<br/>core.bare"]
     S -->|"No"| H["Human reads the marker"]
     C --> T{"Is it bare?"}
     H --> T
     T -->|"Bare, no work tree"| R1["git fetch origin main:main"]
-    T -->|"Has a work tree"| R2["git fetch && git merge --ff-only origin/main"]
-    X["git rev-parse --is-bare-repository"] -.->|"FORBIDDEN for this question"| Q
+    T -->|"Has a work tree"| R2["git fetch, then<br/>git merge --ff-only"]
+    X["git rev-parse<br/>--is-bare-repository"] -.->|"FORBIDDEN for this question"| Q
 
     classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef orange fill:#DE8F05,stroke:#000000,color:#FFFFFF,stroke-width:2px

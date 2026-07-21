@@ -385,14 +385,14 @@ pages). Both navigations resolve, side by side.
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC — WCAG-AA, CB-friendly.
 flowchart TD
-    REQ["Course page request<br/>/en/c/learn/courses/&lt;id&gt;?path=&lt;p&gt;"]:::blue
+    REQ["Course page request<br/>/en/c/learn/courses/&lt;id&gt;<br/>?path=&lt;p&gt;"]:::blue
     CTX["parsePathContext<br/>(core, pure)"]:::teal
     VALID{"valid path<br/>&amp; course in manifest?"}:::orange
     NAVP["resolvePathNav<br/>(manifest order)"]:::teal
     NAVC["weight-based sibling nav<br/>(canonical)"]:::purple
     PREQ["resolvePrerequisites<br/>(always shown)"]:::teal
-    RENDER["Render course:<br/>path breadcrumb + prev/next + prereqs<br/>(links carry ?path=)"]:::blue
-    RENDERC["Render course:<br/>content-tree breadcrumb + prereqs<br/>+ 'part of paths' affordance"]:::purple
+    RENDER["Render course:<br/>path breadcrumb + prev/next<br/>+ prereqs, links carry ?path="]:::blue
+    RENDERC["Render course:<br/>content-tree breadcrumb<br/>+ prereqs + 'part of paths'"]:::purple
 
     REQ --> CTX --> VALID
     VALID -->|yes| NAVP --> RENDER
