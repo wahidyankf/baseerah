@@ -43,6 +43,8 @@ category already built:
   `courseOrder` is transcribed from (DD-22).
 - One ERP card each in `<PATHS>_index.md` and `<PATHS>skills/_index.md` — **populate only**.
 - `<SPECS>skills-erp-path.feature` and its step definitions.
+- Twenty new rows in `<COURSES>_index.md` — the shared course-catalog index — **populate only**; the
+  file itself is created by `ayokoding-learning-path-01-url-restructure`, never by this plan.
 
 ### What this plan never touches
 
@@ -283,11 +285,16 @@ A skills path answers a question a careers path never poses: **how far in do I b
 landing must surface all three "dangerous by here" boundaries, each as a pair — what the reader **can**
 do and what they still **cannot**:
 
-| Boundary | After | Can                                                                   | Cannot                                                                              |
-| -------- | ----- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 1        | #4    | install, configure, integrate a real ERP through its API              | design correct P2P/O2C/R2R flows; extend without breaking upgrades; scope a rollout |
-| 2        | #10   | correct core process flows; safe extension; right integration pattern | production planning; multi-company/multi-currency; SoD enforcement; run a rollout   |
-| 3        | #20   | full competence                                                       | —                                                                                   |
+| Boundary | Reached after                                                   | Can                                                                   | Cannot                                                                              |
+| -------- | --------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 1        | `capstone-stand-up-and-integrate-an-open-source-erp` (#4 of 20) | install, configure, integrate a real ERP through its API              | design correct P2P/O2C/R2R flows; extend without breaking upgrades; scope a rollout |
+| 2        | `erp-integration-patterns` (#10 of 20)                          | correct core process flows; safe extension; right integration pattern | production planning; multi-company/multi-currency; SoD enforcement; run a rollout   |
+| 3        | `capstone-build-a-minimal-erp-core` (#20 of 20)                 | full competence                                                       | —                                                                                   |
+
+The "Reached after" column names the **course id**, not a bare ordinal — the manifest publishes with
+only ten of the twenty courses live (Phase 2), and an ordinal like "#4" or "#10" would silently
+misresolve against a partially-grown `courseOrder` before Phases 3 and 5 land boundaries 2 and 3. The
+parenthetical `(#N of 20)` is informational only.
 
 The **cannot** column is not decoration. Boundary 1's failure mode is a reader who mistakes "can
 integrate" for "can design the flows" and produces orphaned purchase orders, double-counted inventory,
@@ -344,7 +351,10 @@ affected claims are framed with their provenance or dropped — they are not pub
 
 ### Load-bearing for #19 — there is no single "Sharia accounting standard"
 
-Three structurally different jurisdictional models coexist:
+Three structurally different jurisdictional models coexist. **The whole table is `[Unverified]`** —
+including the "AAOIFI used as basis, not adopted" claim for Indonesia and the "not on AAOIFI's
+mandatory-adoption list" claim for Malaysia — pending the primary-source re-verification pass in
+delivery.md's [Phase 1.2](./delivery.md#12--the-a4-verification-pass-before-any-spec-asserts-a-fact):
 
 | Model                                         | Jurisdiction | Shape                                                                                            |
 | --------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------ |
@@ -354,11 +364,14 @@ Three structurally different jurisdictional models coexist:
 
 The engineering lesson of `sharia-compliant-erp-design` is therefore **jurisdictional pluggability**:
 the chart of accounts, the recognition rules, and the disclosure set are configuration, not
-hardcoded constants. A course presenting AAOIFI as "the" standard would be wrong (DD-12).
+hardcoded constants. A course presenting AAOIFI as "the" standard would be wrong (DD-12) — this
+structural claim (three coexisting models, none universal) is independent of the `[Unverified]` cell
+details above and does not itself require re-verification.
 
 The Indonesian **PSAK numbering** is `[Needs Verification]` — sources show both a "PSAK 59 / SIFAS
 101-109" generation and a "PSAK 101-110" series. Resolve against IAI's published list before any
-standard number is written into #19.
+standard number is written into #19. Both this and the `[Unverified]` table above are the same Phase
+1.2 delivery step; #19's spec may not state either as unqualified fact until that step closes.
 
 ## R9 gate posture (declared explicitly)
 
@@ -401,11 +414,12 @@ because of it, and could not run `api-quality-gate` against it without depending
 availability. It is subject matter in exactly the sense the syllabus already draws for target
 codebases — evidence that principles transfer, never a surface this repo owns.
 
-**The binding consequence of point 2 is a real delivery constraint (DD-14):** in courses #4 and #10,
-no code sample may depend on a **live network call to a third-party ERP**. The capstone stands up a
-containerised or fixtured open-source ERP locally; recorded fixtures back every integration example.
-A course that needs someone else's SaaS to be up in order for CI to pass has turned subject matter
-into a build dependency.
+**The binding consequence of point 2 is a real delivery constraint (DD-14):** across all three
+touchpoints — courses `#4`, `#10`, and `#20` — no code sample may depend on a **live network call to
+a third-party ERP**. The `#4` and `#20` capstones each stand up a containerised or fixtured
+open-source ERP locally; recorded fixtures back every integration example, including `#10`'s. A
+course that needs someone else's SaaS to be up in order for CI to pass has turned subject matter into
+a build dependency.
 
 ## UI-design-funnel exemption (recorded explicitly)
 
@@ -479,19 +493,23 @@ transition.
   the 20-course count is labelled `[Judgment call]` wherever it appears. _Source: amendment A4._
   **Decided.**
 - **DD-12 · `sharia-compliant-erp-design` teaches jurisdictional pluggability, not one standard.**
-  AAOIFI, PSAK Syariah, and MFRS + BNM SGP 2019 are three structurally different models; Malaysia is
-  not on AAOIFI's mandatory-adoption list. The engineering requirement is that the chart of accounts,
-  recognition rules, and disclosure set are configuration. A course naming AAOIFI as "the" standard
-  would be factually wrong. **Decided.**
+  AAOIFI, PSAK Syariah, and MFRS + BNM SGP 2019 are three structurally different models — that
+  structural claim, and the engineering requirement it drives (the chart of accounts, recognition
+  rules, and disclosure set are configuration; a course naming AAOIFI as "the" standard would be
+  factually wrong), are **Decided**. The cell-level factual detail that Malaysia specifically "is
+  not on AAOIFI's mandatory-adoption list" is not part of this design decision — it is
+  `[Unverified]`, pending the Phase 1.2 primary-source re-verification pass (see
+  [§Load-bearing for #19](#load-bearing-for-19--there-is-no-single-sharia-accounting-standard)),
+  and must not be stated as unqualified fact until that step closes.
 - **DD-13 · UI gate: exempt, with the exemption and its reason stated.** No component source is
   authored here, so `swe-ui-checker` would scan zero files — a vacuous pass. The Rule-15 three-tester
   retest remains mandatory as the non-vacuous UI check. **Decided.**
 - **DD-14 · API gate: NOT exempt for the manifest; third-party ERP APIs are subject matter.** The
   manifest is reachable behavior exercised through this app's own integrity checks and path-walk e2e,
-  which the plan names rather than claiming a gate it cannot execute. The vendor ERP APIs taught in #4
-  and #10 are not a surface this repo ships — and the binding consequence is that **no code sample in
-  either course may depend on a live network call to a third-party ERP**. Containerised or fixtured
-  ERP only. **Decided.**
+  which the plan names rather than claiming a gate it cannot execute. The vendor ERP APIs taught in
+  #4, #10, and #20 are not a surface this repo ships — and the binding consequence is that **no code
+  sample in any of the three courses may depend on a live network call to a third-party ERP**.
+  Containerised or fixtured ERP only. **Decided.**
 - **DD-15 · "Never create an `_index.md`" means never create a _structural_ index.** A3 assigns
   `<PATHS>_index.md`, `<PATHS>careers/_index.md`, the three arc indexes, and `<PATHS>skills/_index.md`
   to plan 01. This plan's **path landing**, `<ERPLANDING>`, is also an `_index.md` file and **is**
@@ -549,18 +567,19 @@ transition.
 
 ## File impact
 
-| Path                                                        | Change | Note                                                                                       |
-| ----------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
-| `<SYL>README.md` + `<SYL><id>.md` × 20                      | new    | this plan's own syllabus corpus (DD-2)                                                     |
-| `<SYLPATHS>manifest-skills-enterprise-resource-planning.md` | new    | the manifest mirror this plan's courseOrder is transcribed from (DD-22)                    |
-| `<ERPMAN>`                                                  | new    | the single manifest; grown four times                                                      |
-| `<ERPLANDING>`                                              | new    | the path landing (DD-15)                                                                   |
-| `<COURSES><erp-course-id>/` × 20                            | new    | course bundles, four authoring waves                                                       |
-| `<PATHS>_index.md`                                          | edit   | add one ERP card — populate only                                                           |
-| `<PATHS>skills/_index.md`                                   | edit   | add one ERP card — populate only                                                           |
-| `<SPECS>skills-erp-path.feature`                            | new    | this plan's Gherkin                                                                        |
-| `apps/ayokoding-www-fe-e2e/src/steps/course-paths.steps.ts` | edit   | step bindings; file created by plan 03                                                     |
-| `<MANIFESTS>published-manifests.unit.test.ts`               | edit   | add the ERP manifest assertions; file owned by plan 05 — additive only, see the note below |
+| Path                                                           | Change | Note                                                                                       |
+| -------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| `<SYL>README.md` + `<SYL><id>.md` × 20                         | new    | this plan's own syllabus corpus (DD-2)                                                     |
+| `<SYLPATHS>manifest-skills-enterprise-resource-planning.md`    | new    | the manifest mirror this plan's courseOrder is transcribed from (DD-22)                    |
+| `<ERPMAN>`                                                     | new    | the single manifest; grown four times                                                      |
+| `<ERPLANDING>`                                                 | new    | the path landing (DD-15)                                                                   |
+| `<COURSES><erp-course-id>/` × 20                               | new    | course bundles, four authoring waves                                                       |
+| `<PATHS>_index.md`                                             | edit   | add one ERP card — populate only                                                           |
+| `<PATHS>skills/_index.md`                                      | edit   | add one ERP card — populate only                                                           |
+| `<COURSES>_index.md`                                           | edit   | add twenty catalog rows — populate only; file created by plan 01                           |
+| `<SPECS>skills-erp-path.feature`                               | new    | this plan's Gherkin                                                                        |
+| `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-path.steps.ts` | new    | step bindings; created by this plan, pairing 1:1 with its own `skills-erp-path.feature`    |
+| `<MANIFESTS>published-manifests.unit.test.ts`                  | edit   | add the ERP manifest assertions; file owned by plan 05 — additive only, see the note below |
 
 **The one shared code file.** The published-manifest unit test is created and owned by
 `ayokoding-learning-path-05-manifests`. This plan **appends** its ERP assertions to it rather than

@@ -107,7 +107,7 @@ justified one reads as honest.
 
 ## Acceptance Criteria (Gherkin)
 
-Thirteen scenarios. Each uses exactly one primary `Given`, one `When`, and one `Then`; every extra
+Fourteen scenarios. Each uses exactly one primary `Given`, one `When`, and one `Then`; every extra
 precondition, action, or outcome chains with `And` or `But`.
 
 ### The dependency on the accounting corpus
@@ -152,6 +152,14 @@ Scenario: A reader is dangerous again after the tenth course
   When they open the path landing
   Then the landing states that they can now design correct core process flows, extend safely, and pick the right integration pattern
   And it states plainly that they cannot yet do production planning, multi-entity work, segregation-of-duties enforcement, or run a rollout
+```
+
+```gherkin
+Scenario: A reader reaches full competence after the twentieth course
+  Given a reader has completed all twenty ERP courses
+  When they open the path landing
+  Then the landing states that they have reached full competence across the corpus
+  And no further "still cannot" caveat remains for the ERP domain
 ```
 
 ```gherkin
@@ -239,6 +247,9 @@ Scenario: The ERP skills path builds and validates green
 - 20 course bodies under `apps/ayokoding-www/content/en/learn/courses/<course-id>/`.
 - Populating the ERP card in the skills category landing and the paths hub — populate only, never
   create.
+- Adding all twenty ERP course entries to the shared
+  `apps/ayokoding-www/content/en/learn/courses/_index.md` catalog index — populate only; the file
+  itself is created by `ayokoding-learning-path-01-url-restructure`, never by this plan.
 - Manifest integrity, prerequisite-consistency, and no-forked-body verification at every phase gate.
 - The A4 verification pass and its named open items.
 

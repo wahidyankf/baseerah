@@ -50,11 +50,16 @@ manifest still records `arc: immediately-effective` (see
 The research gives three explicit **"dangerous by here"** boundaries, and they are the spine of this
 plan's delivery, not merely manifest metadata:
 
-| Boundary | Reached after  | What the reader can do                                                                                                       | What they still cannot do                                                           |
-| -------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **1**    | course **#4**  | Install, configure and integrate a real ERP through its API — storefront↔inventory wiring, report automation, internal tools | Design correct P2P/O2C/R2R flows, extend without breaking upgrades, scope a rollout |
-| **2**    | course **#10** | Correct core process flows, safe extension, the right integration pattern per case                                           | Production planning, multi-company/multi-currency, SoD enforcement, run a rollout   |
-| **3**    | course **#20** | Full competence across the corpus                                                                                            | —                                                                                   |
+| Boundary | Reached after                                                   | What the reader can do                                                                                                       | What they still cannot do                                                           |
+| -------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **1**    | `capstone-stand-up-and-integrate-an-open-source-erp` (#4 of 20) | Install, configure and integrate a real ERP through its API — storefront↔inventory wiring, report automation, internal tools | Design correct P2P/O2C/R2R flows, extend without breaking upgrades, scope a rollout |
+| **2**    | `erp-integration-patterns` (#10 of 20)                          | Correct core process flows, safe extension, the right integration pattern per case                                           | Production planning, multi-company/multi-currency, SoD enforcement, run a rollout   |
+| **3**    | `capstone-build-a-minimal-erp-core` (#20 of 20)                 | Full competence across the corpus                                                                                            | —                                                                                   |
+
+Each boundary names the **course id**, not a bare ordinal — the manifest publishes with only ten of
+the twenty courses live at first, so an ordinal like "#4" would silently misresolve against a
+partially-grown roster before boundaries 2 and 3 land. The `(#N of 20)` parenthetical is
+informational only.
 
 Each boundary is a **delivery phase gate** and a **manifest growth point** (DD-6). The path ships
 usable at boundary 1 and deepens; it never waits for boundary 3 to become a product.
@@ -290,6 +295,10 @@ to `prod-ayokoding-www` after every merge. See [delivery.md](./delivery.md) for 
 - [Learnings (learnings.md)](./learnings.md) — knowledge-capture running log.
 
 **Sibling plan, out of scope**: `ayokoding-learning-path-06-skills-accounting` owns the accounting
-half of the `skills/` category. That plan folder may not yet exist on disk as this plan is written, so
-it is named rather than linked; a link to a not-yet-created folder would fail
-`md links validate`. Re-point to a real link once both plans coexist.
+half of the `skills/` category. It is named rather than linked here — not because the folder does not
+yet exist (it does, alongside this one) — but because plan folders migrate across
+`plans/backlog/` → `plans/in-progress/` → `plans/done/YYYY-MM-DD__…` over their lifecycle, and a
+relative link authored at planning time could break before this plan (currently in `backlog/`) ever
+executes, since the two plans are not guaranteed to migrate in lockstep. Re-point to a real link once
+`ayokoding-learning-path-06-skills-accounting` archives to `plans/done/`, or once both plans are
+confirmed to have settled in the same lifecycle stage for the remainder of execution.
