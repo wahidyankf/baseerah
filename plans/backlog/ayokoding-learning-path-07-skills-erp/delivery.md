@@ -204,7 +204,8 @@ an exact membership test.
 
 > **Shell-tooling notes for every acceptance clause below.** `grep` here is **ugrep**: `grep -c`
 > counts **lines**, not matches, and `grep -L` means files-WITHOUT-match and exits 0 — neither is used
-> anywhere in this file. `--glob` is unsupported; use `--exclude-dir`. `find -newermt` is GNU syntax
+> anywhere in this file. (`--glob` _is_ supported by this ugrep — measured 2026-07-22 — so
+> `--exclude-dir`, where it appears, is a preference not a workaround.) `find -newermt` is GNU syntax
 > and fails on this BSD `find` — it is not used. `md links validate` takes **no positional path**;
 > only the exclude form appears here.
 

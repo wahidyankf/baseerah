@@ -136,9 +136,12 @@ expanded is not executable.
 > `<SPECS>` are expanded. The expansion is **textual, never a shell variable**: shell state does not
 > survive between tool calls in this harness, and an empty `$PLAN` would silently turn a `git diff`
 > pathspec into one that matches nothing and **passes vacuously** — the exact trap step 7.1 (c)
-> exists to catch. 7.1 (c) catches it only because it counts with `| grep -cF "<PLAN>/syllabus/"`,
-> which reads `0` for a pathspec that matches nothing; counted with `| wc -l` the vacuous case would
-> read as `1` and pass (see the RTK note in the Phase 0 preamble).
+> exists to catch. 7.1 (c) catches it because it counts with `| grep -cF "<PLAN>/syllabus/"`, which
+> asserts **which** path changed, not merely that some line was printed. A bare line count cannot make
+> that distinction: `| wc -l` and `| grep -c .` both read `1` when a single _unrelated_ file is in the
+> diff, and 7.1 (c) would pass on it. The prefix form reads `0` there and fails loudly. (A vacuous
+> pathspec reads `0` under every form, so it is caught either way — see the RTK note in the Phase 0
+> preamble for why the empty case is not the risk it was once documented to be.)
 
 - `<PLAN>` = this plan's folder at its current stage — `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag`
   once promoted, `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag` before then.
@@ -212,15 +215,17 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > start precondition is that `origin/main` is green and the `course-paths` feature does not yet
 > exist.
 >
-> **`grep` here is ugrep, not GNU grep — three traps every `grep` clause in this checklist is written
-> around.** (i) **Literal parens inside a BRE `\|` alternation are a regex parse error, exit 2**: the
-> BRE `"it(\|describe("` is translated to `(?:it(|describe()` and dies with `error: unclosed group`,
-> printing no matches — so the step blocks on a false red rather than on a real defect. Use `-E` and
-> escape the parens, e.g. `grep -nE "\b(it|describe)\("`, which is verified to work. (ii) **`grep -c`
-> exits 1 when the count is 0** — never `&&`-chain it; read its printed output instead (see step 1.4).
-> (iii) **`--glob` is unavailable**; the supported spelling for excluding a folder is `--exclude-dir`
-> with a bare folder name (see step 7.2). (iv) **On a non-existent file ugrep exits 2, not 1** — a
-> missing-file case is never the same observation as a no-match case.
+> **`grep` here is ugrep, not GNU grep — two traps every `grep` clause in this checklist is written
+> around.** (i) **`grep -c` counts matching _lines_, not matches, and exits 1 when the count is 0** —
+> never `&&`-chain it; read its printed output instead (see step 1.4). (ii) **On a non-existent file
+> ugrep exits 2, not 1** — a missing-file case is never the same observation as a no-match case.
+> [Repo-grounded — measured 2026-07-22: a zero-match `grep -c` printed `0` and exited 1; a missing path exited 2 with `ugrep: warning: ... No such file or directory`.]
+>
+> **Two traps asserted by an earlier draft were withdrawn on measurement (2026-07-22).** A BRE `\|`
+> alternation containing literal parens was said to be a parse error exiting 2; in fact
+> `grep -n "it(\|describe("` exits **0** and prints its matches. `--glob` was said to be unavailable;
+> in fact `grep --glob='*.ts' -c it <file>` exits **0**. Both spellings below are therefore choices,
+> not workarounds, and neither is load-bearing.
 >
 > **`git` here is routed through RTK, and its `git diff` filter rewrites the output in _two_ ways —
 > one for the empty case and one for the non-empty case.** Measured on this machine (rtk 0.42.3) for
@@ -247,7 +252,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > path-prefix pattern it **cannot be made vacuously true** by an unexpanded `<PLAN>` — which for a
 > zero-assertion would be a false green. Positive-count clauses have the opposite risk profile (an
 > unexpanded pattern counts 0 and fails loudly), which is why they take the prefix form. Either way
-> `grep -c` exits 1 on a zero count (trap (ii)) — never `&&`-chain it; read its printed number.
+> `grep -c` exits 1 on a zero count (trap (i)) — never `&&`-chain it; read its printed number.
 >
 > None of this applies to `git ls-tree`, verified to return the same 128 under both `wc -l` and
 > `grep -c .`, nor to `find`, which is unfiltered — both keep `wc -l`.
@@ -348,9 +353,9 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — acceptance: both commands print at least one line (exit 0) and the output is committed. This is
       the before-picture the Phase 2 cycle-4 change is diffed against. Falsifiable both ways: run the
       second command against the **implementation** file rather than its `.test.ts` sibling and it
-      prints nothing and exits 1. **The second command is ERE (`-E`) deliberately** — the BRE form
-      `grep -n "it(\|describe("` is a regex parse error under this repo's ugrep (trap (i) in this
-      phase's preamble), which exits 2 and blocks the step.
+      prints nothing and exits 1. **The second command is ERE (`-E`) by preference, not necessity** — the
+      BRE form `grep -n "it(\|describe("` also works here (it exits 0 and prints the same matches);
+      `-E` with `\b` is simply the clearer spelling.
 - [ ] [AI] **Confirm the `syllabus/` corpus is intact and untouched** —
       `find <PLAN>/syllabus -type f | wc -l`
       — acceptance: returns **128**. Falsifiable both ways: a deletion or an addition changes the
@@ -1602,8 +1607,9 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       assertion: it measured 43 on 2026-07-22. Re-measure; do not assert.)
       **Two properties of this command are load-bearing.** (i) `--exclude-dir` takes the **bare
       folder name**, so it excludes this plan's folder from whichever stage it currently sits in
-      (`plans/backlog/` or `plans/in-progress/`) without the command needing to know which — and
-      `--exclude-dir` is the ugrep-supported spelling here; `--glob` is **not** available. (ii) The
+      (`plans/backlog/` or `plans/in-progress/`) without the command needing to know which.
+      (`--glob` is also supported by this ugrep — measured 2026-07-22 — so `--exclude-dir` is the
+      chosen spelling, not the only one.) (ii) The
       exclusion is what makes 7.3's assertion satisfiable at all: after the `git mv` this plan's
       folder is under `plans/done/`, outside the search roots, so its self-references can never be
       counted again.
