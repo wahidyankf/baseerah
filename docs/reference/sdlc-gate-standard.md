@@ -214,11 +214,20 @@ directory) or a linked worktree under `worktrees/<name>/` (where `.git` is a git
 the shared object store and refs live in the common dir).
 
 Concretely: resolve the current tree root with `git rev-parse --show-toplevel` and shared metadata
-with `git rev-parse --git-common-dir`; never treat `.git/` as a directory; resolve `repo-config.yml`,
-exclude lists, and test fixtures from the current worktree's toplevel, never the main checkout. Husky
-hooks invoke via `core.hooksPath`, which linked worktrees inherit from the common dir, so the hooks
-fire in a worktree unchanged. `ose-infra` is a bare repo worked only through linked worktrees (no
-primary checkout exists), so worktree-agnostic execution is a hard requirement there, not a nicety.
+with `git rev-parse --git-common-dir`; never treat `.git/` as a directory. A related but separate
+question is whether the repository is bare at all — never answer that with
+`git rev-parse --is-bare-repository` **at all, regardless of where you are standing**, since that
+command answers "is _this checkout_ bare" (always `false` from a linked worktree, by documented
+design — and correct only when run from the bare repository's own main worktree, which is exactly
+the fact this question exists to establish, not something to assume in advance), not "is the
+repository bare." Ask the bareness question instead with `git worktree list` (look for the `(bare)`
+marker) or, when a scriptable form is needed, the labelled `core.bare` read — both defined in the
+[Bare-Repo Base-Worktree Landing Method](../../repo-governance/development/workflow/bare-repo-landing-method.md#verify-topology-first).
+Resolve `repo-config.yml`, exclude lists, and test fixtures from the current worktree's toplevel,
+never the main checkout. Husky hooks invoke via `core.hooksPath`, which linked worktrees inherit from
+the common dir, so the hooks fire in a worktree unchanged. `ose-infra` is a bare repo worked only
+through linked worktrees (no primary checkout exists), so worktree-agnostic execution is a hard
+requirement there, not a nicety.
 
 ## Target Standard
 
