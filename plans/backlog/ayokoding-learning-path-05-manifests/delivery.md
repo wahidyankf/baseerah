@@ -17,11 +17,14 @@ Two standing constraints govern every step below.
 > `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
 > them; do not author from any other source.
 >
-> **The manifest ownership invariant (binding)**: this plan owns **every** file under `<MANIFESTS>`
-> and every step that creates, appends to, reorders, or re-verifies one.
+> **The manifest ownership invariant (binding)**: this plan owns **every** file under
+> `<MANIFESTS>careers/` and every step that creates, appends to, reorders, or re-verifies one of the
+> four `careers/` manifests. `ayokoding-learning-path-06-skills-accounting` and
+> `ayokoding-learning-path-07-skills-erp` own the sibling `<MANIFESTS>skills/` subtree end-to-end —
+> one manifest each — under the identical invariant, scoped to its own category.
 > `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and never edits a
-> manifest. A step here that authors a course body is a boundary violation in the other direction and
-> is equally forbidden.
+> manifest under either category. A step here that authors a course body is a boundary violation in
+> the other direction and is equally forbidden.
 
 ## Worktree
 
@@ -130,8 +133,11 @@ acceptance clause below degrades to an unresolvable placeholder.
 - Path ids: `careers/interview-ready/software-engineer`, `careers/immediately-effective/software-engineer`, `careers/fundamentally-strong/software-engineer`, `careers/immediately-effective/ai-engineer` (fourth path, manifest at `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml`)
 
 One additional constant is owned by this plan: `<MANIFESTS>published-manifests.unit.test.ts` — the
-unit-test file that asserts every published manifest's shape, integrity, and growth state. It lives
-inside `<MANIFESTS>` because this plan owns that directory outright.
+unit-test file that asserts every published `careers/` manifest's shape, integrity, and growth state.
+It lives directly inside `<MANIFESTS>` (the unscoped root, not `<MANIFESTS>careers/`) and is **shared**
+once `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` add
+their own assertions alongside — see
+[tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 
 ---
 
@@ -162,8 +168,9 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
       — acceptance: exits 0; returns non-zero before the schema plan lands.
 - [ ] [AI] **Start precondition 5** — confirm the full `careers/`-software-engineering catalog
       resolves (R5: 127 is the `careers/` catalog total, not a whole-programme total — the sibling
-      `skills/` corpus is a separate corpus owned by `ayokoding-learning-path-06-skills-paths` and is
-      not counted here): `find <COURSES> -maxdepth 1 -mindepth 1 -type d | wc -l`
+      `skills/` corpus is a separate corpus owned by `ayokoding-learning-path-06-skills-accounting`
+      and `ayokoding-learning-path-07-skills-erp` and is not counted here):
+      `find <COURSES> -maxdepth 1 -mindepth 1 -type d | wc -l`
       — acceptance: returns **127**. Falsifiable both ways: it returns **37** after the
       url-restructure plan's re-home alone, and the `find` fails outright before `<COURSES>` exists.
 - [ ] [AI] Establish baselines: `npx nx run ayokoding-www:build` and
@@ -171,15 +178,17 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
       — acceptance: all exit 0; record the pass counts in `evidence/phase-0-snapshot.txt`.
 - [ ] [AI] **Manifest baseline snapshot** — record the current manifest inventory to
       `evidence/phase-0-snapshot.txt` via
-      `find <MANIFESTS>careers/ -name '*.yaml' | sort` — acceptance: the command prints **nothing** (no
-      manifest exists yet) and the empty result is recorded. Falsifiable both ways: after Phase 4 the
-      same command prints four paths.
+      `find <MANIFESTS>careers/ -name '*.yaml' 2>/dev/null | sort` — acceptance: the command prints
+      **nothing** (no manifest exists yet, and `2>/dev/null` keeps the result robust regardless of
+      whether the `careers/` subdirectory itself pre-exists) and the empty result is recorded.
+      Falsifiable both ways: after Phase 4 the same command prints four paths.
 - [ ] [AI] **Paths-hub baseline snapshot** — record the current `careers/` card count to
       `evidence/phase-0-snapshot.txt` via
       `grep -oE '/en/learn/paths/careers/[a-z-]+/[a-z0-9-]+' <PATHS>_index.md | sort -u | wc -l`
       — acceptance: returns **0** (the hub exists with an empty, category-grouped layout, created by
       the url-restructure plan); returns **4** after Phase 4. Scoped to `careers/` per R4, so a
-      concurrent `skills/` card from `ayokoding-learning-path-06-skills-paths` cannot change this
+      concurrent `skills/` card from `ayokoding-learning-path-06-skills-accounting` or
+      `ayokoding-learning-path-07-skills-erp` cannot change this
       count. **Not** the older 2-segment pattern (`[a-z-]+/[a-z0-9-]+` with no `careers/` anchor) —
       that pattern under-counts because it stops matching at the first `/` inside a 3-segment
       `careers/<arc>/<role>` URL and collapses two different `immediately-effective/*` cards
@@ -231,15 +240,22 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
 
 ### 1.1 · TDD cycle A — publish the manifest data file
 
-- [ ] [AI] **RED** — create `<MANIFESTS>published-manifests.unit.test.ts` _(new file, this plan owns
-      `<MANIFESTS>`)_ with a failing assertion that
+- [ ] [AI] **RED** — create `<MANIFESTS>published-manifests.unit.test.ts` _(new file; lives in the
+      unscoped `<MANIFESTS>` root and is shared with `ayokoding-learning-path-06-skills-accounting`
+      and `ayokoding-learning-path-07-skills-erp`, see
+      the path constants section above)_ with a failing assertion that
       `<MANIFESTS>careers/interview-ready/software-engineer.yaml` loads, zod-validates against
       `<FEAT>core/schemas.ts`, and passes `checkManifestIntegrity` +
       `checkPrerequisiteConsistency` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion **fails** with a module-not-found or empty-glob error naming
       `careers/interview-ready/software-engineer.yaml`. A failure for any other reason (a missing
       `schemas.ts` import, for instance) means a start precondition was not honoured — stop and
-      re-check Phase 0.
+      re-check Phase 0. Also create `<SPECS>path-composition.feature` _(new file)_ with the scenario
+      below mirrored verbatim, and add a matching step definition to
+      `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts` _(created by this plan,
+      pairing 1:1 with its own `path-composition.feature`)_ that asserts the manifest loads and the landing
+      renders — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new step
+      **fails** for the same reason (neither the manifest nor the landing exists yet).
 
   **Gherkin (binds) →** "The interview-ready MVP proves the architecture before other path work begins"
 
@@ -290,9 +306,9 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
 ### 1.3 · TDD cycle B — old-way and new-way coexistence
 
 - [ ] [AI] **RED** — add the coexistence scenario to
-      `<SPECS>path-composition.feature` _(new file)_ and a failing e2e step in
-      `apps/ayokoding-www-fe-e2e/src/steps/course-paths.steps.ts` _(existing file, created by
-      `ayokoding-learning-path-03-navigation-ui`)_ asserting that a course reached from this path's
+      `<SPECS>path-composition.feature` _(existing file, created in Phase 1.1)_ and a failing e2e step in
+      `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts` _(created by this plan,
+      pairing 1:1 with its own `path-composition.feature`)_ asserting that a course reached from this path's
       landing and the same course reached through the legacy section-index browse resolve to one
       canonical body — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: the new spec **fails** because the path landing does not yet link that course.
@@ -396,13 +412,18 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
       (present, not absent — inverted 2026-07-21, DD-35) — command:
       `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion **fails** because the manifest file does not exist; the Phase-1
-      assertions still pass in the same run.
+      assertions still pass in the same run. Also extend `<SPECS>path-composition.feature`
+      _(existing file, created in Phase 1.1)_ with the scenario below mirrored verbatim, and add a
+      matching step definition to `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts`
+      asserting the manifest loads with the SWE-fundamentals IDs present at the head of
+      `courseOrder` — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new step
+      **fails** because the manifest file does not exist.
 
   **Gherkin (binds) →** "The AI-engineer path includes its software-engineering prerequisites instead
-  of linking them"
+  of linking them (inverted 2026-07-21, see tech-docs.md DD-35)"
 
   ```gherkin
-  Scenario: The AI-engineer path includes its software-engineering prerequisites instead of linking them
+  Scenario: The AI-engineer path includes its software-engineering prerequisites instead of linking them (inverted 2026-07-21, see tech-docs.md DD-35)
     Given the careers/immediately-effective/ai-engineer path manifest is published
     When a reader with no prior software-engineering competence inspects its courseOrder
     Then the shared software-engineering-fundamentals courses this path's AI-specific spine depends on are present at the head of courseOrder, ordered prerequisite-consistently
@@ -471,7 +492,10 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
       it — acceptance: the phase ordering in this file matches DD-27, stated here in writing. This is
       a build-order claim about this plan's own delivery sequence; no test harness can execute it,
       and it is kept deliberately per
-      [README §JC-1](./README.md#jc-1-the-build-order-scenario-is-kept-not-deleted).
+      [README §JC-1](./README.md#jc-1-the-build-order-scenario-is-kept-not-deleted). **This scenario
+      intentionally does not land in `<SPECS>path-composition.feature`** — unlike the four
+      manifest-composition scenarios (1.1/2.1/3.1/4.1), it has no step binding and never will one;
+      its `Given/When/Then` below is verified by reading this checklist, not by running a test.
 
   **Gherkin (binds) →** "The AI path is authored before the other two manifests are composed"
 
@@ -539,7 +563,12 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
       integrity gates, and places the build-a-real-app capstone before every pure-theory course —
       command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion **fails** because the manifest file does not exist; the Phase-1
-      and Phase-2 assertions still pass in the same run.
+      and Phase-2 assertions still pass in the same run. Also extend `<SPECS>path-composition.feature`
+      _(existing file, created in Phase 1.1)_ with the scenario below mirrored verbatim, and add a
+      matching step definition to `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts`
+      asserting the manifest loads with the build-a-real-app capstone before every pure-theory
+      course — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new step
+      **fails** because the manifest file does not exist.
 
   **Gherkin (binds) →** "The immediately-effective path is build-app-first"
 
@@ -629,7 +658,13 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
       CS foundations / computer architecture / paradigms / DS&A before the build-real-software courses
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion **fails** because the manifest file does not exist; the three
-      prior manifests' assertions still pass in the same run.
+      prior manifests' assertions still pass in the same run. Also extend
+      `<SPECS>path-composition.feature` _(existing file, created in Phase 1.1)_ with the scenario
+      below mirrored verbatim, and add a matching step definition to
+      `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts` asserting the manifest loads with
+      CS foundations / computer architecture / paradigms / DS&A before the build-real-software
+      courses — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new step
+      **fails** because the manifest file does not exist.
 
   **Gherkin (binds) →** "The fundamentally-strong path is fundamentals-first"
 
@@ -676,7 +711,7 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
 
 - [ ] [AI] **GREEN** — implement the no-forked-body check — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: exits 0, AND the shell equivalent agrees:
-      `for id in $(cat <MANIFESTS>*/*.yaml | grep -oE '^ *- [a-z0-9-]+' | sed 's/^ *- //' | sort -u); do find <COURSES> -maxdepth 1 -mindepth 1 -type d -name "$id" | wc -l; done | sort -u`
+      `for id in $(find <MANIFESTS>careers/ -name '*.yaml' -exec cat {} + | grep -oE '^ *- [a-z0-9-]+' | sed 's/^ *- //' | sort -u); do find <COURSES> -maxdepth 1 -mindepth 1 -type d -name "$id" | wc -l; done | sort -u`
       prints exactly the single line `1`. Falsifiable both ways: a dangling ID prints a `0` line and a
       forked body prints a `2` line, so any output other than a lone `1` fails.
 - [ ] [AI] **REFACTOR** — move the shell equivalent into the test as a documented comment so the two
@@ -685,7 +720,7 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
 ### 4.3 · TDD cycle C — a shared course names every path that includes it
 
 - [ ] [AI] **RED** — add the affordance scenario to `<SPECS>path-composition.feature` and a failing
-      e2e step in `apps/ayokoding-www-fe-e2e/src/steps/course-paths.steps.ts` asserting that a course
+      e2e step in `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts` asserting that a course
       present in more than one manifest, opened with **no** `?path=`, lists every including path in
       the "this course is part of" affordance — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: the new spec **fails** because the affordance currently enumerates fewer paths
@@ -758,8 +793,8 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
 ## Phase 5: Manifest growth as backfill lands
 
 > **Absorbed from `ayokoding-learning-path-04-course-authoring` per the manifest ownership
-> invariant.** All four steps below genuinely mutate a `.yaml` under `<MANIFESTS>`; a Wave-2 plan
-> cannot grow a Wave-3 plan's artefacts. The course **bodies** these growths depend on are authored by
+> invariant.** All four steps below genuinely mutate a `.yaml` under `<MANIFESTS>careers/`; a
+> Wave-2 plan cannot grow a Wave-3 plan's artefacts. The course **bodies** these growths depend on are authored by
 > that plan and are already merged (Phase 0 precondition 2); what lands here is only their manifest
 > consequence.
 >
@@ -807,9 +842,7 @@ inside `<MANIFESTS>` because this plan owns that directory outright.
       in place, never by reordering.
   - _Suggested executor: `web-researcher` for any external claim in the bridge prose_
 
-### 5.4 · AI-path growth to its full composition (DD-33, amended in scope by DD-35 — no longer a
-
-fixed "15-course" figure)
+### 5.4 · AI-path growth to its full composition (DD-33, amended in scope by DD-35 — no longer a fixed "15-course" figure)
 
 - [ ] [AI] Record the manifest's entry count immediately before this step —
       `grep -cE '^ *- [a-z0-9-]+' <MANIFESTS>careers/immediately-effective/ai-engineer.yaml` — and save
@@ -886,9 +919,14 @@ fixed "15-course" figure)
       they are deliberately not cited as evidence anywhere in this plan.)
 - [ ] [AI] Build the site: `npx nx run ayokoding-www:build` — acceptance: exits 0.
 - [ ] [AI] Run link + heading-hierarchy + markdown validation:
-      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` +
-      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate` + `npm run lint:md` (the actual mechanism — **not** `nx run` targets) — acceptance: the link
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` +
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate` + `npm run lint:md` (the actual mechanism — **not** `nx run` targets) — acceptance: the link
       validator prints `All links valid! No broken links found.`; the other two exit 0.
+
+  **This scenario intentionally does not land in `<SPECS>path-composition.feature`** — it is a
+  build/CI-gate assertion over the whole manifest layer, not a single user-facing behavior; its
+  `Given/When/Then` is verified by the shell commands above, not a Playwright step binding, per
+  [README §JC-2](./README.md#jc-2-the-composite-build-green-scenario-is-decomposed-not-inherited).
 
   **Gherkin (binds) →** "The manifest layer builds and validates green"
 
@@ -915,11 +953,12 @@ fixed "15-course" figure)
       nothing else: `find <MANIFESTS>careers/ -name '*.yaml' | wc -l` returns
       **4**, and `find <MANIFESTS>careers/ -name '*.yaml' | sort` lists exactly the four declared path IDs
       — acceptance: both hold. Scoped to `<MANIFESTS>careers/`, not the bare `<MANIFESTS>` root, so a
-      sibling `skills/*.yaml` manifest landed concurrently by `ayokoding-learning-path-06-skills-paths`
-      cannot change this count in either direction. Falsifiable both ways: a fifth `careers/` manifest
+      sibling `skills/*.yaml` manifest landed concurrently by `ayokoding-learning-path-06-skills-accounting`
+      and/or `ayokoding-learning-path-07-skills-erp` cannot change this count in either direction.
+      Falsifiable both ways: a fifth `careers/` manifest
       added by any other plan makes the count **5**, and a deleted `careers/` manifest makes it **3**.
 - [ ] [AI] **Cross-plan link check (this plan's own folder)** —
-      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content 2>&1 | grep -F "ayokoding-learning-path-05-manifests"`
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content 2>&1 | grep -F "ayokoding-learning-path-05-manifests"`
       — acceptance: the `grep` finds **no** matching line (exit 1). Falsifiable the other way too:
       introduce one bad `./syllabus/` link into this folder and the same command prints that file and
       exits 0. `md links validate` accepts **no positional path** and always walks the repo, so
@@ -1118,8 +1157,9 @@ fixed "15-course" figure)
       asserts only the count of bodies it itself authored, while the 127-catalog claim is only
       meaningful once every manifest resolves against it. `<COURSES>` today holds only the
       `careers/software-engineering` corpus — the `skills/` category's ERP + accounting corpus is a
-      separate corpus authored by `ayokoding-learning-path-06-skills-paths` and is not counted by this
-      `find`, so this assertion does not need to change when that sibling plan lands.
+      separate corpus authored by `ayokoding-learning-path-06-skills-accounting` and
+      `ayokoding-learning-path-07-skills-erp` and is not counted by this
+      `find`, so this assertion does not need to change when those sibling plans land.
 - [ ] [AI] **Scoped cross-plan link check** — re-run the Phase 6 filtered link validation and confirm
       it still finds no line naming this plan's folder. If
       `ayokoding-learning-path-02-schema-and-prerequisite-dag` has archived since, confirm every

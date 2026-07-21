@@ -5,8 +5,9 @@
 Turn the shared **software-engineering** course library into **four usable `careers/` products** by
 authoring, publishing, growing, and verifying the four ordered `careers/` path manifests that compose
 it. (A sibling category, `skills/`, adds two more products over a separate ERP + accounting corpus —
-owned end-to-end by the sibling plan `ayokoding-learning-path-06-skills-paths`, out of this plan's
-scope; see [tech-docs.md DD-34](./tech-docs.md#design-decisions).) The library is the investment; the
+owned end-to-end by the sibling plans `ayokoding-learning-path-06-skills-accounting` (accounting)
+and `ayokoding-learning-path-07-skills-erp` (ERP), out of this plan's scope; see
+[tech-docs.md DD-34](./tech-docs.md#design-decisions).) The library is the investment; the
 manifests are what convert that single investment into four audience-fit reading arcs, each with a
 coherent, prerequisite-aware, path-aware journey:
 
@@ -182,8 +183,9 @@ Every metric below is an **observable check**, not a projected number.
   course-authoring plan when they are.
 - **A fifth `careers/` path.** The four-path `careers/` composition is locked (DL-1 / DL-15); a fifth
   would be its own plan. (The sibling `skills/` category's two paths, owned end-to-end by
-  `ayokoding-learning-path-06-skills-paths`, are a separate category — not a fifth `careers/` path —
-  see [tech-docs.md DD-34](./tech-docs.md#design-decisions).)
+  `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`, are a
+  separate category — not a fifth `careers/` path — see
+  [tech-docs.md DD-34](./tech-docs.md#design-decisions).)
 
 ## Business Risks and Mitigations
 

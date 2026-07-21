@@ -16,34 +16,39 @@ population, the per-path smoothness audits, and every manifest growth as backfil
 **Category scope (2026-07-21 path-category-split ruling).** The paths hub now serves **two**
 categories at different URL depths — `careers/<arc>/<role>` (3 segments, 4 paths, this plan) and
 `skills/<subject>` (2 segments, no arc level today, 2 paths,
-`ayokoding-learning-path-06-skills-paths`). This plan is **careers-only**; it does not create,
+`ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`, one
+manifest each). This plan is **careers-only**; it does not create,
 touch, or assert anything about the `skills/` category. Every count and every mechanical check in
 this document is scoped to `careers/` for exactly that reason — see [DD-34](#design-decisions) for
 the full ruling record.
 
 It consumes three upstream layers and produces one:
 
-| Layer                                   | Owner                                                    | This plan's relationship           |
-| --------------------------------------- | -------------------------------------------------------- | ---------------------------------- |
-| URL / IA                                | `ayokoding-learning-path-01-url-restructure`             | consumes (`courses/`, `paths/`)    |
-| Schema / core / integrity               | `ayokoding-learning-path-02-schema-and-prerequisite-dag` | consumes (zod, gates, syllabus)    |
-| Rendering / route wiring                | `ayokoding-learning-path-03-navigation-ui`               | consumes (components, `?path=`)    |
-| Course bodies                           | `ayokoding-learning-path-04-course-authoring`            | consumes (127 bundles)             |
-| **`careers/` manifests + landings**     | **this plan**                                            | **produces**                       |
-| `skills/` manifests + landings + corpus | `ayokoding-learning-path-06-skills-paths`                | sibling — out of this plan's scope |
+| Layer                                   | Owner                                                                                    | This plan's relationship           |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------- |
+| URL / IA                                | `ayokoding-learning-path-01-url-restructure`                                             | consumes (`courses/`, `paths/`)    |
+| Schema / core / integrity               | `ayokoding-learning-path-02-schema-and-prerequisite-dag`                                 | consumes (zod, gates, syllabus)    |
+| Rendering / route wiring                | `ayokoding-learning-path-03-navigation-ui`                                               | consumes (components, `?path=`)    |
+| Course bodies                           | `ayokoding-learning-path-04-course-authoring`                                            | consumes (127 bundles)             |
+| **`careers/` manifests + landings**     | **this plan**                                                                            | **produces**                       |
+| `skills/` manifests + landings + corpus | `ayokoding-learning-path-06-skills-accounting` + `ayokoding-learning-path-07-skills-erp` | sibling — out of this plan's scope |
 
 ## The manifest ownership invariant (now scoped per category)
 
 **This plan owns every file under `apps/ayokoding-www/src/features/course-paths/manifests/careers/`
 and every step that creates, appends to, reorders, or re-verifies one of the four `careers/`
-manifests.** `ayokoding-learning-path-06-skills-paths` owns the sibling `.../manifests/skills/`
-subtree end-to-end (both skills manifests, their landings, and the full ERP + accounting corpus)
-under the identical invariant, scoped to its own category.
+manifests.** `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`
+together own the sibling `.../manifests/skills/` subtree end-to-end —
+`ayokoding-learning-path-06-skills-accounting` owns `manifests/skills/accounting.yaml` and its
+landing; `ayokoding-learning-path-07-skills-erp` owns
+`manifests/skills/enterprise-resource-planning.yaml` and its landing — each under the identical
+invariant, scoped to its own manifest.
 `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and **never edits a
 manifest under either category**.
 
 Before the 2026-07-21 ruling this invariant named the whole `manifests/` directory as this plan's
-exclusive property. That is now **too broad**: `ayokoding-learning-path-06-skills-paths` writing
+exclusive property. That is now **too broad**: `ayokoding-learning-path-06-skills-accounting` or
+`ayokoding-learning-path-07-skills-erp` writing
 `.yaml` files under the same directory's `skills/` subtree is not a boundary violation — it is the
 sibling half of the same invariant, applied to the other category. Every mechanical check below that
 used to assert "this plan owns the whole `manifests/` directory" is rescoped to assert "this plan
@@ -57,19 +62,20 @@ sidesteps the depth question entirely rather than asserting a depth.
 
 ### What this plan writes
 
-| Path                                                                                      | Kind    | Note                                                                                                                                                                                           |
-| ----------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/ayokoding-www/src/features/course-paths/manifests/careers/**/*.yaml`                | data    | all four `careers/` manifests, exclusively                                                                                                                                                     |
-| `apps/ayokoding-www/src/features/course-paths/manifests/published-manifests.unit.test.ts` | test    | asserts every published `careers/` manifest's shape, integrity, and growth state — this file itself is shared once `ayokoding-learning-path-06-skills-paths` adds its own assertions alongside |
-| `apps/ayokoding-www/content/en/learn/paths/careers/<arc>/<role>/_index.md`                | content | four thin landing anchors, prose/SEO only                                                                                                                                                      |
-| `apps/ayokoding-www/content/en/learn/paths/_index.md`                                     | content | `careers/` card population only — the file itself is `ayokoding-learning-path-01-url-restructure`'s; `skills/` cards are `ayokoding-learning-path-06-skills-paths`'s                           |
+| Path                                                                                      | Kind    | Note                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `apps/ayokoding-www/src/features/course-paths/manifests/careers/**/*.yaml`                | data    | all four `careers/` manifests, exclusively                                                                                                                                                                                                       |
+| `apps/ayokoding-www/src/features/course-paths/manifests/published-manifests.unit.test.ts` | test    | asserts every published `careers/` manifest's shape, integrity, and growth state — this file itself is shared once `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` add their own assertions alongside |
+| `apps/ayokoding-www/content/en/learn/paths/careers/<arc>/<role>/_index.md`                | content | four thin landing anchors, prose/SEO only                                                                                                                                                                                                        |
+| `apps/ayokoding-www/content/en/learn/paths/_index.md`                                     | content | `careers/` card population only — the file itself is `ayokoding-learning-path-01-url-restructure`'s; `skills/` cards are `ayokoding-learning-path-06-skills-accounting`'s and `ayokoding-learning-path-07-skills-erp`'s                          |
 
 ### What this plan never touches
 
 - Any file under `apps/ayokoding-www/content/en/learn/courses/` — course bodies are read (to verify a
   `courseOrder` ID resolves) and never written.
 - Any file under `apps/ayokoding-www/src/features/course-paths/manifests/skills/` — owned end-to-end
-  by `ayokoding-learning-path-06-skills-paths`, same invariant, other category.
+  by `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`, same
+  invariant, other category.
 - Any file under `apps/ayokoding-www/src/features/course-paths/core/` or `.../shell/` — the pure
   modules and the rendering components are consumed, never modified.
 - Any redirect module, any `next.config.ts` entry, any `legacy/` content.
@@ -579,8 +585,8 @@ ruling.
 - **DD-34 · Category segment adopted: every path id now carries a leading `careers/` (2026-07-21
   path-category-split ruling; amends DD-23's URL-segment framing above).** The paths hub and every
   path id now carry a leading category segment — `careers/<arc>/<role>` (this plan's four paths,
-  3 segments) or `skills/<subject>` (`ayokoding-learning-path-06-skills-paths`'s two paths, 2
-  segments, no arc level today). `/en/learn/paths/` did not exist before
+  3 segments) or `skills/<subject>` (`ayokoding-learning-path-06-skills-accounting`'s and
+  `ayokoding-learning-path-07-skills-erp`'s two paths, 2 segments, no arc level today). `/en/learn/paths/` did not exist before
   `ayokoding-learning-path-01-url-restructure`'s work, so inserting the category segment costs
   **zero redirects** — there is no prior `/en/learn/paths/<arc>/...` URL to preserve. This plan's
   manifest files move one level deeper to mirror it: `<MANIFESTS>careers/<arc>/<role>.yaml`, never
@@ -759,22 +765,22 @@ non-goal, not a code limitation — the navigation mechanism itself is locale-ne
 
 ## File Impact
 
-| Path                                                                                                          | Change                                    | Phase      |
-| ------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ---------- |
-| `apps/ayokoding-www/src/features/course-paths/manifests/published-manifests.unit.test.ts`                     | created (Phase 1), extended (2, 3, 4)     | 1-4        |
-| `apps/ayokoding-www/src/features/course-paths/manifests/careers/interview-ready/software-engineer.yaml`       | created                                   | 1          |
-| `apps/ayokoding-www/content/en/learn/paths/careers/interview-ready/software-engineer/_index.md`               | created                                   | 1          |
-| `apps/ayokoding-www/src/features/course-paths/manifests/careers/immediately-effective/ai-engineer.yaml`       | created                                   | 2          |
-| `apps/ayokoding-www/content/en/learn/paths/careers/immediately-effective/ai-engineer/_index.md`               | created                                   | 2          |
-| `apps/ayokoding-www/src/features/course-paths/manifests/careers/immediately-effective/software-engineer.yaml` | created                                   | 3          |
-| `apps/ayokoding-www/content/en/learn/paths/careers/immediately-effective/software-engineer/_index.md`         | created                                   | 3          |
-| `apps/ayokoding-www/src/features/course-paths/manifests/careers/fundamentally-strong/software-engineer.yaml`  | created                                   | 4          |
-| `apps/ayokoding-www/content/en/learn/paths/careers/fundamentally-strong/software-engineer/_index.md`          | created                                   | 4          |
-| `apps/ayokoding-www/content/en/learn/paths/_index.md`                                                         | edited (card population, once per phase)  | 1, 2, 3, 4 |
-| All four manifest `.yaml` files                                                                               | edited (growth)                           | 5          |
-| `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/path-composition.feature`                   | created (Phase 1), extended (4)           | 1, 4       |
-| `apps/ayokoding-www-fe-e2e/src/steps/course-paths.steps.ts`                                                   | extended (created by the navigation plan) | 1, 4       |
-| `plans/backlog/ayokoding-learning-path-05-manifests/evidence/`                                                | created                                   | 7          |
+| Path                                                                                                          | Change                                                 | Phase      |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ---------- |
+| `apps/ayokoding-www/src/features/course-paths/manifests/published-manifests.unit.test.ts`                     | created (Phase 1), extended (2, 3, 4)                  | 1-4        |
+| `apps/ayokoding-www/src/features/course-paths/manifests/careers/interview-ready/software-engineer.yaml`       | created                                                | 1          |
+| `apps/ayokoding-www/content/en/learn/paths/careers/interview-ready/software-engineer/_index.md`               | created                                                | 1          |
+| `apps/ayokoding-www/src/features/course-paths/manifests/careers/immediately-effective/ai-engineer.yaml`       | created                                                | 2          |
+| `apps/ayokoding-www/content/en/learn/paths/careers/immediately-effective/ai-engineer/_index.md`               | created                                                | 2          |
+| `apps/ayokoding-www/src/features/course-paths/manifests/careers/immediately-effective/software-engineer.yaml` | created                                                | 3          |
+| `apps/ayokoding-www/content/en/learn/paths/careers/immediately-effective/software-engineer/_index.md`         | created                                                | 3          |
+| `apps/ayokoding-www/src/features/course-paths/manifests/careers/fundamentally-strong/software-engineer.yaml`  | created                                                | 4          |
+| `apps/ayokoding-www/content/en/learn/paths/careers/fundamentally-strong/software-engineer/_index.md`          | created                                                | 4          |
+| `apps/ayokoding-www/content/en/learn/paths/_index.md`                                                         | edited (card population, once per phase)               | 1, 2, 3, 4 |
+| All four manifest `.yaml` files                                                                               | edited (growth)                                        | 5          |
+| `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/path-composition.feature`                   | created (1.1), extended (1.3, 2.1, 3.1, 4.1, 4.2, 4.3) | 1-4        |
+| `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts`                                               | extended (created by the navigation plan)              | 1-4        |
+| `plans/backlog/ayokoding-learning-path-05-manifests/evidence/`                                                | created                                                | 7          |
 
 All paths are marked `_New file_` except `paths/_index.md`, which is created by
 `ayokoding-learning-path-01-url-restructure` and only **populated** here. None of the manifest paths
@@ -784,14 +790,14 @@ exists on the current tree — `apps/ayokoding-www/src/features/course-paths/` i
 
 ## Testing Strategy
 
-| Level                    | What it covers here                                                                                             | Command                                                               |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Unit                     | manifest loads + zod-validates; integrity; prerequisite-consistency; no-forked-body; before/after growth checks | `npx nx run ayokoding-www:test:unit`                                  |
-| Specs (Gherkin coverage) | every scenario in `prd.md` binds a step definition under `specs/`                                               | `npx nx run ayokoding-www:specs:behavior:coverage`                    |
-| E2E                      | path-walk from each landing; `?path=` persistence; breadcrumb; prerequisite display; part-of-paths affordance   | `npx nx run ayokoding-www-fe-e2e:test:e2e`                            |
-| Build                    | all four manifests resolve against 127 bundles at build time                                                    | `npx nx run ayokoding-www:build`                                      |
-| Manual                   | four landings + hub at 375 / 768 / 1280 px, `en`, with committed evidence                                       | Playwright MCP (Phase 7)                                              |
-| Live-site triad          | Rule-15 EWT / UWT / DWT retest before archival                                                                  | `web-exploratory-tester`, `web-usability-tester`, `web-design-tester` |
+| Level                    | What it covers here                                                                                                                                                                                                                                                                                                                                                                       | Command                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Unit                     | manifest loads + zod-validates; integrity; prerequisite-consistency; no-forked-body; before/after growth checks                                                                                                                                                                                                                                                                           | `npx nx run ayokoding-www:test:unit`                                  |
+| Specs (Gherkin coverage) | 7 of 9 `prd.md` scenarios bind a step definition under `specs/` (Phase 2.3's AI-path build-order and Phase 6's manifest-layer build-green scenarios are recorded instead in [README §JC-1](./README.md#jc-1-the-build-order-scenario-is-kept-not-deleted) / [README §JC-2](./README.md#jc-2-the-composite-build-green-scenario-is-decomposed-not-inherited) — no step binding, by design) | `npx nx run ayokoding-www:specs:behavior:coverage`                    |
+| E2E                      | path-walk from each landing; `?path=` persistence; breadcrumb; prerequisite display; part-of-paths affordance                                                                                                                                                                                                                                                                             | `npx nx run ayokoding-www-fe-e2e:test:e2e`                            |
+| Build                    | all four manifests resolve against 127 bundles at build time                                                                                                                                                                                                                                                                                                                              | `npx nx run ayokoding-www:build`                                      |
+| Manual                   | four landings + hub at 375 / 768 / 1280 px, `en`, with committed evidence                                                                                                                                                                                                                                                                                                                 | Playwright MCP (Phase 7)                                              |
+| Live-site triad          | Rule-15 EWT / UWT / DWT retest before archival                                                                                                                                                                                                                                                                                                                                            | `web-exploratory-tester`, `web-usability-tester`, `web-design-tester` |
 
 **TDD shape.** The manifests are data files under `src/` consumed by app code, so every manifest step
 is Red→Green→Refactor: RED writes the failing integrity/e2e assertion for the manifest that does not

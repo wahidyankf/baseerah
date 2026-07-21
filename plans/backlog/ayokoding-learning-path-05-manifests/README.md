@@ -13,7 +13,8 @@ every manifest growth as backfill content lands.
 **Category scope (2026-07-21 path-category-split ruling — see [tech-docs DD-34](./tech-docs.md#design-decisions)).**
 The paths hub now serves **two** categories at different URL depths: `careers/<arc>/<role>` (3
 segments, 4 paths, this plan) and `skills/<subject>` (2 segments, no arc level today, 2 paths,
-the sibling plan `ayokoding-learning-path-06-skills-paths`). This plan is **careers-only**; "four
+the sibling plans `ayokoding-learning-path-06-skills-accounting` and
+`ayokoding-learning-path-07-skills-erp`). This plan is **careers-only**; "four
 manifests" and "four path manifests" in this plan always mean the four `careers/` manifests — never
 the whole six-path programme. Where a statement below is about the whole programme rather than this
 plan's own scope, it says so explicitly.
@@ -33,9 +34,12 @@ _Binding — and the reason this plan exists as a separate unit._
 
 **This plan owns every file under `apps/ayokoding-www/src/features/course-paths/manifests/careers/`
 and every step that creates, appends to, reorders, or re-verifies one of the four `careers/`
-manifests.** `ayokoding-learning-path-06-skills-paths` owns the sibling `.../manifests/skills/`
-subtree end-to-end (both skills manifests, their landings, and the full ERP + accounting corpus)
-under the identical invariant, scoped to its own category.
+manifests.** `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`
+together own the sibling `.../manifests/skills/` subtree end-to-end —
+`ayokoding-learning-path-06-skills-accounting` owns `manifests/skills/accounting.yaml` and its
+landing; `ayokoding-learning-path-07-skills-erp` owns
+`manifests/skills/enterprise-resource-planning.yaml` and its landing — each under the identical
+invariant, scoped to its own manifest.
 `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and **never edits a
 manifest under either category**.
 
@@ -61,8 +65,9 @@ Its two mechanical consequences:
   [Phase 2](./delivery.md#phase-2-author-the-ai-path-manifest-landing-and-smoothness-audit).
 - **The terminal 127-course catalog assertion is this plan's**, at its own archival gate. **127 is
   the `careers/`/software-engineering catalog total only** — the skills corpus
-  `ayokoding-learning-path-06-skills-paths` authors is additional and never folded into this figure
-  (R5). The course-authoring plan asserts only the count of bodies it itself authored.
+  `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` author
+  is additional and never folded into this figure (R5). The course-authoring plan asserts only the
+  count of bodies it itself authored.
 
 ## Scope
 
@@ -208,10 +213,10 @@ per-phase gate that closes each one:
 **No dependency on any plan outside this five-way split.** The FS-SE hard dependency was removed
 before the split (DL-12 / DD-17); the sibling FS-SE plan is closed at
 [`plans/done/2026-07-19__fundamentally-strong-software-engineer/`](../../done/2026-07-19__fundamentally-strong-software-engineer/README.md).
-**This includes the new sibling `ayokoding-learning-path-06-skills-paths`**: it neither blocks nor
-is blocked by this plan — the two plans share the same `manifests/` and `paths/_index.md` files at
-the filesystem level but never the same category subtree, so neither is on the other's critical
-path.
+**This includes the new sibling plans `ayokoding-learning-path-06-skills-accounting` and
+`ayokoding-learning-path-07-skills-erp`**: neither blocks nor is blocked by this plan — all three
+plans share the same `manifests/` and `paths/_index.md` files at the filesystem level but never the
+same category subtree, so none is on another's critical path.
 
 ## Implementation Sequence and Prerequisites
 
@@ -224,8 +229,9 @@ This plan is **Wave 3** — the terminal plan — of a five-plan split of the cl
 
 **This plan owns every file under `apps/ayokoding-www/src/features/course-paths/manifests/careers/`
 and every step that creates, appends to, reorders, or re-verifies one of the four `careers/`
-manifests.** `ayokoding-learning-path-06-skills-paths` owns the sibling `.../manifests/skills/`
-subtree end-to-end under the identical invariant, scoped to its own category.
+manifests.** `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`
+together own the sibling `.../manifests/skills/` subtree end-to-end — one manifest each — under the
+identical invariant, scoped to its own category.
 `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and never edits a
 manifest under either category. This invariant is what breaks the otherwise-genuine dependency cycle
 between this plan and the course-authoring plan, and it is the reason this plan's hard prerequisite
@@ -252,7 +258,8 @@ is **both** Wave-2 plans rather than the navigation plan alone.
 4. `test -d apps/ayokoding-www/src/features/course-paths/manifests` returns 0.
 5. `find apps/ayokoding-www/content/en/learn/courses -maxdepth 1 -mindepth 1 -type d | wc -l`
    returns **127** — the `careers/`/software-engineering catalog total (R5); the `skills/` corpus
-   `ayokoding-learning-path-06-skills-paths` authors is additional and does not change this figure.
+   `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` author
+   is additional and does not change this figure.
 
 ### Downstream
 
@@ -427,6 +434,11 @@ this scenario as bindable to the AI-path gate. Keeping an unexecutable scenario 
 documentation check per run; deleting it costs the only structured trace of why the fourth path jumps
 ahead of two manifests whose content already exists.
 
+**It intentionally does not appear in `<SPECS>path-composition.feature`.** Mirroring a
+non-harness-executable claim into an executable-spec file would misrepresent it as testable; the
+`.feature` file stays reserved for the four manifest-composition scenarios and the coexistence /
+no-forked-body / part-of-paths scenarios that a step definition genuinely binds.
+
 ### JC-2: the composite build-green scenario is decomposed, not inherited
 
 The source scenario **"The app builds and validates green"** conjoins the navigation feature **and**
@@ -437,6 +449,11 @@ plan by construction, and it binds no delivery step. It has no single receiving 
 This plan's replacement is **"The manifest layer builds and validates green"**, bound to
 [Phase 6](./delivery.md#phase-6-section-and-app-verification). The composite original is not inherited
 by any plan.
+
+**It intentionally does not appear in `<SPECS>path-composition.feature`.** It is a build/CI-gate
+assertion over the whole manifest layer rather than a single user-facing behaviour, so its
+`Given/When/Then` is verified by the shell commands Phase 6 already runs (build, affected quality
+gates, link/heading validation), not by a Playwright step binding.
 
 ## Delivery Mode: worktree-to-pr
 
@@ -469,7 +486,8 @@ which this plan does not opt out of (see **DN-11** above). `ayokoding-www` is de
   from-scratch, prerequisites-included model by that plan; the prerequisite-consistent stage-by-stage
   ordering of the newly included courses is still pending in that plan's own Phase 1.4 — see
   tech-docs).
-- **Skills paths (sibling plan, out of scope)** — `ayokoding-learning-path-06-skills-paths` owns the
-  `skills/` category end-to-end. That plan folder does not exist in this repo as of this writing (this
-  plan flags the sibling, per R4, without linking to a not-yet-created folder); not read or referenced
-  by this plan's own delivery checklist.
+- **Skills paths (sibling plans, out of scope)** — `ayokoding-learning-path-06-skills-accounting`
+  and `ayokoding-learning-path-07-skills-erp` together own the `skills/` category end-to-end, one
+  manifest each ([`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md),
+  [`ayokoding-learning-path-07-skills-erp`](../ayokoding-learning-path-07-skills-erp/README.md)); not
+  read or referenced by this plan's own delivery checklist.

@@ -259,7 +259,8 @@ Scenario: The manifest layer builds and validates green
   Owned by `ayokoding-learning-path-01-url-restructure`.
 - **A fifth `careers/` path.** The four-path `careers/` composition is locked; a fifth would be its
   own plan. (The sibling `skills/` category's two paths, owned end-to-end by
-  `ayokoding-learning-path-06-skills-paths`, are a separate category, not a fifth `careers/` path.)
+  `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`, are a
+  separate category, not a fifth `careers/` path.)
 - **An Indonesian mirror of the path content** — deferred; `id/belajar/` has zero courses and zero
   paths, so a manifest over it would compose nothing.
 - **Path-level progress persistence, accounts, or bookmarking.**
