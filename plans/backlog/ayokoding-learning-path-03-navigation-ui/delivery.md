@@ -326,9 +326,15 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
       today (verified — none is missing), so the pre-step count of `STALE` lines is not a fixed number;
       it depends on which stems were most recently re-rendered relative to their HTML source, and drifts
       on every checkout (`git checkout`/worktree provisioning reset file-modification times, so mtime
-      state is never a stable, authorable fact across checkouts). The falsifiable pre-state claim is that
-      the loop prints **at least one** `STALE` line before this step — never a bare count of "8" or "12",
-      and never an assertion of which specific stems are stale at any given checkout.
+      state is never a stable, authorable fact across checkouts). **Assert nothing about the pre-step
+      state** — not a count, not "at least one", not which stems. The pre-step reading is legitimately
+      any value from 0 to 12, so this step is **unconditional**: render all 12 regardless of what the
+      loop prints beforehand. Demonstrate the check is capable of failing by construction instead:
+      `touch <PLAN>assets/src/paths-hub-option-a-desktop.html` makes the loop print exactly
+      `STALE paths-hub-a`, and re-rendering that stem clears it. That proof does not depend on ambient
+      mtime state, so it holds on any checkout. **Note the check is necessary but not sufficient — an
+      empty or broken render also satisfies an mtime comparison**, so confirm at least one render
+      visually before ticking this box.
 - [ ] [AI] Render `<PLAN>assets/landing-hero-option-a-mobile.png` from
       `<PLAN>assets/src/landing-hero-option-a-mobile.html` at 375 px — acceptance: file exists;
       single-column goal cards, four careers cards only (skills reachable via the tertiary link, not a
