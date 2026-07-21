@@ -7,6 +7,11 @@ chosen order. Zero body duplication, single source of truth per course. This pla
 **real ayokoding-www UI change** that makes path-aware navigation work — one canonical course URL
 plus client-side path context — under the `/en/c/learn` URL model.
 
+**Scope extension (2026-07-21)** — the plan additionally **revamps everything else under
+`/{locale}/c/learn/`**, so the learn section closes at **exactly three** structural buckets:
+`paths/`, `courses/`, and a new `legacy/` bucket for everything not yet a course or a path. See
+[The three-bucket learn section](#the-three-bucket-learn-section-scope-extension-2026-07-21) below.
+
 ## Four paths, one library, per-role convergence
 
 Paths converge **within a role**, not globally — the library now serves **more than one endpoint**.
@@ -82,6 +87,62 @@ correctly for color-blind viewers: `SWEGOAL` is a circle, `AIGOAL` is a hexagon.
   and orderings into the one DAG** that converges on the shared software-engineering endpoint; the
   fourth path converges on its own AI-engineering endpoint — see
   [tech-docs.md DD-22](./tech-docs.md#design-decisions).
+
+## The three-bucket learn section (scope extension, 2026-07-21)
+
+The original plan converted **one** of the seven domains under `en/learn/` (`fundamentally-strong`)
+and left six in place — a top level mixing two structural buckets with six subject domains, which is
+neither the old IA nor the new one. The extension closes the section at **exactly three** structural
+buckets (DD-40):
+
+| Bucket     | URL shape                                   | Contents                                                             |
+| ---------- | ------------------------------------------- | -------------------------------------------------------------------- |
+| `paths/`   | `/en/c/learn/paths/<arc>/<role-or-subject>` | The four ordered path manifests (already in the plan)                |
+| `courses/` | `/en/c/learn/courses/<course-id>`           | Canonical, path-neutral course bodies, **flat** namespace            |
+| `legacy/`  | `/en/c/learn/legacy/<domain>/<…verbatim…>`  | **NEW** — the six remaining domains, **1,148** `.md` [Repo-grounded] |
+
+The relocation is a **prefix move, not a rewrite**: each domain keeps its sub-taxonomy verbatim, so
+the redirect is a **per-domain 308 prefix rule** (six for `en`), never 1,713 per-file rules and never
+a blanket `/en/c/learn/:path*` rule — which would swallow `courses/` and `paths/` and self-recurse
+(DD-41, DD-42). Condensed target tree (full BEFORE/AFTER trees, source tree, and URL-mapping table in
+[tech-docs](./tech-docs.md#content-tree--after-target-state); markers: `✓` verified on disk, `+` new,
+`→` moved by `git mv`, `~` changed):
+
+```text
+apps/ayokoding-www/content/en/learn/                ✓  1,713 .md today
+├── _index.md                                       ~  machine-regenerated
+├── overview.md                                     ~  hand-rewritten: 6 domains → 3 buckets
+├── paths/                                          +  BUCKET 1
+│   ├── _index.md                                   +  paths hub (2×2 grid, 4 cards)
+│   ├── interview-ready/software-engineer/          +
+│   ├── immediately-effective/software-engineer/    +
+│   ├── immediately-effective/software-engineer-to-ai-engineer/   +
+│   └── fundamentally-strong/software-engineer/     +
+├── courses/                                        +  BUCKET 2 — flat, one dir per course-id
+│   ├── _index.md                                   +
+│   ├── just-enough-python/  advanced-algorithms/  capstone-solid-core/  …   →  37 re-homed (Phase 5)
+│   └── evaluating-ai-output-essentials/  nosql-databases/  coding-interview/  …  +  toward the 127-course catalog
+└── legacy/                                         +  BUCKET 3 — relocated, not rewritten
+    ├── _index.md                                   +  REQUIRED (see DD-44)
+    ├── software-engineering/                       →  979 .md, sub-taxonomy verbatim
+    ├── artificial-intelligence/                    →   55 .md
+    ├── information-security/                       →   51 .md
+    ├── personal-development/                       →   50 .md
+    ├── it-governance/                              →    9 .md
+    └── business/                                   →    4 .md
+```
+
+`fundamentally-strong/` does **not** appear above: its 37 topic directories collapse into flat
+`courses/` bodies with **per-course** redirects, so the legacy prefix module deliberately carries no
+rule for it (DD-43). The `id` locale is left untouched and the deferral is recorded explicitly
+(DD-45). Navigation needs **zero** code changes — sidebar, browse index, section cards, search,
+`sitemap.ts`, and `feed.xml` are all tree-derived (DD-44).
+
+**Six decisions are still open** and are recorded with recommended defaults rather than silently
+applied — `legacy/` as staging pen vs archive (Q-A), `id` scope (Q-B) and segment translation (Q-C),
+`legacy/` SEO treatment (Q-D), the three residual `fundamentally-strong` index pages (Q-E), and
+`en/learn/overview.md` (Q-F). See
+[tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-unresolved).
 
 ## Course-block & manifest model (summary)
 
@@ -255,7 +316,12 @@ and the native authoring of the 61 transferred topics — it does not wait on an
   navigation screens against the `/en/c/learn` URL model.
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — the shared-course-library architecture, the
   course-ID + manifest schema, the prerequisite DAG, the ayokoding-www path-aware-navigation UI
-  design, the course library catalog, and the four path manifests.
+  design, the course library catalog, the four path manifests, and — as of the 2026-07-21 scope
+  extension — the
+  [three-bucket learn-section IA](./tech-docs.md#learn-section-ia--the-three-bucket-model-scope-extension-2026-07-21)
+  (BEFORE/AFTER content trees, BEFORE/AFTER source tree, URL-mapping table, redirect design,
+  per-file IA consequences) and its six
+  [Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-unresolved).
 - [Delivery Checklist (delivery.md)](./delivery.md) — phased executable checklist.
 - [Syllabus](./syllabus/README.md) — the per-course detail layer: the
   [`courses/` catalog](./syllabus/courses/README.md) (the 127-course catalog) and the
@@ -375,3 +441,35 @@ courses each path curates, exact orderings) are resolved in the manifests (tech-
   is authoring priority #1 behind an architecture-smoke-test MVP (DD-27, amends DL-7); and course
   surgery is now permitted, with six net-new AI courses bringing the catalog to 127 (DD-28, amends
   DL-6). **Decided 2026-07-20.**
+- **DL-16 · Whole-section IA revamp — `/{locale}/c/learn/` closes at three structural buckets
+  (2026-07-21 scope extension).** Summary of the decision record folded into
+  [tech-docs.md DD-40 through DD-45](./tech-docs.md#design-decisions): the learn section ends with
+  exactly `paths/`, `courses/`, and a new `legacy/` bucket, plus the section's own two hub files
+  (DD-40); the legacy move is a **prefix relocation preserving each domain's sub-taxonomy verbatim**,
+  rewriting no page (DD-41); redirects are **per-domain 308 prefix rules** in a new
+  `apps/ayokoding-www/src/redirects/learn-three-bucket.ts`, with a blanket `/en/c/learn/:path*` rule
+  explicitly FORBIDDEN and the `next.config.ts` ordering load-bearing (DD-42);
+  `fundamentally-strong/` stays on its **per-course** re-home redirects and is excluded from the
+  bucket module (DD-43); navigation needs **zero** code changes because the IA is tree-derived, with
+  `legacy/_index.md` and `generated/search-data.json` named as the two surfaces that do not self-heal
+  (DD-44); and the extension is **`en`-only**, with the `id` deferral recorded rather than implied
+  (DD-45). Delivered by **Phase 5A** in [delivery.md](./delivery.md). **Six questions remain OPEN**
+  with recommended defaults — Q-A through Q-F in
+  [tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-unresolved).
+  **Decided 2026-07-21** (the six `Q-` items are explicitly _not_ decided).
+- **DL-17 · Screen 3 is the left path rail (Option B), and the design funnel covers three viewports
+  (2026-07-21 design revision).** The maintainer overturned the earlier Screen 3 selection: the course
+  page in path context now carries the **path's whole ordered arc as the left rail** rather than a
+  one-line top banner. The rail is a **content swap in two already-shipped hosts** — `ResizableSidebar`
+  on `md+` and the `MobileNav` left `Sheet` below `md` — so the "needs a mobile sheet" objection that
+  originally sank Option B is answered by an overlay that already exists; the residual cost (one
+  net-new `PathRail`, truncation at the ~115 px width floor) is accepted deliberately and recorded, not
+  quietly dropped. The `PathBanner` survives as the rail's compact readout and hosts the below-`md`
+  disclosure trigger. With no `?path=`, both hosts render exactly what they render today. Alongside it,
+  the funnel now carries **a lo-fi wireframe and a hi-fi render per screen, per option, at three
+  viewports** (375 / 768 / 1280 px) — **30 `.png` total** — because the reselection turned on precisely
+  the mobile question that desktop-only artefacts could not surface. See
+  [tech-docs.md DD-46 / DD-47](./tech-docs.md#design-decisions),
+  [prd.md Screen 3](./prd.md#screen-3--course-page-in-path-context), and
+  [prd.md §Hi-fi asset matrix](./prd.md#hi-fi-asset-matrix-screen--option--viewport).
+  **Decided 2026-07-21.**

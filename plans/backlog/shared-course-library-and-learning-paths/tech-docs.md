@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan has two technical halves:
+This plan has three technical parts (the third added by the 2026-07-21 scope extension):
 
 1. **A content-architecture change** — replace the single-order "Fundamentally Strong" section with a
    **shared course library**: one canonical, path-neutral body per course (keyed by a stable
@@ -17,6 +17,15 @@ This plan has two technical halves:
    page's prev/next, breadcrumb, and **prerequisite display** follow the active path's manifest, with a
    graceful canonical fallback when no path context is present. This is a genuine Next.js feature with
    unit + integration + e2e tests and a `specs/` Gherkin companion.
+3. **A whole-section IA revamp (scope extension, 2026-07-21)** — the six `en/learn/` domains that are
+   neither courses nor paths (`software-engineering`, `artificial-intelligence`,
+   `information-security`, `personal-development`, `it-governance`, `business` — **1,148** `.md` files
+   [Repo-grounded]) are **prefix-relocated** into a third bucket, `legacy/`, with per-domain 308
+   redirects, so `/{locale}/c/learn/` ends with **exactly three** structural buckets: `paths/`,
+   `courses/`, `legacy/` (DD-40 through DD-45). No content is rewritten; navigation needs zero code
+   changes beyond the redirect module, because the IA is entirely tree-derived. See
+   [Learn-Section IA](#learn-section-ia--the-three-bucket-model-scope-extension-2026-07-21) and the
+   six unresolved [Open Questions](#open-questions--learn-section-scope-extension-unresolved).
 
 Because part 2 adds user-facing screens under `apps/`, this is a **UI-bearing plan**: its
 UI-design-funnel lives in [prd.md](./prd.md#ui-design-funnel-path-aware-navigation-screens). The
@@ -221,6 +230,651 @@ software-engineer-focused excerpt (DD-24).
   body) — a "no forked body" check.
 - Course IDs are stable slugs; a re-home changes a body's URL (with a redirect) but never its ID.
 
+## Learn-Section IA — the Three-Bucket Model (scope extension, 2026-07-21)
+
+The original plan converted **one** of the seven domains under `en/learn/` (`fundamentally-strong`)
+into `courses/` + `paths/` and left the other six untouched. That leaves `/en/c/learn/` with a mixed
+taxonomy — two structural buckets beside six legacy subject domains — which is neither the old IA nor
+the new one. **This scope extension revamps everything else under `/en/c/learn/`** so that when the
+plan lands, `/{locale}/c/learn/` has **exactly three** structural children and nothing else
+(DD-40):
+
+| Bucket     | URL shape                                   | What lives there                                                         |
+| ---------- | ------------------------------------------- | ------------------------------------------------------------------------ |
+| `paths/`   | `/en/c/learn/paths/<arc>/<role-or-subject>` | The four ordered path manifests (already in the plan)                    |
+| `courses/` | `/en/c/learn/courses/<course-id>`           | Canonical, path-neutral course bodies (already in the plan)              |
+| `legacy/`  | `/en/c/learn/legacy/<domain>/<…verbatim…>`  | **NEW** — everything under `/en/c/learn/` that is not yet course or path |
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC — WCAG-AA, CB-friendly.
+flowchart LR
+    LEARN["/en/c/learn<br/>section root"]:::blue
+    PATHS["paths/<br/>4 ordered manifests"]:::teal
+    COURSES["courses/<br/>canonical course bodies"]:::orange
+    LEGACY["legacy/<br/>6 relocated domains<br/>sub-taxonomy verbatim"]:::purple
+    LEARN --> PATHS
+    LEARN --> COURSES
+    LEARN --> LEGACY
+
+    classDef blue fill:#0173B2,stroke:#000,color:#fff,stroke-width:2px
+    classDef teal fill:#029E73,stroke:#000,color:#fff,stroke-width:2px
+    classDef orange fill:#DE8F05,stroke:#000,color:#fff,stroke-width:2px
+    classDef purple fill:#CC78BC,stroke:#000,color:#fff,stroke-width:2px
+```
+
+### Ground-truth inventory (measured 2026-07-21)
+
+`en/learn/` holds **1,713** `.md` files across seven top-level domains, plus its own `_index.md` and
+`overview.md` [Repo-grounded — `find apps/ayokoding-www/content/en/learn -name '*.md' | wc -l`].
+Content root is `apps/ayokoding-www/content/`; the route
+`src/app/[locale]/(content)/c/[...slug]/page.tsx` serves a content path `en/learn/X` at
+`/en/c/learn/X` [Repo-grounded].
+
+| Domain under `en/learn/`  | `.md` files | Disposition                                             |
+| ------------------------- | ----------- | ------------------------------------------------------- |
+| `fundamentally-strong`    | 563         | → `courses/` (already the plan's scope; see DD-2/DD-43) |
+| `software-engineering`    | 979         | → `legacy/software-engineering`                         |
+| `artificial-intelligence` | 55          | → `legacy/artificial-intelligence`                      |
+| `information-security`    | 51          | → `legacy/information-security`                         |
+| `personal-development`    | 50          | → `legacy/personal-development`                         |
+| `it-governance`           | 9           | → `legacy/it-governance`                                |
+| `business`                | 4           | → `legacy/business`                                     |
+
+The six relocated domains total **1,148** `.md` files [Repo-grounded — the six rows above sum to
+1,148]. `fundamentally-strong/` itself contains only `_index.md`, `software-engineer/_index.md`,
+`software-engineer/overview.md`, and **37 already-built course-shaped directories**
+[Repo-grounded — `ls apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer`
+returns 39 entries: 2 files + 37 directories]. The plan's catalog is **127** courses, so `courses/`
+starts with ~37 real bodies and grows through Phases 7 and 12 — the bucket is deliberately
+under-filled at first, not broken.
+
+### Content tree — BEFORE (current reality, verified 2026-07-21)
+
+> **Marker legend** (used in every tree in this document): `✓` = **verified on disk** in the current
+> commit; `+` = **NEW**, the plan creates it; `→` = **MOVED** by `git mv`, contents byte-identical;
+> `~` = **CHANGED**, edited or machine-regenerated. Anything without a marker is an elision
+> (`…`) or a comment. A reader never has to guess which nodes are today's reality and which are the
+> target state.
+
+```text
+apps/ayokoding-www/content/
+├── en/
+│   ├── _index.md                                                  ✓
+│   ├── about-ayokoding.md                                         ✓  loose page (not under /c)
+│   ├── terms-and-conditions.md                                    ✓  loose page (not under /c)
+│   ├── rants/                                                     ✓  sibling section — untouched
+│   └── learn/                                                     ✓  1,713 .md total
+│       ├── _index.md                                              ✓  machine-generated (generate-indexes)
+│       ├── overview.md                                            ✓  hand-authored; links all 6 domains
+│       ├── fundamentally-strong/                                  ✓  563 .md
+│       │   ├── _index.md                                          ✓
+│       │   └── software-engineer/                                 ✓  39 entries = 2 files + 37 dirs
+│       │       ├── _index.md                                      ✓  spiral-ordered section index
+│       │       ├── overview.md                                    ✓
+│       │       ├── just-enough-python/                            ✓  1 of the 37 built course-shaped dirs
+│       │       │   ├── _index.md                                  ✓
+│       │       │   ├── learning/                                  ✓
+│       │       │   │   ├── _index.md                              ✓
+│       │       │   │   ├── overview.md                            ✓
+│       │       │   │   ├── beginner.md                            ✓
+│       │       │   │   ├── intermediate.md                        ✓
+│       │       │   │   ├── advanced.md                            ✓
+│       │       │   │   ├── capstone/                              ✓
+│       │       │   │   └── code/                                  ✓
+│       │       │   └── drilling/                                  ✓
+│       │       │       ├── _index.md                              ✓
+│       │       │       ├── overview.md                            ✓
+│       │       │       └── code/                                  ✓
+│       │       └── … 36 more course-shaped dirs …                 ✓  (advanced-algorithms, sql-essentials, capstone-solid-core, …)
+│       ├── software-engineering/                                  ✓  979 .md
+│       │   ├── _index.md                                          ✓
+│       │   ├── overview.md                                        ✓
+│       │   ├── programming-languages/                             ✓
+│       │   │   ├── _index.md                                      ✓
+│       │   │   ├── overview.md                                    ✓
+│       │   │   ├── python/                                        ✓
+│       │   │   │   ├── _index.md                                  ✓
+│       │   │   │   ├── overview.md                                ✓
+│       │   │   │   ├── quick-start.md                             ✓
+│       │   │   │   ├── initial-setup.md                           ✓
+│       │   │   │   └── by-example/                                ✓
+│       │   │   │       ├── _index.md                              ✓
+│       │   │   │       ├── overview.md                            ✓
+│       │   │   │       ├── beginner.md                            ✓
+│       │   │   │       ├── intermediate.md                        ✓
+│       │   │   │       └── advanced.md                            ✓
+│       │   │   └── … c-sharp/ clojure/ dart/ elixir/ f-sharp/ golang/ java/ kotlin/ rust/ typescript/ webassembly/ …   ✓
+│       │   └── … algorithms-and-data-structures/ automation-testing/ automation-tools/ compilers-and-interpreters/    ✓
+│       │         data/ development/ infrastructure/ networking/ platforms/ software-architecture/ system-design/ …
+│       ├── artificial-intelligence/                               ✓  55 .md  (_index.md, overview.md, chat-with-pdf.md, tools/)
+│       ├── information-security/                                  ✓  51 .md  (_index.md, overview.md, by-concept/, by-example/, roles/, tools/)
+│       ├── personal-development/                                  ✓  50 .md  (_index.md, overview.md, tools/)
+│       ├── it-governance/                                         ✓   9 .md  (_index.md, overview.md, it-grc/)
+│       └── business/                                              ✓   4 .md  (_index.md, overview.md, accounting.md, corporate-finance.md)
+└── id/
+    ├── _index.md                                                  ✓
+    ├── tentang-ayokoding.md                                       ✓  loose page
+    ├── syarat-dan-ketentuan.md                                    ✓  loose page
+    ├── celoteh/                                                   ✓  sibling section — untouched
+    ├── konten-video/                                              ✓  sibling section — untouched
+    └── belajar/                                                   ✓  53 .md   (section slug is `belajar`, NOT `learn`)
+        ├── _index.md                                              ✓
+        ├── ikhtisar.md                                            ✓
+        ├── perkenalan.md                                          ✓
+        └── manusia/                                               ✓  50 .md — the locale's ONLY domain
+            ├── _index.md                                          ✓
+            ├── ikhtisar.md                                        ✓
+            └── peralatan/                                         ✓
+                ├── _index.md                                      ✓
+                ├── ikhtisar.md                                    ✓
+                └── cliftonstrengths/                              ✓
+```
+
+### Content tree — AFTER (target state)
+
+`en/learn/` ends with **exactly three structural buckets** plus the section's own two hub files
+(DD-40, DD-45). Under `courses/` the namespace is **flat** — one directory per stable `course-id`,
+with **no** arc, role, or subject nesting — which is what makes a course path-neutral (DD-2). Under
+`legacy/` each relocated domain keeps its sub-taxonomy **byte-identical** (DD-41): compare the
+`software-engineering/programming-languages/python/by-example/` branch below with the same branch in
+the BEFORE tree — only the `legacy/` prefix differs.
+
+```text
+apps/ayokoding-www/content/
+├── en/
+│   ├── _index.md                                                  ✓  unchanged
+│   ├── about-ayokoding.md                                         ✓  unchanged
+│   ├── terms-and-conditions.md                                    ✓  unchanged
+│   ├── rants/                                                     ✓  unchanged
+│   └── learn/                                                     ✓  section root — now closed (DD-40)
+│       ├── _index.md                                              ~  regenerated by `nx run ayokoding-www:generate-indexes`
+│       ├── overview.md                                            ~  hand-rewritten: 6-domain inventory → 3-bucket orientation (DD-45 / Q-F)
+│       │
+│       ├── paths/                                                 +  BUCKET 1 — ordered path manifests (thin landing anchors only)
+│       │   ├── _index.md                                          +  paths hub, 2×2 grid of 4 cards (Phase 1 / prd Screen 1)
+│       │   ├── interview-ready/
+│       │   │   └── software-engineer/
+│       │   │       └── _index.md                                  +  Phase 6 — /en/c/learn/paths/interview-ready/software-engineer
+│       │   ├── immediately-effective/
+│       │   │   ├── software-engineer/
+│       │   │   │   └── _index.md                                  +  Phase 10
+│       │   │   └── software-engineer-to-ai-engineer/
+│       │   │       └── _index.md                                  +  Phase 9
+│       │   └── fundamentally-strong/
+│       │       └── software-engineer/
+│       │           └── _index.md                                  +  Phase 11
+│       │
+│       ├── courses/                                               +  BUCKET 2 — FLAT namespace, one dir per course-id
+│       │   ├── _index.md                                          +  library landing (127-course catalog)
+│       │   ├── just-enough-python/                                →  git mv from fundamentally-strong/software-engineer/ (Phase 5)
+│       │   │   ├── _index.md                                      →  + `prerequisites: [...]` added (Phase 5)
+│       │   │   ├── learning/                                      →  contents byte-identical
+│       │   │   └── drilling/                                      →  contents byte-identical
+│       │   ├── just-enough-nvim/                                  →  Phase 5
+│       │   ├── advanced-algorithms/                               →  Phase 5
+│       │   ├── sql-essentials/                                    →  Phase 5
+│       │   ├── capstone-solid-core/                               →  Phase 5 (DD-20, already live on disk)
+│       │   ├── … 32 more re-homed dirs (37 built total) …         →  Phase 5
+│       │   ├── evaluating-ai-output-essentials/                   +  Phase 7 — 1 of the 6 net-new AI courses
+│       │   ├── statistics-for-evaluation/                         +  Phase 7
+│       │   ├── … 4 more net-new AI courses …                      +  Phase 7
+│       │   ├── nosql-databases/                                   +  Phase 12 Band 1 — native-authored backfill
+│       │   ├── coding-interview/                                  +  Phase 12 Band 9
+│       │   └── … backfill to the full 127-course catalog …        +  Phase 12
+│       │
+│       └── legacy/                                                +  BUCKET 3 — relocated, NOT rewritten (DD-41)
+│           ├── _index.md                                          +  REQUIRED: generate-indexes only rewrites existing section files;
+│           │                                                         without it buildTreeForLocale synthesizes a weight:0 node
+│           │                                                         that sorts FIRST (DD-44). Carries the Q-D notice (prd Screen 4).
+│           ├── software-engineering/                              →  979 .md — sub-taxonomy verbatim
+│           │   ├── _index.md                                      →
+│           │   ├── overview.md                                    →
+│           │   ├── programming-languages/                         →
+│           │   │   ├── _index.md                                  →
+│           │   │   ├── overview.md                                →
+│           │   │   ├── python/                                    →
+│           │   │   │   ├── _index.md                              →
+│           │   │   │   ├── overview.md                            →
+│           │   │   │   ├── quick-start.md                         →
+│           │   │   │   ├── initial-setup.md                       →
+│           │   │   │   └── by-example/                            →  identical to the BEFORE branch; only the prefix moved
+│           │   │   │       ├── _index.md                          →
+│           │   │   │       ├── overview.md                        →
+│           │   │   │       ├── beginner.md                        →
+│           │   │   │       ├── intermediate.md                    →
+│           │   │   │       └── advanced.md                        →
+│           │   │   └── … c-sharp/ clojure/ dart/ elixir/ f-sharp/ golang/ java/ kotlin/ rust/ typescript/ webassembly/ …   →
+│           │   └── … algorithms-and-data-structures/ automation-testing/ automation-tools/ compilers-and-interpreters/     →
+│           │         data/ development/ infrastructure/ networking/ platforms/ software-architecture/ system-design/ …
+│           ├── artificial-intelligence/                           →  55 .md
+│           ├── information-security/                              →  51 .md
+│           ├── personal-development/                              →  50 .md
+│           ├── it-governance/                                     →   9 .md
+│           └── business/                                          →   4 .md
+│                                                                     └─ 1,148 .md relocated in total
+│
+│       ── NOT PRESENT after the plan: fundamentally-strong/ ──
+│          Its 37 course dirs become courses/ (Phase 5); its three residual index pages
+│          (_index.md, software-engineer/_index.md, software-engineer/overview.md) fold into the
+│          fundamentally-strong/software-engineer path landing under Q-E's recommended answer.
+│          It is NOT relocated into legacy/ — see DD-43.
+│
+└── id/                                            ⚠ CONDITIONAL on Q-B — rendered per its RECOMMENDED answer (A: out of scope)
+    ├── _index.md                                                  ✓  unchanged
+    ├── tentang-ayokoding.md                                       ✓  unchanged
+    ├── syarat-dan-ketentuan.md                                    ✓  unchanged
+    ├── celoteh/                                                   ✓  unchanged
+    ├── konten-video/                                              ✓  unchanged
+    └── belajar/                                                   ✓  UNCHANGED — no bucket, no move, no redirect (DD-45)
+        ├── _index.md                                              ✓
+        ├── ikhtisar.md                                            ✓
+        ├── perkenalan.md                                          ✓
+        └── manusia/                                               ✓  50 .md — stays exactly where it is
+```
+
+**If Q-B is overturned** (maintainer picks option B or C), `id/belajar/` takes this shape instead —
+segment names per [Q-C](#q-c--if-id-is-in-scope-are-the-bucket-segments-translated), shown here under
+its recommended answer A (translated: `kursus` / `jalur` / `arsip`):
+
+```text
+└── id/belajar/                                    ⚠ ONLY IF Q-B resolves to B or C — not the recommended path
+    ├── _index.md                                                  ✓
+    ├── ikhtisar.md                                                ✓
+    ├── perkenalan.md                                              ✓
+    ├── jalur/                                                     +  = paths/   — EMPTY today (id has zero paths)   [Q-B option B only]
+    │   └── _index.md                                              +
+    ├── kursus/                                                    +  = courses/ — EMPTY today (id has zero courses) [Q-B option B only]
+    │   └── _index.md                                              +
+    └── arsip/                                                     +  = legacy/
+        ├── _index.md                                              +
+        └── manusia/                                               →  50 .md, sub-taxonomy verbatim
+            ├── _index.md                                          →
+            ├── ikhtisar.md                                        →
+            └── peralatan/                                         →
+                ├── _index.md                                      →
+                ├── ikhtisar.md                                    →
+                └── cliftonstrengths/                              →
+```
+
+Under **Q-B option C** the two empty buckets (`jalur/`, `kursus/`) are omitted and only `arsip/` is
+created. Either variant additionally requires `id` rule pairs in the redirect module and makes the
+bucket URL shape per-locale, which the `course-paths` feature does not currently model — the cost
+noted in [Q-C](#q-c--if-id-is-in-scope-are-the-bucket-segments-translated).
+
+### Source tree — BEFORE and AFTER (`apps/ayokoding-www/src/`)
+
+Same marker legend. Only the paths this plan touches are shown; every other file under `src/` is
+untouched. Test files are listed beside the module they cover.
+
+**BEFORE** (verified 2026-07-21):
+
+```text
+apps/ayokoding-www/
+├── next.config.ts                                                 ✓  redirects(): [...learnReorg, ...contentNamespace]
+└── src/
+    ├── app/
+    │   ├── sitemap.ts                                             ✓  iterates contentMap → contentUrl()
+    │   ├── feed.xml/route.ts                                      ✓  iterates contentMap → contentUrl()
+    │   └── [locale]/(content)/
+    │       ├── c/page.tsx                                         ✓  browse index — TOP-LEVEL sections only
+    │       └── c/[...slug]/page.tsx                               ✓  content route + buildBreadcrumbs()
+    ├── features/
+    │   ├── content/
+    │   │   ├── core/{content-url.ts, tree-builder.ts, types.ts}   ✓  contentUrl / buildTrees / computePrevNext
+    │   │   ├── core/landing-sections.ts                           ✓  LANDING_SECTION_OVERRIDES (top-level slugs)
+    │   │   └── shell/{browse-index.tsx, section-card.tsx,         ✓
+    │   │              index-generator.ts}                         ✓  generate-indexes: rewrites EXISTING section files
+    │   ├── navigation/shell/{sidebar.tsx, sidebar-tree.tsx,       ✓
+    │   │                     breadcrumb.tsx, prev-next.tsx}       ✓
+    │   └── search/shell/generate-search-data.ts                   ✓  doc id = `${locale}:${slug}`
+    └── redirects/
+        ├── learn-reorg.ts                                         ✓  within-/en/learn/ renames (Phase 2-7 history)
+        ├── content-namespace.ts                                   ✓  /{locale}/{section}/:path* → /{locale}/c/{section}/:path*
+        └── content-namespace.unit.test.ts                         ✓  the pattern the new test mirrors
+```
+
+**AFTER** (target state):
+
+```text
+apps/ayokoding-www/
+├── next.config.ts                                                 ~  redirects(): [...learnReorg, ...learnThreeBucket, ...contentNamespace]
+│                                                                     ORDER IS LOAD-BEARING — see DD-42
+└── src/
+    ├── app/
+    │   ├── sitemap.ts                                             ✓  UNCHANGED code; emits 1,148 changed URLs (DD-44)
+    │   ├── feed.xml/route.ts                                      ✓  UNCHANGED code; <link> AND <guid> change for relocated items
+    │   └── [locale]/(content)/
+    │       ├── c/page.tsx                                         ✓  UNCHANGED — never listed learn's children
+    │       └── c/[...slug]/page.tsx                               ~  CHANGED by Group A only (?path context); the legacy move
+    │                                                                 needs no edit — breadcrumbs gain a "Legacy" crumb mechanically
+    ├── features/
+    │   ├── content/
+    │   │   ├── core/content-url.ts                                ~  CHANGED by Group A only (optional pathId → ?path=)
+    │   │   ├── core/{tree-builder.ts, types.ts}                   ✓  UNCHANGED (types.ts gains manifest fields in Group A)
+    │   │   ├── core/landing-sections.ts                           ✓  UNCHANGED — keyed by top-level slug, not bucket
+    │   │   └── shell/{browse-index.tsx, section-card.tsx,         ✓  UNCHANGED
+    │   │              index-generator.ts}                         ✓  UNCHANGED
+    │   ├── navigation/shell/{sidebar.tsx, sidebar-tree.tsx}       ✓  UNCHANGED — tree-derived
+    │   ├── navigation/shell/{breadcrumb.tsx, prev-next.tsx}       ~  CHANGED by Group A only (optional path context)
+    │   ├── search/shell/generate-search-data.ts                   ✓  UNCHANGED code; `generated/search-data.json` MUST be regenerated
+    │   └── course-paths/                                          +  NEW FEATURE — Group A (Phases 1-4)
+    │       ├── core/{schemas,manifest,path-nav,path-context,      +  pure, no IO
+    │       │        prerequisites,manifest-integrity}.ts          +
+    │       ├── core/*.test.ts                                     +  unit tests
+    │       ├── manifests/                                         +  MACHINE SOURCE OF TRUTH — nested to mirror slash path-ids
+    │       │   ├── README.md                                      +  Phase 1
+    │       │   ├── interview-ready/software-engineer.yaml         +  Phase 6
+    │       │   ├── immediately-effective/software-engineer.yaml   +  Phase 10
+    │       │   ├── immediately-effective/                         +
+    │       │   │   software-engineer-to-ai-engineer.yaml          +  Phase 9
+    │       │   └── fundamentally-strong/software-engineer.yaml    +  Phase 11
+    │       └── shell/{manifest-repository.ts, path-landing.tsx,   +  IO + React
+    │                 path-card.tsx, path-banner.tsx,              +
+    │                 prerequisite-list.tsx, path-course-links.tsx} +
+    └── redirects/
+        ├── learn-reorg.ts                                         ✓  UNCHANGED — must still run FIRST (DD-42)
+        ├── content-namespace.ts                                   ✓  UNCHANGED — must still run LAST (DD-42)
+        ├── content-namespace.unit.test.ts                         ✓  UNCHANGED
+        ├── learn-three-bucket.ts                                  +  NEW — 12 rules: 6 relocated domains × 2 tiers (DD-42)
+        └── learn-three-bucket.unit.test.ts                        +  NEW — mirrors content-namespace.unit.test.ts
+```
+
+> **Manifest-location note**: the `manifests/` directory is drawn here at
+> `src/features/course-paths/manifests/`, matching the `<MANIFESTS>` = `<FEAT>manifests/` constant in
+> [delivery.md](./delivery.md) — that constant is authoritative. The feature-layout sketch in
+> [New feature: `course-paths`](#new-feature-course-paths-functional-core--imperative-shell) draws it
+> one level deeper, under `shell/`; the loader globs `manifests/**/*.yaml` either way, and Group A
+> Phase 1 fixes the location when it creates the directory.
+
+### URL mapping (old → new → covering rule)
+
+Every row is a **308** (`permanent: true`). The "covering rule" column names the module and tier that
+handles it. Note the two inbound forms per legacy URL: the bare pre-`/c` form (which the tier-1 rule
+short-circuits) and the `/c` form (tier 2).
+
+| #   | Old URL                                                                                           | New URL                                                                                    | Covering rule                                                                                                          |
+| --- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/en/c/learn/software-engineering/…`                                                              | `/en/c/learn/legacy/software-engineering/…`                                                | `learn-three-bucket.ts` tier 2                                                                                         |
+| 2   | `/en/learn/software-engineering/…` _(bare, pre-`/c`)_                                             | `/en/c/learn/legacy/software-engineering/…`                                                | `learn-three-bucket.ts` tier 1 (short-circuits `content-namespace`)                                                    |
+| 3   | `/en/c/learn/software-engineering/programming-languages/python/by-example/advanced` _(deep path)_ | `/en/c/learn/legacy/software-engineering/programming-languages/python/by-example/advanced` | `learn-three-bucket.ts` tier 2 — one `:path*` covers arbitrary depth                                                   |
+| 4   | `/en/c/learn/artificial-intelligence/…`                                                           | `/en/c/learn/legacy/artificial-intelligence/…`                                             | `learn-three-bucket.ts` tier 2                                                                                         |
+| 5   | `/en/c/learn/information-security/…`                                                              | `/en/c/learn/legacy/information-security/…`                                                | `learn-three-bucket.ts` tier 2                                                                                         |
+| 6   | `/en/c/learn/personal-development/…`                                                              | `/en/c/learn/legacy/personal-development/…`                                                | `learn-three-bucket.ts` tier 2                                                                                         |
+| 7   | `/en/c/learn/it-governance/…`                                                                     | `/en/c/learn/legacy/it-governance/…`                                                       | `learn-three-bucket.ts` tier 2                                                                                         |
+| 8   | `/en/c/learn/business/…`                                                                          | `/en/c/learn/legacy/business/…`                                                            | `learn-three-bucket.ts` tier 2                                                                                         |
+| 9   | `/en/learn/human/…` _(historical rename)_                                                         | `/en/c/learn/legacy/personal-development/…`                                                | `learn-reorg.ts` (→ `personal-development`) **then** `learn-three-bucket` tier 1 — the reason ordering is load-bearing |
+| 10  | `/en/c/learn/fundamentally-strong/software-engineer/<slug>` _(per-course collapse)_               | `/en/c/learn/courses/<course-id>`                                                          | **per-course** re-home redirect (Phase 3) — **NOT** `learn-three-bucket.ts` (DD-43)                                    |
+| 11  | `/en/c/learn/courses/<course-id>`                                                                 | _(no redirect — served)_                                                                   | **none by design** — a blanket bucket rule would swallow this (DD-42)                                                  |
+| 12  | `/en/c/learn/paths/<arc>/<role-or-subject>`                                                       | _(no redirect — served)_                                                                   | **none by design** — same hazard (DD-42)                                                                               |
+| 13  | `/id/c/belajar/manusia/…`                                                                         | _(no redirect — served unchanged)_                                                         | **none** — `id` is out of scope under Q-B's recommended answer (DD-45)                                                 |
+
+Rows 11-13 are **negative** cases and are asserted as such in the redirect unit test: a rule matching
+any of them would be a defect, not an omission.
+
+### The legacy move is a prefix relocation, not a rewrite (DD-41)
+
+Each of the six domains keeps its **existing sub-taxonomy verbatim** under `legacy/`. The move is a
+single `git mv <domain>/ legacy/<domain>/` per domain — no file is renamed, no body is edited, no
+heading is touched. Two consequences follow directly:
+
+1. **The redirect is a per-domain prefix rule (6 rules for `en`), not 1,713 per-file rules.** Because
+   only the prefix changes, one `:path*` wildcard per domain covers every descendant.
+2. **No content rewriting happens in this plan.** Promoting a legacy page into a real `courses/`
+   course (e.g. `legacy/software-engineering/programming-languages/python/by-example` →
+   `courses/just-enough-python`) is separate, later work — see [Q-A](#open-questions--learn-section-scope-extension-unresolved).
+
+### Redirect design (DD-42)
+
+The repo already has two redirect modules, spread into `next.config.ts` `redirects()` in a
+deliberate order — `[...learnReorgRedirects, ...contentNamespaceRedirects]`
+[Repo-grounded — `apps/ayokoding-www/next.config.ts` line 39]. `contentNamespaceRedirects` uses
+prefix-wildcard rules (`{ source: "/en/learn/:path*", destination: "/en/c/learn/:path*", permanent: true }`)
+at 308, and carries an explicit warning in its own header comment that a blanket
+`/{locale}/:path*` rule "would wrongly swallow" sibling routes [Repo-grounded —
+`apps/ayokoding-www/src/redirects/content-namespace.ts`].
+
+**A blanket `/en/c/learn/:path*` → `/en/c/learn/legacy/:path*` rule is FORBIDDEN.** It would (a)
+swallow `courses/` and `paths/`, and (b) self-recurse, since its own destination re-matches its own
+source. The six moved domains are therefore **enumerated explicitly**, exactly as
+`content-namespace.ts` enumerates its moved sections.
+
+A **new third module**, `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` _(New file)_,
+declares **twelve** rules for `en` — a matched pair per relocated domain:
+
+```ts
+// tier 1 — pre-/c form, short-circuits the two-hop chain (spread BEFORE contentNamespaceRedirects)
+{ source: "/en/learn/software-engineering/:path*",
+  destination: "/en/c/learn/legacy/software-engineering/:path*", permanent: true },
+// tier 2 — post-/c form, catches links already living in the /c namespace
+{ source: "/en/c/learn/software-engineering/:path*",
+  destination: "/en/c/learn/legacy/software-engineering/:path*", permanent: true },
+```
+
+**Ordering in `next.config.ts`** — `[...learnReorgRedirects, ...learnThreeBucketRedirects, ...contentNamespaceRedirects]`:
+
+- **After `learnReorgRedirects`** — those rules rewrite _within_ `/en/learn/<domain>/…` (e.g.
+  `human/` → `personal-development/`, `algorithm-and-data-structures/` → plural)
+  [Repo-grounded — `apps/ayokoding-www/src/redirects/learn-reorg.ts`]. They must resolve to their
+  canonical legacy-domain path **before** the bucket rule relocates it, otherwise an old rename would
+  land in `legacy/` under its pre-rename name.
+- **Before `contentNamespaceRedirects`** — the tier-1 rules short-circuit what would otherwise be a
+  three-hop chain (`/en/learn/X` → `/en/c/learn/X` → `/en/c/learn/legacy/X`) down to one hop. The
+  tier-2 rules remain necessary for links that already point into `/c`.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC — WCAG-AA, CB-friendly.
+flowchart LR
+    REQ["incoming URL"]:::blue
+    REORG{"matches a<br/>learn-reorg rename?"}:::orange
+    BUCKET{"matches a relocated<br/>legacy domain prefix?"}:::orange
+    LEGACY["308 into legacy/<br/>then serve"]:::teal
+    NS["/c namespace rule<br/>if needed, then serve"]:::purple
+    REQ --> REORG
+    REORG -->|"308 to canonical name"| BUCKET
+    REORG -->|no| BUCKET
+    BUCKET -->|yes| LEGACY
+    BUCKET -->|"no — courses/ or paths/"| NS
+
+    classDef blue fill:#0173B2,stroke:#000,color:#fff,stroke-width:2px
+    classDef teal fill:#029E73,stroke:#000,color:#fff,stroke-width:2px
+    classDef orange fill:#DE8F05,stroke:#000,color:#fff,stroke-width:2px
+    classDef purple fill:#CC78BC,stroke:#000,color:#000,stroke-width:2px
+```
+
+**Redirect unit tests** mirror the existing `content-namespace.unit.test.ts` pattern
+[Repo-grounded — `apps/ayokoding-www/src/redirects/content-namespace.unit.test.ts`], asserting: one
+rule pair per relocated domain; every rule `permanent: true`; destination equals source with
+`legacy/` inserted at the bucket position; **no rule whose source is `/en/c/learn/:path*`** (the
+self-recursing blanket); and **no rule whose source prefix is `courses` or `paths`**.
+
+### `fundamentally-strong/` is the exception — per-course redirects (DD-43)
+
+`fundamentally-strong/`'s topic directories collapse into **flat** `courses/<course-id>` bodies, so
+its redirects are **per-course**, not a prefix rule: `.../fundamentally-strong/software-engineer/<slug>`
+→ `/en/c/learn/courses/<course-id>`. **This is already specified** by the plan — see
+[Redirects](#redirects) and `delivery.md` Phase 3's "add redirects for re-homed courses" step. The
+scope extension does **not** duplicate it. The only reconciliation the extension adds is a boundary
+rule:
+
+> `learn-three-bucket.ts` carries **no** `fundamentally-strong` rule. The `fundamentally-strong`
+> prefix belongs entirely to the per-course re-home redirect set, and a prefix rule there would
+> shadow the per-course rules for the 37 already-built directories.
+
+The residual `fundamentally-strong/_index.md`, `software-engineer/_index.md`, and
+`software-engineer/overview.md` — which are section indexes, not courses — are the subject of
+[Q-E](#q-e--what-happens-to-fundamentally-strongs-three-residual-index-pages).
+
+### IA / navigation consequences (every affected source file, read-verified)
+
+`ayokoding-www`'s navigation is **entirely tree-derived** — no production source file hardcodes a
+`learn/` domain slug [Repo-grounded — `grep -rn "software-engineering\|artificial-intelligence\|…" apps/ayokoding-www/src`
+returns hits only in `src/redirects/learn-reorg.ts` and in `*.test.ts*` fixtures]. That is why the
+relocation is affordable. The table below records what each surface does and whether it needs a code
+change:
+
+| Surface (file, read-verified)                                                 | Derivation                                                             | Verdict                                                                                                                                                                |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/features/navigation/shell/sidebar.tsx` + `sidebar-tree.tsx`              | `getTree(locale)`, root's `isSection` children, recursive              | **No code change.** `learn` gains a `legacy` child; the six domains sit one level deeper; auto-expand keys off `pathname`.                                             |
+| `src/features/content/shell/browse-index.tsx` + `app/…/c/page.tsx`            | **Top-level** sections only (`learn`, `rants`)                         | **No code change.** The browse index never listed `learn`'s children.                                                                                                  |
+| `src/features/content/shell/section-card.tsx`                                 | Presentational, fed by browse index                                    | **No code change.**                                                                                                                                                    |
+| `src/features/content/core/landing-sections.ts` (`LANDING_SECTION_OVERRIDES`) | Keyed by **top-level** locale section slug (`learn` / `belajar`)       | **No code change.** Bucket slugs are one level below the override keys.                                                                                                |
+| `src/app/sitemap.ts`                                                          | Iterates `index.contentMap`, emits `contentUrl(locale, meta.slug)`     | **No code change**, but **1,148 URLs change**. Old URLs leave the sitemap (correct — they become 308s).                                                                |
+| `src/app/feed.xml/route.ts`                                                   | Same derivation, `en` non-section pages                                | **No code change**, but every relocated item's `<link>` **and `<guid>`** changes → feed readers may re-surface items as new. Risk-listed.                              |
+| `src/features/search/shell/generate-search-data.ts`                           | Reads disk, doc id `${locale}:${slug}`                                 | **No code change**, but `generated/search-data.json` **must be regenerated** (`nx run ayokoding-www:generate-search-data`).                                            |
+| `src/features/content/shell/index-generator.ts` (`generate-indexes`)          | Rewrites each **existing** `isSection` file's child list from the tree | **No code change**, but it only rewrites `_index.md` files that already exist → `legacy/_index.md` **must be authored** first.                                         |
+| `src/features/content/core/tree-builder.ts` (`buildTreeForLocale`)            | Synthesizes a missing ancestor node with `weight: 0`                   | **No code change**, but a missing `legacy/_index.md` would yield a synthetic "Legacy" node sorting **first** — a second reason to author it with an explicit `weight`. |
+| `src/features/content/core/tree-builder.ts` (`computePrevNext`)               | Groups by parent slug, sorts siblings by `weight`                      | **No code change.** A whole subtree moving together preserves intra-domain prev/next; only `learn`'s own direct children shift.                                        |
+| `src/app/…/c/[...slug]/page.tsx` `buildBreadcrumbs`                           | Mechanical title-casing of slug parts                                  | **No code change**, cosmetic consequence: legacy pages gain one extra crumb (`Home / Browse / Learn / Legacy / …`).                                                    |
+| `apps/ayokoding-www/content/en/learn/overview.md`                             | **Hand-authored** links to `/en/learn/<domain>` (pre-`/c` form)        | **MUST be edited** — it is the one hand-maintained inventory of the six domains.                                                                                       |
+| `apps/ayokoding-www/content/en/learn/_index.md`                               | **Generated** by `generate-indexes`                                    | Regenerates automatically; committed as part of the move.                                                                                                              |
+
+### Bilingual (`id`) treatment
+
+`apps/ayokoding-www/content` is bilingual, and an `en` content change usually needs its `id`
+counterpart. The `id` tree is much smaller: `id/belajar/` holds **one** domain (`manusia`, 50 `.md`)
+plus `_index.md`, `ikhtisar.md`, and `perkenalan.md` — 53 `.md` in total
+[Repo-grounded — `find apps/ayokoding-www/content/id/belajar -name '*.md' | wc -l`]. Note the
+per-locale **section-slug asymmetry**: `learn` (en) vs `belajar` (id), already load-bearing in
+`content-namespace.ts`, `LOOSE_PAGE_ALLOWLIST`, and `LANDING_SECTION_OVERRIDES` [Repo-grounded].
+
+The plan is currently **`en`-only** and declares an Indonesian mirror a non-goal
+[see [brd.md §Business-Scope Non-Goals](./brd.md#business-scope-non-goals)]. `id` has **no** courses
+and **no** paths at all, so a three-bucket `id/belajar/` would today contain a `legacy/` bucket and
+two empty ones. Whether to extend the shape to `id` now — and, if so, whether to translate the
+bucket segments — are [Q-B](#q-b--does-the-id-locale-get-the-same-three-bucket-shape-now) and
+[Q-C](#q-c--if-id-is-in-scope-are-the-bucket-segments-translated). **Until those are answered the
+extension is scoped `en`-only, and the deferral is recorded explicitly rather than left implicit.**
+
+## Open Questions — Learn-Section Scope Extension (UNRESOLVED)
+
+These six decisions are **not made**. Each carries a recommended default and the reasoning behind it,
+so the maintainer can accept or overturn each in a single pass. Nothing below is silently applied:
+`delivery.md` Phase 5A executes the **recommended default** for each and names the alternative
+inline, so an overturned ruling is a bounded edit rather than a rewrite.
+
+### Q-A — Is `legacy/` a staging pen or a permanent archive?
+
+| Option                                        | Consequence                                                                                                          |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **A. Staging pen (Recommended)**              | The bucket is expected to **shrink** as legacy material is promoted into real `courses/`; each promotion is tracked. |
+| B. Permanent archive                          | The bucket is frozen; nothing ever leaves it; overlap with `courses/` is permanent and acknowledged.                 |
+| C. Hybrid (pen for SWE, archive for the rest) | Only `legacy/software-engineering` is a pen; the five small domains are frozen.                                      |
+
+**Recommendation: A — staging pen.** Much of the legacy material **already overlaps courses the
+catalog plans**: `legacy/software-engineering/programming-languages/python/by-example` overlaps
+`just-enough-python`; the `information-security` domain overlaps `security-essentials` /
+`offensive-security` / `defensive-security`; `it-governance` overlaps `it-governance-grc`. A
+permanent archive would leave two competing bodies on the same subject indefinitely — exactly the
+duplication the shared-library model exists to prevent (see
+[brd.md §Why a shared library](./brd.md#why-a-shared-library-instead-of-four-curricula)).
+
+**What "staging pen" implies for tracking** — a lightweight, in-repo ledger, not a new system:
+
+- `legacy/_index.md` states the bucket's **transitional** status in prose, so the intent is visible
+  to a reader and to a future author.
+- Each `courses/<course-id>` whose subject is covered by a legacy page names that page as
+  **superseded** in its own `overview.md`, so promotion is recorded where the survivor lives.
+- The residual bucket contents are re-inventoried at archival (Phase 17), so a shrinking count is an
+  observable fact rather than an aspiration.
+- **No** per-page migration backlog plan is filed by this plan — that would be scope creep. Filing
+  one is a Knowledge-Capture routing outcome (Phase 16) if the audit finds it warranted.
+
+### Q-B — Does the `id` locale get the same three-bucket shape now?
+
+| Option                                                  | Consequence                                                                                                     |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **A. `id` stays out of scope (Recommended)**            | `id/belajar/` is untouched; the extension is `en`-only; the deferral is recorded in `brd.md` Non-Goals.         |
+| B. `id` gets the full three-bucket shape now            | `id/belajar/manusia` → `id/belajar/<legacy-slug>/manusia`; two empty buckets are created; `id` redirects added. |
+| C. `id` gets `legacy/` only, no empty `courses`/`paths` | `manusia` is relocated but no empty buckets are scaffolded; the shape is completed when `id` gets courses.      |
+
+**Recommendation: A — out of scope.** The plan already declares an Indonesian content mirror a
+non-goal, and `id` has **zero** courses and **zero** paths. Creating `id/belajar/kursus/` and
+`id/belajar/jalur/` today would ship two permanently-empty sections into production navigation, and
+relocating the single `manusia` domain into a `legacy/` bucket buys structural symmetry at the price
+of one more 308 hop for `id`'s only content — a cost with no corresponding reader benefit while the
+other two buckets stay empty. Option C is the strongest runner-up and becomes the right answer the
+moment `id` gains its first course.
+
+### Q-C — If `id` is in scope, are the bucket segments translated?
+
+Only live if Q-B resolves to B or C.
+
+| Option                                                                  | Consequence                                                                                                   |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **A. Translated — `kursus`/`jalur`/`arsip` (Recommended, conditional)** | Matches the existing `learn`/`belajar` precedent; `id` readers see Indonesian URLs end to end.                |
+| B. Untranslated — `courses`/`paths`/`legacy`                            | One vocabulary for both locales; simpler manifest `pathId`s; but breaks the established per-locale slug rule. |
+| C. Translated buckets, untranslated `path-id`s                          | Bucket segments localized; manifest IDs stay English so one manifest serves both locales.                     |
+
+**Recommendation: A (conditional on Q-B).** The `learn`-vs-`belajar` asymmetry is **already** the
+repo's precedent and is load-bearing in three places [Repo-grounded — `content-namespace.ts`
+per-locale rules, `LOOSE_PAGE_ALLOWLIST`, `LANDING_SECTION_OVERRIDES` "The asymmetry between locales
+is intentional"]. Mixing an Indonesian section slug with English bucket slugs
+(`/id/c/belajar/courses/…`) would be a new, third convention. Note the cost honestly: translated
+buckets mean the `courses/`/`paths/` URL shapes in DD-2/DD-3 become per-locale, which the
+`course-paths` feature does not currently model — that is a real Group-A design delta, and it is the
+main reason Q-B's recommended answer is "defer".
+
+### Q-D — SEO treatment of `legacy/`
+
+| Option                                                                           | Consequence                                                                                        |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **A. Keep indexed as-is + a visible "legacy / superseded" banner (Recommended)** | Traffic preserved; readers warned; a superseding course can be linked from the banner.             |
+| B. Keep indexed as-is, no banner                                                 | Zero work; readers get no signal that a canonical course may supersede the page.                   |
+| C. `noindex` the whole bucket                                                    | Search engines drop ~1,148 pages; the bucket becomes reachable only by direct link or in-site nav. |
+
+**Recommendation: A.** Option C's traffic risk is the decisive factor: **1,148 pages** is ~67% of the
+`en/learn/` corpus, and `software-engineering` alone (979 pages) is the single largest body of content
+in the app. `noindex`-ing it would surrender that search surface **before** the replacement courses
+exist — the catalog is 127 courses of which ~37 bodies are built today, so the replacement is years of
+authoring away under this plan's own build order (DD-27/DD-15). The 308s already preserve link equity
+for the moved URLs; adding `noindex` on top would discard it. Option A costs one `Alert`-style callout
+partial on the legacy section landing plus a per-page banner, and it is **reversible** — switching to
+C later is a one-line metadata change, whereas recovering de-indexed traffic is not. **The banner is a
+user-facing UI change, so it carries a design-funnel entry**: see
+[prd.md Screen 4](./prd.md#screen-4--legacy-bucket-landing-and-page-banner-scope-extension).
+
+### Q-E — What happens to `fundamentally-strong`'s three residual index pages?
+
+`fundamentally-strong/_index.md`, `software-engineer/_index.md`, and `software-engineer/overview.md`
+survive once the 37 topic directories become `courses/` bodies.
+
+| Option                                                                                   | Consequence                                                                                                  |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **A. Fold into the `fundamentally-strong/software-engineer` path landing (Recommended)** | Their prose becomes the path landing's narrative; the old URLs 308 to the path landing.                      |
+| B. Move to `legacy/fundamentally-strong/`                                                | Preserves them verbatim, but strands the plan's own brand section inside the legacy bucket.                  |
+| C. Delete them                                                                           | Cleanest tree, but discards hand-written framing prose and breaks two live URLs with nothing to redirect to. |
+
+**Recommendation: A — fold into the path landing.** This is the only option consistent with
+**DD-19**, the plan's own additive-model decision: the legacy `_index.md` browse must keep resolving
+after re-homing, and `delivery.md` Phase 5 §5a already carries a gate that re-points **every** entry
+in those files. Option A honors that gate and gives the prose a real home — the
+`fundamentally-strong/software-engineer` path landing is the direct successor of
+`software-engineer/overview.md`. Option B contradicts DD-40's "nothing else" invariant by putting a
+plan-owned section into the legacy pen; Option C loses the DD-19 gate's redirect targets. **Caveat**:
+Option A supersedes part of DD-19's "UPDATED, never deleted" instruction for these three files
+specifically (their content moves rather than being re-pointed in place) — that is a deliberate,
+narrow amendment recorded here, not an oversight.
+
+### Q-F — What happens to `en/learn/overview.md`?
+
+Not in the maintainer's original list, but surfaced by the ground-truth read: `en/learn/overview.md`
+is a **fourth** child URL at `/en/c/learn/overview`, so "exactly three children and nothing else"
+(DD-40) is not literally true while it exists [Repo-grounded — `ls apps/ayokoding-www/content/en/learn`].
+
+| Option                                                                | Consequence                                                                                               |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **A. Keep it as the section's own hub page, rewritten (Recommended)** | It is the section landing's prose, not a taxonomy bucket; DD-40 is scoped to **structural buckets**.      |
+| B. Fold its prose into `learn/_index.md` and delete it                | Literal three-child tree; but `_index.md` is machine-regenerated, so hand prose there would be clobbered. |
+| C. Move it to `legacy/`                                               | Literal three-child tree; but the section loses its only orientation page.                                |
+
+**Recommendation: A.** Option B is actively unsafe: `generate-indexes` **rewrites every
+`isSection` file's body** from the tree [Repo-grounded — `processAllIndexFiles` in
+`index-generator.ts` writes `rebuildIndexFile(withFields, childList)`], so hand-written prose placed
+in `learn/_index.md` is destroyed on the next `nx run ayokoding-www:generate-indexes`. DD-40's
+invariant is therefore stated as **"exactly three structural buckets"**, with `overview.md` named as
+the section's hub page — and its hand-authored six-domain inventory is rewritten in Phase 5A to point
+at the three buckets instead.
+
 ## Path-Aware Navigation UI (ayokoding-www)
 
 `ayokoding-www` is a **Next.js app** [Repo-grounded — `apps/ayokoding-www/next.config.ts`,
@@ -257,10 +911,25 @@ apps/ayokoding-www/src/features/course-paths/          # NEW feature — Group A
     │   ├── fundamentally-strong/software-engineer.yaml
     │   └── immediately-effective/software-engineer-to-ai-engineer.yaml  # added 2026-07-20
     ├── path-landing.tsx       # renders a path landing page from a manifest (ordered course list)
-    ├── path-banner.tsx        # in-path affordance on a course page (path name + position + a11y)
+    ├── path-rail.tsx          # SELECTED Screen 3 (Option B) — the path's ordered course list as the
+    │                          #   left rail; rendered as ResizableSidebar's children when ?path= is
+    │                          #   present, and inside MobileNav's SheetContent below md
+    ├── path-banner.tsx        # in-path affordance on a course page (path name + position + a11y);
+    │                          #   below md it also carries the rail's disclosure trigger
     ├── prerequisites.tsx      # renders a course's prerequisites (links to canonical course pages)
     └── path-course-links.tsx  # "this course is part of: [path A] [path B] [path C]" affordance
 ```
+
+**Screen 3 selected Option B (left path rail), not Option A (banner only)** — see
+[prd.md Screen 3](./prd.md#screen-3--course-page-in-path-context) and its
+[responsive specification](./prd.md#screen-3-responsive-specification-the-selected-option-b-breakpoint-by-breakpoint).
+The rail introduces **no new shell and no new overlay pattern**: it swaps the `children` of the shipped
+`ResizableSidebar` (`<aside className="… hidden … md:block">` + `ResizablePanel`, 15 %-35 % band,
+`ayokoding-sidebar-width` key) and, below `md`, the `children` of the shipped `MobileNav`
+`Sheet`/`SheetContent side="left"` that already renders `SidebarTree`
+[Repo-grounded — `apps/ayokoding-www/src/features/navigation/shell/resizable-sidebar.tsx`,
+`apps/ayokoding-www/src/features/app-shell/shell/mobile-nav.tsx`]. With no `?path=`, both hosts render
+exactly what they render today.
 
 - **`resolvePathNav(manifest, courseId)`** (pure, core): finds `courseId` in `manifest.courseOrder`;
   returns `{ prev, next }` neighboring course refs (title + id), or `{prev:null,next:null}` when
@@ -339,8 +1008,14 @@ apps/ayokoding-www/src/features/course-paths/          # NEW feature — Group A
 
 - Breadcrumb and prev/next remain `nav` landmarks with `aria-label`s [Repo-grounded — existing
   components]; the path crumb marks the current path with `aria-current` where appropriate.
-- The path banner, prerequisite list, and "part of paths" affordance are keyboard-operable,
+- The path rail, path banner, prerequisite list, and "part of paths" affordance are keyboard-operable,
   visible-focus, and colour-contrast WCAG-AA; `html[lang]` stays correct per locale.
+- The path rail is a `<nav aria-label="{Path} course list">` landmark over a semantic `<ol>`; the current
+  course is marked with `aria-current="page"` **and** a text/shape signal (`▸` + `font-semibold`), never
+  hue alone (WCAG AA 1.4.1). Below `md` its disclosure trigger carries a full accessible name
+  ("Open path course list — {Path}, course {k} of {N}") plus `aria-expanded`/`aria-controls`, and the
+  drawer inherits Radix `Dialog` focus-trap/restore/`Esc` from the shipped `Sheet` — no new focus
+  machinery is written.
 - The path landing course list and the prerequisite list are semantic ordered/unordered lists; screen
   readers announce course position and prerequisite relationships.
 
@@ -1159,6 +1834,109 @@ fourth-path grilling session and are folded in verbatim from the session's decis
   "authoring priority #1" stands; only the manifest's _published_ subset differs from its long-run full
   composition until Band 5/8 land.
 
+**The following six decisions (DD-40 through DD-45) were made in the 2026-07-21 learn-section
+scope-extension pass.** They are numbered from **40**, not 34: the tokens `DD-34`, `DD-35`, and
+`DD-39` are already in use **inside this plan's own folder** — they appear throughout
+`syllabus/courses/**` carrying **FS-SE-inherited** meanings (concept enumeration, primary-source
+citation policy, typed-Python policy) rather than this document's numbering
+[Repo-grounded — `grep -rn "DD-3[4-9]" plans/backlog/shared-course-library-and-learning-paths/`
+returns hits only under `syllabus/courses/`]. Starting at 40 keeps every `DD-NN` token in this plan
+folder unambiguous for an execution-grade reader.
+
+- **DD-40 · `/{locale}/c/learn/` has exactly three structural buckets: `paths/`, `courses/`,
+  `legacy/`.** The learn section's IA is closed: a URL under `/en/c/learn/` is either an ordered path
+  manifest landing, a canonical course body, or relocated legacy material — nothing else. The section
+  also keeps its own two hub files (`_index.md`, machine-generated; `overview.md`, hand-authored — see
+  DD-45 and [Q-F](#q-f--what-happens-to-enlearnoverviewmd)); those are the section's landing prose,
+  not a fourth taxonomy bucket. **Why**: the original plan converted one of seven domains and left the
+  other six in place, producing a hybrid taxonomy that is neither the old IA nor the new one — the
+  worst of both, and unexplainable to a reader. See
+  [Learn-Section IA](#learn-section-ia--the-three-bucket-model-scope-extension-2026-07-21).
+- **DD-41 · The legacy move is a prefix relocation, not a rewrite.** Each of the six non-course
+  domains moves via a single `git mv <domain>/ legacy/<domain>/`, preserving its existing
+  sub-taxonomy **verbatim**: no file renamed, no body edited, no heading touched. **Why**: (a) it makes
+  the redirect a per-domain prefix rule rather than 1,713 per-file rules; (b) it keeps a 1,148-file
+  move reviewable as a pure rename diff; (c) promoting a legacy page into a real course is genuinely
+  different work with its own editorial judgment, and bundling it here would make the move
+  unreviewable. Promotion is later work — see
+  [Q-A](#q-a--is-legacy-a-staging-pen-or-a-permanent-archive).
+- **DD-42 · Per-domain prefix redirects; a blanket `/en/c/learn/:path*` rule is FORBIDDEN.** A new
+  module `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` _(New file)_ enumerates the six
+  relocated domains explicitly, as two tiers of 308 prefix rules (pre-`/c` short-circuit + post-`/c`
+  catch), spread into `next.config.ts` **between** `learnReorgRedirects` and
+  `contentNamespaceRedirects`. **Why the ban**: a blanket rule would (a) swallow `courses/` and
+  `paths/` and (b) self-recurse, since its own destination re-matches its own source. This is the same
+  hazard `content-namespace.ts` already warns about in its header comment for
+  `/{locale}/:path*` [Repo-grounded]. **Why the ordering**: `learnReorgRedirects` must resolve
+  within-`/en/learn/` renames to their canonical domain names first, or an old rename lands in
+  `legacy/` under its pre-rename name; and placing the bucket rules ahead of
+  `contentNamespaceRedirects` collapses a three-hop chain to one hop for the common pre-`/c` inbound
+  link. Enforced by a unit test mirroring `content-namespace.unit.test.ts`.
+- **DD-43 · `fundamentally-strong/` stays on per-course redirects; `learn-three-bucket.ts` carries no
+  rule for it.** Its topic directories collapse into flat `courses/<course-id>` bodies, so its
+  redirects are per-course — **already specified** by [Redirects](#redirects) and `delivery.md`
+  Phase 3, and **not duplicated** by the scope extension. **Why the explicit exclusion**: a
+  `fundamentally-strong` prefix rule in the bucket module would shadow the per-course rules for all 37
+  already-built directories, silently sending every re-homed course to a legacy URL that holds
+  nothing.
+- **DD-44 · No navigation code changes; the IA is tree-derived, and the two non-derived surfaces are
+  named.** Sidebar, browse index, section cards, landing-section overrides, `sitemap.ts`,
+  `feed.xml`, search data, `generate-indexes`, breadcrumbs, and `computePrevNext` all derive from the
+  content tree, so the relocation needs **zero** production code edits beyond the redirect module
+  [Repo-grounded — no production source file hardcodes a `learn/` domain slug]. The two surfaces that
+  do **not** self-heal are called out and given delivery steps: `legacy/_index.md` must be **authored**
+  (because `generate-indexes` only rewrites `_index.md` files that already exist, and
+  `buildTreeForLocale` would otherwise synthesize a `weight: 0` "Legacy" node that sorts **first**),
+  and `generated/search-data.json` must be **regenerated** (every relocated doc's `id` is
+  `${locale}:${slug}`). Full per-surface verdicts in
+  [IA / navigation consequences](#ia--navigation-consequences-every-affected-source-file-read-verified).
+- **DD-45 · The extension is `en`-only by default, and the `id` deferral is recorded, not implied.**
+  `id/belajar/` holds one domain (`manusia`, 50 `.md`) and has **zero** courses and **zero** paths, so
+  a three-bucket `id` today would ship two permanently-empty sections. The extension therefore stays
+  `en`-scoped and states the deferral explicitly in `brd.md` Non-Goals and in `delivery.md` Phase 5A.
+  **Why it is a decision, not an omission**: `apps/ayokoding-www/content` is bilingual and an `en`
+  change normally needs its `id` counterpart, so silently skipping `id` would read as a bug. The
+  reversal conditions and the segment-translation question are
+  [Q-B](#q-b--does-the-id-locale-get-the-same-three-bucket-shape-now) and
+  [Q-C](#q-c--if-id-is-in-scope-are-the-bucket-segments-translated).
+
+The next two decisions were made in the 2026-07-21 design-funnel revision, after the maintainer
+overturned the Screen 3 selection.
+
+- **DD-46 · Screen 3 is the left path rail (Option B), and the banner survives as its compact
+  readout.** The plan originally selected Option A (a top banner) and rejected Option B on mobile-first
+  grounds — _"desktop-only … would need to collapse into a top sheet on mobile"_. That objection is
+  **answered, not deleted**: the collapse target already exists. `MobileNav` is a shipped left `Sheet`
+  that already renders `SidebarTree` below `md`, opened from the header's
+  `aria-label="Open navigation menu"` button [Repo-grounded —
+  `apps/ayokoding-www/src/features/app-shell/shell/mobile-nav.tsx`, `.../header.tsx`], so the rail's
+  mobile form is a **content swap in an existing overlay**, not new overlay machinery. Likewise on
+  desktop: `ResizableSidebar` keeps its `<aside>`, `hidden … md:block` gate, 15 %-35 % `ResizablePanel`
+  band, resize handle, and `ayokoding-sidebar-width` key — only its `children` change
+  [Repo-grounded — `.../navigation/shell/resizable-sidebar.tsx`]. **What is genuinely more expensive
+  than Option A and accepted deliberately**: one net-new `PathRail` component, a conditional child in
+  two hosts, and truncation behaviour at the ~115 px 15 %-floor width at `md`. **Bought with it**: the
+  whole ordered arc stays visible while reading, so "where am I / what's next / what did I skip" costs
+  no navigation. `PathBanner` is retained from Option A, demoted to the rail's always-visible compact
+  readout and the host of the below-`md` disclosure trigger. **Invariant**: with no `?path=`, both hosts
+  render exactly what they render today — the no-path reader has zero regression surface. Full
+  breakpoint contract in
+  [prd.md §Screen 3 responsive specification](./prd.md#screen-3-responsive-specification-the-selected-option-b-breakpoint-by-breakpoint).
+- **DD-47 · Every screen's every option carries a wireframe and a render at three viewports.** The
+  funnel previously held desktop-only artefacts (8 `.png`, one per screen per option) with mobile
+  behaviour described in prose. A prose footnote cannot be reviewed the way a drawing can, and the
+  Screen 3 reselection turned on exactly a mobile question — which is the argument for the rule, not an
+  anecdote against it. The funnel therefore renders **5 screens × 2 options × 3 viewports = 30 `.png`**
+  at **375 / 768 / 1280 px** (Tailwind's default `sm`/`md`/`lg`/`xl` scale [Web-cited —
+  <https://tailwindcss.com/docs/responsive-design>, accessed 2026-07-21]), matching the widths the
+  plan's Playwright verification already resizes to, plus a lo-fi wireframe per viewport. Naming is
+  `assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png` from `assets/src/<same-stem>.html`; the
+  eight pre-existing files were renamed into the scheme and every `![]()` reference updated. `.png`
+  only, per the
+  [UI Mockups convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
+  Delivery enumerates the renders **one checkbox per asset** — a coarse "render all mockups" step can
+  be ticked with most of the set missing.
+
 ## Smoothness Architecture (per-path)
 
 Smoothness is a per-manifest property (each path has its own order), now underwritten by the machine
@@ -1276,19 +2054,21 @@ it reads 15 once Phase 12 Band 5/8 land the harness-cluster bodies (DD-33).
 `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/`;
 `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/`;
 `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/` (**new feature**);
-`<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`.
+`<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`;
+`<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension).
 
-| Group | Target                                                                                                                          | Change                                                                                                        | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A     | nav feature (`course-paths`)                                                                                                    | New app code (TDD)                                                                                            | `<FEAT>core/{schemas,manifest,path-nav,path-context,prerequisites}.ts` + tests; `<FEAT>shell/{manifest-repository,path-landing,path-banner,prerequisites,path-course-links}.tsx`; edits to `content-url.ts`, `prev-next.tsx`, `breadcrumb.tsx`, `c/[...slug]/page.tsx`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| A     | specs + redirects                                                                                                               | New Gherkin + redirect config                                                                                 | `<SPECS>*.feature` + `README.md`; `apps/ayokoding-www/src/redirects/learn-reorg.ts` entries for re-homed courses                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| A     | library + paths homes                                                                                                           | New content scaffolding                                                                                       | `<COURSES>_index.md` (library landing); `<PATHS>_index.md` (paths hub / choose-a-path, **four** cards, 2×2 grid — amended 2026-07-20, DD-23)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| B     | `interview-ready/software-engineer` (MVP)                                                                                       | Re-home 1–33 + 4 existing capstones + manifest — **architecture smoke test ONLY (amended 2026-07-20, DD-27)** | `git mv` shipped topics 1–33 + the 4 existing capstones (incl. `capstone-solid-core`, DD-20) into `<COURSES><id>/` (+ redirects); **update** legacy `content/en/learn/fundamentally-strong/**/_index.md` section indexes to re-point every entry to the re-homed course URLs (old-way browse still resolves — additive model); author `<FEAT>manifests/interview-ready/software-engineer.yaml` + thin `<PATHS>interview-ready/software-engineer/_index.md` landing anchor; ship end-to-end + deploy. Authoring `coding-interview`, `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`, `capstone-interview-loop` is **no longer bundled into this group** (DD-27) — those NEW courses land whenever the `interview-ready` path's remaining authoring is scheduled, without blocking groups F/C/D below |
-| F     | `immediately-effective/software-engineer-to-ai-engineer` — **authoring priority #1 (new group, added 2026-07-20, DD-24/DD-27)** | Six net-new AI courses + manifest, smoke-test-scoped                                                          | Author the six net-new courses (light eval gate, statistics for evals, deep evals, product patterns for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — DD-25/DD-26/DD-28; full catalog rows land at authoring time, see [Course Library Catalog](#course-library-catalog)) into `<COURSES>`; author `<FEAT>manifests/immediately-effective/software-engineer-to-ai-engineer.yaml` (SWE-fundamentals prerequisites **linked, not included**, DD-24; smoke-test-scoped to these 6 courses at ship, **grows to 15** — walking the existing 9-course AI/harness cluster — at Phase 12 Band 5/8, DD-33) + thin `<PATHS>immediately-effective/software-engineer-to-ai-engineer/_index.md` landing anchor                                                                                                    |
-| C     | `immediately-effective/software-engineer`                                                                                       | Manifest over the library                                                                                     | Author `<FEAT>manifests/immediately-effective/software-engineer.yaml` + thin `<PATHS>immediately-effective/software-engineer/_index.md`; author any build-fast-only NEW course as needed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| D     | `fundamentally-strong/software-engineer`                                                                                        | Manifest over the library                                                                                     | Author `<FEAT>manifests/fundamentally-strong/software-engineer.yaml` + thin `<PATHS>fundamentally-strong/software-engineer/_index.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| E     | Backfill topics 34–94                                                                                                           | Author native into `courses/`                                                                                 | Author the 61 transferred bodies + remaining NEW courses/capstones (incl. the deferred 4 interview courses + `capstone-interview-loop`, DD-27) into `<COURSES>`; grow each manifest's `courseOrder` as courses land                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| Final | verify / retest / archive                                                                                                       | plan-side + evidence                                                                                          | `evidence/…`; `learnings.md` triage; `git mv` plan → `plans/done/…`; README updates                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Group | Target                                                                                                                          | Change                                                                                                        | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A     | nav feature (`course-paths`)                                                                                                    | New app code (TDD)                                                                                            | `<FEAT>core/{schemas,manifest,path-nav,path-context,prerequisites}.ts` + tests; `<FEAT>shell/{manifest-repository,path-landing,path-banner,prerequisites,path-course-links}.tsx`; edits to `content-url.ts`, `prev-next.tsx`, `breadcrumb.tsx`, `c/[...slug]/page.tsx`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| A     | specs + redirects                                                                                                               | New Gherkin + redirect config                                                                                 | `<SPECS>*.feature` + `README.md`; `apps/ayokoding-www/src/redirects/learn-reorg.ts` entries for re-homed courses                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| A     | library + paths homes                                                                                                           | New content scaffolding                                                                                       | `<COURSES>_index.md` (library landing); `<PATHS>_index.md` (paths hub / choose-a-path, **four** cards, 2×2 grid — amended 2026-07-20, DD-23)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| B     | `interview-ready/software-engineer` (MVP)                                                                                       | Re-home 1–33 + 4 existing capstones + manifest — **architecture smoke test ONLY (amended 2026-07-20, DD-27)** | `git mv` shipped topics 1–33 + the 4 existing capstones (incl. `capstone-solid-core`, DD-20) into `<COURSES><id>/` (+ redirects); **update** legacy `content/en/learn/fundamentally-strong/**/_index.md` section indexes to re-point every entry to the re-homed course URLs (old-way browse still resolves — additive model); author `<FEAT>manifests/interview-ready/software-engineer.yaml` + thin `<PATHS>interview-ready/software-engineer/_index.md` landing anchor; ship end-to-end + deploy. Authoring `coding-interview`, `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`, `capstone-interview-loop` is **no longer bundled into this group** (DD-27) — those NEW courses land whenever the `interview-ready` path's remaining authoring is scheduled, without blocking groups F/C/D below                                                                                      |
+| F     | `immediately-effective/software-engineer-to-ai-engineer` — **authoring priority #1 (new group, added 2026-07-20, DD-24/DD-27)** | Six net-new AI courses + manifest, smoke-test-scoped                                                          | Author the six net-new courses (light eval gate, statistics for evals, deep evals, product patterns for probabilistic systems, inference serving and model deployment, fine-tuning and adaptation — DD-25/DD-26/DD-28; full catalog rows land at authoring time, see [Course Library Catalog](#course-library-catalog)) into `<COURSES>`; author `<FEAT>manifests/immediately-effective/software-engineer-to-ai-engineer.yaml` (SWE-fundamentals prerequisites **linked, not included**, DD-24; smoke-test-scoped to these 6 courses at ship, **grows to 15** — walking the existing 9-course AI/harness cluster — at Phase 12 Band 5/8, DD-33) + thin `<PATHS>immediately-effective/software-engineer-to-ai-engineer/_index.md` landing anchor                                                                                                                                                                                         |
+| C     | `immediately-effective/software-engineer`                                                                                       | Manifest over the library                                                                                     | Author `<FEAT>manifests/immediately-effective/software-engineer.yaml` + thin `<PATHS>immediately-effective/software-engineer/_index.md`; author any build-fast-only NEW course as needed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| D     | `fundamentally-strong/software-engineer`                                                                                        | Manifest over the library                                                                                     | Author `<FEAT>manifests/fundamentally-strong/software-engineer.yaml` + thin `<PATHS>fundamentally-strong/software-engineer/_index.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| E     | Backfill topics 34–94                                                                                                           | Author native into `courses/`                                                                                 | Author the 61 transferred bodies + remaining NEW courses/capstones (incl. the deferred 4 interview courses + `capstone-interview-loop`, DD-27) into `<COURSES>`; grow each manifest's `courseOrder` as courses land                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| L     | **Legacy bucket — whole-section IA revamp (new group, scope extension 2026-07-21, DD-40–DD-45)**                                | Prefix-relocate 6 domains; new redirect module; hub-page rewrites                                             | `git mv` `software-engineering`, `artificial-intelligence`, `information-security`, `personal-development`, `it-governance`, `business` from `apps/ayokoding-www/content/en/learn/<domain>/` into `<LEGACY><domain>/` (sub-taxonomy verbatim, DD-41); author `<LEGACY>_index.md` (required — `generate-indexes` only rewrites existing section files, DD-44); author `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` _(New file)_ + `learn-three-bucket.unit.test.ts` _(New test)_ and spread into `next.config.ts` between `learnReorgRedirects` and `contentNamespaceRedirects` (DD-42); rewrite the hand-authored `apps/ayokoding-www/content/en/learn/overview.md` six-domain inventory to the three buckets (DD-45/Q-F); regenerate `apps/ayokoding-www/content/en/learn/_index.md` + `generated/search-data.json`; add `<SPECS>`-sibling Gherkin under `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/` |
+| Final | verify / retest / archive                                                                                                       | plan-side + evidence                                                                                          | `evidence/…`; `learnings.md` triage; `git mv` plan → `plans/done/…`; README updates                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 **Net authored surface** (amended 2026-07-20 — six net-new AI courses + a fourth manifest added, DD-28):
 the `course-paths` feature (new app code) + 20 new course bundles (the original 14 + the six net-new AI
@@ -1325,6 +2105,14 @@ stack (zod is already used [Repo-grounded — `apps/ayokoding-www` schemas use z
   landing + `?path=` nav without touching any course body.
 - **Re-home revert**: because each re-home is a `git mv` + redirect, reverting restores the old
   `fundamentally-strong/software-engineer/<slug>/` location and drops the redirect atomically.
+- **Legacy-bucket revert (Group L, DD-41)**: the relocation is a pure `git mv` per domain plus one new
+  redirect module, so `git revert <merge-commit-sha>` restores all six domains to
+  `content/en/learn/<domain>/` and removes `learnThreeBucketRedirects` from `next.config.ts`
+  atomically — **no body was edited, so no content is at risk**. The two derived artifacts
+  (`content/en/learn/_index.md`, `generated/search-data.json`) regenerate from the reverted tree via
+  `npx nx run ayokoding-www:generate-indexes` and `:generate-search-data`. The one manual follow-up is
+  `content/en/learn/overview.md`, whose hand-authored inventory the revert restores from git along
+  with everything else.
 
 ## Testing / Verification Strategy
 
@@ -1343,3 +2131,21 @@ stack (zod is already used [Repo-grounded — `apps/ayokoding-www` schemas use z
   curl not applicable (no new API).
 - **Rule-15 web retest**: path-aware nav is a user-facing change → run the three live-site testers
   before archival (see [delivery.md](./delivery.md)).
+- **Three-bucket IA (Group L, DD-40–DD-45)**: four verification layers, each falsifiable in **both**
+  directions —
+  1. **Redirect unit tests** (`src/redirects/learn-three-bucket.unit.test.ts`, mirroring the existing
+     `content-namespace.unit.test.ts` shape): one rule pair per relocated domain; every rule
+     `permanent: true`; destination = source with `legacy/` inserted; **no** self-recursing blanket
+     `/en/c/learn/:path*` source; **no** rule whose source prefix is `courses`, `paths`, or
+     `fundamentally-strong` (DD-43).
+  2. **Structural gate**: `ls apps/ayokoding-www/content/en/learn` lists exactly `_index.md`,
+     `overview.md`, `courses`, `legacy`, `paths` — i.e. the three structural buckets plus the two hub
+     files (DD-40/DD-45). Falsifiable both ways: it lists seven domain directories today.
+  3. **Link + build**: `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`
+     and `nx run ayokoding-www:build` green after the move, plus
+     `nx run ayokoding-www:validate-indexes` green (proving `_index.md` regeneration converged) and
+     `nx run ayokoding-www:generate-search-data` re-run.
+  4. **E2E**: one relocated URL per domain 308s to its `legacy/` address (both the pre-`/c` and the
+     `/c` inbound forms); a `courses/` and a `paths/` URL are **not** rewritten (proving the blanket
+     rule is absent); an old `fundamentally-strong` course URL still resolves to
+     `/en/c/learn/courses/<id>` (proving DD-43's exclusion holds).

@@ -31,6 +31,19 @@ each path's context, under the `/en/c/learn` URL model. The library body is larg
 from `specs:coverage`); the **navigation feature is app code** and carries a `specs/` Gherkin companion
 and three-level tests.
 
+**Whole-section IA (scope extension, 2026-07-21).** The plan no longer converts only the
+`fundamentally-strong` domain and leaves the rest of the learn section alone. When it lands,
+`/{locale}/c/learn/` has **exactly three** structural buckets and nothing else: `paths/`, `courses/`,
+and a **new `legacy/`** bucket holding everything that is not yet a course or a path — the six
+remaining `en/learn/` domains (`software-engineering`, `artificial-intelligence`,
+`information-security`, `personal-development`, `it-governance`, `business`; **1,148** `.md` files
+[Repo-grounded]). The relocation is a **prefix move that preserves each domain's sub-taxonomy
+verbatim** — no page is rewritten — and every relocated URL keeps working through a per-domain 308
+redirect. Design, redirect mechanics, IA consequences, and the six unresolved questions are in
+[tech-docs §Learn-Section IA](./tech-docs.md#learn-section-ia--the-three-bucket-model-scope-extension-2026-07-21)
+and [tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-unresolved)
+(DD-40 through DD-45).
+
 The topic content of the existing courses is unchanged — the 33 shipped topics (1–33) are **re-homed**
 (moved to `courses/<course-id>/` with redirects) and the 61 transferred topics (34–94) are authored
 **native** into `courses/`; all are **re-framed** (referenced by four manifests), not rewritten. This
@@ -98,8 +111,18 @@ further NEW AI-specific courses** (2026-07-20) the fourth path needs, for a **12
 - As a **reader targeting an AI-agent-infra or security codebase**, I want the async-Python/FastAPI,
   CDP, MCP/harness, C++, and detection-engineering courses available in the library, so that any path
   can lead me to the stack skills those codebases need.
-- As a **screen-reader / keyboard user**, I want the path banner, breadcrumb, prerequisite list, and
-  prev/next to be fully accessible, so that path-aware navigation works without a mouse.
+- As a **screen-reader / keyboard user**, I want the path rail, banner, breadcrumb, prerequisite
+  list, and prev/next to be fully accessible, so that path-aware navigation works without a mouse.
+- As a **reader browsing `/en/c/learn`**, I want the section to offer exactly three understandable
+  choices — follow a path, browse the course library, or dig into the older material — so that I am
+  not handed a mixed taxonomy of two structural buckets sitting beside six subject domains.
+- As a **reader who bookmarked or search-landed on an older learn page**, I want my URL to keep
+  working after the section is reorganized, so that no link I hold or that Google holds ever 404s.
+- As a **reader who lands on an older, not-yet-converted page**, I want to see that it is legacy
+  material and where the canonical course lives (if one exists), so that I do not study a superseded
+  page believing it is current.
+- As the **maintainer**, I want the legacy relocation to be a pure prefix move that rewrites no page
+  bodies, so that a 1,148-file change stays reviewable as a rename diff and carries no content risk.
 
 ## Learner Journey (End-to-End)
 
@@ -111,13 +134,13 @@ leaves for a follow-up (this plan ships _path-aware navigation_, not a per-user 
 is grounded in a `web-researcher` window-shop of ~14 platforms on **2026-07-21** (sources in
 [R7 Prior-Art Findings](#r7-prior-art-findings-window-shopped-2026-07-21)).
 
-| Stage           | Learner's need                               | Design response (screen / affordance)                                                                  | Scope    |
-| --------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------- |
-| **1 Landing**   | "Where do I even start?"                     | **Screen 0** hero surfaces the 4 goal cards + "Compare all paths" escape hatch                         | In-scope |
-| **2 Discovery** | "Which path fits me? what's shared?"         | **Screen 1** paths hub (compare paths, course counts); "Browse the full library" for topic-led seekers | In-scope |
-| **3 Before**    | "Am I ready? can I skip ahead?"              | **Screen 2** syllabus preview + advisory `PrerequisiteList` + fast-path "skip the prologue" callout    | In-scope |
-| **4 During**    | "Keep me oriented and moving"                | **Screen 3** `PathBanner` (step k of N) + path breadcrumb + manifest prev/next keeping `?path=`        | In-scope |
-| **5 After**     | "I finished — what now? where else is this?" | **Screen 3** `PathCourseLinks` ("this course is also in …") + manifest next → capstone framing         | In-scope |
+| Stage           | Learner's need                               | Design response (screen / affordance)                                                                                                                           | Scope    |
+| --------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| **1 Landing**   | "Where do I even start?"                     | **Screen 0** hero surfaces the 4 goal cards + "Compare all paths" escape hatch                                                                                  | In-scope |
+| **2 Discovery** | "Which path fits me? what's shared?"         | **Screen 1** paths hub (compare paths, course counts); "Browse the full library" for topic-led seekers                                                          | In-scope |
+| **3 Before**    | "Am I ready? can I skip ahead?"              | **Screen 2** syllabus preview + advisory `PrerequisiteList` + fast-path "skip the prologue" callout                                                             | In-scope |
+| **4 During**    | "Keep me oriented and moving"                | **Screen 3** `PathRail` (whole ordered arc, current course marked) + `PathBanner` readout (step k of N) + path breadcrumb + manifest prev/next keeping `?path=` | In-scope |
+| **5 After**     | "I finished — what now? where else is this?" | **Screen 3** `PathCourseLinks` ("this course is also in …") + manifest next → capstone framing                                                                  | In-scope |
 
 **Stage-by-stage smoothness**
 
@@ -137,7 +160,9 @@ is grounded in a `web-researcher` window-shop of ~14 platforms on **2026-07-21**
   points sideways ("take X first"), and experienced/re-entrant learners get an explicit skip-ahead
   (the fast-path callout lands them further down the _same_ ordered syllabus, not a separate stripped
   variant). No quiz-wall, no lock.
-- **4 · During** — orientation without a login: the `PathBanner` shows "on path: … · course k of N", the
+- **4 · During** — orientation without a login: the `PathRail` keeps the whole ordered arc beside the
+  body (in the shipped drawer below `md`) with the current course marked, the `PathBanner` readout shows
+  "on path: … · course k of N", the
   breadcrumb and prev/next all keep `?path=`, so the learner never falls out of path context by
   clicking forward. Deep-links/shares keep the path via the query param; opening a course with no
   `?path=` degrades to the canonical view. **[Future]** a client-only `localStorage` "mark done" +
@@ -184,10 +209,13 @@ reappears in Path B; After→re-entry is the industry's weakest seam and is expl
 
 ## UI-Design-Funnel (Path-Aware Navigation Screens)
 
-The path-aware navigation adds/changes **four user-facing screens** in `ayokoding-www` (a Next.js
+The path-aware navigation adds/changes **five user-facing screens** in `ayokoding-www` (a Next.js
 app): **Screen 0** is the site **landing hero** at `/en` (where a first-time visitor first meets the
 paths); **Screens 1-3** live under the `/en/c/learn` URL model (paths hub, path landing,
-course-in-path). Each screen runs the diverge → narrow → select → justify funnel. Low-fidelity
+course-in-path); **Screen 4** (added by the 2026-07-21 scope extension) is the **legacy-bucket
+landing and page banner**, whose selection is pending the
+[Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy) ruling. Each screen runs the diverge → narrow →
+select → justify funnel. Low-fidelity
 wireframes are authored below; the two high-fidelity finalists per screen are rendered as `.png`
 assets under this plan's [`assets/`](./assets/) and embedded inline here. Repo-grounded **textual**
 hi-fi specifications for each chosen screen are authored in
@@ -208,7 +236,8 @@ reinvent: `libs/web-ui` component inventory + tokens + Storybook; the ayokoding 
 (`apps/ayokoding-www/src/features/app-shell/`); the existing `sidebar-tree`, `breadcrumb`, `prev-next`,
 and `section-card` components [Repo-grounded — `apps/ayokoding-www/src/features/navigation/shell/` and
 `.../content/shell/section-card.tsx`]. Reference the `swe-developing-frontend-ui` skill. **Net-new
-components**: `PathCard`, `PathLanding`, `PathBanner`, `PathCourseLinks`, `PrerequisiteList` — all
+components**: `PathCard`, `PathLanding`, `PathRail`, `PathBanner`, `PathCourseLinks`,
+`PrerequisiteList` — all
 composed from existing `libs/web-ui` primitives; named in
 [tech-docs §New feature: `course-paths`](./tech-docs.md#new-feature-course-paths-functional-core--imperative-shell).
 
@@ -232,9 +261,10 @@ drove the selections:
   fast-path "skip the prologue" callout for re-entrant users.
 - **A course-page path banner and a "this course is in N paths" affordance are an industry-wide
   whitespace** — no surveyed platform surfaces them ([Boot.dev](https://www.boot.dev/paths/backend-python-golang)
-  path pages have no breadcrumb; Frontend Masters shows no cross-path indicator). Our `PathBanner` and
-  `PathCourseLinks` are therefore **net-new differentiators**, built on the nearest adjacent precedent
-  (Coursera's program breadcrumb) rather than copied.
+  path pages have no breadcrumb; Frontend Masters shows no cross-path indicator). Our `PathRail`,
+  `PathBanner`, and `PathCourseLinks` are therefore **net-new differentiators**, built on the nearest
+  adjacent precedents (Coursera's program breadcrumb; the persistent lesson rail every docs-style site
+  ships) rather than copied.
 
 ### Screen 0 · Landing hero (path entry)
 
@@ -247,6 +277,59 @@ The site landing hero at `/en` ([`app-shell/shell/hero.tsx`](../../../apps/ayoko
   the landing page into the first step of the learner journey rather than a dead-drop into a taxonomy.
 
 **Low-fi Option A — Four goal cards in the hero (Recommended)**
+
+_Mobile — 375 px (`<sm`): one column, cards full-width_
+
+```text
+┌────────────────────────────────────┐
+│ ☰  AyoKoding            ⌕  ☾       │
+├────────────────────────────────────┤
+│ Learn to build software,           │
+│ the clear way.                     │
+│ Start from your goal — every path  │
+│ is one route through one library.  │
+│ CHOOSE YOUR PATH                   │
+│ ┌────────────────────────────────┐ │
+│ │ Pass a SWE interview soon      │ │
+│ │ Interview-Ready SWE      ~119  │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ Get productive & ship fast     │ │
+│ │ Immediately-Effective    ~116  │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ Build durable fundamentals     │ │
+│ │ Fundamentally Strong     ~121  │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ Move from SWE into AI          │ │
+│ │ SWE → AI Engineer         ~15  │ │
+│ └────────────────────────────────┘ │
+│ Compare all paths →                │
+│ Browse the full library →          │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px (`md`): the 2×2 grid turns on (`md:grid-cols-2`)_
+
+```text
+┌────────────────────── AyoKoding · /en ───────────────────────┐
+│ Learn to build software, the clear way.                       │
+│ Start from your goal — one route through one library.         │
+│ CHOOSE YOUR PATH                                              │
+│  ┌────────────────────────┐  ┌────────────────────────┐      │
+│  │ Pass a SWE interview   │  │ Get productive & ship  │      │
+│  │ Interview-Ready   ~119 │  │ Immediately-Eff.  ~116 │      │
+│  └────────────────────────┘  └────────────────────────┘      │
+│  ┌────────────────────────┐  ┌────────────────────────┐      │
+│  │ Build fundamentals     │  │ Move from SWE into AI  │      │
+│  │ Fundamentally S.  ~121 │  │ SWE → AI Eng.      ~15 │      │
+│  └────────────────────────┘  └────────────────────────┘      │
+│  Compare all paths →        Browse the full library →         │
+└───────────────────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px (`xl`)_
 
 ```text
 ┌──────────────────────────── AyoKoding · /en ─────────────────────────────┐
@@ -267,6 +350,38 @@ The site landing hero at `/en` ([`app-shell/shell/hero.tsx`](../../../apps/ayoko
 
 **Low-fi Option B — Goal-question strip below a single-CTA hero (Coursera model)**
 
+_Mobile — 375 px: the two CTAs stack, so all four goals sit below the fold_
+
+```text
+┌────────────────────────────────────┐
+│ Learn to build software,           │
+│ the clear way.                     │
+│ [ Start learning →              ]  │
+│ [ Explore tools                 ]  │
+│ ────────────────────────────────── │
+│ What brings you here today?        │  ← typically below the fold
+│  • Pass a SWE interview soon →     │
+│  • Get productive & ship fast →    │
+│  • Build durable fundamentals →    │
+│  • Move from SWE into AI →         │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px: CTAs sit inline; the goal strip becomes two columns_
+
+```text
+┌────────────────────── AyoKoding · /en ───────────────────────┐
+│ Learn to build software, the clear way.                       │
+│ [ Start learning → ]   [ Explore tools ]                      │
+│ ───────────────────────────────────────────────────────────── │
+│ What brings you here today?                                   │
+│  • Pass a SWE interview soon →   • Get productive & ship →     │
+│  • Build durable fundamentals →  • Move from SWE into AI →     │
+└───────────────────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px_
+
 ```text
 ┌──────────────────────────── AyoKoding · /en ─────────────────────────────┐
 │ Learn to build software, the clear way.                                   │
@@ -279,6 +394,30 @@ The site landing hero at `/en` ([`app-shell/shell/hero.tsx`](../../../apps/ayoko
 ```
 
 **Low-fi Option C — Single "Find your path" CTA + guided quiz (edX/Educative model)**
+
+_Mobile — 375 px_
+
+```text
+┌────────────────────────────────────┐
+│ Learn to build software,           │
+│ the clear way.                     │
+│ [ Find your path →              ]  │
+│ (answer 3 questions)               │
+│ or browse all paths →              │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px_
+
+```text
+┌────────────────────── AyoKoding · /en ───────────────────────┐
+│ Learn to build software, the clear way.                       │
+│ [ Find your path → ]  (answer 3 questions)                    │
+│ or browse all paths →                                         │
+└───────────────────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px_
 
 ```text
 ┌──────────────────────────── AyoKoding · /en ─────────────────────────────┐
@@ -295,9 +434,9 @@ pushed below a fold-and-a-half the way Option B's strip is once the primary CTAs
 
 **Hi-fi finalists** (rendered from the token-accurate HTML mockups):
 
-![Landing hero, Option A — the AyoKoding landing page with the brand headline and tagline, then a "Choose your path" label above a 2×2 grid of four goal-led cards (Pass a SWE interview soon, Get productive and ship fast, Build durable fundamentals, Move from SWE into AI), each hue-coded with the formal path name and course count and a Start action, and a subordinate "Not sure which fits? Compare all paths" link beside "Browse the full course library"](./assets/landing-hero-option-a.png)
+![Landing hero, Option A — the AyoKoding landing page with the brand headline and tagline, then a "Choose your path" label above a 2×2 grid of four goal-led cards (Pass a SWE interview soon, Get productive and ship fast, Build durable fundamentals, Move from SWE into AI), each hue-coded with the formal path name and course count and a Start action, and a subordinate "Not sure which fits? Compare all paths" link beside "Browse the full course library"](./assets/landing-hero-option-a-desktop.png)
 
-![Landing hero, Option B — the landing page with a single "Start learning" primary CTA and an "Explore tools" secondary button, and below a divider a "What brings you here today?" strip of four goal options each with a hue dot, following the Coursera goal-question pattern](./assets/landing-hero-option-b.png)
+![Landing hero, Option B — the landing page with a single "Start learning" primary CTA and an "Explore tools" secondary button, and below a divider a "What brings you here today?" strip of four goal options each with a hue dot, following the Coursera goal-question pattern](./assets/landing-hero-option-b-desktop.png)
 
 **Selected: Option A — four goal cards in the hero.**
 
@@ -327,6 +466,59 @@ on a different endpoint than the other three (per-role convergence, DD-22), so t
 
 **Low-fi Option A — Path cards, 2×2 grid (Recommended)**
 
+_Mobile — 375 px (`<sm`): one column; no sidebar (it is `hidden` below `md`)_
+
+```text
+┌────────────────────────────────────┐
+│ ☰  AyoKoding            ⌕  ☾       │
+├────────────────────────────────────┤
+│ Choose your path.                  │
+│ One library, converging within     │
+│ your role.                         │
+│ ┌────────────────────────────────┐ │
+│ │ Interview-Ready SWE            │ │
+│ │ interview-first · ~N courses   │ │
+│ │ [ Start →                    ] │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ Immediately-Effective          │ │
+│ │ build-app-first · ~N courses   │ │
+│ │ [ Start →                    ] │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ Fundamentally Strong           │ │
+│ │ fundamentals-first · ~N        │ │
+│ │ [ Start →                    ] │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ SWE → AI Engineer              │ │
+│ │ AI-transition-first · ~N       │ │
+│ │ [ Start →                    ] │ │
+│ └────────────────────────────────┘ │
+│ Or browse the full library →       │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px (`md`): sidebar appears; grid goes two-up_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▸ Learn      │ Choose your path. One library, converging       │
+│   ▸ Paths    │ within your role.                               │
+│   ▸ Courses  │ ┌──────────────────┐ ┌──────────────────┐      │
+│   ▸ Legacy   │ │ Interview-Ready  │ │ Immediately-Eff. │      │
+│              │ │ ~N · [ Start → ] │ │ ~N · [ Start → ] │      │
+│              │ └──────────────────┘ └──────────────────┘      │
+│              │ ┌──────────────────┐ ┌──────────────────┐      │
+│              │ │ Fundamentally S. │ │ SWE → AI Eng.    │      │
+│              │ │ ~N · [ Start → ] │ │ ~N · [ Start → ] │      │
+│              │ └──────────────────┘ └──────────────────┘      │
+│              │ Or browse the full course library →             │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px (`xl`)_
+
 ```text
 ┌────────────────────────── Fundamentally Strong · Learn ──────────────────────────┐
 │  Choose your path. One library, converging within your role.                      │
@@ -354,6 +546,44 @@ on a different endpoint than the other three (per-role convergence, DD-22), so t
 
 **Low-fi Option B — Stacked comparison rows**
 
+_Mobile — 375 px: each row wraps to three lines, pushing the fourth path far below the fold_
+
+```text
+┌────────────────────────────────────┐
+│ Interview-Ready SWE                │
+│ interview-first · ~N courses       │
+│ [ Start → ]                        │
+│ ────────────────────────────────── │
+│ Immediately-Effective              │
+│ build-app-first · ~N courses       │
+│ [ Start → ]                        │
+│ ────────────────────────────────── │
+│ Fundamentally Strong               │
+│ fundamentals-first · ~N courses    │
+│ [ Start → ]                        │
+│ ────────────────────────────────── │
+│ SWE → AI Engineer                  │  ← ~3 screens down
+│ AI-transition-first · ~N courses   │
+│ [ Start → ]                        │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px: rows fit on two lines each; still a vertical ranking_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▸ Learn      │ Interview-Ready SWE (interview-first)  ~N       │
+│              │   interview prep → production → deeper  [Start]│
+│              │ ──────────────────────────────────────────────  │
+│              │ Immediately-Effective (build-app-first) ~N      │
+│              │   editor → one language → BUILD → deepen [Start]│
+│              │ ──────────────────────────────────────────────  │
+│              │ Fundamentally Strong … / SWE → AI Engineer …    │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px_
+
 ```text
 ┌───────────────── Fundamentally Strong · Four Paths ──────────────────┐
 │ Interview-Ready SWE (interview-first) [ Start → ]  ~N courses         │
@@ -376,9 +606,9 @@ target on mobile.
 
 **Hi-fi finalists** (rendered from the token-accurate HTML mockups):
 
-![Paths hub, Option A — four equal path cards in a 2×2 grid, each with a hue-coded top border, a kind badge, the path name, its one-line arc, a course-count badge, and a Start call-to-action](./assets/paths-hub-option-a.png)
+![Paths hub, Option A — four equal path cards in a 2×2 grid, each with a hue-coded top border, a kind badge, the path name, its one-line arc, a course-count badge, and a Start call-to-action](./assets/paths-hub-option-a-desktop.png)
 
-![Paths hub, Option B — the four paths as stacked full-width comparison rows, each with a hue accent bar, name, kind badge, arc summary, course count, and Start action](./assets/paths-hub-option-b.png)
+![Paths hub, Option B — the four paths as stacked full-width comparison rows, each with a hue accent bar, name, kind badge, arc summary, course count, and Start action](./assets/paths-hub-option-b-desktop.png)
 
 **Selected: Option A — Path cards, 2×2 grid.**
 
@@ -394,6 +624,44 @@ every course link carries `?path=<path-id>`. The ordering is a valid topological
 prerequisite DAG.
 
 **Low-fi Option A — Phase-grouped numbered syllabus (Recommended)**
+
+_Mobile — 375 px: one course per row, phase headings inline (never sticky — sticky is `lg+`)_
+
+```text
+┌────────────────────────────────────┐
+│ ☰  AyoKoding            ⌕  ☾       │
+├────────────────────────────────────┤
+│ Interview-Ready SWE                │
+│ interview-first                    │
+│ ⓘ Experienced & job-hunting?       │
+│   Skip the prologue → Phase 1.     │
+│ PROLOGUE · EDITOR (skippable)      │
+│   1. Just Enough Nvim              │
+│   2. Just Enough Lua               │
+│   3. Extending Neovim              │
+│   ▸ Capstone · Forge-Ready         │
+│ PHASE 1 · INTERVIEW PREPARATION    │
+│   4. Just Enough Python            │
+│   …                                │
+│   9. Coding Interview              │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px: sidebar returns; list stays one column, phase headings still inline_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▸ Learn      │ Interview-Ready SWE · interview-first           │
+│   ▾ Paths    │ ⓘ Skip the prologue → jump to Phase 1.          │
+│   ▸ Courses  │ PROLOGUE · EDITOR FOUNDATIONS (skippable)        │
+│              │   1. Just Enough Nvim   2. Just Enough Lua      │
+│              │   3. Extending Neovim   ▸ Capstone · Forge-Ready│
+│              │ PHASE 1 · INTERVIEW PREPARATION                  │
+│              │   4. Just Enough Python … 9. Coding Interview   │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px: `max-w-3xl` reading column; phase headings sticky (`lg:sticky lg:top-16`)_
 
 ```text
 ┌──────────── Interview-Ready Software Engineer · interview-first ─────────┐
@@ -412,6 +680,33 @@ prerequisite DAG.
 
 **Low-fi Option B — Collapsible phase accordion**
 
+_Mobile — 375 px: all stages collapsed except the first — the arc is hidden_
+
+```text
+┌────────────────────────────────────┐
+│ Fundamentally Strong SWE           │
+│ ▼ Stage 1 · CS foundations   (N)   │
+│     1. Just Enough Git             │
+│     2. Computer Systems            │
+│ ▶ Stage 2 · Paradigms, DS&A  (N)   │
+│ ▶ Stage 3 · Build real SW    (N)   │
+│ ▶ Stage 4 · Systems & ops    (N)   │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px: two stages expanded_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▸ Learn      │ ▼ Stage 1 · CS foundations & architecture  (N)  │
+│              │ ▼ Stage 2 · Paradigms, DS&A, algorithms    (N)  │
+│              │ ▶ Stage 3 · Build real software (collapsed)     │
+│              │ ▶ Stage 4 · Systems, data, security, ops        │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px_
+
 ```text
 ┌──────────── Fundamentally Strong SWE · fundamentals-first ──────────────┐
 │ ▼ Stage 1 · CS foundations & architecture       (N courses)             │
@@ -428,9 +723,9 @@ Option B's accordion collapses all but the first stage on mobile to keep the lis
 
 **Hi-fi finalists** (rendered from the token-accurate HTML mockups):
 
-![Path landing, Option A — a hue strip header with the path title and arc, an info callout to skip the prologue, then phase-grouped sections each rendering a numbered ordered list of course rows where the number is the path order, with capstone markers](./assets/path-landing-option-a.png)
+![Path landing, Option A — a hue strip header with the path title and arc, an info callout to skip the prologue, then phase-grouped sections each rendering a numbered ordered list of course rows where the number is the path order, with capstone markers](./assets/path-landing-option-a-desktop.png)
 
-![Path landing, Option B — the syllabus as collapsible phase accordions, the first two stages expanded to show course rows and the remaining stages collapsed with course counts](./assets/path-landing-option-b.png)
+![Path landing, Option B — the syllabus as collapsible phase accordions, the first two stages expanded to show course rows and the remaining stages collapsed with course counts](./assets/path-landing-option-b-desktop.png)
 
 **Selected: Option A — Phase-grouped numbered syllabus.**
 
@@ -441,36 +736,132 @@ Option B's accordion collapses all but the first stage on mobile to keep the lis
 
 ### Screen 3 · Course page in path context
 
-A shared course body rendered with the active path's affordances: a top **path banner** (path name +
-position), a path breadcrumb, a **prerequisite list**, and manifest-driven prev/next. Without `?path=`
-→ canonical view (which still surfaces prerequisites).
+A shared course body rendered with the active path's affordances: the active path's **ordered course
+list** as the left rail, a path breadcrumb, a **prerequisite list**, and manifest-driven prev/next.
+Without `?path=` → canonical view (generic content-tree sidebar, which still surfaces prerequisites).
 
-**Low-fi Option A — Top path banner + path breadcrumb + prerequisites + bottom prev/next (Recommended)**
+**Low-fi Option A — Top path banner + path breadcrumb + prerequisites + bottom prev/next**
+
+_Mobile — 375 px (`<sm`)_
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ▸ On path: Interview-Ready SWE · course 9 of N       [ view full path ]   │
-│ Home / Learn / Interview-Ready SWE / Coding Interview                     │
-│ Prerequisites: Data Structures & Algorithms · Advanced Algorithms         │
-│                                                                          │
-│ # Coding Interview                                                        │
-│ …course body (unchanged, canonical, path-neutral)…                        │
-│                                                                          │
-│ ← Prev: Advanced Algorithms        Next: Take-Home & Live Coding →        │
-│   (both links keep ?path=interview-ready/software-engineer)               │
-└──────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────┐
+│ ☰  AyoKoding            ⌕  ☾       │
+├────────────────────────────────────┤
+│ ▸ On path: Interview-Ready SWE     │
+│   course 9 of N   [view full path] │
+│ Home / … / Coding Interview        │
+│ Prereqs: DS&A · Advanced Algos     │
+│                                    │
+│ # Coding Interview                 │
+│ …body (unchanged, path-neutral)…   │
+│                                    │
+│ ← Prev: Advanced Algorithms        │
+│ Next: Take-Home & Live Coding →    │
+└────────────────────────────────────┘
 ```
 
-Canonical fallback (no `?path=`):
+_Tablet — 768 px (`md`)_
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│ Home / Learn / Courses / Coding Interview                                 │
-│ Prerequisites: Data Structures & Algorithms · Advanced Algorithms         │
-│ # Coding Interview … body …                                              │
-│ This course is part of: [ Interview-Ready ] · [ Immediately-Effective ]   │
-│                          · [ Fundamentally Strong ]                       │
-└──────────────────────────────────────────────────────────────────────────┘
+┌── Sidebar (content tree) ─┬──────────────────────────────────────┐
+│ ▸ Learn                   │ ▸ On path: Interview-Ready SWE ·      │
+│   ▸ Paths                 │   course 9 of N     [view full path] │
+│   ▾ Courses               │ Home / … / Coding Interview           │
+│     · Advanced Algorithms │ Prereqs: DS&A · Advanced Algorithms   │
+│     · Coding Interview    │ # Coding Interview … body …           │
+│   ▸ Legacy                │ ← Prev: Advanced Algos   Next: … →    │
+└───────────────────────────┴──────────────────────────────────────┘
+```
+
+_Desktop — 1280 px (`xl`)_
+
+```text
+┌── Sidebar ────┬──────────────────────────────────────────────────────────────────────────┐
+│ ▸ Learn       │ ▸ On path: Interview-Ready SWE · course 9 of N       [ view full path ]   │
+│   ▸ Paths     │ Home / Learn / Interview-Ready SWE / Coding Interview                     │
+│   ▾ Courses   │ Prerequisites: Data Structures & Algorithms · Advanced Algorithms         │
+│     · Adv Alg │                                                                          │
+│     · Coding  │ # Coding Interview                                                        │
+│   ▸ Legacy    │ …course body (unchanged, canonical, path-neutral)…                        │
+│               │                                                                          │
+│               │ ← Prev: Advanced Algorithms        Next: Take-Home & Live Coding →        │
+│               │   (both links keep ?path=interview-ready/software-engineer)               │
+└───────────────┴──────────────────────────────────────────────────────────────────────────┘
+```
+
+**Low-fi Option B — Left path rail replacing the sidebar (SELECTED)**
+
+The rail is the same `<aside>` slot the generic content-tree sidebar occupies today; only its
+**contents** swap when `?path=` is present. Below `md` that slot does not exist at all — the tree
+already lives in the shipped left `Sheet` drawer — so the rail collapses into the **same drawer**, and
+the banner strip is retained as its always-visible compact readout.
+
+_Mobile — 375 px (`<sm`): rail collapsed into the shipped drawer; banner strip is the readout_
+
+```text
+┌────────────────────────────────────┐
+│ ☰  AyoKoding            ⌕  ☾       │   ← ☰ = "Open navigation menu"
+├────────────────────────────────────┤
+│ ▸ Interview-Ready SWE · 9 of N  ⌄  │   ← tap ⌄ = "Open path course list"
+│ Home / … / Coding Interview        │
+│ Prereqs: DS&A · Advanced Algos     │
+│ # Coding Interview  …body…         │
+│ ← Prev …            Next … →       │
+└────────────────────────────────────┘
+  ⌄ opens the SAME left drawer, path-scoped:
+┌──────────────────────┬─────────────┐
+│ Interview-Ready SWE ✕│  (scrim)    │
+│  8  Data Structures  │             │
+│ ▸9  Coding Interview │             │
+│ 10  Take-Home & Live │             │
+│ 11  System Design    │             │
+│  [ view full path → ]│             │
+└──────────────────────┴─────────────┘
+```
+
+_Tablet — 768 px (`md`): rail present at the panel's 15 % floor (~115 px) — number + truncated title_
+
+```text
+┌── Path rail ─┬───────────────────────────────────────────────────┐
+│ Interview-R… │ Home / Learn / Interview-Ready SWE / Coding Int…   │
+│  8 Data Str… │ Prereqs: DS&A · Advanced Algorithms                │
+│ ▸9 Coding I… │ # Coding Interview … body …                        │
+│ 10 Take-Hom… │ ← Prev: Advanced Algos        Next: Take-Home →    │
+│ 11 System D… │   (both links keep ?path=…)                        │
+│ [full path →]│                                                    │
+└──────────────┴───────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px (`xl`): rail at its resizable default; full titles + phase grouping_
+
+```text
+┌── Path rail ───────────┬─────────────────────────────────────────────────────────┐
+│ Interview-Ready SWE    │ Home / Learn / Interview-Ready SWE / Coding Interview    │
+│ course 9 of N          │ Prerequisites: Data Structures & Algorithms ·            │
+│ ── PHASE 2 · PRACTICE ─│               Advanced Algorithms                        │
+│   8  Data Structures   │                                                         │
+│ ▸ 9  Coding Interview ●│ # Coding Interview                                       │
+│  10  Take-Home & Live  │ …course body (unchanged, canonical, path-neutral)…       │
+│ ── PHASE 3 · DESIGN ───│                                                         │
+│  11  System Design     │ ← Prev: Advanced Algorithms   Next: Take-Home & Live →   │
+│ [ view full path → ]   │   (both links keep ?path=interview-ready/software-engineer)│
+└────────────────────────┴─────────────────────────────────────────────────────────┘
+```
+
+Canonical fallback (no `?path=`, all breakpoints) — the rail slot reverts to the **generic
+content-tree sidebar exactly as it renders today**; nothing about the no-path reader's experience
+changes:
+
+```text
+┌── Sidebar (unchanged) ─┬─────────────────────────────────────────────────────────┐
+│ ▸ Learn                │ Home / Learn / Courses / Coding Interview                │
+│   ▸ Paths              │ Prerequisites: Data Structures & Algorithms ·            │
+│   ▾ Courses            │               Advanced Algorithms                        │
+│   ▸ Legacy             │ # Coding Interview … body …                              │
+│                        │ This course is part of: [ Interview-Ready ] ·            │
+│                        │   [ Immediately-Effective ] · [ Fundamentally Strong ]   │
+└────────────────────────┴─────────────────────────────────────────────────────────┘
 ```
 
 `coding-interview` shows only three badges because the `software-engineer-to-ai-engineer` path
@@ -478,46 +869,331 @@ Canonical fallback (no `?path=`):
 generically renders **one badge per path whose `courseOrder` actually lists the course**, so an
 AI-specific course would instead show a single `[ SWE → AI Engineer ]` badge.
 
-**Low-fi Option B — Left path rail replacing the sidebar**
+#### Screen 3 responsive specification (the selected Option B, breakpoint by breakpoint)
+
+Choosing B **obligates this plan to design the very thing the earlier rationale used to reject it**.
+That specification is below; the accepted cost is recorded in the decision table that follows.
+
+| Breakpoint                      | What the path rail does                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mobile `<md`** (<768)         | The `<aside>` is `hidden` [Repo-grounded — `resizable-sidebar.tsx` L46 `hidden … md:block`], so there is **no rail**. The path's ordered list moves into the **already-shipped left `Sheet` drawer** that renders `SidebarTree` today; the `PathBanner` strip stays as the always-visible readout and gains a disclosure trigger.                                                                                                     |
+| **Tablet `md`–`lg`** (768-1023) | Rail occupies the `<aside>`, which is live from `md` up. `ResizablePanel`'s band is **15 %-35 % of viewport** [Repo-grounded — `MIN_WIDTH_PCT`/`MAX_WIDTH_PCT`], i.e. **~115-269 px** at 768: rows render as `<number> <truncated title>` with the full title in the link's `aria-label`. Phase separators collapse to a thin rule (no phase label). The right TOC rail is `hidden xl:block`, so there is never a three-column crush. |
+| **Desktop `lg+`** (≥1024)       | Rail at the reader's persisted width (**~192-448 px** at 1280): full course titles, phase-group separators with labels, `course k of N` header, and the `view full path →` footer link.                                                                                                                                                                                                                                               |
+
+**Collapse affordance below `md` — the shipped left drawer, not a new pattern.** This is the single
+decisive fact that overturns the old objection: the "mobile sheet" B was rejected for needing **already
+exists and is in production** — `apps/ayokoding-www/src/features/app-shell/shell/mobile-nav.tsx` renders
+`SidebarTree` inside `Sheet` / `SheetContent side="left"` with persisted preset widths, opened from the
+header's `aria-label="Open navigation menu"` button [Repo-grounded — `mobile-nav.tsx`, `header.tsx` L34].
+The path rail therefore reuses that drawer with a **content swap**, exactly as it reuses the desktop
+`<aside>`. Chosen over the two alternatives:
+
+- **Bottom sheet** (a second, different overlay) — rejected: a second sheet idiom in one app, and the
+  existing `Sheet` is already `side="left"`.
+- **In-flow disclosure under the banner** — rejected: it would push the H1 below the fold on a phone
+  when the path has 20+ courses, and it duplicates a list the drawer already shows.
+
+**Trigger** — a `<button>` inside the `PathBanner` strip, accessible name **"Open path course list —
+Interview-Ready SWE, course 9 of N"**, carrying `aria-expanded` + `aria-controls` pointed at the drawer;
+the existing header `☰` continues to open the same drawer (path-scoped when `?path=` is present, generic
+otherwise). **Dismiss** — Radix `Dialog` semantics inherited from `Sheet`: `Esc`, scrim click, the
+drawer's own `✕`, and route change (`onOpenChange(false)` on link click, as `MobileNav` already does).
+**Focus** — also inherited: focus moves into the drawer on open, is trapped while open, and returns to
+the trigger on close; no new focus machinery is written.
+
+**Reconciliation with the shipped `ResizableSidebar` — reuse, not replace, not coexist.** "Replacing the
+sidebar" means replacing its **contents**, not the component. `ResizableSidebar` keeps owning the
+`<aside>` shell, the `md:block` gate, the drag/keyboard resize handle, and the persisted width; only its
+`children` change from `<Sidebar>` (content tree) to `<PathRail>` when a `?path=` is present. Consequences,
+stated explicitly:
+
+- **With `?path=`** — the reader sees the path's ordered courses **instead of** the content tree, at the
+  same width, with the same resize handle and the same `localStorage` width key.
+- **Without `?path=`** — byte-identical to today: `ResizableSidebar` + `Sidebar` + `SidebarTree`. No
+  regression surface for the majority of pages.
+- **Escape hatch** — the rail footer carries `view full path →` (→ the path landing) and
+  `browse all courses →` (→ `/en/c/learn/courses`), so a reader is never trapped inside a path with no
+  route back to the generic tree.
+
+**A11y (the rail is a navigation landmark).** `<nav aria-label="Interview-Ready SWE course list">`
+wrapping a semantic `<ol>` — the visible number **is** the list semantics, matching Screen 2's syllabus.
+The current course carries `aria-current="page"` **and** a text/shape signal, never colour alone (WCAG AA
+1.4.1): a `▸` marker plus `font-semibold` plus the `bg-accent` row fill. Keyboard order is
+header → rail (`<nav>` in DOM order before `<article>`, reachable by the existing skip-link's sibling
+route) → content → prev/next; within the rail, plain `Tab` order follows course order with the canonical
+`focus-visible:ring-2 focus-visible:ring-ring`. The mobile trigger's accessible name is the full string
+above (not "Menu" or an icon alone), and the drawer's `SheetTitle` becomes the path name so the dialog is
+announced with a meaningful label.
+
+**Hi-fi finalists** (desktop renders; the mobile and tablet renders are produced by the delivery steps in
+[Phase 1 · Design assets](./delivery.md) — see the [asset matrix](#hi-fi-asset-matrix-screen--option--viewport)):
+
+![Course in path, Option A at desktop width — a hue-washed top path banner reading On path with course position and a view-full-path link, a path breadcrumb, an inline prerequisites line with linked prerequisites, the unchanged course body, and a manifest-driven prev/next pair that keeps the path query parameter](./assets/course-path-option-a-desktop.png)
+
+![Course in path, Option B at desktop width — a left path rail in the resizable sidebar slot listing the path's ordered courses grouped by phase, the current course marked with a triangle and a filled row, alongside the course body, breadcrumb, prerequisites, and prev/next](./assets/course-path-option-b-desktop.png)
+
+**Selected: Option B — Left path rail replacing the sidebar.**
+
+The earlier draft of this plan selected Option A and rejected B on mobile-first grounds, in these words:
+_"Option B's left rail is desktop-only and would need to collapse into a top sheet on mobile — extra
+complexity, so Option A wins on mobile-first grounds."_ That objection is **not deleted here** — it is
+**answered and its residual cost accepted deliberately**: (a) the mobile sheet is not extra complexity
+because it is already shipped and already renders the same tree component, so the collapse is a content
+swap rather than new overlay machinery; (b) what remains genuinely more expensive than A is the rail
+itself (a net-new `PathRail` component, a conditional `ResizableSidebar` child, and truncation behaviour
+at the 15 % width floor) — that cost is accepted in exchange for continuous path orientation instead of a
+one-line position readout. A later reader should see this as a trade made with eyes open, not as an
+objection that was quietly dropped.
+
+| Design                | Why it won / lost                                                                                                                                                                                                                   |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B — left path rail ✅ | The **whole ordered arc stays visible** while reading, so "where am I / what's next / what did I skip" needs no navigation; reuses the shipped `ResizableSidebar` shell **and** the shipped mobile `Sheet` — no new overlay pattern |
+| A — top banner        | Cheaper and untouched-layout, but a one-line "course 9 of N" readout gives position without context; the reader must leave the page to see the arc. Its banner strip survives inside B as the rail's compact readout                |
+
+**What B inherits from A (recorded explicitly, so the selection is not read as a clean sweep).** B keeps
+A's `PathBanner` strip, path-aware `Breadcrumb`, `PrerequisiteList`, and manifest-driven `PrevNext`
+verbatim. The strip is demoted from "the design" to "the rail's always-visible compact readout", which is
+what makes B viable below `md`. Net component delta versus A: **one** net-new component (`PathRail`) plus
+one conditional prop on `ResizableSidebar`.
+
+### Screen 4 · Legacy-bucket landing and page banner (scope extension)
+
+**Added 2026-07-21 by the whole-section IA revamp.** The `legacy/` bucket introduces one new landing
+(`/en/c/learn/legacy`) and, under [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy)'s recommended
+answer, a per-page **"legacy / superseded"** banner on relocated pages. Both are user-facing, so they
+run the funnel like Screens 0-3 — with one honest difference recorded up front: **the selection is
+pending the Q-D ruling.** The low-fi alternatives below map 1:1 to Q-D's options, and the two hi-fi
+finalists are produced by a `delivery.md` Phase 5A step (matching the pattern Phase 1 uses for
+Screens 0-3), not fabricated here for an undecided design.
+
+**R5 grounding note** — no net-new component is required. The banner is the existing composite
+`Alert` (`Alert` / `AlertTitle` / `AlertDescription` from `@open-sharia-enterprise/web-ui`, the same
+primitive [Screen 2's fast-path callout](#screen-2--path-landing-page) uses); the landing is an
+ordinary content `_index.md` rendered by the existing `/c/[...slug]` route with the existing
+`Breadcrumb` + `MarkdownRenderer` [Repo-grounded — `apps/ayokoding-www/src/app/[locale]/(content)/c/[...slug]/page.tsx`].
+**Zero new components; zero navigation code changes** (DD-44).
+
+**Low-fi Option A — Indexed, with a landing notice + a per-page banner (Recommended; Q-D option A)**
+
+_Mobile — 375 px: domain links single-column; banner above the H1 so it survives the fold_
 
 ```text
-┌── Path rail ──┬────────────────────────────────────────────────┐
-│ Interview-Rdy │ Home / … / Coding Interview                     │
-│ ▸ 9 Coding ●  │ Prereqs: DS&A · Advanced Algorithms             │
-│   10 Take-home│ # Coding Interview … body …                     │
-│               │ ← Prev … Next → (?path kept)                    │
-└───────────────┴──────────────────────────────────────────────────┘
+┌────────────────────────────────────┐
+│ Home / … / Legacy                  │
+│ # Legacy material                  │
+│ ⓘ Older material kept for          │
+│   reference while the course       │
+│   library fills. Where a course    │
+│   exists, it supersedes this.      │
+│   → Browse the course library      │
+│   → Choose a path                  │
+│ • Software Engineering             │
+│ • Artificial Intelligence          │
+│ • Information Security             │
+│ • Personal Development             │
+│ • IT Governance                    │
+│ • Business                         │
+└────────────────────────────────────┘
+┌──── a relocated page (375 px) ─────┐
+│ Home / … / Business / <title>      │
+│ ⓘ Legacy — superseded by           │
+│   [Course Name]                    │  ← link wraps to its own line
+│ # <title>   …body unchanged…       │
+└────────────────────────────────────┘
 ```
 
-**Responsive (mobile ↔ desktop)** — Option A's path banner is a full-width strip on all breakpoints;
-prev/next stack vertically below `sm` and sit left/right at `sm+` (mirrors the existing `PrevNext`
-component [Repo-grounded]). Option B's left rail is desktop-only and would need to collapse into a top
-sheet on mobile — extra complexity, so Option A wins on mobile-first grounds.
+_Tablet — 768 px: two-column domain list (`md:grid-cols-2`); notice on two lines_
 
-**Hi-fi finalists** (rendered from the token-accurate HTML mockups):
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▸ Learn      │ Home / Browse / Learn / Legacy                  │
+│   ▸ Paths    │ # Legacy material                               │
+│   ▸ Courses  │ ⓘ Older material kept for reference while the   │
+│   ▾ Legacy   │   library fills. → library   → paths            │
+│              │ • Software Engineering   • Personal Development │
+│              │ • Artificial Intelligence • IT Governance       │
+│              │ • Information Security   • Business             │
+└──────────────┴────────────────────────────────────────────────┘
+```
 
-![Course in path, Option A — a hue-washed top path banner reading On path with course position and a view-full-path link, a path breadcrumb, an inline prerequisites line with linked prerequisites, the unchanged course body, and a manifest-driven prev/next pair that keeps the path query parameter](./assets/course-path-option-a.png)
+_Desktop — 1280 px_
 
-![Course in path, Option B — a desktop-only left path rail listing the path's ordered courses with the current one highlighted, replacing the generic sidebar, alongside the course body, breadcrumb, prerequisites, and prev/next](./assets/course-path-option-b.png)
+```text
+┌──────────────── /en/c/learn/legacy ─────────────────────────────────────┐
+│ Home / Browse / Learn / Legacy                                           │
+│ # Legacy material                                                        │
+│ ⓘ Older material kept for reference while the course library fills.      │
+│   Where a canonical course exists, it supersedes the page here.          │
+│   → Browse the course library   → Choose a path                          │
+│ • Software Engineering   • Artificial Intelligence  • Information Sec.   │
+│ • Personal Development   • IT Governance            • Business           │
+└──────────────────────────────────────────────────────────────────────────┘
+┌──────────── a relocated page, e.g. …/legacy/business/… ─────────────────┐
+│ Home / Browse / Learn / Legacy / Business / <title>                      │
+│ ⓘ Legacy — superseded by [Course Name] ·  (link omitted when none)       │
+│ # <title>   …body unchanged…                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
-**Selected: Option A — Top path banner + path breadcrumb + prerequisites + bottom prev/next.**
+**Low-fi Option B — Indexed, landing notice only, no per-page banner (Q-D option B)**
 
-| Design             | Why it won / lost                                                                              |
-| ------------------ | ---------------------------------------------------------------------------------------------- |
-| A — top banner ✅  | Minimal change to the existing content layout; reuses `breadcrumb` + `prev-next`; mobile-first |
-| B — left path rail | Rich, but a desktop-only pattern that fights the existing sidebar and needs a mobile sheet     |
+_Mobile — 375 px: a search-landed reader sees no signal at all on the page they arrive at_
+
+```text
+┌────────────────────────────────────┐
+│ # Legacy material                  │
+│ ⓘ Older material kept for          │
+│   reference.                       │
+│ • Software Engineering             │
+│ • Artificial Intelligence  • …     │
+└────────────────────────────────────┘
+┌──── a relocated page (375 px) ─────┐
+│ Home / … / Business / <title>      │
+│ # <title>   …body, no banner…      │  ← no legacy signal
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▾ Legacy     │ # Legacy material                               │
+│              │ ⓘ Older material kept for reference.            │
+│              │ • Software Engineering   • Personal Development │
+│              │ • Artificial Intelligence • …                   │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px_
+
+```text
+┌──────────────── /en/c/learn/legacy ─────────────────────────────────────┐
+│ # Legacy material                                                        │
+│ ⓘ Older material kept for reference.                                     │
+│ • Software Engineering   • Artificial Intelligence  • …                  │
+└──────────────────────────────────────────────────────────────────────────┘
+┌──────────── a relocated page ───────────────────────────────────────────┐
+│ Home / Browse / Learn / Legacy / Business / <title>                      │
+│ # <title>   …body unchanged, no banner…                                 │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**Low-fi Option C — `noindex` the bucket, minimal landing (Q-D option C)**
+
+_Mobile — 375 px_
+
+```text
+┌────────────────────────────────────┐
+│ # Legacy material                  │
+│ (not indexed; reachable from       │
+│  in-site nav only)                 │
+│ • Software Engineering             │
+│ • Artificial Intelligence  • …     │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▾ Legacy     │ # Legacy material  (robots: noindex)            │
+│              │ • Software Engineering   • Personal Development │
+│              │ • Artificial Intelligence • …                   │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
+_Desktop — 1280 px_
+
+```text
+┌──────────────── /en/c/learn/legacy  (robots: noindex) ──────────────────┐
+│ # Legacy material  (not indexed; reachable from in-site nav only)        │
+│ • Software Engineering   • …                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**Responsive (mobile ↔ desktop)** — mobile-first. The landing's six domain links render as a
+**single-column stacked list** below `md` and a **two-column list** at `md+` (≥768 px); they never
+become a card grid, because they are navigational links into an archive, not promoted destinations
+competing with the four path cards. The `Alert` notice is full-width at every breakpoint, wrapping to
+three lines on mobile and one to two on desktop. The per-page banner (Option A) sits **above** the H1
+and **below** the breadcrumb at every breakpoint, so it is never pushed off a phone's first screen;
+its "superseded by" link wraps to its own line below `sm` rather than truncating. The breadcrumb gains
+one segment (`Legacy`) — on mobile the existing `Breadcrumb` already handles overflow, and the
+verification step in Phase 5A explicitly checks for **no multi-line breadcrumb wrap at 375 px**
+(the ergonomics constraint already stated in the [Learner Journey](#learner-journey-end-to-end)).
+
+**Hi-fi finalists** — produced by `delivery.md` Phase 5A as **six** files following the
+[asset matrix](#hi-fi-asset-matrix-screen--option--viewport) scheme —
+`assets/legacy-landing-option-{a,b}-{mobile,tablet,desktop}.png`, rendered at 375 / 768 / 1280 px from
+token-accurate HTML mockups under [`assets/src/`](./assets/src/), exactly as the Screen 0-3 finalists
+are. Option C is not carried to hi-fi: it is Option B's landing with a `robots` metadata change, which
+a mockup cannot show.
+
+**Selection: PENDING the [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy) ruling.** Option A is the
+recommendation carried into Phase 5A. The rationale table records why each option would win or lose,
+so an overturned ruling is a bounded edit rather than a re-run of the funnel:
+
+| Design                                        | Why it would win / lose                                                                                                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A — indexed + landing notice + page banner ⭐ | Preserves ~1,148 pages of search surface **and** warns the reader per page; reuses `Alert`; reversible to C in one metadata change                               |
+| B — indexed, landing notice only              | Cheapest, but a search-landed reader never reaches the landing, so the one place the warning lives is the one place they never see                               |
+| C — `noindex` the bucket                      | Cleanest signal that the material is superseded, but discards the app's largest search surface **before** the 127-course catalog exists (~37 bodies built today) |
+
+**A11y (all options)** — the notice and banner are semantic `Alert` regions with real text, never
+colour alone; "Legacy" is a text breadcrumb segment, not an icon; the "superseded by" link names the
+destination course explicitly rather than reading "here".
+
+### Hi-fi asset matrix (screen × option × viewport)
+
+Every screen's every option carries a wireframe **and** a rendered mockup at **three viewports** —
+mobile-first, not one desktop drawing with a prose footnote about phones.
+
+**Naming scheme** — `assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png`, rendered from a
+token-accurate source at `assets/src/<same-stem>.html`. Screen slugs: `landing-hero` (0), `paths-hub`
+(1), `path-landing` (2), `course-path` (3), `legacy-landing` (4). The eight pre-existing desktop
+renders were renamed into this scheme (`…-option-a.png` → `…-option-a-desktop.png`) so the set is
+uniform; every `![]()` reference was updated with them.
+
+**Render widths** — exactly the three in the shared design legend: **375 px** (mobile, below `sm`),
+**768 px** (tablet, `md`), **1280 px** (desktop, `xl`). Identical across all five screens, and identical
+to the widths the plan's Playwright verification steps resize to.
+
+**Format** — `.png` only, per the
+[UI Mockups convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs):
+`.excalidraw.svg` is ruled out (GitHub blocks the Excalidraw font) and inline HTML+CSS is ruled out
+(GitHub strips styles). The `.html` sources are build inputs, never the embedded artefact.
+
+**Alt text** — each image gets its own descriptive alt text naming **what differs at that width**
+(stacked vs. 2×2, rail present vs. collapsed-into-drawer, truncated vs. full titles). Copying the
+desktop alt text onto the mobile render is a defect, not a shortcut.
+
+| Screen           | Option A stem               | Option B stem               | Viewports produced        | Status                               |
+| ---------------- | --------------------------- | --------------------------- | ------------------------- | ------------------------------------ |
+| 0 Landing hero   | `landing-hero-option-a-*`   | `landing-hero-option-b-*`   | mobile / tablet / desktop | desktop on disk; 2 pending (Phase 1) |
+| 1 Paths hub      | `paths-hub-option-a-*`      | `paths-hub-option-b-*`      | mobile / tablet / desktop | desktop on disk; 2 pending (Phase 1) |
+| 2 Path landing   | `path-landing-option-a-*`   | `path-landing-option-b-*`   | mobile / tablet / desktop | desktop on disk; 2 pending (Phase 1) |
+| 3 Course in path | `course-path-option-a-*`    | `course-path-option-b-*`    | mobile / tablet / desktop | desktop on disk; 2 pending (Phase 1) |
+| 4 Legacy landing | `legacy-landing-option-a-*` | `legacy-landing-option-b-*` | mobile / tablet / desktop | all 6 pending (Phase 5A)             |
+
+**Total: 5 screens × 2 options × 3 viewports = 30 `.png`** — 8 on disk, 16 produced in
+[Phase 1](./delivery.md), 6 in Phase 5A. The delivery checklist enumerates them **one checkbox per
+asset** rather than one coarse "render all mockups" step, because the volume is large enough that a
+single checkbox could be ticked with most of the set missing.
 
 ### Hi-Fi Specifications (Textual, Repo-Grounded)
 
 These **textual hi-fi specifications** are the source of truth the embedded `.png` finalists render —
-they pin the chosen **Option A** of each screen to concrete, existing design-system facts so both the
-mockups and the Group-A/B build have an unambiguous target. Every primitive, token, and class named
+they pin the **selected option of each screen** to concrete, existing design-system facts so both the
+mockups and the Group-A/B build have an unambiguous target. The selections are **not uniformly Option
+A**: Screens 0, 1, and 2 selected Option A; **Screen 3 selected Option B** (left path rail — see
+[Screen 3](#screen-3--course-page-in-path-context)); Screen 4's selection is pending the
+[Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy) ruling. Every primitive, token, and class named
 below is **repo-grounded** in `@open-sharia-enterprise/web-ui` (barrel) /
 `@open-sharia-enterprise/web-ui/primitives` and the AyoKoding token layer (`libs/web-ui-token`,
 `apps/ayokoding-www/src/app/globals.css`), verified against the existing `prev-next`, `breadcrumb`,
 `section-card`, and `hero`/`landing` components — nothing here invents a primitive or token.
 
-#### Shared design legend (all four screens)
+#### Shared design legend (all five screens)
 
 - **Import surface**: `@open-sharia-enterprise/web-ui` (composite `Button`, `Badge`, `Card*`,
   `Alert*`) and `@open-sharia-enterprise/web-ui/primitives` where a primitive is required — **not**
@@ -537,7 +1213,14 @@ below is **repo-grounded** in `@open-sharia-enterprise/web-ui` (barrel) /
 - **Breakpoints**: `sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280 — the only prefixes this app uses. The
   content column stays fluid `flex-1 px-6 py-8 lg:px-8` inside the `max-w-screen-2xl` content shell;
   the right TOC rail (`w-[200px]`, `hidden xl:block`) and resizable sidebar (`hidden md:block`) are
-  untouched.
+  untouched **except** for the Screen 3 `<aside>` content swap (`ResizableSidebar` keeps its shell,
+  gate, handle, and persisted width — only its `children` change).
+- **The three render viewports** (used by every lo-fi wireframe and every hi-fi `.png`, identical across
+  all five screens): **mobile 375 px** (below `sm` 640), **tablet 768 px** (exactly `md`), **desktop
+  1280 px** (exactly `xl`). These are Tailwind's default breakpoints [Web-cited —
+  <https://tailwindcss.com/docs/responsive-design>, accessed 2026-07-21: `sm` 40rem/640px, `md`
+  48rem/768px, `lg` 64rem/1024px, `xl` 80rem/1280px], and 375/768/1280 are already the widths this
+  plan's Playwright verification steps resize to, so mockups and verification agree by construction.
 - **A11y baseline** (mirrors existing components): each new navigation region is a
   `<nav aria-label="…">`; lists are semantic `<ol>`/`<ul>` (this app uses semantic lists, not
   `role="list"`); the canonical focus ring is `focus-visible:ring-2 focus-visible:ring-ring`; the
@@ -621,15 +1304,34 @@ below is **repo-grounded** in `@open-sharia-enterprise/web-ui` (barrel) /
 - **A11y**: `<nav aria-label="{Path} syllabus">` around the phases; each phase an `<ol>` so reading
   order and "course k of N" are programmatically derivable — numbers are list semantics, not decoration.
 
-#### Screen 3 hi-fi — Course page in path context, Option A (banner + breadcrumb + prereqs + prev/next)
+#### Screen 3 hi-fi — Course page in path context, Option B (left path rail + banner readout + prereqs + prev/next)
 
 The **unchanged, path-neutral course body** renders as today (`article className="min-w-0 flex-1 px-6 py-8 lg:px-8"`,
-`h1 text-4xl font-extrabold`, `MarkdownRenderer`) with four affordances layered around it.
+`h1 text-4xl font-extrabold`, `MarkdownRenderer`) with the path rail beside it and four affordances
+layered around it.
 
-- **`PathBanner`** (net-new, above the breadcrumb, only when `?path=` is present): full-width strip
+- **`PathRail`** (net-new — the selected Option B's centrepiece; rendered as `ResizableSidebar`'s
+  `children` instead of `<Sidebar>` when `?path=` is present, and inside `MobileNav`'s `SheetContent`
+  below `md`): `<nav aria-label="{Path} course list">` wrapping a header block (path title
+  `text-sm font-semibold`, `course k of N` `text-xs text-muted-foreground`, a
+  `bg-[var(--hue-<h>-wash)]` tint tying it to the hub card) and a semantic
+  `<ol className="mt-3 space-y-0.5">`. Each row is a `<Link>` carrying `?path=<path-id>`, styled like
+  `sidebar-tree`'s links (`rounded-md px-2 py-1 text-sm hover:bg-accent hover:text-foreground`) with
+  the order number in a fixed-width `<span className="tabular-nums text-muted-foreground">`. Phase
+  groups are `<li>` separators (`mt-3 border-t pt-2 text-xs uppercase tracking-wide text-muted-foreground`)
+  at `lg+`, degrading to a bare `border-t` rule at `md`. **Current row**: `aria-current="page"` plus a
+  `▸` marker plus `font-semibold` plus `bg-accent` — never hue alone. **Footer**: `view full path →`
+  and `browse all courses →` links (`text-xs`), so the generic tree is always one click away.
+  **Truncation**: rows are `truncate` with the full title in the link's `aria-label`, which is what the
+  `~115 px` 15 %-floor width at `md` requires.
+- **`PathBanner`** (net-new, above the breadcrumb, only when `?path=` is present; **retained from
+  Option A as the rail's compact readout** — it is the only path affordance visible below `md` before
+  the drawer is opened): full-width strip
   `<div className="mb-4 flex items-center justify-between rounded-lg bg-[var(--hue-<h>-wash)] px-4 py-2 text-sm">`
   — left `▸ On path: <Path> · course <k> of <N>` (`text-[var(--hue-<h>-ink)] font-medium`), right a
-  "view full path" `<Link>` (`underline-offset-2 hover:underline`) → the path landing.
+  "view full path" `<Link>` (`underline-offset-2 hover:underline`) → the path landing, and — below
+  `md` only (`md:hidden`) — a disclosure `<button aria-expanded aria-controls>` with accessible name
+  `Open path course list — {Path}, course {k} of {N}` that opens the shipped left drawer.
 - **Path-aware `Breadcrumb`**: `Home / Learn / <Path Title> / <Course Title>` (the `<Path Title>` crumb
   links to the landing with `?path=`), via the extended component below.
 - **`PrerequisiteList`** (net-new, shown in **both** path and canonical views):
@@ -640,21 +1342,31 @@ The **unchanged, path-neutral course body** renders as today (`article className
 - **`PrevNext` (path-aware)**: existing component, markup unchanged; `prev`/`next` come from the
   **manifest** (not `weight`) and both hrefs keep `?path=<path-id>`; bottom of article as today
   (`mt-12 border-t pt-6`).
-- **Canonical fallback (no `?path=`)**: no banner; breadcrumb `Home / Learn / Courses / <Course Title>`;
+- **Canonical fallback (no `?path=`)**: no rail (the `<aside>` reverts to `<Sidebar>` / `SidebarTree`,
+  and `MobileNav`'s drawer stays generic — byte-identical to today); no banner; breadcrumb
+  `Home / Learn / Courses / <Course Title>`;
   `PrerequisiteList` still shows; and a **`PathCourseLinks`** (net-new) affordance renders below the
   body: `<div className="mt-8 text-sm"><span className="text-muted-foreground">This course is part of:</span> …</div>`
   with **one `Badge` link per path whose manifest `courseOrder` actually lists this course** (hue per
   path, `variant="outline"`, wrapped in a `<Link>` to that path's landing). A course a path only
   **links** (not includes) shows no badge for it (DD-24) — `coding-interview` shows three badges; an
   AI-specific course shows a single `SWE → AI Engineer` badge.
-- **States**: with-path (banner + path breadcrumb + manifest prev/next); without-path (canonical
-  breadcrumb + `PathCourseLinks` + canonical neighbours or omitted prev/next); no-prereq (list
-  omitted); single-path course (one `PathCourseLinks` badge).
-- **Responsive**: banner full-width at all breakpoints; `PrevNext` stacks `<sm`, left/right `sm+`
-  (unchanged); `PathCourseLinks` badges wrap.
-- **A11y**: banner is a `<nav aria-label="Path position">`; "course k of N" is real text; prerequisite
-  and path-course affordances are semantic inline link lists; hue badges always carry the path name as
-  text.
+- **States**: with-path (rail + banner readout + path breadcrumb + manifest prev/next); without-path
+  (generic sidebar + canonical breadcrumb + `PathCourseLinks` + canonical neighbours or omitted
+  prev/next); no-prereq (list omitted); single-path course (one `PathCourseLinks` badge); rail-in-drawer
+  (below `md`, opened from either the header `☰` or the banner disclosure).
+- **Responsive** (full breakpoint-by-breakpoint contract in
+  [Screen 3 responsive specification](#screen-3-responsive-specification-the-selected-option-b-breakpoint-by-breakpoint)):
+  rail hidden `<md` → drawer; rail truncated at the 15 % floor `md`-`lg`; rail full-width-of-panel with
+  phase labels `lg+`. Banner full-width at all breakpoints (with the `md:hidden` disclosure button);
+  `PrevNext` stacks `<sm`, left/right `sm+` (unchanged); `PathCourseLinks` badges wrap.
+- **A11y**: rail is `<nav aria-label="{Path} course list">` over a semantic `<ol>` with
+  `aria-current="page"` + `▸` + `font-semibold` on the current row (never colour alone, WCAG AA 1.4.1);
+  banner is a `<nav aria-label="Path position">`; "course k of N" is real text; the mobile disclosure
+  button carries the full accessible name and `aria-expanded`/`aria-controls`; the drawer inherits Radix
+  `Dialog` focus trap / restore / `Esc` from the shipped `Sheet`, and its `SheetTitle` becomes the path
+  name; prerequisite and path-course affordances are semantic inline link lists; hue badges always carry
+  the path name as text.
 
 #### Extended existing components (additive props, no fork)
 
@@ -669,6 +1381,17 @@ The **unchanged, path-neutral course body** renders as today (`article className
 - **`contentUrl()`** (`.../content/core/content-url.ts`): add an optional `pathId` that appends
   `?path=<path-id>`, so breadcrumb, prev/next, and prerequisite link builders all produce
   path-preserving URLs from one place.
+- **`ResizableSidebar`** (`.../navigation/shell/resizable-sidebar.tsx`) — **selected Option B's only
+  change to an existing shell**: the `<aside>`, the `hidden … md:block` gate, `ResizablePanel`, the
+  15 %-35 % band, the drag/keyboard handle, and the `ayokoding-sidebar-width` `localStorage` key are all
+  unchanged [Repo-grounded]. Only the `children` passed by `ContentLayout` change — `<PathRail>` when
+  the request carries `?path=`, `<Sidebar>` otherwise. No fork, no second `<aside>`, no second width key.
+- **`MobileNav`** (`.../app-shell/shell/mobile-nav.tsx`): same content swap inside the already-shipped
+  `Sheet` / `SheetContent side="left"` — `<SidebarTree>` is replaced by `<PathRail>` when a path context
+  is active, and `SheetTitle` becomes the path name. The preset-width `fieldset`, the `PRIMARY_NAV_LINKS`
+  menu, the tRPC tree fetch, and `onOpenChange(false)`-on-link-click all stay as they are
+  [Repo-grounded]. The component additionally accepts the banner's disclosure button as a second opener,
+  so `open` state stays single-sourced in `header.tsx`.
 
 ### R7 Prior-Art Findings (window-shopped 2026-07-21)
 
@@ -817,7 +1540,32 @@ Scenario: A course omitted from a path shows no path nav for that path
   Given a course is not listed in a given path's manifest
   When a reader opens that course with that path's context
   Then the course renders the canonical standalone view
-  And the path banner is not shown for that path
+  And neither the path rail nor the path banner is shown for that path
+```
+
+```gherkin
+Scenario: The path rail shows the whole ordered arc beside a course at desktop width
+  Given a reader opens a course in path context on a desktop-width viewport
+  When the page renders
+  Then the left rail lists that path's courses in manifest order with the current course marked
+  And the current course is distinguished by a marker and weight, not by colour alone
+  And the rail offers a link back to the full path and to the whole course library
+```
+
+```gherkin
+Scenario: The path rail collapses into the existing navigation drawer on a phone
+  Given a reader opens a course in path context on a phone-width viewport
+  When they activate the path readout's "open path course list" control
+  Then the existing left navigation drawer opens showing that path's ordered courses
+  And focus moves into the drawer and returns to the control when the drawer is dismissed
+```
+
+```gherkin
+Scenario: A course opened without path context renders the generic sidebar unchanged
+  Given a reader opens a canonical course URL with no path context query parameter
+  When the page renders
+  Then the left sidebar shows the generic content tree exactly as it does elsewhere in the site
+  And no path rail, path readout, or path breadcrumb segment appears
 ```
 
 ```gherkin
@@ -903,7 +1651,7 @@ Scenario: The behavioral course covers the layoff and employment-gap narrative
 ```gherkin
 Scenario: The navigation feature meets accessibility requirements
   Given a reader uses a keyboard and a screen reader on a course in path context
-  When they navigate the path banner, breadcrumb, prerequisite list, and prev/next
+  When they navigate the path rail, banner, breadcrumb, prerequisite list, and prev/next
   Then each is a labelled landmark reachable and operable by keyboard with visible focus
   And the document language attribute matches the active locale
 ```
@@ -914,6 +1662,81 @@ Scenario: The app builds and validates green
   When nx run ayokoding-www:build, the three test tiers, and the link/heading validators run
   Then the build and all tiers succeed
   And link, heading-hierarchy, and markdownlint validation report no errors
+```
+
+### Three-bucket learn-section IA (scope extension, 2026-07-21)
+
+```gherkin
+Scenario: The learn section exposes exactly three structural buckets
+  Given the learn-section IA revamp has landed
+  When the content tree under the en learn section is inspected
+  Then its only structural buckets are paths, courses, and legacy
+  And no former subject domain remains as a direct child of the learn section
+  And the section keeps its own index and overview hub pages
+```
+
+```gherkin
+Scenario: A relocated legacy domain URL redirects to its legacy address
+  Given a page previously lived at a learn-section domain that is not a course or a path
+  When a reader requests that page's old URL
+  Then the app permanently redirects to the same page under the legacy bucket
+  And the rest of the path after the domain segment is preserved unchanged
+```
+
+```gherkin
+Scenario: A deep legacy path keeps its sub-taxonomy verbatim
+  Given a legacy page previously lived several levels below its domain
+  When a reader follows the redirect to its new legacy address
+  Then every path segment below the domain is unchanged
+  And the page body is byte-identical to the body served before the relocation
+```
+
+```gherkin
+Scenario: The legacy redirect never swallows the courses or paths buckets
+  Given the legacy bucket redirect rules are configured
+  When a reader requests a canonical course URL or a path landing URL
+  Then the app serves the page without redirecting it
+  And no redirect rule declares a bucket-wide learn-section wildcard source
+```
+
+```gherkin
+Scenario: A re-homed fundamentally-strong course is not routed into the legacy bucket
+  Given the fundamentally-strong topic directories were collapsed into flat course bodies
+  When a reader requests a legacy fundamentally-strong course URL
+  Then the app redirects to that course's canonical course URL
+  And no legacy-bucket rule matches the fundamentally-strong prefix
+```
+
+```gherkin
+Scenario: The relocation rewrites no page content
+  Given the six non-course learn-section domains have been relocated
+  When the relocation commit's diff is inspected
+  Then every relocated file appears as a pure rename with no content change
+  And the only edited content files are the section overview and the new legacy bucket index
+```
+
+```gherkin
+Scenario: Navigation surfaces follow the relocated tree with no code change
+  Given the six domains now live under the legacy bucket
+  When the sidebar tree, browse index, sitemap, feed, and search data are regenerated
+  Then each lists every relocated page at its new legacy URL
+  And no navigation source file required a hardcoded domain slug to be edited
+```
+
+```gherkin
+Scenario: The legacy bucket landing tells a reader what the bucket is
+  Given a reader opens the legacy bucket landing page
+  When the page renders
+  Then it states that the material is older and kept for reference while the course library fills
+  And it links onward to the course library and to the paths hub
+```
+
+```gherkin
+Scenario: The Indonesian locale is left unchanged and the deferral is recorded
+  Given the learn-section IA revamp is scoped to the English locale
+  When the Indonesian content tree is inspected after the revamp
+  Then its section is unchanged with no bucket directories and no relocation
+  And the plan records the Indonesian deferral explicitly as a non-goal
 ```
 
 ## NEW Course & Capstone Specifications
@@ -1156,6 +1979,13 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
   blast-radius statement per surgery (DD-28).
 - Three-level tests (unit/integration/e2e) + a `specs/` Gherkin companion for the nav feature.
 - Per-path progression-smoothness audits.
+- **The whole-section IA revamp (scope extension, 2026-07-21)**: prefix-relocating the six non-course
+  `en/learn/` domains (1,148 `.md`) into a new `legacy/` bucket so `/{locale}/c/learn/` closes at
+  exactly three structural buckets (DD-40/DD-41); a new per-domain 308 redirect module
+  (`src/redirects/learn-three-bucket.ts`) with its unit test (DD-42); the authored
+  `legacy/_index.md` landing (DD-44); the rewritten hand-authored `en/learn/overview.md` (DD-45/Q-F);
+  regeneration of `en/learn/_index.md` and `generated/search-data.json`; and the Screen 4 design
+  funnel for the legacy landing/banner.
 
 **Out-of-scope features**:
 
@@ -1166,6 +1996,12 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
 - Speculative enumeration of course variants (authored on demand only).
 - Teaching how to **drive** AI coding agents — that stays `agentic-coding`'s existing, unrelated scope
   (DD-21).
+- **Rewriting, merging, re-titling, or re-sequencing any legacy page** (scope extension) — the move is
+  a prefix relocation only (DD-41).
+- **Promoting legacy pages into real `courses/` bodies** — that is later work, tracked per
+  [Q-A](./tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive), not delivered here.
+- **Extending the three-bucket shape to the `id` locale** — deferred and recorded explicitly (DD-45,
+  [Q-B](./tech-docs.md#q-b--does-the-id-locale-get-the-same-three-bucket-shape-now)).
 
 ## Product-Level Risks
 
@@ -1175,6 +2011,19 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
   course-ID slugs.
 - **Deep-link fallback gap**: a course without path context renders poorly. Mitigated by a first-class
   canonical view (with prerequisites surfaced) + Gherkin scenario + e2e test.
+- **Path rail regresses the generic sidebar** (Screen 3 Option B, DD-46): the rail shares the shipped
+  `ResizableSidebar` shell, so a careless implementation could change width persistence, the resize
+  handle, or the `md:block` gate for **every** content page, not just courses in path context.
+  Mitigated by making the change a **`children` swap only** (no fork, no second `<aside>`, no second
+  `localStorage` key), a no-path regression guard test asserting both directions, and a Phase 14
+  no-path sweep at all three breakpoints.
+- **Rail unusable at the tablet width floor**: at 768 px the `ResizablePanel` 15 % floor is ~115 px, so
+  long course titles truncate hard and could make the rail unreadable. Mitigated by the specified
+  truncation contract (number + ellipsised title, full title in `aria-label`, phase labels dropped to
+  bare rules) and by a dedicated 768 px verification step and hi-fi render.
+- **Mobile path context invisible until the drawer is opened**: below `md` the rail is not on screen.
+  Mitigated by retaining the `PathBanner` readout at every breakpoint as the always-visible
+  "course k of N" signal, with the drawer as the on-demand expansion.
 - **URL breakage on re-home**: mitigated by a redirect per re-homed course + redirect specs.
 - **Duplication creep**: a path forks a body for framing. Mitigated by callout-only framing, a distinct
   course variant for genuine pedagogy differences, and a no-forked-body check.
@@ -1191,3 +2040,25 @@ Scenario: The pentest-engine capstone assembles the convergence track into a sco
   or prerequisite chain. Mitigated by DD-28's binding rule: every surgery states its blast radius
   across all four manifests before it is applied, and every affected manifest is re-verified
   prerequisite-consistent afterward.
+- **Blanket-redirect swallow / self-recursion** (scope extension): a single
+  `/en/c/learn/:path*` → `/en/c/learn/legacy/:path*` rule would swallow `courses/` and `paths/` and
+  re-match its own destination. Mitigated by DD-42's explicit per-domain enumeration plus a unit-test
+  assertion that no such blanket source exists — the same guard `content-namespace.ts` already carries
+  in prose.
+- **Redirect-order regression** (scope extension): moving `learnThreeBucketRedirects` in
+  `next.config.ts` would either strand historical renames under their pre-rename names or restore a
+  three-hop chain. Mitigated by DD-42's stated ordering plus e2e coverage of both the bare and `/c`
+  inbound forms and of the `learn-reorg` → bucket chain (URL-mapping row 9).
+- **Feed churn on relocation** (scope extension): every relocated item's RSS `<guid>` changes with its
+  URL, so subscribers may see ~1,148 items re-surface as new. Accepted as a one-time cost of the move
+  and called out in the IA-consequence table; no mitigation exists short of not moving the content.
+- **Missing `legacy/_index.md`** (scope extension): without it, `generate-indexes` produces no child
+  list and `buildTreeForLocale` synthesizes a `weight: 0` "Legacy" node that sorts **first** in the
+  sidebar, ahead of `courses/` and `paths/`. Mitigated by making the authored `_index.md` (with an
+  explicit `weight`) a delivery step and a phase-gate check (DD-44).
+- **Legacy/course duplication confusion** (scope extension): a reader finds both a legacy page and a
+  canonical course on the same subject and cannot tell which is current. Mitigated by
+  [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy)'s recommended per-page "superseded by" banner
+  (prd Screen 4); the residual risk is that the banner is only as good as the superseded-by mapping,
+  which is why [Q-A](./tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive) recommends
+  recording it in the surviving course's `overview.md` rather than in a separate ledger.

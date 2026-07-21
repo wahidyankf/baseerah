@@ -30,6 +30,17 @@ framing + a real navigation UI**, plus the thin layer of NEW courses the intervi
 productivity / harness / security clusters, and (as of 2026-07-20) the AI-engineering cluster need —
 not a rewrite of the existing topics' subject content.
 
+**Scope extension (2026-07-21) — finish the learn section, do not half-convert it.** The plan above
+converts **one** of the seven domains under `en/learn/` and leaves six in place. That would ship a
+learn section whose top level mixes two structural buckets (`paths/`, `courses/`) with six subject
+domains — an IA that is neither the old one nor the new one, and that cannot be explained to a reader
+in a sentence. The extension therefore revamps **everything else** under `/{locale}/c/learn/` so the
+section closes at **exactly three** structural buckets: `paths/`, `courses/`, and a new `legacy/`
+bucket holding everything not yet a course or a path. It is a **prefix relocation, not a rewrite** —
+1,148 `.md` files move with their sub-taxonomy intact and their URLs preserved by 308 redirects
+[Repo-grounded]. See
+[tech-docs §Learn-Section IA](./tech-docs.md#learn-section-ia--the-three-bucket-model-scope-extension-2026-07-21).
+
 ## Why a shared library instead of four curricula
 
 The naive alternative — author four separate curricula — would quadruplicate ~94 topics, quadruple the
@@ -119,6 +130,10 @@ accessibility, and unit/integration/e2e tests plus a `specs/` Gherkin companion.
   their existing competence — they either re-walk SWE fundamentals they already have, or have no
   structured on-ramp into building AI systems at all (added 2026-07-20).
 - Four separate curricula would quadruplicate content and quadruple maintenance.
+- **The learn section would be left half-converted** (scope extension): converting only
+  `fundamentally-strong` leaves `/en/c/learn/` listing two structural buckets beside six subject
+  domains, so a reader arriving at the section cannot tell what kind of thing each child is, and a
+  future author has no rule for where new material belongs.
 
 **Expected benefits** (qualitative reasoning; no fabricated metrics):
 
@@ -128,6 +143,9 @@ accessibility, and unit/integration/e2e tests plus a `specs/` Gherkin companion.
   future tracks (e.g. a security track, a data track) can reuse for the marginal cost of one more
   manifest — proven out by the fourth, AI-engineering track added 2026-07-20 at exactly that marginal
   cost.
+- **One explainable learn section** (scope extension): `/{locale}/c/learn/` offers three
+  understandable choices — follow a path, browse the course library, dig into the older material —
+  instead of a hybrid taxonomy, and every future page has an unambiguous home.
 - The interview-ready path ships real technique modules; the immediately-effective path ships a
   build-app-first productive arc; the fundamentally-strong path ships a rigorous theory-first arc; the
   software-engineer-to-ai-engineer path ships a short, assumes-competence spine into building AI
@@ -188,6 +206,16 @@ navigation UI feature.
 - **Progression smoothness** (observable): each path reads smoothly for its persona — prereq-chaining,
   monotonic-ish difficulty, skip/fast-path affordances, and (for the interview-ready path) refresh
   register — verified by a per-path smoothness audit before archival.
+- **The learn section closes at three buckets** (observable, scope extension):
+  `ls apps/ayokoding-www/content/en/learn` lists exactly `_index.md`, `overview.md`, `courses`,
+  `legacy`, `paths` — the three structural buckets plus the section's two hub files (DD-40/DD-45).
+  Falsifiable in both directions: it lists seven domain directories today.
+- **Zero content rewritten in the relocation** (observable, scope extension): the relocation commit's
+  diff shows every one of the 1,148 relocated files as a pure rename (`git show --stat -M`), with the
+  only edited content files being `en/learn/overview.md` and the new `legacy/_index.md` (DD-41).
+- **No relocated URL 404s** (observable, scope extension): every relocated domain's old URL — in both
+  its bare and `/c` inbound forms — 308s to its `legacy/` address, and `courses/` and `paths/` URLs
+  are provably **not** rewritten; verified by the redirect unit test and e2e (DD-42).
 - **No regressions** (observable): `nx run ayokoding-www:build` renders green; `test:unit` /
   `test:integration` / `test:e2e`, heading-hierarchy, markdownlint, and link validation pass across the
   app and the section; legacy `fundamentally-strong/software-engineer/<slug>` URLs redirect to
@@ -199,7 +227,17 @@ navigation UI feature.
   re-framing + re-ordering; and authoring a course variant only where a path genuinely needs a
   different teaching approach).
 - Adding an Indonesian mirror of the section content — deferred (the nav UI still handles all app
-  locales correctly).
+  locales correctly). **This deferral now explicitly covers the three-bucket IA too** (scope
+  extension, DD-45): `id/belajar/` is left untouched — no `legacy/` bucket, no relocation, no `id`
+  redirect rules — because `id` has zero courses and zero paths, so two of the three buckets would
+  ship empty. Recorded as a decision, not an omission; reversal conditions in
+  [Q-B](./tech-docs.md#q-b--does-the-id-locale-get-the-same-three-bucket-shape-now) and
+  [Q-C](./tech-docs.md#q-c--if-id-is-in-scope-are-the-bucket-segments-translated).
+- **Rewriting, re-titling, merging, or re-sequencing any relocated legacy page** (scope extension) —
+  the move preserves each domain's sub-taxonomy verbatim (DD-41).
+- **Promoting legacy material into real courses** (scope extension) — later work, tracked per
+  [Q-A](./tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive); this plan files no
+  per-page migration backlog.
 - Building path-level progress persistence, accounts, or bookmarking — the path context is
   URL/client-state only for this plan (a future enhancement).
 - Interactive/JS flashcards — drilling stays static markdown, matching the sibling.
@@ -223,3 +261,8 @@ navigation UI feature.
 | Navigation UI regresses existing content nav (non-path readers).                                                                | The canonical (no-path) view is the existing behavior; the UI adds path-awareness without changing default nav — covered by retained navigation specs + tests.                                                                                                                    |
 | Course surgery (added 2026-07-20) ripples unpredictably across the four shared manifests.                                       | Every surgery states its blast radius across all four manifests before it is applied, and every affected manifest is re-verified prerequisite-consistent afterward (DD-28) — no silent cross-path breakage.                                                                       |
 | The per-role convergence amendment (added 2026-07-20) reads as a contradiction of the original "one converging endpoint" claim. | The amendment is documented explicitly, in one place (DD-22), and cross-referenced everywhere the original claim was made, rather than silently overwritten — a reader following any link lands on the current, accurate model.                                                   |
+| Relocating 1,148 pages (scope extension) breaks live URLs at scale.                                                             | Per-domain 308 prefix rules cover every descendant via one `:path*` each (DD-42), asserted by a unit test mirroring `content-namespace.unit.test.ts` and by e2e on both inbound forms; the relocation is a pure `git mv`, so `git revert` restores everything atomically.         |
+| A blanket redirect rule swallows the `courses/` and `paths/` buckets or self-recurses.                                          | A blanket `/en/c/learn/:path*` rule is explicitly FORBIDDEN (DD-42); the six domains are enumerated, and the unit test asserts no blanket source and no `courses`/`paths`/`fundamentally-strong` source prefix exists.                                                            |
+| Search traffic to the six relocated domains (~1,148 pages, ~67% of the `en/learn/` corpus) collapses.                           | 308s preserve link equity, and [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy)'s recommended answer keeps the bucket **indexed**; `noindex` is explicitly rejected as the default because the replacement courses do not exist yet (~37 of 127 bodies built).                  |
+| Legacy material and canonical courses cover the same subject, and a reader studies the superseded one.                          | Q-D's per-page "superseded by" banner plus recording the supersession in the surviving course's `overview.md` ([Q-A](./tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive)); the bucket is a staging pen expected to shrink, not a permanent parallel library.      |
+| The `id` locale silently diverges from `en`'s IA in a bilingual app.                                                            | The deferral is a recorded decision (DD-45) with stated reversal conditions, surfaced in Non-Goals, in the delivery checklist, and in the AFTER content tree — not an unstated omission a later reader would read as a bug.                                                       |
