@@ -103,11 +103,12 @@ subagents capped per the orchestration convention). The main thread self-promote
 
 - **Phases 0 → 1 → 2 are serial.** Phase 1 defines the schema Phase 2's core is written against;
   Phase 2's every RED step imports from what Phase 1 created.
-- **Inside Phase 2, the seven TDD cycles are serial by convention, not by necessity.** Cycles 2
-  (`path-nav`), 3 (`path-context`), 4 (`content-url`) and 5 (`resolvePrerequisites`) touch disjoint
-  files and could pipeline through review under the cap; cycles 6 and 7 depend on cycle 1's
-  normalized course-ref shape. Keep them serial unless the cap has genuine headroom — the phase is
-  one PR either way.
+- **Inside Phase 2, the eight TDD cycles (2.1-2.5, 2.6a, 2.6b, 2.7) are serial by convention, not by
+  necessity.** Cycles 2.2 (`path-nav`), 2.3 (`path-context`), 2.4 (`content-url`) and 2.5
+  (`resolvePrerequisites`) touch disjoint files and could pipeline through review under the cap;
+  2.6a, 2.6b and 2.7 depend on cycle 2.1's normalized course-ref shape, and **2.6b depends on 2.6a**
+  (same function, same result object). Keep them serial unless the cap has genuine headroom — the
+  phase is one PR either way.
 - **Phases 3 → 4 → 5 → 6 → 7 are serial.**
 - **This plan runs in parallel with `ayokoding-learning-path-01-url-restructure`** (the other Wave-1
   plan). Do not serialize them for convenience — the split exists to buy that parallelism.
@@ -117,8 +118,52 @@ subagents capped per the orchestration convention). The main thread self-promote
 Reproduced verbatim in all five split plans. A checklist whose `<FEAT>` placeholders cannot be
 expanded is not executable.
 
-- `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/` (course bundles; served at `/en/learn/courses/<course-id>`)
-- `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` (thin path-landing anchors; served at `/en/learn/paths/<path-id>`)
+> **On-disk slug vs. served URL — the `/c/` namespace.** Every constant below is an **on-disk content
+> path**; the URL it is served at is a different string. `contentUrl` maps every content-tree slug to
+> `/{locale}/c/{slug}`. Repo-grounded:
+> `apps/ayokoding-www/src/features/content/core/content-url.ts` returns a
+> `/{locale}/c/{normalized}` template literal for every content-tree slug; only the two per-locale
+> `LOOSE_PAGE_ALLOWLIST` top-level pages and the empty/`_index` slug escape it, and seven assertions
+> in `content-url.test.ts` pin it.
+> **This plan does not change that namespace** — cycle 2.4 only appends an optional `?path=` query
+> string. See [tech-docs.md §Path constants](./tech-docs.md#path-constants).
+>
+> **`<PLAN>` — this plan's own folder, never hardcoded to a stage.** This plan is authored under
+> `plans/backlog/` and is **promoted to `plans/in-progress/` before Phase 0 runs**, so any command
+> hardcoding the `plans/backlog/` prefix is stale for the whole execution. Every command below that
+> names the plan folder therefore writes `<PLAN>`, which the first Phase 0 step **resolves once** and
+> the executor then expands textually everywhere — exactly as `<COURSES>`, `<PATHS>`, `<FEAT>` and
+> `<SPECS>` are expanded. The expansion is **textual, never a shell variable**: shell state does not
+> survive between tool calls in this harness, and an empty `$PLAN` would silently turn a `git diff`
+> pathspec into one that matches nothing and **passes vacuously** — the exact trap step 7.1 (c)
+> exists to catch. 7.1 (c) catches it only because it counts with `| grep -cF "<PLAN>/syllabus/"`,
+> which reads `0` for a pathspec that matches nothing; counted with `| wc -l` the vacuous case would
+> read as `1` and pass (see the RTK note in the Phase 0 preamble).
+
+- `<PLAN>` = this plan's folder at its current stage — `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag`
+  once promoted, `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag` before then.
+  No trailing slash: write `<PLAN>/syllabus`, `<PLAN>/evidence`, `<PLAN>/learnings.md`. Resolved and
+  recorded by the first Phase 0 step. After the Phase 7 `git mv` the folder sits at
+  `plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag`; Phase 7 names that
+  destination literally rather than through `<PLAN>`, because the move is what changes it.
+- `<PLAN01>` = the **Wave-1 sibling** plan's folder at its current stage —
+  `plans/in-progress/ayokoding-learning-path-01-url-restructure` once promoted,
+  `plans/backlog/ayokoding-learning-path-01-url-restructure` before then. Resolved by the same Phase 0
+  step that resolves `<PLAN>`, and expanded textually the same way. It gets its own constant for the
+  same reason `<PLAN>` does, and more urgently: `ayokoding-learning-path-01-url-restructure` runs
+  **concurrently** with this plan (see [Parallelization model](#parallelization-model)), so it is the
+  folder most likely to be promoted **while this plan executes**. A hardcoded `plans/backlog/` prefix
+  for it is stale the moment that happens.
+- `<BASELINE_SHA>` = the 40-hex commit SHA this execution's `syllabus/` custody checks are measured
+  **against**, resolved once by Phase 0 and expanded textually everywhere — **never** the live
+  `origin/main` ref. The ref moves: the **Per-Phase Integration Protocol** declared above under
+  `## Delivery Mode` merges every phase's PR to `main` before the next phase starts, so from Phase 2 onward `origin/main`
+  already contains step 1.4's edit and a diff against it prints **zero** lines — which the custody
+  checks would read as "1.4 never ran", blocking the Phase 3 gate and, at 7.1 (c), blocking archival
+  permanently. A SHA pinned **before** Phase 1 does not move under those merges, so the same three
+  checks stay falsifiable in both directions at every phase that runs them.
+- `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/` (course bundles; served at `/en/c/learn/courses/<course-id>`)
+- `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` (thin path-landing anchors; served at `/en/c/learn/paths/<path-id>`)
 - `<SE_OLD>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/` (legacy home of the 33 shipped topics + 4 existing capstones, incl. `capstone-solid-core` — the re-home source)
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/`
 - `<MANIFESTS>` = `<FEAT>manifests/` (standalone YAML data files, nested to mirror the **variable-depth**
@@ -127,7 +172,7 @@ expanded is not executable.
   `<MANIFESTS>skills/accounting.yaml` — this plan's schema/resolvers validate only the first segment
   (`careers`/`skills`) and manifest resolvability, never depth — see
   [tech-docs.md §Variable-depth `pathId`](./tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8), R2/R8)
-- `<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension; served at `/en/learn/legacy/<domain>/…`)
+- `<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension; served at `/en/c/learn/legacy/<domain>/…`)
 - `<REDIR>` = `apps/ayokoding-www/src/redirects/`
 - `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`
 - `<NAVSPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/` (existing domain — the three-bucket Gherkin lands beside `content-namespace-redirects.feature`)
@@ -136,8 +181,9 @@ expanded is not executable.
   `careers/immediately-effective/ai-engineer` (fourth path, **corrected 2026-07-21 per R3** — a
   from-scratch path, no longer a transition path; manifest at
   `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml`). The sibling `skills/` category
-  (2 path ids, e.g. `skills/accounting`) exists in the wider programme but is owned end-to-end by a
-  separate, not-yet-created plan — see
+  (2 path ids) is owned end-to-end by two sibling plans —
+  `ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
+  `ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`) — see
   [tech-docs.md §Ownership split](./tech-docs.md#ownership-split-careers-vs-skills--r4).
 
 ## Phase provenance
@@ -149,7 +195,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 | --------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | Phase 0   | Phase 0 (`delivery.md:177-234`), scoped               | Generic steps kept; re-home / component / collision / legacy inventories dropped (they route to other plans) |
 | Phase 1   | Phase 1 partial (`delivery.md:314-327`)               | The three schema step blocks only. `:310-313` → url-restructure; `:244-309` → navigation-ui                  |
-| Phase 2   | Phase 2 (`delivery.md:343-502`) in full               | Split into seven explicit RED/GREEN/REFACTOR cycles                                                          |
+| Phase 2   | Phase 2 (`delivery.md:343-502`) in full               | Split into eight explicit RED/GREEN/REFACTOR cycles (2.1-2.5, 2.6a, 2.6b, 2.7)                               |
 | Phase 3   | Phase 13 (`delivery.md:1973-2026`), scoped            | Manifest / three-bucket / redirect sweeps dropped — not this plan's surface                                  |
 | Phase 4   | Phase 14 (`delivery.md:2029-2105`), scoped + inverted | Feature walk-through replaced by a no-regression sweep; Rule-15 exemption recorded                           |
 | Phase 5   | Phase 15 (`delivery.md:2108-2130`), scoped            | Deploy confirmation dropped — no rendered surface ships                                                      |
@@ -165,7 +211,109 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > **No cross-plan precondition.** This plan is Wave 1 with no plan-level prerequisite. The only
 > start precondition is that `origin/main` is green and the `course-paths` feature does not yet
 > exist.
+>
+> **`grep` here is ugrep, not GNU grep — three traps every `grep` clause in this checklist is written
+> around.** (i) **Literal parens inside a BRE `\|` alternation are a regex parse error, exit 2**: the
+> BRE `"it(\|describe("` is translated to `(?:it(|describe()` and dies with `error: unclosed group`,
+> printing no matches — so the step blocks on a false red rather than on a real defect. Use `-E` and
+> escape the parens, e.g. `grep -nE "\b(it|describe)\("`, which is verified to work. (ii) **`grep -c`
+> exits 1 when the count is 0** — never `&&`-chain it; read its printed output instead (see step 1.4).
+> (iii) **`--glob` is unavailable**; the supported spelling for excluding a folder is `--exclude-dir`
+> with a bare folder name (see step 7.2). (iv) **On a non-existent file ugrep exits 2, not 1** — a
+> missing-file case is never the same observation as a no-match case.
+>
+> **`git` here is routed through RTK, and its `git diff` filter rewrites the output in _two_ ways —
+> one for the empty case and one for the non-empty case.** Measured on this machine (rtk 0.42.3) for
+> `git diff --name-only <ref> -- <path>`: (1) an **empty** real diff is emitted as a single **blank
+> line**, so `wc -l` prints `1` where the honest answer is `0`; (2) a **non-empty** real diff gains a
+> blank line, a literal `--- Changes ---` section header and another blank line appended after the
+> file list, so `| grep -c .` over-counts by exactly **one** and `wc -l` by three. Measured on the
+> one-changed-file state: `wc -l` prints **4**, `grep -c .` prints **2**. On a six-file state: **9**
+> and **7**. So any clause worded "prints nothing" is wrong about what the executor sees, and a
+> **positive** count taken with `grep -c .` is wrong by one. `--stat` output carries **no** trailer
+> (verified on both the empty and the non-empty case).
+>
+> **Two rules bind every `git diff`-derived count in this checklist.** (A) **Never `| wc -l`** — it
+> is inflated in both states, and being a raw line count it also varies with the invocation shape: a
+> bare `git …` is RTK-rewritten while a `git …` embedded in a compound statement is not, and then
+> prints the unfiltered `0` / `1` / `6`. (B) **Count a `--name-only` list by its path prefix, not by
+> its lines** — `| grep -cF "<PLAN>/syllabus/"` prints the true file count (**0** clean, **1** for
+> one file, **6** for six), because the `--- Changes ---` trailer holds no `syllabus/` substring.
+> Verified identical under RTK and under a bypassed RTK, so it also removes the invocation-shape
+> dependency. **Expand `<PLAN>` inside the pattern**, exactly as in the pathspec.
+>
+> **The one deliberate exception to (B)**: a clause asserting the count is **0** keeps `| grep -c .`.
+> There it is falsifiable both ways already (0 clean, non-zero in every dirty state), and unlike a
+> path-prefix pattern it **cannot be made vacuously true** by an unexpanded `<PLAN>` — which for a
+> zero-assertion would be a false green. Positive-count clauses have the opposite risk profile (an
+> unexpanded pattern counts 0 and fails loudly), which is why they take the prefix form. Either way
+> `grep -c` exits 1 on a zero count (trap (ii)) — never `&&`-chain it; read its printed number.
+>
+> None of this applies to `git ls-tree`, verified to return the same 128 under both `wc -l` and
+> `grep -c .`, nor to `find`, which is unfiltered — both keep `wc -l`.
 
+- [ ] [AI] **Resolve the `<PLAN>` path constant — do this first, before any other command in this
+      checklist runs.** Every later command that names this plan's folder is written with `<PLAN>`
+      and must be expanded to the resolved value before it is run. Resolve it with — command (single
+      line):
+      `test -d plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag && echo plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag || echo plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag`
+      — acceptance: it prints exactly one path, **and** `test -d <the printed path>` returns 0.
+      Record the printed value as the `<PLAN>` expansion used for this execution, writing it into
+      `<PLAN>/evidence/phase-0-baseline.txt` once the last step of this phase creates that folder.
+      Falsifiable both ways: if the plan sits in neither stage, the command still prints the
+      `plans/backlog/` fallback but the follow-up `test -d` on that printed path returns
+      non-zero, so the step fails loudly instead of silently proceeding with a path that does not
+      exist. **Never expand `<PLAN>` to a shell variable** — shell state does not survive between
+      tool calls here, and an empty expansion makes a `git diff` pathspec match nothing and pass
+      vacuously.
+- [ ] [AI] **Resolve the `<PLAN01>` path constant — the Wave-1 sibling's folder — in the same way, and
+      for the same reason.** Resolve it with — command (single line):
+      `test -d plans/in-progress/ayokoding-learning-path-01-url-restructure && echo plans/in-progress/ayokoding-learning-path-01-url-restructure || echo plans/backlog/ayokoding-learning-path-01-url-restructure`
+      — acceptance: it prints exactly one path, **and** `test -d <the printed path>` returns 0. Record
+      the printed value as the `<PLAN01>` expansion for this execution, writing it into
+      `<PLAN>/evidence/phase-0-baseline.txt` once the last step of this phase creates that folder.
+      Falsifiable both ways: if the sibling sits in neither stage the command still prints the
+      `plans/backlog/` fallback, but the follow-up `test -d` on that printed path returns non-zero, so
+      the step fails loudly instead of proceeding with a stale path. This matters more than for
+      `<PLAN>`: the sibling runs **concurrently**, so it can be promoted at any point during this
+      execution, and a stale pathspec handed to `git log` prints **no SHA** and **exits 0** (under
+      RTK the executor sees a single blank line, not truly empty output — which is why step 1.1
+      asserts with `grep -qE "^[0-9a-f]{40}$"` rather than an emptiness test) — see step 1.1.
+- [ ] [AI] **Record the `<BASELINE_SHA>` constant — the commit every later `syllabus/` custody check is
+      measured against.** Resolve it here, before any worktree file is modified — command:
+      `git rev-parse origin/main`
+      — acceptance: three checks, all required. (a) The value is a 40-hex SHA:
+      `git rev-parse origin/main | grep -qE "^[0-9a-f]{40}$"` exits 0. (b) That commit already holds the
+      custodied corpus: `git ls-tree -r --name-only <BASELINE_SHA> -- <PLAN>/syllabus | wc -l` returns
+      **128**. (c) That commit already holds the **corrected** corpus — command (single line):
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -c .`
+      returns **0**. Record the printed SHA as the `<BASELINE_SHA>` expansion for this execution and
+      write it into `<PLAN>/evidence/phase-0-baseline.txt` once the last step of this phase creates
+      that folder.
+      Falsifiable both ways: check (a) fails on any non-SHA output; check (b) returns **0** rather
+      than 128 if the SHA predates the plan's promotion or names the wrong stage path; and check (c)
+      returns a **non-zero** count naming every corpus file whose plan-authoring-time correction
+      (the R1/R2 `careers/`-prefix pass, custody rules 1a / 1b.i / 1b.ii, and the R3 rename plus
+      framing correction) has not yet landed in the pinned commit. **Check (c) is what (b) cannot
+      do**: those corrections are all in-place content edits, so the file count is 128 both before
+      and after them and (b) passes either way. If (c) returns non-zero, **re-pin `<BASELINE_SHA>`
+      before Phase 1** — do not proceed; a baseline predating the corrections makes Phase 3's and
+      7.1's custody checks print one line per uncorrected file, which those clauses would otherwise
+      mis-read as a custody violation.
+      **Count check (c) with `| grep -c .`, never `| wc -l`.** This harness routes `git` through
+      RTK, whose `git diff` filter emits a single **blank line** when the real output is empty — so
+      `wc -l` prints `1` for a clean tree (and `4` for a one-file diff, inflated by the
+      `--- Changes ---` trailer), whereas `grep -c .` prints `0` (and exits 1, so never `&&`-chain
+      it) and some non-zero number in every dirty state. **A zero-asserting count keeps `grep -c .`
+      deliberately**: the path-prefix counter that this plan's _positive_-count clauses use
+      (`| grep -cF "<PLAN>/syllabus/"` — see this phase's preamble) would print `0`, and so pass,
+      if `<PLAN>` were left unexpanded in its pattern, which is a false green in exactly the
+      direction check (c) exists to guard. `git ls-tree` output in check (b) is **not** filtered —
+      verified to return the same 128 under both `wc -l` and `grep -c .` — so (b) deliberately
+      keeps `wc -l`.
+      **Pin the SHA; never re-read `origin/main` later** — the ref advances at every phase merge, and
+      a diff against the advanced ref carries no changed file, which the custody checks count as zero
+      and read as "1.4 never ran".
 - [ ] [AI] Enter/provision the worktree and install dependencies in the root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized.
 - [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
@@ -173,45 +321,75 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 - [ ] [AI] Establish baselines: `npx nx run ayokoding-www:build`, `npx nx run ayokoding-www:test:unit`,
       and `npx nx run ayokoding-www:specs:behavior:coverage`
       — acceptance: all three exit 0; record the pass state and the current specs-coverage summary in
-      `evidence/phase-0-baseline.txt`. Any preexisting failure is resolved before Phase 1 starts, not
-      deferred (Root Cause Orientation).
-- [ ] [AI] **Confirm the `course-paths` feature does not exist yet** (the start precondition):
-      `test -d apps/ayokoding-www/src/features/course-paths`
-      — acceptance: returns **non-zero**. Falsifiable both ways: it returns 0 the moment Phase 1
-      creates the directory, so this check only passes before any work has landed. Record the result
-      in `evidence/phase-0-baseline.txt`.
+      `<PLAN>/evidence/phase-0-baseline.txt`. Any preexisting failure is resolved before Phase 1 starts,
+      not deferred (Root Cause Orientation).
+- [ ] [AI] **Confirm the `course-paths` feature does not exist yet** (the start precondition) —
+      command (single line):
+      `find apps/ayokoding-www/src/features/course-paths -type f 2>/dev/null | wc -l`
+      — acceptance: returns **0**. Falsifiable both ways: it returns non-zero the moment cycle 1.2's
+      GREEN step writes `schemas.ts`, so this check only passes before any work has landed. Record
+      the result in `<PLAN>/evidence/phase-0-baseline.txt`.
+      **Assert over files, not the directory inode.** A bare
+      `test -d apps/ayokoding-www/src/features/course-paths` is the wrong shape here: a **stray empty
+      untracked directory** at that path already exists in this repo's primary checkout (verified
+      2026-07-22), and git cannot represent empty directories, so it is invisible to `git status`,
+      survives every checkout and branch operation in that working tree, and is absent from
+      `origin/main`. `test -d` therefore returns **0** there today and produces a false red that
+      blocks this phase on a phantom. The `find` form returns **0** whether the directory is absent
+      **or** present-but-empty, so it agrees with the `origin/main` fact that
+      [README.md](./README.md) and [tech-docs.md](./tech-docs.md) state, in both the root checkout
+      and the worktree, while still flipping the instant a real source file lands.
 - [ ] [AI] **Snapshot the `content-url.ts` baseline** — record the current exported signature and the
       current test names from
       `apps/ayokoding-www/src/features/content/core/content-url.ts` and its `.test.ts` sibling into
-      `evidence/phase-0-baseline.txt` via
+      `<PLAN>/evidence/phase-0-baseline.txt` via
       `grep -n "export" apps/ayokoding-www/src/features/content/core/content-url.ts` and
-      `grep -n "it(\|describe(" apps/ayokoding-www/src/features/content/core/content-url.test.ts`
-      — acceptance: both commands print at least one line and the output is committed. This is the
-      before-picture the Phase 2 cycle-4 change is diffed against.
+      `grep -nE "\b(it|describe)\(" apps/ayokoding-www/src/features/content/core/content-url.test.ts`
+      — acceptance: both commands print at least one line (exit 0) and the output is committed. This is
+      the before-picture the Phase 2 cycle-4 change is diffed against. Falsifiable both ways: run the
+      second command against the **implementation** file rather than its `.test.ts` sibling and it
+      prints nothing and exits 1. **The second command is ERE (`-E`) deliberately** — the BRE form
+      `grep -n "it(\|describe("` is a regex parse error under this repo's ugrep (trap (i) in this
+      phase's preamble), which exits 2 and blocks the step.
 - [ ] [AI] **Confirm the `syllabus/` corpus is intact and untouched** —
-      `find plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus -type f | wc -l`
+      `find <PLAN>/syllabus -type f | wc -l`
       — acceptance: returns **128**. Falsifiable both ways: a deletion or an addition changes the
-      number. Record it in `evidence/phase-0-baseline.txt`.
-- [ ] [AI] **Confirm the `<SPECS>` domain folder does not exist yet** —
-      `test -d specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths`
-      — acceptance: returns **non-zero** (Phase 2 creates it).
+      number. Record it in `<PLAN>/evidence/phase-0-baseline.txt`.
+- [ ] [AI] **Confirm the `<SPECS>` domain folder holds no spec yet** — command (single line):
+      `find specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths -type f 2>/dev/null | wc -l`
+      — acceptance: returns **0** (Phase 2.0 creates the folder and its `.feature` files, which
+      flips it non-zero). Asserted over files rather than `test -d` for the same reason as the
+      `course-paths` feature precondition above: an empty directory satisfies `test -d` while
+      holding nothing.
 - [ ] [AI] Confirm `learnings.md` exists in the plan folder with its H1 —
-      `test -f plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/learnings.md`
+      `test -f <PLAN>/learnings.md`
       — acceptance: returns 0 and the file's first content line is
       `# Learnings: ayokoding-learning-path-02-schema-and-prerequisite-dag`.
-- [ ] [AI] Create the evidence folder: `mkdir -p plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/evidence`
-      — acceptance: `test -d …/evidence` returns 0.
+- [ ] [AI] Create the evidence folder: `mkdir -p <PLAN>/evidence`
+      — acceptance: `test -d <PLAN>/evidence` returns 0.
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
+- [ ] [AI] `<PLAN>`, `<PLAN01>` and `<BASELINE_SHA>` are all resolved and written into
+      `<PLAN>/evidence/phase-0-baseline.txt`; `<BASELINE_SHA>` matches `^[0-9a-f]{40}$` and
+      `git ls-tree -r --name-only <BASELINE_SHA> -- <PLAN>/syllabus | wc -l` returns **128**.
+- [ ] [AI] The pinned baseline already carries the plan-authoring-time corpus corrections —
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -c .` returns **0**
+      (`grep -c .`, never `wc -l` — RTK's `git diff` filter prints one blank line when the real
+      output is empty; a **zero**-asserting count deliberately keeps `grep -c .` rather than the
+      path-prefix counter the positive-count clauses use, per the Phase 0 preamble). Any non-zero
+      count means the baseline must be re-pinned before Phase 1.
 - [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
 - [ ] [AI] `ayokoding-www` `build` + `test:unit` + `specs:behavior:coverage` baselines recorded green
-      in `evidence/phase-0-baseline.txt`; zero unresolved preexisting failures.
-- [ ] [AI] `test -d apps/ayokoding-www/src/features/course-paths` returns non-zero and
-      `test -d specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths` returns non-zero —
-      both surfaces confirmed absent.
+      in `<PLAN>/evidence/phase-0-baseline.txt`; zero unresolved preexisting failures.
+- [ ] [AI] `find apps/ayokoding-www/src/features/course-paths -type f 2>/dev/null | wc -l` returns
+      **0** and
+      `find specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths -type f 2>/dev/null | wc -l`
+      returns **0** — both surfaces confirmed empty-or-absent. **Asserted over files, not `test -d`**:
+      a stray empty untracked directory at either path returns 0 from `test -d` while holding no
+      content, which would be a false red (see the Phase 0 start-precondition step).
 - [ ] [AI] `find …/syllabus -type f | wc -l` returns **128**.
 - [ ] [AI] Draft PR opened; CI triggered; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged.
 
@@ -236,28 +414,46 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `tech-docs.md` under `## The prerequisite frontmatter contract (canonical here)`, naming the
       key `prerequisites`, the YAML-sequence-of-course-ID-strings value, and the six binding rules
       — command:
-      `grep -qF "The prerequisite frontmatter contract (canonical here)" plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md`
+      `grep -qF "The prerequisite frontmatter contract (canonical here)" <PLAN>/tech-docs.md`
       — acceptance: exits 0. Falsifiable both ways: renaming or deleting the heading makes it exit 1.
 - [ ] [AI] **Verify the Wave-1 sibling's copy agrees** — read
-      `plans/backlog/ayokoding-learning-path-01-url-restructure/tech-docs.md` and compare its
+      `<PLAN01>/tech-docs.md` (expand `<PLAN01>` to the value Phase 0 resolved — **never** hardcode
+      `plans/backlog/`; the sibling runs concurrently and may already be promoted) and compare its
       reproduction of the `prerequisites:` frontmatter contract against this plan's canonical
       statement, clause by clause (key name, value type, empty-list rule, ID referent, unordered
-      rule, resolver-miss rule) — acceptance: the two statements agree on all six clauses. **If they
-      diverge, this plan's wins**: correct the sibling plan's copy in this phase's commit and note
-      the correction in `learnings.md`. Falsifiable both ways: introducing a deliberate one-word
-      change in either copy makes the comparison fail.
+      rule, resolver-miss rule)
+      — acceptance: `test -f <PLAN01>/tech-docs.md` returns 0 **and** the two statements agree on all
+      six clauses. **If they diverge, this plan's wins**: correct the sibling plan's copy in this
+      phase's commit and note the correction in `learnings.md`. Falsifiable both ways: introducing a
+      deliberate one-word change in either copy makes the comparison fail, and a `<PLAN01>` expanded
+      to a stage the sibling no longer sits in fails the `test -f` loudly instead of being read as
+      "nothing to compare".
   - _Suggested executor: `plan-fixer` (if a correction to the sibling plan doc is needed)_
-- [ ] [AI] Record in `evidence/phase-1-contract-agreement.txt` the exact six-clause comparison result
-      and the commit SHA of the sibling plan folder at the time of comparison (`git log -1
---format=%H -- plans/backlog/ayokoding-learning-path-01-url-restructure`)
-      — acceptance: file exists and names a SHA. This is the audit trail for failure mode F-6, whose
-      symptom (37 empty prerequisite lists, green build) is otherwise invisible until Wave 2.
+- [ ] [AI] Record in `<PLAN>/evidence/phase-1-contract-agreement.txt` the exact six-clause comparison
+      result and the commit SHA of the sibling plan folder at the time of comparison — command (single
+      line): `git log -1 --format=%H -- <PLAN01>`
+      — acceptance: the file exists and the recorded value is a **non-empty 40-hex SHA**, asserted with
+      `git log -1 --format=%H -- <PLAN01> | grep -qE "^[0-9a-f]{40}$"` exiting 0. **The non-empty
+      assertion is load-bearing**: a `git` pathspec that matches nothing prints **no SHA and exits 0**
+      (verified 2026-07-22: `git log -1 --format=%H -- plans/backlog/does-not-exist-xyz` → no SHA,
+      exit 0; under RTK the visible output is a single blank line rather than a truly empty stream,
+      which is why this asserts the 40-hex shape rather than testing for emptiness — the same
+      `grep -qE` call returns exit 1 in that state),
+      so a bare "file exists and names a SHA" acceptance would pass with an empty SHA line the executor
+      itself wrote. Falsifiable both ways: the `grep -qE` exits 1 on empty or short output, and exits 0
+      only on a real commit id. This is the audit trail for failure mode F-6, whose symptom (37 empty
+      prerequisite lists, green build) is otherwise invisible until Wave 2.
 
 ### 1.2 `PathManifest` zod schema — TDD cycle
 
 > **R2 / R8 scope note.** This schema must be **category-agnostic by construction**: it validates the
-> `pathId`'s first segment (`careers` | `skills`) and the presence of a required `arc` field —
-> **never** a specific segment count. See
+> `pathId`'s first segment (`careers` | `skills`), a **minimum** of one further non-empty segment,
+> and the presence of a required `arc` field. The minimum-arity floor is the **only** permitted depth
+> expression — `>= 2` (equivalently `> 1`), counted **after dropping empty tokens**
+> (`split('/').filter(Boolean)`), which is what makes `"careers/"` fail the same floor as `"careers"`
+> without asserting any particular count; a **fixed** total count in either direction (`=== 2`,
+> `=== 3`, `!== 3`, `<= 3`, `> 3`) is forbidden, and there is no upper bound at all, so a 4-segment
+> `careers/a/b/c` must validate. See
 > [tech-docs §Variable-depth `pathId`](./tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8).
 
 - [ ] [AI] **RED** — write failing unit tests in
@@ -266,41 +462,59 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       (a) **accepts** a manifest carrying `pathId`, `arc`, `title`, `description`, and a `courseOrder`
       mixing bare course-ID strings with `{ id, framing: { intro, outro } }` objects;
       (b) **accepts** a **3-segment careers fixture** (`pathId: "careers/interview-ready/software-engineer"`,
-      `arc: "interview-ready"`) **and** a **2-segment skills fixture**
-      (`pathId: "skills/accounting"`, `arc: "immediately-effective"`) — neither fixture asserts a
-      specific segment count, proving depth is not hardcoded either way;
+      `arc: "interview-ready"`), a **2-segment skills fixture**
+      (`pathId: "skills/accounting"`, `arc: "immediately-effective"`), **and** a **4-segment
+      forward-compatibility fixture** (`pathId: "careers/a/b/c"`, `arc: "interview-ready"`) — no
+      fixture asserts a specific segment count, and the 4-segment case is what actually proves no
+      fixed-arity assumption was written (R2);
       (c) **rejects** a manifest whose `pathId`'s first segment is neither `careers` nor `skills`
       (e.g. `"bogus/foo"`);
-      (d) **rejects** a manifest missing `arc` (present even on the 2-segment skills fixture, per R8 —
+      (d) **rejects** a bare single-segment `pathId` (`"careers"`, and `"careers/"` — the
+      minimum-arity floor: a category with nothing after it names no path);
+      (e) **rejects** a manifest missing `arc` (present even on the 2-segment skills fixture, per R8 —
       the URL grammar omitting the arc segment does not make the field optional);
-      (e) **rejects** a manifest missing `courseOrder`
+      (f) **rejects** a manifest missing `courseOrder`
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the run fails with a module-resolution error naming `./schemas` (the file does
-      not exist yet). Falsifiable both ways: once `schemas.ts` exists and is correct, all five
-      assertions pass; reverting any one of the GREEN checks below makes its corresponding assertion
-      fail again.
+      not exist yet). Falsifiable both ways: once `schemas.ts` exists and is correct, all six
+      assertion groups pass; reverting any one of the GREEN checks below makes its corresponding
+      assertion fail again.
 - [ ] [AI] **GREEN** — implement the `PathManifest` zod schema in
       `apps/ayokoding-www/src/features/course-paths/core/schemas.ts` _(new file)_ using **zod 4.3.6**
       [Repo-grounded — `apps/ayokoding-www/package.json`], per
       [tech-docs §The `PathManifest` zod schema](./tech-docs.md#the-pathmanifest-zod-schema): `pathId`
-      string with a `.refine()` validating only that its first `/`-segment is `careers` or `skills`
-      and that at least one further segment follows (never a fixed total segment count), `arc` string
+      string with a `.refine()` validating exactly two things — that its first `/`-segment is
+      `careers` or `skills`, and that **at least one further non-empty segment follows** (a
+      minimum-arity floor, written as `>= 2` or `> 1`; never a fixed total count and never an upper
+      bound, so a 4-segment id validates). **Count segments only after dropping empty tokens** —
+      `pathId.split('/').filter(Boolean).length >= 2` — because a bare `split('/')` leaves a trailing
+      empty token: `"careers/".split('/')` is `["careers", ""]`, which an unfiltered count would read
+      as two segments and wrongly accept. The filter rejects empty segments, not any particular
+      count, so the floor stays a floor and `"careers"` and `"careers/"` are rejected by the same
+      expression that accepts `"skills/accounting"` and `"careers/a/b/c"` — `arc` string
       (required, not enum-constrained — R8), `title` string, `description` string, `courseOrder`
       array of (course-ID string) or (object with `id` plus optional `framing` carrying optional
       `intro` / `outro`)
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck`
-      — acceptance: both exit 0; all five new `schemas.test.ts` assertions pass and no
+      — acceptance: both exit 0; all six new `schemas.test.ts` assertion groups pass and no
       previously-passing test regresses.
 - [ ] [AI] **REFACTOR** — export the inferred `PathManifest` and `CourseRef` types from `schemas.ts`
       so no downstream module re-declares them, confirm the file imports nothing but `zod`, and
-      confirm no assertion in `schemas.test.ts` names a literal segment count (`grep -n "segments\?\s*===\|\.length\s*===\s*[23]" apps/ayokoding-www/src/features/course-paths/core/schemas.ts apps/ayokoding-www/src/features/course-paths/core/schemas.test.ts`
-      returns no output)
+      confirm neither `schemas.ts` nor `schemas.test.ts` asserts a **fixed** segment count. The
+      fixed-depth guard (broadened 2026-07-21 — the old `=== 2|3`-only pattern could not catch
+      `<= 3`, `> 3` or `!== 3`, i.e. the very constructs R2 forbids):
+      `grep -nE "length[[:space:]]*(===|!==|==|!=|>=|<=|>|<)[[:space:]]*(3|4)|length[[:space:]]*(===|!==|==|!=)[[:space:]]*2" apps/ayokoding-www/src/features/course-paths/core/schemas.ts apps/ayokoding-www/src/features/course-paths/core/schemas.test.ts`
+      — acceptance: it prints **no output** and exits 1. By construction it permits the one legal
+      depth expression (`length >= 2`, `length > 1`) while flagging every comparison against 3 or 4
+      and every equality/inequality against 2. **The guard is a backstop, not the proof** — the
+      substantive proof that no fixed arity was assumed is the 4-segment `careers/a/b/c` fixture from
+      the RED step, which fails outright if the schema bounds depth above.
       — command:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint && grep -n "^import" apps/ayokoding-www/src/features/course-paths/core/schemas.ts`
-      — acceptance: the first two exit 0, the `grep` prints exactly one line importing from `zod`, and
-      the depth-literal `grep` above returns no output. Falsifiable both ways: adding a second import
-      makes the import `grep` print two lines; adding a hardcoded `=== 3` (or `=== 2`) depth check
-      makes the depth-literal `grep` print a line.
+      — acceptance: the first two exit 0 and the import `grep` prints exactly one line importing from
+      `zod`. Falsifiable both ways: adding a second import makes the import `grep` print two lines;
+      adding a hardcoded `=== 3`, `<= 3` or `> 3` depth check makes the depth guard print a line
+      **and** breaks the 4-segment fixture.
 
 ### 1.3 `<MANIFESTS>` directory and its README
 
@@ -335,11 +549,11 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > manifest's `courseOrder` composition changed (2026-07-21 clarification to R3).
 
 - [ ] [AI] **Confirm the rename and framing correction already hold** —
-      `test -f plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
+      `test -f <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
       returns 0 AND
-      `test -f plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md`
+      `test -f <PLAN>/syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md`
       returns non-zero AND
-      `grep -qF "from-scratch" plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
+      `grep -qF "from-scratch" <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
       — acceptance: all three hold. Falsifiable both ways: reverting the rename or the framing
       correction flips the corresponding check.
 - [ ] [AI] **Order Stage 0.** In
@@ -351,7 +565,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `data-structures-and-algorithms-essentials`, `software-product-engineering`,
       `frontend-essentials`) with a numbered, prerequisite-consistent order. For each of the 11, read
       its declared prerequisites from `syllabus/courses/<course-id>.md`
-      (`grep -A3 "^## Prerequisites" plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/<course-id>.md`
+      (`grep -A3 "^## Prerequisites" <PLAN>/syllabus/courses/<course-id>.md`
       for each course-id); where a prerequisite is **also** one of the 11, it must appear earlier in
       the finalized order. A prerequisite **outside** the 11 stays out of scope for this correction —
       the manifest's own callout documents that decision; do not add courses beyond the 11 to chase
@@ -361,15 +575,42 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       strictly lower than the course's. Falsifiable both ways: swapping any two entries whose
       prerequisite relationship is satisfied only in the corrected order re-breaks the property the
       unordered list could not yet claim.
-- [ ] [AI] Remove the "not yet ordered" / "PENDING" language from Stage 0 once it is genuinely
-      ordered —
-      `grep -c "not yet ordered\|PENDING" plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
-      — acceptance: returns **0**. Falsifiable both ways: the marker is present before this step and
-      absent after — but its absence alone does not certify correctness, which is why the previous
-      step's per-pair check is the substantive acceptance and this one only certifies that the
-      pending-work marker was not simply deleted without ordering.
+- [ ] [AI] **Remove every pending marker in the file**, not just the Stage 0 heading token, once
+      Stage 0 is genuinely ordered. As of 2026-07-21 the file carries **nine** such lines and they
+      are spread across the whole document, in mixed case: the top-of-file pending callout (line 13),
+      the two intra-file anchor links that spell `pending` inside the Stage 0 slug (lines 55, 80),
+      the "candidate for inclusion … pending" note (line 75), the
+      "**Prerequisite-consistent** ordering for the newly-included set is pending" statement
+      (line 79), the Stage 0 heading's `PENDING detailed ordering` token (line 87), the
+      `> **Not yet ordered.**` blockquote and its "pending-work callout" sentence (lines 89-90), and
+      the closing composition note (line 152). **Editing only the heading leaves six other places
+      still saying Stage 0 is unordered.**
+      — command (single line):
+      `grep -ci "not yet ordered\|pending" <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
+      — acceptance: it prints **`0`**. Falsifiable both ways: it prints `9` today, before this step.
+      **Two traps this clause is written around** — (a) the pattern is `-i`, because the old
+      case-sensitive `"not yet ordered\|PENDING"` form matched only **1** of the 9 (the heading
+      token) and let an executor "satisfy" the step by editing one line; (b) `grep -c` exits **1**
+      when the count is 0, so **do not chain this command with `&&`** — read its printed output.
+      Marker absence alone does not certify correctness, which is why the previous step's per-pair
+      check is the substantive acceptance and this one only certifies the pending-work markers were
+      not deleted without the ordering being done.
+- [ ] [AI] **Repoint the two intra-file anchors the retitle breaks — in the same edit.** Lines 55 and
+      80 both link to `#stage-0--software-engineering-foundation-from-scratch-entry--pending-detailed-ordering-r3`,
+      the github-slugger slug of the Stage 0 heading **as it reads today**. Removing `PENDING` from
+      that heading changes the slug and breaks both links, and `md links validate` **does** validate
+      anchor fragments (category `broken-anchor`) and is not excluded for `plans/backlog` — so the
+      very next Phase 3 or Phase 7 run of the pre-push form would fail. After retitling the heading
+      to `## Stage 0 · Software-engineering foundation (from-scratch entry, R3)`, rewrite both link
+      targets to the new slug `#stage-0--software-engineering-foundation-from-scratch-entry-r3`
+      **[Repo-grounded — computed with the repo-local `node_modules/github-slugger`, not hand-typed]**;
+      if the retitle wording differs, recompute the slug with that same tool rather than guessing
+      — command (single line):
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
+      — acceptance: prints `All links valid! No broken links found.` Falsifiable both ways:
+      retitling without repointing makes it report two `broken-anchor` findings in this file.
 - [ ] [AI] Re-confirm the `syllabus/` file **count** is unaffected by this in-place content edit —
-      `find plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus -type f | wc -l`
+      `find <PLAN>/syllabus -type f | wc -l`
       — acceptance: returns **128** (unchanged — an edit to an existing file's content, not an
       addition or removal).
 
@@ -398,11 +639,13 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `find …/manifests -name '*.yaml' | wc -l` returns **0**.
 - [ ] [AI] The six-clause contract-agreement comparison against
       `ayokoding-learning-path-01-url-restructure` is recorded in
-      `evidence/phase-1-contract-agreement.txt` with a SHA, and any divergence was corrected in
-      favour of this plan.
-- [ ] [AI] The Stage 0 ordering (1.4) is complete: no "not yet ordered" / "PENDING" marker remains in
-      `syllabus/paths/manifest-immediately-effective-ai-engineer.md`, and the per-pair prerequisite
-      check from 1.4's second step is recorded.
+      `<PLAN>/evidence/phase-1-contract-agreement.txt` with a non-empty 40-hex SHA, and any divergence
+      was corrected in favour of this plan.
+- [ ] [AI] The Stage 0 ordering (1.4) is complete:
+      `grep -ci "not yet ordered\|pending" <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
+      prints **`0`** (it prints `9` before 1.4 runs; note `grep -c` exits 1 on a zero count, so do
+      not chain it with `&&`), the two intra-file Stage 0 anchors were repointed to the retitled
+      heading's slug, and the per-pair prerequisite check from 1.4's second step is recorded.
 - [ ] [AI] `find …/syllabus -type f | wc -l` still returns **128** — unchanged from the Phase 0
       baseline. This phase's only `syllabus/` touch is 1.4's **one recorded exception** (an in-place
       content edit to the already-renamed AI-engineer manifest mirror, ordering Stage 0); the file
@@ -422,10 +665,26 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > _Suggested executor: `swe-typescript-dev` (core logic) + `specs-maker` (Gherkin)._
 >
 > Source: `delivery.md:343-502` of `shared-course-library-and-learning-paths`, expanded from four
-> combined RED steps into **seven explicit RED/GREEN/REFACTOR cycles** plus a closing purity refactor.
+> combined RED steps into **eight explicit RED/GREEN/REFACTOR cycles** (2.1-2.5, 2.6a, 2.6b, 2.7 —
+> one bound Gherkin scenario each) plus a closing purity refactor.
 > This is the most code-heavy phase in the whole five-way split.
 
 ### 2.0 Specs RED — the `course-paths` Gherkin companion
+
+> **Coverage semantics — one rule, applied at every gate in this plan.** The step bindings that make
+> these scenarios executable belong to `ayokoding-learning-path-03-navigation-ui`, so they do not
+> exist while this plan runs. The deferral is expressed with the behavior-coverage validator's own
+> exemption tag, **`@wip`**, which makes a scenario **fully exempt** from coverage. Repo-grounded:
+> `apps/rhino-cli/src/application/behavior_coverage/validator.rs` documents and implements "`@wip`
+> scenarios are fully exempt", and `extract.rs` parses the tag. Consequence:
+> `npx nx run ayokoding-www:specs:behavior:coverage` **exits 0 at every gate in this plan**, before
+> and after the new domain lands — there is no "expected red" anywhere in this checklist.
+>
+> This is not cosmetic. `test:quick` runs `test:specs`, which runs `specs:behavior:coverage`
+> [Repo-grounded — `apps/ayokoding-www/project.json`], and `test:quick` runs in the **pre-push
+> hook** — so an untagged (or level-tagged-but-unbound) `course-paths` scenario would block **every**
+> push from Phase 2 onward, up to and including the archival push. An untagged scenario is also a
+> hard `UntaggedScenario` violation in its own right, so "just leave the tags off" is not an option.
 
 - [ ] [AI] Author the `course-paths` Gherkin companion under
       `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/` _(new directory)_ — one
@@ -434,21 +693,41 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       prerequisite-consistent ordering) plus a `README.md`, sourced from
       [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin) and from the
       downstream-owned scenarios listed in
-      [prd.md §Scenarios owned by downstream plans](./prd.md#scenarios-owned-by-downstream-plans-that-this-plans-resolvers-underpin)
+      [prd.md §Scenarios owned by downstream plans](./prd.md#scenarios-owned-by-downstream-plans-that-this-plans-resolvers-underpin).
+      **Tag every scenario `@wip`** and give it no level tag, since no `@covers` marker can exist yet
       — command: `npx nx run ayokoding-www:specs:behavior:coverage`
-      — acceptance: the command **fails**, reporting the new `course-paths` domain as uncovered (no
-      step bindings exist yet). Falsifiable both ways: it exits 0 today, before the folder exists.
+      — acceptance: **exits 0**, with zero findings against any file under `<SPECS>`. Falsifiable
+      both ways: dropping the `@wip` tag from a single scenario makes the same command report an
+      `UntaggedScenario` (or `MissingCoverage`) violation naming that file and exit non-zero.
   - _Suggested executor: `specs-maker`_
-- [ ] [AI] Record the resulting coverage delta and name its closing plan explicitly in
-      `evidence/phase-2-specs-coverage-delta.txt`: _"the `course-paths` step bindings are authored by
-      `ayokoding-learning-path-03-navigation-ui`; this delta closes there, not here"_
-      — acceptance: file exists and names that plan by full folder name.
+- [ ] [AI] Confirm the exemption is actually in force, not merely intended — run these two commands
+      and compare their per-file output:
+      `grep -c "^ *Scenario:" specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/*.feature`
+      then
+      `grep -c "^ *@wip" specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/*.feature`
+      — acceptance: for **every** listed file the two counts are **equal and non-zero** (exactly one
+      `@wip` tag line per scenario). Falsifiable both ways: omitting one tag makes that file's two
+      counts differ by one.
+- [ ] [AI] Record the deferred obligation and name its closing plan explicitly in
+      `<PLAN>/evidence/phase-2-specs-coverage-delta.txt`: _"every `course-paths` scenario ships `@wip`
+      (validator-sanctioned step-binding deferral), so `specs:behavior:coverage` is green throughout
+      this plan. `ayokoding-learning-path-03-navigation-ui` authors the step bindings, removes the
+      `@wip` tags, adds the real level tags and the matching `@covers` markers. The obligation closes
+      there, not here."_
+      — acceptance: file exists, names that plan by full folder name, and names `@wip` as the
+      mechanism.
 - [ ] [AI] Verify every scenario in the new `.feature` files satisfies the step-keyword cardinality
       rule (exactly one primary `Given`, one `When`, one `Then`; extras chained with `And` / `But`)
       — command:
-      `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance gherkin-keyword-cardinality`
-      — acceptance: exits 0 with no finding against any file under `<SPECS>`. Falsifiable both ways:
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs gherkin-cardinality validate`
+      — acceptance: prints
+      `GHERKIN KEYWORD CARDINALITY AUDIT PASSED: every scenario uses each primary keyword at most once`
+      and exits 0, with no finding against any file under `<SPECS>`. Falsifiable both ways:
       a deliberate second primary `When` in any scenario makes it report that file.
+      **The audit lives under the `specs` subcommand, not `repo-governance`** — it was moved there
+      during the rhino-cli Rust port. `rhino-cli repo-governance gherkin-keyword-cardinality` exits
+      non-zero with `error: unrecognized subcommand`, and the bare `specs gherkin-cardinality` form
+      errors with "requires a subcommand"; only the three-word form above runs.
 
 ### 2.1 TDD cycle 1 — course-ref normalization (`manifest.ts`)
 
@@ -550,7 +829,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 
   ```gherkin
   Scenario: A course deep-linked without path context renders the canonical view
-    Given a reader opens a course URL /en/learn/courses/<course-id> with no path context query parameter
+    Given a reader opens a course URL /en/c/learn/courses/<course-id> with no path context query parameter
     When the course page renders
     Then the course body renders in full with the content-tree breadcrumb and its prerequisite list
     And a "this course is part of" affordance lists every path that includes the course
@@ -584,17 +863,30 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 
 > This is the **only** cycle in this plan that modifies shipped code. It is what makes the Phase 4
 > no-regression sweep necessary.
+>
+> **Read `content-url.ts` before writing a line of this cycle.** `contentUrl` returns a
+> `/{locale}/c/{normalized}` template literal for **every** content-tree slug — only the two per-locale
+> `LOOSE_PAGE_ALLOWLIST` entries and the empty/`_index` slug are exempt — so the canonical course URL
+> is `/en/c/learn/courses/<course-id>`, **not** `/en/learn/courses/<course-id>`. Seven existing
+> assertions in `content-url.test.ts` pin this [Repo-grounded, re-verified 2026-07-21]. This cycle is
+> **additive only**: it appends a query string and touches no URL segment. Removing or relocating the
+> `/c/` segment would be a breaking URL migration with its own redirect coverage, and is **not**
+> this plan's scope in any form.
 
 - [ ] [AI] **RED** — extend
       `apps/ayokoding-www/src/features/content/core/content-url.test.ts` _(existing test file,
-      Repo-grounded)_ with failing assertions that `contentUrl("en", "learn/courses/x", "careers/interview-ready/software-engineer")`
-      appends `?path=careers/interview-ready/software-engineer`, and that
-      `contentUrl("en", "learn/courses/x")` (no third argument) still returns
-      `/en/learn/courses/x` unchanged
+      Repo-grounded)_ with (a) a **failing** assertion that
+      `contentUrl("en", "learn/courses/x", "careers/interview-ready/software-engineer")` returns
+      `/en/c/learn/courses/x?path=careers/interview-ready/software-engineer`, and (b) a
+      **characterization** assertion that `contentUrl("en", "learn/courses/x")` (no third argument)
+      returns `/en/c/learn/courses/x` — which is today's shipped behaviour, restated so the cycle
+      pins it explicitly
       — command: `npx nx run ayokoding-www:test:unit`
-      — acceptance: the new `?path=` assertion **fails** (the parameter is not supported) while the
-      no-argument assertion **passes** (existing behaviour). Falsifiable both ways: after GREEN both
-      pass, and reverting GREEN makes only the first fail again.
+      — acceptance: assertion (a) **fails** with a signature/arity or wrong-value error (the third
+      parameter is not supported yet) while assertion (b) **passes** unchanged. Falsifiable both
+      ways: after GREEN both pass; reverting GREEN makes only (a) fail again; and if (b) fails at any
+      point, the `/c/` namespace has been broken and the cycle must stop rather than "fix" the
+      expectation.
 
   **Gherkin (underpins) →** "A path landing page lists its courses in manifest order"; "The
   breadcrumb reflects the active path"; "A legacy fundamentally-strong URL redirects to the canonical
@@ -604,7 +896,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
   ```gherkin
   Scenario: A path landing page lists its courses in manifest order
     Given the careers/interview-ready/software-engineer path manifest is published
-    When a reader opens the path landing page at /en/learn/paths/careers/interview-ready/software-engineer
+    When a reader opens the path landing page at /en/c/learn/paths/careers/interview-ready/software-engineer
     Then the courses appear in the manifest's courseOrder
     And every course link carries the path context query parameter
 
@@ -612,23 +904,28 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     Given a reader is on a course with an active path context
     When the breadcrumb renders
     Then it shows Home, Learn, the path title, and the course title
-    And the path crumb links to the path landing page /en/learn/paths/<path-id> with the path context preserved
+    And the path crumb links to the path landing page /en/c/learn/paths/<path-id> with the path context preserved
 
   Scenario: A legacy fundamentally-strong URL redirects to the canonical course URL
     Given a re-homed course previously lived under the legacy fundamentally-strong/software-engineer content path
     When a reader requests the legacy URL
-    Then the app redirects to the course's canonical /en/learn/courses/<course-id> URL
+    Then the app redirects to the course's canonical /en/c/learn/courses/<course-id> URL
     And the redirect preserves any path context query parameter
   ```
 
 - [ ] [AI] **GREEN** — extend `contentUrl` in
       `apps/ayokoding-www/src/features/content/core/content-url.ts` _(existing file, Repo-grounded)_
-      with an **optional** third `pathId` parameter appending `?path=<path-id>`, preserving the
-      canonical `/en/learn/courses/<course-id>` shape when it is omitted
+      with an **optional** third `pathId` parameter that appends `?path=<path-id>` to the string the
+      function already returns. **Every existing return path is left byte-identical** — the
+      locale-home case (`/{locale}`), the loose-page case (`/{locale}/{slug}`), and the content-tree
+      case (`/{locale}/c/{slug}`) are untouched; the only new code is the query-string suffix
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck`
-      — acceptance: both exit 0; the new assertion passes and **every** pre-existing `content-url`
-      assertion recorded in `evidence/phase-0-baseline.txt` still passes (or is updated for the
-      canonical shape in this same commit, with the update named explicitly in the commit body).
+      — acceptance: both exit 0; the new `?path=` assertion passes and **every** pre-existing
+      `content-url` assertion recorded in `<PLAN>/evidence/phase-0-baseline.txt` still passes
+      **unchanged**.
+      No pre-existing assertion may be edited by this cycle — needing to edit one means the URL shape
+      moved, which is out of scope. Falsifiable both ways: dropping or relocating the `/c/` segment
+      makes the seven pre-existing `contentUrl` assertions fail.
 - [ ] [AI] **REFACTOR** — ensure the parameter is genuinely optional at the type level (no call site
       elsewhere in the app needs updating) and that the query string is built once, not concatenated
       ad hoc
@@ -676,64 +973,99 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > completeness. See
 > [tech-docs.md §Link-don't-walk](./tech-docs.md#link-dont-walk-prerequisite-omission-is-permitted-oi-4-ruling-2026-07-21)
 > for the full ruling and reasoning.
+>
+> **This cycle is split into 2.6a and 2.6b — one bound Gherkin scenario each.**
+> `checkPrerequisiteConsistency` is a behaviour-implementing function, so the one-scenario-per-cycle
+> rule applies: 2.6a builds the **ordering** half and binds the topological scenario; 2.6b builds the
+> **link-don't-walk** half and binds the OI-4 scenario. They land in the same file
+> (`prerequisites.ts`) and the same test file, and 2.6b's RED must run **after** 2.6a's REFACTOR is
+> green.
+
+#### 2.6a — ordering violations (binds the topological scenario)
 
 - [ ] [AI] **RED** — write failing unit tests in
       `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts` _(existing test file
       from cycle 2.5)_ for
       `checkPrerequisiteConsistency(manifest, prerequisitesByCourse, libraryCourseIds)`: a **clean**
       fixture manifest whose `courseOrder` places every in-manifest prerequisite before its dependent
-      reports **zero** violations; a **deliberately-violating** fixture that places
+      reports **zero** `violations`; a **deliberately-violating** fixture that places
       `advanced-algorithms` before its declared prerequisite
-      `data-structures-and-algorithms-essentials` reports **exactly one** violation naming that
-      course; a prerequisite that is declared but **omitted from the manifest** is **not** reported as
-      a violation (OI-4 — link-don't-walk is permitted); and that same omitted-prerequisite fixture's
-      `linkedPrerequisites` output contains **exactly one** entry naming the omitted course and its
-      dependent
+      `data-structures-and-algorithms-essentials` reports **exactly one** `violations` entry naming
+      that course
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the run fails because `checkPrerequisiteConsistency` is undefined. Falsifiable
       both ways: the clean and violating fixtures must produce **different** `violations` results
       after GREEN, so an implementation that always returns zero violations fails the second
-      assertion; the omitted-prerequisite fixture's `linkedPrerequisites` must be non-empty after
-      GREEN, so an implementation that never populates it fails the fourth assertion.
+      assertion.
 
   **Gherkin (binds) →** "A path manifest is a valid topological entry into the prerequisite DAG"
 
   ```gherkin
   Scenario: A path manifest is a valid topological entry into the prerequisite DAG
     Given a path manifest lists a courseOrder of course IDs
-    When the manifest-integrity check runs
+    When the prerequisite-consistency check runs
     Then no course appears before any of its declared prerequisites that are also in the manifest
-    And every listed course ID resolves to an existing course in the library
+    And the check reports zero ordering violations for that manifest
   ```
 
-  **New scenario (OI-4 ruling)** — see the matching addition in
+  > The `When` names **`checkPrerequisiteConsistency`**, not the manifest-integrity check — the two
+  > functions have disjoint outputs and cycle 2.7 binds the other one. The resolvability clause that
+  > used to trail this scenario lives in cycle 2.7's scenario, where it is actually implemented and
+  > tested; see [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin).
+
+- [ ] [AI] **GREEN** — implement the ordering half of `checkPrerequisiteConsistency` in
+      `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts` _(existing file from cycle
+      2.5)_: for each course in `courseOrder`, report every declared prerequisite that is present in
+      `libraryCourseIds` **and** in the manifest but appears at a later index as a `violations` entry
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: exits 0; the clean fixture reports zero `violations` and the violating fixture
+      reports exactly one `violations` entry naming `advanced-algorithms`.
+- [ ] [AI] **REFACTOR** — return each violation as a structured record
+      `{ courseId, missingPrerequisiteId, courseIndex, prerequisiteIndex }` rather than a bare string,
+      so a downstream gate can render a precise message
+      — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck`
+      — acceptance: both exit 0 and the violating fixture's single `violations` record carries all
+      four fields.
+
+#### 2.6b — link-don't-walk `linkedPrerequisites` (binds the OI-4 scenario)
+
+- [ ] [AI] **RED** — add failing unit tests to the same
+      `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts` for the **second**
+      output of `checkPrerequisiteConsistency`: a fixture whose manifest includes a course while
+      **omitting** its declared, in-library prerequisite reports **zero** `violations` (OI-4 —
+      link-don't-walk is permitted, so this is never an ordering failure) **and** carries **exactly
+      one** `linkedPrerequisites` entry naming the omitted course and its dependent; the clean
+      fixture from 2.6a carries an **empty** `linkedPrerequisites`
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: the run fails because `linkedPrerequisites` is undefined on the result.
+      Falsifiable both ways: an implementation that never populates the list fails the
+      exactly-one assertion, and one that reports the omission as a violation fails the
+      zero-`violations` assertion.
+
+  **Gherkin (binds) →** "A path may link a prerequisite it does not include, without failing
+  integrity" — see the matching scenario in
   [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin):
 
   ```gherkin
   Scenario: A path may link a prerequisite it does not include, without failing integrity
     Given a path manifest includes a course whose declared prerequisite is absent from that manifest
-    When the manifest-integrity check runs
+    When the prerequisite-consistency check runs
     Then the absent prerequisite is not reported as a violation
     And the absent prerequisite appears in the check's informational linkedPrerequisites list
   ```
 
-- [ ] [AI] **GREEN** — implement `checkPrerequisiteConsistency` in
-      `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts` _(existing file from cycle
-      2.5)_: for each course in `courseOrder`, report every declared prerequisite that is present in
-      `libraryCourseIds` **and** in the manifest but appears at a later index as a `violations` entry;
-      separately, for each course in `courseOrder`, collect every declared prerequisite that is
-      present in `libraryCourseIds` **but absent** from the manifest into a `linkedPrerequisites`
-      entry (informational only — never a violation, never affects pass/fail)
+- [ ] [AI] **GREEN** — implement the `linkedPrerequisites` half in the same
+      `prerequisites.ts`: for each course in `courseOrder`, collect every declared prerequisite that
+      is present in `libraryCourseIds` **but absent** from the manifest (informational only — never a
+      violation, never affects pass/fail)
       — command: `npx nx run ayokoding-www:test:unit`
-      — acceptance: exits 0; the clean fixture reports zero `violations` and empty
-      `linkedPrerequisites`; the violating fixture reports exactly one `violations` entry naming
-      `advanced-algorithms`; the omitted-prerequisite fixture reports zero `violations` and exactly
-      one `linkedPrerequisites` entry.
-- [ ] [AI] **REFACTOR** — return a structured result `{ violations: { courseId,
-missingPrerequisiteId, courseIndex, prerequisiteIndex }[], linkedPrerequisites: { courseId,
-missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream gate can render
-      a precise message for a real violation and a reviewer-facing diagnostic list for linked
-      prerequisites without conflating the two
+      — acceptance: exits 0; the omitted-prerequisite fixture reports zero `violations` and exactly
+      one `linkedPrerequisites` entry, and 2.6a's two fixtures still report exactly what they did
+      before.
+- [ ] [AI] **REFACTOR** — return one structured result
+      `{ violations: { courseId, missingPrerequisiteId, courseIndex, prerequisiteIndex }[], linkedPrerequisites: { courseId, missingPrerequisiteId }[] }`
+      so a downstream gate can render a precise message for a real violation and a reviewer-facing
+      diagnostic list for linked prerequisites without conflating the two
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck`
       — acceptance: both exit 0, the violating fixture's single `violations` record carries all four
       fields, and the omitted-prerequisite fixture's single `linkedPrerequisites` record carries both
@@ -791,11 +1123,16 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 - [ ] [AI] `npx nx affected -t typecheck` — acceptance: exits 0.
 - [ ] [AI] `npx nx affected -t lint` — acceptance: exits 0.
 - [ ] [AI] `npx nx affected -t test:quick test:unit test:integration test:e2e` — acceptance: exits 0.
-      `test:integration` and `test:e2e` author nothing new here; they run to prove the
-      `content-url.ts` change regresses no existing journey.
-- [ ] [AI] `npx nx affected -t specs:behavior:coverage` — acceptance: reports the recorded
-      `course-paths` delta and **no other** delta. The `course-paths` delta is expected and its
-      closing plan is named in `evidence/phase-2-specs-coverage-delta.txt`.
+      **`test:integration` and `test:e2e` prove nothing here and are not cited as evidence anywhere
+      in this plan**: for `ayokoding-www` both targets are `echo` no-op stubs that always exit 0
+      [Repo-grounded — `apps/ayokoding-www/project.json`: `echo 'no-op: integration tier not used for
+      this content app'` and `echo 'no-op: target not applicable for this project'`]. They are listed
+      for completeness only. The regression evidence for the `content-url.ts` change is
+      `content-url.test.ts` (under `test:unit`) plus the Phase 4 Playwright sweep.
+- [ ] [AI] `npx nx affected -t specs:behavior:coverage` — acceptance: **exits 0**. Every
+      `course-paths` scenario ships `@wip` (see 2.0), which the validator treats as a full coverage
+      exemption, so there is no delta to tolerate and no hedge in this clause. Falsifiable both ways:
+      dropping `@wip` from one scenario makes this exit non-zero.
 - [ ] [AI] Fix ALL failures — including preexisting issues not caused by this phase's changes.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes.
@@ -830,10 +1167,13 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 - [ ] [AI] The purity guard prints nothing:
       `grep -rnE "from ['\"](node:)?(fs|path)['\"]|from ['\"]react['\"]" apps/ayokoding-www/src/features/course-paths/core`
       exits 1.
-- [ ] [AI] `course-paths` Gherkin authored under `<SPECS>`; the
-      `repo-governance gherkin-keyword-cardinality` audit exits 0; the coverage delta is recorded in
-      `evidence/phase-2-specs-coverage-delta.txt` naming
-      `ayokoding-learning-path-03-navigation-ui` as its closing plan.
+- [ ] [AI] `course-paths` Gherkin authored under `<SPECS>` with **one `@wip` tag per scenario**
+      (per-file `Scenario:` and `@wip` counts equal and non-zero);
+      `npx nx run ayokoding-www:specs:behavior:coverage` **exits 0**; the
+      `specs gherkin-cardinality validate` audit exits 0; the deferred obligation is
+      recorded in `<PLAN>/evidence/phase-2-specs-coverage-delta.txt` naming
+      `ayokoding-learning-path-03-navigation-ui` as the plan that removes the `@wip` tags and adds
+      the `@covers` markers.
 - [ ] [AI] `npx nx run ayokoding-www:typecheck` + `:lint` + `:build` exit 0.
 - [ ] [AI] `find …/syllabus -type f | wc -l` still returns **128** — unchanged from the Phase 0
       baseline (no delivery step in this phase touches `syllabus/`; the file count is stable across a
@@ -862,9 +1202,10 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 
 - [ ] [AI] Run affected quality gates from the worktree:
       `npx nx affected -t typecheck lint test:quick test:unit test:integration test:e2e specs:behavior:coverage`
-      — acceptance: exits 0, with the single expected `course-paths` specs delta recorded in
-      `evidence/phase-2-specs-coverage-delta.txt`. Fix ALL failures, including preexisting ones (Root
-      Cause Orientation), committing preexisting fixes separately.
+      — acceptance: **exits 0**, with no tolerated delta of any kind — `specs:behavior:coverage` is
+      green because every `course-paths` scenario ships `@wip` (Phase 2.0), and `test:integration` /
+      `test:e2e` are `echo` no-ops that carry no evidential weight. Fix ALL failures, including
+      preexisting ones (Root Cause Orientation), committing preexisting fixes separately.
 - [ ] [AI] Build the site: `npx nx run ayokoding-www:build` — acceptance: exits 0.
 - [ ] [AI] Run link + heading-hierarchy + markdown validation:
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
@@ -874,7 +1215,9 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
       — acceptance: the first prints `All links valid! No broken links found.`; the other two exit 0.
       **Note**: `md links validate` accepts **no positional path** and always walks the repo — the
       three `--exclude` flags are the pre-push hook's own form, and the bare repo-wide command is
-      unsatisfiable because the repo carries 93 pre-existing broken links under `plans/done/`.
+      unsatisfiable because the repo carries pre-existing broken links under `plans/done/`, all
+      unrelated to this work. **No count is quoted**: that number drifts every time a plan is
+      archived, so a hardcoded figure here would be stale before this plan executes.
 
   **Gherkin (binds) →** "The schema and prerequisite-DAG surface builds and validates green"
 
@@ -887,17 +1230,49 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
   ```
 
 - [ ] [AI] **Verify the plan's own boundary held** — confirm no manifest data file, no `shell/`
-      component, no course body, and no `syllabus/` file was created or modified by **any delivery
-      step in this phase or any before it** (the R3 custody exception is a single, recorded,
-      plan-authoring-time correction that predates Phase 0's baseline — see
-      [tech-docs.md §Custody rules](./tech-docs.md#custody-rules-binding) — not a Phase-0-through-3
-      delivery-step edit):
+      component and no course body was created, and that **no `syllabus/` file other than the one
+      recorded 1.4 exception** was modified by any delivery step in this phase or any before it.
+      **Phase 1.4 _is_ a delivery-step edit under `syllabus/`** — it is the single recorded R3 custody
+      exception (see [tech-docs.md §Custody rules](./tech-docs.md#custody-rules-binding)), and it
+      precedes this phase, so a boundary check that claimed "no delivery step edited `syllabus/`"
+      would be false. The check below therefore proves the **scope** of that edit rather than its
+      absence, because a file **count** is unchanged by an in-place edit and so certifies nothing
+      about it:
       `find apps/ayokoding-www/src/features/course-paths/manifests -name '*.yaml' | wc -l` returns
       **0**; `test -d apps/ayokoding-www/src/features/course-paths/shell` returns **non-zero**;
-      `find plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus -type f | wc -l`
-      returns **128** (unchanged from the Phase 0 baseline)
-      — acceptance: all three hold. Falsifiable both ways: creating any one of those artefacts flips
-      the corresponding check.
+      `find <PLAN>/syllabus -type f | wc -l`
+      returns **128** (unchanged from the Phase 0 baseline); and the custody diff resolves to
+      **exactly one changed file, and that file the permitted path**, asserted as a count **and** a
+      content match — command (single line, count):
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -cF "<PLAN>/syllabus/"`
+      returns **1**, and — command (single line, content):
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -cxF "<PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md"`
+      also returns **1**
+      — acceptance: all four hold. Falsifiable in both directions: a count of **0** (the counting
+      command prints `0` and exits 1) means either 1.4 never ran, **or** `<BASELINE_SHA>` was pinned
+      to a commit that already contained 1.4's edit, **or** `<PLAN>` was left unexpanded in the
+      counting **pattern** (which then matches nothing); a count of **two or more** means either a
+      second `syllabus/` file was touched — a custody violation — **or** `<BASELINE_SHA>` was pinned
+      before the plan-authoring-time corpus corrections landed, so the uncorrected files diff too
+      (Phase 0 check (c) is what rules that second cause out; re-verify it before hunting for an
+      unauthorised edit). The content command isolates the remaining case where the count is right
+      but the file is wrong. Creating any of the forbidden artefacts flips its own check.
+      **Count the `--name-only` list by its path prefix — `| grep -cF "<PLAN>/syllabus/"` — never
+      with `| wc -l` and never with a bare `| grep -c .`.** RTK's `git diff` filter appends a blank
+      line, a literal `--- Changes ---` header and another blank line to non-empty output, so on the
+      one-permitted-file state `wc -l` prints **4** and `grep -c .` prints **2** — neither is the
+      file count this clause asserts, and a clause demanding `1` from either would be a permanent
+      false red. The prefix form prints **1** there (the trailer holds no `syllabus/` substring),
+      **0** on a clean diff and **6** on a six-file diff, reading the same whether or not RTK
+      filters the call — so the clause does not depend on how the command is wrapped. `grep -c`
+      exits 1 on a zero count, so never `&&`-chain it; read the printed number. The
+      `find … | wc -l` above is unaffected — `find` output is not RTK-filtered.
+      **The comparison is against `<BASELINE_SHA>`, the SHA Phase 0 pinned — never the live
+      `origin/main` ref.** Phase 1's PR is merged to `main` before this phase starts (Per-Phase
+      Integration Protocol), so `origin/main` already contains 1.4's edit by now and a diff against it
+      would print **zero** lines, which this very clause reads as "1.4 never ran" — a false red that
+      blocks the gate. The pinned SHA predates that merge, so both directions stay meaningful here and
+      at every later phase.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
 > (Root Cause Orientation). Commit preexisting fixes separately with conventional-commit messages.
@@ -907,12 +1282,18 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 > All checks below must pass before starting Phase 4.
 
 - [ ] [AI] Affected `typecheck` / `lint` / `test:quick` / `test:unit` / `test:integration` /
-      `test:e2e` / `specs:behavior:coverage` exit 0, with only the recorded `course-paths` delta.
+      `test:e2e` / `specs:behavior:coverage` all exit 0, with **no** tolerated delta.
 - [ ] [AI] `npx nx run ayokoding-www:build` exits 0; the pre-push form of `md links validate` prints
       `All links valid! No broken links found.`; `md heading-hierarchy validate` and `npm run lint:md`
       exit 0.
 - [ ] [AI] Boundary check green: zero `.yaml` under `<MANIFESTS>`, no `<FEAT>shell/` directory, 128
-      files under `syllabus/`.
+      files under `syllabus/`, and the custody diff resolves to exactly the one permitted path —
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -cF "<PLAN>/syllabus/"` returns **1** and
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -cxF "<PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md"`
+      returns **1** — **against the pinned `<BASELINE_SHA>`, not `origin/main`**, which by now
+      already carries that edit, and counted **by path prefix** rather than by lines because RTK's
+      `git diff` filter appends a `--- Changes ---` trailer to non-empty output, which inflates
+      `wc -l` to **4** and a bare `grep -c .` to **2** on the one-changed-file state.
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged.
 
 > **Pause Safety**: the whole data layer passes every automated gate and the plan's ownership
@@ -928,11 +1309,19 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 > **no-regression sweep** proving the one shipped-code change (`contentUrl`'s optional `pathId`
 > parameter and canonical URL shape, cycle 2.4) broke nothing that already renders.
 >
-> **Locale scope**: `ayokoding-www` supports **two** locales, `en` and `id` [Repo-grounded —
+> **Locale scope**: `ayokoding-www` supports **two** locales, `en` and `id`
+> [Repo-grounded — `SUPPORTED_LOCALES` in `apps/ayokoding-www/src/features/i18n/core/config.ts`].
+> `contentUrl` is locale-parameterized, so a regression would hit **both**. Both are therefore
+> verified. This is a code-surface check, not a content walk-through — no `id` course content exists
+> and none is expected.
 >
-> > `SUPPORTED_LOCALES` in `apps/ayokoding-www/src/features/i18n/core/config.ts`]. `contentUrl` is
-> > locale-parameterized, so a regression would hit **both**. Both are therefore verified. This is a
-> > code-surface check, not a content walk-through — no `id` course content exists and none is expected.
+> **URL scope**: every URL opened below is `/c/`-namespaced, because that is what `contentUrl`
+> emits — the English learn root is `/en/c/learn` and the Indonesian one is `/id/c/belajar`.
+> Repo-grounded: `content/en/learn/` and `content/id/belajar/` exist on disk, and `content-url.ts`
+> `/c/`-prefixes both. The un-namespaced `/en/learn` and `/id/belajar` forms are the **legacy**
+> URLs, 308-redirected to the `/c/` forms — pinned by
+> `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/content-namespace-redirects.feature`
+> — so opening them would exercise the redirect layer rather than the pages this sweep is about.
 
 - [ ] [AI] Confirm the supported locale set —
       `grep -n "SUPPORTED_LOCALES" apps/ayokoding-www/src/features/i18n/core/config.ts`
@@ -941,20 +1330,25 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 - [ ] [AI] Start dev server: `npx nx dev ayokoding-www` — acceptance: server up on its configured
       port (3101 per the repo's Web Sites table).
 - [ ] [AI] For **each** locale (`en`, `id`) × **each** breakpoint (375 / 768 / 1280 px), via
-      Playwright MCP `browser_navigate` + `browser_resize`: open the locale's learn section root
-      (`/en/learn` and `/id/belajar`), open one existing content page beneath it, and follow its
-      prev/next and breadcrumb links one hop each
-      — acceptance: every page renders; every followed link resolves (no 404); `html[lang]` matches
-      the locale under test.
+      Playwright MCP `browser_navigate` + `browser_resize`: open the locale's learn section root at
+      its **canonical `/c/`-namespaced URL** — `http://localhost:3101/en/c/learn` and
+      `http://localhost:3101/id/c/belajar` — then open one existing content page beneath it and
+      follow its prev/next and breadcrumb links one hop each
+      — acceptance: every page renders with HTTP 200 **without a redirect hop**; every followed link
+      resolves (no 404); `html[lang]` matches the locale under test. Falsifiable both ways: the
+      un-namespaced `/en/learn` form answers 308 rather than 200, so a wrong URL is visible in
+      `browser_network_requests` instead of silently passing.
 - [ ] [AI] Check `browser_console_messages` on every page opened above
       — acceptance: **zero** console errors per locale per breakpoint. Falsifiable both ways: a
       single thrown error in link construction would surface here.
 - [ ] [AI] Check `browser_network_requests` on the same pages
       — acceptance: no request returns 4xx or 5xx.
 - [ ] [AI] Capture one screenshot per locale per breakpoint via `browser_take_screenshot`, saved to
-      `evidence/phase-4-no-regression-<locale>-<breakpoint>px.png` (six files:
-      `en`/`id` × 375/768/1280)
-      — acceptance: `find plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/evidence -name 'phase-4-no-regression-*.png' | wc -l`
+      `<PLAN>/evidence/phase-4-no-regression-<locale>-<breakpoint>px.png` (six files:
+      `en`/`id` × 375/768/1280). **The save target is `<PLAN>`-prefixed, matching the verification
+      command below** — a repo-root-relative `evidence/` writes to a different directory than the one
+      the check reads, and the check then returns 0.
+      — acceptance: `find <PLAN>/evidence -name 'phase-4-no-regression-*.png' | wc -l`
       returns **6**. Falsifiable both ways: it returns 0 before this step.
 - [ ] [AI] Reference each screenshot inline in this checklist as
       `![Learn section, <locale>, <breakpoint>px, unchanged after the contentUrl change](./evidence/phase-4-no-regression-<locale>-<breakpoint>px.png)`
@@ -964,7 +1358,7 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 ### Rule-15 three-tester retest — exemption recorded
 
 - [ ] [AI] **Record the Rule-15 exemption explicitly, with its reason**, in this checklist and in
-      `evidence/phase-4-rule-15-exemption.txt`: _"This plan ships no rendered surface — six pure
+      `<PLAN>/evidence/phase-4-rule-15-exemption.txt`: _"This plan ships no rendered surface — six pure
       TypeScript modules, one directory with a README, one additive optional parameter on an existing
       pure function. There is no new screen, component, or user-facing flow for
       `web-exploratory-tester`, `web-usability-tester` or `web-design-tester` to explore. The
@@ -976,18 +1370,18 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
       obligation instead. **The exemption is recorded, never silently omitted.**
 - [ ] [AI] **Record the Rule-16 non-applicability** in the same file: this plan exposes no REST or
       GraphQL endpoint and adds no HTTP surface, so `api-exploratory-tester` is not applicable
-      — acceptance: the statement is present in `evidence/phase-4-rule-15-exemption.txt`.
+      — acceptance: the statement is present in `<PLAN>/evidence/phase-4-rule-15-exemption.txt`.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
 - [ ] [AI] Both supported locales (`en`, `id`) verified at all three breakpoints; six screenshots
-      present under `evidence/` and referenced inline with descriptive alt text.
+      present under `<PLAN>/evidence/` and referenced inline with descriptive alt text.
 - [ ] [AI] Zero console errors and zero 4xx/5xx responses across all twelve locale × breakpoint page
       loads.
 - [ ] [AI] The Rule-15 exemption **and** the Rule-16 non-applicability are recorded with reasons in
-      `evidence/phase-4-rule-15-exemption.txt`, each naming the plan that carries the obligation
+      `<PLAN>/evidence/phase-4-rule-15-exemption.txt`, each naming the plan that carries the obligation
       instead (or stating that none does).
 - [ ] [AI] Draft PR opened (evidence + any fixes); 3-cycle PR-Review complete; CI green; PR
       `[AI]`-merged.
@@ -1085,17 +1479,28 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 
 > **This archival is not routine.** This plan is Wave 1 and archives long before
 > `ayokoding-learning-path-05-manifests` and `ayokoding-learning-path-04-course-authoring` finish.
-> Its `git mv` relocates the target of every inbound cross-plan `syllabus/` link held by the other
-> four plan folders — inherited from the source plan as **34** references across five files (README 8,
-> `brd.md` 1, `prd.md` 2, `tech-docs.md` 8, `delivery.md` 15; **13 unique targets**), redistributed
-> across those four folders by the split.
+> Its `git mv` relocates the target of every inbound cross-plan `syllabus/` link held by **every**
+> sibling plan folder under `plans/backlog` and `plans/in-progress` — a set that has already grown
+> past the source plan's original four folders (`ayokoding-learning-path-06-skills-accounting` and
+> `-07-skills-erp` now link in too) and will keep changing as siblings are added and archived. **No
+> count is hardcoded here on purpose**: step 7.2 measures the live inventory as `N_BEFORE` and 7.3
+> asserts against that measurement, so the check cannot go stale.
+>
+> **`N_BEFORE` measures sibling references only — this plan's own folder is excluded.** The measured
+> set and the asserted set must be the **same set**, and after the `git mv` this plan's folder sits
+> under `plans/done/`, which the post-move checks do not search. Counting this plan's own
+> self-references into `N_BEFORE` would make 7.3's equality unsatisfiable no matter what the executor
+> does — it would over-count by every self-reference. 7.2 therefore measures with
+> `--exclude-dir=ayokoding-learning-path-02-schema-and-prerequisite-dag`, and 7.3 asserts with the
+> **identical command**, so the two quantities are the same expression rather than two different
+> populations that happen to share a name.
 >
 > **The repoint must land in the SAME commit as the `git mv`.** Nothing fails at commit time if it
 > does not: `md links validate` does **not** run pre-commit. The `lint-staged` `*.md` chain is
 > `prettier --write`, `markdownlint-cli2`, `md mermaid validate`, `md heading-hierarchy validate`,
 > `md naming validate`, `md frontmatter validate` — **no link validation**. Link validation runs in
-> the **pre-push** hook. So the blast radius is: the **next push** from any of the four surviving
-> plans fails, for a reason having nothing to do with that push.
+> the **pre-push** hook. So the blast radius is: the **next push** from any surviving sibling plan
+> fails, for a reason having nothing to do with that push.
 
 ### 7.1 Pre-archival verification
 
@@ -1106,26 +1511,78 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
       — acceptance: Phase 6 gate is fully ticked.
 - [ ] [AI] Verify ALL quality gates pass (local + CI) and `npx nx run ayokoding-www:build` exits 0.
 - [ ] [AI] Verify the manual no-regression evidence is committed —
-      `find plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/evidence -name 'phase-4-no-regression-*.png' | wc -l`
+      `find <PLAN>/evidence -name 'phase-4-no-regression-*.png' | wc -l`
       returns **6**, covering both supported locales at all three breakpoints
       — acceptance: returns 6.
 - [ ] [AI] Verify the Rule-15 exemption and Rule-16 non-applicability are on the record —
-      `test -f plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/evidence/phase-4-rule-15-exemption.txt`
+      `test -f <PLAN>/evidence/phase-4-rule-15-exemption.txt`
       — acceptance: returns 0 and the file states both, with reasons. **There are no rule-15
       EWT/UWT/DWT findings to fix because the retest was exempted, not skipped** — the exemption is
       the artefact this check asserts.
-- [ ] [AI] Verify the `syllabus/` corpus is byte-intact relative to `origin/main` as of this plan's
-      start —
-      `find plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus -type f | wc -l`
-      returns **128** AND
-      `git diff --stat origin/main -- plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus`
-      prints nothing
-      — acceptance: both hold. **Note (R3 custody exception)**: this check is unaffected by the
-      2026-07-21 R3 custody exception, because that rename+correction landed on `origin/main` as a
-      plan-authoring-time correction **before** this plan's Phase 0 ever branched — so `origin/main`
-      already carries the corrected corpus throughout Phases 0-7, and no delivery step in this
-      checklist introduces any further diff. Falsifiable both ways: any delivery-step edit under
-      `syllabus/` during execution makes the `git diff` print a stat line.
+- [ ] [AI] Verify the `syllabus/` corpus carries **exactly the one permitted delivery-step diff**
+      relative to the pinned `<BASELINE_SHA>`. Three checks, all required:
+      (a) `find <PLAN>/syllabus -type f | wc -l`
+      returns **128**;
+      (b) every file **except** the one permitted exception is byte-intact — command (single line):
+      `git diff --stat <BASELINE_SHA> -- <PLAN>/syllabus ':(exclude)<PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md' | grep -c .`
+      returns **0**;
+      (c) the exception is the **only** diffed file, and it really was diffed — two commands, both
+      required. Count (single line):
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -cF "<PLAN>/syllabus/"`
+      returns **1**; content (single line):
+      `git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -cxF "<PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md"`
+      also returns **1**
+      — acceptance: all three hold.
+      **No `git diff` count here goes through `| wc -l`, and check (c) counts `--name-only` output
+      by its path prefix rather than with a bare `| grep -c .`.** RTK filters `git diff` in this
+      harness in two ways. It emits a single **blank line** when the real output is empty, so
+      `wc -l` returns `1` for a clean diff and check (c) under `wc -l` would return 1 in the
+      **empty** state and pass — a false green in precisely the direction (c) exists to guard, since
+      (c)'s whole job is to prove the diff is non-empty. It also appends a blank line, a literal
+      `--- Changes ---` header and another blank line to **non-empty** `--name-only` output, so on
+      the one-permitted-file state `wc -l` prints **4** and a bare `grep -c .` prints **2** —
+      neither is the file count (c) asserts, so a clause demanding `1` from either would be a
+      permanent false red. `| grep -cF "<PLAN>/syllabus/"` prints the true count in every state
+      (**0** clean, **1** for the permitted file alone, **6** for six files) because the trailer
+      holds no `syllabus/` substring, and reads the same whether or not RTK filters the call.
+      `grep -c` exits 1 on a zero count, so never `&&`-chain it. **Check (b) keeps a bare
+      `grep -c .` deliberately**: `--stat` output carries no trailer, and a **zero**-asserting count
+      must not be expressed as a pattern that an unexpanded `<PLAN>` could satisfy vacuously.
+      Check (c)'s content command is what separates "one file" from "the right file".
+      `find … | wc -l` in (a) is unaffected — `find` output is not RTK-filtered. **Why (b) is scoped and (c) exists.** Phase 1.4 **is** a
+      delivery-step edit under `syllabus/` — the single recorded R3 custody exception, which orders
+      Stage 0 in that manifest mirror in place. An unscoped zero-count check would therefore be
+      unsatisfiable the moment 1.4 runs, blocking archival forever; and a bare `--stat` zero-count is
+      not falsifiable in the other direction anyway, since a pathspec that matches no file also
+      produces no output and exits 0. Check (c) supplies that missing direction. Its count has three
+      readings, and the executor must distinguish them before acting:
+      a count of **0** means either 1.4 never ran, **or** `<BASELINE_SHA>` was pinned to a commit
+      that already contained 1.4's edit, **or** `<PLAN>` was left unexpanded in the counting
+      **pattern** (which then matches nothing); a count of **two or more** means either a second
+      corpus file was touched — a custody violation — **or** `<BASELINE_SHA>` was pinned **before**
+      the plan-authoring-time corpus corrections landed (the R1/R2 `careers/`-prefix pass, custody rules
+      1a / 1b.i / 1b.ii, and the R3 rename plus framing correction), so every still-uncorrected file
+      diffs alongside the permitted one. **Re-run Phase 0's check (c) first**
+      (`git diff --name-only <BASELINE_SHA> -- <PLAN>/syllabus | grep -c .` at the pinned baseline)
+      before concluding a custody violation — a stale baseline is the far likelier cause, and hunting
+      for an unauthorised edit that does not exist is the failure mode this note exists to prevent.
+      Check (c)'s content command narrows the remaining case: a count of 1 with a content match of 0
+      means the wrong file was touched.
+      **Expand `<PLAN>` before running (b)** — the whole point of the constant is that a
+      pathspec naming a stage the plan is no longer in matches nothing and passes vacuously, and an
+      unexpanded literal `<PLAN>` fails the same way. Check (c) is the independent guard: it uses the
+      same expansion and would count zero files instead of one. **Expand `<PLAN>` in (c)'s two
+      `grep` patterns as well as in its pathspec** — an unexpanded pattern matches no line, so both
+      of (c)'s commands print `0` and (c) fails loudly rather than passing on a technicality.
+      **Why `<BASELINE_SHA>` and not `origin/main`.** The same principle that keeps the earlier
+      plan-authoring-time rename and framing correction out of all three checks — they landed on
+      `origin/main` **before** Phase 0 ever branched — applies to 1.4's own edit the moment Phase 1's
+      PR is merged. By this point six phase merges have advanced `origin/main`, and Phase 5 explicitly
+      re-syncs to it (`git fetch origin && git checkout main && git pull`), so a diff against the live
+      ref counts **zero** lines: (c) would read that as "1.4 never ran" and block archival forever,
+      and (b)'s scoped pathspec would count zero for a second, unrelated reason — degenerating back
+      into exactly the vacuous-pass form (c) exists to guard. `<BASELINE_SHA>` is pinned before Phase 1
+      and does not move under any merge, so (b) and (c) keep meaning what they say at every phase.
 - [ ] [AI] Verify the plan's ownership boundary held to the end —
       `find apps/ayokoding-www/src/features/course-paths/manifests -name '*.yaml' | wc -l` returns
       **0** and `test -d apps/ayokoding-www/src/features/course-paths/shell` returns non-zero
@@ -1133,53 +1590,105 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 
 ### 7.2 Count the inbound cross-plan links (before the move)
 
-- [ ] [AI] Record the pre-move inbound-link inventory to
-      `evidence/phase-7-inbound-links-before.txt` via
-      `grep -rn "ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress`
-      — acceptance: the command prints **at least one** line (exit 0), and the captured line count is
-      recorded as `N_BEFORE`. Falsifiable both ways: if it printed nothing, either the four sibling
-      plans do not exist yet or they never linked in — both are conditions to investigate before
-      moving, not to move through.
-- [ ] [AI] Record the per-file breakdown by sibling plan folder in the same evidence file, so a
-      reviewer can see all four plans are represented
-      — acceptance: the evidence file names each sibling plan folder that holds at least one link.
+- [ ] [AI] **Measure `N_BEFORE` — the sibling-only inbound-link inventory.** Record it to
+      `<PLAN>/evidence/phase-7-inbound-links-before.txt` — command (single line):
+      `grep -rn "ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress --exclude-dir=ayokoding-learning-path-02-schema-and-prerequisite-dag`
+      — acceptance: it prints **at least one** line (exit 0), and its **line count** is recorded as
+      `N_BEFORE`. Falsifiable both ways: printing nothing means either the sibling plans do not exist
+      yet or they never linked in — both are conditions to investigate before moving, not to move
+      through. **`N_BEFORE` is the only quantity this plan uses** and it is **never** written down as
+      a literal here; sibling plans are added and archived independently of this one, so any figure
+      quoted in this document would be stale before execution. (For orientation only, not as an
+      assertion: it measured 43 on 2026-07-22. Re-measure; do not assert.)
+      **Two properties of this command are load-bearing.** (i) `--exclude-dir` takes the **bare
+      folder name**, so it excludes this plan's folder from whichever stage it currently sits in
+      (`plans/backlog/` or `plans/in-progress/`) without the command needing to know which — and
+      `--exclude-dir` is the ugrep-supported spelling here; `--glob` is **not** available. (ii) The
+      exclusion is what makes 7.3's assertion satisfiable at all: after the `git mv` this plan's
+      folder is under `plans/done/`, outside the search roots, so its self-references can never be
+      counted again.
+- [ ] [AI] **Record the spelling breakdown** in the same evidence file — 7.3 must repoint **every**
+      spelling that names this plan's folder, not just the `../` sibling form — command (single
+      line):
+      `grep -rnE "(\.\./|plans/backlog/|plans/in-progress/|plans/<stage>/)ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress --exclude-dir=ayokoding-learning-path-02-schema-and-prerequisite-dag`
+      — acceptance: every line it prints is captured in the evidence file. These are the lines the
+      move makes stale; 7.3's check (b) asserts this same command prints nothing afterwards. Lines
+      that match the previous step's looser pattern but **not** this one are location-agnostic prose
+      (e.g. "any file inside `ayokoding-…-dag/syllabus/`", with no path prefix); they stay correct
+      after the move and are deliberately left alone, which is why this count is normally lower than
+      `N_BEFORE`.
+- [ ] [AI] Record the per-folder breakdown in the same evidence file, so a reviewer can see which
+      sibling folders are represented — command (single line):
+      `grep -rl "ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress --exclude-dir=ayokoding-learning-path-02-schema-and-prerequisite-dag`
+      — acceptance: the evidence file names **every** sibling folder that holds at least one link
+      (as of 2026-07-22 that is `01`, `03`, `04`, `05`, `06` and `07` — but the list is whatever the
+      command prints on the day, not this parenthetical).
 
 ### 7.3 Move and repoint — one commit
 
 - [ ] [AI] Move the plan folder using today's completion date:
-      `git mv plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag`
+      `git mv <PLAN> plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag`
       (substitute today's date; the `evidence/` and `syllabus/` subfolders move with it)
       — acceptance: `test -d plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus`
-      returns 0 and `test -d plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag`
+      returns 0 and `test -d <PLAN>`
       returns non-zero.
-- [ ] [AI] **In the same commit**, repoint every inbound cross-plan link in the other four plan
-      folders from the sibling form
-      `../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/…`
-      to the archived form
-      `../../done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/…`
-      (adjust the `../` depth if a sibling sits in `plans/in-progress/` rather than `plans/backlog/` —
-      both are one level under `plans/`, so the depth is the same)
-      — acceptance: `grep -rn "\.\./ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress`
-      prints **nothing** and exits 1, AND
-      `grep -rn "done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress`
-      prints exactly `N_BEFORE` lines. Falsifiable both ways: leaving one link unrewritten makes the
-      first command print it and exit 0.
+- [ ] [AI] **In the same commit**, repoint **every stale spelling** that names this plan's folder, in
+      **every** sibling plan folder under `plans/backlog` and `plans/in-progress` — the exact folder
+      list is the one recorded by step 7.2, never a hardcoded set. **All four spellings are
+      rewritten, not just the `../` sibling form** (7.2's second command enumerates the live set):
+      `../ayokoding-…-dag/syllabus/…` becomes
+      `../../done/YYYY-MM-DD__ayokoding-…-dag/syllabus/…`; and
+      `plans/backlog/ayokoding-…-dag/syllabus/…`,
+      `plans/in-progress/ayokoding-…-dag/syllabus/…` and the placeholder form
+      `plans/<stage>/ayokoding-…-dag/syllabus/…` all become
+      `plans/done/YYYY-MM-DD__ayokoding-…-dag/syllabus/…` (substitute today's real date throughout).
+      The `../` depth is the same from either stage, since `plans/backlog/` and `plans/in-progress/`
+      are both one level under `plans/`. A line that names the folder with **no** location prefix
+      (prose such as "any file inside `ayokoding-…-dag/syllabus/`") is location-agnostic and is
+      **left alone**. **Rewrite in place, by string substitution only — do not re-wrap any line**;
+      the repo's Prettier config sets `proseWrap: preserve`, so no automatic re-wrap happens, and a
+      manual one would break the line-count conservation that check (a) rests on.
+      — acceptance: three checks, all required.
+      **(a) Conservation** — the **identical command 7.2 measured with**,
+      `grep -rn "ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress --exclude-dir=ayokoding-learning-path-02-schema-and-prerequisite-dag`,
+      still prints **exactly `N_BEFORE`** lines. The measured and asserted quantities are literally
+      the same expression, so this is satisfiable by construction: every rewritten form still
+      contains the substring `ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus`, and a
+      pure string substitution therefore conserves the line count. Falsifiable both ways: deleting a
+      reference lowers the count, adding one raises it.
+      **(b) No stale spelling survives** — 7.2's four-prefix ERE command prints **nothing** and exits 1. Falsifiable both ways: leaving a single link unrewritten in any of the four spellings makes
+      it print that line and exit 0. This check **replaces** the former `../`-only clause, which
+      passed while absolute-style spellings across the sibling plans were still stale.
+      **(c) The archived form is really present** — command (single line):
+      `grep -rn "done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus" plans/backlog plans/in-progress --exclude-dir=ayokoding-learning-path-02-schema-and-prerequisite-dag`
+      prints **at least one** line and exits 0 (substitute today's real date). Falsifiable both ways:
+      no rewrite at all, or a rewrite that used the wrong date, prints nothing and exits 1. This is
+      deliberately **not** asserted to equal `N_BEFORE`: at least one sibling spells the archived
+      target with a date-free `plans/done/*__…` glob, which is already future-proof and matches no
+      literal date — and (a) plus (b) together already prove that every one of the `N_BEFORE` lines
+      is non-stale.
 - [ ] [AI] Run the link validator in **the pre-push hook's exact form** — command (single line):
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
       — acceptance: prints `All links valid! No broken links found.`
       **Two corrections, both verified.** (a) `md links validate` accepts **no positional path** —
       passing one fails with `error: unexpected argument '<path>' found` — and it cannot be scoped by
       `cd`-ing into a folder; it always walks the repo, so "run it in this plan's folder" is not
-      expressible. (b) The bare repo-wide form is **unsatisfiable**: the repo carries **93
-      pre-existing broken links**, all under `plans/done/`, unrelated to this work, so the unfiltered
-      command always fails and this clause would block archival forever. The three `--exclude` flags
+      expressible. (b) The bare repo-wide form is **unsatisfiable**: the repo carries **pre-existing
+      broken links**, all under `plans/done/`, unrelated to this work, so the unfiltered command
+      always fails and this clause would block archival forever. **No count is quoted** — that number
+      drifts every time a plan is archived, so a hardcoded figure would be stale before this plan
+      executes; the qualitative fact is what the clause rests on. The three `--exclude` flags
       above are the pre-push hook's own form, which is what actually gates a push.
       Note this excludes `plans/done`, so it does **not** catch a link pointing _into_ the new
       archived location being wrong; the two `grep` checks in the previous step are what catch that.
       **Both checks are required — neither alone is sufficient.**
-- [ ] [AI] Update `plans/backlog/README.md` — remove this plan's entry
-      — acceptance: `grep -qF "ayokoding-learning-path-02-schema-and-prerequisite-dag" plans/backlog/README.md`
-      exits **1**.
+- [ ] [AI] Update the **stage index README the plan is leaving** — `plans/backlog/README.md` or
+      `plans/in-progress/README.md`, whichever matches the `<PLAN>` stage resolved in Phase 0 (both
+      files exist) — removing this plan's entry
+      — acceptance: `grep -qF "ayokoding-learning-path-02-schema-and-prerequisite-dag" <that README>`
+      exits **1**. Check the other stage index too and remove any leftover entry there: after a
+      promotion, a stale `plans/backlog/README.md` row is exactly the residue this step exists to
+      clear.
 - [ ] [AI] Update `plans/done/README.md` — add this plan's entry with today's completion date
       — acceptance: `grep -qF "ayokoding-learning-path-02-schema-and-prerequisite-dag" plans/done/README.md`
       exits **0**.
@@ -1199,11 +1708,19 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 
 - [ ] [AI] The plan folder is under `plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag/`
       and its `syllabus/` still holds **128** files.
-- [ ] [AI] Zero occurrences of the old sibling link form remain under `plans/backlog` or
-      `plans/in-progress`, and the archived form appears exactly `N_BEFORE` times.
+- [ ] [AI] **Conservation** — 7.2's measuring command
+      (`grep -rn "…-dag/syllabus" plans/backlog plans/in-progress --exclude-dir=…-dag`) still prints
+      exactly `N_BEFORE` lines. Same command, same roots, same exclusion as the measurement, so the
+      asserted quantity is the measured quantity.
+- [ ] [AI] **No stale spelling survives** — 7.2's four-prefix ERE command
+      (`../`, `plans/backlog/`, `plans/in-progress/`, `plans/<stage>/`) prints nothing and exits 1
+      under `plans/backlog` and `plans/in-progress`.
+- [ ] [AI] **Archived form present** — the `done/YYYY-MM-DD__…-dag/syllabus` grep prints at least one
+      line and exits 0 with today's real date substituted.
 - [ ] [AI] The pre-push form of `md links validate` prints `All links valid! No broken links found.`
 - [ ] [AI] `git show --stat HEAD` proves the `git mv` and the repoint landed in **one** commit.
-- [ ] [AI] `plans/backlog/README.md`, `plans/done/README.md` and any other referencing README are
+- [ ] [AI] The stage index README the plan left (`plans/backlog/README.md` or
+      `plans/in-progress/README.md`), `plans/done/README.md`, and any other referencing README are
       updated.
 - [ ] [AI] Draft PR opened (archival move + repoint); 3-cycle PR-Review complete; CI green; PR
       `[AI]`-merged.
@@ -1222,21 +1739,52 @@ missingPrerequisiteId }[] }` rather than a bare array or string, so a downstream
 - [ ] [AI] `npx nx affected -t typecheck` exits 0.
 - [ ] [AI] `npx nx affected -t lint` exits 0.
 - [ ] [AI] `npx nx affected -t test:quick test:unit` exits 0 (add `test:integration test:e2e` for the
-      phases touching `content-url.ts`).
-- [ ] [AI] `npx nx affected -t specs:behavior:coverage` exits 0, or reports only the recorded
-      `course-paths` delta.
+      phases touching `content-url.ts` — noting both are `echo` no-ops for `ayokoding-www` and prove
+      nothing).
+- [ ] [AI] `npx nx affected -t specs:behavior:coverage` **exits 0** — unconditionally, with no
+      tolerated delta, because every `course-paths` scenario ships `@wip` (Phase 2.0).
 - [ ] [AI] Fix ALL failures — including preexisting issues not caused by your changes (Root Cause
       Orientation).
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes.
 > Commit preexisting fixes separately with appropriate conventional-commit messages.
 
-### Note: plan location at archival time
+### Note: plan location, and how `<PLAN>` covers it
 
 This plan is created in `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/`.
 When work starts it is promoted to
 `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/` — a pure move, no date
 prefix on either stage. The `git mv` in Phase 7 then archives from wherever it sits to
 `plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag/` using the
-completion date. Every path in Phase 7's steps is written against `plans/backlog/`; substitute
-`plans/in-progress/` if the plan has been promoted by then.
+completion date.
+
+**Promotion happens before Phase 0 runs**, so this is not a Phase-7-only concern: a `plans/backlog/`
+prefix hardcoded anywhere in this checklist would be stale from the very first command. That is why
+**every phase**, not just Phase 7, writes the plan folder as `<PLAN>` (see
+[§Path constants](#path-constants)), resolved once by the first Phase 0 step and expanded textually
+by the executor thereafter. Phase 7 is the single exception, and only for the `git mv`
+**destination**, which is written literally as
+`plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag` because the move is
+precisely what changes the location.
+
+The failure this replaces was not merely cosmetic. Most stale-prefix clauses fail loudly (`find`
+returns 0 where 128 was asserted; `test -f` returns non-zero), but **step 7.1's `git diff --stat`
+pathspec would have passed vacuously** — a git pathspec matching no file produces no diff and exits
+0, which is exactly the trap 7.1 (c) documents. (Under RTK's `git diff` filter the executor sees a
+single blank line rather than truly empty output, and a `--- Changes ---` trailer on non-empty
+`--name-only` output — which is why 7.1 never counts with `| wc -l`, and why its positive
+`--name-only` count goes through `| grep -cF "<PLAN>/syllabus/"` rather than a bare `| grep -c .`;
+see the RTK note in the Phase 0 preamble.) `<PLAN>` removes the
+stale prefix; 7.1 (c)'s positive `--name-only` count-plus-content check remains as the independent
+guard against any pathspec that silently matches nothing.
+
+**The same rule binds every _other_ plan folder this checklist names, not just this one.** The
+Wave-1 sibling `ayokoding-learning-path-01-url-restructure` runs **concurrently** (see
+[§Parallelization Model](#parallelization-model)), so it can be promoted to `plans/in-progress/`
+mid-execution — making a hardcoded `plans/backlog/` prefix for it stale in exactly the same way, and
+sooner. Step 1.1 therefore writes it as `<PLAN01>`, resolved by the same Phase 0 step. Its
+`git log -1 --format=%H -- <PLAN01>` clause is the sharpest instance of the vacuous-pass shape: a
+stale pathspec makes `git log` print **nothing and exit 0**, and because the executor is the one
+writing the resulting evidence file, the step would "pass" with an empty SHA line — silently
+destroying the plan's only audit trail for failure mode F-6. The explicit
+`grep -qE "^[0-9a-f]{40}$"` assertion is what closes that direction.

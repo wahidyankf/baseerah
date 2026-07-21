@@ -13,7 +13,7 @@ the standalone data file
 frontmatter on any `_index.md`). Per
 [tech-docs §Variable-depth `pathId`](../../tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8),
 the manifest also carries an explicit `arc: immediately-effective` field (R8). Path landing served at
-`/en/learn/paths/careers/immediately-effective/software-engineer`. Order rationale:
+`/en/c/learn/paths/careers/immediately-effective/software-engineer`. Order rationale:
 [tech-docs §Path `careers/immediately-effective/software-engineer`](../../tech-docs.md#path-careersimmediately-effectivesoftware-engineer-build-fast-first).
 
 ## Composition (curated + converge, LOCKED 2026-07-19)

@@ -46,8 +46,9 @@ knowing what a manifest composes.
 
 **This plan is careers-only (R4, 2026-07-21 ruling).** All four paths below sit under the `careers/`
 URL category (`<pathId>` = `careers/<arc>/<role>`). A sibling `skills/` category (2 manifests,
-`<pathId>` = `skills/<subject>`) exists in the wider programme but is owned end-to-end by a separate,
-not-yet-created plan — see
+`<pathId>` = `skills/<subject>`) exists in the wider programme but is owned end-to-end by **two**
+sibling plans — `ayokoding-learning-path-06-skills-accounting` and
+`ayokoding-learning-path-07-skills-erp` — see
 [tech-docs §Ownership split](./tech-docs.md#ownership-split-careers-vs-skills--r4). This plan's schema
 and resolvers are category-agnostic by construction (R2) and do not hardcode either category's URL
 depth.
@@ -72,14 +73,14 @@ prerequisites (DD-6). Those two decisions are this plan's. Every manifest also c
 
 ## What this plan owns
 
-| Surface                                                             | Detail                                                                                                                            |
-| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/ayokoding-www/src/features/course-paths/core/`                | Five pure modules — `schemas.ts`, `manifest.ts`, `path-nav.ts`, `path-context.ts`, `prerequisites.ts`, `manifest-integrity.ts`    |
-| `apps/ayokoding-www/src/features/course-paths/manifests/`           | The `<MANIFESTS>` directory and its `README.md` (empty of `.yaml` files — those belong to `ayokoding-learning-path-05-manifests`) |
-| `apps/ayokoding-www/src/features/content/core/content-url.ts`       | Extended with the optional `pathId` param and the canonical `/en/learn/courses/<course-id>` shape                                 |
-| `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/` | The `course-paths` Gherkin companion (specs RED)                                                                                  |
-| The `prerequisites: [course-id, ...]` frontmatter contract          | **Canonical here.** `ayokoding-learning-path-01-url-restructure` writes the field; this plan defines its shape                    |
-| `syllabus/` (128 files)                                             | Custodied, not authored — see below                                                                                               |
+| Surface                                                             | Detail                                                                                                                                                               |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/ayokoding-www/src/features/course-paths/core/`                | Six pure modules — `schemas.ts`, `manifest.ts`, `path-nav.ts`, `path-context.ts`, `prerequisites.ts`, `manifest-integrity.ts`                                        |
+| `apps/ayokoding-www/src/features/course-paths/manifests/`           | The `<MANIFESTS>` directory and its `README.md` (empty of `.yaml` files — those belong to `ayokoding-learning-path-05-manifests`)                                    |
+| `apps/ayokoding-www/src/features/content/core/content-url.ts`       | Extended with an optional `pathId` param appending `?path=`; the existing `/{locale}/c/{slug}` shape (e.g. `/en/c/learn/courses/<course-id>`) is preserved unchanged |
+| `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/` | The `course-paths` Gherkin companion (specs RED)                                                                                                                     |
+| The `prerequisites: [course-id, ...]` frontmatter contract          | **Canonical here.** `ayokoding-learning-path-01-url-restructure` writes the field; this plan defines its shape                                                       |
+| `syllabus/` (128 files)                                             | Custodied, not authored — see below                                                                                                                                  |
 
 **Explicitly NOT owned** (each named with its owning plan, so a reader never assumes a gap):
 
@@ -89,9 +90,10 @@ prerequisites (DD-6). Those two decisions are this plan's. Every manifest also c
 - Every **careers** `.yaml` manifest file and every step that creates, appends to, reorders, or
   re-verifies one → `ayokoding-learning-path-05-manifests` (4 manifests, not 6 — R4).
 - Every course body under `<COURSES>` → `ayokoding-learning-path-04-course-authoring`.
-- The entire `skills/` URL category — both path landings, both manifests, and its course corpus → a
-  separate, not-yet-created plan (R4). This plan's `syllabus/` custody, schema, and resolvers never
-  reference it.
+- The entire `skills/` URL category — both path landings, both manifests, and its course corpus →
+  `ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
+  `ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`), R4. This plan's
+  `syllabus/` custody, schema, and resolvers never reference either.
 
 ## Custody of `syllabus/` — a corpus this plan does not consume
 
@@ -113,7 +115,7 @@ exactly one recorded content exception** (the R3 custody exception, 2026-07-21) 
 non-content mechanical `careers/`-prefix string correction (R1/R2) across the manifest mirrors and
 the `syllabus/` READMEs, neither a content re-derivation. Its obligations are: keep the corpus's
 curriculum content byte-identical against `origin/main` (all files but the R3 exception), keep it
-linkable from the other four plan folders,
+linkable from every sibling plan folder,
 complete the R3 exception's deferred Stage 0 ordering ([delivery.md Phase
 1.4](./delivery.md#14-syllabus-custody-exception--ai-engineer-path-correction-r3)), and — at
 archival — repoint every inbound cross-plan link in the same commit as the move (see
@@ -164,8 +166,10 @@ reader does not "fix" the apparent gap and corrupt the corpus:
 
 The `[Repo-grounded]` path in that quotation names the **pre-split** folder, because that is what the
 passage said when it was written. Post-split the equivalent check is
-`grep -rn "DD-3[4-9]" plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/`, which
-still returns hits only under `syllabus/courses/`.
+`grep -rn "DD-3[4-9]" plans/*/ayokoding-learning-path-02-schema-and-prerequisite-dag/`, which still
+returns hits only under `syllabus/courses/`. The `plans/*/` glob is deliberate: the plan is promoted
+from `plans/backlog/` to `plans/in-progress/` before execution starts, so a hardcoded stage prefix
+would be stale — the same reason `delivery.md` writes every plan-folder path as `<PLAN>`.
 
 **Never renumber to close the gap.** A renumbering pass would rewrite 276 in-corpus tokens whose
 meanings belong to a different, closed plan.
@@ -191,19 +195,19 @@ exist yet — this plan creates it).
 
 ### Downstream — what this plan hands off, and to whom
 
-| Downstream plan                               | Artefact handed over                                                                                                                               | Consumed by                                                                           |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `ayokoding-learning-path-03-navigation-ui`    | `apps/ayokoding-www/src/features/course-paths/core/` — `schemas.ts`, `path-nav.ts`, `path-context.ts`, `prerequisites.ts`, `manifest-integrity.ts` | every shell component and the route wiring import from these pure modules             |
-| `ayokoding-learning-path-03-navigation-ui`    | `apps/ayokoding-www/src/features/course-paths/manifests/` + its `README.md`                                                                        | the manifest repository loads `**/*.yaml` from this directory                         |
-| `ayokoding-learning-path-04-course-authoring` | `syllabus/courses/<course-id>.md` — 121 settled per-course spec files                                                                              | each course body is authored **from** its spec file, never from a fresh judgment call |
-| `ayokoding-learning-path-04-course-authoring` | the `prerequisites: [course-id, ...]` frontmatter contract                                                                                         | every net-new course `_index.md` declares it                                          |
-| `ayokoding-learning-path-05-manifests`        | `syllabus/paths/manifest-*.md` — the four authoritative human-readable orderings                                                                   | each YAML manifest's `courseOrder` is transcribed from its mirror                     |
-| `ayokoding-learning-path-05-manifests`        | `checkManifestIntegrity` + `checkPrerequisiteConsistency`                                                                                          | every manifest phase gate runs these                                                  |
+| Downstream plan                               | Artefact handed over                                                                                                                                                                    | Consumed by                                                                           |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `ayokoding-learning-path-03-navigation-ui`    | `apps/ayokoding-www/src/features/course-paths/core/` — all six pure modules: `schemas.ts`, `manifest.ts`, `path-nav.ts`, `path-context.ts`, `prerequisites.ts`, `manifest-integrity.ts` | every shell component and the route wiring import from these pure modules             |
+| `ayokoding-learning-path-03-navigation-ui`    | `apps/ayokoding-www/src/features/course-paths/manifests/` + its `README.md`                                                                                                             | the manifest repository loads `**/*.yaml` from this directory                         |
+| `ayokoding-learning-path-04-course-authoring` | `syllabus/courses/<course-id>.md` — 121 settled per-course spec files                                                                                                                   | each course body is authored **from** its spec file, never from a fresh judgment call |
+| `ayokoding-learning-path-04-course-authoring` | the `prerequisites: [course-id, ...]` frontmatter contract                                                                                                                              | every net-new course `_index.md` declares it                                          |
+| `ayokoding-learning-path-05-manifests`        | `syllabus/paths/manifest-*.md` — the four authoritative human-readable orderings                                                                                                        | each YAML manifest's `courseOrder` is transcribed from its mirror                     |
+| `ayokoding-learning-path-05-manifests`        | `checkManifestIntegrity` + `checkPrerequisiteConsistency`                                                                                                                               | every manifest phase gate runs these                                                  |
 
 ### Cross-plan `syllabus/` ownership (binding)
 
-`syllabus/` lives **only** here. The other four plans link into it by relative path and **never
-copy it**. A copy forks the source of truth for 121 course specs and four manifest orderings.
+`syllabus/` lives **only** here. Every sibling plan links into it by relative path and **never
+copies it**. A copy forks the source of truth for 121 course specs and four manifest orderings.
 
 `syllabus/courses/**` is the only place the tokens `DD-34`, `DD-35` and `DD-39` appear (113 / 114 /
 49 occurrences). Those are **FS-SE-inherited tokens with different meanings**, not this plan's
@@ -211,11 +215,13 @@ decisions, and `DD-36`/`DD-37`/`DD-38` are unused. **Do not renumber to close th
 
 ### Archival is gated on downstream archival
 
-Because four plans link into this folder, this plan's `Plan Archival` phase carries an extra step:
-in the **same commit** as the `git mv` to `plans/done/YYYY-MM-DD__…`, repoint every cross-plan
-`syllabus/` link in the other four plan folders to the new archived path, then run the link
-validator in **the pre-push hook's exact form** (the bare repo-wide command is unsatisfiable — 93
-pre-existing broken links under `plans/done/` make it always fail):
+Because every sibling plan links into this folder, this plan's `Plan Archival` phase carries an
+extra step: in the **same commit** as the `git mv` to `plans/done/YYYY-MM-DD__…`, repoint every
+cross-plan `syllabus/` link in **every** sibling plan folder under `plans/backlog` and
+`plans/in-progress` to the new archived path, then run the link validator in **the pre-push hook's
+exact form** (the bare repo-wide command is unsatisfiable — the repo carries pre-existing broken
+links under `plans/done/`, all unrelated to this work, which make it always fail; no count is quoted
+here because that number drifts every time a plan is archived):
 
 ```bash
 cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
@@ -237,7 +243,7 @@ This plan is done for downstream purposes when its final PR is **merged to `orig
 **Downstream (`blocks`), by full folder name:**
 
 - `ayokoding-learning-path-03-navigation-ui` — Wave 2. Cannot start until this plan's PR is merged;
-  every `shell/` component imports the five `core/` modules, and `manifest-repository.ts` cannot
+  every `shell/` component imports the six `core/` modules, and `manifest-repository.ts` cannot
   validate without `schemas.ts`.
 - `ayokoding-learning-path-04-course-authoring` — Wave 2. Cannot start until this plan's PR is
   merged; each course body is authored from its `syllabus/courses/<course-id>.md` spec and declares
@@ -419,19 +425,22 @@ with black borders and WCAG-AA-contrasting text.
 
 ## Archival lifecycle
 
-The archival move is not a routine `git mv`: it relocates the target of **34** cross-plan `syllabus/`
-links spread across five files in the other four plan folders (13 unique targets). The repoint must
-land in the **same commit** as the move.
+The archival move is not a routine `git mv`: it relocates the target of every cross-plan `syllabus/`
+link held by every sibling plan folder under `plans/backlog` and `plans/in-progress`. The exact
+inventory is **measured at execution time** — [delivery.md Phase 7.2](./delivery.md#72-count-the-inbound-cross-plan-links-before-the-move)
+records it as `N_BEFORE` — rather than hardcoded here, because sibling plans are added and archived
+independently of this one. The repoint must land in the **same commit** as the move.
 
 ```mermaid
 %% Archival lifecycle. The reciprocal-repoint step is what distinguishes this plan's
-%% archival from an ordinary one; skipping it breaks the next push from four other plans.
-%% The recovery branch is drawn explicitly so the failure mode is not folded into prose.
+%% archival from an ordinary one; skipping it breaks the next push from every sibling plan
+%% that links in. The recovery branch is drawn explicitly so the failure mode is not folded
+%% into prose.
 flowchart TD
     GATES["Phases 0-6 gates<br/>all green"]
-    REPOINT["Repoint 34 inbound<br/>cross-plan links"]
+    REPOINT["Repoint every inbound<br/>cross-plan link — N_BEFORE"]
     ARCHIVED["Archived under<br/>done/YYYY-MM-DD__"]
-    BROKEN["Four sibling plans<br/>hold dead links"]
+    BROKEN["Sibling plans<br/>hold dead links"]
 
     GATES -->|"repoint FIRST, then move"| REPOINT
     REPOINT -->|"git mv in the SAME commit"| ARCHIVED

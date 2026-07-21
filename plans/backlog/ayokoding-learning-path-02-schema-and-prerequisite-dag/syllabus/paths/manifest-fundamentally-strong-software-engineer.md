@@ -14,7 +14,7 @@ the standalone data file
 frontmatter on any `_index.md`). Per
 [tech-docs §Variable-depth `pathId`](../../tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8),
 the manifest also carries an explicit `arc: fundamentally-strong` field (R8). Path landing served at
-`/en/learn/paths/careers/fundamentally-strong/software-engineer`. Order rationale:
+`/en/c/learn/paths/careers/fundamentally-strong/software-engineer`. Order rationale:
 [tech-docs §Path `careers/fundamentally-strong/software-engineer`](../../tech-docs.md#path-careersfundamentally-strongsoftware-engineer-theory-first).
 
 ## Composition (curated + converge, LOCKED 2026-07-19)

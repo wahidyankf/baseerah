@@ -19,18 +19,36 @@ half; `ayokoding-learning-path-03-navigation-ui` creates its `shell/` half.
 Used throughout this document and `delivery.md`. Reproduced verbatim in all five split plans — a
 checklist whose `<FEAT>` placeholders cannot be expanded is not executable.
 
-- `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/` (course bundles; served at `/en/learn/courses/<course-id>`)
-- `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` (thin path-landing anchors; served at `/en/learn/paths/<path-id>`)
+> **On-disk slug vs. served URL — the `/c/` namespace.** Every path below is an **on-disk content
+> path**; the URL it is served at is **not** the same string. `contentUrl` maps every content-tree
+> slug to `/{locale}/c/{slug}`. Repo-grounded:
+> `apps/ayokoding-www/src/features/content/core/content-url.ts` returns a
+> `/{locale}/c/{normalized}` template literal for every content-tree slug; only the two per-locale
+> `LOOSE_PAGE_ALLOWLIST` top-level pages and the empty/`_index` slug escape the `/c/` namespace, and
+> seven assertions in `content-url.test.ts` pin it. So the on-disk `content/en/learn/courses/x/` is
+> served at `/en/c/learn/courses/x`, and the Indonesian mirror root `content/id/belajar/` is served
+> at `/id/c/belajar`. **This plan does not change that namespace** — it only appends an optional
+> `?path=` query string.
+
+- `<PLAN>` = this plan's own folder at its current stage —
+  `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag` once promoted,
+  `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag` before then (no trailing
+  slash). Promotion happens **before Phase 0 runs**, so no command or table row hardcodes a stage
+  prefix; `delivery.md`'s first Phase 0 step resolves `<PLAN>` once and the executor expands it
+  textually thereafter — see
+  [delivery.md §Path constants](./delivery.md#path-constants)
+- `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/` (course bundles; served at `/en/c/learn/courses/<course-id>`)
+- `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` (thin path-landing anchors; served at `/en/c/learn/paths/<path-id>`)
 - `<SE_OLD>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/` (legacy home of the 33 shipped topics + 4 existing capstones, incl. `capstone-solid-core` — the re-home source)
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/`
 - `<MANIFESTS>` = `<FEAT>manifests/` (standalone YAML data files, nested to mirror slash path ids —
   `<MANIFESTS><path-id>.yaml`; `<path-id>` is **variable-depth**: `careers/<arc>/<role>` (3 segments) or
   `skills/<subject>` (2 segments) — see
   [§Variable-depth `pathId`](#variable-depth-pathid-careers-vs-skills--r2-r8))
-- `<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension; served at `/en/learn/legacy/<domain>/…`)
+- `<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension; served at `/en/c/learn/legacy/<domain>/…`)
 - `<REDIR>` = `apps/ayokoding-www/src/redirects/`
 - `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`
-- `<NAVSPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/` (existing domain — the three-bucket Gherkin lands beside `content-namespace-redirects.feature`)
+- `<NAVSPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/` (existing domain — the three-bucket Gherkin lands beside `content-namespace-redirects.feature`, whose own scenarios pin the `/c/` namespace: `/en/learn/software-engineering` 308-redirects to `/en/c/learn/software-engineering`)
 - **This plan is careers-only** (R4): the 4 path ids it owns are `careers/interview-ready/software-engineer`,
   `careers/immediately-effective/software-engineer`, `careers/fundamentally-strong/software-engineer`,
   `careers/immediately-effective/ai-engineer` (fourth path, corrected 2026-07-21 — see
@@ -58,7 +76,9 @@ apps/ayokoding-www/src/features/course-paths/          # NEW feature — this pl
 
 Plus one edit outside the feature:
 `apps/ayokoding-www/src/features/content/core/content-url.ts` [Repo-grounded — file exists] gains an
-optional `pathId` param and the canonical `/en/learn/courses/<course-id>` shape.
+optional `pathId` param appending `?path=<path-id>`. Its canonical shape —
+`/en/c/learn/courses/<course-id>` — is the `/c/`-namespaced URL the function **already** emits and is
+preserved unchanged; see the `/c/` note under [Path constants](#path-constants).
 
 ### Module interaction
 
@@ -267,7 +287,23 @@ shape is exercised only via unit-test fixtures proving the code does not silentl
   the constraint the ruling keeps open, so that a future `skills/<arc>/<subject>` (3 segments) is a
   purely additive change, never a breaking URL/schema migration.
 - **DO validate that the first segment is one of `careers` | `skills`**, and that the id resolves to a
-  loaded manifest. Depth itself is never the thing asserted.
+  loaded manifest.
+- **The one permitted arity assertion is a floor, never a ceiling and never an equality.** The
+  `.refine()` may assert that **at least one further non-empty segment follows** the category segment
+  — so a bare `"careers"` or `"careers/"` is rejected as malformed — and nothing beyond that. No
+  **fixed** total segment count is ever asserted, in either direction: `=== 2`, `=== 3`, `!== 3`,
+  `<= 3` and `> 3` are all forbidden; `>= 2` (equivalently `> 1`) is the sole legal depth expression.
+  A 4-segment `careers/a/b/c` must validate, and a unit-test fixture proves it (Phase 1.2).
+- **Segments are counted after empty tokens are dropped.** `"careers/".split("/")` is
+  `["careers", ""]`, so an unfiltered length-2 count would wrongly accept it; the count is therefore
+  taken over `pathId.split("/").filter(Boolean)`, making
+  `pathId.split("/").filter(Boolean).length >= 2` the concrete form of the floor above. This filter
+  constrains **emptiness, not arity** — it removes empty segments and asserts nothing about how many
+  non-empty ones there are, so `"skills/accounting"` (2), `"careers/interview-ready/software-engineer"`
+  (3) and `"careers/a/b/c"` (4) all pass the identical expression, while `"careers"` and `"careers/"`
+  (both 1 after filtering) are rejected by it. The filter is also invisible to the Phase 1.2 REFACTOR
+  depth guard, which flags comparisons against 3 or 4 and equalities against 2 — `filter(Boolean).length >= 2`
+  matches neither alternative, so no guard change is needed.
 - **`arc` is a required manifest field, independent of the URL grammar (R8).** Every `PathManifest` —
   careers or skills — carries an explicit `arc` string. For `careers/*` paths the arc is also the
   `pathId`'s middle segment (`interview-ready`, `immediately-effective`, or `fundamentally-strong`).
@@ -278,15 +314,18 @@ shape is exercised only via unit-test fixtures proving the code does not silentl
   what R2 forbids. Keeping `arc` a required field regardless of category means only the URL grammar
   would ever need to widen.
 - **Unit-test proof of depth-independence** (Phase 1.2, `schemas.test.ts`): a fixture manifest with a
-  2-segment `skills/<subject>` `pathId` and a fixture manifest with a 3-segment `careers/<arc>/<role>`
-  `pathId` both validate successfully through the same `PathManifestSchema`, and a fixture whose
-  `pathId` starts with neither `careers/` nor `skills/` is rejected. No fixture asserts a specific
-  segment count.
+  2-segment `skills/<subject>` `pathId`, one with a 3-segment `careers/<arc>/<role>` `pathId`, **and
+  one with a 4-segment `careers/a/b/c` `pathId`** all validate successfully through the same
+  `PathManifestSchema`; a fixture whose `pathId` starts with neither `careers/` nor `skills/` is
+  rejected; and both bare single-segment fixtures — `"careers"` **and** `"careers/"` — are rejected
+  by the same minimum-arity floor, because the count is taken after empty tokens are dropped. No
+  fixture asserts a specific segment count.
 
 This plan does not itself validate that a `skills/` manifest exists or resolves to any real content —
-the `skills/` category, its manifests, and its corpus are owned end-to-end by a separate, not-yet-created
-plan (see [§Ownership split](#ownership-split-careers-vs-skills--r4)). What this plan guarantees is that
-its own schema and resolvers never structurally prevent that plan's manifests from loading.
+the `skills/` category, its manifests, and its corpus are owned end-to-end by **two** sibling plans,
+`ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` (see
+[§Ownership split](#ownership-split-careers-vs-skills--r4)). What this plan guarantees is that
+its own schema and resolvers never structurally prevent either plan's manifests from loading.
 
 ### Canonical `pathId` form (2026-07-21 ruling — binding on every sibling plan)
 
@@ -304,15 +343,15 @@ for careers paths (`interview-ready/software-engineer`) instead of the 3-segment
 1. **Full form, not a 2-field split.** `PathManifest` has exactly one identifier field, `pathId`,
    never a `pathId` + `category` pair. Splitting them would let the two drift (a manifest's `category`
    field disagreeing with its own `pathId`'s first segment) for no benefit — a single string is both
-   the URL suffix (`/en/learn/paths/<pathId>`), the YAML file's nested path
+   the URL suffix (`/en/c/learn/paths/<pathId>`), the YAML file's nested path
    (`<MANIFESTS><pathId>.yaml`), and the `?path=` query value, so keeping it one string keeps all
    three uses trivially in sync.
 2. **A bare 2-segment careers shorthand is never legal — not an alias, not a legacy form. It is
    invalid.** `interview-ready/software-engineer` is **structurally indistinguishable in arity** from
    a 2-segment `skills/<subject>` id (R2's own point: a fixed-arity assumption anywhere is already
    wrong, which is exactly why an arity-only-implied-category shorthand is hazardous). The schema's
-   `.refine()` checks the **literal value** of the first segment, not segment count — so
-   `interview-ready/software-engineer`'s first segment (`interview-ready`) is neither `careers` nor
+   `.refine()` checks the **literal value** of the first segment, never a **fixed** segment count —
+   so `interview-ready/software-engineer`'s first segment (`interview-ready`) is neither `careers` nor
    `skills` and `PathManifestSchema.safeParse(...)` **rejects it outright**, exactly like any other
    malformed `pathId`. No code path in this plan special-cases or coerces the 2-segment shorthand.
 3. **Resolution of the other form is a hard, typed validation failure — never silent acceptance.**
@@ -320,9 +359,14 @@ for careers paths (`interview-ready/software-engineer`) instead of the 3-segment
    a category-less careers id into its 3-segment canonical form. Silent acceptance is exactly the
    failure mode this ruling forecloses: it would let two spellings of the same path coexist and
    diverge without anything failing (per the concern that prompted this ruling). Any plan whose
-   content still writes the 2-segment shorthand for a careers path (plan 01, confirmed; possibly
-   others) is citing an **invalid** `pathId` and must update to the 3-segment canonical form — that
-   conformance sweep is **not** this plan's to run (see the escalation-response note below).
+   content still writes the 2-segment shorthand for a careers path is citing an **invalid** `pathId`
+   and must update to the 3-segment canonical form — that conformance sweep is **not** this plan's to
+   run (see the escalation-response note below). **Status, re-measured 2026-07-21**: all six sibling
+   `ayokoding-learning-path-*` folders now write the 3-segment form; the four remaining 2-segment
+   hits in `ayokoding-learning-path-01-url-restructure` are references to the legacy **content
+   directory** `content/en/learn/fundamentally-strong/software-engineer/` (that plan's `<SE_OLD>`
+   constant) — a filesystem path, not a `pathId` — and are correct as written. The escalation is
+   closed; nothing is outstanding.
 
 **Filename convention for `syllabus/paths/manifest-*.md` mirrors.** These filenames do **not** encode
 the category today (`manifest-interview-ready-software-engineer.md`,
@@ -354,7 +398,8 @@ The schema is written in `<FEAT>core/schemas.ts` using **zod 4.3.6** [Repo-groun
 dependency list. Shape:
 
 - `pathId` — string, the slash-form path ID. Validated (via `.refine()`) to start with `careers/` or
-  `skills/`; **never** validated by segment count (R2).
+  `skills/` **and** to carry at least one further segment; **never** validated by a fixed segment
+  count, and never bounded above (R2).
 - `arc` — string, **required** on every manifest regardless of category (R8). Not constrained to a
   fixed enum — new arcs (careers or skills) are expected to be added later without a schema change.
 - `title` — string, display title.
@@ -548,7 +593,7 @@ sequenceDiagram
     participant P4 as course-authoring (Wave 2)
     participant P5 as manifests (Wave 3)
 
-    P2->>Main: merge core/ five pure modules + schemas.ts + MANIFESTS dir
+    P2->>Main: merge core/ six pure modules incl. schemas.ts + MANIFESTS dir
     P2->>Main: merge course-paths Gherkin (RED, no step bindings)
     Note over Main: handoff signal — schemas.ts exists AND typecheck exits 0
     Main->>P3: import resolvePathNav, parsePathContext, resolvePrerequisites
@@ -588,8 +633,9 @@ amendment annotations intact.
   prerequisites of `building-production-cli-tools` (no course now precedes its own prereqs in any path).
 - **R2 / R8 · Variable-depth `pathId` with a required `arc` field (2026-07-21 ruling; cited by R-number,
   not `DD-NN`, to avoid colliding with the numbering-gap tokens documented below).** `pathId` is
-  `careers/<arc>/<role>` (3 segments) or `skills/<subject>` (2 segments); the schema validates only the
-  first segment (`careers` | `skills`) and manifest resolvability, never segment count, so a future
+  `careers/<arc>/<role>` (3 segments) or `skills/<subject>` (2 segments); the schema validates the
+  first segment (`careers` | `skills`) plus a **minimum** of one further segment, never a **fixed**
+  segment count and never an upper bound, so a future
   `skills/<arc>/<subject>` is purely additive. `arc` is a required `PathManifest` field independent of
   the URL grammar — present even where the URL omits it (every `skills/*` path, always the
   `immediately-effective` arc per R8). See
@@ -641,19 +687,59 @@ the nested `manifests/**/*.yaml` data file in the `course-paths` feature.
    content exception (rule 2).** The corpus's curriculum content — course specs, orderings,
    pedagogical framing — arrived settled and is never re-derived, added to, or removed by this plan,
    **except** the single R3 content exception below. This is distinct from — and does not conflict
-   with — the mechanical, non-substantive correction in rule 1a.
-   1. **1a — Mechanical `careers/`-prefix correction (not a content exception).** This plan-fixer
-      pass corrected the path-id **strings** already present in `syllabus/README.md`,
+   with — the mechanical, non-substantive string corrections in rules 1a and 1b.
+   1. **1a — Mechanical `careers/`-prefix correction (not a content exception).** Two plan-fixer
+      passes corrected the path-id **strings** already present in `syllabus/README.md`,
       `syllabus/paths/README.md`, and all four manifest mirrors, to carry the `careers/` category
-      prefix R1/R2 made canonical. This is a **string substitution**, never a curriculum, ordering,
-      or framing decision — the same class of change as repointing a link after a rename (rule 5),
-      required because the R1/R2 URL-grammar ruling changed every path id's canonical spelling
-      programme-wide (see [§Canonical `pathId`
-      form](#canonical-pathid-form-2026-07-21-ruling--binding-on-every-sibling-plan)); leaving the
-      corpus's own cross-references citing a `pathId` form the schema itself now rejects would make
-      the corpus internally broken, not merely stale. It does **not** count against the "one content
-      exception" invariant, and no delivery step performs it — like the R3 exception's rename, it
-      was applied directly in this plan-authoring pass, before Phase 0.
+      prefix R1/R2 made canonical. The first pass missed five ids in `syllabus/paths/README.md`
+      (four table rows plus one prose bullet); the 2026-07-21 audit caught the gap and the follow-up
+      pass closed it. **Verification, falsifiable both ways** — searching those two files for a
+      path-id spelling that begins with a bare arc token (`interview-ready/`,
+      `immediately-effective/` or `fundamentally-strong/` rather than `careers/`) finds **exactly
+      one** occurrence: `syllabus/paths/README.md`'s explicitly-historical
+      `immediately-effective/software-engineer-to-ai-engineer` annotation, which correctly records
+      the retired name and is deliberately left unprefixed. Any additional occurrence is a
+      regression; zero occurrences would mean the historical record was wrongly rewritten. This is a
+      **string substitution**, never a curriculum, ordering, or framing decision — the same class of
+      change as repointing a link after a rename (rule 5), required because the R1/R2 URL-grammar
+      ruling changed every path id's canonical spelling programme-wide (see
+      [§Canonical `pathId` form](#canonical-pathid-form-2026-07-21-ruling--binding-on-every-sibling-plan));
+      leaving the corpus's own cross-references citing a `pathId` form the schema itself now rejects
+      would make the corpus internally broken, not merely stale. It does **not** count against the
+      "one content exception" invariant, and no delivery step performs it — like the R3 exception's
+      rename, it was applied directly in the plan-authoring passes, before Phase 0.
+   2. **1b — Mechanical corrections of two further string classes (not content exceptions).** Rule
+      1a's justification is not specific to path-id spellings: it licenses any **string
+      substitution** that keeps the corpus's own cross-references consistent with the rulings and
+      repo facts they cite, and forbids any curriculum, ordering, or framing decision. Two further
+      classes were corrected under it in the 2026-07-22 plan-fixer pass, both because the corpus had
+      come to **contradict the very `tech-docs.md` sections it cross-links to**:
+      1. **Sibling-plan identifiers.** `syllabus/README.md` and `syllabus/paths/README.md` described
+         the `skills/` category as owned by a single **"not-yet-created" "plan 06"**, while the
+         section they link to ([§Ownership split](#ownership-split-careers-vs-skills--r4)) names
+         **two** existing plans. Both sentences now state the two-plan model and name
+         `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`.
+         **Verification, falsifiable both ways** — searching `syllabus/` for `not-yet-created` or
+         `not yet created` prints nothing and exits 1 (any hit is a regression), while
+         `grep -rl "ayokoding-learning-path-06-skills-accounting" syllabus/` names exactly
+         `syllabus/README.md` and `syllabus/paths/README.md` (zero files would mean the correction
+         was reverted).
+      2. **Serving-URL namespace.** Twelve serving-URL claims in `syllabus/README.md`,
+         `syllabus/paths/README.md` and the four manifest mirrors asserted the **legacy**
+         un-namespaced `/en/learn/…` form. `contentUrl` maps every content-tree slug to
+         `/{locale}/c/{slug}` and the legacy form 308-redirects to it (see
+         [§Path constants](#path-constants)), so those strings named a URL that answers **308**, not
+         **200** — the exact failure mode this plan's Phase 4 sweep is written to catch. All twelve
+         now carry `/c/`. **Verification, falsifiable both ways** — searching `syllabus/` for
+         `/en/learn/` prints nothing and exits 1, while
+         `grep -rn "/en/c/learn/" syllabus/ | wc -l` prints **12** (as of 2026-07-22; the corpus is
+         frozen, so this figure is an invariant, not a drifting measurement).
+
+      Both classes were corrected **in full**, never partially: a half-corrected class leaves the
+      corpus asserting two different answers to the same question, which is strictly worse than
+      uniform staleness. Like 1a, neither counts against the "one content exception" invariant and
+      no delivery step performs either.
+
 2. **The R3 custody exception (2026-07-21 ruling).** `careers/immediately-effective/ai-engineer`
    (formerly modelled as a transition path assuming SWE competence, prerequisites linked not included)
    is now a genuine from-scratch path. This is a **content change, not a rename** — the retired
@@ -674,7 +760,7 @@ the nested `manifests/**/*.yaml` data file in the `course-paths` feature.
    archival](./README.md#archival-is-gated-on-downstream-archival)) — a rename obligates fixing its
    own inbound references; that is a mechanical corollary of the one recorded exception, not a
    second, independent content exception.
-3. **The other four plans link into it and never copy it.** A copy forks the source of truth for 121
+3. **Every sibling plan links into it and never copies it.** A copy forks the source of truth for 121
    course specs and four manifest orderings, so a later spec correction lands in one copy only.
 4. **Cross-plan references use the full relative path** —
    `../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/<rest>` while both plans sit
@@ -687,30 +773,34 @@ the nested `manifests/**/*.yaml` data file in the `course-paths` feature.
 
 The `syllabus/` corpus custodied here carries **28 back-references** into this plan's `tech-docs.md`,
 `prd.md` and `README.md`, targeting sections that the five-way split routed to **other** plans. The
-corpus is frozen — no step in this plan edits a file under `syllabus/` — so those anchors are kept
-resolvable from **this** side instead, as pointer sections.
+corpus is frozen — the only delivery step that edits a file under `syllabus/` is the one recorded R3
+custody exception, [delivery.md Phase 1.4](./delivery.md#14-syllabus-custody-exception--ai-engineer-path-correction-r3),
+which touches a single manifest mirror and no anchor target — so those anchors are kept resolvable
+from **this** side instead, as pointer sections.
 
 Each heading below exists **only** to keep an inbound anchor alive and to name the plan that now owns
 that content. None of them duplicates the content itself: duplicating a 200-line catalog or a
 four-manifest ordering would fork exactly the source of truth this split exists to keep singular.
 
-The 12 distinct broken targets and their owners:
+The distinct broken targets and their owners:
 
-| Anchor target                                                 | Owning plan                                       |
-| ------------------------------------------------------------- | ------------------------------------------------- |
-| `tech-docs.md#course-library-catalog`                         | `ayokoding-learning-path-04-course-authoring`     |
-| `tech-docs.md#path-manifests` (and its four per-path anchors) | `ayokoding-learning-path-05-manifests`            |
-| `tech-docs.md#path-aware-navigation-ui-ayokoding-www`         | `ayokoding-learning-path-03-navigation-ui`        |
-| `tech-docs.md#smoothness-architecture-per-path`               | `ayokoding-learning-path-05-manifests`            |
-| `prd.md#new-course--capstone-specifications`                  | `ayokoding-learning-path-04-course-authoring`     |
-| `README.md#four-paths-one-library-per-role-convergence`       | this plan's `README.md` (carried as real content) |
+| Anchor target                                                                  | Owning plan                                       |
+| ------------------------------------------------------------------------------ | ------------------------------------------------- |
+| `tech-docs.md#course-library-catalog`                                          | `ayokoding-learning-path-04-course-authoring`     |
+| `tech-docs.md#path-manifests` (and its four per-path anchors)                  | `ayokoding-learning-path-05-manifests`            |
+| `tech-docs.md#path-aware-navigation-ui-ayokoding-www`                          | `ayokoding-learning-path-03-navigation-ui`        |
+| `tech-docs.md#smoothness-architecture-per-path`                                | `ayokoding-learning-path-05-manifests`            |
+| `tech-docs.md#productive-in-target-codebases-proof-of-transfer-outcome-anchor` | `ayokoding-learning-path-04-course-authoring`     |
+| `prd.md#new-course--capstone-specifications`                                   | `ayokoding-learning-path-04-course-authoring`     |
+| `README.md#four-paths-one-library-per-role-convergence`                        | this plan's `README.md` (carried as real content) |
 
 ### Course Library Catalog
 
 Moved to **`ayokoding-learning-path-04-course-authoring`**. The catalog enumerates the **127-course
 careers/software-engineering library** (121 software-engineer-role baseline + 6 net-new AI-engineering
 courses, DD-28) — this figure is the careers-only total (R4/R5); the `skills/` category's ERP +
-accounting corpus is additional and owned end-to-end by a separate, not-yet-created plan. The
+accounting corpus is additional and owned end-to-end by `ayokoding-learning-path-07-skills-erp` and
+`ayokoding-learning-path-06-skills-accounting` respectively. The
 authoritative per-course detail is [`syllabus/courses/`](./syllabus/courses/README.md), custodied
 here.
 
@@ -718,7 +808,7 @@ here.
 
 Moved to **`ayokoding-learning-path-05-manifests`**, which owns every **careers** manifest file and
 every manifest mutation — **exactly the 4 manifests below**, not 6 (R4). A sibling `skills/` category
-(2 manifests) is owned end-to-end by a separate plan; see
+(2 manifests) is owned end-to-end by two other plans; see
 [§Ownership split](#ownership-split-careers-vs-skills--r4). The authoritative human-readable orderings
 are [`syllabus/paths/`](./syllabus/paths/README.md), custodied here; each YAML manifest's `courseOrder`
 is transcribed from its mirror.
@@ -749,15 +839,21 @@ Added 2026-07-20 as a transition path; **corrected 2026-07-21 (R3)** to a from-s
 
 **Ruling, 2026-07-21.** Plans 01-05 (this plan included) absorb the `careers/` URL category segment and
 its content; their wave DAG (W1: 01, 02 · W2: 03, 04 · W3: 05) is unchanged, and they stay
-**careers-only**. A new, not-yet-created "plan 06" owns the `skills/` category **end-to-end** — both
-path landings, both manifests (`skills/enterprise-resource-planning`, `skills/accounting`), and the
-full ERP + accounting course corpus (syllabus specs and authored bodies). Neither category's plans
-touch the other's manifests, corpus, or landing pages.
+**careers-only**. The `skills/` category is owned **end-to-end** by **two** sibling plans, one per
+subject [Repo-grounded — both folders exist under `plans/backlog/`]:
 
-This scopes the manifest-ownership invariant **per category**, not globally: `ayokoding-learning-path-05-manifests`
+| `skills/` path                        | Owning plan                                    | Scope                                         |
+| ------------------------------------- | ---------------------------------------------- | --------------------------------------------- |
+| `skills/accounting`                   | `ayokoding-learning-path-06-skills-accounting` | Path landing, manifest, and accounting corpus |
+| `skills/enterprise-resource-planning` | `ayokoding-learning-path-07-skills-erp`        | Path landing, manifest, and ERP corpus        |
+
+Neither category's plans touch the other's manifests, corpus, or landing pages, and neither skills
+plan touches the other's.
+
+This scopes the manifest-ownership invariant **per path**, not globally: `ayokoding-learning-path-05-manifests`
 is the sole owner of the **4 careers manifests** (unchanged from its original "owns every manifest
-file" framing, now stated precisely as careers-only); the separate skills plan is the sole owner of the
-**2 skills manifests**. Neither owns the other's. Every place in this plan's docs that states "the
+file" framing, now stated precisely as careers-only); each skills plan is the sole owner of its **one**
+skills manifest. None owns another's. Every place in this plan's docs that states "the
 manifest owner" or "four manifests" is scoped to careers — see the corrections in
 [§Path constants](#path-constants), [§`syllabus/` folder structure](#syllabus-folder-structure-and-custody),
 and [§Path Manifests](#path-manifests) above.
@@ -782,6 +878,16 @@ as `checkPrerequisiteConsistency`; everything else in the smoothness architectur
 monotonicity, skip affordances, refresh register) is an editorial property of a manifest and is
 audited there.
 
+### Productive in Target Codebases (proof-of-transfer outcome anchor)
+
+Moved to **`ayokoding-learning-path-04-course-authoring`**, which owns the course library and
+therefore the outcome claim the library makes. The claim, in one sentence so the pointer is not
+empty: the library teaches **durable principles**, and the named target codebases are **evidence
+those principles transfer**, never subject matter — no course names any repository as its subject.
+This heading exists only to keep the inbound anchor from
+[`syllabus/README.md`](./syllabus/README.md) resolvable while the corpus stays frozen; the full
+statement lives in the owning plan.
+
 ## Orphan-segment / one-pathId-one-page investigation (R7)
 
 **Task, 2026-07-21**: the decision record's R7 asks every plan touching path ids to check whether its
@@ -790,12 +896,14 @@ landing) and `/paths/careers/<arc>/` (arc landing) are now also pages, alongside
 path landing (`/paths/careers/<arc>/<role>`). Findings below are reported per the task's own
 instruction even though the fix, if any is needed, belongs to a sibling plan.
 
-- **This plan's four core modules never assume 1:1 `pathId` → page.** `parsePathContext` and
+- **This plan's six core modules never assume 1:1 `pathId` → page.** `parsePathContext` and
   `resolvePathNav` (`path-context.ts`, `path-nav.ts`) treat `pathId` as an **opaque string**, matched
   only against the set of loaded manifests — they resolve "does a manifest with this id exist," never
   "is there exactly one page for this id." `manifest-integrity.ts` operates purely over the manifest
-  set, with no page-count assumption. None of the four would need to change if a `pathId` were reachable
-  from more than one page, or from none.
+  set, with no page-count assumption. `schemas.ts` validates a `pathId`'s shape and never its
+  reachability; `manifest.ts` loads and normalizes manifest records without reference to pages; and
+  `prerequisites.ts` works over course ids alone, which are not `pathId`s at all. None of the six
+  would need to change if a `pathId` were reachable from more than one page, or from none.
 - **`content-url.ts`'s `contentUrl` only ever builds one URL shape**: the canonical course page,
   optionally carrying `?path=<pathId>`. It has no function that constructs or enumerates an
   **arc-landing** (`/paths/careers/<arc>/`) or **category-landing** (`/paths/careers/`,
@@ -852,7 +960,9 @@ manifest any Wave-2/3 plan will ever publish is validated by exactly this code, 
 the programme re-implements it.
 
 **How it is exercised, named explicitly**: each function's own TDD-authored unit suite
-(`path-context.test.ts`, `prerequisites.test.ts`, `manifest-integrity.test.ts`, `path-nav.test.ts`),
+(`schemas.test.ts`, `manifest.test.ts`, `path-context.test.ts`, `prerequisites.test.ts`,
+`manifest-integrity.test.ts`, `path-nav.test.ts` — one per `core/` module, all six listed in
+[File Impact](#file-impact)),
 re-run at every phase gate, plus `content-url.test.ts` for the modified `contentUrl()`.
 
 **What cannot run, and why** [Repo-grounded, re-verified 2026-07-21]: `api-quality-gate` requires a
@@ -891,10 +1001,22 @@ externally-observable contracts — so it carries companion Gherkin under `<SPEC
 Phase 2.
 
 The step bindings that turn that Gherkin green are **not** this plan's: they live in the shell
-components and route wiring built by `ayokoding-learning-path-03-navigation-ui`. So
-`npx nx run ayokoding-www:specs:behavior:coverage` will report a coverage delta at this plan's Phase 2
-gate. That delta is **recorded explicitly with its closing plan named**, rather than treated as an
-anonymous regression — see the Phase 2 gate in `delivery.md`.
+components and route wiring built by `ayokoding-learning-path-03-navigation-ui`.
+
+**How the deferral is expressed without redding the build — one semantics, everywhere.** Every
+scenario this plan authors under `<SPECS>` carries the `@wip` tag. `@wip` is the behavior-coverage
+validator's own step-binding-deferral exemption [Repo-grounded —
+`apps/rhino-cli/src/application/behavior_coverage/validator.rs`: "`@wip` scenarios are fully exempt",
+and `extract.rs` parses the tag], so `npx nx run ayokoding-www:specs:behavior:coverage` **exits 0**
+at every gate in this plan, before and after the new domain lands. That matters beyond tidiness:
+`test:quick` runs `test:specs`, which runs `specs:behavior:coverage` [Repo-grounded —
+`apps/ayokoding-www/project.json`], and `test:quick` is a pre-push hook target — so an untagged
+`course-paths` scenario would block **every** push from Phase 2 onward, including the archival push.
+
+The **deferred obligation** is recorded explicitly with its closing plan named, rather than expressed
+as a red target: `ayokoding-learning-path-03-navigation-ui` replaces the `@wip` tags with real level
+tags (`@unit` / `@e2e`) and adds the matching `@covers` markers when it authors the step bindings.
+See the Phase 2 gate in `delivery.md`.
 
 The existing Gherkin domain layout is [Repo-grounded]:
 `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/` currently holds `app-shell/`, `content/`,
@@ -903,24 +1025,26 @@ domain folder**.
 
 ## File Impact
 
-| Path                                                                                                                                | Change                            | Note                                                                                                                                          |
-| ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/ayokoding-www/src/features/course-paths/core/schemas.ts`                                                                      | _New file_                        | `PathManifest` zod schema                                                                                                                     |
-| `apps/ayokoding-www/src/features/course-paths/core/manifest.ts`                                                                     | _New file_                        | Type + course-ref normalization                                                                                                               |
-| `apps/ayokoding-www/src/features/course-paths/core/path-nav.ts`                                                                     | _New file_                        | `resolvePathNav`                                                                                                                              |
-| `apps/ayokoding-www/src/features/course-paths/core/path-nav.test.ts`                                                                | _New test_                        | Boundaries + missing course                                                                                                                   |
-| `apps/ayokoding-www/src/features/course-paths/core/path-context.ts`                                                                 | _New file_                        | `parsePathContext`                                                                                                                            |
-| `apps/ayokoding-www/src/features/course-paths/core/path-context.test.ts`                                                            | _New test_                        | Valid / unknown / absent                                                                                                                      |
-| `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts`                                                                | _New file_                        | `resolvePrerequisites`, `checkPrerequisiteConsistency`                                                                                        |
-| `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts`                                                           | _New test_                        | Declared / missing; consistent + deliberately-violating fixtures                                                                              |
-| `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.ts`                                                           | _New file_                        | `checkManifestIntegrity`                                                                                                                      |
-| `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.test.ts`                                                      | _New test_                        | Unresolved + duplicate ID fixtures                                                                                                            |
-| `apps/ayokoding-www/src/features/course-paths/manifests/README.md`                                                                  | _New file_                        | Directory marker; states which plan writes `.yaml` here                                                                                       |
-| `apps/ayokoding-www/src/features/content/core/content-url.ts`                                                                       | Modified                          | Optional `pathId` param + canonical `/en/learn/courses/<course-id>` shape [Repo-grounded — file exists]                                       |
-| `apps/ayokoding-www/src/features/content/core/content-url.test.ts`                                                                  | Modified                          | New assertions; existing assertions updated for the canonical shape in the same commit                                                        |
-| `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`                                                                 | _New dir_                         | Gherkin companion + `README.md`                                                                                                               |
-| `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md` | Modified (one recorded exception) | R3 custody exception; Stage 0 ordered in [delivery.md Phase 1.4](./delivery.md#14-syllabus-custody-exception--ai-engineer-path-correction-r3) |
-| `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/` (all other files)                                  | Unchanged                         | Custodied; **no delivery step edits any other file**                                                                                          |
+| Path                                                                           | Change                            | Note                                                                                                                                                                         |
+| ------------------------------------------------------------------------------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/ayokoding-www/src/features/course-paths/core/schemas.ts`                 | _New file_                        | `PathManifest` zod schema                                                                                                                                                    |
+| `apps/ayokoding-www/src/features/course-paths/core/schemas.test.ts`            | _New test_                        | Six `pathId` / `arc` / `courseOrder` assertion groups; created by [delivery.md cycle 1.2 RED](./delivery.md#12-pathmanifest-zod-schema--tdd-cycle)                           |
+| `apps/ayokoding-www/src/features/course-paths/core/manifest.ts`                | _New file_                        | Type + course-ref normalization                                                                                                                                              |
+| `apps/ayokoding-www/src/features/course-paths/core/manifest.test.ts`           | _New test_                        | Course-ref normalization; created by [delivery.md cycle 2.1 RED](./delivery.md#21-tdd-cycle-1--course-ref-normalization-manifestts)                                          |
+| `apps/ayokoding-www/src/features/course-paths/core/path-nav.ts`                | _New file_                        | `resolvePathNav`                                                                                                                                                             |
+| `apps/ayokoding-www/src/features/course-paths/core/path-nav.test.ts`           | _New test_                        | Boundaries + missing course                                                                                                                                                  |
+| `apps/ayokoding-www/src/features/course-paths/core/path-context.ts`            | _New file_                        | `parsePathContext`                                                                                                                                                           |
+| `apps/ayokoding-www/src/features/course-paths/core/path-context.test.ts`       | _New test_                        | Valid / unknown / absent                                                                                                                                                     |
+| `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts`           | _New file_                        | `resolvePrerequisites`, `checkPrerequisiteConsistency`                                                                                                                       |
+| `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts`      | _New test_                        | Declared / missing; consistent + deliberately-violating fixtures                                                                                                             |
+| `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.ts`      | _New file_                        | `checkManifestIntegrity`                                                                                                                                                     |
+| `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.test.ts` | _New test_                        | Unresolved + duplicate ID fixtures                                                                                                                                           |
+| `apps/ayokoding-www/src/features/course-paths/manifests/README.md`             | _New file_                        | Directory marker; states which plan writes `.yaml` here                                                                                                                      |
+| `apps/ayokoding-www/src/features/content/core/content-url.ts`                  | Modified                          | Optional `pathId` param appending `?path=`; the existing `/{locale}/c/{slug}` shape (`/en/c/learn/courses/<course-id>`) is preserved unchanged [Repo-grounded — file exists] |
+| `apps/ayokoding-www/src/features/content/core/content-url.test.ts`             | Modified                          | New `?path=` assertions only; the seven existing assertions stay **unchanged** (the URL shape does not move)                                                                 |
+| `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`            | _New dir_                         | Gherkin companion + `README.md`                                                                                                                                              |
+| `<PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`          | Modified (one recorded exception) | R3 custody exception; Stage 0 ordered in [delivery.md Phase 1.4](./delivery.md#14-syllabus-custody-exception--ai-engineer-path-correction-r3)                                |
+| `<PLAN>/syllabus/` (all other files)                                           | Unchanged                         | Custodied; **no delivery step edits any other file**                                                                                                                         |
 
 ## Dependencies
 
@@ -943,10 +1067,13 @@ Every phase in this plan is additive and independently revertable:
   existing function. `git revert` of the phase commits removes the feature wholesale; nothing else
   imports it yet, because the only importers are Wave-2 plans that have not started.
 - **The `content-url.ts` edit** is the one change touching shipped code. It is additive (an optional
-  parameter) and reversible in isolation; the Phase 4 no-regression sweep across both locales is what
-  proves it is safe to keep.
-- **The `syllabus/` corpus** is never modified, so there is nothing in it to roll back.
-- **The archival repoint** touches only markdown links in four sibling plan folders. Reverting the
+  parameter, with the `/c/` URL shape preserved) and reversible in isolation; the Phase 4
+  no-regression sweep across both locales is what proves it is safe to keep.
+- **The `syllabus/` corpus** is modified by exactly one delivery step — Phase 1.4's recorded R3
+  custody exception, an in-place edit to
+  `syllabus/paths/manifest-immediately-effective-ai-engineer.md`. Reverting that one commit restores
+  the mirror; every other file in the corpus is untouched and has nothing to roll back.
+- **The archival repoint** touches only markdown links in sibling plan folders. Reverting the
   archival commit restores both the folder location and the links atomically, because they land in
   the same commit.
 
@@ -960,13 +1087,20 @@ Per the repo's three-level testing standard and TDD mandate, every module here i
   `checkPrerequisiteConsistency` (clean fixture passes; deliberately-violating fixture is reported),
   `checkManifestIntegrity` (clean fixture passes; unresolved-ID and duplicate-ID fixtures are
   reported), `PathManifest` schema validation, and `contentUrl` with `pathId`.
-- **Integration** (`test:integration`) — **not exercised by this plan**. Loading manifests from disk
-  is `manifest-repository.ts`'s job, in `ayokoding-learning-path-03-navigation-ui`. The affected
-  target is still run to prove no regression.
-- **E2E** (`test:e2e`) — **no new E2E is authored here**; this plan renders nothing. The affected
-  target is run to prove the `content-url.ts` change regresses no existing journey.
-- **`specs/` Gherkin companion** — authored RED under `<SPECS>`, consumed by
-  `specs:behavior:coverage`; step bindings land in `ayokoding-learning-path-03-navigation-ui`.
+- **Integration** (`test:integration`) and **E2E** (`test:e2e`) — **neither tier is exercised by this
+  plan, and neither can be.** Both targets are `echo` no-op stubs for `ayokoding-www`
+  [Repo-grounded — `apps/ayokoding-www/project.json`: `test:integration` runs
+  `echo 'no-op: integration tier not used for this content app'` and `test:e2e` runs
+  `echo 'no-op: target not applicable for this project'`], so they always exit 0 and **prove
+  nothing**. They are kept in the affected-target lists for completeness only; no acceptance clause
+  in this plan derives evidence from them. The actual regression evidence for the `content-url.ts`
+  change is `content-url.test.ts` (unit) plus the Phase 4 Playwright no-regression sweep. That the
+  one tier which could catch a cross-page URL regression is a stub here is a real gap in
+  `ayokoding-www`'s harness, not something this plan can close — it is raised as a Knowledge-Capture
+  candidate in `learnings.md`.
+- **`specs/` Gherkin companion** — authored RED under `<SPECS>` with every scenario tagged `@wip`, so
+  `specs:behavior:coverage` exits 0 throughout; step bindings (and the `@wip` removal) land in
+  `ayokoding-learning-path-03-navigation-ui`.
 - **Manual behavioural verification** — a targeted **no-regression sweep**, not a feature walk-through:
   the `content-url.ts` change alters link generation across the site, so Phase 4 opens existing learn
   pages in **both** supported locales (`en` and `id` [Repo-grounded — `SUPPORTED_LOCALES` in

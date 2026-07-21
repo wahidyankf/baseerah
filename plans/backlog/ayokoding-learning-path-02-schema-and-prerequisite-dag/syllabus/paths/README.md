@@ -5,11 +5,12 @@ data. A **path** is an ordered, prerequisite-consistent list of **course IDs** o
 [shared course library](../courses/README.md); it composes existing course building blocks in a chosen
 order and adds **zero new bodies** (every course body it names lives once in the library). **This plan
 is careers-only** (R4, 2026-07-21 ruling): all four paths below sit under the `careers/` URL category
-(`/en/learn/paths/careers/<arc>/<role>`), and `ayokoding-learning-path-05-manifests` owns exactly these
-**4 careers manifests** — not 6. A sibling `skills/` category (`/en/learn/paths/skills/<subject>`,
-2 manifests) exists in the wider programme but is owned **end-to-end** by a new "plan 06" (not yet
-created as of this ruling; its exact folder identifier is not this plan's to invent); neither its
-manifests nor its corpus live here. See
+(`/en/c/learn/paths/careers/<arc>/<role>`), and `ayokoding-learning-path-05-manifests` owns exactly these
+**4 careers manifests** — not 6. A sibling `skills/` category (`/en/c/learn/paths/skills/<subject>`,
+2 manifests) exists in the wider programme but is owned **end-to-end** by **two** sibling plans, one
+per subject — `ayokoding-learning-path-06-skills-accounting` owns `skills/accounting` and
+`ayokoding-learning-path-07-skills-erp` owns `skills/enterprise-resource-planning`; both folders
+exist under `plans/backlog/`. Neither their manifests nor their corpora live here. See
 [tech-docs §Ownership split](../../tech-docs.md#ownership-split-careers-vs-skills--r4) for the full
 accounting.
 
@@ -67,28 +68,30 @@ capstones — it is a specialization spine, not a whole-library ordering.
 Each manifest is the **human-readable mirror**. The **machine-consumed source of truth** is a standalone
 data file at `apps/ayokoding-www/src/features/course-paths/manifests/<path-id>.yaml` (nested to mirror
 the slash-form path id — e.g. `manifests/careers/interview-ready/software-engineer.yaml`). Path landing
-pages are served at `/en/learn/paths/<path-id>`; a course page reads path context via `?path=<path-id>`
+pages are served at `/en/c/learn/paths/<path-id>`; a course page reads path context via `?path=<path-id>`
 and its prev/next + breadcrumb follow that path's ordering. `<path-id>` is `careers/<arc>/<role>` for
 every path in this folder (R1, R2) — see
 [tech-docs §Variable-depth `pathId`](../../tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8).
 
 ## The paths
 
-All four path ids below share the `careers/` category segment (R1); it is omitted as its own table
-column since every row carries it.
+All four path ids below are written in their **full 3-segment canonical form**, including the
+`careers/` category segment (R1, R2). The bare 2-segment shorthand is **invalid** — not an alias, not
+a legacy form — and `PathManifestSchema.safeParse` rejects it outright; see
+[tech-docs §Canonical `pathId` form](../../tech-docs.md#canonical-pathid-form-2026-07-21-ruling--binding-on-every-sibling-plan).
 
-| Path id (under `careers/`)                | Persona                                                                    | Shape                                                                                                                        | Manifest                                                          |
-| ----------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `interview-ready/software-engineer`       | Experienced engineer re-entering the job market                            | Interview/production **spine** + optional **Go deeper tail** (116 courses)                                                   | [manifest](./manifest-interview-ready-software-engineer.md)       |
-| `immediately-effective/software-engineer` | Builder who wants to be effective fast                                     | Build-first **spine** + **Deepening band** (119 courses)                                                                     | [manifest](./manifest-immediately-effective-software-engineer.md) |
-| `fundamentally-strong/software-engineer`  | Learner who wants university-style depth                                   | Theory-first, **all 121 software-engineer-role courses** (complete mastery)                                                  | [manifest](./manifest-fundamentally-strong-software-engineer.md)  |
-| `immediately-effective/ai-engineer`       | Reader with no assumed prior SWE competence, specializing directly into AI | From-scratch **AI-specific specialization** — 15-course AI spine (Stages 1-5) + a pending from-scratch entry stage (Stage 0) | [manifest](./manifest-immediately-effective-ai-engineer.md)       |
+| Path id                                           | Persona                                                                    | Shape                                                                                                                        | Manifest                                                          |
+| ------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `careers/interview-ready/software-engineer`       | Experienced engineer re-entering the job market                            | Interview/production **spine** + optional **Go deeper tail** (116 courses)                                                   | [manifest](./manifest-interview-ready-software-engineer.md)       |
+| `careers/immediately-effective/software-engineer` | Builder who wants to be effective fast                                     | Build-first **spine** + **Deepening band** (119 courses)                                                                     | [manifest](./manifest-immediately-effective-software-engineer.md) |
+| `careers/fundamentally-strong/software-engineer`  | Learner who wants university-style depth                                   | Theory-first, **all 121 software-engineer-role courses** (complete mastery)                                                  | [manifest](./manifest-fundamentally-strong-software-engineer.md)  |
+| `careers/immediately-effective/ai-engineer`       | Reader with no assumed prior SWE competence, specializing directly into AI | From-scratch **AI-specific specialization** — 15-course AI spine (Stages 1-5) + a pending from-scratch entry stage (Stage 0) | [manifest](./manifest-immediately-effective-ai-engineer.md)       |
 
 - **`interview-ready`** was formerly `job-seeking`.
 - **`immediately-effective`** was formerly the `fundamentally-strong` shipping-first path.
 - **`fundamentally-strong`** is the new university-style path, and is also the library/section brand.
-- **`immediately-effective/ai-engineer`** is new (this plan) — the first AI-engineer-role path (D3); its
-  landing is served at `/en/learn/paths/careers/immediately-effective/ai-engineer`. **Corrected
+- **`careers/immediately-effective/ai-engineer`** is new (this plan) — the first AI-engineer-role path (D3); its
+  landing is served at `/en/c/learn/paths/careers/immediately-effective/ai-engineer`. **Corrected
   2026-07-21 (R3, custody exception)**: originally modelled and named as a software-engineer→AI-engineer
   _transition_ path (`immediately-effective/software-engineer-to-ai-engineer`, prerequisites linked, not
   included); it is now a genuine from-scratch path and its mirror file was renamed to

@@ -31,7 +31,7 @@ the standalone data file
 [tech-docs §Variable-depth `pathId`](../../tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8),
 the manifest also carries an explicit `arc: immediately-effective` field — the arc is a manifest field
 independent of the URL grammar, which is what keeps a future `skills/<arc>/<subject>` shape purely
-additive (R8). Path landing served at `/en/learn/paths/careers/immediately-effective/ai-engineer`. Order
+additive (R8). Path landing served at `/en/c/learn/paths/careers/immediately-effective/ai-engineer`. Order
 rationale:
 [tech-docs §Path `careers/immediately-effective/ai-engineer`](../../tech-docs.md#path-careersimmediately-effectiveai-engineer-fourth-path-corrected-2026-07-21).
 

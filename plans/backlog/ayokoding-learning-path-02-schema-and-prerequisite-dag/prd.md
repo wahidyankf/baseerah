@@ -22,9 +22,13 @@ Concretely, it ships five things:
 5. The **`course-paths` Gherkin companion** under
    `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`, authored RED.
 
-It also extends `content-url.ts` with the optional `pathId` param and the canonical
-`/en/learn/courses/<course-id>` URL shape, because path context has to be expressible in a link
-before any component can render one.
+It also extends `content-url.ts` with an optional `pathId` param, because path context has to be
+expressible in a link before any component can render one. The URL shape itself is **unchanged**:
+`contentUrl` already maps every content-tree slug to `/{locale}/c/{slug}` [Repo-grounded —
+`apps/ayokoding-www/src/features/content/core/content-url.ts` returns `` `/${locale}/c/${normalized}` ``;
+only the `LOOSE_PAGE_ALLOWLIST` top-level pages and the empty/`_index` slug escape the `/c/`
+namespace], so a course canonically lives at `/en/c/learn/courses/<course-id>` and the new parameter
+only appends `?path=<path-id>` to it.
 
 **Nothing user-facing ships here.** No component, no route, no rendered page, no manifest data file,
 no course body. Each of those has a named owner listed in
@@ -100,7 +104,7 @@ downstream plans.
   instead of shipping a dead entry.
 - As the **maintainer**, I want the ordering and prerequisite logic to be pure and IO-free, so that I
   can unit-test the hardest part of the product without a browser, a server, or a fixture site.
-- As a **downstream plan author** (`ayokoding-learning-path-03-navigation-ui`), I want the five
+- As a **downstream plan author** (`ayokoding-learning-path-03-navigation-ui`), I want the six
   `core/` modules merged and typechecking before I start, so that my RED steps fail on the behaviour
   under test rather than on an unresolved import.
 - As a **downstream plan author** (`ayokoding-learning-path-04-course-authoring`), I want the
@@ -127,12 +131,20 @@ scoped share of the decomposed build-green scenario — see the provenance note 
 fourth is new, added 2026-07-21 to resolve **OI-4** (see
 [tech-docs.md §Link-don't-walk](./tech-docs.md#link-dont-walk-prerequisite-omission-is-permitted-oi-4-ruling-2026-07-21)).
 
+> **Each `When` step names exactly one function under test**, so a downstream step-binder reading the
+> `.feature` file alone cannot wire a scenario to the wrong resolver.
+> `When the prerequisite-consistency check runs` binds `checkPrerequisiteConsistency`
+> (`{ violations, linkedPrerequisites }`, delivery cycles 2.6a / 2.6b);
+> `When the manifest-integrity check runs` binds `checkManifestIntegrity` (unresolved-ID and
+> duplicate-ID sets, delivery cycle 2.7). The two functions have disjoint outputs and are never
+> interchangeable.
+
 ```gherkin
 Scenario: A path manifest is a valid topological entry into the prerequisite DAG
   Given a path manifest lists a courseOrder of course IDs
-  When the manifest-integrity check runs
+  When the prerequisite-consistency check runs
   Then no course appears before any of its declared prerequisites that are also in the manifest
-  And every listed course ID resolves to an existing course in the library
+  And the check reports zero ordering violations for that manifest
 ```
 
 ```gherkin
@@ -146,7 +158,7 @@ Scenario: Every manifest course reference resolves to a real course
 ```gherkin
 Scenario: A path may link a prerequisite it does not include, without failing integrity
   Given a path manifest includes a course whose declared prerequisite is absent from that manifest
-  When the manifest-integrity check runs
+  When the prerequisite-consistency check runs
   Then the absent prerequisite is not reported as a violation
   And the absent prerequisite appears in the check's informational linkedPrerequisites list
 ```
@@ -195,7 +207,7 @@ The affected scenarios, by title:
 - _The breadcrumb reflects the active path_ — underpinned by `contentUrl(pathId)`.
 - _A course page surfaces its declared prerequisites_ — underpinned by `resolvePrerequisites`.
 - _A legacy fundamentally-strong URL redirects to the canonical course URL_ — underpinned by
-  `contentUrl`'s canonical `/en/learn/courses/<course-id>` shape. **Owned by
+  `contentUrl`'s canonical `/en/c/learn/courses/<course-id>` shape. **Owned by
   `ayokoding-learning-path-01-url-restructure`**, not by the navigation plan.
 
 ## Product Scope
@@ -213,21 +225,24 @@ The affected scenarios, by title:
   (`resolvePathNav`), `path-context.ts` (`parsePathContext`), `prerequisites.ts`
   (`resolvePrerequisites`, `checkPrerequisiteConsistency`), `manifest-integrity.ts`
   (`checkManifestIntegrity`) — each built RED → GREEN → REFACTOR.
-- The `content-url.ts` extension: an optional `pathId` param appending `?path=<path-id>`, and the
-  canonical `/en/learn/courses/<course-id>` shape.
+- The `content-url.ts` extension: an optional `pathId` param appending `?path=<path-id>` to the
+  canonical `/en/c/learn/courses/<course-id>` URL the function already emits. The `/c/` namespace is
+  preserved exactly as-is; this plan does not migrate it.
 - The `course-paths` Gherkin companion under
   `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/` plus its `README.md`, authored
-  RED (step bindings land in `ayokoding-learning-path-03-navigation-ui`).
-- Custody of the `syllabus/` detail layer (128 files), including the archival repoint of 34
-  cross-plan inbound links.
+  RED with every scenario tagged `@wip` (step bindings land in
+  `ayokoding-learning-path-03-navigation-ui`).
+- Custody of the `syllabus/` detail layer (128 files), including the archival repoint of every
+  inbound cross-plan link — the inventory measured at execution time, not hardcoded.
 
 **Out-of-scope features:**
 
 - Any **careers** `.yaml` manifest data file — owned by `ayokoding-learning-path-05-manifests`
   (4 manifests, not 6 — R4).
-- The entire `skills/` URL category — both path landings, both manifests
-  (`skills/enterprise-resource-planning`, `skills/accounting`), and its course corpus — owned
-  end-to-end by a separate, not-yet-created plan (R4). See
+- The entire `skills/` URL category — both path landings, both manifests, and its course corpus —
+  owned end-to-end by **two** sibling plans (R4):
+  `ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
+  `ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`). See
   [tech-docs.md §Ownership split](./tech-docs.md#ownership-split-careers-vs-skills--r4).
 - Any `shell/` component, the `?path=` route wiring, the path rail, the path banner, the paths hub,
   and every mockup render — owned by `ayokoding-learning-path-03-navigation-ui`.
@@ -246,7 +261,7 @@ The affected scenarios, by title:
 The `syllabus/` corpus custodied by this plan back-references one section of this document that the
 five-way split routed elsewhere. The corpus is frozen, so the anchor is kept resolvable from this
 side. The heading below exists only to keep that inbound anchor alive and to name the owning plan; it
-duplicates no content. The full accounting of all 12 such targets is in
+duplicates no content. The full accounting of those targets is in
 [tech-docs.md §Sections that route to sibling plans](./tech-docs.md#sections-that-route-to-sibling-plans).
 
 ### NEW Course & Capstone Specifications
@@ -272,28 +287,36 @@ authored **from** its spec file, never from a fresh judgment call.
 - **Deep-link fallback gap** — a course reached without path context resolves to an error rather than
   a canonical view. Mitigated in the core: `parsePathContext` returns `null` for unknown and absent
   path IDs and never throws; the rendered half is the navigation plan's.
-- **`content-url.ts` regression** — the new canonical `/en/learn/courses/<course-id>` shape changes
-  link generation for pages this plan does not otherwise touch. Mitigated by keeping the `pathId`
-  param optional, by updating the existing `content-url` tests in the same commit, and by a Phase 4
-  live no-regression sweep across both supported locales at three breakpoints with committed
-  screenshot evidence.
+- **`content-url.ts` regression** — `contentUrl` is the single source of truth for every content URL
+  on the site, so any change to it touches pages this plan does not otherwise reason about.
+  Mitigated by making the change strictly additive: the `pathId` param is optional and the
+  `/{locale}/c/{slug}` shape is preserved byte-for-byte, so the seven existing `content-url`
+  assertions stay unchanged and keep passing; plus a Phase 4 live no-regression sweep across both
+  supported locales at three breakpoints with committed screenshot evidence.
 - **The pure core acquires IO** — a later convenience import of `fs` or React inside `core/` destroys
   the property that makes this layer cheap to test. Mitigated by an explicit REFACTOR step asserting
   no `fs` and no React import under `core/`, and by DD-9's stated functional-core boundary.
-- **Specs coverage delta is untraceable** — the `course-paths` Gherkin lands with no step bindings
-  (they are the navigation plan's), so `specs:behavior:coverage` reports a delta. Mitigated by
-  recording the delta explicitly at the Phase 2 gate and naming
-  `ayokoding-learning-path-03-navigation-ui` as the plan that closes it, so the delta has a named
-  owner rather than being an anonymous regression.
+- **Specs coverage obligation is untraceable** — the `course-paths` Gherkin lands with no step
+  bindings (they are the navigation plan's), so an untagged scenario would fail
+  `specs:behavior:coverage` and — because `test:quick` runs `test:specs`, which runs
+  `specs:behavior:coverage` [Repo-grounded — `apps/ayokoding-www/project.json`] — would red the
+  pre-push hook for every push from Phase 2 onward. Mitigated by tagging every new scenario `@wip`,
+  the validator's own step-binding-deferral exemption [Repo-grounded —
+  `apps/rhino-cli/src/application/behavior_coverage/validator.rs`: "`@wip` scenarios are fully
+  exempt"], so the target **exits 0** throughout; and by recording the deferred obligation at the
+  Phase 2 gate naming `ayokoding-learning-path-03-navigation-ui` as the plan that removes the `@wip`
+  tags and adds the `@covers` markers, so it has a named owner rather than being an anonymous gap.
 - **The `syllabus/` corpus is copied rather than linked** — forking the source of truth for 121
   course specs and four manifest orderings, so a later spec correction lands in one copy only.
   Mitigated by the custody rule stated in this plan's `README.md` and restated as a
-  `> **Cross-plan source of truth**` blockquote in each of the other four plans' READMEs.
-- **The archival move breaks four sibling plans** — this plan is Wave 1 and archives long before
-  `ayokoding-learning-path-05-manifests` and `ayokoding-learning-path-04-course-authoring` finish;
-  its `git mv` relocates the target of 34 inbound cross-plan links. Mitigated by the reciprocal
-  repoint step in the same commit as the move, plus the pre-push-hook form of `md links validate` as
-  its acceptance.
+  `> **Cross-plan source of truth**` blockquote in each sibling plan's README.
+- **The archival move breaks every sibling plan that links in** — this plan is Wave 1 and archives
+  long before `ayokoding-learning-path-05-manifests` and
+  `ayokoding-learning-path-04-course-authoring` finish; its `git mv` relocates the target of every
+  inbound cross-plan `syllabus/` link. Mitigated by the reciprocal repoint step in the same commit as
+  the move — scoped to **every** sibling folder under `plans/backlog` and `plans/in-progress`, with
+  the inventory measured at execution time (Phase 7.2's `N_BEFORE`) rather than hardcoded — plus the
+  pre-push-hook form of `md links validate` as its acceptance.
 - **The DD-34 / DD-35 / DD-39 numbering gap is "fixed"** — a future reader closes the apparent gap
   and rewrites 276 in-corpus tokens whose meanings belong to a different, closed plan. Mitigated by
   restating the source plan's explanatory passage verbatim in both `README.md` and `tech-docs.md`,

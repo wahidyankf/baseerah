@@ -20,9 +20,12 @@ the concrete **Concepts** (`co-NN`), **Worked examples** (`ex-NN`), and **Capsto
 the concrete ordered manifest.
 
 **Careers-only (R4, 2026-07-21 ruling)**: this corpus and its four manifests sit entirely under the
-`careers/` URL category (`/en/learn/paths/careers/<arc>/<role>`). A sibling `skills/` category
-(`/en/learn/paths/skills/<subject>`, 2 manifests, its own course corpus) exists in the wider programme
-but is owned end-to-end by a separate, not-yet-created plan — see
+`careers/` URL category (`/en/c/learn/paths/careers/<arc>/<role>`). A sibling `skills/` category
+(`/en/c/learn/paths/skills/<subject>`, 2 manifests, its own course corpus) exists in the wider programme
+but is owned end-to-end by **two** sibling plans, one per subject —
+`ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
+`ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`); both folders exist
+under `plans/backlog/`. See
 [tech-docs §Ownership split](../tech-docs.md#ownership-split-careers-vs-skills--r4).
 
 ## Core model — one shared library, composing path manifests
@@ -50,12 +53,12 @@ flowchart TD
 
 - **Course = standalone, path-neutral building block.** A course is a self-contained topic module
   (learning + drilling track) with a stable **course ID** (its kebab-case slug). One canonical body,
-  one canonical URL (`/en/learn/courses/<course-id>`), authored once, never forked. Rendering a course
+  one canonical URL (`/en/c/learn/courses/<course-id>`), authored once, never forked. Rendering a course
   with no path context shows its canonical standalone view.
 - **Path = ordered manifest composing course-ids.** A path lists course IDs in a chosen order over a
   curated selection of the library; a course page reads the active path context (`?path=<path-id>`) and
   its prev/next + breadcrumb follow that path's order. Path landings live at
-  `/en/learn/paths/<path-id>`, with `<path-id>` = `careers/<arc>/<role>` for every path in this folder
+  `/en/c/learn/paths/<path-id>`, with `<path-id>` = `careers/<arc>/<role>` for every path in this folder
   (R1, R2). Every manifest also carries an explicit `arc` field, independent of the URL grammar (R8).
   See [tech-docs §Path-Aware Navigation UI](../tech-docs.md#path-aware-navigation-ui-ayokoding-www) and
   [tech-docs §Variable-depth `pathId`](../tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8).
@@ -128,5 +131,3 @@ This anchor justifies the **library** and is inherited by all paths.
 
 Next: [courses/README.md — the 127-course catalog](./courses/README.md) ·
 [paths/README.md — the path manifests](./paths/README.md)
-</content>
-</invoke>
