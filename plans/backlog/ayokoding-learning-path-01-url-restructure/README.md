@@ -18,16 +18,17 @@ and has **no plan-level prerequisite** — it starts immediately.
 
 ## What this plan delivers
 
-| Deliverable                                 | Surface                                                                            |
-| ------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Flat course namespace                       | `apps/ayokoding-www/content/en/learn/courses/` — 37 re-homed bundles + `_index.md` |
-| Paths content home                          | `apps/ayokoding-www/content/en/learn/paths/_index.md` — 2×2 grid, room for four    |
-| Per-course re-home redirects                | `apps/ayokoding-www/src/redirects/` — 37 old-URL → canonical-URL rules             |
-| Legacy bucket                               | `apps/ayokoding-www/content/en/learn/legacy/` — 1,148 `.md` relocated verbatim     |
-| Per-domain 308 prefix module                | `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` — 6 rules + unit test     |
-| De-namespacing (DD-48, site-wide)           | `content-namespace.ts` inverted; `c/[...slug]` removed, `[...slug]` widened        |
-| Legacy landing + rewritten section overview | `legacy/_index.md`, `en/learn/overview.md`                                         |
-| Screen 4 design funnel                      | `prd.md` §Screen 4 + `assets/legacy-landing-option-{a,b}-{mobile,tablet,desktop}`  |
+| Deliverable                                 | Surface                                                                                                                                                              |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flat course namespace                       | `apps/ayokoding-www/content/en/learn/courses/` — 37 re-homed bundles + `_index.md`                                                                                   |
+| Paths content home                          | `apps/ayokoding-www/content/en/learn/paths/_index.md` — grid grown as each path ships                                                                                |
+| Every structural index under `paths/` (A3)  | `paths/careers/_index.md`, the three `paths/careers/<arc>/_index.md`, `paths/skills/_index.md` — 5 more files, all rendering acceptably empty until 05/06/07 publish |
+| Per-course re-home redirects                | `apps/ayokoding-www/src/redirects/` — 37 old-URL → canonical-URL rules                                                                                               |
+| Legacy bucket                               | `apps/ayokoding-www/content/en/learn/legacy/` — 1,148 `.md` relocated verbatim                                                                                       |
+| Per-domain 308 prefix module                | `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` — 6 rules + unit test                                                                                       |
+| De-namespacing (DD-48, site-wide)           | `content-namespace.ts` inverted; `c/[...slug]` removed, `[...slug]` widened                                                                                          |
+| Legacy landing + rewritten section overview | `legacy/_index.md`, `en/learn/overview.md`                                                                                                                           |
+| Screen 4 design funnel                      | `prd.md` §Screen 4 + `assets/legacy-landing-option-{a,b}-{mobile,tablet,desktop}`                                                                                    |
 
 Explicitly **not** in this plan: the `course-paths` feature code, the `PathManifest` schema, any
 manifest file, any path landing renderer, any authored course body. Those belong to the four sibling
@@ -40,11 +41,11 @@ and left six in place — a top level mixing two structural buckets with six sub
 neither the old IA nor the new one. This plan closes the section at **exactly three** structural
 buckets (DD-40):
 
-| Bucket     | URL shape                                 | Contents                                                             |
-| ---------- | ----------------------------------------- | -------------------------------------------------------------------- |
-| `paths/`   | `/en/learn/paths/<arc>/<role-or-subject>` | The four ordered path manifests (landing anchors only)               |
-| `courses/` | `/en/learn/courses/<course-id>`           | Canonical, path-neutral course bodies, **flat** namespace            |
-| `legacy/`  | `/en/learn/legacy/<domain>/<…verbatim…>`  | **NEW** — the six remaining domains, **1,148** `.md` [Repo-grounded] |
+| Bucket     | URL shape                                                         | Contents                                                               |
+| ---------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `paths/`   | `/en/learn/paths/<path-id>` (variable-segment, category-prefixed) | The ordered path manifests (landing anchors only), grown as each ships |
+| `courses/` | `/en/learn/courses/<course-id>`                                   | Canonical, path-neutral course bodies, **flat** namespace              |
+| `legacy/`  | `/en/learn/legacy/<domain>/<…verbatim…>`                          | **NEW** — the six remaining domains, **1,148** `.md` [Repo-grounded]   |
 
 ```mermaid
 %% Target IA of /en/learn after this plan lands (DD-40).
@@ -52,7 +53,7 @@ buckets (DD-40):
 %% Node shape is redundant with colour: the section root is a rectangle, buckets are stadiums.
 flowchart LR
     LEARN["/en/learn<br/>section root<br/>+ _index.md + overview.md"]:::blue
-    PATHS(["paths/<br/>4 ordered manifests<br/>landing anchors only"]):::teal
+    PATHS(["paths/<br/>ordered manifests<br/>landing anchors only"]):::teal
     COURSES(["courses/<br/>canonical course bodies<br/>FLAT namespace"]):::orange
     LEGACY(["legacy/<br/>6 relocated domains<br/>sub-taxonomy verbatim"]):::purple
     LEARN --> PATHS
@@ -89,7 +90,12 @@ apps/ayokoding-www/content/en/learn/                ✓  1,713 .md today
 ├── _index.md                                       ~  machine-regenerated
 ├── overview.md                                     ~  hand-rewritten: 6 domains → 3 buckets
 ├── paths/                                          +  BUCKET 1
-│   └── _index.md                                   +  paths hub (2×2 grid, room for 4 cards)
+│   ├── _index.md                                   +  paths hub (grid grown as each path ships)
+│   ├── careers/_index.md                           +  structural (A3) — empty until 05 publishes
+│   ├── careers/interview-ready/_index.md           +  structural (A3) — empty until 05 publishes
+│   ├── careers/immediately-effective/_index.md     +  structural (A3) — empty until 05 publishes
+│   ├── careers/fundamentally-strong/_index.md      +  structural (A3) — empty until 05 publishes
+│   └── skills/_index.md                            +  structural (A3) — empty until 06/07 publish
 ├── courses/                                        +  BUCKET 2 — flat, one dir per course-id
 │   ├── _index.md                                   +  library landing
 │   └── just-enough-python/  advanced-algorithms/  capstone-solid-core/  …   →  37 re-homed
@@ -179,15 +185,17 @@ This plan is **Wave 1** of a five-plan split of the closed
 
 ### Downstream — what this plan hands off, and to whom
 
-| Downstream plan                                                          | Artefact handed over                                                                 | Consumed by                                                                             |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| `ayokoding-learning-path-03-navigation-ui`                               | `apps/ayokoding-www/src/redirects/` per-course re-home redirect table (37 rules)     | its no-path regression guard and its Phase-4 e2e redirect assertion                     |
-| `ayokoding-learning-path-03-navigation-ui`                               | `apps/ayokoding-www/content/en/learn/courses/_index.md` and `.../paths/_index.md`    | the paths hub and path landings have nowhere to render without them                     |
-| `ayokoding-learning-path-03-navigation-ui`                               | `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` + the six relocated domains | the nav regression sweep must run against the final three-bucket tree, not a hybrid one |
-| `ayokoding-learning-path-03-navigation-ui`                               | `prd.md` Screen 4 section + the six `assets/legacy-landing-option-*-*.png` renders   | closes the DD-47 30-render matrix across the two plans                                  |
-| `ayokoding-learning-path-03-navigation-ui`                               | Open Questions **Q-A … Q-F** (this plan owns all six verbatim)                       | Q-E gates the three residual `fundamentally-strong` index pages the nav plan renders    |
-| `ayokoding-learning-path-04-course-authoring`                            | 37 re-homed course bundles occupying the flat `courses/` namespace                   | the 23-new-slug collision check is only meaningful against a populated namespace        |
-| `ayokoding-learning-path-05-manifests` _(transitive, via the two above)_ | canonical `/en/learn/courses/<id>` URLs for the 33 topics + 4 capstones              | the first manifest's `courseOrder` references exactly these IDs                         |
+| Downstream plan                                                                   | Artefact handed over                                                                                                             | Consumed by                                                                                                                             |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `ayokoding-learning-path-03-navigation-ui`                                        | `apps/ayokoding-www/src/redirects/` per-course re-home redirect table (37 rules)                                                 | its no-path regression guard and its Phase-4 e2e redirect assertion                                                                     |
+| `ayokoding-learning-path-03-navigation-ui`                                        | `apps/ayokoding-www/content/en/learn/courses/_index.md` and `.../paths/_index.md`                                                | the paths hub and path landings have nowhere to render without them                                                                     |
+| `ayokoding-learning-path-03-navigation-ui`                                        | `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` + the six relocated domains                                             | the nav regression sweep must run against the final three-bucket tree, not a hybrid one                                                 |
+| `ayokoding-learning-path-03-navigation-ui`                                        | `prd.md` Screen 4 section + the six `assets/legacy-landing-option-*-*.png` renders                                               | closes the DD-47 30-render matrix across the two plans                                                                                  |
+| `ayokoding-learning-path-03-navigation-ui`                                        | Open Questions **Q-A … Q-F** (this plan owns all six verbatim)                                                                   | Q-E gates the three residual `fundamentally-strong` index pages the nav plan renders                                                    |
+| `ayokoding-learning-path-03-navigation-ui`                                        | the five deeper structural indexes under `paths/careers/` and `paths/skills/` (amendment A3)                                     | its `category-landing.tsx`/`arc-landing.tsx` renderers mount these routes and need the content files to exist first                     |
+| `ayokoding-learning-path-04-course-authoring`                                     | 37 re-homed course bundles occupying the flat `courses/` namespace                                                               | the 23-new-slug collision check is only meaningful against a populated namespace                                                        |
+| `ayokoding-learning-path-05-manifests` _(transitive, via the two above)_          | canonical `/en/learn/courses/<id>` URLs for the 33 topics + 4 capstones                                                          | the first manifest's `courseOrder` references exactly these IDs                                                                         |
+| `ayokoding-learning-path-05-manifests`, `-06-skills-accounting`, `-07-skills-erp` | all six structural indexes under `paths/` (amendment A3) — each populates cards or a leaf landing into a bucket it never creates | `paths/careers/_index.md`/each arc index is 05's card-population target; `paths/skills/_index.md` is 06's and 07's, on the same footing |
 
 ### Wave-1 sibling coordination (not a dependency)
 
@@ -200,7 +208,9 @@ two statements ever diverge, the schema plan's wins.
 
 This plan is done for downstream purposes when its final PR is **merged to `origin/main`** AND
 `ls apps/ayokoding-www/content/en/learn` lists exactly `_index.md`, `courses`, `legacy`,
-`overview.md`, `paths`.
+`overview.md`, `paths`, AND
+`find apps/ayokoding-www/content/en/learn/paths -name _index.md | wc -l` returns **6** (amendment A3
+— all six structural indexes under `paths/` exist).
 
 ## Build order (inherited)
 
@@ -237,7 +247,8 @@ constrains).
 **How the five-way split maps onto that order.** Group A's architecture work splits across
 `ayokoding-learning-path-02-schema-and-prerequisite-dag` (the pure core) and
 `ayokoding-learning-path-03-navigation-ui` (the rendering layer); this plan carries Group A's IA
-scaffolding (the two content homes) plus the whole re-home and relocation. The MVP manifest and every
+scaffolding (the two content homes, plus the five deeper structural indexes under `paths/` per
+amendment A3) plus the whole re-home and relocation. The MVP manifest and every
 later manifest belong to `ayokoding-learning-path-05-manifests`; the backfill belongs to
 `ayokoding-learning-path-04-course-authoring`. The wave table in [Depends-on](#depends-on) is the
 split's expression of DD-15/DD-27, not a replacement for it.
@@ -303,7 +314,7 @@ of the per-plan phases (0 and 13–17). Phase numbers are renumbered contiguousl
 | This plan | Source plan phase | Scope                                                               |
 | --------- | ----------------- | ------------------------------------------------------------------- |
 | Phase 0   | Phase 0 (scoped)  | Baseline + the re-home and legacy-bucket inventories, `id` baseline |
-| Phase 1   | Phase 1 (partial) | `<COURSES>_index.md` + `<PATHS>_index.md` content homes             |
+| Phase 1   | Phase 1 (partial) | `<COURSES>_index.md` + all six `<PATHS>` structural indexes (A3)    |
 | Phase 2   | Phase 5           | Re-home 33 topics + 4 capstones, **plus** the per-course redirects  |
 | Phase 3   | Phase 5A          | Six-domain relocation, 308 module, Screen 4 funnel                  |
 | Phase 4   | Phase 13 (scoped) | Section + app verification, three-bucket sweep, redirect ordering   |
@@ -337,11 +348,11 @@ once the review and all quality gates are green (**DN-11**, above). `ayokoding-w
 
 - [Business Requirements (brd.md)](./brd.md) — WHY the section is closed at three buckets, who it
   serves, what the URL-breakage risk is.
-- [Product Requirements (prd.md)](./prd.md) — personas, user stories, the 14 Gherkin acceptance
+- [Product Requirements (prd.md)](./prd.md) — personas, user stories, the 16 Gherkin acceptance
   criteria, product scope, and the **Screen 4 UI-design funnel** (legacy landing + page banner).
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — the three-bucket IA, BEFORE/AFTER content and
-  source trees, the URL-mapping table, the two redirect modules, the ten design decisions this plan
-  owns, and the six Open Questions Q-A…Q-F.
+  source trees, the URL-mapping table, the two redirect modules, the twelve design decisions this
+  plan owns, and the six Open Questions Q-A…Q-F.
 - [Delivery Checklist (delivery.md)](./delivery.md) — the phased executable checklist.
 - [Learnings (learnings.md)](./learnings.md) — knowledge-capture running log.
 - Per-course and per-path specs: `plans/<stage>/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`

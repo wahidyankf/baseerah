@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --hue-terracotta: oklch(65% 0.16 30);
+        --hue-honey: oklch(76% 0.15 75);
+        --hue-sage: oklch(70% 0.1 150);
+        --hue-teal: oklch(66% 0.1 200);
+        --hue-sky: oklch(68% 0.11 230);
+        --hue-plum: oklch(60% 0.12 305);
+        --hue-terracotta-ink: oklch(40% 0.13 30);
+        --hue-honey-ink: oklch(44% 0.12 75);
+        --hue-sage-ink: oklch(37% 0.09 150);
+        --hue-teal-ink: oklch(37% 0.09 200);
+        --hue-sky-ink: oklch(39% 0.1 230);
+        --hue-plum-ink: oklch(37% 0.1 305);
+        --hue-terracotta-wash: oklch(95% 0.04 30);
+        --hue-honey-wash: oklch(96% 0.05 75);
+        --hue-sage-wash: oklch(95% 0.03 150);
+        --hue-teal-wash: oklch(95% 0.03 200);
+        --hue-sky-wash: oklch(95% 0.03 230);
+        --hue-plum-wash: oklch(95% 0.03 305);
+        --warm-0: oklch(99% 0.006 85);
+        --warm-50: oklch(97% 0.009 85);
+        --warm-100: oklch(94% 0.012 85);
+        --warm-200: oklch(88% 0.014 85);
+        --warm-300: oklch(78% 0.016 85);
+        --warm-400: oklch(62% 0.016 85);
+        --warm-500: oklch(48% 0.018 80);
+        --warm-700: oklch(32% 0.018 75);
+        --warm-800: oklch(24% 0.018 70);
+        --warm-900: oklch(18% 0.016 70);
+        --background: var(--warm-0);
+        --foreground: var(--warm-900);
+        --card: #fff;
+        --card-foreground: var(--warm-900);
+        --primary: var(--hue-honey);
+        --primary-foreground: #fff;
+        --secondary: var(--warm-100);
+        --secondary-foreground: var(--warm-900);
+        --muted: var(--warm-100);
+        --muted-foreground: var(--warm-500);
+        --accent: var(--hue-terracotta-wash);
+        --accent-foreground: var(--hue-terracotta-ink);
+        --border: var(--warm-200);
+        --ring: var(--hue-honey);
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.25rem;
+        --shadow-sm: 0 1px 3px 0 oklch(20% 0.02 75/0.08), 0 1px 2px -1px oklch(20% 0.02 75/0.06);
+        --shadow-md: 0 4px 8px -2px oklch(20% 0.02 75/0.08), 0 2px 4px -2px oklch(20% 0.02 75/0.06);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--background);
+        color: var(--foreground);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        padding: 40px;
+      }
+      .cap {
+        font-size: 12px;
+        color: var(--muted-foreground);
+        margin-bottom: 14px;
+      }
+      .cap b {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+      .win {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        background: var(--card);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-bottom: 26px;
+        max-width: 1180px;
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--warm-50);
+      }
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .url {
+        margin-left: 10px;
+        font-size: 11px;
+        color: var(--muted-foreground);
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding: 14px 32px;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand {
+        font-weight: 800;
+        font-size: 16px;
+      }
+      .brand .k {
+        color: var(--hue-honey-ink);
+      }
+      .navlinks {
+        margin-left: auto;
+        display: flex;
+        gap: 20px;
+        font-size: 13.5px;
+        color: var(--muted-foreground);
+      }
+      .layout {
+        display: flex;
+        gap: 28px;
+        padding: 30px 32px;
+      }
+      a {
+        color: inherit;
+      }
+      .sidebar {
+        width: 190px;
+        flex-shrink: 0;
+        font-size: 13px;
+      }
+      .sidebar .item {
+        padding: 8px 10px;
+        border-radius: var(--radius-sm);
+        color: var(--muted-foreground);
+      }
+      .sidebar .item.parent {
+        font-weight: 700;
+        color: var(--foreground);
+        padding-left: 0;
+      }
+      .sidebar .item.child {
+        padding-left: 18px;
+      }
+      .sidebar .item.active {
+        background: var(--accent);
+        color: var(--accent-foreground);
+        font-weight: 600;
+      }
+      .content {
+        flex: 1;
+        min-width: 0;
+      }
+      .crumb {
+        font-size: 12.5px;
+        color: var(--muted-foreground);
+        margin-bottom: 12px;
+      }
+      .crumb .cur {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+      h1 {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 14px;
+      }
+      .alert {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: var(--hue-sky-wash);
+        color: var(--hue-sky-ink);
+        border-radius: var(--radius-md);
+        padding: 14px 16px;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+      .alert .ic {
+        flex-shrink: 0;
+        font-size: 15px;
+      }
+      .alert .links {
+        display: inline-flex;
+        gap: 16px;
+        margin-left: 6px;
+      }
+      .alert a {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        font-weight: 600;
+      }
+      .domain-grid {
+        list-style: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+      }
+      .domain-grid li {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 11px 13px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--card);
+        font-size: 13.5px;
+        font-weight: 500;
+      }
+      .domain-grid li .b {
+        color: var(--muted-foreground);
+      }
+      .banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        background: var(--hue-terracotta-wash);
+        color: var(--hue-terracotta-ink);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        font-size: 13.5px;
+        margin-bottom: 16px;
+      }
+      .banner a {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        font-weight: 600;
+      }
+      .banner .note {
+        font-size: 11.5px;
+        opacity: 0.75;
+      }
+      .para {
+        color: var(--warm-700);
+        font-size: 13.5px;
+        line-height: 1.7;
+        max-width: 640px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cap">
+      Screen 4 · Legacy-bucket landing — <b>Option A: landing notice + per-page banner (Selected)</b> · 1280&nbsp;px
+      (desktop)
+    </div>
+
+    <div class="win">
+      <div class="bar">
+        <span class="dot" style="background: var(--hue-terracotta)"></span>
+        <span class="dot" style="background: var(--hue-honey)"></span>
+        <span class="dot" style="background: var(--hue-sage)"></span>
+        <span class="url">ayokoding.com/en/learn/legacy</span>
+      </div>
+      <div class="nav">
+        <span class="brand">Ayo<span class="k">Koding</span></span>
+        <span class="navlinks"><span>Learn</span><span>Tools</span><span>Blog</span></span>
+      </div>
+      <div class="layout">
+        <div class="sidebar">
+          <div class="item parent">▸ Learn</div>
+          <div class="item child">▸ Paths</div>
+          <div class="item child">▸ Courses</div>
+          <div class="item child active">▾ Legacy</div>
+        </div>
+        <div class="content">
+          <div class="crumb">Home / Browse / Learn / <span class="cur">Legacy</span></div>
+          <h1>Legacy material</h1>
+          <div class="alert">
+            <span class="ic">ⓘ</span>
+            <span
+              >Older material kept for reference while the course library fills. Where a canonical course exists, it
+              supersedes the page here.
+              <span class="links"><a>→ Browse the course library</a><a>→ Choose a path</a></span></span
+            >
+          </div>
+          <ul class="domain-grid">
+            <li><span class="b">•</span> Software Engineering</li>
+            <li><span class="b">•</span> Artificial Intelligence</li>
+            <li><span class="b">•</span> Information Security</li>
+            <li><span class="b">•</span> Personal Development</li>
+            <li><span class="b">•</span> IT Governance</li>
+            <li><span class="b">•</span> Business</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="win">
+      <div class="bar">
+        <span class="dot" style="background: var(--hue-terracotta)"></span>
+        <span class="dot" style="background: var(--hue-honey)"></span>
+        <span class="dot" style="background: var(--hue-sage)"></span>
+        <span class="url">ayokoding.com/en/learn/legacy/business/break-even-analysis</span>
+      </div>
+      <div class="nav">
+        <span class="brand">Ayo<span class="k">Koding</span></span>
+        <span class="navlinks"><span>Learn</span><span>Tools</span><span>Blog</span></span>
+      </div>
+      <div class="layout">
+        <div class="sidebar">
+          <div class="item parent">▸ Learn</div>
+          <div class="item child">▸ Paths</div>
+          <div class="item child">▸ Courses</div>
+          <div class="item child active">▾ Legacy</div>
+        </div>
+        <div class="content">
+          <div class="crumb">
+            Home / Browse / Learn / Legacy / Business / <span class="cur">Break-Even Analysis</span>
+          </div>
+          <div class="banner">
+            <span><span class="ic">ⓘ</span> Legacy — superseded by <a>Understanding Financial Statements</a></span>
+            <span class="note">link omitted when none</span>
+          </div>
+          <h1>Break-Even Analysis</h1>
+          <p class="para">…body unchanged…</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

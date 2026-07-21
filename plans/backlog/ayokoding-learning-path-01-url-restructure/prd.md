@@ -4,9 +4,14 @@
 
 When this plan lands, `/{locale}/learn/` has **exactly three** structural buckets and nothing else:
 
-- **`paths/`** — the ordered path manifests' landing anchors, served at
-  `/en/learn/paths/<arc>/<role-or-subject>`. This plan creates the bucket and its 2×2-grid hub
-  landing; the four path landings and the manifests behind them belong to sibling plans.
+- **`paths/`** — the ordered path manifests' landing anchors, served at `/en/learn/paths/<path-id>`
+  (a variable-segment, category-prefixed id — see [tech-docs.md DD-23](./tech-docs.md#design-decisions)).
+  This plan creates the bucket and its grid hub landing, grown to fit the current path roster, **plus
+  every deeper structural index underneath it** — `paths/careers/_index.md`, the three
+  `paths/careers/<arc>/_index.md` (`interview-ready`, `immediately-effective`,
+  `fundamentally-strong`), and `paths/skills/_index.md` (amendment A3, DD-49) — so no URL segment
+  under `paths/` is ever a dead one; the path landings and the manifests behind them belong to
+  sibling plans, added as each ships.
 - **`courses/`** — canonical, path-neutral course bodies in a **flat** namespace, served at
   `/en/learn/courses/<course-id>`. This plan re-homes the **33 shipped topics + 4 existing
   capstones** into it, each with a per-course 308 redirect from its old URL, and each declaring
@@ -105,10 +110,11 @@ and does not restate it.
 
 This plan is **UI-bearing**: it adds one user-facing screen (the `/en/learn/legacy` landing) and,
 under [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy)'s recommended answer, a per-page
-**"legacy / superseded"** banner on relocated pages. Both run the funnel — with one honest difference
-recorded up front: **the selection is pending the Q-D ruling.** The low-fi alternatives below map 1:1
-to Q-D's options, and the two hi-fi finalists are produced by a `delivery.md` Phase 3 step (matching
-the pattern the source plan used for Screens 0–3), not fabricated here for an undecided design.
+**"legacy / superseded"** banner on relocated pages. Both run the full funnel below through a named
+Selection (Option A, Q-D's own recommended default — see [Selection and rationale](#selection-and-rationale))
+and a Justify record. The **hi-fi finalist renders** (Stage 2's binary `.png` mockups) are produced
+and embedded below — see [Hi-fi finalists](#hi-fi-finalists). The low-fi alternatives below map 1:1
+to Q-D's options.
 
 Screens 0–3 (landing hero, paths hub, path landing, course-in-path) belong to
 `ayokoding-learning-path-03-navigation-ui` — that plan carries their funnel record and their 24
@@ -272,7 +278,7 @@ _Desktop — 1280 px_
 
 Mobile-first. The landing's six domain links render as a **single-column stacked list** below `md`
 and a **two-column list** at `md+` (≥768 px); they never become a card grid, because they are
-navigational links into an archive, not promoted destinations competing with the four path cards. The
+navigational links into an archive, not promoted destinations competing with the path cards. The
 `Alert` notice is full-width at every breakpoint, wrapping to three lines on mobile and one to two on
 desktop. The per-page banner (Option A) sits **above** the H1 and **below** the breadcrumb at every
 breakpoint, so it is never pushed off a phone's first screen; its "superseded by" link wraps to its
@@ -292,21 +298,44 @@ the only place the warning lives.
 
 ### Hi-fi finalists
 
-Produced by `delivery.md` Phase 3 as **six** files following the
-[asset matrix](#hi-fi-asset-matrix--this-plans-slice) scheme —
-`assets/legacy-landing-option-{a,b}-{mobile,tablet,desktop}.png`, rendered at 375 / 768 / 1280 px
-from token-accurate HTML mockups under `assets/src/`, exactly as the navigation plan's Screen 0–3
-finalists are. Option C is **not** carried to hi-fi: it is Option B's landing with a `robots` metadata
-change, which a mockup cannot show.
+**Finalist 1 — Option A** (indexed, landing notice + per-page banner) and **Finalist 2 — Option B**
+(indexed, landing notice only) are the two alternatives carried forward. Option C is **not** carried
+to hi-fi: it is Option B's landing with a `robots` metadata change — a difference no image can depict,
+only metadata — so a mockup would add nothing a prose note doesn't already say.
 
-The six `![]()` embeds are added by the Phase 3 embed step, not authored here — embedding a link to a
-file that does not exist yet would fail link validation on this plan's first push.
+**Finalist 1 — Option A** (mobile → tablet → desktop):
+
+![Legacy-bucket landing, Option A, mobile — a stacked single-column view: the /en/learn/legacy landing with breadcrumb, H1, an info alert linking to the course library and paths hub, and a single-column list of the six legacy domains; below it, a relocated legacy page showing the truncated breadcrumb and a two-line "Legacy — superseded by" banner above the H1, with the course-name link wrapped to its own line](./assets/legacy-landing-option-a-mobile.png)
+
+![Legacy-bucket landing, Option A, tablet — the /en/learn/legacy landing with a visible left navigation sidebar (Learn > Paths, Courses, Legacy) beside a two-column grid of the six legacy domains and a two-line info alert; below it, a relocated legacy page with the same sidebar shell and a single-line "Legacy — superseded by" banner above the H1](./assets/legacy-landing-option-a-tablet.png)
+
+![Legacy-bucket landing, Option A, desktop — the full-width /en/learn/legacy landing with the left sidebar, a three-column grid of the six legacy domains, and a one-line info alert; below it, a relocated legacy page with the full breadcrumb, the sidebar, and a single-line "Legacy — superseded by [Course Name]" banner noting the link is omitted when no course exists yet](./assets/legacy-landing-option-a-desktop.png)
+
+**Finalist 2 — Option B** (mobile → tablet → desktop):
+
+![Legacy-bucket landing, Option B, mobile — the same single-column /en/learn/legacy landing as Option A but with a shorter info alert and no onward links; below it, a relocated legacy page whose breadcrumb and H1 carry no superseded-by banner at all, the decisive gap for a mobile search-landed reader](./assets/legacy-landing-option-b-mobile.png)
+
+![Legacy-bucket landing, Option B, tablet — the sidebar-and-two-column landing with the shorter notice; below it, a relocated legacy page with the sidebar shell but no banner](./assets/legacy-landing-option-b-tablet.png)
+
+![Legacy-bucket landing, Option B, desktop — the full-width sidebar-and-three-column landing with the shorter notice; below it, a relocated legacy page with no superseded-by banner anywhere on the page](./assets/legacy-landing-option-b-desktop.png)
+
+**Regeneration note** — all six renders are produced from self-contained, token-accurate HTML
+mockups at [`assets/src/`](./assets/src/), styled with the same AyoKoding token palette
+(`libs/web-ui-token/src/ayokoding.css`) and browser-chrome scaffolding
+`ayokoding-learning-path-03-navigation-ui`'s `assets/src/*.html` mockups use, so the two plans'
+renders look like one system. To regenerate: open `assets/src/<stem>.html` in a browser sized to
+its target viewport (375 / 768 / 1280 px) and take a full-page screenshot to
+`assets/<stem>.png` — this plan's copy of the pipeline `delivery.md`'s
+[Phase 3.4](./delivery.md#34--screen-4-design-funnel-q-d) verifies and re-runs if the sources
+change.
 
 ### Selection and rationale
 
-**Selection: PENDING the [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy) ruling.** Option A is the
-recommendation carried into Phase 3. The rationale table records why each option would win or lose, so
-an overturned ruling is a bounded edit rather than a re-run of the funnel:
+**Selected: Option A — indexed, with a landing notice + a per-page banner** — Q-D's own recommended
+default (see [tech-docs.md Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy)), adopted here as the
+named Selection at plan-quality-gate time. The rationale table records why each option would win or
+lose, so if execution surfaces information that overturns Q-D's recommendation, updating this line
+and the table is a bounded edit rather than a re-run of the funnel:
 
 | Design                                        | Why it would win / lose                                                                                                                                          |
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -337,11 +366,12 @@ rendered from a token-accurate source at `assets/src/<same-stem>.html`. Screen s
 
 ## Acceptance Criteria (Gherkin)
 
-Fifteen scenarios. Twelve are inherited whole from the source plan; two are additions made at split
+Sixteen scenarios. Twelve are inherited whole from the source plan; two are additions made at split
 time and flagged below; one is a **new addition for the DD-48 de-namespacing scope extension**,
-flagged in its own subsection. Each scenario uses exactly one primary `Given`/`When`/`Then`; extras
-chain with `And`. Every scenario is bound to a delivery step in [delivery.md](./delivery.md) — none
-is left unbound.
+flagged in its own subsection; one is a **new addition for the A3 structural-index amendment
+(DD-49)**, also flagged in its own subsection. Each scenario uses exactly one primary
+`Given`/`When`/`Then`; extras chain with `And`. Every scenario is bound to a delivery step in
+[delivery.md](./delivery.md) — none is left unbound.
 
 ### Re-home and per-course redirects
 
@@ -404,8 +434,9 @@ Scenario: The de-namespaced redirect chain never loops
 > _Provenance_: **new at split time**, added for the DD-48 scope extension (the site-wide
 > `/c/`-segment removal folded into this plan). Neither the source plan nor the pre-split
 > `ayokoding-learning-path-01-url-restructure` draft carried a scenario for this — the `/c/` namespace
-> did not exist as a routing concern for either. Bound to the Phase 3.0 RED/GREEN steps and the Phase 3
-> gate's loop-safety check in [delivery.md](./delivery.md).
+> did not exist as a routing concern for either. Bound via `**Gherkin (binds) →**` to Phase 3.0's
+> `REFACTOR — loop-safety invariant` step in [delivery.md](./delivery.md), which asserts the exact
+> cross-module `/c/`-destination-absence condition this scenario's `Then`/`And` describe.
 
 ### Three-bucket learn-section IA
 
@@ -482,6 +513,25 @@ Scenario: The Indonesian locale is left unchanged and the deferral is recorded
   And the plan records the Indonesian deferral explicitly as a non-goal
 ```
 
+### Structural indexes under `paths/` (A3, DD-49)
+
+```gherkin
+Scenario: Every structural index under paths renders before its subject is populated
+  Given the six structural indexes under paths have been created and no subject manifest has published yet
+  When a reader requests any of the paths, paths/careers, paths/careers/<arc>, or paths/skills URLs
+  Then each request serves a page carrying a title and at least one sentence, never a blank body
+  And none of the six requests returns a 404
+```
+
+> _New addition for amendment A3_: `paths/skills/_index.md` sits on a cross-plan seam shared by two
+> sibling `skills/` plans (06 and 07), so centralising every structural index — `paths/_index.md`
+> and the five in this scenario — under this plan removes that seam (see
+> [tech-docs.md DD-49](./tech-docs.md#design-decisions)). The interval this scenario covers is real:
+> every one of the five new files renders **before** `ayokoding-learning-path-05-manifests`,
+> `-06-skills-accounting`, or `-07-skills-erp` has published a manifest into it. This plan proves
+> only that each page renders acceptably (title + sentence, no 404) — the empty-state **design**
+> itself is `ayokoding-learning-path-03-navigation-ui`'s.
+
 ### Build health
 
 ```gherkin
@@ -513,7 +563,17 @@ Scenario: The relocated tree builds and validates green
 - Preserving the **additive "old-way" `_index.md` section browse** (DD-19): every impacted legacy
   section index is UPDATED, never deleted, re-pointing each entry at the canonical course URL.
 - The two **content homes**: `courses/_index.md` (library landing) and `paths/_index.md` (paths hub /
-  choose-a-path landing whose 2×2-grid layout has room for all four paths, populated as each ships).
+  choose-a-path landing whose grid layout grows to fit the current path roster, populated as each
+  ships).
+- **Five more structural indexes under `<PATHS>`** (amendment A3, DD-49): `paths/careers/_index.md`,
+  the three `paths/careers/<arc>/_index.md` (`interview-ready`, `immediately-effective`,
+  `fundamentally-strong`), and `paths/skills/_index.md` — six structural indexes total once
+  `paths/_index.md` above is counted. Every URL segment under `<PATHS>` must render something (R7 —
+  `ayokoding-learning-path-03-navigation-ui`'s 2026-07-21 category-split ruling), and this plan is
+  the sole owner of every **bucket**; a **path landing** (the leaf `_index.md` a manifest-owning
+  plan populates) never is. Each of the five renders with a title, frontmatter, and one sentence
+  that reads sensibly while its category is unpopulated — the **empty-state design** itself belongs
+  to `ayokoding-learning-path-03-navigation-ui`.
 - The **`legacy/` bucket**: prefix-relocating the six non-course `en/learn/` domains (1,148 `.md`) via
   a pure `git mv` per domain (DD-40/DD-41).
 - A new **per-domain 308 redirect module** `src/redirects/learn-three-bucket.ts` (6 rules, single tier:
@@ -582,6 +642,16 @@ Scenario: The relocated tree builds and validates green
   `buildTreeForLocale` synthesizes a `weight: 0` "Legacy" node that sorts **first** in the sidebar,
   ahead of `courses/` and `paths/`. Mitigated by making the authored `_index.md` (with an explicit
   `weight`) a delivery step and a phase-gate check (DD-44).
+- **A missing structural index under `paths/` is a dead URL segment (R7, amendment A3)**:
+  `paths/careers/`, each of its three arcs, and `paths/skills/` are real, reachable URLs the moment
+  `ayokoding-learning-path-03-navigation-ui`'s renderers mount them; without an `_index.md` each one
+  either 404s or falls back to a synthesized `weight: 0` node, exactly the `legacy/_index.md` failure
+  mode above but five more times over. Mitigated by creating all five in the same Phase 1 step as
+  `paths/_index.md`, each rendering a title and a sentence of body — **acceptably empty**, not
+  blank — for the interval before `ayokoding-learning-path-05-manifests`,
+  `-06-skills-accounting`, and `-07-skills-erp` publish their manifests. That interval is real and
+  user-visible, not a theoretical edge case (DD-49); the empty-state **design** for it belongs to
+  `ayokoding-learning-path-03-navigation-ui`, not this plan.
 - **Legacy/course duplication confusion**: a reader finds both a legacy page and a canonical course on
   the same subject and cannot tell which is current. Mitigated by
   [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy)'s recommended per-page "superseded by" banner
@@ -608,8 +678,9 @@ Scenario: The relocated tree builds and validates green
   would surface later as an empty prerequisite list on 37 course pages with a green build. Mitigated
   by reproducing the contract verbatim in both plans' `tech-docs.md`, with the schema plan named
   canonical.
-- **Q-D is overturned after the funnel is drawn**: the selection is recorded as PENDING and the
-  rationale table names why each option would win or lose, so an overturned ruling is a bounded edit
-  (a metadata change plus a notice edit) rather than a re-run of the funnel.
+- **Q-D is overturned after the funnel is drawn**: the selection is recorded as Option A (Q-D's own
+  recommended default) and the rationale table names why each option would win or lose, so an
+  overturned ruling is a bounded edit (a metadata change plus a notice edit) rather than a re-run of
+  the funnel.
 - **A DD-47 auditor reads this plan's 6 renders as under-delivery**: mitigated by the cross-plan note
   in the asset matrix above and by the same note repeated in the archival phase.

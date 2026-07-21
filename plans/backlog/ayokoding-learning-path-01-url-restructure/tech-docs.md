@@ -3,8 +3,9 @@
 ## Scope of this document
 
 The **URL and IA layer** of the ayokoding-www learn section: the flat `courses/` namespace, the
-`paths/` content home, the `legacy/` bucket, all four redirect modules this plan touches or adds
-(`content-namespace.ts` inverted, `learn-reorg.ts` reordered around, `course-rehome.ts` and
+`paths/` content home and every structural index beneath it (`careers/`, its three arcs, and
+`skills/` — amendment A3, DD-49), the `legacy/` bucket, all four redirect modules this plan touches
+or adds (`content-namespace.ts` inverted, `learn-reorg.ts` reordered around, `course-rehome.ts` and
 `learn-three-bucket.ts` new), the site-wide de-namespacing (DD-48), and the additive legacy
 `_index.md` browse. The `course-paths` feature architecture (pure core, shell components, `?path=`
 context, manifest loading) is **not** documented here — it belongs to
@@ -84,8 +85,14 @@ property (below) and as a Phase 3 gate check, not left as an unstated expectatio
 
 ### File inventory (measured; do not re-derive, re-verify what an acceptance clause cites)
 
-24 non-plan files reference the `/c/` segment: **21** under `apps/ayokoding-www/src/`, **3** Gherkin
-features, and **3** step-definition files. `apps/ayokoding-www-be-e2e` has zero — no work there.
+28 non-plan files reference the `/c/` segment (measured 2026-07-22 via
+`grep -rlF '/c/' apps/ayokoding-www/src` for the first bucket and a literal-substring scan of
+`specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/*.feature` and
+`apps/ayokoding-www/test/unit/fe-steps/*.steps.tsx` for the other two): **21** under
+`apps/ayokoding-www/src/`, **3** Gherkin features, and **4** step-definition files — the three paired
+1:1 with the renamed Gherkin features (Step definitions row below) plus `navigation.steps.tsx`,
+whose two hardcoded `/c/`-prefixed href fixtures are corrected alongside its siblings in the
+Navigation shell row. `apps/ayokoding-www-be-e2e` has zero — no work there.
 
 | Group               | Files                                                                                                                                                      | Disposition                                                                                                                                                                                          |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -95,11 +102,11 @@ features, and **3** step-definition files. `apps/ayokoding-www-be-e2e` has zero 
 | Core (changed)      | `features/content/core/content-url.ts` + `.test.ts`                                                                                                        | `contentUrl()` drops the `/c/`-prefix branch entirely — see below                                                                                                                                    |
 | Core (doc-only)     | `features/content/core/slug.ts` + `.test.ts`, `features/content/core/content-link-rewrite.ts`                                                              | No logic change — both delegate to `contentUrl()`/plain joins; their doc comments name the retired `/c/[...slug]` route and the `/c/` namespace and must stop doing so                               |
 | Redirect (inverted) | `redirects/content-namespace.ts` + `content-namespace.unit.test.ts`                                                                                        | Inverted in place — see above; **filename kept** (see below)                                                                                                                                         |
-| Navigation shell    | `breadcrumb.tsx` + `.test.tsx`, `prev-next.test.tsx`, `sidebar-tree.test.tsx`, `resizable-sidebar.test.tsx`                                                | `breadcrumb.tsx`'s `contentHrefs` prop and its `hrefFor` branch become a no-op once `contentUrl()` never differs from the bare form — collapse it (see below); the rest are test-fixture URL updates |
+| Navigation shell    | `breadcrumb.tsx` + `.test.tsx`, `prev-next.test.tsx`, `sidebar-tree.test.tsx`, `resizable-sidebar.test.tsx`, `navigation.steps.tsx`                        | `breadcrumb.tsx`'s `contentHrefs` prop and its `hrefFor` branch become a no-op once `contentUrl()` never differs from the bare form — collapse it (see below); the rest are test-fixture URL updates |
 | Content shell       | `browse-index.tsx` + `.test.tsx`, `section-card.test.tsx`                                                                                                  | `browse-index.tsx` links to the relocated `browse/` route instead of `/c`; the two test files update fixture URLs                                                                                    |
 | Test-fixture only   | `app/sitemap.unit.test.ts`, `app/feed.xml/route.unit.test.ts`, `features/search/shell/search-dialog.test.tsx`, `features/app-shell/shell/landing.test.tsx` | Production `sitemap.ts` / `feed.xml/route.ts` already derive every URL from `contentUrl()` (DD-44) — **no production code change** here, only fixture URLs in these four test files                  |
 | Gherkin             | `content-namespace-redirects.feature`, `ia-navigation-revamp.feature`, `learn-reorg-redirects.feature`                                                     | Content inverts to match; **filenames kept** (see below)                                                                                                                                             |
-| Step definitions    | `content-namespace.steps.ts`, `ia-navigation-revamp.steps.ts`, `landing.steps.ts`                                                                          | Step bodies updated to match the inverted scenarios; no rename                                                                                                                                       |
+| Step definitions    | `content-namespace-redirects.steps.tsx`, `ia-navigation-revamp.steps.tsx`, `learn-reorg-redirects.steps.tsx`                                               | Step bodies updated to match the inverted scenarios; no rename                                                                                                                                       |
 
 ### Naming decisions (so sibling plans are not silently broken)
 
@@ -260,11 +267,11 @@ named canonical owner — not a dependency edge, which would collapse the wave s
 When this plan lands, `/{locale}/learn/` has **exactly three** structural children and nothing else
 (DD-40):
 
-| Bucket     | URL shape                                 | What lives there                                                       |
-| ---------- | ----------------------------------------- | ---------------------------------------------------------------------- |
-| `paths/`   | `/en/learn/paths/<arc>/<role-or-subject>` | The four ordered path manifests' landing anchors                       |
-| `courses/` | `/en/learn/courses/<course-id>`           | Canonical, path-neutral course bodies                                  |
-| `legacy/`  | `/en/learn/legacy/<domain>/<…verbatim…>`  | **NEW** — everything under `/en/learn/` that is not yet course or path |
+| Bucket     | URL shape                                                                     | What lives there                                                               |
+| ---------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `paths/`   | `/en/learn/paths/<path-id>` (variable-segment, category-prefixed — see DD-23) | The ordered path manifests' landing anchors, one per path, grown as each ships |
+| `courses/` | `/en/learn/courses/<course-id>`                                               | Canonical, path-neutral course bodies                                          |
+| `legacy/`  | `/en/learn/legacy/<domain>/<…verbatim…>`                                      | **NEW** — everything under `/en/learn/` that is not yet course or path         |
 
 ### Content tree — BEFORE (current reality, re-verified at authoring)
 
@@ -343,9 +350,24 @@ apps/ayokoding-www/content/
 │       │                                                             → 3-bucket orientation (DD-45 / Q-F)
 │       │
 │       ├── paths/                                                 +  BUCKET 1 — landing anchors only
-│       │   └── _index.md                                          +  paths hub, 2×2 grid, room for 4 cards
-│       │                                                             (the four per-path landings are
-│       │                                                              authored by the manifests plan)
+│       │   ├── _index.md                                          +  paths hub, grid grown to fit the
+│       │   │                                                          current path roster (the per-path
+│       │   │                                                          landings are authored by the
+│       │   │                                                          manifests plan, added as each ships)
+│       │   ├── careers/                                           +  STRUCTURAL bucket (A3/DD-49) —
+│       │   │   ├── _index.md                                      +  category index, plan 01's; EMPTY
+│       │   │   │                                                      until plan 05 publishes a manifest
+│       │   │   ├── interview-ready/                                +  arc bucket (A3/DD-49)
+│       │   │   │   └── _index.md                                  +  arc index, plan 01's; the leaf
+│       │   │   │                                                      .../interview-ready/software-engineer/
+│       │   │   │                                                      _index.md is plan 05's, NOT this plan's
+│       │   │   ├── immediately-effective/                          +  arc bucket (A3/DD-49)
+│       │   │   │   └── _index.md                                  +  arc index, plan 01's
+│       │   │   └── fundamentally-strong/                           +  arc bucket (A3/DD-49)
+│       │   │       └── _index.md                                  +  arc index, plan 01's
+│       │   └── skills/                                             +  STRUCTURAL bucket (A3/DD-49)
+│       │       └── _index.md                                      +  category index, plan 01's; EMPTY
+│       │                                                              until plan 06 or 07 publishes
 │       │
 │       ├── courses/                                               +  BUCKET 2 — FLAT namespace, one dir per course-id
 │       │   ├── _index.md                                          +  library landing
@@ -405,6 +427,67 @@ Under **Q-B option C** the two empty buckets (`jalur/`, `kursus/`) are omitted a
 created. Either variant additionally requires `id` rule pairs in the redirect module and makes the
 bucket URL shape per-locale, which the `course-paths` feature does not currently model — the cost
 noted in [Q-C](#q-c--if-id-is-in-scope-are-the-bucket-segments-translated).
+
+### Structural indexes under `paths/` — ownership and the empty interval (DD-49)
+
+**Six files, one ruling.** Amendment A3 (2026-07-21) assigns every structural index under `<PATHS>`
+to this plan: `paths/_index.md` (already this plan's before the amendment), `paths/careers/_index.md`,
+the three `paths/careers/<arc>/_index.md` (`interview-ready`, `immediately-effective`,
+`fundamentally-strong`), and `paths/skills/_index.md`. All six are created in **Phase 1**, the same
+phase that already created `paths/_index.md` and `courses/_index.md`, so the bucket is created
+coherently in one step rather than dribbled across phases.
+
+**Why centralise instead of splitting ownership per category.** `paths/skills/_index.md` is
+populated by **two** sibling `skills/` plans on equal footing —
+`ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` — so
+assigning the file to either would put a shared file on a cross-plan seam the other plan would have
+to work around. `paths/careers/_index.md` and its three arc indexes have only one populating plan
+today (`ayokoding-learning-path-05-manifests`), but the same reasoning generalizes: a **bucket** is
+IA work, not category content, and this plan already owns the IA layer for `/{locale}/learn/`
+(DD-40). Centralising all six here means no downstream plan ever creates a structural index, so no
+two plans can race on one.
+
+**The motivating rule is R7** — `ayokoding-learning-path-03-navigation-ui`'s own 2026-07-21
+category-split ruling states it as "every URL segment must render". `paths/careers/`,
+`paths/careers/<arc>/`, and `paths/skills/` are real, reachable URLs the instant that plan's
+`category-landing.tsx` and `arc-landing.tsx` renderers mount them; a URL segment with no `_index.md`
+is an orphan segment. This plan does not build those renderers — it creates the content files the
+renderers mount, which is the same division of labor `paths/_index.md` and `courses/_index.md`
+already have with the paths-hub and library-landing renderers.
+
+**The consequence this plan designs for, not discovers: a real, user-visible empty interval.** Every
+landing under `<PATHS>` is populated **from a manifest**, and manifests land in Wave 3 and later
+(`ayokoding-learning-path-05-manifests`, `-06-skills-accounting`, `-07-skills-erp`) — all downstream
+of this Wave-1 plan. Between this plan merging and whichever sibling first publishes into a given
+structural index, that index renders **empty**. That interval is not a theoretical edge case: it
+spans the gap between this plan's Phase 1 and the earliest of three separate downstream plans'
+publication phases. This plan's obligation is narrower than designing the empty state — it is:
+create each of the five new files in a state that renders **acceptably empty** (frontmatter with a
+`title`, plus one sentence of body that reads sensibly with zero cards beneath it — never a blank
+page), and **explicitly name `ayokoding-learning-path-03-navigation-ui` as the owner of the
+empty-state's actual design** (the `EmptyPathListState` component and its copy — see that plan's own
+`prd.md`, §"Screen 1a · Category landing" — the "Skills instance — empty state" sub-section
+specifically). This cross-plan reference is deliberately **inline text, not a markdown link** — per
+the "Cross-plan source of truth" note in [README.md](./README.md), a sibling plan's stage folder
+(`backlog/` → `in-progress/` → `done/YYYY-MM-DD__…`) changes over the lifecycle, and a hard link
+would rot exactly while this plan still needs it. This plan adds **no
+mockup, no design funnel entry, and no component** for the empty state — Screen 4 (the legacy-bucket
+landing) remains this plan's only screen.
+
+**The structural-index / path-landing boundary, stated from the owning side.** Plans 06 and 07 each
+state the identical rule from the consuming side — this is the same rule, not a parallel one:
+
+- A **structural index** is a **bucket**: `paths/_index.md`, `paths/careers/_index.md`, each
+  `paths/careers/<arc>/_index.md`, and `paths/skills/_index.md`. Creating a bucket is IA work, and it
+  is **always this plan's**, regardless of which downstream plan populates it.
+- A **path landing** is a **leaf**: the `_index.md` a manifest-owning plan populates with real
+  content, e.g. `paths/careers/interview-ready/software-engineer/_index.md` (plan 05's) or
+  `paths/skills/accounting/_index.md` (plan 06's). A path landing is **never this plan's** — this
+  plan does not author path-landing content, does not know a manifest's shape, and does not race a
+  sibling plan on its own leaf file.
+- The two are distinguished by **position in the tree, not by filename** — both are literally named
+  `_index.md`. Anything at or above `paths/skills/` or `paths/careers/<arc>/` is structural;
+  anything one segment deeper (a role or subject leaf) is a path landing.
 
 ### Source tree — BEFORE and AFTER (`apps/ayokoding-www/src/`)
 
@@ -532,7 +615,7 @@ URL then matches whichever row below applies, normally.
 | 9   | `/en/learn/fundamentally-strong/software-engineer/<slug>` _(per-course collapse)_               | `/en/learn/courses/<course-id>`                                                             | **per-course** re-home rule in `course-rehome.ts` — **NOT** `learn-three-bucket.ts` (DD-43)                                                                                                                                                            |
 | 10  | `/en/c/learn/…` _(any stale `/c`-bookmark, any of the four sections not otherwise moved)_       | the row above with the `/c/` segment stripped, one hop earlier                              | `content-namespace.ts` (DD-48) — runs FIRST, so every row above receives an already-bare URL                                                                                                                                                           |
 | 11  | `/en/learn/courses/<course-id>`                                                                 | _(no redirect — served)_                                                                    | **none by design** — a blanket bucket rule would swallow this (DD-42)                                                                                                                                                                                  |
-| 12  | `/en/learn/paths/<arc>/<role-or-subject>`                                                       | _(no redirect — served)_                                                                    | **none by design** — same hazard (DD-42)                                                                                                                                                                                                               |
+| 12  | `/en/learn/paths/<path-id>` (variable-segment, category-prefixed — see DD-23)                   | _(no redirect — served)_                                                                    | **none by design** — same hazard (DD-42)                                                                                                                                                                                                               |
 | 13  | `/id/belajar/manusia/…`                                                                         | _(no redirect — served unchanged, but de-namespaced per DD-48 if it arrived `/c`-prefixed)_ | **none** for the three-bucket shape — `id` is out of scope under Q-B's recommended answer (DD-45); de-namespacing IS in scope (DD-48) — the two are independent, see [De-namespacing §Scope note](#de-namespacing--retiring-the-c-content-route-dd-48) |
 
 Rows 11–13 are **negative** cases for the three-bucket relocation and are asserted as such in the
@@ -918,8 +1001,9 @@ assumption is **wrong**. DD-48's site-wide de-namespacing (see
 A checker run scoped to this plan's diff would find real `.tsx` component source to scan — the
 opposite of a vacuous pass. **`ui-quality-gate` (`swe-ui-checker` / `swe-ui-fixer`) is therefore not
 exempt and must run against exactly this file set** as part of Phase 3/4 verification. This plan's
-delivery checklist does not yet name that step explicitly; recording the non-exemption here surfaces
-the gap rather than leaving it implicit, per R9, rather than smoothing it into an assumed pass.
+delivery checklist names that step explicitly — see
+[delivery.md Phase 4 Gate — "UI Quality Gate (R9)"](./delivery.md#phase-4-gate), per R9, rather than
+smoothing it into an assumed pass.
 
 **Independently**, this plan is also UI-bearing by content: Screen 4 (the legacy-bucket landing and
 per-page banner), already declared in [Scope of this document](#scope-of-this-document). That is a
@@ -958,8 +1042,9 @@ which is what the workflow's own §Relationship to Other Gates asks for.
 
 ## Design Decisions
 
-Eleven decisions are owned by this plan (ten from the learn-section IA revamp plus DD-48, added for
-the site-wide de-namespacing scope extension). Two further decisions are **cross-cutting** (DD-15,
+Twelve decisions are owned by this plan: ten from the learn-section IA revamp, plus DD-48 for the
+site-wide de-namespacing scope extension and DD-49 for amendment A3's structural indexes under
+`paths/`. Two further decisions are **cross-cutting** (DD-15,
 DD-27) and are reproduced verbatim in
 [README §Build order (inherited)](./README.md#build-order-inherited) rather than here. Decisions owned
 by sibling plans are referenced by ID only and are not restated.
@@ -986,23 +1071,31 @@ by sibling plans are referenced by ID only and are not restated.
   the "4 existing capstones" and is re-homed and redirected exactly like the 33 shipped topics, for a
   re-home set of **37**. This plan restates only that half; the promotion ruling, the catalog
   arithmetic (114 → 121), and the manifest placements are not restated here.
-- **DD-23 (URL-shape half) · The `paths/` bucket's second segment is `<endpoint>` — the role or
-  subject the path converges on — never a starting-point or a transition between two roles.** Path
-  landings live at `/en/learn/paths/<first-segment>/<second-segment>`, where the first segment is the
-  arc style (`interview-ready` / `immediately-effective` / `fundamentally-strong`) and the second
-  names the endpoint role: `software-engineer` for three of the four paths, `ai-engineer` for the
-  fourth. **There is no role-to-role-transition category** — the fourth path was originally modelled
-  as `software-engineer-to-ai-engineer`, encoding an assumed prior software-engineering role the
-  reader must already hold, but a 2026-07-21 ruling retired that framing along with its id: the path
-  no longer assumes prior SWE competence (its needed SWE fundamentals are now composed into the path
+- **DD-23 (URL-shape half) · Path ids are full, category-prefixed, slash-bearing strings with a
+  VARIABLE segment count — never a fixed shape — and the FINAL segment is always the endpoint (the
+  role or subject the path converges on), never a starting-point or a transition between two roles.**
+  This plan's own `careers/` arc ids are **three** segments — `careers/<arc>/<endpoint>`, matching
+  `delivery.md`'s "Path ids" list verbatim (e.g. `careers/interview-ready/software-engineer`) — where
+  the first segment is the category (`careers`), the second is the arc style (`interview-ready` /
+  `immediately-effective` / `fundamentally-strong`), and the third (final) names the endpoint role:
+  `software-engineer` for three of the four `careers/` paths, `ai-engineer` for the fourth. Other
+  categories are not scoped to this plan and are not guaranteed to share that segment count — a
+  category id could be shorter (e.g. a two-segment `<category>/<subject>` shape) or longer, so
+  **no logic or acceptance clause anywhere in this plan may key on segment count**; every path id
+  MUST be treated as an opaque, variable-length, slash-bearing string. **There is no
+  role-to-role-transition category** — the fourth `careers/` path was originally modelled as
+  `software-engineer-to-ai-engineer`, encoding an assumed prior software-engineering role the reader
+  must already hold, but a 2026-07-21 ruling retired that framing along with its id: the path no
+  longer assumes prior SWE competence (its needed SWE fundamentals are now composed into the path
   itself from existing library courses, not assumed background), so encoding a role transition in its
   id became factually wrong the moment the framing changed. **Paths are named by their endpoint,
   never by an assumed starting point** — this is the general rule the id grammar now states, not an
-  exception carved out for one path. **Why this plan carries it**: the `paths/` bucket and its
-  2×2-grid hub landing must accommodate a **two-segment, slash-bearing** path ID, and a hub built on
-  the assumption that the second segment is always `software-engineer` would need rework the moment a
-  path with a different endpoint lands. The rest of DD-23 (the fourth path's ID registration and its
-  manifest location) belongs to `ayokoding-learning-path-05-manifests`.
+  exception carved out for one path. **Why this plan carries it**: the `paths/` bucket's hub landing
+  must accommodate every category's variable-segment path IDs without hardcoding a shape, and a hub
+  built on the assumption that ids are always a fixed segment count ending in `software-engineer`
+  would need rework the moment a path with a different category, length, or endpoint lands. The rest
+  of DD-23 (the fourth path's ID registration and its manifest location) belongs to
+  `ayokoding-learning-path-05-manifests`.
 - **DD-40 · `/{locale}/learn/` has exactly three structural buckets: `paths/`, `courses/`,
   `legacy/`.** The learn section's IA is closed: a URL under `/en/learn/` is either an ordered path
   manifest landing, a canonical course body, or relocated legacy material — nothing else. The section
@@ -1092,6 +1185,32 @@ by sibling plans are referenced by ID only and are not restated.
   deferral (de-namespacing `id/belajar` is not the same decision as extending the three-bucket shape
   to it). Full exposition, file inventory, and the churn-sequencing rationale in
   [De-namespacing — retiring the `/c/` content route](#de-namespacing--retiring-the-c-content-route-dd-48).
+- **DD-49 · Amendment A3 (2026-07-21) — this plan owns every structural index under `<PATHS>`, not
+  just `paths/_index.md`.** `paths/careers/_index.md`, the three `paths/careers/<arc>/_index.md`
+  (`interview-ready`, `immediately-effective`, `fundamentally-strong`), and `paths/skills/_index.md`
+  are created here alongside `paths/_index.md`, for six files total. **Why centralise**:
+  `paths/skills/_index.md` is populated by two sibling `skills/` plans
+  (`ayokoding-learning-path-06-skills-accounting`, `ayokoding-learning-path-07-skills-erp`); owning
+  the file itself by either one would put a shared file on a cross-plan seam. Assigning every
+  structural index to this plan — the plan that already owns the section's IA layer — removes the
+  seam rather than picking a side, the same reasoning DD-40 already applies to `paths/`, `courses/`,
+  and `legacy/` themselves. **The motivating rule is R7** ("every URL segment must render" —
+  `ayokoding-learning-path-03-navigation-ui`'s 2026-07-21 category-split ruling): `paths/careers/`,
+  each arc, and `paths/skills/` are real, reachable URLs the moment that plan's
+  `category-landing.tsx`/`arc-landing.tsx` renderers mount them, so each needs an `_index.md` or it
+  is an orphan segment. **The consequence this plan designs for, not discovers**: every one of the
+  five new files renders **empty** for the real, user-visible interval between this plan landing and
+  whichever of plans 05/06/07 first publishes a manifest into it — this plan creates the files in a
+  state that renders **acceptably empty** (a title and a sentence, never a blank body); the
+  empty-state's actual **design** is `ayokoding-learning-path-03-navigation-ui`'s, named here only as
+  a cross-reference, never authored in this plan. **The structural-index / path-landing boundary**
+  (stated from the owning side; plans 06 and 07 state the identical rule from the consuming side): a
+  **structural index** is a bucket — `paths/`, `paths/careers/`, `paths/careers/<arc>/`,
+  `paths/skills/` — and is always this plan's; a **path landing** is the leaf `_index.md` a
+  manifest-owning plan populates (e.g. `paths/careers/interview-ready/software-engineer/_index.md`,
+  `paths/skills/accounting/_index.md`) and is never this plan's. The two are distinguished by
+  **position, not filename** — both are literally named `_index.md`. Full exposition in
+  [Structural indexes under `paths/`](#structural-indexes-under-paths--ownership-and-the-empty-interval-dd-49).
 
 **Referenced but not owned here**: DD-1, DD-3 through DD-18, DD-21, DD-22, DD-24 through DD-39, DD-46
 and DD-47 belong to sibling plans. **DD-34, DD-35 and DD-39 are not this family's decisions at all** —
@@ -1191,8 +1310,12 @@ C later is a one-line metadata change, whereas recovering de-indexed traffic is 
 user-facing UI change, so it carries a design-funnel entry**: see
 [prd.md Screen 4](./prd.md#ui-design-funnel--screen-4--legacy-bucket-landing-and-page-banner).
 
-**Q-D gates this plan's Screen 4 selection**, which is why the funnel records its selection as PENDING
-rather than fabricating one. The three low-fi alternatives map 1:1 onto A / B / C.
+**Q-D's recommended answer (A) IS Screen 4's named Selection at plan-quality-gate time** — recorded
+as `Selected: Option A` in
+[prd.md's Selection and rationale](./prd.md#selection-and-rationale), not left open, per the
+UI-Design-Funnel HARD RULE. The three low-fi alternatives map 1:1 onto A / B / C; if execution
+surfaces information that overturns this recommendation, updating that line is a bounded edit, not a
+re-run of the funnel.
 
 ### Q-E — What happens to `fundamentally-strong`'s three residual index pages?
 
@@ -1246,23 +1369,24 @@ Per the repo's three-level testing standard and TDD mandate, every code change i
 test-first. Each Gherkin acceptance criterion in [prd.md](./prd.md#acceptance-criteria-gherkin) is
 covered at exactly one level:
 
-| Gherkin scenario                                                            | Level              | Home                                                                                                                                            |
-| --------------------------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| A legacy fundamentally-strong URL redirects to the canonical course URL     | unit + e2e         | `course-rehome.unit.test.ts`; `ayokoding-www-fe-e2e`                                                                                            |
-| Every re-homed course declares its prerequisites                            | unit               | frontmatter assertion over the 37 re-homed `_index.md`                                                                                          |
-| The legacy section-index browse still resolves after re-homing              | e2e                | `ayokoding-www-fe-e2e` old-way nav walk                                                                                                         |
-| The legacy section-index browse resolves to the canonical course body       | e2e                | `ayokoding-www-fe-e2e` old-way nav walk                                                                                                         |
-| The learn section exposes exactly three structural buckets                  | specs + phase gate | `<NAVSPECS>learn-three-bucket.feature`; `ls` structural check                                                                                   |
-| A relocated legacy domain URL redirects to its legacy address               | unit + specs + e2e | `learn-three-bucket.unit.test.ts`; `<NAVSPECS>`; `fe-e2e`                                                                                       |
-| A deep legacy path keeps its sub-taxonomy verbatim                          | e2e                | `ayokoding-www-fe-e2e` deep-path assertion                                                                                                      |
-| The legacy redirect never swallows the courses or paths buckets             | unit + e2e         | negative assertions in `learn-three-bucket.unit.test.ts`; `fe-e2e`                                                                              |
-| A re-homed fundamentally-strong course is not routed into the legacy bucket | unit               | negative assertion (no `fundamentally-strong`-prefixed source)                                                                                  |
-| The relocation rewrites no page content                                     | phase gate         | `git diff --cached --summary -M` pure-rename proof                                                                                              |
-| Navigation surfaces follow the relocated tree with no code change           | phase gate         | `generate-indexes` + `generate-search-data` + `validate-indexes`                                                                                |
-| The legacy bucket landing tells a reader what the bucket is                 | e2e + manual       | `fe-e2e` landing assertion; Playwright MCP verification                                                                                         |
-| The Indonesian locale is left unchanged and the deferral is recorded        | phase gate         | `find id/belajar` count + `test -e` absence check                                                                                               |
-| The relocated tree builds and validates green                               | build + validators | `ayokoding-www:build`; `md links`/`heading-hierarchy`; markdownlint                                                                             |
-| The de-namespaced redirect chain never loops                                | unit + specs + e2e | `content-namespace.unit.test.ts` (inverted); `content-namespace-redirects.feature` (inverted, filename kept); `fe-e2e` compound-chain assertion |
+| Gherkin scenario                                                            | Level                        | Home                                                                                                                                                 |
+| --------------------------------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A legacy fundamentally-strong URL redirects to the canonical course URL     | unit + e2e                   | `course-rehome.unit.test.ts`; `ayokoding-www-fe-e2e`                                                                                                 |
+| Every re-homed course declares its prerequisites                            | unit                         | frontmatter assertion over the 37 re-homed `_index.md`                                                                                               |
+| The legacy section-index browse still resolves after re-homing              | e2e                          | `ayokoding-www-fe-e2e` old-way nav walk                                                                                                              |
+| The legacy section-index browse resolves to the canonical course body       | e2e                          | `ayokoding-www-fe-e2e` old-way nav walk                                                                                                              |
+| The learn section exposes exactly three structural buckets                  | specs + phase gate           | `<NAVSPECS>learn-three-bucket.feature`; `ls` structural check                                                                                        |
+| A relocated legacy domain URL redirects to its legacy address               | unit + specs + e2e           | `learn-three-bucket.unit.test.ts`; `<NAVSPECS>`; `fe-e2e`                                                                                            |
+| A deep legacy path keeps its sub-taxonomy verbatim                          | e2e                          | `ayokoding-www-fe-e2e` deep-path assertion                                                                                                           |
+| The legacy redirect never swallows the courses or paths buckets             | unit + e2e                   | negative assertions in `learn-three-bucket.unit.test.ts`; `fe-e2e`                                                                                   |
+| A re-homed fundamentally-strong course is not routed into the legacy bucket | unit                         | negative assertion (no `fundamentally-strong`-prefixed source)                                                                                       |
+| The relocation rewrites no page content                                     | phase gate                   | `git diff --cached --summary -M` pure-rename proof                                                                                                   |
+| Navigation surfaces follow the relocated tree with no code change           | phase gate                   | `generate-indexes` + `generate-search-data` + `validate-indexes`                                                                                     |
+| The legacy bucket landing tells a reader what the bucket is                 | e2e + manual                 | `fe-e2e` landing assertion; Playwright MCP verification                                                                                              |
+| The Indonesian locale is left unchanged and the deferral is recorded        | phase gate                   | `find id/belajar` count + `test -e` absence check                                                                                                    |
+| The relocated tree builds and validates green                               | build + validators           | `ayokoding-www:build`; `md links`/`heading-hierarchy`; markdownlint                                                                                  |
+| The de-namespaced redirect chain never loops                                | unit + specs + e2e           | `content-namespace.unit.test.ts` (inverted); `content-namespace-redirects.feature` (inverted, filename kept); `fe-e2e` compound-chain assertion      |
+| Every structural index under paths renders before its subject is populated  | content + build + phase gate | Phase 1 frontmatter/body assertions over the five new `_index.md` files; `ayokoding-www:build`; Phase 1 Gate `find … -name _index.md \| wc -l` check |
 
 **Target notes (verified, and load-bearing for RED steps).** `ayokoding-www:test:e2e` and
 `ayokoding-www:test:integration` are **no-op echo stubs** [Repo-grounded —

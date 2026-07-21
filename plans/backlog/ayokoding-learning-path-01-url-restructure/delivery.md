@@ -205,32 +205,87 @@ use are retained deliberately, not pruned):
 
 ---
 
-## Phase 1: Library + paths content homes
+## Phase 1: Library + paths content homes (all structural indexes, A3)
 
-> _Suggested executor: `apps-ayokoding-www-content-maker`_ (two `_index.md` section landings mirroring
-> an existing section index).
+> _Suggested executor: `apps-ayokoding-www-general-maker`_ (seven `_index.md` section landings
+> mirroring an existing section index).
 >
 > **Boundary note (BF-3).** This step is **owned by this plan**, not by the schema or navigation-ui
 > plans. The source plan located it inside a phase that otherwise belongs to
 > `ayokoding-learning-path-02-schema-and-prerequisite-dag`; as written, Phase 2's re-home would have
 > had nowhere to move bodies into and Phase 3's structural gate would have been unsatisfiable. See
 > [README §Provenance](./README.md#provenance--where-this-plan-came-from).
+>
+> **Boundary note (A3, DD-49).** This phase also creates every structural index under `<PATHS>` —
+> not just `<PATHS>_index.md` — per amendment A3 (2026-07-21). Creating a bucket is IA work, so it
+> belongs in the same phase and the same step as the other two content homes, not scattered across a
+> later phase or left to a sibling plan. See
+> [tech-docs.md's structural-indexes section](./tech-docs.md#structural-indexes-under-paths--ownership-and-the-empty-interval-dd-49).
 
 - [ ] [AI] **Library + paths content homes** — create `<COURSES>_index.md` _(New file)_ (library
       landing, `title` + `weight` + `date` + `draft: false`) and `<PATHS>_index.md` _(New file)_ (paths
-      hub / choose-a-path landing whose 2×2-grid layout has room for **all four** paths, populated as
-      each ships), both mirroring the frontmatter shape of an existing section `_index.md` such as
+      hub / choose-a-path landing whose grid layout grows to fit the current path roster, populated
+      as each ships), both mirroring the frontmatter shape of an existing section `_index.md` such as
       `apps/ayokoding-www/content/en/learn/_index.md` — acceptance: `test -f <COURSES>_index.md` and
       `test -f <PATHS>_index.md` both return 0 (both return non-zero before this step, verified in
       Phase 0's collision check), and `npx nx run ayokoding-www:build` exits 0.
+- [ ] [AI] **Five more structural indexes under `<PATHS>` (amendment A3, DD-49)** — create
+      `<PATHS>careers/_index.md`, `<PATHS>careers/interview-ready/_index.md`,
+      `<PATHS>careers/immediately-effective/_index.md`,
+      `<PATHS>careers/fundamentally-strong/_index.md`, and `<PATHS>skills/_index.md` (all five
+      `_(New file)_`), each mirroring `<PATHS>_index.md`'s frontmatter shape (`title` + `weight` +
+      `date` + `draft: false`) plus one sentence of body prose that reads sensibly with zero cards
+      beneath it — **acceptably empty, never blank** (see
+      [tech-docs.md's structural-indexes section](./tech-docs.md#structural-indexes-under-paths--ownership-and-the-empty-interval-dd-49);
+      the empty-state's actual **design** belongs to `ayokoding-learning-path-03-navigation-ui`, not
+      authored here — this plan writes only a title and a sentence, no component, no mockup). This
+      plan creates every **structural index** (a bucket) under `<PATHS>`; it never creates a **path
+      landing** (the leaf a manifest-owning plan populates) — command:
+
+  ```bash
+  STRUCTIDX=(
+    "apps/ayokoding-www/content/en/learn/paths/careers/_index.md"
+    "apps/ayokoding-www/content/en/learn/paths/careers/interview-ready/_index.md"
+    "apps/ayokoding-www/content/en/learn/paths/careers/immediately-effective/_index.md"
+    "apps/ayokoding-www/content/en/learn/paths/careers/fundamentally-strong/_index.md"
+    "apps/ayokoding-www/content/en/learn/paths/skills/_index.md"
+  )
+  for f in "${STRUCTIDX[@]}"; do test -f "$f" || echo "MISSING $f"; done
+  ```
+
+  — acceptance: the loop prints nothing (all five exist; falsifiable both ways — today, before this
+  step, it prints all five `MISSING` lines, verified live), AND each file has at least one non-empty
+  body line after its frontmatter closes —
+  `for f in "${STRUCTIDX[@]}"; do awk '/^---$/{c++; next} c>=2 && NF' "$f" | grep -q . || echo "EMPTY $f"; done`
+  prints nothing (falsifiable both ways — a frontmatter-only stub with no body line makes this print
+  `EMPTY <path>` for that file, verified live) — and `npx nx run ayokoding-www:build` exits 0.
+
+  **Gherkin (binds) →** "Every structural index under paths renders before its subject is populated"
+
+  ```gherkin
+  Scenario: Every structural index under paths renders before its subject is populated
+    Given the six structural indexes under paths have been created and no subject manifest has published yet
+    When a reader requests any of the paths, paths/careers, paths/careers/<arc>, or paths/skills URLs
+    Then each request serves a page carrying a title and at least one sentence, never a blank body
+    And none of the six requests returns a 404
+  ```
+
 - [ ] [AI] **Set explicit weights so the bucket order is `paths`, `courses`, `legacy`** — give
       `<PATHS>_index.md` the lowest `weight` and `<COURSES>_index.md` the next, leaving headroom above
-      both for the Phase 3 `<LEGACY>_index.md` — acceptance: the two `weight` values are present,
-      distinct, and both strictly less than the value Phase 3 will assign to `legacy`. Rationale:
-      `buildTreeForLocale` sorts siblings by `weight` and synthesizes `weight: 0` for any missing
-      ancestor [Repo-grounded — `apps/ayokoding-www/src/features/content/core/tree-builder.ts`], so
-      leaving weights implicit makes sidebar order an accident of file order.
-- [ ] [AI] Regenerate the derived indexes so the two new sections enter the tree:
+      both for the Phase 3 `<LEGACY>_index.md`; give the five new structural indexes explicit,
+      distinct `weight` values too — `<PATHS>careers/_index.md` before `<PATHS>skills/_index.md`
+      among `paths/`'s own children, and each arc ordered `interview-ready` →
+      `immediately-effective` → `fundamentally-strong` among `careers/`'s children, matching this
+      plan's own DL-7 build-order citation for the arcs — acceptance: all seven files (the two
+      content homes plus the five new structural indexes) carry explicit, distinct `weight` values
+      among their respective siblings; the two content-home values stay strictly less than the value
+      Phase 3 will assign to `legacy`. Rationale: `buildTreeForLocale` sorts siblings by `weight` and
+      synthesizes `weight: 0` for any missing ancestor [Repo-grounded —
+      `apps/ayokoding-www/src/features/content/core/tree-builder.ts`], so leaving weights implicit
+      makes sidebar order an accident of file order — the same reasoning that already governs
+      `<PATHS>_index.md` and `<COURSES>_index.md` applies identically to every sibling set this step
+      introduces.
+- [ ] [AI] Regenerate the derived indexes so the seven new content nodes enter the tree:
       `npx nx run ayokoding-www:generate-indexes` then `npx nx run ayokoding-www:validate-indexes`
       — acceptance: both exit 0 (the second proves regeneration converged).
 - [ ] [AI] Run the local quality gates and the [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr)
@@ -243,13 +298,20 @@ use are retained deliberately, not pruned):
 - [ ] [AI] `test -f apps/ayokoding-www/content/en/learn/courses/_index.md` and
       `test -f apps/ayokoding-www/content/en/learn/paths/_index.md` both return 0 — both returned
       non-zero at Phase 0.
-- [ ] [AI] Both files carry explicit, distinct `weight` values leaving headroom for `legacy`.
+- [ ] [AI] **All six structural indexes under `paths/` exist (amendment A3, DD-49)** —
+      `find apps/ayokoding-www/content/en/learn/paths -name _index.md | wc -l` returns **6**.
+      Falsifiable both ways: it returns **0** at Phase 0 (the directory does not exist yet), and it
+      would return **5** or fewer if any arc or category index were missed.
+- [ ] [AI] Both content-home files carry explicit, distinct `weight` values leaving headroom for
+      `legacy`; the five new structural indexes carry explicit, distinct `weight` values among their
+      own siblings (§Set explicit weights above).
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:typecheck` + `:validate-indexes` exit 0.
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: two empty section landings exist and render; no body moved, no URL changed, no
-> redirect added. Production serves the same content it served before, plus two new (empty) landing
-> pages. Safe to stop indefinitely. To resume: `npx nx run ayokoding-www:build`.
+> **Pause Safety**: all six structural indexes under `paths/` exist and render acceptably empty
+> (title + one sentence, no cards); `courses/_index.md` exists and renders; no body moved, no URL
+> changed, no redirect added. Production serves the same content it served before, plus seven new
+> (empty) content nodes. Safe to stop indefinitely. To resume: `npx nx run ayokoding-www:build`.
 
 ---
 
@@ -494,7 +556,7 @@ deleted), re-pointing each entry to wherever the content now lives.
 ## Phase 3: Relocate the six non-course domains into `legacy/` + per-domain 308 redirects
 
 > _Suggested executor: `swe-typescript-dev`_ (redirect module + unit test + `next.config.ts` wiring)
-> _plus `apps-ayokoding-www-content-fixer`_ for the two hub-file rewrites.
+> _plus `apps-ayokoding-www-general-fixer`_ for the two hub-file rewrites.
 >
 > **Why this is one phase, not two.** The six `git mv`s and the redirect module must land **together**:
 > a live 308 pointing at a not-yet-moved path 404s, and a moved path with no 308 breaks ~1,148 URLs.
@@ -544,9 +606,10 @@ deleted), re-pointing each entry to wherever the content now lives.
   URL, not the reverse.
 
 - [ ] [AI] **RED (specs)** — invert the Gherkin content of `content-namespace-redirects.feature` in
-      place (filename kept) and update its paired `content-namespace.steps.ts` step definitions to
-      match — command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: fails (step
-      bindings still assert the old forward direction against the still-forward production code).
+      place (filename kept) and update its paired `content-namespace-redirects.steps.tsx` step
+      definitions to match — command: `npx nx run ayokoding-www:specs:behavior:coverage` —
+      acceptance: fails (step bindings still assert the old forward direction against the
+      still-forward production code).
   - _Suggested executor: `specs-maker`_
 
 - [ ] [AI] **GREEN** — invert `<REDIR>content-namespace.ts` in place: for all five rules
@@ -608,6 +671,18 @@ deleted), re-pointing each entry to wherever the content now lives.
       `prev-next.test.tsx`, `sidebar-tree.test.tsx`, `resizable-sidebar.test.tsx` updated to match) —
       command: `npx nx run ayokoding-www:test:unit` — acceptance: all four suites pass with the prop
       removed.
+- [ ] [AI] **GREEN** — update `apps/ayokoding-www/test/unit/fe-steps/navigation.steps.tsx`'s two
+      hardcoded `/c/`-prefixed href assertions (currently at line 188:
+      `expect(html).toContain('href="/en/c/learn/fundamentally-strong/software-engineer/overview"')`
+      and line 221:
+      `expect(html).toContain('href="/en/c/learn/fundamentally-strong/software-engineer/just-enough-nvim/sibling"')`)
+      to the bare form (`href="/en/learn/fundamentally-strong/software-engineer/overview"` and
+      `href="/en/learn/fundamentally-strong/software-engineer/just-enough-nvim/sibling"`) — command:
+      `npx nx run ayokoding-www:test:unit` — acceptance:
+      `grep -c '/en/c/learn' apps/ayokoding-www/test/unit/fe-steps/navigation.steps.tsx` returns `0`
+      (falsifiable: today it returns `2`, matching the two hardcoded assertions above) and the
+      `unit-fe` vitest project (`apps/ayokoding-www/vitest.config.ts:82`, which globs
+      `test/unit/fe-steps/**/*.steps.{ts,tsx}`) passes.
 - [ ] [AI] **GREEN** — update `browse-index.tsx` to link to the relocated `browse/` route instead of
       `/c`, and update its and `section-card.tsx`'s test fixtures (`browse-index.test.tsx`,
       `section-card.test.tsx`) to bare URLs — command: `npx nx run ayokoding-www:test:unit` —
@@ -623,9 +698,9 @@ deleted), re-pointing each entry to wherever the content now lives.
       [prd.md's Product-Level Risks](./prd.md#product-level-risks).
 - [ ] [AI] **GREEN** — invert `ia-navigation-revamp.feature` and `learn-reorg-redirects.feature`'s
       scenario content in place (filenames kept) and update their paired
-      `ia-navigation-revamp.steps.ts` / `landing.steps.ts` step definitions to match — command:
-      `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits 0, all three feature files'
-      scenarios pass against the now-inverted production code.
+      `ia-navigation-revamp.steps.tsx` / `learn-reorg-redirects.steps.tsx` step definitions to match —
+      command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits 0, all three
+      feature files' scenarios pass against the now-inverted production code.
 - [ ] [AI] **GREEN** — reorder `apps/ayokoding-www/next.config.ts` `redirects()` to place
       `contentNamespaceRedirects` **first**: `return [...contentNamespaceRedirects, ...learnReorgRedirects, ...courseRehomeRedirects];`
       — this sub-step's own intermediate order (§3.1 below appends `learnThreeBucketRedirects` last) —
@@ -636,6 +711,17 @@ deleted), re-pointing each entry to wherever the content now lives.
       wired module redirects a bare URL back into `/c/`). Falsifiable the other way: temporarily
       restoring the pre-inversion `content-namespace.ts` makes this command print 5 matching lines
       (verified in Phase 0 before this sub-phase started).
+
+  **Gherkin (binds) →** "The de-namespaced redirect chain never loops"
+
+  ```gherkin
+  Scenario: The de-namespaced redirect chain never loops
+    Given the content-namespace redirect module has been inverted to leave the retired /c/ segment
+    When every redirect rule across all four of this plan's modules is inspected
+    Then no rule declares a destination containing a /c/ segment
+    And no two rules combine to redirect any URL back to itself
+  ```
+
 - [ ] [AI] **REFACTOR** — run the full affected suite over everything touched this sub-phase:
       `npx nx affected -t typecheck lint test:unit specs:behavior:coverage` — acceptance: all exit 0.
 
@@ -643,23 +729,19 @@ deleted), re-pointing each entry to wherever the content now lives.
 
 - [ ] [AI] **RED** — write a failing unit test at `<REDIR>learn-three-bucket.unit.test.ts`
       _(New test)_, mirroring the existing `<REDIR>content-namespace.unit.test.ts` structure
-      [Repo-grounded], asserting all six properties: (a) exactly **6** rules, single tier — one per
-      relocated domain, not 12 (the `/c`-form tier is unreachable dead code once §3.0's
-      `content-namespace.ts` inversion always strips `/c/` first — see
+      [Repo-grounded], asserting the swallow-prevention properties: (a) exactly **6** rules, single
+      tier — one per relocated domain, not 12 (the `/c`-form tier is unreachable dead code once
+      §3.0's `content-namespace.ts` inversion always strips `/c/` first — see
       [tech-docs.md's Module 2](./tech-docs.md#module-2--learn-three-bucketts-per-domain-dd-42-collapsed-to-one-tier-by-dd-48));
       (b) every rule `permanent: true` with non-empty `source`/`destination`; (c) each destination
       equals its source with `legacy/` inserted at the bucket position; (d) **no** rule whose source
-      matches `/^\/en\/learn\/:path\*$/` (the self-recursing blanket, DD-42); (e) **no** rule whose
-      first path segment after `learn/` is `courses`, `paths`, or `fundamentally-strong`
-      (DD-42/DD-43); (f) **no** rule's `source` or `destination` contains a `/c/` segment (loop-safety
-      invariant, DD-48); (g) the six expected domain names are all covered — command:
+      matches `/^\/en\/learn\/:path\*$/` (the self-recursing blanket, DD-42) — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: the suite fails with `learn-three-bucket`
       module not found. Falsifiable both ways: the module does not exist today
       (`test -f apps/ayokoding-www/src/redirects/learn-three-bucket.ts` returns non-zero, verified in
       Phase 0) and returns 0 after the GREEN step.
 
-  **Gherkin (binds) →** "The legacy redirect never swallows the courses or paths buckets"; "A
-  re-homed fundamentally-strong course is not routed into the legacy bucket"
+  **Gherkin (binds) →** "The legacy redirect never swallows the courses or paths buckets"
 
   ```gherkin
   Scenario: The legacy redirect never swallows the courses or paths buckets
@@ -667,7 +749,40 @@ deleted), re-pointing each entry to wherever the content now lives.
     When a reader requests a canonical course URL or a path landing URL
     Then the app serves the page without redirecting it
     And no redirect rule declares a bucket-wide learn-section wildcard source
+  ```
 
+- [ ] [AI] **GREEN** — author `<REDIR>learn-three-bucket.ts` _(New file)_ exporting
+      `learnThreeBucketRedirects`, deriving every rule from one exported `RELOCATED_DOMAINS` array
+      naming the **6** real domains — `software-engineering`, `artificial-intelligence`,
+      `information-security`, `personal-development`, `it-governance`, `business` — one bare rule
+      per domain, `/en/learn/<domain>/:path*` → `/en/learn/legacy/<domain>/:path*`, each
+      `permanent: true`. No `/c`-form tier — it would be unreachable dead code, since §3.0's inverted
+      `content-namespace.ts` (wired first — see below) already strips any `/c/`-prefixed request down
+      to its bare form before this module ever runs. Deriving every rule from the array (rather than
+      six hand-written literals) means the module structurally cannot also contain a blanket
+      `/en/learn/:path*` rule, satisfying (a)-(d) at once — command:
+      `npx nx run ayokoding-www:test:unit` — acceptance: the new suite passes; no existing redirect
+      test breaks.
+- [ ] [AI] **REFACTOR** — add a header comment on `<REDIR>learn-three-bucket.ts` stating the blanket
+      ban, the tier collapse and why (DD-48), and the ordering requirement, in the style of
+      `content-namespace.ts` — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint`
+      — acceptance: both exit 0; the swallow-prevention assertions (a)-(d) still pass.
+
+- [ ] [AI] **RED** — extend `<REDIR>learn-three-bucket.unit.test.ts` with the
+      shadowing-prevention properties: (e) **no** rule whose first path segment after `learn/` is
+      `courses`, `paths`, or `fundamentally-strong` (DD-42/DD-43); (f) **no** rule's `source` or
+      `destination` contains a `/c/` segment (loop-safety invariant, DD-48); (g) `RELOCATED_DOMAINS`
+      names exactly the six expected domains, no more, no fewer — command:
+      `npx nx run ayokoding-www:test:unit` — acceptance: the suite **passes immediately** — the prior
+      cycle's array-derived implementation already structurally excludes
+      `courses`/`paths`/`fundamentally-strong` and any `/c/` segment, so this is a **regression
+      guard**, not new production code. Falsifiable both ways: temporarily adding
+      `"fundamentally-strong"` to `RELOCATED_DOMAINS` makes this assertion fail, proving the guard is
+      live; reverting makes it pass again.
+
+  **Gherkin (binds) →** "A re-homed fundamentally-strong course is not routed into the legacy bucket"
+
+  ```gherkin
   Scenario: A re-homed fundamentally-strong course is not routed into the legacy bucket
     Given the fundamentally-strong topic directories were collapsed into flat course bodies
     When a reader requests a legacy fundamentally-strong course URL
@@ -675,16 +790,6 @@ deleted), re-pointing each entry to wherever the content now lives.
     And no legacy-bucket rule matches the fundamentally-strong prefix
   ```
 
-- [ ] [AI] **GREEN** — author `<REDIR>learn-three-bucket.ts` _(New file)_ exporting
-      `learnThreeBucketRedirects` with **6** rules, single tier — one bare rule per domain,
-      `/en/learn/<domain>/:path*` → `/en/learn/legacy/<domain>/:path*`, each `permanent: true`, for
-      `software-engineering`, `artificial-intelligence`, `information-security`,
-      `personal-development`, `it-governance`, `business`. No `/c`-form tier — it would be unreachable
-      dead code, since §3.0's inverted `content-namespace.ts` (wired first — see below) already strips
-      any `/c/`-prefixed request down to its bare form before this module ever runs. Carry a header
-      comment stating the blanket ban, the tier collapse and why (DD-48), and the ordering requirement,
-      in the style of `content-namespace.ts` — command: `npx nx run ayokoding-www:test:unit` —
-      acceptance: the new suite passes; no existing redirect test breaks.
 - [ ] [AI] **GREEN** — wire the module into `apps/ayokoding-www/next.config.ts` `redirects()`,
       completing the array §3.0 started, as:
       `return [...contentNamespaceRedirects, ...learnReorgRedirects, ...courseRehomeRedirects, ...learnThreeBucketRedirects];`
@@ -699,10 +804,9 @@ deleted), re-pointing each entry to wherever the content now lives.
       acceptance: both exit 0, and `grep -F "learnThreeBucketRedirects" apps/ayokoding-www/next.config.ts`
       prints exactly two lines (the import and the spread) — it prints nothing before this step,
       verified.
-- [ ] [AI] **REFACTOR** — extract the six domain names into one exported `RELOCATED_DOMAINS` array the
-      single tier maps over, so a seventh domain cannot be added and forgotten — command:
+- [ ] [AI] **REFACTOR** — run the full affected suite over the module and its wiring:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint` — acceptance: both exit 0;
-      the 6-rule assertion still passes.
+      the 6-rule assertion and both regression guards (a)-(g) still pass.
 
 ### 3.2 · Relocate the six domains (pure `git mv`, DD-41)
 
@@ -804,27 +908,30 @@ deleted), re-pointing each entry to wherever the content now lives.
 ### 3.3 · Specs + e2e (Gherkin-bound)
 
 - [ ] [AI] **RED (specs)** — author `<NAVSPECS>learn-three-bucket.feature` _(New file)_ beside the
-      existing `content-namespace-redirects.feature` [Repo-grounded], carrying the three-bucket
-      scenarios from [prd.md](./prd.md#three-bucket-learn-section-ia) — command:
-      `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: fails (no step bindings yet).
+      existing `content-namespace-redirects.feature` [Repo-grounded], carrying the two three-bucket
+      scenarios [tech-docs.md's traceability table](./tech-docs.md#testing-strategy) marks `specs`
+      level — "The learn section exposes exactly three structural buckets" (already tagged, as a
+      binding declaration, on the `§3.2` step that regenerates the derived artifacts — its specs-level
+      file did not exist until now) and this cycle's own "A relocated legacy domain URL redirects to
+      its legacy address" — verbatim from [prd.md](./prd.md#three-bucket-learn-section-ia). The
+      remaining three-bucket scenarios are verified at unit, e2e, or phase-gate level per that same
+      table, not as `.feature` scenarios — command: `npx nx run ayokoding-www:specs:behavior:coverage`
+      — acceptance: fails (no step bindings yet for either scenario in the file).
   - _Suggested executor: `specs-maker`_
 - [ ] [AI] **RED (e2e)** — write failing Playwright specs in the paired `ayokoding-www-fe-e2e` project
       asserting: one relocated URL per domain 308s to its `legacy/` address in **both** inbound forms
       (bare `/en/learn/<domain>/…` in one hop, and a stale `/c`-bookmark `/en/c/learn/<domain>/…` in
-      two hops); the deep path
-      `/en/learn/software-engineering/programming-languages/python/by-example/advanced` lands at its
-      `legacy/` twin with every segment below the domain unchanged; a historical `learn-reorg` source
-      (`/en/learn/human/…`) chains to `/en/learn/legacy/personal-development/…`; a `courses/` URL and
-      a `paths/` URL are **not** rewritten; and an old `fundamentally-strong` course URL still resolves
-      to `/en/learn/courses/<id>` (DD-43) — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` —
+      two hops); a historical `learn-reorg` source (`/en/learn/human/…`) chains to
+      `/en/learn/legacy/personal-development/…`; a `courses/` URL and a `paths/` URL are **not**
+      rewritten; and an old `fundamentally-strong` course URL still resolves to
+      `/en/learn/courses/<id>` (DD-43) — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` —
       acceptance: the new specs fail. **Do NOT target `ayokoding-www:test:e2e`** — that target is
       `echo 'no-op: target not applicable for this project'` and always exits 0
       [Repo-grounded — `apps/ayokoding-www/project.json`], so a RED clause pointed at it can never
       fail.
   - _Suggested executor: `swe-e2e-dev`_
 
-  **Gherkin (binds) →** "A relocated legacy domain URL redirects to its legacy address"; "A deep
-  legacy path keeps its sub-taxonomy verbatim"
+  **Gherkin (binds) →** "A relocated legacy domain URL redirects to its legacy address"
 
   ```gherkin
   Scenario: A relocated legacy domain URL redirects to its legacy address
@@ -832,7 +939,31 @@ deleted), re-pointing each entry to wherever the content now lives.
     When a reader requests that page's old URL
     Then the app permanently redirects to the same page under the legacy bucket
     And the rest of the path after the domain segment is preserved unchanged
+  ```
 
+- [ ] [AI] **GREEN (specs + e2e)** — implement the step bindings so this `<NAVSPECS>` scenario and its
+      e2e specs execute against the landed module and moved tree — command:
+      `npx nx run ayokoding-www:specs:behavior:coverage && npx nx run ayokoding-www-fe-e2e:test:e2e` —
+      acceptance: both exit 0 for this scenario's coverage (other scenarios in the shared feature file
+      may still be unbound at this point — expected; they are completed by the sibling cycles that
+      bind them).
+- [ ] [AI] **REFACTOR** — dedupe shared step-definition helpers (URL-building, redirect-following) in
+      the new `learn-three-bucket.steps.tsx` _(New file, in `apps/ayokoding-www/test/unit/fe-steps/`
+      alongside sibling `content-namespace-redirects.steps.tsx` — not under `<NAVSPECS>`, which is the
+      Gherkin `.feature` directory)_ so the sibling cycle below can reuse them rather than duplicate —
+      command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits 0; this
+      scenario's coverage still passes.
+
+- [ ] [AI] **RED (e2e)** — write a failing Playwright spec asserting the deep path
+      `/en/learn/software-engineering/programming-languages/python/by-example/advanced` lands at its
+      `legacy/` twin with every segment below the domain unchanged, and the page body is
+      byte-identical to the body served before the relocation — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new spec fails.
+  - _Suggested executor: `swe-e2e-dev`_
+
+  **Gherkin (binds) →** "A deep legacy path keeps its sub-taxonomy verbatim"
+
+  ```gherkin
   Scenario: A deep legacy path keeps its sub-taxonomy verbatim
     Given a legacy page previously lived several levels below its domain
     When a reader follows the redirect to its new legacy address
@@ -840,10 +971,12 @@ deleted), re-pointing each entry to wherever the content now lives.
     And the page body is byte-identical to the body served before the relocation
   ```
 
-- [ ] [AI] **GREEN (specs + e2e)** — implement the step bindings so both the `<NAVSPECS>` scenarios and
-      the e2e specs execute against the landed module and moved tree — command:
-      `npx nx run ayokoding-www:specs:behavior:coverage && npx nx run ayokoding-www-fe-e2e:test:e2e` —
-      acceptance: both exit 0.
+- [ ] [AI] **GREEN (e2e)** — confirm the deep-path e2e spec passes against the landed module and
+      moved tree (this scenario is `e2e`-only per
+      [tech-docs.md's traceability table](./tech-docs.md#testing-strategy) — it has no `.feature`
+      counterpart, unlike the sibling cycle's scenario above) — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: exits 0; both this cycle's spec and the
+      sibling cycle's specs still pass.
 - [ ] [AI] **REFACTOR** — run
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ose-www/content` + `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate` + `npm run lint:md` over the relocated tree and the two rewritten hub files (the actual
       link/heading mechanism — **not** `nx run` targets; both also run pre-commit via `lint-staged` for
@@ -863,42 +996,66 @@ deleted), re-pointing each entry to wherever the content now lives.
 > `ayokoding-learning-path-03-navigation-ui`** (Screens 0–3). Every asset clause in this plan
 > therefore asserts **6**, scoped to this plan's own `assets/` folder, and never 30. A reader auditing
 > DD-47 against this plan alone must not read 6 as under-delivery.
+>
+> **These six sources and their renders were produced ahead of execution**, during this plan's
+> plan-quality-gate fixing pass — see [prd.md's regeneration note](./prd.md#hi-fi-finalists). The
+> six steps below are therefore **verify-and-refresh** steps, not first-production steps: each
+> checks the artefact still exists and still reflects its source, and re-renders only if the source
+> was edited more recently than its `.png` (a real design change during Phases 0–3, for example).
 
-- [ ] [AI] Author the six render sources under `assets/src/` _(New files)_ —
-      `legacy-landing-option-{a,b}-{mobile,tablet,desktop}.html`, each a static HTML+CSS mock at its
-      target width, reusing the app's existing token palette — acceptance:
-      `find assets/src -name 'legacy-landing-option-*.html' | wc -l` returns **6** (returns 0 before
-      this step — the `assets/` folder does not exist yet, verified).
-- [ ] [AI] Render `assets/legacy-landing-option-a-mobile.png` from
-      `assets/src/legacy-landing-option-a-mobile.html` at 375 px — acceptance: file exists; the render
-      shows a single-column domain list with the per-page banner above the H1.
-- [ ] [AI] Render `assets/legacy-landing-option-a-tablet.png` from
-      `assets/src/legacy-landing-option-a-tablet.html` at 768 px — acceptance: file exists; the render
+- [ ] [AI] Verify the six render sources under `assets/src/` are present and current —
+      `legacy-landing-option-{a,b}-{mobile,tablet,desktop}.html` — acceptance:
+      `find assets/src -name 'legacy-landing-option-*.html' | wc -l` returns **6** (holds true today;
+      deleting any one source drops this below 6 and fails the check). If any source's markup no
+      longer matches
+      [prd.md's low-fi wireframes](./prd.md#low-fi-option-a--indexed-with-a-landing-notice--a-per-page-banner-recommended-q-d-option-a)
+      for that option (a design change surfaced during Phases 0–3), edit the source to match before
+      re-rendering.
+- [ ] [AI] Verify/refresh `assets/legacy-landing-option-a-mobile.png` — acceptance:
+      `test -f assets/legacy-landing-option-a-mobile.png` exits 0 AND
+      `test -f assets/src/legacy-landing-option-a-mobile.html` exits 0 (fails loudly on a missing or
+      mistyped source path — a bare `find` against a nonexistent path errors only to stderr and would
+      otherwise read as a silent pass) AND
+      `[ -z "$(find assets/src/legacy-landing-option-a-mobile.html -newer assets/legacy-landing-option-a-mobile.png)" ]`
+      exits 0 (source is not newer than its render — falsifiable both ways: editing the source after
+      the render makes the inner `find` print the file path, so this test fails with a non-zero exit;
+      a missing/mistyped source instead fails the preceding `test -f`, so it can never be misread as
+      "nothing newer"). If stale, re-render: open the HTML at 375 px width in a browser (or
+      Playwright) and take a full-page screenshot to the same path; the render shows a single-column
+      domain list with the per-page banner above the H1.
+- [ ] [AI] Verify/refresh `assets/legacy-landing-option-a-tablet.png` — acceptance: same three-part
+      check as above (render exists, source exists, source not newer) against
+      `assets/src/legacy-landing-option-a-tablet.html` at 768 px; if stale, re-render — the render
       shows a two-column domain list with the sidebar column present.
-- [ ] [AI] Render `assets/legacy-landing-option-a-desktop.png` from
-      `assets/src/legacy-landing-option-a-desktop.html` at 1280 px — acceptance: file exists.
-- [ ] [AI] Render `assets/legacy-landing-option-b-mobile.png` from
-      `assets/src/legacy-landing-option-b-mobile.html` at 375 px — acceptance: file exists; the
-      relocated page shows **no** banner (the option's defining absence).
-- [ ] [AI] Render `assets/legacy-landing-option-b-tablet.png` from
-      `assets/src/legacy-landing-option-b-tablet.html` at 768 px — acceptance: file exists.
-- [ ] [AI] Render `assets/legacy-landing-option-b-desktop.png` from
-      `assets/src/legacy-landing-option-b-desktop.html` at 1280 px — acceptance: file exists.
-- [ ] [AI] **Embed all six in `prd.md`'s Screen 4 funnel** with viewport-specific descriptive alt text
-      (each naming what differs at that width, never a copy of the desktop text) — acceptance:
+- [ ] [AI] Verify/refresh `assets/legacy-landing-option-a-desktop.png` — acceptance: same three-part
+      check as above (render exists, source exists, source not newer) against
+      `assets/src/legacy-landing-option-a-desktop.html` at 1280 px; if stale, re-render.
+- [ ] [AI] Verify/refresh `assets/legacy-landing-option-b-mobile.png` — acceptance: same three-part
+      check as above (render exists, source exists, source not newer) against
+      `assets/src/legacy-landing-option-b-mobile.html` at 375 px; if stale, re-render — the relocated
+      page shows **no** banner (the option's defining absence).
+- [ ] [AI] Verify/refresh `assets/legacy-landing-option-b-tablet.png` — acceptance: same three-part
+      check as above (render exists, source exists, source not newer) against
+      `assets/src/legacy-landing-option-b-tablet.html` at 768 px; if stale, re-render.
+- [ ] [AI] Verify/refresh `assets/legacy-landing-option-b-desktop.png` — acceptance: same three-part
+      check as above (render exists, source exists, source not newer) against
+      `assets/src/legacy-landing-option-b-desktop.html` at 1280 px; if stale, re-render.
+- [ ] [AI] **Verify all six are embedded in `prd.md`'s Screen 4 funnel** with viewport-specific
+      descriptive alt text (each naming what differs at that width, never a copy of the desktop
+      text) — acceptance:
       `grep -o "assets/legacy-landing-option-[ab]-[a-z]*\.png" prd.md | sort -u | wc -l` returns **6**
-      (returns **0** before this step, verified — the prose mentions of the naming convention use brace
-      notation and do not match this pattern), AND
+      (holds true today; falsifiable the other way — removing an embed drops this below 6), AND
       `find assets -name 'legacy-landing-option-*-*.png' | wc -l` returns **6** — this plan's complete
       slice, AND
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
-      resolves every new `![]()` target.
-- [ ] [AI] **Record the Screen 4 selection** — replace `prd.md`'s
-      "**Selection: PENDING…**" line with the ruled answer once Q-D is settled; under the recommended
-      default (option A) that is "**Selected: Option A — indexed + landing notice + per-page banner**"
-      — acceptance: `grep -F "Selection: PENDING" prd.md` prints nothing (it prints exactly one line
-      today, verified) AND `grep -F "Selected: Option A" prd.md` prints at least one line (it prints
-      nothing today, verified — this plan authored no selection line).
+      resolves every `![]()` target. If any render was refreshed above because its source changed,
+      re-verify its embedded alt text still accurately describes the (possibly changed) render.
+- [ ] [AI] **Reconcile the Screen 4 selection against execution-time findings** — `prd.md` already
+      records `Selected: Option A` (Q-D's recommended default) as of plan authoring; re-review Q-D
+      against anything Phases 0–3 surfaced. If nothing overturns it, this step is a no-op
+      confirmation. If it IS overturned, update `prd.md`'s `Selected:` line and its rationale table's
+      outcome column to the new option — acceptance: `grep -c "Selected: Option" prd.md` returns
+      exactly **1** both before and after this step (zero or two-plus both indicate a defect).
 - [ ] [AI] Apply the ruled Q-D treatment: under option A, add the `Alert`-based "legacy / superseded"
       notice to `<LEGACY>_index.md` and the per-page banner affordance; under option C instead set
       `robots: noindex` metadata for the bucket. Reuse the existing composite `Alert` primitive — **no
@@ -973,7 +1130,9 @@ deleted), re-pointing each entry to wherever the content now lives.
       non-zero AND `test -f "apps/ayokoding-www/src/app/[locale]/(content)/browse/page.tsx"` returns 0
       (browse index relocated); `grep -F "/c/" apps/ayokoding-www/src/features/content/core/content-url.ts`
       prints nothing (uniform bare join); `content-namespace.ts`'s five rules are inverted (`/c/`-prefixed
-      sources, bare destinations); the collision negative check from §3.0 still holds.
+      sources, bare destinations); `grep -c '/en/c/learn' apps/ayokoding-www/test/unit/fe-steps/navigation.steps.tsx`
+      returns `0` (navigation.steps.tsx's two hardcoded assertions updated); the collision negative
+      check from §3.0 still holds.
 - [ ] [AI] **Loop-safety invariant (DD-48), falsifiable both ways** —
       `grep -rn '"/[a-z][a-z]/c/' apps/ayokoding-www/src/redirects/` is empty; reintroducing a forward
       rule in any module makes it non-empty.
@@ -996,8 +1155,8 @@ deleted), re-pointing each entry to wherever the content now lives.
 - [ ] [AI] All six Screen 4 renders exist in `assets/` and are embedded in `prd.md` with
       viewport-specific alt text; `find assets -name 'legacy-landing-option-*-*.png' | wc -l` returns
       **6** (this plan's DD-47 slice; the other 24 belong to
-      `ayokoding-learning-path-03-navigation-ui`); the Q-D selection is recorded and no
-      "Selection: PENDING" line remains.
+      `ayokoding-learning-path-03-navigation-ui`); `prd.md` still records exactly one
+      `Selected: Option` line (no regression to an open/PENDING state).
 - [ ] [AI] `id/belajar` still holds **53** `.md` with no bucket directory; the deferral note is written
       into this checklist (DD-45).
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
@@ -1235,13 +1394,16 @@ deleted), re-pointing each entry to wherever the content now lives.
       `ls apps/ayokoding-www/content/en/learn` lists exactly `_index.md`, `courses`, `legacy`,
       `overview.md`, `paths`; `find apps/ayokoding-www/content/en/learn/legacy -name '*.md' | wc -l`
       returns **1148**; `ls apps/ayokoding-www/content/en/learn/courses | wc -l` returns **38**;
-      `find apps/ayokoding-www/content/id/belajar -name '*.md' | wc -l` returns **53** and
-      `test -e apps/ayokoding-www/content/id/belajar/legacy` returns non-zero (DD-45's deferral held);
-      and all six Q-A…Q-F rulings are recorded in `tech-docs.md` rather than left "Recommendation".
+      `find apps/ayokoding-www/content/en/learn/paths -name _index.md | wc -l` returns **6**
+      (amendment A3, DD-49 — all six structural indexes still present, none dropped by a later
+      phase's edit); `find apps/ayokoding-www/content/id/belajar -name '*.md' | wc -l` returns **53**
+      and `test -e apps/ayokoding-www/content/id/belajar/legacy` returns non-zero (DD-45's deferral
+      held); and all six Q-A…Q-F rulings are recorded in `tech-docs.md` rather than left
+      "Recommendation".
 - [ ] [AI] **Verify this plan's design-funnel slice is complete (DD-47)** —
       `find assets -name 'legacy-landing-option-*-*.png' | wc -l` returns **6** (2 options × 3
-      viewports for Screen 4); every one is embedded in `prd.md` with viewport-specific alt text; the
-      Q-D selection is recorded and `grep -F "Selection: PENDING" prd.md` prints nothing. **The other
+      viewports for Screen 4); every one is embedded in `prd.md` with viewport-specific alt text; and
+      `grep -c "Selected: Option" prd.md` returns exactly **1**. **The other
       24 renders of DD-47's 30-render matrix belong to
       `ayokoding-learning-path-03-navigation-ui`** — 6 here is the complete slice, not an
       under-delivery.
@@ -1266,22 +1428,40 @@ deleted), re-pointing each entry to wherever the content now lives.
     --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
   ```
 
-  — acceptance: prints `All links valid! No broken links found.` The bare repo-wide form is
-  **unsatisfiable** (the repo carries 93 pre-existing broken links, all under `plans/done/`,
-  unrelated to this work), so this exclusion form — which is exactly what the pre-push hook runs
-  — is the binding check. Both this and the previous gate are required; neither alone suffices.
+  — acceptance: prints `All links valid! No broken links found.` The bare, no-exclude repo-wide form
+  is **unsatisfiable by design** — the repo accumulates pre-existing broken links as other,
+  unrelated work lands, so a pinned count goes stale within days. Measured 2026-07-22: the bare form
+  reported 139 broken links, most but not all under `plans/done/` — at least
+  `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/capstone-solid-core/overview.md:2766`
+  does not, and `capstone-solid-core` is one of the 37 bundles this plan `git mv`s in Phase 2. That
+  link is not this gate's problem: Phase 2.4's own non-excluding sweep (excludes only `plans/done`
+  and `apps/ose-www/content`, deliberately not `apps/ayokoding-www/content`) independently catches
+  and forces a fix of it before this gate ever runs. Because the bare form's count is inherently
+  unstable and its content is unrelated to this plan's own correctness, this exclusion form — exactly
+  what the pre-push hook runs — is the durable, binding check. Both this and the previous gate are
+  required; neither alone suffices.
 
-- [ ] [AI] Move: `git mv plans/in-progress/ayokoding-learning-path-01-url-restructure/ plans/done/YYYY-MM-DD__ayokoding-learning-path-01-url-restructure/`
+- [ ] [AI] **Move to `plans/done/`, resolving the current stage folder first** — this plan starts in
+      `plans/backlog/` and this checklist carries no explicit backlog→in-progress promotion step (the
+      plan-execution workflow may execute directly from either stage, per
+      [plan-execution.md §Execute Plan from Backlog](../../../repo-governance/workflows/plan/plan-execution.md#execute-plan-from-backlog)):
+      `SRC=plans/backlog/ayokoding-learning-path-01-url-restructure; test -d plans/in-progress/ayokoding-learning-path-01-url-restructure && SRC=plans/in-progress/ayokoding-learning-path-01-url-restructure; git mv "$SRC" plans/done/YYYY-MM-DD__ayokoding-learning-path-01-url-restructure/`
       using today's completion date (the `assets/` and `evidence/` subfolders move with it) —
-      acceptance: the folder resolves under `plans/done/` and no longer under `plans/in-progress/`.
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
+      acceptance: the folder resolves under `plans/done/` and no longer under `plans/backlog/` or
+      `plans/in-progress/`.
+- [ ] [AI] Update whichever stage-folder README currently lists this plan
+      (`plans/backlog/README.md` or `plans/in-progress/README.md` — check both) — remove the plan
+      entry.
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with its completion date.
 - [ ] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`,
       `plans/backlog/README.md`) — acceptance:
       `grep -rF "ayokoding-learning-path-01-url-restructure" plans --include=README.md` shows every
       hit pointing at the new `plans/done/YYYY-MM-DD__…` path.
 - [ ] [AI] Repoint the four sibling plans' references to this plan's new archived path — acceptance:
-      `grep -rF "plans/in-progress/ayokoding-learning-path-01-url-restructure" plans` prints nothing.
+      `grep -rF "plans/in-progress/ayokoding-learning-path-01-url-restructure" plans` prints nothing
+      AND `grep -rF "plans/backlog/ayokoding-learning-path-01-url-restructure" plans` prints nothing
+      (sibling plans reference this plan by bare name, not by stage-folder path, so both checks are
+      expected to already print nothing; this guards against a stage-prefixed path having crept in).
 - [ ] [AI] Commit the archival:
       `chore(plans): move ayokoding-learning-path-01-url-restructure to done`.
 - [ ] [AI] Remove the worktree once the archival PR is merged:
