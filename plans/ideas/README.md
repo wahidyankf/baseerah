@@ -20,6 +20,7 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 - [doc-command-existence-validation](./doc-command-existence-validation.md) — a rhino-cli validator catching doc-cited commands that don't exist.
 - [harness-binding-catalog-drift](./harness-binding-catalog-drift.md) — triage the 2026-07-20 harness-compatibility external-drift findings.
 - [iam-service-module](./iam-service-module.md) — a shared IAM (authn/authz) capability; early placeholder, mostly open questions.
+- [learning-plan-syllabus-folder-convention](./learning-plan-syllabus-folder-convention.md) — UI plans have a mandated `assets/` funnel; learning plans grew a `syllabus/` folder three times with no convention behind it.
 - [mermaid-state-label-render-clipping-warn](./mermaid-state-label-render-clipping-warn.md) — a WARN rule for `stateDiagram-v2` edge labels that clip in GitHub's renderer.
 - [plan-archival-in-pr-multi-repo-gap](./plan-archival-in-pr-multi-repo-gap.md) — `plan-execution.md` §8's Archival-in-PR rule has no provision for a plan whose delivery spans multiple repositories.
 - [plan-quality-gate-convergence](./plan-quality-gate-convergence.md) — make the plan-quality-gate loop converge in a bounded number of iterations without relaxing checks.
