@@ -1472,6 +1472,14 @@ acceptance scenarios appear further down, under
 [NEW Course & Capstone Specifications](#new-course--capstone-specifications).
 
 ```gherkin
+Scenario: The landing hero surfaces the four goal paths directly
+  Given a first-time visitor opens the site landing page at /en
+  When the hero section renders
+  Then the hero shows a goal-labeled path card for each published path
+  And a "Compare all paths" link to /en/c/learn/paths is visible below the cards
+```
+
+```gherkin
 Scenario: A path landing page lists its courses in manifest order
   Given the interview-ready/software-engineer path manifest is published
   When a reader opens the path landing page at /en/c/learn/paths/interview-ready/software-engineer

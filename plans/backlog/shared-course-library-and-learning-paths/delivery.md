@@ -729,20 +729,55 @@ playwright test`).
       declared prerequisites) so the e2e specs exercise the real components — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: all `course-paths` e2e specs pass in `en`
       (this plan's content locale; see [brd.md §Business-Scope Non-Goals](./brd.md#business-scope-non-goals)).
-- [ ] [AI] **REFACTOR** — ensure the landing + hub reuse `libs/web-ui` primitives (no bespoke CSS where
-      a token exists); a11y pass (labels, focus, `aria-current`) — command:
-      `npx nx run ayokoding-www-fe-e2e:test:e2e && :lint` — acceptance: green; a11y assertions pass.
+- [ ] [AI] **RED (Screen 0 hero)** — write a failing Playwright e2e spec asserting the landing hero at
+      `/en` renders a "Choose your path" eyebrow with a `PathCard` grid (populated from the same
+      fixture manifest as the other `course-paths` e2e specs) and a "Compare all paths" link to
+      `/en/c/learn/paths`, per
+      [prd.md Screen 0 hi-fi spec](./prd.md#screen-0-hi-fi--landing-hero-en-option-a-four-goal-cards-in-the-hero)
+      — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new spec fails (today's
+      `hero.tsx` renders only the H1/tagline/Learn+Tools buttons — no "Choose your path" eyebrow, no
+      `PathCard` grid, no "Compare all paths" link).
+
+  **Gherkin (binds) →** "The landing hero surfaces the four goal paths directly"
+
+  ```gherkin
+  Scenario: The landing hero surfaces the four goal paths directly
+    Given a first-time visitor opens the site landing page at /en
+    When the hero section renders
+    Then the hero shows a goal-labeled path card for each published path
+    And a "Compare all paths" link to /en/c/learn/paths is visible below the cards
+  ```
+
+- [ ] [AI] **GREEN (Screen 0 hero)** — edit
+      `apps/ayokoding-www/src/features/app-shell/shell/hero.tsx` per the same hi-fi spec: add the
+      "Choose your path" eyebrow + a `PathCard` grid (`context="hero"` variant, 2×2 at `md+`, single
+      column below, sourced from the same loaded-manifest data as the paths hub) and the escape-hatch
+      row ("Not sure which fits? Compare all paths →" to `/en/c/learn/paths`, "Browse the full course
+      library →" to `/en/c/learn/courses`); move the existing Learn/Tools CTAs into the global nav —
+      command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the Screen 0 hero e2e spec
+      passes.
+- [ ] [AI] **REFACTOR** — ensure the landing + hub + hero reuse `libs/web-ui` primitives (no bespoke
+      CSS where a token exists) and the hero's `PathCard` grid is the same component and
+      manifest-loading path as the hub's (no duplicated card markup or a second data source); a11y pass
+      (labels, focus, `aria-current`) — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e && :lint` — acceptance: green; a11y assertions pass; no
+      second `PathCard`-rendering implementation exists (`rg -c "function PathCard" apps/ayokoding-www/src`
+      returns exactly `1`).
 
 ### Phase 4 Gate
 
-- [ ] [AI] Path landing + 2×2-grid paths hub (up to four cards) render from a manifest; prerequisite display verified; all `course-paths` e2e specs green in `en` (this plan's content locale).
+- [ ] [AI] Path landing + 2×2-grid paths hub (up to four cards) + the landing-hero `PathCard` grid and
+      escape hatch render from the same manifest data; prerequisite display verified; all
+      `course-paths` e2e specs green in `en` (this plan's content locale), including the Screen 0 hero
+      spec.
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` + `:build` + `:lint` + `:specs:behavior:coverage` **and** `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0. (`ayokoding-www:test:e2e` and `:test:integration` are both no-op echoes — e2e lives in the paired `ayokoding-www-fe-e2e` project, and the integration tier is deliberately unused for content apps.)
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: the full path-aware navigation UI (incl. prerequisite display + the 2×2-grid hub) is
-> implemented, tested (unit + integration + e2e + specs), and live — but no real path manifests are
-> published yet, so production still shows the canonical library. **Group A (the hard prerequisite) is
-> complete.** Safe to stop. To resume: `npx nx run ayokoding-www-fe-e2e:test:e2e`.
+> **Pause Safety**: the full path-aware navigation UI (incl. prerequisite display + the 2×2-grid hub +
+> the landing-hero path-card grid) is implemented, tested (unit + integration + e2e + specs), and
+> live — but no real path manifests are published yet, so production still shows the canonical
+> library. **Group A (the hard prerequisite) is complete.** Safe to stop. To resume:
+> `npx nx run ayokoding-www-fe-e2e:test:e2e`.
 
 ---
 
@@ -895,7 +930,8 @@ wherever the content now lives.
       `learn-three-bucket` module not found (falsifiable both ways: the module does not exist today —
       `test -f apps/ayokoding-www/src/redirects/learn-three-bucket.ts` returns non-zero, verified).
 
-  **Gherkin (binds) →** "The legacy redirect never swallows the courses or paths buckets"
+  **Gherkin (binds) →** "The legacy redirect never swallows the courses or paths buckets"; "A
+  re-homed fundamentally-strong course is not routed into the legacy bucket"
 
   ```gherkin
   Scenario: The legacy redirect never swallows the courses or paths buckets
@@ -903,6 +939,12 @@ wherever the content now lives.
     When a reader requests a canonical course URL or a path landing URL
     Then the app serves the page without redirecting it
     And no redirect rule declares a bucket-wide learn-section wildcard source
+
+  Scenario: A re-homed fundamentally-strong course is not routed into the legacy bucket
+    Given the fundamentally-strong topic directories were collapsed into flat course bodies
+    When a reader requests a legacy fundamentally-strong course URL
+    Then the app redirects to that course's canonical course URL
+    And no legacy-bucket rule matches the fundamentally-strong prefix
   ```
 
 - [ ] [AI] **GREEN** — author `<REDIR>learn-three-bucket.ts` _(New file)_ exporting
@@ -939,6 +981,17 @@ wherever the content now lives.
       — acceptance: **no** modified (`M`) content file under `<LEGACY>` other than files this phase
       explicitly authors; `git diff --cached --summary -M` shows the relocated files as pure renames
       (DD-41). A content-modifying hunk here is a defect, not a cleanup.
+
+  **Gherkin (binds) →** "The relocation rewrites no page content"
+
+  ```gherkin
+  Scenario: The relocation rewrites no page content
+    Given the six non-course learn-section domains have been relocated
+    When the relocation commit's diff is inspected
+    Then every relocated file appears as a pure rename with no content change
+    And the only edited content files are the section overview and the new legacy bucket index
+  ```
+
 - [ ] [AI] Author `<LEGACY>_index.md` _(New file)_ — **required**, not optional: `generate-indexes`
       only rewrites `_index.md` files that already exist
       [Repo-grounded — `processAllIndexFiles` filters `allContent.filter(c => c.isSection)` in
@@ -952,6 +1005,17 @@ wherever the content now lives.
       acceptance: `test -f apps/ayokoding-www/content/en/learn/legacy/_index.md`; and after
       `npx nx run ayokoding-www:build` the sidebar order under `learn` is `paths`, `courses`,
       `legacy` (verified in 5A.5's Playwright pass, not asserted by grep).
+
+  **Gherkin (binds) →** "The legacy bucket landing tells a reader what the bucket is"
+
+  ```gherkin
+  Scenario: The legacy bucket landing tells a reader what the bucket is
+    Given a reader opens the legacy bucket landing page
+    When the page renders
+    Then it states that the material is older and kept for reference while the course library fills
+    And it links onward to the course library and to the paths hub
+  ```
+
 - [ ] [AI] Rewrite the hand-authored `apps/ayokoding-www/content/en/learn/overview.md` so its
       inventory names the **three buckets** instead of the six domains (Q-F recommended answer A —
       keep it as the section hub page; do **not** move its prose into `_index.md`, which
@@ -966,6 +1030,24 @@ wherever the content now lives.
       `npx nx run ayokoding-www:validate-indexes` exits 0 afterward (proving regeneration converged);
       `generated/search-data.json` is rewritten and every relocated doc's `slug` now begins
       `learn/legacy/`.
+
+  **Gherkin (binds) →** "The learn section exposes exactly three structural buckets"; "Navigation
+  surfaces follow the relocated tree with no code change"
+
+  ```gherkin
+  Scenario: The learn section exposes exactly three structural buckets
+    Given the learn-section IA revamp has landed
+    When the content tree under the en learn section is inspected
+    Then its only structural buckets are paths, courses, and legacy
+    And no former subject domain remains as a direct child of the learn section
+    And the section keeps its own index and overview hub pages
+
+  Scenario: Navigation surfaces follow the relocated tree with no code change
+    Given the six domains now live under the legacy bucket
+    When the sidebar tree, browse index, sitemap, feed, and search data are regenerated
+    Then each lists every relocated page at its new legacy URL
+    And no navigation source file required a hardcoded domain slug to be edited
+  ```
 
 ### 5A.3 · Specs + e2e (Gherkin-bound)
 
@@ -989,7 +1071,8 @@ wherever the content now lives.
       fail.
   - _Suggested executor: `swe-e2e-dev`_
 
-  **Gherkin (binds) →** "A relocated legacy domain URL redirects to its legacy address"
+  **Gherkin (binds) →** "A relocated legacy domain URL redirects to its legacy address"; "A deep
+  legacy path keeps its sub-taxonomy verbatim"
 
   ```gherkin
   Scenario: A relocated legacy domain URL redirects to its legacy address
@@ -997,6 +1080,12 @@ wherever the content now lives.
     When a reader requests that page's old URL
     Then the app permanently redirects to the same page under the legacy bucket
     And the rest of the path after the domain segment is preserved unchanged
+
+  Scenario: A deep legacy path keeps its sub-taxonomy verbatim
+    Given a legacy page previously lived several levels below its domain
+    When a reader follows the redirect to its new legacy address
+    Then every path segment below the domain is unchanged
+    And the page body is byte-identical to the body served before the relocation
   ```
 
 - [ ] [AI] **GREEN (specs + e2e)** — implement the step bindings so both the `<NAVSPECS>` scenarios
@@ -1062,6 +1151,16 @@ wherever the content now lives.
       baseline) and `test -e apps/ayokoding-www/content/id/belajar/legacy` returns non-zero; then note
       in this checklist that the `id` locale is deliberately out of scope per Q-B's recommended answer
       — acceptance: both checks hold and the deferral note is written here, not left implicit.
+
+  **Gherkin (binds) →** "The Indonesian locale is left unchanged and the deferral is recorded"
+
+  ```gherkin
+  Scenario: The Indonesian locale is left unchanged and the deferral is recorded
+    Given the learn-section IA revamp is scoped to the English locale
+    When the Indonesian content tree is inspected after the revamp
+    Then its section is unchanged with no bucket directories and no relocation
+    And the plan records the Indonesian deferral explicitly as a non-goal
+  ```
 
 ### Phase 5A Gate
 
@@ -1415,6 +1514,17 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
       `grep -cE "just-enough-typescript|backend-essentials|api-design" <MANIFESTS>immediately-effective/software-engineer-to-ai-engineer.yaml`
       returns **0** (falsifiable both ways: a manifest that mistakenly included one of these would make
       this return ≥1).
+
+  **Gherkin (binds) →** "The AI path is authored before the other two manifests are composed"
+
+  ```gherkin
+  Scenario: The AI path is authored before the other two manifests are composed
+    Given the interview-ready MVP has shipped
+    When authoring effort is allocated across the remaining paths
+    Then the software-engineer-to-ai-engineer path's six net-new courses and manifest are authored first
+    And the immediately-effective/software-engineer and fundamentally-strong/software-engineer manifests are composed only afterward
+  ```
+
 - [ ] [AI] Author the thin landing anchor
       `<PATHS>immediately-effective/software-engineer-to-ai-engineer/_index.md` (prose/SEO only — no
       `courseOrder`); the ordered course list renders from the loaded manifest, and the landing narrative
@@ -1503,6 +1613,16 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
       depth; the "you shipped; now understand why" bridge is present on the landing; prereq-chaining
       holds — acceptance: levers verified; regressions fixed by soften/bridge, never reorder.
 
+  **Gherkin (binds) →** "The immediately-effective path is build-app-first"
+
+  ```gherkin
+  Scenario: The immediately-effective path is build-app-first
+    Given the immediately-effective/software-engineer path manifest is published
+    When a reader walks the path
+    Then editor/tooling, one language end-to-end, and building a real app precede the CS-fundamentals and DS&A courses
+    And the reader ships a real deployed app before any pure-theory course
+  ```
+
 ### Phase 10 Gate
 
 - [ ] [AI] `immediately-effective/software-engineer` manifest published (zero duplicated bodies, seeded over the available library); paths hub shows three of the four published paths.
@@ -1550,6 +1670,16 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
 - [ ] [AI] **Progression smoothness audit (fundamentals-first, DD-16)** — theory precedes application;
       the "why-before-how" bridges are present; prereq-chaining holds — acceptance: levers verified;
       regressions fixed by soften/bridge, never reorder.
+
+  **Gherkin (binds) →** "The fundamentally-strong path is fundamentals-first"
+
+  ```gherkin
+  Scenario: The fundamentally-strong path is fundamentals-first
+    Given the fundamentally-strong/software-engineer path manifest is published
+    When a reader walks the path
+    Then CS foundations, computer architecture, paradigms, and DS&A precede the build-real-software courses
+    And the ordering is a valid topological entry into the prerequisite DAG
+  ```
 
 ### Phase 11 Gate
 
@@ -1658,12 +1788,30 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
 - [ ] [AI] `build-your-own-reactive-ui` (By Example · TypeScript) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `creating-ai-powered-apps` (By Example · Python; use-an-LLM scope) — convention complete; checkers clean; **Phase 8 evals forward-link contract applied**: `grep -c "deep-evals" creating-ai-powered-apps/overview.md` returns ≥1 (its evals material forward-links to `deep-evals` rather than re-teaching it, DD-25/DD-28). _by-example-maker_
 - [ ] [AI] `agentic-ai` (By Example · Python; survey + forward-links, no build-your-own depth) — convention complete; checkers clean; **Phase 8 evals forward-link contract applied**: `grep -c "deep-evals" agentic-ai/overview.md` returns ≥1. _by-example-maker_
+      **Gherkin (binds) →** "The agentic-ai survey forward-links each primitive without re-teaching it"
+      — forward-link acceptance: `agentic-ai/overview.md` names and links each of the five
+      harness-cluster courses (`the-agent-loop`, `agent-tools-and-mcp`, `agent-context-and-memory`,
+      `agent-permissions-and-sandboxing`, `agent-orchestration-subagents-and-observability`) — verify
+      with
+      `grep -ciE 'the-agent-loop|agent-tools-and-mcp|agent-context-and-memory|agent-permissions-and-sandboxing|agent-orchestration-subagents-and-observability' agentic-ai/overview.md`
+      (ERE alternation) returning ≥5 distinct lines, and no lesson in `agentic-ai/` builds a working
+      agent-loop/tool/memory/permission/orchestration implementation (that depth stays in the cluster
+      courses).
 - [ ] [AI] `browser-automation-with-cdp` (By Example · Python/CDP) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `the-agent-loop` (By Example · Python) — convention complete; checkers clean; **Phase 8 D9 citation contract applied**: harness-engineering naming/lineage line present, citing Anthropic (2025-11-26), OpenAI, and Böckeler/Thoughtworks (2026-04-02) — no rename. _by-example-maker_
 - [ ] [AI] `agent-tools-and-mcp` (By Example · Python) — convention complete; checkers clean; **Phase 8 D9 + D11 contracts applied**: harness-engineering citation line present; concept coverage includes tool-count degradation (Berkeley Function-Calling Leaderboard + GeoEngine 46-vs-19-tool evidence) and tool-result token efficiency. _by-example-maker_
 - [ ] [AI] `agent-context-and-memory` (Annotated-concept · Python) — convention complete; checkers clean; **Phase 8 D9 + D11 contracts applied**: context-engineering naming/lineage line present, citing Lütke (2025-06-19), Karpathy (2025-06-25), Willison (2025-06-27), and Anthropic's Effective Context Engineering methodology (2025-09-29); concept coverage includes cache-aware prefix ordering framed as a general stable-before-variable principle, not tied to one vendor's mechanism. _annotated-concept-maker_
 - [ ] [AI] `agent-permissions-and-sandboxing` (By Example · Python) — convention complete; checkers clean; **Phase 8 D11 contract applied**: concept coverage includes the train-vs-production permission asymmetry, framed as a risk distinction, not a capability distinction. _by-example-maker_
 - [ ] [AI] `agent-orchestration-subagents-and-observability` (Annotated-concept · Python) — convention complete; checkers clean; **Phase 8 evals forward-link contract applied**: `grep -c "deep-evals" agent-orchestration-subagents-and-observability/overview.md` returns ≥1. _annotated-concept-maker_
+      **Gherkin (binds) →** "The harness cluster builds a working agent from runnable code"
+      — runnable-example acceptance: each of the five harness-cluster courses above (`the-agent-loop`,
+      `agent-tools-and-mcp`, `agent-context-and-memory`, `agent-permissions-and-sandboxing`,
+      `agent-orchestration-subagents-and-observability`) ships a runnable typed-Python worked example
+      covering its slice of the loop/tools/memory/permissions/orchestration, and each names
+      `remotebrowser`'s bundled MCP or CDP browser only as an illustrative pickup, never a required
+      dependency — verified during each course's checker pass (the by-example-maker/
+      annotated-concept-maker convention already requires runnable examples; this bind adds the
+      remotebrowser-scope check).
 
 **Band 6 — Low-level systems, JVM & languages, internals builds (T + N):**
 
@@ -1706,7 +1854,17 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
 **Band 8 — Remaining capstones (N, incl. six DD-20 inter-topic capstones):**
 
 - [ ] [AI] `capstone-build-your-own-coding-agent` (Python; assembles the harness cluster) — convention complete; checkers clean; **Phase 8 D9 citation contract applied**: harness-engineering naming/lineage line present, citing Anthropic (2025-11-26), OpenAI, and Böckeler/Thoughtworks (2026-04-02) — no rename. _by-example-maker_
+      **Gherkin (binds) →** "The coding-agent capstone assembles the harness cluster into a working CLI"
+      — assembly acceptance: the capstone's done-bar produces a runnable coding-agent CLI composed from
+      the agent loop, tools/MCP, memory, permissions, and orchestration courses; a disallowed action
+      fails closed and every run emits a trace — verify with the capstone's own runnable
+      acceptance-criteria checklist (per the capstone-policy shape) naming all five source courses.
 - [ ] [AI] `capstone-build-your-own-pentest-engine` (TypeScript; swarm + MCP + CDP + security chaining) — convention complete; checkers clean. _by-example-maker_
+      **Gherkin (binds) →** "The pentest-engine capstone assembles the convergence track into a scoped engine"
+      — assembly acceptance: the capstone's done-bar produces a runnable engine composed from swarm
+      orchestration, MCP tooling, CDP browser driving, and security-tool-chaining; scope enforcement
+      refuses an out-of-scope target, and `vacti-pentest-engine` is named only as an illustration, never
+      a required dependency — verify with the capstone's own runnable acceptance-criteria checklist.
 - [ ] [AI] `capstone-real-world-delivery` (Python + TS + IaC; DD-20 — embedded spec in `defensive-security.md`) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `capstone-secure-service` (Python + shell; DD-20 — embedded spec in `defensive-security.md`) — convention complete; checkers clean. _by-example-maker_
 - [ ] [AI] `capstone-data-pipeline` (SQL + Python; DD-20 — embedded spec in `defensive-security.md`) — convention complete; checkers clean. _by-example-maker_
@@ -1721,12 +1879,27 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
 - [ ] [AI] `system-design-interview` (Annotated-concept · no code; forward-links `system-design`) — convention complete; checkers clean. _annotated-concept-maker_
 - [ ] [AI] `behavioral-and-leadership-interviews` (Annotated-concept · no code) — convention complete; checkers clean.
 
-  **Gherkin (binds) →** "The behavioral course covers the layoff and employment-gap narrative"
+  **Gherkin (binds) →** "The behavioral course covers the layoff and employment-gap narrative"; "Interview
+  courses are written in a refresh register"
   — coverage acceptance: the learning track explicitly covers framing an employment gap, a layoff, and
   a re-entry story, and treats senior/staff/EM leadership rounds as core (not optional) material —
   verify with `grep -ciE 'employment gap|layoff|re-entry' <course>/**/*.md` (ERE alternation) returning
   ≥3 distinct lessons.
+  — register acceptance (all four Band 9 courses: `coding-interview`, `take-home-and-live-coding`,
+  `system-design-interview`, `behavioral-and-leadership-interviews`): each course's `overview.md`
+  states it assumes prior professional experience and frames the material as technique/breadth
+  refresh, never a from-zero concept teach — verify with
+  `grep -ciE 'assumes|prior experience|refresh' <course>/overview.md` (ERE alternation) returning ≥1 for
+  each of the four (returns 0 today since none of the four course directories exist yet).
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
+
+  ```gherkin
+  Scenario: Interview courses are written in a refresh register
+    Given the four new interview-technique courses are authored
+    When an experienced engineer reads them
+    Then each assumes prior professional experience and focuses on interview technique and breadth refresh
+    And none teaches core concepts from zero
+  ```
 
 - [ ] [AI] `capstone-interview-loop` (Python + prose) — convention complete; checkers clean. _by-example-maker_
 
@@ -1808,6 +1981,17 @@ immediately-effective/software-engineer-to-ai-engineer`, `title`, `description`,
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate` +
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate` + `npm run lint:md` (the actual mechanism — not `nx run` targets; both `md` subcommands also run
       automatically pre-commit via `lint-staged` for every staged `.md` file) — acceptance: all green.
+
+  **Gherkin (binds) →** "The app builds and validates green"
+
+  ```gherkin
+  Scenario: The app builds and validates green
+    Given the navigation feature and the interview-ready path are complete
+    When nx run ayokoding-www:build, the three test tiers, and the link/heading validators run
+    Then the build and all tiers succeed
+    And link, heading-hierarchy, and markdownlint validation report no errors
+  ```
+
 - [ ] [AI] **Manifest-integrity + prerequisite-consistency sweep** — all four manifests: every
       `courseOrder` ID resolves; no dup ID; prereq-consistency holds; no forked body across the three
       software-engineer-role paths (the AI path links rather than shares bodies, DD-24) —
