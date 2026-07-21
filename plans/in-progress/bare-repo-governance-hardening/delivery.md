@@ -1648,16 +1648,27 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
   `plans/`, which maps to no Nx project, so the affected set is empty by construction. The markdown
   validators and the 67-check pre-push hook are what actually exercised this content.
 
-  **Pre-existing failure recorded, deliberately not fixed** (per the Phase 4 precedent and the
-  `learnings.md` entry on scope-mismatched gates): the **repo-wide** `md mermaid validate` reports
-  **109** violations in `ose-infra`, all under `plans/done/**` (29 files) and `apps/**` (4 files) —
-  **zero** in any file this changeset touches, confirmed by the directory-scoped run above returning 0. This is the same cross-repo condition Phase 4 found in `ose-primer`; the same archived files
-  exist in `ose-public`, so patching only `ose-infra` would manufacture exactly the divergence DD-10
-  and the parity workflow exist to prevent. The class is already tracked in `ose-public` as
-  `plans/ideas/ayokoding-mermaid-diagram-remediation.md`. Note this phase **did** widen its own
-  mermaid gate beyond the `repo-governance docs` scope Phase 4 used, adding `.claude` and
-  `plans/ideas` — which is why the touched-file verdict above is trustworthy rather than merely
-  scope-limited.
+  **Pre-existing mermaid violations — measured, then correctly scoped, and NOT a CI risk here.** An
+  unqualified repo-wide `md mermaid validate` reports **109** violations in `ose-infra`, all under
+  `plans/done/**` (29 files) and `apps/**` (4 files), zero in any file this changeset touches. But
+  running **CI's own exact command** —
+  `md mermaid validate --max-depth=4 --exclude plans/done --exclude apps/rhino-cli/tests/fixtures` —
+  reports `0 violation(s) and 0 warning(s) in 122 file(s)`. Every one of the 109 lies inside CI's own
+  exclusion set, so none of them can gate anything.
+
+  **This is where `ose-infra` diverges from Phase 4's finding, and the divergence was verified rather
+  than assumed.** Phase 4 recorded `ose-primer`'s `main-ci` as already red on a schedule-only mermaid
+  gate. `ose-infra` has no such exposure: **both** its `pr-quality-gate.yml` (L268) and its
+  `main-ci.yml` (L176) invoke the **identical `--exclude`-qualified form**, and its last four
+  scheduled `main-ci` runs — including the two most recent against the pre-merge `origin/main`
+  `f6ecdcc0b` — all completed **success**. The `learnings.md` candidate route ("widen this plan's
+  local mermaid gate, or record its scope limit explicitly, before Phase 5 runs the same gate against
+  `ose-infra`") is therefore **discharged for this repo by measurement**: the local gate was widened
+  (to `repo-governance docs .claude plans/ideas`) _and_ CI's exact command was run directly, and the
+  two agree. The residual 109 remain a genuine cross-repo backlog item — tracked in `ose-public` as
+  `plans/ideas/ayokoding-mermaid-diagram-remediation.md`, and deliberately not patched here, since
+  patching one sibling would manufacture exactly the divergence DD-10 and the parity workflow exist
+  to prevent.
 
 - [x] [AI] Stage **explicit paths only**, commit thematically, push the branch
       — acceptance: exits 0
