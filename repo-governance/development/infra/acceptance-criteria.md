@@ -137,7 +137,7 @@ Scenario: Login succeeds
 
 (The fix replaces the second `When` with `And`.)
 
-**Enforcement**: The deterministic `rhino-cli repo-governance gherkin-keyword-cardinality`
+**Enforcement**: The deterministic `rhino-cli specs gherkin-cardinality validate`
 audit flags every `.feature` file that violates this rule. `plan-checker` and
 `repo-rules-checker` apply the same rule to Gherkin fences in plan markdown.
 

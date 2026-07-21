@@ -246,7 +246,7 @@ Scenario: User login flow
 **Rationale:**
 
 - Multiple primary keywords blur where the scenario's single action starts and ends
-- Deterministic linter (`rhino-cli repo-governance gherkin-keyword-cardinality`) flags violations
+- Deterministic linter (`rhino-cli specs gherkin-cardinality validate`) flags violations
 - `plan-checker` and `repo-rules-checker` enforce the rule on Gherkin fences in plan markdown
 - Note: `Background` blocks and `Scenario Outline` `Examples` tables are exempt
 
