@@ -365,6 +365,56 @@ fn given_m_lr_width_ok(w: &mut DocsWorld) {
     );
 }
 
+// ---------------------------------------------------------------------------
+// Regression: a Mermaid comment or init directive above the type directive must
+// not suppress validation. Before the fix, `detect_kind` treated the first
+// non-empty line as the header, so a leading `%%` line classified the block as
+// an unsupported diagram type and every rule was skipped silently.
+// ---------------------------------------------------------------------------
+
+#[given(
+    "a markdown file containing an over-wide LR flowchart with a %% comment above the directive"
+)]
+fn given_m_commented_lr_wide(w: &mut DocsWorld) {
+    let mut body = String::from("%% Color palette: Blue #0173B2\nflowchart LR");
+    for i in 0..5 {
+        let _ = write!(body, "\n    N{i} --> N{}", i + 1);
+    }
+    w.write("docs/d.md", &mermaid_block(&body));
+}
+
+#[given(
+    "a markdown file containing an over-wide LR flowchart with an init directive above the type"
+)]
+fn given_m_init_directive_lr_wide(w: &mut DocsWorld) {
+    let mut body = String::from("%%{init: {'theme':'base'}}%%\nflowchart LR");
+    for i in 0..5 {
+        let _ = write!(body, "\n    N{i} --> N{}", i + 1);
+    }
+    w.write("docs/d.md", &mermaid_block(&body));
+}
+
+#[given(
+    "a markdown file containing an over-long state label with a %% comment above the directive"
+)]
+fn given_m_commented_state_long_label(w: &mut DocsWorld) {
+    let label = "y".repeat(40);
+    w.write(
+        "docs/d.md",
+        &mermaid_block(&format!(
+            "%% a comment\nstateDiagram-v2\n    [*] --> a\n    a --> b : {label}"
+        )),
+    );
+}
+
+#[given("a markdown file containing a sequenceDiagram with a %% comment above the directive")]
+fn given_m_commented_sequence(w: &mut DocsWorld) {
+    w.write(
+        "docs/d.md",
+        &mermaid_block("%% a comment\nsequenceDiagram\n    A ->> B: hello there friend"),
+    );
+}
+
 #[given("a markdown file containing an LR flowchart with a chain that is 4 levels deep")]
 fn given_m_lr_chain_deep(w: &mut DocsWorld) {
     // LR: horizontal = depth. A 6-node chain → depth 6 > default max-width 4 →

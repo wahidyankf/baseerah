@@ -87,6 +87,29 @@ Feature: Mermaid Flowchart Structural Validation
     Then the command exits successfully
     And the output reports no violations
 
+  Scenario: A flowchart preceded by a Mermaid comment line is still validated
+    Given a markdown file containing an over-wide LR flowchart with a %% comment above the directive
+    When the developer runs docs validate-mermaid
+    Then the command exits with a failure code
+    And the output identifies the file and block with the excessive width
+
+  Scenario: A flowchart preceded by a Mermaid init directive is still validated
+    Given a markdown file containing an over-wide LR flowchart with an init directive above the type
+    When the developer runs docs validate-mermaid
+    Then the command exits with a failure code
+    And the output identifies the file and block with the excessive width
+
+  Scenario: A state diagram preceded by a Mermaid comment line is still validated
+    Given a markdown file containing an over-long state label with a %% comment above the directive
+    When the developer runs docs validate-mermaid
+    Then the command exits with a failure code
+
+  Scenario: A commented non-flowchart block is still ignored
+    Given a markdown file containing a sequenceDiagram with a %% comment above the directive
+    When the developer runs docs validate-mermaid
+    Then the command exits successfully
+    And the output reports no violations
+
   Scenario: Non-flowchart mermaid blocks are ignored
     Given a markdown file containing only sequenceDiagram and classDiagram mermaid blocks
     When the developer runs docs validate-mermaid
