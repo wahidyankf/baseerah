@@ -4,8 +4,14 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_None currently active._ Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md);
-promote one here when work begins.
+- [bare-repo-governance-hardening](./bare-repo-governance-hardening/README.md) — authors the
+  previously-undocumented base-worktree landing method, fixes the local-`main`-lags-`origin` drift it
+  causes, and closes four bare-repo/delivery-mode governance-doc gaps (including the
+  `git rev-parse --is-bare-repository` trap), then propagates all of it to `ose-primer` and
+  `ose-infra`. Promoted from two two-pagers. Delivery Mode: `worktree-to-pr`.
+
+Other ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
+work begins.
 
 ## Instructions
 

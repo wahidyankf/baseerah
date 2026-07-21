@@ -71,6 +71,12 @@ siblings:
 - Changing the base-worktree method itself — this plan **documents** it, it does not redesign it.
 - Changing delivery-mode **behaviour** — only the documentation of which modes a bare repo can use.
 - Adopting any third-party sync tool ([S4](./tech-docs.md#research-findings): adopt nothing).
+- A **mirrored plan folder** in either sibling. This plan folder is the single home for all three
+  repos' work; `ose-primer` and `ose-infra` receive the C1-C7 **changeset** through Phases 4 and 5
+  and their own PRs, never a copy of these five documents. Verified 2026-07-21: neither sibling
+  holds a plan or brief on this subject. See [DD-10](./tech-docs.md#dd-10--one-plan-folder-in-ose-public-only-siblings-receive-the-changeset-not-a-plan-copy),
+  which also records why this deviates from the multi-repo parity workflow's one-plan-per-repo
+  default.
 
 ## Approach Summary
 
@@ -108,4 +114,4 @@ declaration and rationale in [delivery.md](./delivery.md#delivery-mode-worktree-
 
 ## Status
 
-**Not Started** — backlog.
+**In Progress** — promoted from `backlog/` on 2026-07-21.

@@ -126,6 +126,9 @@ graph TD
 - `<GATE>` = `repo-governance/workflows/pr/pr-review-quality-gate.md` _(source note; unchanged)_
 - `<SDLC>` = `docs/reference/sdlc-gate-standard.md`
 - `<IDEAS>` = `plans/ideas/`
+- `<PLANDIR>` = `plans/in-progress/bare-repo-governance-hardening/` — this plan's own folder. It was
+  promoted out of `plans/backlog/` on 2026-07-21; neither stage carries a date prefix, so the move
+  was a pure rename and every relative link inside these documents kept the same `../../../` depth
 - `<repo-root>` = the root of whichever repo the step is operating on — `ose-public` unless the
   step names `<PRIMER>` or `<INFRA>`. In a bare sibling there is no work tree at `<repo-root>`, so
   only bare-safe commands may target it (see the bare-safe command note in Phase 4)
@@ -162,12 +165,16 @@ graph TD
 - [ ] [AI] Record each sibling's current divergence:
       `git -C /Users/wkf/ose-projects/ose-primer rev-list --left-right --count origin/main...main`
       and the same for `ose-infra`
-      — acceptance: both print `0` and `0`; if not, record the actual counts here before continuing
+      — acceptance: the actual counts are recorded here. **Expect non-zero on first run**: as of
+      2026-07-21 both siblings read `2 0` (local `main` two commits behind `origin/main`), the live
+      reproduction documented in
+      [tech-docs §Verified In-Repo State](./tech-docs.md#verified-in-repo-state-re-anchor-by-content-not-by-line-number).
+      Reconcile per **DD-6** — `git fetch origin main:main` — then re-run until both print `0` and `0`
 - [ ] [AI] Create the Knowledge Capture running log at
-      `plans/backlog/bare-repo-governance-hardening/learnings.md` if it does not already exist, with
+      `<PLANDIR>/learnings.md` if it does not already exist, with
       the H1 `# Learnings: bare-repo-governance-hardening` as its first content line (markdownlint
       MD041 fails a scaffold of bare HTML comments)
-      — acceptance: `head -3 plans/backlog/bare-repo-governance-hardening/learnings.md` shows the H1
+      — acceptance: `head -3 <PLANDIR>/learnings.md` shows the H1
 
 ### Phase 0 Gate
 
@@ -200,9 +207,10 @@ graph TD
 > If any check here fails, the promotion was incomplete — repair it before Phase 2 rather than
 > proceeding.
 
-- [ ] [AI] Verify the plan folder exists at the backlog stage with **no date prefix**
-      — acceptance: `test -d plans/backlog/bare-repo-governance-hardening` exits 0 and
-      `test -f plans/backlog/bare-repo-governance-hardening/delivery.md` exits 0
+- [ ] [AI] Verify the plan folder exists at the `in-progress` stage with **no date prefix**
+      — acceptance: `test -d <PLANDIR>` exits 0, `test -f <PLANDIR>/delivery.md` exits 0, and
+      `test -d plans/backlog/bare-repo-governance-hardening` exits **1** (the promotion move left no
+      copy behind)
 - [ ] [AI] Verify the first brief is gone
       — acceptance: `test -f plans/ideas/bare-repo-worktree-landing-hygiene.md` exits **1**
 - [ ] [AI] Verify the second brief is gone
@@ -216,9 +224,10 @@ graph TD
       and the same for the second slug
       — acceptance: both exit 1 (the only surviving mentions are inside this plan's own documents).
       Note `--exclude-dir`, not ripgrep's `--glob '!…'`, per the tooling caveat above
-- [ ] [AI] Verify the plan is registered in `plans/backlog/README.md`
-      — acceptance: `grep -Fc "bare-repo-governance-hardening" plans/backlog/README.md` prints at
-      least 1
+- [ ] [AI] Verify the plan is registered in `plans/in-progress/README.md` and **de**-registered from
+      `plans/backlog/README.md`
+      — acceptance: `grep -Fc "bare-repo-governance-hardening" plans/in-progress/README.md` prints at
+      least 1, and the same grep against `plans/backlog/README.md` exits 1
 - [ ] [AI] Verify the retirement is in history, not merely in the working tree
       — acceptance:
       `git log --oneline --diff-filter=D -- plans/ideas/bare-repo-worktree-landing-hygiene.md`
@@ -237,14 +246,15 @@ graph TD
 - [ ] [AI] `test -f plans/ideas/bare-repo-delivery-mode-governance-hardening.md` exits 1
 - [ ] [AI] `grep -Fc "bare-repo-worktree-landing-hygiene" plans/ideas/README.md` exits 1
 - [ ] [AI] `grep -Fc "bare-repo-delivery-mode-governance-hardening" plans/ideas/README.md` exits 1
-- [ ] [AI] `grep -Fc "bare-repo-governance-hardening" plans/backlog/README.md` prints at least 1
+- [ ] [AI] `grep -Fc "bare-repo-governance-hardening" plans/in-progress/README.md` prints at least 1,
+      and the same grep against `plans/backlog/README.md` exits 1
 - [ ] [AI] `npx rhino-cli md links validate` reports zero broken links (no surviving link points at
       a deleted brief)
 - [ ] [AI] `git status --porcelain` lists nothing unexpected — every changed path is one this phase
       authored
 
 > **Pause Safety**: the two briefs are retired (at promotion time) and the plan is registered in the
-> backlog index; the repository is self-consistent (no dangling links to the deleted files) and no
+> `in-progress` index; the repository is self-consistent (no dangling links to the deleted files) and no
 > governance document has been touched yet. Safe to stop. To resume: run
 > `npx rhino-cli md links validate` and confirm it is still clean.
 
@@ -562,6 +572,13 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       [tech-docs.md §Verified In-Repo State](./tech-docs.md#verified-in-repo-state-re-anchor-by-content-not-by-line-number)).
       Confirm once and move on
       — acceptance: `grep -rF "bare-repo-worktree-landing-hygiene" <primer worktree>` exits 1
+- [ ] [AI] **No plan folder here either** — per **DD-10** this plan lives only in `ose-public`;
+      `<PRIMER>` receives the C1-C7 changeset, not a mirrored plan. Do **not** scaffold
+      `plans/*/bare-repo-governance-hardening/`, and do not add an entry to any of the sibling's
+      `plans/` index READMEs
+      — acceptance: `ls -d <primer worktree>/plans/*/bare-repo-governance-hardening` exits non-zero
+      (it exits 0 if such a folder is scaffolded), and
+      `grep -rF "bare-repo-governance-hardening" <primer worktree>/plans` exits 1
 - [ ] [AI] Run the local quality gates in the sibling worktree:
       `npx nx affected -t typecheck lint test:quick specs:coverage` plus the markdown validators
       — acceptance: all exit 0; fix every failure, including preexisting ones
@@ -633,6 +650,12 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       — acceptance: `grep -Fc "bare-repo-landing-method.md"` prints at least 1 in each
 - [ ] [AI] **No brief deletion here** — neither two-pager exists in `<INFRA>` (verified: zero hits)
       — acceptance: `grep -rF "bare-repo-delivery-mode-governance-hardening" <infra worktree>` exits 1
+- [ ] [AI] **No plan folder here either** — per **DD-10**, `<INFRA>` receives the C1-C7 changeset,
+      not a mirrored plan. Do **not** scaffold `plans/*/bare-repo-governance-hardening/`, and do not
+      add an entry to any of the sibling's `plans/` index READMEs
+      — acceptance: `ls -d <infra worktree>/plans/*/bare-repo-governance-hardening` exits non-zero
+      (it exits 0 if such a folder is scaffolded), and
+      `grep -rF "bare-repo-governance-hardening" <infra worktree>/plans` exits 1
 - [ ] [AI] Run the local quality gates plus the markdown validators in the worktree
       — acceptance: all exit 0; fix every failure, including preexisting ones
 - [ ] [AI] Stage **explicit paths only**, commit thematically, push the branch
@@ -737,12 +760,14 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 - [ ] [AI] Verify every propagation worktree is removed in all three repos
 - [ ] [AI] Rename and move the plan folder using **today's** date as the completion date (NOT the
       creation date):
-      `git mv plans/in-progress/bare-repo-governance-hardening/ plans/done/YYYY-MM-DD__bare-repo-governance-hardening/`
-      (if the plan is still in `plans/backlog/`, move it from there instead)
-      — acceptance: `test -d plans/done/YYYY-MM-DD__bare-repo-governance-hardening` exits 0
-- [ ] [AI] Update `plans/backlog/README.md` (and `plans/in-progress/README.md` if the plan passed
-      through it) — remove the plan entry
-      — acceptance: `grep -Fc "bare-repo-governance-hardening" plans/backlog/README.md` exits 1
+      `git mv <PLANDIR> plans/done/YYYY-MM-DD__bare-repo-governance-hardening/` — the plan is at the
+      `in-progress` stage (promoted 2026-07-21), so this is the only source stage to move from
+      — acceptance: `test -d plans/done/YYYY-MM-DD__bare-repo-governance-hardening` exits 0 and
+      `test -d <PLANDIR>` exits 1
+- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry, restoring the
+      `_None currently active._` placeholder if it was the last entry
+      — acceptance: `grep -Fc "bare-repo-governance-hardening" plans/in-progress/README.md` exits 1,
+      and the same grep against `plans/backlog/README.md` exits 1 (it was de-registered at promotion)
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with its completion date
       — acceptance: `grep -Fc "bare-repo-governance-hardening" plans/done/README.md` prints at
       least 1
@@ -751,13 +776,14 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 - [ ] [AI] Commit the archival:
       `git commit -m "chore(plans): move bare-repo-governance-hardening to done"`
 - [ ] [AI] **Land the archival commit on `origin/main`.** By this point the Phase 3 PR has already
-      merged (a Phase 3 Gate precondition), so this commit has no open PR to ride. It touches
-      **only `plans/**`** — no `apps/`or`libs/`code — so it lands under the **plan-docs-only
- carve-out** in
- [plan-planning §The Plan-Docs-Only Carve-Out](../../../repo-governance/workflows/plan/plan-planning.md),
- which permits a direct push for exactly this shape of change. Push it:
-`git push origin HEAD:main`    — acceptance:`git rev-list --left-right --count origin/main...HEAD`prints`0`and`0`, and
- `git show --stat origin/main` lists the archival move
+      merged (a Phase 3 Gate precondition), so this commit has no open PR to ride. It touches only
+      paths under `plans/` — no `apps/` or `libs/` code — so it lands under the **plan-docs-only
+      carve-out** in
+      [plan-planning §The Plan-Docs-Only Carve-Out](../../../repo-governance/workflows/plan/plan-planning.md),
+      which permits a direct push for exactly this shape of change. Push it:
+      `git push origin HEAD:main`
+      — acceptance: `git rev-list --left-right --count origin/main...HEAD` prints `0` and `0`, and
+      `git show --stat origin/main` lists the archival move
   - _Note: this is the one step whose landing route deliberately differs from the plan's declared
     `worktree-to-pr` Delivery Mode. The carve-out is named here so the divergence is recorded, not
     silently assumed — an unexplained direct push would be indistinguishable from a mode violation._
@@ -773,9 +799,12 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 
 > Terminal gate — the plan is complete when every check below passes.
 
-- [ ] [AI] `test -d plans/done/YYYY-MM-DD__bare-repo-governance-hardening` exits 0 and
-      `test -d plans/backlog/bare-repo-governance-hardening` exits 1
+- [ ] [AI] `test -d plans/done/YYYY-MM-DD__bare-repo-governance-hardening` exits 0, and both
+      `test -d <PLANDIR>` and `test -d plans/backlog/bare-repo-governance-hardening` exit 1
 - [ ] [AI] `npx rhino-cli md links validate` exits 0 across the repo
+- [ ] [AI] Exactly **one** plan folder was archived, in `ose-public` — per **DD-10**, no sibling ever
+      held one: `ls -d <PRIMER>/plans/*/bare-repo-governance-hardening` and
+      `ls -d <INFRA>/plans/*/bare-repo-governance-hardening` both exit non-zero
 - [ ] [AI] CI green on `main` in all three repos
 - [ ] [AI] `git worktree list` shows no leftover worktree for this plan in any of the three repos
 

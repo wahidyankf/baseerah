@@ -294,6 +294,45 @@ while writing its missing target would violate
 
 **Consequence**: the re-point propagates to both siblings with the rest of C6.
 
+### DD-10 — One plan folder, in `ose-public` only; siblings receive the changeset, not a plan copy
+
+This plan lives at `ose-public/plans/in-progress/bare-repo-governance-hardening/` (promoted from
+`plans/backlog/` on 2026-07-21) and **nowhere else**.
+Neither `ose-primer` nor `ose-infra` receives a mirrored plan folder; each receives the C1-C7
+**changeset** through its own propagation phase (Phase 4, Phase 5) and its own PR.
+
+This is a **deliberate deviation** from
+[plan-multi-repo-parity-planning](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md),
+whose declared output is "One plan folder path per target repo" — one plan per repo, one grill
+session across all repos. That deviation is recorded here so a later reader knows it was decided
+rather than overlooked.
+
+**Rationale**: the per-repo split exists to absorb per-repo **divergence** — different starting
+states, different CI wiring, different toolchain constraints, each resolved through a deviation
+matrix. This changeset has none. C1 is copied **verbatim** (the Phase 4 and Phase 5 acceptance
+criterion is that `diff` reports no difference), and C2-C6 apply the same edits to the same paths in
+all three repos; the only per-repo difference is that sites must be located **by content** because
+line numbers differ. Three plan folders would therefore be three copies of one document differing in
+nothing but the repo name — and three folders that must then be kept in sync, gated in sync,
+archived in sync, and indexed in sync. The deviation matrix that justifies the per-repo split would
+be empty.
+
+**Verified in-repo state (2026-07-21)**: neither sibling holds a plan or a brief on this subject.
+Every non-archived plan document in both repos was enumerated — `ose-primer` carries one
+`in-progress` plan (`add-investment-oracle-app`), an empty `backlog/`, and three ideas
+(`rhino-cli-exclude-dir-shared-steps-gap`, `rust-msrv-1-94-1-upgrade`,
+`source-code-credential-scanning`); `ose-infra` carries three `in-progress` plans (two k3s deploys,
+one PVE alerting), one backlog plan (`ci-runner-health-monitoring`), and nine ideas. **Zero** are on
+this subject. The nearest neighbour by keyword,
+`ose-infra/plans/ideas/worktree-portable-terraform-state.md`, concerns a Terraform state backend,
+not git landing. The only sibling matches for the string `bare-repo` are two lines in each repo's
+archived `plans/done/2026-07-03__unify-rhino-cli-sdlc-parity/`, and both state that bare-repo-specific
+handling was **not** required there.
+
+**Consequence**: Phases 4 and 5 each carry an explicit non-goal — do not scaffold a plan folder in
+the sibling — and Phase 7 archives exactly one folder, in `ose-public`. The siblings' `plans/`
+indexes are untouched by this plan.
+
 ## Research Findings
 
 Full report: `generated-reports/plan-idea-promotion-planning__bare2p_7f3a91c4__2026-07-21--14-53__report.md`.
@@ -336,14 +375,24 @@ variables `core.bare` or `core.worktree` are present in the common config file a
 — <https://git-scm.com/docs/git-worktree> (accessed 2026-07-21) [Web-cited]. A linked worktree is by
 design never bare, so `false` correctly answers "is _this checkout_ bare".
 
-Corroborated by a `git@vger.kernel.org` maintainer thread in which core developer Phillip Wood and
-maintainer Junio C Hamano debate the special-casing:
-<https://www.spinics.net/lists/git/msg487689.html> (accessed 2026-07-21) [Web-cited].
+A corroborating maintainer thread was cited in an earlier draft
+(<https://www.spinics.net/lists/git/msg487689.html>) and is **withdrawn as unverified**
+[re-checked 2026-07-21]: the host refused connection on every attempt, and the only retrievable
+metadata indicates the thread concerns `git worktree repair` on a copied bare repository — an
+adjacent bug, not the `--is-bare-repository` scoping question. **Do not cite it in C1** unless
+someone re-reads it from an environment that can reach the host. The `git-worktree(1)` quote above
+is load-bearing on its own; note also that `git-rev-parse(1)` documents `--is-bare-repository` only
+as "When the repository is bare print `true`, otherwise `false`" and is **silent on worktree
+scoping**, so C1's framing is a defensible inference from documented mechanics rather than a
+statement git makes about itself. Say so in C1 rather than implying upstream asserts it.
 
 **Binding constraint on wording**: frame the rule as **"documented scoping semantics — ask the right
 question"**, never as "git has a bug". Also name
-<https://www.gitworktree.org/troubleshooting/must-be-run-in-work-tree> as a **known-bad
-counter-source**: it asserts the opposite of the documented mechanics.
+<https://www.gitworktree.org/troubleshooting/must-be-run-in-work-tree> as a **misleading source**: it
+recommends `git rev-parse --is-bare-repository` as a general bareness diagnostic **without
+addressing the linked-worktree scoping caveat**. Two independent fetches found no sentence asserting
+the opposite of the documented mechanics — the defect is a **material omission, not a stated
+contradiction**, and C1 must describe it that way.
 
 ### F4 (MEDIUM) — Provenance honesty for the `core.bare` read
 
@@ -381,23 +430,47 @@ it, mark it **observed behaviour, not a documented guarantee**.
 
 `git-merge(1)` on `--ff-only`: resolve the merge as a fast-forward when possible; when not possible,
 **refuse to merge and exit with a non-zero status** — <https://git-scm.com/docs/git-merge> (accessed
-2026-07-21) [Web-cited]. `git-pull(1)` documents `--ff-only` as the default when no reconciliation
-method is given, and recommends separate `fetch` + `merge` over `pull` for recoverability —
-<https://git-scm.com/docs/git-pull> (accessed 2026-07-21).
+2026-07-21) [Web-cited]. `git-pull(1)` documents `--ff-only` as "the default when no method for
+reconciling divergent histories is provided" — <https://git-scm.com/docs/git-pull> (accessed
+2026-07-21) [Web-cited].
+
+**Correction [re-checked 2026-07-21]**: an earlier draft added "and recommends separate `fetch` +
+`merge` over `pull` for recoverability" to that `git-pull(1)` citation. All 14 top-level sections of
+the page were enumerated and **no such recommendation exists** — EXAMPLES presents the two as
+functionally equivalent, with no safety framing. The claim is **withdrawn**; C1 must not attribute
+it to `git-pull(1)`. If C1 wants to prefer `fetch` + `merge`, it must argue that on its own terms.
 
 ### S4 — Buy-vs-build: adopt nothing
 
-| Candidate               | License       | Verdict                                                                                           |
-| ----------------------- | ------------- | ------------------------------------------------------------------------------------------------- |
-| `git-town`              | MIT           | Rejected — solves branch-stack sync; requires adopting its branch-hierarchy model across 3 repos  |
-| `git-machete`           | MIT           | Rejected — same shape of commitment                                                               |
-| Graphite `gt`           | closed-source | Rejected — closed-source SaaS since 2023-07-14; vendor lock-in                                    |
-| Jujutsu                 | Apache-2.0    | Rejected — colocated model structurally avoids the bug class, but retrofitting is a VCS migration |
-| `git-absorb`            | BSD-3         | Rejected — unrelated problem                                                                      |
-| `git-extras` `git sync` | —             | **DISQUALIFIED ON SAFETY** — see below                                                            |
+| Candidate               | License       | Verdict                                                                                            |
+| ----------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| `git-town`              | MIT           | Rejected — solves branch-stack sync; requires adopting its branch-hierarchy model across 3 repos   |
+| `git-machete`           | MIT           | Rejected — same shape of commitment                                                                |
+| Graphite `gt`           | closed-source | Rejected — closed-source SaaS since 2023-07-14 (date secondary-sourced, see below); vendor lock-in |
+| Jujutsu                 | Apache-2.0    | Rejected — colocated model structurally avoids the bug class, but retrofitting is a VCS migration  |
+| `git-absorb`            | BSD-3         | Rejected — unrelated problem                                                                       |
+| `git-extras` `git sync` | —             | **DISQUALIFIED ON SAFETY** — see below                                                             |
 
-`git-extras`' `git sync` shell source runs `git fetch`, then **unconditionally** `git reset --hard
-<remote_branch>` plus `git clean -d -f -x`. `reset --hard` is forbidden under this repo's
+**Licence provenance [re-verified 2026-07-21]**: git-town (MIT), git-machete (MIT), Jujutsu
+(Apache-2.0), and git-absorb (BSD-3) were each confirmed against the project's own `LICENSE` file.
+The Graphite row is weaker: its `2023-07-14` closed-source date could **not** be confirmed from a
+primary Graphite source — the announcement post 404s and `withgraphite/graphite-cli` is gone — and
+rests on a community fork's README instead. Treat that date as **secondary-sourced**. It does not
+affect the verdict, which turns on the tool being closed-source today, not on when it became so.
+
+`git-extras`' `git sync` shell source runs `git fetch`, then `git reset --hard <remote_branch>` plus
+`git clean -d -f -x`.
+
+**Correction [raw source re-fetched 2026-07-21]**: an earlier draft called those two commands
+**unconditional**. They are not. `bin/git-sync` prompts —
+`Are you sure you want to clean all changes & sync with '${remote_branch}'? [y/N]:` — and runs the
+destructive pair only inside the `"Y"|"y"|"yes"|"Yes"|"YES"` branch. Passing `-f`/`--force` presets
+the answer and skips the prompt. **The disqualification stands, on corrected grounds**: the tool is
+safe only while a human answers the prompt, and `-f` — the only mode in which a scripted reconcile
+primitive could use it — removes that single safety gate entirely. Unsuitable either way, but C1 and
+any future write-up must not claim the destruction is unconditional.
+
+`reset --hard` is forbidden under this repo's
 [No Destructive Git Operations Convention](../../../repo-governance/development/workflow/no-destructive-git-operations.md),
 and in Brief A's own originating scenario — roughly a hundred files of staged WIP — it would have
 destroyed exactly what the brief exists to protect.
@@ -469,7 +542,28 @@ delivery step re-anchors by **content**. Do not `sed`-address any of these.
 | `plans/ideas/README.md` L16, L17               | The two brief index lines                                                                                        | Both present; both removed by C7                                             |
 
 **Sibling repos**: `/Users/wkf/ose-projects/ose-primer` and `/Users/wkf/ose-projects/ose-infra`,
-both `core.bare=true`, both clean and `0 0` versus `origin/main` as of this session [Repo-grounded].
+both `core.bare=true` [Repo-grounded].
+
+> **Live reproduction of the defect, recorded 2026-07-21 during promotion** [Repo-grounded]. An
+> earlier line here read "both clean and `0 0` versus `origin/main` as of this session". That is no
+> longer true, and the way it stopped being true is the plan's own thesis:
+>
+> ```console
+> $ git -C ose-primer rev-list --left-right --count origin/main...main
+> 2 0
+> $ git -C ose-infra rev-list --left-right --count origin/main...main
+> 2 0
+> ```
+>
+> Both local `main` refs are **2 commits behind** `origin/main` — `c12e1eb7f` + `53d9081b7` in
+> `ose-primer`, `474545a69` + `f6ecdcc0b` in `ose-infra` (the `detect_kind` mermaid fix and its
+> content remediation). Those commits were landed **through side worktrees** in a prior session,
+> which advanced `origin/main` and the remote-tracking ref but never the repos' own `main`. No
+> command failed; nothing warned. This is precisely the silent lag [C1](#dd-5--the-method-gets-a-new-document-the-advisory-wip-rule-lives-in-it)
+> must prescribe a terminal reconcile for, and it means Phase 0's divergence check will legitimately
+> report non-zero on first run rather than `0 0`. Reconcile per **DD-6** (`git fetch origin main:main`)
+> and record the counts, exactly as Phase 0 instructs — do not treat the non-zero reading as a
+> blocker.
 
 **Verified fact — nothing to delete in the siblings**: neither brief exists in `ose-primer` or
 `ose-infra`. Searched by filename across `plans/**` and grepped both repos for both slugs — **zero
@@ -486,7 +580,12 @@ hits** [Repo-grounded]. Recorded here explicitly so a later reader does not re-c
 | `grep -Fc "any bare repo" .../plan-multi-repo-parity-planning.md`            | exit 1 (no match) |
 | `grep -Fc "floor" repo-governance/development/workflow/pr-merge-protocol.md` | exit 1 (no match) |
 | `grep -Fc "is-bare-repository" docs/reference/sdlc-gate-standard.md`         | exit 1 (no match) |
-| `grep -Fc "bare-repo-worktree-landing-hygiene" plans/ideas/README.md`        | prints `1`        |
+| `grep -Fc "bare-repo-worktree-landing-hygiene" plans/ideas/README.md`        | exit 1 — see note |
+
+**Note on the last row.** It read `prints 1` at authoring time, because the two briefs were still in
+`plans/ideas/`. C7 (their retirement) executed **at promotion time**, in commit `4f16f89b5`, so the
+"pre-change" state for that one row is already history: the grep now exits `1`. Phase 1 verifies
+exactly that, and the seven rows above it were re-confirmed unchanged on 2026-07-21.
 
 > **Tooling caveat — verified empirically 2026-07-21.** In this repo `grep` is a shell function
 > routing to **ugrep** (`-G` mode), **not ripgrep**. An earlier draft of this plan asserted ripgrep
