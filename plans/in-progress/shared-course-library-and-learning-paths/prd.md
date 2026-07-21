@@ -101,24 +101,107 @@ further NEW AI-specific courses** (2026-07-20) the fourth path needs, for a **12
 - As a **screen-reader / keyboard user**, I want the path banner, breadcrumb, prerequisite list, and
   prev/next to be fully accessible, so that path-aware navigation works without a mouse.
 
+## Learner Journey (End-to-End)
+
+The design screens are not judged in isolation — they must make the **whole learner arc** smooth, from
+the first cold visit through returning months later. This section maps the five journey stages to the
+screens/affordances that serve them, the ergonomics principle behind each, and — critically — the
+**scope tag** separating what **this plan builds** from **[Future]** enhancements it deliberately
+leaves for a follow-up (this plan ships _path-aware navigation_, not a per-user progress backend). It
+is grounded in a `web-researcher` window-shop of ~14 platforms on **2026-07-21** (sources in
+[R7 Prior-Art Findings](#r7-prior-art-findings-window-shopped-2026-07-21)).
+
+| Stage           | Learner's need                               | Design response (screen / affordance)                                                                  | Scope    |
+| --------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------- |
+| **1 Landing**   | "Where do I even start?"                     | **Screen 0** hero surfaces the 4 goal cards + "Compare all paths" escape hatch                         | In-scope |
+| **2 Discovery** | "Which path fits me? what's shared?"         | **Screen 1** paths hub (compare paths, course counts); "Browse the full library" for topic-led seekers | In-scope |
+| **3 Before**    | "Am I ready? can I skip ahead?"              | **Screen 2** syllabus preview + advisory `PrerequisiteList` + fast-path "skip the prologue" callout    | In-scope |
+| **4 During**    | "Keep me oriented and moving"                | **Screen 3** `PathBanner` (step k of N) + path breadcrumb + manifest prev/next keeping `?path=`        | In-scope |
+| **5 After**     | "I finished — what now? where else is this?" | **Screen 3** `PathCourseLinks` ("this course is also in …") + manifest next → capstone framing         | In-scope |
+
+**Stage-by-stage smoothness**
+
+- **1 · Landing** — the failure mode today is a hero that dumps a goal-driven learner into a recall-heavy
+  browse index. Screen 0 replaces that with four **goal-labeled** cards. Because the labels are the
+  learner's own goal ("pass an interview soon"), the four options are trivially comparable and carry a
+  built-in heuristic — the exact condition under which choice-overload does **not** bite (see the
+  ergonomics note below), and the "Compare all paths" link is the Codecademy-style escape hatch for the
+  genuinely undecided. **[Future]** a `localStorage`-read "welcome back — resume _Coding Interview_"
+  banner would close the industry's weakest seam (cold returning visitor); noted, not built here.
+- **2 · Discovery** — the seam from Landing must not "bait-and-switch": the hub the "Compare all paths"
+  link opens shows the _same four paths_ with more detail (course counts, one-line arcs), not a
+  different taxonomy. Topic-led seekers who don't want a path get "Browse the full library" → the course
+  index. A shared course legitimately has several parent paths — a **polyhierarchy** — applied with
+  restraint (a course appears only in the paths whose manifest actually lists it, not every path).
+- **3 · Before** — readiness is **advisory, never gated**: prerequisites render as an inline list that
+  points sideways ("take X first"), and experienced/re-entrant learners get an explicit skip-ahead
+  (the fast-path callout lands them further down the _same_ ordered syllabus, not a separate stripped
+  variant). No quiz-wall, no lock.
+- **4 · During** — orientation without a login: the `PathBanner` shows "on path: … · course k of N", the
+  breadcrumb and prev/next all keep `?path=`, so the learner never falls out of path context by
+  clicking forward. Deep-links/shares keep the path via the query param; opening a course with no
+  `?path=` degrades to the canonical view. **[Future]** a client-only `localStorage` "mark done" +
+  "k of N done" indicator (Zeigarnik re-engagement) — keyed by **course-ID alone** so completion
+  **carries across every path** that shares the course (DataCamp's cross-track carry-over, done
+  no-login); noted, not built here.
+- **5 · After** — close the loop, don't dead-end: manifest `next` hands off to the following course;
+  the terminal node is a **capstone** framed as a portfolio artifact (distinct treatment from a
+  mid-path course); and `PathCourseLinks` answers "where else does this course live?" — a
+  cross-path-continuity affordance the survey found **no platform** ships, so it is a deliberate
+  differentiator here. **[Future]** a peak-end completion celebration (with an `aria-live`
+  announcement, not color/confetti alone).
+
+**The seams** (where journeys usually break) — Landing→Discovery keeps the same four paths visible so
+information scent is preserved; Before→During turns "skip ahead" into a starting offset in the _same_
+structure, not a forked variant to maintain; During→After uses one boolean per course-ID so "in
+progress" and "done" are the same data model, and finishing a course in Path A registers when it
+reappears in Path B; After→re-entry is the industry's weakest seam and is explicitly parked as
+**[Future]** rather than hand-waved.
+
+**Ergonomics principles (evidence-backed, applied across the journey)**
+
+- **Choice overload is contextual, not automatic.** The canonical jam study (24 vs. 6 options) is real,
+  but the largest meta-analysis ([Scheibehenne, Greifeneder & Todd 2010](https://www.psychologytoday.com/us/blog/pop-psych/201602/is-choice-overload-real-thing),
+  50 studies) found a near-zero _average_ effect — overload bites mainly when the user has **no
+  preexisting preference, options are hard to compare, and no heuristic/filter exists**. Screen 0's
+  goal-labeled cards + escape hatch neutralize all three, so four cards in the hero is safe.
+- **Hick's Law is logarithmic** (`RT = a + b·log₂n`), with **no magic-number cutoff** — the "7±2" figure
+  is Miller's working-memory law, a different construct, and is not used here. [lawsofux.com/hicks-law](https://lawsofux.com/hicks-law/).
+- **Polyhierarchy** — one course, a _few restrained_ parent paths, not cross-listed everywhere. [NN/g](https://www.nngroup.com/articles/polyhierarchy/).
+- **Breadcrumb = location, not history** ([NN/g](https://www.nngroup.com/articles/breadcrumbs/)). NN/g's
+  default is a single canonical parent; our path-aware breadcrumb is a **deliberate, documented
+  departure** — justified because the active path is explicit and shareable in the URL (`?path=`), so
+  the trail is deterministic _given the URL_ rather than silently referrer-driven.
+- **Recognition over recall / information scent** — persistent path banner + breadcrumb so the learner
+  never has to remember which path they're in. [NN/g recognition](https://www.nngroup.com/articles/recognition-and-recall/),
+  [NN/g scent](https://www.nngroup.com/articles/information-scent/).
+- **Zeigarnik & peak-end** (both **[Future]**) — an unfinished-count indicator drives return visits;
+  completion should end on a rewarding note without an upsell. [NN/g Zeigarnik](https://www.nngroup.com/videos/zeigarnik-effect/),
+  [NN/g peak-end](https://www.nngroup.com/articles/peak-end-rule/).
+- **Mobile & a11y per stage** — advisory-vs-hard signifiers never color-only; tap targets ≥44px (above
+  the [WCAG 2.2 §2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) 24px
+  floor); no multi-line breadcrumb wrap on small screens; completion state announced via `aria-live`.
+
 ## UI-Design-Funnel (Path-Aware Navigation Screens)
 
-The path-aware navigation adds/changes **three user-facing screens** in `ayokoding-www` (a Next.js
-app), all under the `/en/c/learn` URL model. Each screen runs the diverge → narrow → select → justify
-funnel. Low-fidelity wireframes are authored below; the two high-fidelity finalists per screen are
-rendered as `.png` assets under this plan's [`assets/`](./assets/) and embedded inline here.
-Repo-grounded **textual** hi-fi specifications for each chosen screen are authored in
+The path-aware navigation adds/changes **four user-facing screens** in `ayokoding-www` (a Next.js
+app): **Screen 0** is the site **landing hero** at `/en` (where a first-time visitor first meets the
+paths); **Screens 1-3** live under the `/en/c/learn` URL model (paths hub, path landing,
+course-in-path). Each screen runs the diverge → narrow → select → justify funnel. Low-fidelity
+wireframes are authored below; the two high-fidelity finalists per screen are rendered as `.png`
+assets under this plan's [`assets/`](./assets/) and embedded inline here. Repo-grounded **textual**
+hi-fi specifications for each chosen screen are authored in
 [Hi-Fi Specifications](#hi-fi-specifications-textual-repo-grounded) below and are the source of truth
-those PNGs render.
+those PNGs render. The screens are sequenced along the [Learner Journey](#learner-journey-end-to-end)
+— landing → discovery → before → during → after — so the funnel optimizes the _whole_ arc, not each
+screen in isolation.
 
-> **Assets note**: the six hi-fi finalist PNGs (two per screen, Screens 1-3) are **already produced**
+> **Assets note**: the eight hi-fi finalist PNGs (two per screen, Screens 0-3) are **already produced**
 > and embedded below. They are rendered from self-contained HTML mockups (kept alongside as
 > [`assets/src/*.html`](./assets/src/)) styled with the **exact AyoKoding token palette**
 > (`libs/web-ui-token/src/ayokoding.css` — the same `oklch` hues, `--warm-*` neutral scale, radius,
 > and shadow tokens the running app uses), so the mockups are colour- and spacing-accurate rather than
-> sketches. To regenerate: serve `assets/src/` over HTTP and full-page-screenshot each page. During
-> Group A the diverge/select stages may still re-pin a selection per the R7 caveat below; if a
-> selection changes, its mockup is re-rendered from the updated HTML source.
+> sketches. To regenerate: serve `assets/src/` over HTTP and full-page-screenshot each page.
 
 **R5 grounding note (all screens)** — before drafting, survey the existing UI to reuse rather than
 reinvent: `libs/web-ui` component inventory + tokens + Storybook; the ayokoding app-shell
@@ -129,20 +212,112 @@ components**: `PathCard`, `PathLanding`, `PathBanner`, `PathCourseLinks`, `Prere
 composed from existing `libs/web-ui` primitives; named in
 [tech-docs §New feature: `course-paths`](./tech-docs.md#new-feature-course-paths-functional-core--imperative-shell).
 
-**R7 prior-art citation (all screens)** — consult, via `web-researcher` at Group-A authoring time, how
-comparable learning platforms present a "path/track over shared lessons" and a "prerequisite graph"
-(e.g. roadmap.sh track pages, Exercism tracks, freeCodeCamp curriculum, Coursera specialization/path
-pages) so the alternatives are informed rather than invented. [Needs Verification — delegate before
-authoring.]
+**R7 prior-art survey (all screens) — COMPLETE.** A `web-researcher` window-shop of 13 learning
+platforms ran on **2026-07-21**; the selections below are now **prior-art-informed** (this discharges
+the earlier provisional-diverge caveat). Sources and the full adopt/adapt/avoid mapping are in
+[R7 Prior-Art Findings](#r7-prior-art-findings-window-shopped-2026-07-21) below. Headline results that
+drove the selections:
 
-> **Provisional-diverge note**: the R7 prior-art survey has **not** run yet — it is scheduled as a
-> `delivery.md` Group A step (`web-researcher` delegation). The Screens 1-3 low-fi alternatives,
-> selections, and rationales below were therefore drafted **without** prior-art input and are
-> **provisional**: Group A re-runs the diverge/select stages against the R7 findings before the hi-fi
-> finalists are produced, and may replace an alternative, change the selection, or add a new option if
-> the survey surfaces a materially better pattern. Do not treat the "Selected:" lines below as
-> prior-art-informed until Group A's R7 sweep lands (with inline excerpt + URL + access date per the
-> Anti-Hallucination convention).
+- **No platform puts more than 3-4 large path choices in/near the hero** — the dense catalog is always
+  one click deeper (roadmap.sh's 92-roadmap catalog, Codecademy's 12-path center). Our four
+  goal-labeled paths sit safely under every choice-overload threshold ([Hick's Law](https://lawsofux.com/hicks-law/);
+  Iyengar & Lepper's jam study), so Screen 0 puts the **4 goal cards directly in the hero** with an
+  "Not sure? Compare paths" escape hatch (Boot.dev + Codecademy model).
+- **Path landings are numbered flat lists + an advisory "take in order, content builds" note**, never
+  a DAG diagram or 3-level nesting ([Coursera](https://www.coursera.org/professional-certificates/google-data-analytics);
+  NN/g caps disclosure at [two levels](https://www.nngroup.com/articles/progressive-disclosure/)) —
+  validates Screen 2 Option A.
+- **Prerequisites are advisory prose, not hard gates** across every platform (Scrimba, DataCamp,
+  Pluralsight's "skip modules you already know") — validates our advisory `PrerequisiteList` + the
+  fast-path "skip the prologue" callout for re-entrant users.
+- **A course-page path banner and a "this course is in N paths" affordance are an industry-wide
+  whitespace** — no surveyed platform surfaces them ([Boot.dev](https://www.boot.dev/paths/backend-python-golang)
+  path pages have no breadcrumb; Frontend Masters shows no cross-path indicator). Our `PathBanner` and
+  `PathCourseLinks` are therefore **net-new differentiators**, built on the nearest adjacent precedent
+  (Coursera's program breadcrumb) rather than copied.
+
+### Screen 0 · Landing hero (path entry)
+
+The site landing hero at `/en` ([`app-shell/shell/hero.tsx`](../../../apps/ayokoding-www/src/features/app-shell/shell/hero.tsx)
+
+- [`landing.tsx`](../../../apps/ayokoding-www/src/features/app-shell/shell/landing.tsx)). **Today** it
+  offers only two generic CTAs — **Start learning** → `/en/c` (a recall-heavy browse index of sections)
+  and **Explore tools** — so a goal-driven learner ("I want to get interview-ready") has **zero path
+  scent** above the fold. This screen fixes that: the hero must **surface `/paths` directly**, turning
+  the landing page into the first step of the learner journey rather than a dead-drop into a taxonomy.
+
+**Low-fi Option A — Four goal cards in the hero (Recommended)**
+
+```text
+┌──────────────────────────── AyoKoding · /en ─────────────────────────────┐
+│ Learn to build software, the clear way.                                   │
+│ Start from your goal — every path is one route through one library.       │
+│ CHOOSE YOUR PATH                                                          │
+│  ┌───────────────────────────┐  ┌───────────────────────────┐            │
+│  │ Pass a SWE interview soon │  │ Get productive & ship fast │           │
+│  │ Interview-Ready SWE  ~119 │  │ Immediately-Effective ~116 │           │
+│  └───────────────────────────┘  └───────────────────────────┘            │
+│  ┌───────────────────────────┐  ┌───────────────────────────┐            │
+│  │ Build durable fundamentals│  │ Move from SWE into AI      │           │
+│  │ Fundamentally Strong ~121 │  │ SWE → AI Engineer     ~15  │           │
+│  └───────────────────────────┘  └───────────────────────────┘            │
+│  Not sure which fits? Compare all paths →     Browse the full library →   │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Low-fi Option B — Goal-question strip below a single-CTA hero (Coursera model)**
+
+```text
+┌──────────────────────────── AyoKoding · /en ─────────────────────────────┐
+│ Learn to build software, the clear way.                                   │
+│ [ Start learning → ]   [ Explore tools ]                                  │
+│ ───────────────────────────────────────────────────────────────────────  │
+│ What brings you here today?                                               │
+│  • Pass a SWE interview soon →     • Get productive & ship fast →         │
+│  • Build durable fundamentals →    • Move from SWE into AI →              │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Low-fi Option C — Single "Find your path" CTA + guided quiz (edX/Educative model)**
+
+```text
+┌──────────────────────────── AyoKoding · /en ─────────────────────────────┐
+│ Learn to build software, the clear way.                                   │
+│ [ Find your path → ]  (answer 3 questions)      or browse all paths →     │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Responsive (mobile ↔ desktop)** — Option A shows a **2×2 card grid** at `md+` and **stacks to one
+column** below `md`; each card is a full-width tap target (≥ the WCAG 2.2 §2.5.8 24px floor, sized to
+the ~48px comfort target). The "Compare all paths" / "Browse library" links wrap under the grid on
+mobile. The four cards fit above the fold on desktop and within one short scroll on mobile — no card is
+pushed below a fold-and-a-half the way Option B's strip is once the primary CTAs precede it.
+
+**Hi-fi finalists** (rendered from the token-accurate HTML mockups):
+
+![Landing hero, Option A — the AyoKoding landing page with the brand headline and tagline, then a "Choose your path" label above a 2×2 grid of four goal-led cards (Pass a SWE interview soon, Get productive and ship fast, Build durable fundamentals, Move from SWE into AI), each hue-coded with the formal path name and course count and a Start action, and a subordinate "Not sure which fits? Compare all paths" link beside "Browse the full course library"](./assets/landing-hero-option-a.png)
+
+![Landing hero, Option B — the landing page with a single "Start learning" primary CTA and an "Explore tools" secondary button, and below a divider a "What brings you here today?" strip of four goal options each with a hue dot, following the Coursera goal-question pattern](./assets/landing-hero-option-b.png)
+
+**Selected: Option A — four goal cards in the hero.**
+
+| Design                      | Why it won / lost                                                                                                     |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| A — 4 goal cards in hero ✅ | Zero clicks/scroll to the core decision; strongest information scent (goal verbs + course counts); 4 ≪ overload cap   |
+| B — goal-question strip     | Proven (Coursera), but the primary CTA precedes it, so path choice needs a scroll and competes with "Start learning"  |
+| C — guided quiz             | Best only when paths are ambiguous; ours are already goal-labeled, and no surveyed platform uses a quiz as sole entry |
+
+**Ergonomics rationale** — our four paths are **already goal-labeled**, so no quiz is needed to
+translate intent into a route (avoids Option C's mandatory extra step). Four cards is at the low end of
+every threshold surveyed ([Hick's Law](https://lawsofux.com/hicks-law/); Iyengar & Lepper 2000 jam
+study; NN/g "show a few of the most important options"), so putting them **in** the hero — not one
+scroll below it like Option B — removes the single friction point every "goal-question-then-cards"
+platform still has. The subordinate **"Compare all paths →"** link (→ Screen 1) is the escape hatch for
+undecided visitors (Codecademy's "sorting quiz alongside the grid" pattern) without diluting the
+four-card decision; **"Browse the full library →"** preserves the non-path, self-directed entry
+(recognition-over-recall for learners who know the topic they want). The existing **Start learning /
+Explore tools** buttons are **not deleted** — they move into the global nav so the hero's primary
+visual weight is the path decision.
 
 ### Screen 1 · Paths hub ("choose your path")
 
@@ -334,17 +509,15 @@ sheet on mobile — extra complexity, so Option A wins on mobile-first grounds.
 
 ### Hi-Fi Specifications (Textual, Repo-Grounded)
 
-These **textual hi-fi specifications** complement the deferred `.excalidraw.png` finalists (produced
-in Group A) — they pin the chosen **Option A** of each screen to concrete, existing design-system
-facts so both the hi-fi PNGs and the Group-A/B build have an unambiguous target. Every primitive,
-token, and class named below is **repo-grounded** in `@open-sharia-enterprise/web-ui` (barrel) /
+These **textual hi-fi specifications** are the source of truth the embedded `.png` finalists render —
+they pin the chosen **Option A** of each screen to concrete, existing design-system facts so both the
+mockups and the Group-A/B build have an unambiguous target. Every primitive, token, and class named
+below is **repo-grounded** in `@open-sharia-enterprise/web-ui` (barrel) /
 `@open-sharia-enterprise/web-ui/primitives` and the AyoKoding token layer (`libs/web-ui-token`,
 `apps/ayokoding-www/src/app/globals.css`), verified against the existing `prev-next`, `breadcrumb`,
-and `section-card` components — nothing here invents a primitive or token. The provisional-diverge and
-R7 caveats above still apply: if the R7 sweep changes a selection, the matching spec below is re-pinned
-before its PNG is drawn.
+`section-card`, and `hero`/`landing` components — nothing here invents a primitive or token.
 
-#### Shared design legend (all three screens)
+#### Shared design legend (all four screens)
 
 - **Import surface**: `@open-sharia-enterprise/web-ui` (composite `Button`, `Badge`, `Card*`,
   `Alert*`) and `@open-sharia-enterprise/web-ui/primitives` where a primitive is required — **not**
@@ -369,6 +542,35 @@ before its PNG is drawn.
   `<nav aria-label="…">`; lists are semantic `<ol>`/`<ul>` (this app uses semantic lists, not
   `role="list"`); the canonical focus ring is `focus-visible:ring-2 focus-visible:ring-ring`; the
   current location uses `aria-current="page"`; the global skip-link → `#main-content` is unchanged.
+
+#### Screen 0 hi-fi — Landing hero (`/en`), Option A (four goal cards in the hero)
+
+- **Where it lands**: extends [`app-shell/shell/hero.tsx`](../../../apps/ayokoding-www/src/features/app-shell/shell/hero.tsx)
+  (currently H1 + tagline + `Button` Learn/Tools). The two existing CTAs move into the global nav; the
+  hero's primary visual weight becomes the path decision.
+- **Container**: keep the existing `<section className="px-6 pt-12 pb-10 lg:px-8 lg:pt-16">` with the
+  inner `mx-auto max-w-6xl`. H1 unchanged (`text-4xl … sm:text-5xl lg:text-6xl font-extrabold`,
+  `t(locale,"heroHeading")`); tagline `mt-5 max-w-2xl text-lg text-muted-foreground` (goal-framed copy).
+- **"Choose your path" eyebrow**: `<p className="mt-8 text-sm font-semibold uppercase tracking-wide text-muted-foreground">`.
+- **Grid**: `<ul className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">` — 2×2 at `md+`, single column
+  below. Each `<li>` a **`PathCard`** (same net-new component as Screen 1, `context="hero"` variant):
+  the whole card is one `<Link href={`/${locale}/c/learn/paths/${pathId}`}>` (SectionCard pattern, no
+  link-in-link). Card = `Card` (`rounded-lg border-border shadow-sm hover:bg-accent hover:shadow-md`,
+  `border-l-4` in the path hue `border-[var(--hue-<h>)]`). Contents — **goal phrase** as the prominent
+  line (`text-lg font-semibold`), the **formal path name** beneath (`text-xs text-muted-foreground`), a
+  course-count `Badge` (`variant="secondary" size="sm"` + hue wash), and a "Start →" `meta`
+  (`text-sm font-medium text-primary`, lucide `ArrowRight`).
+- **Escape hatch row**: below the grid, `<div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">`
+  — a primary-weight `<Link className="text-sm font-medium text-[var(--hue-honey-ink)]">` "Not sure
+  which fits? Compare all paths →" (→ `/en/c/learn/paths`, Screen 1) and a subordinate
+  `text-sm text-muted-foreground` "Browse the full course library →" (→ `/en/c/learn/courses`).
+- **States**: card hover `bg-accent shadow-md`, arrow nudges `group-hover:translate-x-0.5`;
+  focus-visible `ring-2 ring-ring` on the card. All four cards equal weight — none de-ranked.
+- **Responsive**: 2×2 `md+`; single column `<md` (full-width cards, ≥44px tap height); escape-hatch
+  links wrap under the grid on mobile; four cards + eyebrow stay within one short scroll on a phone.
+- **A11y**: `<ul>`/`<li>`; each card `<a aria-label="Start the {path} path — {goal}, ~{N} courses">`;
+  hue is decorative (goal phrase + path name carry meaning); eyebrow is a real heading landmark, not
+  styled text alone if it introduces the list.
 
 #### Screen 1 hi-fi — Paths hub (`/en/c/learn/paths`), Option A (2×2 card grid)
 
@@ -467,6 +669,76 @@ The **unchanged, path-neutral course body** renders as today (`article className
 - **`contentUrl()`** (`.../content/core/content-url.ts`): add an optional `pathId` that appends
   `?path=<path-id>`, so breadcrumb, prev/next, and prerequisite link builders all produce
   path-preserving URLs from one place.
+
+### R7 Prior-Art Findings (window-shopped 2026-07-21)
+
+A `web-researcher` surveyed 13 learning platforms on 2026-07-21 for how a "path/track over a shared
+library" is presented end-to-end. Every claim below carries a source URL (access date 2026-07-21).
+
+**Per-platform highlights**
+
+- **roadmap.sh** — the home page _is_ the catalog: role-based + skill-based roadmaps as chunked text
+  links, 92-item catalog one level deep; deliberately not a hero-style chooser.
+  [roadmap.sh](https://roadmap.sh/), [/roadmaps](https://roadmap.sh/roadmaps).
+- **Coursera** — generic value-prop hero + single CTA; a **4-option goal-question** ("What brings you
+  to Coursera today?") sits _below_ the hero; Professional-Certificate landings use a **numbered
+  "Course 1 of 9" list + advisory "take in order, content builds"** note, with a breadcrumb.
+  [home](https://www.coursera.org/), [Google Data Analytics cert](https://www.coursera.org/professional-certificates/google-data-analytics).
+- **Boot.dev** — generic hero → **"Pick a Learning Path" section with 3 cards**; path landing is a
+  **flat numbered list (1-23)**, no breadcrumb/banner. [boot.dev](https://www.boot.dev/),
+  [backend path](https://www.boot.dev/paths/backend-python-golang).
+- **Codecademy** — Career Center shows **12 path cards + a "sorting quiz" alongside** (not gating);
+  two-tier syllabus (path → unit). [career-center](https://www.codecademy.com/career-center).
+- **Pluralsight** — optional **Skill IQ** entry; once inside a path you **"skip modules you already
+  know"** (advisory, not gated). [product/paths](https://www.pluralsight.com/product/paths).
+- **Exercism** — join a track, **completion unlocks** more; **Practice-Mode opt-out** unlocks
+  everything for experienced users. [getting-started](https://exercism.org/docs/using/getting-started).
+- **Scrimba / DataCamp** — prerequisites shown as **advisory prose** ("for intermediate devs; if not,
+  do X first" / "no prerequisites for this track"), never a gate or DAG. [Scrimba AI path](https://scrimba.com/the-ai-engineer-path-c02v),
+  [DataCamp track](https://www.datacamp.com/tracks/associate-data-scientist-in-python).
+- **edX / Educative** — "answer a few questions" quiz offered as an **alternative** route, never the
+  sole entry. [edX find-your-path](https://www.edx.org/find-your-path), [Educative paths](https://www.educative.io/paths).
+- **Frontend Masters / Khan Academy** — level-tiered path cards with **no cross-path overlap
+  indicator**; Khan's mastery model is the strongest "what's next" precedent. [FEM learn](https://frontendmasters.com/learn/),
+  [Khan mastery](https://support.khanacademy.org/hc/en-us/articles/115002552631-What-are-Course-and-Unit-Mastery).
+
+**Adopt / adapt / avoid (mapped to our screens)**
+
+| Pattern (source)                                                    | Screen           | Verdict                                                       |
+| ------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------- |
+| 3-4 path cards under a value-prop hero (Boot.dev)                   | 0 Landing hero   | **Adopt** — extend 3→4; put the cards _in_ the hero           |
+| 4-option goal-question (Coursera)                                   | 0 (Option B)     | **Adapt** — kept as the runner-up; goal verbs reused on cards |
+| Guided quiz as sole entry (edX/Educative)                           | 0 (Option C)     | **Avoid** — our paths are already goal-labeled                |
+| Filterable card grid w/ course-count metadata (DataCamp)            | 1 Paths hub      | **Adopt** — differentiate overlapping paths without a table   |
+| Full categorized catalog, dense (roadmap.sh)                        | 1 (browse all)   | **Adopt for hub, avoid for hero**                             |
+| Sorting quiz _alongside_ direct cards (Codecademy)                  | 0→1 escape hatch | **Adapt** — "Compare all paths" link, never a gate            |
+| Numbered list + advisory "builds on earlier" (Coursera)             | 2 Path landing   | **Adopt** — validates Option A over the accordion             |
+| Two-level syllabus, max 2 disclosure levels (Codecademy + NN/g)     | 2                | **Adopt** — phase → course, never phase → unit → lesson       |
+| Advisory prereqs + skip-ahead for experienced (Scrimba/Pluralsight) | 2, 3             | **Adopt** — `PrerequisiteList` + fast-path callout            |
+| Breadcrumb on a nested/shared page (Coursera)                       | 3 Course-in-path | **Adopt** — nearest precedent for `PathBanner`                |
+| Course-page path banner + "in N paths" affordance                   | 3                | **Build net-new** — industry-wide whitespace, no precedent    |
+| Undifferentiated role+skill list (LinkedIn Learning)                | 1                | **Avoid** — keep path types legible                           |
+
+**Evidence-backed UX principles applied** (each drives a selection above)
+
+- **Hick's Law** — decision time grows with the number/complexity of choices; minimize and highlight a
+  recommended option. [lawsofux.com/hicks-law](https://lawsofux.com/hicks-law/). → 4 cards, not 12.
+- **Choice overload (Iyengar & Lepper 2000, "jam study")** — 6 options converted ~10× better than 24.
+  [study summary](https://www.researchgate.net/publication/12189991_When_Choice_is_Demotivating_Can_One_Desire_Too_Much_of_a_Good_Thing).
+  → dense catalog deferred to the hub.
+- **Progressive disclosure** — show a few key options first; **more than two levels hurts usability**.
+  [NN/g](https://www.nngroup.com/articles/progressive-disclosure/). → phase → course only.
+- **Information scent** — cue value before the click. [NN/g](https://www.nngroup.com/articles/information-scent/).
+  → goal verbs + course counts on cards.
+- **Recognition over recall** — show, don't make them remember. [NN/g](https://www.nngroup.com/articles/recognition-and-recall/).
+  → persistent path banner/breadcrumb on the course page.
+- **Target size** — WCAG 2.2 §2.5.8 AA floor 24×24px; ~48px comfort. [W3C](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
+  → full-card tap targets on mobile.
+
+**Whitespace / gaps** — no surveyed platform surfaces "this course is in N paths" or a course-page
+path banner; both are **net-new** here (built on Coursera's breadcrumb as the nearest analog). Freshness
+caveats: Codecademy/DataCamp homepages returned 403 and Scrimba's exact prereq wording is search-derived
+— re-verify verbatim before quoting in shipped UI copy.
 
 ## Acceptance Criteria (Gherkin)
 
