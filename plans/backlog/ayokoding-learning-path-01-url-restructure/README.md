@@ -118,13 +118,13 @@ course-authoring plans carry one-line "blocked-on" notes pointing back here. See
 
 ## Depends-on
 
-| Direction      | Plan (full folder name)                                  | Relationship                                         |
-| -------------- | -------------------------------------------------------- | ---------------------------------------------------- |
-| **Upstream**   | _(none)_                                                 | Wave 1 — no plan-level prerequisite                  |
-| Wave-1 sibling | `ayokoding-learning-path-02-schema-and-prerequisite-dag` | Parallel, not blocking — shared frontmatter contract |
-| **Downstream** | `ayokoding-learning-path-03-navigation-ui`               | Hard — needs this plan merged                        |
-| **Downstream** | `ayokoding-learning-path-04-course-authoring`            | Hard — needs this plan merged                        |
-| Downstream     | `ayokoding-learning-path-05-manifests`                   | Transitive, via the two plans above                  |
+| Direction      | Plan (full folder name)                                  | Relationship                                                                                                                                                                  |
+| -------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Upstream**   | _(none)_                                                 | Wave 1 — no plan-level prerequisite                                                                                                                                           |
+| Wave-1 sibling | `ayokoding-learning-path-02-schema-and-prerequisite-dag` | Parallel, not blocking — two shared seams: the frontmatter contract (duplicated verbatim) and `content-url.ts` / `content-url.test.ts` (shared code; second to merge rebases) |
+| **Downstream** | `ayokoding-learning-path-03-navigation-ui`               | Hard — needs this plan merged                                                                                                                                                 |
+| **Downstream** | `ayokoding-learning-path-04-course-authoring`            | Hard — needs this plan merged                                                                                                                                                 |
+| Downstream     | `ayokoding-learning-path-05-manifests`                   | Transitive, via the two plans above                                                                                                                                           |
 
 ```mermaid
 %% Wave and dependency DAG for the five-way split; this plan (P1) is the highlighted Wave-1 node.

@@ -128,6 +128,30 @@ expanded is not executable.
 > **This plan does not change that namespace** — cycle 2.4 only appends an optional `?path=` query
 > string. See [tech-docs.md §Path constants](./tech-docs.md#path-constants).
 >
+> **`content-url.ts` and `content-url.test.ts` are a shared Wave-1 code seam — read this before
+> Phase 0.** The other Wave-1 plan, `ayokoding-learning-path-01-url-restructure`, edits **both of
+> these same files**, and it does change the namespace: under its `R0` inversion it deletes the `/c/`
+> segment entirely (its own acceptance asserts `grep -F "/c/" …/content-url.ts` prints nothing) and
+> consequently rewrites the four of the seven `contentUrl` assertions whose names state `/c/`
+> explicitly [Repo-grounded — measured 2026-07-22: `describe("contentUrl")` holds exactly 7 `it(`
+>
+> > blocks; 4 of them name `/c/` in the title].
+>
+> The two edits are **orthogonal in substance** — this plan appends an optional query parameter and
+> never touches the path segment — so they compose cleanly. They are **not orthogonal in file
+> position**. Since the two plans merge independently and nothing serialises them:
+>
+> - **Whichever merges second must rebase onto the other's `content-url.ts` and
+>   `content-url.test.ts`** before its own gate is meaningful.
+> - If `01` merged first, this plan's Phase-0 baseline of the pre-existing assertions is **stale**.
+>   Re-take it after rebasing, and read cycle 2.4's acceptance as "every pre-existing assertion **as
+>   of this plan's rebased base** still passes unchanged" — not as of the original Phase-0 snapshot.
+>   The `/c/`-shaped assertions will legitimately have changed, and that is `01`'s change, not a
+>   regression introduced here.
+> - Cycle 2.4's "dropping or relocating the `/c/` segment makes the seven assertions fail"
+>   falsifiability note describes **this plan's own edit in isolation**. It is not a claim that the
+>   segment survives the wave.
+>
 > **`<PLAN>` — this plan's own folder, never hardcoded to a stage.** This plan is authored under
 > `plans/backlog/` and is **promoted to `plans/in-progress/` before Phase 0 runs**, so any command
 > hardcoding the `plans/backlog/` prefix is stale for the whole execution. Every command below that

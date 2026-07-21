@@ -650,6 +650,15 @@ deleted), re-pointing each entry to wherever the content now lives.
       `/c/`-prefix branch so it uniformly returns `/{locale}` for the root slug and
       `/{locale}/{normalizeSlug(slug)}` otherwise — command: `npx nx run ayokoding-www:test:unit` —
       acceptance: `content-url.test.ts` passes with the updated uniform-join assertions.
+      **`content-url.ts` and `content-url.test.ts` are a shared Wave-1 code seam.** The sibling
+      `ayokoding-learning-path-02-schema-and-prerequisite-dag` edits both files too, adding an
+      optional `pathId` parameter that appends a `?path=` query. That change is **orthogonal in
+      substance** — it never touches the path segment this step deletes — so the two compose; but the
+      plans merge independently and nothing serialises them, so **whichever merges second rebases
+      onto the other's version of both files** before its gate means anything. If `02` merged first,
+      preserve its optional `pathId` parameter and its `?path=` assertion while deleting the `/c/`
+      branch; do not revert it as unexpected. Of the seven `contentUrl` assertions, the four naming
+      `/c/` in their titles are this step's to rewrite [Repo-grounded — measured 2026-07-22].
 - [ ] [AI] **GREEN — resolve the `LOOSE_PAGE_ALLOWLIST` open question (delivery-time verification, not
       an assumed fact)** — read `generateStaticParams` in the merged `[...slug]/page.tsx` and the
       content indexer it calls (`index.contentMap` construction) to determine whether the two loose
