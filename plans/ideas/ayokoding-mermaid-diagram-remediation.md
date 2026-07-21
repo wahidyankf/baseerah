@@ -1,6 +1,6 @@
 # AyoKoding mermaid diagram remediation
 
-One-line summary: 644 mermaid violations across 241 `apps/ayokoding-www/content` tutorial files
+One-line summary: 636 mermaid violations across 241 `apps/ayokoding-www/content` tutorial files
 became visible when a validator bug was fixed; remediate them and drop the temporary CI exclude.
 
 > Surfaced 2026-07-21 while fixing the `detect_kind` leading-comment bug in `rhino-cli md mermaid validate`.
@@ -12,21 +12,22 @@ fence was a `%%` comment. `detect_kind` skipped blank lines but treated a commen
 diagram type, returned `DiagramKind::Other`, and `validate_one_block` then returned early — bypassing
 every label-length, width, depth, and subgraph rule for that block.
 
-**2,852 of 3,923 mermaid blocks (73%), across 637 files, opened with a `%%` line** and were therefore
+**2,851 of 3,905 mermaid blocks (73%), across 637 files, opened with a `%%` line** and were therefore
 never validated. The colour-palette header used repo-wide is a `%%` line, and the Diagrams Convention
 itself _mandates_ a `%%` justification comment above the directive for the `TD` exception — so the
 diagrams most in need of checking were exactly the ones skipped.
 
-With the parser fixed, 665 violations appeared. 21 were fixed immediately (governance, plans, docs,
+With the parser fixed, 665 violations appeared. 29 were fixed immediately (governance, plans, docs,
 specs, ose-www). The remainder is concentrated in one tree:
 
 | Tree                         | Findings  | Files |
 | ---------------------------- | --------- | ----- |
-| `apps/ayokoding-www/content` | **644**   | 241   |
+| `apps/ayokoding-www/content` | **636**   | 241   |
 | everything else              | 0 (fixed) | —     |
 
-Breakdown of the 644: predominantly `label_too_long` (node labels over the 30-char-per-line limit),
-with a minority of `width_exceeded` (chain depth over 4 in `LR`, or over 4 nodes at one rank in `TD`).
+Breakdown of the 636: 465 `label_too_long` (node labels over the 30-char-per-line limit) and 171
+`width_exceeded` (chain depth over 4 in `LR`, or over 4 nodes at one rank in `TD`). A further 8
+`subgraph_density` findings are advisory warnings, not violations, and are excluded from the 636.
 
 ## Why now
 
@@ -65,7 +66,7 @@ rationale matters most. It should not become permanent by default.
 
 ## Rough scope & non-goals
 
-In scope: the 644 findings in `apps/ayokoding-www/content`; removing the temporary exclude from both
+In scope: the 636 findings in `apps/ayokoding-www/content`; removing the temporary exclude from both
 invocation sites; a spot-check that rendered pages still read correctly on a narrow viewport.
 
 Out of scope (for now): relaxing the 30-char / 4-node thresholds themselves (a separate conversation —
