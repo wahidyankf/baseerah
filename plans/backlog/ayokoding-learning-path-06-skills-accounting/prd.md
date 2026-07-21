@@ -240,6 +240,15 @@ Scenario: The accounting path builds and validates green
 - One `PathManifest` YAML data file at
   `apps/ayokoding-www/src/features/course-paths/manifests/skills/accounting.yaml`, carrying
   `pathId: skills/accounting` and `arc: immediately-effective`.
+- **That manifest's own co-located unit test** at
+  `apps/ayokoding-www/src/features/course-paths/manifests/skills/accounting-manifest.unit.test.ts`.
+  Per the 2026-07-21 ruling each manifest-owning plan owns its manifest **and** that manifest's test:
+  there is no shared root-level `published-manifests.unit.test.ts`, and this plan appends to no
+  sibling's test file.
+- One Gherkin feature file at
+  `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/skills-path-composition.feature`
+  and its 1:1 step-definition file at
+  `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts`.
 - One path landing bundle at `apps/ayokoding-www/content/en/learn/paths/skills/accounting/_index.md`
   — prose, SEO metadata, the arc statement, the three-boundary ramp, and the outbound links to the
   two linked prerequisites. **No `courseOrder` in the landing.**
@@ -318,8 +327,10 @@ surface, the **Rule-15 three-tester retest remains mandatory** and runs in
   SQL; `capstone-build-a-general-ledger-system` drifts into teaching HTTP services. Mitigated by the
   same boundary-statement rule, applied against the linked library course.
 - **Cross-plan file collision.** Two skills plans, one manifests directory, one structural index.
-  Mitigated by one manifest file per plan and by A3 assigning every `_index.md` under `paths/` to
-  plan 01; asserted by the Phase 6 ownership-footprint check.
+  Mitigated by one manifest **data** file per plan — each with its **own** co-located unit test
+  rather than a shared one, so no test file sits on a cross-plan merge seam — and by A3 assigning
+  every `_index.md` under `paths/` to plan 01; asserted by the Phase 6 ownership-footprint check,
+  which is scoped to this plan's own merged PRs so a sibling's concurrent merge cannot fail it.
 - **The landing reads as a syllabus.** Mitigated by the landing content contract ordering the arc and
   ramp ahead of the list, by the list rendering from the manifest, and by the Rule-15 usability
   tester exercising the live page.

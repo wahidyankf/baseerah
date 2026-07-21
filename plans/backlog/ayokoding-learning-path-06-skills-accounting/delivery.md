@@ -12,11 +12,15 @@
 
 Four standing constraints govern every step below.
 
-> **Ownership**: this plan owns exactly **one** manifest file (`<MANIFEST>`), **one** path landing
-> bundle (`<LANDING>`), **twenty** course bundles, and **twenty** syllabus specs inside this plan
-> folder. It creates **no `_index.md` under `<PATHS>`** other than its own landing (A3 — plan 01 owns
-> every structural index), authors **no ERP content** (plan 07's), and edits **no existing library
-> course**.
+> **Ownership**: this plan owns exactly **one** manifest **data** file (`<MANIFEST>`) **plus that
+> manifest's co-located unit test** (`<MTEST>`) — the 2026-07-21 ruling gives every manifest-owning
+> plan its own test file, so there is **no shared or root-level `published-manifests.unit.test.ts`
+> and no plan appends to a sibling's test file** — **one** path landing bundle (`<LANDING>`),
+> **twenty** course bundles, **twenty** syllabus specs inside this plan folder, and the two
+> test-layer files at `<SPECS>skills-path-composition.feature` and
+> `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts`. It creates **no `_index.md`
+> under `<PATHS>`** other than its own landing (A3 — plan 01 owns every structural index), authors
+> **no ERP content** (plan 07's), and edits **no existing library course**.
 >
 > **Verification hygiene**: no `[Unverified]` research claim is ever restated as fact. Every external
 > claim carries a confidence marker or a primary-source citation. See
@@ -113,16 +117,43 @@ concurrency limit: 3 in Phase 2, 13 in Phase 3, 4 in Phase 5, and 1 everywhere e
 - `<MANIFEST>` = `<MANIFESTS>skills/accounting.yaml`
 - `<MTEST>` = `<MANIFESTS>skills/accounting-manifest.unit.test.ts` _(new file; matches the vitest
   `unit` project's `**/*.unit.{test,spec}.{ts,tsx}` include)_
-- `<SPEC>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/courses/`
-- `<EVID>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/evidence/` — this plan's
-  committed evidence dir (baseline SHA, tool snapshots, Phase 7 screenshots). Repo-root-relative, so
-  every clause below resolves identically no matter which directory it is run from. **Phase 0 creates
-  it**; shell redirection (`>`) does not create parent directories.
-- `<SPECPATHS>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/paths/`
+- `<PLANDIR>` = this plan's own folder, **repo-root-relative and promotion-aware**:
+  `plans/backlog/ayokoding-learning-path-06-skills-accounting/` while the plan sits in
+  `plans/backlog/`, and `plans/in-progress/ayokoding-learning-path-06-skills-accounting/` once
+  `plan-execution` promotes it (Phase 10 archives it a third time, to
+  `plans/done/YYYY-MM-DD__ayokoding-learning-path-06-skills-accounting/`). Resolve it **once per
+  shell session, and again after any promotion**, with the block below; every
+  `<PLANDIR>`-derived constant must be re-derived in the same command, because a shell assignment
+  captures a value rather than a live reference:
+
+  ```bash
+  if test -d plans/in-progress/ayokoding-learning-path-06-skills-accounting/; then
+    PLANDIR=plans/in-progress/ayokoding-learning-path-06-skills-accounting/
+  elif test -d plans/backlog/ayokoding-learning-path-06-skills-accounting/; then
+    PLANDIR=plans/backlog/ayokoding-learning-path-06-skills-accounting/
+  else
+    unset PLANDIR
+  fi
+  SPEC="${PLANDIR}syllabus/courses/"; SPECPATHS="${PLANDIR}syllabus/paths/"
+  EVID="${PLANDIR}evidence/"; VLOG="${PLANDIR}verification-log.md"
+  DELIVERY="${PLANDIR}delivery.md"
+  ```
+
+- `<SPEC>` = `<PLANDIR>syllabus/courses/`
+- `<EVID>` = `<PLANDIR>evidence/` — this plan's committed evidence dir (baseline SHA, tool snapshots,
+  Phase 7 screenshots). Repo-root-relative like every other constant here, so every clause below
+  resolves identically no matter which directory it is run from — **no clause uses a bare filename or
+  a plan-folder-relative path as a command argument**. **Phase 0 creates it**; shell redirection (`>`)
+  does not create parent directories.
+- `<SPECPATHS>` = `<PLANDIR>syllabus/paths/`
 - `<MIRROR>` = `<SPECPATHS>manifest-skills-accounting.md` — filename fixed by plan 02's ruling; a bare
   `manifest-accounting.md` is **not** acceptable
 - `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`
-- `<VLOG>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/verification-log.md`
+- `<VLOG>` = `<PLANDIR>verification-log.md`
+- `<DELIVERY>` = `<PLANDIR>delivery.md` — **this file**. Every clause that greps this file names it
+  through this constant, never as a bare `delivery.md`, which would resolve only when the shell's cwd
+  happens to be the plan folder and would silently return `0` (ugrep exits **2** on a missing file)
+  from the repo root where every other clause runs.
 - Path ID: **`skills/accounting`** — the full slash string including the category segment; no separate
   `category` field, no bare `accounting`. Arc: `immediately-effective` — a separate **required**
   manifest field, recorded as data, omitted from the URL.
@@ -167,12 +198,23 @@ ACCT_S2_ALT=$(printf '%s|' "${ACCT_S2[@]}" | sed 's/|$//')
 ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
 ```
 
-> **Why loops and derived alternations rather than `grep -c` or `grep -L`**: `grep` in this repo is
-> **ugrep**. `grep -c` counts **lines**, not matches, and `grep -L` means files-**without**-match and
-> exits 0 — neither is safe in an acceptance clause. `--glob` is unsupported; `--exclude-dir` is the
-> supported form. No clause below uses `find -newermt` either, which is GNU syntax and fails on this
-> BSD `find`. No course ID is a substring of another, which is what makes the alternation counts
-> sound.
+> **Why loops and derived alternations rather than `grep -c <pattern>` or `grep -L`**: `grep` in this
+> repo is **ugrep**. `grep -c <pattern>` counts **matching lines**, not matches, and `grep -L` means
+> files-**without**-match and exits 0 — neither is safe as a match count in an acceptance clause. On a
+> **missing** file ugrep exits **2**, not 1. `--glob` is unsupported; `--exclude-dir` is the supported
+> form. No clause below uses `find -newermt` either, which is GNU syntax and fails on this BSD `find`.
+> No course ID is a substring of another, which is what makes the alternation counts sound.
+>
+> **The one sanctioned `grep -c` form is `grep -c .`** — a _line_ count of non-empty lines, which is
+> exactly what it is being asked for, and it is **mandatory after every `git` pipeline**. A repo hook
+> routes `git` through **RTK**, whose `git diff` filter emits a **single blank line** when the diff is
+> empty, so `git diff --name-only … | wc -l` returns **1** in the clean state — indistinguishable from
+> a one-file violation, and a permanent false failure of any clause expecting `0`. The `grep -c .`
+> form prints `0` for that blank line.
+> [Repo-grounded — measured on this tree: for one and the same empty diff, the `wc -l` form printed 1 and the `grep -c .` form printed 0.]
+> A `grep -v …` filter in the middle does **not** help: the blank line matches no exclusion pattern
+> and passes straight through. `grep -c .` exits 1 when the count is 0, so **the printed count is the
+> signal, never the exit status**.
 
 ---
 
@@ -187,6 +229,15 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
       — acceptance: exits 0, `node_modules/` synchronized.
 - [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift.
+- [ ] [AI] **Resolve `<PLANDIR>` and its derived constants (run this FIRST, from the repo root, and
+      again in every new shell and after any promotion).** Paste the whole detection block from
+      [§Path constants](#path-constants) — not just a `PLANDIR=` line, since `SPEC`, `SPECPATHS`,
+      `EVID`, `VLOG` and `DELIVERY` capture a value rather than a live reference and must be
+      re-derived in the same command — acceptance: `test -n "$PLANDIR"` exits 0, `test -d "$PLANDIR"`
+      exits 0, and `test -f "$DELIVERY"` exits 0. Falsifiable both ways: run from any directory other
+      than the repo root, or after the plan has been promoted from `plans/backlog/` to
+      `plans/in-progress/` without re-running the block, and `test -d "$PLANDIR"` exits non-zero —
+      which is the signal to fix the shell, not to hand-edit a path into a clause.
 - [ ] [AI] **Start precondition 1** — the URL-restructure plan is merged:
       `gh pr list --search "ayokoding-learning-path-01-url-restructure" --state merged --json number --jq 'length'`
       — acceptance: returns a value ≥ 1. Falsifiable both ways: returns `0` while that plan is open.
@@ -230,10 +281,13 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
 - [ ] [AI] **Baseline: no accounting manifest exists** — `test -f <MANIFEST>`
       — acceptance: exits **non-zero**; exits 0 after Phase 2.
 - [ ] [AI] **Capture the plan-start baseline SHA** — record the `origin/main` commit this plan starts
-      from, so Phase 6's cumulative ownership checks can diff against a fixed pre-plan point instead
-      of the by-then-already-advanced `origin/main` that Phases 2, 3 and 5 will each have merged their
-      own PRs into before Phase 6 branches (a diff against the literal `origin/main` at that point
-      would be empty by construction and could not detect a violation merged in an earlier phase):
+      from. It is this plan's **audit and rollback anchor**: the fixed record of what `origin/main`
+      looked like before any of this plan's PRs merged, which
+      [tech-docs §Rollback](./tech-docs.md#rollback) reverts back toward. It is deliberately **not**
+      used as a diff base for the Phase 6 ownership checks — `main` advances with plans 04, 05 and 07
+      merging concurrently, so a `baseline...HEAD` path diff would report **their** files as this
+      plan's footprint and fail a fully correct execution (see
+      [Phase 6](#phase-6-section-and-app-verification), which scopes by **authorship** instead):
       `mkdir -p <EVID> && git rev-parse origin/main > <EVID>phase-0-baseline-sha.txt`
       — the `mkdir -p` is **required, not defensive**: `<EVID>` does not exist on the current tree
       and shell redirection does not create parent directories, so the bare `git rev-parse ... >` form
@@ -263,6 +317,8 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
 > All checks below must pass before starting Phase 1.
 
 - [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
+- [ ] [AI] `<PLANDIR>` resolved from the repo root and `test -d "$PLANDIR"` / `test -f "$DELIVERY"`
+      both exit 0 — every later clause's plan-folder paths are resolvable.
 - [ ] [AI] All three start preconditions hold — plans 01, 02 and 03 merged; `<MANIFESTS>` present;
       `manifest-repository.ts` present.
 - [ ] [AI] `test -d <COURSES>sql-essentials && test -d <COURSES>backend-essentials` exits 0, and
@@ -270,8 +326,7 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
 - [ ] [AI] The twenty-course PRESENT count is **0** and `test -f <MANIFEST>` exits non-zero — the
       baseline is genuinely empty.
 - [ ] [AI] `<EVID>phase-0-baseline-sha.txt` exists, is non-empty, and its recorded SHA passes
-      `git cat-file -e <sha>^{commit}` — the fixed point Phase 6's cumulative ownership checks diff
-      against.
+      `git cat-file -e <sha>^{commit}` — this plan's recorded audit and rollback anchor.
 - [ ] [AI] `ayokoding-www:build` + `:test:unit` + `ayokoding-www-fe-e2e:test:e2e` baselines recorded
       green in `<EVID>phase-0-snapshot.txt`; zero preexisting failures unresolved.
 - [ ] [AI] `grep -oE '^OI-4: ROUTED' <VLOG> | wc -l` returns **1**.
@@ -338,10 +393,16 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
       returns **0**. Falsifiable both ways: writing a bare `Paths: accounting` line into any spec
       makes the first clause **1**.
 - [ ] [AI] **Plan-02 custody check** — confirm this phase touched nothing inside the sibling plan's
-      frozen corpus:
-      `git diff --name-only origin/main...HEAD -- plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag | wc -l`
-      — acceptance: returns **0**. Falsifiable both ways: editing one of the 121 plan-02 specs makes
-      it **1**.
+      frozen corpus. Match plan 02 by **slug across the whole diff**, never by a
+      `plans/backlog/…` pathspec: plan 02 is merged before Phase 0 (start precondition 2) and may
+      already have been promoted to `plans/in-progress/` or archived to
+      `plans/done/YYYY-MM-DD__…`, and a git pathspec that matches nothing prints nothing and **exits
+      0**, which reads exactly like a pass:
+      `git diff --name-only origin/main...HEAD | grep -F 'ayokoding-learning-path-02-schema-and-prerequisite-dag' | grep -c .`
+      — acceptance: prints **0** (`grep -c .` is mandatory here rather than `wc -l`; RTK's `git diff`
+      filter emits a blank line on an empty diff, which `wc -l` would count as **1**). Falsifiable
+      both ways: editing one of the 121 plan-02 specs, in whichever stage folder it currently lives,
+      makes it **1**.
 - [ ] [AI] **Prerequisite transcription check** — every spec's `## Prerequisites` section matches the
       catalog table exactly, including the two linked `(SWE)` edges
       — acceptance: `grep -F -q 'sql-essentials' "<SPEC>chart-of-accounts-and-data-modeling.md"`
@@ -375,7 +436,11 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
       tokens, or be reworded — the check is deliberately strict.)
 - [ ] [AI] Run `npm run lint:md` and
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
-      over the new spec folder — acceptance: both exit 0.
+      — acceptance: both exit 0. Both forms above are **repo-wide** and that is deliberate:
+      `npm run lint:md` is `markdownlint-cli2 "**/*.md"` [Repo-grounded — `package.json`], and while
+      `md heading-hierarchy validate` does accept optional positional paths, running it unscoped keeps
+      it identical to the pre-push hook and to [Phase 6](#phase-6-section-and-app-verification). The
+      new spec folder is a subset of what they cover, not a separate scope.
 
 ### Phase 1 Gate
 
@@ -1181,26 +1246,54 @@ validate` takes **no positional path**, so the exclude form above is the only me
       no duplicate ID; prerequisite-consistency holds across all 20 entries; no forked body
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: zero violations reported.
-- [ ] [AI] **Ownership boundary check — manifests.** Confirm this plan's commits touched exactly one
-      data file (`<MANIFEST>`) plus its co-located unit test (`<MTEST>`, created alongside it in
-      §2.2) under `<MANIFESTS>`, diffed against the **Phase 0 baseline SHA**
-      (`<EVID>phase-0-baseline-sha.txt`) rather than the literal `origin/main`: by the time Phase 6
-      branches, `origin/main` already contains every prior phase's own merged PR, so a diff against it
-      is empty by construction and cannot detect a violation already merged in Phase 2, 3 or 5 —
-      diffing against the fixed pre-Phase-0 baseline instead spans the plan's whole footprint:
-      `git diff --name-only "$(cat <EVID>phase-0-baseline-sha.txt)"...HEAD -- <MANIFESTS> | grep -vE 'skills/accounting\.yaml|skills/accounting-manifest\.unit\.test\.ts' | wc -l`
-      — acceptance: returns **0**. Falsifiable both ways: a step in **any** phase of this plan —
+- [ ] [AI] **Build this plan's own cumulative file list (`PLAN_FILES`)** — the input both ownership
+      checks below consume. It must be scoped by **authorship**, not by a commit range. A
+      `origin/main` diff is empty by construction at Phase 6 (Phases 1-5 have each merged their own PR
+      already), and a `<Phase-0-baseline-SHA>...HEAD` diff is **worse than useless**: plans 04, 05 and
+      07 merge into the same `main` concurrently, so a path diff over that range reports plan 05's four
+      `manifests/careers/**` files, its `careers-manifests.unit.test.ts`, its four
+      `paths/careers/**/_index.md` landings and plan 07's ERP manifest as though this plan had written
+      them — a **guaranteed false failure on a fully correct execution**. Enumerate this plan's own
+      merged PRs (the same `--search` idiom Phase 8 uses) plus the in-flight Phase 6 branch instead:
+
+  ```bash
+  PLAN_FILES=$(
+    { gh pr list --search "ayokoding-learning-path-06-skills-accounting" --state merged \
+        --limit 200 --json number --jq '.[].number' \
+      | while read -r n; do gh pr view "$n" --json files --jq '.files[].path'; done
+      git diff --name-only origin/main...HEAD
+    } | sort -u
+  )
+  ```
+
+  `--limit 200` is **required, not defensive**: this plan opens one PR per phase **and** one per
+  course sub-phase, comfortably more than `gh pr list`'s default limit of 30, and a truncated list
+  would under-report this plan's footprint and let a real violation pass unseen.
+
+  — acceptance: `printf '%s\n' "$PLAN_FILES" | grep -c .` returns **≥ 20** (this plan has merged at
+  least its twenty course bundles by Phase 6, each of which is several files). Falsifiable both ways:
+  it returns **0** if the search matched no PR, which means the list is empty and **both checks below
+  would pass vacuously** — stop and fix the enumeration rather than accepting the zeros. Also confirm
+  `printf '%s\n' "$PLAN_FILES" | grep -F '<MANIFEST>' | grep -c .` returns **1**: the list must
+  contain this plan's own manifest, or it is not enumerating this plan's work at all.
+
+- [ ] [AI] **Ownership boundary check — manifests.** Confirm this plan's own commits touched exactly
+      one data file (`<MANIFEST>`) plus its co-located unit test (`<MTEST>`, created alongside it in
+      §2.2) under `<MANIFESTS>`:
+      `printf '%s\n' "$PLAN_FILES" | grep -F 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -vE 'skills/accounting\.yaml$|skills/accounting-manifest\.unit\.test\.ts$' | grep -c .`
+      — acceptance: prints **0**. Falsifiable both ways: a step in **any** phase of this plan —
       including one already merged before Phase 6 branched — that touched `manifests/careers/**` or
-      plan 07's ERP manifest makes it ≥ 1 (neither of those paths matches the two-way exclusion
-      pattern above, so either still trips the check). _(A count of all `.yaml` files under
-      `<MANIFESTS>` is deliberately **not** used: plans 05 and 07 land their own manifests
-      concurrently, so a fixed total would be a false failure.)_
+      plan 07's ERP manifest makes it ≥ 1 (neither path matches the two-way exclusion pattern, so
+      either still trips the check), while plan 05's and plan 07's **own** concurrent merges never
+      appear in `PLAN_FILES` at all and therefore cannot trip it. _(A count of all `.yaml` files under
+      `<MANIFESTS>` is deliberately **not** used either: plans 05 and 07 land their own manifests
+      concurrently, so a fixed total would be a false failure for the same reason.)_
 - [ ] [AI] **Ownership boundary check — `<PATHS>`.** Confirm this plan created no structural
-      `_index.md` (A3), diffed against the same **Phase 0 baseline SHA** for the same reason (Phase 1
-      through Phase 5 have each already merged their own PR into `origin/main` by the time Phase 6
-      branches, so a literal `origin/main` diff would be empty and vacuous):
-      `git diff --name-only "$(cat <EVID>phase-0-baseline-sha.txt)"...HEAD -- <PATHS> | grep -vF 'paths/skills/accounting/_index.md' | wc -l`
-      — acceptance: returns **0**. Falsifiable both ways: creating `paths/skills/_index.md` in **any**
+      `_index.md` (A3), against the same authorship-scoped list and for the same reason (plan 05
+      creates four `paths/careers/**/_index.md` landings and populates `paths/_index.md` while this
+      plan runs, so any range-based diff over `<PATHS>` would flag them as this plan's):
+      `printf '%s\n' "$PLAN_FILES" | grep -F 'apps/ayokoding-www/content/en/learn/paths/' | grep -vF 'paths/skills/accounting/_index.md' | grep -c .`
+      — acceptance: prints **0**. Falsifiable both ways: creating `paths/skills/_index.md` in **any**
       phase — including one already merged before Phase 6 branched — makes it **1**.
 - [ ] [AI] **Ramp-smoothness audit** — walk the published `courseOrder` and confirm the three
       boundaries hold against the landed content: #1–#3 genuinely produce a balancing ledger, #16
@@ -1245,11 +1338,11 @@ validate` takes **no positional path**, so the exclude form above is the only me
 > `ayokoding-learning-path-03-navigation-ui`; see
 > [prd.md §UI-design-funnel disposition](./prd.md#ui-design-funnel-disposition).
 >
-> **Locale scope**: `en` only. The supported-locale set is `["en", "id"]` [Repo-grounded —
->
-> > `apps/ayokoding-www/src/features/i18n/core/config.ts`], but `id/belajar/` holds zero courses and
-> > zero paths, so an `id` walk-through would be fabricated rather than verified. Recorded as a non-goal
-> > in [brd.md §Business-Scope Non-Goals](./brd.md#business-scope-non-goals), not a skipped locale.
+> **Locale scope**: `en` only. The supported-locale set is `["en", "id"]`.
+> [Repo-grounded — `apps/ayokoding-www/src/features/i18n/core/config.ts`.]
+> But `id/belajar/` holds zero courses and zero paths, so an `id` walk-through would be fabricated
+> rather than verified. Recorded as a non-goal in
+> [brd.md §Business-Scope Non-Goals](./brd.md#business-scope-non-goals), not a skipped locale.
 
 - [ ] [AI] Confirm `en` is the only content locale for this path — command:
       `test -d <LANDING> && test ! -d apps/ayokoding-www/content/id/belajar/paths`
@@ -1347,8 +1440,11 @@ validate` takes **no positional path**, so the exclude form above is the only me
 - [ ] [AI] **Confirm all three stage signals are readable in this file** with real merged SHAs, as
       the human/audit-readable record of the handoff (plan 07's own gates verify readiness
       independently via `test -d` checks against `origin/main` and never read this file) — acceptance:
-      `grep -oE '^STAGE: [123]$' delivery.md | wc -l` returns **3**, and each block's `MERGED_COMMIT`
-      passes `git cat-file -e <sha>^{commit}`.
+      `grep -oE '^STAGE: [123]$' <DELIVERY> | wc -l` returns **3** (returns **0** before Phase 2), and
+      each block's `MERGED_COMMIT` passes `git cat-file -e <sha>^{commit}`. The `<DELIVERY>` constant
+      is mandatory here: a bare `delivery.md` resolves only when the shell happens to sit in the plan
+      folder, and every other clause in this file runs from the repo root, where ugrep would exit **2**
+      on the missing file and `wc -l` would print **0** — a silent false failure.
 
 ### Phase 8 Gate
 
@@ -1451,10 +1547,17 @@ validate` takes **no positional path**, so the exclude form above is the only me
       confirm every cross-plan reference in this folder points at its `plans/done/YYYY-MM-DD__…` path
       — acceptance: the filtered `grep` exits 1 and the repo-wide filtered validator prints
       `All links valid! No broken links found.`
-- [ ] [AI] Move: `git mv plans/in-progress/ayokoding-learning-path-06-skills-accounting plans/done/YYYY-MM-DD__ayokoding-learning-path-06-skills-accounting`
+- [ ] [AI] Move the plan folder **from whichever stage folder it currently occupies** — re-run the
+      `<PLANDIR>` resolution block from [§Path constants](#path-constants) first rather than assuming
+      `plans/in-progress/`, because a plan executed without a promotion step is still under
+      `plans/backlog/` and `git mv` on a non-existent source aborts:
+      `git mv "${PLANDIR%/}" plans/done/YYYY-MM-DD__ayokoding-learning-path-06-skills-accounting`
       using today's completion date (the `<EVID>`, `syllabus/` and `verification-log.md` artefacts
-      move with it).
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
+      move with it) — acceptance: `test -d plans/done/YYYY-MM-DD__ayokoding-learning-path-06-skills-accounting`
+      exits 0 and `test -d "${PLANDIR%/}"` exits non-zero.
+- [ ] [AI] Update the README of the stage folder the plan just left
+      (`plans/in-progress/README.md`, or `plans/backlog/README.md` if it never promoted) — remove the
+      plan entry.
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with its completion date.
 - [ ] [AI] Update any other READMEs that reference this plan (`plans/README.md`,
       `plans/backlog/README.md`), and update `ayokoding-learning-path-07-skills-erp`'s

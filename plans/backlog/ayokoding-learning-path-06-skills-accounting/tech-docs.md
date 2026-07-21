@@ -46,11 +46,26 @@ over it, does not create a placeholder index, and does not treat it as a defect 
 - `<LANDING>` = `<PATHS>skills/accounting/` — **this plan's only content home outside `<COURSES>`**
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/` _(created by plans 02 and 03)_
 - `<MANIFESTS>` = `<FEAT>manifests/` — YAML data files, nested to mirror slash path IDs
-- `<MANIFEST>` = `<MANIFESTS>skills/accounting.yaml` — **this plan's only file under `<FEAT>`**
-- `<SPEC>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/courses/` — this
-  plan's own 20-file spec layer _(see [DD-601](#design-decisions))_
-- `<SPECPATHS>` = `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/paths/` — this
-  plan's own path mirror, holding exactly `manifest-skills-accounting.md`
+- `<MANIFEST>` = `<MANIFESTS>skills/accounting.yaml` — **this plan's only _data_ file under
+  `<FEAT>`**; the one other file it writes there is `<MTEST>`, this manifest's co-located unit test
+- `<MTEST>` = `<MANIFESTS>skills/accounting-manifest.unit.test.ts` — the unit test for `<MANIFEST>`,
+  owned by this plan and living beside the manifest it covers. It matches the vitest `unit` project's
+  `**/*.unit.{test,spec}.{ts,tsx}` include [Repo-grounded — `apps/ayokoding-www/vitest.config.ts`] and
+  is excluded from the coverage denominator by that config's `**/*.{test,spec}.{ts,tsx}` exclude.
+  **Not shared**: per the 2026-07-21 ruling each manifest-owning plan owns its own test file, so there
+  is no root-level `published-manifests.unit.test.ts` and this plan appends to no sibling's test file
+  (plan 05 owns the `careers/` test, plan 07 owns the ERP one)
+- `<PLANDIR>` = this plan's folder — `plans/backlog/ayokoding-learning-path-06-skills-accounting/`
+  today, `plans/in-progress/…` once promoted for execution, `plans/done/YYYY-MM-DD__…` after Phase 10.
+  Every plan-folder constant below is derived from it, and
+  [delivery.md §Path constants](./delivery.md#path-constants) carries the shell block that detects the
+  current stage and re-derives them all in one command
+- `<SPEC>` = `<PLANDIR>syllabus/courses/` — this plan's own 20-file spec layer
+  _(see [DD-601](#design-decisions))_
+- `<SPECPATHS>` = `<PLANDIR>syllabus/paths/` — this plan's own path mirror, holding exactly
+  `manifest-skills-accounting.md`
+- `<DELIVERY>` = `<PLANDIR>delivery.md` — named through the constant, never as a bare `delivery.md`,
+  in every clause that greps it
 - Path ID: **`skills/accounting`** — the full slash string, category segment included, with no
   separate `category` field. Arc: `immediately-effective`, a required manifest field, recorded as
   data and omitted from the URL. **Nothing keys on segment count** — see
@@ -493,7 +508,9 @@ sequenceDiagram
 Record the five fields as their own paragraph in `delivery.md`, immediately following the signal's
 checklist item — **never** as a bulleted sub-list, a table row, or an inline-code span inside prose.
 Each field name is anchored at **column 0**, outside any table, bullet, or blockquote: this is what
-makes Phase 8's `grep -oE '^STAGE: [123]$' delivery.md | wc -l` count meaningful. A `- **STAGE**: 1`
+makes Phase 8's `grep -oE '^STAGE: [123]$' <DELIVERY> | wc -l` count meaningful — and the
+`<DELIVERY>` constant is what makes it **resolvable**, since a bare `delivery.md` argument would miss
+the file from the repo root, where every clause in that file runs. A `- **STAGE**: 1`
 bullet, a table row, or a bolded inline label all satisfy this section's prose but fail that grep
 silently, because none of them puts the literal text `STAGE: 1` at the start of a line. The literal
 shape, shown once for Stage 1 (Stages 2 and 3 use this identical shape with their own field values):
@@ -635,8 +652,10 @@ Each per-course spec is one `<course-id>.md` file stating:
 - **DD-615 · Ownership is one manifest data file (plus its co-located unit test), and no `_index.md`
   under `paths/`.** See
   [§The manifest ownership invariant](#the-manifest-ownership-invariant-scoped-to-one-data-file).
-  Asserted mechanically at the Phase 6 gate as a directory-footprint check, so a boundary violation is
-  a failing check rather than a review opinion.
+  Asserted mechanically at the Phase 6 gate as an **authorship-scoped commit-footprint check** — this
+  plan's own merged-PR file list, not a commit-range directory diff, because plans 04, 05 and 07 merge
+  into the same `main` while this plan runs — so a boundary violation is a failing check rather than a
+  review opinion, and a sibling's concurrent merge is not a false failure.
 - **DD-616 · The landing reads as an arc, not a table of contents.** The arc promise and the three
   ramp boundaries appear **before** the course list, and the list itself renders from the manifest.
   A skills-path reader is asking how fast they become useful and how far that gets them; a topic
@@ -788,14 +807,16 @@ screen, no net-new component, no `assets/` folder.
 | `<SPECPATHS>manifest-skills-accounting.md`                             | _New file_  | Path mirror; filename fixed by plan 02's ruling                                                |
 | `<COURSES><course-id>/**` × 20                                         | _New dirs_  | Full page bundles, one per course                                                              |
 | `<LANDING>_index.md`                                                   | _New file_  | Path landing content — **no `courseOrder`**                                                    |
-| `<MANIFEST>`                                                           | _New file_  | The only file this plan writes under `<FEAT>`                                                  |
+| `<MANIFEST>`                                                           | _New file_  | The only **data** file this plan writes under `<FEAT>`                                         |
+| `<MTEST>`                                                              | _New file_  | `<MANIFEST>`'s co-located unit test — owned by this plan, shared with no sibling               |
 | `<SPECS>skills-path-composition.feature`                               | _New file_  | This plan's only Gherkin feature file                                                          |
 | `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts` | _New file_  | Step definitions, pairing 1:1 with the feature above; created by this plan, **not** by plan 03 |
 | `<COURSES>_index.md`                                                   | Existing    | 20 catalog rows appended (created by plan 01)                                                  |
 | `learnings.md`, `evidence/`                                            | _New_       | Knowledge-capture log and screenshot evidence                                                  |
 
 **Never touched**: any `_index.md` under `<PATHS>` other than this plan's own landing bundle; any
-existing library course; `manifests/careers/**`; `manifests/skills/enterprise-resource-planning.yaml`;
+existing library course; `manifests/careers/**` **including plan 05's `careers`-manifest unit test**;
+`manifests/skills/enterprise-resource-planning.yaml` **and plan 07's ERP-manifest unit test**;
 any file inside `ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`; any component,
 schema, or resolver.
 
@@ -804,22 +825,22 @@ manifest.
 
 ## Testing / Verification Strategy
 
-| Level                     | What it verifies                                                                         | Mechanism                                                              |
-| ------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Manifest unit (TDD)       | Loads, zod-validates, integrity, prerequisite-consistency, exact `courseOrder` length    | `npx nx run ayokoding-www:test:unit`                                   |
-| Path-walk e2e             | The 2-segment `pathId` resolves; `?path=` persists; prev/next follows manifest order     | `npx nx run ayokoding-www-fe-e2e:test:e2e`                             |
-| Composition assertions    | Linked prerequisites absent from `courseOrder` **and** present in frontmatter            | Grep-checkable clauses on the manifest steps                           |
-| Per-course content checks | Concept coverage, register, format, worked-example volume, scope boundary                | Matching `apps-ayokoding-www-*-checker`                                |
-| Silent-failure assertion  | Every course #4+ carries its "what still balances while being wrong" section             | Grep-checkable clause on each authoring step                           |
-| Sharia content assertions | Three named models per course; AAOIFI never "the" standard; the two commonly-wrong facts | Grep-checkable clauses plus `apps-ayokoding-www-facts-checker`         |
-| Verification hygiene      | No open `[Needs Verification]` item when the Sharia stage begins                         | Phase 4 gate                                                           |
-| Structural                | Bundle anatomy present; `prerequisites` declared                                         | `test -d` / `test -f` plus frontmatter grep                            |
-| Ownership footprint       | Exactly one manifest file; zero `_index.md` created under `<PATHS>` outside the landing  | `find` plus `wc -l` at the Phase 6 gate                                |
-| Section build             | The authored tree renders                                                                | `npx nx run ayokoding-www:build`                                       |
-| Markdown quality          | markdownlint, link validation, heading hierarchy                                         | `npm run lint:md` plus the two `rhino-cli md` subcommands              |
-| Regression                | No existing project's gates broke                                                        | `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` |
-| Manual behavioural        | Landing, ramp, and sample courses render at three breakpoints in `en`                    | Playwright MCP plus committed `evidence/` screenshots                  |
-| Live-site retest          | Rule-15 EWT / UWT / DWT against the running landing and path walk                        | The three live-site testers                                            |
+| Level                     | What it verifies                                                                                           | Mechanism                                                                                                                                                                                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Manifest unit (TDD)       | Loads, zod-validates, integrity, prerequisite-consistency, exact `courseOrder` length                      | `npx nx run ayokoding-www:test:unit`                                                                                                                                                                                                                 |
+| Path-walk e2e             | The 2-segment `pathId` resolves; `?path=` persists; prev/next follows manifest order                       | `npx nx run ayokoding-www-fe-e2e:test:e2e`                                                                                                                                                                                                           |
+| Composition assertions    | Linked prerequisites absent from `courseOrder` **and** present in frontmatter                              | Grep-checkable clauses on the manifest steps                                                                                                                                                                                                         |
+| Per-course content checks | Concept coverage, register, format, worked-example volume, scope boundary                                  | Matching `apps-ayokoding-www-*-checker`                                                                                                                                                                                                              |
+| Silent-failure assertion  | Every course #4+ carries its "what still balances while being wrong" section                               | Grep-checkable clause on each authoring step                                                                                                                                                                                                         |
+| Sharia content assertions | Three named models per course; AAOIFI never "the" standard; the two commonly-wrong facts                   | Grep-checkable clauses plus `apps-ayokoding-www-facts-checker`                                                                                                                                                                                       |
+| Verification hygiene      | No open `[Needs Verification]` item when the Sharia stage begins                                           | Phase 4 gate                                                                                                                                                                                                                                         |
+| Structural                | Bundle anatomy present; `prerequisites` declared                                                           | `test -d` / `test -f` plus frontmatter grep                                                                                                                                                                                                          |
+| Ownership footprint       | One manifest data file plus its co-located unit test; zero `_index.md` under `<PATHS>` outside the landing | This plan's own merged-PR file list (`gh pr view --json files`) plus the in-flight branch diff, filtered at the Phase 6 gate — **authorship-scoped**, never a commit-range diff, because plans 04, 05 and 07 merge into the same `main` concurrently |
+| Section build             | The authored tree renders                                                                                  | `npx nx run ayokoding-www:build`                                                                                                                                                                                                                     |
+| Markdown quality          | markdownlint, link validation, heading hierarchy                                                           | `npm run lint:md` plus the two `rhino-cli md` subcommands                                                                                                                                                                                            |
+| Regression                | No existing project's gates broke                                                                          | `npx nx affected -t typecheck lint test:quick specs:behavior:coverage`                                                                                                                                                                               |
+| Manual behavioural        | Landing, ramp, and sample courses render at three breakpoints in `en`                                      | Playwright MCP plus committed `evidence/` screenshots                                                                                                                                                                                                |
+| Live-site retest          | Rule-15 EWT / UWT / DWT against the running landing and path walk                                          | The three live-site testers                                                                                                                                                                                                                          |
 
 **Deliberately not cited as evidence anywhere**: `ayokoding-www:test:e2e` and
 `ayokoding-www:test:integration` are no-op echo targets in this workspace and can never fail. The

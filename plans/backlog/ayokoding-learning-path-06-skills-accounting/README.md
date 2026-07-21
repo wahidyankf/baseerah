@@ -44,7 +44,13 @@ The full statement, with its consequences for personas and acceptance criteria, 
   — its copy, its ramp narrative, and its outbound links. _(Content and data only; the landing's
   visual design is owned by `ayokoding-learning-path-03-navigation-ui`. This plan ships no `assets/`
   folder, no mockup, and no render.)_
-- The single manifest `apps/ayokoding-www/src/features/course-paths/manifests/skills/accounting.yaml`.
+- The single manifest **data file**
+  `apps/ayokoding-www/src/features/course-paths/manifests/skills/accounting.yaml`, **plus that
+  manifest's own co-located unit test** `…/manifests/skills/accounting-manifest.unit.test.ts`. Each
+  manifest-owning plan owns its manifest and that manifest's test (2026-07-21 ruling) — there is no
+  shared root-level `published-manifests.unit.test.ts` and no plan appends to a sibling's test file.
+- One Gherkin feature (`…/gherkin/course-paths/skills-path-composition.feature`) and its 1:1
+  step-definition file `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts`.
 - **20 syllabus specs** under this plan's own `syllabus/courses/` folder — the per-course contract
   layer (id, format, prerequisites, concept enumeration, scope boundary).
 - **One path mirror** at `syllabus/paths/manifest-skills-accounting.md` — the human-readable ordering
