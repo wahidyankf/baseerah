@@ -50,6 +50,8 @@ apps/ayokoding-www/src/features/course-paths/
     ├── category-landing.tsx   # Screen 1a — NEW (R7): careers/skills category landing, two instances
     ├── arc-landing.tsx        # Screen 1b — NEW (R7): careers/<arc>/ arc landing, 1- and 2-role states
     ├── empty-path-list-state.tsx # NEW (R7): shared empty state for 1a/1b before a manifest lands
+    ├── ramp-milestone-strip.tsx # NEW (R7): Screen 1a skills-instance dangerous/comfortable/confident ticks
+    ├── syllabus-preview.tsx   # NEW (R7): Screen 1b single-role card's inline first-phase course list
     ├── path-rail.tsx          # Screen 3 (Option B) — the path's ordered course list as the left rail
     ├── path-banner.tsx        # Screen 3 — compact readout + the below-`md` disclosure trigger
     ├── prerequisite-list.tsx  # a course's prerequisites, rendered in BOTH views
@@ -84,6 +86,8 @@ flowchart LR
     CATLAND["category-landing.tsx<br/>NEW (R7)"]:::mine
     ARCLAND["arc-landing.tsx<br/>NEW (R7)"]:::mine
     EMPTY["empty-path-list-state.tsx<br/>NEW (R7)"]:::mine
+    RAMP["ramp-milestone-strip.tsx<br/>NEW (R7)"]:::mine
+    SYLLABUS["syllabus-preview.tsx<br/>NEW (R7)"]:::mine
     PREQ["prerequisite-list.tsx"]:::mine
     LINKS["path-course-links.tsx"]:::mine
 
@@ -114,6 +118,8 @@ flowchart LR
     ARCLAND --> CARD
     CATLAND --> EMPTY
     ARCLAND --> EMPTY
+    CATLAND --> RAMP
+    ARCLAND --> SYLLABUS
     PAGE --> CATLAND
     PAGE --> ARCLAND
     PREVNEXT --> URL
@@ -158,8 +164,23 @@ label names its file, so no meaning depends on colour alone.
   a silent blank render. Addresses the real (not theoretical) interval between plan 01's amendment A3
   creating structural `_index.md` files and the populating plans (careers: plan 05; skills: sibling
   skills-plans) shipping real manifests.
+- **`ramp-milestone-strip.tsx`** (NEW, R7): rendered by `category-landing.tsx`'s skills instance as a
+  `PathCard`-only addition (not on the Screen 1 hub card) — the dangerous/comfortable/confident course
+  markers as a small horizontal `<ol>` of three labelled ticks, tick dots in the subject hue. This is
+  the **compact preview only**; the detailed can/cannot text, runway-justification paragraph, and
+  linked-prerequisite outbound links render on that subject's own `path-landing.tsx` page, not here. See
+  [prd.md Screen 1a hi-fi](./prd.md#screen-1a-hi-fi--category-landing-enlearnpathscareers-enlearnpathsskills-option-a-arc-cards-with-member-role-preview).
+- **`syllabus-preview.tsx`** (NEW, R7): rendered by `arc-landing.tsx`'s single-role state inside that one
+  `PathCard` — the first phase's course titles as a small inline list, sharing the same "number is
+  order" ordered-list semantics `path-landing.tsx`'s syllabus uses. See
+  [prd.md Screen 1b hi-fi](./prd.md#screen-1b-hi-fi--arc-landing-enlearnpathscareersarc-option-a-always-render-arc-header--role-cards-single-role-gets-a-syllabus-preview).
 - **`path-landing.tsx`**: renders a manifest as phase-grouped semantic `<ol>` sections; the visible
-  number **is** the `courseOrder` index. Every course link carries `?path=`.
+  number **is** the `courseOrder` index. Every course link carries `?path=`. For a `skills/` path, also
+  renders the `_index.md`'s markdown body (via the shipped `MarkdownRenderer`) between the H1/arc-summary
+  and the syllabus — the rendering surface for the can/cannot table, runway-justification paragraph, and
+  linked-prerequisite outbound links `ayokoding-learning-path-07-skills-erp` §Requirement L-1/L-2/L-4 and
+  `ayokoding-learning-path-06-skills-accounting` §Landing content contract hand off to this plan. See
+  [prd.md Screen 2 hi-fi](./prd.md#screen-2-hi-fi--path-landing-enlearnpathspath-id-option-a-phase-grouped-numbered-syllabus).
 - **`path-rail.tsx`**: `<nav aria-label="{Path} course list">` over a semantic `<ol>`. Renders
   identically in both hosts; the only host-dependent behaviour is truncation (see
   [Screen 3 responsive contract](#screen-3-the-rail-is-a-content-swap-not-a-new-shell)).
@@ -392,9 +413,20 @@ focus behaviour — is in
 ## Path landing and paths hub
 
 - **Path landing** at `/en/learn/paths/<path-id>` (now variable-depth, R2), rendered by
-  `path-landing.tsx`: the thin content `_index.md` supplies only the landing prose/SEO anchor; the
-  ordered course list is rendered from the loaded manifest data, grouped by the path's phase headings,
-  each course link carrying `?path=`. **Ordering never lives in the `_index.md` frontmatter.**
+  `path-landing.tsx`: the `_index.md` **frontmatter** supplies only the SEO title/description, and its
+  **markdown body**, when present, renders between the H1/arc-summary and the syllabus via the shipped
+  `MarkdownRenderer` [Repo-grounded — `apps/ayokoding-www/src/features/content/shell/markdown-renderer.tsx`]
+  fed the same `html` the shipped `content.getBySlug` procedure already returns for any `_index.md`
+  [Repo-grounded — `serverCaller.content.getBySlug` in `<ROUTE>`]. This body slot is the rendering
+  surface for a `skills/` path's ramp can/cannot table, runway-justification paragraph, and
+  linked-prerequisite outbound links (`ayokoding-learning-path-07-skills-erp` §Requirement L-1/L-2/L-4;
+  `ayokoding-learning-path-06-skills-accounting` §Landing content contract) — see
+  [prd.md Screen 2 hi-fi's landing body content](./prd.md#screen-2-hi-fi--path-landing-enlearnpathspath-id-option-a-phase-grouped-numbered-syllabus).
+  A careers `_index.md` supplies no body, so a careers path landing renders exactly as before this
+  addition. The ordered course list is rendered from the loaded manifest data, grouped by the path's
+  phase headings, each course link carrying `?path=`. **Ordering never lives in the `_index.md`
+  frontmatter or body** — a body that hand-writes a course list is a second source of truth this plan
+  does not read; only the manifest drives ordering.
 - **Paths hub** at `/en/learn/paths`: **redesigned by the category-split ruling (R6)** — the
   "choose your path" screen with a `CategorySection`/`ArcGroup` layout (a `careers/` section grouped by
   arc, a `skills/` section flat) replacing the retired flat four-card grid, each `PathCard` built from
@@ -573,12 +605,13 @@ blocks `ayokoding-learning-path-05-manifests`.
 
 ### Consumed from sibling plans (not restated)
 
-| Decision    | Subject                                                                               | Owning plan                                              |
-| ----------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| DD-1        | Order lives outside the body                                                          | `ayokoding-learning-path-02-schema-and-prerequisite-dag` |
-| DD-3        | Path-aware nav via `?path=` client context                                            | `ayokoding-learning-path-02-schema-and-prerequisite-dag` |
-| DD-24       | AI path links, does not include, SWE prerequisites — **stale per R3, see flag below** | `ayokoding-learning-path-05-manifests`                   |
-| DD-40–DD-45 | Three-bucket IA, `legacy/` relocation, redirects                                      | `ayokoding-learning-path-01-url-restructure`             |
+| Decision    | Subject                                                                                      | Owning plan                                              |
+| ----------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| DD-1        | Order lives outside the body                                                                 | `ayokoding-learning-path-02-schema-and-prerequisite-dag` |
+| DD-3        | Path-aware nav via `?path=` client context                                                   | `ayokoding-learning-path-02-schema-and-prerequisite-dag` |
+| DD-24       | AI path links, does not include, SWE prerequisites — **stale per R3, see flag below**        | `ayokoding-learning-path-05-manifests`                   |
+| DD-40–DD-45 | Three-bucket IA, `legacy/` relocation, redirects                                             | `ayokoding-learning-path-01-url-restructure`             |
+| DD-611      | The ramp affordance is handed to this plan as content only — no dedicated component required | `ayokoding-learning-path-06-skills-accounting`           |
 
 This plan **implements the rendering consequences** of DD-3 and DD-24 (query-param context; badge only
 for paths that list the course) without re-deciding either.
@@ -599,16 +632,16 @@ for paths that list the course) without re-deciding either.
 `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`;
 `<E2E>` = `apps/ayokoding-www-fe-e2e/`.
 
-| Area                    | Change                                            | Files                                                                                                                                                                                                                                                                                                                                               |
-| ----------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `course-paths` shell    | New app code (TDD)                                | `<FEAT>shell/{manifest-repository.ts,path-landing.tsx,path-card.tsx,category-landing.tsx,arc-landing.tsx,empty-path-list-state.tsx,path-rail.tsx,path-banner.tsx,prerequisite-list.tsx,path-course-links.tsx}` _(all New files — `category-landing.tsx`, `arc-landing.tsx`, `empty-path-list-state.tsx` added 2026-07-21)_ + colocated `*.test.tsx` |
-| Route wiring            | Edit                                              | `apps/ayokoding-www/src/app/[locale]/(content)/[...slug]/page.tsx` [Repo-grounded]                                                                                                                                                                                                                                                                  |
-| Extended nav components | Additive props, no fork                           | `<NAV>prev-next.tsx`, `<NAV>breadcrumb.tsx`, `apps/ayokoding-www/src/features/content/core/content-url.ts` [all Repo-grounded]                                                                                                                                                                                                                      |
-| Screen 3 hosts          | `children` swap only                              | `<NAV>resizable-sidebar.tsx`, `<SHELL>mobile-nav.tsx` [both Repo-grounded]                                                                                                                                                                                                                                                                          |
-| Screen 0 hero           | Edit — `PathCard` grid + skills escape-hatch link | `<SHELL>hero.tsx` [Repo-grounded]; existing `<SHELL>landing.test.tsx` extended                                                                                                                                                                                                                                                                      |
-| Specs (Gherkin)         | New domain folder                                 | `<SPECS>*.feature` + `<SPECS>README.md` _(New files; sibling `navigation/` exists — Repo-grounded)_                                                                                                                                                                                                                                                 |
-| E2E                     | New fixture + step defs                           | `<E2E>` careers-shaped and skills-shaped fixture manifests _(New files)_ + `course-paths` step definitions _(New files; sibling `resizable-sidebar.steps.ts` exists — Repo-grounded)_                                                                                                                                                               |
-| Plan artefacts          | Funnel + evidence                                 | `assets/*.png` (**36 total**: 8 pre-existing HTML sources content-fixed in place for R6/R8, 4 new HTML source stems added for Screens 1a/1b — all 36 `.png` pending render/re-render), `prd.md` embeds, `evidence/*.png`                                                                                                                            |
+| Area                    | Change                                            | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ----------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `course-paths` shell    | New app code (TDD)                                | `<FEAT>shell/{manifest-repository.ts,path-landing.tsx,path-card.tsx,category-landing.tsx,arc-landing.tsx,empty-path-list-state.tsx,ramp-milestone-strip.tsx,syllabus-preview.tsx,path-rail.tsx,path-banner.tsx,prerequisite-list.tsx,path-course-links.tsx}` _(all New files — `category-landing.tsx`, `arc-landing.tsx`, `empty-path-list-state.tsx`, `ramp-milestone-strip.tsx`, `syllabus-preview.tsx` added 2026-07-21)_ + colocated `*.test.tsx` |
+| Route wiring            | Edit                                              | `apps/ayokoding-www/src/app/[locale]/(content)/[...slug]/page.tsx` [Repo-grounded]                                                                                                                                                                                                                                                                                                                                                                    |
+| Extended nav components | Additive props, no fork                           | `<NAV>prev-next.tsx`, `<NAV>breadcrumb.tsx`, `apps/ayokoding-www/src/features/content/core/content-url.ts` [all Repo-grounded]                                                                                                                                                                                                                                                                                                                        |
+| Screen 3 hosts          | `children` swap only                              | `<NAV>resizable-sidebar.tsx`, `<SHELL>mobile-nav.tsx` [both Repo-grounded]                                                                                                                                                                                                                                                                                                                                                                            |
+| Screen 0 hero           | Edit — `PathCard` grid + skills escape-hatch link | `<SHELL>hero.tsx` [Repo-grounded]; existing `<SHELL>landing.test.tsx` extended                                                                                                                                                                                                                                                                                                                                                                        |
+| Specs (Gherkin)         | New domain folder                                 | `<SPECS>*.feature` + `<SPECS>README.md` _(New files; sibling `navigation/` exists — Repo-grounded)_                                                                                                                                                                                                                                                                                                                                                   |
+| E2E                     | New fixture + step defs                           | `<E2E>` careers-shaped and skills-shaped fixture manifests _(New files)_ + `course-paths` step definitions _(New files; sibling `resizable-sidebar.steps.ts` exists — Repo-grounded)_                                                                                                                                                                                                                                                                 |
+| Plan artefacts          | Funnel + evidence                                 | `assets/*.png` (**36 total**: 8 pre-existing HTML sources content-fixed in place for R6/R8, 4 new HTML source stems added for Screens 1a/1b — all 36 `.png` pending render/re-render), `prd.md` embeds, `evidence/*.png`                                                                                                                                                                                                                              |
 
 **Not touched by this plan**: any file under `apps/ayokoding-www/content/`, `<FEAT>core/`,
 `<FEAT>shell/manifests/`, `apps/ayokoding-www/src/redirects/`, or `next.config.ts`. If a delivery step
@@ -660,14 +693,14 @@ appears to require one of those, it belongs to a sibling plan — stop and re-re
 Built test-first per the repo's TDD mandate; each acceptance criterion in
 [prd.md](./prd.md#acceptance-criteria-gherkin) is mapped to exactly one test level below.
 
-| Level                                | Covers                                                                                                                                                                                                                                                                                                                    |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Unit** (`test:unit`)               | `contentUrl` with `pathId`; `manifest-repository` parse/validate against the fixture; each shell component's rendering branches (rail current-row marking, banner `k of N`, prerequisite empty state, `path-course-links` badge selection, `path-card` hero vs. hub variant)                                              |
-| **Integration** (`test:integration`) | Route wiring: a course + valid path resolves to the path-aware view; an invalid path and an omitted course both resolve to the canonical view; every emitted internal link carries `?path=`                                                                                                                               |
-| **E2E** (`test:e2e`, playwright-bdd) | The fixture path walk (landing → course order via prev/next, param persists), breadcrumb trail, prerequisite links, deep-link fallback, rail at desktop, rail-in-drawer on a phone (focus in and back out), generic sidebar unchanged with no `?path=`, accessibility sweep, and the legacy-redirect **regression guard** |
-| **Specs coverage**                   | `nx run ayokoding-www:specs:behavior:coverage` green for the new `course-paths` Gherkin domain [Repo-grounded — target exists]                                                                                                                                                                                            |
-| **Manual behavioral**                | Playwright MCP at 375 / 768 / 1280 px, in `en`, with committed evidence under `evidence/`; curl not applicable (no new API)                                                                                                                                                                                               |
-| **Rule-15 web retest**               | The three live-site testers before archival — mandatory here, since this plan owns the largest UI surface of the five                                                                                                                                                                                                     |
+| Level                                | Covers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Unit** (`test:unit`)               | `contentUrl` with `pathId`; `manifest-repository` parse/validate against the fixture; each shell component's rendering branches (rail current-row marking, banner `k of N`, prerequisite empty state, `path-course-links` badge selection, `path-card` hero vs. hub variant)                                                                                                                                                                                                                                                 |
+| **Integration** (`test:integration`) | Route wiring: a course + valid path resolves to the path-aware view; an invalid path and an omitted course both resolve to the canonical view; every emitted internal link carries `?path=`                                                                                                                                                                                                                                                                                                                                  |
+| **E2E** (`test:e2e`, playwright-bdd) | The fixture path walk (landing → course order via prev/next, param persists), breadcrumb trail, prerequisite links, deep-link fallback, rail at desktop, rail-in-drawer on a phone (focus in and back out), generic sidebar unchanged with no `?path=`, accessibility sweep, the legacy-redirect **regression guard**, paths-hub category grouping, category-landing arc-chooser, skills fixed-arc statement, category-landing empty-state, arc-landing two-role, arc-landing one-role, and skills-path landing-body content |
+| **Specs coverage**                   | `nx run ayokoding-www:specs:behavior:coverage` green for the new `course-paths` Gherkin domain [Repo-grounded — target exists]                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Manual behavioral**                | Playwright MCP at 375 / 768 / 1280 px, in `en`, with committed evidence under `evidence/`; curl not applicable (no new API)                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Rule-15 web retest**               | The three live-site testers before archival — mandatory here, since this plan owns the largest UI surface of the five                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 **The two-direction rule.** Every acceptance clause must be falsifiable in both directions. The
 regression-critical pair is: _with_ `?path=` the rail renders and the generic tree does not; _without_

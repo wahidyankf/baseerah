@@ -287,11 +287,14 @@ back to the source plan; do not renumber to "close the gaps".
 > **This is a large render volume, so it is enumerated per asset rather than hidden behind one
 > "render all mockups" checkbox.** **Amended 2026-07-21 by the category-split ruling (R6/R7)**: 12
 > desktop HTML sources now exist in `<PLAN>assets/src/` (the original 8, content-fixed/rebuilt in place
-> for R6/R8/path-id renames — same filenames — plus 4 new stems for Screens 1a/1b), but **zero of the
-> 36 target `.png` files are currently valid** — the 8 pre-existing renders are stale against their
-> edited HTML (this is a superset of, not a duplicate of, the already-known de-namespacing staleness:
-> the hub and hero HTML changed for **content**, not just URL strings), and the 4 new screens have no
-> render at all yet. **All 36 are produced here.** Naming scheme, render widths, and alt-text rules:
+> for R6/R8/path-id renames — same filenames — plus 4 new stems for Screens 1a/1b), and **all 12 desktop
+> `.png` files also already exist** — but because all 12 desktop HTML sources changed content under the
+> category-split ruling (the original 8 via the R6/R8/path-id fixes, the 4 new stems newly authored),
+> every one of the 12 desktop renders requires a fresh render here regardless of its current on-disk
+> modification-time state (this is a superset of, not a duplicate of, the already-known de-namespacing
+> staleness: the hub and hero HTML changed for **content**, not just URL strings), and the 24
+> mobile/tablet renders have never been rendered at all. **All 36 are produced or re-produced here.**
+> Naming scheme, render widths, and alt-text rules:
 > [prd.md §Hi-fi asset matrix](./prd.md#hi-fi-asset-matrix-screen--option--viewport). Every file is
 > `<PLAN>assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png`, rendered from
 > `<PLAN>assets/src/<same-stem>.html` at **375 / 768 / 1280 px** — `.png` only, per the
@@ -312,14 +315,20 @@ back to the source plan; do not renumber to "close the gaps".
 - [ ] [AI] **Re-render all 12 desktop `.png` from their (new or content-changed) HTML sources** — every
       one of the 8 pre-existing HTML sources changed content under the category-split ruling (the hub
       was redesigned; the AI-engineer card copy and id were fixed; the path-landing/course-path sources'
-      `?path=` strings gained the `careers/` prefix), and the 4 new stems have no render at all — command:
-      render each at 1280 px from its `src/<same-stem>.html` — acceptance: for every one of the 12 stems,
+      `?path=` strings gained the `careers/` prefix), and the 4 new stems' `.png` files, though already
+      committed, likewise require a fresh render since their HTML sources are newly authored content —
+      command: render each at 1280 px from its
+      `src/<same-stem>.html` — acceptance: for every one of the 12 stems,
       `f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html"` holds (mtime check), i.e.
       `for s in landing-hero paths-hub category-landing arc-landing path-landing course-path; do for o in a b; do
 f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STALE $s-$o"; done; done`
-      prints nothing. Falsifiable the other way: before this step the loop prints all 12 pairs (the 4 new
-      stems because their `.png` does not exist yet — `test -nt` on a missing file fails — and the 8
-      existing stems because their `.html` mtime now postdates their committed `.png`).
+      prints nothing after this step. Falsifiable the other way: **all 12 `.png` already exist on disk**
+      today (verified — none is missing), so the pre-step count of `STALE` lines is not a fixed number;
+      it depends on which stems were most recently re-rendered relative to their HTML source, and drifts
+      on every checkout (`git checkout`/worktree provisioning reset file-modification times, so mtime
+      state is never a stable, authorable fact across checkouts). The falsifiable pre-state claim is that
+      the loop prints **at least one** `STALE` line before this step — never a bare count of "8" or "12",
+      and never an assertion of which specific stems are stale at any given checkout.
 - [ ] [AI] Render `<PLAN>assets/landing-hero-option-a-mobile.png` from
       `<PLAN>assets/src/landing-hero-option-a-mobile.html` at 375 px — acceptance: file exists;
       single-column goal cards, four careers cards only (skills reachable via the tertiary link, not a
@@ -425,8 +434,9 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
       alternatives per screen, both hi-fi finalists, a named selection, a rationale table, the
       responsive strategy per breakpoint, the R5 grounding note, and the R7 prior-art citation.
 - [ ] [AI] **All 36 of this plan's hi-fi renders exist** —
-      `find <PLAN>assets -name '*-option-*-*.png' | wc -l` returns **36** (returns **8** before this
-      phase), and every one is embedded in `prd.md` with viewport-specific alt text.
+      `find <PLAN>assets -name '*-option-*-*.png' | wc -l` returns **36** (returns **12** before this
+      phase — the 12 desktop `.png` files, re-rendered rather than first-rendered by this phase), and
+      every one is embedded in `prd.md` with viewport-specific alt text.
       Screen 4's remaining 6 renders belong to `ayokoding-learning-path-01-url-restructure`; **36 is
       the complete deliverable here**, not a shortfall against DD-47's cross-plan total of 42.
 - [ ] [AI] Screen 3's selection reads **Option B — Left path rail**, and no surviving text in
@@ -735,10 +745,13 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
 - [ ] [AI] **RED (specs)** — author the `course-paths` Gherkin companion under `<SPECS>` _(New folder;
       sibling `.../gherkin/navigation/` exists — Repo-grounded)_, one `.feature` per behavior group
       (path-order nav, breadcrumb, canonical fallback, invalid-path fallback, omitted course,
-      prerequisite display, rail desktop, rail drawer, no-path regression, a11y, build-green), copied
-      verbatim from [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin), plus
-      `<SPECS>README.md` — command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance:
-      exits non-zero (scenarios present, no step definitions yet).
+      prerequisite display, rail desktop, rail drawer, no-path regression, a11y, build-green,
+      paths-hub category grouping, category-landing arc-chooser, skills fixed-arc statement,
+      category-landing empty-state, arc-landing two-role, arc-landing one-role, skills-path
+      landing-body content), copied verbatim from
+      [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin), plus `<SPECS>README.md` —
+      command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits non-zero
+      (scenarios present, no step definitions yet).
   - _Suggested executor: `specs-maker`_
 - [ ] [AI] **GREEN (specs)** — implement the step bindings so every `<SPECS>` scenario executes —
       command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits 0.
@@ -854,19 +867,16 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint` — acceptance:
       both exit 0.
 
-### Cycle 3.1b — Category landing (Screen 1a, R7)
+### Cycle 3.1b-i — Category landing: careers arc chooser (Screen 1a, R7)
 
-- [ ] [AI] **RED (e2e)** — write a failing Playwright spec in `<E2E>` asserting: the careers-shaped
+- [ ] [AI] **RED (e2e)** — write a failing Playwright spec in `<E2E>` asserting the careers-shaped
       fixture's category landing at `/en/learn/paths/careers/` renders one `ArcCard` per arc with a
-      member-role preview (the `immediately-effective` fixture arc previewing two roles); and the
-      skills-shaped fixture's category landing at `/en/learn/paths/skills/` renders the fixed-arc ramp
-      statement with **no** arc-selection control present anywhere on the page — command:
+      member-role preview (the `immediately-effective` fixture arc previewing two roles) — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the spec fails (no
       `category-landing.tsx` exists yet).
   - _Suggested executor: `swe-e2e-dev`_
 
-  **Gherkin (binds) →** "The careers category landing offers an arc chooser" AND "The skills category
-  landing states its fixed arc once, with no chooser"
+  **Gherkin (binds) →** "The careers category landing offers an arc chooser"
 
   ```gherkin
   Scenario: The careers category landing offers an arc chooser
@@ -874,7 +884,30 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
     When a reader opens the careers category landing at /en/learn/paths/careers/
     Then the page renders one arc card per arc with its member role(s) previewed
     And the immediately-effective arc card previews exactly two member roles
+  ```
 
+- [ ] [AI] **GREEN** — author `<FEAT>shell/category-landing.tsx` _(New file)_ per
+      [prd.md Screen 1a hi-fi spec](./prd.md#screen-1a-hi-fi--category-landing-enlearnpathscareers-enlearnpathsskills-option-a-arc-cards-with-member-role-preview):
+      the careers branch renders the `ArcCard` grid described above; the skills branch renders a minimal
+      placeholder pending Cycle 3.1b-ii (not yet the final `RampMilestoneStrip` design) — command:
+      `npx nx run ayokoding-www:build && npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: both
+      exit 0; only the careers-shaped fixture spec is asserted at this cycle.
+- [ ] [AI] **REFACTOR** — the careers branch reads its arc list from the loaded manifest index once, not
+      per card — command: `npx nx run ayokoding-www-fe-e2e:test:e2e && npx nx run ayokoding-www:lint` —
+      acceptance: both exit 0.
+
+### Cycle 3.1b-ii — Category landing: skills fixed-arc statement, no chooser (Screen 1a, R7)
+
+- [ ] [AI] **RED (e2e)** — write a failing Playwright spec in `<E2E>` asserting the skills-shaped
+      fixture's category landing at `/en/learn/paths/skills/` renders the fixed-arc ramp statement with
+      **no** arc-selection control present anywhere on the page — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the spec fails against Cycle 3.1b-i's
+      placeholder skills branch.
+  - _Suggested executor: `swe-e2e-dev`_
+
+  **Gherkin (binds) →** "The skills category landing states its fixed arc once, with no chooser"
+
+  ```gherkin
   Scenario: The skills category landing states its fixed arc once, with no chooser
     Given a fixture skills manifest set is loaded
     When a reader opens the skills category landing at /en/learn/paths/skills/
@@ -882,13 +915,12 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
     And no arc-selection control is present anywhere on the page
   ```
 
-- [ ] [AI] **GREEN** — author `<FEAT>shell/category-landing.tsx` _(New file)_ per
-      [prd.md Screen 1a hi-fi spec](./prd.md#screen-1a-hi-fi--category-landing-enlearnpathscareers-enlearnpathsskills-option-a-arc-cards-with-member-role-preview):
-      **two separate render branches** (careers = `ArcCard` grid; skills = `path-card.tsx`
-      `context="hub"` grid + `RampMilestoneStrip`), never one grid driven by a boolean prop (R8) — falls
-      back to `empty-path-list-state.tsx` when the category's manifest set is empty — command:
+- [ ] [AI] **GREEN** — replace the skills branch's placeholder with `path-card.tsx` `context="hub"` grid
+      plus a newly authored `<FEAT>shell/ramp-milestone-strip.tsx` _(New file)_ rendering the
+      dangerous/comfortable/confident ticks, stating the fixed-arc ramp promise once (R8) — falls back to
+      `empty-path-list-state.tsx` when the category's manifest set is empty — command:
       `npx nx run ayokoding-www:build && npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: both
-      exit 0.
+      exit 0; both the careers and skills fixture specs pass together.
 - [ ] [AI] **REFACTOR** — confirm the two branches are structurally distinct (not a single JSX tree with
       a chooser conditionally hidden) — command:
       `grep -A5 -- "function CategoryLanding" <FEAT>shell/category-landing.tsx | grep -c "arc ===" || true`
@@ -896,18 +928,15 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
       commands exit 0; a human/agent review confirms no shared chooser markup renders conditionally
       hidden for the skills branch (checked at PR review, not asserted by a single grep).
 
-### Cycle 3.1c — Arc landing (Screen 1b, R7)
+### Cycle 3.1c-i — Arc landing: two-role state renders both cards (Screen 1b, R7)
 
-- [ ] [AI] **RED (e2e)** — write a failing Playwright spec in `<E2E>` asserting: a two-role fixture arc
-      (`immediately-effective`) renders both role cards side by side with no placeholder; and a
-      one-role fixture arc (`interview-ready`) renders exactly one role card with an inline first-phase
-      syllabus preview, and the layout never reserves or renders a visibly empty second card — command:
+- [ ] [AI] **RED (e2e)** — write a failing Playwright spec in `<E2E>` asserting a two-role fixture arc
+      (`immediately-effective`) renders both role cards side by side with no placeholder — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the spec fails (no `arc-landing.tsx`
       exists yet).
   - _Suggested executor: `swe-e2e-dev`_
 
   **Gherkin (binds) →** "An arc landing with two paths renders both role cards without a placeholder"
-  AND "An arc landing with one path renders a full card, not a sparse stub"
 
   ```gherkin
   Scenario: An arc landing with two paths renders both role cards without a placeholder
@@ -915,7 +944,29 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
     When a reader opens the arc landing at /en/learn/paths/careers/immediately-effective/
     Then both role cards render side by side with their own course counts
     And neither card is a placeholder or an empty grid cell
+  ```
 
+- [ ] [AI] **GREEN** — author `<FEAT>shell/arc-landing.tsx` _(New file)_ per
+      [prd.md Screen 1b hi-fi spec](./prd.md#screen-1b-hi-fi--arc-landing-enlearnpathscareersarc-option-a-always-render-arc-header--role-cards-single-role-gets-a-syllabus-preview):
+      render **exactly as many** role cards as the arc has roles (never a fixed 2-slot grid) — command:
+      `npx nx run ayokoding-www:build && npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: both
+      exit 0; only the two-role fixture spec is asserted at this cycle.
+- [ ] [AI] **REFACTOR** — the role grid reads the arc's role count once, not per card — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e && npx nx run ayokoding-www:lint` — acceptance: both
+      exit 0.
+
+### Cycle 3.1c-ii — Arc landing: single-role state gets an inline syllabus preview (Screen 1b, R7)
+
+- [ ] [AI] **RED (e2e)** — write a failing Playwright spec in `<E2E>` asserting a one-role fixture arc
+      (`interview-ready`) renders exactly one role card with an inline first-phase syllabus preview, and
+      the layout never reserves or renders a visibly empty second card — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the spec fails (Cycle 3.1c-i's grid renders
+      one card but no `SyllabusPreview`, and `syllabus-preview.tsx` does not exist yet).
+  - _Suggested executor: `swe-e2e-dev`_
+
+  **Gherkin (binds) →** "An arc landing with one path renders a full card, not a sparse stub"
+
+  ```gherkin
   Scenario: An arc landing with one path renders a full card, not a sparse stub
     Given a fixture arc manifest lists exactly one role
     When a reader opens that arc's landing page
@@ -923,16 +974,61 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
     And the layout does not reserve or render a visibly empty second card
   ```
 
-- [ ] [AI] **GREEN** — author `<FEAT>shell/arc-landing.tsx` _(New file)_ per
-      [prd.md Screen 1b hi-fi spec](./prd.md#screen-1b-hi-fi--arc-landing-enlearnpathscareersarc-option-a-always-render-arc-header--role-cards-single-role-gets-a-syllabus-preview):
-      render **exactly as many** role cards as the arc has roles (never a fixed 2-slot grid); the
-      single-role state renders `SyllabusPreview` inline in that card — command:
+- [ ] [AI] **GREEN** — author `<FEAT>shell/syllabus-preview.tsx` _(New file)_ and render it inline inside
+      the single-role state's card — command:
       `npx nx run ayokoding-www:build && npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: both
-      exit 0.
+      exit 0; both the two-role and one-role fixture specs pass together.
 - [ ] [AI] **REFACTOR** — the role grid and `SyllabusPreview` list share the same "number is order"
       list-rendering helper `path-landing.tsx`'s syllabus uses (no duplicated ordered-list markup) —
       command: `npx nx run ayokoding-www-fe-e2e:test:e2e && npx nx run ayokoding-www:lint` — acceptance:
       both exit 0.
+
+### Cycle 3.1d — Skills path landing body content (Screen 2, L-1/L-2/L-4 handoff surface)
+
+> Closes Finding 1: the two skills plans' landing-content requirements (plan 07 §Requirement
+> L-1/L-2/L-4; plan 06 §Landing content contract) need a rendering surface on the individual skills
+> path's own landing, per [prd.md Screen 2 hi-fi's landing body content](./prd.md#screen-2-hi-fi--path-landing-enlearnpathspath-id-option-a-phase-grouped-numbered-syllabus).
+
+- [ ] [AI] **RED (e2e)** — write a failing Playwright spec in `<E2E>` asserting: given two skills-shaped
+      fixture path landings whose `_index.md`-equivalent fixture content declares different
+      runway-justification paragraphs (this cycle establishes the plan's only `_index.md`-equivalent
+      content-fixture mechanism — Cycle 3.1's fixture is a `PathManifest`-only fixture and supplies no
+      content of its own, so there is nothing to extend here; the GREEN step below calls
+      `content.getBySlug` fresh, the same way the standard content route already does, and no other cycle
+      in this plan introduces a second content-fixture mechanism), each path's own landing renders its
+      own justification paragraph between the title and the syllabus, and never renders the other path's
+      paragraph — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the spec fails (`path-landing.tsx` does
+      not yet render any body content; both paragraphs are absent).
+  - _Suggested executor: `swe-e2e-dev`_
+
+  **Gherkin (binds) →** "A skills path's authored runway-justification content renders on its own
+  landing"
+
+  ```gherkin
+  Scenario: A skills path's authored runway-justification content renders on its own landing
+    Given two fixture skills paths whose landing bodies declare different runway-justification paragraphs for their differing first boundaries
+    When a reader opens either skills path's landing page
+    Then that path's landing renders its own authored runway-justification paragraph between the title and the syllabus
+    And the other path's justification paragraph never appears on this page
+  ```
+
+- [ ] [AI] **GREEN** — extend `<FEAT>shell/path-landing.tsx`: call the same `content.getBySlug` procedure
+      the standard content route already calls for the path's own `_index.md`
+      [Repo-grounded — `serverCaller.content.getBySlug` in `<ROUTE>`], and render the returned `html`
+      through the shipped `MarkdownRenderer`
+      [Repo-grounded — `apps/ayokoding-www/src/features/content/shell/markdown-renderer.tsx`,
+      `{ html, locale }` props] between the H1/arc-summary and the Fast-path callout/syllabus — command:
+      `npx nx run ayokoding-www:build && npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: both
+      exit 0.
+- [ ] [AI] **No-regression clause (not owned Gherkin)** — assert a **careers** fixture path's landing
+      renders byte-identical to its Phase 0 (pre-this-cycle) snapshot, since a careers `_index.md`
+      supplies no body — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the existing
+      careers-fixture path-landing spec from Cycle 3.1 still passes unmodified.
+- [ ] [AI] **REFACTOR** — unify this body-render call site with the standard content route's own
+      `content.getBySlug` call site through one shared helper, rather than two independent call
+      sites fetching the same procedure — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e && npx nx run ayokoding-www:lint` — acceptance: both exit 0.
 
 ### Cycle 3.2 — Landing hero (Screen 0)
 

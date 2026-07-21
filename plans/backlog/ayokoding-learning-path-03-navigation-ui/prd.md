@@ -1404,10 +1404,17 @@ desktop alt text onto the mobile render is a defect, not a shortcut.
 original 24 by the category-split ruling (R6/R7), which redesigned Screen 1 in place (no new files) and
 added two new screen types, Screen 1a and Screen 1b (four new `.html` stems, two options each, each
 producing three viewports). **12 desktop `.html` sources on disk today** (the original 8 fixed/rebuilt
-in place, plus 4 new desktop HTML sources for 1a and 1b authored — one per screen per option) — none of
-the 36 `.png` renders themselves exist yet at the fixed content, so **all 36 `.png` are pending**
-re-render/first-render in
-[Phase 1](./delivery.md#phase-1-ui-design-funnel-screens-0-1-1a-1b-2-3)). The delivery checklist enumerates them
+in place, plus 4 new desktop HTML sources for 1a and 1b authored — one per screen per option), and all
+**12 desktop `.png` renders also already exist on disk and are embedded below** — but because all 12
+desktop `.html` sources changed content under the category-split ruling, every one of the 12 desktop
+`.png` requires a fresh render in Phase 1, so all 12 are **re-rendered**, not first-rendered, there.
+(File-modification-time state is not a stable, authorable fact — `git checkout` and worktree
+provisioning reset it on every checkout — so this plan does not assert a specific STALE/FRESH split as a
+fixed truth; see the Phase 1 checkbox's falsifiable acceptance clause for the actual executable check.)
+The remaining **24 mobile/tablet `.png` renders** (2 viewports × 2 options ×
+6 screens) have never been rendered at all, so those 24 are genuinely **first-rendered**. **All 36
+`.png` are produced or re-produced** in
+[Phase 1](./delivery.md#phase-1-ui-design-funnel-screens-0-1-1a-1b-2-3). The delivery checklist enumerates them
 **one checkbox per asset** rather than one coarse "render all mockups" step, because the volume is large
 enough that a single checkbox could be ticked with most of the set missing.
 
@@ -1577,7 +1584,10 @@ md:grid-cols-2">` of the two subject `PathCard`s directly under the section head
   **same two-up `PathCard` grid Screen 1's Skills section uses** — reused, not re-implemented — plus a
   **`RampMilestoneStrip`** (net-new, subject `PathCard`-only addition on this screen, not on the hub
   card) rendering the dangerous/comfortable/confident course markers as a small horizontal `<ol>` of
-  three labelled ticks (`text-[10px] text-muted-foreground`, tick dots in the subject hue).
+  three labelled ticks (`text-[10px] text-muted-foreground`, tick dots in the subject hue). **This is
+  the compact preview only** — the can/cannot text per boundary, the runway-justification paragraph,
+  and the linked-prerequisite outbound links render on that subject's own Screen 2 landing, not here;
+  see [Screen 2 hi-fi's landing body content](#screen-2-hi-fi--path-landing-enlearnpathspath-id-option-a-phase-grouped-numbered-syllabus).
 - **`EmptyPathListState`** (net-new, shared with Screen 1b): `Alert`-composed
   (`<Alert variant="default" className="mt-8">`), one sentence stating the interval is expected
   ("New skills paths are being written — check back soon."), one `<Link>` CTA to a populated sibling
@@ -1621,6 +1631,27 @@ md:grid-cols-2">` of the two subject `PathCard`s directly under the section head
   path-aware `Breadcrumb` (`Home / Learn / <Path Title>`), `<h1 className="text-4xl font-extrabold tracking-tight">`
   = path title, `<p className="text-muted-foreground">` = arc summary, framed by a hue strip
   (`bg-[var(--hue-<h>-wash)]`) matching the path's hub card.
+- **Landing body content — skills paths only** (`MarkdownRenderer`
+  [Repo-grounded — `apps/ayokoding-www/src/features/content/shell/markdown-renderer.tsx`,
+  `{ html, locale }` props], reused unchanged, fed the same `html` the shipped `content.getBySlug`
+  procedure already returns for any `_index.md`
+  [Repo-grounded — `serverCaller.content.getBySlug` in `<ROUTE>`]): rendered between the H1/arc-summary
+  and the Fast-path callout/syllabus below. A `skills/` path's `_index.md` body is the rendering surface
+  for the three content obligations `ayokoding-learning-path-07-skills-erp` and
+  `ayokoding-learning-path-06-skills-accounting` each hand off to this plan in their own `tech-docs.md`
+  (plan 07 §Requirement L-1/L-2/L-4; plan 06 §Landing content contract):
+  **(a)** a can/cannot pair per "dangerous by here" boundary, authored as an ordinary markdown table;
+  **(b)** a one-paragraph runway-justification when the path's first boundary is not the ramp's minimum
+  across the category (ERP's course #4 vs. accounting's course #3 — this plan renders whichever prose
+  the skills plan authors and authors none of it itself, per
+  `ayokoding-learning-path-06-skills-accounting` §DD-611's "content only" boundary);
+  **(c)** an outbound "Prerequisites (not included in this path)" link block to the linked-not-walked
+  courses, authored as ordinary markdown links to their canonical `/en/learn/courses/<id>` URLs.
+  **Careers paths render no body content** — a careers `_index.md` supplies only the SEO description,
+  exactly as today; the slot is present for every path but is a silent no-op when the body is empty, so
+  the careers render is byte-identical to before this addition. **Ordering never lives in the body** —
+  same rule as the `_index.md` frontmatter below; a hand-written course list in the body would be a
+  second source of truth this plan does not read.
 - **Fast-path callout** (interview-ready etc.): `Alert variant="info"` above the list — "Experienced &
   job-hunting? Skip the prologue → jump to Phase 1." with an in-page anchor.
 - **Syllabus**: each phase is a `<section>` with heading
@@ -1854,6 +1885,14 @@ Scenario: A path landing page lists its courses in manifest order
   When a reader opens that fixture path's landing page under /en/learn/paths/
   Then the courses appear in the fixture manifest's courseOrder
   And every course link carries the path context query parameter
+```
+
+```gherkin
+Scenario: A skills path's authored runway-justification content renders on its own landing
+  Given two fixture skills paths whose landing bodies declare different runway-justification paragraphs for their differing first boundaries
+  When a reader opens either skills path's landing page
+  Then that path's landing renders its own authored runway-justification paragraph between the title and the syllabus
+  And the other path's justification paragraph never appears on this page
 ```
 
 ```gherkin
