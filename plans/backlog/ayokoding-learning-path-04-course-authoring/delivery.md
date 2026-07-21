@@ -34,13 +34,21 @@ construction rather than as a retrofit.
 >
 > **Executor environment note — RTK-wrapped commands emit an empty-output marker, not true
 > emptiness**: this repo routes `git` (and other commands) through RTK via a Claude Code hook (see
-> `CLAUDE.md` §RTK). On an empty result RTK prints one marker line instead of zero lines — a **blank
-> line** for `git diff`, a literal **`(empty)`** line for `ls` — so a naive `| wc -l` returns **1** on
-> an empty result, indistinguishable from a genuine one-line result. The sanctioned zero-assertion
-> form for `git diff --name-only …` clauses is **`| grep -c .`** (the blank marker does not match
-> `.`, so it returns the true line count in both directions: 0 clean, N dirty). This does not
-> generalize to `ls` — **never use an `ls`-based emptiness assertion** (an `ls <dir> | wc -l` clause
-> asserting 0 is unreliable under RTK).
+> `CLAUDE.md` §RTK), and RTK rewrites the output it filters. For `git diff` it appends a three-line
+> trailer — blank, `--- Changes ---`, blank — whenever the result is **non-empty**, and appends
+> nothing when the result is empty. So for `N` changed paths, `| wc -l` prints `N + 3` and
+> `| grep -c .` prints `N + 1`; in the clean state both print `0`
+> [Repo-grounded — measured on this tree 2026-07-22: 12 changed files gave 15 and 13 respectively; a clean path gave 0 and 0].
+>
+> **Every `git diff --name-only …` clause in this plan asserts `0`**, and for that assertion the
+> sanctioned form **`| grep -c .`** is exact: the trailer is absent in the clean state, which is the
+> only state these clauses accept. The form is **not** exact for a non-zero assertion — do not reuse
+> it to count changed files. A clause needing a real count must interpose a `grep -F …` / `grep -E …`
+> path filter (the literal `--- Changes ---` matches no path pattern and is dropped) or read the
+> command through `rtk proxy git diff …`.
+>
+> None of this generalizes to `ls` — **never use an `ls`-based emptiness assertion** (an
+> `ls <dir> | wc -l` clause asserting 0 is unreliable under RTK).
 
 ## Worktree
 

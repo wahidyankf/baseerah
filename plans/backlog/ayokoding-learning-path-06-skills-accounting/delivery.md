@@ -205,16 +205,23 @@ ACCT_S3_ALT=$(printf '%s|' "${ACCT_S3[@]}" | sed 's/|$//')
 > form. No clause below uses `find -newermt` either, which is GNU syntax and fails on this BSD `find`.
 > No course ID is a substring of another, which is what makes the alternation counts sound.
 >
-> **The one sanctioned `grep -c` form is `grep -c .`** — a _line_ count of non-empty lines, which is
-> exactly what it is being asked for, and it is **mandatory after every `git` pipeline**. A repo hook
-> routes `git` through **RTK**, whose `git diff` filter emits a **single blank line** when the diff is
-> empty, so `git diff --name-only … | wc -l` returns **1** in the clean state — indistinguishable from
-> a one-file violation, and a permanent false failure of any clause expecting `0`. The `grep -c .`
-> form prints `0` for that blank line.
-> [Repo-grounded — measured on this tree: for one and the same empty diff, the `wc -l` form printed 1 and the `grep -c .` form printed 0.]
-> A `grep -v …` filter in the middle does **not** help: the blank line matches no exclusion pattern
-> and passes straight through. `grep -c .` exits 1 when the count is 0, so **the printed count is the
-> signal, never the exit status**.
+> **Counting the output of `git diff` needs care.** A repo hook routes `git` through **RTK**, and
+> RTK's `git diff` filter appends a three-line trailer — blank, `--- Changes ---`, blank — whenever
+> the result is **non-empty**. On an **empty** result it appends nothing at all. So for a diff of `N`
+> paths, `| wc -l` prints `N + 3` and `| grep -c .` prints `N + 1`, while both correctly print `0`
+> in the clean state.
+> [Repo-grounded — measured on this tree 2026-07-22: against a 12-file dirty path, `wc -l` printed 15 and `grep -c .` printed 13; against a clean path both printed 0; `rtk proxy git diff --name-only` printed 12.]
+>
+> Two consequences bind every clause below. **A clause asserting `0` is safe in either form** — the
+> trailer does not exist in the clean state, which is the only state such a clause accepts. **A clause
+> asserting a non-zero count must never count raw `git diff` output.** It must either interpose a
+> `grep -F …` / `grep -E …` filter that selects real paths (the literal `--- Changes ---` matches no
+> path pattern and is dropped), or read the unfiltered command through `rtk proxy git diff …`. Both
+> forms are used below; neither is optional.
+>
+> Note this is specific to `git diff`. **`git ls-tree` is not RTK-filtered** — its count is exact in
+> every form [Repo-grounded — measured 2026-07-22: `wc -l`, `grep -c .`, and `rtk proxy` all printed 128 for the custodied corpus].
+> `grep -c .` exits 1 when the count is 0, so **the printed count is the signal, never the exit status**.
 
 ---
 
