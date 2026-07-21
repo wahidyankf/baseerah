@@ -1,5 +1,22 @@
 # Fundamentally Strong — Shared Course Library, Four Learning Paths
 
+> **RETIRED 2026-07-21 — superseded by a five-way split. Do not execute this plan.**
+>
+> No phase of this plan was ever executed. Its entire scope was **transferred, not abandoned**, to
+> five independently mergeable plans in [`../../backlog/`](../../backlog/README.md), whose `NN-`
+> prefix is the execution sequence:
+> [`01-url-restructure`](../../backlog/ayokoding-www-learning-path-01-url-restructure/README.md),
+> [`02-schema-and-prerequisite-dag`](../../backlog/ayokoding-www-learning-path-02-schema-and-prerequisite-dag/README.md),
+> [`03-navigation-ui`](../../backlog/ayokoding-www-learning-path-03-navigation-ui/README.md),
+> [`04-course-authoring`](../../backlog/ayokoding-www-learning-path-04-course-authoring/README.md),
+> and [`05-manifests`](../../backlog/ayokoding-www-learning-path-05-manifests/README.md).
+>
+> This folder is retained **only** as the provenance record those five plans cite. Its `syllabus/`
+> corpus and design assets now live in `02-schema-and-prerequisite-dag` and `03-navigation-ui`
+> respectively, so the intra-folder links below no longer resolve — that is expected, and is why
+> `plans/done` is excluded from the link gate. Everything after this banner is the plan as it stood
+> at the moment of the split.
+
 Turn the "Fundamentally Strong" curriculum into a **shared course library** composed by **four
 learning paths**. One canonical body per course (a path-neutral "building block"); each path is an
 **ordered, prerequisite-consistent manifest** that composes a **curated subset** of course IDs in a

@@ -4,6 +4,17 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-07-21: shared-course-library-and-learning-paths](./2026-07-21__shared-course-library-and-learning-paths/README.md) —
+  **Closed superseded-by-split — no phase of this plan was executed.** Re-architected the
+  fundamentally-strong curriculum into a shared, path-neutral course library
+  (`/en/c/learn/courses/<course-id>`) consumed by converging path manifests at
+  `/en/c/learn/paths/<path-id>`. The plan reached full execution-grade depth (43 bound scenarios, 45
+  design decisions, a 128-file `syllabus/` corpus) but was **too wide to deliver as one PR**: its
+  work splits cleanly along an ownership boundary into five independently mergeable plans, so it was
+  split rather than started. Its entire scope was **transferred, not abandoned**, to the
+  `ayokoding-www-learning-path-01..05-*` plans in [`../backlog/`](../backlog/README.md), whose `NN-`
+  prefix is the execution sequence. This folder is retained as the provenance record those five
+  plans cite; it is not schedulable. Superseded 2026-07-21.
 - [2026-07-20: parallel-orchestration-shared-machine-governance](./2026-07-20__parallel-orchestration-shared-machine-governance/README.md) —
   Inverted the PR merge default to `[AI]`-merges-by-default (`[HUMAN]` becomes an explicit per-plan
   opt-in, preconditions identical either way), adopted the N+1 orchestration model
@@ -30,7 +41,7 @@ Archived plans and completed project planning documents.
   silent-undetected-scenario gap deferred from PR #66's cycle-7 review. Delivered byte-identically
   across ose-public/ose-primer/ose-infra; merged via PR #76 (`e21f7a212`). No generalizable learning
   surfaced (terminal KC "none"). Delivery Mode: `worktree-to-pr`. Completed 2026-07-19.
-- [2026-07-19: fundamentally-strong-software-engineer](./2026-07-19__fundamentally-strong-software-engineer/README.md) — **Closed delivered-as-descoped.** Shipped the breadth-first relearn-and-drill section on ayokoding-www through **Passes 0–2 (Phases 0–37, topics 1–33 + capstones)** — authored, live, and deployed to production (`prod-ayokoding-www` @ `e21f7a212`, 2026-07-19). The remaining **Passes 3–5 (topics 34–94)** were **transferred, not abandoned**, to the successor plan [`shared-course-library-and-learning-paths`](../backlog/shared-course-library-and-learning-paths/README.md), which re-architects the curriculum into a shared course library (`/en/c/learn/courses/<course-id>`) consumed by three converging path manifests — `interview-ready/software-engineer` (interview-first), `immediately-effective/software-engineer` (build-fast-first), and `fundamentally-strong/software-engineer` (theory-first) at `/en/c/learn/paths/<path-id>`. Delivery Mode: Phases 0–3 `main-to-origin-main`, Phases 4–37 `worktree-to-pr` (per-phase PRs, 3-cycle-reviewed, AI-auto-merged). Completed 2026-07-19.
+- [2026-07-19: fundamentally-strong-software-engineer](./2026-07-19__fundamentally-strong-software-engineer/README.md) — **Closed delivered-as-descoped.** Shipped the breadth-first relearn-and-drill section on ayokoding-www through **Passes 0–2 (Phases 0–37, topics 1–33 + capstones)** — authored, live, and deployed to production (`prod-ayokoding-www` @ `e21f7a212`, 2026-07-19). The remaining **Passes 3–5 (topics 34–94)** were **transferred, not abandoned**, to the successor plan [`shared-course-library-and-learning-paths`](./2026-07-21__shared-course-library-and-learning-paths/README.md), which re-architects the curriculum into a shared course library (`/en/c/learn/courses/<course-id>`) consumed by three converging path manifests — `interview-ready/software-engineer` (interview-first), `immediately-effective/software-engineer` (build-fast-first), and `fundamentally-strong/software-engineer` (theory-first) at `/en/c/learn/paths/<path-id>`. Delivery Mode: Phases 0–3 `main-to-origin-main`, Phases 4–37 `worktree-to-pr` (per-phase PRs, 3-cycle-reviewed, AI-auto-merged). Completed 2026-07-19.
 - [2026-07-19: rhino-cli-git-root-test-fixture-race](./2026-07-19__rhino-cli-git-root-test-fixture-race/README.md) — Fix a rhino-cli git-root test fixture that escaped its tempdir under parallel/concurrent execution and corrupted the real repository's git state (stray commits, linked worktrees, overwritten local `user.*`). Root cause was a CWD race, not the originally-hypothesized unchecked-init upward discovery; the fix is defense-in-depth isolation (explicit `GIT_DIR` + `GIT_CEILING_DIRECTORIES` + nulled global/system config + pre-write escape guard), plus a new [Git Fixture Isolation Convention](../../repo-governance/development/quality/git-fixture-isolation.md). Delivered byte-identically across ose-public/ose-primer/ose-infra (Completed: 2026-07-19)
 - [2026-07-18: e2e-scenario-coverage-gap-detector](./2026-07-18__e2e-scenario-coverage-gap-detector/README.md) —
   Added `rhino-cli specs e2e-coverage validate`, a mechanical, baseline-aware gate that diffs each

@@ -740,7 +740,7 @@ sibling entries' descriptive style.
 ## Dependencies
 
 - **No external dependencies.** No package, service, or tool is added.
-- **No blocking plans.** `plans/backlog/shared-course-library-and-learning-paths/` touches
+- **No blocking plans.** `plans/done/2026-07-21__shared-course-library-and-learning-paths/` touches
   disjoint paths.
 - **Sibling repo availability** — Phases 4 and 5 require `/Users/wkf/ose-projects/ose-primer` and
   `/Users/wkf/ose-projects/ose-infra` to be present and reachable. Both verified this session.

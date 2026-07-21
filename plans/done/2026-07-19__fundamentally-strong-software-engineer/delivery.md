@@ -20,7 +20,7 @@ does not mistake a 94-topic plan closed at topic 33 for abandonment.
   3-cycle-reviewed and AI-auto-merged.
 - **TRANSFERRED (not abandoned)** — **Pass 3, Pass 4, Pass 5 (Phases 38–109): topics 34–94** and their
   capstones. This remaining scope is **absorbed by the successor plan**
-  [`shared-course-library-and-learning-paths`](../../backlog/shared-course-library-and-learning-paths/README.md)
+  [`shared-course-library-and-learning-paths`](../2026-07-21__shared-course-library-and-learning-paths/README.md)
   (currently in `backlog`), which re-architects the whole curriculum into a **shared course
   library** (`/en/c/learn/courses/<course-id>`) consumed by **two path manifests** —
   `interview-ready/software-engineer` (interview-first) and `immediately-effective/software-engineer`
