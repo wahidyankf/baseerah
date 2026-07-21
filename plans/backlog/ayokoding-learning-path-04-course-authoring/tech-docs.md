@@ -98,12 +98,14 @@ This plan is its single largest consumer and **never copies it**.
 `md links validate` accepts **no positional path**; passing one fails with
 `error: unexpected argument '<path>' found`. It also cannot be scoped by `cd`-ing into a folder — it
 always walks the repo. So "run it in this plan's folder" is **not expressible**. Separately, the bare
-repo-wide invocation is **unsatisfiable**: the repo carries 93 pre-existing broken links, all under
-`plans/done/`, unrelated to this work. Use the repo-wide form with the pre-push hook's own excludes
-and filter to this plan's own paths:
+repo-wide invocation is **unsatisfiable**: the repo carries a pre-existing, non-zero backlog of
+broken links, nearly all under `plans/done/`, unrelated to this work (137 of 138 repo-wide as of
+2026-07-22 — a point-in-time snapshot that drifts as more plans archive). Use the repo-wide form with
+the pre-push hook's own excludes and filter to this plan's own paths:
 
 ```bash
-cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+  --quiet \
   --exclude plans/done \
   --exclude apps/ayokoding-www/content \
   --exclude apps/ose-www/content 2>&1 | grep -F "ayokoding-learning-path-04-course-authoring"
@@ -485,7 +487,9 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
   breakpoints or OpenAI's automatic threshold); **tool-count degradation** → `agent-tools-and-mcp`
   co-23 (tool-selection accuracy declines as available tool count rises, per the Berkeley
   Function-Calling Leaderboard and a GeoEngine benchmark finding a model failing at 46 tools and
-  succeeding at 19 — governs when to split a tool surface across subagents); **tool-result token
+  succeeding at 19 `[Needs Verification]` — re-verify both benchmark citations at authoring time,
+  see `syllabus/courses/agent-tools-and-mcp.md`; governs when to split a tool surface across
+  subagents); **tool-result token
   efficiency** → `agent-tools-and-mcp` co-24 (a tool's result shape is a context-budget decision;
   promotes the prior unquantified ex-27 aside to a named concept); **train-vs-production permission
   asymmetry** → `agent-permissions-and-sandboxing` co-23 (a training/exploration harness is permissive,
@@ -533,8 +537,19 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
 | DD-16 | Prerequisite-consistency is the audited smoothness property      | `ayokoding-learning-path-02-schema-and-prerequisite-dag`  |
 | DD-21 | The AI path teaches building AI systems, not driving them        | `ayokoding-learning-path-05-manifests`                    |
 | DD-22 | Convergence amended: paths converge per role, not globally       | `ayokoding-learning-path-05-manifests`                    |
-| DD-24 | Fourth path's entry point: linked, not included, prerequisites   | `ayokoding-learning-path-05-manifests`                    |
+| DD-24 | Fourth path's entry point — **SUPERSEDED 2026-07-21**, see below | `ayokoding-learning-path-05-manifests`                    |
 | DD-33 | Fourth path's manifest WALKS the AI/harness cluster; spine is 15 | `ayokoding-learning-path-05-manifests`                    |
+
+**DD-24 supersession (2026-07-21).** DD-24 originally set the fourth path's entry point as
+**linked, not included** prerequisites, on the assumption of an already-working software engineer.
+That assumption is overturned: `careers/immediately-effective/ai-engineer` assumes **no** prior
+software-engineering competence, and its prerequisites are **included** in `courseOrder` rather than
+linked out. The consequence for this plan is **nil in authored volume** — the included prerequisites
+are existing library courses, so the path's manifest lengthens (a
+`ayokoding-learning-path-05-manifests` change) while the 90 bodies authored here are unchanged. The
+body-level rule that survives is a **scope boundary**, not an entry assumption: each AI-specific
+course teaches AI material only and never re-teaches SWE fundamentals another course owns. Recorded
+in [`prd.md` §Product Overview](./prd.md#product-overview).
 
 ## Course Library Catalog
 
@@ -965,4 +980,3 @@ application code here to test. The e2e suite that walks a course page is owned b
 plan; `ayokoding-www:test:e2e` and `ayokoding-www:test:integration` are no-op echo targets in this
 workspace and are therefore never cited as evidence — the real e2e project is `ayokoding-www-fe-e2e`,
 and it is not this plan's to run.
-</content>

@@ -31,6 +31,16 @@ construction rather than as a retrofit.
 > **content correctness** (checkers, build, lint) and its **integration** (draft PR opened, 3-cycle
 > PR-Review, CI green, `[AI]` merge, `ayokoding-www` deployed). A phase is not complete until every
 > gate check is green.
+>
+> **Executor environment note — RTK-wrapped commands emit an empty-output marker, not true
+> emptiness**: this repo routes `git` (and other commands) through RTK via a Claude Code hook (see
+> `CLAUDE.md` §RTK). On an empty result RTK prints one marker line instead of zero lines — a **blank
+> line** for `git diff`, a literal **`(empty)`** line for `ls` — so a naive `| wc -l` returns **1** on
+> an empty result, indistinguishable from a genuine one-line result. The sanctioned zero-assertion
+> form for `git diff --name-only …` clauses is **`| grep -c .`** (the blank marker does not match
+> `.`, so it returns the true line count in both directions: 0 clean, N dirty). This does not
+> generalize to `ls` — **never use an `ls`-based emptiness assertion** (an `ls <dir> | wc -l` clause
+> asserting 0 is unreliable under RTK).
 
 ## Worktree
 
@@ -301,7 +311,8 @@ subagents capped per the orchestration convention). The main thread self-promote
       in this plan's own files resolves:
 
   ```bash
-  cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+  cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+    --quiet \
     --exclude plans/done \
     --exclude apps/ayokoding-www/content \
     --exclude apps/ose-www/content 2>&1 | grep -F "ayokoding-learning-path-04-course-authoring"
@@ -310,8 +321,16 @@ subagents capped per the orchestration convention). The main thread self-promote
   — acceptance: the `grep` finds **no** matching line (exits 1). Falsifiable both ways: adding one
   bad `../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/nope.md` link makes the
   same command print that file and exit 0. `md links validate` accepts **no positional path**
-  (passing one errors out) and the bare repo-wide form is unsatisfiable (93 pre-existing broken
-  links under `plans/done/`) — use this exact form.
+  (passing one errors out) and the bare repo-wide form is unsatisfiable (a pre-existing, non-zero
+  backlog of broken links, nearly all under `plans/done/`, unrelated to this work — 137 of 138
+  repo-wide as of 2026-07-22) — use this exact form.
+
+- [ ] [AI] **Confirm no manifest file changed in this phase** — this phase only writes
+      `evidence/` toolchain-baseline files, but it still opens and merges its own PR under the
+      Per-Phase Integration Protocol, so it gets the same individual gate as every other phase:
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+      — acceptance: returns **0**. Falsifiable both ways: touching any file under that path makes the
+      command return ≥1 and the phase gate fails.
 
 ### Phase 0 Gate
 
@@ -325,6 +344,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 - [ ] [AI] `evidence/authored-body-slugs.txt` holds 90 unique slugs; the ABSENT-count baseline of 90 is
       recorded in `evidence/phase-0-snapshot.txt`.
 - [ ] [AI] Cross-plan link gate green (no line naming this plan's folder).
+- [ ] [AI] Zero manifest files touched (`git diff --name-only ... | grep -c .` returns 0).
 - [ ] [AI] Draft PR opened; CI triggered; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged;
       `ayokoding-www` deployed (no-op redeploy).
 
@@ -376,6 +396,13 @@ subagents capped per the orchestration convention). The main thread self-promote
    acceptance: every finding addressed.
 7. [AI] **Re-verify** — re-run checkers + `npx nx run ayokoding-www:build` + `npm run lint:md` —
    acceptance: zero CRITICAL/HIGH/MEDIUM remain; build + lint exit 0.
+8. [AI] **Confirm no manifest file changed in this course's own diff** — the per-band and per-phase
+   manifest checks elsewhere in this file each branch fresh from `origin/main` and so can only see
+   their own diff, never an already-merged sub-phase's diff (same reasoning as every other individual
+   check in this file); this course's own sub-phase branch needs its own check for the same reason:
+   `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+   — acceptance: returns **0** on this course's own branch before it merges. Falsifiable both ways:
+   touching any file under that path makes the command return ≥1.
 
 Each course below is its own sub-phase (own branch → draft PR → 3-cycle review → `[AI]` merge →
 deploy), applying the convention:
@@ -383,7 +410,7 @@ deploy), applying the convention:
 - [ ] [AI] Light eval gate (`evaluating-ai-output-essentials` — Annotated-concept, Python, settled per
       `$SYLLABUS_ROOT/evaluating-ai-output-essentials.md`, 295 lines) — sits right after the first
       working LLM call, before RAG/agents; answers "how will you know this works?" (DD-25) —
-      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
+      acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
       `grep -F -q 'evaluating-ai-systems-in-depth' "<COURSES>evaluating-ai-output-essentials/overview.md"`
       exits 0 (the scope boundary against the deep-evals course is stated). Falsifiable both ways: the
       same command exits 1 today (no such directory) and exits 1 again if the boundary line is dropped.
@@ -392,7 +419,7 @@ deploy), applying the convention:
       settled per `$SYLLABUS_ROOT/statistics-for-evaluation.md`, 368 lines) — scoped tightly to what
       evals demand (judge concordance, significance testing), not a general statistics survey (DD-26);
       it is a **hard prerequisite** of `evaluating-ai-systems-in-depth`, so it is authored before (or
-      in the same review cycle as) the deep-evals course — acceptance: all 7 convention steps complete;
+      in the same review cycle as) the deep-evals course — acceptance: all 8 convention steps complete;
       checkers report zero CRITICAL/HIGH/MEDIUM;
       `grep -F -q 'analytics-and-experimentation' "<COURSES>statistics-for-evaluation/overview.md"`
       exits 0 (the scope boundary against classical A/B testing is stated).
@@ -413,7 +440,7 @@ deploy), applying the convention:
       `$SYLLABUS_ROOT/evaluating-ai-systems-in-depth.md`, 384 lines) — sits after agents; error
       analysis, task-specific criteria, LLM-as-judge with measured human agreement, CI gating,
       judge-scope reliability (DD-25); declares `statistics-for-evaluation` a **hard prerequisite** —
-      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
+      acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
       `grep -F -q 'statistics-for-evaluation' "<COURSES>evaluating-ai-systems-in-depth/_index.md"`
       exits 0 (the hard prerequisite is declared) **and**
       `grep -F -q 'evaluating-ai-output-essentials' "<COURSES>evaluating-ai-systems-in-depth/overview.md"`
@@ -435,17 +462,17 @@ deploy), applying the convention:
       Annotated-concept, no code, settled per
       `$SYLLABUS_ROOT/product-patterns-for-probabilistic-systems.md`, 370 lines) — product design
       patterns for probabilistic (not deterministic) outputs; no course owns this today (DD-28) —
-      acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
+      acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
 - [ ] [AI] Inference serving and model deployment (`inference-serving-and-model-deployment` — By
       Example, Python, settled per `$SYLLABUS_ROOT/inference-serving-and-model-deployment.md`, 405
       lines) — vLLM/TGI, KV-cache, batching, GPU considerations; entirely absent from the library today
-      (DD-28) — acceptance: all 7 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
+      (DD-28) — acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
       every vLLM/TGI version claim sits in a dated accuracy-note sidebar, verified by the facts checker.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] Fine-tuning and adaptation (`fine-tuning-and-adaptation` — By Example, Python, settled per
       `$SYLLABUS_ROOT/fine-tuning-and-adaptation.md`, 423 lines) — fine-tuning/LoRA/PEFT versus RAG as
-      a foil (DD-28) — acceptance: all 7 convention steps complete; checkers report zero
+      a foil (DD-28) — acceptance: all 8 convention steps complete; checkers report zero
       CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] **Add catalog rows** — replace the "per its settled spec" prerequisite cells in
@@ -463,6 +490,12 @@ deploy), applying the convention:
       populated and `MERGED_COMMIT` a real 40-char SHA on `origin/main`
       (`git cat-file -e <sha>^{commit}` exits 0). Falsifiable both ways: a placeholder SHA fails
       `git cat-file -e`.
+- [ ] [AI] **Confirm no manifest file changed in this phase** — this phase authors six course bodies
+      via the same mechanism Bands 1–9 use, so it gets the identical individual gate every band
+      already carries via its own "per-band closing steps" step 3:
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+      — acceptance: returns **0**. Falsifiable both ways: touching any file under that path makes the
+      command return ≥1 and the phase gate fails.
 
 ### Phase 1 Gate
 
@@ -479,6 +512,7 @@ deploy), applying the convention:
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate`
       all exit 0.
 - [ ] [AI] Band-completion signal recorded with all five fields; `MERGED_COMMIT` verified real.
+- [ ] [AI] Zero manifest files touched (`git diff --name-only ... | grep -c .` returns 0).
 - [ ] [AI] Every course sub-phase PR is `[AI]`-merged and deployed.
 
 > **Pause Safety**: the library holds the 37 re-homed bundles plus six new AI courses, all at canonical
@@ -544,7 +578,7 @@ deploy), applying the convention:
       `agent-permissions-and-sandboxing` — acceptance: each concept appears as an explicit acceptance
       criterion on the relevant Band 5 item below, naming the concept and its target course.
 - [ ] [AI] **Confirm no manifest file changed in this phase** —
-      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | wc -l`
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
       — acceptance: returns **0**. Falsifiable both ways: touching any file under that path makes the
       command return ≥1 and the phase gate fails.
 
@@ -554,7 +588,7 @@ deploy), applying the convention:
       concept-addition contracts locked as explicit Band 5 / Band 8 acceptance criteria.
 - [ ] [AI] "Harness engineering" is cited, not adopted as structure — no course renamed (D9); the
       unverified OpenAI attribution is excluded.
-- [ ] [AI] Zero manifest files touched (`git diff --name-only ... | wc -l` returns 0).
+- [ ] [AI] Zero manifest files touched (`git diff --name-only ... | grep -c .` returns 0).
 - [ ] [AI] Draft PR opened (this phase's PR touches only this delivery checklist's own text — no app
       content changes); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed (no-op).
 
@@ -596,7 +630,7 @@ rows as part of "convention complete".
    `LANDED_COURSE_IDS`, `GROW_MANIFESTS`, `MERGED_COMMIT`) per
    [README §Band-completion signal contract](./README.md#band-completion-signal-contract).
 3. [AI] Confirm zero manifest files were touched:
-   `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | wc -l`
+   `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
    returns **0**.
 
 ---
@@ -1245,6 +1279,31 @@ rows as part of "convention complete".
 - [ ] [AI] **Verify every authored body has both tracks** —
       `while read -r s; do test -d "apps/ayokoding-www/content/en/learn/courses/$s/learning" && test -d "apps/ayokoding-www/content/en/learn/courses/$s/drilling" || echo "INCOMPLETE $s"; done < evidence/authored-body-slugs.txt | wc -l`
       — acceptance: returns **0**.
+- [ ] [AI] **Supersession sweep (Q-A-conditional)** — this plan's hard `blockedBy` on
+      `ayokoding-learning-path-01-url-restructure` guarantees Q-A is ruled (not left
+      "Recommendation") by the time this phase runs: Phase 0 already verified that plan is merged to
+      `origin/main`, and its own archival gate requires all six Q-A…Q-F rulings recorded in its
+      `tech-docs.md`. Read the ruled option in the
+      [Q-A record](../ayokoding-learning-path-01-url-restructure/tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive)
+      before branching:
+  - **If ruled A (staging pen) or C (hybrid, for the overlapping subjects)**: for every course in
+    `evidence/authored-body-slugs.txt` whose subject overlaps a remaining
+    `apps/ayokoding-www/content/en/learn/legacy/` page, append a `Superseded by:` line naming that
+    page to the course's own `<COURSES><course-id>/overview.md`, and record the identified slug list
+    (one per line) to `evidence/supersession-sweep-slugs.txt` — acceptance:
+    `grep -lF 'Superseded by:' <COURSES>*/overview.md | wc -l` equals
+    `wc -l < evidence/supersession-sweep-slugs.txt`. Falsifiable both ways: before this step runs,
+    `grep -lF 'Superseded by:' <COURSES>*/overview.md | wc -l` returns **0**; after this step, both
+    counts are equal (non-zero unless the overlap set is genuinely empty, in which case both are 0
+    and this branch's outcome matches ruling B's).
+  - **If ruled B (permanent archive)**: edit no `overview.md`; record
+    `Q-A ruled B — no supersession sweep performed` in `learnings.md` — acceptance:
+    `grep -lF 'Superseded by:' <COURSES>*/overview.md | wc -l` returns **0**.
+  - Either branch commits on this phase's own branch, ahead of this phase's existing
+    manifest-ownership check below and its own draft PR — no separate branch or PR is opened for the
+    sweep. The sweep only ever touches `<COURSES>*/overview.md`, never a `<MANIFESTS>` path, so it is
+    already covered by this phase's manifest-ownership check, which runs on this same branch before
+    the phase merges.
 - [ ] [AI] Run affected quality gates from the worktree:
       `npx nx affected -t typecheck lint test:quick test:unit specs:behavior:coverage`
       — acceptance: exits 0. Fix ALL failures, including preexisting ones (Root Cause Orientation),
@@ -1255,7 +1314,8 @@ rows as part of "convention complete".
       `npm run lint:md`, plus the scoped link gate:
 
   ```bash
-  cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+  cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+    --quiet \
     --exclude plans/done \
     --exclude apps/ose-www/content 2>&1 | grep -F "learn/courses/"
   ```
@@ -1263,7 +1323,8 @@ rows as part of "convention complete".
   — acceptance: the first two exit 0 and the `grep` finds **no** line naming a `learn/courses/`
   path (exits 1). Note the content exclusion is narrowed here (only `ose-www` content is excluded)
   precisely so this plan's own authored bodies are validated; `plans/done` stays excluded because
-  the repo carries 93 pre-existing broken links there, unrelated to this work.
+  the repo carries a pre-existing, non-zero backlog of broken links there, unrelated to this work
+  (137 as of 2026-07-22, and drifts as more plans archive).
 
   **Gherkin (binds) →** "The authored course library builds and validates green"
 
@@ -1275,13 +1336,44 @@ rows as part of "convention complete".
     And link, heading-hierarchy, and markdownlint validation report no errors across the authored course bodies
   ```
 
-- [ ] [AI] **Verify zero manifest files were touched by this entire plan** —
-      `git log origin/main --name-only --pretty=format: --grep 'ayokoding-learning-path-04-course-authoring' | grep -F 'src/features/course-paths/manifests/' | sort -u | wc -l`
-      — acceptance: returns **0**. This is the ownership invariant's terminal proof.
+- [ ] [AI] **Verify zero manifest files were touched by this entire plan** — every phase before this
+      one that opens/merges its own PR carries the identical individual check on its own diff before
+      that phase merges (Phase 0's check, Phase 1's check, Phase 2's check, and every "per-band closing
+      steps" step 3, Phases 3–11); each of the **90 individual course sub-phases** nested inside Phase 1
+      and Bands 1–9 additionally carries its own instance of this check as **convention step 8** (see the
+      "NEW-course authoring convention"), asserted on that course's own branch before it merges — the
+      closing-steps checks alone branch fresh from `origin/main` after every course in that band has
+      already merged, so they can only ever see their own diff, never the already-merged course diffs;
+      only each course's own convention step 8 can see that. Re-assert the same sound mechanism here on
+      this phase's own branch. A commit-message `--grep` filter is unsound for this purpose: nothing in
+      this plan mandates the plan identifier appear in commit messages (the Commit Guidelines example
+      below, `feat(ayokoding-www): add nosql-databases course body`, does not contain it), and a filter
+      that matches zero commits exits 0 and looks like success whether or not the invariant actually
+      held:
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+      — acceptance: returns **0**. Falsifiable both ways: touching any file under that path on this
+      branch makes it return ≥1; this check, plus every one of the 90 course sub-phases' own
+      convention-step-8 check, plus every prior phase's own already-passed individual check, together
+      constitute the ownership invariant's terminal proof for Phases 0–12 (Phase 13, 14, and 15 each
+      carry — or, for Phase 14, do not need, since it commits nothing of its own — the same individual
+      check on their own diffs; Phase 16 re-asserts once more for its own diff).
 - [ ] [AI] **Verify every band-completion signal is complete** — each of the ten signals in this file
-      (Phase 1 + Bands 1–9) carries all five fields and a `MERGED_COMMIT` that resolves:
-      `for c in $(grep -F 'MERGED_COMMIT:' delivery.md | awk '{print $NF}'); do git cat-file -e "$c^{commit}" || echo "BAD $c"; done | wc -l`
-      — acceptance: returns **0**, and `grep -F 'MERGED_COMMIT:' delivery.md | wc -l` returns **10**.
+      (Phase 1 + Bands 1–9) carries all five fields and a `MERGED_COMMIT` that resolves. Anchor the
+      count on the field's line-start form (`MERGED_COMMIT: <sha>` alone on its own line inside the
+      fenced signal block per the [band-completion signal contract](./README.md#band-completion-signal-contract))
+      so the checklist's own prose mentions of the bare substring `MERGED_COMMIT:` (this explanation,
+      the command below, and Phase 14's downstream-notification check all mention the literal
+      substring in prose) are never counted:
+      `for c in $(grep -oE '^MERGED_COMMIT: [0-9a-f]{7,40}$' delivery.md | awk '{print $NF}'); do git cat-file -e "$c^{commit}" || echo "BAD $c"; done | wc -l`
+      — acceptance: returns **0**, and `grep -cE '^MERGED_COMMIT: [0-9a-f]{7,40}$' delivery.md` returns
+      **10** (`-c` counts matching _lines_ here, which is exactly one per genuine signal block, not
+      substring occurrences — unlike the bare-substring form `grep -cF 'MERGED_COMMIT:' delivery.md`,
+      which overcounts by however many prose lines in this checklist happen to mention the literal
+      substring at the time; that count drifts as the checklist itself is edited, so do not trust a
+      fixed number here — run `grep -nF 'MERGED_COMMIT:' delivery.md` to see the live count before
+      reasoning about the bare-substring form). Falsifiable both ways: today, before any band lands,
+      both commands return **0** (not 10); once all ten signals are genuinely recorded, the second
+      returns exactly **10**.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
 > (Root Cause Orientation). Commit preexisting fixes separately with conventional-commit messages.
@@ -1289,6 +1381,9 @@ rows as part of "convention complete".
 ### Phase 12 Gate
 
 - [ ] [AI] All three 90-body structural loops (presence, prerequisites, both tracks) return 0.
+- [ ] [AI] Supersession sweep resolved one way or the other: either the `Superseded by:` count in
+      `<COURSES>*/overview.md` matches `evidence/supersession-sweep-slugs.txt`, or Q-A ruled B and
+      `learnings.md` records the no-op — never left unresolved.
 - [ ] [AI] Affected `typecheck / lint / test:quick / test:unit / specs:behavior:coverage` exit 0.
 - [ ] [AI] Build + heading-hierarchy + markdownlint green; the scoped link gate finds no
       `learn/courses/` failure.
@@ -1347,6 +1442,12 @@ rows as part of "convention complete".
 - [ ] [AI] **Record the rule-15 exemption in `learnings.md`** with its three reasons and a pointer to
       the navigation-UI plan that carries the triad — acceptance: the exemption entry is present, so
       the archival gate can verify it was recorded rather than forgotten.
+- [ ] [AI] **Confirm no manifest file changed in this phase** — this phase opens and merges its own PR
+      (verification evidence) under the Per-Phase Integration Protocol exactly like every other phase,
+      so it gets the same individual gate:
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+      — acceptance: returns **0**. Falsifiable both ways: touching any file under that path makes the
+      command return ≥1 and the phase gate fails.
 
 ### Phase 13 Gate
 
@@ -1355,6 +1456,7 @@ rows as part of "convention complete".
 - [ ] [AI] 33 screenshots present under `evidence/` and referenced in this checklist.
 - [ ] [AI] The rule-15 exemption is recorded with reasons (not silently omitted); the triad itself is
       **not** run here.
+- [ ] [AI] Zero manifest files touched (`git diff --name-only ... | grep -c .` returns 0).
 - [ ] [AI] Draft PR opened (verification evidence); 3-cycle PR-Review complete; CI green; PR
       `[AI]`-merged; deployed.
 
@@ -1374,14 +1476,26 @@ rows as part of "convention complete".
 - [ ] [AI] Monitor the final `main` CI run (poll every ~2 min; one
       `gh run view --json status,conclusion` per wakeup; never `gh run watch`) — acceptance: all GitHub
       Actions green; fix root causes and push follow-ups (own PR → review → `[AI]` merge) until green.
+      **Any follow-up PR opened here carries the identical individual manifest-diff check on its own
+      branch before it merges** — this hypothetical path has no dedicated content-authoring convention
+      to inherit the check from (unlike the 90 course sub-phases), so it is stated explicitly here:
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+      returns **0** on the follow-up branch before merge. Falsifiable both ways: touching any file
+      under that path makes it return ≥1.
 - [ ] [AI] Confirm `prod-ayokoding-www` serves the authored bodies — spot-check five canonical course
       URLs across five different bands — acceptance: each returns 200 with the expected course title.
       Re-dispatch `apps-ayokoding-www-deployer` if any earlier deploy lagged.
 - [ ] [AI] **Notify the downstream manifest plan** — confirm all ten band-completion signals are
       present in this file on `origin/main` and reachable by
       [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/delivery.md)
-      — acceptance: `git show origin/main:plans/*/ayokoding-learning-path-04-course-authoring/delivery.md | grep -F 'MERGED_COMMIT:' | wc -l`
-      returns **10**.
+      — acceptance: `git show origin/main:plans/*/ayokoding-learning-path-04-course-authoring/delivery.md | grep -cE '^MERGED_COMMIT: [0-9a-f]{7,40}$'`
+      returns **10**. Uses the same anchored line-start form as Phase 12's band-completion-signal
+      check; the bare-substring form (`grep -cF 'MERGED_COMMIT:'`) is unreachable here too, for the
+      same reason — it also matches this checklist's own prose mentions of the literal substring, so
+      it overcounts by however many such prose lines exist at the time (that count drifts as the
+      checklist is edited; re-run `grep -nF 'MERGED_COMMIT:' delivery.md` for the live figure rather
+      than trusting a fixed number here). Falsifiable both ways: today, before any band lands, this
+      returns **0**.
 
 ### Phase 14 Gate
 
@@ -1419,12 +1533,21 @@ rows as part of "convention complete".
       records its terminal routing state.
 - [ ] [AI] If no generalizable learning surfaced, record `No generalizable learnings — <reason>` in
       `learnings.md` — acceptance: `learnings.md` is never silently empty.
+- [ ] [AI] **Confirm no manifest file changed in this phase** — this phase commits the
+      `learnings.md` triage and any inline non-code fixes, and opens/merges its own PR under the
+      Per-Phase Integration Protocol like every other phase, so it gets the same individual gate
+      (the code-routing rule above already forbids landing a manifest-touching fix inline; this
+      re-asserts it mechanically rather than trusting the routing rule alone):
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+      — acceptance: returns **0**. Falsifiable both ways: touching any file under that path makes the
+      command return ≥1 and the phase gate fails.
 
 ### Phase 15 Gate
 
 - [ ] [AI] Every `learnings.md` entry is terminal (routed inline / filed as backlog / discarded with
       reason) or the explicit "none" escape is present.
 - [ ] [AI] No code-homed learning landed inline in this plan's own commits/PRs.
+- [ ] [AI] Zero manifest files touched (`git diff --name-only ... | grep -c .` returns 0).
 - [ ] [AI] Draft PR opened (`learnings.md` triage); 3-cycle PR-Review complete; CI green; PR
       `[AI]`-merged; deployed (no-op).
 
@@ -1450,14 +1573,22 @@ rows as part of "convention complete".
       hold. **This plan asserts 90, not 127.** The 127-course catalog total is
       `ayokoding-learning-path-05-manifests`'s terminal assertion (90 authored here + 37 re-homed by
       `ayokoding-learning-path-01-url-restructure`).
-- [ ] [AI] **Verify the ownership invariant held** —
-      `git log origin/main --name-only --pretty=format: --grep 'ayokoding-learning-path-04-course-authoring' | grep -F 'src/features/course-paths/manifests/' | sort -u | wc -l`
-      returns **0** — acceptance: no manifest file was ever touched by this plan.
+- [ ] [AI] **Verify the ownership invariant held** — re-assert the same sound diff-based mechanism used
+      by every prior commit-producing phase's own individual check (Phase 0, Phase 1, Phase 2, every
+      band's per-band closing steps, every one of the 90 individual course sub-phases' own convention
+      step 8, Phase 12, Phase 13, and Phase 15), on this phase's own diff (a commit-message `--grep`
+      filter is unsound: nothing mandates the plan identifier appear in commit messages, and a filter
+      matching zero commits exits 0 and looks like success regardless of whether the invariant actually
+      held):
+      `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+      returns **0** — acceptance: no manifest file was touched on this branch. Falsifiable both ways:
+      touching any file under that path makes it return ≥1.
 - [ ] [AI] **Verify every cross-plan reference still resolves after upstream archival** — the schema
       plan archives to `plans/done/YYYY-MM-DD__…` while this plan runs, so re-run the BF-8 link gate:
 
   ```bash
-  cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+  cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate \
+    --quiet \
     --exclude plans/done \
     --exclude apps/ayokoding-www/content \
     --exclude apps/ose-www/content 2>&1 | grep -F "ayokoding-learning-path-04-course-authoring"
@@ -1525,4 +1656,3 @@ This plan is created in `plans/backlog/ayokoding-learning-path-04-course-authori
 starts it is promoted to `plans/in-progress/ayokoding-learning-path-04-course-authoring/` (no date
 prefix on either); the `git mv` in Phase 16 then archives it to
 `plans/done/YYYY-MM-DD__ayokoding-learning-path-04-course-authoring/` using the completion date.
-</content>

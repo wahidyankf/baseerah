@@ -77,8 +77,11 @@ shape is specified in `README.md` rather than left to convention.
   where its design calls for fifteen.
 - There is no interview-technique material at all — the single highest-time-pressure use of the whole
   curriculum (an experienced engineer days-to-weeks from a senior loop) has nothing to read.
-- An already-working software engineer moving into AI engineering has no structured on-ramp into
-  **building** AI systems. The six net-new AI courses are that on-ramp.
+- Someone entering AI engineering from scratch has no structured on-ramp into **building** AI
+  systems. The six net-new AI courses are that on-ramp. (Re-scoped 2026-07-21: the path assumes no
+  prior software-engineering competence and includes its prerequisites in `courseOrder` rather than
+  linking out. Those prerequisites are existing library courses, so the re-scoping lengthens the
+  path's manifest — owned by `ayokoding-learning-path-05-manifests` — without adding a body here.)
 - The library's evals material is triple-taught with no single owner, and its agent primitives risk
   being taught twice (once as survey, once at build-your-own depth). Both are duplication the
   shared-library model exists to prevent.
@@ -198,5 +201,3 @@ judgment rather than a check, it is labelled.
 | Ninety bodies authored serially stall the plan indefinitely.                                             | Bodies are content-independent (each writes only its own subtree) and pipeline concurrently through review, bounded by the in-force concurrency cap. Each band is its own phase with its own safe stopping point, so partial delivery is always a coherent state.   |
 | Q-A is ruled after authoring begins, forcing a rewrite of 90 `overview.md` files.                        | Authoring proceeds without the supersession line and records the pending obligation; the supersession sweep is one bounded conditional pass over only the courses whose subject a legacy page covers, not a per-course rewrite.                                     |
 | A band lands but the manifest plan never grows its manifests, leaving paths permanently truncated.       | Each band's gate requires a complete five-field signal naming every affected manifest by full path plus the merge commit SHA; an incomplete signal is rejected by the receiving plan rather than guessed at.                                                        |
-
-</content>

@@ -87,9 +87,12 @@ Scoped to this plan's surface — the course bodies themselves.
 - As an **experienced engineer re-entering the market**, I want real interview-technique modules in a
   **refresh register** plus a layoff/gap-narrative section, so that I reload technique at my level
   instead of being taught concepts from zero.
-- As an **already-working software engineer moving into AI engineering**, I want six AI-specific
-  courses that teach me to **build** AI systems, so that I get an on-ramp that assumes the SWE
-  competence I already have.
+- As **someone entering AI engineering from scratch**, I want six AI-specific courses that teach me
+  to **build** AI systems (models, agents, evals, inference serving), so that I get an on-ramp to an
+  AI-engineering endpoint that assumes no prior software-engineering competence. (Re-scoped
+  2026-07-21; the entry assumption changed, the six courses did not. The prerequisites that make the
+  path stand alone are **existing library courses** included in its `courseOrder` — the manifest
+  grows, but this plan authors no additional body for them.)
 - As a **reader of any AI-band course**, I want each course to state its scope boundary against the
   sibling it could be confused with, so that I never read a fourth treatment of material another
   course owns.
@@ -255,11 +258,11 @@ a `**Gherkin (binds) →**` marker plus its verbatim fenced block on the named s
 
 ## NEW Course & Capstone Specifications
 
-This plan authors **twenty NEW courses + eight NEW capstones** — the original fourteen (interview +
+This plan authors **twenty NEW courses + nine NEW capstones** — the original fourteen (interview +
 productivity/harness/security clusters) plus **six further NEW AI-specific courses** added 2026-07-20
-for the `careers/immediately-effective/ai-engineer` path, plus eight capstones (two original plus six of the
-seven DD-20 inter-topic capstones; the seventh, `capstone-solid-core`, is already live on disk and is
-re-homed by `ayokoding-learning-path-01-url-restructure`, not authored here) — alongside the 61
+for the `careers/immediately-effective/ai-engineer` path, plus nine capstones (three original plus six
+of the seven DD-20 inter-topic capstones; the seventh, `capstone-solid-core`, is already live on disk
+and is re-homed by `ayokoding-learning-path-01-url-restructure`, not authored here) — alongside the 61
 transferred topics authored native.
 
 Each course is a full page-bundle (learning track + drilling track) matching the sibling plan's
@@ -276,10 +279,14 @@ The catalog is the source of truth for authoring; these specs are not a substitu
 **Register.** The four interview-technique courses use a **refresh register** (assume prior
 professional experience; reload technique, do not teach from zero). The ten productivity/harness/
 security courses and the six AI-specific courses (2026-07-20) use the normal **first-learn By-Example
-register**; `just-enough-cpp` is primer scope. The AI-specific courses additionally use the
-**links-not-included** entry model: they assume the reader already has the SWE fundamentals the other
-three paths teach (DD-24) — the courses themselves teach AI material only, they do not re-teach the
-linked prerequisites.
+register**; `just-enough-cpp` is primer scope. Each AI-specific course teaches **AI material only**
+and never re-teaches the SWE fundamentals the other three paths own — but that scope boundary is a
+**body-level** rule, not an entry assumption about the reader. DD-24's **links-not-included** entry
+model is **superseded** by the 2026-07-21 re-scoping recorded above (see
+[Product Overview](#product-overview)): the fourth path assumes **no** prior software-engineering
+competence and **includes** its prerequisite courses in `courseOrder`. Those prerequisites are
+existing library courses reached before the AI band begins, so the bodies authored here are
+unchanged by the supersession.
 
 **Principle-first framing (HARD).** Every course teaches a durable **principle**; target codebases
 (`remotebrowser`, `wazuh`, `vacti*`, the ose family) are **illustrative worked-examples**, never the
@@ -485,4 +492,3 @@ inside their host course spec files under the cross-plan `syllabus/courses/` fol
   [tech-docs DD-28](./tech-docs.md#design-decisions).
 - **Ninety bodies authored serially stalling the plan.** Mitigated by band-per-phase structure with
   independent safe stopping points and concurrent review pipelining bounded by the in-force cap.
-  </content>

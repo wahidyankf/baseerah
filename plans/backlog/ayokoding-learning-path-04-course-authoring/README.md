@@ -382,8 +382,9 @@ forbidden.
 
 - [Business Requirements (brd.md)](./brd.md) — WHY these 90 bodies exist, who they serve, the
   business risks of authoring them, and what "done" means in business terms.
-- [Product Requirements (prd.md)](./prd.md) — personas, user stories, the ten Gherkin acceptance
-  criteria this plan owns, the NEW-course and capstone specifications, and product scope.
+- [Product Requirements (prd.md)](./prd.md) — personas, user stories, the eleven Gherkin acceptance
+  criteria this plan owns (ten routed from the source plan, plus one newly authored scoped
+  build-green scenario), the NEW-course and capstone specifications, and product scope.
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — the authoring architecture, the sixteen design
   decisions this plan owns, the Course Library Catalog, the proof-of-transfer outcome-anchor, the
   cross-plan `syllabus/` reference rule, and the UI-design-funnel exemption.
@@ -415,5 +416,3 @@ This plan is one of five folders produced by splitting
   `syllabus/courses/**` carrying **FS-SE-inherited** meanings (concept enumeration, primary-source
   citation policy, typed-Python policy) and travel with `syllabus/` into the schema plan. `DD-36`,
   `DD-37`, and `DD-38` are unused. **Do not renumber to close the apparent gap.**
-  </content>
-  </invoke>
