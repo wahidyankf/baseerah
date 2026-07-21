@@ -284,7 +284,9 @@ full three-substep cycle._
       `test -f "${FEAT}shell/manifest-repository.ts"` — acceptance: exits 0; returns non-zero before
       `ayokoding-learning-path-03-navigation-ui` lands.
 - [ ] [AI] **Start precondition 4** — confirm the structural skills index exists and is **not** this
-      plan's to create (A3 / DD-15): `test -f "${PATHS}skills/_index.md"` — acceptance: exits 0. If it
+      plan's to create (programme amendment `A3`; **this plan's own** `DD-15`; the file is created by
+      `ayokoding-learning-path-01-url-restructure` under **its** `DD-49`):
+      `test -f "${PATHS}skills/_index.md"` — acceptance: exits 0. If it
       returns non-zero, **stop**: plan 01 has not landed and creating it here would be a boundary
       violation.
 - [ ] [AI] **Start precondition 5** — confirm the eight existing-library prerequisites resolve as

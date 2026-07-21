@@ -51,6 +51,35 @@ at all and are authorable while `06` is still in flight.
 Other candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md); promote one
 here when it is ripe.
 
+### Learning-path programme decisions (`R*` / `A*`)
+
+The seven plans above cite these ids throughout (`R7`, `A3`, and so on). They are **programme-scope
+decisions, not governance rule ids** — nothing under [`../../repo-governance/`](../../repo-governance/README.md)
+defines them, and they bind only this programme. They are recorded here because they are shared by
+all seven plans, so putting them inside any one plan would place a shared document on a cross-plan
+seam (the same reasoning as `A3` itself). Each plan additionally encodes the rules that affect it as
+its own numbered `DD-*` decisions, where the full rationale lives; the table below is definitional.
+
+`A*` amendments are **later than** the `R*` rules and **win on conflict**.
+
+| Id  | Decision                                                                                                                                                  |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R0  | Remove the `/c/` content namespace by **inverting** `contentNamespaceRedirects` — supplementing it would 308-loop                                         |
+| R1  | URL grammar is `/en/learn/paths/{careers,skills}/…` over six paths                                                                                        |
+| R2  | `pathId` is **variable-depth by design** — `careers/<arc>/<role>` is 3 segments, `skills/<subject>` is 2; nothing may key on segment count                |
+| R3  | The fourth careers path targets a distinct AI-engineering endpoint (superseded in part by `A1`)                                                           |
+| R4  | Ownership split: plans 01-05 are `careers/`-only; the `skills/` category is separate (revised by `A2`)                                                    |
+| R5  | The full skills corpus is authored **in this programme**, not deferred                                                                                    |
+| R6  | The paths hub is **redesigned** around the two categories, not relabelled                                                                                 |
+| R7  | **Every URL segment must render** — no orphan segments                                                                                                    |
+| R8  | Every `skills/` path uses the **immediately-effective** arc, always                                                                                       |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why            |
+| A1  | `careers/immediately-effective/ai-engineer` assumes **no** prior software-engineering competence; prerequisites are included in `courseOrder`, not linked |
+| A2  | The skills category splits into **two** plans — 06 (accounting) and 07 (ERP), the latter `blockedBy` the former                                           |
+| A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                             |
+| A4  | Research verification status is carried forward verbatim — an `[Unverified]` claim must never be restated as fact                                         |
+| A5  | Plan 03 owns **all** design assets; a `.png` is a baked render and desynchronises silently when its `.html` changes                                       |
+
 ## Instructions
 
 **Idea Capture**: For ideas not ready for formal planning, write a two-pager in
