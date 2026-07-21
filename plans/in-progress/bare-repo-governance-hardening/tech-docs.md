@@ -11,7 +11,7 @@ ordered correctly, and a three-repo propagation sequence in which two targets ar
 ```mermaid
 %% Color palette: Blue #0173B2, Orange #DE8F05, Teal #029E73
 %% Node labels are shortened for mobile rendering (max 30 chars per line);
-%% the full repository-relative paths are in the Path Constants table above.
+%% the full repository-relative paths are in the Path Constants section of delivery.md.
 flowchart LR
     C1["C1 NEW<br/>bare-repo-landing-method.md"]
     ND["C2 edit<br/>no-destructive-git-ops.md"]
@@ -133,6 +133,21 @@ worktree, and each propagation phase must therefore execute the very method this
 That self-application is deliberate: it is the cheapest available proof that the written procedure
 is executable rather than merely plausible. Call it out during execution; do not treat it as an
 incidental detail.
+
+## File Impact
+
+Every file this plan touches is already mapped twice — this section is the conventionally-named
+landing spot for that mapping, not a third copy of it:
+
+- **What changes and how the pieces link** — the
+  [Document graph](#document-graph--what-changes-and-how-the-pieces-link) diagram above: the new
+  `<C1>` plus every edited file (`no-destructive-git-operations.md`, `plans.md`,
+  `plan-multi-repo-parity-planning.md`, `pr-merge-protocol.md`, `sdlc-gate-standard.md`,
+  `plan-idea-promotion-planning.md`, and the two index READMEs) and the two unchanged files the
+  diagram calls out for contrast (`worktree-and-artifact-cleanup.md`,
+  `pr-review-quality-gate.md`).
+- **Which Change ID touches which file, and why** — [README.md §Scope](./README.md#scope)'s C1-C7
+  table.
 
 ## Design Decisions
 
@@ -276,6 +291,17 @@ surfaces, and the total work is small enough that parallelism buys nothing worth
 **Consequence**: the Parallelization Model in `delivery.md` declares a fully serial DAG with the
 independence noted.
 
+**Binds the late-correction case too**: Phase 4 and Phase 5 execute `<C1>`'s own documented method
+while propagating it (Phases 4-5's headings both say "Self-Applying the Method"), so either phase can
+surface friction between `<C1>`'s written procedure and what execution actually required. This
+directionality rule binds that case exactly as it binds the original changeset: Phase 4 and Phase 5
+never edit `<C1>` in place inside their own propagation worktree (that copy is not the source of
+truth), and any correction is instead recorded in `learnings.md` and landed through the `<C1>`
+Correction Propagation Sub-Cycle in `delivery.md` Phase 6 — `ose-public` first, then both siblings.
+Without this, an in-place fix inside `<PRIMER-WT>` would land in `ose-primer` while Phase 5 still
+copies the unfixed text from merged `ose-public`, and `ose-public` itself — the source of truth this
+decision names — would never receive the correction at all.
+
 ### DD-9 — The dangling "bare-repo git-ops method" cross-link is re-pointed and absorbed
 
 Discovered during pre-write verification, not present in either brief:
@@ -332,6 +358,47 @@ handling was **not** required there.
 **Consequence**: Phases 4 and 5 each carry an explicit non-goal — do not scaffold a plan folder in
 the sibling — and Phase 7 archives exactly one folder, in `ose-public`. The siblings' `plans/`
 indexes are untouched by this plan.
+
+### DD-11 — Phase 7 archival departs from `plan-execution.md` §8 by necessity, not oversight
+
+Phase 7's archival commit (`git mv plans/in-progress/... plans/done/...`) lands via direct push to
+`origin main` **after** the Phase 3 `ose-public` PR — the only PR that ever carries this plan's
+folder (DD-10) — has already merged. This is a documented departure from
+[`plan-execution.md` §8 Finalization and Archival, "Archival-in-PR"](../../../repo-governance/workflows/plan/plan-execution.md#8-finalization-and-archival-sequential),
+which states, with no multi-repo carve-out: _"the `git mv plans/in-progress/... plans/done/...` move
+(and the accompanying README index updates) is committed **inside the delivering PR itself**, as a
+normal commit on the PR branch pushed before the merge — **not as a separate commit landed on
+`main` after merge**."_
+
+**Rationale — why compliance is structurally impossible (primary reason)**: this plan's delivery
+spans **three PRs across three repositories** — `ose-public` (Phase 3), `ose-primer` (Phase 4), and
+`ose-infra` (Phase 5, the third and final PR to merge). §8 assumes one plan → one repo → one
+delivering PR: a single PR that is simultaneously the _last_ to merge and the _one_ that can carry
+the plan folder's `git mv`. Per DD-10, the plan folder exists in `ose-public` only. The PR that
+holds the folder (`ose-public`, Phase 3) is not the PR that merges last (`ose-infra`, Phase 5); the
+PR that merges last holds no plan folder to move. No single PR in this plan's shape satisfies both
+of §8's implicit assumptions at once — the rule has no provision for a plan whose delivery spans
+repositories the plan folder does not live in.
+
+**Rationale — the maintainer's standing instruction (secondary reason)**: independent of the
+structural argument above, plan-document lifecycle work (authoring, stage promotion, quality-gate
+review cycles, and archival) is standing maintainer policy to run on local `main`, landing via the
+[Plan-Docs-Only Carve-Out](../../../repo-governance/workflows/plan/plan-planning.md#the-plan-docs-only-carve-out)
+rather than through a worktree/PR — the worktree and its PR are reserved for this plan's C1-C7
+implementation phases (DD-4).
+
+**This decision disclaims being a general precedent.** It resolves this plan's specific shape — a
+plan folder that lives in one repo while its delivery's last-merging PR lives in another — and does
+not establish that every future `*-to-pr` plan may archive via direct push. The proper fix is a rule
+change, not a repeatable citation: see
+[`plan-archival-in-pr-multi-repo-gap`](../../../plans/ideas/plan-archival-in-pr-multi-repo-gap.md),
+the idea brief this decision is tracked against, proposing `plan-execution.md` §8 gain an explicit
+multi-repo provision so a future plan of this shape does not need to re-argue the case from first
+principles.
+
+**Consequence**: Phase 7's "Land the archival commit" step and note (see `delivery.md`) cite this
+decision and §8 directly; the git operation itself (`git push origin HEAD:main`) is unchanged from
+prior iterations of this plan — only its justification and forward-traceability change.
 
 ## Research Findings
 
@@ -636,6 +703,16 @@ Sections:
 
 The phrase **"bare-repo git-ops method"** appears verbatim in the document (DD-9) so the incoming
 link from `plan-idea-promotion-planning.md` resolves to named content.
+
+### C2 — the safety-convention cross-link
+
+Two cross-links added to `no-destructive-git-operations.md` (§Conventions Implemented/Respected and
+§Related Documentation), each pointing at `<C1>` and describing it as the procedure whose safety
+guarantees that convention supplies. The shape is a one-line link addition, not a new section — see
+[DD-5](#dd-5--the-method-gets-a-new-document-the-advisory-wip-rule-lives-in-it) for why the method
+lives in a new document rather than being folded into this convention, and
+[delivery.md Phase 2](./delivery.md#phase-2-author-the-landing-method-document-c1-c2-and-register-it)
+for the concrete edit and its acceptance criterion.
 
 ### C3-C6 — edit shapes
 

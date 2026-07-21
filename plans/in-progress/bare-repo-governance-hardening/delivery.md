@@ -57,11 +57,52 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 ## Delivery Mode: worktree-to-pr
 
 Per **DD-4** ([tech-docs.md](./tech-docs.md#dd-4--delivery-mode-for-this-plans-own-execution-is-worktree-to-pr)).
-The `ose-public` changeset is authored in the worktree above, lands as a **draft PR** against `main`,
-runs the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3 sequential
+`worktree-to-pr` governs this plan's **implementation** — the C1-C7 changeset that lands in each
+repo. The `ose-public` changeset is authored in the worktree above, lands as a **draft PR** against
+`main`, runs the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3 sequential
 CI-gated cycles), then `[AI]` merges once the five hardened preconditions hold. Each sibling
 propagation phase opens its **own** draft PR in its own repo, preserving the strict
 1-PR ↔ 1-worktree relationship.
+
+**Plan-document lifecycle work is out of scope for this mode — it is governed by standing repo
+policy, not by this section.** Authoring this plan, promoting it between `plans/` stages, running its
+own quality-gate review cycles, and archiving it at completion (Phase 7) are **plan-document work**:
+they touch only paths under `plans/`, ship no runtime behaviour, and land on the local `main` branch
+via direct push under the
+[Plan-Docs-Only Carve-Out](../../../repo-governance/workflows/plan/plan-planning.md#the-plan-docs-only-carve-out).
+DD-4 states this split directly: "the plan **documents** are pushed to `origin main`. The plan's own
+future **execution** runs `worktree-to-pr`." Phase 7's archival commit is therefore the terminal
+instance of that standing policy, not a per-plan divergence from it — the worktree and its PR are for
+this plan's C1-C7 **implementation** phases only.
+
+**This departs from `plan-execution.md` §8, named here rather than left implicit.**
+[§8 Finalization and Archival, "Archival-in-PR"](../../../repo-governance/workflows/plan/plan-execution.md#8-finalization-and-archival-sequential)
+states, for every `*-to-pr` plan and with no multi-repo carve-out: _"the `git mv
+plans/in-progress/... plans/done/...` move (and the accompanying README index updates) is committed
+**inside the delivering PR itself**, as a normal commit on the PR branch pushed before the merge —
+**not as a separate commit landed on `main` after merge**."_ Phase 7 does not do this. Two reasons,
+stated plainly rather than reframed away:
+
+1. **Structural (primary reason)**: this plan's delivery spans **three PRs across three
+   repositories** — `ose-public` (Phase 3), `ose-primer` (Phase 4), and `ose-infra` (Phase 5, the
+   third and last to merge). Per **DD-10**, the plan folder exists **only** in `ose-public` — the
+   siblings receive the C1-C7 changeset, never a mirrored plan folder. §8's rule presumes a single
+   "delivering PR" that is both the last to merge and the one holding the plan folder. No such PR
+   exists here: `ose-public`'s PR holds the folder but merges first (a Phase 3 Gate precondition,
+   before Phases 4 and 5 even begin); `ose-infra`'s PR merges last but holds no plan folder to move.
+   §8 has no provision for this shape.
+2. **Standing instruction (secondary reason)**: independent of the structural argument, the
+   maintainer's standing preference is that plan-document lifecycle work — authoring, stage
+   promotion, quality-gate review cycles, and archival — runs on local `main` and lands via the
+   Plan-Docs-Only Carve-Out; the worktree and its PR are reserved for this plan's C1-C7
+   implementation phases.
+
+See **DD-11** in
+[tech-docs.md](./tech-docs.md#dd-11--phase-7-archival-departs-from-plan-executionmd-8-by-necessity-not-oversight)
+for the full design-decision record, and
+[`plan-archival-in-pr-multi-repo-gap`](../../../plans/ideas/plan-archival-in-pr-multi-repo-gap.md)
+for the tracked follow-up proposing §8 gain an explicit multi-repo provision so a future plan of
+this shape does not need to re-argue the case from first principles.
 
 This plan does **not** opt into a `[HUMAN]` merge gate. See
 [Plans Organization Convention §Delivery Mode](../../../repo-governance/conventions/structure/plans.md#delivery-mode),
@@ -117,7 +158,6 @@ graph TD
 
 ## Path Constants
 
-- `<WF>` = `repo-governance/development/workflow/`
 - `<C1>` = `repo-governance/development/workflow/bare-repo-landing-method.md` _(New file)_
 - `<PLANS>` = `repo-governance/conventions/structure/plans.md`
 - `<PARITY>` = `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`
@@ -125,15 +165,26 @@ graph TD
 - `<MERGE>` = `repo-governance/development/workflow/pr-merge-protocol.md`
 - `<GATE>` = `repo-governance/workflows/pr/pr-review-quality-gate.md` _(source note; unchanged)_
 - `<SDLC>` = `docs/reference/sdlc-gate-standard.md`
-- `<IDEAS>` = `plans/ideas/`
 - `<PLANDIR>` = `plans/in-progress/bare-repo-governance-hardening/` — this plan's own folder. It was
   promoted out of `plans/backlog/` on 2026-07-21; neither stage carries a date prefix, so the move
   was a pure rename and every relative link inside these documents kept the same `../../../` depth
 - `<repo-root>` = the root of whichever repo the step is operating on — `ose-public` unless the
   step names `<PRIMER>` or `<INFRA>`. In a bare sibling there is no work tree at `<repo-root>`, so
-  only bare-safe commands may target it (see the bare-safe command note in Phase 4)
+  every mutation must flow through a linked worktree — stated in Phase 4's preamble and enacted by
+  the `worktree add` step in both Phase 4 (`<PRIMER>`) and Phase 5 (`<INFRA>`)
 - `<PRIMER>` = `/Users/wkf/ose-projects/ose-primer` _(bare, `core.bare=true`)_
 - `<INFRA>` = `/Users/wkf/ose-projects/ose-infra` _(bare, `core.bare=true`)_
+- `<PUBLIC>` = `/Users/wkf/ose-projects/ose-public` — the primary `ose-public` checkout (not bare).
+  After Phase 3's PR merges and local `main` is fast-forwarded, `<PUBLIC>/<C1>` is the merged,
+  source-of-truth copy that Phase 4 and Phase 5 copy from
+- `<PRIMER-WT>` = `/Users/wkf/ose-projects/ose-primer/worktrees/bare-repo-governance-hardening` —
+  Phase 4's propagation worktree, provisioned from `<PRIMER>`'s `origin/main`, removed at the end of
+  Phase 4. The Phase 6 `<C1>` Correction Propagation Sub-Cycle re-provisions it at the same path if
+  and only if a `<C1>` correction is routed
+- `<INFRA-WT>` = `/Users/wkf/ose-projects/ose-infra/worktrees/bare-repo-governance-hardening` —
+  Phase 5's propagation worktree, provisioned from `<INFRA>`'s `origin/main`, removed at the end of
+  Phase 5. The Phase 6 `<C1>` Correction Propagation Sub-Cycle re-provisions it at the same path if
+  and only if a `<C1>` correction is routed
 
 ---
 
@@ -536,8 +587,13 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 
 > `<PRIMER>` is a **bare** repository (`core.bare=true`, verified in Phase 0). Every mutation flows
 > through a linked worktree. **This phase executes the very method `<C1>` documents** — treat any
-> friction encountered here as a defect in `<C1>`'s wording and fix `<C1>` rather than working
-> around it.
+> friction encountered here as a defect in `<C1>`'s wording. **Record it in `learnings.md`; do not
+> edit `<C1>` inside `<PRIMER-WT>`.** The copy of `<C1>` in this worktree is not the source of truth
+> (**DD-8**: `ose-public` is): an in-place edit here would land in `ose-primer` while Phase 5 still
+> copies the unfixed text from merged `ose-public`, silently forking the document across repos.
+> Corrections land through the dedicated `<C1>` Correction Propagation Sub-Cycle in
+> [Phase 6](#phase-6-knowledge-capture), `ose-public` first, then both siblings — never a same-phase
+> in-place edit.
 
 - [ ] [AI] Verify topology before anything else — `git -C <PRIMER> worktree list`
       — acceptance: prints a line ending in `(bare)`. **Do not** use
@@ -547,22 +603,65 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       — acceptance: prints `0` and `0`; if not, reconcile per `<C1>` before proceeding and record
       the counts here
 - [ ] [AI] Provision a worktree at `origin/main`:
-      `git -C <PRIMER> worktree add /Users/wkf/ose-projects/ose-primer/worktrees/bare-repo-governance-hardening -b bare-repo-governance-hardening origin/main`
-      — acceptance: `git -C <PRIMER> worktree list` lists the new path
+      `git -C <PRIMER> worktree add <PRIMER-WT> -b bare-repo-governance-hardening origin/main`
+      — acceptance: `git -C <PRIMER> worktree list` lists `<PRIMER-WT>`
 - [ ] [AI] Initialize the toolchain in that worktree: `npm install` then `npm run doctor -- --fix`
       — acceptance: both exit 0 (see
       [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md))
 - [ ] [AI] Copy `<C1>` verbatim from merged `ose-public` into the sibling worktree at the identical
       path `repo-governance/development/workflow/bare-repo-landing-method.md`
-      — acceptance: `diff <ose-public path> <primer worktree path>` reports no difference, **or**
-      every difference is a repo-specific fact justified inline in this checklist
-- [ ] [AI] Apply C2 (the two `no-destructive-git-operations.md` cross-links), C3
-      (`plans.md` bare-repo note), C4a/C4b/C4c (`<PARITY>` question + option lists + class sweep),
-      C5 (both `<MERGE>` sites), C6a (`<SDLC>`), and C6b (`<PROMO>` re-point) — locating each site
-      **by content**, since sibling line numbers differ (e.g. `<SDLC>` sits at ~L214 there versus
-      ~L217 in `ose-public`)
-      — acceptance: every Phase 2 and Phase 3 acceptance grep reproduces the same result in the
-      sibling worktree; record the per-check results here
+      — acceptance: `diff <PUBLIC>/<C1> <PRIMER-WT>/<C1>` reports no difference (exit 0, empty
+      output). `<C1>` carries no repo-specific facts (**DD-10**), so any nonzero-exit output here is
+      a defect in this copy step to fix, never a divergence to justify inline — see the Phase 4
+      preamble above for why in-place edits are forbidden
+- [ ] [AI] **C2** — in
+      `<PRIMER-WT>/repo-governance/development/workflow/no-destructive-git-operations.md`, add the
+      same two cross-links to `<C1>` (§Conventions Implemented/Respected and §Related Documentation),
+      mirroring the Phase 2 edit. Locate by content, not by line number — sibling line numbers differ
+      — acceptance: `grep -Fc "bare-repo-landing-method.md" <PRIMER-WT>/repo-governance/development/workflow/no-destructive-git-operations.md`
+      prints exactly `2` (exits 1 before this step)
+- [ ] [AI] **C3** — in `<PRIMER-WT>/repo-governance/conventions/structure/plans.md`, add the same
+      bare-repo note beneath the Delivery Mode table, mirroring the Phase 3 edit. Locate by content,
+      not by line number — sibling line numbers differ
+      — acceptance: `grep -Fc "bare repo" <PRIMER-WT>/repo-governance/conventions/structure/plans.md`
+      prints at least 1 (exits 1 before this step), and
+      `grep -Fc "bare-repo-landing-method.md" <PRIMER-WT>/repo-governance/conventions/structure/plans.md`
+      prints at least 1 (exits 1 before this step)
+- [ ] [AI] **C4a** — in `<PRIMER-WT>/<PARITY>`, rewrite meta-question #1's condition to bind to the
+      bare-repo **property** rather than the name, mirroring the Phase 3 edit. Locate by content, not
+      by line number — sibling line numbers differ
+      — acceptance: `grep -Fc "any bare repo" <PRIMER-WT>/<PARITY>` prints at least 1 (exits 1
+      before this step)
+- [ ] [AI] **C4b** — in the same `<PRIMER-WT>/<PARITY>` question's option list, strike
+      `main-to-origin-main`, mirroring the Phase 3 edit. Locate by content, not by line number —
+      sibling line numbers differ
+      — acceptance: no delivery-mode option list in `<PRIMER-WT>/<PARITY>` that applies to a bare
+      target offers `main-to-origin-main` or `main-to-pr` (before this step, meta-question #1's
+      option A does offer `main-to-origin-main`); record a per-list verdict in this checklist
+- [ ] [AI] **C4c** — sweep `<PRIMER-WT>/<PARITY>` for every remaining bare-repo delivery-mode site
+      (the note paragraph, the `values:` frontmatter list, §Relationship to Each Repo's Own Delivery
+      Mode, and the mode descriptions near the end) and confirm each agrees, mirroring the Phase 3
+      sweep. Locate by content, not by line number — sibling line numbers differ
+      — acceptance: a per-site verdict table is recorded in this checklist, one row per site, each
+      marked consistent (before this step, at least the note paragraph and meta-question #1
+      disagree, mirroring the self-contradiction C4a/C4b fixed in `ose-public`)
+- [ ] [AI] **C5** — in `<PRIMER-WT>/<MERGE>`, append the floor-not-ceiling qualifier at both
+      precondition-(a) sites (§The Rule and §Agent Workflow → Before Merging), mirroring the Phase 3
+      edit. Locate by content, not by line number — sibling line numbers differ
+      — acceptance: `grep -Fc "floor" <PRIMER-WT>/<MERGE>` prints exactly `2` (exits 1 before this
+      step)
+- [ ] [AI] **C6a** — in `<PRIMER-WT>/<SDLC>` §Worktree-Agnostic Execution, extend the existing
+      paragraph with the bareness question and the ban on `git rev-parse --is-bare-repository`,
+      mirroring the Phase 3 edit. Locate by content, not by line number — sibling line numbers differ
+      (e.g. `<SDLC>` sits at ~L214 there versus ~L217 in `ose-public`)
+      — acceptance: `grep -Fc "is-bare-repository" <PRIMER-WT>/<SDLC>` prints at least 1 (exits 1
+      before this step), and `grep -Fc "bare-repo-landing-method.md" <PRIMER-WT>/<SDLC>` prints at
+      least 1 (exits 1 before this step)
+- [ ] [AI] **C6b** — in `<PRIMER-WT>/<PROMO>`, re-point the `[bare-repo git-ops method]` link at
+      `<C1>`, mirroring the Phase 3 edit. Locate by content, not by line number — sibling line
+      numbers differ
+      — acceptance: `grep -Fc "bare-repo-landing-method.md" <PRIMER-WT>/<PROMO>` prints at least 1
+      (exits 1 before this step)
 - [ ] [AI] Register `<C1>` in the sibling's `repo-governance/development/README.md` and
       `repo-governance/development/workflow/README.md`
       — acceptance: `grep -Fc "bare-repo-landing-method.md"` prints at least 1 in each
@@ -571,14 +670,14 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       hits** (recorded in
       [tech-docs.md §Verified In-Repo State](./tech-docs.md#verified-in-repo-state-re-anchor-by-content-not-by-line-number)).
       Confirm once and move on
-      — acceptance: `grep -rF "bare-repo-worktree-landing-hygiene" <primer worktree>` exits 1
+      — acceptance: `grep -rF "bare-repo-worktree-landing-hygiene" <PRIMER-WT>` exits 1
 - [ ] [AI] **No plan folder here either** — per **DD-10** this plan lives only in `ose-public`;
       `<PRIMER>` receives the C1-C7 changeset, not a mirrored plan. Do **not** scaffold
       `plans/*/bare-repo-governance-hardening/`, and do not add an entry to any of the sibling's
       `plans/` index READMEs
-      — acceptance: `ls -d <primer worktree>/plans/*/bare-repo-governance-hardening` exits non-zero
+      — acceptance: `ls -d <PRIMER-WT>/plans/*/bare-repo-governance-hardening` exits non-zero
       (it exits 0 if such a folder is scaffolded), and
-      `grep -rF "bare-repo-governance-hardening" <primer worktree>/plans` exits 1
+      `grep -rF "bare-repo-governance-hardening" <PRIMER-WT>/plans` exits 1
 - [ ] [AI] Run the local quality gates in the sibling worktree:
       `npx nx affected -t typecheck lint test:quick specs:coverage` plus the markdown validators
       — acceptance: all exit 0; fix every failure, including preexisting ones
@@ -589,8 +688,7 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       PR-Review Maker→Fixer Cycle, verify CI green, then `[AI]`-merge once the five hardened
       preconditions hold (tester gates: **exemption recorded**, same justification as `ose-public`)
       — acceptance: `gh pr view --json state` shows `MERGED`
-- [ ] [AI] Remove the worktree:
-      `git -C <PRIMER> worktree remove /Users/wkf/ose-projects/ose-primer/worktrees/bare-repo-governance-hardening`
+- [ ] [AI] Remove the worktree: `git -C <PRIMER> worktree remove <PRIMER-WT>`
       — acceptance: `git -C <PRIMER> worktree list` no longer lists it. **Never** `--force`, never
       `rm -rf`
 - [ ] [AI] **Terminal reconcile** — the step this whole plan exists to codify. `<PRIMER>` is bare,
@@ -606,6 +704,11 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 
 - [ ] [AI] `git -C <PRIMER> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md`
       exits 0 (the document is on the sibling's `main`)
+- [ ] [AI] `<C1>` was propagated verbatim, never edited in place:
+      `diff <PUBLIC>/<C1> <(git -C <PRIMER> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
+      — acceptance: reports no difference (exit 0, empty output); a nonzero-exit output here means
+      Phase 4 forked `<C1>` in violation of DD-8 and must be fixed via the Phase 6 sub-cycle, not
+      left to stand
 - [ ] [AI] Every Phase 2 and Phase 3 acceptance grep reproduces in `<PRIMER>`'s `origin/main` — the
       per-check verdict table is recorded above
 - [ ] [AI] `gh pr view --json state` in `ose-primer` shows `MERGED`; CI green on its `main`
@@ -627,7 +730,9 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 > It does **not** participate in the `ose-public` ↔ `ose-primer` content-parity loop, but these
 > governance rules describe how work lands in it, so it receives them. Apply the **repo-relevance
 > gate**: nothing infra-private (Terraform, k3s, Proxmox, real hostnames or inventories) may flow
-> back out of this phase into `ose-public` or `ose-primer`.
+> back out of this phase into `ose-public` or `ose-primer`. As in Phase 4, this phase's copy of
+> `<C1>` is not the source of truth (**DD-8**) — **never** edit `<C1>` in place inside `<INFRA-WT>`;
+> record any friction in `learnings.md` for the Phase 6 sub-cycle instead.
 
 - [ ] [AI] Verify topology — `git -C <INFRA> worktree list`
       — acceptance: prints a line ending in `(bare)`
@@ -635,27 +740,67 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       `git -C <INFRA> fetch origin && git -C <INFRA> rev-list --left-right --count origin/main...main`
       — acceptance: prints `0` and `0`
 - [ ] [AI] Provision a worktree at `origin/main`:
-      `git -C <INFRA> worktree add /Users/wkf/ose-projects/ose-infra/worktrees/bare-repo-governance-hardening -b bare-repo-governance-hardening origin/main`
-      — acceptance: `git -C <INFRA> worktree list` lists the new path
+      `git -C <INFRA> worktree add <INFRA-WT> -b bare-repo-governance-hardening origin/main`
+      — acceptance: `git -C <INFRA> worktree list` lists `<INFRA-WT>`
 - [ ] [AI] Initialize the toolchain in that worktree: `npm install` then `npm run doctor -- --fix`
       — acceptance: both exit 0
 - [ ] [AI] Copy `<C1>` verbatim from merged `ose-public` to the identical path
-      — acceptance: `diff` reports no difference, or every difference is justified inline here
-- [ ] [AI] Apply C2, C3, C4a/C4b/C4c, C5, C6a, C6b — locating every site **by content**, since
-      `<INFRA>`'s line numbers differ from both other repos
-      — acceptance: every Phase 2 and Phase 3 acceptance grep reproduces here; record the per-check
-      results
+      — acceptance: `diff <PUBLIC>/<C1> <INFRA-WT>/<C1>` reports no difference (exit 0, empty
+      output). `<C1>` carries no repo-specific facts (**DD-10**), so any nonzero-exit output here is
+      a defect in this copy step to fix, never a divergence to justify inline
+- [ ] [AI] **C2** — in `<INFRA-WT>/repo-governance/development/workflow/no-destructive-git-operations.md`,
+      add the same two cross-links to `<C1>`, mirroring the Phase 2 edit. Locate by content, not by
+      line number — `<INFRA>`'s line numbers differ from both other repos
+      — acceptance: `grep -Fc "bare-repo-landing-method.md" <INFRA-WT>/repo-governance/development/workflow/no-destructive-git-operations.md`
+      prints exactly `2` (exits 1 before this step)
+- [ ] [AI] **C3** — in `<INFRA-WT>/repo-governance/conventions/structure/plans.md`, add the same
+      bare-repo note beneath the Delivery Mode table, mirroring the Phase 3 edit. Locate by content,
+      not by line number — `<INFRA>`'s line numbers differ from both other repos
+      — acceptance: `grep -Fc "bare repo" <INFRA-WT>/repo-governance/conventions/structure/plans.md`
+      prints at least 1 (exits 1 before this step), and
+      `grep -Fc "bare-repo-landing-method.md" <INFRA-WT>/repo-governance/conventions/structure/plans.md`
+      prints at least 1 (exits 1 before this step)
+- [ ] [AI] **C4a** — in `<INFRA-WT>/<PARITY>`, rewrite meta-question #1's condition to bind to the
+      bare-repo **property** rather than the name, mirroring the Phase 3 edit. Locate by content, not
+      by line number — `<INFRA>`'s line numbers differ from both other repos
+      — acceptance: `grep -Fc "any bare repo" <INFRA-WT>/<PARITY>` prints at least 1 (exits 1 before
+      this step)
+- [ ] [AI] **C4b** — in the same `<INFRA-WT>/<PARITY>` question's option list, strike
+      `main-to-origin-main`, mirroring the Phase 3 edit. Locate by content, not by line number
+      — acceptance: no delivery-mode option list in `<INFRA-WT>/<PARITY>` that applies to a bare
+      target offers `main-to-origin-main` or `main-to-pr` (before this step, meta-question #1's
+      option A does offer `main-to-origin-main`); record a per-list verdict in this checklist
+- [ ] [AI] **C4c** — sweep `<INFRA-WT>/<PARITY>` for every remaining bare-repo delivery-mode site,
+      mirroring the Phase 3 sweep. Locate by content, not by line number
+      — acceptance: a per-site verdict table is recorded in this checklist, one row per site, each
+      marked consistent (before this step, at least the note paragraph and meta-question #1
+      disagree, mirroring the self-contradiction C4a/C4b fixed in `ose-public`)
+- [ ] [AI] **C5** — in `<INFRA-WT>/<MERGE>`, append the floor-not-ceiling qualifier at both
+      precondition-(a) sites, mirroring the Phase 3 edit. Locate by content, not by line number
+      — acceptance: `grep -Fc "floor" <INFRA-WT>/<MERGE>` prints exactly `2` (exits 1 before this
+      step)
+- [ ] [AI] **C6a** — in `<INFRA-WT>/<SDLC>` §Worktree-Agnostic Execution, extend the existing
+      paragraph with the bareness question and the ban on `git rev-parse --is-bare-repository`,
+      mirroring the Phase 3 edit. Locate by content, not by line number — `<INFRA>`'s line numbers
+      differ from both other repos
+      — acceptance: `grep -Fc "is-bare-repository" <INFRA-WT>/<SDLC>` prints at least 1 (exits 1
+      before this step), and `grep -Fc "bare-repo-landing-method.md" <INFRA-WT>/<SDLC>` prints at
+      least 1 (exits 1 before this step)
+- [ ] [AI] **C6b** — in `<INFRA-WT>/<PROMO>`, re-point the `[bare-repo git-ops method]` link at
+      `<C1>`, mirroring the Phase 3 edit. Locate by content, not by line number
+      — acceptance: `grep -Fc "bare-repo-landing-method.md" <INFRA-WT>/<PROMO>` prints at least 1
+      (exits 1 before this step)
 - [ ] [AI] Register `<C1>` in the sibling's `repo-governance/development/README.md` and
       `repo-governance/development/workflow/README.md`
       — acceptance: `grep -Fc "bare-repo-landing-method.md"` prints at least 1 in each
 - [ ] [AI] **No brief deletion here** — neither two-pager exists in `<INFRA>` (verified: zero hits)
-      — acceptance: `grep -rF "bare-repo-delivery-mode-governance-hardening" <infra worktree>` exits 1
+      — acceptance: `grep -rF "bare-repo-delivery-mode-governance-hardening" <INFRA-WT>` exits 1
 - [ ] [AI] **No plan folder here either** — per **DD-10**, `<INFRA>` receives the C1-C7 changeset,
       not a mirrored plan. Do **not** scaffold `plans/*/bare-repo-governance-hardening/`, and do not
       add an entry to any of the sibling's `plans/` index READMEs
-      — acceptance: `ls -d <infra worktree>/plans/*/bare-repo-governance-hardening` exits non-zero
+      — acceptance: `ls -d <INFRA-WT>/plans/*/bare-repo-governance-hardening` exits non-zero
       (it exits 0 if such a folder is scaffolded), and
-      `grep -rF "bare-repo-governance-hardening" <infra worktree>/plans` exits 1
+      `grep -rF "bare-repo-governance-hardening" <INFRA-WT>/plans` exits 1
 - [ ] [AI] Run the local quality gates plus the markdown validators in the worktree
       — acceptance: all exit 0; fix every failure, including preexisting ones
 - [ ] [AI] Stage **explicit paths only**, commit thematically, push the branch
@@ -664,16 +809,25 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       CI green, then `[AI]`-merge once the five hardened preconditions hold (tester gates:
       **exemption recorded**)
       — acceptance: `gh pr view --json state` shows `MERGED`
-- [ ] [AI] Remove the worktree: `git -C <INFRA> worktree remove <path>` — never `--force`, never
+- [ ] [AI] Remove the worktree: `git -C <INFRA> worktree remove <INFRA-WT>` — never `--force`, never
       `rm -rf`
       — acceptance: `git -C <INFRA> worktree list` no longer lists it
 - [ ] [AI] **Terminal reconcile** — bare form per **DD-6**: `git -C <INFRA> fetch origin main:main`
       — acceptance: exits 0, and
       `git -C <INFRA> rev-list --left-right --count origin/main...main` prints `0` and `0`
-- [ ] [AI] Verify the three repos agree: for each of `<C1>`, `<PLANS>`, `<PARITY>`, `<MERGE>`,
+- [ ] [AI] Verify the three repos agree on `<C1>` specifically, with **no** escape allowed
+      (**DD-10**: `<C1>` carries no repo-specific facts, so unlike the five files below a nonzero
+      diff here is always a defect, never a justified divergence):
+      `diff <PUBLIC>/<C1> <(git -C <PRIMER> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
+      and
+      `diff <PUBLIC>/<C1> <(git -C <INFRA> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
+      — acceptance: both report no difference (exit 0, empty output)
+- [ ] [AI] Verify the remaining five files agree: for each of `<PLANS>`, `<PARITY>`, `<MERGE>`,
       `<SDLC>`, `<PROMO>`, diff the `ose-public` version against each sibling's
       — acceptance: a three-column verdict table is recorded here; every difference is either zero
       or a justified repo-specific fact
+- [ ] [AI] Record in `learnings.md` any friction between `<C1>`'s written procedure and what this
+      phase actually had to do, mirroring Phase 4's step — this phase is `<C1>`'s second live test
 
 ### Phase 5 Gate
 
@@ -681,6 +835,8 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 
 - [ ] [AI] `git -C <INFRA> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md`
       exits 0
+- [ ] [AI] `<C1>` was propagated verbatim, never edited in place — the `<C1>`-specific zero-diff step
+      above passed for `<INFRA>` (both diffs report no difference)
 - [ ] [AI] Every Phase 2 and Phase 3 acceptance grep reproduces in `<INFRA>`'s `origin/main`
 - [ ] [AI] `gh pr view --json state` in `ose-infra` shows `MERGED`; CI green on its `main`
 - [ ] [AI] `git -C <INFRA> worktree list` shows only the bare main worktree
@@ -718,10 +874,71 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       `plans/backlog/<slug>/` plan and **NEVER** landed inline in this plan's own commits or PRs
       — acceptance: every `learnings.md` entry records its terminal routing state
 - [ ] [AI] Specifically triage any friction recorded in Phase 4 or Phase 5 between `<C1>`'s written
-      procedure and what execution actually required — that friction routes back into `<C1>` itself
-      and propagates to both siblings, since `<C1>` is the durable surface for exactly that class
-      — acceptance: each such entry is either routed into `<C1>` (all three repos) or discarded with
-      a reason
+      procedure and what execution actually required. `<C1>` is the durable surface for exactly that
+      class, so each such entry's terminal state is either "routed" (landed via the sub-cycle below,
+      `ose-public` first per **DD-8**, then both siblings) or "discarded — `<reason>`"
+      — acceptance: every such `learnings.md` entry names one of those two terminal states
+- [ ] [AI] Record the routing decision: does **at least one** `<C1>`-friction entry have terminal
+      state "routed"?
+      — acceptance: the yes/no answer is recorded in this checklist. If **no**, mark every step in
+      the sub-cycle below N/A with a one-line note and skip to the "no generalizable learning" step
+
+### `<C1>` Correction Propagation Sub-Cycle (Conditional)
+
+> Runs only if the routing decision above answered "yes". Mirrors Phases 2-5's own
+> worktree → edit → quality-gates → PR → merge → reconcile mechanism, scoped to `<C1>` alone, and
+> preserves **DD-8**'s directionality: `ose-public` is corrected first, then both siblings copy the
+> corrected text from it — never the reverse, and never a sibling-only fix.
+
+- [ ] [AI] Cut a dedicated follow-up branch in the plan's own (still-provisioned) worktree:
+      `git -C worktrees/bare-repo-governance-hardening fetch origin && git -C worktrees/bare-repo-governance-hardening checkout -b bare-repo-governance-hardening-c1-followup origin/main`
+      — acceptance: `git -C worktrees/bare-repo-governance-hardening branch --show-current` prints
+      `bare-repo-governance-hardening-c1-followup`
+- [ ] [AI] Apply every "routed" entry's correction to
+      `worktrees/bare-repo-governance-hardening/<C1>`, following Phase 2's authoring discipline
+      (frontmatter unchanged; edit only the section each entry names)
+      — acceptance: `diff <PUBLIC>/<C1> worktrees/bare-repo-governance-hardening/<C1>` reports a
+      difference limited to the routed correction(s) (before this step it reports no difference)
+- [ ] [AI] Run the local quality gates in that worktree:
+      `npx nx affected -t typecheck lint test:quick specs:coverage` plus the markdown validators
+      — acceptance: all exit 0; fix every failure, including preexisting ones
+- [ ] [AI] Stage **explicit paths only**, commit
+      (`git commit -m "docs(governance): land Phase 4/5 <C1> friction correction"`), and push:
+      `git push -u origin bare-repo-governance-hardening-c1-followup`
+      — acceptance: exits 0
+- [ ] [AI] Open a **draft PR** in `ose-public` against `main`, run the 3-cycle PR-Review Maker→Fixer
+      Cycle, verify CI green, then `[AI]`-merge once the five hardened preconditions hold
+      — acceptance: `gh pr view --json state` shows `MERGED`
+- [ ] [AI] Fast-forward `<PUBLIC>`'s local `main`:
+      `git fetch origin && git -C <PUBLIC> merge --ff-only origin/main`
+      — acceptance: `git -C <PUBLIC> rev-list --left-right --count origin/main...main` prints `0`
+      and `0`
+- [ ] [AI] Re-propagate the now-corrected `<C1>` to `ose-primer`, repeating Phase 4's own copy
+      mechanism exactly: re-provision `<PRIMER-WT>` at `origin/main` with a fresh branch
+      (`git -C <PRIMER> worktree add <PRIMER-WT> -b bare-repo-governance-hardening-c1-followup origin/main`),
+      copy `<C1>` verbatim from `<PUBLIC>`, run the local quality gates, stage/commit/push, open a
+      draft PR, run the review cycle, `[AI]`-merge, remove the worktree
+      (`git -C <PRIMER> worktree remove <PRIMER-WT>`), then terminal-reconcile
+      (`git -C <PRIMER> fetch origin main:main`)
+      — acceptance:
+      `diff <PUBLIC>/<C1> <(git -C <PRIMER> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
+      reports no difference, and
+      `git -C <PRIMER> rev-list --left-right --count origin/main...main` prints `0` and `0`
+- [ ] [AI] Re-propagate the now-corrected `<C1>` to `ose-infra`, repeating Phase 5's own copy
+      mechanism exactly: re-provision `<INFRA-WT>` at `origin/main` with a fresh branch
+      (`git -C <INFRA> worktree add <INFRA-WT> -b bare-repo-governance-hardening-c1-followup origin/main`),
+      copy `<C1>` verbatim from `<PUBLIC>`, run the local quality gates, stage/commit/push, open a
+      draft PR, run the review cycle, `[AI]`-merge, remove the worktree
+      (`git -C <INFRA> worktree remove <INFRA-WT>`), then terminal-reconcile
+      (`git -C <INFRA> fetch origin main:main`)
+      — acceptance:
+      `diff <PUBLIC>/<C1> <(git -C <INFRA> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
+      reports no difference, and
+      `git -C <INFRA> rev-list --left-right --count origin/main...main` prints `0` and `0`
+- [ ] [AI] Record each "routed" `learnings.md` entry's terminal state as landed, naming the three PR
+      URLs (`ose-public`, `ose-primer`, `ose-infra`)
+      — acceptance: every "routed" entry names all three PR URLs
+
 - [ ] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
       `No generalizable learnings — <one-line reason>`
       — acceptance: `learnings.md` is never silently empty
@@ -733,7 +950,13 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
 - [ ] [AI] Every `learnings.md` entry is in a terminal state (routed inline, filed as backlog, or
       discarded with reason), or the file records the explicit "none" escape
 - [ ] [AI] No code-homed learning landed inline in this plan's own commits or PRs
-- [ ] [AI] Any `<C1>` correction routed here has landed in **all three** repos, not just `ose-public`
+- [ ] [AI] **Falsifiable both ways**: if the routing decision above answered "yes",
+      `gh pr view --json state` shows `MERGED` for all three sub-cycle PRs (`ose-public`,
+      `ose-primer`, `ose-infra`), and both diff checks in the sub-cycle's last two steps report no
+      difference — a correction that is "routed" but not landed in all three repos is a failing
+      gate, not a deferrable item. If the routing decision answered "no" (or `learnings.md` records
+      the "none" escape), this check is vacuously satisfied — the recorded "no" answer is itself the
+      evidence
 
 > **Pause Safety**: `learnings.md` is fully triaged (or explicitly recorded as empty); no future
 > process depends on querying it later. Safe to stop. To resume: re-read `learnings.md` and confirm
@@ -775,18 +998,34 @@ origin/main...main` in `ose-public` (expect `0 0`), then begin Phase 4.
       — acceptance: `npx rhino-cli md links validate` exits 0
 - [ ] [AI] Commit the archival:
       `git commit -m "chore(plans): move bare-repo-governance-hardening to done"`
-- [ ] [AI] **Land the archival commit on `origin/main`.** By this point the Phase 3 PR has already
-      merged (a Phase 3 Gate precondition), so this commit has no open PR to ride. It touches only
-      paths under `plans/` — no `apps/` or `libs/` code — so it lands under the **plan-docs-only
-      carve-out** in
-      [plan-planning §The Plan-Docs-Only Carve-Out](../../../repo-governance/workflows/plan/plan-planning.md),
-      which permits a direct push for exactly this shape of change. Push it:
+- [ ] [AI] **Land the archival commit on `origin/main`.** Archival is plan-document work, not
+      implementation (see [Delivery Mode](#delivery-mode-worktree-to-pr) above) — it lands on the
+      local `main` branch via direct push under the
+      [Plan-Docs-Only Carve-Out](../../../repo-governance/workflows/plan/plan-planning.md#the-plan-docs-only-carve-out),
+      which permits a direct push for any change touching only `plans/**` with no `apps/`/`libs/`
+      code. Push it:
       `git push origin HEAD:main`
       — acceptance: `git rev-list --left-right --count origin/main...HEAD` prints `0` and `0`, and
       `git show --stat origin/main` lists the archival move
-  - _Note: this is the one step whose landing route deliberately differs from the plan's declared
-    `worktree-to-pr` Delivery Mode. The carve-out is named here so the divergence is recorded, not
-    silently assumed — an unexplained direct push would be indistinguishable from a mode violation._
+  - _Note: this step's landing route follows standing repo policy (DD-4; the Plan-Docs-Only
+    Carve-Out above), not the plan's `worktree-to-pr` Delivery Mode — that mode governs this plan's
+    C1-C7 implementation only, and archival is plan-document work, not implementation. This departs
+    from
+    [`plan-execution.md` §8, "Archival-in-PR"](../../../repo-governance/workflows/plan/plan-execution.md#8-finalization-and-archival-sequential),
+    which requires the archival `git mv` be "committed **inside the delivering PR itself**... not as
+    a separate commit landed on `main` after merge," with no multi-repo carve-out. Two reasons: (1)
+    structural, primary — this plan's delivery spans **three PRs across three repositories**
+    (`ose-public` Phase 3, `ose-primer` Phase 4, `ose-infra` Phase 5), the plan folder lives in
+    `ose-public` only (DD-10), and the Phase 3 PR that holds the folder has already merged by this
+    point (a Phase 3 Gate precondition, a consequence of DD-8's sequencing) while the last-merging
+    PR (`ose-infra`, Phase 5) holds no plan folder to move — no single PR is both delivering and
+    folder-holding; (2) standing instruction, secondary — the maintainer's standing preference routes
+    plan-document lifecycle work through the Plan-Docs-Only Carve-Out on local `main`, reserving the
+    worktree/PR for implementation. See **DD-11** in
+    [tech-docs.md](./tech-docs.md#dd-11--phase-7-archival-departs-from-plan-executionmd-8-by-necessity-not-oversight)
+    for the full record, and
+    [`plan-archival-in-pr-multi-repo-gap`](../../../plans/ideas/plan-archival-in-pr-multi-repo-gap.md)
+    for the tracked follow-up proposing §8 gain an explicit multi-repo provision._
 - [ ] [AI] Verify CI is green on `main` after the archival push before removing anything —
       `gh run list --limit 5` shows the triggered runs at `completed/success`. Poll every **2
       minutes**; never `gh run watch`

@@ -47,10 +47,13 @@ Three independent strands converge on "write it down, do not automate it":
   five seconds ago" from "staged for six weeks", so the WIP-parking rule is inherently a judgment
   call and must be advisory (**DD-2**).
 - **Adopting a tool is worse than writing a paragraph.** Every candidate was rejected on inspection
-  ([S4](./tech-docs.md#research-findings)); `git-extras`' `git sync` was **disqualified on safety**
-  because its shell source runs an unconditional `git reset --hard` plus `git clean -d -f -x` —
-  in this plan's own originating scenario it would have destroyed the very WIP the plan protects,
-  and it is forbidden outright by the
+  ([S4](./tech-docs.md#research-findings)); `git-extras`' `git sync` was **disqualified on safety**.
+  Its shell source runs the destructive `git reset --hard` plus `git clean -d -f -x` pair only inside
+  an interactive `[y/N]` confirmation prompt — `-f`/`--force` presets the answer and skips it. The
+  disqualification stands on that corrected ground: the tool is safe only while a human answers the
+  prompt, and `-f` — the only mode a scripted reconcile primitive could use — removes that single
+  safety gate entirely. In this plan's own originating scenario, an `-f`-forced run would have
+  destroyed the very WIP the plan protects, and the pair is forbidden outright by the
   [No Destructive Git Operations Convention](../../../repo-governance/development/workflow/no-destructive-git-operations.md).
 
 The honest counter-argument is recorded rather than suppressed: documentation-over-automation has a
