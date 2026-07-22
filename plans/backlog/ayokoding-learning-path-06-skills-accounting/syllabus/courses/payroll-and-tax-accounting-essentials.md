@@ -46,10 +46,29 @@ standards that govern the area and are not worked through.
 fact anywhere in this course]`.
 - Income-tax accounting (co-10 through co-14) is cited by standard name only — ASC 740 under US GAAP,
   IAS 12 under IFRS — with no clause text, threshold wording, or numbering layout reproduced, per A8.
-  The book-basis/tax-basis, temporary-difference and deferred-balance structure taught here is domain
-  reasoning rather than a claim sourced from this plan's grounding file `[Needs Verification]` pending
-  the Phase 1 coverage pass, and the recognition wording each standard uses for a deferred tax asset is
-  deliberately not stated.
+  The book-basis/tax-basis, temporary-difference and deferred-balance structure taught here was
+  externally grounded against freely-readable secondary sources `[Verified]` — a CPDbox IAS 12
+  explainer, KPMG's IFRS-versus-US-GAAP income-taxes comparison, and Corporate Finance Institute's
+  permanent-versus-temporary-differences article — confirming that the two bases, the temporary
+  difference, its reversal, and the recoverability judgment are the shared mechanic of both standards.
+  No clause text was consulted or reproduced; the recognition wording each standard uses for a deferred
+  tax asset is deliberately not stated.
+- **ex-09 was revised as a result of that grounding, not merely confirmed.** It previously used a
+  period-end payroll accrual as the temporary difference. That is wrong in the general case: where the
+  governing rule makes a services liability deductible when the services are rendered, an ordinary
+  payroll accrual produces **no** temporary difference, and a gap appears only under narrower
+  conditions (incentive compensation unsettled beyond a stated window, related-party compensation)
+  that are jurisdiction-specific tax-code mechanics this course puts out of scope. ex-09 now uses a
+  depreciation timing difference, whose divergence arises from an accounting policy choice tax codes
+  generally decline to accept — a pattern that transfers across jurisdictions. The payroll case
+  survives as ex-13, reframed to teach that whether an accrual creates a deferred balance is a fact
+  about the governing rule rather than a property of the accrual `[Verified]` against a practitioner
+  account of accrued-liability deduction timing and a temporary-differences explainer.
+- Where the two standards genuinely diverge — direct `probable` recognition under IFRS versus a
+  separate valuation allowance under US GAAP, backwards tracing of items originally taken to OCI,
+  uncertain tax positions, outside basis differences, and IAS 12's initial-recognition exemption —
+  this course teaches only the shared core and does not imply the two are interchangeable beyond it
+  `[Verified]`.
 
 ## Concepts
 
@@ -122,10 +141,13 @@ fact anywhere in this course]`.
   every individual entry still balances (gross still splits correctly into net plus withholding) while
   every entry uses the wrong rate, and name the fix (moving the rate into jurisdiction-scoped
   configuration). (co-09, silent-failure)
-- **ex-09 · book-profit-against-taxable-profit** — take ex-05's period-end payroll accrual, deductible
-  for tax only when the cash is actually paid in the following period — verify book profit and taxable
-  profit differ for that period by exactly the accrual, and that the difference disappears once the
-  cash is paid. (co-07, co-10, co-11)
+- **ex-09 · book-profit-against-taxable-profit** — an asset depreciated on one schedule for reporting
+  and on a different, faster schedule for tax — verify book profit and taxable profit differ for the
+  period by exactly the depreciation gap, and that the gap reverses over the asset's life so the two
+  bases agree in total. Depreciation is the example here because the divergence comes from an
+  accounting policy choice the tax code declines to accept, which is a structural pattern that holds
+  across jurisdictions rather than a feature of one tax code. `fixed-assets-and-depreciation` is course
+  9 in both paths and this is course 16, so the mechanics are already in hand. (co-10, co-11)
 - **ex-10 · deferred-tax-across-the-reversal** — apply a stated tax rate to ex-09's difference and
   carry the resulting deferred tax balance across both periods — verify the balance arises in the first
   period and unwinds to zero in the second, and that total tax expense across the two periods equals
@@ -138,6 +160,14 @@ fact anywhere in this course]`.
   expected future taxable profit is stated first as more than sufficient and then as insufficient —
   verify the carried amount differs between the two cases even though the underlying difference is
   identical, and state which number a reader could not have recomputed from the transactions alone.
+- **ex-13 · when-an-accrual-creates-no-difference** — take ex-05's ordinary period-end payroll accrual
+  and ask whether it produces a temporary difference at all — verify that under a rule making the
+  expense deductible when the services are rendered it produces **none**, book and tax agreeing in the
+  same period, and that a difference appears only under a narrower condition such as incentive
+  compensation left unsettled beyond a stated window after period end. The point is not the window: it
+  is that whether an accrual creates a deferred balance is a fact about the governing tax rule, not a
+  property of the accrual, so a system cannot infer it from the transaction. The specific condition is
+  jurisdiction-dependent and deliberately not stated here. (co-07, co-10, co-12, silent-failure)
   (co-13, co-14, `estimation-under-uncertainty`)
 
 ## Applied synthesis (no build — A6)

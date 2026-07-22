@@ -822,10 +822,16 @@ Scenario: The conventional-accounting manifest completes and the Sharia-accounti
       returns **0**, the first is passing vacuously and the check is void.
 
   > **Expected to fail today, by design — like Phase 6 §6.4.** At plan-authoring time these return
-  > **15** and **17**: the register names the deliberate residuals, while the other 15 markers are
+  > **14** and **16**: the register names the deliberate residuals, while the other 14 markers are
   > Phase 1 authoring-time placeholders reading "pending the Phase 1 coverage pass." Phase 1 must
   > resolve each or promote it into the register with a reason; only then does this Phase 4 gate pass.
-  > A checker reading this plan before execution should expect 15, not 0.
+  > A checker reading this plan before execution should expect 14, not 0.
+  >
+  > These were **15** and **17** until `payroll-and-tax-accounting-essentials.md`'s marker was
+  > resolved by external grounding ahead of execution — the deferred-tax structure cleared to
+  > `[Verified]` and `ex-09` was revised, so that file now carries no marker. Re-measure rather than
+  > trusting these numbers: they are a snapshot, and the whole point of the two commands below is that
+  > they are cheap to run.
 
 ```bash
 # (1) Syllabus files carrying a marker but NOT named in the residuals register. MUST print 0.
