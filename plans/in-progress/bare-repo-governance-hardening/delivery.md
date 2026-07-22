@@ -502,7 +502,7 @@ apps/ose-www/content` reports zero broken links in `<C1>`
       re-reading it (frontmatter and full body unchanged from the Phase 2 preamble read). The
       `git diff --name-only HEAD` form itself could not be run this session (no Bash tool — see the
       Phase 2 Gate note), so this is confirmed by content inspection rather than by the git command
-- [ ] [AI] Commit: `git add` the explicit paths, then
+- [x] [AI] Commit: `git add` the explicit paths, then
       `git commit -m "docs(governance): add the bare-repo base-worktree landing method"`
       — acceptance: `git show --stat HEAD` lists `<C1>` plus the three link/index edits and nothing
       else
@@ -510,6 +510,16 @@ apps/ose-www/content` reports zero broken links in `<C1>`
       stage, or push anything" for this Phase 2 execution — Phase 3 handles staging and commits for
       the full `ose-public` changeset. All four files above (`<C1>` plus the three link/index edits)
       remain uncommitted, unstaged working-tree changes at the end of Phase 2
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: subsumed by Phase 3's first
+      commit rather than left undone. `4f5556fa3` —
+      `docs(governance): add the bare-repo landing method convention` — carries exactly the four
+      files this step names and nothing else: `<C1>` (258 new lines),
+      `repo-governance/development/workflow/no-destructive-git-operations.md` (+8, the C2
+      cross-links) and the two index edits (`repo-governance/development/README.md`,
+      `repo-governance/development/workflow/README.md`, +1 each). The commit message headline
+      differs from the literal string above ("landing method convention" vs "base-worktree landing
+      method") — recorded as an actual divergence rather than papered over; the acceptance clause
+      constrains the file set, and the file set matches
 
 ### Phase 2 Gate
 
@@ -858,10 +868,21 @@ valid! No broken links found.` after the removal.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
+- [x] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
+- [x] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: all four exit 0. Two
+      measurements, because the literal command alone is vacuous here: (1) the literal form
+      (`--base=origin/main --head=HEAD`, `main` == `origin/main` == `cff5dfd54`) prints
+      `NX No tasks were run` for each of the four targets, rc 0 — an **empty affected set**, which
+      certifies nothing on its own; (2) the same four targets re-run over this plan's actual merged
+      changeset range, `npx nx affected -t typecheck lint test:quick specs:coverage
+--base=2b719347a~1 --head=main` (`2b719347a` is PR #79's merge commit), which is **non-empty**
+      — "Successfully ran targets typecheck, lint, test:quick for 2 projects" plus `test:specs` for
+      `ayokoding-www`, rc 0, zero failures. Independently, these same four targets ran under the
+      `pre-push` hook on **every** push of the PR branch — no push in this plan used `--no-verify`
+      and no hook was bypassed at any point
 - [x] [AI] Run markdown gates: `npm run lint:md:fix` then
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate
       --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
@@ -879,9 +900,20 @@ heading-hierarchy validate` — all exit 0
       distinct targets after dedup). Both `--exclude` flags are load-bearing — `--exclude plans/done`
       alone still leaves the one `apps/ayokoding-www/content` link broken. Full command/result table
       in the Phase 3 Gate tooling note below
-- [ ] [AI] Fix **ALL** failures, including preexisting issues not caused by this changeset; commit
+- [x] [AI] Fix **ALL** failures, including preexisting issues not caused by this changeset; commit
       preexisting fixes separately
-- [ ] [AI] Re-run every failing check to confirm resolution — acceptance: zero failures before push
+- [x] [AI] Re-run every failing check to confirm resolution — acceptance: zero failures before push
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: zero failures reached the push
+      in any of the three repos. Every failure encountered during the plan was resolved at its root
+      and re-run to confirm, never suppressed: the two broken links that blocked a Phase 6 push (one
+      of them self-inflicted — an `ideas/README.md` index line restored for a file another agent had
+      already deleted, reverted at `cff5dfd54`), and the seven `setup-rust` CI failures in Phase 5,
+      each a `static.rust-lang.org` toolchain-download flake resolved with `gh run rerun --failed`
+      (a retry of a flaked infra step, not a gate bypass — the fourth was preceded by a deliberate
+      wait once the pattern showed a sustained upstream outage). The one class deliberately **not**
+      fixed is the 138 pre-existing broken links under `plans/done/**` and
+      `apps/ayokoding-www/content/**`, excluded by the pre-push command form and out of scope by
+      explicit instruction — recorded above rather than silently absorbed
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes.
 > This follows the root cause orientation principle — proactively fix preexisting errors encountered
@@ -890,21 +922,40 @@ heading-hierarchy validate` — all exit 0
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically — group related changes into logically cohesive commits (C3+C4 as the
+- [x] [AI] Commit thematically — group related changes into logically cohesive commits (C3+C4 as the
       delivery-mode concern; C5 as the merge-protocol concern; C6 as the bareness concern)
-- [ ] [AI] Follow Conventional Commits: `<type>(<scope>): <description>`
-- [ ] [AI] Stage **explicit paths only** — never `git add -A` or `git add .`, per the
+- [x] [AI] Follow Conventional Commits: `<type>(<scope>): <description>`
+- [x] [AI] Stage **explicit paths only** — never `git add -A` or `git add .`, per the
       [No Destructive Git Operations Convention](../../../repo-governance/development/workflow/no-destructive-git-operations.md)
-- [ ] [AI] Preexisting fixes get their own commits, separate from plan work
+- [x] [AI] Preexisting fixes get their own commits, separate from plan work
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: PR #79 landed **16 commits**,
+      each one thematic and Conventional-Commits-formatted. The planned split held: `4f5556fa3`
+      (C1, the landing method), `bdebe2219` (C3+C4, delivery-mode-in-bare-repos), `a07fa5c7b` /
+      `4d8cadd7c` / `2d77f7c53` (C5, the merge-protocol review-cycle count, including cycle 3's
+      floor-to-ceiling reversal), `67766b9b0` / `e79776379` (C6, the bareness check), with
+      review-cycle fixes and plan-doc updates in their own commits (`870987d47`, `9cb0a9d62`,
+      `cbcb41f83`, `f820768b7`, `ff8cb0f82`, `b166ddbb1`, `de4552289`) and two explicit
+      `origin/main` integration merges (`c67b3f3a7`, `7c05b2924`). No commit in this plan, in any of
+      the three repos, used `git add -A` or `git add .`; staging was by explicit path throughout,
+      and `git commit --only <paths>` was used wherever foreign uncommitted WIP shared the tree —
+      61 dirty files under `plans/backlog/` belonging to three concurrently running agents were
+      never staged, committed, or reverted
 
 ### Open the PR and Run the Review Cycle
 
-- [ ] [AI] Push the branch: `git push -u origin bare-repo-governance-hardening`
+- [x] [AI] Push the branch: `git push -u origin bare-repo-governance-hardening`
       — acceptance: exits 0; the remote branch exists
-- [ ] [AI] Open a **draft PR** against `main`:
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: pushed; the remote branch
+      existed and carried all 16 commits through to the merge. Deleted after the merge, so the
+      surviving evidence is PR #79's own commit list (quoted under Commit Guidelines above) plus
+      merge commit `2b719347a` on `origin/main`
+- [x] [AI] Open a **draft PR** against `main`:
       `gh pr create --draft --base main --title "docs(governance): bare-repo governance hardening" --body-file <summary>`
       — acceptance: `gh pr view --json number,isDraft` shows a draft PR number
-- [ ] [AI] Run the **PR-Review Maker→Fixer Cycle** — 3 strictly sequential
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: PR **#79**,
+      <https://github.com/wahidyankf/ose-public/pull/79>, opened as a draft against `main` with head
+      `bare-repo-governance-hardening`
+- [x] [AI] Run the **PR-Review Maker→Fixer Cycle** — 3 strictly sequential
       `pr-review-maker` → `pr-review-fixer` cycles, each gated by a green CI run, per the
       [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md).
       **Corrected during PR-review cycle 3 (final)**: `{cycles}` is a **hard ceiling**, not a floor —
@@ -913,27 +964,52 @@ heading-hierarchy validate` — all exit 0
       workflow's former saturation-based extension mechanism accordingly
       — acceptance: the loop exits `done` (not `escalated`) after exactly 3 cycles; 0 CRITICAL and 0
       HIGH outstanding — per precondition (b), which the 3-cycle ceiling never waives
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: 3 CI-gated cycles ran on PR #79
+      via `pr-review-maker` → `pr-review-fixer` against the live GitHub Reviews API, exiting `done`,
+      not `escalated`, with 0 CRITICAL and 0 HIGH outstanding at the merge. Every cycle found real
+      defects — cycle 1 forced the fabricated-git-output removal (`f820768b7`) and the unconditional
+      `--is-bare-repository` prohibition (`e79776379`); cycle 2 forced the delivery-mode-resolver
+      overclaim fix (`9cb0a9d62`) and the `<GATE>` normative-site edit (`4d8cadd7c`); cycle 3 forced
+      the floor-to-ceiling reversal (`2d77f7c53`) and the remaining plan-doc corrections
+      (`b166ddbb1`, `de4552289`)
   - _Suggested executor: `pr-review-maker` then `pr-review-fixer`, alternating_
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Monitor **all** GitHub Actions workflows on the PR's check run — poll every **2 minutes**
+- [x] [AI] Monitor **all** GitHub Actions workflows on the PR's check run — poll every **2 minutes**
       with one `gh run view --json status,conclusion` per wakeup; never tight-loop, never
       `gh run watch`
-- [ ] [AI] Verify **all** CI checks pass — no exceptions
-- [ ] [AI] If any check fails, investigate the root cause and push a follow-up commit; never bypass
-- [ ] [AI] Repeat until all GitHub Actions pass with zero failures
+- [x] [AI] Verify **all** CI checks pass — no exceptions
+- [x] [AI] If any check fails, investigate the root cause and push a follow-up commit; never bypass
+- [x] [AI] Repeat until all GitHub Actions pass with zero failures
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: PR #79's final check rollup is
+      **17 SUCCESS, 0 FAILURE, 3 SKIPPED** (the three skips are language gates for languages this
+      docs-only changeset does not touch — `gh pr checks 79` reports them as `skipping`, not as
+      failures). Monitoring used the 2-minute single-call `gh run view --json status,conclusion`
+      cadence throughout; `gh run watch` was never used and no wakeup tight-looped
 
-- [ ] [AI] Flip the PR to ready and **merge it** — `[AI]` is the merge actor by default; this plan
+- [x] [AI] Flip the PR to ready and **merge it** — `[AI]` is the merge actor by default; this plan
       declares no `[HUMAN]` merge gate. Confirm all five hardened preconditions first: (a) review
       cycles complete and not `escalated`, (b) 0 CRITICAL + 0 HIGH outstanding, (c) branch
       non-destructively up to date with `origin/main`, (d) all quality gates green, (e) tester gates
       run **or exemption recorded** — here, **exemption recorded** in
       [tech-docs.md §Testing Strategy and Gate Exemptions](./tech-docs.md#testing-strategy-and-gate-exemptions)
       — acceptance: `gh pr view --json state` shows `MERGED`
-- [ ] [AI] Fast-forward local `main` after the merge — the same class of drift this plan documents:
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: `gh pr view 79 --json state`
+      → `MERGED`, squash-merged at `2b719347a` on 2026-07-21T16:55:49Z. All five preconditions held
+      at the merge: (a) 3 cycles complete, exited `done`; (b) 0 CRITICAL + 0 HIGH; (c) branch
+      up to date with `origin/main` via two non-destructive integration merges (`c67b3f3a7`,
+      `7c05b2924`) — never a rebase-with-force or a `reset --hard`; (d) 17/17 non-skipped CI checks
+      green; (e) tester gates **exempt with the exemption recorded**, not assumed, in
+      [tech-docs.md §Testing Strategy and Gate Exemptions](./tech-docs.md#testing-strategy-and-gate-exemptions)
+- [x] [AI] Fast-forward local `main` after the merge — the same class of drift this plan documents:
       `git fetch origin && git -C <repo-root> merge --ff-only origin/main`
       — acceptance: `git rev-list --left-right --count origin/main...main` prints `0` and `0`
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: reconciled. Measured **after**
+      `git fetch origin`, never before — measuring first is exactly the false-clean this plan
+      documents in `<C1>` §"Measure after fetching, never before". Current state:
+      `git rev-list --left-right --count origin/main...main` → `0 0`, with `main` and `origin/main`
+      both at `cff5dfd54`
 
 ### Phase 3 Gate
 
@@ -957,7 +1033,7 @@ heading-hierarchy validate` — all exit 0
       — **Result**: 1
 - [x] [AI] `grep -Fc "bare-repo-landing-method.md" <PROMO>` prints at least 1
       — **Result**: 1
-- [ ] [AI] ~~`git diff --name-only origin/main~1 origin/main` does **not** list
+- [x] [AI] ~~`git diff --name-only origin/main~1 origin/main` does **not** list
       `repo-governance/workflows/pr/pr-review-quality-gate.md` or
       `repo-governance/development/workflow/worktree-and-artifact-cleanup.md`~~
       **Superseded during PR-review cycle 2/3 — this check is now unsatisfiable as originally
@@ -977,7 +1053,16 @@ heading-hierarchy validate` — all exit 0
       correction note a few hundred lines above, which records `<GATE>` being edited at `4d8cadd7c`.
       Neither corrected check above can be run against a merge commit yet — this PR is not merged —
       but they are now at least satisfiable once it is, which the original phrasing was not
-- [ ] [AI] `gh pr view --json state` shows `MERGED`; CI green on `main`
+      — **Result — both corrected checks now RUN and PASS (2026-07-22, Phase 7 pre-archival
+      sweep)**: run against PR #79's actual merge commit, `2b719347a`, not against
+      `origin/main~1 origin/main` — `origin/main` has advanced past the merge since (it is now
+      `cff5dfd54`), so the relative form no longer names this changeset and would silently measure
+      an unrelated commit. `git diff --name-only 2b719347a~1 2b719347a` lists 22 files;
+      `repo-governance/development/workflow/worktree-and-artifact-cleanup.md` is **absent** (check 1
+      passes — DD-5 kept the WIP rule in `<C1>`) and
+      `repo-governance/workflows/pr/pr-review-quality-gate.md` is **present** (check 2 passes — the
+      expected C5 edit site)
+- [x] [AI] `gh pr view --json state` shows `MERGED`; CI green on `main`
       — **Corrected during PR-review cycle 3 (final)**: "no PR was opened this session" is false —
       **PR #79 is open** (`https://github.com/wahidyankf/ose-public/pull/79`, draft, base `main`,
       head `bare-repo-governance-hardening`, 12 commits as of this cycle, `mergeable: MERGEABLE`).
@@ -990,11 +1075,21 @@ heading-hierarchy validate` — all exit 0
       happened on the live PR. `gh pr checks 79` currently reports 17 passed, 0 failed (CI green).
       `gh pr view --json state` reports `OPEN`, not yet `MERGED` — this specific acceptance clause is
       genuinely not yet satisfied, honestly, rather than falsely claimed either way
-- [ ] [AI] `git rev-list --left-right --count origin/main...main` prints `0` and `0` in `ose-public`
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: now `MERGED`. PR #79
+      squash-merged at `2b719347a` (2026-07-21T16:55:49Z) with a final rollup of 17 SUCCESS / 0
+      FAILURE / 3 SKIPPED, and `main-ci` on `main` is green at `cff5dfd54`. The cycle-3 note's
+      refusal to tick these boxes on live-PR evidence alone was the right call at the time; they are
+      ticked now because the underlying acceptance clauses are satisfied and independently
+      re-verifiable from the merge commit
+- [x] [AI] `git rev-list --left-right --count origin/main...main` prints `0` and `0` in `ose-public`
       — **Deliberately not run**: no push to `main` or merge has happened yet, so this comparison is
       not yet meaningful. Unlike the two items above, this one's original "not yet meaningful"
       framing was accurate and needed no correction — only the two items above overstated what had
       happened
+      — **Result — closed 2026-07-22 (Phase 7 pre-archival sweep)**: now meaningful and measured.
+      After `git fetch origin` (never before it — see `<C1>` §"Measure after fetching, never
+      before"), `git rev-list --left-right --count origin/main...main` prints `0 0` in `ose-public`,
+      with both refs at `cff5dfd54`
 
 > **Tooling note (this Phase 3 document-editing pass)**: this executor's toolset was `Read`/`Write`/
 > `Edit`/`Glob`/`Grep` with no `Bash` access, so every "prints N" result above was produced with the
@@ -1092,7 +1187,7 @@ heading-hierarchy validate` — all exit 0
       `git -C <PUBLIC> show origin/main:<C1>`, verified byte-identical to the `ose-public` plan
       worktree's copy before use. Recorded in `learnings.md`; the same substitution is needed in
       Phase 5 and in both phases' gate diffs
-- [ ] [AI] **C2** — in
+- [x] [AI] **C2** — in
       `<PRIMER-WT>/repo-governance/development/workflow/no-destructive-git-operations.md`, add the
       same two cross-links to `<C1>` (§Conventions Implemented/Respected and §Related Documentation),
       mirroring the Phase 2 edit. Locate by content, not by line number — sibling line numbers differ
@@ -1102,6 +1197,11 @@ heading-hierarchy validate` — all exit 0
       content (§Conventions Implemented/Respected after the Worktree Toolchain Initialization
       bullet; §Related Documentation after the same document's line) at sibling lines 53 and 179
       versus 53 and 180 in `ose-public`
+      — **Checkbox ticked 2026-07-22 (Phase 7 pre-archival sweep)** — the Result above was already
+      complete; the box itself had been left unticked. Re-verified post-merge against the landed
+      state rather than the worktree, which no longer exists:
+      `git -C /Users/wkf/ose-projects/ose-primer show origin/main:repo-governance/development/workflow/no-destructive-git-operations.md`
+      contains the string exactly **2** times
 - [x] [AI] **C3** — in `<PRIMER-WT>/repo-governance/conventions/structure/plans.md`, add the same
       bare-repo note beneath the Delivery Mode table, mirroring the Phase 3 edit. Locate by content,
       not by line number — sibling line numbers differ
@@ -1953,31 +2053,91 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
 > Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md).
 
-- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
+- [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
       catch this automatically next time; discard the rest with a one-line reason
       — acceptance: every entry has either a route or a discard reason
-- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
+      — **Result**: 18 entries, all terminal, zero pending
+      (`grep -c "Terminal state.*pending" learnings.md` → **0**). Four were discarded, each because
+      its concrete half was **plan-local work already executed** during Phases 4-5 — not because it
+      was uninteresting. In every one of those four the generalizable half was preserved in a brief
+      rather than dropped, which is the distinction the litmus test is actually asking about: the
+      question is whether a durable surface would catch it next time, not whether the observation was
+      worth making.
+- [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
       credential, token, or private hostname to a `<placeholder>` token, or discard if unsanitizable
       — acceptance: `learnings.md` contains no raw secret
-- [ ] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content
+      — **Result**: clean, nothing to sanitize. The entries contain commit SHAs, CI run IDs, public
+      repo names, and public URLs — none of which is a secret. No credential, token, key, connection
+      string, private hostname, or inventory appears anywhere in the file. No `.env*` file was read,
+      written, or quoted at any point in this plan.
+- [x] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content
       (Terraform, k3s, Proxmox, real hostnames or inventories) stays in `ose-infra` only and is
       **never** cross-routed into `ose-public` or `ose-primer`; public-governance content may
       propagate via the existing parity loop
       — acceptance: no infra-private content appears in this repo's routed output
-- [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
+      — **Result**: clean. Applied **per entry, not per batch**, and the entries most at risk are the
+      ones sourced from `ose-infra` execution: the CI-flake entry, the bare-repo push entry, and the
+      four-premise entry. Each was checked individually. What they carry out of `ose-infra` is
+      **generic and public**: the name of a public rustup endpoint, the observable that a `pre-push`
+      hook needs a work tree, and public GitHub run IDs. **Zero hostnames, zero inventories, zero
+      credentials, zero IP addresses, zero `coralpolyp` internals, zero Terraform/k3s/Proxmox
+      configuration.** The one place infra tooling is named at all — the CI-retry brief — names only
+      third-party GitHub Actions that are public by construction.
+- [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
       matrix — non-code homes may land inline (small edit) or as a `plans/backlog/` follow-up
       (large); code homes (`apps/`, `libs/`, tests) are **ALWAYS** filed as a separate
       `plans/backlog/<slug>/` plan and **NEVER** landed inline in this plan's own commits or PRs
       — acceptance: every `learnings.md` entry records its terminal routing state
-- [ ] [AI] Specifically triage any friction recorded in Phase 4 or Phase 5 between `<C1>`'s written
+      — **Result**: every entry records one terminal state. Routing summary:
+
+  | Terminal state                     | Count | Destination                                                              |
+  | ---------------------------------- | ----: | ------------------------------------------------------------------------ |
+  | Routed to `<C1>` via the sub-cycle |     3 | `bare-repo-landing-method.md`, all three repos                           |
+  | Routed inline, already landed      |     1 | `<C1>` §Worked example, satisfied during Phase 2 authoring               |
+  | Filed as a new two-pager           |     8 | 5 new briefs in `plans/ideas/` (several entries share a brief)           |
+  | Folded into an existing two-pager  |     2 | `plan-quality-gate-convergence`, `ayokoding-mermaid-diagram-remediation` |
+  | Discarded — plan-local, executed   |     4 | generalizable half preserved in `propagation-checklist-under-coverage`   |
+
+  **No code-homed learning landed inline.** The one code/CI learning — the `setup-rust` toolchain
+  download, which failed **seven** times across this phase — is filed as
+  `plans/ideas/ci-setup-rust-toolchain-retry.md` and explicitly **not** patched by this plan, exactly
+  as the routing matrix requires.
+
+  **The five new briefs**: `propagation-checklist-under-coverage`, `acceptance-clause-vacuity`,
+  `class-sweep-completeness`, `ci-setup-rust-toolchain-retry`, `sdlc-gate-standard-property-bound-lag`.
+  Several entries were consolidated rather than filed one-to-one — four separate propagation entries
+  share a single brief because they are four instances of one problem, per the ideas folder's
+  **integrate-don't-duplicate** rule. Two entries split across two briefs each, where the entry
+  genuinely carried two distinct classes.
+
+  **Triage caught two false claims in this plan's own `learnings.md`** and corrected them rather than
+  routing them onward: the retry-wrapped rustup installer fetch lives inside a **third-party action**,
+  not in this repo's `setup-rust` (the line was read out of a CI log and attributed to the wrong
+  file), and the three repos do **not** share a `setup-rust` implementation — `ose-public` and
+  `ose-primer` use `actions-rust-lang/setup-rust-toolchain@v1` while `ose-infra` uses
+  `dtolnay/rust-toolchain@stable`. Both errors came from inferring repository structure from CI
+  output without opening the file. Routing a wrong claim into a durable surface is worse than not
+  routing it at all, which is why the gate is applied before the route, not after.
+
+- [x] [AI] Specifically triage any friction recorded in Phase 4 or Phase 5 between `<C1>`'s written
       procedure and what execution actually required. `<C1>` is the durable surface for exactly that
       class, so each such entry's terminal state is either "routed" (landed via the sub-cycle below,
       `ose-public` first per **DD-8**, then both siblings) or "discarded — `<reason>`"
       — acceptance: every such `learnings.md` entry names one of those two terminal states
-- [ ] [AI] Record the routing decision: does **at least one** `<C1>`-friction entry have terminal
+      — **Result**: four `<C1>`-friction entries, each naming one of the two states. Three are
+      **routed** (the bare-repo push blocker, the working-tree-path copy source, and the
+      reconcile's own false-clean measurement); one is **already landed** — its proposed route, a
+      worked example showing the non-zero reading and the recovery, was satisfied during Phase 2
+      authoring, verified by reading `<C1>` rather than assumed.
+      — **`<C1>` was read before deciding, not after.** All three routed corrections were confirmed
+      **absent** from the existing document first: `grep` for `gh api`, `--delete`, `no-verify`,
+      `git show`, and any fetch-before-measure statement returned **zero** matches. That check is what
+      turned the routing decision from a judgement call into a measurement.
+- [x] [AI] Record the routing decision: does **at least one** `<C1>`-friction entry have terminal
       state "routed"?
       — acceptance: the yes/no answer is recorded in this checklist. If **no**, mark every step in
       the sub-cycle below N/A with a one-line note and skip to the "no generalizable learning" step
+      — **Result**: **YES** — three entries are routed, so the sub-cycle below runs in full.
 
 ### `<C1>` Correction Propagation Sub-Cycle (Conditional)
 
@@ -1986,29 +2146,98 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
 > preserves **DD-8**'s directionality: `ose-public` is corrected first, then both siblings copy the
 > corrected text from it — never the reverse, and never a sibling-only fix.
 
-- [ ] [AI] Cut a dedicated follow-up branch in the plan's own (still-provisioned) worktree:
+- [x] [AI] Cut a dedicated follow-up branch in the plan's own (still-provisioned) worktree:
       `git -C worktrees/bare-repo-governance-hardening fetch origin && git -C worktrees/bare-repo-governance-hardening checkout -b bare-repo-governance-hardening-c1-followup origin/main`
       — acceptance: `git -C worktrees/bare-repo-governance-hardening branch --show-current` prints
       `bare-repo-governance-hardening-c1-followup`
-- [ ] [AI] Apply every "routed" entry's correction to
+      — **Result**: prints exactly that, at `origin/main` (`b5f6090a6`).
+      — **The worktree was not clean when this step began**, which the step does not anticipate. It
+      held pre-Prettier drafts of `delivery.md` and `learnings.md` from a Phase 4 session, and
+      `checkout -b` would have carried them onto the new branch. They were **verified superseded
+      before being disposed of** — a set-difference against `main`'s copies showed every line already
+      present there, the only residual differences being `*italic*` → `_italic_` MD049 fixes and
+      pre-Prettier table padding — and then **committed to the old branch rather than discarded**, so
+      nothing was lost and the worktree could later be removed without `--force`. A merged PR does
+      not imply an empty working tree.
+- [x] [AI] Apply every "routed" entry's correction to
       `worktrees/bare-repo-governance-hardening/<C1>`, following Phase 2's authoring discipline
       (frontmatter unchanged; edit only the section each entry names)
       — acceptance: `diff <PUBLIC>/<C1> worktrees/bare-repo-governance-hardening/<C1>` reports a
       difference limited to the routed correction(s) (before this step it reports no difference)
-- [ ] [AI] Run the local quality gates in that worktree:
+      — **Result**: three sections added, frontmatter byte-unchanged, nothing deleted.
+      §"Measure after fetching, never before" (an `###` under §Terminal Reconcile),
+      §"Remote-Branch Cleanup in a Bare Repository", and §"Reading a File From Another Repository".
+      PR-review cycle 1 additionally required cross-links from the numbered method into the cleanup
+      section, so the final diff also touches steps 6-7 and §"One Landing Path Per Unit Of Work" —
+      beyond the literal wording of this step, and correctly so: a section that names an ordering
+      trap while leaving the numbered method silent about it describes the defect instead of closing
+      it.
+- [x] [AI] Run the local quality gates in that worktree:
       `npx nx affected -t typecheck lint test:quick specs:coverage` plus the markdown validators
       — acceptance: all exit 0; fix every failure, including preexisting ones
-- [ ] [AI] Stage **explicit paths only**, commit
+      — **Result**: all exit 0 — `markdownlint-cli2` 0 errors, `prettier --check` clean,
+      `md links validate` (pre-push exclude form) `All links valid!`, `md heading-hierarchy validate`
+      exit 0, `nx affected` `No tasks were run` (a **vacuous** pass: markdown-only, no Nx project
+      affected — recorded as vacuous rather than green, as in every earlier phase).
+- [x] [AI] Stage **explicit paths only**, commit
       (`git commit -m "docs(governance): land Phase 4/5 <C1> friction correction"`), and push:
       `git push -u origin bare-repo-governance-hardening-c1-followup`
       — acceptance: exits 0
-- [ ] [AI] Open a **draft PR** in `ose-public` against `main`, run the 3-cycle PR-Review Maker→Fixer
+      — **Result**: exit 0, `* [new branch]`. One file staged by explicit path across three commits
+      (`cf4d3606a` authoring, `b5b182fc8` cycle-1 fixes, `067f0bd40` cycle-2 corrections). All hooks
+      ran; no `--no-verify` at any point.
+- [x] [AI] Open a **draft PR** in `ose-public` against `main`, run the 3-cycle PR-Review Maker→Fixer
       Cycle, verify CI green, then `[AI]`-merge once the five hardened preconditions hold
       — acceptance: `gh pr view --json state` shows `MERGED`
-- [ ] [AI] Fast-forward `<PUBLIC>`'s local `main`:
+      — **Result**: [wahidyankf/ose-public#81](https://github.com/wahidyankf/ose-public/pull/81),
+      squash-merged at **`ed2fe97282bd546ab305019f290508e9c7c6c17a`**. Two CI-gated cycles; the
+      ceiling of 3 was not exhausted because cycle 2 came back clean at blocking severity, and 3 is a
+      **hard ceiling, not a floor**.
+
+  | Cycle | Findings                            | Outcome                                                      |
+  | ----- | ----------------------------------- | ------------------------------------------------------------ |
+  | 1     | 1 HIGH, 1 MEDIUM, 1 LOW             | all fixed in `b5b182fc8`, all threads resolved               |
+  | 2     | **0 CRITICAL, 0 HIGH**, 1 MED 1 LOW | precondition (b) satisfied; both fixed anyway in `067f0bd40` |
+
+  **Cycle 1's HIGH is the finding worth recording.** The new §"Reading a File From Another
+  Repository" asserted that `git show origin/main:<path>` is "correct regardless of any checkout's
+  sync state". That is **false** — `origin/main` is a purely local ref, so the read does no network
+  access and silently returns whatever was last fetched — and it directly contradicted the
+  §"Measure after fetching, never before" section added **in the same commit**. The consequence is
+  sharper than the wording: this ref form's main use is the three-repo byte-identity check
+  `diff <PUBLIC>/<C1> <(git -C <SIBLING> show origin/main:<C1>)`, which against a stale sibling ref
+  reports **no difference** — a false byte-identical verdict on the invariant it exists to protect.
+  It replaced a loud failure with a silent wrong answer. Fixed by rewriting the section as a
+  fetch-then-show pair scoped to what the ref form genuinely fixes.
+
+  **Cycle 2's two findings were both introduced by cycle 1's own fix** — a rewrite that corrected one
+  mis-stated claim introduced two more in the same paragraph (mis-attributing which command fails in
+  a refspec-less bare clone, and calling `main` the already-current ref when it was the one behind).
+  Non-blocking, but fixed before merge rather than deferred, because this text was about to be copied
+  verbatim into two other repositories. **Only a second review pass over the rewritten text caught
+  them**, which is the argument for the cycle structure existing at all.
+
+- [x] [AI] Fast-forward `<PUBLIC>`'s local `main`:
       `git fetch origin && git -C <PUBLIC> merge --ff-only origin/main`
       — acceptance: `git -C <PUBLIC> rev-list --left-right --count origin/main...main` prints `0`
       and `0`
+      — **Result**: `0 0`, but **not by `--ff-only`** — that command as written could not run here,
+      and the reason is worth recording. Local `main` carried an unpushed plan-docs commit while
+      `origin/main` had advanced by the squash merge, so the two had **diverged** (`1 1`), and
+      `--ff-only` refuses a non-fast-forward by design. A rebase was also unavailable: the primary
+      checkout held **61 dirty files belonging to three other agents**, and `git rebase` refuses to
+      run with unstaged changes — the only ways past that would have been to stash or discard another
+      actor's work, which the No Destructive Git Operations Convention forbids outright.
+      Resolved with `git merge origin/main`, after first confirming the incoming commit touched **no
+      dirty path** (`comm -12` over the two file lists returned empty). Non-destructive, and it left
+      every foreign file untouched.
+      — **The push then failed too, and correctly.** The pre-push hook's link validator found two
+      broken links: one was mine (an index line I had restored while trying to keep another agent's
+      in-flight promotion out of my diff — the restoration recreated a link to a file they had already
+      deleted, so it was reverted), and one existed **only in another agent's uncommitted edit**,
+      absent from `HEAD`. Rather than bypass the hook or edit a file another agent was actively
+      writing, the push was run from **inside this plan's own worktree**, whose tree is clean. The
+      hook ran in full against the content actually being pushed. `--no-verify` was never used.
 - [ ] [AI] Re-propagate the now-corrected `<C1>` to `ose-primer`, repeating Phase 4's own copy
       mechanism exactly: re-provision `<PRIMER-WT>` at `origin/main` with a fresh branch
       (`git -C <PRIMER> worktree add <PRIMER-WT> -b bare-repo-governance-hardening-c1-followup origin/main`),
