@@ -177,6 +177,40 @@ worked examples validated by domain checkers, not application behaviour validate
 source plan states this explicitly and this plan preserves the ruling. See
 [§TDD exemption](#tdd-exemption-this-plan-ships-no-application-code) below.
 
+### Licensing posture (programme A8)
+
+Programme
+[`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a) binds every plan that
+authors teaching material, and this plan authors the most of it — 90 course bodies. **Describe, cite,
+and link; never reproduce.** Six concrete hazards apply to a `careers/` course body, each mapped to
+where the maker-checker-fixer pipeline above must catch it:
+
+- **Code examples.** Every `learning/code/` worked example (`ex-NN`) is authored originally for this
+  course, never copied from a framework's docs, a tutorial, a blog post, or Stack Overflow. Stack
+  Overflow content is **CC-BY-SA** — attribution _and_ share-alike — a licence course material
+  generally cannot satisfy. The **maker-checker-fixer** step-5 content checkers are the enforcement
+  point (see the delivery-checklist acceptance clause below).
+- **Documentation prose.** A concept explanation (`co-NN`) restates the idea in this course's own
+  words with a citation, the same discipline the `syllabus/courses/*.md` "Accuracy notes" sections
+  already model (e.g. `syllabus/courses/actor-model-concurrency.md`'s hexdocs citations) — never a
+  paraphrase-by-substitution of the official docs' own sentences.
+- **Figures, diagrams and screenshots.** Any diagram in a course body is authored (Mermaid, per the
+  [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md)), never a
+  screenshot or image lifted from a vendor or project site.
+- **Book and course structure.** A course's own module/example progression is authored from the
+  `syllabus/courses/<course-id>.md` spec's `co-NN` concept order, never from reproducing a well-known
+  book's chapter progression or a paid course's module sequence — the same derivative-work risk `A12`
+  states for syllabus confirmation.
+- **Trademarks.** Language, framework, and vendor names appear nominatively only — never in a course
+  title, path segment, or phrasing implying endorsement or affiliation.
+- **Datasets and sample data.** Any dataset a worked example touches is authored for the example, not
+  lifted from a source whose licence was not examined.
+
+This plan does not duplicate `A8`'s text; see
+[ayokoding-learning-path-programme.md#a8](../ayokoding-learning-path-programme.md#a8--licensing-binds-the-whole-programme)
+for the full rationale, and this plan's `brd.md` for the corresponding risk row and `delivery.md` for
+the grep-checkable acceptance clause applied per authored course.
+
 ### The `prerequisites` frontmatter contract (consumed, not owned)
 
 Every authored `_index.md` declares:

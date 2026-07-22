@@ -411,6 +411,15 @@ subagents capped per the orchestration convention). The main thread self-promote
    `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
    — acceptance: returns **0** on this course's own branch before it merges. Falsifiable both ways:
    touching any file under that path makes the command return ≥1.
+9. [AI] **Licensing self-check (programme
+   [`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a))** — grep this course's
+   own worked-example code for the CC-BY-SA Stack Overflow hazard `A8` names explicitly:
+   `grep -rn 'stackoverflow\.com\|reddit\.com' "<COURSES><course-id>/learning/code/" 2>/dev/null | grep -c .`
+   — acceptance: prints `0` (ugrep semantics — this exits 1, do not chain with `&&`; read the printed
+   output). Falsifiable both ways: pasting an SO/Reddit URL into any file under that directory makes
+   the count ≥1 today, before this step is satisfied. This is a targeted heuristic, not a full
+   copyright audit — the maker-checker-fixer content checkers (step 5) and the human author's own
+   judgment remain the primary `A8` control for prose, figures, and structure.
 
 Each course below is its own sub-phase (own branch → draft PR → 3-cycle review → `[AI]` merge →
 deploy), applying the convention:

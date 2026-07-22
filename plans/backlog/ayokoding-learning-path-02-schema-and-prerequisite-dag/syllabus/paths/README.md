@@ -6,11 +6,13 @@ data. A **path** is an ordered, prerequisite-consistent list of **course IDs** o
 order and adds **zero new bodies** (every course body it names lives once in the library). **This plan
 is careers-only** (R4, 2026-07-21 ruling): all four paths below sit under the `careers/` URL category
 (`/en/c/learn/paths/careers/<arc>/<role>`), and `ayokoding-learning-path-05-manifests` owns exactly these
-**4 careers manifests** — not 6. A sibling `skills/` category (`/en/c/learn/paths/skills/<subject>`,
-2 manifests) exists in the wider programme but is owned **end-to-end** by **two** sibling plans, one
-per subject — `ayokoding-learning-path-06-skills-accounting` owns `skills/accounting` and
-`ayokoding-learning-path-07-skills-erp` owns `skills/enterprise-resource-planning`; both folders
-exist under `plans/backlog/`. Neither their manifests nor their corpora live here. See
+**4 careers manifests** — not 8 (count amended by A10). A sibling `skills/` category
+(`/en/c/learn/paths/skills/<subject>`, **4** manifests as of amendment A10) exists in the wider
+programme but is owned **end-to-end** by **two** sibling plans, two subjects each —
+`ayokoding-learning-path-06-skills-accounting` owns `skills/conventional-accounting` and
+`skills/sharia-accounting`, and `ayokoding-learning-path-07-skills-erp` owns `skills/conventional-erp`
+and `skills/sharia-erp`; both folders exist under `plans/backlog/`. Neither their manifests nor their
+corpora live here. See
 [tech-docs §Ownership split](../../tech-docs.md#ownership-split-careers-vs-skills--r4) for the full
 accounting.
 

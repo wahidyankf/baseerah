@@ -11,6 +11,10 @@ This is **Wave 2** of a five-plan split of the closed
 plan. It owns **course bodies only**. It owns no schema, no route, no component, no redirect — and,
 most importantly, **no manifest**.
 
+> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`A6`, `A8`, `A9`, `A12`,
+> and so on) throughout; their definitions and the wave DAG live in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+>
 > **Cross-plan source of truth** — the authoritative per-course and per-path specs live in
 > `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
 > them; do not author from any other source. Every course body in this plan is authored **from** its

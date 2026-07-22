@@ -9,6 +9,10 @@ This is **plan #2 of a five-way split** of the closed
 plan. It is **Wave 1** and has **no plan-level prerequisite** — it starts immediately, in parallel
 with `ayokoding-learning-path-01-url-restructure`.
 
+> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R2`, `R4`, `A2`, `A10`,
+> and so on) throughout; their definitions and the wave DAG live in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+>
 > **Custody notice.** The `syllabus/` folder in this plan is a **moved corpus**. Its curriculum
 > content — course specs, orderings, pedagogical framing — is not authored, edited, or re-derived by
 > this plan, **with exactly one recorded content exception**: the R3 custody exception (2026-07-21
@@ -45,10 +49,10 @@ The architecture this data layer serves, in one paragraph — reproduced here be
 knowing what a manifest composes.
 
 **This plan is careers-only (R4, 2026-07-21 ruling).** All four paths below sit under the `careers/`
-URL category (`<pathId>` = `careers/<arc>/<role>`). A sibling `skills/` category (2 manifests,
-`<pathId>` = `skills/<subject>`) exists in the wider programme but is owned end-to-end by **two**
-sibling plans — `ayokoding-learning-path-06-skills-accounting` and
-`ayokoding-learning-path-07-skills-erp` — see
+URL category (`<pathId>` = `careers/<arc>/<role>`). A sibling `skills/` category (**four** manifests
+as of amendment A10 — up from the original two, `<pathId>` = `skills/<subject>`) exists in the wider
+programme but is owned end-to-end by **two** sibling plans — `ayokoding-learning-path-06-skills-accounting`
+and `ayokoding-learning-path-07-skills-erp` — see
 [tech-docs §Ownership split](./tech-docs.md#ownership-split-careers-vs-skills--r4). This plan's schema
 and resolvers are category-agnostic by construction (R2) and do not hardcode either category's URL
 depth.
@@ -88,12 +92,13 @@ prerequisites (DD-6). Those two decisions are this plan's. Every manifest also c
 - The UI design funnel, every mockup render, and every `shell/` component →
   `ayokoding-learning-path-03-navigation-ui`.
 - Every **careers** `.yaml` manifest file and every step that creates, appends to, reorders, or
-  re-verifies one → `ayokoding-learning-path-05-manifests` (4 manifests, not 6 — R4).
+  re-verifies one → `ayokoding-learning-path-05-manifests` (4 manifests, not 8 — R4, count amended by A10).
 - Every course body under `<COURSES>` → `ayokoding-learning-path-04-course-authoring`.
-- The entire `skills/` URL category — both path landings, both manifests, and its course corpus →
-  `ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
-  `ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`), R4. This plan's
-  `syllabus/` custody, schema, and resolvers never reference either.
+- The entire `skills/` URL category — all **four** path landings, four manifests, and its course
+  corpus → `ayokoding-learning-path-06-skills-accounting` (`skills/conventional-accounting`,
+  `skills/sharia-accounting`) and `ayokoding-learning-path-07-skills-erp` (`skills/conventional-erp`,
+  `skills/sharia-erp`), R4 as amended by A10. This plan's `syllabus/` custody, schema, and resolvers
+  never reference any of the four.
 
 ## Custody of `syllabus/` — a corpus this plan does not consume
 

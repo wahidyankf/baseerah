@@ -1,5 +1,8 @@
 # Business Requirements — ayokoding-www Learning-Path URL Restructure
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 ## Business Goal
 
 Give the ayokoding-www learn section **one explainable shape**. Today `/{locale}/learn/` lists
@@ -174,7 +177,7 @@ file under `.claude/agents/`].
   `paths/`, `paths/careers/`, `paths/careers/<arc>/`, `paths/skills/`) is always this plan's; a
   **path landing** (the leaf `_index.md` a manifest-owning plan populates, e.g.
   `paths/careers/interview-ready/software-engineer/_index.md` or
-  `paths/skills/accounting/_index.md`) never is. See
+  `paths/skills/conventional-accounting/_index.md`) never is. See
   [tech-docs.md DD-49](./tech-docs.md#design-decisions) for the full ownership rule and
   [prd.md's structural-index requirement](./prd.md#product-scope) for the acceptably-empty
   rendering constraint each of the five new files must satisfy — the empty-state **design** itself

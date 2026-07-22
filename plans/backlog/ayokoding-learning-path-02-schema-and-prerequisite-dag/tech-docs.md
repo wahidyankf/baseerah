@@ -54,8 +54,9 @@ checklist whose `<FEAT>` placeholders cannot be expanded is not executable.
   `careers/immediately-effective/ai-engineer` (fourth path, corrected 2026-07-21 — see
   [§Path `careers/immediately-effective/ai-engineer`](#path-careersimmediately-effectiveai-engineer-fourth-path-corrected-2026-07-21) —
   manifest at `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml`). A sibling `skills/` category
-  (2 path ids, e.g. `skills/enterprise-resource-planning`) exists in the wider programme but is out of
-  this plan's scope — see [§Ownership split](#ownership-split-careers-vs-skills--r4).
+  (**4** path ids as of amendment A10 — `skills/conventional-accounting`, `skills/sharia-accounting`,
+  `skills/conventional-erp`, `skills/sharia-erp` — up from the original two) exists in the wider
+  programme but is out of this plan's scope — see [§Ownership split](#ownership-split-careers-vs-skills--r4).
 
 ## Architecture — the pure core this plan builds
 
@@ -243,7 +244,7 @@ edge. `checkPrerequisiteConsistency` is the function that proves a given walk re
 - **Storage**: each manifest is a standalone data file under `<MANIFESTS>` — the loader globs
   `manifests/**/*.yaml` and a **slash in a path ID becomes a nested directory** (e.g.
   `manifests/careers/interview-ready/software-engineer.yaml`, or, for the 2-segment `skills/` category
-  owned by a separate plan, `manifests/skills/enterprise-resource-planning.yaml`). This data file is
+  owned by two separate plans, `manifests/skills/conventional-erp.yaml`). This data file is
   the **single machine-consumed source of truth** for the path — it is NOT `courseOrder` frontmatter on
   any content `_index.md`.
 
@@ -299,7 +300,7 @@ shape is exercised only via unit-test fixtures proving the code does not silentl
   taken over `pathId.split("/").filter(Boolean)`, making
   `pathId.split("/").filter(Boolean).length >= 2` the concrete form of the floor above. This filter
   constrains **emptiness, not arity** — it removes empty segments and asserts nothing about how many
-  non-empty ones there are, so `"skills/accounting"` (2), `"careers/interview-ready/software-engineer"`
+  non-empty ones there are, so `"skills/conventional-accounting"` (2), `"careers/interview-ready/software-engineer"`
   (3) and `"careers/a/b/c"` (4) all pass the identical expression, while `"careers"` and `"careers/"`
   (both 1 after filtering) are rejected by it. The filter is also invisible to the Phase 1.2 REFACTOR
   depth guard, which flags comparisons against 3 or 4 and equalities against 2 — `filter(Boolean).length >= 2`
@@ -376,7 +377,8 @@ existing careers mirror filenames are not renamed** — no collision risk exists
 vocabulary — three arcs, two roles — shares no token with any skills subject), and renaming
 already-settled filenames is pure churn with no correctness benefit. **Going forward, a skills
 manifest mirror filename MUST carry an explicit `skills-` marker** — `manifest-skills-<subject>.md`
-(e.g. `manifest-skills-accounting.md`, `manifest-skills-enterprise-resource-planning.md`) — keeping
+(e.g. `manifest-skills-conventional-accounting.md`, `manifest-skills-sharia-erp.md`, per the four
+subjects amendment A10 introduced) — keeping
 the same flat dash-joined shape (no literal slash in the filename) but making the category
 unambiguous in the filename itself, by design rather than by vocabulary coincidence. This asymmetry
 (careers unmarked, skills marked) is deliberate: the careers filenames are locked, shipped-adjacent
@@ -646,6 +648,28 @@ amendment annotations intact.
 canonical fallback) is owned by `ayokoding-learning-path-03-navigation-ui`; DD-15 and DD-27 (build
 order) are cross-cutting and reproduced in this plan's `README.md`.
 
+**A pre-existing `DD-15` numbering collision (found while reconciling A8, not fixed here).** The 127
+`syllabus/courses/*.md` files this plan custodies carry an inherited `License-aware (DD-15)` marker in
+each Scope note — a reference to the **original**
+[`fundamentally-strong-software-engineer`](../../done/2026-07-19__fundamentally-strong-software-engineer/tech-docs.md)
+closed plan's own `DD-15` ("License-aware technology choices": pick the free/teachable tool when a
+well-known library's licence shifts, e.g. Redis SSPL→AGPL, Akka→BSL + the Apache Pekko fork). That is
+a **different, narrower** decision from this plan's own `DD-15` above (build order) — the two plan
+lineages independently minted a `DD-15` and the per-course files were never renumbered when the
+content moved through `shared-course-library-and-learning-paths` into this plan. Both are true
+simultaneously and neither is wrong in its own file; this note exists so a reader hitting both does not
+assume one supersedes the other.
+
+**Reconciling with programme
+[`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a) (strict clean-room
+licensing).** The inherited `DD-15` (technology-choice licensing) and `A8` (authorship/reproduction
+licensing) are **complementary, not duplicate**: `DD-15` governs _which tool a course teaches_ when a
+licence shift makes one option non-free; `A8` governs _how the course's own content is authored_ —
+code examples, documentation prose, figures/screenshots, book/course structure, trademarks, and
+datasets must never be reproduced from a source, only described, cited, and linked. `DD-15`'s narrower
+scope does not need restating; `A8` is the current, binding, programme-wide rule this corpus's content
+(existing and future) must additionally satisfy, and it is cited here rather than duplicated.
+
 ### The DD-34 / DD-35 / DD-39 numbering gap is deliberate
 
 Restated **verbatim** from the source plan (`tech-docs.md:1837-1844`), so that no future reader
@@ -807,8 +831,9 @@ here.
 ### Path Manifests
 
 Moved to **`ayokoding-learning-path-05-manifests`**, which owns every **careers** manifest file and
-every manifest mutation — **exactly the 4 manifests below**, not 6 (R4). A sibling `skills/` category
-(2 manifests) is owned end-to-end by two other plans; see
+every manifest mutation — **exactly the 4 manifests below**, not 8 (R4, count amended by A10). A
+sibling `skills/` category (4 manifests, two per subject, amendment A10) is owned end-to-end by two
+other plans; see
 [§Ownership split](#ownership-split-careers-vs-skills--r4). The authoritative human-readable orderings
 are [`syllabus/paths/`](./syllabus/paths/README.md), custodied here; each YAML manifest's `courseOrder`
 is transcribed from its mirror.
@@ -837,24 +862,27 @@ Added 2026-07-20 as a transition path; **corrected 2026-07-21 (R3)** to a from-s
 
 ## Ownership split (careers vs. skills — R4)
 
-**Ruling, 2026-07-21.** Plans 01-05 (this plan included) absorb the `careers/` URL category segment and
-its content; their wave DAG (W1: 01, 02 · W2: 03, 04 · W3: 05) is unchanged, and they stay
-**careers-only**. The `skills/` category is owned **end-to-end** by **two** sibling plans, one per
-subject [Repo-grounded — both folders exist under `plans/backlog/`]:
+**Ruling, 2026-07-21; skills-category path count amended 2026-07-21 by A10.** Plans 01-05 (this plan
+included) absorb the `careers/` URL category segment and its content; their wave DAG (W1: 01, 02 ·
+W2: 03, 04 · W3: 05) is unchanged, and they stay **careers-only**. The `skills/` category carries
+**four** paths (amendment A10 — up from the original two) and is owned **end-to-end** by **two**
+sibling plans, two subjects each [Repo-grounded — both folders exist under `plans/backlog/`]:
 
-| `skills/` path                        | Owning plan                                    | Scope                                         |
-| ------------------------------------- | ---------------------------------------------- | --------------------------------------------- |
-| `skills/accounting`                   | `ayokoding-learning-path-06-skills-accounting` | Path landing, manifest, and accounting corpus |
-| `skills/enterprise-resource-planning` | `ayokoding-learning-path-07-skills-erp`        | Path landing, manifest, and ERP corpus        |
+| `skills/` path                   | Owning plan                                    | Scope                                                      |
+| -------------------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| `skills/conventional-accounting` | `ayokoding-learning-path-06-skills-accounting` | Path landing, manifest, and conventional-accounting corpus |
+| `skills/sharia-accounting`       | `ayokoding-learning-path-06-skills-accounting` | Path landing, manifest, and sharia-accounting corpus       |
+| `skills/conventional-erp`        | `ayokoding-learning-path-07-skills-erp`        | Path landing, manifest, and conventional-ERP corpus        |
+| `skills/sharia-erp`              | `ayokoding-learning-path-07-skills-erp`        | Path landing, manifest, and sharia-ERP corpus              |
 
 Neither category's plans touch the other's manifests, corpus, or landing pages, and neither skills
 plan touches the other's.
 
 This scopes the manifest-ownership invariant **per path**, not globally: `ayokoding-learning-path-05-manifests`
 is the sole owner of the **4 careers manifests** (unchanged from its original "owns every manifest
-file" framing, now stated precisely as careers-only); each skills plan is the sole owner of its **one**
-skills manifest. None owns another's. Every place in this plan's docs that states "the
-manifest owner" or "four manifests" is scoped to careers — see the corrections in
+file" framing, now stated precisely as careers-only); each skills plan is the sole owner of its **two**
+skills manifests (amendment A10 — up from one each). None owns another's. Every place in this plan's
+docs that states "the manifest owner" or "four manifests" is scoped to careers — see the corrections in
 [§Path constants](#path-constants), [§`syllabus/` folder structure](#syllabus-folder-structure-and-custody),
 and [§Path Manifests](#path-manifests) above.
 

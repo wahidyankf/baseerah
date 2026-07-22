@@ -9,6 +9,10 @@ relocates the six remaining `en/learn/` subject domains into a new `legacy/` buc
 It is **Wave 1** of a five-plan split of the closed `shared-course-library-and-learning-paths` plan
 and has **no plan-level prerequisite** — it starts immediately.
 
+> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R1`, `R7`, `A3`, `A10`,
+> and so on) throughout; their definitions and the wave DAG live in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+>
 > **Cross-plan source of truth** — The authoritative per-course and per-path specs live in
 > `plans/<stage>/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
 > them; do not author from any other source. Cross-plan `syllabus/` paths are written in this plan as

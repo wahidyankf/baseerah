@@ -10,13 +10,18 @@ category**: the four `PathManifest` YAML data files, their thin content landing 
 `careers/` slice of the paths-hub card population, the per-path progression-smoothness audits, and
 every manifest growth as backfill content lands.
 
-**Category scope (2026-07-21 path-category-split ruling — see [tech-docs DD-34](./tech-docs.md#design-decisions)).**
-The paths hub now serves **two** categories at different URL depths: `careers/<arc>/<role>` (3
-segments, 4 paths, this plan) and `skills/<subject>` (2 segments, no arc level today, 2 paths,
+> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R4`, `A3`, `A8`, `A10`,
+> and so on) throughout; their definitions and the wave DAG live in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+
+**Category scope (2026-07-21 path-category-split ruling — see [tech-docs DD-34](./tech-docs.md#design-decisions);
+skills path count amended 2026-07-21 by A10).** The paths hub now serves **two** categories at
+different URL depths: `careers/<arc>/<role>` (3 segments, 4 paths, this plan) and `skills/<subject>`
+(2 segments, no arc level today, **4** paths as of amendment A10 — up from the original two — owned by
 the sibling plans `ayokoding-learning-path-06-skills-accounting` and
-`ayokoding-learning-path-07-skills-erp`). This plan is **careers-only**; "four
+`ayokoding-learning-path-07-skills-erp`, two each). This plan is **careers-only**; "four
 manifests" and "four path manifests" in this plan always mean the four `careers/` manifests — never
-the whole six-path programme. Where a statement below is about the whole programme rather than this
+the whole eight-path programme. Where a statement below is about the whole programme rather than this
 plan's own scope, it says so explicitly.
 
 Four manifests ship here, in the DD-27 build order:
@@ -35,11 +40,12 @@ _Binding — and the reason this plan exists as a separate unit._
 **This plan owns every file under `apps/ayokoding-www/src/features/course-paths/manifests/careers/`
 and every step that creates, appends to, reorders, or re-verifies one of the four `careers/`
 manifests.** `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`
-together own the sibling `.../manifests/skills/` subtree end-to-end —
-`ayokoding-learning-path-06-skills-accounting` owns `manifests/skills/accounting.yaml` and its
-landing; `ayokoding-learning-path-07-skills-erp` owns
-`manifests/skills/enterprise-resource-planning.yaml` and its landing — each under the identical
-invariant, scoped to its own manifest.
+together own the sibling `.../manifests/skills/` subtree end-to-end, **four** manifests as of
+amendment A10 (up from two) —
+`ayokoding-learning-path-06-skills-accounting` owns `manifests/skills/conventional-accounting.yaml`
+and `manifests/skills/sharia-accounting.yaml` and their landings; `ayokoding-learning-path-07-skills-erp`
+owns `manifests/skills/conventional-erp.yaml` and `manifests/skills/sharia-erp.yaml` and their
+landings — each under the identical invariant, scoped to its own manifests.
 `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and **never edits a
 manifest under either category**.
 
@@ -230,8 +236,8 @@ This plan is **Wave 3** — the terminal plan — of a five-plan split of the cl
 **This plan owns every file under `apps/ayokoding-www/src/features/course-paths/manifests/careers/`
 and every step that creates, appends to, reorders, or re-verifies one of the four `careers/`
 manifests.** `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`
-together own the sibling `.../manifests/skills/` subtree end-to-end — one manifest each — under the
-identical invariant, scoped to its own category.
+together own the sibling `.../manifests/skills/` subtree end-to-end — four manifests as of amendment
+A10 (up from two), two each — under the identical invariant, scoped to its own category.
 `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and never edits a
 manifest under either category. This invariant is what breaks the otherwise-genuine dependency cycle
 between this plan and the course-authoring plan, and it is the reason this plan's hard prerequisite

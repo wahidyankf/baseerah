@@ -1,5 +1,8 @@
 # Product Requirements — ayokoding-www Learning-Path URL Restructure
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 ## Product Overview
 
 When this plan lands, `/{locale}/learn/` has **exactly three** structural buckets and nothing else:

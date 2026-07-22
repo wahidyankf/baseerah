@@ -1,5 +1,8 @@
 # Technical Docs — ayokoding-www Learning-Path URL Restructure
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 ## Scope of this document
 
 The **URL and IA layer** of the ayokoding-www learn section: the flat `courses/` namespace, the
@@ -482,7 +485,8 @@ state the identical rule from the consuming side — this is the same rule, not 
   is **always this plan's**, regardless of which downstream plan populates it.
 - A **path landing** is a **leaf**: the `_index.md` a manifest-owning plan populates with real
   content, e.g. `paths/careers/interview-ready/software-engineer/_index.md` (plan 05's) or
-  `paths/skills/accounting/_index.md` (plan 06's). A path landing is **never this plan's** — this
+  `paths/skills/conventional-accounting/_index.md` (plan 06's) or `paths/skills/conventional-erp/_index.md`
+  (plan 07's). A path landing is **never this plan's** — this
   plan does not author path-landing content, does not know a manifest's shape, and does not race a
   sibling plan on its own leaf file.
 - The two are distinguished by **position in the tree, not by filename** — both are literally named
@@ -1208,7 +1212,7 @@ by sibling plans are referenced by ID only and are not restated.
   **structural index** is a bucket — `paths/`, `paths/careers/`, `paths/careers/<arc>/`,
   `paths/skills/` — and is always this plan's; a **path landing** is the leaf `_index.md` a
   manifest-owning plan populates (e.g. `paths/careers/interview-ready/software-engineer/_index.md`,
-  `paths/skills/accounting/_index.md`) and is never this plan's. The two are distinguished by
+  `paths/skills/conventional-accounting/_index.md`) and is never this plan's. The two are distinguished by
   **position, not filename** — both are literally named `_index.md`. Full exposition in
   [Structural indexes under `paths/`](#structural-indexes-under-paths--ownership-and-the-empty-interval-dd-49).
 

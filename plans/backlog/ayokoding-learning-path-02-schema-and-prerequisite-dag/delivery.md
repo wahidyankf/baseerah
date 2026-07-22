@@ -196,7 +196,7 @@ expanded is not executable.
 - `<MANIFESTS>` = `<FEAT>manifests/` (standalone YAML data files, nested to mirror the **variable-depth**
   slash path id — `<MANIFESTS><path-id>.yaml`; a careers id nests 3 deep, e.g.
   `<MANIFESTS>careers/interview-ready/software-engineer.yaml`; a skills id nests 2 deep, e.g.
-  `<MANIFESTS>skills/accounting.yaml` — this plan's schema/resolvers validate only the first segment
+  `<MANIFESTS>skills/conventional-accounting.yaml` — this plan's schema/resolvers validate only the first segment
   (`careers`/`skills`) and manifest resolvability, never depth — see
   [tech-docs.md §Variable-depth `pathId`](./tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8), R2/R8)
 - `<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension; served at `/en/c/learn/legacy/<domain>/…`)
@@ -208,9 +208,10 @@ expanded is not executable.
   `careers/immediately-effective/ai-engineer` (fourth path, **corrected 2026-07-21 per R3** — a
   from-scratch path, no longer a transition path; manifest at
   `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml`). The sibling `skills/` category
-  (2 path ids) is owned end-to-end by two sibling plans —
-  `ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
-  `ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`) — see
+  (**4** path ids as of amendment A10) is owned end-to-end by two sibling plans, two each —
+  `ayokoding-learning-path-06-skills-accounting` (`skills/conventional-accounting`,
+  `skills/sharia-accounting`) and `ayokoding-learning-path-07-skills-erp` (`skills/conventional-erp`,
+  `skills/sharia-erp`) — see
   [tech-docs.md §Ownership split](./tech-docs.md#ownership-split-careers-vs-skills--r4).
 
 ## Phase provenance
@@ -494,7 +495,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       mixing bare course-ID strings with `{ id, framing: { intro, outro } }` objects;
       (b) **accepts** a **3-segment careers fixture** (`pathId: "careers/interview-ready/software-engineer"`,
       `arc: "interview-ready"`), a **2-segment skills fixture**
-      (`pathId: "skills/accounting"`, `arc: "immediately-effective"`), **and** a **4-segment
+      (`pathId: "skills/conventional-accounting"`, `arc: "immediately-effective"`), **and** a **4-segment
       forward-compatibility fixture** (`pathId: "careers/a/b/c"`, `arc: "interview-ready"`) — no
       fixture asserts a specific segment count, and the 4-segment case is what actually proves no
       fixed-arity assumption was written (R2);
@@ -522,7 +523,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       empty token: `"careers/".split('/')` is `["careers", ""]`, which an unfiltered count would read
       as two segments and wrongly accept. The filter rejects empty segments, not any particular
       count, so the floor stays a floor and `"careers"` and `"careers/"` are rejected by the same
-      expression that accepts `"skills/accounting"` and `"careers/a/b/c"` — `arc` string
+      expression that accepts `"skills/conventional-accounting"` and `"careers/a/b/c"` — `arc` string
       (required, not enum-constrained — R8), `title` string, `description` string, `courseOrder`
       array of (course-ID string) or (object with `id` plus optional `framing` carrying optional
       `intro` / `outro`)
@@ -644,6 +645,12 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `find <PLAN>/syllabus -type f | wc -l`
       — acceptance: returns **128** (unchanged — an edit to an existing file's content, not an
       addition or removal).
+- [ ] [AI] **Licensing check (programme [`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a)) — this step orders existing courses, it does not author new content**, so confirm no new course was introduced by the Stage 0 ordering —
+      `for c in just-enough-python software-testing cicd-and-release-engineering backend-at-scale containers-and-orchestration computer-architecture site-reliability-engineering data-engineering data-structures-and-algorithms-essentials software-product-engineering frontend-essentials; do test -f <PLAN>/syllabus/courses/$c.md || echo "MISSING: $c"; done`
+      — acceptance: prints nothing (every one of the 11 resolves to a pre-existing, already-authored
+      spec file; A8 does not apply to this step because it introduces no new prose, code example, or
+      figure — only a `courseOrder` position). Falsifiable both ways: renaming one of the 11 to a
+      non-existent id makes the loop print a `MISSING:` line.
 
 ### Local Quality Gates (Before Push)
 

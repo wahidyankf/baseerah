@@ -1,5 +1,8 @@
 # Product Requirements — Learning Path Schema and Prerequisite DAG
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 ## Product Overview
 
 This plan delivers the **data layer** of the shared-course-library product: the machine-readable
@@ -238,11 +241,12 @@ The affected scenarios, by title:
 **Out-of-scope features:**
 
 - Any **careers** `.yaml` manifest data file — owned by `ayokoding-learning-path-05-manifests`
-  (4 manifests, not 6 — R4).
-- The entire `skills/` URL category — both path landings, both manifests, and its course corpus —
-  owned end-to-end by **two** sibling plans (R4):
-  `ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
-  `ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`). See
+  (4 manifests, not 8 — R4, count amended by A10).
+- The entire `skills/` URL category — all **four** path landings, four manifests (amendment A10),
+  and its course corpus — owned end-to-end by **two** sibling plans (R4):
+  `ayokoding-learning-path-06-skills-accounting` (`skills/conventional-accounting`,
+  `skills/sharia-accounting`) and `ayokoding-learning-path-07-skills-erp` (`skills/conventional-erp`,
+  `skills/sharia-erp`). See
   [tech-docs.md §Ownership split](./tech-docs.md#ownership-split-careers-vs-skills--r4).
 - Any `shell/` component, the `?path=` route wiring, the path rail, the path banner, the paths hub,
   and every mockup render — owned by `ayokoding-learning-path-03-navigation-ui`.

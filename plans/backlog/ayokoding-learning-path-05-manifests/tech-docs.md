@@ -1,5 +1,8 @@
 # Technical Documentation — Learning Path Manifests
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+>
 > **Cross-plan source of truth**: the authoritative per-course and per-path specs live in
 > `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
 > them; do not author from any other source. In particular, each manifest's `courseOrder` is
@@ -13,11 +16,12 @@ This plan delivers the **composition layer of the `careers/` category**: four `P
 data files, their thin content landing anchors, the `careers/` slice of the paths-hub card
 population, the per-path smoothness audits, and every manifest growth as backfill content lands.
 
-**Category scope (2026-07-21 path-category-split ruling).** The paths hub now serves **two**
-categories at different URL depths — `careers/<arc>/<role>` (3 segments, 4 paths, this plan) and
-`skills/<subject>` (2 segments, no arc level today, 2 paths,
-`ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`, one
-manifest each). This plan is **careers-only**; it does not create,
+**Category scope (2026-07-21 path-category-split ruling, amended by A10).** The paths hub now serves
+**two** categories at different URL depths — `careers/<arc>/<role>` (3 segments, 4 paths, this plan)
+and `skills/<subject>` (2 segments, no arc level today, **4** paths as of amendment A10 — up from the
+original two — split 2-and-2 across `ayokoding-learning-path-06-skills-accounting`
+(`conventional-accounting`, `sharia-accounting`) and `ayokoding-learning-path-07-skills-erp`
+(`conventional-erp`, `sharia-erp`)). This plan is **careers-only**; it does not create,
 touch, or assert anything about the `skills/` category. Every count and every mechanical check in
 this document is scoped to `careers/` for exactly that reason — see [DD-34](#design-decisions) for
 the full ruling record.
@@ -38,11 +42,12 @@ It consumes three upstream layers and produces one:
 **This plan owns every file under `apps/ayokoding-www/src/features/course-paths/manifests/careers/`
 and every step that creates, appends to, reorders, or re-verifies one of the four `careers/`
 manifests.** `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp`
-together own the sibling `.../manifests/skills/` subtree end-to-end —
-`ayokoding-learning-path-06-skills-accounting` owns `manifests/skills/accounting.yaml` and its
-landing; `ayokoding-learning-path-07-skills-erp` owns
-`manifests/skills/enterprise-resource-planning.yaml` and its landing — each under the identical
-invariant, scoped to its own manifest.
+together own the sibling `.../manifests/skills/` subtree end-to-end, four manifests as of amendment
+A10 (up from two) — `ayokoding-learning-path-06-skills-accounting` owns
+`manifests/skills/conventional-accounting.yaml` and `manifests/skills/sharia-accounting.yaml` and
+their landings; `ayokoding-learning-path-07-skills-erp` owns
+`manifests/skills/conventional-erp.yaml` and `manifests/skills/sharia-erp.yaml` and their
+landings — each under the identical invariant, scoped to its own manifests.
 `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and **never edits a
 manifest under either category**.
 

@@ -19,13 +19,15 @@ stories, Gherkin, NEW-course specs). This folder adds the dimension the tables c
 the concrete **Concepts** (`co-NN`), **Worked examples** (`ex-NN`), and **Capstone spec**; and per path,
 the concrete ordered manifest.
 
-**Careers-only (R4, 2026-07-21 ruling)**: this corpus and its four manifests sit entirely under the
+**Careers-only ([R4](../../ayokoding-learning-path-programme.md#programme-decisions-r--a), 2026-07-21
+ruling)**: this corpus and its four manifests sit entirely under the
 `careers/` URL category (`/en/c/learn/paths/careers/<arc>/<role>`). A sibling `skills/` category
-(`/en/c/learn/paths/skills/<subject>`, 2 manifests, its own course corpus) exists in the wider programme
-but is owned end-to-end by **two** sibling plans, one per subject —
-`ayokoding-learning-path-06-skills-accounting` (`skills/accounting`) and
-`ayokoding-learning-path-07-skills-erp` (`skills/enterprise-resource-planning`); both folders exist
-under `plans/backlog/`. See
+(`/en/c/learn/paths/skills/<subject>`, **4** manifests as of amendment A10 — up from the original two
+— its own course corpus) exists in the wider programme but is owned end-to-end by **two** sibling
+plans, two subjects each —
+`ayokoding-learning-path-06-skills-accounting` (`skills/conventional-accounting`,
+`skills/sharia-accounting`) and `ayokoding-learning-path-07-skills-erp` (`skills/conventional-erp`,
+`skills/sharia-erp`); both folders exist under `plans/backlog/`. See
 [tech-docs §Ownership split](../tech-docs.md#ownership-split-careers-vs-skills--r4).
 
 ## Core model — one shared library, composing path manifests

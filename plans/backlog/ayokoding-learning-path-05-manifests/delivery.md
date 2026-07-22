@@ -1,5 +1,8 @@
 # Delivery Checklist — Learning Path Manifests
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+>
 > **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
 > `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
 > privileged-credential handling). `[AI+HUMAN]`: agent prepares, human approves or finishes.
@@ -21,7 +24,8 @@ Two standing constraints govern every step below.
 > `<MANIFESTS>careers/` and every step that creates, appends to, reorders, or re-verifies one of the
 > four `careers/` manifests. `ayokoding-learning-path-06-skills-accounting` and
 > `ayokoding-learning-path-07-skills-erp` own the sibling `<MANIFESTS>skills/` subtree end-to-end —
-> one manifest each — under the identical invariant, scoped to its own category.
+> four manifests as of amendment A10 (up from two), two each — under the identical invariant, scoped
+> to its own category.
 > `ayokoding-learning-path-04-course-authoring` owns course **bodies only** and never edits a
 > manifest under either category. A step here that authors a course body is a boundary violation in
 > the other direction and is equally forbidden.
@@ -139,8 +143,11 @@ state. It lives inside `<MANIFESTS>careers/`, alongside the manifests it covers.
 > **It is NOT shared, and no sibling appends to it (ruled 2026-07-21).** Each plan owns its own
 > manifest **and that manifest's test**, mirroring the manifest-ownership invariant exactly:
 > `ayokoding-learning-path-06-skills-accounting` owns
-> `<MANIFESTS>skills/accounting-manifest.unit.test.ts` and `ayokoding-learning-path-07-skills-erp`
-> owns `<MANIFESTS>skills/erp-manifest.unit.test.ts`.
+> `<MANIFESTS>skills/conventional-accounting-manifest.unit.test.ts` and
+> `<MANIFESTS>skills/sharia-accounting-manifest.unit.test.ts`; `ayokoding-learning-path-07-skills-erp`
+> owns `<MANIFESTS>skills/conventional-erp-manifest.unit.test.ts` and
+> `<MANIFESTS>skills/sharia-erp-manifest.unit.test.ts` (four manifests, four tests, as of amendment
+> A10 — up from two).
 >
 > An earlier draft declared a single root-level `published-manifests.unit.test.ts` shared by all
 > three plans. That was overturned for two reasons. First, it puts a file on a **three-way
