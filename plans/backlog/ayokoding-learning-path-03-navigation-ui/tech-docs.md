@@ -1,7 +1,7 @@
 # Technical Documentation — Path-Aware Navigation UI
 
 > **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> [§Programme decisions](#programme-decisions) below.
 
 ## Scope of this document
 
@@ -644,6 +644,31 @@ for paths that list the course) without re-deciding either.
 > whose `courseOrder` actually lists the course) needs no change, since it was never depth- or
 > path-specific — only DD-24's illustrative claim is affected, and only its owning plan corrects it. See
 > the matching flag in [prd.md Screen 3](./prd.md#screen-3--course-page-in-path-context).
+
+## Programme decisions
+
+The decision ids this plan cites (`R1`, `R2`, `R3`, `R4`, `R5`, `R6`, `R7`, `R8`, `R9`, `A3`, `A5`,
+`A9`, `A10`) were **folded verbatim from the now-retired shared programme file and are owned locally here** — that
+shared programme file no longer exists, so these definitions live in this section. They are **programme-scope decisions, not governance rule ids**; each `A*` amendment is
+later than the `R*` rules and wins on conflict. The wave/DAG position is stated locally in
+[README §Wave and dependency position](./README.md#wave-and-dependency-position) and
+[README §Depends-on](./README.md#depends-on).
+
+| Id  | Decision                                                                                                                                                                                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1  | URL grammar is `/en/learn/paths/{careers,skills}/…` over six paths (raised to **eight** by `A10`)                                                                                            |
+| R2  | `pathId` is **variable-depth by design** — `careers/<arc>/<role>` is 3 segments, `skills/<subject>` is 2; nothing may key on segment count                                                   |
+| R3  | The fourth careers path targets a distinct AI-engineering endpoint (superseded in part by `A1`)                                                                                              |
+| R4  | Ownership split: plans 01-05 are `careers/`-only; the `skills/` category is separate (revised by `A2`)                                                                                       |
+| R5  | The full skills corpus is authored **in this programme**, not deferred                                                                                                                       |
+| R6  | The paths hub is **redesigned** around the two categories, not relabelled                                                                                                                    |
+| R7  | **Every URL segment must render** — no orphan segments                                                                                                                                       |
+| R8  | Every `skills/` path uses the **immediately-effective** arc, always                                                                                                                          |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                                                                |
+| A5  | Plan 03 owns **all** design assets **except plan 01's Screen 4 funnel and its six renders**; a `.png` is a baked render and desynchronises silently when its `.html` changes                 |
+| A9  | Both corpora **expand past 20 courses** as the domain requires; every derived count follows                                                                                                  |
+| A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
 
 ## File Impact
 

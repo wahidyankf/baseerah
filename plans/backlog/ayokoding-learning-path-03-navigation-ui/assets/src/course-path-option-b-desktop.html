@@ -268,6 +268,35 @@
       .pn .next {
         text-align: right;
       }
+      /* responsive breakpoints */
+      @media (max-width: 768px) {
+        body {
+          padding: 24px;
+        }
+        .frame {
+          width: 100%;
+        }
+        .body {
+          padding: 24px 24px 32px;
+        }
+      }
+      @media (max-width: 480px) {
+        body {
+          padding: 12px;
+        }
+        .body {
+          padding: 18px 16px 24px;
+        }
+        .layout {
+          flex-direction: column;
+        }
+        .rail {
+          width: 100%;
+          flex: none;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+      }
     </style>
   </head>
   <body>

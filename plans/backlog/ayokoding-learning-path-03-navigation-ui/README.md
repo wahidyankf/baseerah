@@ -18,8 +18,9 @@ URL-restructure plan's), authors no course body, and writes no path manifest.
 > them; do not author from any other source.
 >
 > **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R1`, `R6`, `A5`, `A10`,
-> and so on) throughout; their definitions and the wave DAG live in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+> and so on) throughout; their definitions live in
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions), and the wave DAG is stated
+> locally in [§Wave and dependency position](#wave-and-dependency-position) below.
 
 ## Scope in one screen
 

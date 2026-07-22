@@ -148,6 +148,29 @@
         font-size: 12.5px;
         font-style: italic;
       }
+      /* responsive breakpoints */
+      @media (max-width: 768px) {
+        body {
+          padding: 24px;
+        }
+        .frame {
+          width: 100%;
+        }
+        .body {
+          padding: 24px 24px 32px;
+        }
+      }
+      @media (max-width: 480px) {
+        body {
+          padding: 12px;
+        }
+        .body {
+          padding: 18px 16px 24px;
+        }
+        .role-grid {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>

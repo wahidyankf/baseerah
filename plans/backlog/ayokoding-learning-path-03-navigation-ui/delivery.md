@@ -1,7 +1,7 @@
 # Delivery Checklist — Path-Aware Navigation UI
 
 > **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions).
 
 This checklist delivers the **rendering layer** of the `course-paths` feature in `ayokoding-www`: the
 shell modules, the `?path=` route wiring, the Screen 3 left path rail, the landing hero's four goal
@@ -311,12 +311,18 @@ back to the source plan; do not renumber to "close the gaps".
 > category-split ruling (the original 8 via the R6/R8/path-id fixes, the 4 new stems newly authored),
 > every one of the 12 desktop renders requires a fresh render here regardless of its current on-disk
 > modification-time state (this is a superset of, not a duplicate of, the already-known de-namespacing
-> staleness: the hub and hero HTML changed for **content**, not just URL strings), and the 24
-> mobile/tablet renders have never been rendered at all. **All 36 are produced or re-produced here.**
-> Naming scheme, render widths, and alt-text rules:
-> [prd.md §Hi-fi asset matrix](./prd.md#hi-fi-asset-matrix-screen--option--viewport). Every file is
-> `<PLAN>assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png`, rendered from
-> `<PLAN>assets/src/<same-stem>.html` at **375 / 768 / 1280 px** — `.png` only, per the
+> staleness: the hub and hero HTML changed for **content**, not just URL strings). **All 36 are
+> produced or re-produced here.** **Responsive single-source model (R1)**: there is exactly **one**
+> HTML source per screen/option — the responsive `<PLAN>assets/src/<screen>-option-<a|b>-desktop.html`
+> file, which carries `@media (max-width: 768px)` and `@media (max-width: 480px)` breakpoints that
+> reflow the layout (multi-column grids stack, the frame drops to full width, padding shrinks) so the
+> same file renders cleanly at all three viewports. There are **no** separate `-mobile.html` /
+> `-tablet.html` sources — the mobile and tablet `.png` files are produced by rendering the one
+> `-desktop.html` source at 375 px and 768 px respectively. Naming scheme, render widths, and alt-text
+> rules: [prd.md §Hi-fi asset matrix](./prd.md#hi-fi-asset-matrix-screen--option--viewport). Every
+> output file is `<PLAN>assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png`, rendered from
+> `<PLAN>assets/src/<screen>-option-<a|b>-desktop.html` at **375 / 768 / 1280 px** — `.png` only, per
+> the
 > [UI Mockups convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 > (`.excalidraw.svg` and inline HTML+CSS are ruled out: GitHub strips styles and blocks Excalidraw fonts).
 >
@@ -337,7 +343,8 @@ back to the source plan; do not renumber to "close the gaps".
       `?path=` strings gained the `careers/` prefix), and the 4 new stems' `.png` files, though already
       committed, likewise require a fresh render since their HTML sources are newly authored content —
       command: render each at 1280 px from its
-      `src/<same-stem>.html` — acceptance: for every one of the 12 stems,
+      `src/<screen>-option-<a|b>-desktop.html` (the same responsive source used for that screen/option's
+      mobile and tablet renders) — acceptance: for every one of the 12 stems,
       `f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html"` holds (mtime check), i.e.
       `for s in landing-hero paths-hub category-landing arc-landing path-landing course-path; do for o in a b; do
 f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STALE $s-$o"; done; done`
@@ -355,85 +362,113 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
       empty or broken render also satisfies an mtime comparison**, so confirm at least one render
       visually before ticking this box.
 - [ ] [AI] Render `<PLAN>assets/landing-hero-option-a-mobile.png` from
-      `<PLAN>assets/src/landing-hero-option-a-mobile.html` at 375 px — acceptance: file exists;
-      single-column goal cards, four careers cards only (skills reachable via the tertiary link, not a
-      fifth card), no retired grid-glyph text anywhere in the rendered copy.
+      `<PLAN>assets/src/landing-hero-option-a-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/landing-hero-option-a-mobile.png` succeeds and the render is >5 KB; the
+      `.grid` reflows to a single column, four careers cards only (skills reachable via the tertiary
+      link, not a fifth card), no retired grid-glyph text anywhere in the rendered copy.
 - [ ] [AI] Render `<PLAN>assets/landing-hero-option-b-mobile.png` from
-      `<PLAN>assets/src/landing-hero-option-b-mobile.html` at 375 px — acceptance: file exists; the two
-      primary CTAs stack above the goal strip.
+      `<PLAN>assets/src/landing-hero-option-b-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/landing-hero-option-b-mobile.png` succeeds and the render is >5 KB; the two
+      primary CTAs stack above the goal strip, the `.qlist` collapses to one column.
 - [ ] [AI] Render `<PLAN>assets/landing-hero-option-a-tablet.png` from
-      `<PLAN>assets/src/landing-hero-option-a-tablet.html` at 768 px — acceptance: file exists;
-      two-column grid visible (`md:grid-cols-2` active), "Explore skills paths" link present.
+      `<PLAN>assets/src/landing-hero-option-a-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/landing-hero-option-a-tablet.png` succeeds and the render is >5 KB; the
+      `.grid` remains two-up at this width, "Explore skills paths" link present.
 - [ ] [AI] Render `<PLAN>assets/landing-hero-option-b-tablet.png` from
-      `<PLAN>assets/src/landing-hero-option-b-tablet.html` at 768 px — acceptance: file exists; CTAs
+      `<PLAN>assets/src/landing-hero-option-b-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/landing-hero-option-b-tablet.png` succeeds and the render is >5 KB; CTAs
       inline, goal strip two-column.
 - [ ] [AI] Render `<PLAN>assets/paths-hub-option-a-mobile.png` from
-      `<PLAN>assets/src/paths-hub-option-a-mobile.html` at 375 px — acceptance: file exists; a Careers
+      `<PLAN>assets/src/paths-hub-option-a-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/paths-hub-option-a-mobile.png` succeeds and the render is >5 KB; a Careers
       section (arc sub-headings, `immediately-effective` showing two cards) stacked above a Skills
-      section (two cards), both single-column; no flat undifferentiated grid.
+      section (two cards), both single-column (the `.skills-grid` collapses to one column); no flat
+      undifferentiated grid.
 - [ ] [AI] Render `<PLAN>assets/paths-hub-option-b-mobile.png` from
-      `<PLAN>assets/src/paths-hub-option-b-mobile.html` at 375 px — acceptance: file exists; all six
-      cards single-column, each carrying its category·arc badge.
+      `<PLAN>assets/src/paths-hub-option-b-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/paths-hub-option-b-mobile.png` succeeds and the render is >5 KB; the `.grid`
+      collapses to one column so all six cards are single-column, each carrying its category·arc badge.
 - [ ] [AI] Render `<PLAN>assets/paths-hub-option-a-tablet.png` from
-      `<PLAN>assets/src/paths-hub-option-a-tablet.html` at 768 px — acceptance: file exists; Careers arc
-      groups two-up, Skills section two-up, sidebar column present.
+      `<PLAN>assets/src/paths-hub-option-a-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/paths-hub-option-a-tablet.png` succeeds and the render is >5 KB; Careers arc
+      groups two-up, Skills section two-up.
 - [ ] [AI] Render `<PLAN>assets/paths-hub-option-b-tablet.png` from
-      `<PLAN>assets/src/paths-hub-option-b-tablet.html` at 768 px — acceptance: file exists; six badged
-      cards, two-up.
+      `<PLAN>assets/src/paths-hub-option-b-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/paths-hub-option-b-tablet.png` succeeds and the render is >5 KB; the `.grid`
+      reflows from three-up to two-up — six badged cards, two-up.
 - [ ] [AI] Render `<PLAN>assets/category-landing-option-a-mobile.png` from
-      `<PLAN>assets/src/category-landing-option-a-mobile.html` at 375 px — acceptance: file exists;
-      careers instance shows three stacked arc cards, `immediately-effective` previewing two member
-      roles; skills instance (composited in the same image) shows the ramp-milestone strip and the
-      empty state, both single-column.
+      `<PLAN>assets/src/category-landing-option-a-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/category-landing-option-a-mobile.png` succeeds and the render is >5 KB; the
+      `.arc-grid` and `.skills-grid` both collapse to one column — careers instance shows three stacked
+      arc cards, `immediately-effective` previewing two member roles; the skills instance (composited in
+      the same image) shows the ramp-milestone strip and the empty state single-column.
 - [ ] [AI] Render `<PLAN>assets/category-landing-option-b-mobile.png` from
-      `<PLAN>assets/src/category-landing-option-b-mobile.html` at 375 px — acceptance: file exists; the
-      careers instance as a single-column plain list.
+      `<PLAN>assets/src/category-landing-option-b-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/category-landing-option-b-mobile.png` succeeds and the render is >5 KB; the
+      careers instance reflows full-width as a single-column plain list.
 - [ ] [AI] Render `<PLAN>assets/category-landing-option-a-tablet.png` from
-      `<PLAN>assets/src/category-landing-option-a-tablet.html` at 768 px — acceptance: file exists;
-      careers arc cards two-up with the third wrapping full-width; sidebar column present.
+      `<PLAN>assets/src/category-landing-option-a-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/category-landing-option-a-tablet.png` succeeds and the render is >5 KB; the
+      `.arc-grid` reflows from three-up to two-up; the `.skills-grid` stays two-up.
 - [ ] [AI] Render `<PLAN>assets/category-landing-option-b-tablet.png` from
-      `<PLAN>assets/src/category-landing-option-b-tablet.html` at 768 px — acceptance: file exists; the
-      plain list, sidebar column present.
+      `<PLAN>assets/src/category-landing-option-b-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/category-landing-option-b-tablet.png` succeeds and the render is >5 KB; the
+      plain list reflows full-width.
 - [ ] [AI] Render `<PLAN>assets/arc-landing-option-a-mobile.png` from
-      `<PLAN>assets/src/arc-landing-option-a-mobile.html` at 375 px — acceptance: file exists; both the
-      two-role state and the single-role state (with its inline syllabus preview) stack full-width, and
-      the single-role card is never a visibly bare stub.
+      `<PLAN>assets/src/arc-landing-option-a-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/arc-landing-option-a-mobile.png` succeeds and the render is >5 KB; the
+      `.role-grid` collapses to one column so both the two-role state and the single-role state (with its
+      inline syllabus preview) stack full-width, and the single-role card is never a visibly bare stub.
 - [ ] [AI] Render `<PLAN>assets/arc-landing-option-b-mobile.png` from
-      `<PLAN>assets/src/arc-landing-option-b-mobile.html` at 375 px — acceptance: file exists; the
-      single-role state's second grid cell renders visibly empty (this is the rejected option — the
-      emptiness is the point of the comparison).
+      `<PLAN>assets/src/arc-landing-option-b-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/arc-landing-option-b-mobile.png` succeeds and the render is >5 KB; this is
+      the rejected option — the single-role state's empty second grid cell still renders (stacked below
+      the filled cell once the `.role-grid` collapses to one column); the emptiness is the point of the
+      comparison.
 - [ ] [AI] Render `<PLAN>assets/arc-landing-option-a-tablet.png` from
-      `<PLAN>assets/src/arc-landing-option-a-tablet.html` at 768 px — acceptance: file exists; two-role
-      state two-up, sidebar column present.
+      `<PLAN>assets/src/arc-landing-option-a-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/arc-landing-option-a-tablet.png` succeeds and the render is >5 KB; the
+      `.role-grid` stays two-up so the two-role state renders two-up.
 - [ ] [AI] Render `<PLAN>assets/arc-landing-option-b-tablet.png` from
-      `<PLAN>assets/src/arc-landing-option-b-tablet.html` at 768 px — acceptance: file exists; the
-      visibly-empty second grid cell reproduced at this width too.
+      `<PLAN>assets/src/arc-landing-option-b-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/arc-landing-option-b-tablet.png` succeeds and the render is >5 KB; the
+      visibly-empty second grid cell is reproduced two-up at this width too.
 - [ ] [AI] Render `<PLAN>assets/path-landing-option-a-mobile.png` from
-      `<PLAN>assets/src/path-landing-option-a-mobile.html` at 375 px — acceptance: file exists; phase
-      headings inline (not sticky — sticky is `lg+` only).
+      `<PLAN>assets/src/path-landing-option-a-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/path-landing-option-a-mobile.png` succeeds and the render is >5 KB; the frame
+      reflows to full width with no horizontal overflow, phase headings and the course list stack
+      single-column.
 - [ ] [AI] Render `<PLAN>assets/path-landing-option-b-mobile.png` from
-      `<PLAN>assets/src/path-landing-option-b-mobile.html` at 375 px — acceptance: file exists; only the
-      first stage expanded.
+      `<PLAN>assets/src/path-landing-option-b-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/path-landing-option-b-mobile.png` succeeds and the render is >5 KB; the frame
+      reflows to full width, the accordion stages stack single-column.
 - [ ] [AI] Render `<PLAN>assets/path-landing-option-a-tablet.png` from
-      `<PLAN>assets/src/path-landing-option-a-tablet.html` at 768 px — acceptance: file exists; sidebar
-      column present (`md:block` active).
+      `<PLAN>assets/src/path-landing-option-a-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/path-landing-option-a-tablet.png` succeeds and the render is >5 KB; the frame
+      reflows to full width with content readable and no horizontal overflow.
 - [ ] [AI] Render `<PLAN>assets/path-landing-option-b-tablet.png` from
-      `<PLAN>assets/src/path-landing-option-b-tablet.html` at 768 px — acceptance: file exists; two
-      stages expanded, the rest collapsed with counts.
+      `<PLAN>assets/src/path-landing-option-b-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/path-landing-option-b-tablet.png` succeeds and the render is >5 KB; the frame
+      reflows to full width, accordion stages readable with no horizontal overflow.
 - [ ] [AI] Render `<PLAN>assets/course-path-option-a-mobile.png` from
-      `<PLAN>assets/src/course-path-option-a-mobile.html` at 375 px — acceptance: file exists; banner
-      strip full-width, no rail, `PrevNext` stacked.
-- [ ] [AI] Render `<PLAN>assets/course-path-option-b-mobile.png` **showing the collapsed rail plus the
-      opened left drawer** (the selected design's mobile form) from
-      `<PLAN>assets/src/course-path-option-b-mobile.html` at 375 px — acceptance: file exists; the
-      drawer's ordered course list and the banner disclosure trigger are both visible.
+      `<PLAN>assets/src/course-path-option-a-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/course-path-option-a-mobile.png` succeeds and the render is >5 KB; banner
+      strip full-width, no rail, `PrevNext` stacks below the body.
+- [ ] [AI] Render `<PLAN>assets/course-path-option-b-mobile.png` **showing the left path rail stacked
+      full-width above the article body** (the selected design's responsive mobile form) from
+      `<PLAN>assets/src/course-path-option-b-desktop.html` at 375 px — acceptance:
+      `test -f <PLAN>assets/course-path-option-b-mobile.png` succeeds and the render is >5 KB; the
+      `.layout` flex reflows to a column and the `.rail` becomes full-width (right border swaps to a
+      bottom border), so the rail's ordered course list sits above the article body with both visible.
 - [ ] [AI] Render `<PLAN>assets/course-path-option-a-tablet.png` from
-      `<PLAN>assets/src/course-path-option-a-tablet.html` at 768 px — acceptance: file exists; generic
-      content-tree sidebar visible beside the banner.
-- [ ] [AI] Render `<PLAN>assets/course-path-option-b-tablet.png` **showing the rail truncated at the
-      15 % width floor (~115 px)** from `<PLAN>assets/src/course-path-option-b-tablet.html` at 768 px —
-      acceptance: file exists; rows render as number + ellipsised title, phase separators are bare rules
-      with no labels.
+      `<PLAN>assets/src/course-path-option-a-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/course-path-option-a-tablet.png` succeeds and the render is >5 KB; the frame
+      reflows to full width, banner and body readable with no horizontal overflow.
+- [ ] [AI] Render `<PLAN>assets/course-path-option-b-tablet.png` from
+      `<PLAN>assets/src/course-path-option-b-desktop.html` at 768 px — acceptance:
+      `test -f <PLAN>assets/course-path-option-b-tablet.png` succeeds and the render is >5 KB; the
+      `.rail` remains beside the article body at this width (the rail stacks only below the 480 px
+      breakpoint), the whole frame reflowed to full width with no horizontal overflow.
 - [ ] [AI] **Embed all 24 new (mobile + tablet) renders in `prd.md`** under their screen's "Hi-fi
       finalists" block, each with viewport-specific descriptive alt text that names what differs **at
       that width** (never a copy of the desktop alt text) — acceptance:
@@ -459,9 +494,12 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
       alternatives per screen, both hi-fi finalists, a named selection, a rationale table, the
       responsive strategy per breakpoint, the R5 grounding note, and the R7 prior-art citation.
 - [ ] [AI] **All 36 of this plan's hi-fi renders exist** —
-      `find <PLAN>assets -name '*-option-*-*.png' | wc -l` returns **36** (returns **12** before this
-      phase — the 12 desktop `.png` files, re-rendered rather than first-rendered by this phase), and
-      every one is embedded in `prd.md` with viewport-specific alt text.
+      `find <PLAN>assets -name '*-option-*-*.png' | wc -l` returns **36** after this phase. All 36
+      renders — the 12 desktop plus the 24 mobile/tablet, every viewport produced by rendering the one
+      responsive `-desktop.html` source per screen/option — exist on disk today; the pre-phase count is
+      checkout-dependent (a fresh worktree re-derives the `.png` set from the committed `.html` sources)
+      and is **not asserted**, consistent with the per-asset re-render steps above, which regenerate all
+      36 unconditionally. Every render is embedded in `prd.md` with viewport-specific alt text.
       Screen 4's remaining 6 renders belong to `ayokoding-learning-path-01-url-restructure`; **36 is
       the complete deliverable here**, not a shortfall against DD-47's cross-plan total of 42.
 - [ ] [AI] Screen 3's selection reads **Option B — Left path rail**, and no surviving text in

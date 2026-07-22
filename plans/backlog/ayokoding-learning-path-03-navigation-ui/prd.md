@@ -1,7 +1,7 @@
 # Product Requirements — Path-Aware Navigation UI
 
 > **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions).
 
 ## Product Overview
 
@@ -1406,8 +1406,10 @@ and asserts nothing about it. Nothing in this plan's delivery checklist produces
 Every screen's every option carries a wireframe **and** a rendered mockup at **three viewports** —
 mobile-first, not one desktop drawing with a prose footnote about phones.
 
-**Naming scheme** — `assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png`, rendered from a
-token-accurate source at `assets/src/<same-stem>.html`. Screen slugs: `landing-hero` (0), `paths-hub`
+**Naming scheme** — `assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png`, all three rendered from
+a **single responsive** token-accurate source at `assets/src/<screen>-option-<a|b>-desktop.html` (one
+source per screen/option, carrying `@media` breakpoints — see the responsive-single-source note below;
+there are no separate `-mobile.html` / `-tablet.html` sources). Screen slugs: `landing-hero` (0), `paths-hub`
 (1), `category-landing` (1a), `arc-landing` (1b), `path-landing` (2), `course-path` (3),
 `legacy-landing` (4). The eight pre-existing desktop renders were renamed into this scheme
 (`…-option-a.png` → `…-option-a-desktop.png`) so the set is uniform; every `![]()` reference was
@@ -1420,14 +1422,17 @@ the mtime re-render check below, not a rename) and four **new** stems
 **768 px** (tablet, `md`), **1280 px** (desktop, `xl`). Identical across all screens, and identical to
 the widths this plan's Playwright verification steps resize to.
 
-**Mobile/tablet variant decision (recorded, not silently skipped).** All 12 desktop `.html` sources
-(the original 8, plus the 4 new stems for Screens 1a/1b) are desktop-only on disk today; mobile/tablet
-renders for every screen — including the redesigned hub and the two new screen types — are **explicitly
-in scope**, produced from their own per-viewport HTML sources during
-[Phase 1](./delivery.md#phase-1-ui-design-funnel-screens-0-1-1a-1b-2-3), following the same pattern the four
-original screens already use. This is a deliberate **yes**, not a default: the two-category hub in
-particular is exactly the kind of layout (a section, sub-grouped by arc, sitting above a second section)
-that can collapse badly on a narrow viewport if the reflow is not designed and rendered, not assumed.
+**Responsive single-source model (recorded, not silently skipped).** Each of the 12 `.html` sources
+(the original 8, plus the 4 new stems for Screens 1a/1b) is **one responsive file** carrying
+`@media (max-width: 768px)` and `@media (max-width: 480px)` breakpoints: multi-column grids collapse
+(three-up → two-up at tablet → one column at mobile), the fixed-width frame drops to full width, and
+padding shrinks, so the single `-desktop.html` source reflows cleanly at all three viewports. Mobile
+and tablet `.png` files are produced by rendering that one source at 375 px and 768 px — mobile/tablet
+renders for every screen (including the redesigned hub and the two new screen types) are **explicitly
+in scope** and now exist on disk (all 36 `.png` are rendered). This is a deliberate **yes**, not a
+default: the two-category hub in particular is exactly the kind of layout (a section, sub-grouped by
+arc, sitting above a second section) that can collapse badly on a narrow viewport if the reflow is not
+designed and rendered, not assumed.
 
 **Format** — `.png` only, per the
 [UI Mockups convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs):
@@ -1435,33 +1440,35 @@ that can collapse badly on a narrow viewport if the reflow is not designed and r
 (GitHub strips styles). The `.html` sources are build inputs, never the embedded artefact.
 
 **Alt text** — each image gets its own descriptive alt text naming **what differs at that width**
-(stacked vs. two-column, rail present vs. collapsed-into-drawer, truncated vs. full titles). Copying the
-desktop alt text onto the mobile render is a defect, not a shortcut.
+(stacked vs. two-column, three-up vs. two-up grid, rail beside the body vs. rail stacked full-width
+above it). Copying the desktop alt text onto the mobile render is a defect, not a shortcut.
 
-| Screen              | Option A stem                 | Option B stem                 | Viewports produced        | Owner and status                                                         |
-| ------------------- | ----------------------------- | ----------------------------- | ------------------------- | ------------------------------------------------------------------------ |
-| 0 Landing hero      | `landing-hero-option-a-*`     | `landing-hero-option-b-*`     | mobile / tablet / desktop | **this plan** — desktop on disk (content fixed, R8); 2 pending (Phase 1) |
-| 1 Paths hub         | `paths-hub-option-a-*`        | `paths-hub-option-b-*`        | mobile / tablet / desktop | **this plan** — desktop rebuilt in place (R6); 2 pending (Phase 1)       |
-| 1a Category landing | `category-landing-option-a-*` | `category-landing-option-b-*` | mobile / tablet / desktop | **this plan** — new (R7); desktop on disk; 2 pending (Phase 1)           |
-| 1b Arc landing      | `arc-landing-option-a-*`      | `arc-landing-option-b-*`      | mobile / tablet / desktop | **this plan** — new (R7); desktop on disk; 2 pending (Phase 1)           |
-| 2 Path landing      | `path-landing-option-a-*`     | `path-landing-option-b-*`     | mobile / tablet / desktop | **this plan** — desktop on disk (path-id fixed); 2 pending (Phase 1)     |
-| 3 Course in path    | `course-path-option-a-*`      | `course-path-option-b-*`      | mobile / tablet / desktop | **this plan** — desktop on disk (path-id fixed); 2 pending (Phase 1)     |
-| 4 Legacy landing    | `legacy-landing-option-a-*`   | `legacy-landing-option-b-*`   | mobile / tablet / desktop | `ayokoding-learning-path-01-url-restructure` — all 6 pending there       |
+| Screen              | Option A stem                 | Option B stem                 | Viewports produced        | Owner and status                                                   |
+| ------------------- | ----------------------------- | ----------------------------- | ------------------------- | ------------------------------------------------------------------ |
+| 0 Landing hero      | `landing-hero-option-a-*`     | `landing-hero-option-b-*`     | mobile / tablet / desktop | **this plan** — all 3 viewports on disk (content fixed, R8)        |
+| 1 Paths hub         | `paths-hub-option-a-*`        | `paths-hub-option-b-*`        | mobile / tablet / desktop | **this plan** — all 3 viewports on disk (rebuilt in place, R6)     |
+| 1a Category landing | `category-landing-option-a-*` | `category-landing-option-b-*` | mobile / tablet / desktop | **this plan** — new (R7); all 3 viewports on disk                  |
+| 1b Arc landing      | `arc-landing-option-a-*`      | `arc-landing-option-b-*`      | mobile / tablet / desktop | **this plan** — new (R7); all 3 viewports on disk                  |
+| 2 Path landing      | `path-landing-option-a-*`     | `path-landing-option-b-*`     | mobile / tablet / desktop | **this plan** — all 3 viewports on disk (path-id fixed)            |
+| 3 Course in path    | `course-path-option-a-*`      | `course-path-option-b-*`      | mobile / tablet / desktop | **this plan** — all 3 viewports on disk (path-id fixed)            |
+| 4 Legacy landing    | `legacy-landing-option-a-*`   | `legacy-landing-option-b-*`   | mobile / tablet / desktop | `ayokoding-learning-path-01-url-restructure` — all 6 pending there |
 
 **This plan's total: 6 screens × 2 options × 3 viewports = 36 `.png`** — amended 2026-07-21 from the
 original 24 by the category-split ruling (R6/R7), which redesigned Screen 1 in place (no new files) and
 added two new screen types, Screen 1a and Screen 1b (four new `.html` stems, two options each, each
-producing three viewports). **12 desktop `.html` sources on disk today** (the original 8 fixed/rebuilt
-in place, plus 4 new desktop HTML sources for 1a and 1b authored — one per screen per option), and all
-**12 desktop `.png` renders also already exist on disk and are embedded below** — but because all 12
-desktop `.html` sources changed content under the category-split ruling, every one of the 12 desktop
-`.png` requires a fresh render in Phase 1, so all 12 are **re-rendered**, not first-rendered, there.
-(File-modification-time state is not a stable, authorable fact — `git checkout` and worktree
-provisioning reset it on every checkout — so this plan does not assert a specific STALE/FRESH split as a
-fixed truth; see the Phase 1 checkbox's falsifiable acceptance clause for the actual executable check.)
-The remaining **24 mobile/tablet `.png` renders** (2 viewports × 2 options ×
-6 screens) have never been rendered at all, so those 24 are genuinely **first-rendered**. **All 36
-`.png` are produced or re-produced** in
+producing three viewports). **12 responsive `.html` sources on disk today** (the original 8
+fixed/rebuilt in place, plus 4 new sources for 1a and 1b authored — one per screen per option, each
+carrying the `@media` breakpoints), and **all 36 `.png` renders now exist on disk** — the 12 desktop
+renders (embedded below) plus the 24 mobile/tablet renders produced by rendering each responsive source
+at 375 px and 768 px. The 24 mobile/tablet renders exist on disk but are **not yet embedded** in this
+document; Phase 1 embeds them under each screen's finalist block with viewport-specific alt text.
+Phase 1 **re-renders** all 36 from their sources (an idempotent regeneration step, since the sources
+are the authored source of truth); a fresh worktree checkout re-derives the `.png` set from the
+committed `.html` sources. (File-modification-time state is
+not a stable, authorable fact — `git checkout` and worktree provisioning reset it on every checkout —
+so this plan does not assert a specific STALE/FRESH split as a fixed truth; see the Phase 1 checkbox's
+falsifiable acceptance clause for the actual executable check.) **All 36 `.png` are produced or
+re-produced** in
 [Phase 1](./delivery.md#phase-1-ui-design-funnel-screens-0-1-1a-1b-2-3). The delivery checklist enumerates them
 **one checkbox per asset** rather than one coarse "render all mockups" step, because the volume is large
 enough that a single checkbox could be ticked with most of the set missing.

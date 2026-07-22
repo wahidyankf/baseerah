@@ -1,7 +1,7 @@
 # Business Requirements — Path-Aware Navigation UI
 
 > **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions).
 
 ## Business Goal
 
