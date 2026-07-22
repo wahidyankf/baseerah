@@ -29,7 +29,49 @@ Entry shape:
 
 ## Entries
 
-_None yet — execution has not started._
+## Learning: `ls` is shell-aliased to `eza` — `ls … | xargs` corrupts output
 
-If execution completes and nothing generalizable surfaced, replace the line above with the explicit
+- **Context**: Phase 0, freezing the 37 re-home slugs via
+  `ls -d …/*/ | xargs -n1 basename > evidence/phase-0-rehome-slugs.txt`.
+- **Observation**: `ls` resolves to `eza --icons --hyperlink` in this environment. Piping its
+  hyperlinked (OSC-8-escaped) output through `xargs` collapsed 37 directory names into 2 garbled
+  lines with embedded escape codes. Invoking `/bin/ls` explicitly produced the correct 37 lines.
+- **Why it might generalize**: distinct from the plan's already-documented `find`/RTK hazard — this is
+  an `ls`-alias hazard. Any later step (or any plan) that pipes `ls` into `xargs`/`while read`/`wc`
+  must use `/bin/ls` (or `command ls`). Phases 1–3 of this plan use `ls`-based enumeration.
+- **Routing**: _(Phase 7 — candidate durable home: an env/tooling hazards note alongside the RTK
+  `find` hazard, since both are "a bare builtin is silently transformed before your command sees it".)_
+
+## Learning: tech-docs ground-truth counts drift; re-measure at Phase 0, don't trust the authored table
+
+- **Context**: Phase 0 baseline inventory vs. tech-docs' "Ground-truth inventory" table.
+- **Observation**: `fundamentally-strong` measured 562 `.md` on disk (git-tracked) vs. 563 stated in
+  tech-docs — a stale authored count, confirmed via `git ls-files` + `git log --diff-filter=DR` (no
+  deletions), i.e. authoring-time miscount, not a session regression. Reconciled in tech-docs (table +
+  tree) and the delivery baseline string this session.
+- **Why it might generalize**: any plan that hard-codes a repo-measured count in its docs should have
+  a Phase-0 step that re-measures and reconciles before a later phase asserts on it — the count the
+  author wrote can be stale by the time the plan runs.
+- **Routing**: _(Phase 7 — likely discard-as-plan-specific, or fold into the anti-hallucination
+  "repo-ground every count" guidance.)_
+
+## Learning: `generate-indexes` owns section bodies — persistent index prose must live in frontmatter
+
+- **Context**: Phase 1, authoring the five structural `paths/**/_index.md` indexes required by DD-49
+  to render "acceptably empty, never blank."
+- **Observation**: `index-generator.ts` (`rebuildIndexFile`) rewrites every `isSection` `_index.md`
+  **body** from its live children on `generate-indexes`, and `validate-indexes` gates equality — so a
+  childless section's hand-written body sentence is erased and cannot be reinstated without failing
+  the gate. The plan's "write a body sentence" step and its "validate-indexes must pass" step were
+  mutually exclusive for childless buckets. Fix: put the sentence in a `description:` **frontmatter**
+  field (preserved verbatim by the generator); the page still renders title + breadcrumb + prev/next
+  (not a 404). Visible empty-state deferred to the render-layer plan.
+- **Why it might generalize**: any plan that seeds a section index expecting persistent hand prose
+  must use frontmatter (or a generator-preserved region), never the body, in a repo whose index
+  generator regenerates section bodies. A plan step that mandates both "author body prose" and "run +
+  validate the index generator" is internally contradictory for childless sections.
+- **Routing**: _(Phase 7 — candidate durable home: a note in the content-authoring / index-generator
+  docs, or the plan-anti-hallucination guidance on internally-contradictory acceptance steps.)_
+
+If execution completes and nothing generalizable surfaced, replace the entries above with the explicit
 escape: `No generalizable learnings — <one-line reason>`. This file is never left silently empty.

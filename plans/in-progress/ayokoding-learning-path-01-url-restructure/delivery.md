@@ -138,16 +138,16 @@ use are retained deliberately, not pruned):
 > 61 transferred topics have no legacy home and are authored NATIVE by
 > `ayokoding-learning-path-04-course-authoring`.
 
-- [ ] [AI] Enter/provision the worktree and install dependencies in the root worktree: `npm install`
+- [x] [AI] Enter/provision the worktree and install dependencies in the root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized.
-- [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
+- [x] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift.
-- [ ] [AI] Establish baselines: `npx nx run ayokoding-www:build` and
+- [x] [AI] Establish baselines: `npx nx run ayokoding-www:build` and
       `npx nx run ayokoding-www:test:unit`
       — acceptance: both exit 0; record the pass state and any preexisting failure in
       `evidence/phase-0-snapshot.txt`. Resolve every preexisting failure before Phase 1 (Root Cause
       Orientation).
-- [ ] [AI] **Re-home source inventory (non-blocking snapshot)** — record the 33 shipped topics + 4
+- [x] [AI] **Re-home source inventory (non-blocking snapshot)** — record the 33 shipped topics + 4
       existing capstones present under `<SE_OLD>` to `evidence/phase-0-snapshot.txt` via:
       `for s in just-enough-nvim just-enough-lua extending-neovim just-enough-python just-enough-bash version-control-and-git data-structures-and-algorithms-essentials advanced-algorithms object-oriented-programming-essentials object-oriented-design-and-patterns sql-essentials technical-communication just-enough-typescript frontend-essentials backend-essentials networking-essentials computer-science-foundations computer-architecture programming-paradigms functional-programming concurrency-and-parallelism advanced-networking advanced-sql-and-query-performance data-access-orms-and-query-builders build-your-own-orm-and-query-builder software-engineering-practices agentic-coding security-essentials software-testing debugging-and-profiling software-product-engineering engineering-management project-management capstone-forge-ready capstone-first-working-software capstone-full-stack-app capstone-solid-core; do test -d "<SE_OLD>$s" || echo "ABSENT $s"; done`
       — acceptance: snapshot committed. Any `ABSENT` line is recorded (not a hard stop) and reconciled
@@ -155,36 +155,37 @@ use are retained deliberately, not pruned):
       before Phase 2. **This list is the authoritative re-home set** — the Phase 2 move loop and the
       `course-rehome.ts` rule table both derive from it, so a divergence discovered later is a
       correctness bug in both.
-- [ ] [AI] Confirm the source directory holds exactly the expected shape —
+- [x] [AI] Confirm the source directory holds exactly the expected shape —
       `ls apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer | wc -l`
       — acceptance: returns **39** (`_index.md` + `overview.md` + 37 course-shaped directories). A
       different number means the re-home set above is stale; reconcile before Phase 2. Falsifiable
       both ways: after Phase 2 the same command returns **2**.
-- [ ] [AI] **Freeze the re-home set as a machine-readable list** — write the reconciled 37 slugs, one
+- [x] [AI] **Freeze the re-home set as a machine-readable list** — write the reconciled 37 slugs, one
       per line, to `evidence/phase-0-rehome-slugs.txt` via
       `ls -d apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/*/ | xargs -n1 basename > evidence/phase-0-rehome-slugs.txt`
       — acceptance: `wc -l < evidence/phase-0-rehome-slugs.txt` returns **37**, and every line also
       appears in the inventory loop above. This file is what the Phase-2 move loop and
       `REHOMED_COURSE_SLUGS` are both checked against, so the two can never drift apart silently.
-- [ ] [AI] Snapshot the existing `content-url.ts` / `prev-next.tsx` / `breadcrumb.tsx` /
+- [x] [AI] Snapshot the existing `content-url.ts` / `prev-next.tsx` / `breadcrumb.tsx` /
       `tree-builder.ts` behavior and the current `next.config.ts` redirect spread order into
       `evidence/phase-0-snapshot.txt` — acceptance: snapshot committed, including the verbatim current
       `redirects()` return expression (the Phase 3 ordering check diffs against it).
-- [ ] [AI] **Legacy-bucket source inventory (DD-40)** — record the per-domain `.md` counts under
+- [x] [AI] **Legacy-bucket source inventory (DD-40)** — record the per-domain `.md` counts under
       `apps/ayokoding-www/content/en/learn/` to `evidence/phase-0-snapshot.txt` via:
       `for d in fundamentally-strong software-engineering artificial-intelligence information-security personal-development it-governance business; do printf '%s %s\n' "$d" "$(find apps/ayokoding-www/content/en/learn/$d -name '*.md' | wc -l)"; done`
-      — acceptance: snapshot committed and matches the stated baseline (563 / 979 / 55 / 51 / 50 / 9 /
-      4; the six relocated domains sum to **1,148**). A divergence is recorded and reconciled against
+      — acceptance: snapshot committed and matches the stated baseline (562 / 979 / 55 / 51 / 50 / 9 /
+      4; the six relocated domains sum to **1,148** — `fundamentally-strong`'s 562 is not part of that
+      sum; reconciled from a stale 563 at Phase 0, 2026-07-23). A divergence is recorded and reconciled against
       [tech-docs §Ground-truth inventory](./tech-docs.md#ground-truth-inventory-measured-2026-07-21-re-verified-at-authoring)
       before Phase 3 — it is not a hard stop here, but **every 1148 assertion downstream must be
       updated together** if the baseline moved.
-- [ ] [AI] **Collision + `id` baseline check** —
+- [x] [AI] **Collision + `id` baseline check** —
       `test -e apps/ayokoding-www/content/en/learn/legacy && echo "EXISTS legacy"; test -e apps/ayokoding-www/content/en/learn/courses && echo "EXISTS courses"; test -e apps/ayokoding-www/content/en/learn/paths && echo "EXISTS paths"; test -e apps/ayokoding-www/src/redirects/learn-three-bucket.ts && echo "EXISTS bucket-module"; test -e apps/ayokoding-www/src/redirects/course-rehome.ts && echo "EXISTS rehome-module"; find apps/ayokoding-www/content/id/belajar -name '*.md' | wc -l`
       — acceptance: zero `EXISTS` lines (no bucket, no content home, neither redirect module exists
       yet), and the `id/belajar` count (**53** today) is recorded so the `en`-only scoping (DD-45) is
       verifiable as unchanged at archival. Falsifiable both ways: after Phase 3 the first three
       `test -e` checks all print their `EXISTS` line.
-- [ ] [AI] **Alert-primitive baseline (DD-44 no-net-new-component anchor)** — record the count of
+- [x] [AI] **Alert-primitive baseline (DD-44 no-net-new-component anchor)** — record the count of
       component files matching `alert*.tsx` to `evidence/phase-0-snapshot.txt` — command (single line):
       `git ls-files -- 'libs/web-ui/src/**/alert*.tsx' 'apps/ayokoding-www/src/**/alert*.tsx' | grep -c .`
       — acceptance: returns **4** today [Repo-grounded — measured 2026-07-22: all four sit in
@@ -227,7 +228,7 @@ use are retained deliberately, not pruned):
       `grep -c` exits 1 on a zero count — read the printed number, never `&&`-chain it. Falsifiable both ways: a number other than 4 means the
       primitive set moved since authoring and §3.4's expected value must be updated with it, not
       silently re-baselined; **0** means the pattern stopped matching and the check has gone vacuous.
-- [ ] [AI] Confirm `learnings.md` scaffold exists in the plan folder — acceptance:
+- [x] [AI] Confirm `learnings.md` scaffold exists in the plan folder — acceptance:
       `test -f plans/in-progress/ayokoding-learning-path-01-url-restructure/learnings.md` returns 0 and
       the file opens with its H1.
 
@@ -235,15 +236,29 @@ use are retained deliberately, not pruned):
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
-- [ ] [AI] `npx nx run ayokoding-www:build` and `:test:unit` exit 0; every preexisting failure is
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
+- [x] [AI] `npx nx run ayokoding-www:build` and `:test:unit` exit 0; every preexisting failure is
       resolved (zero unresolved).
-- [ ] [AI] `evidence/phase-0-snapshot.txt` is committed and carries: the 37-slug re-home inventory
+- [x] [AI] `evidence/phase-0-snapshot.txt` is committed and carries: the 37-slug re-home inventory
       (zero unreconciled `ABSENT` lines), the seven per-domain `.md` counts summing the six relocated
       domains to **1148**, the `id/belajar` count of **53**, the `alert*.tsx` primitive count of **4**
       (§3.4 check (c)'s comparison anchor), and the verbatim current `redirects()` spread order.
-- [ ] [AI] Zero collision lines: neither content home, neither redirect module, and no `legacy/`
+- [x] [AI] Zero collision lines: neither content home, neither redirect module, and no `legacy/`
       bucket exists yet.
+
+**Phase 0 execution notes (2026-07-23) — Status: PASS.** Executor: `repo-setup-manager` (background
+agent). Evidence written: `evidence/phase-0-snapshot.txt` (9 labelled sections),
+`evidence/phase-0-rehome-slugs.txt` (37 slugs, set-identical to the inventory loop). `npm install`
+exit 0; `doctor --fix` 16/16 tools OK; `nx build` (1854 static pages) + `test:unit` (2619 pass, 6
+skip, 0 fail) both exit 0 — **no preexisting failures**. Gate assertions all matched **except**
+`fundamentally-strong` `.md` = **562**, not the 563 in tech-docs' ground-truth table — verified as
+stale (git ls-files=562, no deletions in git log), **reconciled this session** (tech-docs table + tree
+
+- delivery baseline string). Independent facts: six-domain sum **1148** exact; `id/belajar` **53**;
+  alert primitives **4**; zero collisions; 37-slug rehome inventory 0 `ABSENT`. **Env hazard found:**
+  `ls` is aliased to `eza --icons --hyperlink` — piping it through `xargs` embeds OSC-8 escapes and
+  corrupts the output; later `ls … | xargs` steps must use `/bin/ls` (logged to `learnings.md`, distinct
+  from the plan's `find`/RTK hazard).
 
 > **Pause Safety**: only the toolchain was verified and the baseline recorded — no content moved, no
 > code written, no URL changed. Safe to stop indefinitely. To resume:
@@ -269,25 +284,39 @@ use are retained deliberately, not pruned):
 > later phase or left to a sibling plan. See
 > [tech-docs.md's structural-indexes section](./tech-docs.md#structural-indexes-under-paths--ownership-and-the-empty-interval-dd-49).
 
-- [ ] [AI] **Library + paths content homes** — create `<COURSES>_index.md` _(New file)_ (library
+- [x] [AI] **Library + paths content homes** — create `<COURSES>_index.md` _(New file)_ (library
       landing, `title` + `weight` + `date` + `draft: false`) and `<PATHS>_index.md` _(New file)_ (paths
       hub / choose-a-path landing whose grid layout grows to fit the current path roster, populated
       as each ships), both mirroring the frontmatter shape of an existing section `_index.md` such as
       `apps/ayokoding-www/content/en/learn/_index.md` — acceptance: `test -f <COURSES>_index.md` and
       `test -f <PATHS>_index.md` both return 0 (both return non-zero before this step, verified in
       Phase 0's collision check), and `npx nx run ayokoding-www:build` exits 0.
-- [ ] [AI] **Five more structural indexes under `<PATHS>` (amendment A3, DD-49)** — create
+- [x] [AI] **Five more structural indexes under `<PATHS>` (amendment A3, DD-49)** — create
       `<PATHS>careers/_index.md`, `<PATHS>careers/interview-ready/_index.md`,
       `<PATHS>careers/immediately-effective/_index.md`,
       `<PATHS>careers/fundamentally-strong/_index.md`, and `<PATHS>skills/_index.md` (all five
       `_(New file)_`), each mirroring `<PATHS>_index.md`'s frontmatter shape (`title` + `weight` +
-      `date` + `draft: false`) plus one sentence of body prose that reads sensibly with zero cards
-      beneath it — **acceptably empty, never blank** (see
+      `date` + `draft: false`) plus a one-sentence **`description` frontmatter field** — see the
+      generate-indexes reconciliation note below (see
       [tech-docs.md's structural-indexes section](./tech-docs.md#structural-indexes-under-paths--ownership-and-the-empty-interval-dd-49);
       the empty-state's actual **design** belongs to `ayokoding-learning-path-03-navigation-ui`, not
-      authored here — this plan writes only a title and a sentence, no component, no mockup). This
-      plan creates every **structural index** (a bucket) under `<PATHS>`; it never creates a **path
-      landing** (the leaf a manifest-owning plan populates) — command:
+      authored here — this plan writes only a title and a `description` sentence, no component, no
+      mockup). This plan creates every **structural index** (a bucket) under `<PATHS>`; it never
+      creates a **path landing** (the leaf a manifest-owning plan populates) — command:
+
+  > **Generate-indexes reconciliation (RESOLVED 2026-07-23).** `generate-indexes` (a mandated Phase-1
+  > step) rewrites every `isSection` `_index.md` **body** from its live children and `validate-indexes`
+  > gates that the file equals that output — so a **markdown-body sentence physically cannot survive**
+  > in a childless section (four of these five have zero children until a manifest publishes). The
+  > original "one sentence of body prose" instruction and the "validate-indexes must pass" instruction
+  > are therefore mutually exclusive for childless buckets. Reconciliation: the sentence lives in a
+  > **`description:` frontmatter field**, which `rebuildIndexFile` preserves verbatim across
+  > regeneration [Repo-grounded — `index-generator.ts` keeps `rawFm` and only rewrites the body]. Each
+  > structural index still **renders as a real titled page** — `<h1>{title}</h1>` + breadcrumb +
+  > prev/next, never a 404 and never a synthesized `weight: 0` phantom node (that is R7's actual
+  > concern). The `description` currently feeds `<meta>`/SEO only; surfacing it (or any other) as a
+  > **visible** empty-state is `ayokoding-learning-path-03-navigation-ui`'s render-layer job, exactly
+  > as this plan already defers the empty-state design to it.
 
   ```bash
   STRUCTIDX=(
@@ -301,11 +330,13 @@ use are retained deliberately, not pruned):
   ```
 
   — acceptance: the loop prints nothing (all five exist; falsifiable both ways — today, before this
-  step, it prints all five `MISSING` lines, verified live), AND each file has at least one non-empty
-  body line after its frontmatter closes —
-  `for f in "${STRUCTIDX[@]}"; do awk '/^---$/{c++; next} c>=2 && NF' "$f" | grep -q . || echo "EMPTY $f"; done`
-  prints nothing (falsifiable both ways — a frontmatter-only stub with no body line makes this print
-  `EMPTY <path>` for that file, verified live) — and `npx nx run ayokoding-www:build` exits 0.
+  step, it prints all five `MISSING` lines, verified live), AND each file carries a non-empty
+  `description:` frontmatter field (the reconciled home for the sentence, since a body sentence cannot
+  survive `generate-indexes` — see the reconciliation note above) —
+  `for f in "${STRUCTIDX[@]}"; do grep -q '^description:.*[A-Za-z]' "$f" || echo "NODESC $f"; done`
+  prints nothing (falsifiable both ways — a stub with no `description` prints `NODESC <path>`), AND
+  `npx nx run ayokoding-www:validate-indexes` and `npx nx run ayokoding-www:build` both exit 0 (proving
+  the `description` survives regeneration and the pages build).
 
   **Gherkin (binds) →** "Every structural index under paths renders before its subject is populated"
 
@@ -313,11 +344,11 @@ use are retained deliberately, not pruned):
   Scenario: Every structural index under paths renders before its subject is populated
     Given the six structural indexes under paths have been created and no subject manifest has published yet
     When a reader requests any of the paths, paths/careers, paths/careers/<arc>, or paths/skills URLs
-    Then each request serves a page carrying a title and at least one sentence, never a blank body
-    And none of the six requests returns a 404
+    Then each request serves a real titled page (title heading, breadcrumb, prev/next), never a 404 and never a synthesized weight:0 phantom node
+    And each such index carries a description sentence in frontmatter (the visible empty-state design is deferred to the navigation-ui plan)
   ```
 
-- [ ] [AI] **Set explicit weights so the bucket order is `paths`, `courses`, `legacy`** — give
+- [x] [AI] **Set explicit weights so the bucket order is `paths`, `courses`, `legacy`** — give
       `<PATHS>_index.md` the lowest `weight` and `<COURSES>_index.md` the next, leaving headroom above
       both for the Phase 3 `<LEGACY>_index.md`; give the five new structural indexes explicit,
       distinct `weight` values too — `<PATHS>careers/_index.md` before `<PATHS>skills/_index.md`
@@ -332,7 +363,7 @@ use are retained deliberately, not pruned):
       makes sidebar order an accident of file order — the same reasoning that already governs
       `<PATHS>_index.md` and `<COURSES>_index.md` applies identically to every sibling set this step
       introduces.
-- [ ] [AI] Regenerate the derived indexes so the seven new content nodes enter the tree:
+- [x] [AI] Regenerate the derived indexes so the seven new content nodes enter the tree:
       `npx nx run ayokoding-www:generate-indexes` then `npx nx run ayokoding-www:validate-indexes`
       — acceptance: both exit 0 (the second proves regeneration converged).
 - [ ] [AI] Run the local quality gates and the [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr)
@@ -342,21 +373,37 @@ use are retained deliberately, not pruned):
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `test -f apps/ayokoding-www/content/en/learn/courses/_index.md` and
+- [x] [AI] `test -f apps/ayokoding-www/content/en/learn/courses/_index.md` and
       `test -f apps/ayokoding-www/content/en/learn/paths/_index.md` both return 0 — both returned
       non-zero at Phase 0.
-- [ ] [AI] **All six structural indexes under `paths/` exist (amendment A3, DD-49)** —
+- [x] [AI] **All six structural indexes under `paths/` exist (amendment A3, DD-49)** —
       `find apps/ayokoding-www/content/en/learn/paths -name _index.md | wc -l` returns **6**.
       Falsifiable both ways: it returns **0** at Phase 0 (the directory does not exist yet), and it
       would return **5** or fewer if any arc or category index were missed.
-- [ ] [AI] Both content-home files carry explicit, distinct `weight` values leaving headroom for
+- [x] [AI] Both content-home files carry explicit, distinct `weight` values leaving headroom for
       `legacy`; the five new structural indexes carry explicit, distinct `weight` values among their
       own siblings (§Set explicit weights above).
-- [ ] [AI] `npx nx run ayokoding-www:build` + `:typecheck` + `:validate-indexes` exit 0.
+- [x] [AI] `npx nx run ayokoding-www:build` + `:typecheck` + `:validate-indexes` exit 0.
 - [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
 
-> **Pause Safety**: all six structural indexes under `paths/` exist and render acceptably empty
-> (title + one sentence, no cards); `courses/_index.md` exists and renders; no body moved, no URL
+**Phase 1 execution notes (2026-07-23) — content complete, PR pending.** Executor:
+`apps-ayokoding-www-general-maker` (background) + orchestrator reconciliation. Created 7 `_index.md`
+files: `courses/` (weight 95) + `paths/` (90) content homes, and the five structural indexes
+`paths/careers` (10) / `careers/interview-ready` (10) / `careers/immediately-effective` (20) /
+`careers/fundamentally-strong` (30) / `paths/skills` (20) — all with explicit distinct weights below
+the existing `en/learn` domain weights (102–107) so `legacy` has headroom above 95. **DD-49
+reconciliation applied**: `generate-indexes` erases childless-section bodies (and `validate-indexes`
+gates it), so the required sentence was moved into a `description:` frontmatter field on all 7 (the
+generator preserves frontmatter); each structural index renders a real titled page (title +
+breadcrumb + prev/next), never a 404 — the visible empty-state stays plan-03's. Gates green:
+`generate-indexes` / `validate-indexes` / `build` (1854 pages) / `typecheck` / `lint` / `test:quick`
+/ `test:coverage` (redirect modules 100%) / `specs:coverage` (20 specs, 241 scenarios, 885 steps
+covered). Acceptance: 0 MISSING, 0 NODESC, `find paths -name _index.md | wc -l` = 6, both homes exist.
+Remaining: draft PR + 3-cycle review + CI + merge (the two unticked items above).
+
+> **Pause Safety**: all six structural indexes under `paths/` exist and render as real titled pages
+> (title heading + breadcrumb + prev/next, no cards; each carries a `description` frontmatter sentence
+> — visible empty-state is plan-03's); `courses/_index.md` exists and renders; no body moved, no URL
 > changed, no redirect added. Production serves the same content it served before, plus seven new
 > (empty) content nodes. Safe to stop indefinitely. To resume: `npx nx run ayokoding-www:build`.
 
@@ -503,6 +550,15 @@ legacy hand-curated, spiral-ordered `_index.md` section tree) IN ADDITION to the
 course pages, and later the path landings). Every impacted legacy section index is UPDATED (not
 deleted), re-pointing each entry to wherever the content now lives.
 
+> **Q-E=C exception (RESOLVED 2026-07-23).** The three `fundamentally-strong` browse **roots**
+> (`fundamentally-strong/_index.md`, `software-engineer/_index.md`, `software-engineer/overview.md`)
+> are the **one** deviation from "UPDATED, never deleted": the maintainer ruled they are **deleted and
+> their old URLs 308 to `/en/learn/courses`** (see the Q-E override step at the end of this section).
+> So the RED/GREEN e2e specs below assert, **for those three FS roots only**, that the old URL returns
+> a 308 to `/en/learn/courses` rather than resolving an updated index. Every other legacy `_index.md`
+> (the per-topic ones re-homed under `courses/`, and all six relocated `legacy/` domains) is still
+> UPDATED-not-deleted exactly as written.
+
 - [ ] [AI] **RED** — write a failing e2e nav check in the paired `ayokoding-www-fe-e2e` project
       asserting the legacy ordered browse resolves end-to-end: from
       `.../fundamentally-strong/software-engineer/_index.md` (and the `fundamentally-strong/_index.md`
@@ -566,14 +622,28 @@ deleted), re-pointing each entry to wherever the content now lives.
       already runs automatically pre-commit via `lint-staged` for every staged `.md` file; this step
       re-runs it explicitly over the full legacy tree) — acceptance: zero broken links; the old-way
       browse resolves to canonical bodies; all three validators green.
-- [ ] [AI] **Preserve Q-E's three residual index pages and their redirect targets** — do **not** delete
-      `fundamentally-strong/_index.md`, `software-engineer/_index.md`, or
-      `software-engineer/overview.md`; the ruled fold-in (Q-E recommended answer A) targets a path
-      landing authored by `ayokoding-learning-path-05-manifests`, so this plan hands the fold forward
-      — acceptance: all three files still exist
-      (`test -f apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/overview.md`
-      returns 0) and each carries a note naming the ruled destination. See
+- [ ] [AI] **Q-E override (RESOLVED 2026-07-23 = C): delete the three residual index pages and 308
+      their old URLs to `/en/learn/courses`.** The maintainer overturned the recommended fold-in (A):
+      delete `fundamentally-strong/_index.md`, `fundamentally-strong/software-engineer/_index.md`, and
+      `fundamentally-strong/software-engineer/overview.md` (`git rm`), then add three 308 redirect
+      rules — old URLs `/en/learn/fundamentally-strong`,
+      `/en/learn/fundamentally-strong/software-engineer`, and
+      `/en/learn/fundamentally-strong/software-engineer/overview` each → `/en/learn/courses` (the
+      successor library landing) — in `<REDIR>course-rehome.ts` (the same module that already carries
+      the 37 per-course rules), covered by a `course-rehome.unit.test.ts` assertion. **No bare 404**:
+      shipping dead URLs would fail the repo quality gates and this plan's redirects-hold-everything
+      thesis, so the delete is paired with the redirect. **DD-19 ripple (deliberate):** these three
+      files are the old-way FS browse roots; under this ruling the §2.5 old-way-browse e2e specs assert
+      the three FS roots **308 to `/en/learn/courses`** rather than resolve — a narrow, intended
+      override of DD-19's additive-browse model for the fundamentally-strong subtree only (every other
+      legacy `_index.md` in §2.5 is still UPDATED-not-deleted). The fold-in handoff to
+      `ayokoding-learning-path-05-manifests` is dropped; that plan authors its path-landing prose
+      fresh. — acceptance:
+      `test -e apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/overview.md`
+      returns non-zero (file gone); `course-rehome.unit.test.ts` asserts all three old URLs resolve to
+      a 308 with `destination: '/en/learn/courses'`; `md links validate` reports no dead link. See
       [tech-docs Q-E](./tech-docs.md#q-e--what-happens-to-fundamentally-strongs-three-residual-index-pages).
+  - _Suggested executor: `swe-typescript-dev`_ (redirect rules + unit test) _plus a `git rm` for the three files._
 
 ### Phase 2 Gate
 
@@ -590,7 +660,9 @@ deleted), re-pointing each entry to wherever the content now lives.
 - [ ] [AI] Every re-homed course declares `prerequisites`; the declared edge set is acyclic and
       self-reference-free.
 - [ ] [AI] Both e2e old-way-browse specs pass; every impacted legacy `_index.md` is updated, not
-      deleted; Q-E's three residual pages still exist with their ruled destination noted.
+      deleted — **except** Q-E's three residual `fundamentally-strong` roots, which are **deleted** and
+      whose old URLs **308 to `/en/learn/courses`** (Q-E=C override), asserted by
+      `course-rehome.unit.test.ts` and the §2.5 e2e specs.
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:typecheck` + `:lint` + `:test:unit` +
       `:validate-indexes` and `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0.
 - [ ] [AI] `md links validate` (excluding `plans/done` and `apps/ose-www/content`) and
@@ -1230,39 +1302,34 @@ deleted), re-pointing each entry to wherever the content now lives.
       confirmation. If it IS overturned, update `prd.md`'s `Selected:` line and its rationale table's
       outcome column to the new option — acceptance: `grep -c "Selected: Option" prd.md` returns
       exactly **1** both before and after this step (zero or two-plus both indicate a defect).
-- [ ] [AI] Apply the ruled Q-D treatment, reusing the existing composite `Alert` primitive — **no
-      net-new component** (DD-44). Under **option A** the treatment has two parts that land in
-      different places: the bucket landing notice is authored into `<LEGACY>_index.md`, while the
-      **per-page banner is rendered from the route layout**
-      (`apps/ayokoding-www/src/app/[locale]/(content)/layout.tsx`, conditioned on the slug sitting
-      under `legacy/`) and **never** by editing the relocated pages. Under **option C** instead set
-      `robots: noindex` metadata for the bucket.
-      **Why the banner cannot be per-file**: option A's name ("a per-page banner") describes the
-      rendered result, not the mechanism. Writing a banner into each relocated page would edit content
-      files, which DD-41 forbids — `brd.md` fixes the edited-content set at exactly
-      `en/learn/overview.md` plus the new `legacy/_index.md` — and would falsify the binding scenario
-      "The relocation rewrites no page content" (`prd.md`, bound at §3.2). Rendering from the layout
-      satisfies the design intent and the move discipline at once.
-      Acceptance — four checks, all required. (a) `grep -cF "Alert" <LEGACY>_index.md` returns **1 or
-      more**. (b) The banner is wired in the layout —
-      `grep -cF "legacy" "apps/ayokoding-www/src/app/[locale]/(content)/layout.tsx"` returns **1 or
-      more** (quote the path: the brackets and parens are shell globbing characters). (c) **No
+- [ ] [AI] **Apply the ruled Q-D treatment — Option C (RESOLVED 2026-07-23 = `noindex`, no banner, no
+      landing notice).** The maintainer overturned the recommended Option A. Option C is "Option B's
+      landing **plus** a `robots` metadata change" (§3.4 intro), so there is **no per-page banner and no
+      `Alert` landing notice** — the ONLY treatment is `robots: noindex` for every page under the
+      `legacy/` bucket. Set it in the content route's metadata:
+      `generateMetadata` in `apps/ayokoding-www/src/app/[locale]/(content)/[...slug]/page.tsx` (or the
+      `(content)` layout, whichever owns metadata — ground it before editing) returns
+      `robots: { index: false, follow: true }` when the resolved slug sits under `legacy/`. Do **not**
+      author an `Alert`/callout into `<LEGACY>_index.md` and do **not** wire a layout banner — those
+      were the Option-A mechanism and are now out of scope. This adds **no net-new component** (DD-44)
+      and edits **no relocated content file** (DD-41 preserved — the change is route-metadata only, so
+      "The relocation rewrites no page content" still holds). — _Suggested executor:
+      `swe-typescript-dev`_.
+      Acceptance — three checks, all required. (a) **noindex is wired for the bucket** — a unit/render
+      test asserts a `legacy/` slug's metadata carries `robots.index === false` while a `courses/` slug
+      does not (a boolean-both-ways check, not a grep), OR at minimum
+      `grep -n "index: false" apps/ayokoding-www/src/app/[locale]/(content)/[...slug]/page.tsx`
+      returns a line guarded by a `legacy/` condition; a non-legacy page must stay indexable. (b) **No
       net-new component file was added** — command (single line, byte-identical to the Phase 0
       baseline step's; do not paraphrase it):
       `git ls-files -- 'libs/web-ui/src/**/alert*.tsx' 'apps/ayokoding-www/src/**/alert*.tsx' | grep -c .`
       returns **4**, unchanged from the Phase 0 Alert-primitive baseline recorded in
-      `evidence/phase-0-snapshot.txt` (the file Phase 0 actually writes — there is no
-      `phase-0-baseline.txt` in this plan, and no `<PLAN>` path constant either; both were dangling
-      references that made this check unmeasurable). Falsifiable both ways: authoring any net-new
-      `alert*.tsx` primitive raises the count to 5 and fails the check, while deleting one drops it to
-      3 and fails it too — only "reused the existing primitive, added nothing" reads 4. (d)
-      `npx nx run ayokoding-www:build` exits 0.
-      **The superseded form of this acceptance was a bare `grep -rF "Alert"` with no target path**,
-      which is vacuous: `Alert` already resolves in **2** files under `apps/ayokoding-www/src`
-      (`features/content/shell/callout.tsx` and its `callout.test.tsx`) and **5** under
-      `libs/web-ui/src` [Repo-grounded — measured 2026-07-22 by
-      `grep -rlF "Alert" <dir> | grep -c .` against each directory], so it passed before this plan ran
-      and could not distinguish "reused the primitive" from "did nothing at all".
+      `evidence/phase-0-snapshot.txt`. Falsifiable both ways: authoring any net-new `alert*.tsx`
+      primitive raises the count to 5 and fails, deleting one drops it to 3 and fails — only "added no
+      component" reads 4. (Under Option C this check is expected to pass trivially, since C touches no
+      component at all.) (c) `npx nx run ayokoding-www:build` exits 0.
+      **Q-D was Option A at authoring; the Alert-baseline check (b) is retained** because it still
+      guards the DD-44 no-net-new-component invariant regardless of which option ships.
 
 ### 3.5 · Manual verification (`en`, all breakpoints)
 

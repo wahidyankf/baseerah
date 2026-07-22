@@ -40,7 +40,7 @@ rules and **win on conflict**.
 
 ## Ground-truth inventory (measured 2026-07-21, re-verified at authoring)
 
-`en/learn/` holds **1,713** `.md` files across seven top-level domains, plus its own `_index.md` and
+`en/learn/` holds **1,712** `.md` files across seven top-level domains, plus its own `_index.md` and
 `overview.md` [Repo-grounded — `find apps/ayokoding-www/content/en/learn -name '*.md' | wc -l`].
 Content root is `apps/ayokoding-www/content/`; the route
 `src/app/[locale]/(content)/[...slug]/page.tsx` serves a content path `en/learn/X` at
@@ -48,7 +48,7 @@ Content root is `apps/ayokoding-www/content/`; the route
 
 | Domain under `en/learn/`  | `.md` files | Disposition                                   |
 | ------------------------- | ----------- | --------------------------------------------- |
-| `fundamentally-strong`    | 563         | → `courses/` (per-course re-home; DD-2/DD-43) |
+| `fundamentally-strong`    | 562         | → `courses/` (per-course re-home; DD-2/DD-43) |
 | `software-engineering`    | 979         | → `legacy/software-engineering`               |
 | `artificial-intelligence` | 55          | → `legacy/artificial-intelligence`            |
 | `information-security`    | 51          | → `legacy/information-security`               |
@@ -308,10 +308,10 @@ apps/ayokoding-www/content/
 │   ├── about-ayokoding.md                                         ✓  loose page (not under /c)
 │   ├── terms-and-conditions.md                                    ✓  loose page (not under /c)
 │   ├── rants/                                                     ✓  sibling section — untouched
-│   └── learn/                                                     ✓  1,713 .md total
+│   └── learn/                                                     ✓  1,712 .md total
 │       ├── _index.md                                              ✓  machine-generated (generate-indexes)
 │       ├── overview.md                                            ✓  hand-authored; links all 6 domains
-│       ├── fundamentally-strong/                                  ✓  563 .md
+│       ├── fundamentally-strong/                                  ✓  562 .md
 │       │   ├── _index.md                                          ✓
 │       │   └── software-engineer/                                 ✓  39 entries = 2 files + 37 dirs
 │       │       ├── _index.md                                      ✓  spiral-ordered section index
@@ -483,8 +483,9 @@ structural index, that index renders **empty**. That interval is not a theoretic
 spans the gap between this plan's Phase 1 and the earliest of three separate downstream plans'
 publication phases. This plan's obligation is narrower than designing the empty state — it is:
 create each of the five new files in a state that renders **acceptably empty** (frontmatter with a
-`title`, plus one sentence of body that reads sensibly with zero cards beneath it — never a blank
-page), and **explicitly name `ayokoding-learning-path-03-navigation-ui` as the owner of the
+`title`, plus a one-sentence `description` frontmatter field — **not a body sentence**; see the
+reconciliation below — so each renders a real titled page with breadcrumb and prev/next, never a 404
+or a synthesized `weight: 0` phantom node), and **explicitly name `ayokoding-learning-path-03-navigation-ui` as the owner of the
 empty-state's actual design** (the `EmptyPathListState` component and its copy — see that plan's own
 `prd.md`, §"Screen 1a · Category landing" — the "Skills instance — empty state" sub-section
 specifically). This cross-plan reference is deliberately **inline text, not a markdown link** — per
@@ -493,6 +494,21 @@ the "Cross-plan source of truth" note in [README.md](./README.md), a sibling pla
 would rot exactly while this plan still needs it. This plan adds **no
 mockup, no design funnel entry, and no component** for the empty state — Screen 4 (the legacy-bucket
 landing) remains this plan's only screen.
+
+**Reconciliation — the sentence lives in `description` frontmatter, not the body (RESOLVED 2026-07-23,
+during Phase 1 execution).** The mandated `generate-indexes` step rewrites every `isSection`
+`_index.md` **body** from that node's live children, and `validate-indexes` gates that each section
+file equals the generator's output — so a **markdown-body sentence cannot survive** in a childless
+section (four of the five structural indexes have zero children until a downstream manifest publishes).
+The original "one sentence of body prose" wording collided head-on with the "validate-indexes must
+pass" gate. The resolution keeps both: the sentence is authored as a **`description:` frontmatter
+field**, which `rebuildIndexFile` preserves verbatim across regeneration [Repo-grounded —
+`index-generator.ts` keeps the raw frontmatter and only regenerates the body]. Each structural index
+therefore renders a **real titled page** (`<h1>{title}</h1>` + breadcrumb + prev/next — verified: the
+build emits them as static pages, not 404s), which is exactly R7's "never a dead URL segment" concern.
+The `description` currently feeds `<meta>`/SEO only; making it (or a richer copy) a **visible** empty
+state is `ayokoding-learning-path-03-navigation-ui`'s render-layer work, consistent with the
+empty-state ownership stated just above.
 
 **The structural-index / path-landing boundary, stated from the owning side.** Plans 06 and 07 each
 state the identical rule from the consuming side — this is the same rule, not a parallel one:
@@ -1037,7 +1053,7 @@ and re-homes 37 course pages, all user-visible.
 
 This plan has a reachable behavioural delta: **the redirect table is behaviour.** A malformed or
 mis-ordered rule in `content-namespace.ts`, `course-rehome.ts`, or `learn-three-bucket.ts` changes
-what a caller's browser is sent to for any of the ~1,713 affected URLs — including the literal
+what a caller's browser is sent to for any of the ~1,712 affected URLs — including the literal
 infinite-308-loop hazard this plan exists to forbid (see
 [De-namespacing §Why the direction inverts, not supplements](#why-the-direction-inverts-not-supplements)).
 That the delta is exercised through Next.js `redirects()` config rather than a REST or GraphQL
@@ -1128,7 +1144,7 @@ by sibling plans are referenced by ID only and are not restated.
 - **DD-41 · The legacy move is a prefix relocation, not a rewrite.** Each of the six non-course
   domains moves via a single `git mv <domain>/ legacy/<domain>/`, preserving its existing sub-taxonomy
   **verbatim**: no file renamed, no body edited, no heading touched. **Why**: (a) it makes the redirect
-  a per-domain prefix rule rather than 1,713 per-file rules; (b) it keeps a 1,148-file move reviewable
+  a per-domain prefix rule rather than 1,712 per-file rules; (b) it keeps a 1,148-file move reviewable
   as a pure rename diff; (c) promoting a legacy page into a real course is genuinely different work
   with its own editorial judgment, and bundling it here would make the move unreviewable. Promotion is
   later work — see [Q-A](#q-a--is-legacy-a-staging-pen-or-a-permanent-archive).
@@ -1222,7 +1238,8 @@ by sibling plans are referenced by ID only and are not restated.
   is an orphan segment. **The consequence this plan designs for, not discovers**: every one of the
   five new files renders **empty** for the real, user-visible interval between this plan landing and
   whichever of plans 05/06/07 first publishes a manifest into it — this plan creates the files in a
-  state that renders **acceptably empty** (a title and a sentence, never a blank body); the
+  state that renders **acceptably empty** (a title and a `description` frontmatter sentence — not a
+  body sentence; see the [reconciliation](#structural-indexes-under-paths--ownership-and-the-empty-interval-dd-49)); the
   empty-state's actual **design** is `ayokoding-learning-path-03-navigation-ui`'s, named here only as
   a cross-reference, never authored in this plan. **The structural-index / path-landing boundary**
   (stated from the owning side; plans 06 and 07 state the identical rule from the consuming side): a
