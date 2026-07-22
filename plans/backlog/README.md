@@ -6,79 +6,34 @@ that genuinely need a full plan's depth to answer.
 
 ## Planned Projects
 
-The seven `ayokoding-learning-path-*` plans below deliver one programme. Plans `01`-`05` are the
-**five-way split** of the retired
-[`shared-course-library-and-learning-paths`](../done/2026-07-21__shared-course-library-and-learning-paths/README.md)
-plan and cover the **`careers/`** category only; plans `06` and `07` add the **`skills/`** category,
-which that retired plan never scoped. Their `NN-` prefix **is the execution sequence**, and it
-encodes a three-wave dependency DAG: Wave 1 (`01`, `02`) starts immediately and in parallel; Wave 2
-(`03`, `04`, `06`) needs both Wave 1 plans merged; Wave 3 (`05`, `07`) needs its own Wave 2
-predecessor merged. Each is a separate `worktree-to-pr` delivery with its own PR.
-
-The two category branches are independent after Wave 1 — nothing in `05` waits on `06`/`07`, and
-nothing in `07` waits on `05`. The one cross-branch edge is `07`'s dependency on `06`, which is
-**soft overall and hard at four wave gates**: ten of the ERP courses have no accounting prerequisite
-at all and are authorable while `06` is still in flight.
+The seven `ayokoding-learning-path-*` plans deliver one programme in three dependency waves. Their
+shared structure and decisions live in
+[ayokoding-learning-path-programme.md](./ayokoding-learning-path-programme.md); each plan's own
+README carries its scope, counts and gates.
 
 - [ayokoding-learning-path-01-url-restructure](./ayokoding-learning-path-01-url-restructure/README.md)
-  — **Wave 1.** Removes the `/c/` content namespace, then resolves everything under `/en/learn` to
-  exactly three buckets (`paths/`,
-  `courses/`, `legacy/`), re-homes 37 existing course slugs into the flat `courses/` namespace, and
-  ships the per-course 308 redirect table.
+  — **Wave 1.** Removes the `/c/` namespace, resolves everything under `/en/learn` to three buckets,
+  and ships the per-course redirect table.
 - [ayokoding-learning-path-02-schema-and-prerequisite-dag](./ayokoding-learning-path-02-schema-and-prerequisite-dag/README.md)
-  — **Wave 1.** The data layer: the `PathManifest` zod schema, the pure `course-paths` functional
-  core, the course-prerequisite frontmatter contract, and custody of the 128-file `syllabus/` corpus.
+  — **Wave 1.** The data layer: manifest schema, the pure `course-paths` core, the prerequisite
+  contract, and custody of the `syllabus/` corpus.
 - [ayokoding-learning-path-03-navigation-ui](./ayokoding-learning-path-03-navigation-ui/README.md)
-  — **Wave 2.** The UI design funnel and every rendered surface: path landings, path cards, the
-  manifest repository, and the `?path=` prev/next/breadcrumb wiring.
+  — **Wave 2.** The design funnel and every rendered surface: path landings, cards, and the
+  prev/next/breadcrumb wiring.
 - [ayokoding-learning-path-04-course-authoring](./ayokoding-learning-path-04-course-authoring/README.md)
-  — **Wave 2.** Authors 90 of the 127 course bodies, band by band, each from its `syllabus/` spec,
-  emitting a five-field band-completion signal the manifest plan consumes.
+  — **Wave 2.** Authors the `careers/` course bodies band by band, each from its `syllabus/` spec.
 - [ayokoding-learning-path-05-manifests](./ayokoding-learning-path-05-manifests/README.md)
-  — **Wave 3, terminal for `careers/`.** Owns every `careers/` `.yaml` manifest and every step that
-  creates, appends to, reorders, or re-verifies one — the ownership invariant that breaks the
-  authoring/manifest cycle.
+  — **Wave 3, terminal for `careers/`.** Owns every `careers/` manifest and every step that touches
+  one.
 - [ayokoding-learning-path-06-skills-accounting](./ayokoding-learning-path-06-skills-accounting/README.md)
-  — **Wave 2.** The first `skills/` path: 20 accounting courses on an immediately-effective ramp that
-  reaches a working ledger by course 3, then deliberately slows — because this domain's
-  characteristic failure is **silent** (a trial balance still balances when revenue is recognised in
-  the wrong period). Owns its own manifest.
+  — **Wave 2.** The `conventional-accounting` and `sharia-accounting` paths, their corpus and their
+  manifests.
 - [ayokoding-learning-path-07-skills-erp](./ayokoding-learning-path-07-skills-erp/README.md)
-  — **Wave 3, terminal for `skills/`.** 20 ERP courses. Depends on `06` one-directionally — no
-  accounting course cites an ERP course — with the hard edge first biting at `record-to-report`,
-  since subledger-to-GL posting is meaningless without a balanced ledger. Owns its own manifest.
+  — **Wave 3, terminal for `skills/`.** The `conventional-erp` and `sharia-erp` paths, their corpus
+  and their manifests.
 
 Other candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md); promote one
 here when it is ripe.
-
-### Learning-path programme decisions (`R*` / `A*`)
-
-The seven plans above cite these ids throughout (`R7`, `A3`, and so on). They are **programme-scope
-decisions, not governance rule ids** — nothing under [`../../repo-governance/`](../../repo-governance/README.md)
-defines them, and they bind only this programme. They are recorded here because they are shared by
-all seven plans, so putting them inside any one plan would place a shared document on a cross-plan
-seam (the same reasoning as `A3` itself). Each plan additionally encodes the rules that affect it as
-its own numbered `DD-*` decisions, where the full rationale lives; the table below is definitional.
-
-`A*` amendments are **later than** the `R*` rules and **win on conflict**.
-
-| Id  | Decision                                                                                                                                                  |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R0  | Remove the `/c/` content namespace by **inverting** `contentNamespaceRedirects` — supplementing it would 308-loop                                         |
-| R1  | URL grammar is `/en/learn/paths/{careers,skills}/…` over six paths                                                                                        |
-| R2  | `pathId` is **variable-depth by design** — `careers/<arc>/<role>` is 3 segments, `skills/<subject>` is 2; nothing may key on segment count                |
-| R3  | The fourth careers path targets a distinct AI-engineering endpoint (superseded in part by `A1`)                                                           |
-| R4  | Ownership split: plans 01-05 are `careers/`-only; the `skills/` category is separate (revised by `A2`)                                                    |
-| R5  | The full skills corpus is authored **in this programme**, not deferred                                                                                    |
-| R6  | The paths hub is **redesigned** around the two categories, not relabelled                                                                                 |
-| R7  | **Every URL segment must render** — no orphan segments                                                                                                    |
-| R8  | Every `skills/` path uses the **immediately-effective** arc, always                                                                                       |
-| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why            |
-| A1  | `careers/immediately-effective/ai-engineer` assumes **no** prior software-engineering competence; prerequisites are included in `courseOrder`, not linked |
-| A2  | The skills category splits into **two** plans — 06 (accounting) and 07 (ERP), the latter `blockedBy` the former                                           |
-| A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                             |
-| A4  | Research verification status is carried forward verbatim — an `[Unverified]` claim must never be restated as fact                                         |
-| A5  | Plan 03 owns **all** design assets; a `.png` is a baked render and desynchronises silently when its `.html` changes                                       |
 
 ## Instructions
 
