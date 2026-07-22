@@ -1701,41 +1701,243 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
       CI green, then `[AI]`-merge once the five hardened preconditions hold (tester gates:
       **exemption recorded**)
       — acceptance: `gh pr view --json state` shows `MERGED`
-- [ ] [AI] Remove the worktree: `git -C <INFRA> worktree remove <INFRA-WT>` — never `--force`, never
+      — **PR**: [wahidyankf/ose-infra#16](https://github.com/wahidyankf/ose-infra/pull/16), opened as
+      a draft off `f6ecdcc0b`. All three cycles ran, each gated by a green CI run on the head the
+      review was pinned to. **Every cycle found real defects** — none came back clean, and cycle 3
+      found a regression that cycle 2 had itself introduced.
+
+  | Cycle | Maker findings                 | Fixed in    | CI gate on the fixed head                     |
+  | ----- | ------------------------------ | ----------- | --------------------------------------------- |
+  | 1     | 2 HIGH, 0 CRITICAL             | `9c3656ad3` | run 29868278329 — success (after 1 re-run)    |
+  | 2     | 2 HIGH, 1 MEDIUM, 1 LOW        | `30ec8dedb` | run 29871560447 — success (after 1 re-run)    |
+  | 3     | 2 HIGH, 2 MEDIUM, 0 CRITICAL   | `812b6ca24` | run 29874633252 — superseded before finishing |
+  | —     | author correction (no cycle 4) | `3423c7b69` | run 29875931326 — final gate                  |
+
+  **What each cycle actually caught** — recorded because the pattern matters more than the counts:
+  - **Cycle 1** — the propagation had updated every surface that _describes_ the delivery-mode
+    vocabulary but none that _emits_ a value from it: `plan-maker`, `plan-fixer`, `plan-planning.md`,
+    `git-push-default.md`, and both SKILL files still offered the unqualified four-mode choice.
+  - **Cycle 2** — `AGENTS.md` had **zero** bareness carve-out: `grep -i bare AGENTS.md` returned no
+    matches at all, in the one file every harness auto-loads on every invocation. The cycle-1 fixer's
+    own commit was titled "add bareness carve-outs to every mode-declaring surface" and had swept
+    `.claude/`, `.opencode/` and `repo-governance/` without ever looking at the repo root. Also
+    `best-practices.md`'s worked example, the `.opencode/agent/` → `.opencode/agents/` typo, and a
+    mislabelled link in `<MERGE>`.
+  - **Cycle 3** — two HIGHs, both worth naming. (i) The C5 hunk, while rewriting `<GATE>`'s
+    precondition (a) for the floor→ceiling reversal, had **silently deleted the unrelated
+    `and the review loop did not exit \`escalated\`` conjunct** — from the single copy `<MERGE>`
+    designates as _normative_, while six derivative copies in the same PR kept it. (ii) Cycle 2's own
+    `best-practices.md` fix was half-applied: it changed the comment line to
+    `worktree-to-origin-main`and left the primary-checkout commands (`git push origin main`, no
+    `git worktree add`) underneath, so the label and the body of one five-line example contradicted
+    each other. Both are recorded in`learnings.md`.
+
+  **One author correction landed after cycle 3 and did not open a cycle 4** (`3423c7b69`, announced
+  on the PR as [issuecomment-5039964696](https://github.com/wahidyankf/ose-infra/pull/16#issuecomment-5039964696)).
+  Cycle 3's maker flagged `<SDLC>`'s evidence-table row as **follow-up-only** solely because the line
+  falls outside the PR diff and cannot be line-anchored. The row claimed the worktree-agnostic
+  guardrails were "verified from both the primary checkout and a linked worktree in all 3" — which
+  **two of the three repos have no primary checkout to perform**. It is the same name-bound,
+  topology-blind class this whole changeset exists to remove, it sits in a file the PR already edits,
+  and `ose-primer` already carries a replacement that passed its own 3-cycle review. Adopting that
+  wording verbatim took `<SDLC>`'s `ose-primer`-vs-`ose-infra` difference from 2 lines to **0**.
+
+  **Four CI failures across three runs, every one the same third-party infrastructure fault** and
+  none a content defect: `.github/actions/setup-rust` failed at `dtolnay/rust-toolchain@stable` with
+  `could not download file from 'https://static.rust-lang.org/dist/channel-rust-stable.toml'`
+  (connection reset, then timed out, then operation timed out), and on the fourth even the
+  `rustup-init` download itself failed despite that step's own `curl --retry 10`. It hit a
+  **different job every time** — harness-duplication validation, then repo-config schema parity, then
+  the env-contract validator twice — which is the signature of a shared setup step, not a
+  job-specific defect. Each was resolved with `gh run rerun --failed`, **a retry of a flaked
+  infrastructure step, not a gate bypass**: no `--no-verify`, no hook skipped, no gate marked green
+  by hand, and the fourth was preceded by a deliberate wait rather than an immediate retry once the
+  pattern showed a sustained outage rather than a blip. The changeset is markdown-only and maps to no
+  Nx project, so none of the failing jobs could have been caused by it, and each passes when CI's
+  exact command is run locally. Root cause located and routed to `learnings.md` rather than patched
+  here (the action is shared CI infrastructure across the parity set).
+
+  **Merged**: squash-merged as
+  [`70a4a463c20db46a48135495d57a86079b6f9263`](https://github.com/wahidyankf/ose-infra/commit/70a4a463c20db46a48135495d57a86079b6f9263);
+  `gh pr view 16 --json state` reports `MERGED`. Squash was chosen to match this repo's existing
+  convention (the previously merged PR #15 has a single parent). **All five hardened preconditions
+  were measured immediately before the merge, not assumed**:
+
+  | Precondition                                | Evidence at head `3423c7b69`                                                                                    |
+  | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+  | (a) review cycles complete, not `escalated` | 3 of 3 cycles ran, each CI-gated; loop exited `done`                                                            |
+  | (b) 0 CRITICAL + 0 HIGH outstanding         | GraphQL `reviewThreads` filtered on `isResolved==false` returns **0** across all 3 cycles' threads              |
+  | (c) branch non-destructively up to date     | `git rev-list --left-right --count origin/main...HEAD` → `0 11` (0 behind); no rebase, no force-push, no reset  |
+  | (d) all quality gates green                 | `gh pr checks 16` → `pass=19 skipping=2`; `mergeStateStatus` `CLEAN`. The 2 skips are by design                 |
+  | (e) tester gates run or exemption recorded  | **Exemption recorded** — markdown-only changeset, no UI and no API surface, so EWT/UWT/DWT and AET do not apply |
+
+  The PR was opened as a draft and marked ready (`gh pr ready 16`) only once (a)-(e) held, so it was
+  never mergeable-by-accident while findings were outstanding.
+
+- [x] [AI] Remove the worktree: `git -C <INFRA> worktree remove <INFRA-WT>` — never `--force`, never
       `rm -rf`
       — acceptance: `git -C <INFRA> worktree list` no longer lists it
-- [ ] [AI] **Terminal reconcile** — bare form per **DD-6**: `git -C <INFRA> fetch origin main:main`
+      — **Result**: removed **without `--force`**, which is only possible because the worktree was
+      verified clean first — `git status --porcelain` empty, `git stash list` empty, and
+      `git rev-list --count origin/bare-repo-governance-hardening..HEAD` = **0** (nothing unpushed).
+      `git worktree list` now shows a single line, the bare repo itself. The directory is gone from
+      disk. **Checking before removing is the point**: a merged PR does not imply an empty working
+      tree, and `--force` would have silently discarded anything that was there.
+- [x] [AI] **Terminal reconcile** — bare form per **DD-6**: `git -C <INFRA> fetch origin main:main`
       — acceptance: exits 0, and
       `git -C <INFRA> rev-list --left-right --count origin/main...main` prints `0` and `0`
-- [ ] [AI] Verify the three repos agree on `<C1>` specifically, with **no** escape allowed
+      — **Result**: exits 0; **before `1 0`, after `0 0`**. The divergence this step exists to repair
+      was real and was measured, not assumed:
+
+  | Moment                                      | `origin/main` | `main`      | `rev-list --left-right --count origin/main...main` |
+  | ------------------------------------------- | ------------- | ----------- | -------------------------------------------------- |
+  | Immediately after the merge, before `fetch` | `f6ecdcc0b`   | `f6ecdcc0b` | `0 0` — **a false clean**                          |
+  | After `git fetch origin` (tracking refs)    | `70a4a463c`   | `f6ecdcc0b` | `1 0` — 1 behind, the real state                   |
+  | After `git fetch origin main:main`          | `70a4a463c`   | `70a4a463c` | `0 0` — reconciled                                 |
+
+  **The first row is the trap, and it is worth stating plainly**: a left-right count taken before
+  fetching reports `0 0` because both refs are equally stale — the count is only meaningful once the
+  remote-tracking ref has been updated. An agent that ran the acceptance command once, saw `0 0`, and
+  moved on would have recorded a pass while local `main` sat a commit behind. This is the same class
+  of vacuous-pass defect the four suspect premises warned about, reached from a different direction.
+
+- [x] [AI] **Branch cleanup in a bare repo** (not a step the checklist named — recorded because the
+      convention's own step order walks into it)
+      — the remote branch was deleted with `gh api -X DELETE /repos/wahidyankf/ose-infra/git/refs/heads/bare-repo-governance-hardening`,
+      **never** `git push --delete`: a bare repo cannot push at all, because the husky pre-push hook
+      runs `nx affected`, which needs a work tree. Ordering the API delete _after_ the worktree
+      removal is therefore safe here, whereas a `git push`-based cleanup at that point would have had
+      no work tree left to run the hook in
+      — the local branch would not delete with `git branch -d` ("not fully merged") because the
+      **squash** merge leaves no ancestry link. Rather than trusting the merge, tree equality was
+      verified directly — `bare-repo-governance-hardening^{tree}` and `main^{tree}` are both
+      `bc74dfb6dc821c9bc93852a962cee4f7152a4a5a` — proving the branch held nothing unique before
+      `git branch -D` ran
+      — **Result**: `git -C <INFRA> branch` lists only `main`; `git -C <INFRA> worktree list` lists
+      only the bare repo; `git -C <INFRA> branch -r` no longer lists the propagation branch
+- [x] [AI] Verify the three repos agree on `<C1>` specifically, with **no** escape allowed
       (**DD-10**: `<C1>` carries no repo-specific facts, so unlike the five files below a nonzero
       diff here is always a defect, never a justified divergence):
       `diff <PUBLIC>/<C1> <(git -C <PRIMER> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
       and
       `diff <PUBLIC>/<C1> <(git -C <INFRA> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
       — acceptance: both report no difference (exit 0, empty output)
-- [ ] [AI] Verify the remaining five files agree: for each of `<PLANS>`, `<PARITY>`, `<MERGE>`,
+      — **Result**: both diffs are empty and exit 0, run against `origin/main` in each sibling
+      **after** the merge, so the measurement is of the landed state and not of a branch. The file's
+      sha1 is `b48153277ea8c7eab18a9c992455553a81ff464b` in all three repos — re-derived at every
+      review cycle's head, never carried forward as an assumption, because the whole point of a
+      verbatim-copy rule is that it is checked rather than intended.
+- [x] [AI] Verify the remaining five files agree: for each of `<PLANS>`, `<PARITY>`, `<MERGE>`,
       `<SDLC>`, `<PROMO>`, diff the `ose-public` version against each sibling's
       — acceptance: a three-column verdict table is recorded here; every difference is either zero
       or a justified repo-specific fact
-- [ ] [AI] Record in `learnings.md` any friction between `<C1>`'s written procedure and what this
+      — **Result**: recorded below, measured against `origin/main` in all three repos post-merge.
+      Counts are changed lines (`diff -u`, `+`/`-` lines only). **A nonzero count here is expected
+      and is not a defect** — unlike `<C1>`, these five files carry repo-specific content by design.
+
+  | File       | pub↔primer | pub↔infra | primer↔infra | Verdict                                                                  |
+  | ---------- | ---------: | --------: | -----------: | ------------------------------------------------------------------------ |
+  | `<PROMO>`  |          0 |         0 |            0 | **Byte-identical in all three.** Full convergence, no escape needed      |
+  | `<SDLC>`   |         10 |        10 |        **0** | `primer`≡`infra`; `ose-public` is the lagging repo — follow-up filed     |
+  | `<MERGE>`  |         32 |        12 |           20 | Both siblings cite `<GATE>`'s done-definition instead of restating it    |
+  | `<PLANS>`  |         90 |       139 |          171 | Pre-existing drift: worked examples, index scope, repo-relevance wording |
+  | `<PARITY>` |        110 |       169 |          189 | Siblings carry a §Verifying Bareness (Method) section `ose-public` lacks |
+
+  **Every difference was inspected, not just counted** — a line count alone cannot distinguish a
+  justified repo-specific fact from a propagation miss. The changeset's own clauses were probed
+  independently of the diffs, by grepping for their signature strings in all three repos:
+
+  | Probe                                           | pub | primer | infra | Verdict                                      |
+  | ----------------------------------------------- | --: | -----: | ----: | -------------------------------------------- |
+  | `<C1>` link present in `<PLANS>`                |   1 |      1 |     1 | Propagated everywhere                        |
+  | `<C1>` link present in `<SDLC>` and `<PROMO>`   |   1 |      1 |     1 | Propagated everywhere                        |
+  | `<C1>` links present in `<PARITY>`              |   1 |      4 |     3 | Siblings link it more, never fewer           |
+  | `hard ceiling` in `<MERGE>`                     |   2 |      2 |     2 | Reversal landed identically                  |
+  | `hard ceiling, not a floor` in `<PLANS>`        |   1 |      1 |     1 | Reversal landed (wording differs, see below) |
+  | Files still linking the deleted `#saturation-…` |   2 |      0 |     0 | See note                                     |
+  | Files still saying `floor, not a ceiling`       |   1 |      0 |     0 | See note                                     |
+
+  **The two nonzero residuals in `ose-public` are this plan's own documents** — `delivery.md` and
+  `learnings.md` quoting the removed strings descriptively, to record what was reversed. Zero
+  governance files in any of the three repos still link the deleted section or state the floor
+  reading. Verified by listing the matching paths, not by trusting the count.
+
+  **`<PLANS>`'s `hard ceiling, not a floor` phrasing differs across repos and that is correct**:
+  `ose-public` and `ose-infra` restate the precondition inline; `ose-primer` instead cites `<MERGE>`
+  so a future strengthening cannot drift. Different sentence, same binding rule — which is exactly
+  the kind of difference a raw diff count would have misread as a propagation gap.
+
+  **`<SDLC>` is the one place `ose-public` is now behind both siblings.** Its evidence-table row and
+  its §Worktree-Agnostic Execution paragraph are still name-bound ("`ose-infra` is a bare repo …",
+  "verified from both the primary checkout … in all 3"), which is factually impossible for two bare
+  clones. Both siblings carry the property-bound replacement and are byte-identical to each other.
+  Correcting `ose-public` is deliberately **not** done from this phase — it is a separate change to a
+  different repo, routed to `learnings.md` for Phase 6 triage.
+
+- [x] [AI] Record in `learnings.md` any friction between `<C1>`'s written procedure and what this
       phase actually had to do, mirroring Phase 4's step — this phase is `<C1>`'s second live test
+      — **Result**: recorded. `<C1>`'s procedure held up on its second live application with **one**
+      genuine friction point, plus one confirmation of a Phase-4 finding:
+      — **Friction (new)**: `<C1>`'s terminal-reconcile step gives the command and the acceptance
+      count but does not say **when** the count is meaningful. Run before `git fetch origin`, the
+      left-right count reads `0 0` because both refs are equally stale — a false clean that an agent
+      following the written order literally can record as a pass. Candidate route at Phase 6: have
+      `<C1>` state the fetch-then-measure ordering explicitly, or fold the fetch into the acceptance
+      command so the count cannot be taken early.
+      — **Confirmed (Phase 4's finding, re-observed)**: the convention's step order removes the
+      worktree before branch cleanup, which is only survivable because the branch delete goes through
+      `gh api -X DELETE` rather than `git push --delete`. In a bare repo a push cannot run at all —
+      the pre-push hook's `nx affected` needs a work tree — so after the worktree is gone there is no
+      place left to run it from. `<C1>` already carries this; this phase exercised it and it worked.
+      — **No friction** on: topology verification via `git worktree list` (never
+      `git rev-parse --is-bare-repository`), the `git -c core.bare=false --work-tree=… --git-dir=…`
+      form, `GIT_DIR`/`GIT_WORK_TREE` for binding generation, or the verbatim-copy rule.
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `git -C <INFRA> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md`
+- [x] [AI] `git -C <INFRA> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md`
       exits 0
-- [ ] [AI] `<C1>` was propagated verbatim, never edited in place — the `<C1>`-specific zero-diff step
+      — **Result**: exit 0.
+- [x] [AI] `<C1>` was propagated verbatim, never edited in place — the `<C1>`-specific zero-diff step
       above passed for `<INFRA>` (both diffs report no difference)
-- [ ] [AI] Every Phase 2 and Phase 3 acceptance grep reproduces in `<INFRA>`'s `origin/main`
+      — **Result**: both diffs empty; sha1 `b48153277ea8c7eab18a9c992455553a81ff464b` in all three
+      repos.
+- [x] [AI] Every Phase 2 and Phase 3 acceptance grep reproduces in `<INFRA>`'s `origin/main`
+      — **Result**: re-run against `origin/main` post-merge (not against the branch, and not carried
+      forward from the pre-merge measurement): `<C1>` cross-links in
+      `no-destructive-git-operations.md` = **2**; index entry in `development/workflow/README.md` =
+      **1**; index entry in `development/README.md` = **1**; `hard ceiling` in `<MERGE>` = **2**;
+      `saturation` anywhere in `<GATE>` = **0**; files mentioning the retired
+      `bare-repo-worktree-landing-hygiene` slug = **0**.
 - [ ] [AI] `gh pr view --json state` in `ose-infra` shows `MERGED`; CI green on its `main`
-- [ ] [AI] `git -C <INFRA> worktree list` shows only the bare main worktree
-- [ ] [AI] `git -C <INFRA> rev-list --left-right --count origin/main...main` prints `0` and `0`
-- [ ] [AI] The three-repo agreement table is complete, with every difference at zero or justified
-- [ ] [AI] Repo-relevance gate: no infra-private content appears in any `ose-public` or `ose-primer`
+      — **PR state**: `MERGED` (squash, `70a4a463c`). **CI on `main`**: `validate-env` run
+      `29878539420` is **success** (after one re-run for the same rustup network flake);
+      `pr-quality-gate` run `29878539451` still executing — this box stays open until it reports
+      `success`.
+- [x] [AI] `git -C <INFRA> worktree list` shows only the bare main worktree
+      — **Result**: one line, `/Users/wkf/ose-projects/ose-infra  (bare)`. `git branch` lists only
+      `main`; `git branch -r` no longer lists the propagation branch.
+- [x] [AI] `git -C <INFRA> rev-list --left-right --count origin/main...main` prints `0` and `0`
+      — **Result**: `0 0`, measured **after** `git fetch` (see the reconcile step above for why the
+      pre-fetch reading of `0 0` was a false clean).
+- [x] [AI] The three-repo agreement table is complete, with every difference at zero or justified
+      — **Result**: both tables recorded above — a five-file difference matrix and an independent
+      signature-string probe. `<C1>` and `<PROMO>` are byte-identical in all three; `<SDLC>` is
+      byte-identical between the two siblings with `ose-public` lagging; the remaining differences
+      are pre-existing repo-specific content, inspected individually rather than inferred from a
+      line count.
+- [x] [AI] Repo-relevance gate: no infra-private content appears in any `ose-public` or `ose-primer`
       change made by this plan
+      — **Result**: clean. Swept all nine governance files this plan touches, in both public repos,
+      for `proxmox|coralpolyp|ansible|terraform|k3s|oserunner` and RFC-1918 addresses. Every hit is
+      a **pre-existing generic tool mention**, not a private fact: `plans.md:817` uses
+      `terraform apply` as a generic example of an infrastructure-apply step; `<SDLC>` names
+      `coralpolyp` as `ose-infra`'s app and lists IaC lint gates, in lines this plan did not add.
+      **Zero hostnames, zero inventories, zero credentials, zero IP addresses.** The `ose-infra` PR
+      was also swept in the other direction during cycles 2 and 3 — no infra-private content leaked
+      outward into files meant to stay aligned with the two public siblings.
 
 > **Pause Safety**: all three repos carry the identical rule set on their respective `main`
 > branches, all CI is green, every local `main` ref is reconciled, and every propagation worktree is

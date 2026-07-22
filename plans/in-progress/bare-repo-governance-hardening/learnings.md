@@ -363,3 +363,105 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   `repo-governance/development/pattern/maker-checker-fixer.md` or the plan conventions — when a
   change restricts a declared enum, enumerate the maker/producer surfaces explicitly, since the
   checker may be structurally unable to carry the restriction.
+
+## Learning: the sweep that fixed "every mode-declaring surface" missed the one file every agent auto-loads
+
+- **Context**: PR-review cycle 2 on `ose-infra` PR #16, finding 1 (HIGH, confidence 88).
+- **Observation**: cycle 1's fixer commit `9c3656ad3` is titled _"add bareness carve-outs to every
+  mode-declaring surface"_ and did reach `plan-maker.md`, `plan-fixer.md`, `plan-planning.md`,
+  `git-push-default.md`, and both SKILL files. It missed `AGENTS.md`, where a
+  case-insensitive search for `bare` returned **no matches at all** and §Delivery Mode stated all
+  four modes flatly with no qualifier. `AGENTS.md` is the root canonical instruction file: every harness auto-loads it on every
+  invocation, so it is the highest-traffic mode-declaring surface in the repo and the one most likely
+  to be the actual source of a wrong declaration. The sweep enumerated `.claude/`, `.opencode/`, and
+  `repo-governance/` and never looked at the repo root.
+- **Why it might generalize**: root instruction files (`AGENTS.md`, `CLAUDE.md`, `CONVENTIONS.md`)
+  sit outside every directory-scoped sweep, because a sweep is naturally expressed as a walk over the
+  directories that hold the artifact class. They are the default blind spot of any "fix the class"
+  pass, and they are simultaneously the surface with the widest blast radius. A class sweep must name
+  the root instruction files explicitly, not rely on a directory walk reaching them.
+- **Second-order constraint discovered while fixing it**: the fix could not be a blockquote. The
+  Instruction-File Size Budget (`repo-config.yml` `instruction-size`) puts `AGENTS.md` at
+  `target: 24000 / warn: 27000 / fail: 30000`; `ose-infra`'s was 23902 bytes pre-fix and 24096
+  post-fix — over the advisory target, inside the passing band. The same clause is **not** currently
+  applicable to `ose-public`, whose `AGENTS.md` is **29982 bytes, 18 bytes below its hard-fail
+  threshold of 30000**. So the source of truth physically cannot absorb the carve-out that its
+  downstream sibling now carries: `ose-infra` leads `ose-public` on this specific surface, and
+  closing that gap in `ose-public` requires progressive disclosure first, not an edit.
+- **Terminal state**: pending — triage at Phase 6. Two candidate routes: (1) add root instruction
+  files to the enumerated surface list wherever a class sweep is prescribed; (2) a separate
+  `ose-public` follow-up to shrink `AGENTS.md` under its budget before the bareness clause can
+  propagate upstream.
+
+## Learning: `ose-infra`'s `setup-rust` composite action has no retry on the toolchain download, and it flaked three times in one PR
+
+- **Context**: Phase 5, `ose-infra` PR #16. **Three** CI runs against three different heads failed in
+  `.github/actions/setup-rust`, every one at the same third-party step
+  (`dtolnay/rust-toolchain@stable` → `rustup toolchain install`):
+
+  ```text
+  error: could not download file from 'https://static.rust-lang.org/dist/channel-rust-stable.toml'
+    ... connection reset  (run 29868278329, head 9c3656ad3, job "Harness duplication validation")
+    ... timed out         (run 29871560447, head 30ec8dedb, job "repo-config.yml schema parity")
+    ... operation timed out (run 29875931376, head 3423c7b69, job "Validate env contract")
+  ```
+
+- **Observation**: the changeset is **markdown-only** — it maps to no Nx project, and each failing
+  job passes cleanly when CI's exact command is run locally. The failures hit a **different job every
+  time**, which is the signature of a shared setup step rather than a job-specific defect, and the
+  first two cascaded into a `Quality gate → Check all gates` failure. So a pure-docs PR was gated
+  three times by a network fault it could not possibly have caused. Each was resolved with
+  `gh run rerun --failed`, which is a retry of a flaked infrastructure step, **not** a gate bypass —
+  no `--no-verify`, no hook skipped, no gate marked green by hand.
+- **Frequency is the finding.** Three hits across roughly two hours on one PR is not a rare event to
+  be tolerated; at that rate every non-trivial PR in this repo pays a re-run tax, and the tax is
+  invisible in any per-run report because a re-run reports green.
+- **Root cause, located but deliberately not fixed here**: the action's own first step wraps the
+  rustup installer in `curl --retry 10 --retry-connrefused`, so someone already knew this endpoint is
+  unreliable. But the **next** step delegates to `dtolnay/rust-toolchain@stable`, which shells out to
+  `rustup toolchain install` with **no retry at any layer**. The hardening stopped one step short of
+  where it was needed.
+- **Why it might generalize**: a retry applied to the bootstrap of a tool, but not to the tool's own
+  first network call, buys almost nothing — the expensive, large, most-likely-to-fail download is the
+  second one. More generally: when a repo's CI wraps step N in retries, that is evidence the
+  dependency is flaky, and steps N+1..M hitting the same host inherit the risk without inheriting the
+  mitigation.
+- **Not fixed in this PR, on purpose**: `.github/actions/setup-rust/action.yml` is CI infrastructure
+  shared by the parity set, unrelated to this plan's governance changeset. Patching it inside a
+  governance PR would both scope-creep the PR and manufacture a one-repo divergence in a file the
+  parity workflow expects to stay aligned.
+- **Terminal state**: pending — triage at Phase 6. Candidate route: a `plans/backlog/` follow-up
+  applying a retry wrapper around the toolchain install in **all three** repos' `setup-rust` (code
+  change, so per the Knowledge Capture routing matrix it must become its own plan, never land
+  inline).
+
+## Learning: rewriting a sentence for one reason silently dropped an unrelated conjunct — from the one copy declared normative
+
+- **Context**: PR-review cycle 3 on `ose-infra` PR #16, finding 1 (HIGH, confidence 95).
+- **Observation**: the C5 hunk rewrote `<GATE>`'s precondition (a) to carry the floor→ceiling
+  reversal. In the course of that rewrite it also **deleted the `and the review loop did not exit
+\`escalated\``conjunct**, which has nothing to do with the reversal. Six other surfaces in the very
+  same PR kept the conjunct (`<MERGE>` twice, `<PLANS>`,`plan-quality-gate.md`,
+  `development/workflow/README.md`,`AGENTS.md`), and`ose-primer` kept it too — so exactly one copy
+  lost it. That copy is the one `<MERGE>` designates as **normative**, with the explicit instruction
+  "Do not substitute the shorter list that used to live here". `<MERGE>` also spells out the exact
+  failure this enables: _"Without this clause the loop exits `done` and an `[AI]` merge proceeds on
+  the strength of one side of an unsettled argument."_
+- **Why it might generalize**: the loss is invisible to every check anyone would think to run. A
+  before/after grep for the **new** wording passes; a grep for the **removed** floor wording passes;
+  a link check passes; markdown lint passes. Nothing compares the rest of the sentence. And the
+  redundancy that normally saves you — six sibling copies — actively hurt here, because the majority
+  stayed right while the authoritative minority went wrong, so a "do these agree?" spot-check on any
+  two of the six would have looked fine. The rule: when an edit rewrites a sentence that carries
+  **more than one** independent clause, diff the sentence for what was _removed_, not only for what
+  was _added_ — and check the normative copy first, since a defect there outranks agreement among
+  derivatives.
+- **Cycle-2's own fix was half-applied for a related reason** (cycle 3, finding 2, HIGH): the fixer
+  changed a worked example's comment line from `main-to-origin-main` to `worktree-to-origin-main` and
+  left the two commands under it — `git push origin main`, no `git worktree add` — untouched. The
+  label and the body of the same five-line block then contradicted each other. Same shape: the edit
+  addressed the string that was cited and not the unit of meaning that contained it.
+- **Terminal state**: pending — triage at Phase 6. Candidate route: a line in the PR-review workflow
+  or the maker-checker-fixer pattern requiring the fixer to re-read the **whole enclosing block** it
+  edits (example, list item, precondition, table row) and confirm every part still agrees, rather
+  than verifying only that the cited substring changed.
