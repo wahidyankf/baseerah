@@ -4,6 +4,24 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-07-22: bare-repo-governance-hardening](./2026-07-22__bare-repo-governance-hardening/README.md) —
+  Authored the previously-undocumented base-worktree landing method as
+  `repo-governance/development/workflow/bare-repo-landing-method.md`, fixed the
+  local-`main`-lags-`origin` drift it causes, and closed four bare-repo/delivery-mode governance-doc
+  gaps — including the `git rev-parse --is-bare-repository` trap, now forbidden **unconditionally**
+  because it answers "is _this checkout_ bare", not "is this repository bare". Carve-outs are
+  **property-bound** (`core.bare=true`, "no primary checkout"), never keyed on repo names, since all
+  three repos are templates. Delivered byte-identically across ose-public/ose-primer/ose-infra —
+  merged via PR #79/#14/#16, then a `<C1>` correction round via PR #81/#15/#17; the landing method is
+  sha1 `618e74ff8…` in all three, verified by `diff` against each sibling's `origin/main` blob
+  **after fetching**. Nine PR-review cycles across five PRs each found real defects, including a
+  reversal edit that silently dropped a conjunct from the one copy `pr-merge-protocol.md` designates
+  normative while six derivatives kept it, and `AGENTS.md` having zero bareness carve-out despite
+  being the file every harness auto-loads. Knowledge Capture routed 19 learnings; the recurring
+  theme — acceptance clauses that cannot fail — became
+  [`plans/ideas/acceptance-clause-vacuity.md`](../ideas/acceptance-clause-vacuity.md), seeded by the
+  terminal reconcile's own command reporting a false clean when run before `git fetch`. Delivery
+  Mode: `worktree-to-pr`. Completed 2026-07-22.
 - [2026-07-21: shared-course-library-and-learning-paths](./2026-07-21__shared-course-library-and-learning-paths/README.md) —
   **Closed superseded-by-split — no phase of this plan was executed.** Re-architected the
   fundamentally-strong curriculum into a shared, path-neutral course library

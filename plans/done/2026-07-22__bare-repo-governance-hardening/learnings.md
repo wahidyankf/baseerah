@@ -215,7 +215,11 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   machine another session's local `main` may lag and a bare source repository has no path to read at
   all. Landed in `ose-public` PR
   [#81](https://github.com/wahidyankf/ose-public/pull/81); propagated to both siblings by the same
-  sub-cycle. The plan-local half — Phase 5's own copy step — was already switched to the ref form
+  sub-cycle and **landed there too** — `ose-primer` PR
+  [#15](https://github.com/wahidyankf/ose-primer/pull/15) (merged `cedabb2f1`) and `ose-infra` PR
+  [#17](https://github.com/wahidyankf/ose-infra/pull/17) (merged `1d64990bb`). All three copies of
+  `<C1>` are byte-identical at sha1 `618e74ff8ebc5c0a0abf19b2a40c2af9ac2e01db`, verified by `diff`
+  against each sibling's `origin/main` blob after fetching. The plan-local half — Phase 5's own copy step — was already switched to the ref form
   during execution.
 
 ## Learning: a fourth deviation — carve-outs to trunk-based-development.md and its SKILL.md mirror are unrecorded, and Phase 5's checklist names neither file
@@ -339,7 +343,11 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   API afterwards), names the ordering trap in `<C1>`'s own step sequence, and says plainly that
   `--no-verify` is **not** the sanctioned answer. Landed in `ose-public` PR
   [#81](https://github.com/wahidyankf/ose-public/pull/81); propagated to both siblings by the same
-  sub-cycle. **Confirmed a second time at Phase 5** — the identical failure recurred in `ose-infra`
+  sub-cycle and **landed there too** — `ose-primer` PR
+  [#15](https://github.com/wahidyankf/ose-primer/pull/15) (merged `cedabb2f1`) and `ose-infra` PR
+  [#17](https://github.com/wahidyankf/ose-infra/pull/17) (merged `1d64990bb`). All three copies of
+  `<C1>` are byte-identical at sha1 `618e74ff8ebc5c0a0abf19b2a40c2af9ac2e01db`, verified by `diff`
+  against each sibling's `origin/main` blob after fetching. **Confirmed a second time at Phase 5** — the identical failure recurred in `ose-infra`
   and the same API route resolved it, which is what upgraded this from a one-off to a documented
   property of the topology.
 
@@ -564,7 +572,11 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   §"Measure after fetching, never before", carrying the three-reading transcript above as the worked
   example. Landed in `ose-public` PR
   [#81](https://github.com/wahidyankf/ose-public/pull/81); propagated to both siblings by the same
-  sub-cycle.
+  sub-cycle and **landed there too** — `ose-primer` PR
+  [#15](https://github.com/wahidyankf/ose-primer/pull/15) (merged `cedabb2f1`) and `ose-infra` PR
+  [#17](https://github.com/wahidyankf/ose-infra/pull/17) (merged `1d64990bb`). All three copies of
+  `<C1>` are byte-identical at sha1 `618e74ff8ebc5c0a0abf19b2a40c2af9ac2e01db`, verified by `diff`
+  against each sibling's `origin/main` blob after fetching.
 
 ## Learning: `ose-public` is now behind both siblings on a document it is the source of truth for
 
