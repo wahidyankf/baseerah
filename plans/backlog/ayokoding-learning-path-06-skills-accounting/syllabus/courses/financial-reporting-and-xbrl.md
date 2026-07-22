@@ -34,31 +34,31 @@ standard's taxonomy applies.
 
 - XBRL's tagging model (elements, contexts, instance documents) and the existence of jurisdiction-
   specific mandates (e.g. SEC filing requirements in the US, ESMA's ESEF mandate in the EU) are
-  documented `[Judgment call — cited generically, structure only, no taxonomy text reproduced per A8;
-flagged`[Needs Verification]`pending the Phase 1 coverage pass, since filing-mandate details change
-over time and must be re-verified at authoring]`.
+  documented `[Judgment call — cited generically, structure only, no taxonomy text reproduced per A8]`.
+  Flagged `[Needs Verification]` pending the Phase 1 coverage pass, since filing-mandate details
+  change over time and must be re-verified at authoring.
 
 ## Concepts
 
-1. **co-01 · xbrl-overview** — eXtensible Business Reporting Language: a standardized, machine-readable
-   markup for financial data, distinct from a human-readable statement layout.
-2. **co-02 · taxonomy** — the defined set of reportable elements (e.g. "Revenue," "AssetsCurrent") a
-   filer can tag figures against; taxonomies are standard-specific.
-3. **co-03 · element-tagging** — attaching a taxonomy element to a specific reported figure, asserting
-   what that figure represents.
-4. **co-04 · instance-document** — the actual filing: a set of tagged facts for a specific reporting
-   period and entity.
-5. **co-05 · context-and-dimensional-tagging** — attaching period, entity, and dimensional context
-   (e.g. by segment or by currency) to a tagged fact, so the same element can represent different
-   sliced figures.
-6. **co-06 · taxonomy-extension** — a filer-specific addition to the standard taxonomy for a figure the
-   base taxonomy has no element for, used sparingly since over-extension defeats comparability.
-7. **co-07 · filing-mandate** — the jurisdiction-specific requirement to file in XBRL (or a related
-   machine-readable format) as a condition of regulatory filing, distinct from the accounting standard
-   itself.
-8. **co-08 · taxonomy-divergence** — the US GAAP Financial Reporting Taxonomy and the IFRS Taxonomy are
-   separately maintained, standard-specific tag sets — a figure correct under one accounting standard
-   still needs the matching taxonomy's element, not a translated tag from the other.
+- **co-01 · xbrl-overview** — eXtensible Business Reporting Language: a standardized, machine-readable
+  markup for financial data, distinct from a human-readable statement layout.
+- **co-02 · taxonomy** — the defined set of reportable elements (e.g. "Revenue," "AssetsCurrent") a
+  filer can tag figures against; taxonomies are standard-specific.
+- **co-03 · element-tagging** — attaching a taxonomy element to a specific reported figure, asserting
+  what that figure represents.
+- **co-04 · instance-document** — the actual filing: a set of tagged facts for a specific reporting
+  period and entity.
+- **co-05 · context-and-dimensional-tagging** — attaching period, entity, and dimensional context
+  (e.g. by segment or by currency) to a tagged fact, so the same element can represent different
+  sliced figures.
+- **co-06 · taxonomy-extension** — a filer-specific addition to the standard taxonomy for a figure the
+  base taxonomy has no element for, used sparingly since over-extension defeats comparability.
+- **co-07 · filing-mandate** — the jurisdiction-specific requirement to file in XBRL (or a related
+  machine-readable format) as a condition of regulatory filing, distinct from the accounting standard
+  itself.
+- **co-08 · taxonomy-divergence** — the US GAAP Financial Reporting Taxonomy and the IFRS Taxonomy are
+  separately maintained, standard-specific tag sets — a figure correct under one accounting standard
+  still needs the matching taxonomy's element, not a translated tag from the other.
 
 ## Tensions & trade-offs — when tagging effort is and is not worth it
 

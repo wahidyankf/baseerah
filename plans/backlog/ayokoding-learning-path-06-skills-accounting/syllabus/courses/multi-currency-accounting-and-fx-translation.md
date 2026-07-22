@@ -40,25 +40,25 @@ ASC 830 and IAS 21; no clause or paragraph is reproduced from either standard pe
 
 ## Concepts
 
-1. **co-01 · functional-currency** — the currency of the primary economic environment an entity
-   operates in, determined by facts, not by choice.
-2. **co-02 · transaction-currency-vs-functional-currency** — a transaction denominated in a currency
-   other than the entity's functional currency, recorded at the spot rate on the transaction date.
-3. **co-03 · fx-gain-or-loss-realized** — the gain or loss recognised when a foreign-currency-
-   denominated item is settled at a different rate than it was recorded.
-4. **co-04 · fx-gain-or-loss-unrealized** — the gain or loss recognised at period end on an open
-   foreign-currency-denominated monetary item, before settlement.
-5. **co-05 · monetary-vs-nonmonetary-items** — monetary items (cash, receivables, payables) are
-   remeasured at the current rate each period; nonmonetary items (inventory, fixed assets) generally
-   remain at their historical rate.
-6. **co-06 · current-rate-translation-method** — translating an entire foreign entity's statements at
-   the current rate for the balance sheet and an average rate for the income statement, when the
-   foreign operation's functional currency is not the reporting currency.
-7. **co-07 · cumulative-translation-adjustment** — the equity account that absorbs the translation
-   difference produced by the current-rate method, rather than flowing through net income.
-8. **co-08 · rate-selection-by-item-type** — different account types use different rates (spot,
-   average, historical) even within the same translation, and choosing consistently is what makes a
-   translation defensible.
+- **co-01 · functional-currency** — the currency of the primary economic environment an entity
+  operates in, determined by facts, not by choice.
+- **co-02 · transaction-currency-vs-functional-currency** — a transaction denominated in a currency
+  other than the entity's functional currency, recorded at the spot rate on the transaction date.
+- **co-03 · fx-gain-or-loss-realized** — the gain or loss recognised when a foreign-currency-
+  denominated item is settled at a different rate than it was recorded.
+- **co-04 · fx-gain-or-loss-unrealized** — the gain or loss recognised at period end on an open
+  foreign-currency-denominated monetary item, before settlement.
+- **co-05 · monetary-vs-nonmonetary-items** — monetary items (cash, receivables, payables) are
+  remeasured at the current rate each period; nonmonetary items (inventory, fixed assets) generally
+  remain at their historical rate.
+- **co-06 · current-rate-translation-method** — translating an entire foreign entity's statements at
+  the current rate for the balance sheet and an average rate for the income statement, when the
+  foreign operation's functional currency is not the reporting currency.
+- **co-07 · cumulative-translation-adjustment** — the equity account that absorbs the translation
+  difference produced by the current-rate method, rather than flowing through net income.
+- **co-08 · rate-selection-by-item-type** — different account types use different rates (spot,
+  average, historical) even within the same translation, and choosing consistently is what makes a
+  translation defensible.
 
 ## Worked examples
 
@@ -102,9 +102,10 @@ stated rates. No system is built — the synthesis is the two hand-worked FX cal
 
 ## Read more
 
-- **IFRS Foundation — IAS 21 The Effects of Changes in Foreign Exchange Rates** (ifrs.org). IFRS
-  Foundation carries an explicit free-educational-use carve-out; named nominatively, no clause text
-  reproduced.
+- **IFRS Foundation — IAS 21 The Effects of Changes in Foreign Exchange Rates** (ifrs.org). The IFRS
+  Foundation publishes its **own** free teaching materials for classroom use by recognised
+  institutions under attribution and non-commercial terms; **the Standards text itself still requires
+  a separate licence to reproduce** `[Verified]`; named nominatively, no clause text reproduced.
 - **FASB Accounting Standards Codification — Topic 830** (fasb.org). FASB's codification is closed
   copyright; named nominatively only.
 

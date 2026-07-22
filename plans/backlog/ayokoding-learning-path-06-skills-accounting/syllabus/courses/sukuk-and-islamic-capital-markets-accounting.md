@@ -35,30 +35,31 @@ contract concepts and #12's FX-translation mechanics for cross-currency sukuk is
 
 - `[Verified]` AAOIFI FAS 32–34 (Ijarah through sukuk-holder reporting) are this course's anchor
   standards. Specific issuance structures beyond the general asset-backed-vs-asset-based distinction
-  are `[Judgment call — cited generically from general domain knowledge, not sourced from the seeding
-grounding file; flagged`[Needs Verification]`pending the Phase 1 coverage pass]`.
+  are
+  `[Judgment call — cited generically from general domain knowledge, not sourced from the seeding grounding file]`.
+  Flagged `[Needs Verification]` pending the Phase 1 coverage pass.
 
 ## Concepts
 
-1. **co-01 · sukuk-vs-bond-contrast** — a sukuk represents an ownership or usufruct interest in an
-   underlying asset; a conventional bond represents a debt claim paying interest — the "Islamic bond"
-   description is a useful approximation, not a structural equivalence.
-2. **co-02 · asset-backed-sukuk** — a sukuk structure genuinely backed by transferred ownership of an
-   underlying asset, with sukuk-holders bearing the asset's performance risk.
-3. **co-03 · asset-based-sukuk** — a sukuk structure referencing an asset without a genuine ownership
-   transfer, a more contested structure closer to the debt-like end of the spectrum, and a case where
-   `form-vs-substance` scrutiny matters most.
-4. **co-04 · ijarah-sukuk-structure** — a common sukuk structure built on an Ijarah (lease) contract,
-   where sukuk-holders receive rental-derived returns tied to the leased asset.
-5. **co-05 · profit-distribution-vs-interest-coupon** — sukuk-holders receive a profit or rental
-   distribution tied to underlying performance; bondholders receive a fixed interest coupon regardless
-   of the issuer's underlying asset performance.
-6. **co-06 · sukuk-issuance-accounting** — recognising the proceeds of a sukuk issuance and the
-   corresponding asset/usufruct transfer at the issuer's books.
-7. **co-07 · sukuk-holder-reporting** — the disclosure requirements specific to reporting a
-   sukuk-holder's position, distinct from conventional bondholder disclosure, per AAOIFI FAS 32–34.
-8. **co-08 · cross-currency-sukuk-translation** — a sukuk issued in a currency other than the issuer's
-   functional currency requires #12's translation mechanics applied to a Sharia-specific instrument.
+- **co-01 · sukuk-vs-bond-contrast** — a sukuk represents an ownership or usufruct interest in an
+  underlying asset; a conventional bond represents a debt claim paying interest — the "Islamic bond"
+  description is a useful approximation, not a structural equivalence.
+- **co-02 · asset-backed-sukuk** — a sukuk structure genuinely backed by transferred ownership of an
+  underlying asset, with sukuk-holders bearing the asset's performance risk.
+- **co-03 · asset-based-sukuk** — a sukuk structure referencing an asset without a genuine ownership
+  transfer, a more contested structure closer to the debt-like end of the spectrum, and a case where
+  `form-vs-substance` scrutiny matters most.
+- **co-04 · ijarah-sukuk-structure** — a common sukuk structure built on an Ijarah (lease) contract,
+  where sukuk-holders receive rental-derived returns tied to the leased asset.
+- **co-05 · profit-distribution-vs-interest-coupon** — sukuk-holders receive a profit or rental
+  distribution tied to underlying performance; bondholders receive a fixed interest coupon regardless
+  of the issuer's underlying asset performance.
+- **co-06 · sukuk-issuance-accounting** — recognising the proceeds of a sukuk issuance and the
+  corresponding asset/usufruct transfer at the issuer's books.
+- **co-07 · sukuk-holder-reporting** — the disclosure requirements specific to reporting a
+  sukuk-holder's position, distinct from conventional bondholder disclosure, per AAOIFI FAS 32–34.
+- **co-08 · cross-currency-sukuk-translation** — a sukuk issued in a currency other than the issuer's
+  functional currency requires #12's translation mechanics applied to a Sharia-specific instrument.
 
 ## Tensions & trade-offs — where the sukuk/bond line gets contested
 

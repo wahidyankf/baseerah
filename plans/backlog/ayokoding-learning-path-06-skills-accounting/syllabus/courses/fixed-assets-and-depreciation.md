@@ -34,22 +34,22 @@ non-dynamic domain fact]`.
 
 ## Concepts
 
-1. **co-01 · capitalisation-threshold** — the decision to record a purchase as an asset (spread over
-   future periods) rather than expense it immediately, and its balance-sheet consequence.
-2. **co-02 · straight-line-depreciation** — spreading an asset's depreciable cost evenly across its
-   useful life.
-3. **co-03 · declining-balance-depreciation** — depreciating a larger portion of cost in earlier
-   periods, modelling faster early consumption.
-4. **co-04 · units-of-production-depreciation** — depreciating in proportion to actual usage (units
-   produced, hours run) rather than time elapsed.
-5. **co-05 · fixed-asset-subledger** — the asset register: useful life, salvage value, and accumulated
-   depreciation as a contra-account.
-6. **co-06 · accumulated-depreciation-as-contra-account** — a contra-asset account that reduces an
-   asset's carrying value without altering its original cost.
-7. **co-07 · disposal-gain-or-loss** — the difference between an asset's sale proceeds and its carrying
-   value at disposal, recognised as a gain or loss.
-8. **co-08 · impairment-conceptual** — a conceptual-level trigger for writing an asset down when its
-   carrying value exceeds its recoverable value, ahead of its normal depreciation schedule.
+- **co-01 · capitalisation-threshold** — the decision to record a purchase as an asset (spread over
+  future periods) rather than expense it immediately, and its balance-sheet consequence.
+- **co-02 · straight-line-depreciation** — spreading an asset's depreciable cost evenly across its
+  useful life.
+- **co-03 · declining-balance-depreciation** — depreciating a larger portion of cost in earlier
+  periods, modelling faster early consumption.
+- **co-04 · units-of-production-depreciation** — depreciating in proportion to actual usage (units
+  produced, hours run) rather than time elapsed.
+- **co-05 · fixed-asset-subledger** — the asset register: useful life, salvage value, and accumulated
+  depreciation as a contra-account.
+- **co-06 · accumulated-depreciation-as-contra-account** — a contra-asset account that reduces an
+  asset's carrying value without altering its original cost.
+- **co-07 · disposal-gain-or-loss** — the difference between an asset's sale proceeds and its carrying
+  value at disposal, recognised as a gain or loss.
+- **co-08 · impairment-conceptual** — a conceptual-level trigger for writing an asset down when its
+  carrying value exceeds its recoverable value, ahead of its normal depreciation schedule.
 
 ## Worked examples
 

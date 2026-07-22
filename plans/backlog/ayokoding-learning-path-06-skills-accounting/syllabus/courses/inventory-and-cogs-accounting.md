@@ -4,9 +4,12 @@
 
 **Short summary**: Inventory costing methods and their COGS consequences.
 
-**Scope note**: costing methods and the inventory-to-COGS flow. Systems architecture for inventory
-(negative stock, reservations, backdated transactions) is a separate, ERP-owned systems-architecture
-concern this course does not teach.
+**Scope note**: costing methods and the inventory-to-COGS flow. **The per-unit cost these methods
+operate on arrives from #8 and is not assumed here** — for a purchased good it is an invoice price, but
+for a manufactured good it is #8's cost roll-up of materials, labour, and absorbed overhead, so this
+course takes its input from that course rather than treating unit cost as given. Systems architecture
+for inventory (negative stock, reservations, backdated transactions) is a separate, ERP-owned
+systems-architecture concern this course does not teach.
 
 ## Why this exists · the big idea
 
@@ -23,29 +26,38 @@ concern this course does not teach.
 ## Prerequisites
 
 - **Prior courses**: `chart-of-accounts-and-data-modeling` (#2), `managerial-and-cost-accounting` (#8).
-- **Assumed knowledge**: #2's schema, #8's cost-classification vocabulary.
+- **Assumed knowledge**: #2's schema; #8's cost-classification vocabulary **and** its overhead
+  absorption and cost roll-up, which produce the per-unit cost every method below consumes.
 
 ## Accuracy notes
 
 - FIFO/weighted-average and the IFRS LIFO prohibition are stable, well-documented domain facts with no
   dynamic component to re-verify at authoring `[Verified — stable, non-dynamic domain fact]`.
+- The dependence of this course's unit cost on #8's roll-up and absorption choices (co-09) is domain
+  reasoning about where that input comes from, not a claim sourced from this plan's grounding file
+  `[Needs Verification]` pending the Phase 1 coverage pass.
 
 ## Concepts
 
-1. **co-01 · fifo-costing** — first-in-first-out: the earliest-purchased units are assumed sold first.
-2. **co-02 · weighted-average-costing** — a single average cost per unit, recomputed as new purchases
-   arrive.
-3. **co-03 · specific-identification** — tracking the actual cost of each specific unit sold, used
-   where units are individually distinguishable.
-4. **co-04 · lifo-and-the-ifrs-prohibition** — last-in-first-out is GAAP-permitted but IFRS-forbidden —
-   a genuine, stable cross-standard divergence.
-5. **co-05 · perpetual-inventory-system** — COGS and inventory balances update with every transaction.
-6. **co-06 · periodic-inventory-system** — COGS is computed only at period end from a physical count,
-   not per transaction.
-7. **co-07 · cogs-derivation** — the mechanical path from a chosen costing method to a computed COGS
-   figure.
-8. **co-08 · lower-of-cost-or-net-realisable-value** — writing inventory down below its costed value
-   when its net realisable value has fallen below cost.
+- **co-01 · fifo-costing** — first-in-first-out: the earliest-purchased units are assumed sold first.
+- **co-02 · weighted-average-costing** — a single average cost per unit, recomputed as new purchases
+  arrive.
+- **co-03 · specific-identification** — tracking the actual cost of each specific unit sold, used
+  where units are individually distinguishable.
+- **co-04 · lifo-and-the-ifrs-prohibition** — last-in-first-out is GAAP-permitted but IFRS-forbidden —
+  a genuine, stable cross-standard divergence.
+- **co-05 · perpetual-inventory-system** — COGS and inventory balances update with every transaction.
+- **co-06 · periodic-inventory-system** — COGS is computed only at period end from a physical count,
+  not per transaction.
+- **co-07 · cogs-derivation** — the mechanical path from a chosen costing method to a computed COGS
+  figure.
+- **co-08 · lower-of-cost-or-net-realisable-value** — writing inventory down below its costed value
+  when its net realisable value has fallen below cost.
+- **co-09 · unit-cost-is-an-input-not-a-given** — every method above consumes a per-unit cost it does
+  not itself produce. For a purchased good that cost is an invoice price; for a manufactured good it is
+  #8's roll-up of materials, labour, and absorbed overhead, so changing #8's overhead rate or its
+  absorption-versus-variable choice changes this course's COGS and ending inventory without any
+  purchase or sale having changed.
 
 ## Worked examples
 
@@ -79,6 +91,10 @@ concern this course does not teach.
   physically moves last-in-first-out (e.g. a bulk pile drawn from the top) — verify the trial balance
   still foots while COGS and ending inventory are both wrong in offsetting ways that never trip a
   balance check. (co-01, silent-failure)
+- **ex-09 · same-method-different-unit-cost** — run ex-01's FIFO costing twice over the identical
+  purchase and sale sequence for a manufactured good, changing only #8's overhead absorption rate
+  between the two runs — verify FIFO is applied identically both times while COGS and ending inventory
+  differ, and name where that difference originated. (co-01, co-07, co-09)
 
 ## Applied synthesis (no build — A6)
 
@@ -91,9 +107,10 @@ built — the synthesis is the two hand-worked costings and the standard-diverge
 
 - **Intermediate Accounting** — Kieso, Weygandt & Warfield (Wiley). Cited nominatively for a fuller
   treatment of inventory costing methods.
-- **IFRS Foundation — IAS 2 Inventories** (ifrs.org). IFRS Foundation carries an explicit
-  free-educational-use carve-out; named nominatively for the LIFO prohibition, no clause text
-  reproduced.
+- **IFRS Foundation — IAS 2 Inventories** (ifrs.org). The IFRS Foundation publishes its **own** free
+  teaching materials for classroom use by recognised institutions under attribution and
+  non-commercial terms; **the Standards text itself still requires a separate licence to reproduce**
+  `[Verified]`; named nominatively for the LIFO prohibition, no clause text reproduced.
 
 ## In which paths
 

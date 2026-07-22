@@ -39,8 +39,16 @@ License-aware (DD-15).
   fact here.
 - The structural claim (three coexisting models, none universal) is independent of the cell-level
   detail and does not itself require re-verification, per `tech-docs.md` DD-12.
-- Indonesian PSAK numbering is `[Needs Verification]` — sources show both a "PSAK 59 / SIFAS 101-109"
-  generation and a "PSAK 101-110" series; not asserted as a specific number here.
+- Indonesian PSAK numbering is `[Verified]` — **PSAK 101-110 is the operative series; PSAK 59 was
+  superseded.** The earlier ambiguity between a "PSAK 59 / SIFAS 101-109" generation and a "PSAK
+  101-110" series is resolved against IAI's published PSAK Syariah standard list, recorded as `OI-1`
+  in plan 06's verification log and carried into `tech-docs.md`.
+- One residual remains `[Needs Verification]` and must not be restated as fact: the exact PPSAK
+  ratification date for PSAK 101 was **not** confirmed. This course therefore cites the **series** and
+  never a specific ratification date.
+- Concepts co-08 and co-09 are placed on domain-reasoning grounds rather than sourced from the
+  grounding research, and are `[Needs Verification]` pending the Phase 1.2a coverage pass; which
+  income items any given jurisdictional model treats as non-permissible is deliberately not asserted.
 
 ## Concepts
 
@@ -57,6 +65,14 @@ License-aware (DD-15).
 - **co-06 · profit-sharing-hook** — a configuration point for profit-sharing calculation logic
   (Mudaraba/Musharaka), detailed in course 29.
 - **co-07 · zakat-hook** — a configuration point for zakat calculation, detailed in course 29.
+- **co-08 · non-permissible-income-segregation-hook** — a configuration point that routes income the
+  applicable jurisdictional model treats as non-permissible into its own account and its own
+  disclosure line, rather than merging it into ordinary revenue; which items qualify is configuration,
+  the same pluggability argument as co-02. `[Needs Verification]`
+- **co-09 · jurisdictional-configuration-effective-dating** — a jurisdictional configuration changes
+  over time, so the design must record which version was in force when a document posted; without
+  effective dating, restating a prior period silently applies today's rules to yesterday's
+  transactions.
 
 ## Worked examples
 
@@ -75,6 +91,13 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
   where the document flow would need to diverge (full treatment: course 28). (co-05)
 - **ex-04 · disclosure-configuration-trace** — given two jurisdictions with different disclosure
   requirements for the same transaction type, show how the configuration would differ. (co-04)
+- **ex-05 · segregation-hook-configuration-contrast** — given two jurisdictional configurations that
+  treat the same income item differently, show how the segregation hook would be configured in each
+  and which disclosure line the item lands on, without asserting either treatment as the universal
+  one. (co-02, co-04, co-08)
+- **ex-06 · effective-dated-restatement-trace** — given a jurisdictional configuration changed
+  mid-year and a prior-period figure restated afterwards, show which configuration version each
+  posting must be evaluated under and what an undated design would get wrong. (co-02, co-09)
 
 ## Synthesis exercise — intra-topic
 

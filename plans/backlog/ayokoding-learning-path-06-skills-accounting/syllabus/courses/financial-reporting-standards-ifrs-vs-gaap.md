@@ -31,43 +31,43 @@ adds the ones not yet covered, without re-deriving any of them from scratch.
 ## Accuracy notes
 
 - The IASB/FASB convergence project (the 2002 Norwalk Agreement and its aftermath) and the resulting
-  full alignment of the five-step revenue model are documented history `[Judgment call — cited
-generically, not sourced from the seeding grounding file; flagged`[Needs Verification]`pending the
-Phase 1 coverage pass]`.
+  full alignment of the five-step revenue model are documented history
+  `[Judgment call — cited generically, not sourced from the seeding grounding file]`. Flagged
+  `[Needs Verification]` pending the Phase 1 coverage pass.
 - The LIFO prohibition under IFRS (co-03) restates #10's already-`[Verified]` fact.
 - The lessee single-model-vs-dual-model lease divergence (co-04), the inventory-writedown-reversal
   divergence (co-05), and the development-cost-capitalisation divergence (co-06) are well-documented,
-  stable cross-standard differences `[Judgment call — cited generically from general domain knowledge,
-not sourced from the seeding grounding file; flagged`[Needs Verification]`pending the Phase 1
-coverage pass]`.
+  stable cross-standard differences
+  `[Judgment call — cited generically from general domain knowledge, not sourced from the seeding grounding file]`.
+  Flagged `[Needs Verification]` pending the Phase 1 coverage pass.
 - "Principles-based vs. rules-based" (co-07) is a common characterization of the two standards, not a
   precise technical claim, and is presented as such.
 
 ## Concepts
 
-1. **co-01 · two-standard-setters** — the IASB issues IFRS; the FASB issues US GAAP; neither has
-   authority over the other, and a reporting entity's jurisdiction (or listing requirements) determines
-   which applies.
-2. **co-02 · convergence-history** — the IASB and FASB pursued an explicit convergence project from the
-   early 2000s; some areas (the five-step revenue model, #5) fully aligned, others did not.
-3. **co-03 · lifo-divergence** — LIFO is GAAP-permitted, IFRS-forbidden (restates #10's `[Verified]`
-   fact at the corpus's explicit standard-plurality course).
-4. **co-04 · lease-model-divergence** — IFRS 16 uses a single on-balance-sheet lessee model with no
-   operating/finance distinction; ASC 842 retains the operating/finance distinction for lessees even
-   though both are on-balance-sheet, producing different expense patterns for an otherwise identical
-   lease.
-5. **co-05 · inventory-writedown-reversal-divergence** — IFRS permits reversing a prior
-   lower-of-cost-or-net-realisable-value writedown if value recovers; GAAP prohibits reversal.
-6. **co-06 · development-cost-capitalisation-divergence** — IFRS requires capitalising qualifying
-   development costs once specific criteria are met; GAAP generally expenses research and development
-   as incurred, with narrower exceptions (e.g. certain software costs, #18's subject).
-7. **co-07 · principles-based-vs-rules-based-characterization** — IFRS is commonly characterized as
-   more principles-based, GAAP as more detailed and rules-based; a common characterization, not a
-   precise technical boundary, and useful mainly as a lens for why new situations get resolved
-   differently under each.
-8. **co-08 · dual-reporting-need** — a cross-listed or dual-jurisdiction entity may need to reconcile
-   or dual-report figures, and the divergences above are exactly where that reconciliation work
-   concentrates.
+- **co-01 · two-standard-setters** — the IASB issues IFRS; the FASB issues US GAAP; neither has
+  authority over the other, and a reporting entity's jurisdiction (or listing requirements) determines
+  which applies.
+- **co-02 · convergence-history** — the IASB and FASB pursued an explicit convergence project from the
+  early 2000s; some areas (the five-step revenue model, #5) fully aligned, others did not.
+- **co-03 · lifo-divergence** — LIFO is GAAP-permitted, IFRS-forbidden (restates #10's `[Verified]`
+  fact at the corpus's explicit standard-plurality course).
+- **co-04 · lease-model-divergence** — IFRS 16 uses a single on-balance-sheet lessee model with no
+  operating/finance distinction; ASC 842 retains the operating/finance distinction for lessees even
+  though both are on-balance-sheet, producing different expense patterns for an otherwise identical
+  lease.
+- **co-05 · inventory-writedown-reversal-divergence** — IFRS permits reversing a prior
+  lower-of-cost-or-net-realisable-value writedown if value recovers; GAAP prohibits reversal.
+- **co-06 · development-cost-capitalisation-divergence** — IFRS requires capitalising qualifying
+  development costs once specific criteria are met; GAAP generally expenses research and development
+  as incurred, with narrower exceptions (e.g. certain software costs, #18's subject).
+- **co-07 · principles-based-vs-rules-based-characterization** — IFRS is commonly characterized as
+  more principles-based, GAAP as more detailed and rules-based; a common characterization, not a
+  precise technical boundary, and useful mainly as a lens for why new situations get resolved
+  differently under each.
+- **co-08 · dual-reporting-need** — a cross-listed or dual-jurisdiction entity may need to reconcile
+  or dual-report figures, and the divergences above are exactly where that reconciliation work
+  concentrates.
 
 ## Tensions & trade-offs — when a systems builder must model the divergence explicitly
 
@@ -107,6 +107,17 @@ cites the `co-NN` it exercises, and a "verify" clause means recompute by hand ag
   income under both standards, with the LIFO and lease divergences as the two reconciling items —
   verify the reconciliation ties both figures back to the same underlying transactions. (co-08)
 
+### Theme C · The silent failure — a plausible number produced under the wrong standard
+
+- **ex-06 · reversal-taken-under-the-wrong-standard** — a US-GAAP-reporting entity writes inventory
+  down, its net realisable value later recovers, and the recovery is reversed the way co-05 records
+  IFRS as permitting — verify every entry balances, the trial balance foots, and the restored carrying
+  amount is entirely plausible on its face (it never rises above original cost), so nothing in the
+  arithmetic marks the figure as inadmissible under the standard the entity actually reports under;
+  name the observable signal (a writedown reversal appearing in a filing prepared on a US GAAP basis)
+  that would reveal it, and state which layer the reversal rule belongs in per this course's
+  tensions section. (co-05, co-08, silent-failure)
+
 ## Applied synthesis (no build — A6)
 
 Take one entity's set of transactions (including one LIFO-eligible inventory decision and one lease)
@@ -117,8 +128,10 @@ hand-worked reporting views and their reconciliation.
 
 ## Read more
 
-- **IFRS Foundation — IFRS/GAAP comparison resources** (ifrs.org). IFRS Foundation carries an explicit
-  free-educational-use carve-out; named nominatively, no clause text reproduced.
+- **IFRS Foundation — IFRS/GAAP comparison resources** (ifrs.org). The IFRS Foundation publishes its
+  **own** free teaching materials for classroom use by recognised institutions under attribution and
+  non-commercial terms; **the Standards text itself still requires a separate licence to reproduce**
+  `[Verified]`; named nominatively, no clause text reproduced.
 - **FASB Accounting Standards Codification** (fasb.org). FASB's codification is closed copyright; named
   nominatively only.
 - **International Financial Reporting Standards vs. US GAAP** — Ernst & Young / KPMG comparison guides

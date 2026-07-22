@@ -22,7 +22,7 @@ the book's primary language (CPython, PSF-license, Tier-1 DD-21).
 ## Prerequisites
 
 - **Prior topics**: [topic 1 Just Enough Nvim](./just-enough-nvim.md) (to edit/run files); the
-  [`capstone-forge-ready`](./extending-neovim.md) forge is recommended but not required.
+  [`capstone-forge-ready`](./capstone-forge-ready.md) forge is recommended but not required.
 - **Tools & environment**: a macOS/Linux terminal; **Python 3.x** installed (`python3 --version`) with
   `venv` + `pip`; the `black`, `ruff`, and `pyright` CLIs (or installed via `pip`).
 - **Assumed knowledge**: basic terminal use; no prior Python required (this is the reader's Python

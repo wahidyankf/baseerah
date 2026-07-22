@@ -183,6 +183,49 @@ use are retained deliberately, not pruned):
       yet), and the `id/belajar` count (**53** today) is recorded so the `en`-only scoping (DD-45) is
       verifiable as unchanged at archival. Falsifiable both ways: after Phase 3 the first three
       `test -e` checks all print their `EXISTS` line.
+- [ ] [AI] **Alert-primitive baseline (DD-44 no-net-new-component anchor)** — record the count of
+      component files matching `alert*.tsx` to `evidence/phase-0-snapshot.txt` — command (single line):
+      `git ls-files -- 'libs/web-ui/src/**/alert*.tsx' 'apps/ayokoding-www/src/**/alert*.tsx' | grep -c .`
+      — acceptance: returns **4** today [Repo-grounded — measured 2026-07-22: all four sit in
+      `libs/web-ui/src/components/alert/` (`alert.tsx`, `alert.stories.tsx`, `alert.test.tsx`,
+      `alert.steps.tsx`) and none under `apps/ayokoding-www/src`], and the number is written into the
+      snapshot. **§3.4 check (c) compares against this recorded number** — without it that check has
+      nothing to compare to and passes vacuously.
+      **Why `git ls-files` here — and why `find … | wc -l` elsewhere in this plan is still fine.**
+      This clause needs a `**`-glob spanning two unrelated roots, which `git ls-files` expands itself
+      from its own quoted pathspecs; the patterns must therefore stay **quoted** so zsh never sees
+      them. That is a convenience, not a rescue: the `find … | wc -l` counts used throughout the rest
+      of this checklist are **sound as written**. The RTK hazard is real but is scoped to a shape no
+      acceptance clause in this plan uses — see the rule below.
+      **The bare-versus-piped rule.** The Claude Code hook rewrites a **bare** `find` (one whose
+      output is not piped) to `rtk find`, and RTK then replaces the file list with a compact report —
+      `2F 1D:`, a blank line, then `./ a.yaml b.yaml` for two matches, or the single line
+      `0 for '<pattern>'` for none. A line count over that reads _format_ lines, not matches: a
+      wrong-but-plausible number, which is worse than an error. Worse still for an **enumeration**: the
+      report lists only the first 50 matches, ends with `+N more`, and elides the middle of long paths
+      with `...`, so the output is unusable as a work list. A **piped** `find … | wc -l` is not
+      rewritten and returns real `find` output.
+      **Every `find` in this plan must therefore reach the hook in a suppressing shape — piped, or
+      wrapped in a `$(…)` substitution — including the ones used to enumerate rather than to count.**
+      An earlier revision of this line asserted they all already were; that was false. §3.1's
+      `_index.md` enumeration was bare and silently truncated to 50 of 139 entries, and now carries an
+      explicit `| sort`. The six `[ -z "$(find … -newer …)" ]` freshness checks in §3.4 are already safe,
+      because `$(…)` suppresses the rewrite exactly as a pipe does. Treat this as a standing invariant
+      to re-check whenever a new `find` is added, not as a one-time repair.
+      [Repo-grounded — measured 2026-07-22, each command issued **alone as the whole content of one
+      call**: `git ls-files … | grep -c .` read **4**; `find <dir> -name '*.yaml' | wc -l` read the
+      true **2**, and the same query over an empty directory read the true **0**. The reformatted
+      report reproduces under a bare `find` or an explicit `rtk find`, not under the piped form.
+      **This citation deliberately reports single-issue measurements rather than repetition counts.**
+      An earlier revision cited "10 of 10" and "40 of 40" runs gathered inside `for` loops — but a
+      loop, a `$(…)` substitution, a subshell `( … )`, and a redirection to a file each **suppress**
+      the hook, so those samples measured the wrapper, not the clause. The conclusion for `find`
+      survived re-measurement; the same wrapper error led the parallel note in §3.4 to a **wrong**
+      conclusion about `git diff`, which is filtered even when piped. Never treat `find` and
+      `git diff` as following one rule.]
+      `grep -c` exits 1 on a zero count — read the printed number, never `&&`-chain it. Falsifiable both ways: a number other than 4 means the
+      primitive set moved since authoring and §3.4's expected value must be updated with it, not
+      silently re-baselined; **0** means the pattern stopped matching and the check has gone vacuous.
 - [ ] [AI] Confirm `learnings.md` scaffold exists in the plan folder — acceptance:
       `test -f plans/backlog/ayokoding-learning-path-01-url-restructure/learnings.md` returns 0 and
       the file opens with its H1.
@@ -196,8 +239,8 @@ use are retained deliberately, not pruned):
       resolved (zero unresolved).
 - [ ] [AI] `evidence/phase-0-snapshot.txt` is committed and carries: the 37-slug re-home inventory
       (zero unreconciled `ABSENT` lines), the seven per-domain `.md` counts summing the six relocated
-      domains to **1148**, the `id/belajar` count of **53**, and the verbatim current `redirects()`
-      spread order.
+      domains to **1148**, the `id/belajar` count of **53**, the `alert*.tsx` primitive count of **4**
+      (§3.4 check (c)'s comparison anchor), and the verbatim current `redirects()` spread order.
 - [ ] [AI] Zero collision lines: neither content home, neither redirect module, and no `legacy/`
       bucket exists yet.
 
@@ -506,7 +549,12 @@ deleted), re-pointing each entry to wherever the content now lives.
 
 - [ ] [AI] **GREEN** — enumerate every impacted `_index.md` under
       `apps/ayokoding-www/content/en/learn/fundamentally-strong/**`
-      (`find apps/ayokoding-www/content/en/learn/fundamentally-strong -name _index.md` — esp.
+      (`find apps/ayokoding-www/content/en/learn/fundamentally-strong -name _index.md | sort` —
+      **the `| sort` is load-bearing, not cosmetic**: run bare, this command is RTK-reformatted to a
+      compact report that lists only the first 50 of the 139 matches, ends with `+89 more`, and elides
+      the middle of long paths with `...`, so neither the count nor the paths are usable. Piped it
+      returns all 139 real paths [Repo-grounded — measured 2026-07-22: piped `| wc -l` = **139**; bare
+      = `139F 139D:` followed by 50 truncated rows and `+89 more`] — esp.
       `.../software-engineer/_index.md`, each per-topic `_index.md`, and the
       `fundamentally-strong/_index.md` parent) and update each so every entry it lists is re-pointed to
       the new `/en/learn/courses/<course-id>` URL (or resolves via the redirect) — the legacy
@@ -642,12 +690,28 @@ deleted), re-pointing each entry to wherever the content now lives.
 - [ ] [AI] **GREEN — collision negative check** — confirm the widened route introduces no routing
       collision, per the verdict in
       [tech-docs.md's Collision verdict](./tech-docs.md#collision-verdict--widening-slug-against-tools-and-the-locale-root):
-      `grep -E '"tools"|"browse"' apps/ayokoding-www/src/features/content/core/content-url.ts`
-      prints nothing (no `LOOSE_PAGE_ALLOWLIST` entry is `tools` or `browse`), AND
-      `find apps/ayokoding-www/content/en apps/ayokoding-www/content/id -maxdepth 1 -type d \( -name 'tools' -o -name 'browse' \)`
-      prints nothing (no top-level content directory is named `tools` or `browse`) — acceptance: both
-      checks print nothing, as they do today (verified in Phase 0); either printing a match would mean
-      the collision verdict no longer holds and this step must halt before proceeding.
+      check (a) `grep -cE '"tools"|"browse"' apps/ayokoding-www/src/features/content/core/content-url.ts`
+      reads **0** (no `LOOSE_PAGE_ALLOWLIST` entry is `tools` or `browse`), AND check (b)
+      `git ls-files -- 'apps/ayokoding-www/content/en/tools/**' 'apps/ayokoding-www/content/en/browse/**' 'apps/ayokoding-www/content/id/tools/**' 'apps/ayokoding-www/content/id/browse/**' | grep -c .`
+      reads **0** (no top-level content directory is named `tools` or `browse`) — acceptance: both
+      checks read `0`, as they do today (verified in Phase 0); any non-zero count means the collision
+      verdict no longer holds and this step must halt before proceeding.
+      **Read the printed number, do not `&&`-chain either check** — `grep -c` exits 1 on a zero count,
+      so a chained form inverts the verdict. **Do not express check (b) as a `find` with a compound
+      predicate.** `find … \( -name 'tools' -o -name 'browse' \)` is rejected outright in this harness
+      — it exits **1** having written only a one-line refusal to stderr (RTK reports that its `find`
+      shim does not support compound predicates or actions such as `-not` and `-exec`) and prints
+      **nothing on stdout** — indistinguishable from a clean pass, which is the failure mode this
+      clause exists to prevent. `git ls-files` is unfiltered and expands its own
+      quoted patterns, so neither zsh nor RTK ever sees the `*`.
+      [Repo-grounded — measured 2026-07-22: check (a) reads `0` and exits 1, while the same `grep -c`
+      against `LOOSE_PAGE_ALLOWLIST` reads `4` and against a non-existent path exits **2** — the three
+      outcomes are distinguishable; check (b) read `0` on three consecutive runs, and the identical
+      command shape against `content/{en,id}/learn/**` read `6044`, so a zero here is a real absence
+      and not a broken pattern.]
+      Falsifiable both ways: a non-zero count in either check is a genuine collision and halts the
+      step; a `0` from check (b) whose control form also read `0` would mean the pathspec stopped
+      matching and the check has gone vacuous.
 
 - [ ] [AI] **GREEN** — update `contentUrl()` in `features/content/core/content-url.ts`: delete the
       `/c/`-prefix branch so it uniformly returns `/{locale}` for the root slug and
@@ -888,6 +952,18 @@ deleted), re-pointing each entry to wherever the content now lives.
   **Gherkin (binds) →** "The learn section exposes exactly three structural buckets"; "Navigation
   surfaces follow the relocated tree with no code change"
 
+  > **Why this step carries a two-scenario `;`-list tag.** §3.2 is mechanical `git mv` work and this
+  > checkbox is deliberately **not** a `**RED**` step — the RED/GREEN/REFACTOR cycles for both
+  > behaviours live in §3.0, §3.1 and §3.3. The
+  > [Gherkin-Tagged Delivery Steps rule](../../../repo-governance/development/workflow/test-driven-development.md#gherkin-tagged-delivery-steps)
+  > scopes its one-scenario-per-tag requirement to behaviour **RED** steps, so this step is outside
+  > that requirement rather than an exception to it. The tag is retained here only to keep the
+  > regeneration traceable to the behaviours it preserves. The double-counting note in
+  > [§3.3 · Specs + e2e (Gherkin-bound)](#33--specs--e2e-gherkin-bound) explains why "three
+  > structural buckets" is bound here rather than on the step that authors its `.feature` file, and
+  > `tech-docs.md`'s traceability table records why the second scenario verifies at the
+  > **phase-gate** tier only and never becomes a `.feature` scenario at all.
+
   ```gherkin
   Scenario: The learn section exposes exactly three structural buckets
     Given the learn-section IA revamp has landed
@@ -907,8 +983,30 @@ deleted), re-pointing each entry to wherever the content now lives.
       the whole phase** — confirm this sub-step's own staged diff touches no production navigation
       source file:
       `git diff --cached --name-only -- apps/ayokoding-www/src/features/navigation apps/ayokoding-www/src/features/content apps/ayokoding-www/src/app` —
-      acceptance: prints nothing at this point in the phase. Falsifiable both ways: touching any of
-      those files in this sub-step's own commit makes it print that path. **DD-44's claim is narrower
+      acceptance: pipe it to `grep -c .` and read **0** at this point in the phase. **Assert the count,
+      not "prints nothing"** — a "prints nothing" clause cannot distinguish a clean pass from a command
+      that errored before producing output.
+      **RTK's `git diff` filter fires even when the output is piped**, so a count taken over it is not
+      trustworthy. Run as the literal, unwrapped, sole command of a call — exactly how an executor runs
+      an acceptance command — a **non-empty** `git diff` gains a blank line and a literal
+      `--- Changes ---` header, inflating `| grep -c .` by one and `| wc -l` by three. An **empty**
+      diff is emitted as a single blank line, which `| grep -c .` reads as a true **0** (a blank line
+      holds no `.`) while `| wc -l` reads **1**. That asymmetry is exactly why this clause asserts zero
+      through `grep -c .` and never through `wc -l`.
+      [Repo-grounded — measured 2026-07-22, each command issued alone as the whole content of one call,
+      against a truth value taken independently via `rtk proxy`: a one-file `--name-only` diff read
+      **2** under `grep -c .` where the truth was **1**; an empty `--name-only` diff read **0** under
+      `grep -c .`. **Beware the measurement trap**: a `for` loop, a `$(…)` substitution, a subshell
+      `( … )`, or a redirection to a file each **suppress** the hook and return raw output — two
+      earlier revisions of this note wrongly concluded the piped form was safe because their samples
+      were gathered inside loops. A plain `|` pipe does not suppress it. `find` is different from
+      `git diff` here: a piped `find … | wc -l` really is unfiltered (verified true **2** and true
+      **0**), while a bare `find` is reformatted.]
+      Where a positive count is needed elsewhere, a
+      path-prefix counter `| grep -cF "<path>/"` is preferred because it is immune to the trailer,
+      which holds no path substring. `grep -c` exits 1 on a zero count —
+      read the printed number, never `&&`-chain it. Falsifiable both ways: touching any of
+      those files in this sub-step's own commit makes the count ≥1 and names that path. **DD-44's claim is narrower
       than "Phase 3 makes no production code changes"** — §3.0's DD-48 de-namespacing work legitimately
       edits files under all three of these directories (`c/[...slug]/page.tsx` deletion,
       `[...slug]/page.tsx` widening, `content-url.ts`, `breadcrumb.tsx`, and others per the
@@ -1129,14 +1227,22 @@ deleted), re-pointing each entry to wherever the content now lives.
       more**. (b) The banner is wired in the layout —
       `grep -cF "legacy" "apps/ayokoding-www/src/app/[locale]/(content)/layout.tsx"` returns **1 or
       more** (quote the path: the brackets and parens are shell globbing characters). (c) **No
-      net-new component file was added** — the count of files matching `alert*.tsx` under
-      `libs/web-ui/src` and `apps/ayokoding-www/src` is **unchanged** from the Phase 0 baseline
-      recorded in `<PLAN>/evidence/phase-0-baseline.txt`. (d) `npx nx run ayokoding-www:build`
-      exits 0.
+      net-new component file was added** — command (single line, byte-identical to the Phase 0
+      baseline step's; do not paraphrase it):
+      `git ls-files -- 'libs/web-ui/src/**/alert*.tsx' 'apps/ayokoding-www/src/**/alert*.tsx' | grep -c .`
+      returns **4**, unchanged from the Phase 0 Alert-primitive baseline recorded in
+      `evidence/phase-0-snapshot.txt` (the file Phase 0 actually writes — there is no
+      `phase-0-baseline.txt` in this plan, and no `<PLAN>` path constant either; both were dangling
+      references that made this check unmeasurable). Falsifiable both ways: authoring any net-new
+      `alert*.tsx` primitive raises the count to 5 and fails the check, while deleting one drops it to
+      3 and fails it too — only "reused the existing primitive, added nothing" reads 4. (d)
+      `npx nx run ayokoding-www:build` exits 0.
       **The superseded form of this acceptance was a bare `grep -rF "Alert"` with no target path**,
-      which is vacuous: `Alert` already resolves in **1** file under `apps/ayokoding-www/src` and
-      **5** under `libs/web-ui/src` [Repo-grounded — measured 2026-07-22], so it passed before this
-      plan ran and could not distinguish "reused the primitive" from "did nothing at all".
+      which is vacuous: `Alert` already resolves in **2** files under `apps/ayokoding-www/src`
+      (`features/content/shell/callout.tsx` and its `callout.test.tsx`) and **5** under
+      `libs/web-ui/src` [Repo-grounded — measured 2026-07-22 by
+      `grep -rlF "Alert" <dir> | grep -c .` against each directory], so it passed before this plan ran
+      and could not distinguish "reused the primitive" from "did nothing at all".
 
 ### 3.5 · Manual verification (`en`, all breakpoints)
 
@@ -1532,11 +1638,33 @@ deleted), re-pointing each entry to wherever the content now lives.
       `plans/backlog/README.md`) — acceptance:
       `grep -rF "ayokoding-learning-path-01-url-restructure" plans --include=README.md` shows every
       hit pointing at the new `plans/done/YYYY-MM-DD__…` path.
-- [ ] [AI] Repoint the four sibling plans' references to this plan's new archived path — acceptance:
-      `grep -rF "plans/in-progress/ayokoding-learning-path-01-url-restructure" plans` prints nothing
-      AND `grep -rF "plans/backlog/ayokoding-learning-path-01-url-restructure" plans` prints nothing
-      (sibling plans reference this plan by bare name, not by stage-folder path, so both checks are
-      expected to already print nothing; this guards against a stage-prefixed path having crept in).
+- [ ] [AI] Repoint the four sibling plans' references to this plan's new archived path — run both
+      checks, each of which **excludes this plan's own `delivery.md`** (the exclusion substring
+      `ayokoding-learning-path-01-url-restructure/delivery.md` matches the file both before the move,
+      under `plans/backlog/…`, and after it, under `plans/done/YYYY-MM-DD__…`, so one form serves both
+      sides of the archival):
+      `grep -rlF "plans/in-progress/ayokoding-learning-path-01-url-restructure" plans | grep -vF "ayokoding-learning-path-01-url-restructure/delivery.md" | grep -c .`
+      and the same pipeline with `plans/backlog/` substituted for `plans/in-progress/` — acceptance:
+      **each reads `1`, and the single remaining file is
+      `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/delivery.md`** (re-run
+      without the final `| grep -c .` to read the name). That one match is **expected and must not be
+      "fixed"**: it is plan 02's deliberate two-branch `test -d … && echo … || echo …` stage probe
+      that resolves `<PLAN01>` at its own Phase 0, plus the prose documenting that idiom — a
+      stage-agnostic resolver, not a hardcoded link.
+      **Why this is not phrased as "prints nothing".** The unexcluded form is permanently
+      unsatisfiable: this very step's text, and the `git mv` command two steps above, both contain the
+      literal strings being searched for, so this plan's own `delivery.md` self-matches forever — and
+      `plans/done/` is an immutable archive, so the self-match survives archival. A "prints nothing"
+      acceptance would block the archival phase for an executor following it verbatim.
+      [Repo-grounded — measured 2026-07-22: unexcluded, each pattern matches **2** files (this plan's
+      `delivery.md` and plan 02's); with the exclusion applied each reads **1**. The unexcluded count
+      of 2 is the control — it proves the exclusion is narrowing a real match set rather than the
+      pattern having silently stopped matching.]
+      Falsifiable both ways: **0** means the search pattern broke or the exclusion swallowed the whole
+      set, and the check has gone vacuous — verify against the unexcluded control before believing it;
+      **2 or more**, or a remaining file that is not plan 02's `delivery.md`, means a genuine
+      stage-prefixed reference has crept in and must be repointed at the new `plans/done/YYYY-MM-DD__…`
+      path. Note `grep -c` exits 1 on a zero count — read the printed number, never `&&`-chain it.
 - [ ] [AI] Commit the archival:
       `chore(plans): move ayokoding-learning-path-01-url-restructure to done`.
 - [ ] [AI] Remove the worktree once the archival PR is merged:

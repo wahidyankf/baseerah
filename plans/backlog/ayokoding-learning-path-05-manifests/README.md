@@ -10,9 +10,13 @@ category**: the four `PathManifest` YAML data files, their thin content landing 
 `careers/` slice of the paths-hub card population, the per-path progression-smoothness audits, and
 every manifest growth as backfill content lands.
 
-> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R4`, `A3`, `A8`, `A10`,
-> and so on) throughout; their definitions and the wave DAG live in
+> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids `R2`, `R4`, `R9`, `A8`,
+> and `A10`; their definitions and the wave DAG live in
 > [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+> `A8` (programme-wide clean-room licensing) governs every landing-prose authoring step — cycles 1.2,
+> 2.2, 3.2, and 4.4 — and is invoked there explicitly rather than assumed. Note that the `R5` and `R7`
+> appearing in [tech-docs](./tech-docs.md) are the **UI-design-funnel skill's own** R5 grounding note
+> and R7 prior-art citation, not programme decisions R5/R7, which this plan does not cite.
 
 **Category scope (2026-07-21 path-category-split ruling — see [tech-docs DD-34](./tech-docs.md#design-decisions);
 skills path count amended 2026-07-21 by A10).** The paths hub now serves **two** categories at
@@ -72,7 +76,7 @@ Its two mechanical consequences:
 - **The terminal 127-course catalog assertion is this plan's**, at its own archival gate. **127 is
   the `careers/`/software-engineering catalog total only** — the skills corpus
   `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` author
-  is additional and never folded into this figure (R5). The course-authoring plan asserts only the
+  is additional and never folded into this figure (R4). The course-authoring plan asserts only the
   count of bodies it itself authored.
 
 ## Scope
@@ -217,8 +221,12 @@ per-phase gate that closes each one:
 | `blocks`    | _(none)_                                                 | terminal plan; its archival is the last |
 
 **No dependency on any plan outside this five-way split.** The FS-SE hard dependency was removed
-before the split (DL-12 / DD-17); the sibling FS-SE plan is closed at
-[`plans/done/2026-07-19__fundamentally-strong-software-engineer/`](../../done/2026-07-19__fundamentally-strong-software-engineer/README.md).
+before the split — recorded as `DL-12` and `DD-17` in **this split's source plan**, at
+[`plans/done/2026-07-21__shared-course-library-and-learning-paths/`](../../done/2026-07-21__shared-course-library-and-learning-paths/README.md).
+Separately, the sibling FS-SE plan is closed at
+[`plans/done/2026-07-19__fundamentally-strong-software-engineer/`](../../done/2026-07-19__fundamentally-strong-software-engineer/README.md)
+— note that plan defines its **own, unrelated** `DD-17` (raw-form-first tooling), so it is not where
+the `DL-12`/`DD-17` cited here live.
 **This includes the new sibling plans `ayokoding-learning-path-06-skills-accounting` and
 `ayokoding-learning-path-07-skills-erp`**: neither blocks nor is blocked by this plan — all three
 plans share the same `manifests/` and `paths/_index.md` files at the filesystem level but never the
@@ -263,7 +271,7 @@ is **both** Wave-2 plans rather than the navigation plan alone.
 3. `test -f apps/ayokoding-www/src/features/course-paths/shell/manifest-repository.ts` returns 0.
 4. `test -d apps/ayokoding-www/src/features/course-paths/manifests` returns 0.
 5. `find apps/ayokoding-www/content/en/learn/courses -maxdepth 1 -mindepth 1 -type d | wc -l`
-   returns **127** — the `careers/`/software-engineering catalog total (R5); the `skills/` corpus
+   returns **127** — the `careers/`/software-engineering catalog total (R4); the `skills/` corpus
    `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` author
    is additional and does not change this figure.
 
@@ -276,20 +284,24 @@ is **both** Wave-2 plans rather than the navigation plan alone.
 Five steps that the source plan placed inside authoring phases mutate or re-verify manifests and
 therefore belong here, appended after this plan's fourth-manifest phase:
 
-| Source location         | Step                                                                            | Note                                                                                                                               |
-| ----------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `delivery.md:1735-1740` | Bands 1–8 manifest growth (three software-engineer manifests)                   | genuine mutation                                                                                                                   |
-| `delivery.md:1741-1754` | Band 9 manifest growth (interview-ready + fundamentally-strong only)            | genuine mutation                                                                                                                   |
-| `delivery.md:1755-1759` | Interview-ready refresh-register smoothness re-audit                            | mutation-adjacent; closes the Phase-6 deferral                                                                                     |
-| `delivery.md:1760-1778` | AI-path manifest growth to its full composition (DD-35; no longer a fixed "15") | genuine mutation                                                                                                                   |
-| `delivery.md:1363-1368` | Phase-8 manifest re-verification                                                | read-only by its own acceptance text, but it re-verifies a manifest this plan authored and inverts the wave order if left upstream |
+Source steps are cited by their **heading and step text**, not by line number: the source plan is
+archived and its line numbers have already drifted once, which silently pointed every row in an
+earlier revision of this table at unrelated course-body checklists.
+
+| Source location                                                                                   | Step                                                                            | Note                                                                                                                               |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| §"Manifest growth (serial sync point after each band)" → "After each of Bands 1–8 lands, append…" | Bands 1–8 manifest growth (three software-engineer manifests)                   | genuine mutation                                                                                                                   |
+| §"Manifest growth…" → "**Band 9 manifest growth (interview-ready + fundamentally-strong only)**"  | Band 9 manifest growth (interview-ready + fundamentally-strong only)            | genuine mutation                                                                                                                   |
+| §"Manifest growth…" → "**Interview-ready smoothness re-audit (refresh-register lever…)**"         | Interview-ready refresh-register smoothness re-audit                            | mutation-adjacent; closes the Phase-6 deferral                                                                                     |
+| §"Manifest growth…" → "**AI-path manifest growth (Band 5 + Band 8, DD-33)**"                      | AI-path manifest growth to its full composition (DD-35; no longer a fixed "15") | genuine mutation                                                                                                                   |
+| Phase 8 → "**Re-verify manifests prerequisite-consistent to date**"                               | Phase-8 manifest re-verification                                                | read-only by its own acceptance text, but it re-verifies a manifest this plan authored and inverts the wave order if left upstream |
 
 ### Handoff signal
 
 This plan is complete when its final PR is **merged to `origin/main`** AND all four `careers/`
 manifests validate AND
 `find apps/ayokoding-www/content/en/learn/courses -maxdepth 1 -mindepth 1 -type d | wc -l`
-returns **127** (the `careers/`-only catalog total, R5).
+returns **127** (the `careers/`-only catalog total, R4).
 
 ## Build order (inherited)
 
@@ -402,7 +414,11 @@ Reproduced verbatim from the source plan; this plan is their receiving home in t
   point **was** modelled as assuming an already-working software engineer, with prerequisites linked
   rather than included (DD-24 — **superseded for this path by DD-35**: it is now from-scratch with
   prerequisites included); evals are split into an early light gate and a later deep-evals course
-  (DD-25 — still holds); a scoped statistics-for-evals course is authored (DD-26 — still holds); the
+  (DD-25 — still holds); a scoped statistics-for-evals course is authored (DD-26 — still holds).
+  **`DD-25` and `DD-26` live in a different plan**, like `DD-28` below — read them at
+  [`ayokoding-learning-path-04-course-authoring` §Design Decisions](../ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions);
+  neither is defined in this plan's own `tech-docs.md`, so the `DD-21 through DD-28` range above spans
+  two plans rather than one. Continuing: the
   locked build order is amended so the path is authoring priority #1 behind an architecture-smoke-test
   MVP (DD-27, amends DL-7 — still holds); and course surgery is now permitted, with six net-new AI
   courses bringing the catalog to 127 (DD-28, amends DL-6 — the "127" catalog total and the

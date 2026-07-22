@@ -103,10 +103,10 @@ prerequisites (DD-6). Those two decisions are this plan's. Every manifest also c
 ## Custody of `syllabus/` — a corpus this plan does not consume
 
 `syllabus/` lives here because it must exist, versioned and stable, **before** its consumers start —
-and because a single owner is the only structure that keeps 121 course specs and four path orderings
+and because a single owner is the only structure that keeps 120 course specs and four path orderings
 from forking. But this plan is **not** its consumer:
 
-- `syllabus/courses/<course-id>.md` (121 files) is the **literal source of truth for authoring each
+- `syllabus/courses/<course-id>.md` (120 files) is the **literal source of truth for authoring each
   course body**, consumed by `ayokoding-learning-path-04-course-authoring`. Authoring "from a fresh
   judgment call" instead of from the spec is explicitly forbidden.
 - `syllabus/paths/manifest-*.md` (4 files) are the **authoritative human-readable manifest
@@ -133,7 +133,7 @@ archival — repoint every inbound cross-plan link in the same commit as the mov
 %% Colours are the repo's verified colour-blind-friendly palette and are redundant with shape.
 flowchart LR
     P2["ayokoding-learning-path-<br/>02-schema-and-prerequisite-dag<br/>(this plan · custodian)"]:::owner
-    CORPUS[("syllabus/<br/>121 course specs<br/>4 path orderings<br/>3 READMEs")]:::corpus
+    CORPUS[("syllabus/<br/>120 course specs<br/>+ surgery.md<br/>4 path orderings<br/>3 READMEs")]:::corpus
     P4["ayokoding-learning-path-<br/>04-course-authoring"]:::consumer
     P5["ayokoding-learning-path-<br/>05-manifests"]:::consumer
 
@@ -204,7 +204,7 @@ exist yet — this plan creates it).
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | `ayokoding-learning-path-03-navigation-ui`    | `apps/ayokoding-www/src/features/course-paths/core/` — all six pure modules: `schemas.ts`, `manifest.ts`, `path-nav.ts`, `path-context.ts`, `prerequisites.ts`, `manifest-integrity.ts` | every shell component and the route wiring import from these pure modules             |
 | `ayokoding-learning-path-03-navigation-ui`    | `apps/ayokoding-www/src/features/course-paths/manifests/` + its `README.md`                                                                                                             | the manifest repository loads `**/*.yaml` from this directory                         |
-| `ayokoding-learning-path-04-course-authoring` | `syllabus/courses/<course-id>.md` — 121 settled per-course spec files                                                                                                                   | each course body is authored **from** its spec file, never from a fresh judgment call |
+| `ayokoding-learning-path-04-course-authoring` | `syllabus/courses/<course-id>.md` — 120 settled per-course spec files                                                                                                                   | each course body is authored **from** its spec file, never from a fresh judgment call |
 | `ayokoding-learning-path-04-course-authoring` | the `prerequisites: [course-id, ...]` frontmatter contract                                                                                                                              | every net-new course `_index.md` declares it                                          |
 | `ayokoding-learning-path-05-manifests`        | `syllabus/paths/manifest-*.md` — the four authoritative human-readable orderings                                                                                                        | each YAML manifest's `courseOrder` is transcribed from its mirror                     |
 | `ayokoding-learning-path-05-manifests`        | `checkManifestIntegrity` + `checkPrerequisiteConsistency`                                                                                                                               | every manifest phase gate runs these                                                  |
@@ -212,7 +212,7 @@ exist yet — this plan creates it).
 ### Cross-plan `syllabus/` ownership (binding)
 
 `syllabus/` lives **only** here. Every sibling plan links into it by relative path and **never
-copies it**. A copy forks the source of truth for 121 course specs and four manifest orderings.
+copies it**. A copy forks the source of truth for 120 course specs and four manifest orderings.
 
 `syllabus/courses/**` is the only place the tokens `DD-34`, `DD-35` and `DD-39` appear (113 / 114 /
 49 occurrences). Those are **FS-SE-inherited tokens with different meanings**, not this plan's

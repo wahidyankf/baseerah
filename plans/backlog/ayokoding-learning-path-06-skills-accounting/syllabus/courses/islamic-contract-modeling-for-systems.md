@@ -42,29 +42,29 @@ worked examples, not sourced from any AAOIFI text or reference implementation]`,
 
 ## Concepts
 
-1. **co-01 · murabaha-as-trade** — the institution purchases an asset, then resells it to the customer
-   at a disclosed cost-plus-markup, on deferred payment terms; the markup is trade profit, not
-   interest (FAS 28).
-2. **co-02 · murabaha-vs-conventional-loan-contrast** — the same payment schedule modelled two ways:
-   as a murabaha (asset purchase, then resale) and as a loan (cash advanced, then repaid with
-   interest) — structurally different even when cash flows look similar.
-3. **co-03 · mudaraba-profit-loss-sharing** — a partnership where one party provides capital and the
-   other provides expertise/labour; profit is shared by an agreed ratio, loss is borne by the capital
-   provider alone (absent misconduct by the managing partner) (FAS 3).
-4. **co-04 · musharaka-joint-partnership** — a partnership where multiple parties contribute capital and
-   share both profit and loss by an agreed ratio, distinct from Mudaraba's asymmetric loss allocation
-   (FAS 4).
-5. **co-05 · salam-forward-sale** — a sale with payment made in full at contract signing and delivery
-   of the (typically fungible, quantifiable) goods deferred to a future date — the reverse timing of a
-   conventional trade (FAS 7).
-6. **co-06 · istisnaa-manufacturing-contract** — a contract to manufacture or construct an asset to
-   specification, with payment terms agreed at contract signing and delivery on completion (FAS 10).
-7. **co-07 · deferred-payment-markup-recognition** — recognising a murabaha's markup as profit over the
-   deferred-payment period rather than entirely at the point of resale, echoing #5's revenue-timing
-   discipline applied to a Sharia-specific contract.
-8. **co-08 · asset-risk-transfer-timing** — the point at which the institution, rather than the
-   customer, bears risk of loss on the underlying asset — a determining factor in whether a contract is
-   genuinely a trade (co-01) rather than a disguised loan.
+- **co-01 · murabaha-as-trade** — the institution purchases an asset, then resells it to the customer
+  at a disclosed cost-plus-markup, on deferred payment terms; the markup is trade profit, not
+  interest (FAS 28).
+- **co-02 · murabaha-vs-conventional-loan-contrast** — the same payment schedule modelled two ways:
+  as a murabaha (asset purchase, then resale) and as a loan (cash advanced, then repaid with
+  interest) — structurally different even when cash flows look similar.
+- **co-03 · mudaraba-profit-loss-sharing** — a partnership where one party provides capital and the
+  other provides expertise/labour; profit is shared by an agreed ratio, loss is borne by the capital
+  provider alone (absent misconduct by the managing partner) (FAS 3).
+- **co-04 · musharaka-joint-partnership** — a partnership where multiple parties contribute capital and
+  share both profit and loss by an agreed ratio, distinct from Mudaraba's asymmetric loss allocation
+  (FAS 4).
+- **co-05 · salam-forward-sale** — a sale with payment made in full at contract signing and delivery
+  of the (typically fungible, quantifiable) goods deferred to a future date — the reverse timing of a
+  conventional trade (FAS 7).
+- **co-06 · istisnaa-manufacturing-contract** — a contract to manufacture or construct an asset to
+  specification, with payment terms agreed at contract signing and delivery on completion (FAS 10).
+- **co-07 · deferred-payment-markup-recognition** — recognising a murabaha's markup as profit over the
+  deferred-payment period rather than entirely at the point of resale, echoing #5's revenue-timing
+  discipline applied to a Sharia-specific contract.
+- **co-08 · asset-risk-transfer-timing** — the point at which the institution, rather than the
+  customer, bears risk of loss on the underlying asset — a determining factor in whether a contract is
+  genuinely a trade (co-01) rather than a disguised loan.
 
 ## Worked examples
 
@@ -81,8 +81,8 @@ worked examples, not sourced from any AAOIFI text or reference implementation]`,
 
 - **ex-03 · contrast-murabaha-and-loan-entries** — record the identical cash-flow schedule once as a
   murabaha (per ex-01/ex-02) and once as a conventional interest-bearing loan — verify the two produce
-  different account structures despite similar period-by-period cash amounts. (co-02, `form-vs-
-substance`)
+  different account structures despite similar period-by-period cash amounts.
+  (co-02, `form-vs-substance`)
 - **ex-04 · record-a-mudaraba-profit-split** — split a Mudaraba venture's period profit between capital
   provider and managing partner by an agreed ratio — verify a period loss is instead borne entirely by
   the capital provider. (co-03)

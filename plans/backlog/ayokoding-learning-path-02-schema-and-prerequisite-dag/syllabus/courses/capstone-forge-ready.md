@@ -26,6 +26,41 @@ courses each path places in its Prologue / Stage 1.
 - **Assumed knowledge**: vanilla Neovim editing fluency, basic Lua, and a working extended config from
   the three prerequisite courses.
 
+## Accuracy notes (web-verified)
+
+> This capstone introduces **no technical claim of its own** — it integrates `just-enough-nvim`,
+> `just-enough-lua`, and `extending-neovim`, and every toolchain claim its steps rest on is already
+> verified in those three files. It is therefore **not** in the pre-authoring `web-researcher` sweep-pending
+> cohort: sweep #48 (DD-28, 2026-07-12) covered all three integrated courses and was re-confirmed
+> 2026-07-14. The findings below are the subset of theirs that this capstone's acceptance criteria
+> actually exercise, restated with their verification status carried forward unchanged (A4). Re-confirm
+> every version pin at authoring — all three source files flag them as fast-moving.
+
+- 2026-07-12 — verified (inherited from [`just-enough-nvim`](./just-enough-nvim.md), sweep #48, DD-28):
+  current stable Neovim is **v0.12.4** (2026-07-05), and vanilla `nvim` ships `:checkhealth` and
+  `:terminal` as core with zero plugins. Step 1's headless `+checkhealth` bootstrap and step 4's
+  `:terminal` build loop both depend on this. Fast-moving — re-confirm the version pin at authoring.
+- 2026-07-12 — verified (inherited from [`extending-neovim`](./extending-neovim.md)): Neovim 0.12 ships
+  the built-in native plugin manager **`vim.pack`**, which installs into `site/pack/core/opt` and
+  `:packadd`s each plugin programmatically, with a JSON packlockfile — so step 1's "pinned plugin
+  lockfile" is satisfiable with zero external dependency. lazy.nvim stays valid where richer
+  lazy-loading is wanted.
+- 2026-07-12 — verified, with one open pin: `nvim-treesitter/nvim-treesitter` was **archived
+  2026-04-03** (re-confirmed 2026-07-14, zero commits since), and the active community fork
+  `neovim-treesitter/nvim-treesitter` ships `:TSInstall`. Which installer to pin is
+  `[Needs Verification]` — [`extending-neovim`](./extending-neovim.md) records the ecosystem as
+  fragmented with no consolidated winner. Step 2's "Treesitter highlighting appears" acceptance cannot
+  be settled ahead of authoring for that reason.
+- 2026-07-14 — verified (raised at authoring time under this capstone's own name; recorded in full in
+  [`extending-neovim`](./extending-neovim.md)): the pinned `nvim-lspconfig` **v2.10.0** now marks its own
+  `:checkhealth lspconfig` integration **deprecated** and points users at `:checkhealth vim.lsp`; the
+  plugin itself still functions. Step 1's "reports healthy" acceptance must therefore be read off
+  `vim.lsp`, never off the deprecated `lspconfig` hook. Independently reproduced against the pinned tag.
+- 2026-07-22 — `[Needs Verification]`: this file names its own pins only in the abstract — the
+  plugin lockfile contents, the LSP server for step 2's Python sample project, and that project's check
+  command. Pin all three to exact CVE-clean versions at authoring, the way
+  [`capstone-first-working-software`](./capstone-first-working-software.md) pins its stack.
+
 ## Capstone spec — inter-course (Prologue milestone)
 
 Integrates the editor-tooling trio (`just-enough-nvim`, `just-enough-lua`, `extending-neovim`): vanilla

@@ -81,12 +81,25 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
    thematically (Conventional Commits, imperative, no period), push the branch, open a **draft PR**
    against `main` (`gh pr create --draft --base main ...`) — CI runs on the PR.
 3. [AI] Run the **PR-Review Maker→Fixer Cycle** (3 sequential CI-gated cycles), resolve every finding,
-   then `gh pr ready`.
+   then `gh pr ready` — acceptance: three `pr-review-maker` reviews have been posted and answered, and
+   `gh pr view --json reviewThreads --jq '[.reviewThreads[] | select(.isResolved == false)] | length'`
+   returns **0**, with **zero CRITICAL and zero HIGH** findings outstanding. Falsifiable both ways: an
+   unanswered thread or an unresolved CRITICAL/HIGH returns non-zero and blocks the merge.
 4. [AI] **Merge** once all quality gates are green (typecheck, lint, `test:quick`, `test:unit`,
-   `test:e2e` where affected, `specs:behavior:coverage`, CI, the 3-cycle review) — `[AI]` auto-merge
-   per DN-11.
+   `ayokoding-www-fe-e2e:test:e2e` via `npx nx run ayokoding-www-fe-e2e:test:e2e` where the phase
+   touches a manifest or landing, `specs:behavior:coverage`, CI, the 3-cycle review) — `[AI]`
+   auto-merge per DN-11. **Never** the same-project `ayokoding-www:test:e2e`, which is an `echo` no-op
+   that can never fail.
 5. [AI] Dispatch `apps-ayokoding-www-deployer` to deploy `ayokoding-www` to `prod-ayokoding-www` — a
-   no-op redeploy for plan-side-only phases.
+   no-op redeploy for plan-side-only phases — acceptance:
+   `git rev-parse origin/prod-ayokoding-www` equals `git rev-parse origin/main` after the deployer
+   returns, and the deployer reports success. Falsifiable both ways: a failed or skipped deploy leaves
+   the two revisions unequal. **The deployer always runs, including on plan-side-only phases** — only
+   it advances `prod-ayokoding-www`, via an explicit `git push origin main:prod-ayokoding-www`, so
+   there is no CI auto-deploy that would make the refs converge on their own. Because step 5 runs
+   after the merge in step 4, `origin/main` is ahead of `origin/prod-ayokoding-www` whenever step 5
+   begins, for every phase. Record the deployer's own success/no-op determination, never a
+   pre-existing ref equality.
 
 ## Depends-on and start preconditions
 
@@ -188,7 +201,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] **Start precondition 4** — confirm the manifest directory exists: `test -d <MANIFESTS>`
       — acceptance: exits 0; returns non-zero before the schema plan lands.
 - [ ] [AI] **Start precondition 5** — confirm the full `careers/`-software-engineering catalog
-      resolves (R5: 127 is the `careers/` catalog total, not a whole-programme total — the sibling
+      resolves (R4: 127 is the `careers/` catalog total, not a whole-programme total — the sibling
       `skills/` corpus is a separate corpus owned by `ayokoding-learning-path-06-skills-accounting`
       and `ayokoding-learning-path-07-skills-erp` and is not counted here):
       `find <COURSES> -maxdepth 1 -mindepth 1 -type d | wc -l`
@@ -236,7 +249,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       green in `evidence/phase-0-snapshot.txt`; zero preexisting failures unresolved.
 - [ ] [AI] Manifest inventory recorded as empty; hub card count recorded as **0**; the four syllabus
       mirrors reachable at their cross-plan path.
-- [ ] [AI] Draft PR opened; CI triggered; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged;
+- [ ] [AI] Draft PR opened; CI triggered; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each;
       `ayokoding-www` deployed (no-op redeploy).
 
 > **Pause Safety**: only the toolchain was verified and the current state snapshotted — no manifest,
@@ -318,9 +334,18 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       landing — acceptance: findings recorded.
 - [ ] [AI] Apply the matching fixer to every CRITICAL/HIGH/MEDIUM finding — acceptance: zero
       CRITICAL/HIGH/MEDIUM remain on re-run.
+- [ ] [AI] **A8 clean-room licensing self-check** on the landing prose just authored — confirm no
+      sentence, heading, or ordered list was lifted or closely paraphrased from a third-party
+      curriculum, syllabus, or course page, per programme decision `A8`
+      — acceptance: the authoring agent records, in this checklist, the sources consulted and an
+      explicit statement that the prose is original. Falsifiable both ways: any passage traceable to an
+      external syllabus fails and must be rewritten before the phase gate closes.
 - [ ] [AI] Populate the first paths-hub card in `<PATHS>_index.md` _(existing file, created by
-      `ayokoding-learning-path-01-url-restructure`)_ — add the `interview-ready` card to the 2×2
-      grid, leaving the remaining three slots present but unpopulated — acceptance:
+      `ayokoding-learning-path-01-url-restructure`)_ — add the `interview-ready` card to the
+      `careers/` category group's **Interview-Ready arc sub-group**, leaving the other `careers/` arc
+      sub-groups present but unpopulated. **Not a flat 2×2 grid** — the hub is category-grouped since
+      the 2026-07-21 ruling (DD-34), and its layout is owned by
+      `ayokoding-learning-path-03-navigation-ui` — acceptance:
       `grep -oE '/en/learn/paths/careers/[a-z-]+/[a-z0-9-]+' <PATHS>_index.md | sort -u | wc -l` returns
       **1** (returns **0** before this step).
 
@@ -386,7 +411,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       returns **1**.
 - [ ] [AI] Smoothness audit passes for every assessable lever; the refresh-register deferral is
       written into this checklist.
-- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
+- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed.
 
 > **Pause Safety**: the `careers/interview-ready/software-engineer` path is live end-to-end in production over
 > its smoke-test-scoped `courseOrder` — **the architecture is proven against real content**. The other
@@ -495,6 +523,12 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] Run `apps-ayokoding-www-link-checker` and `apps-ayokoding-www-general-checker` over the new
       landing; apply the matching fixer to every CRITICAL/HIGH/MEDIUM finding — acceptance: zero
       CRITICAL/HIGH/MEDIUM remain on re-run.
+- [ ] [AI] **A8 clean-room licensing self-check** on the landing prose just authored — confirm no
+      sentence, heading, or ordered list was lifted or closely paraphrased from a third-party
+      curriculum, syllabus, or course page, per programme decision `A8`
+      — acceptance: the authoring agent records, in this checklist, the sources consulted and an
+      explicit statement that the prose is original. Falsifiable both ways: any passage traceable to an
+      external syllabus fails and must be rewritten before the phase gate closes.
 - [ ] [AI] Populate the second paths-hub card (`AI Engineer` — endpoint-named, not
       `SWE → AI Engineer`, per the 2026-07-21 rename: the path no longer assumes a starting role, so
       it is described by its endpoint only) in `<PATHS>_index.md` —
@@ -518,7 +552,11 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       manifest-composition scenarios (1.1/2.1/3.1/4.1), it has no step binding and never will one;
       its `Given/When/Then` below is verified by reading this checklist, not by running a test.
 
-  **Gherkin (binds) →** "The AI path is authored before the other two manifests are composed"
+  **Gherkin (documentation-verified) →** "The AI path is authored before the other two manifests are
+  composed" — a deliberate **third** tag form. Neither `(binds)` nor `(underpins)` fits: `(binds)`
+  asserts a companion step definition, which this scenario will never have, and `(underpins)` denotes
+  a pure-core unit test, which this is not. Rationale in
+  [README §JC-1](./README.md#jc-1-the-build-order-scenario-is-kept-not-deleted).
 
   ```gherkin
   Scenario: The AI path is authored before the other two manifests are composed
@@ -557,7 +595,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       already-working-software-engineer persona named (the SWE-fundamentals-leak-of-persona-language
       grep above returns **0**).
 - [ ] [AI] The build-order assertion is recorded in writing, with its non-executability stated.
-- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
+- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed.
 
 > **Pause Safety**: the AI path is live end-to-end in production over its smoke-test-scoped starting
 > composition (included SWE-fundamentals prerequisites at the head of `courseOrder`, plus whichever
@@ -627,6 +668,12 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] Run `apps-ayokoding-www-link-checker` and `apps-ayokoding-www-general-checker`; apply the
       matching fixer to every CRITICAL/HIGH/MEDIUM finding — acceptance: zero CRITICAL/HIGH/MEDIUM
       remain on re-run.
+- [ ] [AI] **A8 clean-room licensing self-check** on the landing prose just authored — confirm no
+      sentence, heading, or ordered list was lifted or closely paraphrased from a third-party
+      curriculum, syllabus, or course page, per programme decision `A8`
+      — acceptance: the authoring agent records, in this checklist, the sources consulted and an
+      explicit statement that the prose is original. Falsifiable both ways: any passage traceable to an
+      external syllabus fails and must be rewritten before the phase gate closes.
 - [ ] [AI] Populate the third paths-hub card in `<PATHS>_index.md` — acceptance:
       `grep -oE '/en/learn/paths/careers/[a-z-]+/[a-z0-9-]+' <PATHS>_index.md | sort -u | wc -l` returns
       **3** (returned **2** after Phase 2).
@@ -655,7 +702,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and**
       `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0.
 - [ ] [AI] Hub card count returns **3**; a shared course's prev/next provably differs by active path.
-- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
+- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed.
 
 > **Pause Safety**: three of the four paths are live over one shared library with zero body
 > duplication. Every published manifest validates. Safe to stop indefinitely. To resume: re-run all
@@ -775,8 +825,16 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] Run `apps-ayokoding-www-link-checker` and `apps-ayokoding-www-general-checker`; apply the
       matching fixer to every CRITICAL/HIGH/MEDIUM finding — acceptance: zero CRITICAL/HIGH/MEDIUM
       remain on re-run.
-- [ ] [AI] Populate the **fourth and final** paths-hub card in `<PATHS>_index.md`, completing the 2×2
-      grid — acceptance:
+- [ ] [AI] **A8 clean-room licensing self-check** on the landing prose just authored — confirm no
+      sentence, heading, or ordered list was lifted or closely paraphrased from a third-party
+      curriculum, syllabus, or course page, per programme decision `A8`
+      — acceptance: the authoring agent records, in this checklist, the sources consulted and an
+      explicit statement that the prose is original. Falsifiable both ways: any passage traceable to an
+      external syllabus fails and must be rewritten before the phase gate closes.
+- [ ] [AI] Populate the **fourth and final** `careers/` paths-hub card in `<PATHS>_index.md`,
+      completing all four `careers/` cards across the three arc sub-groups (Interview-Ready 1,
+      Immediately-Effective 2, Fundamentally-Strong 1 — asymmetric by design, **not** a 2×2 grid)
+      — acceptance:
       `grep -oE '/en/learn/paths/careers/[a-z-]+/[a-z0-9-]+' <PATHS>_index.md | sort -u | wc -l` returns
       **4** (returned **3** after Phase 3).
 - [ ] [AI] Verify path-aware nav: prev/next walks the fundamentals-first order and preserves
@@ -800,7 +858,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and**
       `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0.
 - [ ] [AI] Hub card count returns **4** — the `careers/` group of the category-grouped hub is complete.
-- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
+- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed.
 
 > **Pause Safety**: all four paths are live over one shared library — zero body duplication among the
 > three software-engineer paths; the AI path includes its SWE-fundamentals prerequisites at the head
@@ -837,7 +898,41 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 
 ### 5.2 · Band 9 growth (interview-ready and fundamentally-strong only)
 
-- [ ] [AI] Insert the five landed interview-technique courses (`coding-interview`,
+> **This growth step is the one exception to Phase 5's data-edit exemption** (see
+> [tech-docs §TDD shape](./tech-docs.md#testing-strategy)) and carries a real RED. Unlike Bands 1-8,
+> it introduces a **new cross-manifest routing invariant** — these five IDs belong in exactly two of
+> the three software-engineer manifests — that no existing assertion covers. A wrongly-placed but
+> otherwise valid course ID passes integrity, prerequisite-consistency, and no-forked-body checks
+> alike, so without a persisted assertion this invariant would be verified once at execution time and
+> never again.
+
+- [ ] [AI] **RED** — extend `<MANIFESTS>careers/careers-manifests.unit.test.ts`
+      with a persisted Band-9 routing assertion: `careers/interview-ready/software-engineer.yaml` and
+      `careers/fundamentally-strong/software-engineer.yaml` each have all five of `coding-interview`,
+      `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`,
+      `capstone-interview-loop` in `courseOrder`, **and**
+      `careers/immediately-effective/software-engineer.yaml` has none of them
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: **fails**, naming the two manifests that do not yet contain the five IDs. This is
+      the mirror image of the Phase 1 "five deferred IDs are absent" assertion. Falsifiable both ways:
+      it fails before the append below and passes after, and it fails again if any future edit moves
+      one of the five into `immediately-effective` or drops it from either of the other two.
+
+  **Gherkin (underpins) →** "The interview-ready MVP proves the architecture before other path work
+  begins" ([prd.md](./prd.md#acceptance-criteria-gherkin)). This cycle closes that scenario's deferral
+  clause — the interview cluster's remaining NEW courses, explicitly _not_ required for the MVP to
+  ship, land here. It `underpins` rather than `binds`: the assertion is a data-routing invariant over
+  manifest files, not a user-facing behaviour with its own step definition.
+
+  ```gherkin
+  Scenario: The interview-ready MVP proves the architecture before other path work begins
+    Given the careers/interview-ready/software-engineer MVP (an architecture smoke test over already-live topics 1-33) is delivered end-to-end
+    When the careers/immediately-effective/ai-engineer path's authoring begins
+    Then the interview-ready MVP's landing page, manifest, and path-aware nav are already live in production
+    And the interview cluster's remaining NEW courses are not required for that MVP to be considered shipped
+  ```
+
+- [ ] [AI] **GREEN** — Insert the five landed interview-technique courses (`coding-interview`,
       `take-home-and-live-coding`, `system-design-interview`,
       `behavioral-and-leadership-interviews`, `capstone-interview-loop`) into
       `<MANIFESTS>careers/interview-ready/software-engineer.yaml` — closing the gap Phase 1 deliberately left
@@ -851,6 +946,16 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       returns **5** (it returned **0** at Phase 1), AND the **same command against**
       `<MANIFESTS>careers/immediately-effective/software-engineer.yaml` still returns **0**. Both halves are
       required — a growth applied to all three manifests passes the first check and fails the second.
+
+- [ ] [AI] **REFACTOR** — fold the Band-9 routing assertion into the same table-driven shape the other
+      per-manifest assertions in `<MANIFESTS>careers/careers-manifests.unit.test.ts` use, so the three
+      manifests are expressed as data (expected-present / expected-absent ID sets) rather than three
+      hand-written blocks, and confirm no duplicate ID-list literal survives
+      — command:
+      `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint && grep -cF 'capstone-interview-loop' <MANIFESTS>careers/careers-manifests.unit.test.ts`
+      — acceptance: the first two exit 0, and the `grep -cF` returns **1**, proving the five-ID list is
+      declared once rather than repeated per manifest. Falsifiable both ways: leaving the three blocks
+      hand-written returns 2 or more.
 
 ### 5.3 · Interview-ready refresh-register smoothness re-audit
 
@@ -910,9 +1015,11 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 
 - [ ] [AI] Bands 1–8 growth applied to all three software-engineer manifests; `test:unit` exited 0
       after each band's append.
-- [ ] [AI] Band 9 check passes **both** ways: the five-ID check returns **5** against
-      `careers/interview-ready/software-engineer.yaml` and **0** against
-      `careers/immediately-effective/software-engineer.yaml`.
+- [ ] [AI] Band 9 check passes **all three** ways, one per software-engineer manifest: the five-ID
+      check returns **5** against `careers/interview-ready/software-engineer.yaml`, **5** against
+      `careers/fundamentally-strong/software-engineer.yaml`, and **0** against
+      `careers/immediately-effective/software-engineer.yaml`. All three are required — checking only
+      the first and last would pass even if `fundamentally-strong` never grew.
 - [ ] [AI] The AI path's nine-cluster-ID check returns **9** and its entry count grew by exactly
       **9** over its recorded pre-growth count (5.4); the SWE-fundamentals **inclusion** check still
       returns **11 or more** (inverted 2026-07-21 — DD-35).
@@ -920,7 +1027,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] `find <COURSES> -maxdepth 1 -mindepth 1 -type d | wc -l` returns **127**;
       `npx nx run ayokoding-www:test:unit` and `:build` exit 0 with all four manifests validating.
 - [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` exits 0 across all four grown paths.
-- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
+- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed.
 
 > **Pause Safety**: all four manifests are at their **full** composition over the complete 127-course
 > library — no manifest is truncated, and the two smoke-test deferrals are provably closed in both
@@ -949,7 +1059,9 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
   `Given/When/Then` is verified by the shell commands above, not a Playwright step binding, per
   [README §JC-2](./README.md#jc-2-the-composite-build-green-scenario-is-decomposed-not-inherited).
 
-  **Gherkin (binds) →** "The manifest layer builds and validates green"
+  **Gherkin (documentation-verified) →** "The manifest layer builds and validates green" — the same
+  deliberate **third** tag form used at cycle 2.3 above, for the same reason: this scenario has no
+  step definition and never will, so `(binds)` would contradict the paragraph directly above it.
 
   ```gherkin
   Scenario: The manifest layer builds and validates green
@@ -1001,7 +1113,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] The ownership boundary check returns exactly **4** manifest files, matching the four
       declared path IDs.
 - [ ] [AI] The scoped cross-plan link check finds no line naming this plan's folder.
-- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed.
+- [ ] [AI] Draft PR opened; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed.
 
 > **Pause Safety**: the whole four-path composition passes every automated gate. Safe to stop
 > indefinitely. To resume: re-run the affected quality gates and the build.
@@ -1035,9 +1150,15 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] Deep-link a course with **no** `?path=` and confirm the canonical view renders with the
       "this course is part of" affordance naming **every** path whose manifest includes it; then hit an
       invalid `?path=` and confirm the canonical view renders with no error — acceptance: both hold.
-- [ ] [AI] For the AI path landing specifically, confirm the outbound links to prerequisite
-      software-engineer courses' canonical pages resolve (DD-24) — acceptance: every outbound
-      `/en/learn/courses/<id>` link returns 200.
+- [ ] [AI] For the AI path landing specifically, confirm the **included** SWE-fundamentals
+      prerequisite courses render as ordered path steps and that each one's canonical page resolves
+      — acceptance: the landing renders all **11** named SWE-fundamentals courses as `courseOrder`
+      steps, and every `/en/learn/courses/<id>` link the landing emits returns 200. Falsifiable both
+      ways: dropping any of the 11 from the manifest removes a step and fails the first half; a broken
+      canonical page fails the second. **Governed by DD-35, not DD-24** — since the 2026-07-21 ruling
+      these prerequisites are _included_ in `courseOrder` rather than linked from landing prose, so the
+      earlier phrasing of this step ("outbound links to prerequisite courses resolve", citing DD-24)
+      would have run against an empty link set and passed vacuously.
 - [ ] [AI] Verify `html[lang]` is `en` and `browser_console_messages` is clean on every screen —
       acceptance: correct lang attribute; **zero** console errors.
 - [ ] [AI] Capture one screenshot per screen per breakpoint via `browser_take_screenshot` to
@@ -1070,8 +1191,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       referenced from this checklist.
 - [ ] [AI] Every rule-15 EWT/UWT/DWT defect finding is fixed and ticked, or explicitly permitted to
       defer by the user.
-- [ ] [AI] Draft PR opened (retest evidence and any fixes); 3-cycle PR-Review complete; CI green; PR
-      `[AI]`-merged; deployed.
+- [ ] [AI] Draft PR opened (retest evidence and any fixes); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed.
 
 > **Pause Safety**: the four-path UI is verified live and defect-clean in `en`, with committed
 > evidence. Safe to stop indefinitely. To resume: re-run the three testers against the running app.
@@ -1142,8 +1265,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       discarded with a reason), or the file records the explicit "none" escape.
 - [ ] [AI] No code-homed learning landed inline in this plan's own commits or PR — every code-routed
       learning has a corresponding `plans/backlog/` folder.
-- [ ] [AI] Draft PR opened (`learnings.md` triage); 3-cycle PR-Review complete; CI green; PR
-      `[AI]`-merged; deployed (no-op).
+- [ ] [AI] Draft PR opened (`learnings.md` triage); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each; deployed (no-op).
 
 > **Pause Safety**: `learnings.md` is fully triaged (or explicitly recorded as empty); no future
 > process depends on querying it later. Safe to stop. To resume: re-read `learnings.md` and confirm
@@ -1165,7 +1290,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires
       explicit user permission and only when genuinely impossible; SG-###/USS-### may be triaged or
       deferred with written rationale.
-- [ ] [AI] **Terminal four-manifest and 127-catalog assertion (R5: the 127 total is the `careers/`
+- [ ] [AI] **Terminal four-manifest and 127-catalog assertion (R4: the 127 total is the `careers/`
       software-engineering catalog only, not a whole-programme total including `skills/`)** — verify
       all four `careers/` path manifests are published and at their **full** composition, all four
       landings are live, the paths hub's `careers/` group shows all four cards, and the
@@ -1206,7 +1331,10 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       validator prints `All links valid! No broken links found.`
 - [ ] [AI] Plan folder is under `plans/done/YYYY-MM-DD__ayokoding-learning-path-05-manifests`; every
       referencing README is updated; the archival is committed.
-- [ ] [AI] Draft PR opened (archival move); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged;
+- [ ] [AI] Draft PR opened (archival move); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged
+      — each of these five steps run verbatim per the
+      [Per-Phase Integration Protocol](#delivery-mode-worktree-to-pr), which carries the explicit
+      command and acceptance criterion for each;
       deployed (no-op).
 
 > **Pause Safety**: the plan is archived and its final PR `[AI]`-merged to `main`. Terminal state — and

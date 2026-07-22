@@ -327,11 +327,11 @@ described functionally... rather than by an ERP course number this plan has no a
 This plan supplies the missing half of that contract — the **named ERP-side stages** plan 06 can point
 at:
 
-| Accounting stage (plan 06's naming)                                                                                                      | Unblocks ERP stage                                       | Mechanical gate (this plan's own, independent — never reads plan 06's `delivery.md`)                                                                                                                                                        |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Stage 1** — "Dangerous 1" (courses 1–3, `financial-statements-and-close-cycle` lands)                                                  | Stage A start (no gate — Stage A never depended on this) | —                                                                                                                                                                                                                                           |
-| **Stage 2** — "Dangerous 2" / **conventional-accounting complete** (courses 4–16 or 4–19, per plan 06's own numbering as of its rewrite) | **Stage B — Conventional Enterprise Depth**              | `test -d <COURSES>financial-statements-and-close-cycle`, `…inventory-and-cogs-accounting`, `…payroll-and-tax-accounting-essentials`, `…consolidation-and-multi-entity-accounting`, `…audit-controls-and-compliance` — all five must resolve |
-| **Stage 3** — "Dangerous 3" / **sharia-accounting complete**                                                                             | **Stage C — Sharia-Compliant Design**                    | `test -d <COURSES>islamic-contract-modeling-for-systems`, `…sharia-accounting-and-aaoifi-standards` — both must resolve                                                                                                                     |
+| Accounting stage (plan 06's naming)                                                                                                         | Unblocks ERP stage                                       | Mechanical gate (this plan's own, independent — never reads plan 06's `delivery.md`)                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stage 1** — "Dangerous 1", ending where `financial-statements-and-close-cycle` lands                                                      | Stage A start (no gate — Stage A never depended on this) | —                                                                                                                                                                                                                                           |
+| **Stage 2** — "Dangerous 2" / **conventional-accounting complete**, i.e. the whole `skills/conventional-accounting` `courseOrder` published | **Stage B — Conventional Enterprise Depth**              | `test -d <COURSES>financial-statements-and-close-cycle`, `…inventory-and-cogs-accounting`, `…payroll-and-tax-accounting-essentials`, `…consolidation-and-multi-entity-accounting`, `…audit-controls-and-compliance` — all five must resolve |
+| **Stage 3** — "Dangerous 3" / **sharia-accounting complete**                                                                                | **Stage C — Sharia-Compliant Design**                    | `test -d <COURSES>islamic-contract-modeling-for-systems`, `…sharia-accounting-and-aaoifi-standards` — both must resolve                                                                                                                     |
 
 This table is a **human/audit-readable coordination note, exactly as plan 06's own stage-signal
 contract describes itself** — never a machine contract. This plan's actual gates in `delivery.md` are
@@ -426,9 +426,13 @@ from the prior design, DD-21):
 
 1. Stage A (15 ids) — identical to `<CONVMAN>`'s Stage A publication.
 2. Stage B growth (+11 → 26) — identical insertion positions to `<CONVMAN>`'s Stage B growth.
-3. Stage C growth (+3 → 29): insert `sharia-compliant-erp-design`,
-   `islamic-contract-based-transaction-flows`, `zakat-and-sharia-compliance-modules` immediately after
-   `multi-company-and-multi-currency-erp` and before `erp-security-and-controls`.
+3. Stage C growth (+3 → 29): **append** `sharia-compliant-erp-design`,
+   `islamic-contract-based-transaction-flows`, `zakat-and-sharia-compliance-modules` after the
+   complete 26-id shared corpus — that is, after `erp-analytics-and-reporting` — so they occupy
+   positions 27, 28 and 29. Stage C is appended, never inserted mid-corpus: this is what makes
+   `zakat-and-sharia-compliance-modules` the terminal id and lets **Dangerous 4** mark the end of the
+   path. Inserting the block ahead of `erp-security-and-controls` would end `sharia-erp` on two
+   generic shared courses and strand the Dangerous 4 boundary mid-ramp.
 
 **Never reorder an already-published id.** Every growth step inserts new ids at a fixed position
 relative to what already exists; any reading-smoothness regression a growth step surfaces is fixed by
@@ -531,9 +535,26 @@ of accounts, recognition rules, and disclosure set are configuration, not hardco
 structural claim (three coexisting models, none universal) is independent of the `[Unverified]` cell
 details and does not itself require re-verification (DD-12).
 
-The Indonesian **PSAK numbering** is `[Needs Verification]` — sources show both a "PSAK 59 / SIFAS
-101-109" generation and a "PSAK 101-110" series; resolve against IAI's published list before course
-27's spec states a number.
+The Indonesian **PSAK numbering** is `[Verified]` — **PSAK 101-110 is the operative series; PSAK 59
+was superseded.** The earlier conflict between a "PSAK 59 / SIFAS 101-109" generation and a "PSAK
+101-110" series is resolved. Source: IAI's published PSAK Syariah standard list, re-confirmed by the
+2026-07-22 `web-researcher` grounding run recorded as `OI-1` in
+[plan 06's verification log](../ayokoding-learning-path-06-skills-accounting/verification-log.md).
+
+One residual is carried forward `[Needs Verification]` and must not be restated as fact: the exact
+PPSAK ratification date for PSAK 101 was **not** confirmed by that run. The corpus rule is therefore
+to **cite the series and never a specific ratification date** until that residual is separately
+resolved.
+
+Relatedly, `OI-3` is `RESOLVED` for the adoption-relationship claim specifically: **Malaysia is not on
+AAOIFI's mandatory-adoption list, and Indonesia uses AAOIFI as a basis rather than adopting it.**
+Governance mechanics beyond that relationship — for instance the internal provisions of Bank Negara
+Malaysia's Shariah Governance Policy — were not directly fetched and remain subject to the standing
+fast-moving-facts re-verification rule.
+
+`OI-2` (the riba doctrinal basis) **remains OPEN** and is not resolved by any of the above. Its
+practical consequence is well-attested, but the minority time-value-of-money position is unsettled and
+is not this corpus's to settle. No course may restate it as fact.
 
 ## Licensing and IP Compliance (A8)
 
@@ -690,10 +711,10 @@ shape of each course file — verified against `syllabus/courses/actor-model-con
 structure. **No stronger precedent was found**, so plan 02's format is followed rather than a lighter
 alternative:
 
-| Half             | Location     | Contents                                                                  |
-| ---------------- | ------------ | ------------------------------------------------------------------------- |
-| Per-course specs | `<SYL>`      | 29 `<course-id>.md` files plus a folder `README.md` index                 |
-| Path mirrors     | `<SYLPATHS>` | `manifest-skills-conventional-erp.md` and `manifest-skills-sharia-erp.md` |
+| Half             | Location     | Contents                                                                                                         |
+| ---------------- | ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Per-course specs | `<SYL>`      | 29 `<course-id>.md` files (the `README.md` index sits one level up, at `syllabus/README.md`, not inside `<SYL>`) |
+| Path mirrors     | `<SYLPATHS>` | `manifest-skills-conventional-erp.md` and `manifest-skills-sharia-erp.md`                                        |
 
 **Required per-course syllabus sections, in plan 02's own order** (DD-33): a `# Title (Format[,
 Language/domain tag])` header; a `**Course ID** · **Format** · **Language**` line; a **Short summary**;
@@ -702,7 +723,8 @@ a **Scope note** ending `License-aware (DD-15)` per the inherited convention (se
 big idea** (problem-before-solution, keep-this-if-you-forget-everything, big ideas touched);
 **Prerequisites** (prior ERP topics, cross-domain SWE/accounting ids, assumed knowledge); **Accuracy
 notes**, honestly stating the Phase 1.2a confirmation pass has not yet run rather than fabricating a
-verification date (A4); **Concepts** (`co-NN`, floor ≥ 10, each specific enough to confirm or refute —
+verification date (A4); **Concepts** (`co-NN`, floor ≥ 8 — see [DD-35](#design-decisions) for why this
+is 8 and not plan 02's 10 — each specific enough to confirm or refute —
 "Advanced topics" is forbidden as a concept or module name); **Worked examples** (`ex-NN`,
 Beginner/Intermediate/Advanced) for By Example courses only; a **Synthesis exercise — intra-topic**
 section in place of plan 02's "Capstone spec" — same position, **renamed** because `A6` forbids any
@@ -861,12 +883,24 @@ Verification]`. **Decided.**
   copyrighted source**. Every ERP syllabus carries both: the inherited "License-aware (DD-15)" Scope
   note tag, and this plan's eleven safe-authoring rules and per-project licence table. See
   [§Licensing and IP Compliance](#licensing-and-ip-compliance-a8). **Decided.**
+- **DD-35 · The per-course concept floor is 8, not plan 02's 10.** The floor was originally stated as
+  ≥ 10 by direct inheritance from plan 02, but plan 02's corpus is multi-pass-refined while this one is
+  first-authored; a floor copied across without that adjustment is a number the plan cannot meet and
+  did not meet. This mirrors plan 06's identical reasoning in its own `DD-627`, which scaled the same
+  inherited floor to 8 for the same reason — **structure is mirrored exactly; volume is proportionate
+  to a first-authored corpus.** Two consequences are deliberate. First, 8 is a floor and not a target:
+  courses whose subject decomposes further carry more, and the corpus's architectural spine
+  (`erp-module-map-and-architecture`, `erp-document-lifecycle-and-state-machines`,
+  `erp-subledger-to-gl-architecture`) sits at 10-12 without being trimmed to the floor. Second,
+  `record-to-report-systems` is held to **≥ 10** rather than 8, because subledger-to-GL convergence is
+  this corpus's own stated architectural crux and is the topic least able to afford
+  under-decomposition. **Decided.**
 
 ## File impact
 
 | Path                                                              | Change | Note                                                                     |
 | ----------------------------------------------------------------- | ------ | ------------------------------------------------------------------------ |
-| `<SYL>README.md` + `<SYL><id>.md` × 29                            | new    | this plan's own syllabus corpus (DD-2, DD-31)                            |
+| `syllabus/README.md` + `<SYL><id>.md` × 29                        | new    | this plan's own syllabus corpus (DD-2, DD-31)                            |
 | `<SYLPATHS>manifest-skills-conventional-erp.md`, `…sharia-erp.md` | new    | the two manifest mirrors this plan's `courseOrder`s are transcribed from |
 | `<CONVMAN>`, `<SHARMAN>`                                          | new    | the two manifests; each grown across the authoring stages                |
 | `<CONVLANDING>`, `<SHARLANDING>`                                  | new    | the two path landings (DD-15)                                            |

@@ -5,9 +5,9 @@
 **Short summary**: The module map, cross-module process flows, the open-source landscape
 
 **Scope note**: names the module families (finance, controlling, materials management, sales,
-production, human capital) and the process flows that cross them, and introduces the open-source
-landscape nominatively so later worked examples can reference "how ERPNext models X" without
-re-explaining what ERPNext is each time. License-aware (DD-15).
+production, quality management, human capital) and the process flows that cross them, and introduces
+the open-source landscape nominatively so later worked examples can reference "how ERPNext models X"
+without re-explaining what ERPNext is each time. License-aware (DD-15).
 
 ## Why this exists · the big idea
 
@@ -33,6 +33,10 @@ re-explaining what ERPNext is each time. License-aware (DD-15).
 - Licence claims for the open-source landscape are `[Repo-grounded]` against the domain-research
   grounding and `tech-docs.md`'s licensing table. Metasfresh's licence is `[Unverified]` and is not
   asserted in this course.
+- Concept co-13 is placed on domain-reasoning grounds rather than sourced from the grounding research,
+  and is `[Needs Verification]` pending the Phase 1.2a coverage pass — specifically, whether covering
+  quality management at its inventory and procurement touchpoints is sufficient, or whether the field
+  would expect it as a module family in its own right.
 
 ## Concepts
 
@@ -54,6 +58,12 @@ re-explaining what ERPNext is each time. License-aware (DD-15).
   segment.
 - **co-12 · enterprise-it-boundary** — what sits outside the ERP boundary (CRM, standalone WMS, BI/data
   warehouse, e-commerce front end) at a glance (deep dive: course 22).
+- **co-13 · quality-management-qm** — the inspection-and-release module family, named here because it
+  sits _inside_ the boundary co-12 draws rather than outside it like CRM, standalone WMS and BI: a
+  goods receipt can be routed to an inspection hold instead of straight into unrestricted stock, and a
+  usage decision then releases or rejects it. This corpus covers QM at that touchpoint rather than as
+  a standalone course — its mechanics land on the stock-type model (course 14) and its rejections on
+  the procurement exception flow (course 12).
 
 ## Worked examples
 
@@ -72,6 +82,9 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
   ledger entry" that stays nominative (no reproduction of ERPNext's own docs). (co-11)
 - **ex-04 · it-boundary-scoping** — given a system landscape diagram, identify which boxes are inside
   the ERP boundary and which are not. (co-12)
+- **ex-05 · qm-boundary-placement** — given a goods receipt that must pass inspection before it can be
+  sold, place the inspection step inside the ERP boundary and explain what distinguishes it from the
+  CRM, standalone WMS and BI systems co-12 places outside. (co-02, co-12, co-13)
 
 ## Synthesis exercise — intra-topic
 

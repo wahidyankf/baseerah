@@ -439,7 +439,11 @@ composition no longer starts from a linked-out SWE-fundamentals baseline), not r
 ## Smoothness Architecture (per-path)
 
 Smoothness is a per-manifest property (each path has its own order), underwritten by the machine
-invariant of DD-6/DD-16. Each manifest must satisfy four levers:
+invariant of DD-6/DD-16. **DD-6 and DD-16 live in a different plan.** Read them at
+[`ayokoding-learning-path-02-schema-and-prerequisite-dag` §Design Decisions](../ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md#design-decisions)
+— DD-6 is "every course declares `prerequisites`", DD-16 is "prerequisite-consistency is the audited
+smoothness property". Neither is among this plan's own eleven decisions; the four levers' substance is
+restated inline below so this section stands alone. Each manifest must satisfy four levers:
 
 1. **Prereq-chaining (a hard gate)** — no course precedes any of its declared `prerequisites` within
    the path's order; every `just-enough-<lang>` primer precedes that language's first use. The old
@@ -772,7 +776,7 @@ non-goal, not a code limitation — the navigation mechanism itself is locale-ne
 
 | Path                                                                                                          | Change                                                 | Phase      |
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ---------- |
-| `apps/ayokoding-www/src/features/course-paths/manifests/careers/careers-manifests.unit.test.ts`               | created (Phase 1), extended (2, 3, 4)                  | 1-4        |
+| `apps/ayokoding-www/src/features/course-paths/manifests/careers/careers-manifests.unit.test.ts`               | created (Phase 1), extended (2, 3, 4, 5.2)             | 1-5        |
 | `apps/ayokoding-www/src/features/course-paths/manifests/careers/interview-ready/software-engineer.yaml`       | created                                                | 1          |
 | `apps/ayokoding-www/content/en/learn/paths/careers/interview-ready/software-engineer/_index.md`               | created                                                | 1          |
 | `apps/ayokoding-www/src/features/course-paths/manifests/careers/immediately-effective/ai-engineer.yaml`       | created                                                | 2          |
@@ -784,8 +788,8 @@ non-goal, not a code limitation — the navigation mechanism itself is locale-ne
 | `apps/ayokoding-www/content/en/learn/paths/_index.md`                                                         | edited (card population, once per phase)               | 1, 2, 3, 4 |
 | All four manifest `.yaml` files                                                                               | edited (growth)                                        | 5          |
 | `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/path-composition.feature`                   | created (1.1), extended (1.3, 2.1, 3.1, 4.1, 4.2, 4.3) | 1-4        |
-| `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts`                                               | extended (created by the navigation plan)              | 1-4        |
-| `plans/backlog/ayokoding-learning-path-05-manifests/evidence/`                                                | created                                                | 7          |
+| `apps/ayokoding-www-fe-e2e/src/steps/path-composition.steps.ts`                                               | created (1.1), extended (1.3, 2.1, 3.1, 4.1, 4.2, 4.3) | 1-4        |
+| `plans/backlog/ayokoding-learning-path-05-manifests/evidence/`                                                | created (0), extended (5, 7)                           | 0, 5, 7    |
 
 All paths are marked `_New file_` except `paths/_index.md`, which is created by
 `ayokoding-learning-path-01-url-restructure` and only **populated** here. None of the manifest paths
@@ -804,11 +808,36 @@ exists on the current tree — `apps/ayokoding-www/src/features/course-paths/` i
 | Manual                   | four landings + hub at 375 / 768 / 1280 px, `en`, with committed evidence                                                                                                                                                                                                                                                                                                                 | Playwright MCP (Phase 7)                                              |
 | Live-site triad          | Rule-15 EWT / UWT / DWT retest before archival                                                                                                                                                                                                                                                                                                                                            | `web-exploratory-tester`, `web-usability-tester`, `web-design-tester` |
 
-**TDD shape.** The manifests are data files under `src/` consumed by app code, so every manifest step
-is Red→Green→Refactor: RED writes the failing integrity/e2e assertion for the manifest that does not
-exist yet, GREEN authors the YAML, REFACTOR tidies and re-runs. The **landing anchors are content**
-and follow the maker → checker → fixer cycle instead — no RED/GREEN/REFACTOR labels, per the source
-plan's own convention.
+**TDD shape.** The manifests are data files under `src/` consumed by app code, so every manifest
+**authoring** step is Red→Green→Refactor: RED writes the failing integrity/e2e assertion for the
+manifest that does not exist yet, GREEN authors the YAML, REFACTOR tidies and re-runs. That covers
+Phases 1-4, where each manifest is created for the first time and its behaviour is newly asserted.
+
+**Most Phase 5 growth mutations are deliberately exempt from the RED/GREEN/REFACTOR split** — every
+one except **5.2**, which carries a real RED for the reason given at the end of this note. The
+exemption is a design choice rather than an oversight. A growth step appends already-authored course IDs into a
+manifest that **already exists and is already covered** by `careers-manifests.unit.test.ts`'s
+integrity and prerequisite-consistency assertions — the behaviour under test does not change, only the
+data does. There is no meaningful RED to write: the pre-append state is not a failing assertion but a
+correct, passing one about a smaller `courseOrder`, so a manufactured "fails before append" test would
+assert the absence of data rather than any behaviour. This is the non-code data-edit carve-out in
+[test-driven-development.md](../../../repo-governance/development/workflow/test-driven-development.md).
+The safety property is preserved a different way: every growth step re-runs the full integrity +
+prerequisite-consistency + no-forked-body suite immediately after each band's append, so a bad append
+fails at that step rather than at the end of the phase. Phase 5.4 additionally records a pre-growth
+count to a file and asserts an exact numeric delta, which is falsifiable in both directions.
+
+**Why 5.2 is different and does carry a RED.** Band-9 growth introduces a **new cross-manifest
+routing invariant** — the five interview-technique IDs belong in `interview-ready` and
+`fundamentally-strong` but deliberately **not** in `immediately-effective` (DL-13). That is a new
+behaviour, not more of the same data: a wrongly-routed but otherwise valid course ID passes the
+integrity, prerequisite-consistency, and no-forked-body checks alike, so the generic suite cannot
+catch it. Verifying it only with an execution-time shell check would leave no permanent CI guard
+against a later edit moving one of the five. Phase 5.2 therefore extends
+`careers-manifests.unit.test.ts` with a persisted assertion in a RED step before the append.
+
+The **landing anchors are content** and follow the maker → checker → fixer cycle instead — no
+RED/GREEN/REFACTOR labels, per the source plan's own convention.
 
 **`ayokoding-www:test:e2e` and `:test:integration` are no-op echo targets** and can never fail; the
 real e2e lives in the paired `ayokoding-www-fe-e2e` project. Every acceptance clause in this plan

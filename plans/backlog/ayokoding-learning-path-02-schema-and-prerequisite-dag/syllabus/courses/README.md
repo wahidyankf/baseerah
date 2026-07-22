@@ -33,6 +33,48 @@ Every manifest reuses the same course bodies reordered — **zero body duplicati
 > `compilers-parsers-and-transpilers.md` ×2, `site-reliability-engineering.md`); see
 > [DD-20](../../tech-docs.md#design-decisions) for the reconciliation ruling.
 
+**Not a course file**: this folder also holds **[`surgery.md`](./surgery.md)** — the course-surgery plan
+(shared-library edits and their four-path blast radius), referenced by all four
+[path manifests](../paths/README.md). It carries no `## Accuracy notes` section and appears in no table
+below, because it is a working document about the corpus, not a course in it. This README and
+`surgery.md` are the only two `.md` files here that are not course detail files.
+
+## Known format fork — recorded, deferred, owned elsewhere
+
+The `co-NN` / `ex-NN` rendering in this folder is **not uniform**. Measured 2026-07-22 by per-file
+loop over the 120 course detail files (`README.md` and `surgery.md` excluded):
+
+| Cohort                                | Files | `co-NN` / `ex-NN` rendering                    | Carries `**Short summary**` |
+| ------------------------------------- | ----: | ---------------------------------------------- | --------------------------- |
+| Inherited courses (re-homed verbatim) |    95 | 94 bullets; `capstone-forge-ready` has no list | yes (95 of 95)              |
+| NEW courses authored by this plan     |    20 | **17 ordered** (`1. **co-01 …`), 3 bullets     | **no** (0 of 20)            |
+| NEW standalone capstones              |     5 | bullets, under `## Concepts integrated`        | **no** (0 of 5)             |
+
+Two measurements pin the cohort down. **All 17** ordered-list files also omit `**Short summary**`;
+and the 25 files omitting `**Short summary**` are **exactly** the 25 carrying the
+"Pre-authoring `web-researcher` sweep pending" note — the same 25, with no file in one set and not
+the other. The fork therefore runs along the **inherited-versus-newly-authored seam** this README
+already documents above (95 + 25 = 120), not along scattered typos.
+
+**Do not retrofit.** The
+[`learning-plan-syllabus-folder-convention`](../../../learning-plan-syllabus-folder-convention/tech-docs.md#dd-06--bullets-are-canonical-the-17-file-ordered-list-cohort-is-grandfathered)
+plan owns this corpus's format convention. Its **DD-06** rules bullets canonical **and explicitly
+grandfathers the 17-file ordered-list cohort**, naming a retrofit out of scope. This section records
+the fork so it is a known deferred item with a named owner rather than an undocumented
+inconsistency. The per-course template below **has** been corrected from ordered lists to bullets so
+that _new_ files match the canonical style — that changes no existing file and leaves the
+grandfathered 17 untouched, so nothing here contradicts DD-06's list.
+
+**Concept lists that look absent but are not.** Six files carry no `## Concepts` heading, and none of
+the six is an omission. Five are the standalone integration capstones (`capstone-interview-loop`,
+`capstone-first-working-software`, `capstone-full-stack-app`, `capstone-build-your-own-coding-agent`,
+`capstone-build-your-own-pentest-engine`), each carrying a bulleted list under
+**`## Concepts integrated`** — the right heading for a capstone that integrates concepts from its
+prerequisites rather than enumerating its own. The sixth, `capstone-forge-ready.md`, has no concept
+list under any heading: its concepts sit inline as the `**Concepts exercised**` checklist inside its
+combined `## Capstone spec` section, which is the shape §8 of the template below prescribes. All six
+are legitimate for their course type.
+
 ## Editor & tooling foundations
 
 | Course ID                                                 | Format     | Language(s)          | Short summary                                    |
@@ -315,11 +357,11 @@ end-to-end + web-verified**.
 
 ## Concepts
 
-1. **co-01 · <slug>** — <one-line claim>. … (floor ≥ 10 subject / ≥ 8 primer|leadership)
+- **co-01 · <slug>** — <one-line claim>. … (floor ≥ 10 subject / ≥ 8 primer|leadership)
 
 ## Worked examples
 
-1. **ex-01 · <slug>** — <one-line spec> — verify <observable>. (co-NN) … (contiguous)
+- **ex-01 · <slug>** — <one-line spec> — verify <observable>. (co-NN) … (contiguous)
 
 ## Capstone spec — intra-course (<kind>)
 

@@ -35,10 +35,17 @@ construction rather than as a retrofit.
 > **Executor environment note — RTK-wrapped commands emit an empty-output marker, not true
 > emptiness**: this repo routes `git` (and other commands) through RTK via a Claude Code hook (see
 > `CLAUDE.md` §RTK), and RTK rewrites the output it filters. For `git diff` it appends a three-line
-> trailer — blank, `--- Changes ---`, blank — whenever the result is **non-empty**, and appends
-> nothing when the result is empty. So for `N` changed paths, `| wc -l` prints `N + 3` and
-> `| grep -c .` prints `N + 1`; in the clean state both print `0`
-> [Repo-grounded — measured on this tree 2026-07-22: 12 changed files gave 15 and 13 respectively; a clean path gave 0 and 0].
+> trailer — blank, `--- Changes ---`, blank — whenever the result is **non-empty**. So for `N` changed
+> paths, `| wc -l` prints `N + 3` and `| grep -c .` prints `N + 1`. In the **clean** state the two
+> forms **diverge**: `| grep -c .` prints `0`, but `| wc -l` prints `1`, because RTK emits a lone
+> newline as an empty-output marker rather than true zero-byte emptiness — precisely the behaviour
+> this note is named after. That divergence is the whole reason `grep -c .` is the sanctioned
+> zero-assertion form here and `wc -l` is never used for one.
+> [Repo-grounded — measured on this tree 2026-07-22, each command issued alone as the whole content of
+>
+> > one call: 12 changed files gave **15** and **13** respectively; a clean path gave **1** under
+> > `wc -l` and **0** under `grep -c .`. An earlier revision of this line claimed the clean state gave
+> > "0 and 0"; the `wc -l` half of that was wrong.]
 >
 > **Every `git diff --name-only …` clause in this plan asserts `0`**, and for that assertion the
 > sanctioned form **`| grep -c .`** is exact: the trailer is absent in the clean state, which is the
@@ -166,17 +173,67 @@ subagents capped per the orchestration convention). The main thread self-promote
 - [ ] [AI] Converge the toolchain: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift.
 - [ ] [AI] **Verify blocking plan #1 merged** — the `<COURSES>` bucket exists and holds the 37 re-homed
-      bundles: `test -d apps/ayokoding-www/content/en/learn/courses && test -f apps/ayokoding-www/content/en/learn/courses/_index.md && find apps/ayokoding-www/content/en/learn/courses -maxdepth 1 -mindepth 1 -type d | wc -l`
-      — acceptance: both `test` commands exit 0 and the count returns **37**. Falsifiable both ways:
-      before the URL-restructure plan merges, `test -d` exits non-zero and the `find` errors out;
-      a count other than 37 means the re-home is incomplete and this plan must not start.
-- [ ] [AI] **Verify blocking plan #2 merged** — the cross-plan syllabus layer is on `origin/main`:
-      `test -d plans/done/*__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses || test -d plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses`
-      — acceptance: exits 0, and the located `syllabus/courses/` directory holds **122** entries
-      (`ls <located>/ | wc -l` returns 122). Record the resolved absolute path to
-      `evidence/phase-0-snapshot.txt` as `SYLLABUS_ROOT=<path>` — every later authoring step reads
-      from that recorded root, never from a copy. Falsifiable both ways: a missing directory or a
-      count other than 122 blocks the start.
+      bundles — command (single line):
+      `test -d apps/ayokoding-www/content/en/learn/courses && test -f apps/ayokoding-www/content/en/learn/courses/_index.md && git ls-files -- 'apps/ayokoding-www/content/en/learn/courses/*/_index.md' | grep -c .`
+      — acceptance: both `test` commands exit 0 and the count returns **37** (one `_index.md` per
+      re-homed bundle; the bucket's own top-level `_index.md` sits one level up and is not matched).
+      **Count with `git ls-files` here**, because it expands its own quoted pathspec so zsh never sees
+      the `*` and the `*/` segment stays a single directory level. **The RTK routing rule, stated
+      accurately.** The Claude Code hook rewrites a **bare** `find` — one whose output is not piped —
+      to `rtk find`, which reformats the file list into a compact report (`2F 1D:`, a blank line, then
+      `./ a.yaml b.yaml`; or the single line `0 for '<pattern>'` when nothing matches) and drops flags
+      it does not know, such as `-mindepth`. A line count over that reads _format_ lines, not matches.
+      A **piped** `find … | wc -l` is not rewritten and returns real output. Earlier revisions of this
+      note claimed the routing was unpredictable; it is not — it is decided by the invocation shape.
+      [Repo-grounded — measured 2026-07-22, each command issued **alone as the whole content of one
+      call**: piped `find <dir> -name '*.yaml' | wc -l` read the true **2**, and the same query over an
+      empty directory read the true **0**. The reformatted report reproduces under a bare `find` or an
+      explicit `rtk find`. **Measurement caveat**: an earlier revision cited "10 of 10" and "40 of 40"
+      runs collected inside `for` loops — a loop, a `$(…)` substitution, a subshell `( … )`, and a
+      redirection to a file each **suppress** the hook, so those counts described the wrapper rather
+      than the clause. `git diff` does **not** share this behaviour — its filter fires even when piped
+      — so the two commands must never be reasoned about as one rule.] Falsifiable both ways:
+      before the URL-restructure plan merges the leading `test -d` exits non-zero, the `&&` chain
+      short-circuits so the `git ls-files` count never runs and no number is printed at all; a count
+      other than 37
+      means the re-home is incomplete and this plan must not start.
+- [ ] [AI] **Verify blocking plan #2 merged** — the cross-plan syllabus layer is on `origin/main`.
+      Locate it with a command that neither zsh nor RTK can distort — command (single line):
+      `git ls-files -- 'plans/done/*ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md' 'plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md'`
+      — acceptance: three checks, all required. (a) It prints **exactly one** path — pipe it to
+      `grep -c .` and read **1**. Its directory is `<SYLLABUS_ROOT>`. (b) `test -d "<SYLLABUS_ROOT>"`
+      exits 0. (c) `git ls-files -- '<SYLLABUS_ROOT>/*.md' | grep -c .` returns **122**. Record the printed path
+      to `evidence/phase-0-snapshot.txt` as `SYLLABUS_ROOT=<path>` — every later authoring step reads
+      from that recorded root, never from a copy.
+      **Do not write this as `test -d plans/done/*__…/syllabus/courses || test -d plans/in-progress/…`.**
+      This harness runs **zsh**, where an unmatched glob is a fatal error rather than a literal: while
+      plan 02 is still `in-progress` the `plans/done/*__…` pattern matches nothing, zsh aborts the whole
+      command line with `no matches found`, and the `||` fallback **never runs** — a false red in the
+      single most likely state. Were the glob instead to match two archived copies, `test -d` would
+      receive two arguments and exit **2** (`too many arguments`). Both measured on this machine
+      2026-07-22. **`find` is also the wrong instrument for this particular check** — not because a
+      piped `find … | wc -l` miscounts (it does not; see the bare-versus-piped rule in the previous
+      step), but because locating a stage-ambiguous path needs a pathspec that `git ls-files` expands
+      itself, and because the **bare** form of `find` — the one an executor is most likely to run
+      interactively while debugging this step — is rewritten to `rtk find`, which reformats the result
+      and drops flags it does not know. An explicit `rtk find` on this very query printed the single
+      **stdout** line `0 for '<pattern>'` for the nothing-landed case, which `| grep -c .` reads as
+      **1** — the exact inversion of the answer, and the reason `find` is not used here.
+      `ls … | wc -l` is unreliable for the same family of reasons (see this file's Phase 0 preamble).
+      `git ls-files` is unfiltered and expands its own quoted patterns, so neither zsh nor RTK ever
+      sees the `*`.
+      [Repo-grounded — measured 2026-07-22, each command issued alone as the whole content of one call:
+      `rtk find … -path '<pattern>'` wrote `0 for '<root>'` to stdout and **nothing to stderr**, so
+      both the stdout-only and the `2>&1`-merged forms of `| grep -c .` read **1**. An earlier revision
+      of this passage claimed `-path` emits `rtk find: unknown flag '-path', ignored` on stderr, that
+      the merged form therefore reads **2**, and that the dropped flag makes `rtk find` "list the search
+      roots wholesale" — **none of those three reproduced**. They appear to have been generalised from
+      `-mindepth`, which genuinely does emit that warning. The inversion-to-**1** point, which is what
+      actually justifies avoiding `find` here, is unaffected.]
+      Falsifiable both ways: before plan 02 lands in either stage the `git ls-files` locate step
+      matches no path and check (a) reads **0** (`grep -c` also exits 1 on a zero count — read the
+      printed number, never `&&`-chain it); **2** means the corpus was archived twice and the root is ambiguous; and a
+      folder that exists but whose `syllabus/courses/` holds a count other than 122 fails check (c).
 - [ ] [AI] Establish content baselines: `npx nx run ayokoding-www:build` and
       `npx nx run ayokoding-www:test:unit`
       — acceptance: both exit 0; record pass state in `evidence/phase-0-snapshot.txt`.
@@ -415,8 +472,8 @@ subagents capped per the orchestration convention). The main thread self-promote
    [`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a))** — grep this course's
    own worked-example code for the CC-BY-SA Stack Overflow hazard `A8` names explicitly:
    `grep -rn 'stackoverflow\.com\|reddit\.com' "<COURSES><course-id>/learning/code/" 2>/dev/null | grep -c .`
-   — acceptance: prints `0` (ugrep semantics — this exits 1, do not chain with `&&`; read the printed
-   output). Falsifiable both ways: pasting an SO/Reddit URL into any file under that directory makes
+   — acceptance: prints `0` (a zero-count `grep -c` exits 1 under every grep engine this harness may
+   use — do not chain with `&&`; read the printed output). Falsifiable both ways: pasting an SO/Reddit URL into any file under that directory makes
    the count ≥1 today, before this step is satisfied. This is a targeted heuristic, not a full
    copyright audit — the maker-checker-fixer content checkers (step 5) and the human author's own
    judgment remain the primary `A8` control for prose, figures, and structure.
@@ -427,16 +484,19 @@ deploy), applying the convention:
 - [ ] [AI] Light eval gate (`evaluating-ai-output-essentials` — Annotated-concept, Python, settled per
       `$SYLLABUS_ROOT/evaluating-ai-output-essentials.md`, 295 lines) — sits right after the first
       working LLM call, before RAG/agents; answers "how will you know this works?" (DD-25) —
-      acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
+      acceptance: all 9 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
       `grep -F -q 'evaluating-ai-systems-in-depth' "<COURSES>evaluating-ai-output-essentials/overview.md"`
       exits 0 (the scope boundary against the deep-evals course is stated). Falsifiable both ways: the
-      same command exits 1 today (no such directory) and exits 1 again if the boundary line is dropped.
+      same command exits **2** today, because `overview.md` does not exist yet: `grep` exits 2 on a
+      missing path and 1 only on a genuine no-match (measured 2026-07-22, and true under both the ugrep
+      and BSD `grep` engines this harness may route to) — the two are never the same observation; and once the file exists it exits **1** if the boundary line is
+      dropped. Only exit 0 satisfies this clause, so either failure mode fails it.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
 - [ ] [AI] Statistics for evals (`statistics-for-evaluation` — Annotated-concept, code-bearing, Python,
       settled per `$SYLLABUS_ROOT/statistics-for-evaluation.md`, 368 lines) — scoped tightly to what
       evals demand (judge concordance, significance testing), not a general statistics survey (DD-26);
       it is a **hard prerequisite** of `evaluating-ai-systems-in-depth`, so it is authored before (or
-      in the same review cycle as) the deep-evals course — acceptance: all 8 convention steps complete;
+      in the same review cycle as) the deep-evals course — acceptance: all 9 convention steps complete;
       checkers report zero CRITICAL/HIGH/MEDIUM;
       `grep -F -q 'analytics-and-experimentation' "<COURSES>statistics-for-evaluation/overview.md"`
       exits 0 (the scope boundary against classical A/B testing is stated).
@@ -457,7 +517,7 @@ deploy), applying the convention:
       `$SYLLABUS_ROOT/evaluating-ai-systems-in-depth.md`, 384 lines) — sits after agents; error
       analysis, task-specific criteria, LLM-as-judge with measured human agreement, CI gating,
       judge-scope reliability (DD-25); declares `statistics-for-evaluation` a **hard prerequisite** —
-      acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
+      acceptance: all 9 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
       `grep -F -q 'statistics-for-evaluation' "<COURSES>evaluating-ai-systems-in-depth/_index.md"`
       exits 0 (the hard prerequisite is declared) **and**
       `grep -F -q 'evaluating-ai-output-essentials' "<COURSES>evaluating-ai-systems-in-depth/overview.md"`
@@ -479,17 +539,17 @@ deploy), applying the convention:
       Annotated-concept, no code, settled per
       `$SYLLABUS_ROOT/product-patterns-for-probabilistic-systems.md`, 370 lines) — product design
       patterns for probabilistic (not deterministic) outputs; no course owns this today (DD-28) —
-      acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
+      acceptance: all 9 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
 - [ ] [AI] Inference serving and model deployment (`inference-serving-and-model-deployment` — By
       Example, Python, settled per `$SYLLABUS_ROOT/inference-serving-and-model-deployment.md`, 405
       lines) — vLLM/TGI, KV-cache, batching, GPU considerations; entirely absent from the library today
-      (DD-28) — acceptance: all 8 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
+      (DD-28) — acceptance: all 9 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
       every vLLM/TGI version claim sits in a dated accuracy-note sidebar, verified by the facts checker.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] Fine-tuning and adaptation (`fine-tuning-and-adaptation` — By Example, Python, settled per
       `$SYLLABUS_ROOT/fine-tuning-and-adaptation.md`, 423 lines) — fine-tuning/LoRA/PEFT versus RAG as
-      a foil (DD-28) — acceptance: all 8 convention steps complete; checkers report zero
+      a foil (DD-28) — acceptance: all 9 convention steps complete; checkers report zero
       CRITICAL/HIGH/MEDIUM.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] **Add catalog rows** — replace the "per its settled spec" prerequisite cells in
@@ -574,7 +634,14 @@ deploy), applying the convention:
       requirement appears verbatim as an acceptance criterion on each of the three courses' Band 5
       checklist items (verify by reading Phase 7 below), and
       `grep -F -q 'evaluating-ai-systems-in-depth' "<COURSES>creating-ai-powered-apps/overview.md"`
-      exits **1** today (that course does not exist yet) and must exit **0** once Band 5 lands it.
+      exits **2** today (that course does not exist yet, and `grep` exits 2 on a missing path — 1 is
+      reserved for a genuine no-match against a file that _does_ exist, per the rule stated at the
+      light-eval gate in Phase 3) and must exit **0** once Band 5 lands it. The intermediate **1** is
+      reachable only in the window where `overview.md` exists but omits the boundary line — which is
+      itself a real failure state, so all three exit codes are distinguishable here.
+      [Repo-grounded — measured 2026-07-22: the exact command above exited **2** with
+      `No such file or directory`. An earlier revision claimed 1, contradicting this file's own
+      correctly-measured rule.]
 - [ ] [AI] **Lock the D9 naming/citation contract** — record, for Band 5's authoring of
       `agent-context-and-memory`, that it MUST include a context-engineering naming/lineage line citing
       Lütke (2025-06-19), Karpathy (2025-06-25), Willison (2025-06-27), and Anthropic's Effective
@@ -1042,6 +1109,15 @@ rows as part of "convention complete".
       `comm -12 <(grep -h '^# ' apps/ayokoding-www/content/en/learn/courses/defensive-security/learning/*.md | sort -u) <(grep -h '^# ' apps/ayokoding-www/content/en/learn/courses/detection-engineering-and-siem-operations/learning/*.md | sort -u) | wc -l`
       returns **0**. Falsifiable both ways: copying one lesson title between the two courses makes it
       return 1.
+      **The two `<(...)` process substitutions are load-bearing — never unwrap them.** The flag `-h`
+      collides with `rtk grep --help`: a bare `grep -h '^# ' <file>` is rewritten by the harness hook
+      to an `rtk grep -h` call, which prints a ~19-line usage banner and exits **0**, so a line count
+      taken over it reads 19 no matter what the file contains. Inside `<(...)` the hook does not
+      rewrite the call, so real grep semantics apply. [Repo-grounded — measured 2026-07-22:
+      `cat <(grep -h '^# ' plans/backlog/ayokoding-learning-path-04-course-authoring/README.md) | wc -l`
+      returns **1**, that README's single `#` heading, while the same grep issued bare returns the
+      banner.] If this clause is ever restructured out of the wrappers, use `command grep -h`, or drop
+      `-h` altogether and strip the `filename:` prefix with `sed 's/^[^:]*://'`.
 
   **Gherkin (binds) →** "Hands-on detection engineering stays distinct from generalist defensive security"
 
@@ -1451,7 +1527,10 @@ rows as part of "convention complete".
       headings visible in `browser_snapshot`.
 - [ ] [AI] Capture one screenshot per sampled course per breakpoint to
       `evidence/phase-13-<course-id>-en-<breakpoint>px.png` — acceptance:
-      `find evidence -name 'phase-13-*-en-*px.png' | wc -l` returns **33** (11 courses × 3 breakpoints).
+      `git ls-files -- 'evidence/phase-13-*-en-*px.png' | grep -c .` returns **33** (11 courses × 3
+      breakpoints), once the captures are staged or committed with the rest of this phase's evidence.
+      Counting with `git ls-files` rather than `find … | wc -l` keeps the number immune to RTK's
+      `find` reformatting (see Phase 0's blocking-plan checks for the measurement).
       Falsifiable both ways: returns 0 before this step and a number below 33 if any capture is skipped.
 - [ ] [AI] Document the evidence in this checklist: reference each screenshot
       (`![alt](./evidence/...)`) and note the console/network status per sampled course — acceptance:
@@ -1505,8 +1584,17 @@ rows as part of "convention complete".
 - [ ] [AI] **Notify the downstream manifest plan** — confirm all ten band-completion signals are
       present in this file on `origin/main` and reachable by
       [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/delivery.md)
-      — acceptance: `git show origin/main:plans/*/ayokoding-learning-path-04-course-authoring/delivery.md | grep -cE '^MERGED_COMMIT: [0-9a-f]{7,40}$'`
-      returns **10**. Uses the same anchored line-start form as Phase 12's band-completion-signal
+      — acceptance: two steps. (a) Resolve the literal path on `origin/main` — command (single line):
+      `git ls-tree -r --name-only origin/main -- plans | grep -F 'ayokoding-learning-path-04-course-authoring/delivery.md'`
+      — it prints **exactly one** path. (b) Feed that literal path to `git show` — command (single line):
+      `git show "origin/main:<the printed path>" | grep -cE '^MERGED_COMMIT: [0-9a-f]{7,40}$'`
+      returns **10**.
+      **Never put a glob in a `git show <rev>:<path>` argument.** Unquoted,
+      `plans/*/ayokoding-…/delivery.md` is a zsh pattern, and whenever it matches nothing zsh aborts
+      the whole command line with `no matches found` before `git show` runs. Quoted, it fares no
+      better: `git show` does **not** glob-expand its path argument, so it returns **zero bytes and
+      exits 0**, making the acceptance value of 10 silently unreachable. [Repo-grounded — both
+      measured 2026-07-22.] Uses the same anchored line-start form as Phase 12's band-completion-signal
       check; the bare-substring form (`grep -cF 'MERGED_COMMIT:'`) is unreachable here too, for the
       same reason — it also matches this checklist's own prose mentions of the literal substring, so
       it overcounts by however many such prose lines exist at the time (that count drifts as the

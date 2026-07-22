@@ -119,7 +119,8 @@ action, or outcome chains with `And`. Provenance is noted above each scenario.
 
 ### Inherited scenarios
 
-_Source: `prd.md` scenario at line 1612 — routed whole to this plan._
+_Source: `prd.md` §Acceptance Criteria (Gherkin), scenario "The interview-ready MVP proves the
+architecture before other path work begins" — routed whole to this plan._
 
 ```gherkin
 Scenario: The interview-ready MVP proves the architecture before other path work begins
@@ -129,7 +130,8 @@ Scenario: The interview-ready MVP proves the architecture before other path work
   And the interview cluster's remaining NEW courses are not required for that MVP to be considered shipped
 ```
 
-_Source: `prd.md` scenario at line 1620 — routed whole to this plan. **Not harness-executable**: this
+_Source: `prd.md` §Acceptance Criteria (Gherkin), scenario "The AI path is authored before the other
+two manifests are composed" — routed whole to this plan. **Not harness-executable**: this
 is a build-order assertion about this plan's own phase sequence, verified by reading the delivery
 checklist. Kept deliberately; see [README §JC-1](./README.md#jc-1-the-build-order-scenario-is-kept-not-deleted)._
 
@@ -141,7 +143,8 @@ Scenario: The AI path is authored before the other two manifests are composed
   And the careers/immediately-effective/software-engineer and careers/fundamentally-strong/software-engineer manifests are composed only afterward
 ```
 
-_Source: `prd.md` scenario at line 1644 — routed whole to this plan._
+_Source: `prd.md` §Acceptance Criteria (Gherkin), scenario "The software-engineer-to-ai-engineer path
+links prerequisites instead of including them" — routed whole to this plan._
 
 ```gherkin
 Scenario: The AI-engineer path includes its software-engineering prerequisites instead of linking them (inverted 2026-07-21, see tech-docs.md DD-35)
@@ -151,7 +154,8 @@ Scenario: The AI-engineer path includes its software-engineering prerequisites i
   And that reader can start at courseOrder[0] and finish the whole path from this one manifest, with no external prerequisite link required
 ```
 
-_Source: `prd.md` scenario at line 1628 — routed whole to this plan._
+_Source: `prd.md` §Acceptance Criteria (Gherkin), scenario "The immediately-effective path is
+build-app-first" — routed whole to this plan._
 
 ```gherkin
 Scenario: The immediately-effective path is build-app-first
@@ -161,7 +165,8 @@ Scenario: The immediately-effective path is build-app-first
   And the reader ships a real deployed app before any pure-theory course
 ```
 
-_Source: `prd.md` scenario at line 1636 — routed whole to this plan._
+_Source: `prd.md` §Acceptance Criteria (Gherkin), scenario "The fundamentally-strong path is
+fundamentals-first" — routed whole to this plan._
 
 ```gherkin
 Scenario: The fundamentally-strong path is fundamentals-first
@@ -171,7 +176,8 @@ Scenario: The fundamentally-strong path is fundamentals-first
   And the ordering is a valid topological entry into the prerequisite DAG
 ```
 
-_Source: `prd.md` scenario at line 1604 — routed whole to this plan (straddle S6). Its `Given` requires
+_Source: `prd.md` §Acceptance Criteria (Gherkin), scenario "The three software-engineer paths reference
+a shared course with no body duplication" — routed whole to this plan (straddle S6). Its `Given` requires
 all three software-engineer manifests to exist, which is first true at this plan's fourth-manifest
 gate. `ayokoding-learning-path-03-navigation-ui` keeps a fixture-level substitute as a checklist
 acceptance clause, not as Gherkin._

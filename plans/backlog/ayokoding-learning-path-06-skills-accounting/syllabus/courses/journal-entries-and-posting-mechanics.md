@@ -40,23 +40,23 @@ references, no code reproduced]`. This course's placement is an A9 addition — 
 
 ## Concepts
 
-1. **co-01 · batch-vs-real-time-posting** — entries posted in scheduled batches versus posted
-   immediately as they occur, and the consistency tradeoffs of each.
-2. **co-02 · posting-date-vs-transaction-date** — the two dates an entry carries, and why conflating
-   them breaks period integrity.
-3. **co-03 · voiding-vs-reversing** — voiding removes an entry as if it never happened; reversing posts
-   an equal-and-opposite entry, preserving the audit trail — a correct system reverses.
-4. **co-04 · reversing-entry-pattern** — the standard correction mechanism: a new entry that offsets
-   the original, both remaining visible.
-5. **co-05 · suspense-account** — a holding account for entries that cannot yet be classified
-   correctly; a persistently nonzero balance is a signal, not a feature.
-6. **co-06 · clearing-a-suspense-account** — the mechanics of moving a suspense balance to its correct
-   final account once known.
-7. **co-07 · recurring-entry-templates** — mechanics for entries that repeat on a schedule
-   (depreciation, accruals) without duplicating logic each period.
-8. **co-08 · posting-mistake-vs-recognition-mistake** — a posting-mechanics error (wrong period, wrong
-   reversal) is a different failure class from a recognition-timing error (#5's subject) — both are
-   silent, but they are caught by different controls.
+- **co-01 · batch-vs-real-time-posting** — entries posted in scheduled batches versus posted
+  immediately as they occur, and the consistency tradeoffs of each.
+- **co-02 · posting-date-vs-transaction-date** — the two dates an entry carries, and why conflating
+  them breaks period integrity.
+- **co-03 · voiding-vs-reversing** — voiding removes an entry as if it never happened; reversing posts
+  an equal-and-opposite entry, preserving the audit trail — a correct system reverses.
+- **co-04 · reversing-entry-pattern** — the standard correction mechanism: a new entry that offsets
+  the original, both remaining visible.
+- **co-05 · suspense-account** — a holding account for entries that cannot yet be classified
+  correctly; a persistently nonzero balance is a signal, not a feature.
+- **co-06 · clearing-a-suspense-account** — the mechanics of moving a suspense balance to its correct
+  final account once known.
+- **co-07 · recurring-entry-templates** — mechanics for entries that repeat on a schedule
+  (depreciation, accruals) without duplicating logic each period.
+- **co-08 · posting-mistake-vs-recognition-mistake** — a posting-mechanics error (wrong period, wrong
+  reversal) is a different failure class from a recognition-timing error (#5's subject) — both are
+  silent, but they are caught by different controls.
 
 ## Worked examples
 

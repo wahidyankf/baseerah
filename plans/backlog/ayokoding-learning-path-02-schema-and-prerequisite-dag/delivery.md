@@ -240,39 +240,98 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > start precondition is that `origin/main` is green and the `course-paths` feature does not yet
 > exist.
 >
-> **`grep` here is ugrep, not GNU grep — two traps every `grep` clause in this checklist is written
-> around.** (i) **`grep -c` counts matching _lines_, not matches, and exits 1 when the count is 0** —
-> never `&&`-chain it; read its printed output instead (see step 1.4). (ii) **On a non-existent file
-> ugrep exits 2, not 1** — a missing-file case is never the same observation as a no-match case.
-> [Repo-grounded — measured 2026-07-22: a zero-match `grep -c` printed `0` and exited 1; a missing path exited 2 with `ugrep: warning: ... No such file or directory`.]
+> **`grep` here is not GNU grep, and which engine serves a call is context-dependent.** `grep` resolves
+> to a **shell function**, not a binary. It normally forwards to the Claude Code executable run as
+> `ARGV0=ugrep` — a ugrep-compatible mode, ripgrep-backed for regex — but falls through to the system
+> **BSD `grep`** whenever the shim cannot resolve an executable, which happens when
+> `CLAUDE_CODE_EXECPATH` points at a version _directory_ rather than a binary. Both engines have been
+> observed serving the identical command line in different sessions. **Depend on the exit codes below,
+> which hold under both engines; never depend on the literal diagnostic text, which does not.**
+> (i) **`grep -c` counts matching _lines_, not matches, and exits 1 when the count is 0** — never
+> `&&`-chain it; read its printed output instead (see step 1.4). (ii) **On a non-existent file it exits
+> 2, not 1** — a missing-file case is never the same observation as a no-match case.
+> [Repo-grounded — measured 2026-07-22, each command issued alone as the whole content of one call: a
 >
-> **Two traps asserted by an earlier draft were withdrawn on measurement (2026-07-22).** A BRE `\|`
-> alternation containing literal parens was said to be a parse error exiting 2; in fact
-> `grep -n "it(\|describe("` exits **0** and prints its matches. `--glob` was said to be unavailable; in fact
-> `grep --glob='*.ts' -c it <file>` exits **0**. The real constraint is narrower: `--glob` works
-> **only in the `--glob=VALUE` form**, and `--glob VALUE` fails with `ugrep: missing argument for
---glob` — a failure that `2>/dev/null` would hide as a clean zero. Both spellings below are therefore choices,
-> not workarounds, and neither is load-bearing.
+> > zero-match `grep -c` printed `0` and exited 1; a missing path exited **2**. The message text differed
+> > by engine, so it is deliberately not quoted here.]
 >
-> **`git` here is routed through RTK, and its `git diff` filter rewrites the output in _two_ ways —
-> one for the empty case and one for the non-empty case.** Measured on this machine (rtk 0.42.3) for
-> `git diff --name-only <ref> -- <path>`: (1) an **empty** real diff is emitted as a single **blank
-> line**, so `wc -l` prints `1` where the honest answer is `0`; (2) a **non-empty** real diff gains a
-> blank line, a literal `--- Changes ---` section header and another blank line appended after the
-> file list, so `| grep -c .` over-counts by exactly **one** and `wc -l` by three. Measured on the
-> one-changed-file state: `wc -l` prints **4**, `grep -c .` prints **2**. On a six-file state: **9**
-> and **7**. So any clause worded "prints nothing" is wrong about what the executor sees, and a
-> **positive** count taken with `grep -c .` is wrong by one. `--stat` output carries **no** trailer
-> (verified on both the empty and the non-empty case).
+> **Two traps, stated at the precision the evidence supports. Re-measured 2026-07-22, each command
+> issued alone as the whole content of one call:**
 >
-> **Two rules bind every `git diff`-derived count in this checklist.** (A) **Never `| wc -l`** — it
-> is inflated in both states, and being a raw line count it also varies with the invocation shape: a
-> bare `git …` is RTK-rewritten while a `git …` embedded in a compound statement is not, and then
-> prints the unfiltered `0` / `1` / `6`. (B) **Count a `--name-only` list by its path prefix, not by
+> - **A `\|` alternation containing literal parens returns two contradictory answers depending on the
+>   engine — never use it.** Under the ugrep-backed engine, `grep -n "it(\|describe(" <file>` reports an
+>   `unclosed group` regex parse error, prints `0 matches`, and exits **2**, even against a file that
+>   genuinely contains `it(` and `describe(`. Under system BSD `grep` the same pattern parses and
+>   matches normally [Repo-grounded — measured 2026-07-22, each command issued alone as the whole
+>   > content of one call: `/usr/bin/grep -c "it(\|describe(" <a real unit-test file>` returned **62** and
+>   > exited **0**, and in that same session the routed `grep` returned **62**/exit **0** as well, while a
+>   > separate session reproduced the exit-2 parse error through the shim]. So this form is neither a
+>   > reliable failure nor a reliable success: it silently answers the same question two different ways
+>   > across sessions. Write parenthesised alternations as ERE (`-E`) with escaped parens instead. A
+>   > paren-free `\|` alternation is fine — the live uses in steps 1.4 and 1.5 work as documented. An
+>   > earlier revision of this bullet asserted the parse error as universal; it is not.
+> - **`--glob VALUE` (space-separated) always fails; `--glob=VALUE` works only under the ugrep
+>   engine.** The space form is rejected by both engines — ugrep with `missing argument for --glob`,
+>   BSD `grep` with `unrecognized option` — and always exits **2**. The equals form is accepted by
+>   ugrep (measured: returns a real count, exits 0, both through the shim in one session and by
+>   invoking the ugrep backend directly) but rejected by BSD `grep` with
+>   `unrecognized option '--glob=…'`, exit **2**. So the equals form is **conditionally** correct and
+>   the space form is **never** correct. **Use `--include=` / `--exclude-dir=`**, which both engines
+>   accept — measured working in the same session where both `--glob` spellings failed. Two earlier
+>   drafts of this bullet were wrong in opposite directions: one claimed the equals form works
+>   unconditionally, the next claimed neither form works. Both generalised a single session's engine to
+>   a law.
+>
+> Where either construct fails it exits 2 while printing to stderr, so a `2>/dev/null` would hide the
+> failure as a clean zero; where it does **not** fail it returns a plausible-looking count that another
+> session may not reproduce. Both outcomes are unsafe in an acceptance clause. Neither construct is used
+> in any live clause here, and neither should be reintroduced.
+>
+> **RTK's `git diff` filter rewrites the output, and the trailer survives a pipe.** When a `git diff`
+> is run as the **literal, unwrapped, sole command of a call** — which is exactly how an executor runs
+> an acceptance command — the Claude Code hook rewrites it even though the output is piped. A
+> **non-empty** diff gains a blank line and a literal `--- Changes ---` header, so `| grep -c .`
+> over-counts by exactly **one** and `| wc -l` by three. An **empty** diff is emitted as a single
+> **blank line**, which `| grep -c .` reads as a true **0** — a blank line contains no `.` — but which
+> `| wc -l` reads as **1**. That asymmetry is the whole reason rule (A) below bans `wc -l` while the
+> zero-asserting `grep -c .` exception is safe. Measured 2026-07-22, each as the sole content of its
+> own call, against a truth value established independently via `rtk proxy`: a one-file `--name-only`
+> diff read **2** under `grep -c .` where the truth was **1**; the same diff through `rtk proxy` read
+> **1**; an empty `--name-only` diff read **0** under `grep -c .` and **1** under `wc -l`.
+> **`find` behaves differently from `git diff` and must not be assumed to follow the same rule** — a
+> piped `find … | wc -l` is _not_ rewritten even as a sole command (verified: a two-match query read
+> **2** and a zero-match query read **0**), while a **bare** `find` _is_, coming back as a compact
+> report (`2F 1D:` then `./ a.yaml b.yaml`, or `0 for '<pattern>'`) with unknown flags such as
+> `-mindepth` silently dropped.
+>
+> > **Methodological warning — read before re-measuring any of this.** A plain `|` pipe does **not**
+> > suppress the hook, but four other shapes do: a `for` loop, a `$(…)` substitution, a subshell
+> > `( … )`, and a redirection to a file (`git diff … > out`). Any of them returns raw output and makes
+> > the command look unfiltered. Two earlier revisions of this preamble drew the wrong conclusion for
+> > exactly this reason — their samples were gathered inside loops — and both concluded the piped form
+> > was safe, which it is not. Measure by issuing the command **alone**, as the entire content of one
+> > call, and compare against `rtk proxy`. A repetition count gathered inside a loop is evidence about
+> > the loop, not about the clause.
+>
+> **Two rules bind every `git diff`-derived count in this checklist.** (A) **Never `| wc -l`.** The
+> filter fires on the shape an acceptance clause actually runs — the command alone, as the whole
+> content of one call — and **piping does not prevent it**, so a `wc -l` over a non-empty diff reads
+> three too many. This preamble has now held **four** positions on the question, which is itself the
+> most useful thing it records: (i) "bare is rewritten, a `git …` inside a compound statement is not";
+> (ii) withdrawn as unpredictable when the same pipeline appeared to print **6** and then **3**;
+> (iii) "piped is never rewritten", asserted from repetition counts of **8 of 8** and **5 of 5** —
+> **all of which were gathered inside `for` loops, which suppress the hook and therefore measured
+> nothing about the clause**; (iv) the present rule, measured one command per call against an
+> `rtk proxy` truth value. Position (iii) was wrong in the safest-looking direction — it declared a
+> real hazard absent — so treat any future "I re-measured and it is fine" claim about this filter as
+> suspect until it states how each sample was issued.
+> (B) **Count a `--name-only` list by its path prefix, not by
 > its lines** — `| grep -cF "<PLAN>/syllabus/"` prints the true file count (**0** clean, **1** for
 > one file, **6** for six), because the `--- Changes ---` trailer holds no `syllabus/` substring.
-> Verified identical under RTK and under a bypassed RTK, so it also removes the invocation-shape
-> dependency. **Expand `<PLAN>` inside the pattern**, exactly as in the pathspec.
+> Verified identical under RTK and under a bypassed RTK, and it read the true **3** in the very
+> measurement where `wc -l` read 6 — so it is the one counting form that stays correct **regardless**
+> of invocation shape, which is why it is the default for every positive count here.
+> **Expand `<PLAN>` inside the pattern**, exactly as in the pathspec.
 >
 > **The one deliberate exception to (B)**: a clause asserting the count is **0** keeps `| grep -c .`.
 > There it is falsifiable both ways already (0 clean, non-zero in every dirty state), and unlike a
@@ -380,9 +439,16 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — acceptance: both commands print at least one line (exit 0) and the output is committed. This is
       the before-picture the Phase 2 cycle-4 change is diffed against. Falsifiable both ways: run the
       second command against the **implementation** file rather than its `.test.ts` sibling and it
-      prints nothing and exits 1. **The second command is ERE (`-E`) by preference, not necessity** — the
-      BRE form `grep -n "it(\|describe("` also works here (it exits 0 and prints the same matches);
-      `-E` with `\b` is simply the clearer spelling.
+      prints nothing and exits 1. **The second command must be ERE (`-E`) — this is a necessity, not a
+      preference.** The BRE form `grep -n "it(\|describe("` does **not** work: the unescaped parens make
+      it a regex parse error (`unclosed group`), printing `0 matches` and exiting **2**, even against
+      this very `.test.ts` file which does contain `it(` and `describe(`. Because it exits non-zero
+      while printing nothing useful, substituting it here would look like a legitimate "no matches"
+      result. [Repo-grounded — measured 2026-07-22 against
+      `apps/ayokoding-www/src/features/content/core/content-url.test.ts`, command issued alone as the
+      whole content of one call. An earlier revision of this line claimed the BRE form "also works here
+      (it exits 0 and prints the same matches)"; that was false, and the same false claim appeared at
+      two other sites in this file — see the Phase 0 preamble, which now documents the trap.]
 - [ ] [AI] **Confirm the `syllabus/` corpus is intact and untouched** —
       `find <PLAN>/syllabus -type f | wc -l`
       — acceptance: returns **128**. Falsifiable both ways: a deletion or an addition changes the
@@ -511,6 +577,30 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       not exist yet). Falsifiable both ways: once `schemas.ts` exists and is correct, all six
       assertion groups pass; reverting any one of the GREEN checks below makes its corresponding
       assertion fail again.
+
+  **Gherkin (underpins) →** the `pathId` and `courseOrder` shape asserted by "A path manifest is a
+  valid topological entry into the prerequisite DAG" and "Every manifest course reference resolves to
+  a real course" (both in [prd.md](./prd.md#acceptance-criteria-gherkin)); the binding cycles are 2.6
+  and 2.7 below. This schema is the validation gate those scenarios' manifests must first pass, so it
+  underpins them rather than binding them — the same relationship, and the same two scenarios, that
+  cycle 2.1's tag records for `normalizeCourseRef`.
+
+  ```gherkin
+  Scenario: A path manifest is a valid topological entry into the prerequisite DAG
+    Given a path manifest lists a courseOrder of course IDs
+    When the prerequisite-consistency check runs
+    Then no course appears before any of its declared prerequisites that are also in the manifest
+    And the check reports zero ordering violations for that manifest
+  ```
+
+  ```gherkin
+  Scenario: Every manifest course reference resolves to a real course
+    Given a path manifest lists a courseOrder of course IDs
+    When the manifest-integrity check runs
+    Then every listed course ID resolves to an existing course in the library
+    And no course ID appears more than once in the manifest
+  ```
+
 - [ ] [AI] **GREEN** — implement the `PathManifest` zod schema in
       `apps/ayokoding-www/src/features/course-paths/core/schemas.ts` _(new file)_ using **zod 4.3.6**
       [Repo-grounded — `apps/ayokoding-www/package.json`], per
@@ -782,6 +872,22 @@ to the source plan is recorded here so a reader auditing the split can trace eve
   topological entry into the prerequisite DAG" and "Every manifest course reference resolves to a
   real course" (both in [prd.md](./prd.md#acceptance-criteria-gherkin)); the binding cycles are 2.6
   and 2.7 below.
+
+  ```gherkin
+  Scenario: A path manifest is a valid topological entry into the prerequisite DAG
+    Given a path manifest lists a courseOrder of course IDs
+    When the prerequisite-consistency check runs
+    Then no course appears before any of its declared prerequisites that are also in the manifest
+    And the check reports zero ordering violations for that manifest
+  ```
+
+  ```gherkin
+  Scenario: Every manifest course reference resolves to a real course
+    Given a path manifest lists a courseOrder of course IDs
+    When the manifest-integrity check runs
+    Then every listed course ID resolves to an existing course in the library
+    And no course ID appears more than once in the manifest
+  ```
 
 - [ ] [AI] **GREEN** — implement `normalizeCourseRef` and re-export the `PathManifest` /
       `CourseRef` types in `apps/ayokoding-www/src/features/course-paths/core/manifest.ts`
@@ -1253,9 +1359,18 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — acceptance: the first prints `All links valid! No broken links found.`; the other two exit 0.
       **Note**: `md links validate` accepts **no positional path** and always walks the repo — the
       three `--exclude` flags are the pre-push hook's own form, and the bare repo-wide command is
-      unsatisfiable because the repo carries pre-existing broken links under `plans/done/`, all
-      unrelated to this work. **No count is quoted**: that number drifts every time a plan is
-      archived, so a hardcoded figure here would be stale before this plan executes.
+      unsatisfiable because the repo carries pre-existing broken links under `plans/done/`, unrelated
+      to this work. **No count is quoted**: that number drifts every time a plan is archived, so a
+      hardcoded figure here would be stale before this plan executes.
+      **`plans/done/` is not the only source of residual breakage.** As measured 2026-07-22, the exact
+      excluded command above still reported `Total broken links: 1` — a broken `#design-decisions`
+      anchor in `plans/backlog/ayokoding-learning-path-06-skills-accounting/delivery.md`, a sibling
+      plan under active authoring at the time, which the three excludes do not cover. Disposition rule
+      for the executor: **do not add a fourth `--exclude` to make this clause pass.** If a residual
+      break is inside this plan's folder, fix it. If it is outside, fix it at root cause per Root Cause
+      Orientation, or — where it belongs to another plan's in-flight edits — re-run after that plan
+      lands and record the deferral. The acceptance value stays `All links valid! No broken links
+found.` precisely so that a non-zero residue must be explained rather than excluded away.
 
   **Gherkin (binds) →** "The schema and prerequisite-DAG surface builds and validates green"
 
@@ -1304,7 +1419,9 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       **0** on a clean diff and **6** on a six-file diff, reading the same whether or not RTK
       filters the call — so the clause does not depend on how the command is wrapped. `grep -c`
       exits 1 on a zero count, so never `&&`-chain it; read the printed number. The
-      `find … | wc -l` above is unaffected — `find` output is not RTK-filtered.
+      `find … | wc -l` above is unaffected — a **piped** `find` is not rewritten by the hook, so its
+      output reaches `wc -l` raw. (Only a **bare** `find` is rewritten to `rtk find` and reformatted;
+      see the Phase 0 preamble.)
       **The comparison is against `<BASELINE_SHA>`, the SHA Phase 0 pinned — never the live
       `origin/main` ref.** Phase 1's PR is merged to `main` before this phase starts (Per-Phase
       Integration Protocol), so `origin/main` already contains 1.4's edit by now and a diff against it
@@ -1587,7 +1704,9 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `grep -c .` deliberately**: `--stat` output carries no trailer, and a **zero**-asserting count
       must not be expressed as a pattern that an unexpanded `<PLAN>` could satisfy vacuously.
       Check (c)'s content command is what separates "one file" from "the right file".
-      `find … | wc -l` in (a) is unaffected — `find` output is not RTK-filtered. **Why (b) is scoped and (c) exists.** Phase 1.4 **is** a
+      `find … | wc -l` in (a) is unaffected — a **piped** `find` is not rewritten by the hook, so its
+      output reaches `wc -l` raw; only a **bare** `find` is reformatted (see the Phase 0 preamble).
+      **Why (b) is scoped and (c) exists.** Phase 1.4 **is** a
       delivery-step edit under `syllabus/` — the single recorded R3 custody exception, which orders
       Stage 0 in that manifest mirror in place. An unscoped zero-count check would therefore be
       unsatisfiable the moment 1.4 runs, blocking archival forever; and a bare `--stat` zero-count is
@@ -1641,8 +1760,13 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       **Two properties of this command are load-bearing.** (i) `--exclude-dir` takes the **bare
       folder name**, so it excludes this plan's folder from whichever stage it currently sits in
       (`plans/backlog/` or `plans/in-progress/`) without the command needing to know which.
-      (`--glob=VALUE` also works here — though the space-separated `--glob VALUE` does not —
-      so `--exclude-dir` is the chosen spelling, not the only one.) (ii) The
+      (`--exclude-dir` is not merely preferred here, it is the only **unconditionally** working
+      spelling: `--glob VALUE` is rejected by both grep engines this harness may use, and
+      `--glob=VALUE` is accepted by the ugrep engine but rejected with `unrecognized option` by the BSD
+      `grep` the shim falls back to — so the equals form works or fails depending on which engine
+      serves the call. `--exclude-dir` and `--include` are accepted by both. Two earlier revisions of
+      this line were wrong in opposite directions about `--glob=VALUE`; see the Phase 0 preamble, which
+      records the measurements behind both corrections.) (ii) The
       exclusion is what makes 7.3's assertion satisfiable at all: after the `git mv` this plan's
       folder is under `plans/done/`, outside the search roots, so its self-references can never be
       counted again.

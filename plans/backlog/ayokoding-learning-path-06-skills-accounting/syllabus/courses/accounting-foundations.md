@@ -39,31 +39,31 @@ suspense accounts (that is #4's).
 
 ## Concepts
 
-1. **co-01 · accounting-equation** — Assets = Liabilities + Equity, restated as a systems invariant:
-   every recorded event has two effects that must offset.
-2. **co-02 · double-entry** — every transaction touches at least two accounts, one debited and one
-   credited, by equal amounts.
-3. **co-03 · debit-credit-mechanics** — for each account type, which side increases it and which
-   decreases it; "debit" and "credit" are positional labels, not judgments.
-4. **co-04 · account-types** — Asset, Liability, Equity, Revenue, Expense, and each type's normal
-   balance side.
-5. **co-05 · t-accounts** — the two-column visualization of one account's debits and credits, a visual
-   aid rather than a data structure to implement literally.
-6. **co-06 · journal-vs-ledger** — the journal records transactions chronologically; the ledger
-   reorganizes them by account.
-7. **co-07 · trial-balance** — the summary check that total debits equal total credits across every
-   account.
-8. **co-08 · balancing-is-not-correctness** — a trial balance can foot while an individual posting is
-   substantively wrong (see the big-idea bullet above) — stated here, demonstrated concretely starting
-   at #4.
-9. **co-09 · chart-of-accounts-preview** — accounts need a stable naming/numbering scheme, taught in
-   full in #2.
-10. **co-10 · accounting-period-preview** — transactions are grouped into a bounded period for
-    reporting, taught in full in #3.
-11. **co-11 · equity-as-residual** — equity is what remains after liabilities are subtracted from
-    assets, not a bank account with its own independent balance.
-12. **co-12 · ledger-as-append-only** — entries are conceptually never edited in place; a correction is
-    a new offsetting entry, not an edit to history.
+- **co-01 · accounting-equation** — Assets = Liabilities + Equity, restated as a systems invariant:
+  every recorded event has two effects that must offset.
+- **co-02 · double-entry** — every transaction touches at least two accounts, one debited and one
+  credited, by equal amounts.
+- **co-03 · debit-credit-mechanics** — for each account type, which side increases it and which
+  decreases it; "debit" and "credit" are positional labels, not judgments.
+- **co-04 · account-types** — Asset, Liability, Equity, Revenue, Expense, and each type's normal
+  balance side.
+- **co-05 · t-accounts** — the two-column visualization of one account's debits and credits, a visual
+  aid rather than a data structure to implement literally.
+- **co-06 · journal-vs-ledger** — the journal records transactions chronologically; the ledger
+  reorganizes them by account.
+- **co-07 · trial-balance** — the summary check that total debits equal total credits across every
+  account.
+- **co-08 · balancing-is-not-correctness** — a trial balance can foot while an individual posting is
+  substantively wrong (see the big-idea bullet above) — stated here, demonstrated concretely starting
+  at #4.
+- **co-09 · chart-of-accounts-preview** — accounts need a stable naming/numbering scheme, taught in
+  full in #2.
+- **co-10 · accounting-period-preview** — transactions are grouped into a bounded period for
+  reporting, taught in full in #3.
+- **co-11 · equity-as-residual** — equity is what remains after liabilities are subtracted from
+  assets, not a bank account with its own independent balance.
+- **co-12 · ledger-as-append-only** — entries are conceptually never edited in place; a correction is
+  a new offsetting entry, not an edit to history.
 
 ## Worked examples
 

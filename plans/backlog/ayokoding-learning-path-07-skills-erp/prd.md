@@ -91,7 +91,9 @@ Feature: Skills ERP paths — landing, manifest, and ramp behavior
     Then it parses against the PathManifest zod schema
     And its pathId equals "skills/sharia-erp"
     And its courseOrder contains exactly 29 unique course ids
-    And the 3 Sharia-exclusive ids appear after "multi-company-and-multi-currency-erp"
+    And its courseOrder position 26 equals "erp-analytics-and-reporting"
+    And its courseOrder positions 27 to 29 are the 3 Sharia-exclusive ids in catalog order
+    And its final courseOrder entry equals "zakat-and-sharia-compliance-modules"
 
   Scenario: record-to-report-systems declares its hard accounting prerequisite
     Given the course "record-to-report-systems"

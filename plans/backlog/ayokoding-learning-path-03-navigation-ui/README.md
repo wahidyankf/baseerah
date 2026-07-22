@@ -145,8 +145,9 @@ its Passes 3–5 scope was absorbed by the split's course-authoring plan, not by
 
 This plan is **Wave 2** of a five-plan split of the closed
 `shared-course-library-and-learning-paths` plan. It owns the **rendering layer**: the UI design
-funnel for Screens 0–3, the `course-paths` shell components, `?path=` route wiring, the path rail,
-path landings, and the paths hub.
+funnel for Screens 0–3 plus the new **Screen 1a** (category landing) and **Screen 1b** (arc landing),
+the `course-paths` shell components, `?path=` route wiring, the path rail, path landings, and the
+paths hub.
 
 ### Upstream — what must exist before this plan starts
 
@@ -348,9 +349,9 @@ See [prd.md §Personas](./prd.md#personas-one-per-path) for the authoritative co
 - [Business Requirements (brd.md)](./brd.md) — WHY the navigation UI is a real frontend change, who
   it serves, and the business risks this plan carries.
 - [Product Requirements (prd.md)](./prd.md) — personas, user stories, the **complete UI-design-funnel
-  for Screens 0–3** (low-fi wireframes at three viewports, hi-fi finalists, selections, rationale,
-  responsive strategy), the hi-fi asset matrix, the R7 prior-art record, and the thirteen Gherkin
-  acceptance criteria.
+  for Screens 0–3 plus the new Screen 1a (category landing) and Screen 1b (arc landing)** (low-fi
+  wireframes at three viewports, hi-fi finalists, selections, rationale, responsive strategy), the
+  hi-fi asset matrix, the R7 prior-art record, and the Gherkin acceptance criteria.
 - [Technical Docs (tech-docs.md)](./tech-docs.md) — the `course-paths` shell architecture, routing and
   `?path=` propagation, prev/next and breadcrumb resolution, the path rail's two hosts, the
   accessibility contract, design decisions, file impact, and the testing strategy.

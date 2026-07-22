@@ -76,15 +76,74 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
 3. [AI] Run the **PR-Review Maker→Fixer Cycle** (3 sequential CI-gated cycles), resolve every finding,
    then `gh pr ready`.
 4. [AI] **Merge** once all quality gates are green (typecheck, lint, `test:quick`, `test:unit`,
-   `test:e2e` where affected, `specs:behavior:coverage`, CI, the 3-cycle review).
+   `ayokoding-www-fe-e2e:test:e2e` where affected — **not** `ayokoding-www:test:e2e`, which is a
+   no-op echo stub — `specs:behavior:coverage`, CI, the 3-cycle review).
 5. [AI] Dispatch `apps-ayokoding-www-deployer` to deploy `ayokoding-www` to `prod-ayokoding-www` — a
    content/data-only plan still deploys, since the manifests and course bundles are reachable
    behavior. Verify the deploy via `curl -sf https://ayokoding.com/en/learn/paths/skills/conventional-erp | grep -qi "conventional"`
    (after Phase 2) or the equivalent `sharia-erp` URL (after Phase 4).
 
+## Depends-on and start preconditions
+
+- **`blockedBy` (hard, must be merged before Phase 0 completes)**:
+  `ayokoding-learning-path-01-url-restructure` (the `paths/skills/…` URL grammar and `<COURSES>`
+  namespace), `ayokoding-learning-path-02-schema-and-prerequisite-dag` (the `PathManifest` zod schema
+  with `arc` and variable-depth `pathId`, the integrity functions), and
+  `ayokoding-learning-path-03-navigation-ui` (`path-landing.tsx`, `path-card.tsx`,
+  `manifest-repository.ts`, the `?path=` wiring — see
+  [tech-docs §Landing content requirements](./tech-docs.md#landing-content-requirements-what-plan-03-cannot-infer)).
+  A manifest with no renderer is invisible, so without plan 03 this plan's landings cannot be verified
+  at Phase 7 at all.
+- **`blockedBy` (soft overall, hard at two stage gates)**:
+  `ayokoding-learning-path-06-skills-accounting`, expressed at **stage granularity** — see
+  [tech-docs §The 06→07 dependency edge](./tech-docs.md#the-0607-dependency-edge-stage-granularity-not-course-numbers)
+  and `DD-4`. Stage A needs nothing from plan 06; Stage B waits on `ACCT_GATE_B` and Stage C on
+  `ACCT_GATE_C`, both checked mechanically in Phases 3 and 4 rather than here.
+- Start precondition: plans 01, 02 and 03 merged to `origin/main`. Verify each **independently**, so a
+  missing plan cannot hide behind another's commits:
+
+  ```bash
+  for n in 01-url-restructure 02-schema-and-prerequisite-dag 03-navigation-ui; do
+    git log origin/main --oneline | grep -q "ayokoding-learning-path-${n}" \
+      || echo "NOT MERGED: ayokoding-learning-path-${n}"
+  done
+  ```
+
+  Acceptance: **empty output**. An aggregate `grep -c "…-0[123]"` returning ≥ 1 is **not** sufficient —
+  it passes when only one of the three has merged. Plan 06 is deliberately **not** in this loop: its
+  gating is per-stage and belongs to the `ACCT_GATE_*` checks, not to a start precondition that would
+  needlessly block Stage A.
+
+## Parallelization Model
+
+Two manifests share one 26-course corpus, so the corpus is the constraint and the manifests are not.
+Within a stage, courses with no prerequisite edge between them author in parallel up to the
+concurrency cap; courses with an edge serialize. **Stage A (15 courses) carries no accounting
+precondition and runs fully concurrently with plan 06** — only Stage B and Stage C wait on their
+`ACCT_GATE_*` checks, which is what makes the 06→07 edge soft overall and hard only at those two
+gates. The two manifests' TDD growth cycles are separate, parallelizable sub-phases once their shared
+courses exist: `<CONVMAN>` stops growing at 26 while `<SHARMAN>` continues to 29, so after §3.2 they
+no longer contend. See
+[tech-docs §Authoring stages vs reading ramp](./tech-docs.md#authoring-stages-vs-reading-ramp-dd-3)
+for the topological ordering this parallelization respects.
+
 ## Shell constants (reused across phases)
 
 ```bash
+# Run from the repo root. Detects this plan's current lifecycle stage and re-derives every path.
+# Never hardcode `plans/backlog/…`: this plan is archived with a `git mv` in Phase 7, and any
+# clause still pointing at the old folder sweeps a path that no longer exists, returns empty, and
+# passes vacuously. Mirrors plan 06's own PLANDIR block.
+if [ -d "plans/backlog/ayokoding-learning-path-07-skills-erp" ]; then
+  PLANDIR="plans/backlog/ayokoding-learning-path-07-skills-erp/"
+elif [ -d "plans/in-progress/ayokoding-learning-path-07-skills-erp" ]; then
+  PLANDIR="plans/in-progress/ayokoding-learning-path-07-skills-erp/"
+else
+  PLANDIR=$(find plans/done -maxdepth 1 -type d -name "*ayokoding-learning-path-07-skills-erp" | head -1)/
+fi
+echo "PLANDIR=$PLANDIR"
+[ -d "$PLANDIR" ] || { echo "PLANDIR-UNRESOLVED — every sweep below would pass vacuously"; }
+
 COURSES="apps/ayokoding-www/content/en/learn/courses/"
 PATHS="apps/ayokoding-www/content/en/learn/paths/"
 MANIFESTS="apps/ayokoding-www/src/features/course-paths/manifests/"
@@ -92,7 +151,7 @@ CONVMAN="${MANIFESTS}skills/conventional-erp.yaml"
 SHARMAN="${MANIFESTS}skills/sharia-erp.yaml"
 CONVLANDING="${PATHS}skills/conventional-erp/_index.md"
 SHARLANDING="${PATHS}skills/sharia-erp/_index.md"
-SYL="plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/courses/"
+SYL="${PLANDIR}syllabus/courses/"
 
 # Stage A — 15 ids, no accounting precondition
 ERP_STAGE_A=(
@@ -138,15 +197,29 @@ ACCT_GATE_C=(
 
 ## Phase 0: Environment Setup
 
+- [ ] [AI] All three hard blocking plans (01, 02, 03) merged to `origin/main` — run the per-plan loop
+      in [§Depends-on](#depends-on-and-start-preconditions); acceptance: empty output. Plan 06 is
+      gated per-stage in Phases 3 and 4, not here.
 - [ ] [AI] Install dependencies: `npm install`.
 - [ ] [AI] Run doctor to verify tooling: `npm run doctor -- --fix`.
 - [ ] [AI] Verify dev server starts: `nx dev ayokoding-www`.
 - [ ] [AI] Verify existing tests pass before making changes:
       `nx run ayokoding-www:test:quick`.
-- [ ] [AI] Verify no id collision: for each id in `ERP_ALL`, confirm it is not a substring of any
-      other id in `ERP_ALL` and does not already exist under `<COURSES>` —
+- [ ] [AI] **Cardinality guard — run before the three checks below, which are all vacuous against an
+      unset array**:
+      `[ "${#ERP_ALL[@]}" -eq 29 ] && [ "${#ACCT_GATE_B[@]}" -eq 5 ] && [ "${#ACCT_GATE_C[@]}" -eq 2 ] && echo GUARD-OK || echo GUARD-FAIL`
+      — acceptance: prints `GUARD-OK`. If the constants block above was not sourced, every `for … in
+"${ERP_ALL[@]}"` sweep in this plan iterates zero times and reports success.
+- [ ] [AI] Verify no id in `ERP_ALL` already exists under `<COURSES>`:
       `for id in "${ERP_ALL[@]}"; do test -d "${COURSES}${id}" && echo "COLLISION: $id"; done | grep -q . && echo FAIL || echo PASS`
       — acceptance: prints `PASS`.
+- [ ] [AI] Verify **no id in `ERP_ALL` is a substring of another** — this is a separate check from the
+      one above, which only tests for pre-existing directories and cannot detect substring overlap:
+      `for a in "${ERP_ALL[@]}"; do for b in "${ERP_ALL[@]}"; do [ "$a" != "$b" ] && case "$b" in *"$a"*) echo "SUBSTRING: $a ⊂ $b";; esac; done; done | grep -q . && echo FAIL || echo PASS`
+      — acceptance: prints `PASS`.
+      **Control probe before believing the `PASS`**: temporarily append a known-colliding id (e.g.
+      `erp-security`) to a copy of the array and re-run — it must print `FAIL`. A check that cannot be
+      made to fail is not measuring anything.
 - [ ] [AI] Verify no id collides with an accounting id: `comm -12 <(printf '%s\n' "${ERP_ALL[@]}" | sort) <(printf '%s\n' "${ACCT_GATE_B[@]}" "${ACCT_GATE_C[@]}" | sort)` — acceptance: empty output.
 
 ### Phase 0 Gate
@@ -163,26 +236,57 @@ precedes confirmation, and confirmation is coverage-only (`A12`).
 
 ### 1.1 — Author all 29 syllabus specs (already drafted; this step verifies, not re-authors)
 
-- [x] [AI] `<SYL>README.md` and all 29 `<SYL><id>.md` files exist, each with the required section set
-      (header block, Scope note ending `License-aware (DD-15)`, Why this exists, Prerequisites,
-      Accuracy notes, Concepts, Worked examples, Synthesis exercise, Read more, In which paths).
-      Verify: `for id in "${ERP_ALL[@]}"; do test -f "${SYL}${id}.md" || echo "MISSING: $id"; done | grep -q . && echo FAIL || echo PASS` —
-      acceptance: prints `PASS`.
-- [x] [AI] `syllabus/paths/manifest-skills-conventional-erp.md` and
-      `syllabus/paths/manifest-skills-sharia-erp.md` exist and together enumerate all 29 ids exactly
-      once each (26 shared + 3 Sharia-exclusive) — verify:
-      `grep -c '^[0-9]\+\.`' plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/paths/manifest-skills-sharia-erp.md`—
-acceptance: the count of numbered`courseOrder` lines is 29.
+- [x] [AI] `${PLANDIR}syllabus/README.md` (the index sits one level **above** `<SYL>`, not inside it)
+      and all 29 `<SYL><id>.md` files exist, each with the required section set (header block, Scope
+      note ending `License-aware (DD-15)`, Why this exists, Prerequisites, Accuracy notes, Concepts,
+      Worked examples, Synthesis exercise, Read more, In which paths). Verify:
+
+  ```bash
+  test -f "${PLANDIR}syllabus/README.md" || echo "MISSING: syllabus/README.md"
+  for id in "${ERP_ALL[@]}"; do test -f "${SYL}${id}.md" || echo "MISSING: $id"; done
+  ```
+
+  Acceptance: **empty output**. Guard first — `[ "${#ERP_ALL[@]}" -eq 29 ] && echo GUARD-OK` must
+  print `GUARD-OK`, or the loop iterates zero times and the emptiness means nothing.
+
+- [x] [AI] Both path mirrors exist and **each** enumerates its own full `courseOrder` — the previous
+      version of this clause checked only the Sharia mirror while claiming to check both, and its
+      command was corrupted by an unescaped backtick. `conventional-erp` carries 26 ids and
+      `sharia-erp` carries 29; together they cover all 29 distinct ids (26 shared + 3
+      Sharia-exclusive):
+
+  ```bash
+  SYLPATHS="${PLANDIR}syllabus/paths/"
+  conv=$(grep -cE '^[0-9]+\. `' "${SYLPATHS}manifest-skills-conventional-erp.md")
+  shar=$(grep -cE '^[0-9]+\. `' "${SYLPATHS}manifest-skills-sharia-erp.md")
+  union=$(cat "${SYLPATHS}manifest-skills-conventional-erp.md" "${SYLPATHS}manifest-skills-sharia-erp.md" \
+    | grep -oE '^[0-9]+\. `[a-z0-9-]+`' | sed 's/^[0-9]*\. //; s/`//g' | sort -u | grep -c .)
+  echo "conv=$conv shar=$shar union=$union"
+  [ "$conv" -eq 26 ] && [ "$shar" -eq 29 ] && [ "$union" -eq 29 ] && echo PASS || echo FAIL
+  ```
+
+  Acceptance: prints `conv=26 shar=29 union=29` then `PASS`. **Control probe**: delete one id line
+  from a scratch copy and re-run — it must print `FAIL`.
 
 ### 1.2 — The A4 verification pass before any spec asserts a fact
 
+- [ ] [AI] **Cardinality guard first — this clause is meaningless without it.**
+      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 29 ] && echo GUARD-OK || echo GUARD-FAIL` — acceptance:
+      prints `GUARD-OK`. A wrong `$SYL` (for example, one still pointing at a lifecycle folder the
+      plan has moved out of) makes every sweep below return empty and pass vacuously; this guard is
+      what makes the emptiness meaningful.
 - [ ] [AI] For every syllabus's "Accuracy notes" section, confirm every `[Verified]` claim traces to
       the domain-research grounding file or a fetched primary source, and every `[Unverified]` /
-      `[Needs Verification]` claim is **not** restated as fact elsewhere in the same file — verify:
-      `grep -L '\[Verified\]\|\[Unverified\]\|\[Needs Verification\]\|\[Judgment call\]' "${SYL}"*.md` returns
-      no ERP-domain-specific-claim file lacking any marker (a file with zero markers because it makes
-      no ERP-domain-specific claim is acceptable; flag any file whose Accuracy notes section is
-      empty).
+      `[Needs Verification]` claim is **not** restated as fact elsewhere in the same file — verify
+      every file carries at least one A4 marker:
+      `for f in "${SYL}"*.md; do grep -qE '\[(Verified|Unverified|Needs Verification|Judgment call)\]' "$f" || echo "NO-MARKER: $f"; done | grep -c .`
+      returns **0**. Do **not** use `grep -L` here: it lists files _without_ a match and exits 0 when
+      it finds one, so the clause would be unfalsifiable.
+      **Control probe before believing the zero**: append `x` to the pattern (making it match nothing)
+      and re-run — the count must jump to 29. If it does not, the sweep is not measuring what it
+      claims and the zero is false.
+      A file whose Accuracy notes section is present but **empty** fails this clause even if a marker
+      appears elsewhere in the file — check that section specifically.
 - [ ] [AI] Re-verify the two open items named in `tech-docs.md` before Phase 4 begins (they gate
       Stage C, not Stage A/B): the PSAK-numbering question in
       `sharia-compliant-erp-design.md`, and the AAOIFI/PSAK/MASB jurisdictional-model table. Dispatch
@@ -216,7 +320,11 @@ acceptance: the count of numbered`courseOrder` lines is 29.
       CI green, `[AI]` merge, no deploy needed (plan-folder-only change, not a build input).
 
 > **Pause Safety**: `syllabus/` is fully authored and confirmed; no `<COURSES>` or manifest file yet
-> exists. Safe to stop. To resume: `test -f plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/courses/zakat-and-sharia-compliance-modules.md && echo READY`.
+> exists. Safe to stop. To resume: re-derive `PLANDIR`/`SYL` from the Shell constants block above,
+> then `test -f "${SYL}zakat-and-sharia-compliance-modules.md" && echo READY`. Do not hardcode
+> `plans/backlog/…` here — this plan is moved with `git mv` in Phase 7, and a hardcoded resume check
+> would
+> report absence after the move.
 
 ## Phase 2: Stage A — Foundations and Architecture
 
@@ -247,6 +355,21 @@ transcribing the module/topic content from `<SYL>${id}.md`:
       acceptance: prints `PASS` for every id in `ERP_STAGE_A`.
 
 ### 2.2 — TDD: publish both manifests at 15 ids
+
+**Gherkin (binds) →** "conventional-erp manifest validates against the PathManifest schema"
+
+```gherkin
+Scenario: conventional-erp manifest validates against the PathManifest schema
+  Given the file "manifests/skills/conventional-erp.yaml"
+  Then it parses against the PathManifest zod schema
+  And its pathId equals "skills/conventional-erp"
+  And its arc equals "immediately-effective"
+  And its courseOrder contains exactly 26 unique course ids
+```
+
+The 26-id assertion is this scenario's **terminal** state, reached at §3.2; this sub-phase publishes
+the manifest at 15 ids and the scenario goes green once Stage B growth completes. `<SHARMAN>`'s own
+schema scenario is bound separately at §4.2 — one scenario per tag.
 
 - [ ] [AI] **RED** — Write `apps/ayokoding-www/src/features/course-paths/manifests/skills/erp-manifests.unit.test.ts`
       asserting `<CONVMAN>` and `<SHARMAN>` each parse against the `PathManifest` zod schema, each has
@@ -286,7 +409,11 @@ immediately-effective`, and `courseOrder` containing exactly the 15 `ERP_STAGE_A
 ### Phase 2 Gate
 
 - [ ] [AI] `nx run ayokoding-www:test:unit` green (erp-manifests suite).
-- [ ] [AI] `nx run ayokoding-www:test:e2e` green for the new feature file.
+- [ ] [AI] `nx run ayokoding-www-fe-e2e:test:e2e` green for the new feature file. **Not
+      `ayokoding-www:test:e2e`** — that target is an `echo 'no-op: target not applicable for this
+project'` stub and can never fail, so citing it would make this checkbox vacuous. The real
+      Playwright suite carrying this plan's step definitions lives on the sibling
+      `ayokoding-www-fe-e2e` project, which is also what plan 06 cites.
 - [ ] [AI] `nx run ayokoding-www:typecheck`, `:lint`, `:test:quick` all green.
 - [ ] [AI] `for id in "${ERP_STAGE_A[@]}"; do test -d "${COURSES}${id}" || echo "MISSING: $id"; done | grep -q . && echo FAIL || echo PASS` prints `PASS`.
 - [ ] [AI] **Integration**: draft PR opened, 3-cycle PR-Review complete, CI green, `[AI]` merge,
@@ -318,6 +445,19 @@ scope-boundary self-check worked example (DD-10) to be present and reviewed by
 - [ ] [AI] `for id in "${ERP_STAGE_B[@]}"; do test -d "${COURSES}${id}" || echo "MISSING: $id"; done | grep -q . && echo FAIL || echo PASS` prints `PASS`.
 
 ### 3.2 — TDD: grow both manifests to 26 ids
+
+**Gherkin (binds) →** "the shared 26 courses are identical bodies referenced from both manifests"
+
+```gherkin
+Scenario: the shared 26 courses are identical bodies referenced from both manifests
+  Given a course id present in both "skills/conventional-erp" and "skills/sharia-erp" courseOrder
+  When the reader visits that course under either path context
+  Then the rendered body content is byte-identical
+  And no second copy of the course file exists on disk
+```
+
+This is `A11`'s one-body-two-references rule made reachable. `conventional-erp` reaches its terminal
+26 ids here and stops at `erp-analytics-and-reporting`.
 
 - [ ] [AI] **RED** — Extend `erp-manifests.unit.test.ts` asserting both `<CONVMAN>` and `<SHARMAN>`
       each contain all 26 shared ids (Stage A's 15 plus Stage B's 11, at the insertion positions in
@@ -382,12 +522,34 @@ Every claim in the jurisdictional-model table carries its A4 marker into the cou
 
 ### 4.2 — TDD: grow `<SHARMAN>` to 29 ids
 
+**Gherkin (binds) →** "sharia-erp manifest validates against the PathManifest schema"
+
+```gherkin
+Scenario: sharia-erp manifest validates against the PathManifest schema
+  Given the file "manifests/skills/sharia-erp.yaml"
+  Then it parses against the PathManifest zod schema
+  And its pathId equals "skills/sharia-erp"
+  And its courseOrder contains exactly 29 unique course ids
+  And its courseOrder position 26 equals "erp-analytics-and-reporting"
+  And its courseOrder positions 27 to 29 are the 3 Sharia-exclusive ids in catalog order
+  And its final courseOrder entry equals "zakat-and-sharia-compliance-modules"
+```
+
+The last three steps are load-bearing, not decorative: a set-membership assertion alone holds under
+both the correct ordering and the superseded "insert before `erp-security-and-controls`" rule, so
+without them this scenario could not regression-guard the terminal boundary.
+
 - [ ] [AI] **RED** — Extend `erp-manifests.unit.test.ts` asserting `<SHARMAN>` contains all 29 ids at
       the positions in
       [tech-docs.md §courseOrder arrays](./tech-docs.md#courseorder-arrays-at-each-growth-boundary)
-      (the 3 Sharia-exclusive ids inserted immediately after `multi-company-and-multi-currency-erp`
-      and before `erp-security-and-controls`), and that `<CONVMAN>` is **unaffected** (still 26,
-      unchanged) — run the suite and verify it **fails**.
+      (the 3 Sharia-exclusive ids **appended after the complete 26-id shared corpus**, i.e. after
+      `erp-analytics-and-reporting`, occupying positions 27-29 with
+      `zakat-and-sharia-compliance-modules` terminal), and that `<CONVMAN>` is **unaffected** (still
+      26, unchanged) — run the suite and verify it **fails**.
+      Assert the terminal id explicitly, not just the set: the test must fail if
+      `<SHARMAN>[28]` is anything other than `zakat-and-sharia-compliance-modules`. A set-membership
+      assertion alone passes under both the correct and the superseded ordering and cannot
+      regression-guard this.
 - [ ] [AI] **GREEN** — Grow `<SHARMAN>` to 29 ids — run the suite and verify it **passes**.
 - [ ] [AI] **REFACTOR** — Re-run integrity checks on `<SHARMAN>` only; verify zero violations.
 
@@ -420,12 +582,37 @@ Every claim in the jurisdictional-model table carries its A4 marker into the cou
 ## Phase 5: Cross-Path Integrity and Spec Coverage Verification
 
 - [ ] [AI] Run `checkManifestIntegrity` and `checkPrerequisiteConsistency` against **both** final
-      manifests together — verify zero violations, and specifically verify no shared course id's body
-      differs in content depending on which manifest referenced it (A11 — one body, two references):
-      `diff <(git log --follow --format=%H -- "${COURSES}erp-foundations-and-history/_index.md" | wc -l) <(echo 1)` is not the right check; instead assert **no duplicate file exists**:
-      `find "${COURSES}" -maxdepth 1 -name 'erp-*' -o -name '*-to-*-systems' -o -name '*-erp*' | sort | uniq -d` — acceptance: empty output (no id appears as more than one directory).
+      manifests together — acceptance: zero violations reported by each.
+- [ ] [AI] **A11 — one body, two references.** Verify no shared course id has a second copy anywhere
+      under `<COURSES>`, which is the only way a body could diverge between the two manifests. Search
+      the whole tree by id rather than a name glob over the top level:
+
+  ```bash
+  for id in "${ERP_ALL[@]}"; do
+    n=$(find "${COURSES}" -type d -name "$id" | grep -c .)
+    [ "$n" -eq 1 ] || echo "EXPECTED-1-GOT-$n: $id"
+  done
+  ```
+
+  Acceptance: **empty output**. Guard first — `[ "${#ERP_ALL[@]}" -eq 29 ] && echo GUARD-OK` must
+  print `GUARD-OK`.
+
+  Three notes on why this replaces the previous clause, which could not fail:
+  - `find … -maxdepth 1 … | sort | uniq -d` was **vacuous by construction** — `find` lists each
+    directory exactly once, so `uniq -d` had nothing to emit no matter what the tree contained.
+  - Its name globs (`erp-*`, `*-to-*-systems`, `*-erp*`) also missed 6 of the 29 ids outright,
+    including `production-planning-and-mrp`, `demand-and-supply-planning`,
+    `inventory-and-warehouse-management`, `human-capital-management-and-hire-to-retire`,
+    `islamic-contract-based-transaction-flows` and `zakat-and-sharia-compliance-modules`.
+  - `git log --follow` on a single hardcoded id was not a corpus-wide check and is dropped.
+
+  **Control probe**: `mkdir -p "${COURSES}sharia-erp/erp-foundations-and-history"` in a scratch
+  checkout and re-run — it must print `EXPECTED-1-GOT-2`. Remove it afterwards.
+
 - [ ] [AI] `nx run ayokoding-www:specs:behavior:coverage` reports 100% for `skills-erp-paths.feature`.
-- [ ] [AI] `nx run ayokoding-www:test:unit` and `:test:e2e` both green for the full corpus.
+- [ ] [AI] `nx run ayokoding-www:test:unit` **and** `nx run ayokoding-www-fe-e2e:test:e2e` both green
+      for the full corpus — acceptance: both exit 0. The e2e target must be the `-fe-e2e` project's;
+      `ayokoding-www:test:e2e` is a no-op echo stub and would pass unconditionally.
 
 ### Phase 5 Gate
 
@@ -451,9 +638,21 @@ never passes vacuously.
       FAS number; **acceptance**: for every quoted FAS number, the confirming dispatch reports "no
       verbatim match found", or the offending span is rewritten before this clause is marked
       complete.
-- [ ] [AI] **No screenshot of proprietary software**: `find apps/ayokoding-www/content/en/learn/courses -path '*erp*' -o -path '*sharia*' | xargs -I{} find {} -iname '*.png' -o -iname '*.jpg' 2>/dev/null` —
-      acceptance: **empty output** (this corpus ships no binary image assets at all, per its
-      no-net-new-screen exemption; any match fails this clause and must be investigated).
+- [ ] [AI] **No screenshot of proprietary software.** Sweep the course bundles this plan actually
+      authored, by id, rather than by a path glob over a tree that may not exist yet:
+      `for id in "${ERP_ALL[@]}"; do find "${COURSES}${id}" \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' -o -iname '*.webp' \); done | grep -c .`
+      — acceptance: returns **0**.
+      Note three things this clause deliberately does **not** do, each of which silently broke the
+      previous version: it does not pipe paths into a second `find`; it does not redirect stderr to
+      `/dev/null` (a missing directory must surface as an error, not as a passing empty result); and
+      it parenthesises the `-o` alternation so the implicit `-print` applies to every branch rather
+      than only the last.
+      **This clause is only meaningful once the bundles exist** — run it after the Phase 5 authoring
+      steps, never before, or it measures an empty tree. Guard:
+      `[ "$(for id in "${ERP_ALL[@]}"; do test -d "${COURSES}${id}" && echo x; done | grep -c .)" -eq 29 ] && echo GUARD-OK || echo GUARD-FAIL`
+      must print `GUARD-OK` first.
+      Expected steady state is zero matches (this corpus ships no binary image assets, per its
+      no-net-new-screen exemption); any match fails the clause and must be investigated.
 - [ ] [AI] **No chart of accounts lifted from a reference implementation**: manual review confirms
       every worked example's dataset in every By-Example course under `ERP_ALL` uses an
       originally-authored account/item/customer/vendor naming scheme, cross-checked against no known
@@ -464,10 +663,33 @@ never passes vacuously.
       `for id in "${ERP_ALL[@]}"; do grep -qF 'License-aware (DD-15)' "${SYL}${id}.md" || echo "MISSING TAG: $id"; done | grep -q . && echo FAIL || echo PASS` —
       acceptance: prints `PASS`.
 
+### Licensing reading audit — course bodies **and** syllabus artifacts (A8 + A12)
+
+> `A8` binds both layers. The clauses above that carry real substance — verbatim standards text,
+> chart-of-accounts provenance — read **course bodies only**, and the syllabus layer gets nothing
+> beyond a tag-presence check. That is a gap: the syllabi are where standards bodies and reference
+> implementations are actually cited, so they carry at least as much exposure as the bodies do.
+> This clause closes it, mirroring plan 06's own combined audit.
+
+- [ ] [AI] Read **both** layers against the eleven safe-authoring rules in
+      [tech-docs §Licensing and IP Compliance](./tech-docs.md#licensing-and-ip-compliance-a8): every
+      file in `"${SYL}"` (29 syllabi) **and** every `overview.md` under `"${COURSES}"` for `ERP_ALL`
+      (29 course bodies) — 58 files total. Confirm none reproduces a standard's clause text or
+      numbering layout, mirrors a commercial curriculum's module sequence (ASCM/APICS CPIM and CSCP
+      outlines are copyrighted products — naming one as corroboration is nominative use and fine,
+      transcribing or re-ordering to match it is not, per `A12`), pastes copyleft code, lifts a
+      reference implementation's demo dataset, or uses a vendor name in a title.
+      Cardinality guard first:
+      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 29 ] && echo GUARD-OK || echo GUARD-FAIL` must print
+      `GUARD-OK` — acceptance: `GUARD-OK`, then zero violations found across all 58 files; any
+      finding is fixed before this gate closes.
+
 ### Phase 6 Gate
 
 - [ ] [AI] All five clauses above pass (not vacuously — each has a real failure mode that was
       checked, not merely a command that could never fail).
+- [ ] [AI] **Integration**: draft PR opened, 3-cycle PR-Review complete, CI green, `[AI]` merge,
+      `ayokoding-www` deployed.
 
 > **Pause Safety**: licensing/trademark posture is verified across the full corpus. Safe to stop. To
 > resume: re-run the five clauses above.
@@ -486,11 +708,26 @@ UI-gate-exempt; the three-tester retest is the mandatory non-vacuous substitute.
       CRITICAL/HIGH findings, and specifically confirm the Dangerous-N ramp table renders
       legibly and the color-blind-friendly palette (inherited from plan 03's design system) is
       preserved.
+- [ ] [AI] **Capture the retest evidence — three "zero findings" reports with no artefact are
+      unauditable**, and this is the mandatory substitute for a UI gate, so its evidence carries more
+      weight here than it would on a UI-gated plan. Each tester runs in `delivery` mode and writes its
+      report into this plan; additionally save to `${PLANDIR}evidence/`:
+  - each tester's report path recorded as `phase7__<tester>__report.md` (or a link to it if the
+    tester wrote elsewhere);
+  - `browser_take_screenshot` of both landings at mobile 375px, tablet 768px and desktop 1440px,
+    using `browser_resize` between each, named `phase7__<path-id>__<width>.png`.
+    Acceptance: `ls "${PLANDIR}evidence/" | grep -c '^phase7__'` returns **at least 9** (6
+    screenshots + 3 tester reports), **and** each tester's recorded verdict is zero CRITICAL and
+    zero HIGH. Do not suppress stderr — a missing evidence directory must surface as an error
+    rather than as a passing empty result.
 
 ### Phase 7 Gate
 
 - [ ] [AI] All three testers report zero CRITICAL/HIGH findings, or every finding is fixed and
       re-verified.
+- [ ] [AI] Evidence captured under `${PLANDIR}evidence/` per the capture step above.
+- [ ] [AI] **Integration**: draft PR opened, 3-cycle PR-Review complete, CI green, `[AI]` merge,
+      `ayokoding-www` deployed.
 
 > **Pause Safety**: both landings are manually retested and clean. Safe to stop. To resume: re-dispatch
 > the three testers.
@@ -503,11 +740,32 @@ UI-gate-exempt; the three-tester retest is the mandatory non-vacuous substitute.
 - [ ] [AI] End-to-end path-walk: navigate `/en/learn/paths/skills/conventional-erp`, step through
       prev/next across all 26 courses via Playwright MCP, verify no broken link and no console error;
       repeat for `/en/learn/paths/skills/sharia-erp` across all 29.
+- [ ] [AI] **Capture evidence for the walk — a walk with no artefact is unauditable.** Write to
+      `${PLANDIR}evidence/`:
+  - `browser_take_screenshot` of each path landing at three breakpoints (mobile 375px, tablet 768px,
+    desktop 1440px), using `browser_resize` between each, named
+    `phase8__<path-id>__<width>__landing.png`.
+  - `browser_take_screenshot` of the first and last course page of each walk, named
+    `phase8__<path-id>__<position>__<course-id>.png` — for `sharia-erp` the last is
+    `zakat-and-sharia-compliance-modules` (course 29), for `conventional-erp` it is
+    `erp-analytics-and-reporting` (course 26).
+  - `browser_console_messages` output for each walk saved as
+    `phase8__<path-id>__console.txt`.
+    Acceptance: `ls "${PLANDIR}evidence/" | grep -c '^phase8__'` returns **at least 11** (6
+    landing screenshots + 4 course screenshots + 2 console logs is 12; the floor allows one
+    combined console capture), **and** every `phase8__*__console.txt` contains zero lines matching
+    `-iE 'error|warning'`:
+    `grep -ilE 'error|warning' "${PLANDIR}evidence/"phase8__*__console.txt | grep -c .` returns
+    **0**. Do not redirect stderr here — a missing evidence directory must surface as an error
+    rather than as a passing empty result.
 
 ### Phase 8 Gate
 
 - [ ] [AI] Build succeeds; affected checks green; both path-walks complete with zero errors.
-      **Integration**: final draft PR (if any residual changes) merged, `ayokoding-www` deployed.
+      **Integration**: final draft PR opened with all preconditions confirmed — but **not merged
+      here**. The PR stays open through Phases 9 and 10 so Knowledge Capture and the archival move are
+      committed to this same branch and land inside this PR, as the merge protocol requires. The
+      `[AI]` merge and the `ayokoding-www` deploy are the terminal steps of Phase 10.
 
 > **Pause Safety**: the full corpus builds and both paths are walkable end to end. Safe to stop. To
 > resume: re-run the Playwright path-walk.
@@ -534,6 +792,8 @@ UI-gate-exempt; the three-tester retest is the mandatory non-vacuous substitute.
 - [ ] [AI] Every `learnings.md` entry is terminal (routed, filed as backlog, discarded with reason),
       or the explicit "none" escape is recorded.
 - [ ] [AI] No code-homed learning landed inline in this plan's own commits/PR.
+- [ ] [AI] **Integration**: the triaged `learnings.md` is committed to the still-open PR branch from
+      Phase 8 (no separate PR), CI green.
 
 > **Pause Safety**: `learnings.md` is fully triaged. Safe to stop. To resume: re-read `learnings.md`
 > and confirm every entry is terminal.
@@ -543,12 +803,32 @@ UI-gate-exempt; the three-tester retest is the mandatory non-vacuous substitute.
 - [ ] [AI] `git mv plans/backlog/ayokoding-learning-path-07-skills-erp plans/done/$(date +%Y-%m-%d)__ayokoding-learning-path-07-skills-erp`.
 - [ ] [AI] Update `plans/backlog/README.md` and `plans/backlog/ayokoding-learning-path-programme.md`
       to remove this plan's backlog entry and reflect its completed status.
-- [ ] [AI] Commit and push the archival move in the same PR as any final residual change; merge.
+- [ ] [AI] Commit the archival move **to the still-open PR branch from Phase 8** — no dedicated
+      follow-up archival PR. Phase 8 deliberately left the PR unmerged precisely so this commit lands
+      inside it; the merge protocol requires archival committed in the PR **before** the merge, and a
+      PR that has already merged cannot receive it. Use a Conventional Commits message, e.g.
+      `git commit -m "chore(plans): archive ayokoding-learning-path-07-skills-erp"`.
+- [ ] [AI] **Push it** — `git push origin HEAD` — acceptance: exits 0 and
+      `git status -sb | grep -c 'ahead'` returns **0**. Committing without pushing would leave the
+      archival move out of the PR while every later check still appeared to pass.
+- [ ] [AI] **Monitor CI on the new head** — poll every 2 minutes, one
+      `gh run view --json status,conclusion` per wakeup; never tight-loop, never `gh run watch`; on a
+      403 rate-limit wait ~35 minutes. Acceptance: `status` is `completed` **and** `conclusion` is
+      `success` **for the run whose head SHA equals `git rev-parse HEAD`** — confirm the SHA matches
+      rather than reading whichever run is newest, or a stale green run from before the archival
+      commit will be mistaken for a pass.
+- [ ] [AI] Re-confirm all five PR Merge Protocol preconditions on the new head, perform the `[AI]`
+      merge, then deploy `ayokoding-www` to `prod-ayokoding-www`. These are the terminal steps.
 
 ### Phase 10 Gate
 
 - [ ] [AI] The plan folder exists under `plans/done/` with the date prefix; no reference to it remains
       under `plans/backlog/`.
+- [ ] [AI] The archival commit landed **inside** the merged PR rather than in a follow-up:
+      `gh pr list --head "$(git rev-parse --abbrev-ref HEAD)" --state merged --json number,mergeCommit`
+      returns this plan's PR. Use `gh pr list --head`, not `git merge-base --is-ancestor`: this repo
+      squash-merges, so ancestry checks false-negative on every merged PR.
+- [ ] [AI] **Integration**: PR merged, `ayokoding-www` deployed to `prod-ayokoding-www`.
 
 > **Pause Safety**: the plan is archived. Terminal state — no further resume needed.
 

@@ -34,25 +34,32 @@ already translated per #12.
 - Consolidation mechanics (control test, intercompany elimination, non-controlling interest) are
   stable, widely taught domain knowledge `[Judgment call — the mechanics are cited generically; no
 clause or paragraph is reproduced from any standard per A8]`.
+- The equity-method treatment for an influenced-but-not-controlled investee (co-08) is domain
+  reasoning about what co-02's control test excludes, not a claim sourced from this plan's grounding
+  file `[Needs Verification]` pending the Phase 1 coverage pass.
 
 ## Concepts
 
-1. **co-01 · parent-subsidiary-structure** — a parent controls one or more subsidiaries, each with its
-   own separately maintained books.
-2. **co-02 · consolidation-scope** — determining which entities are included in the group's
-   consolidated statements, based on control, not mere ownership percentage.
-3. **co-03 · intercompany-balance-elimination** — removing intercompany receivables/payables and
-   intercompany revenue/expense pairs so the group's statements reflect only external transactions.
-4. **co-04 · unrealized-intercompany-profit-elimination** — removing profit on an intercompany sale
-   that has not yet been resold to an external party (e.g. still sitting in the buyer's ending
-   inventory).
-5. **co-05 · non-controlling-interest** — the portion of a partially-owned subsidiary's equity and
-   income attributable to owners outside the parent.
-6. **co-06 · consolidation-worksheet** — the working paper that combines each entity's trial balance and
-   applies elimination entries to produce the consolidated result.
-7. **co-07 · goodwill-on-consolidation** — the excess of the purchase price for a subsidiary over the
-   fair value of its identifiable net assets, recognised at acquisition (ties to #11's goodwill
-   concept at group level).
+- **co-01 · parent-subsidiary-structure** — a parent controls one or more subsidiaries, each with its
+  own separately maintained books.
+- **co-02 · consolidation-scope** — determining which entities are included in the group's
+  consolidated statements, based on control, not mere ownership percentage.
+- **co-03 · intercompany-balance-elimination** — removing intercompany receivables/payables and
+  intercompany revenue/expense pairs so the group's statements reflect only external transactions.
+- **co-04 · unrealized-intercompany-profit-elimination** — removing profit on an intercompany sale
+  that has not yet been resold to an external party (e.g. still sitting in the buyer's ending
+  inventory).
+- **co-05 · non-controlling-interest** — the portion of a partially-owned subsidiary's equity and
+  income attributable to owners outside the parent.
+- **co-06 · consolidation-worksheet** — the working paper that combines each entity's trial balance and
+  applies elimination entries to produce the consolidated result.
+- **co-07 · goodwill-on-consolidation** — the excess of the purchase price for a subsidiary over the
+  fair value of its identifiable net assets, recognised at acquisition (ties to #11's goodwill
+  concept at group level).
+- **co-08 · equity-method-for-significant-influence** — an investee the entity influences but does not
+  control falls outside co-02's consolidation scope entirely: instead of combining its accounts line
+  by line, the investor carries a single investment balance that moves with its share of the
+  investee's profit and is reduced by distributions received.
 
 ## Worked examples
 
@@ -89,6 +96,11 @@ clause or paragraph is reproduced from any standard per A8]`.
   intercompany receivable/payable pair — verify the consolidated trial balance still foots (both sides
   of the omitted elimination are individually balanced) while the group's total assets and liabilities
   are simultaneously overstated by the same amount. (co-03, silent-failure)
+- **ex-09 · influenced-investee-two-ways** — a 30%-held investee the parent influences but does not
+  control, carried once under the equity method and once consolidated line by line — verify the equity
+  method reports one investment balance moving with the investor's profit share, and that the
+  line-by-line treatment instead pulls the investee's full revenue and assets into the group totals.
+  (co-02, co-05, co-08)
 
 ## Applied synthesis (no build — A6)
 

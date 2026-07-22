@@ -19,44 +19,49 @@ Entirely this plan's own corpus; no course is linked in from the existing softwa
 or the accounting corpus — those are **linked, not included**, per
 [tech-docs.md §Requirement L-4](../../tech-docs.md#landing-content-requirements-what-plan-03-cannot-infer).
 
-### Stage A — Foundations & Architecture (courses 1-12, 17, 21-22; 15 total; publishes first)
+**This list is the reading ramp, in `courseOrder` order.** Per
+[tech-docs.md §Authoring stages vs reading ramp](../../tech-docs.md#authoring-stages-vs-reading-ramp-dd-3),
+**authoring order is not reading order** — the manifest fixes what a _reader_ walks, while the
+delivery checklist fixes what an _author_ writes next. Each entry is therefore annotated with its
+authoring stage rather than grouped by it. Grouping by stage would place
+`erp-bom-and-routing-architecture` (Stage A, read 17th) ahead of `record-to-report-systems` (Stage B,
+read 13th) and desynchronise every course's own self-declared "course N of 26" position.
 
-1. `erp-foundations-and-history`
-2. `erp-conceptual-data-model`
-3. `erp-module-map-and-architecture`
-4. `erp-document-lifecycle-and-state-machines`
-5. `erp-posting-rules-and-account-determination`
-6. `erp-subledger-to-gl-architecture`
-7. `erp-fiscal-calendar-and-period-close`
-8. `erp-numbering-sequences-and-uom-conversion`
-9. `erp-audit-trail-and-change-tracking` — **Dangerous 1 ⚡**
-10. `procure-to-pay-systems`
-11. `order-to-cash-systems`
-12. `erp-procurement-and-fulfillment-exceptions`
-13. `erp-bom-and-routing-architecture`
-14. `erp-extension-and-customization`
-15. `erp-integration-patterns`
-
-### Stage B — Conventional Enterprise Depth (courses 13-16, 18-20, 23-26; 11 total; grown after accounting's conventional-accounting boundary)
-
-1. `record-to-report-systems`
-2. `inventory-and-warehouse-management`
-3. `erp-inventory-costing-methods`
-4. `erp-inventory-integrity-and-concurrency` — **Dangerous 2 ⚡**
-5. `production-planning-and-mrp`
-6. `demand-and-supply-planning`
-7. `erp-availability-and-reservations`
-8. `human-capital-management-and-hire-to-retire`
-9. `multi-company-and-multi-currency-erp`
-10. `erp-security-and-controls`
-11. `erp-analytics-and-reporting` — **Dangerous 3 ⚡ — path ENDS HERE**
+1. `erp-foundations-and-history` — Stage A
+2. `erp-conceptual-data-model` — Stage A
+3. `erp-module-map-and-architecture` — Stage A
+4. `erp-document-lifecycle-and-state-machines` — Stage A
+5. `erp-posting-rules-and-account-determination` — Stage A
+6. `erp-subledger-to-gl-architecture` — Stage A
+7. `erp-fiscal-calendar-and-period-close` — Stage A
+8. `erp-numbering-sequences-and-uom-conversion` — Stage A
+9. `erp-audit-trail-and-change-tracking` — Stage A — **Dangerous 1 ⚡**
+10. `procure-to-pay-systems` — Stage A
+11. `order-to-cash-systems` — Stage A
+12. `erp-procurement-and-fulfillment-exceptions` — Stage A
+13. `record-to-report-systems` — Stage B — the hard accounting edge lands here
+14. `inventory-and-warehouse-management` — Stage B
+15. `erp-inventory-costing-methods` — Stage B
+16. `erp-inventory-integrity-and-concurrency` — Stage B — **Dangerous 2 ⚡**
+17. `erp-bom-and-routing-architecture` — Stage A (authored early, read here)
+18. `production-planning-and-mrp` — Stage B
+19. `demand-and-supply-planning` — Stage B
+20. `erp-availability-and-reservations` — Stage B
+21. `erp-extension-and-customization` — Stage A (authored early, read here)
+22. `erp-integration-patterns` — Stage A (authored early, read here)
+23. `human-capital-management-and-hire-to-retire` — Stage B
+24. `multi-company-and-multi-currency-erp` — Stage B
+25. `erp-security-and-controls` — Stage B
+26. `erp-analytics-and-reporting` — Stage B — **Dangerous 3 ⚡ — path ENDS HERE**
 
 ## Growth history (falsifiable checks)
 
-- **Before Stage B growth**: `courseOrder` has exactly 15 entries; `erp-analytics-and-reporting` and
-  every other Stage B id are **absent**.
+- **Before Stage B growth**: `courseOrder` has exactly 15 entries — the Stage A ids only, holding
+  their relative reading order (final-ramp positions 1-12, 17, 21, 22); every Stage B id is
+  **absent**.
 - **After Stage B growth**: `courseOrder` has exactly 26 entries; every Stage A id retains its
-  original relative order; every Stage B id is present exactly once.
+  original relative order; every Stage B id is present exactly once, **inserted at its reading
+  position rather than appended** — Stage B ids interleave with Stage A ids, they do not follow them.
 
 ## Order rationale
 

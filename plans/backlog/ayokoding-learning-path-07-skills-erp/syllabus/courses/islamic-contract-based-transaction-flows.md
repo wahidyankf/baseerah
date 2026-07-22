@@ -34,6 +34,10 @@ License-aware (DD-15).
 - Contract-mechanics claims carry the same `[Unverified]` status as course 27's jurisdictional table
   pending the primary-source re-verification pass; worked examples use originally-authored data and
   do not assert a specific jurisdiction's numeric detail as fact.
+- Concepts co-08 and co-09 are placed on domain-reasoning grounds rather than sourced from the
+  grounding research, and are `[Needs Verification]` pending the Phase 1.2a coverage pass; both are
+  framed as questions the document flow must answer under its jurisdictional configuration, not as a
+  prescribed treatment.
 
 ## Concepts
 
@@ -51,6 +55,14 @@ License-aware (DD-15).
   the underlying profit-sharing agreement and an agreed ratio.
 - **co-07 · conventional-vs-sharia-flow-contrast** — the same underlying business event (financing an
   asset purchase) produces structurally different document flows depending on contract type.
+- **co-08 · overdue-amount-treatment-divergence** — a conventional flow's interest-accruing
+  late-payment charge has no like-for-like counterpart here, so an overdue receivable must be modeled
+  by whatever the applicable jurisdictional configuration (course 27) prescribes; the divergence is
+  structural — a different document, not a renamed field on the same one. `[Needs Verification]`
+- **co-09 · early-settlement-and-remaining-profit** — settling a Murabaha or Ijarah obligation ahead of
+  schedule raises the question of what happens to the not-yet-earned portion of the disclosed markup
+  or the remaining lease term, which the document flow must represent explicitly rather than leave
+  implicit in a balance. `[Needs Verification]`
 
 ## Worked examples
 
@@ -76,6 +88,13 @@ the `co-NN` it exercises.
 - **ex-05 · three-way-flow-contrast** — given one underlying financing need, sketch how it would be
   structured under Murabaha, Ijarah, and Musharaka respectively, noting the structural difference each
   time. (co-01–co-03, co-07)
+- **ex-06 · overdue-amount-flow-divergence** — given the same overdue receivable under a conventional
+  sale flow and under a Murabaha flow, contrast how each flow's documents represent the overdue
+  amount, treating the Murabaha side as configuration-driven rather than asserting any one
+  jurisdiction's prescribed treatment as universal. (co-07, co-08)
+- **ex-07 · early-settlement-trace** — given a Murabaha obligation settled ahead of schedule, trace
+  which documents in the flow must change and identify where the not-yet-earned portion of the
+  disclosed markup is represented. (co-01, co-04, co-09)
 
 ## Synthesis exercise — intra-topic
 

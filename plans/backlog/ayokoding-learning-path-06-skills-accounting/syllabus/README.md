@@ -5,7 +5,7 @@ This folder is this plan's own syllabus corpus, created by Phase 1 and never edi
 see [tech-docs DD-603](../tech-docs.md#design-decisions)). It mirrors the folder convention plan 02
 already established for custodied human-readable mirrors, applied inside this plan's own folder.
 
-**The per-course file shape is inherited from plan 02's 123 existing `syllabus/courses/*.md` files,
+**The per-course file shape is inherited from plan 02's 121 existing `syllabus/courses/*.md` files,
 not invented here** (see [tech-docs DD-627](../tech-docs.md#design-decisions)): same header fields,
 same section names and order (`Why this exists · the big idea`, `Prerequisites`, `Accuracy notes`,
 `Concepts`, `Worked examples`, `Read more`, `In which paths`), same problem-before-solution framing —

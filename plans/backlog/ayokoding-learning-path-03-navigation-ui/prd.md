@@ -208,6 +208,9 @@ it reappears in Path B; After→re-entry is the industry's weakest seam and is e
 
 **Ergonomics principles (evidence-backed, applied across the journey)**
 
+> All external sources cited in this list were **accessed 2026-07-21**, the same access date recorded
+> for the R7 prior-art citation batch below.
+
 - **Choice overload is contextual, not automatic.** The canonical jam study (24 vs. 6 options) is real,
   but the largest meta-analysis ([Scheibehenne, Greifeneder & Todd 2010](https://www.psychologytoday.com/us/blog/pop-psych/201602/is-choice-overload-real-thing),
   50 studies) found a near-zero _average_ effect — overload bites mainly when the user has **no
@@ -255,13 +258,14 @@ those PNGs render. The screens are sequenced along the [Learner Journey](#learne
 — landing → discovery → before → during → after — so the funnel optimizes the _whole_ arc, not each
 screen in isolation.
 
-> **Assets note**: the eight hi-fi finalist PNGs (two per screen, Screens 0-3) are **already produced**
+> **Assets note**: the twelve hi-fi finalist PNGs (two per screen, across the six screens 0, 1, 1a, 1b,
+> 2, 3) are **already produced**
 > and embedded below. They are rendered from self-contained HTML mockups (kept alongside as
 > [`assets/src/*.html`](./assets/src/)) styled with the **exact AyoKoding token palette**
 > (`libs/web-ui-token/src/ayokoding.css` — the same `oklch` hues, `--warm-*` neutral scale, radius,
 > and shadow tokens the running app uses), so the mockups are colour- and spacing-accurate rather than
 > sketches. To regenerate: serve `assets/src/` over HTTP and full-page-screenshot each page. The
-> sixteen mobile and tablet renders are produced by
+> twenty-four mobile and tablet renders are produced by
 > [delivery.md Phase 1](./delivery.md#phase-1-ui-design-funnel-screens-0-1-1a-1b-2-3).
 
 **R5 grounding note (all screens)** — before drafting, survey the existing UI to reuse rather than
@@ -1885,8 +1889,10 @@ These are the source of the `specs/` Gherkin companion for the `course-paths` na
 code). Each scenario uses exactly **one** primary `Given`, **one** `When`, and **one** `Then`; extras
 chain with `And`.
 
-**Provenance and the fixture rewrite.** Eleven of the thirteen scenarios below are routed to this plan
-from the closed source plan. Four of them — "A path landing page lists its courses in manifest order",
+**Provenance and the fixture rewrite.** Twenty scenarios follow, in three provenance buckets: eleven
+routed to this plan from the closed source plan, two of this plan's own additions from that plan's
+split, and seven added by the 2026-07-21 category-split ruling. Eleven of the twenty are routed to
+this plan from the closed source plan. Four of them — "A path landing page lists its courses in manifest order",
 "Prev and next follow the active path's order", "The breadcrumb reflects the active path", and "A
 course omitted from a path shows no path nav for that path" — originally opened
 `Given the … path manifest is published`, and publication belongs to the Wave-3 plan
@@ -1911,8 +1917,13 @@ composite "The app builds and validates green" scenario, whose `Given` conjoined
 **and** the interview-ready path and therefore spanned two plans by construction; each of the five split
 plans writes its own surface-scoped replacement instead.
 
-**Six further scenarios are new, added by the 2026-07-21 category-split ruling (R6/R7/R8)** to bind
-Screen 1's category-grouped redesign and the two new screen types, Screen 1a and Screen 1b.
+**Seven further scenarios are new, added by the 2026-07-21 category-split ruling (R6/R7/R8)** to bind
+Screen 1's category-grouped redesign, the two new screen types Screen 1a and Screen 1b, and the
+skills-path landing body contract. Six of them sit together at the end of the list below ("The paths
+hub groups paths by category, not a flat grid" through "A category landing with no populated manifest
+renders an explicit empty state"); the seventh, "A skills path's authored runway-justification content
+renders on its own landing", is listed earlier beside the other path-landing scenarios because it
+binds the same screen. 11 + 2 + 7 = **20**, which reconciles with the scenario list below.
 
 **Two behaviours are deliberately NOT Gherkin here.** The no-forked-body check across manifests is a
 **checklist acceptance clause** in this plan (run over two fixture manifests); its Gherkin form —

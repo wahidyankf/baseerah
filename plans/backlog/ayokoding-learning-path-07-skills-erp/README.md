@@ -83,11 +83,11 @@ Plan 06's own prior `UNBLOCKS_ERP_COURSES` mapping was keyed to ERP course numbe
 over by both plans' rewrites. Both plans now express the edge at **stage granularity** — stage names
 survive renumbering, course numbers do not.
 
-| Accounting stage (plan 06)                                 | Unblocks this plan's stage                    | Mechanical gate (independent `test -d` checks, never reads plan 06's `delivery.md`) |
-| ---------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Stage 1 ("Dangerous 1", courses 1-3)                       | Stage A start — **no gate**, fully concurrent | —                                                                                   |
-| Stage 2 ("Dangerous 2" / conventional-accounting complete) | Stage B — Conventional Enterprise Depth       | 5 accounting course ids resolve on `origin/main`                                    |
-| Stage 3 ("Dangerous 3" / sharia-accounting complete)       | Stage C — Sharia-Compliant Design             | 2 accounting course ids resolve on `origin/main`                                    |
+| Accounting stage (plan 06)                                                | Unblocks this plan's stage                    | Mechanical gate (independent `test -d` checks, never reads plan 06's `delivery.md`) |
+| ------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Stage 1 ("Dangerous 1", ending at `financial-statements-and-close-cycle`) | Stage A start — **no gate**, fully concurrent | —                                                                                   |
+| Stage 2 ("Dangerous 2" / conventional-accounting complete)                | Stage B — Conventional Enterprise Depth       | 5 accounting course ids resolve on `origin/main`                                    |
+| Stage 3 ("Dangerous 3" / sharia-accounting complete)                      | Stage C — Sharia-Compliant Design             | 2 accounting course ids resolve on `origin/main`                                    |
 
 See [tech-docs.md §The 06→07 dependency edge](./tech-docs.md#the-0607-dependency-edge-stage-granularity-not-course-numbers)
 for the full table and the accounting-course-id coordination risk (the 7 cited ids are as named in

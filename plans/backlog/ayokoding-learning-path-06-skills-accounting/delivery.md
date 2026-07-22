@@ -11,15 +11,38 @@
 
 ## Worktree
 
+**One worktree per parallel unit — strict 1 PR ↔ 1 worktree.** Git permits exactly one checked-out
+branch per worktree, so the N concurrent course PRs this plan declares below require N worktrees; a
+single shared worktree cannot host them. The base worktree carries the sequential phases; each
+parallel authoring leaf gets its own. All paths follow the
+[Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)
+(`worktrees/<name>/`, routed by the repo-local `WorktreeCreate` hook); names stay lowercase
+kebab-case, so the per-unit suffix is `-unit-<unit-id>`, never an underscore separator.
+
+Base worktree — sequential phases (0, 1, 4, 6-10):
+
 ```
 worktrees/ayokoding-learning-path-06-skills-accounting/
 ```
 
-```bash
-claude --worktree ayokoding-learning-path-06-skills-accounting
+Per-unit worktrees — one per course-authoring leaf and per manifest-growth cycle in Phases 2, 3, 5,
+where `<unit-id>` is the course id (or `manifest-conventional` / `manifest-sharia`):
+
+```
+worktrees/ayokoding-learning-path-06-skills-accounting-unit-<unit-id>/
 ```
 
-> Provision the worktree before Phase 0. Do not begin Phase 0 outside this worktree.
+```bash
+claude --worktree ayokoding-learning-path-06-skills-accounting
+# and, per parallel unit:
+claude --worktree ayokoding-learning-path-06-skills-accounting-unit-<unit-id>
+```
+
+> Provision the base worktree before Phase 0. Do not begin Phase 0 outside it. Provision a per-unit
+> worktree at the start of each parallel unit and remove it once that unit's PR has merged — worktree
+> removal is the terminal cleanup node of each parallel phase, per
+> [Worktree and Artifact Cleanup](../../../repo-governance/development/workflow/worktree-and-artifact-cleanup.md).
+> Never exceed the in-force concurrency cap in live worktrees.
 
 ## Delivery Mode: worktree-to-pr
 
@@ -31,16 +54,40 @@ Manifest-growth TDD cycles and landing authoring are each their own PR too, sequ
 courses each phase's manifest step depends on. See
 [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md).
 
+**Per-merge integration protocol.** After each `[AI]` merge above: confirm CI green on `origin/main`
+for the merged SHA, then **dispatch `apps-ayokoding-www-deployer`** to deploy `ayokoding-www` to
+`prod-ayokoding-www` — a no-op redeploy where a phase changed no app content. The deployer is a
+declared dependency of this plan
+([tech-docs §Dependencies](./tech-docs.md#dependencies)); a phase that merges app content without
+dispatching it leaves production stale behind `origin/main`, and Phase 8's production check will
+fail.
+
 ## Depends-on and start preconditions
 
 - **`blockedBy`**: `ayokoding-learning-path-01-url-restructure` (the three-bucket URL grammar and
   `<COURSES>_index.md`), `ayokoding-learning-path-02-schema-and-prerequisite-dag` (the `PathManifest`
-  schema, `course-paths` core, `<MANIFESTS>` directory).
+  schema, `course-paths` core, `<MANIFESTS>` directory), and
+  `ayokoding-learning-path-03-navigation-ui` (`path-landing.tsx`, `path-card.tsx`,
+  `manifest-repository.ts`, the `?path=` wiring) — **all three hard**, matching
+  [README §Depends-on](./README.md#depends-on) and
+  [tech-docs §Dependencies](./tech-docs.md#dependencies). Plan 03 is not optional: a manifest with no
+  renderer is invisible, so without it this plan's landings cannot be verified at Phase 7 at all.
 - **`blocks`**: `ayokoding-learning-path-07-skills-erp` at the stage granularity described in
   [tech-docs §Stage-signal contract](./tech-docs.md#stage-signal-contract-the-plan-07-handoff-stage-granularity).
-- Start precondition: both blocking plans merged to `origin/main`.
-  Verify: `git log origin/main --oneline | grep -c "ayokoding-learning-path-0[12]"` returns ≥ 1 for
-  each (adjust the grep per actual merge-commit message once known).
+- Start precondition: **all three** blocking plans merged to `origin/main` — 01, 02 **and 03**.
+  Verify each independently rather than with one aggregate count, so a missing plan cannot hide behind
+  another's commits:
+
+  ```bash
+  for n in 01-url-restructure 02-schema-and-prerequisite-dag 03-navigation-ui; do
+    git log origin/main --oneline | grep -q "ayokoding-learning-path-${n}" \
+      || echo "NOT MERGED: ayokoding-learning-path-${n}"
+  done
+  ```
+
+  Acceptance: **empty output**. A single `grep -c "…-0[123]"` returning ≥ 1 is **not** sufficient — it
+  passes when only one of the three has merged. Adjust the per-plan patterns if the actual
+  merge-commit subjects differ, but keep the check one-per-plan.
 
 ## Parallelization Model
 
@@ -49,6 +96,9 @@ between them author in parallel up to the concurrency cap; courses with an edge 
 manifests' TDD growth cycles are two separate, parallelizable sub-phases once their shared courses
 exist. See [tech-docs §The ramp order](./tech-docs.md#the-twenty-four-course-catalog) for the full
 topological ordering this parallelization respects.
+
+**Each parallel unit runs in its own worktree** (see [§Worktree](#worktree)) — the fan-out is bounded
+by the concurrency cap, and the number of live per-unit worktrees never exceeds it.
 
 ## Path constants
 
@@ -73,6 +123,7 @@ echo "PLANDIR=$PLANDIR"
 - `MTEST_SA="apps/ayokoding-www/src/features/course-paths/manifests/skills/sharia-accounting-manifest.unit.test.ts"`
 - `SPEC="${PLANDIR}syllabus/courses/"`
 - `SPECPATHS="${PLANDIR}syllabus/paths/"`
+- `SPECS="specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/"`
 
 ## Course ID lists (define once, reuse in every clause — DD-622 HARD rule: shell ARRAYS only)
 
@@ -115,9 +166,15 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
 
 ### Baseline (must all be true before any content is authored)
 
-- [ ] [AI] Both blocking plans merged — see [§Depends-on](#depends-on-and-start-preconditions).
-- [ ] [AI] `<PLANDIR>` resolves and `test -d "${SPEC}"` exits **1** (the spec folder does not exist
-      yet) — acceptance: exits 1 today, will exit 0 after Phase 1.
+- [ ] [AI] All **three** blocking plans merged (01, 02, 03) — run the per-plan loop in
+      [§Depends-on](#depends-on-and-start-preconditions); acceptance: empty output.
+- [ ] [AI] `<PLANDIR>` resolves and the **pre-authored** syllabus corpus is present:
+      `test -d "${SPEC}" && [ "$(ls "${SPEC}"*.md | wc -l)" -eq 24 ] && echo BASELINE-OK || echo BASELINE-FAIL`
+      — acceptance: prints `BASELINE-OK`.
+      This deliberately asserts **presence, not absence**. The 24 syllabus specs are authored ahead of
+      execution (see §1.2, which re-verifies rather than authors), so a check asserting the folder
+      does **not** exist could never pass and would deadlock the Phase 0 Gate. Falsifiable both ways:
+      a missing folder or any count other than 24 prints `BASELINE-FAIL`.
 - [ ] [AI] Neither manifest exists yet:
       `test -f "$MANIFEST_CA" && echo FOUND || echo ABSENT` prints `ABSENT`, and the same for
       `$MANIFEST_SA` — acceptance: both print `ABSENT`. Falsifiable both ways: both flip to `FOUND`
@@ -156,10 +213,11 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
 > [tech-docs §Post-authoring verification](./tech-docs.md#syllabus-layer--custody-and-shape) and
 > [`ayokoding-learning-path-programme.md` §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed).
 
-### 1.1 · Scaffold the spec folder
+### 1.1 · Verify the spec folder (pre-authored — this sub-phase verifies, it does not scaffold)
 
-- [ ] [AI] Create `"${SPEC}"` and `"${SPECPATHS}"` — acceptance: `test -d "${SPEC}"` and
-      `test -d "${SPECPATHS}"` both exit 0.
+- [ ] [AI] `"${SPEC}"` and `"${SPECPATHS}"` already exist and are populated — acceptance:
+      `test -d "${SPEC}" && test -d "${SPECPATHS}" && [ "$(ls "${SPEC}"*.md | wc -l)" -eq 24 ] && [ "$(ls "${SPECPATHS}"*.md | wc -l)" -eq 2 ] && echo PASS || echo FAIL`
+      prints `PASS`. Create either folder only if this check reports `FAIL`.
 - [ ] [AI] Create `"${SPEC}../README.md"` _(new file)_ per
       [tech-docs §Syllabus layer](./tech-docs.md#syllabus-layer--custody-and-shape) with the course
       index table — acceptance: `test -f "${SPEC}../README.md"` exits 0, and
@@ -195,9 +253,13 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
       curriculum's structure." Record findings as `[Needs Verification]` annotations or new concept
       bullets **added to the existing syllabus**, never as a restructuring — acceptance: for every
       course, the syllabus's `## In which paths` section (the file's terminal, position-stable anchor)
-      is unchanged by the coverage pass; `git diff --stat "${SPEC}*.md"` after this step touches only
-      `## Concepts` / `## Worked examples` / `## Accuracy notes` sections, never section order or
-      headings themselves.
+      is unchanged by the coverage pass;
+      `for f in "${SPEC}"*.md; do diff <(git show "HEAD:$f" | grep -E '^## ' | grep -vE '^## (Concepts|Worked examples|Accuracy notes)$') <(grep -E '^## ' "$f" | grep -vE '^## (Concepts|Worked examples|Accuracy notes)$') >/dev/null || echo "HEADINGS CHANGED $f"; done`
+      returns empty — outside those three sections no heading is added, removed, or reordered.
+      Compares the two ordered heading lists directly instead of parsing diff output, so the verdict
+      never depends on how `git diff` renders. The three excluded headings are the ones the coverage
+      pass is allowed to create. Negative control: inserting or moving any other `##` heading in one
+      syllabus makes it print that filename.
 - [ ] [AI] Confirm no syllabus was rewritten to mirror an external curriculum's module titles or
       sequence — verify by reading the diff produced by this step, not by grep (a structural adoption
       would not leave a mechanically greppable signature).
@@ -224,7 +286,39 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
 - [ ] [AI] All 21 `ACCT_SILENT` syllabi carry a worked silent-failure example.
 - [ ] [AI] `#20`'s OI-2 framing holds (`OPEN`, not restated as resolved).
 - [ ] [AI] Every syllabus has a non-empty `## Accuracy notes` licensing-sensitive-sources record.
+- [ ] [AI] **Module-topic breakdown present in every syllabus** —
+      `for f in "${SPEC}"*.md; do for h in '## Concepts' '## Worked examples' '## Prerequisites'; do grep -qF "$h" "$f" || echo "MISSING [$h] $(basename "$f")"; done; done | wc -l`
+      returns **0**. Negative control: deleting the `## Worked examples` heading from any one
+      syllabus makes it return **1** (verified).
+- [ ] [AI] **Concept floor holds ([DD-627](./tech-docs.md#design-decisions), ≥ 8)** —
+      `for f in "${SPEC}"*.md; do n=$(grep -c '^- \*\*co-[0-9]' "$f"); [ "$n" -ge 8 ] || echo "UNDER-FLOOR $(basename "$f") = $n"; done | wc -l`
+      returns **0**. Negative control: several syllabi sit at exactly 8, so removing a single
+      `- **co-NN` line from any of them makes it return **1** (verified) — the floor is tight, not
+      slack.
 - [ ] [AI] `npm run lint:md` exits 0 on the new `syllabus/` tree.
+- [ ] [AI] **Every prerequisite edge is transcribed and resolves** — run the two commands in the
+      fenced block below. Acceptance: the first returns **0** AND the second returns **34**. A zero
+      from the first while the second is also 0 would be vacuous, so both are required. The `awk`
+      range stops at the next `- **` bullet, so the `**Linked (SWE)**` edges (`sql-essentials`,
+      `backend-essentials`) — deliberately external link-don't-walk references into plan 02's corpus
+      — are excluded by construction rather than by an allowlist. Negative control: repointing one
+      `**Prior courses**` id at a non-existent course makes the first return **1** (verified).
+
+```bash
+# (1) Unresolved prior-course edges. MUST print 0.
+for f in "${SPEC}"*.md; do
+  awk '/^- \*\*Prior courses\*\*/{p=1;print;next} p&&/^- \*\*/{p=0} p' "$f" \
+    | grep -oE '`[a-z0-9-]+`' | tr -d '`' | while IFS= read -r id; do
+        [ -f "${SPEC}${id}.md" ] || echo "UNRESOLVED $(basename "$f") -> $id"
+      done
+done | wc -l
+
+# (2) Anti-vacuity companion: total edges examined. MUST print 34, never 0.
+for f in "${SPEC}"*.md; do
+  awk '/^- \*\*Prior courses\*\*/{p=1;print;next} p&&/^- \*\*/{p=0} p' "$f" \
+    | grep -oE '`[a-z0-9-]+`'
+done | wc -l
+```
 
 > **Pause Safety**: the full spec layer exists and is internally consistent; no course body or
 > manifest exists yet. Safe to stop. To resume: re-run the Phase 1 Gate's `for`-loop checks and
@@ -259,8 +353,11 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
 6. [AI] **Apply content fixers** — every CRITICAL/HIGH/MEDIUM finding addressed.
 7. [AI] **Re-verify** — checkers + `nx run ayokoding-www:build` + `npm run lint:md`.
 
-- [ ] [AI] Course #1 `accounting-foundations` (By Example, no prerequisites) — mines
-      `apps/ayokoding-www/content/en/legacy/business/accounting.md` per DD-626 — acceptance: all 7
+- [ ] [AI] Course #1 `accounting-foundations` (By Example, no prerequisites) — mines the legacy
+      accounting article per DD-626. **Resolve its path first, do not hardcode either location** —
+      plan 01 relocates it and may or may not have merged when this step runs:
+      `SRC=apps/ayokoding-www/content/en/legacy/business/accounting.md; [ -f "$SRC" ] || SRC=apps/ayokoding-www/content/en/learn/business/accounting.md; test -f "$SRC" && echo "MINING $SRC" || echo "SOURCE-MISSING"`
+      — acceptance: prints `MINING <path>`, never `SOURCE-MISSING`. Then: all 7
       convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
       `grep -F -q 'chart-of-accounts-and-data-modeling' "${COURSES}accounting-foundations/overview.md"`
       exits 0 (forward boundary to #2 is stated). **No paragraph from the legacy article moves
@@ -391,13 +488,30 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
 
 ### 2.4 · TDD cycle — both path-walk e2e specs
 
-- [ ] [AI] **RED** — add `specs/apps/ayokoding-www/behavior/skills-path-composition.feature` _(new
+- [ ] [AI] **RED** — add `"${SPECS}skills-path-composition.feature"` _(new
       file)_ carrying the two-Examples-row scenario above, plus failing e2e steps in
       `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts` _(new file, pairing 1:1)_
       that open each landing, walk all three courses via prev/next, assert `?path=` persistence, assert
       breadcrumb resolution, and assert a deliberately over-segmented id is hard-rejected — for **both**
       `pathId`s — command: `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new spec **fails**
       for both Examples rows.
+
+  **Gherkin (binds) →** Outline "A two-segment skills path ID resolves end to end"
+
+  ```gherkin
+  Scenario Outline: A two-segment skills path ID resolves end to end
+    Given the manifest declares pathId <path_id> and arc immediately-effective
+    When a reader walks the path from its landing
+    Then the landing, the prev and next controls, and the breadcrumb all resolve against the two-segment path ID
+    And the ?path=<path_id> context persists across every course in the walk
+    And no resolver assumes a three-segment path ID
+
+    Examples:
+      | path_id                       |
+      | skills/conventional-accounting |
+      | skills/sharia-accounting       |
+  ```
+
 - [ ] [AI] **GREEN** — implement the step bindings against both published manifests and live landings
       — command:
       `nx run ayokoding-www:specs:behavior:coverage && nx run ayokoding-www-fe-e2e:test:e2e`
@@ -413,15 +527,17 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
       [tech-docs §Stage-signal contract](./tech-docs.md#stage-signal-contract-the-plan-07-handoff-stage-granularity),
       each field anchored at column 0, outside any table/bullet/blockquote:
 
-  ```
-  STAGE: 1
-  PLAN: ayokoding-learning-path-06-skills-accounting
-  LANDED_COURSE_IDS: accounting-foundations, chart-of-accounts-and-data-modeling, financial-statements-and-close-cycle
-  UNBLOCKS_ERP_CAPABILITY: the ERP stage delivering subledger-to-GL posting and record-to-report capability (the hard edge)
-  MERGED_COMMIT: <40-character SHA — fill in from the actual merge>
-  ```
+```
+STAGE: 1
+PLAN: ayokoding-learning-path-06-skills-accounting
+LANDED_COURSE_IDS: accounting-foundations, chart-of-accounts-and-data-modeling, financial-statements-and-close-cycle
+UNBLOCKS_ERP_CAPABILITY: the ERP stage delivering subledger-to-GL posting and record-to-report capability (the hard edge)
+MERGED_COMMIT: <40-character SHA — fill in from the actual merge>
+```
 
-  — acceptance: `git cat-file -e <sha>^{commit}` exits 0 once the real SHA is recorded.
+— acceptance: `git cat-file -e <sha>^{commit}` exits 0 once the real SHA is recorded, AND
+`grep -c '^STAGE: 1$' delivery.md` returns **1** (the fenced block above must stay at column 0 —
+indenting it under the bullet silently breaks the Phase 8 gate).
 
 ### Phase 2 Gate
 
@@ -433,6 +549,23 @@ branch → draft PR → 3-cycle review → `[AI]` merge → deploy), pipelining 
 - [ ] [AI] Both e2e walk specs green.
 - [ ] [AI] Stage-1 signal recorded with a real, verifiable `MERGED_COMMIT`.
 - [ ] [AI] `nx run ayokoding-www:build` exits 0.
+- [ ] [AI] **The first ramp boundary is reachable in exactly three courses** — the composite claim
+      that §2.2 (both manifests at 3), §2.3 (both landings state the Dangerous-1 boundary) and §2.4
+      (the 3-course walk) jointly establish — acceptance: both `courseOrder`s hold exactly 3 entries,
+      AND `grep -F -q 'Dangerous 1'` exits 0 against **both** landings, AND
+      `nx run ayokoding-www-fe-e2e:test:e2e` exits 0. Negative control: a landing missing its
+      not-yet-safe list fails the `Dangerous 1` check, so confirm each landing names what the reader
+      **cannot** yet do, not merely the boundary label.
+
+  **Gherkin (binds) →** "The first ramp boundary is reachable in three courses"
+
+  ```gherkin
+  Scenario: The first ramp boundary is reachable in three courses
+    Given both accounting manifests are published with courses 1 through 3 in courseOrder
+    When a reader finishes the third course
+    Then the reader can build a correctly balancing ledger and produce the three statements for a single entity
+    And both landings state that the reader cannot yet safely handle revenue recognition, inventory costing, multi-currency translation, leases, or consolidation
+  ```
 
 > **Pause Safety**: both paths have a working, correctly balancing three-course ledger and a live
 > landing. Safe to stop — this is a genuinely shippable, if minimal, state. To resume: re-run
@@ -587,21 +720,64 @@ Scenario: The conventional-accounting manifest completes and the Sharia-accounti
 - [ ] [AI] `for c in "${ACCT_SHARED[@]}"; do n=$(find "${COURSES}$c" -maxdepth 0 -type d | wc -l); [ "$n" -eq 1 ] || echo "DUPLICATE-OR-MISSING $c"; done | wc -l`
       returns **0** (19 courses checked, extends §2.2's 3-course check to the full shared spine).
 
+### 3.5 · TDD cycle — extend both path-walks to the full nineteen-course spine
+
+> This phase is where `conventional-accounting` becomes production-serving, so this is where the
+> delivered surface must be walked end to end. The walk cannot live in Phase 5: Phase 3's own Pause
+> Safety note permits stopping here indefinitely, which would ship 19 courses having walked 3.
+
+- [ ] [AI] **RED** — extend the reusable "walk a skills path given a path id" helper (from §2.4's
+      REFACTOR) in `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts` so both
+      `pathId`s walk all **19** published courses via prev/next, asserting `?path=` persistence and
+      breadcrumb resolution at every step — command: `nx run ayokoding-www-fe-e2e:test:e2e` —
+      acceptance: the new 19-course assertion **fails** for both Examples rows (only 3 courses were
+      walked before this phase).
+
+  **Gherkin (binds) →** Outline "A two-segment skills path ID resolves end to end" — the same Outline
+  §2.4 bound, now exercised against the full nineteen-course shared spine
+
+  ```gherkin
+  Scenario Outline: A two-segment skills path ID resolves end to end
+    Given the manifest declares pathId <path_id> and arc immediately-effective
+    When a reader walks the path from its landing
+    Then the landing, the prev and next controls, and the breadcrumb all resolve against the two-segment path ID
+    And the ?path=<path_id> context persists across every course in the walk
+    And no resolver assumes a three-segment path ID
+
+    Examples:
+      | path_id                        |
+      | skills/conventional-accounting |
+      | skills/sharia-accounting       |
+  ```
+
+- [ ] [AI] **GREEN** — implement against both grown manifests — command:
+      `nx run ayokoding-www:specs:behavior:coverage && nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: both exit 0.
+- [ ] [AI] **REFACTOR** — parameterize the walk on expected course count so Phase 5 extends it to 24
+      without duplicating the helper — command: `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance:
+      exits 0, scenario count unchanged.
+
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
 - [ ] [AI] All 16 Stage-2 course bodies exist, checkers green, every one carries a silent-failure
       section.
+- [ ] [AI] **Both path-walk e2e specs walk all 19 courses, not 3** — command:
+      `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: exits 0. Negative control: this gate must
+      fail if the helper is left at its §2.4 3-course bound, so confirm the walk asserts a
+      19-course length for both `pathId`s before ticking.
 - [ ] [AI] Both manifests grown to 19, still byte-identical, both pass `test:unit`.
 - [ ] [AI] `conventional-accounting` landing states completeness.
 - [ ] [AI] Both `sql-essentials` and `backend-essentials` link-don't-walk checks hold on both
       manifests.
 - [ ] [AI] `nx run ayokoding-www:build` exits 0.
 
-> **Pause Safety**: `conventional-accounting` is a genuinely complete, shippable 19-course path;
-> `sharia-accounting` is at the same 19-course state, one stage short of its own completion. Safe to
-> stop indefinitely at this exact point if Stage 3 authoring is deferred. To resume: re-run
+> **Pause Safety**: `conventional-accounting` is a genuinely complete, shippable 19-course path,
+> **walked end to end by §3.5's e2e**; `sharia-accounting` is at the same 19-course state, one stage
+> short of its own completion. Safe to stop indefinitely at this exact point if Stage 3 authoring is
+> deferred — the pause is only safe because the delivered 19-course surface has been walked here
+> rather than in a later phase this note permits skipping. To resume: re-run
 > `nx run ayokoding-www:test:unit` and confirm 0 exit before starting Phase 4.
 
 ---
@@ -636,6 +812,32 @@ Scenario: The conventional-accounting manifest completes and the Sharia-accounti
 - [ ] [AI] `OI-2` remains `OPEN` — verified, not merely assumed.
 - [ ] [AI] `OI-3` residual explicitly stated.
 - [ ] [AI] `OI-4` remains `OPEN`.
+- [ ] [AI] **No `[Needs Verification]` marker is unaccounted for.** Every syllabus file still carrying
+      one must be named in `verification-log.md`'s `## Carried residuals` register with a reason —
+      run the two commands in the fenced block below. Acceptance: the first returns **0**, AND the
+      second returns the number of files still carrying a marker. **Literal zero markers is not the
+      target** (see the register's opening paragraph: some residuals are deliberate and permanent);
+      the target is zero _unregistered_ markers. Negative control: adding a marker to a course not
+      named in the register makes the first command return **1** — and if the second command ever
+      returns **0**, the first is passing vacuously and the check is void.
+
+  > **Expected to fail today, by design — like Phase 6 §6.4.** At plan-authoring time these return
+  > **15** and **17**: the register names the deliberate residuals, while the other 15 markers are
+  > Phase 1 authoring-time placeholders reading "pending the Phase 1 coverage pass." Phase 1 must
+  > resolve each or promote it into the register with a reason; only then does this Phase 4 gate pass.
+  > A checker reading this plan before execution should expect 15, not 0.
+
+```bash
+# (1) Syllabus files carrying a marker but NOT named in the residuals register. MUST print 0.
+for f in "${SPEC}"*.md; do
+  grep -q '\[Needs Verification\]' "$f" || continue
+  b=$(basename "$f")
+  grep -qF "$b" "${PLANDIR}verification-log.md" || echo "UNREGISTERED $b"
+done | wc -l
+
+# (2) Anti-vacuity companion: files still carrying a marker. If this is 0, check (1) is void.
+for f in "${SPEC}"*.md; do grep -q '\[Needs Verification\]' "$f" && echo "$f"; done | wc -l
+```
 
 > **Pause Safety**: the verification ledger is current and every open item's status is deliberate, not
 > stale. Safe to stop. To resume: `grep -E '^OI-[1-4]: ' "${PLANDIR}verification-log.md"` and confirm
@@ -726,7 +928,9 @@ Scenario: The conventional-accounting manifest completes and the Sharia-accounti
 - [ ] [AI] **GREEN** — grow `$MANIFEST_SA` to 24 entries (19 shared + 5 Sharia-specific, in order) —
       command: `nx run ayokoding-www:test:unit` — acceptance: exits 0; `$MANIFEST_SA` has exactly 24
       `courseOrder` entries; `$MANIFEST_CA` **unchanged** —
-      `git diff --stat "$MANIFEST_CA"` returns empty (no diff at all since Phase 3's freeze).
+      `git diff --quiet -- "$MANIFEST_CA"` **exits 0** (no diff at all since Phase 3's freeze). Exit
+      code, not output — immune to any diff-rendering filter. Negative control: touching one line of
+      `$MANIFEST_CA` makes it exit 1.
 - [ ] [AI] **REFACTOR** — command: `nx run ayokoding-www:test:unit && nx run ayokoding-www:lint` —
       acceptance: both exit 0.
 
@@ -735,9 +939,9 @@ manifest continues past it" — second half, completing Phase 3's first-half ass
 
 - [ ] [AI] **Completion-and-continuation assertion, both halves together**:
       `grep -cE '^  - ' "$MANIFEST_CA"` returns **19**, AND `grep -cE '^  - ' "$MANIFEST_SA"` returns
-      **24**, AND `git diff origin/main -- "$MANIFEST_CA" | wc -l` (measured from the Phase 3 merge
-      point to now) returns **0** — falsifiable both ways: any further edit to `$MANIFEST_CA` after
-      Phase 3 makes the last check nonzero.
+      **24**, AND `git diff --quiet origin/main -- "$MANIFEST_CA"` (measured from the Phase 3 merge
+      point to now) **exits 0** — falsifiable both ways: any further edit to `$MANIFEST_CA` after
+      Phase 3 makes the last check exit 1.
 
 ### 5.3 · Update the `sharia-accounting` landing to reflect all three stages
 
@@ -750,11 +954,30 @@ manifest continues past it" — second half, completing Phase 3's first-half ass
 
 ### 5.4 · TDD cycle — extend the `sharia-accounting` path-walk e2e
 
-- [ ] [AI] **RED** — extend the reusable "walk a skills path" step (from §2.4's REFACTOR) with a
-      24-course walk for `skills/sharia-accounting`, plus an assertion that `skills/conventional-
-accounting`'s walk is still exactly 19 courses (unaffected by this phase) — command:
+- [ ] [AI] **RED** — extend the count-parameterized "walk a skills path" step (from §3.5's REFACTOR)
+      with a 24-course walk for `skills/sharia-accounting`, plus an assertion that the
+      `skills/conventional-accounting` walk is still exactly 19 courses (unaffected by this phase) —
+      command:
       `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new 24-course assertion fails (only 19
       published before this phase).
+
+  **Gherkin (binds) →** Outline "A two-segment skills path ID resolves end to end" — same Outline
+  §2.4 bound, now exercised against `sharia-accounting`'s full 24-course growth
+
+  ```gherkin
+  Scenario Outline: A two-segment skills path ID resolves end to end
+    Given the manifest declares pathId <path_id> and arc immediately-effective
+    When a reader walks the path from its landing
+    Then the landing, the prev and next controls, and the breadcrumb all resolve against the two-segment path ID
+    And the ?path=<path_id> context persists across every course in the walk
+    And no resolver assumes a three-segment path ID
+
+    Examples:
+      | path_id                       |
+      | skills/conventional-accounting |
+      | skills/sharia-accounting       |
+  ```
+
 - [ ] [AI] **GREEN** — command: `nx run ayokoding-www:specs:behavior:coverage && nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: both exit 0.
 - [ ] [AI] **REFACTOR** — command: `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: exits 0,
@@ -779,15 +1002,17 @@ Scenario: Every post-foundations course names what still balances while being wr
 
 - [ ] [AI] **Record the Stage-3 signal**, exact literal shape:
 
-  ```
-  STAGE: 3
-  PLAN: ayokoding-learning-path-06-skills-accounting
-  LANDED_COURSE_IDS: sharia-accounting-and-aaoifi-standards, islamic-contract-modeling-for-systems, zakah-computation-and-reporting-for-systems, sukuk-and-islamic-capital-markets-accounting, sharia-ledger-system-architecture
-  UNBLOCKS_ERP_CAPABILITY: the ERP stages delivering Sharia-compliant ERP capability and founding-architecture capability
-  MERGED_COMMIT: <40-character SHA — fill in from the actual merge>
-  ```
+```
+STAGE: 3
+PLAN: ayokoding-learning-path-06-skills-accounting
+LANDED_COURSE_IDS: sharia-accounting-and-aaoifi-standards, islamic-contract-modeling-for-systems, zakah-computation-and-reporting-for-systems, sukuk-and-islamic-capital-markets-accounting, sharia-ledger-system-architecture
+UNBLOCKS_ERP_CAPABILITY: the ERP stages delivering Sharia-compliant ERP capability and founding-architecture capability
+MERGED_COMMIT: <40-character SHA — fill in from the actual merge>
+```
 
-  — acceptance: `git cat-file -e <sha>^{commit}` exits 0.
+— acceptance: `git cat-file -e <sha>^{commit}` exits 0, AND `grep -c '^STAGE: 3$' delivery.md`
+returns **1** (the fenced block above must stay at column 0 — indenting it under the bullet silently
+breaks the Phase 8 gate).
 
 ### Phase 5 Gate
 
@@ -801,8 +1026,8 @@ Scenario: Every post-foundations course names what still balances while being wr
 - [ ] [AI] Stage-3 signal recorded with a real, verifiable `MERGED_COMMIT`.
 - [ ] [AI] `nx run ayokoding-www:build` exits 0.
 
-> **Pause Safety**: both paths are fully authored and independently shippable — `conventional-
-accounting` at 19, `sharia-accounting` at 24. Safe to stop. To resume:
+> **Pause Safety**: both paths are fully authored and independently shippable —
+> `conventional-accounting` at 19, `sharia-accounting` at 24. Safe to stop. To resume:
 > `nx run ayokoding-www:test:unit && nx run ayokoding-www-fe-e2e:test:e2e` and confirm 0 exit before
 > starting Phase 6.
 
@@ -823,7 +1048,7 @@ accounting` at 19, `sharia-accounting` at 24. Safe to stop. To resume:
 
 ### 6.2 · Ownership footprint check (DD-615)
 
-- [ ] [AI] Authorship-scoped commit-footprint check: `gh pr list --search "ayokoding-learning-path-06-skills-accounting" --state merged --json number,files` and confirm every touched path under `apps/ayokoding-www/src/features/course-paths/manifests/` is one of the two files this plan owns — acceptance: no path under `manifests/careers/` or `manifests/skills/enterprise-resource-planning*` appears; no `_index.md` under `paths/` (other than the two landings) appears.
+- [ ] [AI] Authorship-scoped commit-footprint check: `gh pr list --search "ayokoding-learning-path-06-skills-accounting" --state merged --json number,files` and confirm every touched path under `apps/ayokoding-www/src/features/course-paths/manifests/` is one of the two files this plan owns — acceptance: no path under `manifests/careers/`, `manifests/skills/conventional-erp.yaml`, or `manifests/skills/sharia-erp.yaml` appears; no `_index.md` under `paths/` (other than the two landings) appears.
 
 ### 6.3 · Shared-course non-duplication, final sweep
 
@@ -843,6 +1068,28 @@ accounting` at 19, `sharia-accounting` at 24. Safe to stop. To resume:
       code pasted, no vendor name used in a title. Cross-check against each file's own recorded
       licensing-sensitive-sources note (Phase 1 §1.4) — acceptance: zero violations found; any finding
       is fixed before this gate closes.
+- [ ] [AI] **Every citation resolves to a full URL.** The corpus currently cites sources by bare
+      domain or by unlinked source name (`## Read more` entries, and the grounding citations in
+      `verification-log.md` and `tech-docs.md`). `A8`'s "describe, cite and link; never reproduce"
+      posture depends on the **link** half: a reader sent to the source needs a resolvable address,
+      and an unlinked name cannot be checked for licence terms.
+      Add a full URL to every citation, then verify:
+
+  ```bash
+  for f in "${SPEC}"*.md; do
+    awk '/^## Read more$/{flag=1;next}/^## /{flag=0}flag' "$f" \
+      | grep -E '^\s*[-*] ' | grep -qv 'http' && echo "UNLINKED CITATION: $f"
+  done
+  ```
+
+  Acceptance: **empty output**. Guard first —
+  `[ "$(ls "${SPEC}"*.md | wc -l)" -eq 24 ] && echo GUARD-OK` must print `GUARD-OK`.
+  **Do not fabricate a URL to satisfy this clause.** Where a source is offline-only (a printed
+  textbook, a paywalled standard), cite it nominatively and record it in that file's Accuracy notes as
+  deliberately unlinked with the reason — that is a pass, not a violation. Where a URL is asserted,
+  `apps-ayokoding-www-link-checker` must confirm it resolves; a dead or invented link fails this
+  clause. `A4` markers on the underlying claims are unaffected — adding a link never upgrades an
+  `[Unverified]` claim to `[Verified]`.
 
 **Gherkin (binds) →** "No standard's text or proprietary structure is reproduced"
 
@@ -914,28 +1161,45 @@ Scenario: No unverified claim is published as fact
 > _Suggested executor: Playwright MCP direct use; `web-exploratory-tester` /
 > `web-usability-tester` / `web-design-tester` triad for the Rule-15 retest._
 
-### Manual UI Verification (Playwright MCP)
+### Manual UI Verification (Playwright MCP) — three breakpoints
 
 - [ ] [AI] Start dev server: `nx dev ayokoding-www`.
-- [ ] [AI] Navigate to `/en/learn/paths/skills/conventional-accounting` via `browser_navigate`.
-- [ ] [AI] Inspect DOM via `browser_snapshot` — verify the arc promise, the completeness statement, and
-      the rendered 19-course list all appear.
-- [ ] [AI] Navigate to `/en/learn/paths/skills/sharia-accounting` — verify the arc promise, all three
-      Dangerous-N boundaries, the path-choice note, and the rendered 24-course list.
+- [ ] [AI] For EACH breakpoint (375 / 768 / 1280 px): `browser_resize` to that width, then navigate to
+      `/en/learn/paths/skills/conventional-accounting` via `browser_navigate`.
+- [ ] [AI] Inspect DOM via `browser_snapshot` at every breakpoint — verify the arc promise, the
+      completeness statement, and the rendered 19-course list all appear.
+- [ ] [AI] For EACH breakpoint (375 / 768 / 1280 px): `browser_resize` to that width, then navigate to
+      `/en/learn/paths/skills/sharia-accounting` — verify the arc promise, all three Dangerous-N
+      boundaries, the path-choice note, and the rendered 24-course list.
 - [ ] [AI] Walk both paths end to end via prev/next controls (`browser_click`) — verify breadcrumb and
       `?path=` persistence at every step.
 - [ ] [AI] Check for JS errors via `browser_console_messages` on both landings and a sample of walked
-      courses — zero errors.
-- [ ] [AI] Take screenshots via `browser_take_screenshot` for both landings — commit as evidence.
-- [ ] [AI] Document verification results in this checklist.
+      courses, at every breakpoint — zero errors.
+- [ ] [AI] Take one screenshot per landing per breakpoint via `browser_take_screenshot`, saved to
+      `evidence/phase-7-<landing>-en-<breakpoint>px.png` (e.g.
+      `evidence/phase-7-conventional-accounting-en-375px.png`,
+      `evidence/phase-7-sharia-accounting-en-1280px.png`) — commit as evidence.
+- [ ] [AI] Document verification results in this checklist, referencing each committed screenshot.
 
 ### Rule-15 three-tester retest (both paths, both `pathId`s)
 
-- [ ] [AI] Dispatch `web-exploratory-tester` (spec-blind) against both landings and a sample walk —
-      record findings.
-- [ ] [AI] Dispatch `web-usability-tester` against both landings — record findings.
-- [ ] [AI] Dispatch `web-design-tester` against both landings — record findings.
-- [ ] [AI] Apply fixes for any CRITICAL/HIGH finding from the triad; re-run the affected tester(s).
+All three run in `delivery` mode so their findings land in this checklist rather than in a new backlog
+plan. **Fold every finding in as its own checkbox**, prefixed with the issuing tester's id — `EWT-###`
+(exploratory), `UWT-###` (usability), `DWT-###` (design) — so each is individually tickable and
+auditable. A tester's summary verdict is not a substitute for the per-finding checkboxes.
+
+- [ ] [AI] Dispatch `web-exploratory-tester` (**spec-aware** — it reads `specs/**` Gherkin and hunts
+      functional/correctness defects) against both landings and a sample walk — record every finding
+      as an `EWT-###` checkbox.
+- [ ] [AI] Dispatch `web-usability-tester` (**spec-blind** — first-time-user comprehension, judged
+      only on what the rendered page shows) against both landings — record every finding as a
+      `UWT-###` checkbox.
+- [ ] [AI] Dispatch `web-design-tester` (**design-aware**) against both landings — record every
+      finding as a `DWT-###` checkbox.
+- [ ] [AI] **Resolve every defect finding from the triad, at all severities** — not only CRITICAL and
+      HIGH. Governance requires all defect findings fixed; a MEDIUM or LOW may be deferred **only**
+      with explicit recorded permission naming the finding id and the reason. Re-run the affected
+      tester(s) after fixing and confirm the finding no longer reproduces.
 
 ### Phase 7 Gate
 
@@ -943,7 +1207,10 @@ Scenario: No unverified claim is published as fact
 
 - [ ] [AI] Both landings walked end to end with zero JS console errors.
 - [ ] [AI] Screenshot evidence committed for both landings.
-- [ ] [AI] Rule-15 triad complete for both paths; zero unresolved CRITICAL/HIGH findings.
+- [ ] [AI] Rule-15 triad complete for both paths; every `EWT-###`/`UWT-###`/`DWT-###` finding folded
+      in as a checkbox and **resolved at every severity**, or explicitly deferred with a recorded
+      permission naming the finding id and reason. Zero unresolved CRITICAL/HIGH is necessary but not
+      sufficient.
 
 > **Pause Safety**: both paths are manually verified end to end. Safe to stop. To resume: re-open both
 > landings via `browser_navigate` and re-check `browser_console_messages` before starting Phase 8.
@@ -956,13 +1223,21 @@ Scenario: No unverified claim is published as fact
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `nx affected -t build,test:quick,lint` exits 0.
-- [ ] [AI] `nx run ayokoding-www:specs:coverage` exits 0.
+- [ ] [AI] `nx affected -t typecheck,build,test:quick,lint` exits 0.
+- [ ] [AI] `nx run ayokoding-www:specs:behavior:coverage` exits 0.
 - [ ] [AI] `npm run lint:md` exits 0.
 
 > **Important**: fix ALL failures found during these gates, not just those caused by this plan's own
 > changes — proactively fix any preexisting error encountered, per the root-cause-orientation
 > principle.
+
+### Commit Guidelines
+
+- [ ] [AI] Commit changes thematically — group related changes into logically cohesive commits.
+- [ ] [AI] Follow Conventional Commits format: `<type>(<scope>): <description>`.
+- [ ] [AI] Split different domains/concerns into separate commits (e.g. a syllabus-authoring commit
+      separate from a manifest-growth commit).
+- [ ] [AI] Do NOT bundle unrelated fixes into a single commit.
 
 ### Post-Push Verification
 
@@ -972,9 +1247,12 @@ Scenario: No unverified claim is published as fact
 - [ ] [AI] Monitor GitHub Actions for this PR's check run — poll every 2 minutes, one
       `gh run view --json status,conclusion` per wakeup.
 - [ ] [AI] Verify all CI checks pass; fix and push a follow-up commit for any failure.
-- [ ] [AI] `[AI]` merge once all five PR Merge Protocol preconditions hold (review cycles complete; 0
+- [ ] [AI] Confirm all five PR Merge Protocol preconditions hold (review cycles complete; 0
       CRITICAL/HIGH outstanding; branch current; gates green; tester gates run) — see
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md).
+      **Do not merge here.** The PR stays open through Phases 9 and 10 so that Knowledge Capture and
+      the archival move are committed to **this same branch** and land inside this PR, as the merge
+      protocol requires. The `[AI]` merge is the terminal step of Phase 10.
 
 **Gherkin (binds) →** "Both accounting paths build and validate green"
 
@@ -982,7 +1260,7 @@ Scenario: No unverified claim is published as fact
 Scenario: Both accounting paths build and validate green
   Given both manifests, all twenty-four course bodies, and both landings are merged to origin/main
   When the full ayokoding-www CI suite runs
-  Then build, typecheck, lint, test:quick, and specs:coverage all pass
+  Then build, typecheck, lint, test:quick, and specs:behavior:coverage all pass
   And both e2e path-walk specs pass
   And no CI check for this plan's changes fails
 ```
@@ -997,13 +1275,35 @@ Scenario: Both accounting paths build and validate green
 ### Phase 8 Gate
 
 > All checks below must pass before starting Phase 9.
+>
+> **Two merge states coexist here, and the distinction is load-bearing.** Per
+> [DD-613](./tech-docs.md#design-decisions), every **course and manifest** sub-phase already merged
+> to `origin/main` on its own PR during Phases 2, 3 and 5 — so the corpus itself is live and CI-green
+> by the time Phase 8 runs. What stays **open** is _this plan's own final PR_, carrying Knowledge
+> Capture (Phase 9) and the archival move (Phase 10), which the merge protocol requires to land
+> inside the same PR. "Do not merge here" refers to that final PR only; it does not contradict the
+> corpus already being on `origin/main`.
 
-- [ ] [AI] CI green on `origin/main` for this plan's merged changes.
+- [ ] [AI] CI green on `origin/main` for this plan's **already-merged course and manifest changes**
+      (the DD-613 per-course PRs) — verify against the run whose head SHA matches `origin/main`'s
+      current tip, not merely "the latest run".
 - [ ] [AI] Both stage signals present with real, verifiable commits.
+- [ ] [AI] **Production serves both accounting paths.** Dispatch (or re-dispatch, if an earlier
+      per-merge deploy lagged) `apps-ayokoding-www-deployer` to publish `ayokoding-www` to
+      `prod-ayokoding-www` — acceptance: `https://ayokoding.com/en/learn/paths/skills/conventional-accounting`
+      and `.../sharia-accounting` both return HTTP 200 and each renders its own `courseOrder` length
+      (19 and 24 respectively). Negative control: a 404 on either landing, or a rendered course count
+      that still matches a pre-merge value, means the deploy has not landed — that is a failure, not
+      a pass.
+- [ ] [AI] **This plan's final PR is still open**, containing Phases 8-10's commits —
+      `gh pr list --head "$(git rev-parse --abbrev-ref HEAD)" --state open --json number --jq 'length'`
+      returns **1**. Negative control: a value of **0** means the PR was merged early, which breaks
+      the archival-inside-the-PR requirement and is a blocking regression, not a pass.
 
-> **Pause Safety**: both paths are live on `origin/main`, CI-green. Safe to stop. To resume:
-> `gh run list --branch main --limit 5` and confirm the latest run for this plan's changes is green
-> before starting Phase 9.
+> **Pause Safety**: the authored corpus — both paths — is live on `origin/main` and CI-green, while
+> this plan's final PR remains open by design. Safe to stop. To resume: confirm the `origin/main` run
+> matching the current tip SHA is green, and that this plan's final PR is still open, before starting
+> Phase 9.
 
 ---
 
@@ -1046,13 +1346,35 @@ Scenario: Both accounting paths build and validate green
       available on `origin/main` for its independent `test -d` verification, per
       [tech-docs §Stage-signal contract](./tech-docs.md#stage-signal-contract-the-plan-07-handoff-stage-granularity) —
       this is a note only; plan 07 verifies readiness itself and never parses this file.
-- [ ] [AI] Commit the archival move inside the same final PR (or a dedicated archival PR under
-      `worktree-to-pr`), merge.
+- [ ] [AI] Commit the archival move **to the still-open PR branch from Phase 8** — no dedicated
+      follow-up archival PR. Phase 8 deliberately left the PR unmerged precisely so this commit lands
+      inside it; the merge protocol requires archival committed in the PR **before** the merge, and a
+      "same final PR" that has already merged cannot receive it.
+      Commit with a Conventional Commits message, e.g.
+      `git commit -m "chore(plans): archive ayokoding-learning-path-06-skills-accounting"`.
+- [ ] [AI] **Push the archival commit** — `git push origin HEAD` — acceptance: exits 0 and
+      `git status -sb` reports the branch is not ahead of its upstream:
+      `git status -sb | grep -c 'ahead'` returns **0**. Committing without pushing would leave the
+      archival move out of the PR entirely while every later check still appeared to pass.
+- [ ] [AI] **Monitor CI on the new head** — poll every 2 minutes, one
+      `gh run view --json status,conclusion` per wakeup, exactly as Phase 8 does. Never tight-loop and
+      never use `gh run watch`; on a 403 rate-limit, wait ~35 minutes. Acceptance: `status` is
+      `completed` **and** `conclusion` is `success` **for the run whose head SHA equals
+      `git rev-parse HEAD`** — confirm the SHA matches rather than reading whichever run is newest, or
+      a stale green run from before the archival commit will be mistaken for a pass.
+- [ ] [AI] Re-confirm all five PR Merge Protocol preconditions still hold after the archival commit
+      (the branch changed, so review state and CI must both be re-checked on the new head), then
+      perform the `[AI]` merge. This is the terminal step of the plan.
 
 ### Phase 10 Gate
 
 - [ ] [AI] `test -d plans/done/*__ayokoding-learning-path-06-skills-accounting` exits 0.
 - [ ] [AI] `test -d plans/backlog/ayokoding-learning-path-06-skills-accounting` and
       `test -d plans/in-progress/ayokoding-learning-path-06-skills-accounting` both exit 1.
+- [ ] [AI] The archival commit is an ancestor of the merged PR head — verify the archival landed
+      inside the PR rather than in a follow-up:
+      `gh pr list --head "$(git rev-parse --abbrev-ref HEAD)" --state merged --json number,mergeCommit`
+      returns this plan's PR. Use `gh pr list --head`, not `git merge-base --is-ancestor`: this repo
+      squash-merges, so ancestry checks false-negative on every merged PR.
 
 > **Pause Safety**: plan complete and archived. Nothing further to resume.

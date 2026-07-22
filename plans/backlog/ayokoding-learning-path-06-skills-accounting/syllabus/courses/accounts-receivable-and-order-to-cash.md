@@ -30,23 +30,30 @@ this course covers the operational collection cycle after recognition.
 
 - The allowance method and aging mechanics are stable, widely taught domain knowledge with no dynamic
   component to re-verify at authoring `[Verified — stable, non-dynamic domain fact]`.
+- The write-off-against-the-allowance mechanic (co-08) is domain reasoning completing co-03's
+  allowance cycle rather than a claim sourced from this plan's grounding file `[Needs Verification]`
+  pending the Phase 1 coverage pass.
 
 ## Concepts
 
-1. **co-01 · order-to-cash-cycle** — order, fulfilment, invoice, collection, cash application, as a
-   document chain mirroring #6's P2P.
-2. **co-02 · accounts-receivable-aging** — grouping open invoices by how long they have been
-   outstanding.
-3. **co-03 · allowance-for-doubtful-accounts** — an estimated reserve against receivables expected to
-   go uncollected, reported as a contra-asset.
-4. **co-04 · allowance-method-vs-direct-write-off** — the allowance method estimates uncollectibility
-   in advance; direct write-off waits until a specific account is known bad — and is not
-   GAAP/IFRS-compliant treatment for material balances.
-5. **co-05 · cash-application** — matching an incoming payment to its open invoice(s).
-6. **co-06 · unapplied-cash** — a payment received but not yet matched to an invoice; a persistent
-   unapplied-cash balance is a signal worth investigating.
-7. **co-07 · credit-memo** — a document reducing a customer's balance (return, pricing correction) and
-   its effect on the aging schedule.
+- **co-01 · order-to-cash-cycle** — order, fulfilment, invoice, collection, cash application, as a
+  document chain mirroring #6's P2P.
+- **co-02 · accounts-receivable-aging** — grouping open invoices by how long they have been
+  outstanding.
+- **co-03 · allowance-for-doubtful-accounts** — an estimated reserve against receivables expected to
+  go uncollected, reported as a contra-asset.
+- **co-04 · allowance-method-vs-direct-write-off** — the allowance method estimates uncollectibility
+  in advance; direct write-off waits until a specific account is known bad — and is not
+  GAAP/IFRS-compliant treatment for material balances.
+- **co-05 · cash-application** — matching an incoming payment to its open invoice(s).
+- **co-06 · unapplied-cash** — a payment received but not yet matched to an invoice; a persistent
+  unapplied-cash balance is a signal worth investigating.
+- **co-07 · credit-memo** — a document reducing a customer's balance (return, pricing correction) and
+  its effect on the aging schedule.
+- **co-08 · write-off-against-the-allowance** — removing a specific account confirmed uncollectible by
+  charging it against the allowance already estimated in co-03 rather than against expense, so the
+  write-off itself changes neither the net receivable nor that period's income — the loss was already
+  recognised when the allowance was estimated.
 
 ## Worked examples
 
@@ -80,6 +87,10 @@ this course covers the operational collection cycle after recognition.
   that understates expected losses — verify the balance sheet still balances while collectible assets
   are overstated, and name the observable signal (actual write-offs consistently exceeding the
   allowance) that would reveal it. (co-03, silent-failure)
+- **ex-10 · write-off-a-confirmed-bad-account** — write one confirmed uncollectible invoice off
+  against ex-03's allowance, then contrast it with the same write-off charged straight to expense —
+  verify the allowance route leaves net receivables and period income unchanged while the
+  direct-to-expense route recognises the loss a second time. (co-03, co-04, co-08)
 
 ## Applied synthesis (no build — A6)
 

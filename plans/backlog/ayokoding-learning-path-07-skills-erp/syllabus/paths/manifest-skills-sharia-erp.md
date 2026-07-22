@@ -18,61 +18,54 @@ landing served at `/en/learn/paths/skills/sharia-erp`.
 
 ## Composition (29 courses, terminal — 26 shared + 3 Sharia-exclusive)
 
-### Stage A — Foundations & Architecture (courses 1-12, 17, 21-22; 15 total; identical to `conventional-erp`'s Stage A)
+**This list is the reading ramp, in `courseOrder` order.** Per
+[tech-docs.md §Authoring stages vs reading ramp](../../tech-docs.md#authoring-stages-vs-reading-ramp-dd-3),
+**authoring order is not reading order** — the manifest fixes what a _reader_ walks, while the
+delivery checklist fixes what an _author_ writes next. Each entry is annotated with its authoring
+stage rather than grouped by it. Positions 1-26 are **identical** to `conventional-erp`'s ramp; only
+positions 27-29 differ.
 
-1. `erp-foundations-and-history`
-2. `erp-conceptual-data-model`
-3. `erp-module-map-and-architecture`
-4. `erp-document-lifecycle-and-state-machines`
-5. `erp-posting-rules-and-account-determination`
-6. `erp-subledger-to-gl-architecture`
-7. `erp-fiscal-calendar-and-period-close`
-8. `erp-numbering-sequences-and-uom-conversion`
-9. `erp-audit-trail-and-change-tracking` — **Dangerous 1 ⚡**
-10. `procure-to-pay-systems`
-11. `order-to-cash-systems`
-12. `erp-procurement-and-fulfillment-exceptions`
-13. `erp-bom-and-routing-architecture`
-14. `erp-extension-and-customization`
-15. `erp-integration-patterns`
+1. `erp-foundations-and-history` — Stage A
+2. `erp-conceptual-data-model` — Stage A
+3. `erp-module-map-and-architecture` — Stage A
+4. `erp-document-lifecycle-and-state-machines` — Stage A
+5. `erp-posting-rules-and-account-determination` — Stage A
+6. `erp-subledger-to-gl-architecture` — Stage A
+7. `erp-fiscal-calendar-and-period-close` — Stage A
+8. `erp-numbering-sequences-and-uom-conversion` — Stage A
+9. `erp-audit-trail-and-change-tracking` — Stage A — **Dangerous 1 ⚡**
+10. `procure-to-pay-systems` — Stage A
+11. `order-to-cash-systems` — Stage A
+12. `erp-procurement-and-fulfillment-exceptions` — Stage A
+13. `record-to-report-systems` — Stage B — the hard accounting edge lands here
+14. `inventory-and-warehouse-management` — Stage B
+15. `erp-inventory-costing-methods` — Stage B
+16. `erp-inventory-integrity-and-concurrency` — Stage B — **Dangerous 2 ⚡**
+17. `erp-bom-and-routing-architecture` — Stage A (authored early, read here)
+18. `production-planning-and-mrp` — Stage B
+19. `demand-and-supply-planning` — Stage B
+20. `erp-availability-and-reservations` — Stage B
+21. `erp-extension-and-customization` — Stage A (authored early, read here)
+22. `erp-integration-patterns` — Stage A (authored early, read here)
+23. `human-capital-management-and-hire-to-retire` — Stage B
+24. `multi-company-and-multi-currency-erp` — Stage B
+25. `erp-security-and-controls` — Stage B
+26. `erp-analytics-and-reporting` — Stage B — **Dangerous 3 ⚡ — the shared 26-course corpus ends here; `conventional-erp` stops at this id, `sharia-erp` continues**
+27. `sharia-compliant-erp-design` — Stage C
+28. `islamic-contract-based-transaction-flows` — Stage C
+29. `zakat-and-sharia-compliance-modules` — Stage C — **Dangerous 4 ⚡ — path ENDS HERE**
 
-### Stage B — Conventional Enterprise Depth (courses 13-16, 18-20, 23-26; 11 total; identical insertion positions to `conventional-erp`'s Stage B)
-
-1. `record-to-report-systems`
-2. `inventory-and-warehouse-management`
-3. `erp-inventory-costing-methods`
-4. `erp-inventory-integrity-and-concurrency` — **Dangerous 2 ⚡**
-5. `production-planning-and-mrp`
-6. `demand-and-supply-planning`
-7. `erp-availability-and-reservations`
-8. `human-capital-management-and-hire-to-retire`
-9. `multi-company-and-multi-currency-erp` — **Dangerous 3 ⚡ — the shared corpus ends here; `conventional-erp` stops at this id, `sharia-erp` continues**
-
-### Stage C — Sharia-Compliant Design (courses 27-29; 3 total; `sharia-erp` exclusive — interleaved after the shared corpus)
-
-1. `sharia-compliant-erp-design`
-2. `islamic-contract-based-transaction-flows`
-3. `zakat-and-sharia-compliance-modules` — **Dangerous 4 ⚡ — path ENDS HERE**
-
-### Remaining shared Stage B ids (interleaved before Stage C, per catalog order)
-
-To keep the shared 26-course foundation identical in composition between both manifests while placing
-the 3 Sharia-exclusive ids at their correct prerequisite-consistent position, the final two shared
-Stage B ids sit **between** `multi-company-and-multi-currency-erp` and Stage C:
-
-1. `erp-security-and-controls`
-2. `erp-analytics-and-reporting`
-
-> **Note on section order above**: each `###` subsection here restarts its own local numbering; the
-> **reading position** in this manifest's actual `courseOrder` is the sequence of subsections
-> top-to-bottom (Stage A, then Stage B up to `multi-company-and-multi-currency-erp`, then Stage C's
-> three ids, then the two remaining Stage B ids listed last). `erp-security-and-controls` and
-> `erp-analytics-and-reporting` (both catalog Stage B) read **after** the three Sharia-exclusive
-> courses in this manifest, because `sharia-compliant-erp-design` prerequisites
-> `multi-company-and-multi-currency-erp` only, not either of those two ids — so the Sharia-exclusive
-> block inserts immediately after `multi-company-and-multi-currency-erp`, ahead of them, in this
-> manifest's ramp. `conventional-erp`'s own manifest keeps the catalog's order (those two ids
-> immediately follow `multi-company-and-multi-currency-erp`) since it never inserts the Sharia block.
+> **Where the two paths diverge.** The shared corpus ends at **position 26**
+> (`erp-analytics-and-reporting`), not at `multi-company-and-multi-currency-erp` — both
+> `erp-security-and-controls` and `erp-analytics-and-reporting` are shared Stage B ids that
+> `conventional-erp` also carries. **Dangerous 3** therefore sits at position 26 in both manifests.
+>
+> Stage C is **appended, not inserted**. `sharia-compliant-erp-design` prerequisites
+> `multi-company-and-multi-currency-erp` only, so it _could_ sit earlier — but placing the
+> Sharia-exclusive block last is what makes `zakat-and-sharia-compliance-modules` the terminal course
+> and lets **Dangerous 4** mark the end of the path. Inserting the block ahead of
+> `erp-security-and-controls` would end `sharia-erp` on two generic shared courses and strand the
+> Dangerous 4 boundary mid-ramp.
 
 ## Growth history (falsifiable checks)
 

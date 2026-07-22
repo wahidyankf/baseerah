@@ -33,6 +33,9 @@ structures, closing the loop opened by course 13's intercompany preview. Require
 
 - The accounting-side course id `consolidation-and-multi-entity-accounting` is as named in
   `ayokoding-learning-path-06-skills-accounting`'s own in-flight rewrite as of 2026-07-22.
+- Concept co-08 is placed on domain-reasoning grounds rather than sourced from the grounding research,
+  and is `[Needs Verification]` pending the Phase 1.2a coverage pass; which rate type a given
+  reporting framework mandates is deliberately not asserted here.
 
 ## Concepts
 
@@ -49,6 +52,10 @@ structures, closing the loop opened by course 13's intercompany preview. Require
   currency, as exchange rates move.
 - **co-07 · multi-entity-close-sequencing** — why individual entities must close (course 7) before a
   group consolidation can run.
+- **co-08 · exchange-rate-type-and-rate-date** — which rate a translation reads (a spot rate, a period
+  average, a period-closing rate) and which date it reads it at are two separate configuration
+  choices; changing either moves a group-level figure without any underlying transaction changing,
+  which is why a translated number is only meaningful alongside the rate type it was produced under.
 
 ## Worked examples
 
@@ -75,6 +82,9 @@ the `co-NN` it exercises.
   rate change, compute the revaluation adjustment. (co-06)
 - **ex-06 · multi-entity-close-sequencing-trace** — given three entities on different close schedules,
   determine the earliest possible date for group consolidation. (co-07)
+- **ex-07 · rate-type-sensitivity** — given one foreign-currency balance translated first at a
+  period-closing rate and then at a period-average rate, show the two different group-level figures
+  and state what changed between them and what did not. (co-05, co-06, co-08)
 
 ## Synthesis exercise — intra-topic
 

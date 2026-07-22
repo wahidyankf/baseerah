@@ -19,13 +19,13 @@ nothing in Accounting needs ERP** — see [§Where this plan sits](#where-this-p
 
 _(Repo convention: every promoted plan states what already exists and how it is used.)_
 
-| Prior artefact                                                                      | Size    | Relationship to this plan                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/ayokoding-www/content/en/legacy/business/accounting.md` [Repo-grounded]       | 34.2 KB | Covers nearly all of course **#1**'s scope via a running example — but is written **for small-business owners, not systems builders**, and never touches schema, data modelling, multi-currency, or Sharia treatment. **A source to mine, not a drop-in body.** Plan 01 relocated it to `legacy/business/`.                                                      |
-| `apps/ayokoding-www/content/en/learn/business/corporate-finance.md` [Repo-grounded] | 41.1 KB | Adjacent, **not** a source. Corporate finance is valuation and capital structure; this corpus is bookkeeping, recognition, and reporting. No course in this plan re-teaches it or cites it as a prerequisite.                                                                                                                                                    |
-| The 121-course software-engineering library                                         | —       | **No course duplicates it.** Two courses link it as a cross-domain prerequisite (`sql-essentials`, `backend-essentials`); no other library course is cited.                                                                                                                                                                                                      |
-| `ayokoding-learning-path-05-manifests`                                              | —       | **Structural analogue, not a content source.** This plan matches its file set and gate shape; it copies none of its content.                                                                                                                                                                                                                                     |
-| The original single-path `skills/accounting` design (pre-A10/A6/A8/A9 rewrite)      | —       | **The direct predecessor of this rewrite.** Its twenty-course catalog, ramp reasoning, and stage-signal mechanism are the baseline this document restates, corrects, and extends — see [§Why two paths](#why-two-paths-not-one-a10--a11) and [tech-docs §What changed](./tech-docs.md#what-changed-from-the-original-twenty-course-single-path-catalog-and-why). |
+| Prior artefact                                                                                                                                                                                                    | Size    | Relationship to this plan                                                                                                                                                                                                                                                                                                                                                                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/ayokoding-www/content/en/learn/business/accounting.md` [Repo-grounded — verified at this path, 35,055 bytes] → moves to `content/en/legacy/business/accounting.md` [Planned — depends on plan 01, unmerged] | 34.2 KB | Covers nearly all of course **#1**'s scope via a running example — but is written **for small-business owners, not systems builders**, and never touches schema, data modelling, multi-currency, or Sharia treatment. **A source to mine, not a drop-in body.** Plan 01 relocates it to `legacy/business/`; until that plan merges, the file is only at the `learn/` path, so cite the current path when mining it. |
+| `apps/ayokoding-www/content/en/learn/business/corporate-finance.md` [Repo-grounded]                                                                                                                               | 41.1 KB | Adjacent, **not** a source. Corporate finance is valuation and capital structure; this corpus is bookkeeping, recognition, and reporting. No course in this plan re-teaches it or cites it as a prerequisite.                                                                                                                                                                                                       |
+| The 121-course software-engineering library                                                                                                                                                                       | —       | **No course duplicates it.** Two courses link it as a cross-domain prerequisite (`sql-essentials`, `backend-essentials`); no other library course is cited.                                                                                                                                                                                                                                                         |
+| `ayokoding-learning-path-05-manifests`                                                                                                                                                                            | —       | **Structural analogue, not a content source.** This plan matches its file set and gate shape; it copies none of its content.                                                                                                                                                                                                                                                                                        |
+| The original single-path `skills/accounting` design (pre-A10/A6/A8/A9 rewrite)                                                                                                                                    | —       | **The direct predecessor of this rewrite.** Its twenty-course catalog, ramp reasoning, and stage-signal mechanism are the baseline this document restates, corrects, and extends — see [§Why two paths](#why-two-paths-not-one-a10--a11) and [tech-docs §What changed](./tech-docs.md#what-changed-from-the-original-twenty-course-single-path-catalog-and-why).                                                    |
 
 **How `business/accounting.md` is used, concretely** (see [tech-docs DD-626](./tech-docs.md#design-decisions)):
 course #1 harvests its **running example** and its **narrative sequencing** (the order in which a
@@ -53,13 +53,19 @@ reaches. **A10** splits the corpus into two paths instead:
 `tech-docs.md` already establishes that manifest uniqueness is scoped **per manifest**, not globally,
 and that every manifest references course bodies **by ID** — never by copy:
 
+> Citations anchor on the **quoted phrase**, not a line number — plan 02 is unmerged and under active
+> edit, so any line number cited here goes stale without warning. `grep -F` each quoted string against
+> `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md` to locate it.
+
 - _"No course ID appears twice **within one manifest**"_ [Repo-grounded —
-  `ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md:417`] — the scope is
-  per-manifest, so the same ID may appear in both this plan's manifests.
+  `ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md`, locate via
+  `grep -F 'No course ID appears twice'`] — the scope is per-manifest, so the same ID may appear in
+  both this plan's manifests.
 - _"No course body is duplicated per path (all manifests reference courses **by ID**, never copy a
-  body)"_ [Repo-grounded — same file, line 424].
+  body)"_ [Repo-grounded — same file, locate via `grep -F 'No course body is duplicated'`].
 - _"One body cannot encode four orders; moving order to the manifest [is what enables the shared
-  library]"_ [Repo-grounded — same file, line 615, DD-1].
+  library]"_ [Repo-grounded — same file, DD-1, locate via
+  `grep -F 'One body cannot encode four orders'`].
 
 So the nineteen shared courses are **authored once**, under `<COURSES>`, exactly as every other
 course in the library is. `sharia-accounting.yaml`'s `courseOrder` **interleaves** the shared IDs
@@ -135,8 +141,8 @@ The full statement, with its consequences for personas and acceptance criteria, 
   `…/manifests/skills/sharia-accounting.yaml` — **plus each manifest's own co-located unit test**.
   Each manifest-owning plan owns its manifests and their tests (2026-07-21 ruling, extended here to
   two files within one plan — see [tech-docs DD-602](./tech-docs.md#design-decisions)).
-- Two Gherkin feature companions and their step-definition files (one per path; see
-  [tech-docs §File Impact](./tech-docs.md#file-impact)).
+- One shared Gherkin feature file (a Scenario Outline with two Examples rows, one per path) and its
+  one step-definition file (see [tech-docs §File Impact](./tech-docs.md#file-impact)).
 - **Twenty-four syllabus specs** under this plan's own `syllabus/courses/` folder — the per-course
   contract layer, now carrying an explicit **module/topic breakdown** an author can write from
   without re-deriving scope (see [§Syllabus layer](#syllabus-layer-new-requirement)).
@@ -168,7 +174,7 @@ The full statement, with its consequences for personas and acceptance criteria, 
 Every one of the twenty-four courses now carries a syllabus with an explicit **concept/worked-example
 breakdown** — not just a spec's top matter and prerequisites, but the enumerated concepts (`co-NN`)
 and worked examples (`ex-NN`) an author can write from directly. **The file shape itself is inherited
-from `ayokoding-learning-path-02-schema-and-prerequisite-dag`'s 123 existing `syllabus/courses/*.md`
+from `ayokoding-learning-path-02-schema-and-prerequisite-dag`'s 121 existing `syllabus/courses/*.md`
 files, not invented here** — same header fields, same section names and order, same
 problem-before-solution framing (see [tech-docs DD-627](./tech-docs.md#design-decisions)), adapted for
 a non-code, no-build domain: no `Language` field, and no `Capstone spec` section (A6 forbids a build
@@ -284,18 +290,21 @@ its own right, and its manifest **stops growing** at that point while `sharia-ac
 
 ```mermaid
 %% Phase progression. Every phase ends in a gate and a safe stopping point.
+%% Node SHAPE encodes phase category: stadium = setup, parallelogram = spec,
+%% hexagon = authoring, rectangle = verification, subroutine = finalisation.
+%% Each label also names its category in text. Colours are redundant with both.
 flowchart TD
-    P0["Phase 0<br/>baseline + preconditions"]:::setup
-    P1["Phase 1<br/>24 syllabus specs"]:::spec
-    P2["Phase 2<br/>shared 1-3<br/>publish BOTH manifests"]:::author
-    P3["Phase 3<br/>shared 4-19<br/>grow BOTH to 19<br/>conventional-accounting DONE"]:::author
-    P4["Phase 4<br/>verification debt"]:::spec
-    P5["Phase 5<br/>sharia 20-24<br/>grow sharia-accounting to 24"]:::author
-    P6["Phase 6<br/>section verification"]:::verify
-    P7["Phase 7<br/>manual UI + rule-15"]:::verify
-    P8["Phase 8<br/>main integration + CI"]:::verify
-    P9["Phase 9<br/>knowledge capture"]:::final
-    P10["Phase 10<br/>archival"]:::final
+    P0(["Phase 0 · setup<br/>baseline + preconditions"]):::setup
+    P1[/"Phase 1 · spec<br/>24 syllabus specs"/]:::spec
+    P2{{"Phase 2 · author<br/>shared 1-3<br/>publish BOTH manifests"}}:::author
+    P3{{"Phase 3 · author<br/>shared 4-19<br/>grow BOTH to 19<br/>conventional-accounting DONE"}}:::author
+    P4[/"Phase 4 · spec<br/>verification debt"/]:::spec
+    P5{{"Phase 5 · author<br/>sharia 20-24<br/>grow sharia-accounting to 24"}}:::author
+    P6["Phase 6 · verify<br/>section verification"]:::verify
+    P7["Phase 7 · verify<br/>manual UI + rule-15"]:::verify
+    P8["Phase 8 · verify<br/>main integration + CI"]:::verify
+    P9[["Phase 9 · final<br/>knowledge capture"]]:::final
+    P10[["Phase 10 · final<br/>archival"]]:::final
 
     P0 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10
 
@@ -306,19 +315,25 @@ flowchart TD
     classDef final fill:#029E73,stroke:#000000,color:#FFFFFF
 ```
 
-| Phase | Closing gate                                                                                                    |
-| ----- | --------------------------------------------------------------------------------------------------------------- |
-| 0     | Three start preconditions hold; baselines recorded green                                                        |
-| 1     | 24 specs exist, each with a module/topic breakdown; every prerequisite edge transcribed                         |
-| 2     | Both manifests live with 3 shared courses; the first 2-segment `pathId`s resolve end-to-end                     |
-| 3     | Both manifests at 19 IDs; **`conventional-accounting` is DONE and production-serving**; Stage-2 signal recorded |
-| 4     | Zero `[Needs Verification]` items remain open in this folder                                                    |
-| 5     | `sharia-accounting` at 24 IDs; Stage-3 signal recorded                                                          |
-| 6     | Integrity, prerequisite-consistency, licensing, smoothness and ownership sweeps all green                       |
-| 7     | Both landings + ramp verified live at three breakpoints; zero open rule-15 defects                              |
-| 8     | CI green on `main`; production serves both accounting paths                                                     |
-| 9     | Every `learnings.md` entry terminal                                                                             |
-| 10    | Archived; plan 07 is unblocked end-to-end                                                                       |
+**Accessibility note.** Phase category is carried by node **shape** (stadium = setup, parallelogram =
+spec, hexagon = authoring, rectangle = verification, subroutine = finalisation) and is additionally
+named **in each label's text**, never by colour alone. Fills use the repo's verified
+colour-blind-friendly palette with black borders and WCAG-AA-contrasting text, per the
+[Color Accessibility Convention](../../../repo-governance/conventions/formatting/color-accessibility.md).
+
+| Phase | Closing gate                                                                                                                  |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------- |
+| 0     | Three start preconditions hold; baselines recorded green                                                                      |
+| 1     | 24 specs exist, each with a module/topic breakdown; every prerequisite edge transcribed                                       |
+| 2     | Both manifests live with 3 shared courses; the first 2-segment `pathId`s resolve end-to-end; Stage-1 signal recorded          |
+| 3     | Both manifests at 19 IDs; **`conventional-accounting` is DONE and production-serving** (Stage 2 carries no cross-plan signal) |
+| 4     | Every `[Needs Verification]` marker still standing is registered with a reason in `verification-log.md` (zero _unregistered_) |
+| 5     | `sharia-accounting` at 24 IDs; Stage-3 signal recorded                                                                        |
+| 6     | Integrity, prerequisite-consistency, licensing, smoothness and ownership sweeps all green                                     |
+| 7     | Both landings + ramp verified live at three breakpoints; zero open rule-15 defects                                            |
+| 8     | CI green on `main`; production serves both accounting paths                                                                   |
+| 9     | Every `learnings.md` entry terminal                                                                                           |
+| 10    | Archived; plan 07 is unblocked end-to-end                                                                                     |
 
 ## The 06→07 dependency edge (stage granularity, not course numbers)
 
@@ -354,8 +369,10 @@ fact. Full status ledger, with sources and access dates: [verification-log.md](.
 
 ## Delivery Mode: worktree-to-pr
 
-`worktree-to-pr` — the repo default, declared explicitly. Work in
-`worktrees/ayokoding-learning-path-06-skills-accounting/`, open a draft PR per phase (and per course
+`worktree-to-pr` — the repo default, declared explicitly. Sequential phases work in the base
+worktree `worktrees/ayokoding-learning-path-06-skills-accounting/`; each parallel course-authoring
+leaf gets **its own** worktree (strict 1 PR ↔ 1 worktree — git allows one branch per worktree, so
+concurrent course PRs cannot share one). Open a draft PR per phase (and per course
 sub-phase) against `main`, run the PR-Review Maker→Fixer Cycle (3 sequential CI-gated cycles), then
 `[AI]` merges once every quality gate is green. `ayokoding-www` deploys to `prod-ayokoding-www` after
 each merge. See [delivery.md](./delivery.md#delivery-mode-worktree-to-pr) for the `## Worktree` and

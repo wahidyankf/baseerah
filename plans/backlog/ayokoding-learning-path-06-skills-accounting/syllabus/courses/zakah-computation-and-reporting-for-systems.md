@@ -34,27 +34,35 @@ the original catalog never taught despite AAOIFI FAS 9 being `[Verified]` in the
 
 - `[Verified]` AAOIFI FAS 9 governs Zakah accounting and is this course's anchor standard. The specific
   nisab threshold value and zakatable-asset classification rules are jurisdiction- and
-  institution-specific in practice `[Judgment call — this course teaches the computation pattern
-generically; no specific numeric nisab value is asserted as universal, and any such value is flagged
-`[Needs Verification]`pending the Phase 1 coverage pass]`.
+  institution-specific in practice
+  `[Judgment call — this course teaches the computation pattern generically; no specific numeric nisab value is asserted as universal]`.
+  Any such value is flagged `[Needs Verification]` pending the Phase 1 coverage pass.
+- The holding-period condition and the calendar basis on which it is measured (co-08) are stated
+  generically: this course asserts no specific period length, no specific calendar, and no
+  jurisdiction's rule as universal, and teaches only that the Zakah period is modelled separately from
+  the reporting period `[Needs Verification]` pending the Phase 1 coverage pass.
 
 ## Concepts
 
-1. **co-01 · zakah-as-distinct-obligation** — Zakah is a religious wealth-based obligation, structurally
-   separate from tax, computed on its own base and reported on its own line.
-2. **co-02 · nisab-threshold** — the minimum level of zakatable wealth below which no Zakah obligation
-   arises; a threshold concept, not a flat-rate-on-everything rule.
-3. **co-03 · zakatable-assets** — the categories of assets subject to Zakah (e.g. cash, trade
-   inventory, certain investments), distinct from the entity's full asset base.
-4. **co-04 · zakah-base-computation** — computing the net zakatable base (zakatable assets less
-   qualifying deductions) that the Zakah rate is applied to.
-5. **co-05 · zakah-liability-recognition** — recognising the computed Zakah obligation as a liability
-   in the period it is determined, following the same recognition discipline #5 taught for revenue.
-6. **co-06 · zakah-fund-disclosure** — reporting Zakah separately in the financial statements (often as
-   a dedicated disclosure or fund), never merged into a general tax-expense line.
-7. **co-07 · entity-vs-individual-zakah-payer** — an institution's own Zakah obligation (as a payer) is
-   distinct from its role, where applicable, in facilitating individual shareholders' or depositors'
-   own Zakah obligations — the two are not the same computation.
+- **co-01 · zakah-as-distinct-obligation** — Zakah is a religious wealth-based obligation, structurally
+  separate from tax, computed on its own base and reported on its own line.
+- **co-02 · nisab-threshold** — the minimum level of zakatable wealth below which no Zakah obligation
+  arises; a threshold concept, not a flat-rate-on-everything rule.
+- **co-03 · zakatable-assets** — the categories of assets subject to Zakah (e.g. cash, trade
+  inventory, certain investments), distinct from the entity's full asset base.
+- **co-04 · zakah-base-computation** — computing the net zakatable base (zakatable assets less
+  qualifying deductions) that the Zakah rate is applied to.
+- **co-05 · zakah-liability-recognition** — recognising the computed Zakah obligation as a liability
+  in the period it is determined, following the same recognition discipline #5 taught for revenue.
+- **co-06 · zakah-fund-disclosure** — reporting Zakah separately in the financial statements (often as
+  a dedicated disclosure or fund), never merged into a general tax-expense line.
+- **co-07 · entity-vs-individual-zakah-payer** — an institution's own Zakah obligation (as a payer) is
+  distinct from its role, where applicable, in facilitating individual shareholders' or depositors'
+  own Zakah obligations — the two are not the same computation.
+- **co-08 · zakah-period-is-not-the-reporting-period** — the obligation is conditioned on wealth being
+  held across a defined period, and where that period is measured on a lunar rather than a Gregorian
+  calendar its boundaries drift against the entity's own fiscal year — so a system carries the Zakah
+  period as its own dimension and never reuses the reporting period's start and end dates by default.
 
 ## Worked examples
 
@@ -86,6 +94,10 @@ generically; no specific numeric nisab value is asserted as universal, and any s
   figure is numerically correct while the statement's presentation misrepresents Zakah as a tax
   variant, and name the observable signal (no separate Zakah disclosure despite a nonzero computed
   obligation) that would reveal it. (co-06, silent-failure)
+- **ex-08 · zakah-period-against-fiscal-period** — for an entity whose reporting year runs on a
+  Gregorian calendar while its stated Zakah period is measured on a lunar one, mark both period
+  boundaries on a timeline and recompute ex-03's base at each — verify the two bases differ because
+  the asset balances they capture are measured on different dates. (co-04, co-08)
 
 ## Applied synthesis (no build — A6)
 

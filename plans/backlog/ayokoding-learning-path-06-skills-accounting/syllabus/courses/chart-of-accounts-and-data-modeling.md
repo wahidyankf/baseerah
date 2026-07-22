@@ -37,27 +37,27 @@ sourced from any textbook or vendor system]`.
 
 ## Concepts
 
-1. **co-01 · chart-of-accounts-as-schema** — an account type, number, and hierarchy position expressed
-   as table columns rather than a paper list.
-2. **co-02 · numbering-scheme** — numbering ranges are conventional, not standardised, across
-   organisations; a scheme is a design choice, not a lookup.
-3. **co-03 · parent-child-hierarchy** — accounts roll up into summary parents, supporting both
-   detail-level posting and summary-level reporting.
-4. **co-04 · journal-header-vs-lines** — a journal entry is one header row with many line rows, a
-   one-to-many structure, not a single flat table.
-5. **co-05 · normalisation-tradeoffs-for-ledgers** — where normalising helps (avoiding update anomalies
-   in account metadata) and where a ledger's append-only nature changes the usual tradeoffs.
-6. **co-06 · double-entry-invariant-enforcement** — enforcing "debits = credits per journal entry" at
-   the data layer, not only in application code.
-7. **co-07 · check-constraint-vs-application-layer** — a database constraint fails loudly and always;
-   application-layer enforcement is bypassable by any code path that forgets to call it.
-8. **co-08 · computed-vs-stored-balances** — deriving an account balance on read versus maintaining a
-   cached running balance, and the correctness/performance tradeoff each makes.
-9. **co-09 · rollup-queries** — summing child-account balances into a parent total as an applied
-   `sql-essentials` skill, not a new concept.
-10. **co-10 · original-chart-authorship** — no public-domain chart of accounts exists anywhere
-    `[Verified, 2026-07-22 grounding run]`; every chart in this corpus is originally authored, never
-    copied from a textbook, standard, or vendor system.
+- **co-01 · chart-of-accounts-as-schema** — an account type, number, and hierarchy position expressed
+  as table columns rather than a paper list.
+- **co-02 · numbering-scheme** — numbering ranges are conventional, not standardised, across
+  organisations; a scheme is a design choice, not a lookup.
+- **co-03 · parent-child-hierarchy** — accounts roll up into summary parents, supporting both
+  detail-level posting and summary-level reporting.
+- **co-04 · journal-header-vs-lines** — a journal entry is one header row with many line rows, a
+  one-to-many structure, not a single flat table.
+- **co-05 · normalisation-tradeoffs-for-ledgers** — where normalising helps (avoiding update anomalies
+  in account metadata) and where a ledger's append-only nature changes the usual tradeoffs.
+- **co-06 · double-entry-invariant-enforcement** — enforcing "debits = credits per journal entry" at
+  the data layer, not only in application code.
+- **co-07 · check-constraint-vs-application-layer** — a database constraint fails loudly and always;
+  application-layer enforcement is bypassable by any code path that forgets to call it.
+- **co-08 · computed-vs-stored-balances** — deriving an account balance on read versus maintaining a
+  cached running balance, and the correctness/performance tradeoff each makes.
+- **co-09 · rollup-queries** — summing child-account balances into a parent total as an applied
+  `sql-essentials` skill, not a new concept.
+- **co-10 · original-chart-authorship** — no public-domain chart of accounts exists anywhere
+  `[Verified, 2026-07-22 grounding run]`; every chart in this corpus is originally authored, never
+  copied from a textbook, standard, or vendor system.
 
 ## Worked examples
 

@@ -310,7 +310,7 @@ authored **from** its spec file, never from a fresh judgment call.
   exempt"], so the target **exits 0** throughout; and by recording the deferred obligation at the
   Phase 2 gate naming `ayokoding-learning-path-03-navigation-ui` as the plan that removes the `@wip`
   tags and adds the `@covers` markers, so it has a named owner rather than being an anonymous gap.
-- **The `syllabus/` corpus is copied rather than linked** — forking the source of truth for 121
+- **The `syllabus/` corpus is copied rather than linked** — forking the source of truth for 120
   course specs and four manifest orderings, so a later spec correction lands in one copy only.
   Mitigated by the custody rule stated in this plan's `README.md` and restated as a
   `> **Cross-plan source of truth**` blockquote in each sibling plan's README.

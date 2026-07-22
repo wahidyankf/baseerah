@@ -130,7 +130,19 @@ and now applying identically to both paths:**
 Fourteen scenarios. Each uses **exactly one** primary `Given`, one `When`, and one `Then`; every extra
 precondition, action, or outcome chains with `And`. `Scenario Outline` / `Examples` are used for the
 four checks that repeat identically per path, per the Step-Keyword-Cardinality exemption for
-outlines. Each is bound to a delivery step in [delivery.md](./delivery.md).
+outlines.
+
+**How these relate to `delivery.md`'s embedded Gherkin — they are two levels, not two copies.** The
+scenarios below are **requirement-level** acceptance criteria: they state what must be true of the
+delivered corpus. `delivery.md`'s fenced `Gherkin (binds)` blocks are the **execution-level**
+bindings actually copied into `specs/**` at authoring time; they name the same scenario titles but
+phrase each step against the concrete artifact under test (a numbered course, a named file, a
+specific command). **They are deliberately not verbatim copies of each other, and neither is
+generated from the other.** Every scenario below is verified by at least one delivery step — some by
+a titled `Gherkin (binds)` block, others by a delivery acceptance clause that asserts the same
+property mechanically. When editing either side, re-check the other: a requirement here with no
+verifying delivery step, or a delivery binding asserting a property stated nowhere here, is a defect
+in this plan.
 
 ### The ramp
 
@@ -248,7 +260,7 @@ Scenario: No unverified claim is published as fact
   Given the research seeding this plan marked items as Unverified or Needs Verification
   When a syllabus spec or a course body states a standard number or a doctrinal position
   Then the claim carries either a primary-source citation or an explicit confidence marker
-  And no item marked Needs Verification remains open when the Sharia stage begins
+  And every item still marked Needs Verification when the Sharia stage begins is registered with a reason in verification-log.md
 ```
 
 ```gherkin
@@ -287,8 +299,8 @@ Scenario: Both accounting paths build and validate green
   `apps/ayokoding-www/src/features/course-paths/manifests/skills/conventional-accounting.yaml` and
   `…/manifests/skills/sharia-accounting.yaml`.
 - **Each manifest's own co-located unit test.**
-- Two Gherkin feature files and their 1:1 step-definition files (see
-  [tech-docs §File Impact](./tech-docs.md#file-impact)).
+- One shared Gherkin feature file (Scenario Outline, two Examples rows — one per path) and its one
+  step-definition file (see [tech-docs §File Impact](./tech-docs.md#file-impact)).
 - Two path landing bundles — `<PATHS>skills/conventional-accounting/_index.md` and
   `<PATHS>skills/sharia-accounting/_index.md`. **No `courseOrder` in either landing.**
 - Twenty-four syllabus specs under this plan's own `syllabus/courses/`, each with a module/topic

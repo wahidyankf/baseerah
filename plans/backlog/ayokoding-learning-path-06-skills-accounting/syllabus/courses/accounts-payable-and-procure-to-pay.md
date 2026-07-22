@@ -29,23 +29,30 @@ workflow or approval-routing that generates them (a separate, ERP-owned systems-
 
 - The P2P cycle and three-way match are standard, widely used domain terminology with no dynamic
   component to re-verify at authoring `[Verified — stable, non-dynamic domain fact]`.
+- The goods-received-not-invoiced clearing pattern (co-08) is domain reasoning about how co-02's match
+  is carried in the accounts between receipt and invoice, not a claim sourced from this plan's
+  grounding file `[Needs Verification]` pending the Phase 1 coverage pass.
 
 ## Concepts
 
-1. **co-01 · procure-to-pay-cycle** — purchase requisition, purchase order, goods receipt, invoice,
-   payment, as a document chain.
-2. **co-02 · three-way-match** — matching the purchase order, the goods receipt, and the invoice before
-   a liability is approved for payment.
-3. **co-03 · match-exception** — a mismatch between any two of the three documents (quantity, price)
-   that must be resolved before payment, not silently accepted.
-4. **co-04 · accrued-liability** — goods or services received but not yet invoiced, recognised as a
-   liability at period end regardless of invoice timing.
-5. **co-05 · payment-terms** — the agreed timing and conditions for payment (e.g. net-30), and how they
-   shape when a liability is settled.
-6. **co-06 · early-payment-discount** — the accounting for a discount taken (or missed) for paying
-   before the due date.
-7. **co-07 · liability-without-match** — booking a liability from an invoice alone, without a completed
-   three-way match, as this course's headline control failure.
+- **co-01 · procure-to-pay-cycle** — purchase requisition, purchase order, goods receipt, invoice,
+  payment, as a document chain.
+- **co-02 · three-way-match** — matching the purchase order, the goods receipt, and the invoice before
+  a liability is approved for payment.
+- **co-03 · match-exception** — a mismatch between any two of the three documents (quantity, price)
+  that must be resolved before payment, not silently accepted.
+- **co-04 · accrued-liability** — goods or services received but not yet invoiced, recognised as a
+  liability at period end regardless of invoice timing.
+- **co-05 · payment-terms** — the agreed timing and conditions for payment (e.g. net-30), and how they
+  shape when a liability is settled.
+- **co-06 · early-payment-discount** — the accounting for a discount taken (or missed) for paying
+  before the due date.
+- **co-07 · liability-without-match** — booking a liability from an invoice alone, without a completed
+  three-way match, as this course's headline control failure.
+- **co-08 · goods-received-not-invoiced-clearing** — the intermediate account a goods receipt credits
+  and the matching supplier invoice later debits, so a receipt still awaiting its invoice and an
+  invoice still awaiting its receipt each leave a residual balance that names which side of the match
+  is missing.
 
 ## Worked examples
 
@@ -81,6 +88,10 @@ workflow or approval-routing that generates them (a separate, ERP-owned systems-
   three-way match, where the goods were never actually received — verify the trial balance still
   foots while the entity has paid for goods it does not have, and name the control (the three-way
   match) that would have caught it. (co-07, silent-failure)
+- **ex-11 · reconcile-the-received-not-invoiced-balance** — at period end one receipt has arrived with
+  no invoice yet and one invoice has arrived with no matching receipt — verify the clearing account's
+  residual balance decomposes into exactly those two items, and that neither is visible from the
+  accounts-payable balance alone. (co-02, co-04, co-08)
 
 ## Applied synthesis (no build — A6)
 

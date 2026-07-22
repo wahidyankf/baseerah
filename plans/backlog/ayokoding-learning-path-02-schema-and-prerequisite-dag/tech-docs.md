@@ -362,12 +362,51 @@ for careers paths (`interview-ready/software-engineer`) instead of the 3-segment
    diverge without anything failing (per the concern that prompted this ruling). Any plan whose
    content still writes the 2-segment shorthand for a careers path is citing an **invalid** `pathId`
    and must update to the 3-segment canonical form — that conformance sweep is **not** this plan's to
-   run (see the escalation-response note below). **Status, re-measured 2026-07-21**: all six sibling
-   `ayokoding-learning-path-*` folders now write the 3-segment form; the four remaining 2-segment
-   hits in `ayokoding-learning-path-01-url-restructure` are references to the legacy **content
-   directory** `content/en/learn/fundamentally-strong/software-engineer/` (that plan's `<SE_OLD>`
-   constant) — a filesystem path, not a `pathId` — and are correct as written. The escalation is
-   closed; nothing is outstanding.
+   run (see the escalation-response note below). **Status, re-measured 2026-07-22 — scoped to the
+   sibling plans' own documents**: no sibling folder writes a bare 2-segment careers `pathId` as its
+   current canonical spelling, but the shorthand string still appears **55 times across five of the
+   six** sibling `ayokoding-learning-path-*` folders' top-level
+   `README`/`brd`/`prd`/`tech-docs`/`delivery` documents, in three categories. First, references to the
+   legacy **content directory and legacy URL** `.../learn/fundamentally-strong/software-engineer/`
+   (plan 01's `<SE_OLD>` constant) — a filesystem/URL path, not a `pathId`, and correct as written:
+   these account for all **39** hits in `…-01-url-restructure`, **3** in `…-04-course-authoring`, and
+   **2** in `…-06-skills-accounting`. Second, historical notes recording the fourth path's **retired**
+   id `immediately-effective/software-engineer-to-ai-engineer` — **5** of the **6** hits in
+   `…-05-manifests`, plus one in plan 01's `README`. Third, **5 genuine unprefixed `pathId`s in
+   `…-03-navigation-ui`** (`README.md` lines 224, 251, 277, 278 and `tech-docs.md` line 605), which
+   that plan's own `README` already discloses as "Stale relative to the 2026-07-21 category-split
+   ruling — flagged, not silently corrected here" inside a verbatim-quoted, sibling-owned block.
+   `…-07-skills-erp` has none. An earlier revision of this sentence claimed "all six sibling
+   folders now write the 3-segment form" with "four remaining 2-segment hits" confined to plan 01;
+   a direct count falsifies it in both dimensions — the residual population is 55 lines, not 4, and
+   it spans five folders, not one. **That sweep did not, and was never intended to, cover this plan's
+   own custodied course corpus.** Every entry in `syllabus/courses/` writes the bare 2-segment
+   shorthand and **none writes the `careers/` 3-segment form** — **388 such lines across all 122
+   entries**: 374 across the 120 course spec files, 10 in `README.md` (its per-course template plus
+   its worked examples), and **4 in `surgery.md`**, in that file's four-manifest table. The
+   per-course distribution is **not** uniform: 105 of the 120 course files carry exactly three, one
+   per arc, while 2 carry one, 3 carry two, 6 carry four, 3 carry six, and 1 carries nine
+   [Repo-grounded — measured 2026-07-22 with the shell's `grep` shim bypassed via `command grep`. The
+   population sweep is `command grep -cE '(interview-ready|immediately-effective|fundamentally-strong)/[a-z]' *.md`
+   run from `syllabus/courses/`: `-l` returned 122 and the summed `-c` returned 388. The companion
+   sweep `command grep -cE 'careers/(interview-ready|immediately-effective|fundamentally-strong)/' *.md`,
+   same directory, returned **0** for every file; its control probe —
+   `command grep -cE 'careers/(interview-ready|immediately-effective|fundamentally-strong)/' README.md paths/README.md`
+   run from `syllabus/` — returned **8** and **12**, so that zero is a real zero rather than a
+   non-matching pattern. Both counts are **matching lines, not occurrences**; reconstructing the
+   pattern loosely (for example allowing intervening characters, which catches Mermaid `<br/>`-split
+   node labels) yields different figures and will not reproduce these]. An
+   earlier revision of this sentence read "371 such lines across 121 files" and asserted `surgery.md`
+   "has none"; both figures were wrong, and `surgery.md` in fact carries four. That population is
+   **knowingly out of scope**, not
+   overlooked: custody rule 1a deliberately limited its mechanical `careers/`-prefix correction to
+   `syllabus/README.md`, `syllabus/paths/README.md` and the four manifest mirrors, and its own
+   falsifiability clause is explicitly bounded to "those two files", because custody rule 1 forbids
+   content edits to the frozen corpus outside the single R3 exception. So: **the escalation is closed
+   for the sibling plans' documents and for the manifest-bearing files; it remains deliberately
+   unapplied to the course corpus's prose cross-references.** An earlier revision of this line ended
+   "nothing is outstanding" without that qualification, which read as a completed corpus-wide
+   fact-check and was wrong.
 
 **Filename convention for `syllabus/paths/manifest-*.md` mirrors.** These filenames do **not** encode
 the category today (`manifest-interview-ready-software-engineer.md`,
@@ -648,9 +687,10 @@ amendment annotations intact.
 canonical fallback) is owned by `ayokoding-learning-path-03-navigation-ui`; DD-15 and DD-27 (build
 order) are cross-cutting and reproduced in this plan's `README.md`.
 
-**A pre-existing `DD-15` numbering collision (found while reconciling A8, not fixed here).** The 127
-`syllabus/courses/*.md` files this plan custodies carry an inherited `License-aware (DD-15)` marker in
-each Scope note — a reference to the **original**
+**A pre-existing `DD-15` numbering collision (found while reconciling A8, not fixed here).** **Nine**
+of the 120 `syllabus/courses/*.md` spec files this plan custodies reference an inherited `DD-15`
+marker — two of them spelling it out as `License-aware` / `License-awareness (DD-15)` — a reference
+to the **original**
 [`fundamentally-strong-software-engineer`](../../done/2026-07-19__fundamentally-strong-software-engineer/tech-docs.md)
 closed plan's own `DD-15` ("License-aware technology choices": pick the free/teachable tool when a
 well-known library's licence shifts, e.g. Redis SSPL→AGPL, Akka→BSL + the Apache Pekko fork). That is
@@ -659,6 +699,12 @@ lineages independently minted a `DD-15` and the per-course files were never renu
 content moved through `shared-course-library-and-learning-paths` into this plan. Both are true
 simultaneously and neither is wrong in its own file; this note exists so a reader hitting both does not
 assume one supersedes the other.
+[Repo-grounded — measured 2026-07-22 by per-file loop over `syllabus/courses/`: `DD-15` appears in
+**9** files, `License-aware` in **2**. An earlier revision of this paragraph read "The 127
+`syllabus/courses/*.md` files … carry an inherited `License-aware (DD-15)` marker in **each** Scope
+note", which was wrong twice over — the glob matches 122 entries (120 spec files), not 127, and the
+marker is in nine of them rather than all. A mechanical 127→120 correction would have left the
+"in each Scope note" half still false, so the sentence was rewritten around the measurement instead.]
 
 **Reconciling with programme
 [`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a) (strict clean-room
@@ -693,8 +739,12 @@ This plan's `syllabus/` directory carries the human-readable mirror of the libra
 paths — **128 files**:
 
 - `syllabus/README.md` — overview of the library + the four paths.
-- `syllabus/courses/` — **121 per-course spec files** + `README.md` (122 directory entries). One file
-  per course-id, each stating origin, format, primary language, `prerequisites`, and scope.
+- `syllabus/courses/` — **120 per-course spec files** + `README.md` + `surgery.md` (122 directory
+  entries). One file per course-id, each stating origin, format, primary language, `prerequisites`,
+  and scope. `surgery.md` is the course-surgery plan, **not** a course spec — an earlier revision of
+  this line read "121 per-course spec files + `README.md`", which reached the correct 122 total by
+  silently counting `surgery.md` as a course. The 120 spec files plus the **7** DD-20 capstones
+  embedded in host-topic files are what make the 127-course catalog.
 - `syllabus/paths/` — **4 path-manifest mirrors** + `README.md` (5 directory entries):
   `manifest-interview-ready-software-engineer.md`,
   `manifest-immediately-effective-software-engineer.md`,
@@ -757,7 +807,15 @@ the nested `manifests/**/*.yaml` data file in the `course-paths` feature.
          now carry `/c/`. **Verification, falsifiable both ways** — searching `syllabus/` for
          `/en/learn/` prints nothing and exits 1, while
          `grep -rn "/en/c/learn/" syllabus/ | wc -l` prints **12** (as of 2026-07-22; the corpus is
-         frozen, so this figure is an invariant, not a drifting measurement).
+         frozen, so this figure is an invariant, not a drifting measurement)
+         [Repo-grounded — measured 2026-07-22 three ways that agree: the shim's `grep -rn … | wc -l`,
+         the same command with the shim bypassed via `command grep`, and a summed `grep -rc`, all
+         **12**; the `/en/learn/` search printed nothing and exited **1**]. **Read the `12` as an
+         assertion of a non-zero invariant, never as a zero-check.** Under one of the two grep engines
+         this harness may route to, a plain `grep` that matches nothing prints a
+         `0 matches for '<pattern>'` line, which `| wc -l` would read as **1** — so this shape can
+         distinguish 12 from 11, but cannot distinguish a true 0 from a 1. A zero-assertion here would
+         need a summed `grep -rc` instead.
 
       Both classes were corrected **in full**, never partially: a half-corrected class leaves the
       corpus asserting two different answers to the same question, which is strictly worse than
@@ -784,7 +842,7 @@ the nested `manifests/**/*.yaml` data file in the `course-paths` feature.
    archival](./README.md#archival-is-gated-on-downstream-archival)) — a rename obligates fixing its
    own inbound references; that is a mechanical corollary of the one recorded exception, not a
    second, independent content exception.
-3. **Every sibling plan links into it and never copies it.** A copy forks the source of truth for 121
+3. **Every sibling plan links into it and never copies it.** A copy forks the source of truth for 120
    course specs and four manifest orderings, so a later spec correction lands in one copy only.
 4. **Cross-plan references use the full relative path** —
    `../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/<rest>` while both plans sit

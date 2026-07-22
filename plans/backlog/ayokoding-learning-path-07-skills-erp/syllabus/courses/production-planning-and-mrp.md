@@ -2,10 +2,13 @@
 
 **Course ID**: `production-planning-and-mrp` · **Format**: By Example · **Language**: — (domain, worked scenarios, no application code).
 
-**Short summary**: Demand sources, MRP netting logic, planned-order generation
+**Short summary**: Demand sources, MRP netting logic, planned-order generation, capacity validation
+(RCCP and CRP)
 
 **Scope note**: the core of the production-planning cluster — material requirements planning, one of
-the domain's hard parts [Repo-grounded — domain-research grounding, Part 2]. Transitively requires
+the domain's hard parts [Repo-grounded — domain-research grounding, Part 2] — plus the capacity side
+that validates its output, because netting proves only that the materials exist, never that the work
+centers (course 17) can absorb the work in the periods the plan assigns it. Transitively requires
 `inventory-and-cogs-accounting` via its inventory prerequisite. License-aware (DD-15).
 
 ## Why this exists · the big idea
@@ -29,7 +32,13 @@ the domain's hard parts [Repo-grounded — domain-research grounding, Part 2]. T
 
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
-- Worked MRP examples use an originally-authored demand/supply dataset throughout.
+- Worked MRP examples use an originally-authored demand/supply dataset throughout, including the
+  work-center capacity figures used by the capacity examples.
+- Concepts co-09 through co-12 are placed on domain-reasoning grounds rather than sourced from the
+  grounding research, and are `[Needs Verification]` pending the Phase 1.2a coverage pass. The pass's
+  coverage question for this course explicitly includes whether rough-cut and detailed capacity
+  planning are recognised as belonging alongside material netting; ASCM/APICS outlines may be named as
+  corroboration only, never transcribed or mirrored (`A8`, `A12`).
 
 ## Concepts
 
@@ -47,6 +56,21 @@ the domain's hard parts [Repo-grounded — domain-research grounding, Part 2]. T
   assembly (via BOM explosion, course 17).
 - **co-08 · mrp-run-cascade** — a single MRP run processes demand top-down through a multi-level BOM,
   generating dependent demand at each level.
+- **co-09 · work-center-capacity-vs-load** — a work center (course 17) has an available capacity (hours
+  it can supply in a period) and a load (hours the operations scheduled into that period demand); an
+  overload is load exceeding capacity, a condition material netting alone can never surface because
+  netting only ever asks whether the parts exist.
+- **co-10 · rough-cut-capacity-planning-rccp** — a coarse feasibility check of a proposed production
+  plan against a small set of critical work centers only, run before the detailed planning run so an
+  infeasible plan is rejected while it is still cheap to change.
+- **co-11 · capacity-requirements-planning-crp** — the detailed check that explodes planned and firmed
+  orders through their routings (course 17) into period-by-period load at every work center: the
+  capacity counterpart to co-04's material netting, and the reason routing is modeled separately from
+  the BOM at all.
+- **co-12 · infinite-vs-finite-capacity-scheduling** — whether the planning run may exceed a work
+  center's capacity and report the overload for a planner to resolve, or must instead level the load
+  within the available capacity and move dates out; the choice decides whether the run's output is a
+  plan to fix or a plan to execute.
 
 ## Worked examples
 
@@ -70,21 +94,32 @@ the `co-NN` it exercises.
 
 - **ex-05 · full-mrp-run-trace** — trace one MRP run across a three-level BOM, from top-level demand
   through dependent demand at every level to final planned orders. (co-01–co-08)
+- **ex-06 · rough-cut-capacity-check** — given a proposed production plan and the available capacity of
+  two critical work centers, apply a rough-cut check and decide whether the plan is worth netting in
+  detail at all. (co-09, co-10)
+- **ex-07 · crp-overload-detection** — given ex-05's planned orders and their routings, compute
+  period-by-period load at each work center, identify the overloaded period, and contrast what an
+  infinite-capacity run reports about it against what a finite-capacity run would do to the dates
+  instead. (co-09, co-11, co-12)
 
 ## Synthesis exercise — intra-topic
 
 > Analysis and design only — never build, implement, or deploy a system (`A6`).
 
-- **Goal**: given a multi-level product structure (reusing or extending course 17's) and a demand
-  forecast, run MRP by hand and produce the resulting planned orders at every level.
+- **Goal**: given a multi-level product structure (reusing or extending course 17's), its routings,
+  and a demand forecast, run MRP by hand, produce the resulting planned orders at every level, and
+  check them against work-center capacity.
 - **Concepts exercised**: [ ] netting (co-03, co-04) [ ] planned orders (co-05) [ ] dependent demand
-  cascade (co-07, co-08).
+  cascade (co-07, co-08) [ ] capacity versus load (co-09, co-11) [ ] infinite versus finite scheduling
+  (co-12).
 - **Ordered steps**: 1) state top-level demand; 2) net against on-hand stock; 3) generate the
   top-level planned order; 4) cascade dependent demand through the BOM; 5) net and generate planned
-  orders at each lower level.
+  orders at each lower level; 6) convert those orders into period-by-period work-center load via their
+  routings; 7) name any overloaded period and state what a finite-capacity run would do to it.
 - **Acceptance criteria**: netting is arithmetically correct at every level; dependent demand
-  correctly reflects BOM quantity-per scaling.
-- **Done bar**: a written MRP run, no code, no system built.
+  correctly reflects BOM quantity-per scaling; every overloaded period is identified with both the
+  work center and the hours by which load exceeds capacity.
+- **Done bar**: a written MRP run and capacity analysis, no code, no system built.
 
 ## Read more
 

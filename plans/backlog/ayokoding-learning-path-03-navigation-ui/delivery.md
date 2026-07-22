@@ -156,9 +156,24 @@ says "run the markdown validation" means exactly these; do not substitute a shor
 > **CLI facts, verified against the binary.** `md links validate` accepts **no positional path** —
 > passing one fails with `error: unexpected argument '<path>' found` — and it cannot be scoped by
 > `cd`-ing into a folder; it always walks the repo. `md heading-hierarchy validate` **does** accept
-> positional paths. The bare repo-wide `md links validate` is **unsatisfiable** on this tree (93
-> pre-existing broken links, all under `plans/done/`, unrelated to this work), which is why the
-> exclusion form below is the one that gates a push.
+> positional paths. The bare repo-wide `md links validate` is **unsatisfiable** on this tree — it
+> reports a large, drifting population of pre-existing broken links unrelated to this work, the great
+> majority of them under `plans/done/` — which is why the exclusion form below is the one that gates a
+> push. **No exact count is quoted here, and none should be added.** The figure moves every time a plan
+> is archived or edited, and consecutive repo-wide runs have been observed disagreeing with each other
+> on an unchanged tree, so any hardcoded number is both stale and non-reproducible. This note has now
+> been wrong twice in that exact way: one revision asserted "93 pre-existing broken links, all under
+> `plans/done/`", and its replacement swapped in two freshly measured figures that went false within a
+> day. Do not repeat either mistake — re-measure at execution time instead.
+>
+> **`plans/done/` is not guaranteed to be the only source of residual breakage.** A sibling plan under
+> active authoring can introduce a break that none of the three excludes covers, so a clean run today
+> is not a promise of a clean run at execution time. Disposition rule for the executor: **do not add a
+> fourth `--exclude` to make a gate pass.** If a residual break is inside this plan's folder, fix it; if
+> it is outside, fix it at root cause per Root Cause Orientation, or — where it belongs to another
+> plan's in-flight edits — re-run after that plan lands and record the deferral. The acceptance value
+> stays `All links valid! No broken links found.` precisely so a non-zero residue must be explained
+> rather than excluded away.
 
 1. **Link validation (this repo's pre-push form)**:
 
@@ -1109,10 +1124,19 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
 > **Sanctioned multi-scenario step.** This binder consumes whole `.feature` files, so it is one of the
 > two exceptions to the one-scenario-per-cycle rule (the other being pure-core `underpins` steps).
 
+**Gherkin (binds) →** "A course deep-linked without path context renders the canonical view"; "An
+invalid path context falls back to the canonical view"; "A course omitted from a path shows no path
+nav for that path"; "The path rail shows the whole ordered arc beside a course at desktop width";
+"The path rail collapses into the existing navigation drawer on a phone"; "A course opened without
+path context renders the generic sidebar unchanged"; "The paths hub groups paths by category, not a
+flat grid" (all in [prd.md](./prd.md#acceptance-criteria-gherkin)). This is the plan's only
+multi-scenario binding step; every other scenario has its own dedicated RED cycle above.
+
 - [ ] [AI] **GREEN (aggregate binder)** — implement the remaining `playwright-bdd` step definitions so
       **every** scenario in `<SPECS>` executes against the fixture manifests, covering the deep-link
       fallback, the invalid-path fallback, the omitted-course case, the rail at desktop, the rail in the
-      drawer, and the no-path sidebar — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` —
+      drawer, the no-path sidebar, and the paths hub's category grouping — command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` —
       acceptance: exits 0; every `<SPECS>` scenario reports as executed, none as undefined or pending.
 - [ ] [AI] **Legacy-redirect regression guard (not owned Gherkin)** — assert that one already-shipped
       legacy redirect still resolves after the route-wiring change — command:
@@ -1271,10 +1295,17 @@ project'` and always exits 0, so **no RED clause may point at it**. E2E for this
 - [ ] [AI] Capture one screenshot per screen per breakpoint via `browser_take_screenshot` to
       `<PLAN>evidence/phase-5-<screen>-en-<breakpoint>px.png`, **including** the three rail states
       (`rail-desktop`, `rail-tablet-truncated`, `rail-mobile-drawer-open`) and the empty-state capture
-      — acceptance: files exist in `<PLAN>evidence/`;
-      `find <PLAN>evidence -name 'phase-5-*-en-*px.png' | wc -l` returns at least **18** (6 screens × 3
-      breakpoints: hero, hub, category landing, arc landing, path landing, course) plus the 3 rail-state
-      captures plus the empty-state capture.
+      — acceptance, **both clauses must hold**. (a) Count:
+      `find <PLAN>evidence -name 'phase-5-*-en-*px.png' | wc -l` returns at least **22** — 18 for the
+      base grid (6 screens × 3 breakpoints: hero, hub, category landing, arc landing, path landing,
+      course), plus the 3 rail-state captures, plus the empty-state capture. (b) Named-capture
+      presence, so that (a) can never be satisfied by the base grid alone:
+      `for n in rail-desktop rail-tablet-truncated rail-mobile-drawer-open empty-state; do find <PLAN>evidence -name "phase-5-$n-en-*px.png" | grep -q . || echo "MISSING $n"; done | grep -c .`
+      returns **0**. Falsifiable both ways: today, before any capture exists, (a) returns 0 and (b)
+      returns **4**; deleting any single named capture after the fact makes (b) return 1 and drops (a)
+      below 22. An earlier revision asserted only a floor of 18 while its own parenthetical summed to
+      22, which a literal executor could have satisfied with the base grid while skipping all four
+      named captures the same sentence calls mandatory.
 - [ ] [AI] Document evidence in this checklist: reference each screenshot (`![alt](./evidence/...)`) and
       note console/network status per breakpoint — acceptance: every captured file is referenced; no
       "verified manually" claim stands without a committed artifact.

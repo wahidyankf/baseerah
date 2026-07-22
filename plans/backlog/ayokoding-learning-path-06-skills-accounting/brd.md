@@ -187,8 +187,12 @@ directions — the "before" value is stated so a vacuous pass is impossible.
   frontmatter.
 - **The silent-failure requirement is met** (observable): every shared course from #4 onward and
   every Sharia-specific course carries an explicit "what still balances while being wrong" section.
-- **Zero laundered verification claims** (observable): no `[Needs Verification]` item remains open at
-  the Phase 4 gate.
+- **Zero laundered verification claims** (observable): at the Phase 4 gate, **no `[Needs Verification]`
+  marker is unaccounted for** — every one still standing is named, with a reason, in
+  `verification-log.md`'s `## Carried residuals` register. Literal zero markers is deliberately **not**
+  the target: some residuals (OI-2's doctrinal basis, the PPSAK ratification date, Fineract's
+  Islamic-finance suitability) are permanent until a primary source exists, and `A4` requires them to
+  stay marked rather than be quietly upgraded to fact.
 - **Three jurisdictional models, not one** (observable): every Sharia-specific course that discusses
   standards names AAOIFI, PSAK Syariah **and** MFRS-plus-BNM, and none describes AAOIFI as "the"
   standard.

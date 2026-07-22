@@ -31,6 +31,8 @@ the accounting corpus. License-aware (DD-15).
 
 - The accounting-side course id `payroll-and-tax-accounting-essentials` is as named in
   `ayokoding-learning-path-06-skills-accounting`'s own in-flight rewrite as of 2026-07-22.
+- Concept co-08 is placed on domain-reasoning grounds rather than sourced from the grounding research,
+  and is `[Needs Verification]` pending the Phase 1.2a coverage pass.
 
 ## Concepts
 
@@ -48,6 +50,10 @@ the accounting corpus. License-aware (DD-15).
   subledger-to-GL pattern as course 6, applied to labor cost.
 - **co-07 · position-vs-employee-separation** — why separating the position from its occupant matters
   (e.g. for headcount planning and reorganizations).
+- **co-08 · retroactive-payroll-adjustment** — a change effective in a period already paid (a backdated
+  raise, a corrected timesheet) is recomputed for that period but posts the difference in the current
+  open one, because a closed period (course 7) is not reopened to absorb it — the same posting-date
+  versus effective-date distinction the finance modules carry, applied to labor cost.
 
 ## Worked examples
 
@@ -66,6 +72,9 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
   organizational unit. (co-03)
 - **ex-04 · payroll-posting-trace** — given a period's time-and-attendance data, trace it through to a
   payroll GL posting, citing the subledger-to-GL pattern from course 6. (co-05, co-06)
+- **ex-05 · retroactive-adjustment-trace** — given a raise backdated into a period that has already
+  been paid and closed, compute the difference for that period and identify the period its posting
+  actually lands in. (co-06, co-08)
 
 ## Synthesis exercise — intra-topic
 

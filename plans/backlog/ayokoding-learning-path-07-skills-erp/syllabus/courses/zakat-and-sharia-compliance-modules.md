@@ -35,6 +35,8 @@ License-aware (DD-15).
   `[Unverified]` pending the primary-source re-verification pass named in `tech-docs.md`; this course
   teaches the calculation as a **configured, jurisdiction-dependent module**, not a specific fixed
   formula.
+- Concepts co-07 and co-08 are placed on domain-reasoning grounds rather than sourced from the
+  grounding research, and are `[Needs Verification]` pending the Phase 1.2a coverage pass.
 
 ## Concepts
 
@@ -52,6 +54,13 @@ License-aware (DD-15).
 - **co-06 · jurisdictional-configuration-recap** — zakat and compliance-reporting modules both draw on
   the same jurisdictional-configuration mechanism introduced in course 27, closing the corpus's
   Sharia-specific design arc.
+- **co-07 · zakat-valuation-date-as-configuration** — the point in time a zakat calculation reads
+  balances at is itself configured against the fiscal-calendar variant (course 7), not fixed by the
+  module; two entities on different calendar variants therefore strike the same calculation on
+  different balances. `[Needs Verification]`
+- **co-08 · compliance-evidence-trail** — every zakat figure and every Sharia-board decision must trace
+  back to the transactions and approvals that produced it, reusing course 9's audit-trail and
+  change-tracking mechanics rather than a parallel compliance log that could drift from them.
 
 ## Worked examples
 
@@ -71,6 +80,12 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 - **ex-04 · jurisdictional-recap-trace** — given a business reconfigured from one jurisdictional model
   to another (course 27), trace how its zakat calculation and compliance report both change as a
   result. (co-06)
+- **ex-05 · valuation-date-sensitivity** — given the same set of balances and two entities configured
+  on different fiscal-calendar variants (course 7), show that the zakat calculation reads a different
+  set of balances in each, without asserting any one jurisdiction's rate or nisab. (co-01, co-07)
+- **ex-06 · zakat-figure-traceback** — given a reported zakat figure, trace it back through the
+  classified assets and the Sharia-board approval that produced it, using course 9's change-tracking
+  record. (co-02, co-03, co-08)
 
 ## Synthesis exercise — intra-topic
 

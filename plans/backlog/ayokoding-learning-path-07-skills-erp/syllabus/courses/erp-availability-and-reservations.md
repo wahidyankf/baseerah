@@ -31,6 +31,8 @@ License-aware (DD-15).
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
 - Worked ATP examples use an originally-authored dataset throughout.
+- Concept co-08 is placed on domain-reasoning grounds rather than sourced from the grounding research,
+  and is `[Needs Verification]` pending the Phase 1.2a coverage pass.
 
 ## Concepts
 
@@ -48,6 +50,10 @@ License-aware (DD-15).
 - **co-07 · atp-conflict** — two near-simultaneous orders both querying ATP and both receiving a
   "yes", when only one can actually be fulfilled — a race condition analogous to course 16's
   concurrency treatment.
+- **co-08 · atp-horizon-and-promise-date** — an ATP query answers "how much, by when": confirmed
+  supply arriving after the requested date does not make a quantity promisable on that date, so the
+  answer is a date-qualified quantity rather than a single number, and the horizon bounds how far
+  forward incoming supply may be counted at all.
 
 ## Worked examples
 
@@ -73,6 +79,9 @@ the `co-NN` it exercises.
 - **ex-05 · atp-conflict-demonstration** — given two near-simultaneous orders each querying ATP against
   the same limited stock, show how both can receive a "yes" without a locking mechanism, echoing
   course 16's concurrency-race treatment. (co-07)
+- **ex-06 · promise-date-from-later-supply** — given on-hand stock insufficient for an order and a
+  confirmed receipt dated later in the horizon, determine the quantity promisable on the requested
+  date and the earliest date the full quantity becomes promisable. (co-01, co-05, co-08)
 
 ## Synthesis exercise — intra-topic
 

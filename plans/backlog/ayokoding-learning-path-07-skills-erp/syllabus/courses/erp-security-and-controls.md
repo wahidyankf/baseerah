@@ -37,6 +37,8 @@ corpus. License-aware (DD-15).
   `ayokoding-learning-path-06-skills-accounting`'s own in-flight rewrite as of 2026-07-22.
 - COSO/SOX control-point terminology is treated at concept depth; specific COSO framework citations
   are `[Needs Verification]` pending Phase 1.2a.
+- Concept co-08 is placed on domain-reasoning grounds rather than sourced from the grounding research,
+  and is `[Needs Verification]` pending the Phase 1.2a coverage pass.
 
 ## Concepts
 
@@ -57,6 +59,10 @@ corpus. License-aware (DD-15).
 - **co-07 · scope-boundary-vs-it-governance-grc** — this course's own boundary: ERP-specific
   authorization-object and SoD mechanics, explicitly distinct from `it-governance-grc`'s
   general-purpose GRC framework treatment.
+- **co-08 · privileged-and-emergency-access** — a bounded temporary elevation that deliberately breaks
+  an SoD rule so an incident can be resolved, paired with its compensating control: every action taken
+  under the elevation is recorded (course 9's change-tracking) and reviewed afterwards, which is what
+  distinguishes it from simply granting the conflicting combination permanently.
 
 ## Worked examples
 
@@ -84,6 +90,10 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
   enterprise risk framework selection, ERP authorization-object modeling, vendor risk scoring,
   approval-workflow design), mark which belong in this course and which belong in
   `it-governance-grc` instead. (co-07)
+- **ex-07 · emergency-access-review** — given an emergency elevation that granted both create-vendor
+  and approve-payment to one user for a single day, design the after-the-fact review that determines
+  whether the conflicting combination was actually exercised, and name the recorded evidence it reads.
+  (co-03, co-05, co-08)
 
 ## Synthesis exercise — intra-topic
 

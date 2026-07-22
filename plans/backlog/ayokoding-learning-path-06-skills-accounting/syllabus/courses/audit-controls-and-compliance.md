@@ -34,33 +34,33 @@ catch a trial balance that foots while being wrong.
 
 - The COSO Internal Control–Integrated Framework's five components (control environment, risk
   assessment, control activities, information and communication, monitoring) and the fraud triangle
-  (pressure, opportunity, rationalization) are stable, widely taught domain knowledge `[Judgment call —
-cited generically, framework name and structure only, no text reproduced per A8; flagged`[Needs
-  Verification]`pending the Phase 1 coverage pass]`.
+  (pressure, opportunity, rationalization) are stable, widely taught domain knowledge
+  `[Judgment call — cited generically, framework name and structure only, no text reproduced per A8]`.
+  Flagged `[Needs Verification]` pending the Phase 1 coverage pass.
 
 ## Concepts
 
-1. **co-01 · internal-control-framework** — a structured set of components (e.g. COSO's five) an
-   organisation uses to design and evaluate its controls, named nominatively, never reproduced.
-2. **co-02 · control-environment** — the tone-at-the-top and organisational culture that determines
-   whether controls are taken seriously or routinely overridden.
-3. **co-03 · preventive-control** — a control that stops an error or fraud before it happens (e.g. the
-   three-way match at #6, a data-layer constraint at #2).
-4. **co-04 · detective-control** — a control that finds an error or fraud after it happens (e.g. a
-   bank reconciliation, a variance review).
-5. **co-05 · segregation-of-duties** — no single person should be able to both execute and conceal a
-   transaction (e.g. the person who approves a payment should not also be the person who can edit the
-   vendor master).
-6. **co-06 · control-testing** — verifying that a described control actually operates as designed,
-   distinct from merely confirming the control's existence on paper.
-7. **co-07 · audit-trail** — a complete, unbroken record of who did what and when, which every prior
-   course's "never delete, always reverse" pattern (#4's `co-03`) exists in part to preserve.
-8. **co-08 · materiality** — not every error is worth investigating at the same intensity; materiality
-   is the threshold judgment for where audit and control effort concentrates.
-9. **co-09 · management-override-risk** — the specific risk that the people with authority to bypass a
-   control are also the people best positioned to benefit from bypassing it.
-10. **co-10 · fraud-triangle** — pressure, opportunity, and rationalization as the three conditions
-    commonly present together when fraud occurs; a lens for where controls matter most.
+- **co-01 · internal-control-framework** — a structured set of components (e.g. COSO's five) an
+  organisation uses to design and evaluate its controls, named nominatively, never reproduced.
+- **co-02 · control-environment** — the tone-at-the-top and organisational culture that determines
+  whether controls are taken seriously or routinely overridden.
+- **co-03 · preventive-control** — a control that stops an error or fraud before it happens (e.g. the
+  three-way match at #6, a data-layer constraint at #2).
+- **co-04 · detective-control** — a control that finds an error or fraud after it happens (e.g. a
+  bank reconciliation, a variance review).
+- **co-05 · segregation-of-duties** — no single person should be able to both execute and conceal a
+  transaction (e.g. the person who approves a payment should not also be the person who can edit the
+  vendor master).
+- **co-06 · control-testing** — verifying that a described control actually operates as designed,
+  distinct from merely confirming the control's existence on paper.
+- **co-07 · audit-trail** — a complete, unbroken record of who did what and when, which every prior
+  course's "never delete, always reverse" pattern (#4's `co-03`) exists in part to preserve.
+- **co-08 · materiality** — not every error is worth investigating at the same intensity; materiality
+  is the threshold judgment for where audit and control effort concentrates.
+- **co-09 · management-override-risk** — the specific risk that the people with authority to bypass a
+  control are also the people best positioned to benefit from bypassing it.
+- **co-10 · fraud-triangle** — pressure, opportunity, and rationalization as the three conditions
+  commonly present together when fraud occurs; a lens for where controls matter most.
 
 ## Tensions & trade-offs — when NOT to reach for more control
 

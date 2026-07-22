@@ -30,6 +30,8 @@ Transitively requires `inventory-and-cogs-accounting` via course 18. License-awa
 
 - Forecasting-method names (moving average, exponential smoothing) are treated at concept depth only;
   no specific vendor's forecasting-algorithm implementation is described.
+- Concept co-08 is placed on domain-reasoning grounds rather than sourced from the grounding research,
+  and is `[Needs Verification]` pending the Phase 1.2a coverage pass.
 
 ## Concepts
 
@@ -47,6 +49,10 @@ Transitively requires `inventory-and-cogs-accounting` via course 18. License-awa
   detailed plans (individual SKU, individual location).
 - **co-07 · demand-variability-and-buffer-sizing** — safety stock sizing depends on how variable actual
   demand is relative to the forecast, not a fixed rule of thumb.
+- **co-08 · master-production-schedule** — the committed period-by-period build/buy quantities for
+  finished items, sitting between the aggregate plan (co-06) and MRP's netting run (course 18): it
+  states what is actually promised for production, not what the forecast merely predicted, and it is
+  the schedule a rough-cut capacity check (course 18) is run against.
 
 ## Worked examples
 
@@ -65,6 +71,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
   average demand, explain why they warrant different safety-stock levels. (co-03, co-07)
 - **ex-04 · planning-hierarchy-disaggregation** — given an aggregate product-family plan, disaggregate
   it into individual SKU-level plans. (co-06)
+- **ex-05 · forecast-to-mps-to-mrp-trace** — given an aggregate forecast and its disaggregation,
+  derive the master production schedule for one finished item, then identify which figure MRP (course 18) actually consumes as demand and which figure it never sees. (co-01, co-06, co-08)
 
 ## Synthesis exercise — intra-topic
 

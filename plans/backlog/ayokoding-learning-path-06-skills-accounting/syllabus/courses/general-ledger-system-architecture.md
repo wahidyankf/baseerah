@@ -36,9 +36,9 @@ it does not ask the reader to build, scaffold, or extend one (A6). It carries th
 ## Accuracy notes
 
 - General-ledger architecture patterns (posting engine, subledger integration, close orchestration)
-  are domain-standard software-architecture reasoning `[Judgment call — no single canonical textbook
-source; patterns are cross-checked conceptually against permissively-licensed reference
-implementations per`DD-15`, see the reference-implementation-landscape concept below]`.
+  are domain-standard software-architecture reasoning
+  `[Judgment call — no single canonical textbook source; patterns are cross-checked conceptually against permissively-licensed reference implementations]`
+  per `DD-15`, see the reference-implementation-landscape concept below.
 - **Relationship to `DD-15` (License-aware technology choices, inherited via plan 02's corpus)** — this
   course names real accounting software; per `DD-15`'s precedent, ledger-cli (BSD-3-Clause) and Apache
   Fineract (Apache-2.0) are named as permissively-licensed examples a reader could study directly;
@@ -48,29 +48,29 @@ implementations per`DD-15`, see the reference-implementation-landscape concept b
 
 ## Concepts
 
-1. **co-01 · posting-engine-architecture** — the component responsible for accepting, validating, and
-   committing journal entries — the architectural home for #4's posting mechanics.
-2. **co-02 · subledger-integration-pattern** — how AP, AR, fixed assets, and payroll subledgers post
-   summarised or detailed entries into the GL, and where the boundary between subledger detail and GL
-   summary sits.
-3. **co-03 · idempotent-posting** — designing the posting engine so that retrying a failed post cannot
-   double-post the same transaction — a reliability property, not a bookkeeping rule.
-4. **co-04 · period-close-orchestration** — the system-level sequencing of subledger closes, adjusting
-   entries, and the GL lock, extending #3's close-cycle state machine to a multi-subledger system.
-5. **co-05 · audit-trail-as-architecture-property** — #4's "never delete, always reverse" pattern
-   implemented as a system property (append-only storage, immutable posted entries) rather than a
-   convention someone might forget.
-6. **co-06 · reconciliation-architecture** — the system components that continuously verify each
-   subledger's total ties to its corresponding GL control account.
-7. **co-07 · multi-entity-architecture** — how a system built for one entity extends to support #13's
-   multi-entity consolidation without duplicating the posting engine per entity.
-8. **co-08 · batch-vs-event-driven-posting-architecture** — architecting for scheduled batch posting,
-   real-time event-driven posting, or a hybrid, and the consistency/latency tradeoffs of each,
-   extending #4's batch-vs-real-time concept to the system level.
-9. **co-09 · reference-implementation-landscape** — the licensing posture of real, named
-   general-ledger-adjacent open-source projects, per `DD-15`: ledger-cli and Apache Fineract
-   (permissive, safe to study directly); GnuCash, hledger, and Beancount (copyleft, described
-   behaviourally only).
+- **co-01 · posting-engine-architecture** — the component responsible for accepting, validating, and
+  committing journal entries — the architectural home for #4's posting mechanics.
+- **co-02 · subledger-integration-pattern** — how AP, AR, fixed assets, and payroll subledgers post
+  summarised or detailed entries into the GL, and where the boundary between subledger detail and GL
+  summary sits.
+- **co-03 · idempotent-posting** — designing the posting engine so that retrying a failed post cannot
+  double-post the same transaction — a reliability property, not a bookkeeping rule.
+- **co-04 · period-close-orchestration** — the system-level sequencing of subledger closes, adjusting
+  entries, and the GL lock, extending #3's close-cycle state machine to a multi-subledger system.
+- **co-05 · audit-trail-as-architecture-property** — #4's "never delete, always reverse" pattern
+  implemented as a system property (append-only storage, immutable posted entries) rather than a
+  convention someone might forget.
+- **co-06 · reconciliation-architecture** — the system components that continuously verify each
+  subledger's total ties to its corresponding GL control account.
+- **co-07 · multi-entity-architecture** — how a system built for one entity extends to support #13's
+  multi-entity consolidation without duplicating the posting engine per entity.
+- **co-08 · batch-vs-event-driven-posting-architecture** — architecting for scheduled batch posting,
+  real-time event-driven posting, or a hybrid, and the consistency/latency tradeoffs of each,
+  extending #4's batch-vs-real-time concept to the system level.
+- **co-09 · reference-implementation-landscape** — the licensing posture of real, named
+  general-ledger-adjacent open-source projects, per `DD-15`: ledger-cli and Apache Fineract
+  (permissive, safe to study directly); GnuCash, hledger, and Beancount (copyleft, described
+  behaviourally only).
 
 ## Worked examples
 

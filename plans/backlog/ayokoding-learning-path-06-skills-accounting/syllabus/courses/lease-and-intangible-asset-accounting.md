@@ -31,22 +31,22 @@ call — restated conceptually; no standard text reproduced per A8]`.
 
 ## Concepts
 
-1. **co-01 · operating-vs-finance-lease** — the two classifications, and why ASC 842 / IFRS 16 moved
-   most leases onto the balance sheet regardless of classification.
-2. **co-02 · right-of-use-asset** — the capitalised asset representing the lessee's right to use the
-   leased item over the lease term.
-3. **co-03 · lease-liability** — the capitalised obligation to make future lease payments, recognised
-   alongside the right-of-use asset.
-4. **co-04 · lease-schedule-mechanics** — the amortisation schedule for a capitalised lease's asset and
-   liability over its term.
-5. **co-05 · identifiable-intangible-asset** — an intangible with separable, determinable value
-   (patents, licences), distinct from goodwill.
-6. **co-06 · goodwill** — the unidentifiable excess of purchase price over the fair value of net
-   identifiable assets acquired.
-7. **co-07 · amortisation-vs-impairment-only-treatment** — finite-lived intangibles are amortised over
-   their useful life; goodwill and indefinite-lived intangibles are tested for impairment instead.
-8. **co-08 · capitalised-software-development-costs** — the threshold between research costs (expensed)
-   and development costs (capitalisable) for internally developed software.
+- **co-01 · operating-vs-finance-lease** — the two classifications, and why ASC 842 / IFRS 16 moved
+  most leases onto the balance sheet regardless of classification.
+- **co-02 · right-of-use-asset** — the capitalised asset representing the lessee's right to use the
+  leased item over the lease term.
+- **co-03 · lease-liability** — the capitalised obligation to make future lease payments, recognised
+  alongside the right-of-use asset.
+- **co-04 · lease-schedule-mechanics** — the amortisation schedule for a capitalised lease's asset and
+  liability over its term.
+- **co-05 · identifiable-intangible-asset** — an intangible with separable, determinable value
+  (patents, licences), distinct from goodwill.
+- **co-06 · goodwill** — the unidentifiable excess of purchase price over the fair value of net
+  identifiable assets acquired.
+- **co-07 · amortisation-vs-impairment-only-treatment** — finite-lived intangibles are amortised over
+  their useful life; goodwill and indefinite-lived intangibles are tested for impairment instead.
+- **co-08 · capitalised-software-development-costs** — the threshold between research costs (expensed)
+  and development costs (capitalisable) for internally developed software.
 
 ## Worked examples
 
@@ -90,8 +90,10 @@ and classifications.
 
 ## Read more
 
-- **IFRS Foundation — IFRS 16 Leases** (ifrs.org). IFRS Foundation carries an explicit
-  free-educational-use carve-out; named nominatively, no clause text reproduced.
+- **IFRS Foundation — IFRS 16 Leases** (ifrs.org). The IFRS Foundation publishes its **own** free
+  teaching materials for classroom use by recognised institutions under attribution and
+  non-commercial terms; **the Standards text itself still requires a separate licence to reproduce**
+  `[Verified]`; named nominatively, no clause text reproduced.
 - **Intermediate Accounting** — Kieso, Weygandt & Warfield (Wiley). Cited nominatively for a fuller
   treatment of intangible assets and goodwill.
 

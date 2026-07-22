@@ -36,23 +36,23 @@ non-dynamic domain fact]`.
 
 ## Concepts
 
-1. **co-01 · balance-sheet** — the position statement: what the entity owns, owes, and the residual
-   equity, at a point in time.
-2. **co-02 · income-statement** — the performance statement: revenue less expenses over a period.
-3. **co-03 · cash-flow-statement** — the liquidity statement: cash movements over a period, distinct
-   from accrual-basis income.
-4. **co-04 · statement-interlock** — net income flows into retained earnings, which flows into the
-   balance sheet — the three statements are one system, not three independent reports.
-5. **co-05 · close-cycle-state-machine** — open period → adjusting entries → trial balance →
-   statements → period lock, as an explicit sequence of states.
-6. **co-06 · period-lock** — a locked period rejects new postings; correcting a locked period requires
-   a new entry in the current period, not an edit to the past.
-7. **co-07 · adjusting-entries-mechanical-intro** — accruals and deferrals introduced here at a
-   mechanical level; revisited in depth at #5.
-8. **co-08 · statement-derivation** — the mechanical path from a trial balance to all three statements,
-   not just their definitions.
-9. **co-09 · balancing-vs-correct-preview** — a trial balance can foot while an adjusting entry was
-   booked to the wrong period — the theme previewed again, formalised starting at #4.
+- **co-01 · balance-sheet** — the position statement: what the entity owns, owes, and the residual
+  equity, at a point in time.
+- **co-02 · income-statement** — the performance statement: revenue less expenses over a period.
+- **co-03 · cash-flow-statement** — the liquidity statement: cash movements over a period, distinct
+  from accrual-basis income.
+- **co-04 · statement-interlock** — net income flows into retained earnings, which flows into the
+  balance sheet — the three statements are one system, not three independent reports.
+- **co-05 · close-cycle-state-machine** — open period → adjusting entries → trial balance →
+  statements → period lock, as an explicit sequence of states.
+- **co-06 · period-lock** — a locked period rejects new postings; correcting a locked period requires
+  a new entry in the current period, not an edit to the past.
+- **co-07 · adjusting-entries-mechanical-intro** — accruals and deferrals introduced here at a
+  mechanical level; revisited in depth at #5.
+- **co-08 · statement-derivation** — the mechanical path from a trial balance to all three statements,
+  not just their definitions.
+- **co-09 · balancing-vs-correct-preview** — a trial balance can foot while an adjusting entry was
+  booked to the wrong period — the theme previewed again, formalised starting at #4.
 
 ## Worked examples
 
@@ -98,7 +98,9 @@ rejected on paper. No system is built — the synthesis is the hand-worked close
 - **Financial Accounting** — Weygandt, Kimmel & Kieso (Wiley). Cited nominatively for a fuller
   treatment of statement derivation and the close cycle.
 - **IFRS Foundation — IAS 1 Presentation of Financial Statements** (ifrs.org). The IFRS Foundation
-  carries an explicit free-educational-use carve-out (see
+  publishes its **own** free teaching materials for classroom use by recognised institutions under
+  attribution and non-commercial terms; **the Standards text itself still requires a separate licence
+  to reproduce** `[Verified]` (see
   [tech-docs §Licensing](../../tech-docs.md#licensing-and-ip-compliance-a8)); named nominatively, no
   clause text reproduced.
 
