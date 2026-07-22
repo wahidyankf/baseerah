@@ -393,29 +393,36 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   `ose-public` follow-up to shrink `AGENTS.md` under its budget before the bareness clause can
   propagate upstream.
 
-## Learning: `ose-infra`'s `setup-rust` composite action has no retry on the toolchain download, and it flaked three times in one PR
+## Learning: `ose-infra`'s `setup-rust` composite action has no retry on the toolchain download, and it flaked seven times in one phase
 
-- **Context**: Phase 5, `ose-infra` PR #16. **Three** CI runs against three different heads failed in
-  `.github/actions/setup-rust`, every one at the same third-party step
-  (`dtolnay/rust-toolchain@stable` → `rustup toolchain install`):
+- **Context**: Phase 5, `ose-infra`. **Seven** CI job failures — four on PR #16, three more on `main`
+  after the merge — every one in `.github/actions/setup-rust`, at one of two steps that both fetch
+  from the same host:
 
   ```text
   error: could not download file from 'https://static.rust-lang.org/dist/channel-rust-stable.toml'
-    ... connection reset  (run 29868278329, head 9c3656ad3, job "Harness duplication validation")
-    ... timed out         (run 29871560447, head 30ec8dedb, job "repo-config.yml schema parity")
-    ... operation timed out (run 29875931376, head 3423c7b69, job "Validate env contract")
+    ... connection reset    (29868278329, head 9c3656ad3, "Harness duplication validation")
+    ... timed out           (29871560447, head 30ec8dedb, "repo-config.yml schema parity")
+    ... operation timed out  (29875931376, head 3423c7b69, "Validate env contract")
+    ... timed out           (29878539420, main 70a4a463c, "Validate env contract")
+  error: command failed: downloader https://static.rust-lang.org/rustup/dist/.../rustup-init
+    ... (29875931376 retry, 29878539451 "Governance validators", 29878856211 "repo-config parity")
   ```
 
 - **Observation**: the changeset is **markdown-only** — it maps to no Nx project, and each failing
   job passes cleanly when CI's exact command is run locally. The failures hit a **different job every
-  time**, which is the signature of a shared setup step rather than a job-specific defect, and the
-  first two cascaded into a `Quality gate → Check all gates` failure. So a pure-docs PR was gated
-  three times by a network fault it could not possibly have caused. Each was resolved with
+  time**, which is the signature of a shared setup step rather than a job-specific defect, and
+  several cascaded into a `Quality gate → Check all gates` failure. So a pure-docs change was gated
+  seven times by a network fault it could not possibly have caused. Each was resolved with
   `gh run rerun --failed`, which is a retry of a flaked infrastructure step, **not** a gate bypass —
   no `--no-verify`, no hook skipped, no gate marked green by hand.
-- **Frequency is the finding.** Three hits across roughly two hours on one PR is not a rare event to
-  be tolerated; at that rate every non-trivial PR in this repo pays a re-run tax, and the tax is
-  invisible in any per-run report because a re-run reports green.
+- **Frequency is the finding.** Seven hits in a single phase is not a rare event to be tolerated; at
+  that rate every non-trivial change in this repo pays a re-run tax, and the tax is invisible in any
+  per-run report because a re-run reports green. The failure mode also **escalated mid-phase**: the
+  first four were the toolchain manifest download, but later ones failed to fetch `rustup-init`
+  itself — a step that already carries `curl --retry 10 --retry-connrefused`. When a retry-hardened
+  step starts failing, the fault is sustained rather than transient, and the correct response is to
+  wait before retrying rather than to hammer it (which is what was done for the fourth).
 - **Root cause, located but deliberately not fixed here**: the action's own first step wraps the
   rustup installer in `curl --retry 10 --retry-connrefused`, so someone already knew this endpoint is
   unreliable. But the **next** step delegates to `dtolnay/rust-toolchain@stable`, which shells out to

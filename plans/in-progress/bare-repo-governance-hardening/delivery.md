@@ -1697,7 +1697,7 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
   cause, so it did not prevent the repeat. The cause is that `git rm` stages immediately while the
   rest of the phase stages at commit time, so any later `git commit` sweeps it up.
 
-- [ ] [AI] Open a **draft PR** in `ose-infra`, run the 3-cycle PR-Review Maker→Fixer Cycle, verify
+- [x] [AI] Open a **draft PR** in `ose-infra`, run the 3-cycle PR-Review Maker→Fixer Cycle, verify
       CI green, then `[AI]`-merge once the five hardened preconditions hold (tester gates:
       **exemption recorded**)
       — acceptance: `gh pr view --json state` shows `MERGED`
@@ -1742,8 +1742,8 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
   and `ose-primer` already carries a replacement that passed its own 3-cycle review. Adopting that
   wording verbatim took `<SDLC>`'s `ose-primer`-vs-`ose-infra` difference from 2 lines to **0**.
 
-  **Four CI failures across three runs, every one the same third-party infrastructure fault** and
-  none a content defect: `.github/actions/setup-rust` failed at `dtolnay/rust-toolchain@stable` with
+  **Seven CI failures across this phase — four on the PR, three more on `main` after the merge — and
+  every one the same third-party infrastructure fault**, none a content defect: `.github/actions/setup-rust` failed at `dtolnay/rust-toolchain@stable` with
   `could not download file from 'https://static.rust-lang.org/dist/channel-rust-stable.toml'`
   (connection reset, then timed out, then operation timed out), and on the fourth even the
   `rustup-init` download itself failed despite that step's own `curl --retry 10`. It hit a
@@ -1911,11 +1911,13 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
       **1**; index entry in `development/README.md` = **1**; `hard ceiling` in `<MERGE>` = **2**;
       `saturation` anywhere in `<GATE>` = **0**; files mentioning the retired
       `bare-repo-worktree-landing-hygiene` slug = **0**.
-- [ ] [AI] `gh pr view --json state` in `ose-infra` shows `MERGED`; CI green on its `main`
-      — **PR state**: `MERGED` (squash, `70a4a463c`). **CI on `main`**: `validate-env` run
-      `29878539420` is **success** (after one re-run for the same rustup network flake);
-      `pr-quality-gate` run `29878539451` still executing — this box stays open until it reports
-      `success`.
+- [x] [AI] `gh pr view --json state` in `ose-infra` shows `MERGED`; CI green on its `main`
+      — **PR state**: `MERGED` (squash, `70a4a463c`). **CI on `main` at `70a4a463c` — all four
+      workflows green**: `pr-quality-gate` (29878539451) success, `main-ci` (29878856211) success,
+      `validate-env` (29878539420) success, `test-coralpolyp` (29878654268) success. Three of the
+      four needed a re-run, every one for the same rustup network fault and none for a content
+      defect. The one red run in this window, `test-and-deploy-coralpolyp-development` (29878402230),
+      is on the **pre-merge** sha `f6ecdcc0b` and is unrelated to this changeset.
 - [x] [AI] `git -C <INFRA> worktree list` shows only the bare main worktree
       — **Result**: one line, `/Users/wkf/ose-projects/ose-infra  (bare)`. `git branch` lists only
       `main`; `git branch -r` no longer lists the propagation branch.
