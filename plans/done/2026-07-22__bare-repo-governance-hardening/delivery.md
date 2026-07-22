@@ -2384,10 +2384,12 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
       and one where `ose-primer`'s stricter form may well be right and the other two repos' excludes
       the drift. Folded into
       [`plans/ideas/ayokoding-mermaid-diagram-remediation.md`](../../ideas/ayokoding-mermaid-diagram-remediation.md)
-      with the measurement attached. Two further honest notes: neither sibling's `main-ci` has run on
-      its new merge commit at all, because that workflow is schedule-triggered with no push trigger —
-      so "green on `main`" is unmeasured there, not measured-and-green; and `ose-infra`'s last
-      scheduled `main-ci` was **success** at `70a4a463c`
+      with the measurement attached. On the siblings' post-merge state, precisely: `pr-quality-gate`
+      and `validate-env` **did** run on both merge commits and both passed — `ose-primer` at
+      `cedabb2f1`, `ose-infra` at `1d64990bb`. Only `main-ci` has not run on either, because that one
+      workflow is schedule-triggered with no push trigger. `ose-infra`'s last scheduled `main-ci` was
+      **success** at `70a4a463c`; `ose-primer`'s was **failure** at `a94539c03` — the pre-existing
+      flag divergence above, at the _previous_ commit, not at this plan's merge
 - [x] [AI] Verify the tester-gate exemptions are **recorded, not assumed** — rule-15 (web triad),
       rule-16 (API exploratory), manual UI/API verification, evidence capture, specs/Gherkin
       delivery, and locale coverage are each exempt with written justification in
@@ -2578,8 +2580,11 @@ apps/ose-www/content` exits 0 — the pre-push exclude form, not the bare repo-w
       `main-ci` was `success` at `70a4a463c`, but has **not run** on its new merge commit
       `1d64990bb`. `ose-primer`: `main-ci` is **red**, pre-existing since `53d9081b7` — before this
       plan's Phase 4 — and likewise has not run on `cedabb2f1`. Both siblings' `main-ci` is
-      **schedule**-triggered with no push trigger, so for them "green on `main`" is currently
-      _unmeasured_, not measured-and-green. The `ose-primer` red is a CI-flag divergence, not a
+      **schedule**-triggered with no push trigger, so for that one workflow "green on `main`" is
+      currently _unmeasured_, not measured-and-green. What **did** run post-merge on both siblings is
+      `pr-quality-gate` and `validate-env`, and both passed in both repos — so the siblings are not
+      unverified, only incompletely verified, and the gap is exactly one workflow. The `ose-primer`
+      red is a CI-flag divergence, not a
       content defect: it alone lacks `--exclude plans/done` on `md mermaid validate`, and the file it
       fails on is byte-identical to `ose-public`'s copy. Full measurement and the follow-up route are
       in the "quality gates" step above and in

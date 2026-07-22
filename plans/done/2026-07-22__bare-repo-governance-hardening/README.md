@@ -127,7 +127,14 @@ correction round via `ose-public` [#81](https://github.com/wahidyankf/ose-public
 `618e74ff8ebc5c0a0abf19b2a40c2af9ac2e01db`.
 
 **One gate is recorded as partially unmet rather than ticked**: "CI green on `main` in all three
-repos". `ose-public` is green. Both siblings' `main-ci` is schedule-triggered with no push trigger,
-so it has not run on either merge commit — unmeasured, not measured-and-green — and `ose-primer`'s
-last scheduled run is red on a pre-existing condition that predates this plan. See
+repos". `ose-public` is green. On both siblings, `pr-quality-gate` and `validate-env` ran on the
+merge commit and passed; only `main-ci` did not, because that one workflow is schedule-triggered with
+no push trigger — so the gap is a single workflow, not the siblings being unverified. `ose-primer`'s
+last scheduled `main-ci` is red on a pre-existing condition that predates this plan. See
 [delivery.md §Phase 7 Gate](./delivery.md#phase-7-gate).
+
+A defect **this plan introduced** is tracked in
+[`plans/ideas/bare-repo-landing-method-step-count-drift.md`](../../ideas/bare-repo-landing-method-step-count-drift.md):
+the landing sequence numbers eight steps, but the file's own frontmatter and both governance indexes
+call it "the seven-step landing sequence" — nine sites across the three repos. The undercount drops
+exactly the reconcile step the document was written to add.
