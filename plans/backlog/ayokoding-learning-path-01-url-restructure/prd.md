@@ -120,9 +120,10 @@ and a Justify record. The **hi-fi finalist renders** (Stage 2's binary `.png` mo
 and embedded below — see [Hi-fi finalists](#hi-fi-finalists). The low-fi alternatives below map 1:1
 to Q-D's options.
 
-Screens 0–3 (landing hero, paths hub, path landing, course-in-path) belong to
-`ayokoding-learning-path-03-navigation-ui` — that plan carries their funnel record and their 24
-renders. This plan carries Screen 4 and its 6.
+Screens 0, 1, 1a, 1b, 2, 3 (landing hero, paths hub, category landing, arc landing, path landing,
+course-in-path) belong to `ayokoding-learning-path-03-navigation-ui` — that plan carries their funnel
+record and their 36 renders (grown from 24 via the 2026-07-21 category-split amendment, DD-47 after
+the split). This plan carries Screen 4 and its 6.
 
 **R5 grounding note** — no net-new component is required. The banner is the existing composite
 `Alert` (`Alert` / `AlertTitle` / `AlertDescription` from `@open-sharia-enterprise/web-ui`, the same
@@ -138,7 +139,10 @@ version"), archive notices on retired knowledge bases, and `noindex`-ed legacy t
 plan's `web-researcher` window-shop of ~14 learning platforms (2026-07-21) is carried by
 `ayokoding-learning-path-03-navigation-ui` in its R7 Prior-Art Findings section; the finding relevant
 here is that **no surveyed platform de-indexes superseded material while the replacement is still
-being written** — which is the decisive argument against Option C below.
+being written** [Judgment call — this is the plan author's reasoned synthesis drawn from
+`ayokoding-learning-path-03-navigation-ui`'s R7 Prior-Art Findings survey, not an independently
+re-verified inline excerpt in this file; see that plan's `prd.md` §R7 Prior-Art Findings
+for the underlying ~13-platform citations] — which is the decisive argument against Option C below.
 
 ### Low-fi Option A — Indexed, with a landing notice + a per-page banner (Recommended; Q-D option A)
 
@@ -355,18 +359,20 @@ destination course explicitly rather than reading "here".
 
 Naming scheme (inherited, DD-47) — `assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png`,
 rendered from a token-accurate source at `assets/src/<same-stem>.html`. Screen slugs: `landing-hero`
-(0), `paths-hub` (1), `path-landing` (2), `course-path` (3), `legacy-landing` (4).
+(0), `paths-hub` (1), `category-landing` (1a), `arc-landing` (1b), `path-landing` (2), `course-path`
+(3), `legacy-landing` (4).
 
-| Screen | Slug             | Option × viewport | Renders | Owning plan                                  |
-| ------ | ---------------- | ----------------- | ------- | -------------------------------------------- |
-| 0–3    | see scheme above | 2 × 3 each        | **24**  | `ayokoding-learning-path-03-navigation-ui`   |
-| 4      | `legacy-landing` | 2 × 3             | **6**   | `ayokoding-learning-path-01-url-restructure` |
+| Screen             | Slug             | Option × viewport | Renders | Owning plan                                  |
+| ------------------ | ---------------- | ----------------- | ------- | -------------------------------------------- |
+| 0, 1, 1a, 1b, 2, 3 | see scheme above | 2 × 3 each        | **36**  | `ayokoding-learning-path-03-navigation-ui`   |
+| 4                  | `legacy-landing` | 2 × 3             | **6**   | `ayokoding-learning-path-01-url-restructure` |
 
-> **Cross-plan note on DD-47.** DD-47 mandates **30** renders (5 screens × 2 options × 3 viewports)
-> across two plans — **6 here** and **24 in `ayokoding-learning-path-03-navigation-ui`**. A reader
-> auditing DD-47 against this plan alone must not conclude the matrix was under-delivered. Every
-> asset-count acceptance clause in this plan therefore asserts **6**, scoped to this plan's own
-> `assets/` folder, and never 30.
+> **Cross-plan note on DD-47.** DD-47 mandates **42** renders across two plans — **6 here** and **36
+> in `ayokoding-learning-path-03-navigation-ui`** (grown from the original 30/24 split via that plan's
+> 2026-07-21 category-split amendment, which added Screens 1a/1b and grew its own screen count from 4
+> to 6). A reader auditing DD-47 against this plan alone must not conclude the matrix was
+> under-delivered. Every asset-count acceptance clause in this plan therefore asserts **6**, scoped to
+> this plan's own `assets/` folder, and never 42.
 
 ## Acceptance Criteria (Gherkin)
 
@@ -605,7 +611,7 @@ Scenario: The relocated tree builds and validates green
   `path-course-links.tsx`).
 - The `PathManifest` zod schema, the `<MANIFESTS>` directory, and **every** manifest file.
 - Path landing pages, the `?path=` route wiring, path-aware prev/next, and the path breadcrumb.
-- Screens 0–3 of the design funnel and their 24 renders.
+- Screens 0, 1, 1a, 1b, 2, 3 of the design funnel and their 36 renders (`ayokoding-learning-path-03-navigation-ui`'s slice, grown from 24 via the 2026-07-21 category-split amendment).
 - Authoring **any** course body: the 61 transferred topics, the 6 net-new AI courses, the remaining
   new courses and capstones.
 - Rewriting, merging, re-titling, or re-sequencing any legacy page — the move is a prefix relocation

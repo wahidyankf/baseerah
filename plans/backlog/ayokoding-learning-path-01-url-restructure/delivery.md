@@ -652,10 +652,20 @@ deleted), re-pointing each entry to wherever the content now lives.
       inverted assertions). Falsifiable both ways: the pre-inversion suite passes against today's
       `content-namespace.ts` (verified in Phase 0), and fails the moment these assertions are rewritten.
 
-  **Gherkin (binds) →** every scenario in `content-namespace-redirects.feature` (filename kept; see
-  [Naming decisions](./tech-docs.md#naming-decisions-so-sibling-plans-are-not-silently-broken)) —
-  invert each scenario's Given/When/Then to assert a stale `/c/`-prefixed bookmark 308s to the bare
-  URL, not the reverse.
+  **Gherkin (binds) →** "Old English learn URL permanently redirects to the /c namespace"; "Old
+  Indonesian belajar URL permanently redirects to the /c namespace"; "About page keeps its
+  top-level URL and is not redirected"; "Indonesian terms page keeps its top-level URL and is not
+  redirected"; "Tools index keeps its top-level URL and is not redirected"
+
+  > **Why this step carries a five-scenario `;`-list tag.** This RED(unit) step inverts
+  > `content-namespace.unit.test.ts`, a feature-consuming unit test that exercises the whole
+  > `content-namespace-redirects.feature` (filename kept; see
+  > [Naming decisions](./tech-docs.md#naming-decisions-so-sibling-plans-are-not-silently-broken)) in
+  > one cycle — the aggregate-BDD-binder exception in the
+  > [Gherkin-Tagged Delivery Steps rule](../../../repo-governance/development/workflow/test-driven-development.md#gherkin-tagged-delivery-steps)
+  > applies, so the tag lists every scenario it binds rather than splitting into five separate RED
+  > cycles. Invert each scenario's Given/When/Then to assert a stale `/c/`-prefixed bookmark 308s to
+  > the bare URL, not the reverse.
 
 - [ ] [AI] **RED (specs)** — invert the Gherkin content of `content-namespace-redirects.feature` in
       place (filename kept) and update its paired `content-namespace-redirects.steps.tsx` step
@@ -683,10 +693,11 @@ deleted), re-pointing each entry to wherever the content now lives.
 
 - [ ] [AI] **GREEN** — widen `[...slug]/page.tsx` to serve both loose pages and the full content tree:
       merge the deleted `c/[...slug]/page.tsx`'s content-tree lookup, `generateStaticParams`, and
-      `generateMetadata`/canonical-URL logic into the surviving bare `[...slug]/page.tsx`, and merge its
-      test file (`c/[...slug]/page.unit.test.ts`'s assertions, before its own deletion above, into
-      `[...slug]/page.unit.test.ts`) — command: `npx nx run ayokoding-www:test:unit` — acceptance: the
-      merged suite passes, covering both loose-page and content-tree slugs in one route.
+      `generateMetadata`/canonical-URL logic into the surviving bare `[...slug]/page.tsx`, and create
+      `[...slug]/page.unit.test.ts` _(New file)_ — carry over `c/[...slug]/page.unit.test.ts`'s
+      assertions (captured before its own deletion above) into this new file — command:
+      `npx nx run ayokoding-www:test:unit` — acceptance: the merged suite passes, covering both
+      loose-page and content-tree slugs in one route.
 
 - [ ] [AI] **GREEN — collision negative check** — confirm the widened route introduces no routing
       collision, per the verdict in
@@ -1118,11 +1129,12 @@ deleted), re-pointing each entry to wherever the content now lives.
 > could be ticked with four of six missing. Option C is deliberately **not** rendered: it is Option B's
 > landing plus a `robots` metadata change, which a mockup cannot depict.
 >
-> **Cross-plan note on DD-47.** DD-47's full matrix is **30** renders (5 screens × 2 options × 3
-> viewports) spread across **two** plans — **6 here** and **24 in
-> `ayokoding-learning-path-03-navigation-ui`** (Screens 0–3). Every asset clause in this plan
-> therefore asserts **6**, scoped to this plan's own `assets/` folder, and never 30. A reader auditing
-> DD-47 against this plan alone must not read 6 as under-delivery.
+> **Cross-plan note on DD-47.** DD-47's full matrix is **42** renders spread across **two** plans —
+> **6 here** and **36 in `ayokoding-learning-path-03-navigation-ui`** (Screens 0, 1, 1a, 1b, 2, 3;
+> grown from the original 30/24 split via that plan's 2026-07-21 category-split amendment, which added
+> Screens 1a/1b). Every asset clause in this plan therefore asserts **6**, scoped to this plan's own
+> `assets/` folder, and never 42. A reader auditing DD-47 against this plan alone must not read 6 as
+> under-delivery.
 >
 > **These six sources and their renders were produced ahead of execution**, during this plan's
 > plan-quality-gate fixing pass — see [prd.md's regeneration note](./prd.md#hi-fi-finalists). The
@@ -1336,7 +1348,7 @@ deleted), re-pointing each entry to wherever the content now lives.
       `md heading-hierarchy validate` are green over the relocated tree.
 - [ ] [AI] All six Screen 4 renders exist in `assets/` and are embedded in `prd.md` with
       viewport-specific alt text; `find assets -name 'legacy-landing-option-*-*.png' | wc -l` returns
-      **6** (this plan's DD-47 slice; the other 24 belong to
+      **6** (this plan's DD-47 slice; the other 36 belong to
       `ayokoding-learning-path-03-navigation-ui`); `prd.md` still records exactly one
       `Selected: Option` line (no regression to an open/PENDING state).
 - [ ] [AI] `id/belajar` still holds **53** `.md` with no bucket directory; the deferral note is written
@@ -1586,7 +1598,7 @@ deleted), re-pointing each entry to wherever the content now lives.
       `find assets -name 'legacy-landing-option-*-*.png' | wc -l` returns **6** (2 options × 3
       viewports for Screen 4); every one is embedded in `prd.md` with viewport-specific alt text; and
       `grep -c "Selected: Option" prd.md` returns exactly **1**. **The other
-      24 renders of DD-47's 30-render matrix belong to
+      36 renders of DD-47's 42-render matrix belong to
       `ayokoding-learning-path-03-navigation-ui`** — 6 here is the complete slice, not an
       under-delivery.
 - [ ] [AI] **Cross-plan link gate (BF-8)** — confirm no reference in this plan folder points at a

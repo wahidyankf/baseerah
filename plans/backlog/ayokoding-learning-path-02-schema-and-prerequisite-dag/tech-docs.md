@@ -371,24 +371,54 @@ for careers paths (`interview-ready/software-engineer`) instead of the 3-segment
    diverge without anything failing (per the concern that prompted this ruling). Any plan whose
    content still writes the 2-segment shorthand for a careers path is citing an **invalid** `pathId`
    and must update to the 3-segment canonical form — that conformance sweep is **not** this plan's to
-   run (see the escalation-response note below). **Status, re-measured 2026-07-22 — scoped to the
+   run (see the escalation-response note below). **Status, re-measured 2026-07-23 — scoped to the
    sibling plans' own documents**: no sibling folder writes a bare 2-segment careers `pathId` as its
-   current canonical spelling, but the shorthand string still appears **55 times across five of the
+   current canonical spelling, but the shorthand string still appears **59 times across five of the
    six** sibling `ayokoding-learning-path-*` folders' top-level
-   `README`/`brd`/`prd`/`tech-docs`/`delivery` documents, in three categories. First, references to the
-   legacy **content directory and legacy URL** `.../learn/fundamentally-strong/software-engineer/`
-   (plan 01's `<SE_OLD>` constant) — a filesystem/URL path, not a `pathId`, and correct as written:
-   these account for all **39** hits in `…-01-url-restructure`, **3** in `…-04-course-authoring`, and
-   **2** in `…-06-skills-accounting`. Second, historical notes recording the fourth path's **retired**
-   id `immediately-effective/software-engineer-to-ai-engineer` — **5** of the **6** hits in
-   `…-05-manifests`, plus one in plan 01's `README`. Third, **5 genuine unprefixed `pathId`s in
-   `…-03-navigation-ui`** (`README.md` lines 224, 251, 277, 278 and `tech-docs.md` line 605), which
-   that plan's own `README` already discloses as "Stale relative to the 2026-07-21 category-split
-   ruling — flagged, not silently corrected here" inside a verbatim-quoted, sibling-owned block.
+   `README`/`brd`/`prd`/`tech-docs`/`delivery` documents, in three categories (45 + 7 + 7 = 59)
+   [Repo-grounded — measured 2026-07-23, self-verifying pinned command, counts **matches, not
+   lines**, run from the repo root:
+   `python3 -c "import re; p = re.compile(r'(?<!careers/)(interview-ready|immediately-effective|fundamentally-strong)/[a-zA-Z-]+'); r = 'immediately-effective/software-engineer-to-ai-engineer'; [print(plan, sum(len(p.findall(open(f'plans/backlog/ayokoding-learning-path-{plan}/{f}').read())) for f in ['README.md','brd.md','prd.md','tech-docs.md','delivery.md']), sum(open(f'plans/backlog/ayokoding-learning-path-{plan}/{f}').read().count(r) for f in ['README.md','brd.md','prd.md','tech-docs.md','delivery.md'])) for plan in ['01-url-restructure','03-navigation-ui','04-course-authoring','05-manifests','06-skills-accounting','07-skills-erp']]"`.
+   Per-plan (total, retired-id-hits): 01→(39,1), 03→(8,1), 04→(4,0), 05→(6,5), 06→(2,0), 07→(0,0);
+   summed totals 39+8+4+6+2+0=**59**. Category 2 (retired id) is every retired-id hit in any plan:
+   1+1+0+5+0+0=**7**. Category 1 (legacy-dir/elided-ancestor) is every non-retired-id hit in plans
+   01/04/05/06: (39−1)+(4−0)+(6−5)+(2−0)=38+4+1+2=**45**. Category 3 (genuine unprefixed `pathId`) is
+   every non-retired-id hit in plan 03 alone: 8−1=**7**. 45+7+7=59, matching the independently-summed
+   per-plan total exactly — re-run the command verbatim to reproduce every figure in this paragraph].
+   First, references to legacy or elided-ancestor **filesystem/directory path fragments, not `pathId`
+   values** — most are the legacy **content directory and legacy URL**
+   `.../learn/fundamentally-strong/software-engineer/` (plan 01's `<SE_OLD>` constant); one is the
+   ASCII directory-tree diagram's elided-`careers/`-ancestor comment
+   `.../interview-ready/software-engineer/ _index.md is plan 05's, NOT this plan's`, describing the
+   **new** target directory structure with its `careers/` ancestor elided by the tree's `...`
+   continuation marker rather than omitted as a genuine unprefixed shorthand — both correct as
+   written: these account for **38** of `…-01-url-restructure`'s 39 total shorthand hits (37
+   legacy-directory references + 1 elided-ancestor tree-diagram reference; the 39th is the retired-id
+   hit counted in the second category below), **4** in `…-04-course-authoring`, **2** in
+   `…-06-skills-accounting`, and **1** in `…-05-manifests` (that plan's own `<SE_OLD>` constant
+   definition — the same shape as the other three plans' references, previously left out of every
+   category and out of the sum) — **45** total. Second, historical notes recording the fourth path's
+   **retired** id
+   `immediately-effective/software-engineer-to-ai-engineer` — **5** of `…-05-manifests`'s 6 hits, plus
+   one in plan 01's `README`, plus one in plan 03's `README` (its `DL-7` bullet) — **7** total. Third,
+   **7 genuine unprefixed `pathId`s in `…-03-navigation-ui`** — **7** total — inside its
+   verbatim-reproduced build-order text: 3 in the **Build order (inherited)** section (1 in that
+   section's stale-flag intro sentence, plus 2 in its `DD-27` bullet) and 2 in the `DL-7` bullet under
+   the **Decisions Locked (inherited)** section (both in `README.md`), plus 2 in the `DD-27` bullet
+   under the **Inherited verbatim (build order — no single plan owns it)** section in `tech-docs.md`.
+   Line numbers are
+   deliberately not cited here — plans 03, 04, and 05 are all under active concurrent edit in this
+   same gate, and this exact
+   citation already drifted once from raw line numbers alone; the section-heading and decision-ID
+   references above stay stable across further edits to those files (re-derive a line pointer with
+   `grep -n` against the named section if one is ever needed). That plan's own `README` already
+   discloses this population as "Stale relative to the 2026-07-21 category-split ruling — flagged, not
+   silently corrected here" inside a verbatim-quoted, sibling-owned block.
    `…-07-skills-erp` has none. An earlier revision of this sentence claimed "all six sibling
    folders now write the 3-segment form" with "four remaining 2-segment hits" confined to plan 01;
-   a direct count falsifies it in both dimensions — the residual population is 55 lines, not 4, and
-   it spans five folders, not one. **That sweep did not, and was never intended to, cover this plan's
+   a direct count falsifies it in both dimensions — the residual population is 59 occurrences, not 4,
+   and it spans five folders, not one. **That sweep did not, and was never intended to, cover this
+   plan's
    own custodied course corpus.** Every entry in `syllabus/courses/` writes the bare 2-segment
    shorthand and **none writes the `careers/` 3-segment form** — **388 such lines across all 122
    entries**: 374 across the 120 course spec files, 10 in `README.md` (its per-course template plus
@@ -799,18 +829,18 @@ scope does not need restating; `A8` is the current, binding, programme-wide rule
 ### The DD-34 / DD-35 / DD-39 numbering gap is deliberate
 
 Restated **verbatim** from the source plan (`tech-docs.md:1837-1844`), so that no future reader
-"closes" the apparent gap and rewrites 276 tokens whose meanings belong to a different, closed plan:
+"closes" the apparent gap and rewrites 275 tokens whose meanings belong to a different, closed plan:
 
 > **The following six decisions (DD-40 through DD-45) were made in the 2026-07-21 learn-section
 > scope-extension pass.** They are numbered from **40**, not 34: the tokens `DD-34`, `DD-35`, and
 > `DD-39` are already in use **inside this plan's own folder** — they appear throughout
 > `syllabus/courses/**` carrying **FS-SE-inherited** meanings (concept enumeration, primary-source
 > citation policy, typed-Python policy) rather than this document's numbering
-> [Repo-grounded — `grep -rl "DD-3[4-9]" syllabus/courses/`, run from this plan folder, lists 94
-> files; every occurrence outside `syllabus/` is prose about this very collision]. Starting at 40
-> keeps every `DD-NN` token in this plan folder unambiguous for an execution-grade reader.
+> [Repo-grounded — `grep -rn "DD-3[4-9]" plans/backlog/shared-course-library-and-learning-paths/`
+> returns hits only under `syllabus/courses/`]. Starting at 40 keeps every `DD-NN` token in this plan
+> folder unambiguous for an execution-grade reader.
 
-Occurrence counts, verified: `DD-34` 113, `DD-35` 114, `DD-39` 49. `DD-36`, `DD-37` and `DD-38` are
+Occurrence counts, verified: `DD-34` 113, `DD-35` 113, `DD-39` 49. `DD-36`, `DD-37` and `DD-38` are
 unused anywhere. **Never renumber.**
 
 ## `syllabus/` folder structure and custody

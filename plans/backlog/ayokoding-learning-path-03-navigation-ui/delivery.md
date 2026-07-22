@@ -1168,7 +1168,10 @@ nav for that path"; "The path rail shows the whole ordered arc beside a course a
 "The path rail collapses into the existing navigation drawer on a phone"; "A course opened without
 path context renders the generic sidebar unchanged"; "The paths hub groups paths by category, not a
 flat grid" (all in [prd.md](./prd.md#acceptance-criteria-gherkin)). This is the plan's only
-multi-scenario binding step; every other scenario has its own dedicated RED cycle above.
+multi-scenario binding step. Six of the seven scenarios bound here already have their own dedicated
+RED cycle above; the seventh — the hub's category-grouping behavior — is implemented as part of
+Cycle 3.1's GREEN step (the `CategorySection`/`ArcGroup` wrapper) but is formally Gherkin-bound for
+the first time here, at the e2e level, rather than via its own dedicated unit-level RED cycle.
 
 - [ ] [AI] **GREEN (aggregate binder)** — implement the remaining `playwright-bdd` step definitions so
       **every** scenario in `<SPECS>` executes against the fixture manifests, covering the deep-link

@@ -546,7 +546,8 @@ Four rules make the fixtures trustworthy rather than a self-fulfilling stub:
   redesigned in place and two new screen types (1a, 1b) were added, so the funnel now renders **6
   screens × 2 options × 3 viewports = 36 `.png`** at **375 / 768 / 1280 px** (Tailwind's default
   `sm`/`md`/`lg`/`xl` scale [Web-cited — <https://tailwindcss.com/docs/responsive-design>, accessed
-  2026-07-21]), matching the widths the plan's Playwright verification already resizes to, plus a lo-fi
+  2026-07-21 — "sm 40rem (640px) / md 48rem (768px) / lg 64rem (1024px) / xl 80rem (1280px) / 2xl 96rem
+  (1536px)"]), matching the widths the plan's Playwright verification already resizes to, plus a lo-fi
   wireframe per viewport. Naming is `assets/<screen>-option-<a|b>-<mobile|tablet|desktop>.png` from
   `assets/src/<same-stem>.html`; the eight pre-existing files were renamed into the scheme and every
   `![]()` reference updated; four new stems (`category-landing-option-{a,b}`,

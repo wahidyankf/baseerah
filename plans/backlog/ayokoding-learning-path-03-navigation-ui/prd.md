@@ -208,30 +208,49 @@ it reappears in Path B; After→re-entry is the industry's weakest seam and is e
 
 **Ergonomics principles (evidence-backed, applied across the journey)**
 
-> All external sources cited in this list were **accessed 2026-07-21**, the same access date recorded
-> for the R7 prior-art citation batch below.
-
 - **Choice overload is contextual, not automatic.** The canonical jam study (24 vs. 6 options) is real,
   but the largest meta-analysis ([Scheibehenne, Greifeneder & Todd 2010](https://www.psychologytoday.com/us/blog/pop-psych/201602/is-choice-overload-real-thing),
   50 studies) found a near-zero _average_ effect — overload bites mainly when the user has **no
   preexisting preference, options are hard to compare, and no heuristic/filter exists**. Screen 0's
   goal-labeled cards + escape hatch neutralize all three, so four cards in the hero is safe.
+  [Web-cited: <https://www.psychologytoday.com/us/blog/pop-psych/201602/is-choice-overload-real-thing>,
+  accessed 2026-07-21 — "the average estimated effect size for the choice overload effect across all
+  the experiments was a mere D = 0.02; the effect was all but non-existent" (50 experiments, ~5,000
+  participants, 13 published + 16 unpublished papers, 2000-2009)]
 - **Hick's Law is logarithmic** (`RT = a + b·log₂n`), with **no magic-number cutoff** — the "7±2" figure
-  is Miller's working-memory law, a different construct, and is not used here. [lawsofux.com/hicks-law](https://lawsofux.com/hicks-law/).
-- **Polyhierarchy** — one course, a _few restrained_ parent paths, not cross-listed everywhere. [NN/g](https://www.nngroup.com/articles/polyhierarchy/).
-- **Breadcrumb = location, not history** ([NN/g](https://www.nngroup.com/articles/breadcrumbs/)). NN/g's
-  default is a single canonical parent; our path-aware breadcrumb is a **deliberate, documented
-  departure** — justified because the active path is explicit and shareable in the URL (`?path=`), so
-  the trail is deterministic _given the URL_ rather than silently referrer-driven.
+  is Miller's working-memory law, a different construct, and is not used here.
+  [Web-cited: <https://lawsofux.com/hicks-law/>, accessed 2026-07-21 — "The time it takes to make a
+  decision increases with the number and complexity of choices"]
+- **Polyhierarchy** — one course, a _few restrained_ parent paths, not cross-listed everywhere.
+  [Web-cited: <https://www.nngroup.com/articles/polyhierarchy/>, accessed 2026-07-21 — "exhaustively
+  crossreferencing every single place where a particular item could sit would swell each menu"]
+- **Breadcrumb = location, not history.** NN/g's default is a single canonical parent; our path-aware
+  breadcrumb is a **deliberate, documented departure** — justified because the active path is explicit
+  and shareable in the URL (`?path=`), so the trail is deterministic _given the URL_ rather than
+  silently referrer-driven.
+  [Web-cited: <https://www.nngroup.com/articles/breadcrumbs/>, accessed 2026-07-21 — "Breadcrumbs are
+  not intended to show the history of pages traversed during a session on the site... they are intended
+  to show the hierarchical structure of the site"; "If a page has multiple different parents, identify
+  a canonical path to it in the site hierarchy and show that path in the breadcrumb trail"]
 - **Recognition over recall / information scent** — persistent path banner + breadcrumb so the learner
-  never has to remember which path they're in. [NN/g recognition](https://www.nngroup.com/articles/recognition-and-recall/),
-  [NN/g scent](https://www.nngroup.com/articles/information-scent/).
+  never has to remember which path they're in.
+  [Web-cited: <https://www.nngroup.com/articles/recognition-and-recall/>, accessed 2026-07-21 —
+  "Recognition is easier than recall because it involves more cues"]
+  [Web-cited: <https://www.nngroup.com/articles/information-scent/>, accessed 2026-07-21 — "The user's
+  imperfect estimate of the value that the source will deliver to the user, derived from a
+  representation of the source"]
 - **Zeigarnik & peak-end** (both **[Future]**) — an unfinished-count indicator drives return visits;
-  completion should end on a rewarding note without an upsell. [NN/g Zeigarnik](https://www.nngroup.com/videos/zeigarnik-effect/),
-  [NN/g peak-end](https://www.nngroup.com/articles/peak-end-rule/).
+  completion should end on a rewarding note without an upsell.
+  [Web-cited: <https://www.nngroup.com/videos/zeigarnik-effect/>, accessed 2026-07-21 — "The Zeigarnik
+  effect suggests that unfinished tasks are more memorable than completed ones"]
+  [Web-cited: <https://www.nngroup.com/articles/peak-end-rule/>, accessed 2026-07-21 — "Intense positive
+  or negative moments (the 'peaks') and the final moments of an experience (the 'end') are heavily
+  weighted in our mental calculus"]
 - **Mobile & a11y per stage** — advisory-vs-hard signifiers never colour-only; tap targets ≥44px (above
-  the [WCAG 2.2 §2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) 24px
-  floor); no multi-line breadcrumb wrap on small screens; completion state announced via `aria-live`.
+  the WCAG 2.2 §2.5.8 24px floor); no multi-line breadcrumb wrap on small screens; completion state
+  announced via `aria-live`.
+  [Web-cited: <https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html>, accessed
+  2026-07-21 — "The size of the target for pointer inputs is at least 24 by 24 CSS pixels"]
 
 ## UI-Design-Funnel (Path-Aware Navigation Screens)
 
@@ -879,6 +898,44 @@ and reused, not redesigned per screen.
 
 **Low-fi Option B — Arc list with inline description (no cards)**
 
+_Mobile — 375 px (`<sm`), careers instance: the plain list stacks to one column, each item's
+description wrapping across two or three lines with no card boundary to anchor it_
+
+```text
+┌────────────────────────────────────┐
+│ ☰  AyoKoding            ⌕  ☾       │
+├────────────────────────────────────┤
+│ Home / Learn / Paths / Careers      │
+│ Careers — three arcs, one shared    │
+│ library.                            │
+│ 1. Interview-Ready — pass a SWE     │
+│    interview soon. Software         │
+│    Engineer. →                      │
+│ 2. Immediately-Effective — ship     │
+│    fast, deepen later. Software     │
+│    Engineer, AI Engineer. →         │
+│ 3. Fundamentally Strong —           │
+│    fundamentals first, then         │
+│    build. SWE. →                    │
+│ ← Back to all paths                 │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px, careers instance: sidebar returns; the list stays a single column beside it (no
+two-up reflow available to a plain list the way Option A's cards get one)_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▸ Learn      │ Careers — three arcs, one shared library.       │
+│   ▾ Paths    │ 1. Interview-Ready — pass a SWE interview soon. │
+│     ▾ Careers│    Software Engineer. →                         │
+│     ▸ Skills │ 2. Immediately-Effective — ship fast, deepen    │
+│   ▸ Courses  │    later. Software Engineer, AI Engineer. →     │
+│              │ 3. Fundamentally Strong — fundamentals first,   │
+│              │    then build. SWE. →                           │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
 _Desktop — 1280 px, careers instance: a numbered/plain list rather than cards_
 
 ```text
@@ -897,10 +954,15 @@ never needs more than a two-up reflow (**4** subjects as of amendment A10 — up
 into two rows of two), so it stacks at `<sm` and sits two-up from `md` up with no further breakpoint
 tension.
 
-**Hi-fi finalists** (Option A's render is a **three-frame composite** — careers instance, skills
-instance populated with ramp milestones, and skills instance empty state — following the same
-"one render, multiple documented states" pattern Screen 3 already uses for its rail states; Option B's
-render shows only the careers instance, sufficient to demonstrate why it lost):
+**Hi-fi finalists** (desktop renders below; the mobile and tablet renders for both options are
+produced by the delivery steps in
+[Phase 1 · UI design funnel](./delivery.md#phase-1-ui-design-funnel-screens-0-1-1a-1b-2-3) — see the
+[asset matrix](#hi-fi-asset-matrix-screen--option--viewport) — the low-fi wireframes above already
+carry Option B through all three viewports. Option A's render is a **three-frame composite** —
+careers instance, skills instance populated with ramp milestones, and skills instance empty state —
+following the same "one render, multiple documented states" pattern Screen 3 already uses for its
+rail states; Option B's render shows only the careers instance, sufficient to demonstrate why it
+lost):
 
 ![Category landing, Option A — three stacked browser-chrome frames: the Careers instance with three arc cards side by side (Immediately-Effective visibly showing two member roles, Software Engineer and AI Engineer, where the other two arcs show one), the Skills instance with four subject cards (Conventional Accounting, Sharia Accounting, Conventional ERP, Sharia ERP) each carrying a dangerous/comfortable/confident milestone strip, and the Skills empty state showing a friendly "being written, check back soon" message with a fallback link to Careers](./assets/category-landing-option-a-desktop.png)
 
@@ -999,6 +1061,36 @@ fill, so it stays legible at one card wide too)_
 
 **Low-fi Option B — Uniform N-card grid regardless of count**
 
+_Mobile — 375 px: both states stack to one column exactly like Option A — the bare card template
+gives up nothing at this width, so the design's flaw (the visibly empty second grid cell) does not
+yet show; it only appears once the grid gets a second column_
+
+```text
+┌────────────────────────────────────┐
+│ ☰  AyoKoding            ⌕  ☾       │
+├────────────────────────────────────┤
+│ Home / … / Careers / Interview-R.  │
+│ Interview-Ready                    │
+│ ┌────────────────────────────────┐ │
+│ │ Software Engineer      ~119    │ │
+│ │ [ Start → ]                    │ │
+│ └────────────────────────────────┘ │
+└────────────────────────────────────┘
+```
+
+_Tablet — 768 px, two-role state: the uniform grid at its intended width — both cards render bare,
+with no differentiating content the way Option A's single-role card gets a syllabus preview_
+
+```text
+┌── Sidebar ───┬────────────────────────────────────────────────┐
+│ ▸ Learn      │ Immediately-Effective                           │
+│   ▾ Paths    │ ┌──────────────────┐ ┌──────────────────┐      │
+│    ▾ Careers │ │ Software Engineer│ │ AI Engineer      │      │
+│              │ │ ~116 [ Start → ] │ │ ~132 [ Start → ] │      │
+│              │ └──────────────────┘ └──────────────────┘      │
+└──────────────┴────────────────────────────────────────────────┘
+```
+
 _Desktop — 1280 px, single-role state: the same bare card template the two-role state uses, with
 nothing to fill the second grid cell_
 
@@ -1025,9 +1117,13 @@ the component still reuses the **same `EmptyPathListState`** described in
 future arc added before its manifest lands never silently renders blank. This is a shared-component
 decision, not a second design pass.
 
-**Hi-fi finalists** (rendered from the token-accurate HTML mockups — each composites **both** the
-two-role and single-role states into one image, following the same "one render, multiple documented
-states" pattern already used for Screen 3's rail states):
+**Hi-fi finalists** (desktop renders below; the mobile and tablet renders for both options are
+produced by the delivery steps in
+[Phase 1 · UI design funnel](./delivery.md#phase-1-ui-design-funnel-screens-0-1-1a-1b-2-3) — see the
+[asset matrix](#hi-fi-asset-matrix-screen--option--viewport) — the low-fi wireframes above already
+carry Option B through all three viewports. Each desktop render composites **both** the two-role
+and single-role states into one image, following the same "one render, multiple documented states"
+pattern already used for Screen 3's rail states):
 
 ![Arc landing, Option A — two stacked browser-chrome frames: the Immediately-Effective arc showing two role cards side by side (Software Engineer, AI Engineer), and the Interview-Ready arc showing one prominent role card with an inline first-phase syllabus preview so a single-role arc never reads as a stub](./assets/arc-landing-option-a-desktop.png)
 
@@ -1823,34 +1919,76 @@ layered around it.
 ### R7 Prior-Art Findings (window-shopped 2026-07-21)
 
 A `web-researcher` surveyed 13 learning platforms on 2026-07-21 for how a "path/track over a shared
-library" is presented end-to-end. Every claim below carries a source URL (access date 2026-07-21).
+library" is presented end-to-end. Every claim below is tagged `[Web-cited: URL(s), accessed
+2026-07-21]` (URL + date, per the Anti-Hallucination Convention). Most bullets additionally carry a
+`WebFetch`-verified verbatim excerpt, confirmed on 2026-07-22 re-verification; the exceptions —
+Scrimba, and the Educative and Khan Academy halves of their combined bullets — could not be
+re-confirmed (page unreachable or no matching text on re-fetch) and instead carry an honest caveat
+note explaining why no excerpt is included.
 
 **Per-platform highlights**
 
 - **roadmap.sh** — the home page _is_ the catalog: role-based + skill-based roadmaps as chunked text
   links, 92-item catalog one level deep; deliberately not a hero-style chooser.
-  [roadmap.sh](https://roadmap.sh/), [/roadmaps](https://roadmap.sh/roadmaps).
+  [Web-cited: <https://roadmap.sh/>, <https://roadmap.sh/roadmaps>, accessed 2026-07-21 — re-verified
+  2026-07-22 via `/roadmaps`: "Role Based Roadmaps" (~30 links) and "Skill Based Roadmaps" (~50 links)
+  sections plus an "All Roadmaps92" total counter; a directory-style listing, no hero-style chooser]
 - **Coursera** — generic value-prop hero + single CTA; a **4-option goal-question** ("What brings you
   to Coursera today?") sits _below_ the hero; Professional-Certificate landings use a **numbered
   "Course 1 of 9" list + advisory "take in order, content builds"** note, with a breadcrumb.
-  [home](https://www.coursera.org/), [Google Data Analytics cert](https://www.coursera.org/professional-certificates/google-data-analytics).
+  [Web-cited: <https://www.coursera.org/>, <https://www.coursera.org/professional-certificates/google-data-analytics>,
+  accessed 2026-07-21 — re-verified 2026-07-22 on the certificate page: "We highly recommend taking
+  the courses of each certificate program in the order presented, as the content builds on
+  information from earlier courses," numbered "Course 1", "Course 2" entries, and a
+  Home > Browse > Data Science > Data Analysis breadcrumb]
 - **Boot.dev** — generic hero → **"Pick a Learning Path" section with 3 cards**; path landing is a
-  **flat numbered list (1-23)**, no breadcrumb/banner. [boot.dev](https://www.boot.dev/),
-  [backend path](https://www.boot.dev/paths/backend-python-golang).
+  **flat numbered list (1-23)**, no breadcrumb/banner.
+  [Web-cited: <https://www.boot.dev/>, <https://www.boot.dev/paths/backend-python-golang>, accessed
+  2026-07-21 — re-verified 2026-07-22: the path page confirms a continuous 1-23 numbered list and no
+  navigational breadcrumb; note a promotional header banner ("Go from Python fundamentals to real
+  backend systems…") is present, distinct from a nav breadcrumb]
 - **Codecademy** — Career Center shows **12 path cards + a "sorting quiz" alongside** (not gating);
-  two-tier syllabus (path → unit). [career-center](https://www.codecademy.com/career-center).
+  two-tier syllabus (path → unit).
+  [Web-cited: <https://www.codecademy.com/career-center>, accessed 2026-07-21 — homepage returned 403
+  during the original R7 survey; this fixer's re-verification on 2026-07-22 succeeded and confirms the
+  claim: "Get help exploring your options with our free intro course and sorting quiz, or pick from
+  any of our 12 beginner-friendly career paths," with no gating between the two]
 - **Pluralsight** — optional **Skill IQ** entry; once inside a path you **"skip modules you already
-  know"** (advisory, not gated). [product/paths](https://www.pluralsight.com/product/paths).
+  know"** (advisory, not gated). [Web-cited: <https://www.pluralsight.com/product/paths>, accessed
+  2026-07-21 — re-verified 2026-07-22: "Many learning paths include a Skill IQ to determine where to
+  begin ... Once you've started a learning path, you can always skip modules that you already know"]
 - **Exercism** — join a track, **completion unlocks** more; **Practice-Mode opt-out** unlocks
-  everything for experienced users. [getting-started](https://exercism.org/docs/using/getting-started).
+  everything for experienced users.
+  [Web-cited: <https://exercism.org/docs/using/getting-started>, accessed 2026-07-21 — re-verified
+  2026-07-22: confirms "go to its track page and join the track" and "by completing exercises ... you'll
+  get access to even more exercises"; this specific page does not itself describe the Practice-Mode
+  opt-out (only links onward to a separate unlocking-exercises page), so that part of the claim is not
+  independently re-confirmed via this URL today]
 - **Scrimba / DataCamp** — prerequisites shown as **advisory prose** ("for intermediate devs; if not,
-  do X first" / "no prerequisites for this track"), never a gate or DAG. [Scrimba AI path](https://scrimba.com/the-ai-engineer-path-c02v),
-  [DataCamp track](https://www.datacamp.com/tracks/associate-data-scientist-in-python).
+  do X first" / "no prerequisites for this track"), never a gate or DAG.
+  [Web-cited: <https://scrimba.com/the-ai-engineer-path-c02v>, accessed 2026-07-21 — exact prereq
+  wording is search-derived, re-verify verbatim before quoting in shipped UI copy; this fixer's
+  2026-07-22 re-fetch of this URL found no prerequisite text at all on the page, so the Scrimba half of
+  this claim remains unconfirmed]
+  [Web-cited: <https://www.datacamp.com/tracks/associate-data-scientist-in-python>, accessed
+  2026-07-21 — homepage returned 403 during the original R7 survey; this fixer's re-verification on
+  2026-07-22 succeeded and confirms the exact wording: "There are no prerequisites for this track"]
 - **edX / Educative** — "answer a few questions" quiz offered as an **alternative** route, never the
-  sole entry. [edX find-your-path](https://www.edx.org/find-your-path), [Educative paths](https://www.educative.io/paths).
+  sole entry. [Web-cited: <https://www.edx.org/find-your-path>, <https://www.educative.io/paths>,
+  accessed 2026-07-21 — re-verified 2026-07-22: edX confirms the alternative-route framing verbatim —
+  "This quiz is just one way to discover your path. You can also search our full catalog and use
+  filters ..." plus a "Prefer to explore on your own?" link; Educative's `/paths` page, however, shows
+  only skill-level and topic filters with no quiz mentioned, so the Educative half of this claim is not
+  independently re-confirmed via this URL today]
 - **Frontend Masters / Khan Academy** — level-tiered path cards with **no cross-path overlap
-  indicator**; Khan's mastery model is the strongest "what's next" precedent. [FEM learn](https://frontendmasters.com/learn/),
-  [Khan mastery](https://support.khanacademy.org/hc/en-us/articles/115002552631-What-are-Course-and-Unit-Mastery).
+  indicator**; Khan's mastery model is the strongest "what's next" precedent.
+  [Web-cited: <https://frontendmasters.com/learn/>,
+  <https://support.khanacademy.org/hc/en-us/articles/115002552631-What-are-Course-and-Unit-Mastery>,
+  accessed 2026-07-21 — re-verified 2026-07-22: Frontend Masters confirms four level-tiered path cards
+  (Beginner/Professional/Expert/Computer Science) with "no overlap indicators ... between these
+  offerings"; the Khan Academy support article returned HTTP 403 on this fixer's re-verification
+  attempt, matching the pattern of the ResearchGate citation above — not independently re-confirmable
+  via this URL today]
 
 **Adopt / adapt / avoid (mapped to our screens)**
 
@@ -1872,23 +2010,39 @@ library" is presented end-to-end. Every claim below carries a source URL (access
 **Evidence-backed UX principles applied** (each drives a selection above)
 
 - **Hick's Law** — decision time grows with the number/complexity of choices; minimize and highlight a
-  recommended option. [lawsofux.com/hicks-law](https://lawsofux.com/hicks-law/). → 4 cards, not 12.
+  recommended option. → 4 cards, not 12.
+  [Web-cited: <https://lawsofux.com/hicks-law/>, accessed 2026-07-21 — "The time it takes to make a
+  decision increases with the number and complexity of choices"]
 - **Choice overload (Iyengar & Lepper 2000, "jam study")** — 6 options converted ~10× better than 24.
-  [study summary](https://www.researchgate.net/publication/12189991_When_Choice_is_Demotivating_Can_One_Desire_Too_Much_of_a_Good_Thing).
   → dense catalog deferred to the hub.
+  [Web-cited: <https://www.researchgate.net/publication/12189991_When_Choice_is_Demotivating_Can_One_Desire_Too_Much_of_a_Good_Thing>,
+  accessed 2026-07-21 — returned HTTP 403 on this fixer's re-verification attempt (2026-07-22); the
+  claim traces to the original R7 survey and is not independently re-confirmable via this URL today]
 - **Progressive disclosure** — show a few key options first; **more than two levels hurts usability**.
-  [NN/g](https://www.nngroup.com/articles/progressive-disclosure/). → phase → course only.
-- **Information scent** — cue value before the click. [NN/g](https://www.nngroup.com/articles/information-scent/).
-  → goal verbs + course counts on cards.
-- **Recognition over recall** — show, don't make them remember. [NN/g](https://www.nngroup.com/articles/recognition-and-recall/).
-  → persistent path banner/breadcrumb on the course page.
-- **Target size** — WCAG 2.2 §2.5.8 AA floor 24×24px; ~48px comfort. [W3C](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html).
-  → full-card tap targets on mobile.
+  → phase → course only.
+  [Web-cited: <https://www.nngroup.com/articles/progressive-disclosure/>, accessed 2026-07-21 —
+  "designs that go beyond 2 disclosure levels typically have low usability because users often get
+  lost when moving between the levels"]
+- **Information scent** — cue value before the click. → goal verbs + course counts on cards.
+  [Web-cited: <https://www.nngroup.com/articles/information-scent/>, accessed 2026-07-21 — "The user's
+  imperfect estimate of the value that the source will deliver to the user, derived from a
+  representation of the source"]
+- **Recognition over recall** — show, don't make them remember. → persistent path banner/breadcrumb on
+  the course page.
+  [Web-cited: <https://www.nngroup.com/articles/recognition-and-recall/>, accessed 2026-07-21 —
+  "Recognition is easier than recall because it involves more cues"]
+- **Target size** — WCAG 2.2 §2.5.8 AA floor 24×24px; ~48px comfort. → full-card tap targets on
+  mobile.
+  [Web-cited: <https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html>, accessed
+  2026-07-21 — "The size of the target for pointer inputs is at least 24 by 24 CSS pixels"]
 
 **Whitespace / gaps** — no surveyed platform surfaces "this course is in N paths" or a course-page
 path banner; both are **net-new** here (built on Coursera's breadcrumb as the nearest analog). Freshness
-caveats: Codecademy/DataCamp homepages returned 403 and Scrimba's exact prereq wording is search-derived
-— re-verify verbatim before quoting in shipped UI copy.
+caveats: Codecademy and DataCamp homepages returned 403 during the original 2026-07-21 survey but were
+successfully re-verified by this fixer on 2026-07-22 (excerpts inline above); Scrimba's exact prereq
+wording is still search-derived and was not confirmed on re-fetch — re-verify verbatim before quoting
+in shipped UI copy; the Khan Academy support-article citation returned 403 on this fixer's 2026-07-22
+re-verification attempt and remains unconfirmed via that URL.
 
 ## Acceptance Criteria (Gherkin)
 

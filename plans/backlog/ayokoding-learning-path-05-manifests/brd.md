@@ -145,12 +145,12 @@ Every metric below is an **observable check**, not a projected number.
   language end-to-end → build a real app ahead of CS-fundamentals/DS&A/algorithms/systems depth.
 - **fundamentally-strong is theory-first** (observable): its manifest places CS
   foundations/architecture/paradigms/DS&A ahead of build-at-scale courses.
-- **No manifest ships permanently truncated** (observable): after the growth phase, the interview-ready
-  and fundamentally-strong manifests both carry all five Band-9 interview-technique courses, the
-  immediately-effective manifest carries none of them by design, and the AI path has grown from its
-  smoke-test-scoped starting composition (its included, already-existing SWE-fundamentals
-  prerequisites plus whatever new AI-engineer-role courses exist at that point) to its full,
-  prerequisite-consistent composition — an open item, not a fixed course count, per
+- **No manifest ships permanently truncated** (observable): after the growth phase, all three
+  software-engineer manifests (`interview-ready`, `immediately-effective`, `fundamentally-strong`)
+  carry all five Band-9 interview-technique courses as their trailing optional tail, and the AI path
+  has grown from its smoke-test-scoped starting composition (its included, already-existing
+  SWE-fundamentals prerequisites plus whatever new AI-engineer-role courses exist at that point) to
+  its full, prerequisite-consistent composition — an open item, not a fixed course count, per
   [tech-docs.md DD-35](./tech-docs.md#design-decisions).
 - **The full catalog resolves** (observable): 127 course bundles resolve under
   `apps/ayokoding-www/content/en/learn/courses/` and all four manifests validate against them.

@@ -22,7 +22,10 @@ change to that corpus is routed to plan 02's own `delivery.md` as a change reque
 
 The `R*` rules and `A*` amendments this plan cites are defined here, folded in verbatim from the
 retired programme decision table so this plan is self-contained. This plan cites `R2`, `R4`, `R9`,
-`A8`, and `A10`. `A*` amendments are **later than** the `R*` rules and
+`A2`, `A8`, `A10`, `A11`, and `A12`. `A2`, `A11`, and `A12` are incidental mentions — passing
+references inside other decisions' prose, not gates this plan's own delivery steps or acceptance
+criteria depend on — folded in for completeness so every id this file mentions resolves locally.
+`A*` amendments are **later than** the `R*` rules and
 **win on conflict**. (The `R5` and `R7` tokens elsewhere in this file are the UI-design-funnel
 skill's own R5 grounding note and R7 prior-art citation — not programme decisions R5/R7, which this
 plan does not cite.)
@@ -32,8 +35,11 @@ plan does not cite.)
 | R2  | `pathId` is **variable-depth by design** — `careers/<arc>/<role>` is 3 segments, `skills/<subject>` is 2; nothing may key on segment count                                                   |
 | R4  | Ownership split: plans 01-05 are `careers/`-only; the `skills/` category is separate (revised by `A2`)                                                                                       |
 | R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A2  | The skills category splits into **two** plans — 06 (accounting) and 07 (ERP), the latter `blockedBy` the former                                                                              |
 | A8  | **Strict clean-room licensing, programme-wide** — binds all seven plans, not only 06-07; nothing copyrighted is reproduced, and every concept is restated in original words with a citation  |
 | A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
+| A11 | Shared courses are **referenced by both manifests, authored once** — a Sharia path's `courseOrder` interleaves shared and Sharia-specific ids rather than duplicating files                  |
+| A12 | Every syllabus is **independently authored, then externally confirmed** — a published curriculum may corroborate coverage but must never supply the structure being written                  |
 
 ### A8 — licensing binds the whole programme
 
@@ -331,17 +337,23 @@ because the dangerous state is not failure — it is a manifest that stops at
 %% Lifecycle of a single path manifest. The Truncated end-state is what the growth phase prevents.
 stateDiagram-v2
     direction LR
-    Absent --> SmokeTestScoped: published over live content
-    Absent --> FullyScoped: published complete
+    Absent --> SmokeTestScoped: published over narrow catalog
+    Absent --> Band9TailDeferred: complete body, Band-9 deferred
     SmokeTestScoped --> Grown: band signal triggers growth
     SmokeTestScoped --> Truncated: growth skipped — FAILURE
+    Band9TailDeferred --> Grown: Band-9 growth signal
+    Band9TailDeferred --> Truncated: Band-9 growth skipped: FAILURE
     Grown --> Verified: integrity + smoothness green
-    FullyScoped --> Verified: integrity + smoothness green
 
     note right of SmokeTestScoped
         Publication writes a falsifiable
         before/after check for every
         deliberately deferred course ID.
+    end note
+    note right of Band9TailDeferred
+        Same falsifiable before/after check,
+        scoped to only the five Band-9
+        interview-technique IDs.
     end note
     note right of Truncated
         Blocked by the Phase 5 growth steps
@@ -354,29 +366,62 @@ only other absorbing state and it is a defect, never an accepted outcome. The
 `integrity + smoothness green` transition is shorthand for the full re-run: schema validation,
 `checkManifestIntegrity`, prerequisite-consistency (topological), and the per-path smoothness audit.
 The `band signal triggers growth` transition is the band-completion signal from
-`ayokoding-learning-path-04-course-authoring` that opens Phase 5.
+`ayokoding-learning-path-04-course-authoring` that opens Phase 5; the `Band-9 growth signal`
+transition is the same signal, scoped to Band 9 (Phase 5.2) rather than Bands 1–8 (Phase 5.1). No
+manifest in this plan currently enters through a "published complete, nothing ever deferred" state —
+all four carry at least one deliberately deferred, falsifiably-checked piece of content.
 
-Two of the four manifests enter through `SmokeTestScoped`:
+**A note on timing, given the Wave-gated split.** In the original, pre-split parent plan, course
+authoring and manifest publication interleaved live — a band's courses could land mid-plan, and
+"band signal triggers growth" fired in real time. Under this split's Wave structure, Start
+Precondition 2 requires the _entire_ `ayokoding-learning-path-04-course-authoring` plan — every
+band, including Band 9 — merged to `origin/main` before this plan's Phase 0 even closes. So by the
+time Phase 1 begins, every band-completion signal this diagram describes has already fired,
+historically, and the full 127-course catalog already exists (Start Precondition 5). The
+`SmokeTestScoped → Grown` staging is preserved anyway, by design: it is a deliberate
+small-blast-radius rollout — publish narrow, verify the architecture against real content, then grow
+and re-verify per band — independent of whether the underlying content is still landing or has
+already landed. This is why Phase 5's own steps read "Trigger: band-completion signal" (see
+[delivery.md Phase 5](./delivery.md#phase-5-manifest-growth-as-backfill-lands)): that phrasing names
+the growth model's original rationale, not a live event this plan waits on during its own execution.
 
-- `careers/interview-ready/software-engineer` — published over the 33 re-homed topics + 4 existing capstones;
-  the five Band-9 interview-technique courses are inserted when they land.
+Two of the four manifests enter through `SmokeTestScoped` — a genuinely narrowed course catalog at
+publication time:
+
+- `careers/interview-ready/software-engineer` — published over the 33 re-homed topics + 4 existing
+  capstones; the five Band-9 interview-technique courses are inserted when they land, alongside the
+  rest of Bands 1–8. (Separately, per **DL-13**, this manifest's curated spine also permanently omits
+  deep-systems/OS/kernel/niche courses, offered instead as an optional "go deeper" tail — a
+  course-**composition** choice, not a publication-lifecycle deferral, and outside the scope of this
+  diagram.)
 - `careers/immediately-effective/ai-engineer` — published at Phase 2 over its **included, already-existing**
   SWE-fundamentals prerequisite courses (available immediately — no authoring wait, DD-35) at the head
   of `courseOrder`, plus whichever of the six new AI-engineer-role and AI/harness-cluster courses
-  already exist by then; grows as the rest land. Its exact smoke-test-scoped subset and its full grown
-  composition are **not asserted here as fixed numbers** — see [DD-35](#design-decisions) for why, and
-  for what this plan can and cannot state before `ayokoding-learning-path-02-schema-and-prerequisite-dag`'s
-  own Phase 1.4 lands the prerequisite-consistent ordering of the included set.
+  already exist by then; grows as the rest land — this is the AI path's own **harness walk** (DD-33):
+  the manifest **walks** (includes in `courseOrder`), never links, the nine-course AI/harness cluster
+  as it lands. Its exact smoke-test-scoped subset and its full grown composition are **not asserted
+  here as fixed numbers** — see [DD-35](#design-decisions) for why, and for what this plan can and
+  cannot state before `ayokoding-learning-path-02-schema-and-prerequisite-dag`'s own Phase 1.4 lands
+  the prerequisite-consistent ordering of the included set. Band-9 growth does not apply to this
+  path — it is scoped to the three software-engineer manifests only.
 
 The other two (`careers/immediately-effective/software-engineer`, `careers/fundamentally-strong/software-engineer`)
-are published over the currently-available library and grow through the ordinary Bands 1–8 growth
-step.
+enter through `Band9TailDeferred`, not `SmokeTestScoped`: unlike interview-ready and the AI path, they
+publish their **complete** main body immediately at Phase 3.1/4.1 (114 and 116 courses respectively) —
+no catalog narrowing, nothing pending from Bands 1–8. The one thing each defers is the same five-ID
+Band-9 optional tail (`coding-interview`, `take-home-and-live-coding`, `system-design-interview`,
+`behavioral-and-leadership-interviews`, `capstone-interview-loop`) that interview-ready also grows
+into at Band 9 — each carries its own falsifiable absence check at authoring time (Phase 3.1/4.1
+GREEN, and the Phase 3/4 Gates) and a matching presence check after Phase 5.2's growth (`0` → `5`).
 
 ### Which manifest grows when a band lands
 
-The single highest-risk step in this plan is appending a course to the wrong manifest. Band 9 is the
-trap: `careers/immediately-effective/software-engineer` **deliberately omits** the interview-technique band —
-its reader reaches those courses through their canonical pages, not through the manifest.
+The single highest-risk step in this plan is appending a course to the wrong manifest. Band 9 is a
+special case: per the mirrors' own
+["Optional tail" note](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md#optional-tail--ready-to-job-hunt-bridge-into-the-interview-courses),
+its five interview-technique courses land as a deferred **optional tail** in **all three**
+software-engineer manifests — `interview-ready`, `immediately-effective`, **and**
+`fundamentally-strong` — one canonical body, three orderings.
 
 ```mermaid
 %% Decision branch: given a landed band, which manifests grow.
@@ -390,7 +435,6 @@ flowchart LR
     IE["careers/<br/>immediately-effective/<br/>software-engineer"]:::grow
     FS["careers/<br/>fundamentally-strong/<br/>software-engineer"]:::grow
     AI["careers/<br/>immediately-effective/<br/>ai-engineer"]:::grow
-    NOGROW["careers/<br/>immediately-effective/<br/>software-engineer<br/>DOES NOT GROW"]:::nogrow
 
     BAND --> B18
     BAND --> B9
@@ -399,20 +443,19 @@ flowchart LR
     B18 --> IE
     B18 --> FS
     B9 --> IR
+    B9 --> IE
     B9 --> FS
-    B9 -.->|"omits the band by design"| NOGROW
     B58 --> AI
 
     classDef decision fill:#56B4E9,stroke:#000000,color:#000000
     classDef band fill:#DE8F05,stroke:#000000,color:#000000
     classDef grow fill:#0173B2,stroke:#000000,color:#FFFFFF
-    classDef nogrow fill:#CC79A7,stroke:#000000,color:#000000
 ```
 
-The `DOES NOT GROW` node is a diamond-free rectangle with an explicit label and a dotted edge, so the
-exclusion reads without relying on its distinct fill. The corresponding acceptance clause asserts
-**both** directions in one step: the five interview IDs must be present in the two growing manifests
-**and** still absent from the third.
+Band 9 grows all three software-engineer manifests, exactly like Bands 1-8. The corresponding
+acceptance clause still asserts a genuine cross-manifest invariant in one step: the five interview
+IDs must be present in **all three** manifests, since a check against any single manifest cannot
+detect a wrongly-scoped append that silently skips one of the other two.
 
 ## Path Manifests (the four orderings)
 
@@ -434,8 +477,8 @@ Mirror:
 ### `careers/immediately-effective/software-engineer` (build-fast-first)
 
 Editor/tooling → one language end-to-end → **build a real app first** → then deepen. Adds no new
-course body; composes existing library courses. Grows through Bands 1–8 only — it **omits the
-interview-technique band by design**. Mirror:
+course body; composes existing library courses. Grows through Bands 1–8 and Band 9 (its own trailing
+optional job-hunt tail, mirroring `fundamentally-strong`'s treatment). Mirror:
 [`manifest-immediately-effective-software-engineer.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md).
 
 ### `careers/fundamentally-strong/software-engineer` (theory-first)
@@ -604,6 +647,15 @@ ruling.
   entire time. Ordering it immediately after an architecture-smoke-test MVP gives the AI path first
   claim on every unit of real authoring effort while keeping the architecture proven early against
   content that already exists.
+  - **Wave-split timing note**: this rationale describes the **original authoring-time reasoning**,
+    from before the parent plan split into Waves. Under this split, Start Precondition 2 requires the
+    _entire_ `ayokoding-learning-path-04-course-authoring` plan merged before this plan's Phase 0
+    closes, so by the time this plan's Phase 1 begins, every course this rationale describes as
+    "not yet authored" already exists on disk (Start Precondition 5). The build order and the
+    staged `SmokeTestScoped → Grown` publication model (see
+    [§Manifest lifecycle](#manifest-lifecycle)) are preserved anyway — not because content is still
+    landing, but as a deliberate small-blast-radius rollout: publish narrow, verify the architecture
+    against real content, then grow and re-verify per band.
   - **This plan is DD-27's canonical owner** for citation purposes — its phase ordering is what DD-27
     most directly constrains. The text is nonetheless duplicated verbatim in all five split plans,
     per the cross-cutting-content rule.
@@ -867,21 +919,28 @@ manifest that **already exists and is already covered** by `careers-manifests.un
 integrity and prerequisite-consistency assertions — the behaviour under test does not change, only the
 data does. There is no meaningful RED to write: the pre-append state is not a failing assertion but a
 correct, passing one about a smaller `courseOrder`, so a manufactured "fails before append" test would
-assert the absence of data rather than any behaviour. This is the non-code data-edit carve-out in
-[test-driven-development.md](../../../repo-governance/development/workflow/test-driven-development.md).
+assert the absence of data rather than any behaviour. Per
+[test-driven-development.md §TDD Shape for Delivery Checklists](../../../repo-governance/development/workflow/test-driven-development.md#tdd-shape-for-delivery-checklists),
+"Non-code steps (doc edits, config changes, file creation, governance updates) do not require
+RED-GREEN-REFACTOR" — a manifest-YAML growth append is the same class of non-code data change as a
+config change, so it falls under that provision even though the document does not use the phrase
+"carve-out" for it.
 The safety property is preserved a different way: every growth step re-runs the full integrity +
 prerequisite-consistency + no-forked-body suite immediately after each band's append, so a bad append
 fails at that step rather than at the end of the phase. Phase 5.4 additionally records a pre-growth
 count to a file and asserts an exact numeric delta, which is falsifiable in both directions.
 
 **Why 5.2 is different and does carry a RED.** Band-9 growth introduces a **new cross-manifest
-routing invariant** — the five interview-technique IDs belong in `interview-ready` and
-`fundamentally-strong` but deliberately **not** in `immediately-effective` (DL-13). That is a new
-behaviour, not more of the same data: a wrongly-routed but otherwise valid course ID passes the
-integrity, prerequisite-consistency, and no-forked-body checks alike, so the generic suite cannot
-catch it. Verifying it only with an execution-time shell check would leave no permanent CI guard
-against a later edit moving one of the five. Phase 5.2 therefore extends
-`careers-manifests.unit.test.ts` with a persisted assertion in a RED step before the append.
+completeness invariant** — the five interview-technique IDs belong in **all three**
+software-engineer manifests (`interview-ready`, `immediately-effective`, `fundamentally-strong`),
+per the
+[mirrors' own "Optional tail" note](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md#optional-tail--ready-to-job-hunt-bridge-into-the-interview-courses).
+That is a new behaviour, not more of the same data: a wrongly-scoped append that lands the five IDs
+in only one or two of the three manifests passes the integrity, prerequisite-consistency, and
+no-forked-body checks alike, so the generic suite cannot catch it. Verifying it only with an
+execution-time shell check would leave no permanent CI guard against a later edit dropping one of the
+five from any manifest. Phase 5.2 therefore extends `careers-manifests.unit.test.ts` with a persisted
+assertion in a RED step before the append.
 
 The **landing anchors are content** and follow the maker → checker → fixer cycle instead — no
 RED/GREEN/REFACTOR labels, per the source plan's own convention.

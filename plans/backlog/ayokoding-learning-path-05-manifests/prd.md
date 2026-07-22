@@ -12,6 +12,13 @@ category-grouped, not a flat 2×2 grid, now that it also serves the sibling `ski
 [tech-docs.md DD-34](./tech-docs.md#design-decisions); hub layout owned by
 `ayokoding-learning-path-03-navigation-ui`).
 
+> **URL scheme note**: `/en/learn/...` is the **post**-`ayokoding-learning-path-01-url-restructure`
+> canonical served URL — that plan
+> [inverts `content-namespace.ts` (DD-48)](../ayokoding-learning-path-01-url-restructure/tech-docs.md#de-namespacing--retiring-the-c-content-route-dd-48)
+> so `/en/c/learn/...` redirects to `/en/learn/...` (not the reverse), and this plan is transitively
+> `blockedBy` it (see [README.md §Depends-on](./README.md#depends-on)). Every `/en/learn/...`
+> citation in this plan assumes plan-01 has already merged.
+
 The three `software-engineer` paths converge on the same software-engineering deep mastery; the
 fourth path converges on a distinct AI-engineering deep mastery — convergence is a **per-role**
 property, not a library-wide axiom (see [tech-docs.md DD-22](./tech-docs.md#design-decisions)):
@@ -249,9 +256,10 @@ Scenario: The manifest layer builds and validates green
 - Per-path progression-smoothness audits, including the interview-ready refresh-register lever that
   the smoke-test phase deliberately deferred.
 - All manifest growth as backfill lands: Bands 1–8 into the three software-engineer manifests, Band 9
-  into interview-ready and fundamentally-strong only, and the AI path's growth from its
-  smoke-test-scoped starting composition to its full, prerequisite-consistent composition (an open
-  course count, not a fixed "6 → 15" figure — see [tech-docs.md DD-35](./tech-docs.md#design-decisions)).
+  into all three software-engineer manifests (interview-ready, immediately-effective,
+  fundamentally-strong), and the AI path's growth from its smoke-test-scoped starting composition to
+  its full, prerequisite-consistent composition (an open course count, not a fixed "6 → 15" figure —
+  see [tech-docs.md DD-35](./tech-docs.md#design-decisions)).
 - The four-path blast-radius statement for every course surgery that touches a manifest this plan
   owns.
 
@@ -295,10 +303,10 @@ runs in [Phase 7](./delivery.md#phase-7-manual-ui-verification-and-rule-15-three
   passes integrity, and is never grown — leaving a path that looks correct and is permanently short.
   Mitigated by writing a falsifiable before/after check at publication time for every deliberately
   deferred course ID, by a dedicated growth phase, and by a terminal gate asserting the full arcs.
-- **Growth applied to the wrong manifest**: Band 9's interview-technique courses are appended to
-  `careers/immediately-effective/software-engineer`, which omits that band by design. Mitigated by an
-  acceptance clause that asserts presence in the two growing manifests **and** continued absence in
-  the third, in the same step.
+- **Growth applied to the wrong manifest**: Band 9's interview-technique courses are appended to only
+  one or two of the three software-engineer manifests, silently leaving the missed manifest(s)
+  permanently short of the mirrors' full composition. Mitigated by an acceptance clause that asserts
+  presence in **all three** software-engineer manifests, in the same step.
 - **Duplication creep**: a path forks a body for its framing. Mitigated by callout-only framing (DD-7 /
   DL-5), a distinct course variant for genuine pedagogy differences, and a no-forked-body check at
   every manifest gate.

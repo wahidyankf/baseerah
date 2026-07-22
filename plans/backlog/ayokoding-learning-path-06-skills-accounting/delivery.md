@@ -169,12 +169,15 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
 - [ ] [AI] All **three** blocking plans merged (01, 02, 03) — run the per-plan loop in
       [§Depends-on](#depends-on-and-start-preconditions); acceptance: empty output.
 - [ ] [AI] `<PLANDIR>` resolves and the **pre-authored** syllabus corpus is present:
-      `test -d "${SPEC}" && [ "$(ls "${SPEC}"*.md | wc -l)" -eq 24 ] && echo BASELINE-OK || echo BASELINE-FAIL`
+      `test -d "${SPEC}" && [ "$(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)" -eq 24 ] && echo BASELINE-OK || echo BASELINE-FAIL`
       — acceptance: prints `BASELINE-OK`.
       This deliberately asserts **presence, not absence**. The 24 syllabus specs are authored ahead of
       execution (see §1.2, which re-verifies rather than authors), so a check asserting the folder
       does **not** exist could never pass and would deadlock the Phase 0 Gate. Falsifiable both ways:
-      a missing folder or any count other than 24 prints `BASELINE-FAIL`.
+      a missing folder or any count other than 24 prints `BASELINE-FAIL`. The count excludes
+      `syllabus/courses/README.md` (required by the Learning-Bearing Syllabus Completeness
+      convention) — a naive `ls "${SPEC}"*.md | wc -l` would match the README too and return 25,
+      misfiring on the very state this check is meant to confirm as correct.
 - [ ] [AI] Neither manifest exists yet:
       `test -f "$MANIFEST_CA" && echo FOUND || echo ABSENT` prints `ABSENT`, and the same for
       `$MANIFEST_SA` — acceptance: both print `ABSENT`. Falsifiable both ways: both flip to `FOUND`
@@ -216,8 +219,15 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
 ### 1.1 · Verify the spec folder (pre-authored — this sub-phase verifies, it does not scaffold)
 
 - [ ] [AI] `"${SPEC}"` and `"${SPECPATHS}"` already exist and are populated — acceptance:
-      `test -d "${SPEC}" && test -d "${SPECPATHS}" && [ "$(ls "${SPEC}"*.md | wc -l)" -eq 24 ] && [ "$(ls "${SPECPATHS}"*.md | wc -l)" -eq 2 ] && echo PASS || echo FAIL`
-      prints `PASS`. Create either folder only if this check reports `FAIL`.
+      `test -d "${SPEC}" && test -d "${SPECPATHS}" && [ "$(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)" -eq 24 ] && [ "$(find "${SPECPATHS}" -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)" -eq 2 ] && echo PASS || echo FAIL`
+      prints `PASS`. Create either folder only if this check reports `FAIL`. Both counts exclude
+      each folder's own `README.md` (required by the Learning-Bearing Syllabus Completeness
+      convention) — a naive `ls *.md | wc -l` would match the README too and return 25/3 even in
+      this fully-populated, correct state.
+- [ ] [AI] Each subfolder's own index README exists individually, per the Learning-Bearing Syllabus
+      Completeness convention's required-subfolder-README rule — acceptance:
+      `test -f "${SPEC}README.md" && test -f "${SPECPATHS}README.md" && echo PASS || echo FAIL`
+      prints `PASS`.
 - [ ] [AI] Create `"${SPEC}../README.md"` _(new file)_ per
       [tech-docs §Syllabus layer](./tech-docs.md#syllabus-layer--custody-and-shape) with the course
       index table — acceptance: `test -f "${SPEC}../README.md"` exits 0, and
@@ -254,8 +264,9 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
       bullets **added to the existing syllabus**, never as a restructuring — acceptance: for every
       course, the syllabus's `## In which paths` section (the file's terminal, position-stable anchor)
       is unchanged by the coverage pass;
-      `for f in "${SPEC}"*.md; do diff <(git show "HEAD:$f" | grep -E '^## ' | grep -vE '^## (Concepts|Worked examples|Accuracy notes)$') <(grep -E '^## ' "$f" | grep -vE '^## (Concepts|Worked examples|Accuracy notes)$') >/dev/null || echo "HEADINGS CHANGED $f"; done`
-      returns empty — outside those three sections no heading is added, removed, or reordered.
+      `for f in $(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md'); do diff <(git show "HEAD:$f" | grep -E '^## ' | grep -vE '^## (Concepts|Worked examples|Accuracy notes)$') <(grep -E '^## ' "$f" | grep -vE '^## (Concepts|Worked examples|Accuracy notes)$') >/dev/null || echo "HEADINGS CHANGED $f"; done`
+      returns empty — outside those three sections no heading is added, removed, or reordered. Excludes
+      `README.md` (the folder's own index, not a course spec) from the iteration.
       Compares the two ordered heading lists directly instead of parsing diff output, so the verdict
       never depends on how `git diff` renders. The three excluded headings are the ones the coverage
       pass is allowed to create. Negative control: inserting or moving any other `##` heading in one
@@ -287,14 +298,15 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
 - [ ] [AI] `#20`'s OI-2 framing holds (`OPEN`, not restated as resolved).
 - [ ] [AI] Every syllabus has a non-empty `## Accuracy notes` licensing-sensitive-sources record.
 - [ ] [AI] **Module-topic breakdown present in every syllabus** —
-      `for f in "${SPEC}"*.md; do for h in '## Concepts' '## Worked examples' '## Prerequisites'; do grep -qF "$h" "$f" || echo "MISSING [$h] $(basename "$f")"; done; done | wc -l`
-      returns **0**. Negative control: deleting the `## Worked examples` heading from any one
+      `for f in $(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md'); do for h in '## Concepts' '## Worked examples' '## Prerequisites'; do grep -qF "$h" "$f" || echo "MISSING [$h] $(basename "$f")"; done; done | wc -l`
+      returns **0**. Excludes `README.md` (the folder's own index, not a course spec) from the
+      iteration. Negative control: deleting the `## Worked examples` heading from any one
       syllabus makes it return **1** (verified).
 - [ ] [AI] **Concept floor holds ([DD-627](./tech-docs.md#design-decisions), ≥ 8)** —
-      `for f in "${SPEC}"*.md; do n=$(grep -c '^- \*\*co-[0-9]' "$f"); [ "$n" -ge 8 ] || echo "UNDER-FLOOR $(basename "$f") = $n"; done | wc -l`
-      returns **0**. Negative control: several syllabi sit at exactly 8, so removing a single
-      `- **co-NN` line from any of them makes it return **1** (verified) — the floor is tight, not
-      slack.
+      `for f in $(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md'); do n=$(grep -c '^- \*\*co-[0-9]' "$f"); [ "$n" -ge 8 ] || echo "UNDER-FLOOR $(basename "$f") = $n"; done | wc -l`
+      returns **0**. Excludes `README.md` from the iteration. Negative control: several syllabi sit
+      at exactly 8, so removing a single `- **co-NN` line from any of them makes it return **1**
+      (verified) — the floor is tight, not slack.
 - [ ] [AI] `npm run lint:md` exits 0 on the new `syllabus/` tree.
 - [ ] [AI] **Every prerequisite edge is transcribed and resolves** — run the two commands in the
       fenced block below. Acceptance: the first returns **0** AND the second returns **34**. A zero
@@ -305,16 +317,16 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
       `**Prior courses**` id at a non-existent course makes the first return **1** (verified).
 
 ```bash
-# (1) Unresolved prior-course edges. MUST print 0.
-for f in "${SPEC}"*.md; do
+# (1) Unresolved prior-course edges. MUST print 0. Excludes README.md (find ! -name).
+for f in $(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md'); do
   awk '/^- \*\*Prior courses\*\*/{p=1;print;next} p&&/^- \*\*/{p=0} p' "$f" \
     | grep -oE '`[a-z0-9-]+`' | tr -d '`' | while IFS= read -r id; do
         [ -f "${SPEC}${id}.md" ] || echo "UNRESOLVED $(basename "$f") -> $id"
       done
 done | wc -l
 
-# (2) Anti-vacuity companion: total edges examined. MUST print 34, never 0.
-for f in "${SPEC}"*.md; do
+# (2) Anti-vacuity companion: total edges examined. MUST print 34, never 0. Excludes README.md.
+for f in $(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md'); do
   awk '/^- \*\*Prior courses\*\*/{p=1;print;next} p&&/^- \*\*/{p=0} p' "$f" \
     | grep -oE '`[a-z0-9-]+`'
 done | wc -l
@@ -682,6 +694,21 @@ Scenario Outline: A manifest links its software-engineering prerequisites instea
       `courseOrder` grows from length 3 to length 19, appending `ACCT_S2` in order, still passing
       `checkManifestIntegrity` + `checkPrerequisiteConsistency` — command:
       `nx run ayokoding-www:test:unit` — acceptance: both new assertions fail (length still 3).
+
+  **Gherkin (binds) →** "The conventional-accounting manifest completes and the Sharia-accounting
+  manifest continues past it" — the `conventional-accounting`-terminal half of this scenario is
+  provable here; the `sharia-accounting`-continues half is not provable until Phase 5, so this step
+  records the first half and Phase 5 §5.2 completes the assertion.
+
+  ```gherkin
+  Scenario: The conventional-accounting manifest completes and the Sharia-accounting manifest continues past it
+    Given both manifests have grown to include the full nineteen-course shared spine
+    When a reader reaches the end of the conventional-accounting courseOrder
+    Then the path landing states the path is complete
+    And no further course is appended to conventional-accounting.yaml at any later phase
+    But the sharia-accounting manifest's courseOrder continues past entry nineteen with five further ids
+  ```
+
 - [ ] [AI] **GREEN** — grow `$MANIFEST_CA` and `$MANIFEST_SA` to 19 entries each (both hold exactly
       `ACCT_SHARED` in order, still byte-identical to each other) — command:
       `nx run ayokoding-www:test:unit` — acceptance: exits 0; both files have exactly 19 `courseOrder`
@@ -689,20 +716,6 @@ Scenario Outline: A manifest links its software-engineering prerequisites instea
       (still fully identical — `$MANIFEST_SA`'s divergence does not begin until Phase 5).
 - [ ] [AI] **REFACTOR** — command: `nx run ayokoding-www:test:unit && nx run ayokoding-www:lint` —
       acceptance: both exit 0.
-
-**Gherkin (binds) →** "The conventional-accounting manifest completes and the Sharia-accounting
-manifest continues past it" — the `conventional-accounting`-terminal half of this scenario is provable
-here; the `sharia-accounting`-continues half is not provable until Phase 5, so this step records the
-first half and Phase 5 §5.3 completes the assertion.
-
-```gherkin
-Scenario: The conventional-accounting manifest completes and the Sharia-accounting manifest continues past it
-  Given both manifests have grown to include the full nineteen-course shared spine
-  When a reader reaches the end of the conventional-accounting courseOrder
-  Then the path landing states the path is complete
-  And no further course is appended to conventional-accounting.yaml at any later phase
-  But the sharia-accounting manifest's courseOrder continues past entry nineteen with five further ids
-```
 
 ### 3.3 · `conventional-accounting` reaches its terminal state — a genuine milestone
 
@@ -745,7 +758,7 @@ Scenario: The conventional-accounting manifest completes and the Sharia-accounti
     And no resolver assumes a three-segment path ID
 
     Examples:
-      | path_id                        |
+      | path_id                       |
       | skills/conventional-accounting |
       | skills/sharia-accounting       |
   ```
@@ -812,37 +825,41 @@ Scenario: The conventional-accounting manifest completes and the Sharia-accounti
 - [ ] [AI] `OI-2` remains `OPEN` — verified, not merely assumed.
 - [ ] [AI] `OI-3` residual explicitly stated.
 - [ ] [AI] `OI-4` remains `OPEN`.
-- [ ] [AI] **No `[Needs Verification]` marker is unaccounted for.** Every syllabus file still carrying
-      one must be named in `verification-log.md`'s `## Carried residuals` register with a reason —
-      run the two commands in the fenced block below. Acceptance: the first returns **0**, AND the
-      second returns the number of files still carrying a marker. **Literal zero markers is not the
-      target** (see the register's opening paragraph: some residuals are deliberate and permanent);
-      the target is zero _unregistered_ markers. Negative control: adding a marker to a course not
-      named in the register makes the first command return **1** — and if the second command ever
-      returns **0**, the first is passing vacuously and the check is void.
+- [ ] [AI] **No retired `[Needs Verification]` placeholder remains, and the corpus's verification
+      labelling is genuine (not merely unmarked).** An exhaustive grounding pass (2026-07-22) already
+      resolved every placeholder in this corpus to `[Verified]`, `[Web-cited]`, or an
+      honestly-retained `[Unverified]` tag — before Phase 1 even begins. Run the two commands in the
+      fenced block below. Acceptance: the first returns **0** (no retired placeholder survives) AND
+      the second returns a count **> 0** (the corpus carries genuine verification labelling, not
+      silence). **Zero on command (1) is the correct target state here, not a vacuous pass** —
+      command (2)'s non-zero count is the anti-vacuity proof that the corpus was substantively
+      reviewed and tagged, rather than simply never labelled. Negative control: a corpus that never
+      labelled anything would also make command (1) return 0, but command (2) would then return 0
+      too — that (0, 0) combination is the void-check signal this gate watches for, not (0, >0).
 
-  > **Expected to fail today, by design — like Phase 6 §6.4.** At plan-authoring time these return
-  > **14** and **16**: the register names the deliberate residuals, while the other 14 markers are
-  > Phase 1 authoring-time placeholders reading "pending the Phase 1 coverage pass." Phase 1 must
-  > resolve each or promote it into the register with a reason; only then does this Phase 4 gate pass.
-  > A checker reading this plan before execution should expect 14, not 0.
-  >
-  > These were **15** and **17** until `payroll-and-tax-accounting-essentials.md`'s marker was
-  > resolved by external grounding ahead of execution — the deferred-tax structure cleared to
-  > `[Verified]` and `ex-09` was revised, so that file now carries no marker. Re-measure rather than
-  > trusting these numbers: they are a snapshot, and the whole point of the two commands below is that
-  > they are cheap to run.
+  > **Historical note — do not re-derive stale expectations from earlier plan drafts.** Earlier
+  > authoring-time snapshots of this note cited placeholder counts of 14/16 (later 15/17) across two
+  > named files (`sharia-accounting-and-aaoifi-standards.md`,
+  > `sharia-ledger-system-architecture.md`), describing an in-progress corpus mid-authoring. The
+  > corpus has since been exhaustively resolved: a repo-wide `grep` across all 24
+  > `syllabus/courses/*.md` files (excluding `README.md`) confirms **0** files carry
+  > `[Needs Verification]`, while **48** `[Verified...]`, **18** `[Web-cited...]`, and **4**
+  > `[Unverified...]` tagged claims remain — see `verification-log.md`'s `## Carried residuals`
+  > section for the full breakdown and the four files that legitimately retain `[Unverified]`.
+  > Re-measure rather than trusting any of these numbers, including this note's own — they are a
+  > snapshot, and the whole point of the commands below is that they are cheap to re-run.
 
 ```bash
-# (1) Syllabus files carrying a marker but NOT named in the residuals register. MUST print 0.
-for f in "${SPEC}"*.md; do
-  grep -q '\[Needs Verification\]' "$f" || continue
-  b=$(basename "$f")
-  grep -qF "$b" "${PLANDIR}verification-log.md" || echo "UNREGISTERED $b"
-done | wc -l
+# (1) Syllabus files (excluding README.md) still carrying the retired [Needs Verification]
+# placeholder. MUST print 0 — every course file was resolved during the grounding pass.
+find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md' -print0 \
+  | xargs -0 grep -l '\[Needs Verification\]' 2>/dev/null | wc -l
 
-# (2) Anti-vacuity companion: files still carrying a marker. If this is 0, check (1) is void.
-for f in "${SPEC}"*.md; do grep -q '\[Needs Verification\]' "$f" && echo "$f"; done | wc -l
+# (2) Anti-vacuity companion: total genuine verification-labelling activity across the corpus
+# ([Verified] + [Web-cited] + [Unverified] tags). MUST be > 0 (currently 70) — proves command (1)
+# returning 0 reflects a resolved corpus, not an unmarked one.
+find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md' -print0 \
+  | xargs -0 grep -oh '\[Verified\|\[Web-cited\|\[Unverified' 2>/dev/null | wc -l
 ```
 
 > **Pause Safety**: the verification ledger is current and every open item's status is deliberate, not
@@ -853,9 +870,8 @@ for f in "${SPEC}"*.md; do grep -q '\[Needs Verification\]' "$f" && echo "$f"; d
 
 ## Phase 5: Stage 3 — courses #20–#24 and `sharia-accounting` growth to twenty-four
 
-> \_Suggested executor: `apps-ayokoding-www-by-example-maker` / `apps-ayokoding-www-annotated-concept-maker`
->
-> - `web-researcher`.\_
+> _Suggested executor: `apps-ayokoding-www-by-example-maker` / `apps-ayokoding-www-annotated-concept-maker` /
+> `web-researcher`._
 >
 > **Only `sharia-accounting.yaml` grows here — `conventional-accounting.yaml` is not touched.**
 
@@ -931,6 +947,19 @@ for f in "${SPEC}"*.md; do grep -q '\[Needs Verification\]' "$f" && echo "$f"; d
 - [ ] [AI] **RED** — extend `$MTEST_SA` **only** (never `$MTEST_CA`) with a failing assertion that
       `courseOrder` grows from 19 to 24, appending `ACCT_S3` in order, still passing both integrity
       checks — command: `nx run ayokoding-www:test:unit` — acceptance: fails (length still 19).
+
+  **Gherkin (binds) →** "The conventional-accounting manifest completes and the Sharia-accounting
+  manifest continues past it" — second half, completing Phase 3's first-half assertion.
+
+  ```gherkin
+  Scenario: The conventional-accounting manifest completes and the Sharia-accounting manifest continues past it
+    Given both manifests have grown to include the full nineteen-course shared spine
+    When a reader reaches the end of the conventional-accounting courseOrder
+    Then the path landing states the path is complete
+    And no further course is appended to conventional-accounting.yaml at any later phase
+    But the sharia-accounting manifest's courseOrder continues past entry nineteen with five further ids
+  ```
+
 - [ ] [AI] **GREEN** — grow `$MANIFEST_SA` to 24 entries (19 shared + 5 Sharia-specific, in order) —
       command: `nx run ayokoding-www:test:unit` — acceptance: exits 0; `$MANIFEST_SA` has exactly 24
       `courseOrder` entries; `$MANIFEST_CA` **unchanged** —
@@ -939,9 +968,6 @@ for f in "${SPEC}"*.md; do grep -q '\[Needs Verification\]' "$f" && echo "$f"; d
       `$MANIFEST_CA` makes it exit 1.
 - [ ] [AI] **REFACTOR** — command: `nx run ayokoding-www:test:unit && nx run ayokoding-www:lint` —
       acceptance: both exit 0.
-
-**Gherkin (binds) →** "The conventional-accounting manifest completes and the Sharia-accounting
-manifest continues past it" — second half, completing Phase 3's first-half assertion.
 
 - [ ] [AI] **Completion-and-continuation assertion, both halves together**:
       `grep -cE '^  - ' "$MANIFEST_CA"` returns **19**, AND `grep -cE '^  - ' "$MANIFEST_SA"` returns
@@ -1082,14 +1108,17 @@ breaks the Phase 8 gate).
       Add a full URL to every citation, then verify:
 
   ```bash
-  for f in "${SPEC}"*.md; do
+  # Excludes README.md (the folder's own index, not a course spec) from the iteration.
+  for f in $(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md'); do
     awk '/^## Read more$/{flag=1;next}/^## /{flag=0}flag' "$f" \
       | grep -E '^\s*[-*] ' | grep -qv 'http' && echo "UNLINKED CITATION: $f"
   done
   ```
 
   Acceptance: **empty output**. Guard first —
-  `[ "$(ls "${SPEC}"*.md | wc -l)" -eq 24 ] && echo GUARD-OK` must print `GUARD-OK`.
+  `[ "$(find "${SPEC}" -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)" -eq 24 ] && echo GUARD-OK`
+  must print `GUARD-OK` (the count excludes `syllabus/courses/README.md`; a naive
+  `ls "${SPEC}"*.md | wc -l` would match the README too and return 25, never printing `GUARD-OK`).
   **Do not fabricate a URL to satisfy this clause.** Where a source is offline-only (a printed
   textbook, a paywalled standard), cite it nominatively and record it in that file's Accuracy notes as
   deliberately unlinked with the reason — that is a pass, not a violation. Where a URL is asserted,

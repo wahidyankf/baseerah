@@ -476,7 +476,7 @@ inside their host course spec files under the cross-plan `syllabus/courses/` fol
   42%→78% scaffold-swing figure and by labelling the competence-floor reconciliation a synthesis no
   single source makes.
 - **A natively-authored slug colliding with a not-yet-moved re-home slug.** Two courses would silently
-  share one canonical URL. Mitigated by running the 23-new-slug collision check against a **populated**
+  share one canonical URL. Mitigated by running the 29-new-slug collision check against a **populated**
   namespace — which is why the URL-restructure plan is a hard prerequisite.
 - **A manifest-mutating step reintroduced into this plan.** Makes the wave order unschedulable.
   Mitigated by the invariant being stated in three documents plus a phase-gate check that the plan's

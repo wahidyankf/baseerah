@@ -539,7 +539,7 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
   `agent-orchestration-subagents-and-observability`, `capstone-build-your-own-coding-agent`) satisfies
   all four necessary conditions in the only academic definition of an agent harness (arXiv 2606.10106),
   which the industry began calling **harness engineering** from late 2025 (Anthropic 2025-11-26;
-  OpenAI; Böckeler/Thoughtworks 2026-04-02). A naming/lineage line citing this is added to
+  OpenAI; Böckeler/Thoughtworks 2026-02-17). A naming/lineage line citing this is added to
   `agent-context-and-memory` and to the harness cluster + `capstone-build-your-own-coding-agent`, so a
   learner connects the material to job-market vocabulary. The OpenAI/Anthropic-vs-HumanLayer
   containment dispute (whether harness is the umbrella containing context management, or the reverse)
@@ -553,21 +553,33 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
       solvable by the LLM." <https://x.com/tobi/status/1935533422589399127> (accessed 2026-07-21).
     - [Web-cited] Andrej Karpathy, X/Twitter, 2025-06-25 — "+1 for 'context engineering' over 'prompt
       engineering'…" <https://x.com/karpathy/status/1937902205765607626> (accessed 2026-07-21).
-    - [Web-cited] Simon Willison, "Context engineering," 2025-06-27.
-      <https://simonwillison.net/2025/jun/27/context-engineering/> (accessed 2026-07-21).
-    - [Web-cited] Anthropic, "Effective context engineering for AI agents."
+    - [Web-cited] Simon Willison, "Context engineering," 2025-06-27 — "The term context engineering
+      has recently started to gain traction as a better alternative to prompt engineering. I like
+      it." <https://simonwillison.net/2025/jun/27/context-engineering/> (accessed 2026-07-21).
+    - [Web-cited] Anthropic, "Effective context engineering for AI agents" — "Context engineering
+      refers to the set of strategies for curating and maintaining the optimal set of tokens
+      (information) during LLM inference, including all the other information that may land there
+      outside of the prompts."
       <https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents> (accessed
       2026-07-21; the specific 2025-09-29 publication date cited above was not independently
       re-verified against the live page).
     - [Web-cited] arXiv 2606.10106, "What makes a harness a harness: necessary and sufficient
-      conditions for an agent harness" — confirmed real via WebSearch during the audit that produced
-      this finding. [Web-cited: arXiv:2606.10106 — https://arxiv.org/abs/2606.10106 ; accessed
-      2026-07-22]. The id is well-formed, not anomalous (arXiv YYMM prefix: `26` = 2026, `06` = June).
-    - [Web-cited] Anthropic, "Effective harnesses for long-running agents," 2025-11-26.
+      conditions for an agent harness" — the abstract defines a harness as "the layer that wraps a
+      language model and turns it into a coding agent able to act on a repository," then proposes "a
+      constitutive definition that states the necessary and sufficient conditions for a system to be
+      an agent harness" — confirmed real via WebSearch during the audit that produced this finding.
+      <https://arxiv.org/abs/2606.10106> (accessed 2026-07-22). The id is well-formed, not anomalous
+      (arXiv YYMM prefix: `26` = 2026, `06` = June).
+    - [Web-cited] Anthropic, "Effective harnesses for long-running agents," 2025-11-26 — "We developed
+      a two-fold solution to enable the Claude Agent SDK to work effectively across many context
+      windows: an initializer agent that sets up the environment on the first run, and a coding agent
+      that is tasked with making incremental progress in every session, while leaving clear artifacts
+      for the next session."
       <https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents> (accessed
       2026-07-21).
     - [Web-cited] Birgitta Böckeler / Thoughtworks (via martinfowler.com), "Harness Engineering — first
-      thoughts," 2026-04-02.
+      thoughts," 2026-02-17 — "I like 'harness' as a word to describe the tooling and practices we can
+      use to keep AI agents in check."
       <https://martinfowler.com/articles/exploring-gen-ai/harness-engineering-memo.html> (accessed
       2026-07-21).
     - [Unverified] "OpenAI" — a candidate OpenAI publication exists at
@@ -582,7 +594,7 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
   `capstone-build-your-own-coding-agent` teaches the contested evidence on whether harness quality even
   matters, as content that survives whatever happens to the vocabulary: **METR** (independent, no
   vendor stake, 2026-02-13) found Claude Code ahead of a generic ReAct scaffold in 50.7% of bootstrap
-  samples on Opus 4.5 — a coin flip; **Scale AI / SWE-bench Pro** reports large scaffold-driven swings,
+  samples on Opus 4.5 — a coin flip; **Scale AI / SWE Atlas** reports large scaffold-driven swings,
   with native scaffolds exploring roughly 1.5-2× more; the **competence-floor reconciliation** — METR
   compared against a competently built generic baseline while Scale compared against naive ones,
   implying harness quality matters enormously below a competence floor and then flattens — is
@@ -593,10 +605,11 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
       <https://metr.org/notes/2026-02-13-measuring-time-horizon-using-claude-code-and-codex/> (accessed
       2026-07-21) — confirms Claude Code beats a ReAct scaffold in 50.7% of bootstrap samples on
       Opus 4.5.
-    - [Web-cited] Scale AI, "SWE-Bench Pro: Raising the Bar for Agentic Coding."
-      <https://scale.com/blog/swe-bench-pro> (accessed 2026-07-21) — supports the native-scaffold
-      exploration-multiplier claim; the precise 1.5-2× figure was not independently re-derived from the
-      primary report — re-verify the exact multiplier before citing it in course content.
+    - [Web-cited] Scale AI, "SWE Atlas is Complete: Measuring Coding Agents Across the Engineering
+      Loop." <https://scale.com/blog/swe-atlas-complete> (accessed 2026-07-22) — verbatim: "Models
+      running in their native scaffolds (Claude Code, Codex CLI) perform 1.5x to 2x more exploration,
+      search, and execution than the same models on a generic harness, and they score noticeably
+      higher."
     - The 42%→78% scaffold-swing figure remains a **do-not-cite** per this DD's own text — no primary
       source was found for it.
 - **DD-31 · Four concept-level additions land inside existing courses, never as new courses (D11).**
@@ -649,16 +662,16 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
 
 ### Referenced but owned elsewhere
 
-| DD    | Subject                                                          | Owner plan                                                |
-| ----- | ---------------------------------------------------------------- | --------------------------------------------------------- |
-| DD-2  | One canonical body + URL per course; re-home with redirects      | `ayokoding-learning-path-01-url-restructure`              |
-| DD-6  | Every course declares `prerequisites` → a prerequisite DAG       | `ayokoding-learning-path-02-schema-and-prerequisite-dag`  |
-| DD-7  | Omit-or-create; per-path framing is a callout, never a body fork | `ayokoding-learning-path-05-manifests` (amended by DD-28) |
-| DD-16 | Prerequisite-consistency is the audited smoothness property      | `ayokoding-learning-path-02-schema-and-prerequisite-dag`  |
-| DD-21 | The AI path teaches building AI systems, not driving them        | `ayokoding-learning-path-05-manifests`                    |
-| DD-22 | Convergence amended: paths converge per role, not globally       | `ayokoding-learning-path-05-manifests`                    |
-| DD-24 | Fourth path's entry point — **SUPERSEDED 2026-07-21**, see below | `ayokoding-learning-path-05-manifests`                    |
-| DD-33 | Fourth path's manifest WALKS the AI/harness cluster; spine is 15 | `ayokoding-learning-path-05-manifests`                    |
+| DD    | Subject                                                                                                                                   | Owner plan                                                |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| DD-2  | One canonical body + URL per course; re-home with redirects                                                                               | `ayokoding-learning-path-01-url-restructure`              |
+| DD-6  | Every course declares `prerequisites` → a prerequisite DAG                                                                                | `ayokoding-learning-path-02-schema-and-prerequisite-dag`  |
+| DD-7  | Omit-or-create; per-path framing is a callout, never a body fork                                                                          | `ayokoding-learning-path-05-manifests` (amended by DD-28) |
+| DD-16 | Prerequisite-consistency is the audited smoothness property                                                                               | `ayokoding-learning-path-02-schema-and-prerequisite-dag`  |
+| DD-21 | The AI path teaches building AI systems, not driving them                                                                                 | `ayokoding-learning-path-05-manifests`                    |
+| DD-22 | Convergence amended: paths converge per role, not globally                                                                                | `ayokoding-learning-path-05-manifests`                    |
+| DD-24 | Fourth path's entry point — **SUPERSEDED 2026-07-21**, see below                                                                          | `ayokoding-learning-path-05-manifests`                    |
+| DD-33 | Fourth path's manifest WALKS the AI/harness cluster; spine was fixed at 15 — **SUPERSEDED 2026-07-21** by DD-35, no longer a fixed figure | `ayokoding-learning-path-05-manifests`                    |
 
 **DD-24 supersession (2026-07-21).** DD-24 originally set the fourth path's entry point as
 **linked, not included** prerequisites, on the assumption of an already-working software engineer.
@@ -886,13 +899,12 @@ chain.
 | `capstone-concurrency-showdown`          | N      | Comparison milestone    | Go + Elixir       | `csp-style-concurrency`, `actor-model-concurrency`                                                                                                                                                        | The same problem solved CSP-Go vs actor-Elixir, compared head-to-head (DD-20; embedded spec in `compilers-parsers-and-transpilers.md`)                                                                                                        |
 | `capstone-lead-at-altitude`              | N      | Whole-journey milestone | polyglot + prose  | `capstone-concurrency-and-systems`, `capstone-real-world-delivery`, `site-reliability-engineering`, `software-product-engineering`, `engineering-management`                                              | Whole-journey leadership synthesis: SLOs, strategy, prioritization, a six-pass retrospective (DD-20; embedded spec in `site-reliability-engineering.md`)                                                                                      |
 
-**Count check**: 33 re-homed (E) + 61 transferred-native (T) + 4 existing capstones (Ecap) + 23 new
-(N: 14 courses + 9 capstones) = **121** among the original software-engineer-role baseline, zero
-merges (DD-28 permits course surgery against this 121 going forward, replacing "zero merges" with an
-explicit per-surgery blast-radius statement). Plus the fourth path's **6 net-new AI-engineering
-courses** = **127** total catalog.
+**Count check**: 33 re-homed (E) + 61 transferred-native (T) + 4 existing capstones (Ecap) + 29 new
+(N: 14 courses + 6 AI-engineering courses + 9 capstones) = **127** total catalog, zero merges among
+the original 121 (DD-28 permits course surgery against this 121 going forward, replacing "zero
+merges" with an explicit per-surgery blast-radius statement).
 
-**This plan's own share**: 61 (T) + 23 (N) + 6 (AI) = **90 authored bodies**. The remaining 37
+**This plan's own share**: 61 (T) + 29 (N) = **90 authored bodies**. The remaining 37
 (33 E + 4 Ecap) are re-homed by `ayokoding-learning-path-01-url-restructure`. 90 + 37 = 127.
 
 ## Productive in Target Codebases (proof-of-transfer outcome-anchor)
@@ -1041,6 +1053,49 @@ navigation-UI plan.
 
 This plan changes no REST or GraphQL endpoint and ships no API contract. `api-exploratory-tester` has
 nothing to exercise.
+
+## File Impact
+
+Every artefact this plan writes is additive under `apps/ayokoding-www/content/en/learn/courses/`
+(the `<COURSES>` shorthand defined in the Path constants block of
+[delivery.md §Parallelization Model](./delivery.md#parallelization-model)); nothing under
+`<FEAT>` or `<MANIFESTS>` is ever touched, per
+[§The manifest ownership invariant](#the-manifest-ownership-invariant-binding) and its permit/forbid
+table above. This section consolidates that scattered per-path detail — previously split across
+[§The course page bundle](#the-course-page-bundle), the manifest-invariant table, and `delivery.md`'s
+own Path constants block — into one enumeration.
+
+**New directories created** (90 total, one per authored body, zero overlap with the 37 pre-existing
+re-homed bundles):
+
+- `apps/ayokoding-www/content/en/learn/courses/<course-id>/` — the fixed course-page bundle anatomy
+  (`_index.md`, `overview.md`, `learning/`, `drilling/`), one per slug in
+  `evidence/authored-body-slugs.txt`. See [§The course page bundle](#the-course-page-bundle) for the
+  exact bundle shape.
+
+**Existing files modified per band** (this plan edits these; it never creates them):
+
+| File                                                                            | Change                                                                                                                                                                       |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/ayokoding-www/content/en/learn/courses/_index.md` (`<COURSES>_index.md`)  | one new list entry per landed course ID, appended per band                                                                                                                   |
+| `tech-docs.md` (this file) — [§Course Library Catalog](#course-library-catalog) | one new catalog row per landed course ID, appended per band                                                                                                                  |
+| `delivery.md` (this plan's own file)                                            | the five-field band-completion signal block appended at the end of each band phase — see [§Band-completion signal](#band-completion-signal-the-handoff-to-the-manifest-plan) |
+
+**Never touched, by construction** (verified by a zero-diff gate check at every phase, not merely
+asserted):
+
+- `<FEAT>` (`apps/ayokoding-www/src/features/course-paths/`) — no application code
+- `<MANIFESTS>` (`<FEAT>manifests/`) — every `.yaml` manifest is read-only from this plan; confirmed
+  every phase by the `git diff --name-only … -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
+  zero-assertion in each phase's own gate in `delivery.md`
+- `<PATHS>` (`apps/ayokoding-www/content/en/learn/paths/`) and `<SE_OLD>`
+  (`apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`) — read-only
+  reference paths this plan reads (for collision checks and cross-links) but never writes
+- `<SYLLABUS>` (`../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`) — the
+  cross-plan authoring source; consumed, never copied or edited
+
+**No package-manifest changes**: this plan adds no entry to `package.json`, `go.mod`, `Cargo.toml`,
+or any other dependency manifest — see [§Dependencies](#dependencies) below.
 
 ## Dependencies
 

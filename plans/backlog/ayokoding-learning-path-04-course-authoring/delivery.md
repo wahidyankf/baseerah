@@ -237,12 +237,15 @@ subagents capped per the orchestration convention). The main thread self-promote
 - [ ] [AI] Establish content baselines: `npx nx run ayokoding-www:build` and
       `npx nx run ayokoding-www:test:unit`
       — acceptance: both exit 0; record pass state in `evidence/phase-0-snapshot.txt`.
-- [ ] [AI] **Confirm the twenty-three NEW slugs are absent (no collision)** under `<SE_OLD>` and
-      `<COURSES>` (fourteen new courses + nine new capstones: three original plus six **DD-20**
-      inter-topic capstones):
+- [ ] [AI] **Confirm all twenty-nine NEW slugs are absent (no collision)** under `<SE_OLD>` and
+      `<COURSES>` (six net-new AI-engineering courses + fourteen new courses + nine new capstones:
+      three original plus six **DD-20** inter-topic capstones):
 
   ```bash
-  for s in coding-interview take-home-and-live-coding system-design-interview \
+  for s in evaluating-ai-output-essentials evaluating-ai-systems-in-depth statistics-for-evaluation \
+    product-patterns-for-probabilistic-systems inference-serving-and-model-deployment \
+    fine-tuning-and-adaptation \
+    coding-interview take-home-and-live-coding system-design-interview \
     behavioral-and-leadership-interviews capstone-interview-loop \
     async-python-and-fastapi-services self-hosting-essentials browser-automation-with-cdp \
     the-agent-loop agent-tools-and-mcp agent-context-and-memory \
@@ -405,7 +408,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 - [ ] [AI] Both blocking plans verified merged: `<COURSES>` holds exactly 37 re-homed bundles; the
       cross-plan `syllabus/courses/` holds 122 entries and its root is recorded as `SYLLABUS_ROOT`.
 - [ ] [AI] `ayokoding-www:build` + `test:unit` baselines recorded green.
-- [ ] [AI] All 23 new slugs confirmed absent (zero `EXISTS` lines).
+- [ ] [AI] All 29 new slugs confirmed absent (zero `EXISTS` lines).
 - [ ] [AI] `evidence/authored-body-slugs.txt` holds 90 unique slugs; the ABSENT-count baseline of 90 is
       recorded in `evidence/phase-0-snapshot.txt`.
 - [ ] [AI] Cross-plan link gate green (no line naming this plan's folder).
@@ -647,7 +650,7 @@ deploy), applying the convention:
       Lütke (2025-06-19), Karpathy (2025-06-25), Willison (2025-06-27), and Anthropic's Effective
       Context Engineering methodology; and for the harness cluster (Band 5) plus
       `capstone-build-your-own-coding-agent` (Band 8), that they MUST include the harness-engineering
-      equivalent citing Anthropic (2025-11-26) and Böckeler/Thoughtworks (2026-04-02) — **no course is
+      equivalent citing Anthropic (2025-11-26) and Böckeler/Thoughtworks (2026-02-17) — **no course is
       renamed** (D9 is explicit: "harness engineering" is unsettled terminology; cite the disagreement,
       do not resolve it or adopt a side as structure) — acceptance: these citation requirements appear
       as explicit acceptance criteria on the relevant Band 5 and Band 8 items below.
@@ -959,9 +962,9 @@ rows as part of "convention complete".
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] `the-agent-loop` (By Example · Python) — convention complete; checkers clean; **Phase 2 D9
       citation contract applied**: a harness-engineering naming/lineage line is present citing Anthropic
-      (2025-11-26) and Böckeler/Thoughtworks (2026-04-02), presenting the containment dispute as
+      (2025-11-26) and Böckeler/Thoughtworks (2026-02-17), presenting the containment dispute as
       unresolved — no rename. Acceptance:
-      `for w in "harness engineering" "2025-11-26" "2026-04-02"; do grep -F -q -i "$w" "apps/ayokoding-www/content/en/learn/courses/the-agent-loop/overview.md" || echo "MISSING $w"; done | wc -l`
+      `for w in "harness engineering" "2025-11-26" "2026-02-17"; do grep -F -q -i "$w" "apps/ayokoding-www/content/en/learn/courses/the-agent-loop/overview.md" || echo "MISSING $w"; done | wc -l`
       returns **0**.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
 - [ ] [AI] `agent-tools-and-mcp` (By Example · Python) — convention complete; checkers clean; **Phase 2
@@ -1195,7 +1198,7 @@ rows as part of "convention complete".
 - [ ] [AI] `capstone-build-your-own-coding-agent` (Python; assembles the harness cluster) — convention
       complete; checkers clean; **Phase 2 D9 citation contract applied**: a harness-engineering
       naming/lineage line is present citing Anthropic (2025-11-26) and Böckeler/Thoughtworks
-      (2026-04-02) — no rename. Assembly acceptance: the capstone's done-bar produces a runnable
+      (2026-02-17) — no rename. Assembly acceptance: the capstone's done-bar produces a runnable
       coding-agent CLI composed from the five cluster courses; a disallowed action **fails closed** and
       every run emits a trace — verify the capstone's own runnable acceptance-criteria checklist names
       all five source courses:
@@ -1274,8 +1277,9 @@ rows as part of "convention complete".
 - [ ] [AI] Every sub-phase PR is `[AI]`-merged and deployed.
 
 > **Pause Safety**: every capstone this plan owns is live; the AI path's full nine-course harness walk
-> now has all its bodies present, so the manifest plan can grow that path to its full 15-course
-> composition. Safe to stop. To resume: re-run the section build.
+> now has all its bodies present, so the manifest plan can grow that path to its full DD-35-governed
+> composition (no longer a fixed 15-course figure — DD-35 superseded DD-33's original 6→15 math).
+> Safe to stop. To resume: re-run the section build.
 
 ---
 

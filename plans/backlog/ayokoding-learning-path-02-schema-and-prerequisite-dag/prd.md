@@ -322,6 +322,6 @@ authored **from** its spec file, never from a fresh judgment call.
   the inventory measured at execution time (Phase 7.2's `N_BEFORE`) rather than hardcoded — plus the
   pre-push-hook form of `md links validate` as its acceptance.
 - **The DD-34 / DD-35 / DD-39 numbering gap is "fixed"** — a future reader closes the apparent gap
-  and rewrites 276 in-corpus tokens whose meanings belong to a different, closed plan. Mitigated by
+  and rewrites 275 in-corpus tokens whose meanings belong to a different, closed plan. Mitigated by
   restating the source plan's explanatory passage verbatim in both `README.md` and `tech-docs.md`,
   with an explicit "never renumber" instruction.

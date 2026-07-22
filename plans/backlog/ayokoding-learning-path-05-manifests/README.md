@@ -274,7 +274,11 @@ is **both** Wave-2 plans rather than the navigation plan alone.
 5. `find apps/ayokoding-www/content/en/learn/courses -maxdepth 1 -mindepth 1 -type d | wc -l`
    returns **127** — the `careers/`/software-engineering catalog total (R4); the `skills/` corpus
    `ayokoding-learning-path-06-skills-accounting` and `ayokoding-learning-path-07-skills-erp` author
-   is additional and does not change this figure.
+   is additional and does not change this figure. This is a **confirming** check — precondition 2
+   (the entire course-authoring plan merged) already guarantees all 127 exist; see
+   [tech-docs.md §Manifest lifecycle](./tech-docs.md#manifest-lifecycle) for why the staged,
+   phased manifest rollout in Phases 1-5 is preserved anyway, as a deliberate small-blast-radius
+   verification strategy rather than a response to content unavailability.
 
 ### Downstream
 
@@ -292,7 +296,7 @@ earlier revision of this table at unrelated course-body checklists.
 | Source location                                                                                   | Step                                                                            | Note                                                                                                                               |
 | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | §"Manifest growth (serial sync point after each band)" → "After each of Bands 1–8 lands, append…" | Bands 1–8 manifest growth (three software-engineer manifests)                   | genuine mutation                                                                                                                   |
-| §"Manifest growth…" → "**Band 9 manifest growth (interview-ready + fundamentally-strong only)**"  | Band 9 manifest growth (interview-ready + fundamentally-strong only)            | genuine mutation                                                                                                                   |
+| §"Manifest growth…" → "**Band 9 manifest growth (interview-ready + fundamentally-strong only)**"  | Band 9 manifest growth (all three software-engineer manifests)                  | genuine mutation                                                                                                                   |
 | §"Manifest growth…" → "**Interview-ready smoothness re-audit (refresh-register lever…)**"         | Interview-ready refresh-register smoothness re-audit                            | mutation-adjacent; closes the Phase-6 deferral                                                                                     |
 | §"Manifest growth…" → "**AI-path manifest growth (Band 5 + Band 8, DD-33)**"                      | AI-path manifest growth to its full composition (DD-35; no longer a fixed "15") | genuine mutation                                                                                                                   |
 | Phase 8 → "**Re-verify manifests prerequisite-consistent to date**"                               | Phase-8 manifest re-verification                                                | read-only by its own acceptance text, but it re-verifies a manifest this plan authored and inverts the wave order if left upstream |

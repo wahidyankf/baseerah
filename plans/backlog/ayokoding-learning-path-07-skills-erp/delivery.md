@@ -83,6 +83,11 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
    behavior. Verify the deploy via `curl -sf https://ayokoding.com/en/learn/paths/skills/conventional-erp | grep -qi "conventional"`
    (after Phase 2) or the equivalent `sharia-erp` URL (after Phase 4).
 
+> **Important — fix ALL failures found during quality gates, not just those caused by your changes.**
+> This is the Root Cause Orientation principle applied to every phase's typecheck/lint/`test:quick`
+> run above (step 4): a preexisting failure encountered while running an affected quality gate is
+> fixed inline as part of this plan's own work, never deferred or mentioned-and-skipped.
+
 ## Depends-on and start preconditions
 
 - **`blockedBy` (hard, must be merged before Phase 0 completes)**:
@@ -149,6 +154,8 @@ PATHS="apps/ayokoding-www/content/en/learn/paths/"
 MANIFESTS="apps/ayokoding-www/src/features/course-paths/manifests/"
 CONVMAN="${MANIFESTS}skills/conventional-erp.yaml"
 SHARMAN="${MANIFESTS}skills/sharia-erp.yaml"
+MTEST_CE="${MANIFESTS}skills/conventional-erp-manifest.unit.test.ts"
+MTEST_SE="${MANIFESTS}skills/sharia-erp-manifest.unit.test.ts"
 CONVLANDING="${PATHS}skills/conventional-erp/_index.md"
 SHARLANDING="${PATHS}skills/sharia-erp/_index.md"
 SYL="${PLANDIR}syllabus/courses/"
@@ -272,22 +279,32 @@ precedes confirmation, and confirmation is coverage-only (`A12`).
 ### 1.2 — The A4 verification pass before any spec asserts a fact
 
 - [ ] [AI] **Cardinality guard first — this clause is meaningless without it.**
-      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 30 ] && echo GUARD-OK || echo GUARD-FAIL` — acceptance:
-      prints `GUARD-OK`. A wrong `$SYL` (for example, one still pointing at a lifecycle folder the
-      plan has moved out of) makes every sweep below return empty and pass vacuously; this guard is
-      what makes the emptiness meaningful.
+      `[ "$(find "${SYL}" -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)" -eq 30 ] && echo GUARD-OK || echo GUARD-FAIL`
+      — acceptance: prints `GUARD-OK`. A wrong `$SYL` (for example, one still pointing at a lifecycle
+      folder the plan has moved out of) makes every sweep below return empty and pass vacuously; this
+      guard is what makes the emptiness meaningful. The count excludes `syllabus/courses/README.md`
+      (required by the Learning-Bearing Syllabus Completeness convention) — a naive
+      `ls "${SYL}"*.md | wc -l` would match the README too and return 31, misfiring on the very state
+      this check is meant to confirm as correct.
 - [ ] [AI] For every syllabus's "Accuracy notes" section, confirm every `[Verified]` claim traces to
-      the domain-research grounding file or a fetched primary source, and every `[Unverified]` /
+      the domain reasoning already recorded in `tech-docs.md` or a fetched primary source, and every `[Unverified]` /
       `[Needs Verification]` claim is **not** restated as fact elsewhere in the same file — verify
-      every file carries at least one A4 marker:
-      `for f in "${SYL}"*.md; do grep -qE '\[(Verified|Unverified|Needs Verification|Judgment call)\]' "$f" || echo "NO-MARKER: $f"; done | grep -c .`
+      every file carries at least one A4 marker **or** legitimately states the Phase 1.2a confirmation
+      pass has not yet run for that course, per
+      [tech-docs.md §Syllabus layer](./tech-docs.md#syllabus-layer--custody-and-shape-dd-31)'s own
+      authoring rule that Accuracy notes honestly record a pending confirmation pass rather than
+      fabricate a verification date. Honest "has not yet run" prose is not a stray anti-hallucination
+      bracket and is not itself an A4 violation — the invariant this clause enforces is **no unmarked
+      claim**, not **every file marked**:
+      `for f in $(find "${SYL}" -maxdepth 1 -name '*.md' ! -name 'README.md'); do grep -qE '\[(Verified|Unverified|Needs Verification|Judgment call)\]' "$f" && continue; grep -qF 'has not yet run' "$f" && continue; echo "NO-MARKER-AND-NOT-PENDING: $f"; done | grep -c .`
       returns **0**. Do **not** use `grep -L` here: it lists files _without_ a match and exits 0 when
       it finds one, so the clause would be unfalsifiable.
-      **Control probe before believing the zero**: append `x` to the pattern (making it match nothing)
-      and re-run — the count must jump to 30. If it does not, the sweep is not measuring what it
-      claims and the zero is false.
-      A file whose Accuracy notes section is present but **empty** fails this clause even if a marker
-      appears elsewhere in the file — check that section specifically.
+      **Control probe before believing the zero**: append `x` to **both** patterns (making neither
+      match) and re-run — the count must jump to 30. If it does not, the sweep is not measuring what
+      it claims and the zero is false.
+      A file whose Accuracy notes section is present but **empty** — carrying neither a marker nor the
+      "has not yet run" pending statement anywhere in the file — fails this clause even if a marker
+      appears elsewhere in the file; check that section specifically.
 - [ ] [AI] Re-verify the two open items named in `tech-docs.md` before Phase 4 begins (they gate
       Stage C, not Stage A/B): the PSAK-numbering question in
       `sharia-compliant-erp-design.md`, and the AAOIFI/PSAK/MASB jurisdictional-model table. Dispatch
@@ -338,20 +355,33 @@ accuracy pre-verify → skeleton → learning track → drilling track → check
 transcribing the module/topic content from `<SYL>${id}.md`:
 
 - [ ] [AI] Accuracy pre-verify: re-check every `[Verified]`/`[Unverified]` claim in
-      `<SYL>${id}.md`'s Accuracy notes is current (no drift since Phase 1.2a).
+      `<SYL>${id}.md`'s Accuracy notes is current (no drift since Phase 1.2a) — acceptance: every
+      marker (`[Verified]`/`[Unverified]`/`[Needs Verification]`/`[Judgment call]`) in that section is
+      re-confirmed correct or updated, and zero `[Unverified]`/`[Needs Verification]` claims appear
+      restated as settled fact anywhere else in `<SYL>${id}.md`.
 - [ ] [AI] Skeleton: create `<COURSES>${id}/_index.md` with frontmatter (`title`, `format`,
       `prerequisites: [...]` transcribed verbatim from the catalog table in `tech-docs.md`) and the
       section scaffold.
 - [ ] [AI] Learning track: dispatch `apps-ayokoding-www-annotated-concept-maker` (Annotated-concept
       ids) or `apps-ayokoding-www-by-example-maker` (By Example ids) to author the concept
-      explanations, transcribing every `co-NN` from the syllabus.
+      explanations, transcribing every `co-NN` from the syllabus — acceptance:
+      `grep -oE 'co-[0-9]+' "${COURSES}${id}/_index.md" | sort -u | wc -l` equals
+      `grep -oE 'co-[0-9]+' "${SYL}${id}.md" | sort -u | wc -l` (no concept dropped in transcription)
+      and is **at least 8** (the DD-35 concept floor).
 - [ ] [AI] Drilling track: for By Example ids, author the worked examples transcribed from the
       syllabus's `ex-NN` list (prose worked scenarios, never runnable code standing up a system —
-      A6). For Annotated-concept ids, author the equivalent worked-scenario drills.
+      A6). For Annotated-concept ids, author the equivalent worked-scenario drills — acceptance: for
+      By Example ids, `grep -oE 'ex-[0-9]+' "${COURSES}${id}/_index.md" | sort -u | wc -l` equals
+      `grep -oE 'ex-[0-9]+' "${SYL}${id}.md" | sort -u | wc -l` (no worked example dropped); for
+      Annotated-concept ids, every worked-scenario drill traces to a `co-NN` already present in the
+      authored file.
 - [ ] [AI] Checkers: dispatch `apps-ayokoding-www-annotated-concept-checker` or
       `apps-ayokoding-www-by-example-checker` plus `apps-ayokoding-www-facts-checker` and
-      `apps-ayokoding-www-link-checker`.
-- [ ] [AI] Fixers: dispatch `apps-ayokoding-www-general-fixer`-family agents for every finding.
+      `apps-ayokoding-www-link-checker` — acceptance: each checker's audit report shows zero
+      CRITICAL and zero HIGH findings for `<COURSES>${id}`.
+- [ ] [AI] Fixers: dispatch `apps-ayokoding-www-general-fixer`-family agents for every finding —
+      acceptance: the fixer report shows zero unresolved CRITICAL/HIGH findings, and a re-run of the
+      Checkers step above confirms zero CRITICAL/HIGH findings remain.
 - [ ] [AI] Re-verify: `test -d "${COURSES}${id}" && test -f "${COURSES}${id}/_index.md" && echo PASS` —
       acceptance: prints `PASS` for every id in `ERP_STAGE_A`.
 
@@ -362,6 +392,7 @@ transcribing the module/topic content from `<SYL>${id}.md`:
 ```gherkin
 Scenario: conventional-erp manifest validates against the PathManifest schema
   Given the file "manifests/skills/conventional-erp.yaml"
+  When the manifest is loaded and validated
   Then it parses against the PathManifest zod schema
   And its pathId equals "skills/conventional-erp"
   And its arc equals "immediately-effective"
@@ -372,18 +403,22 @@ The 27-id assertion is this scenario's **terminal** state, reached at §3.2; thi
 the manifest at 15 ids and the scenario goes green once Stage B growth completes. `<SHARMAN>`'s own
 schema scenario is bound separately at §4.2 — one scenario per tag.
 
-- [ ] [AI] **RED** — Write `apps/ayokoding-www/src/features/course-paths/manifests/skills/erp-manifests.unit.test.ts`
-      asserting `<CONVMAN>` and `<SHARMAN>` each parse against the `PathManifest` zod schema, each has
-      `pathId` equal to `skills/conventional-erp` / `skills/sharia-erp` respectively, `arc:
-immediately-effective`, and `courseOrder` containing exactly the 15 `ERP_STAGE_A` ids in order —
-      run `nx run ayokoding-www:test:unit -- erp-manifests` and verify it **fails** (files do not
-      exist yet).
+- [ ] [AI] **RED** — Write `<MTEST_CE>` and `<MTEST_SE>` _(two new files; this plan owns both)_, each
+      asserting its own manifest (`<CONVMAN>` / `<SHARMAN>` respectively) parses against the
+      `PathManifest` zod schema, has `pathId` equal to `skills/conventional-erp` /
+      `skills/sharia-erp` respectively, `arc: immediately-effective`, and `courseOrder` containing
+      exactly the 15 `ERP_STAGE_A` ids in order — run
+      `nx run ayokoding-www:test:unit -- conventional-erp-manifest sharia-erp-manifest` and verify
+      both **fail** (files do not exist yet).
 - [ ] [AI] **GREEN** — Create `<CONVMAN>` and `<SHARMAN>` (both identical at this stage — 15 ids,
       transcribed from `syllabus/paths/manifest-skills-conventional-erp.md` Stage A section) — run
-      `nx run ayokoding-www:test:unit -- erp-manifests` and verify it **passes**.
+      `nx run ayokoding-www:test:unit -- conventional-erp-manifest sharia-erp-manifest` and verify
+      both **pass**.
 - [ ] [AI] **REFACTOR** — Run `checkManifestIntegrity` and `checkPrerequisiteConsistency` (from
       `ayokoding-learning-path-02-schema-and-prerequisite-dag`'s `course-paths` core) against both
-      manifests — verify both return zero violations.
+      manifests; factor a shared load-and-validate test helper so `<MTEST_CE>`/`<MTEST_SE>` and their
+      §3.2/§4.2 extensions add assertions, not copied blocks — verify both manifests return zero
+      violations.
 
 ### 2.3 — Create both path landings and populate cards
 
@@ -397,19 +432,38 @@ immediately-effective`, and `courseOrder` containing exactly the 15 `ERP_STAGE_A
       insertions total) — edit only, these files already exist (A3).
 - [ ] [AI] Populate 15 rows in `<COURSES>_index.md` — edit only, file already exists (A3).
 
-### 2.4 — Gherkin coverage for Stage A
+### 2.4 — TDD: Stage A path-walk coverage
 
-- [ ] [AI] Add scenarios to `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/skills-erp-paths.feature`
-      covering: both landings render, both manifests validate, the Dangerous-1 boundary appears
-      correctly on both landings, and `<SHARLANDING>`'s "covers all the basics" statement is present.
-- [ ] [AI] Author matching step definitions at
-      `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-paths.steps.ts`.
-- [ ] [AI] `nx run ayokoding-www:specs:behavior:coverage` reports 100% coverage for the new feature
-      file.
+**Gherkin (binds) →** "Stage A landings render and both manifests validate at 15 courses"
+
+```gherkin
+Scenario: Stage A landings render and both manifests validate at 15 courses
+  Given both manifests are published with courseOrder containing the 15 Stage A ids
+  When a reader opens either the conventional-erp or sharia-erp path landing
+  Then both landings render and both manifests validate against the PathManifest schema
+  And the Dangerous-1 boundary appears correctly on both landings
+  And the sharia-erp landing states it "covers all the basics"
+```
+
+- [ ] [AI] **RED** — add
+      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/skills-erp-paths.feature`
+      _(new file)_ carrying the scenario above, plus failing step definitions at
+      `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-paths.steps.ts` _(new file, pairing 1:1)_ —
+      command: `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new spec **fails** (the feature
+      and step-definition files did not exist before this step).
+- [ ] [AI] **GREEN** — implement the step bindings against the already-published `<CONVLANDING>` /
+      `<SHARLANDING>` and `<CONVMAN>` / `<SHARMAN>` (from §2.2/§2.3) — command:
+      `nx run ayokoding-www:specs:behavior:coverage && nx run ayokoding-www-fe-e2e:test:e2e` —
+      acceptance: both exit 0, and `specs:behavior:coverage` reports 100% for the new feature file.
+- [ ] [AI] **REFACTOR** — extract a reusable "assert a Dangerous-N boundary on a path landing" helper
+      step definition, parameterized on path id and boundary number, so §3.5 and §4.5 extend it
+      without duplicating step bindings — command: `nx run ayokoding-www-fe-e2e:test:e2e` —
+      acceptance: exits 0, scenario count unchanged.
 
 ### Phase 2 Gate
 
-- [ ] [AI] `nx run ayokoding-www:test:unit` green (erp-manifests suite).
+- [ ] [AI] `nx run ayokoding-www:test:unit -- conventional-erp-manifest sharia-erp-manifest` green
+      (both manifest test suites).
 - [ ] [AI] `nx run ayokoding-www-fe-e2e:test:e2e` green for the new feature file. **Not
       `ayokoding-www:test:e2e`** — that target is an `echo 'no-op: target not applicable for this
 project'` stub and can never fail, so citing it would make this checkbox vacuous. The real
@@ -460,15 +514,20 @@ Scenario: the shared 27 courses are identical bodies referenced from both manife
 This is `A11`'s one-body-two-references rule made reachable. `conventional-erp` reaches its terminal
 27 ids here and stops at `erp-analytics-and-reporting`.
 
-- [ ] [AI] **RED** — Extend `erp-manifests.unit.test.ts` asserting both `<CONVMAN>` and `<SHARMAN>`
-      each contain all 27 shared ids (Stage A's 15 plus Stage B's 12, at the insertion positions in
+- [ ] [AI] **RED** — Extend both `<MTEST_CE>` and `<MTEST_SE>` asserting each manifest (`<CONVMAN>` /
+      `<SHARMAN>` respectively) contains all 27 shared ids (Stage A's 15 plus Stage B's 12, at the
+      insertion positions in
       [tech-docs.md §courseOrder arrays](./tech-docs.md#courseorder-arrays-at-each-growth-boundary)),
-      with every Stage A id's relative order unchanged — run the suite and verify it **fails**.
-- [ ] [AI] **GREEN** — Grow `<CONVMAN>` and `<SHARMAN>` to 27 ids each — run the suite and verify it
-      **passes**.
-- [ ] [AI] **REFACTOR** — Re-run `checkManifestIntegrity`/`checkPrerequisiteConsistency`; verify zero
-      violations, including the hard edge (`record-to-report-systems` requiring
-      `financial-statements-and-close-cycle` to exist under `<COURSES>` on `origin/main`).
+      with every Stage A id's relative order unchanged — run
+      `nx run ayokoding-www:test:unit -- conventional-erp-manifest sharia-erp-manifest` and verify
+      both **fail**.
+- [ ] [AI] **GREEN** — Grow `<CONVMAN>` and `<SHARMAN>` to 27 ids each — run
+      `nx run ayokoding-www:test:unit -- conventional-erp-manifest sharia-erp-manifest` and verify
+      both **pass**.
+- [ ] [AI] **REFACTOR** — Re-run `checkManifestIntegrity`/`checkPrerequisiteConsistency` against both
+      `<MTEST_CE>` and `<MTEST_SE>`; verify zero violations, including the hard edge
+      (`record-to-report-systems` requiring `financial-statements-and-close-cycle` to exist under
+      `<COURSES>` on `origin/main`).
 
 ### 3.3 — Deferral-check assertion (both directions)
 
@@ -484,22 +543,45 @@ This is `A11`'s one-body-two-references rule made reachable. `conventional-erp` 
       HERE").
 - [ ] [AI] Populate 12 more rows in `<COURSES>_index.md` (27 total).
 
-### 3.5 — Gherkin coverage for Stage B
+### 3.5 — TDD: extend Stage A coverage to the Dangerous 2/3 boundaries
 
-- [ ] [AI] Extend `skills-erp-paths.feature` with scenarios for the Dangerous 2/3 boundaries and the
-      `conventional-erp`-ends-here statement; extend step definitions accordingly.
+**Gherkin (binds) →** "conventional-erp landing renders with its full course count" — the same
+terminal-state scenario `prd.md` already declares, reached here as `conventional-erp` completes its
+27-course growth (mirrors plan 06's §2.4→§3.5 progressive-rebind idiom of reusing one pre-existing
+`prd.md` scenario across growth stages)
+
+```gherkin
+Scenario: conventional-erp landing renders with its full course count
+  Given the reader navigates to "/en/learn/paths/skills/conventional-erp"
+  When the landing page loads
+  Then the landing renders 27 courses in courseOrder order
+  And the landing displays the Dangerous 1, Dangerous 2, and Dangerous 3 boundaries
+```
+
+- [ ] [AI] **RED** — extend the reusable boundary helper (from §2.4's REFACTOR) in
+      `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-paths.steps.ts` to assert the Dangerous 2
+      boundary on both landings and the terminal Dangerous 3 / "ENDS HERE" statement on
+      `<CONVLANDING>` — command: `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the new
+      assertions **fail** (only the Dangerous-1 boundary was asserted before this phase).
+- [ ] [AI] **GREEN** — implement the step bindings against the grown `<CONVLANDING>` / `<SHARLANDING>`
+      content (from §3.4) — command:
+      `nx run ayokoding-www:specs:behavior:coverage && nx run ayokoding-www-fe-e2e:test:e2e` —
+      acceptance: both exit 0.
+- [ ] [AI] **REFACTOR** — parameterize the helper on expected boundary count so §4.5 extends it
+      without duplicating assertions — command: `nx run ayokoding-www-fe-e2e:test:e2e` —
+      acceptance: exits 0, scenario count unchanged.
 
 ### Phase 3 Gate
 
 - [ ] [AI] All Phase 2 Gate checks re-run and still green.
 - [ ] [AI] `<CONVMAN>` has exactly 27 `courseOrder` entries; `<SHARMAN>` has exactly 27 (Stage C not
-      yet grown) — `yq '.courseOrder | length' "${CONVMAN}"` prints `27`.
+      yet grown) — `grep -cE '^  - ' "${CONVMAN}"` prints `27`.
 - [ ] [AI] **Integration**: draft PR opened, 3-cycle PR-Review complete, CI green, `[AI]` merge,
       `ayokoding-www` deployed, post-deploy curl check confirms `<CONVLANDING>` shows "ENDS HERE".
 
 > **Pause Safety**: `conventional-erp` is terminal (27/27); `sharia-erp` is mid-growth (27/30). Safe
 > to stop — `conventional-erp` readers get the complete path today. To resume:
-> `yq '.courseOrder | length' worktrees/ayokoding-learning-path-07-skills-erp/${SHARMAN}` and confirm
+> `grep -cE '^  - ' worktrees/ayokoding-learning-path-07-skills-erp/${SHARMAN}` and confirm
 > it reads `27`.
 
 ## Phase 4: Stage C — Sharia-Compliant Design
@@ -528,6 +610,7 @@ Every claim in the jurisdictional-model table carries its A4 marker into the cou
 ```gherkin
 Scenario: sharia-erp manifest validates against the PathManifest schema
   Given the file "manifests/skills/sharia-erp.yaml"
+  When the manifest is loaded and validated
   Then it parses against the PathManifest zod schema
   And its pathId equals "skills/sharia-erp"
   And its courseOrder contains exactly 30 unique course ids
@@ -540,19 +623,23 @@ The last three steps are load-bearing, not decorative: a set-membership assertio
 both the correct ordering and the superseded "insert before `erp-security-and-controls`" rule, so
 without them this scenario could not regression-guard the terminal boundary.
 
-- [ ] [AI] **RED** — Extend `erp-manifests.unit.test.ts` asserting `<SHARMAN>` contains all 30 ids at
-      the positions in
+- [ ] [AI] **RED** — Extend `<MTEST_SE>` **only** (never `<MTEST_CE>`) asserting `<SHARMAN>` contains
+      all 30 ids at the positions in
       [tech-docs.md §courseOrder arrays](./tech-docs.md#courseorder-arrays-at-each-growth-boundary)
       (the 3 Sharia-exclusive ids **appended after the complete 27-id shared corpus**, i.e. after
       `erp-analytics-and-reporting`, occupying positions 28-30 with
-      `zakat-and-sharia-compliance-modules` terminal), and that `<CONVMAN>` is **unaffected** (still
-      27, unchanged) — run the suite and verify it **fails**.
+      `zakat-and-sharia-compliance-modules` terminal), and confirm `<MTEST_CE>`'s existing assertions
+      are untouched (`<CONVMAN>` stays **unaffected**, still 27) — run
+      `nx run ayokoding-www:test:unit -- sharia-erp-manifest` and verify it **fails**.
       Assert the terminal id explicitly, not just the set: the test must fail if
       `<SHARMAN>[28]` is anything other than `zakat-and-sharia-compliance-modules`. A set-membership
       assertion alone passes under both the correct and the superseded ordering and cannot
       regression-guard this.
-- [ ] [AI] **GREEN** — Grow `<SHARMAN>` to 30 ids — run the suite and verify it **passes**.
-- [ ] [AI] **REFACTOR** — Re-run integrity checks on `<SHARMAN>` only; verify zero violations.
+- [ ] [AI] **GREEN** — Grow `<SHARMAN>` to 30 ids — run
+      `nx run ayokoding-www:test:unit -- sharia-erp-manifest` and verify it **passes**.
+- [ ] [AI] **REFACTOR** — Re-run integrity checks on `<SHARMAN>` only via `<MTEST_SE>`; verify zero
+      violations. Confirm `nx run ayokoding-www:test:unit -- conventional-erp-manifest` is still green
+      and unmodified.
 
 ### 4.3 — Deferral-check assertion (both directions)
 
@@ -564,20 +651,46 @@ without them this scenario could not regression-guard the terminal boundary.
 - [ ] [AI] Update `<SHARLANDING>` to show the terminal Dangerous 4 boundary (course 30, "ENDS HERE").
 - [ ] [AI] Populate the final 3 rows in `<COURSES>_index.md` (30 total).
 
-### 4.5 — Gherkin coverage for Stage C
+### 4.5 — TDD: extend coverage to the terminal Dangerous 4 boundary
 
-- [ ] [AI] Extend `skills-erp-paths.feature` with the Dangerous 4 scenario and the `sharia-erp`-ends-
-      here statement; extend step definitions.
+**Gherkin (binds) →** "sharia-erp landing renders with its full course count and states it covers the
+basics" — the same terminal-state scenario `prd.md` already declares, reached here as `sharia-erp`
+completes its 30-course growth (mirrors plan 06's progressive-rebind idiom, the second of plan 07's
+two pre-existing terminal-state `prd.md` scenarios)
+
+```gherkin
+Scenario: sharia-erp landing renders with its full course count and states it covers the basics
+  Given the reader navigates to "/en/learn/paths/skills/sharia-erp"
+  When the landing page loads
+  Then the landing renders 30 courses in courseOrder order
+  And the landing displays the Dangerous 1 through Dangerous 4 boundaries
+  And the landing states explicitly that the path covers all the basics without requiring
+    "conventional-erp" first
+```
+
+- [ ] [AI] **RED** — extend the reusable boundary helper in
+      `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-paths.steps.ts` to assert the Dangerous 4
+      boundary and the terminal "ENDS HERE" statement on `<SHARLANDING>` **only** (never
+      `<CONVLANDING>`, already terminal from §3.5) — command: `nx run ayokoding-www-fe-e2e:test:e2e`
+      — acceptance: the new assertion **fails** (only Dangerous 1-3 were asserted before this phase).
+- [ ] [AI] **GREEN** — implement the step bindings against the grown `<SHARLANDING>` content (from
+      §4.4) — command:
+      `nx run ayokoding-www:specs:behavior:coverage && nx run ayokoding-www-fe-e2e:test:e2e` —
+      acceptance: both exit 0.
+- [ ] [AI] **REFACTOR** — consolidate the four boundary assertions (Dangerous 1-4) into a single
+      table-driven helper — command: `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: exits 0,
+      scenario count unchanged; this is the final growth of `skills-erp-paths.steps.ts` — Phase 5 only
+      re-runs coverage, it never extends the file further.
 
 ### Phase 4 Gate
 
 - [ ] [AI] All Phase 3 Gate checks re-run and still green; `<CONVMAN>` unchanged at 27.
-- [ ] [AI] `yq '.courseOrder | length' "${SHARMAN}"` prints `30`.
+- [ ] [AI] `grep -cE '^  - ' "${SHARMAN}"` prints `30`.
 - [ ] [AI] **Integration**: draft PR opened, 3-cycle PR-Review complete, CI green, `[AI]` merge,
       `ayokoding-www` deployed, post-deploy curl check confirms `<SHARLANDING>` shows "ENDS HERE".
 
 > **Pause Safety**: both paths are terminal (27/27 and 30/30). The full corpus is live. Safe to stop.
-> To resume: `yq '.courseOrder | length' ${SHARMAN}` reads `30` and
+> To resume: `grep -cE '^  - ' ${SHARMAN}` reads `30` and
 > `curl -sf https://ayokoding.com/en/learn/paths/skills/sharia-erp | grep -qi "covers all the basics"`.
 
 ## Phase 5: Cross-Path Integrity and Spec Coverage Verification
@@ -632,8 +745,12 @@ never passes vacuously.
       `grep -riE 'sap|oracle|netsuite|erpnext|odoo' <(printf '%s\n' "${ERP_ALL[@]}" skills/conventional-erp skills/sharia-erp)` —
       acceptance: **empty output** (a non-empty match is a trademark-rule violation and fails this
       clause).
-- [ ] [AI] **No verbatim standards-text reproduction**: for each of the AAOIFI FAS numbers named in
-      the grounding file (FAS 3, 4, 7, 9, 10, 28, 32, 33, 34), confirm no course body contains a
+- [ ] [AI] **No verbatim standards-text reproduction**: for each of the `[Verified]` AAOIFI FAS
+      numbers named in
+      [plan 06's verification log §Verified facts carried in](../ayokoding-learning-path-06-skills-accounting/verification-log.md#verified-facts-carried-in-do-not-re-litigate-do-re-confirm-at-authoring)
+      (FAS 3, 4, 7, 9, 10, 28, 32, 33, 34 — the same list this plan's own
+      [tech-docs.md §Load-bearing for courses 28–30](./tech-docs.md#load-bearing-for-courses-2830--there-is-no-single-sharia-accounting-standard)
+      already cites that log for the adjacent PSAK/OI-1 claim), confirm no course body contains a
       100+-character verbatim span matching AAOIFI's own published standard text — this requires a
       `web-researcher`-assisted diff against the official AAOIFI standard for any course quoting a
       FAS number; **acceptance**: for every quoted FAS number, the confirming dispatch reports "no
@@ -674,16 +791,18 @@ never passes vacuously.
 
 - [ ] [AI] Read **both** layers against the eleven safe-authoring rules in
       [tech-docs §Licensing and IP Compliance](./tech-docs.md#licensing-and-ip-compliance-a8): every
-      file in `"${SYL}"` (30 syllabi) **and** every `overview.md` under `"${COURSES}"` for `ERP_ALL`
+      file in `"${SYL}"` (30 syllabi) **and** every `_index.md` under `"${COURSES}"` for `ERP_ALL`
       (30 course bodies) — 60 files total. Confirm none reproduces a standard's clause text or
       numbering layout, mirrors a commercial curriculum's module sequence (ASCM/APICS CPIM and CSCP
       outlines are copyrighted products — naming one as corroboration is nominative use and fine,
       transcribing or re-ordering to match it is not, per `A12`), pastes copyleft code, lifts a
       reference implementation's demo dataset, or uses a vendor name in a title.
       Cardinality guard first:
-      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 30 ] && echo GUARD-OK || echo GUARD-FAIL` must print
-      `GUARD-OK` — acceptance: `GUARD-OK`, then zero violations found across all 60 files; any
-      finding is fixed before this gate closes.
+      `[ "$(find "${SYL}" -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)" -eq 30 ] && echo GUARD-OK || echo GUARD-FAIL`
+      must print `GUARD-OK` — acceptance: `GUARD-OK`, then zero violations found across all 60 files;
+      any finding is fixed before this gate closes. The count excludes `syllabus/courses/README.md`
+      (required by the Learning-Bearing Syllabus Completeness convention) — a naive
+      `ls "${SYL}"*.md | wc -l` would match the README too and return 31.
 
 ### Phase 6 Gate
 

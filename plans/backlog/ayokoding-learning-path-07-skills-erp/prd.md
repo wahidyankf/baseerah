@@ -62,13 +62,22 @@ build/install/evaluate/select content (A6/A7).
 ```gherkin
 Feature: Skills ERP paths — landing, manifest, and ramp behavior
 
+  Scenario: Stage A landings render and both manifests validate at 15 courses
+    Given both manifests are published with courseOrder containing the 15 Stage A ids
+    When a reader opens either the conventional-erp or sharia-erp path landing
+    Then both landings render and both manifests validate against the PathManifest schema
+    And the Dangerous-1 boundary appears correctly on both landings
+    And the sharia-erp landing states it "covers all the basics"
+
   Scenario: conventional-erp landing renders with its full course count
     Given the reader navigates to "/en/learn/paths/skills/conventional-erp"
+    When the landing page loads
     Then the landing renders 27 courses in courseOrder order
     And the landing displays the Dangerous 1, Dangerous 2, and Dangerous 3 boundaries
 
   Scenario: sharia-erp landing renders with its full course count and states it covers the basics
     Given the reader navigates to "/en/learn/paths/skills/sharia-erp"
+    When the landing page loads
     Then the landing renders 30 courses in courseOrder order
     And the landing displays the Dangerous 1 through Dangerous 4 boundaries
     And the landing states explicitly that the path covers all the basics without requiring
@@ -82,6 +91,7 @@ Feature: Skills ERP paths — landing, manifest, and ramp behavior
 
   Scenario: conventional-erp manifest validates against the PathManifest schema
     Given the file "manifests/skills/conventional-erp.yaml"
+    When the manifest is loaded and validated
     Then it parses against the PathManifest zod schema
     And its pathId equals "skills/conventional-erp"
     And its arc equals "immediately-effective"
@@ -89,6 +99,7 @@ Feature: Skills ERP paths — landing, manifest, and ramp behavior
 
   Scenario: sharia-erp manifest validates against the PathManifest schema
     Given the file "manifests/skills/sharia-erp.yaml"
+    When the manifest is loaded and validated
     Then it parses against the PathManifest zod schema
     And its pathId equals "skills/sharia-erp"
     And its courseOrder contains exactly 30 unique course ids
@@ -98,14 +109,17 @@ Feature: Skills ERP paths — landing, manifest, and ramp behavior
 
   Scenario: record-to-report-systems declares its hard accounting prerequisite
     Given the course "record-to-report-systems"
+    When its frontmatter is inspected
     Then its frontmatter prerequisites include "financial-statements-and-close-cycle"
 
   Scenario: no course id, path id, or landing title contains a vendor trademark
     Given every course id in the 30-course ERP catalog and both path ids
+    When every id is scanned
     Then none of them matches "sap", "oracle", "netsuite", "erpnext", or "odoo" (case-insensitive)
 
   Scenario: the two scope-boundary-risk courses each carry a self-check worked example
     Given the courses "erp-analytics-and-reporting" and "erp-security-and-controls"
+    When each course's overview is inspected
     Then each contains a worked example distinguishing its ERP-specific scope from its named
       general-purpose existing-library sibling course
 
@@ -133,3 +147,36 @@ This plan ships no net-new screen or component. Every screen this plan's content
 hub, category landing, two path landings) is designed, mocked, and rendered by
 `ayokoding-learning-path-03-navigation-ui`. See
 [tech-docs.md §UI-design-funnel exemption](./tech-docs.md#ui-design-funnel-exemption-recorded-explicitly).
+
+## Product-Level Risks
+
+- **A reader misjudges the 9-course runway to Dangerous 1 as padding.** Unlike the sibling accounting
+  path's 3-course runway, ERP's cross-cutting spine (document lifecycle, posting rules,
+  subledger-to-GL architecture, fiscal calendar, numbering, audit trail) has no small usable subset —
+  skipping any one course leaves the reader unable to distinguish sound account-determination logic
+  from broken. Mitigated by stating the reason for the longer runway on the landing itself, not just
+  in narrative (Requirement L-2 in
+  [tech-docs.md §Landing content contract](./tech-docs.md#landing-content-requirements-what-plan-03-cannot-infer)),
+  verified by the Rule-15 usability tester.
+- **A reader assumes `sharia-erp` requires `conventional-erp` first.** Because 27 of `sharia-erp`'s 30
+  courses are the same shared corpus, a reader could reasonably (but wrongly) assume the conventional
+  path is a prerequisite. Mitigated by Requirement L-5's explicit landing statement that
+  `sharia-erp` covers all the basics on its own, reinforced by `courseOrder` actually including all
+  27 shared ids.
+- **The Dangerous-N ramp table fails to render legibly across breakpoints.** Both landings render
+  multiple named boundaries (3 for `conventional-erp`, 4 for `sharia-erp`) plus their course-id
+  anchors; a cramped or truncated rendering would undermine the honesty the ramp language is meant to
+  convey. Mitigated by the Phase 7 manual verification gate, which screenshots each path landing at
+  three breakpoints and asserts legibility against the color-blind-friendly palette.
+- **A reader conflates the two products as one path with an optional add-on.** Because `sharia-erp`'s
+  30-course `courseOrder` visually resembles `conventional-erp`'s 27-course `courseOrder` plus a tail,
+  a reader skimming both landings side by side could misread `sharia-erp` as "conventional-erp plus
+  extras" rather than a complete, independent path. Mitigated by both landings stating their own arc
+  and boundaries independently (Requirement L-3), never cross-referencing the other path as a
+  prerequisite.
+- **A reader over-trusts the Dangerous-N framing as operational competence.** Because every boundary is
+  phrased as what the reader can read, reason about, and design (see
+  [Ramp Boundary Language](#ramp-boundary-language-re-grounded-dd-29) above), a reader could still
+  over-read a "Dangerous 1" label as license to operate a live system. Mitigated by the same
+  re-grounded phrasing never using "operate", "install", or "configure a live system" language at any
+  boundary.

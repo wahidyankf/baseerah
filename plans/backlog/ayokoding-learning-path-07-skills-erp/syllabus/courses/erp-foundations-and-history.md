@@ -42,7 +42,7 @@ a system, `A7`). License-aware (DD-15).
 
 ## Concepts
 
-<!-- co-NN · concept enumeration. Floor >= 10 (Annotated-concept). Each example below cites the co-NN it exercises. -->
+<!-- co-NN · concept enumeration. Floor >= 8 (DD-35, Annotated-concept). Each example below cites the co-NN it exercises. -->
 
 - **co-01 · integration-promise** — one system of record across finance, logistics, and people,
   replacing siloed departmental software.

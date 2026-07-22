@@ -92,29 +92,45 @@ but has no published permission-to-reproduce policy (treated as closed); **no pu
 accounts exists anywhere**, so every chart of accounts in this corpus is originally authored. Full
 table: [tech-docs §Licensing and IP Compliance](./tech-docs.md#licensing-and-ip-compliance-a8).
 
-## Carried residuals — every `[Needs Verification]` marker still standing at the Phase 4 gate
+## Carried residuals — verification-marker resolution status at the Phase 4 gate
 
-**Literal zero is not the target, and never was.** Some markers in this corpus are deliberate and
-permanent until a primary source is obtained; others are authoring-time placeholders that Phase 1's
-coverage pass resolves. The Phase 4 gate therefore asserts that **no marker is unaccounted for** —
-every syllabus file still carrying `[Needs Verification]` must be named in the register below with a
-reason. An unregistered marker is the defect; a registered one is a disclosed limitation.
+**Historical note (superseded by the 2026-07-22 grounding pass — do not re-derive from this
+section's earlier wording).** Earlier authoring-time drafts of this register named
+`sharia-accounting-and-aaoifi-standards.md` (one marker) and
+`sharia-ledger-system-architecture.md` (three markers) as carrying `[Needs Verification]`
+placeholders pending Phase 1's coverage pass. The exhaustive grounding pass that followed resolved
+every placeholder in the corpus before Phase 1 began — a repo-wide check across all 24
+`syllabus/courses/*.md` files (excluding `README.md`), reproducible with
+`find syllabus/courses -maxdepth 1 -name '*.md' ! -name 'README.md' -print0 | xargs -0 grep -l
+'\[Needs Verification\]' | wc -l`, confirms:
 
-Register each as `<course-file>.md — <reason>`. Known deliberate residuals at plan-authoring time:
+- **0** files carry a `[Needs Verification]` marker — the placeholder tag is retired from this
+  corpus entirely.
+- **48** `[Verified...]`-tagged claims remain (across 20 files) — resolved facts with a stated
+  primary source.
+- **18** `[Web-cited...]`-tagged claims remain (across 10 files) — resolved facts with an inline
+  URL and access date.
+- **4** `[Unverified...]`-tagged claims are **honestly retained**, per `A4`/`A8`, in exactly these
+  files (each with a stated, non-asserting reason, either inline in the tag or in the immediately
+  surrounding prose — never a bare unexplained tag):
+  - `managerial-and-cost-accounting.md` — a primary-source-level claim corroborated only by
+    secondary study guides.
+  - `sharia-accounting-and-aaoifi-standards.md` — any FAS number outside the `[Verified]`
+    whitelist, explicitly marked re-verify-or-drop before being written.
+  - `sharia-ledger-system-architecture.md` — the balance-sheet presentation of profit-sharing
+    investment-account balances, deliberately not asserted (Apache Fineract's own two mentions in
+    this file already carry `[Web-cited]`, not `[Unverified]` — they resolved separately).
+  - `zakah-computation-and-reporting-for-systems.md` — a version- and jurisdiction-volatile value,
+    deliberately not asserted.
 
-- `sharia-accounting-and-aaoifi-standards.md` — carries **one** marker, in ex-06's licensing note:
-  the assertion that no FAS 28 recognition pattern, clause, or threshold is reproduced there stays
-  unconfirmed pending the Phase 1 coverage pass. This is `A8` hygiene, not doctrine — OI-2 is left
-  `OPEN` as unmarked prose in the same passage, which is what `A4` requires.
-- `sharia-ledger-system-architecture.md` — carries **three** markers, covered by two reasons:
-  - **Apache Fineract** (2 markers, in the `DD-15` relationship bullet and the `## Read more` entry) —
-    its suitability for modelling Islamic-finance products is a capability inference from the
-    configurable product framework, not a documented feature; searches of `fineract.apache.org`, the
-    GitHub repo and the Mifos docs portal could not confirm documented Islamic-banking support, and no
-    citation is invented for it.
-  - **Standards-ecosystem scope** (1 marker, in the Accuracy notes) — the course deliberately does
-    **not** assert that its architectural patterns belong to any particular standards ecosystem;
-    that claim stays marked pending the Phase 1 coverage pass.
+**This is the target state, not a gap.** A retained `[Unverified]` tag is a legitimate terminal
+state under `A4` — "the corpus honestly declines to assert this, with a reason" — not the same
+thing as the old `[Needs Verification]` placeholder, which meant "this claim has not been resolved
+either way yet." Because the placeholder tag no longer appears anywhere in the corpus, the Phase 4
+gate's checks in `delivery.md` were rewritten to (a) confirm the placeholder's absence and (b) use
+an anti-vacuity companion that confirms the corpus's verification labelling is genuine — a
+substantial number of `[Verified]`/`[Web-cited]`/`[Unverified]` tags actually present — rather than
+checking for files named against a register that no longer describes any real marker.
 
 ### Not registered here — OI-ledger residuals are a different mechanism
 

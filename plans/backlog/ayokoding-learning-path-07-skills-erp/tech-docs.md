@@ -30,18 +30,23 @@ component, resolver, schema, and route it depends on is built by plans 01–03 a
 ## The manifest ownership invariant (scoped to two data files)
 
 Per the programme's manifest-ownership invariant (each plan owns its own data file(s) plus their
-co-located unit test, never a sibling's), this plan owns **exactly two** YAML data files and **one**
-shared unit test that asserts both:
+co-located unit test, never a sibling's), this plan owns **exactly two** YAML data files and **two**
+co-located unit tests, one per manifest:
 
-| Plan | Owns                                                                                                                        | Never writes                                                                 |
-| ---- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| 06   | `manifests/skills/conventional-accounting.yaml`, `manifests/skills/sharia-accounting.yaml` + their unit test(s)             | anything under `manifests/skills/conventional-erp.yaml` or `sharia-erp.yaml` |
-| 07   | `manifests/skills/conventional-erp.yaml`, `manifests/skills/sharia-erp.yaml` (**this plan**) + `erp-manifests.unit.test.ts` | `manifests/careers/**`, `manifests/skills/*accounting*.yaml`                 |
+| Plan | Owns                                                                                                                                                                           | Never writes                                                                 |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| 06   | `manifests/skills/conventional-accounting.yaml`, `manifests/skills/sharia-accounting.yaml` + their unit test(s)                                                                | anything under `manifests/skills/conventional-erp.yaml` or `sharia-erp.yaml` |
+| 07   | `manifests/skills/conventional-erp.yaml`, `manifests/skills/sharia-erp.yaml` (**this plan**) + `conventional-erp-manifest.unit.test.ts` and `sharia-erp-manifest.unit.test.ts` | `manifests/careers/**`, `manifests/skills/*accounting*.yaml`                 |
 
-Both ERP manifests are owned by the **same plan**, so — unlike the cross-plan case that motivated the
-2026-07-21 one-file-per-plan ruling — combining their assertions into **one** test file
-(`erp-manifests.unit.test.ts`) is not a cross-plan seam; it is one plan's own test file covering both
-of its own data files.
+Both ERP manifests are owned by the **same plan**, and — per [DD-37](#design-decisions) — each owns
+its own co-located unit test rather than sharing one: this conforms to sibling plan 06's own `DD-602`
+ruling that "two manifests, two tests" is the one-test-per-data-file granularity used everywhere else
+in the programme, regardless of whether the two manifests happen to sit inside one plan or two. An
+earlier round of this plan combined both manifests' assertions into one `erp-manifests.unit.test.ts`
+file, reasoning that a same-plan combination is not the cross-plan seam the 2026-07-21 ruling
+targeted — that reasoning was correct about the seam but did not reconcile with plan 06's DD-602,
+which faces the identical one-plan-two-manifests situation and explicitly rejects a combined file.
+DD-37 corrects this.
 
 ## Path constants
 
@@ -54,8 +59,10 @@ of its own data files.
 - `<MANIFESTS>` = `<FEAT>manifests/`
 - `<CONVMAN>` = `<MANIFESTS>skills/conventional-erp.yaml`
 - `<SHARMAN>` = `<MANIFESTS>skills/sharia-erp.yaml`
-- `<MTEST>` = `<MANIFESTS>skills/erp-manifests.unit.test.ts` — owned by this plan, asserts both
-  manifests
+- `<MTEST_CE>` = `<MANIFESTS>skills/conventional-erp-manifest.unit.test.ts` — owned by this plan,
+  asserts `<CONVMAN>` only
+- `<MTEST_SE>` = `<MANIFESTS>skills/sharia-erp-manifest.unit.test.ts` — owned by this plan, asserts
+  `<SHARMAN>` only
 - `<SYL>` = `plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/courses/` — this plan's own
   per-course syllabus corpus (DD-2), each carrying an explicit module/topic breakdown (DD-31)
 - `<SYLPATHS>` = `plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/paths/` — this plan's
@@ -103,15 +110,17 @@ Per amendment `A10`, `skills/erp` splits into **`skills/conventional-erp`** (27 
 basics** — `sharia-erp` is never an add-on module assuming the conventional path; a reader entering it
 cold gets full grounding, because its `courseOrder` **includes** all 27 shared ids.
 
-**A11 is the existing schema rule, not a new mechanism** — cited directly rather than re-derived:
+**A11 is the existing schema rule, not a new mechanism** — cited directly rather than re-derived
+(line numbers current as of 2026-07-22; plan 02 is an active, unarchived plan, so re-verify via
+`grep -n` against the live file before relying on exact line numbers):
 
 - _"No course ID appears twice **within one manifest**"_ [Repo-grounded —
-  `ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md:417`]. Uniqueness is
+  `ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md:467`]. Uniqueness is
   per-manifest, so the same course id may legally appear in both `<CONVMAN>` and `<SHARMAN>`.
 - _"No course body is duplicated per path (all manifests reference courses **by ID**, never copy a
-  body)"_ [Repo-grounded — same file, line 424].
+  body)"_ [Repo-grounded — same file, line 474].
 - _"One body cannot encode four orders; moving order to the manifest [is what enables the shared
-  library]"_ [Repo-grounded — same file, line 615, DD-1].
+  library]"_ [Repo-grounded — same file, line 736, DD-1].
 
 **Consequence**: the 27 shared course bodies are authored **once**, under `<COURSES>`, exactly as
 every other course in the library is. `<SHARMAN>`'s `courseOrder` **interleaves** the 27 shared ids
@@ -219,9 +228,18 @@ consuming APIs against a real system) without requiring the reader to stand one 
 
 R5 requires this plan to state whether the new subject domain joins the existing prerequisite DAG or
 forms a disjoint component. It joins. The ERP corpus declares ten edges into the existing
-software-engineering library and seven into the accounting corpus (nine distinct accounting ids
-across the two Sharia-exclusive courses' transitive chain, but only seven distinct **direct** ids —
-see the catalog tables above). **No edge runs the other way**: no software-engineering course and no
+software-engineering library and seven **direct** edges into the accounting corpus — see the catalog
+tables above [Repo-grounded]. Two of those seven edges originate from a single ERP course,
+`sharia-compliant-erp-design` (course 28), which cites `islamic-contract-modeling-for-systems` and
+`sharia-accounting-and-aaoifi-standards`. **These two ids' own combined transitive prerequisite chain
+_inside the accounting corpus_** (a narrower quantity than the full seven-id closure, which reaches
+sixteen) closes over exactly **ten** distinct accounting ids: `accounting-foundations`,
+`chart-of-accounts-and-data-modeling`, `financial-statements-and-close-cycle`,
+`journal-entries-and-posting-mechanics`, `accrual-accounting-and-revenue-recognition`,
+`fixed-assets-and-depreciation`, `lease-and-intangible-asset-accounting`,
+`financial-reporting-standards-ifrs-vs-gaap`, `sharia-accounting-and-aaoifi-standards`, and
+`islamic-contract-modeling-for-systems` itself [Repo-grounded — independently re-derived from plan
+06's own catalog table]. **No edge runs the other way**: no software-engineering course and no
 accounting course declares an ERP course as a prerequisite. ERP is therefore a **downstream-only
 subgraph** attached to the single library-wide DAG, exactly as the 20-course predecessor catalog was.
 
@@ -603,23 +621,23 @@ tags: every syllabus's Scope note ends `License-aware (DD-15)` per the inherited
 `A8` section is the broader content-reproduction rule that additionally binds every course body. See
 [DD-34](#design-decisions).
 
-### Per-project licence table (from the domain-research grounding, `[Verified]`)
+### Per-project licence table (`[Web-cited]` per row; access date 2026-07-22 unless noted)
 
-| Project                                             | Licence            | Note                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| --------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Odoo Community                                      | LGPLv3             | permissive-ish copyleft; describe behaviourally, never quote code                                                                                                                                                                                                                                                                                                                                                                            |
-| Odoo Enterprise                                     | OEEL (proprietary) | never reference its internals beyond nominative naming                                                                                                                                                                                                                                                                                                                                                                                       |
-| ERPNext                                             | GPLv3              | code is copyleft; docs are CC-BY-SA-3.0                                                                                                                                                                                                                                                                                                                                                                                                      |
-| Frappe Framework                                    | MIT                | the only fully permissive project in the table                                                                                                                                                                                                                                                                                                                                                                                               |
-| Tryton                                              | GPLv3+             | copyleft; describe behaviourally                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Apache OFBiz                                        | Apache-2.0         | permissive; still never paste verbatim without attribution                                                                                                                                                                                                                                                                                                                                                                                   |
-| Dolibarr                                            | GPLv3+             | copyleft; describe behaviourally                                                                                                                                                                                                                                                                                                                                                                                                             |
-| iDempiere                                           | GPLv2              | copyleft; describe behaviourally                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Metasfresh                                          | GPLv2              | `[Web-cited: metasfresh/metasfresh LICENSE.md — https://raw.githubusercontent.com/metasfresh/metasfresh/master/LICENSE.md ; accessed 2026-07-22]` — primary source confirms GPLv2; commercial offering is paid support on the same GPL code, **not** a separate proprietary edition. Secondary "GPLv2/GPLv3" characterization (per-repo licence variance) remains `[Needs Verification]`. Copyleft; describe behaviourally, never quote code |
-| ledger-cli (reference for GL mechanics)             | BSD-3-Clause       | permissive; safe to reference more directly than the above                                                                                                                                                                                                                                                                                                                                                                                   |
-| Apache Fineract (reference for subledger mechanics) | Apache-2.0         | permissive; safe to reference more directly than the above                                                                                                                                                                                                                                                                                                                                                                                   |
+| Project                                             | Licence            | Note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| --------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Odoo Community                                      | LGPLv3             | `[Web-cited: odoo/odoo LICENSE — "Odoo is published under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3 (LGPLv3)" — https://raw.githubusercontent.com/odoo/odoo/17.0/LICENSE ; accessed 2026-07-22]`. Permissive-ish copyleft; describe behaviourally, never quote code                                                                                                                                                                                                                                       |
+| Odoo Enterprise                                     | OEEL (proprietary) | `[Web-cited: Odoo official documentation — "Odoo 19 Enterprise Edition is licensed under the Odoo Enterprise Edition License v1.0" — https://www.odoo.com/documentation/master/legal/licenses.html ; accessed 2026-07-22]`. Never reference its internals beyond nominative naming                                                                                                                                                                                                                               |
+| ERPNext                                             | GPLv3              | `[Web-cited: frappe/erpnext license.txt — "GNU GENERAL PUBLIC LICENSE, Version 3" — https://raw.githubusercontent.com/frappe/erpnext/develop/license.txt ; accessed 2026-07-22]`. Code is copyleft; docs are CC-BY-SA-3.0                                                                                                                                                                                                                                                                                        |
+| Frappe Framework                                    | MIT                | `[Web-cited: frappe/frappe GitHub repository — "License: MIT" badge — https://github.com/frappe/frappe ; accessed 2026-07-22]`. The only fully permissive project in the table                                                                                                                                                                                                                                                                                                                                   |
+| Tryton                                              | GPLv3+             | `[Web-cited: tryton/tryton-client LICENSE — "GNU GENERAL PUBLIC LICENSE Version 3" — https://github.com/tryton/tryton-client/blob/develop/LICENSE ; accessed 2026-07-22]`, corroborated by the Tryton community's own GPLv3-licensing discussion at https://discuss.tryton.org/t/gpl-v3-licence-restrictions/4454 (accessed 2026-07-22). Copyleft; describe behaviourally                                                                                                                                        |
+| Apache OFBiz                                        | Apache-2.0         | `[Web-cited: ofbiz.apache.org/download.html — "Licensed under the Apache License, Version 2.0" — https://ofbiz.apache.org/download.html ; accessed 2026-07-22]`. Permissive; still never paste verbatim without attribution                                                                                                                                                                                                                                                                                      |
+| Dolibarr                                            | GPLv3+             | `[Web-cited: Dolibarr/dolibarr COPYRIGHT — "distributed under the GNU General Public License ... version 3 ... or (at your option) any later version (GPL-3+)" — https://raw.githubusercontent.com/Dolibarr/dolibarr/develop/COPYRIGHT ; accessed 2026-07-22]`. Copyleft; describe behaviourally                                                                                                                                                                                                                 |
+| iDempiere                                           | GPLv2              | `[Web-cited: idempiere/idempiere LICENSE.md — "GNU General Public License Version 2, June 1991" — https://raw.githubusercontent.com/idempiere/idempiere/release-11/LICENSE.md ; accessed 2026-07-22]`. Copyleft; describe behaviourally                                                                                                                                                                                                                                                                          |
+| Metasfresh                                          | GPLv2              | `[Web-cited: metasfresh/metasfresh LICENSE.md — https://raw.githubusercontent.com/metasfresh/metasfresh/master/LICENSE.md ; accessed 2026-07-22]` — primary source confirms GPLv2; commercial offering is paid support on the same GPL code, **not** a separate proprietary edition. Secondary "GPLv2/GPLv3" characterization (per-repo licence variance) remains `[Needs Verification]`. Copyleft; describe behaviourally, never quote code                                                                     |
+| ledger-cli (reference for GL mechanics)             | BSD-3-Clause       | `[Web-cited: ledger/ledger README.md license badge, linking to https://opensource.org/licenses/BSD-3-Clause — https://raw.githubusercontent.com/ledger/ledger/master/README.md ; accessed 2026-07-22]`. GitHub's automated license detector reports no recognized SPDX id for this repo's LICENSE file specifically (`[Needs Verification]` for the exact clause text); the project's own self-declared README badge is the primary signal used here. Permissive; safe to reference more directly than the above |
+| Apache Fineract (reference for subledger mechanics) | Apache-2.0         | `[Web-cited: fineract.apache.org — "Licensed under the Apache License, Version 2.0" — https://fineract.apache.org/ ; accessed 2026-07-22]`. Permissive; safe to reference more directly than the above                                                                                                                                                                                                                                                                                                           |
 
-**No public-domain chart-of-accounts template was found in the grounding research.** Any chart of
+**No public-domain chart-of-accounts template was found during authoring research.** Any chart of
 accounts anywhere in this corpus (course 2's data-model examples, course 5's posting-rule worked
 examples, and every By-Example course's sample company) must be **authored originally**.
 
@@ -946,7 +964,8 @@ transcribing its outline is not.
 - **DD-27 · A9 depth expansion: 20 → 30 courses.** The count is an output of covering the cross-cutting
   spine, the module map, the subledger-to-GL crux, and the hard parts — not a target. **Decided.**
 - **DD-28 · A10/A11: two paths, shared-course-by-reference architecture.** Cites plan 02's existing
-  schema rule directly (`tech-docs.md:417`, `:424`, `:615`) rather than proposing a schema change; 27
+  schema rule directly (`tech-docs.md:467`, `:474`, `:736` as of 2026-07-22 — re-verify via `grep -n`
+  against the live file, as plan 02 is active and unarchived) rather than proposing a schema change; 27
   shared courses authored once, referenced by both manifests; 3 Sharia-exclusive courses referenced
   only by `<SHARMAN>`. **Decided.**
 - **DD-29 · The ramp-boundary promise is re-grounded from "operate a real ERP" to "read, reason about,
@@ -991,8 +1010,8 @@ Verification]`. **Decided.**
   inherited floor to 8 for the same reason — **structure is mirrored exactly; volume is proportionate
   to a first-authored corpus.** Two consequences are deliberate. First, 8 is a floor and not a target:
   courses whose subject decomposes further carry more, and the corpus's architectural spine
-  (`erp-module-map-and-architecture`, `erp-document-lifecycle-and-state-machines`,
-  `erp-subledger-to-gl-architecture`) sits at 10-12 without being trimmed to the floor. Second,
+  (`erp-module-map-and-architecture` at 13, `erp-document-lifecycle-and-state-machines` at 12,
+  `erp-subledger-to-gl-architecture` at 11) sits at 11-13 without being trimmed to the floor. Second,
   `record-to-report-systems` is held to **≥ 10** rather than 8, because subledger-to-GL convergence is
   this corpus's own stated architectural crux and is the topic least able to afford
   under-decomposition. **Decided.**
@@ -1014,6 +1033,16 @@ Verification]`. **Decided.**
   applies here exactly as it did when A9 first expanded the catalog past 20). Format is **By Example**, taking the
   format split to 18/12: a lot verdict, a usage decision and a disposition map are all traceable
   scenarios with determinate right answers, which is what the By Example format is for. **Decided.**
+- **DD-37 · Per-manifest test-file granularity, conforming to the programme norm — supersedes the
+  earlier combined-file approach.** `<CONVMAN>` and `<SHARMAN>` each own their own co-located unit
+  test — `conventional-erp-manifest.unit.test.ts` (`<MTEST_CE>`) and `sharia-erp-manifest.unit.test.ts`
+  (`<MTEST_SE>`) — rather than the single `erp-manifests.unit.test.ts` an earlier round of this plan
+  combined them into. The earlier reasoning ("both manifests are owned by the same plan, so combining
+  is not a cross-plan seam") was correct about the seam but did not reconcile with sibling plan 06's
+  own `DD-602`, which faces the structurally identical one-plan-two-manifests situation and explicitly
+  rules "two manifests, two tests, mirroring the one-test-per-data-file granularity used everywhere
+  else in the programme" over inventing a combined file. This plan now conforms to that programme-wide
+  precedent. **Decided.**
 
 ## File impact
 
@@ -1029,11 +1058,14 @@ Verification]`. **Decided.**
 | `<COURSES>_index.md`                                              | edit   | add thirty catalog rows — populate only; file created by plan 01         |
 | `<SPECS>skills-erp-paths.feature`                                 | new    | this plan's Gherkin, covering both paths                                 |
 | `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-paths.steps.ts`   | new    | step bindings; created by this plan, pairing 1:1 with the feature above  |
-| `<MTEST>`                                                         | new    | asserts both manifests; owned by this plan alone                         |
+| `<MTEST_CE>`                                                      | new    | asserts `<CONVMAN>` only; owned by this plan alone (DD-37)               |
+| `<MTEST_SE>`                                                      | new    | asserts `<SHARMAN>` only; owned by this plan alone (DD-37)               |
 
 **No shared code file with any sibling plan** — unchanged rationale from the prior design (a file on a
 cross-plan seam conflicts on merge and makes structure depend on merge order); this plan's own two
-manifests share one test file precisely because that is a **within-plan** concern, not a cross-plan one.
+manifests each carry their own co-located unit test, matching the one-test-per-data-file granularity
+used everywhere else in the programme (DD-37, conforming to plan 06's DD-602) — this is a
+**within-plan** concern, not a cross-plan one.
 
 ## Rollback
 

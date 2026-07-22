@@ -48,6 +48,33 @@ products with independent value, not one product with an optional add-on.
   content appears on; this plan supplies content specifications only (see
   [tech-docs.md §Landing content requirements](./tech-docs.md#landing-content-requirements-what-plan-03-cannot-infer)).
 
+## Business-Scope Non-Goals
+
+- **Any accounting content.** The full accounting corpus, its manifests, and its landings belong to
+  `ayokoding-learning-path-06-skills-accounting`; this plan only consumes it via prerequisite edges
+  (the Stage B/C gates named in [Affected Roles](#affected-roles) above), never by editing an
+  accounting file.
+- **Any UI component, route, or design asset.** Both path landings are rendered by
+  `ayokoding-learning-path-03-navigation-ui`; this plan supplies content specifications only (see
+  [tech-docs.md §Landing content requirements](./tech-docs.md#landing-content-requirements-what-plan-03-cannot-infer)).
+- **Any structural `_index.md` under `paths/`**, including `paths/skills/_index.md` — owned by
+  `ayokoding-learning-path-01-url-restructure` (A3).
+- **Building, installing, configuring, or standing up an ERP system of any kind (A6).** No course,
+  exercise, or capstone asks the reader to construct or operate a live system — the corpus stops at
+  build-founding depth.
+- **Evaluating, selecting, or endorsing any commercial or open-source ERP vendor (A7).** No course
+  teaches vendor comparison, procurement, or implementation methodology; no vendor name appears in any
+  course id, path id, or landing title (trademark exposure, mitigated per the Risks table below).
+- **An Indonesian mirror of either path.** `id/belajar/` holds zero ERP courses and zero ERP paths
+  (DD-20).
+- **A second skills arc.** Both `skills/conventional-erp` and `skills/sharia-erp` are
+  `immediately-effective` (R8); no ramped or foundational arc variant of `skills/` exists.
+- **Reproducing any standard's text, proprietary schema, or copyleft reference-implementation code
+  (A8).** Every course is authored clean-room; see the eleven safe-authoring rules in
+  [tech-docs.md §Licensing and IP Compliance](./tech-docs.md#licensing-and-ip-compliance-a8).
+- **Re-authoring or editing any existing library course.** The 10 existing software-engineering
+  prerequisite courses this corpus links are referenced, never forked or edited.
+
 ## Risks
 
 | Risk                                                                                                                | Likelihood | Impact | Mitigation                                                                                                                                                    |

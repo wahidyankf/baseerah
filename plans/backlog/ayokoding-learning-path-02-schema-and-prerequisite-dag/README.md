@@ -155,7 +155,7 @@ blue, `#029E73` teal, `#DE8F05` orange) with black borders and WCAG-AA-contrasti
 ## The DD-34 / DD-35 / DD-39 numbering gap is deliberate
 
 `DD-34`, `DD-35` and `DD-39` are **not this plan's design decisions**. They are FS-SE-inherited
-tokens used inside `syllabus/courses/**` with different meanings — 113, 114 and 49 occurrences
+tokens used inside `syllabus/courses/**` with different meanings — 113, 113 and 49 occurrences
 respectively. `DD-36`, `DD-37` and `DD-38` are unused anywhere. The source plan documented this
 deliberately at `tech-docs.md:1837-1844`; that passage is restated **verbatim** below so a future
 reader does not "fix" the apparent gap and corrupt the corpus:
@@ -165,18 +165,21 @@ reader does not "fix" the apparent gap and corrupt the corpus:
 > `DD-39` are already in use **inside this plan's own folder** — they appear throughout
 > `syllabus/courses/**` carrying **FS-SE-inherited** meanings (concept enumeration, primary-source
 > citation policy, typed-Python policy) rather than this document's numbering
-> [Repo-grounded — `grep -rl "DD-3[4-9]" syllabus/courses/`, run from this plan folder, lists 94
-> files; every occurrence outside `syllabus/` is prose about this very collision]. Starting at 40
-> keeps every `DD-NN` token in this plan folder unambiguous for an execution-grade reader.
+> [Repo-grounded — `grep -rn "DD-3[4-9]" plans/backlog/shared-course-library-and-learning-paths/`
+> returns hits only under `syllabus/courses/`]. Starting at 40 keeps every `DD-NN` token in this plan
+> folder unambiguous for an execution-grade reader.
 
 The `[Repo-grounded]` path in that quotation names the **pre-split** folder, because that is what the
-passage said when it was written. Post-split the equivalent check is
-`grep -rn "DD-3[4-9]" plans/*/ayokoding-learning-path-02-schema-and-prerequisite-dag/`, which still
-returns hits only under `syllabus/courses/`. The `plans/*/` glob is deliberate: the plan is promoted
+passage said when it was written. Post-split the equivalent check, scoped to the corpus this plan
+custodies rather than the whole plan folder — this very discussion of the collision necessarily
+contains the literal tokens too, so a whole-plan-folder grep is not the intended check — is
+`grep -rn "DD-3[4-9]" plans/*/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/`,
+which returns hits only under that directory [Repo-grounded — measured 2026-07-23: 258 matching
+lines, 0 files outside `syllabus/courses/`]. The `plans/*/` glob is deliberate: the plan is promoted
 from `plans/backlog/` to `plans/in-progress/` before execution starts, so a hardcoded stage prefix
 would be stale — the same reason `delivery.md` writes every plan-folder path as `<PLAN>`.
 
-**Never renumber to close the gap.** A renumbering pass would rewrite 276 in-corpus tokens whose
+**Never renumber to close the gap.** A renumbering pass would rewrite 275 in-corpus tokens whose
 meanings belong to a different, closed plan.
 
 ## Implementation Sequence and Prerequisites
@@ -214,9 +217,10 @@ exist yet — this plan creates it).
 `syllabus/` lives **only** here. Every sibling plan links into it by relative path and **never
 copies it**. A copy forks the source of truth for 120 course specs and four manifest orderings.
 
-`syllabus/courses/**` is the only place the tokens `DD-34`, `DD-35` and `DD-39` appear (113 / 114 /
-49 occurrences). Those are **FS-SE-inherited tokens with different meanings**, not this plan's
-decisions, and `DD-36`/`DD-37`/`DD-38` are unused. **Do not renumber to close the apparent gap.**
+`syllabus/courses/**` is the only place the tokens `DD-34`, `DD-35` and `DD-39` are used with
+**FS-SE-inherited meanings** (113 / 113 / 49 occurrences) — as opposed to being named in prose
+elsewhere in this plan's own docs, as in this very sentence. Those inherited meanings are not this
+plan's decisions, and `DD-36`/`DD-37`/`DD-38` are unused. **Do not renumber to close the apparent gap.**
 
 ### Archival is gated on downstream archival
 

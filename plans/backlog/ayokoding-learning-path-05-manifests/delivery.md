@@ -154,13 +154,14 @@ the unit-test file that asserts every published `careers/` manifest's shape, int
 state. It lives inside `<MANIFESTS>careers/`, alongside the manifests it covers.
 
 > **It is NOT shared, and no sibling appends to it (ruled 2026-07-21).** Each plan owns its own
-> manifest **and that manifest's test**, mirroring the manifest-ownership invariant exactly:
-> `ayokoding-learning-path-06-skills-accounting` owns
+> manifest(s) and their test(s), under the identical invariant:
+> `ayokoding-learning-path-06-skills-accounting` owns two separate test files —
 > `<MANIFESTS>skills/conventional-accounting-manifest.unit.test.ts` and
-> `<MANIFESTS>skills/sharia-accounting-manifest.unit.test.ts`; `ayokoding-learning-path-07-skills-erp`
-> owns `<MANIFESTS>skills/conventional-erp-manifest.unit.test.ts` and
-> `<MANIFESTS>skills/sharia-erp-manifest.unit.test.ts` (four manifests, four tests, as of amendment
-> A10 — up from two).
+> `<MANIFESTS>skills/sharia-accounting-manifest.unit.test.ts`, one per manifest;
+> `ayokoding-learning-path-07-skills-erp` owns two separate test files,
+> `<MANIFESTS>skills/conventional-erp-manifest.unit.test.ts` and
+> `<MANIFESTS>skills/sharia-erp-manifest.unit.test.ts`, one per manifest
+> (four manifests, four tests, as of amendment A10 — up from two).
 >
 > An earlier draft declared a single root-level `published-manifests.unit.test.ts` shared by all
 > three plans. That was overturned for two reasons. First, it puts a file on a **three-way
@@ -203,7 +204,12 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] **Start precondition 5** — confirm the full `careers/`-software-engineering catalog
       resolves (R4: 127 is the `careers/` catalog total, not a whole-programme total — the sibling
       `skills/` corpus is a separate corpus owned by `ayokoding-learning-path-06-skills-accounting`
-      and `ayokoding-learning-path-07-skills-erp` and is not counted here):
+      and `ayokoding-learning-path-07-skills-erp` and is not counted here). This is a **confirming**
+      check, not the reason all 127 exist — Start precondition 2 (the entire course-authoring plan
+      merged) already guarantees it; see
+      [tech-docs §Manifest lifecycle](./tech-docs.md#manifest-lifecycle) for why the staged
+      `SmokeTestScoped → Grown` rollout in Phases 1-5 is preserved anyway, as a deliberate
+      small-blast-radius verification strategy:
       `find <COURSES> -maxdepth 1 -mindepth 1 -type d | wc -l`
       — acceptance: returns **127**. Falsifiable both ways: it returns **37** after the
       url-restructure plan's re-home alone, and the `find` fails outright before `<COURSES>` exists.
@@ -277,9 +283,9 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 
 ### 1.1 · TDD cycle A — publish the manifest data file
 
-- [ ] [AI] **RED** — create `<MANIFESTS>careers/careers-manifests.unit.test.ts` _(new file; lives in the
-      unscoped `<MANIFESTS>` root and is shared with `ayokoding-learning-path-06-skills-accounting`
-      and `ayokoding-learning-path-07-skills-erp`, see
+- [ ] [AI] **RED** — create `<MANIFESTS>careers/careers-manifests.unit.test.ts` _(new file; lives inside
+      `<MANIFESTS>careers/`, alongside the manifests it covers; it is NOT shared with any sibling
+      plan — see
       the path constants section above)_ with a failing assertion that
       `<MANIFESTS>careers/interview-ready/software-engineer.yaml` loads, zod-validates against
       `<FEAT>core/schemas.ts`, and passes `checkManifestIntegrity` +
@@ -615,8 +621,9 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 >
 > Adds **no new course body** — it composes existing library courses into the immediately-effective
 > arc (editor → one language → **build a real app first** → then deepen). Authored over the
-> currently-available library and grown through Bands 1–8 in Phase 5. This manifest **omits the
-> interview-technique band by design** (DL-13) and therefore does **not** grow at Band 9.
+> currently-available library and grown through Bands 1–8 **and Band 9** in Phase 5 — per the
+> [mirror's own "Optional tail" note](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md#optional-tail--ready-to-job-hunt-bridge-into-the-interview-courses),
+> this manifest's optional job-hunt tail lands here exactly like `fundamentally-strong`'s.
 
 ### 3.1 · TDD cycle — publish the manifest data file
 
@@ -645,13 +652,19 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] **GREEN** — author `<MANIFESTS>careers/immediately-effective/software-engineer.yaml` _(new file)_
       with `pathId: careers/immediately-effective/software-engineer`, a `title`, a `description`, and an
       ordered `courseOrder` transcribed from
-      [`../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md)
+      [`../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md),
+      **restricted to the mirror's main body (114 courses), excluding the five optional-tail Band-9
+      IDs (`coding-interview`, `take-home-and-live-coding`, `system-design-interview`,
+      `behavioral-and-leadership-interviews`, `capstone-interview-loop`) deferred to
+      [Phase 5.2](#52--band-9-growth-all-three-software-engineer-manifests)**
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0, AND the build-before-theory ordering holds:
       `awk '/^courseOrder:/{f=1;next} f&&/^ *- /{n++; if ($2=="capstone-full-stack-app") print "app@"n; if ($2=="computer-science-foundations") print "theory@"n}' <MANIFESTS>careers/immediately-effective/software-engineer.yaml`
-      prints the `app@` line **before** the `theory@` line. Falsifiable both ways: a theory-first
-      ordering prints them in the opposite order, and the command prints nothing at all if either ID
-      is missing (which itself fails the check).
+      prints the `app@` line **before** the `theory@` line, AND the five deferred IDs are absent —
+      `grep -oE 'coding-interview|take-home-and-live-coding|system-design-interview|behavioral-and-leadership-interviews|capstone-interview-loop' <MANIFESTS>careers/immediately-effective/software-engineer.yaml | sort -u | wc -l`
+      returns **0**. Falsifiable both ways: a theory-first ordering prints the app@/theory@ lines in
+      the opposite order, the command prints nothing at all if either ID is missing (which itself fails
+      the check), and after Phase 5.2's Band-9 growth the deferred-ID grep must return **5**.
 - [ ] [AI] **REFACTOR** — deduplicate the load-and-validate helper now that three manifests share it,
       and confirm no assertion was weakened — command:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint`
@@ -699,6 +712,8 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] The build-before-theory ordering check prints `app@` before `theory@`.
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` exits 0 — integrity, prerequisite-consistency, and
       no-forked-body green across all three published manifests.
+- [ ] [AI] `grep -oE 'coding-interview|take-home-and-live-coding|system-design-interview|behavioral-and-leadership-interviews|capstone-interview-loop' <MANIFESTS>careers/immediately-effective/software-engineer.yaml | sort -u | wc -l`
+      returns **0** — the deferral is real and is recorded, not silently closed.
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and**
       `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0.
 - [ ] [AI] Hub card count returns **3**; a shared course's prev/next provably differs by active path.
@@ -750,12 +765,20 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] **GREEN** — author `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml` _(new file)_
       with `pathId: careers/fundamentally-strong/software-engineer`, a `title`, a `description`, and an
       ordered `courseOrder` transcribed from
-      [`../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md)
+      [`../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md),
+      **restricted to the mirror's main body (116 courses), excluding the five optional-tail Band-9
+      IDs (`coding-interview`, `take-home-and-live-coding`, `system-design-interview`,
+      `behavioral-and-leadership-interviews`, `capstone-interview-loop`) deferred to
+      [Phase 5.2](#52--band-9-growth-all-three-software-engineer-manifests)**
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0, AND the theory-first ordering holds:
       `awk '/^courseOrder:/{f=1;next} f&&/^ *- /{n++; if ($2=="computer-science-foundations") print "theory@"n; if ($2=="capstone-full-stack-app") print "app@"n}' <MANIFESTS>careers/fundamentally-strong/software-engineer.yaml`
       prints the `theory@` line **before** the `app@` line — the exact inverse of Phase 3's check
-      against the same two IDs, so a copy-paste of the wrong arc fails immediately.
+      against the same two IDs, so a copy-paste of the wrong arc fails immediately — AND the five
+      deferred IDs are absent —
+      `grep -oE 'coding-interview|take-home-and-live-coding|system-design-interview|behavioral-and-leadership-interviews|capstone-interview-loop' <MANIFESTS>careers/fundamentally-strong/software-engineer.yaml | sort -u | wc -l`
+      returns **0**. Falsifiable both ways: after Phase 5.2's Band-9 growth the deferred-ID grep must
+      return **5**.
 - [ ] [AI] **REFACTOR** — assert the two orderings are inverses of each other in a single shared test
       helper, so a future edit to either manifest that collapses the distinction fails loudly —
       command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint`
@@ -855,6 +878,8 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] The no-forked-body shell check prints exactly the single line `1`.
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` exits 0 — integrity, prerequisite-consistency, and
       no-forked-body green across **all four** manifests.
+- [ ] [AI] `grep -oE 'coding-interview|take-home-and-live-coding|system-design-interview|behavioral-and-leadership-interviews|capstone-interview-loop' <MANIFESTS>careers/fundamentally-strong/software-engineer.yaml | sort -u | wc -l`
+      returns **0** — the deferral is real and is recorded, not silently closed.
 - [ ] [AI] `npx nx run ayokoding-www:build` + `:specs:behavior:coverage` **and**
       `npx nx run ayokoding-www-fe-e2e:test:e2e` exit 0.
 - [ ] [AI] Hub card count returns **4** — the `careers/` group of the category-grouped hub is complete.
@@ -865,9 +890,14 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 
 > **Pause Safety**: all four paths are live over one shared library — zero body duplication among the
 > three software-engineer paths; the AI path includes its SWE-fundamentals prerequisites at the head
-> of `courseOrder` and walks its own spine (DD-35). Two manifests remain deliberately
-> smoke-test-scoped and both carry a recorded, falsifiable deferral check, so the truncation is
-> visible rather than silent. Safe to stop indefinitely. To resume:
+> of `courseOrder` and walks its own spine (DD-35). Two manifests (interview-ready, the AI path)
+> remain deliberately catalog-narrowed and smoke-test-scoped; the other two software-engineer
+> manifests (immediately-effective, fundamentally-strong) publish their complete main body at
+> authoring time but defer the same five-ID Band-9 tail. All three software-engineer manifests carry
+> a recorded, falsifiable Band-9-tail deferral check (interview-ready's inside its broader
+> catalog-growth check; immediately-effective's and fundamentally-strong's standalone), and the AI
+> path carries its own harness-walk deferral check — so every truncation is visible rather than
+> silent. Safe to stop indefinitely. To resume:
 > `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www-fe-e2e:test:e2e`.
 
 ---
@@ -883,6 +913,11 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 > **Trigger**: each band's **band-completion signal**, recorded in the course-authoring plan's own
 > `delivery.md`, naming every manifest that must grow by full path. The routing rule is in
 > [tech-docs §Which manifest grows when a band lands](./tech-docs.md#which-manifest-grows-when-a-band-lands).
+> Because Start Precondition 2 requires that entire plan already merged before this plan's Phase 0
+> closes, every band's signal has, by design, already fired historically by the time this phase
+> starts — the staged per-band growth below is a deliberate small-blast-radius rollout, not a wait
+> for content to land. See
+> [tech-docs §Manifest lifecycle](./tech-docs.md#manifest-lifecycle) for the full reconciliation.
 
 ### 5.1 · Bands 1–8 growth (the three software-engineer manifests)
 
@@ -896,27 +931,27 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       — acceptance: exits 0 **after each band's append**, not only after the last one. A band whose
       append breaks prerequisite-consistency fails at that band, so the offending band is identifiable.
 
-### 5.2 · Band 9 growth (interview-ready and fundamentally-strong only)
+### 5.2 · Band 9 growth (all three software-engineer manifests)
 
 > **This growth step is the one exception to Phase 5's data-edit exemption** (see
 > [tech-docs §TDD shape](./tech-docs.md#testing-strategy)) and carries a real RED. Unlike Bands 1-8,
-> it introduces a **new cross-manifest routing invariant** — these five IDs belong in exactly two of
-> the three software-engineer manifests — that no existing assertion covers. A wrongly-placed but
-> otherwise valid course ID passes integrity, prerequisite-consistency, and no-forked-body checks
-> alike, so without a persisted assertion this invariant would be verified once at execution time and
-> never again.
+> it introduces a **new cross-manifest completeness invariant** — these five IDs belong in **all
+> three** software-engineer manifests (per the mirrors' own "Optional tail" note) — that no existing
+> assertion covers. A wrongly-scoped append that lands the five IDs in only one or two of the three
+> manifests passes integrity, prerequisite-consistency, and no-forked-body checks alike, so without a
+> persisted assertion this invariant would be verified once at execution time and never again.
 
 - [ ] [AI] **RED** — extend `<MANIFESTS>careers/careers-manifests.unit.test.ts`
-      with a persisted Band-9 routing assertion: `careers/interview-ready/software-engineer.yaml` and
+      with a persisted Band-9 completeness assertion: `careers/interview-ready/software-engineer.yaml`,
+      `careers/immediately-effective/software-engineer.yaml`, and
       `careers/fundamentally-strong/software-engineer.yaml` each have all five of `coding-interview`,
       `take-home-and-live-coding`, `system-design-interview`, `behavioral-and-leadership-interviews`,
-      `capstone-interview-loop` in `courseOrder`, **and**
-      `careers/immediately-effective/software-engineer.yaml` has none of them
+      `capstone-interview-loop` in `courseOrder`
       — command: `npx nx run ayokoding-www:test:unit`
-      — acceptance: **fails**, naming the two manifests that do not yet contain the five IDs. This is
-      the mirror image of the Phase 1 "five deferred IDs are absent" assertion. Falsifiable both ways:
-      it fails before the append below and passes after, and it fails again if any future edit moves
-      one of the five into `immediately-effective` or drops it from either of the other two.
+      — acceptance: **fails**, naming the manifests that do not yet contain the five IDs. This is the
+      mirror image of the Phase 1 "five deferred IDs are absent" assertion. Falsifiable both ways: it
+      fails before the append below and passes after, and it fails again if any future edit drops one
+      of the five from any of the three manifests.
 
   **Gherkin (underpins) →** "The interview-ready MVP proves the architecture before other path work
   begins" ([prd.md](./prd.md#acceptance-criteria-gherkin)). This cycle closes that scenario's deferral
@@ -936,20 +971,21 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       `take-home-and-live-coding`, `system-design-interview`,
       `behavioral-and-leadership-interviews`, `capstone-interview-loop`) into
       `<MANIFESTS>careers/interview-ready/software-engineer.yaml` — closing the gap Phase 1 deliberately left
-      open — and into `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml` as its trailing
-      optional interview band, each at its correct topological position.
-      **`<MANIFESTS>careers/immediately-effective/software-engineer.yaml` does NOT grow here** — that path
-      omits the interview-technique band by design (DL-13); its reader reaches these courses through
-      their canonical pages, not the manifest — command: `npx nx run ayokoding-www:test:unit`
+      open — into `<MANIFESTS>careers/immediately-effective/software-engineer.yaml` as its trailing
+      optional job-hunt tail — and into `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml`
+      as its trailing optional interview band, each at its correct topological position, per the
+      mirrors' own "Optional tail" note — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0, AND the Phase-1 deferral check now closes the other way:
       `grep -oE 'coding-interview|take-home-and-live-coding|system-design-interview|behavioral-and-leadership-interviews|capstone-interview-loop' <MANIFESTS>careers/interview-ready/software-engineer.yaml | sort -u | wc -l`
-      returns **5** (it returned **0** at Phase 1), AND the **same command against**
-      `<MANIFESTS>careers/immediately-effective/software-engineer.yaml` still returns **0**. Both halves are
-      required — a growth applied to all three manifests passes the first check and fails the second.
+      returns **5** (it returned **0** at Phase 1), AND the **same command run against**
+      `<MANIFESTS>careers/immediately-effective/software-engineer.yaml` and
+      `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml` also returns **5** on each. All
+      three are required — a growth applied to only one or two of the three manifests fails at least
+      one of these checks.
 
-- [ ] [AI] **REFACTOR** — fold the Band-9 routing assertion into the same table-driven shape the other
-      per-manifest assertions in `<MANIFESTS>careers/careers-manifests.unit.test.ts` use, so the three
-      manifests are expressed as data (expected-present / expected-absent ID sets) rather than three
+- [ ] [AI] **REFACTOR** — fold the Band-9 completeness assertion into the same table-driven shape the
+      other per-manifest assertions in `<MANIFESTS>careers/careers-manifests.unit.test.ts` use, so the
+      three manifests are expressed as data (each an expected-present ID set) rather than three
       hand-written blocks, and confirm no duplicate ID-list literal survives
       — command:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint && grep -cF 'capstone-interview-loop' <MANIFESTS>careers/careers-manifests.unit.test.ts`
@@ -1017,9 +1053,9 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       after each band's append.
 - [ ] [AI] Band 9 check passes **all three** ways, one per software-engineer manifest: the five-ID
       check returns **5** against `careers/interview-ready/software-engineer.yaml`, **5** against
-      `careers/fundamentally-strong/software-engineer.yaml`, and **0** against
-      `careers/immediately-effective/software-engineer.yaml`. All three are required — checking only
-      the first and last would pass even if `fundamentally-strong` never grew.
+      `careers/immediately-effective/software-engineer.yaml`, and **5** against
+      `careers/fundamentally-strong/software-engineer.yaml`. All three are required — checking only
+      one or two would pass even if another manifest never grew.
 - [ ] [AI] The AI path's nine-cluster-ID check returns **9** and its entry count grew by exactly
       **9** over its recorded pre-growth count (5.4); the SWE-fundamentals **inclusion** check still
       returns **11 or more** (inverted 2026-07-21 — DD-35).
