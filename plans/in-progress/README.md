@@ -4,9 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_None currently active._
+_No plans are currently in progress._
 
-Other ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
+Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.
 
 ## Instructions

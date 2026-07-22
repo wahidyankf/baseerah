@@ -35,8 +35,8 @@ that is green because nothing looked, not because something passed.
   the evidence is already gathered — the cheapest moment to act.
 - Three-repo parity is a standing norm here, and `ose-public` having a post-merge signal its siblings
   lack is precisely the kind of asymmetry that parity work exists to remove.
-- A plan is currently in backlog
-  ([learning-plan-syllabus-folder-convention](../backlog/learning-plan-syllabus-folder-convention/README.md))
+- A plan is currently in progress
+  ([learning-plan-syllabus-folder-convention](../done/2026-07-22__learning-plan-syllabus-folder-convention/README.md))
   whose Phase 6 merges PRs into both siblings. It will land changes there under exactly this blind
   spot.
 
