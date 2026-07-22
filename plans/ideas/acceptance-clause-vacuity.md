@@ -4,12 +4,12 @@ One-line summary: a whole class of acceptance clause in this repo's plans is unf
 passes no matter what the world looks like — so it certifies nothing while reading exactly like a
 discharged check; clauses should state what makes them **fail**, not only what makes them pass.
 
-> Surfaced 2026-07-21/22 during `bare-repo-governance-hardening` execution (Phases 2-5, four
+> Surfaced 2026-07-21/22 during `bare-repo-governance-hardening` execution (Phases 2-6, five
 > distinct instances).
 
 ## Problem / context
 
-Four vacuous clauses were caught inside a single plan, each vacuous for a different reason:
+Five vacuous clauses were caught inside a single plan, each vacuous for a different reason:
 
 - **Wrong identifier.** A step asserted two briefs were absent from a sibling, and its clause
   grepped for the slug of the one that genuinely _was_ absent. The clause was well-formed,
@@ -27,9 +27,22 @@ Four vacuous clauses were caught inside a single plan, each vacuous for a differ
   pre-commit hook undetected.
 - **The named target is a no-op.** A clause citing an Nx target that is an `echo` stub is vacuous by
   construction; it reports success for a command that does nothing.
+- **A tooling layer rewrote a hard error into a clean pass.** A worktree-removal precondition phrased
+  as "`git stash list` is empty" was checked in a bare repo. Raw `git` answers
+  `fatal: this operation must be run in a work tree` and exits non-zero — the command cannot run
+  there at all. Through this repo's RTK filter, the same invocation prints **`No stashes`** and exits
+  **0**. Ten stashes actually exist on that repo's `refs/stash`
+  (`git rev-list --walk-reflogs --count refs/stash` → `10`). So the clause reports the exact reading
+  that discharges it, in a situation where it is not merely false but unrunnable. Note the clause was
+  never written into any governance document — it lived only in an orchestrator's briefing text —
+  which is why no doc-level review would have caught it. Same family as the `grep`-is-ugrep `-L`
+  false-zero: a wrapper silently changes a command's failure semantics, and the clause reads the
+  wrapper's answer.
 
 The common shape: everyone verifies that the clause **passes**. Nobody verifies that it **could
-have failed**.
+have failed**. The fifth instance sharpens this — a clause can pass while naming a command that
+_cannot execute_ in the environment it was pointed at, because a filtering layer supplied a
+plausible answer on the failing command's behalf.
 
 ## Why now
 
@@ -71,6 +84,12 @@ another let five lint violations reach a git hook.
 - **Scope the gate to everything the phase touched.** A phase that edits markdown lints every path
   it edited, not only its headline directory.
 - **Refuse no-op targets as evidence.** Read a target's actual command before citing it in a clause.
+- **Confirm the named command can run where it is pointed, unfiltered.** A clause whose command is
+  rewritten by a wrapper (RTK, the `grep`-to-ugrep shim) must be spot-checked through the raw
+  binary at least once, because a wrapper can turn a `fatal:` into a clean pass. Corollary for
+  bare repositories specifically: any clause phrased over the working tree, the index, or the stash
+  is unrunnable there by construction, and `refs/stash` is repo-level rather than per-worktree, so
+  emptiness of the stash is not a statement about any one worktree even where it can be read.
 
 ## Rough scope & non-goals
 

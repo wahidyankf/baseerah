@@ -575,3 +575,30 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   **not** fixed from Phase 5, because correcting `ose-public` from inside the `ose-infra` propagation
   would invert DD-8's direction and land an unreviewed edit in a repo that phase was not delivering
   to.
+
+## Learning: a filter turned an unrunnable command into a clean pass, discharging a precondition it could not have checked
+
+- **Context**: the Phase 6 `ose-primer` propagation was briefed with a worktree-removal precondition
+  phrased as "`git stash list` is empty". `ose-primer` is bare.
+- **Observation**: raw `git stash list` in a bare repo answers
+  `fatal: this operation must be run in a work tree` and exits non-zero — the command cannot run
+  there at all. Through this repo's RTK filter, the same invocation prints `No stashes` and exits
+  `0`. Ten stashes actually exist: `git rev-list --walk-reflogs --count refs/stash` → `10`. Both
+  readings were reproduced directly rather than taken on the executing agent's word. The agent
+  reported this as a gap in `<C1>`; it is not — `grep -rn "stash list" repo-governance/ .claude/`
+  returns nothing, so no governance surface has ever stated this precondition. It existed only in an
+  orchestrator's briefing text.
+- **Why it might generalize**: this is the `grep`-is-ugrep `-L` false-zero again in a different
+  wrapper. A filtering layer sits between the clause and the binary, and when the binary fails the
+  filter can substitute a plausible, well-formed, wrong answer — the one that happens to discharge
+  the check. Nothing about the output looks degraded. Two further facts make the stash version worse
+  in a bare repo specifically: `refs/stash` is repo-level rather than per-worktree, so stash
+  emptiness is not a statement about any one worktree even where it is readable; and `ose-primer`
+  carries ten pre-existing foreign stashes that a "clean up before removing" reading might have
+  invited an agent to touch.
+- **Terminal state**: **folded into an existing brief** — `plans/ideas/acceptance-clause-vacuity.md`
+  gains this as its fifth instance plus a "confirm the named command can run where it is pointed,
+  unfiltered" direction, per the ideas folder's integrate-don't-duplicate rule. Deliberately **not**
+  routed to `<C1>`: `<C1>` never made this claim, so there is nothing
+  there to correct, and opening a third three-repo propagation round for
+  a defect no governance surface contains would be cost without a target.

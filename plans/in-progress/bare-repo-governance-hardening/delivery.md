@@ -2238,7 +2238,7 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
       absent from `HEAD`. Rather than bypass the hook or edit a file another agent was actively
       writing, the push was run from **inside this plan's own worktree**, whose tree is clean. The
       hook ran in full against the content actually being pushed. `--no-verify` was never used.
-- [ ] [AI] Re-propagate the now-corrected `<C1>` to `ose-primer`, repeating Phase 4's own copy
+- [x] [AI] Re-propagate the now-corrected `<C1>` to `ose-primer`, repeating Phase 4's own copy
       mechanism exactly: re-provision `<PRIMER-WT>` at `origin/main` with a fresh branch
       (`git -C <PRIMER> worktree add <PRIMER-WT> -b bare-repo-governance-hardening-c1-followup origin/main`),
       copy `<C1>` verbatim from `<PUBLIC>`, run the local quality gates, stage/commit/push, open a
@@ -2249,6 +2249,18 @@ default` paragraph stated the pre-reversal "a floor, not a ceiling" rule and lin
       `diff <PUBLIC>/<C1> <(git -C <PRIMER> show origin/main:repo-governance/development/workflow/bare-repo-landing-method.md)`
       reports no difference, and
       `git -C <PRIMER> rev-list --left-right --count origin/main...main` prints `0` and `0`
+      — **Result — landed 2026-07-22**: PR **#15**,
+      <https://github.com/wahidyankf/ose-primer/pull/15>, squash-merged at `cedabb2f1`
+      (2026-07-22T02:57:40Z). Both acceptance clauses verified **after** a `git fetch origin` in
+      `<PRIMER>`, never before it: the `diff` against
+      `git -C <PRIMER> show origin/main:...bare-repo-landing-method.md` reports **no difference**
+      (both sides sha1 `618e74ff8ebc5c0a0abf19b2a40c2af9ac2e01db`), and
+      `git -C <PRIMER> rev-list --left-right --count origin/main...main` prints `0 0`.
+      `git -C <PRIMER> worktree list` shows only the single `(bare)` line — the propagation worktree
+      is gone, removed without `--force`. Fetching first is load-bearing here and not a formality:
+      this same acceptance `diff` run against a stale `origin/main` returns "no difference" whether
+      or not the propagation ever landed, which is precisely the false-byte-identical verdict the
+      `<C1>` correction being propagated exists to warn about
 - [ ] [AI] Re-propagate the now-corrected `<C1>` to `ose-infra`, repeating Phase 5's own copy
       mechanism exactly: re-provision `<INFRA-WT>` at `origin/main` with a fresh branch
       (`git -C <INFRA> worktree add <INFRA-WT> -b bare-repo-governance-hardening-c1-followup origin/main`),
