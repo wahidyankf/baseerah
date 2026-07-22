@@ -24,6 +24,13 @@ The file is under 20 bytes from its ceiling; the next rule addition is blocked. 
 `parallel-orchestration-shared-machine-governance`, and every future governance plan hits the same
 wall until headroom is restored.
 
+**The ceiling has now blocked a real correction (2026-07-22, `bare-repo-governance-hardening`).**
+`ose-infra`'s `AGENTS.md` gained a one-clause bareness carve-out to §Delivery Mode — 23,902 → 24,096
+bytes, comfortably inside its passing band. `ose-public` **cannot absorb the same clause**: with
+under 20 bytes of headroom there is no room for a clause of any size. So a downstream sibling now
+leads the source of truth on the repo's most-loaded instruction surface, and the gap cannot be closed
+until progressive disclosure runs. The ceiling is no longer a hypothetical future obstruction.
+
 ## Prior art / precedents
 
 - **Instruction-File Size Budget Convention** — the gate that fails `AGENTS.md` over threshold and
@@ -67,6 +74,9 @@ environment-branch rule are trimmed last and only via a complete target.
   a real diff against ground truth.
 - How much byte savings is reachable without touching guardrails is unknown until the section audit is
   done — no target-band-landing headroom has been measured yet. (open)
+- The blocked bareness carve-out above sets a floor on how much headroom is _enough_: whatever this
+  refactor recovers must at minimum accommodate the clause the sibling already carries, plus the
+  ordinary growth that has ratcheted this file upward all along. (open)
 
 ## What success looks like + promotion signal
 

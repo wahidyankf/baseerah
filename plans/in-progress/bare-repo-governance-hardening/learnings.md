@@ -39,8 +39,11 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   of C1's terminal-reconcile step — a rule that is easy to forget is not adequately served by prose
   alone, which is worth weighing against **DD-2**'s no-automation stance at Phase 6 triage.
   It also shows any "verified state" line in a plan needs a re-verification step, not just a date.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: a worked example inside `C1`
-  showing the non-zero reading and the `git fetch origin main:main` recovery.
+- **Terminal state**: **routed inline, already landed** — `<C1>` §"Worked example — the 2026-07-21
+  sibling drift" is exactly the proposed route: it shows the `2 0` reading in both siblings, the
+  `git fetch origin main:main` recovery, and the resulting `0 0`. The route was satisfied during
+  Phase 2 authoring, before this entry was triaged, so no further work is owed. Recorded here rather
+  than discarded because the entry is the live evidence that motivated the section.
 
 ## Learning: varying the approach each iteration makes a stability-based termination rule unreachable
 
@@ -58,9 +61,11 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   hold the approach fixed once a round comes back clean, so the confirming round is genuinely
   equivalent), not to drop either. The same shape applies to any loop-until-dry harness whose exit
   condition counts consecutive empty rounds.
-- **Terminal state**: pending — triage at Phase 6. Candidate route:
-  `repo-governance/workflows/plan/plan-quality-gate.md`, as a constraint on how iterations are
-  briefed rather than a change to the exit condition itself.
+- **Terminal state**: **folded into**
+  [`plans/ideas/plan-quality-gate-convergence.md`](../../ideas/plan-quality-gate-convergence.md) —
+  an existing brief on exactly this loop's convergence, per the ideas folder's integrate-don't-
+  duplicate rule. Not landed inline: the fix is a change to how iterations are briefed in a
+  governance workflow, which is a design question the brief exists to resolve, not a typo.
 
 ## Learning: a checker without the tool its acceptance clauses name will substitute silently
 
@@ -77,10 +82,12 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   substitute returns a plausible number. A phase whose gate is defined in shell commands needs its
   executor's tool grant checked against those commands up front, and any phase that edits markdown
   needs its lint scope to cover **every** path it edited, not just the phase's headline directory.
-- **Terminal state**: pending — triage at Phase 6. Candidate routes:
-  `repo-governance/development/agents/subagent-orchestration.md` (match the tool grant to the
-  acceptance clauses when briefing) and `repo-governance/development/pattern/maker-checker-fixer.md`
-  (a disclosed substitution is not a discharged check).
+- **Terminal state**: filed as
+  [`plans/ideas/acceptance-clause-vacuity.md`](../../ideas/acceptance-clause-vacuity.md) — the
+  tool-grant mismatch is one of four instances that brief carries, all of the same shape: a clause
+  that returns a plausible number while certifying nothing. Both candidate surfaces
+  (`subagent-orchestration.md`, `maker-checker-fixer.md`) are named in the brief as targets; the
+  choice between them is the design question that blocks promotion, so it is not landed inline.
 
 ## Learning: Phase 4/5's file-agreement steps do not name `<GATE>`, which cycle 1 turned into a real edit site
 
@@ -101,11 +108,13 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   bookkeeping updated at the same time the "unedited" claim is retracted — the retraction and the
   propagation-list update are two different edits to two different places, and it is easy to make
   the first without the second.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: before Phase 4 executes, add
-  `<GATE>` to the C5-propagation steps (Phase 4 and Phase 5) and to the "remaining five files agree"
-  step (which becomes six), mirroring how `<MERGE>` is already handled — this is a correction to
-  Phase 4/5's own step list, not yet executed, so it can land as an ordinary edit rather than a
-  reopened-and-corrected retrospective note.
+- **Terminal state**: **discarded as a standalone learning — plan-local, and already acted on.** The
+  concrete half was a correction to this plan's own Phase 4/5 step list, applied during execution:
+  both phases swept `<GATE>` and the sibling copies were diffed against the corrected `ose-public`
+  version. Nothing durable is owed for that. Its generalizable half — a propagation checklist
+  enumerated by change ID under-covers the real changeset — is not lost: it is carried by
+  [`plans/ideas/propagation-checklist-under-coverage.md`](../../ideas/propagation-checklist-under-coverage.md)
+  as one of that brief's four consolidated instances.
 
 ## Learning: CONFIRMED LIVE in Phase 4 — the `<GATE>` propagation gap is not hypothetical
 
@@ -124,10 +133,12 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   under-covers when later review cycles expand a change's site list. The safe unit of propagation is
   the **merged changeset's file list**, not the plan's authoring-time C-list. `ose-public`'s merged
   PR touched 22 files; Phase 4's checklist names 8.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: `plan-multi-repo-parity-planning`
-  should require a propagation phase to derive its file list from the source PR's actual diff
-  (`git show --stat <merge-sha>`), minus explicitly-excluded paths, rather than from the plan's
-  change-ID table.
+- **Terminal state**: filed as
+  [`plans/ideas/propagation-checklist-under-coverage.md`](../../ideas/propagation-checklist-under-coverage.md).
+  This entry supplies that brief's sharpest data point — the source PR touched 22 files while the
+  propagation checklist named 8 — and its proposed route (derive the file list from
+  `git show --stat <merge-sha>`) is the brief's lead proposal. Target surface:
+  `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`.
 
 ## Learning: a propagation step's "already verified absent in the sibling" premise expires
 
@@ -149,10 +160,11 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   clause, which are in contradiction the moment the world moves. Note also the direction of the
   drift: a sibling gained content from `ose-public` through an unrelated parity commit, so "surveyed
   once at authoring time" is not durable for anything in `plans/ideas/`.
-- **Terminal state**: pending — triage at Phase 6. Candidate routes: (1) this plan's Phase 5 step
-  for `ose-infra` carries the identical premise and must be re-checked live rather than trusted;
-  (2) `plan-multi-repo-parity-planning` — a "verified absent in sibling" claim needs an
-  if-present branch, never a bare do-nothing.
+- **Terminal state**: candidate route (1) — re-check the identical premise live at Phase 5 — was
+  **executed**, and the premise was false in `ose-infra` too (see the four-premise entry below).
+  Route (2) is filed as
+  [`plans/ideas/propagation-checklist-under-coverage.md`](../../ideas/propagation-checklist-under-coverage.md):
+  a "verified absent in sibling" claim needs an explicit if-present branch, never a bare do-nothing.
 
 ## Learning: a sibling can be AHEAD of the source of truth on a shared governance document
 
@@ -175,9 +187,11 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   pre-change baseline measured in the source repo does not predict the sibling's baseline. Any
   acceptance clause asserting a sibling's pre-state is an assumption about a repo the plan did not
   read.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: `plan-multi-repo-parity-planning`
-  — propagation acceptance criteria should assert the **post** state only, or measure the sibling's
-  pre-state at execution time rather than inheriting the source repo's.
+- **Terminal state**: filed as
+  [`plans/ideas/propagation-checklist-under-coverage.md`](../../ideas/propagation-checklist-under-coverage.md)
+  — propagation acceptance criteria should assert the **post** state only, never a sibling's
+  pre-state. This entry contributes the brief's most counter-intuitive data point: an acceptance grep
+  that passed **before** any edit was made, which is indistinguishable from a successful edit.
 
 ## Learning: the plan's own `<PUBLIC>/<C1>` copy source did not exist at Phase 4 time
 
@@ -195,10 +209,14 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   not a working-tree path, so it is correct regardless of any checkout's sync state. Both copies were
   confirmed byte-identical (`b48153277…`) once the ref form was used, so the substitution was safe —
   but the step as written was unexecutable.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: rewrite Phase 5's C1 copy step
-  and both phases' gate diffs to use `git -C <PUBLIC> show origin/main:<C1>` rather than
-  `<PUBLIC>/<C1>`; the same correction belongs in `<C1>` itself wherever it tells a reader to read a
-  file from a sibling checkout.
+- **Terminal state**: **routed** to `<C1>` via the `<C1>` Correction Propagation Sub-Cycle — new
+  §"Reading a File From Another Repository", stating that a cross-repo read is addressed by git ref
+  (`git -C <other-repo> show origin/main:<path>`) and never by working-tree path, because on a shared
+  machine another session's local `main` may lag and a bare source repository has no path to read at
+  all. Landed in `ose-public` PR
+  [#81](https://github.com/wahidyankf/ose-public/pull/81); propagated to both siblings by the same
+  sub-cycle. The plan-local half — Phase 5's own copy step — was already switched to the ref form
+  during execution.
 
 ## Learning: a fourth deviation — carve-outs to trunk-based-development.md and its SKILL.md mirror are unrecorded, and Phase 5's checklist names neither file
 
@@ -223,13 +241,14 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   change ID at authoring time silently under-covers sites a later review cycle discovers need the
   same treatment. The fix belongs in the checklist, not in tribal memory of what cycle 2 happened to
   touch in `ose-primer`.
-- **Terminal state**: pending — triage at Phase 6, but actionable immediately at Phase 5: before
-  executing Phase 5 against `ose-infra`, add
-  `repo-governance/development/workflow/trunk-based-development.md` and
-  `.claude/skills/repo-practicing-trunk-based-development/SKILL.md` to Phase 5's file-agreement/sweep
-  steps, applying the same property-bound bareness carve-out to every mode-selection or
-  mode-availability statement in both files (not just the sites `ose-primer`'s cycle 2 happened to
-  cite), mirroring the sweep `ose-primer` PR #14 cycle 3 performed.
+- **Terminal state**: **discarded as a standalone learning — plan-local, and executed.** The
+  immediately-actionable half was done: Phase 5 swept both files in `ose-infra` and applied
+  property-bound carve-outs to every mode-selection statement, not only the sites `ose-primer`'s
+  cycle 2 cited. Its generalizable half is the same class as the entry above and is carried by
+  [`plans/ideas/propagation-checklist-under-coverage.md`](../../ideas/propagation-checklist-under-coverage.md).
+  Worth noting what this entry got right and wrong: it correctly predicted the class would recur in
+  `ose-infra`, and it under-predicted the reach — cycle 2 there found the same defect in `AGENTS.md`,
+  which neither this entry nor `ose-primer`'s sweep had considered.
 
 ## Learning: `ose-primer`'s `main-ci` was already red before Phase 4, and only the scheduled run sees it
 
@@ -252,14 +271,21 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   _directory-scoped_ local gate guarantees a class of failure that is structurally invisible until
   CI runs. The two scopes should match, or the local gate should state which paths it deliberately
   does not cover.
-- **Terminal state**: pending — triage at Phase 6. **Not fixed here, deliberately**: the same
+- **Terminal state**: **folded into an existing brief** (details below). **Not fixed here,
+  deliberately**: the same
   archived file exists in `ose-public` (confirmed on its `origin/main`), so this is a cross-repo
   condition and patching only `ose-primer` would manufacture exactly the divergence DD-10 and the
   parity workflow exist to prevent. The class is already tracked in `ose-public` as
   `plans/ideas/ayokoding-mermaid-diagram-remediation.md` ("636 mermaid violations exposed by the
-  `detect_kind` fix"). Candidate routes: (1) attach this `plans/done/` instance to that brief;
-  (2) widen this plan's own local mermaid gate beyond `repo-governance docs`, or record its scope
-  limit explicitly, before Phase 5 runs the same gate against `ose-infra`.
+  `detect_kind` fix"). **Both candidate routes are now closed.** Route (1): this `plans/done/`
+  instance, and the generalizable half (a repo-wide CI validator paired with a directory-scoped local
+  gate guarantees a class of failure invisible until CI runs), are **folded into**
+  [`plans/ideas/ayokoding-mermaid-diagram-remediation.md`](../../ideas/ayokoding-mermaid-diagram-remediation.md).
+  Route (2): **executed at Phase 5** — the local gate was widened to
+  `repo-governance docs .claude plans/ideas` _and_ CI's own `--exclude`-qualified command was run
+  directly against `ose-infra`, and the two agreed at `0 violation(s)`. That measurement also
+  established `ose-infra` has **no** equivalent exposure: both its workflows use the qualified form
+  and its scheduled runs were green, so the Phase 4 finding does not generalize to it.
 
 ## Learning: a bare repo cannot push at all — the pre-push hook needs a work tree the repo does not have
 
@@ -290,14 +316,20 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   Note the trap it sets: the obvious workaround is `--no-verify`, which the Git Push Safety
   Convention requires explicit per-instance user approval for. A rule that is unexecutable as
   written pushes its reader toward the one escape hatch that needs permission.
-- **Terminal state**: pending — triage at Phase 6, and a genuine `<C1>` defect, so it routes through
-  the `<C1>` Correction Propagation Sub-Cycle (`ose-public` first, never an in-place sibling edit).
+- **Terminal state**: **routed** — a genuine `<C1>` defect, so it goes through the `<C1>` Correction
+  Propagation Sub-Cycle (`ose-public` first, never an in-place sibling edit).
   **Resolved this phase** by deleting the merged ref through the GitHub API
   (`gh api -X DELETE repos/<owner>/<repo>/git/refs/heads/<branch>`) — the identical path
   `gh pr merge --delete-branch` takes natively, so no hook was bypassed and no `--no-verify` was
-  used; the content had already merged through a fully-gated PR. Candidate `<C1>` fix: state that in
-  a bare repo, remote-branch cleanup either happens **before** the worktree is removed (from inside
-  it) or through the API path, and say plainly that `--no-verify` is **not** the sanctioned answer.
+  used; the content had already merged through a fully-gated PR. **The candidate `<C1>` fix is now
+  routed and written**: new §"Remote-Branch Cleanup in a Bare Repository" states both working routes
+  (delete from inside the linked worktree before removing it, or delete the ref through the forge
+  API afterwards), names the ordering trap in `<C1>`'s own step sequence, and says plainly that
+  `--no-verify` is **not** the sanctioned answer. Landed in `ose-public` PR
+  [#81](https://github.com/wahidyankf/ose-public/pull/81); propagated to both siblings by the same
+  sub-cycle. **Confirmed a second time at Phase 5** — the identical failure recurred in `ose-infra`
+  and the same API route resolved it, which is what upgraded this from a one-off to a documented
+  property of the topology.
 
 ## Learning: Phase 5 re-verified four suspect premises against `ose-infra` — three were false again
 
@@ -336,9 +368,13 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   not as fact awaiting contradiction. And an acceptance clause that names a specific slug, file, or
   count is only as good as the accuracy of that identifier — clause 2 above was well-formed,
   falsifiable, and pointed at the wrong string, which is indistinguishable from passing.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: `plan-multi-repo-parity-planning`
-  should require propagation steps to assert **post** state only, derive their file list from the
-  source PR's actual diff, and carry an explicit if-present branch for every "verified absent" claim.
+- **Terminal state**: split across two briefs, because this entry carries two distinct classes. The
+  propagation half — assert **post** state only, derive the file list from the source PR's actual
+  diff, carry an explicit if-present branch for every "verified absent" claim — is filed as
+  [`plans/ideas/propagation-checklist-under-coverage.md`](../../ideas/propagation-checklist-under-coverage.md).
+  The clause half — a well-formed, falsifiable clause pointing at the wrong string is
+  indistinguishable from passing — is filed as
+  [`plans/ideas/acceptance-clause-vacuity.md`](../../ideas/acceptance-clause-vacuity.md).
 
 ## Learning: the reading surfaces got the new rule; the writing surfaces did not
 
@@ -359,10 +395,12 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   legal values, the sweep has to cover producers and validators, not just prose — and if the
   validator is deliberately structural (string membership only), the producers are the _only_ place
   the constraint can live.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: a general rule in
-  `repo-governance/development/pattern/maker-checker-fixer.md` or the plan conventions — when a
-  change restricts a declared enum, enumerate the maker/producer surfaces explicitly, since the
-  checker may be structurally unable to carry the restriction.
+- **Terminal state**: filed as
+  [`plans/ideas/class-sweep-completeness.md`](../../ideas/class-sweep-completeness.md) — this entry
+  is that brief's first of three instances. The candidate route survives into it: when a change
+  restricts a declared enum, enumerate the maker/producer surfaces explicitly, since the checker may
+  be structurally unable to carry the restriction. Target surface named there:
+  `repo-governance/development/pattern/maker-checker-fixer.md`.
 
 ## Learning: the sweep that fixed "every mode-declaring surface" missed the one file every agent auto-loads
 
@@ -388,10 +426,14 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   threshold of 30000**. So the source of truth physically cannot absorb the carve-out that its
   downstream sibling now carries: `ose-infra` leads `ose-public` on this specific surface, and
   closing that gap in `ose-public` requires progressive disclosure first, not an edit.
-- **Terminal state**: pending — triage at Phase 6. Two candidate routes: (1) add root instruction
-  files to the enumerated surface list wherever a class sweep is prescribed; (2) a separate
-  `ose-public` follow-up to shrink `AGENTS.md` under its budget before the bareness clause can
-  propagate upstream.
+- **Terminal state**: both routes filed. (1) Root instruction files belong in the enumerated surface
+  list wherever a class sweep is prescribed — filed as
+  [`plans/ideas/class-sweep-completeness.md`](../../ideas/class-sweep-completeness.md), where this is
+  the second of three instances. (2) The byte-budget blocker is **folded into**
+  [`plans/ideas/agents-md-progressive-disclosure.md`](../../ideas/agents-md-progressive-disclosure.md),
+  an existing brief on exactly that ceiling, per the integrate-don't-duplicate rule. The fold matters
+  for more than bookkeeping: it converts that brief's premise from a forecast into a recorded event,
+  since the ceiling has now blocked a real correction rather than merely threatening to.
 
 ## Learning: `ose-infra`'s `setup-rust` composite action has no retry on the toolchain download, and it flaked seven times in one phase
 
@@ -420,27 +462,43 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   that rate every non-trivial change in this repo pays a re-run tax, and the tax is invisible in any
   per-run report because a re-run reports green. The failure mode also **escalated mid-phase**: the
   first four were the toolchain manifest download, but later ones failed to fetch `rustup-init`
-  itself — a step that already carries `curl --retry 10 --retry-connrefused`. When a retry-hardened
-  step starts failing, the fault is sustained rather than transient, and the correct response is to
-  wait before retrying rather than to hammer it (which is what was done for the fourth).
-- **Root cause, located but deliberately not fixed here**: the action's own first step wraps the
-  rustup installer in `curl --retry 10 --retry-connrefused`, so someone already knew this endpoint is
-  unreliable. But the **next** step delegates to `dtolnay/rust-toolchain@stable`, which shells out to
-  `rustup toolchain install` with **no retry at any layer**. The hardening stopped one step short of
-  where it was needed.
-- **Why it might generalize**: a retry applied to the bootstrap of a tool, but not to the tool's own
-  first network call, buys almost nothing — the expensive, large, most-likely-to-fail download is the
-  second one. More generally: when a repo's CI wraps step N in retries, that is evidence the
-  dependency is flaky, and steps N+1..M hitting the same host inherit the risk without inheriting the
-  mitigation.
+  itself. The CI log shows that installer fetch already carries `curl --retry 10
+--retry-connrefused`, so when even it started failing the fault was clearly sustained rather than
+  transient — which is why the last retry was preceded by a deliberate wait rather than an immediate
+  re-run.
+- **Correction, made during Phase 6 triage**: an earlier draft of this entry attributed that
+  `curl --retry 10` to `.github/actions/setup-rust/action.yml`'s own first step and built a tidy
+  root-cause story on it ("the hardening stopped one step short"). **That attribution was wrong.**
+  Re-reading the action confirms it contains no `curl`, no `retry`, and no `rustup-init` invocation
+  at all — the retry-wrapped installer fetch lives **inside the third-party action**, and it was
+  visible only because the CI log interleaves that action's internal steps with ours. The line was
+  read out of a log and assigned to the wrong file. The observable facts (seven failures, the host,
+  the escalation) are unchanged; the causal explanation was invented, and it was invented in the
+  direction that made the fix look easy.
+- **A second correction — the three repos are not the same shape**: this entry originally assumed a
+  single shared `setup-rust` whose fix could be copy-pasted. Verified otherwise: `ose-public` and
+  `ose-primer` install via `actions-rust-lang/setup-rust-toolchain@v1`, while `ose-infra` uses
+  `dtolnay/rust-toolchain@stable`. "Apply the same fix in all three" is therefore a reconciliation
+  task, not a copy.
+- **Why it might generalize** — two things, and the second is the more valuable. First, the
+  technical one: a retry applied to a tool's bootstrap but not to the tool's own first large download
+  buys little, since the expensive, most-likely-to-fail fetch is the later one. Second, the process
+  one: **a log line is evidence of what happened, not of where the code lives.** Both wrong claims
+  above came from reading CI output and inferring repository structure from it, without opening the
+  file. Where a fix belongs is a question only the source can answer.
 - **Not fixed in this PR, on purpose**: `.github/actions/setup-rust/action.yml` is CI infrastructure
-  shared by the parity set, unrelated to this plan's governance changeset. Patching it inside a
-  governance PR would both scope-creep the PR and manufacture a one-repo divergence in a file the
-  parity workflow expects to stay aligned.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: a `plans/backlog/` follow-up
-  applying a retry wrapper around the toolchain install in **all three** repos' `setup-rust` (code
-  change, so per the Knowledge Capture routing matrix it must become its own plan, never land
-  inline).
+  unrelated to this plan's governance changeset. Patching it inside a governance PR would scope-creep
+  the PR, and — given the shape divergence recorded above — a same-text patch would not even have
+  applied cleanly across the three repos.
+- **Terminal state**: filed as
+  [`plans/ideas/ci-setup-rust-toolchain-retry.md`](../../ideas/ci-setup-rust-toolchain-retry.md) — a
+  retry around the toolchain install in all three repos' `setup-rust`, which the brief records as a
+  **reconciliation** rather than a copy, since the three do not share an implementation. It also
+  carries the open question of where the retry belongs (in our action, or one layer down in the
+  third-party action it delegates to), because the corrected reading above means that is genuinely
+  not yet known. This is a code/CI change, so per the Knowledge Capture routing matrix it must become
+  its own plan and may **never** land inline in this one; the two-pager is the first stage of that
+  route.
 
 ## Learning: rewriting a sentence for one reason silently dropped an unrelated conjunct — from the one copy declared normative
 
@@ -468,7 +526,52 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   left the two commands under it — `git push origin main`, no `git worktree add` — untouched. The
   label and the body of the same five-line block then contradicted each other. Same shape: the edit
   addressed the string that was cited and not the unit of meaning that contained it.
-- **Terminal state**: pending — triage at Phase 6. Candidate route: a line in the PR-review workflow
-  or the maker-checker-fixer pattern requiring the fixer to re-read the **whole enclosing block** it
-  edits (example, list item, precondition, table row) and confirm every part still agrees, rather
-  than verifying only that the cited substring changed.
+- **Terminal state**: filed as
+  [`plans/ideas/class-sweep-completeness.md`](../../ideas/class-sweep-completeness.md) — the third of
+  that brief's three instances, and the one that states the unit-of-edit rule most directly: the
+  fixer must re-read the **whole enclosing block** it edits (example, list item, precondition, table
+  row) and confirm every part still agrees, rather than verifying only that the cited substring
+  changed.
+
+## Learning: the terminal reconcile's own acceptance command reports a false clean when run before fetching
+
+- **Context**: Phase 5's terminal reconcile in `ose-infra`, immediately after PR #16 merged.
+- **Observation**: `git rev-list --left-right --count origin/main...main` compares two **local**
+  refs — `main` and `refs/remotes/origin/main` — and performs no network access. Run before any
+  fetch, both were equally stale and it printed **`0 0`**. After `git fetch origin` it printed
+  **`1 0`**, the true state. After `git fetch origin main:main` it printed **`0 0`** again, this time
+  meaning it. The first and last readings are byte-identical and only one of them means what it
+  appears to mean.
+- **Why it might generalize**: `<C1>`'s numbered method puts the fetch inside step 8's reconcile
+  command, but its acceptance count is stated separately, so a reader who checks the count first —
+  the natural thing to do when verifying whether the step is even needed — gets a pass that certifies
+  nothing. This is the same vacuous-clause shape recorded elsewhere in this file, reached from a
+  different direction: not a clause that can never fail, but a clause whose _timing_ determines
+  whether it can fail at all.
+- **Terminal state**: **routed** to `<C1>` via the `<C1>` Correction Propagation Sub-Cycle — new
+  §"Measure after fetching, never before", carrying the three-reading transcript above as the worked
+  example. Landed in `ose-public` PR
+  [#81](https://github.com/wahidyankf/ose-public/pull/81); propagated to both siblings by the same
+  sub-cycle.
+
+## Learning: `ose-public` is now behind both siblings on a document it is the source of truth for
+
+- **Context**: building Phase 5's three-repo agreement table, diffing `<SDLC>`
+  (`docs/reference/sdlc-gate-standard.md`) across all three repos.
+- **Observation**: two name-bound claims in `ose-public`'s copy are wrong, and both siblings have
+  already replaced them. Its §Worktree-Agnostic Execution paragraph says "`ose-infra` is a bare repo
+  … so worktree-agnostic execution is a hard requirement **there**", which was true when written and
+  is now stale because `ose-primer` is bare too. Its evidence table claims the guardrails were
+  "verified from **both the primary checkout and** a linked worktree in all 3" — not merely stale but
+  **impossible**, since two of the three repos have no primary checkout to verify from. `ose-primer`
+  and `ose-infra` are byte-identical to each other on this file and carry a property-bound
+  replacement that also tells the reader to re-verify rather than trust the sentence.
+- **Why it might generalize**: DD-8 makes `ose-public` the source of truth, and it is easy to read
+  that as "`ose-public` is never the lagging repo". It is a rule about **direction of propagation**,
+  not about correctness: a sibling that fixes something locally leaves the source of truth behind,
+  and nothing in the parity loop detects that asymmetry. This is the third distinct instance in this
+  plan of a sibling being ahead — the pattern is now well-evidenced enough to stop being a surprise.
+- **Terminal state**: filed as `plans/ideas/sdlc-gate-standard-property-bound-lag.md` — deliberately
+  **not** fixed from Phase 5, because correcting `ose-public` from inside the `ose-infra` propagation
+  would invert DD-8's direction and land an unreviewed edit in a repo that phase was not delivering
+  to.

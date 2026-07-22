@@ -29,6 +29,21 @@ Breakdown of the 636: 465 `label_too_long` (node labels over the 30-char-per-lin
 `width_exceeded` (chain depth over 4 in `LR`, or over 4 nodes at one rank in `TD`). A further 8
 `subgraph_density` findings are advisory warnings, not violations, and are excluded from the 636.
 
+### A second instance of the same class (2026-07-22)
+
+Surfaced during `bare-repo-governance-hardening` Phase 4: `ose-primer`'s `main-ci` was **already red
+before the phase started**, failing `Mermaid diagram validation (all .md)` with 3 violations in an
+archived `plans/done/` file — and nobody had seen it. Two reasons compounded. The workflow is
+**schedule**-triggered rather than push-triggered, so it did not run on the merge at all; and the
+local gate scopes mermaid validation to `repo-governance docs`, which cannot reach `plans/done/`.
+`ose-infra` has **no** such exposure — both its workflows use an `--exclude`-qualified form and its
+scheduled runs were green.
+
+The generalizable half is worth carrying into this brief's scope: a **repo-wide** CI validator paired
+with a **directory-scoped** local gate guarantees a class of failure that is structurally invisible
+until CI runs. The two scopes should match, or the local gate should state which paths it
+deliberately does not cover.
+
 ## Why now
 
 A temporary `--exclude apps/ayokoding-www/content` is in place in `.github/workflows/main-ci.yml` and
