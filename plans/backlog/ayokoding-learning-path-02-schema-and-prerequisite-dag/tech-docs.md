@@ -656,6 +656,77 @@ sequenceDiagram
     P5->>P5: run checkManifestIntegrity + checkPrerequisiteConsistency at every gate
 ```
 
+## Programme decisions
+
+Folded in from the retired shared programme file (2026-07-22) so this plan is
+**self-contained** and no longer depends on a shared cross-plan file. This plan sits at **Wave 1** —
+it has **no prerequisite** and runs in parallel with `ayokoding-learning-path-01-url-restructure`.
+Only the `R*`/`A*` decision ids this plan cites are reproduced below, **verbatim** from the programme
+decision table; the `A8` and `A12` prose expansions follow because this plan cites both. These are
+**programme-scope decisions, not governance rule ids** — nothing under `repo-governance/` defines
+them.
+
+`A*` amendments are **later than** the `R*` rules and **win on conflict**.
+
+| Id  | Decision                                                                                                                                                                                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R0  | Remove the `/c/` content namespace by **inverting** `contentNamespaceRedirects` — supplementing it would 308-loop                                                                            |
+| R1  | URL grammar is `/en/learn/paths/{careers,skills}/…` over six paths (raised to **eight** by `A10`)                                                                                            |
+| R2  | `pathId` is **variable-depth by design** — `careers/<arc>/<role>` is 3 segments, `skills/<subject>` is 2; nothing may key on segment count                                                   |
+| R3  | The fourth careers path targets a distinct AI-engineering endpoint (superseded in part by `A1`)                                                                                              |
+| R4  | Ownership split: plans 01-05 are `careers/`-only; the `skills/` category is separate (revised by `A2`)                                                                                       |
+| R5  | The full skills corpus is authored **in this programme**, not deferred                                                                                                                       |
+| R7  | **Every URL segment must render** — no orphan segments                                                                                                                                       |
+| R8  | Every `skills/` path uses the **immediately-effective** arc, always                                                                                                                          |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A2  | The skills category splits into **two** plans — 06 (accounting) and 07 (ERP), the latter `blockedBy` the former                                                                              |
+| A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                                                                |
+| A4  | Research verification status is carried forward verbatim — an `[Unverified]` claim must never be restated as fact                                                                            |
+| A8  | **Strict clean-room licensing, programme-wide** — binds all seven plans, not only 06-07; nothing copyrighted is reproduced, and every concept is restated in original words with a citation  |
+| A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
+| A12 | Every syllabus is **independently authored, then externally confirmed** — a published curriculum may corroborate coverage but must never supply the structure being written                  |
+
+### A8 — licensing binds the whole programme
+
+`A8` originally read as a plan-06/07 concern because the standards bodies are most visibly
+restrictive there. That scoping was wrong: **every plan in the programme authors teaching material,
+and teaching material is where copyright exposure concentrates.** The careers corpus carries its own
+distinct hazards, and they are easy to miss precisely because programming content feels free:
+
+- **Code examples** copied from documentation, tutorials, blog posts or Stack Overflow. Stack
+  Overflow contributions are CC-BY-SA — attribution _and_ share-alike, which is a licence most course
+  material cannot satisfy. Author examples originally.
+- **Documentation prose** from a framework's official docs. Being free to read is not permission to
+  reproduce; most project docs carry their own licence, and it is frequently copyleft.
+- **Figures, diagrams and screenshots** lifted from vendor or project sites.
+- **Book and course structure.** Reproducing a well-known book's chapter progression, or a paid
+  course's module sequence, is the same derivative-work risk as `A12` addresses for syllabi.
+- **Trademarks.** Language, framework and vendor names may be used nominatively but never in a course
+  title, path segment, or anything that implies endorsement or affiliation.
+- **Datasets and sample data** — author them; do not lift a dataset whose licence is unexamined.
+
+The `A8` posture is therefore uniform across all seven plans: **describe, cite and link; never
+reproduce.** Where a reader needs the source text, send them to the source.
+
+### A12 — how a syllabus may and may not be confirmed
+
+`A12` exists because the confirmation step introduces the exact risk the rest of `A8` guards against.
+Published curricula — ACCA, CPA, CIMA, ASCM/APICS CPIM and CSCP, university course catalogues — are
+**copyrighted works**, and several are commercial products whose syllabus _is_ the product. Checking
+a syllabus against one is legitimate; deriving a syllabus from one is not.
+
+The order of operations is what keeps this clean, and it is not optional:
+
+1. Author the syllabus from domain reasoning and the plan's own research grounding.
+2. **Then** research externally to ask whether the coverage is right — what a practitioner would
+   expect that a draft omits, and what it includes that the field does not recognise.
+3. Treat the answer as **evidence about coverage**, never as a structure to adopt. A finding is
+   actionable as "this topic is missing"; it is never actionable as "reorder to match theirs."
+
+Confirmation must never reproduce a curriculum's text, its module titles, or its sequence. Naming a
+body as corroboration ("the topic appears in ASCM's CPIM outline") is nominative use and is fine;
+transcribing its outline is not.
+
 ## Design Decisions
 
 Five decisions are this plan's own, reproduced **verbatim** from the source plan with their
@@ -716,7 +787,7 @@ marker is in nine of them rather than all. A mechanical 127→120 correction wou
 "in each Scope note" half still false, so the sentence was rewritten around the measurement instead.]
 
 **Reconciling with programme
-[`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a) (strict clean-room
+[`A8`](#programme-decisions) (strict clean-room
 licensing).** The inherited `DD-15` (technology-choice licensing) and `A8` (authorship/reproduction
 licensing) are **complementary, not duplicate**: `DD-15` governs _which tool a course teaches_ when a
 licence shift makes one option non-free; `A8` governs _how the course's own content is authored_ —

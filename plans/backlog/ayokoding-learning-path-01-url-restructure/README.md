@@ -10,8 +10,10 @@ It is **Wave 1** of a five-plan split of the closed `shared-course-library-and-l
 and has **no plan-level prerequisite** — it starts immediately.
 
 > **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R1`, `R7`, `A3`, `A10`,
-> and so on) throughout; their definitions and the wave DAG live in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+> and so on) throughout; their definitions are folded in and owned locally at
+> [tech-docs.md § Programme decisions](./tech-docs.md#programme-decisions). This plan is **Wave 1** —
+> no prerequisite; it starts immediately, in parallel with plan 02. The wave DAG is diagrammed locally
+> in [Depends-on](#depends-on).
 >
 > **Cross-plan source of truth** — The authoritative per-course and per-path specs live in
 > `plans/<stage>/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
@@ -194,7 +196,7 @@ This plan is **Wave 1** of a five-plan split of the closed
 | `ayokoding-learning-path-03-navigation-ui`                                        | `apps/ayokoding-www/src/redirects/` per-course re-home redirect table (37 rules)                                                 | its no-path regression guard and its Phase-4 e2e redirect assertion                                                                     |
 | `ayokoding-learning-path-03-navigation-ui`                                        | `apps/ayokoding-www/content/en/learn/courses/_index.md` and `.../paths/_index.md`                                                | the paths hub and path landings have nowhere to render without them                                                                     |
 | `ayokoding-learning-path-03-navigation-ui`                                        | `apps/ayokoding-www/src/redirects/learn-three-bucket.ts` + the six relocated domains                                             | the nav regression sweep must run against the final three-bucket tree, not a hybrid one                                                 |
-| `ayokoding-learning-path-03-navigation-ui`                                        | `prd.md` Screen 4 section + the six `assets/legacy-landing-option-*-*.png` renders                                               | closes the DD-47 30-render matrix across the two plans                                                                                  |
+| `ayokoding-learning-path-03-navigation-ui`                                        | `prd.md` Screen 4 section + the six `assets/legacy-landing-option-*-*.png` renders                                               | closes the DD-47 42-render matrix across the two plans                                                                                  |
 | `ayokoding-learning-path-03-navigation-ui`                                        | Open Questions **Q-A … Q-F** (this plan owns all six verbatim)                                                                   | Q-E gates the three residual `fundamentally-strong` index pages the nav plan renders                                                    |
 | `ayokoding-learning-path-03-navigation-ui`                                        | the five deeper structural indexes under `paths/careers/` and `paths/skills/` (amendment A3)                                     | its `category-landing.tsx`/`arc-landing.tsx` renderers mount these routes and need the content files to exist first                     |
 | `ayokoding-learning-path-04-course-authoring`                                     | 37 re-homed course bundles occupying the flat `courses/` namespace                                                               | the 23-new-slug collision check is only meaningful against a populated namespace                                                        |

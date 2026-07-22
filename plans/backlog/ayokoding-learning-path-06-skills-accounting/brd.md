@@ -1,7 +1,8 @@
 # Business Requirements — Skills Paths: Accounting
 
-> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined locally in
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions) (folded from the retired
+> shared programme file).
 
 ## Business Goal
 

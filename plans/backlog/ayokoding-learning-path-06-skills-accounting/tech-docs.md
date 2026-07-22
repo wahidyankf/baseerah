@@ -262,13 +262,13 @@ as "reorder to match theirs," and no syllabus is rewritten to mirror an external
 titles or sequence. Naming a body as corroboration ("this appears in ASCM's CPIM body of knowledge")
 is nominative use and is fine; the syllabus text itself never transcribes one. A syllabus with vague
 concept or worked-example descriptions cannot be checked for coverage either way and is itself a
-Phase 1 finding. See [`ayokoding-learning-path-programme.md` §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed)
+Phase 1 finding. See [§Programme decisions — A12](#programme-decisions)
 for the full rule this section implements.
 
 ## Licensing and IP Compliance (A8)
 
 **`A8` binds the whole seven-plan programme, not only this plan** — see
-[`ayokoding-learning-path-programme.md` §A8](../ayokoding-learning-path-programme.md#a8--licensing-binds-the-whole-programme)
+[§Programme decisions — A8](#programme-decisions)
 for the canonical, programme-wide statement (code examples, documentation prose, figures, book/course
 structure, trademarks, datasets). What follows is this plan's own **specialization** of that rule for
 the accounting/Sharia-accounting standards bodies specifically — it restates nothing the programme
@@ -721,6 +721,102 @@ FAS 4 (Musharaka), FAS 7 (Salam), FAS 9 (Zakah — now taught, course #22), FAS 
 (Murabaha and deferred payment sales), FAS 32–34 (Ijarah through sukuk-holder reporting — Sukuk now
 taught, course #23). **FAS numbers outside this list are `[Unverified]`** and must be re-verified
 before being written.
+
+## Programme decisions
+
+> **Folded from the retired programme file (2026-07-22).** The shared programme file that formerly
+> held the `R*`/`A*` decisions has been deleted and each plan is now self-contained. The decision
+> definitions this plan cites are copied **verbatim** below from that file and are now **owned
+> locally** by plan 06. Any `[Unverified]` text is preserved verbatim (A4).
+
+**Wave position (stated locally, no longer by linking the programme file).** Plan 06 is a **Wave 2**
+plan: it needs both **Wave 1** plans — `01` (url-restructure) and `02` (schema + prerequisite DAG) —
+merged before it can publish. It is **additionally hard-`blockedBy` plan `03`** (navigation-ui),
+because its two skills paths render through plan 03's category-agnostic shell components, so its
+manifest-publishing steps wait on plan 03's merge even though its corpus authoring can begin as soon
+as Wave 1 lands. This restates this plan's own [Depends-on](./README.md#depends-on) table; the
+programme-level three-wave DAG is **Wave 1** = `01`, `02` (start immediately, in parallel); **Wave 2**
+= `03`, `04`, `06` (need both Wave 1 plans merged); **Wave 3** = `05`, `07` (each needs its own Wave 2
+predecessor merged).
+
+The seven plans cite these ids throughout. They are **programme-scope decisions, not governance rule
+ids** — nothing under [`../../../repo-governance/`](../../../repo-governance/README.md) defines them,
+and they bind only this programme. `A*` amendments are **later than** the `R*` rules and **win on
+conflict**. Only the ids plan 06 cites (`R8`, `R9`, `A2`, `A3`, `A4`, `A6`, `A8`, `A9`, `A10`, `A11`,
+`A12`) are reproduced here.
+
+| Id  | Decision                                                                                                                                                                                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R8  | Every `skills/` path uses the **immediately-effective** arc, always                                                                                                                          |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A2  | The skills category splits into **two** plans — 06 (accounting) and 07 (ERP), the latter `blockedBy` the former                                                                              |
+| A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                                                                |
+| A4  | Research verification status is carried forward verbatim — an `[Unverified]` claim must never be restated as fact                                                                            |
+| A6  | Plans 06-07 teach the **domain to build-founding depth** — enough to implement the software — but contain **no system-building courses**; building is out of scope for a path                |
+| A8  | **Strict clean-room licensing, programme-wide** — binds all seven plans, not only 06-07; nothing copyrighted is reproduced, and every concept is restated in original words with a citation  |
+| A9  | Both corpora **expand past 20 courses** as the domain requires; every derived count follows                                                                                                  |
+| A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
+| A11 | Shared courses are **referenced by both manifests, authored once** — a Sharia path's `courseOrder` interleaves shared and Sharia-specific ids rather than duplicating files                  |
+| A12 | Every syllabus is **independently authored, then externally confirmed** — a published curriculum may corroborate coverage but must never supply the structure being written                  |
+
+### A6 — the build-founding-depth line
+
+`A6` draws a line that is easy to misread in both directions, so it is stated positively and
+negatively:
+
+- **In scope**: the domain knowledge an implementer needs — double-entry mechanics, the
+  subledger-to-general-ledger relationship, costing methods, period close, document state machines,
+  posting rules, the failure modes each of these produces. Architecture is domain knowledge here: you
+  cannot found an implementation without knowing how a ledger is structured.
+- **Out of scope**: building it. No capstone that constructs a system, no "implement X" exercise, no
+  scaffolded codebase the reader extends. A course may describe how a ledger system is architected;
+  it may not ask the reader to build one.
+
+The four courses this removes are `capstone-build-a-general-ledger-system`,
+`capstone-sharia-compliant-ledger`, `capstone-build-a-minimal-erp-core`, and
+`capstone-stand-up-and-integrate-an-open-source-erp`. The first three fail the build test; the fourth
+fails `A7` as well, being buyer-competence material.
+
+### A8 — licensing binds the whole programme
+
+`A8` originally read as a plan-06/07 concern because the standards bodies are most visibly
+restrictive there. That scoping was wrong: **every plan in the programme authors teaching material,
+and teaching material is where copyright exposure concentrates.** The careers corpus carries its own
+distinct hazards, and they are easy to miss precisely because programming content feels free:
+
+- **Code examples** copied from documentation, tutorials, blog posts or Stack Overflow. Stack
+  Overflow contributions are CC-BY-SA — attribution _and_ share-alike, which is a licence most course
+  material cannot satisfy. Author examples originally.
+- **Documentation prose** from a framework's official docs. Being free to read is not permission to
+  reproduce; most project docs carry their own licence, and it is frequently copyleft.
+- **Figures, diagrams and screenshots** lifted from vendor or project sites.
+- **Book and course structure.** Reproducing a well-known book's chapter progression, or a paid
+  course's module sequence, is the same derivative-work risk as `A12` addresses for syllabi.
+- **Trademarks.** Language, framework and vendor names may be used nominatively but never in a course
+  title, path segment, or anything that implies endorsement or affiliation.
+- **Datasets and sample data** — author them; do not lift a dataset whose licence is unexamined.
+
+The `A8` posture is therefore uniform across all seven plans: **describe, cite and link; never
+reproduce.** Where a reader needs the source text, send them to the source.
+
+### A12 — how a syllabus may and may not be confirmed
+
+`A12` exists because the confirmation step introduces the exact risk the rest of `A8` guards against.
+Published curricula — ACCA, CPA, CIMA, ASCM/APICS CPIM and CSCP, university course catalogues — are
+**copyrighted works**, and several are commercial products whose syllabus _is_ the product. Checking
+a syllabus against one is legitimate; deriving a syllabus from one is not.
+
+The order of operations is what keeps this clean, and it is not optional:
+
+1. Author the syllabus from domain reasoning and the plan's own research grounding.
+2. **Then** research externally to ask whether the coverage is right — what a practitioner would
+   expect that a draft omits, and what it includes that the field does not recognise.
+3. Treat the answer as **evidence about coverage**, never as a structure to adopt. A finding is
+   actionable as "this topic is missing"; it is never actionable as "reorder to match theirs."
+
+Confirmation must never reproduce a curriculum's text, its module titles, or its sequence. Naming a
+body as corroboration ("the topic appears in ASCM's CPIM outline") is nominative use and is fine;
+transcribing its outline is not.
 
 ## Design Decisions
 

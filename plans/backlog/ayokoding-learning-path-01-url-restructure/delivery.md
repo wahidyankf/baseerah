@@ -1,7 +1,8 @@
 # Delivery Checklist — ayokoding-www Learning-Path URL Restructure
 
-> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined locally in
+> [tech-docs.md § Programme decisions](./tech-docs.md#programme-decisions), folded in and owned by
+> this plan.
 
 Executable checklist for the **URL and IA layer**: the `courses/` and `paths/` content homes, the
 re-home of 37 shipped bundles with their per-course 308s, the six-domain relocation into `legacy/`

@@ -7,8 +7,9 @@ course corpus custodied by plan 02 but never edits, copies, or forks any file un
 change to that corpus is routed to plan 02's own `delivery.md` as a change request, per the
 [Learning-Plan Syllabus Convention §Custody Rule](../../../repo-governance/conventions/structure/learning-plan-syllabus.md#custody-rule).
 
-> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined locally in
+> [§Programme decisions](#programme-decisions), folded in from the retired programme file so this
+> plan is self-contained.
 >
 > **Cross-plan source of truth**: the authoritative per-course and per-path specs live in
 > `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
@@ -16,6 +17,45 @@ change to that corpus is routed to plan 02's own `delivery.md` as a change reque
 > **transcribed** from its
 > [`syllabus/paths/manifest-*.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/README.md)
 > mirror, never re-derived.
+
+## Programme decisions
+
+The `R*` rules and `A*` amendments this plan cites are defined here, folded in verbatim from the
+retired programme decision table so this plan is self-contained. This plan cites `R2`, `R4`, `R9`,
+`A8`, and `A10`. `A*` amendments are **later than** the `R*` rules and
+**win on conflict**. (The `R5` and `R7` tokens elsewhere in this file are the UI-design-funnel
+skill's own R5 grounding note and R7 prior-art citation — not programme decisions R5/R7, which this
+plan does not cite.)
+
+| Id  | Decision                                                                                                                                                                                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R2  | `pathId` is **variable-depth by design** — `careers/<arc>/<role>` is 3 segments, `skills/<subject>` is 2; nothing may key on segment count                                                   |
+| R4  | Ownership split: plans 01-05 are `careers/`-only; the `skills/` category is separate (revised by `A2`)                                                                                       |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A8  | **Strict clean-room licensing, programme-wide** — binds all seven plans, not only 06-07; nothing copyrighted is reproduced, and every concept is restated in original words with a citation  |
+| A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
+
+### A8 — licensing binds the whole programme
+
+`A8` originally read as a plan-06/07 concern because the standards bodies are most visibly
+restrictive there. That scoping was wrong: **every plan in the programme authors teaching material,
+and teaching material is where copyright exposure concentrates.** The careers corpus carries its own
+distinct hazards, and they are easy to miss precisely because programming content feels free:
+
+- **Code examples** copied from documentation, tutorials, blog posts or Stack Overflow. Stack
+  Overflow contributions are CC-BY-SA — attribution _and_ share-alike, which is a licence most course
+  material cannot satisfy. Author examples originally.
+- **Documentation prose** from a framework's official docs. Being free to read is not permission to
+  reproduce; most project docs carry their own licence, and it is frequently copyleft.
+- **Figures, diagrams and screenshots** lifted from vendor or project sites.
+- **Book and course structure.** Reproducing a well-known book's chapter progression, or a paid
+  course's module sequence, is the same derivative-work risk as `A12` addresses for syllabi.
+- **Trademarks.** Language, framework and vendor names may be used nominatively but never in a course
+  title, path segment, or anything that implies endorsement or affiliation.
+- **Datasets and sample data** — author them; do not lift a dataset whose licence is unexamined.
+
+The `A8` posture is therefore uniform across all seven plans: **describe, cite and link; never
+reproduce.** Where a reader needs the source text, send them to the source.
 
 ## Overview
 

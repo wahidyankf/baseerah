@@ -6,8 +6,9 @@ This `syllabus/` folder is the design surface for a **shared course library** an
 built over it. It has three parts:
 
 - **[courses/](./courses/README.md)** — the **per-course-block detail layer**: the index of the
-  **127-course catalog** (the careers/software-engineering figure — R4; the skills corpus is
-  additional and owned elsewhere) and one **`<course-id>.md`** detail file per course (concepts, worked
+  catalog's **127 course ids** (the careers/software-engineering figure — R4; the skills corpus is
+  additional and owned elsewhere), mirrored on disk as **120 `<course-id>.md` spec files** — the
+  remaining **7** ids are DD-20 capstones embedded in their host-topic files (concepts, worked
   examples, capstone spec). Courses have **no single order** here — order is a per-path property.
 - **[paths/](./paths/README.md)** — the **path manifests**, each an ordered, prerequisite-consistent
   list of course IDs over the shared library.
@@ -21,7 +22,7 @@ stories, Gherkin, NEW-course specs). This folder adds the dimension the tables c
 the concrete **Concepts** (`co-NN`), **Worked examples** (`ex-NN`), and **Capstone spec**; and per path,
 the concrete ordered manifest.
 
-**Careers-only ([R4](../../ayokoding-learning-path-programme.md#programme-decisions-r--a), 2026-07-21
+**Careers-only ([R4](../tech-docs.md#programme-decisions), 2026-07-21
 ruling)**: this corpus and its four manifests sit entirely under the
 `careers/` URL category (`/en/c/learn/paths/careers/<arc>/<role>`). A sibling `skills/` category
 (`/en/c/learn/paths/skills/<subject>`, **4** manifests as of amendment A10 — up from the original two

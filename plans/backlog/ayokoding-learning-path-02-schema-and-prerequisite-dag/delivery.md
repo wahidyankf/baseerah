@@ -735,7 +735,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `find <PLAN>/syllabus -type f | wc -l`
       — acceptance: returns **128** (unchanged — an edit to an existing file's content, not an
       addition or removal).
-- [ ] [AI] **Licensing check (programme [`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a)) — this step orders existing courses, it does not author new content**, so confirm no new course was introduced by the Stage 0 ordering —
+- [ ] [AI] **Licensing check (programme [`A8`](./tech-docs.md#programme-decisions)) — this step orders existing courses, it does not author new content**, so confirm no new course was introduced by the Stage 0 ordering —
       `for c in just-enough-python software-testing cicd-and-release-engineering backend-at-scale containers-and-orchestration computer-architecture site-reliability-engineering data-engineering data-structures-and-algorithms-essentials software-product-engineering frontend-essentials; do test -f <PLAN>/syllabus/courses/$c.md || echo "MISSING: $c"; done`
       — acceptance: prints nothing (every one of the 11 resolves to a pre-existing, already-authored
       spec file; A8 does not apply to this step because it introduces no new prose, code example, or

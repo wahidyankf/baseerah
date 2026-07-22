@@ -10,7 +10,7 @@ convention `ayokoding-learning-path-02-schema-and-prerequisite-dag` established
 Authored independently from domain reasoning and the
 [domain-research grounding](../tech-docs.md#verification-status-carried-forward-a4) **first, with no
 external curriculum open** — per programme decision `A12`
-([`../../ayokoding-learning-path-programme.md`](../../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed)),
+([tech-docs.md §Programme decisions](../tech-docs.md#programme-decisions)),
 a published
 curriculum may only **corroborate coverage after the fact**; it must never supply the structure being
 written. Only **then** does a `web-researcher` confirmation pass run, asking a coverage question only

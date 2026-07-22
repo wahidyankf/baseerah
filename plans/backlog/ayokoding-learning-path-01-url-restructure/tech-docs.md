@@ -1,7 +1,7 @@
 # Technical Docs — ayokoding-www Learning-Path URL Restructure
 
-> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined locally in
+> [§ Programme decisions](#programme-decisions).
 
 ## Scope of this document
 
@@ -20,6 +20,23 @@ banner). The complete funnel record — low-fi alternatives at three viewports, 
 the R5 grounding note, the R7 prior-art citation, the hi-fi finalist plan, and the rationale table —
 lives in [prd.md §UI-Design-Funnel](./prd.md#ui-design-funnel--screen-4--legacy-bucket-landing-and-page-banner),
 per the placement rule. It is not duplicated here.
+
+## Programme decisions
+
+These `R*`/`A*` decision ids were **folded from the retired shared programme file** into this plan and
+are now **owned locally** — plan 01 is self-contained and depends on no cross-plan document for their
+definitions. Only the ids plan 01 cites are reproduced below; each definition is copied verbatim from
+the retired file's `Programme decisions (R*/A*)` table. `A*` amendments are **later than** the `R*`
+rules and **win on conflict**.
+
+| Id  | Decision                                                                                                                                                                                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1  | URL grammar is `/en/learn/paths/{careers,skills}/…` over six paths (raised to **eight** by `A10`)                                                                                            |
+| R5  | The full skills corpus is authored **in this programme**, not deferred                                                                                                                       |
+| R7  | **Every URL segment must render** — no orphan segments                                                                                                                                       |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                                                                |
+| A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
 
 ## Ground-truth inventory (measured 2026-07-21, re-verified at authoring)
 

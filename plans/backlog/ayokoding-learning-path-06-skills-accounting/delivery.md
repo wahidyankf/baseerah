@@ -211,7 +211,7 @@ a string form silently short-circuits to a single false-passing iteration (DD-62
 > reasoning and this plan's own grounding file; only **after** a syllabus exists does step 1.3 dispatch
 > `web-researcher`, and only to check coverage. See
 > [tech-docs §Post-authoring verification](./tech-docs.md#syllabus-layer--custody-and-shape) and
-> [`ayokoding-learning-path-programme.md` §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed).
+> [tech-docs §Programme decisions — A12](./tech-docs.md#programme-decisions).
 
 ### 1.1 · Verify the spec folder (pre-authored — this sub-phase verifies, it does not scaffold)
 

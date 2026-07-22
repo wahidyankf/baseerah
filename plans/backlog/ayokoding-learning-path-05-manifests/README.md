@@ -11,8 +11,9 @@ category**: the four `PathManifest` YAML data files, their thin content landing 
 every manifest growth as backfill content lands.
 
 > **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids `R2`, `R4`, `R9`, `A8`,
-> and `A10`; their definitions and the wave DAG live in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+> and `A10`; their definitions are folded into
+> [tech-docs §Programme decisions](./tech-docs.md#programme-decisions), and the wave DAG is the
+> diagram below in this README.
 > `A8` (programme-wide clean-room licensing) governs every landing-prose authoring step — cycles 1.2,
 > 2.2, 3.2, and 4.4 — and is invoked there explicitly rather than assumed. Note that the `R5` and `R7`
 > appearing in [tech-docs](./tech-docs.md) are the **UI-design-funnel skill's own** R5 grounding note
@@ -509,7 +510,7 @@ which this plan does not opt out of (see **DN-11** above). `ayokoding-www` is de
   ordering of the newly included courses is still pending in that plan's own Phase 1.4 — see
   tech-docs).
 - **Skills paths (sibling plans, out of scope)** — `ayokoding-learning-path-06-skills-accounting`
-  and `ayokoding-learning-path-07-skills-erp` together own the `skills/` category end-to-end, one
-  manifest each ([`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md),
+  and `ayokoding-learning-path-07-skills-erp` together own the `skills/` category end-to-end, two
+  manifests each ([`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md),
   [`ayokoding-learning-path-07-skills-erp`](../ayokoding-learning-path-07-skills-erp/README.md)); not
   read or referenced by this plan's own delivery checklist.

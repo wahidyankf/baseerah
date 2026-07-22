@@ -10,8 +10,8 @@ plan. It is **Wave 1** and has **no plan-level prerequisite** — it starts imme
 with `ayokoding-learning-path-01-url-restructure`.
 
 > **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R2`, `R4`, `A2`, `A10`,
-> and so on) throughout; their definitions and the wave DAG live in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+> and so on) throughout; the ones this plan cites are folded, with their definitions and this plan's
+> Wave-1 position, into [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions).
 >
 > **Custody notice.** The `syllabus/` folder in this plan is a **moved corpus**. Its curriculum
 > content — course specs, orderings, pedagogical framing — is not authored, edited, or re-derived by

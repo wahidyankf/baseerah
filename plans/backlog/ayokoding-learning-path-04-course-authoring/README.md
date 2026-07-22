@@ -11,9 +11,13 @@ This is **Wave 2** of a five-plan split of the closed
 plan. It owns **course bodies only**. It owns no schema, no route, no component, no redirect — and,
 most importantly, **no manifest**.
 
-> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`A6`, `A8`, `A9`, `A12`,
-> and so on) throughout; their definitions and the wave DAG live in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`R9`, `A6`, `A8`,
+> `A9`, `A12`) throughout; their definitions (folded from the retired shared programme file so this
+> plan is self-contained) live in
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions). The wave DAG is stated
+> locally in this file (see the diagram below and §Implementation Sequence and Prerequisites): this
+> plan is **Wave 2** — it needs Wave 1 plans `01` and `02` merged, and is a sibling of plan `03`
+> (same wave, no dependency edge in either direction).
 >
 > **Cross-plan source of truth** — the authoritative per-course and per-path specs live in
 > `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
@@ -39,14 +43,14 @@ plan alone.
 
 **Concretely, these steps left this plan and went to the manifest plan** (do not reintroduce them):
 
-| Step                                                                              | Why it left                                                                        |
-| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Bands 1–8 growth of the three `software-engineer` manifests                       | genuine manifest mutation                                                          |
-| Band 9 growth (`interview-ready` + `fundamentally-strong` only)                   | genuine manifest mutation                                                          |
-| Interview-ready refresh-register smoothness re-audit                              | mutation-adjacent; closes the manifest plan's own earlier deferral                 |
-| AI-path manifest growth from the 6-course spine to the full 15-course composition | genuine manifest mutation                                                          |
-| The course-surgery phase's manifest re-verification                               | read-only, but it inverts the wave order (this plan is Wave 2, that one is Wave 3) |
-| The terminal **127-catalog** assertion                                            | that is the catalog total; this plan asserts only its own **90** authored bodies   |
+| Step                                                                                   | Why it left                                                                        |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Bands 1–8 growth of the three `software-engineer` manifests                            | genuine manifest mutation                                                          |
+| Band 9 growth (`interview-ready` + `fundamentally-strong` only)                        | genuine manifest mutation                                                          |
+| Interview-ready refresh-register smoothness re-audit                                   | mutation-adjacent; closes the manifest plan's own earlier deferral                 |
+| AI-path manifest growth from the 6-course spine to its full DD-35-governed composition | genuine manifest mutation                                                          |
+| The course-surgery phase's manifest re-verification                                    | read-only, but it inverts the wave order (this plan is Wave 2, that one is Wave 3) |
+| The terminal **127-catalog** assertion                                                 | that is the catalog total; this plan asserts only its own **90** authored bodies   |
 
 ## Position in the split
 
@@ -136,7 +140,8 @@ band's gate:
   `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml`
 - **Band 5 and Band 8 additionally** →
   `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml` (the nine harness-cluster
-  bodies that grow the fourth path from its 6-course spine to its full 15-course composition, DD-33)
+  bodies that grow the fourth path from its 6-course spine into its full DD-35-governed manifest
+  composition — DD-33's fixed 6→15 figure is superseded, and the manifest now includes prerequisites)
 - **Band 9** → `<MANIFESTS>careers/interview-ready/software-engineer.yaml` and
   `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml` **only** — the
   `careers/immediately-effective/software-engineer` path omits the interview-technique band from its
@@ -190,7 +195,7 @@ step here that appends a course ID to a `.yaml` is a boundary violation, not a c
 | -------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ayokoding-learning-path-01-url-restructure`             | 37 re-homed course bundles occupying the flat `courses/` namespace | the 23-new-slug collision check is vacuous against an empty namespace, and a native-authored slug could silently collide with a not-yet-moved re-home slug |
 | `ayokoding-learning-path-01-url-restructure`             | `apps/ayokoding-www/content/en/learn/courses/_index.md`            | every authored course is listed in this catalog landing                                                                                                    |
-| `ayokoding-learning-path-02-schema-and-prerequisite-dag` | `syllabus/courses/<course-id>.md` — 121 settled spec files         | each body is authored **from** its spec (`co-NN` concepts, `ex-NN` examples, prerequisite chain, capstone spec), never from a fresh judgment call          |
+| `ayokoding-learning-path-02-schema-and-prerequisite-dag` | `syllabus/courses/<course-id>.md` — 120 settled spec files         | each body is authored **from** its spec (`co-NN` concepts, `ex-NN` examples, prerequisite chain, capstone spec), never from a fresh judgment call          |
 | `ayokoding-learning-path-02-schema-and-prerequisite-dag` | the `prerequisites: [course-id, ...]` frontmatter contract         | every net-new `_index.md` declares it                                                                                                                      |
 
 **Start precondition (checkable — all four must hold):**

@@ -12,8 +12,9 @@ subject each. Accounting lands first because **ERP depends on Accounting one-dir
 nothing in Accounting needs ERP** — see [§Where this plan sits](#where-this-plan-sits).
 
 > **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`A6`, `A8`, `A9`, `A10`,
-> `A11`, `A12`, and so on) throughout; their definitions and the wave DAG live in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+> `A11`, `A12`, and so on) throughout; their definitions and the wave DAG now live locally in
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions) (folded from the retired
+> shared programme file), not in this file.
 
 ## Prior art
 
@@ -194,7 +195,7 @@ to supply or correct the syllabus's structure, module order, or wording. A conce
 asserted on domain-reasoning grounds rather than sourced from the seeding research is marked `[Needs
 Verification]` so the coverage pass has something concrete to confirm or refute; a vague concept
 cannot be checked either way. See
-[`ayokoding-learning-path-programme.md` §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed).
+[tech-docs §Programme decisions — A12](./tech-docs.md#programme-decisions).
 
 ## Licensing (A8) — read before authoring any standards content
 

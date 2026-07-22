@@ -469,7 +469,7 @@ subagents capped per the orchestration convention). The main thread self-promote
    — acceptance: returns **0** on this course's own branch before it merges. Falsifiable both ways:
    touching any file under that path makes the command return ≥1.
 9. [AI] **Licensing self-check (programme
-   [`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a))** — grep this course's
+   [`A8`](./tech-docs.md#programme-decisions))** — grep this course's
    own worked-example code for the CC-BY-SA Stack Overflow hazard `A8` names explicitly:
    `grep -rn 'stackoverflow\.com\|reddit\.com' "<COURSES><course-id>/learning/code/" 2>/dev/null | grep -c .`
    — acceptance: prints `0` (a zero-count `grep -c` exits 1 under every grep engine this harness may
@@ -652,8 +652,14 @@ deploy), applying the convention:
       do not resolve it or adopt a side as structure) — acceptance: these citation requirements appear
       as explicit acceptance criteria on the relevant Band 5 and Band 8 items below.
       **Citation caveat carried forward**: the "OpenAI" attribution in the inherited D9 text is
-      `[Unverified]` — no specific OpenAI publication supports it. Band 5/8 authoring cites Anthropic
-      and Böckeler only, and omits the OpenAI attribution unless a specific URL is supplied.
+      `[Unverified]`. A candidate OpenAI publication exists at
+      `https://openai.com/index/harness-engineering/` ("Harness engineering: leveraging Codex in an
+      agent-first world," reported 2026-02-11), but the primary page returned **HTTP 403** and was not
+      read at verification time (2026-07-22) — the date/content rest on third-party summaries only, so
+      this stays `[Unverified]` pending a primary-source read (do not upgrade to fact). The reported
+      date is **early 2026**, later than the "late 2025" framing; that onset is therefore conditional on
+      the OpenAI lead. Band 5/8 authoring cites Anthropic and Böckeler only, and omits the OpenAI
+      attribution unless the primary page is read and a specific URL confirmed.
 - [ ] [AI] **Lock the D11 concept-addition contract** — record, for Band 5's authoring, the four
       concept-level additions: cache-aware prefix ordering (framed as a general stable-before-variable
       principle, not tied to one vendor's mechanism) → `agent-context-and-memory`; tool-count

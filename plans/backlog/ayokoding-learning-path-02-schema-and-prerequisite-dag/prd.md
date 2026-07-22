@@ -1,7 +1,7 @@
 # Product Requirements — Learning Path Schema and Prerequisite DAG
 
 > **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> [tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions).
 
 ## Product Overview
 

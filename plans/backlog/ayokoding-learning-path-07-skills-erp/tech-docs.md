@@ -534,12 +534,12 @@ trade-off as a design-axis description (not a vendor claim). These are stable an
 
 ### Requires re-verification at authoring time
 
-| Claim class                                 | Status                                                                                                    | Resolution step                                                                                                                                                                                                                             |
-| ------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ERP integration surfaces                    | `[Unverified]` — IDoc retirement from SAP Cloud ERP Public Cloud, Dataverse dual-write, OData generations | `web-researcher` against vendor documentation before authoring course 23                                                                                                                                                                    |
-| Analyst positioning (Gartner MQ)            | `[Unverified]` and **weakly sourced** — paywalled, triangulated from vendor and analyst coverage only     | never state a ranking as fact; frame as market commentary with its provenance, or omit — the corpus carries no evaluation/selection course to attach this to, so it should appear at most incidentally in `erp-module-map-and-architecture` |
-| Platform version pins                       | `[Unverified]`                                                                                            | dated accuracy-note sidebar, never the stable spine                                                                                                                                                                                         |
-| The 30-course count and its stage partition | `[Judgment call]` — curriculum judgment, explicitly not a sourced fact                                    | labelled as judgment wherever stated                                                                                                                                                                                                        |
+| Claim class                                 | Status                                                                                                | Resolution step                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ERP integration surfaces                    | Partly resolved 2026-07-22 — see resolution                                                           | **IDoc**: confirmed absent from SAP S/4HANA Cloud **Public** Edition (release 2508); on-prem/private cloud **retain** IDoc `[Web-cited: SAP Community — IDOCs are Still Safe for SAP S/4HANA (Clean Core Level B) — https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-members/idocs-are-still-safe-for-sap-s-4hana-sap-clean-core-extensibility-level-b/ba-p/14225439 ; accessed 2026-07-22]`. Assert only that; any "eventual retirement everywhere" framing is blog commentary and stays `[Needs Verification]`. **Dataverse dual-write**: **active and being enhanced** (async dual-write) — must **not** be stated as deprecated. **OData**: the Dataverse/Dynamics Web API is **OData v4.0**. Both: `[Web-cited: Microsoft Learn — Dual-write overview (updated 2026-04-03) — https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/data-entities/dual-write/dual-write-overview ; accessed 2026-07-22]` |
+| Analyst positioning (Gartner MQ)            | `[Unverified]` and **weakly sourced** — paywalled, triangulated from vendor and analyst coverage only | never state a ranking as fact; frame as market commentary with its provenance, or omit — the corpus carries no evaluation/selection course to attach this to, so it should appear at most incidentally in `erp-module-map-and-architecture`. If Gartner is ever named, note only that Gartner split the single ERP Magic Quadrant into **three** segmented 2026 reports (Product-Centric, Service-Centric, Cloud ERP Finance); do **not** state MQ positioning as fact (paywalled)                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Platform version pins                       | `[Unverified]`                                                                                        | dated accuracy-note sidebar, never the stable spine                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| The 30-course count and its stage partition | `[Judgment call]` — curriculum judgment, explicitly not a sourced fact                                | labelled as judgment wherever stated                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ### Load-bearing for courses 28–30 — there is no single "Sharia accounting standard"
 
@@ -577,7 +577,7 @@ is not this corpus's to settle. No course may restate it as fact.
 **Every course in this corpus is authored clean-room.** No standards text, proprietary schema, or
 copyleft code is reproduced anywhere. This section is the binding reference every syllabus and every
 authored body cites. `A8` is a **programme-wide** posture — see
-[Programme §A8 — licensing binds the whole programme](../ayokoding-learning-path-programme.md#a8--licensing-binds-the-whole-programme)
+[§Programme decisions](#programme-decisions)
 — and this section is this plan's own instance of that posture, kept consistent with it rather than
 restating it. `A12`'s syllabus-confirmation order (below, and in
 [§Syllabus layer](#syllabus-layer--custody-and-shape-dd-31)) is the sharpest instance of `A8` this
@@ -605,19 +605,19 @@ tags: every syllabus's Scope note ends `License-aware (DD-15)` per the inherited
 
 ### Per-project licence table (from the domain-research grounding, `[Verified]`)
 
-| Project                                             | Licence            | Note                                                                |
-| --------------------------------------------------- | ------------------ | ------------------------------------------------------------------- |
-| Odoo Community                                      | LGPLv3             | permissive-ish copyleft; describe behaviourally, never quote code   |
-| Odoo Enterprise                                     | OEEL (proprietary) | never reference its internals beyond nominative naming              |
-| ERPNext                                             | GPLv3              | code is copyleft; docs are CC-BY-SA-3.0                             |
-| Frappe Framework                                    | MIT                | the only fully permissive project in the table                      |
-| Tryton                                              | GPLv3+             | copyleft; describe behaviourally                                    |
-| Apache OFBiz                                        | Apache-2.0         | permissive; still never paste verbatim without attribution          |
-| Dolibarr                                            | GPLv3+             | copyleft; describe behaviourally                                    |
-| iDempiere                                           | GPLv2              | copyleft; describe behaviourally                                    |
-| Metasfresh                                          | `[Unverified]`     | never cite a licence claim for this project without re-verifying it |
-| ledger-cli (reference for GL mechanics)             | BSD-3-Clause       | permissive; safe to reference more directly than the above          |
-| Apache Fineract (reference for subledger mechanics) | Apache-2.0         | permissive; safe to reference more directly than the above          |
+| Project                                             | Licence            | Note                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Odoo Community                                      | LGPLv3             | permissive-ish copyleft; describe behaviourally, never quote code                                                                                                                                                                                                                                                                                                                                                                            |
+| Odoo Enterprise                                     | OEEL (proprietary) | never reference its internals beyond nominative naming                                                                                                                                                                                                                                                                                                                                                                                       |
+| ERPNext                                             | GPLv3              | code is copyleft; docs are CC-BY-SA-3.0                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Frappe Framework                                    | MIT                | the only fully permissive project in the table                                                                                                                                                                                                                                                                                                                                                                                               |
+| Tryton                                              | GPLv3+             | copyleft; describe behaviourally                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Apache OFBiz                                        | Apache-2.0         | permissive; still never paste verbatim without attribution                                                                                                                                                                                                                                                                                                                                                                                   |
+| Dolibarr                                            | GPLv3+             | copyleft; describe behaviourally                                                                                                                                                                                                                                                                                                                                                                                                             |
+| iDempiere                                           | GPLv2              | copyleft; describe behaviourally                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Metasfresh                                          | GPLv2              | `[Web-cited: metasfresh/metasfresh LICENSE.md — https://raw.githubusercontent.com/metasfresh/metasfresh/master/LICENSE.md ; accessed 2026-07-22]` — primary source confirms GPLv2; commercial offering is paid support on the same GPL code, **not** a separate proprietary edition. Secondary "GPLv2/GPLv3" characterization (per-repo licence variance) remains `[Needs Verification]`. Copyleft; describe behaviourally, never quote code |
+| ledger-cli (reference for GL mechanics)             | BSD-3-Clause       | permissive; safe to reference more directly than the above                                                                                                                                                                                                                                                                                                                                                                                   |
+| Apache Fineract (reference for subledger mechanics) | Apache-2.0         | permissive; safe to reference more directly than the above                                                                                                                                                                                                                                                                                                                                                                                   |
 
 **No public-domain chart-of-accounts template was found in the grounding research.** Any chart of
 accounts anywhere in this corpus (course 2's data-model examples, course 5's posting-rule worked
@@ -757,7 +757,7 @@ concepts").
 
 **Authored first from domain reasoning and the grounding research — confirmed second, and only for
 coverage, never for structure (`A12`).** Per
-[Programme §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed), a
+[§Programme decisions](#programme-decisions), a
 published curriculum may corroborate that a syllabus's coverage is right; it must never supply the
 structure being written. The binding order, restated for this plan's own Phase 1:
 
@@ -778,6 +778,91 @@ structure being written. The binding order, restated for this plan's own Phase 1
 Where a topic is placed on domain-reasoning grounds rather than sourced from the grounding research,
 it is marked `[Needs Verification]` in the syllabus, giving the Phase 1.2a pass something concrete to
 confirm or refute without ever becoming the source of the syllabus's shape.
+
+## Programme decisions
+
+The `R*` rules and `A*` amendments this plan cites throughout were **folded in from the retired
+shared programme file and are now owned locally** — this section is their sole home for plan 07. They are **programme-scope decisions, not governance rule ids**; nothing under
+[`../../../repo-governance/`](../../../repo-governance/README.md) defines them, and they bind only the
+`ayokoding-learning-path-*` programme. `A*` amendments are **later than** the `R*` rules and **win on
+conflict**. Only the ids plan 07 actually cites are reproduced below.
+
+| Id  | Decision                                                                                                                                                                                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R2  | `pathId` is **variable-depth by design** — `careers/<arc>/<role>` is 3 segments, `skills/<subject>` is 2; nothing may key on segment count                                                   |
+| R5  | The full skills corpus is authored **in this programme**, not deferred                                                                                                                       |
+| R8  | Every `skills/` path uses the **immediately-effective** arc, always                                                                                                                          |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A1  | `careers/immediately-effective/ai-engineer` assumes **no** prior software-engineering competence; prerequisites are included in `courseOrder`, not linked                                    |
+| A2  | The skills category splits into **two** plans — 06 (accounting) and 07 (ERP), the latter `blockedBy` the former                                                                              |
+| A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                                                                |
+| A4  | Research verification status is carried forward verbatim — an `[Unverified]` claim must never be restated as fact                                                                            |
+| A6  | Plans 06-07 teach the **domain to build-founding depth** — enough to implement the software — but contain **no system-building courses**; building is out of scope for a path                |
+| A7  | ERP's buyer/consultant courses are **replaced** by domain-depth courses; evaluation, selection and implementation-methodology material leaves the corpus                                     |
+| A8  | **Strict clean-room licensing, programme-wide** — binds all seven plans, not only 06-07; nothing copyrighted is reproduced, and every concept is restated in original words with a citation  |
+| A9  | Both corpora **expand past 20 courses** as the domain requires; every derived count follows                                                                                                  |
+| A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
+| A11 | Shared courses are **referenced by both manifests, authored once** — a Sharia path's `courseOrder` interleaves shared and Sharia-specific ids rather than duplicating files                  |
+| A12 | Every syllabus is **independently authored, then externally confirmed** — a published curriculum may corroborate coverage but must never supply the structure being written                  |
+
+### A6 — the build-founding-depth line
+
+`A6` draws a line that is easy to misread in both directions, so it is stated positively and
+negatively:
+
+- **In scope**: the domain knowledge an implementer needs — double-entry mechanics, the
+  subledger-to-general-ledger relationship, costing methods, period close, document state machines,
+  posting rules, the failure modes each of these produces. Architecture is domain knowledge here: you
+  cannot found an implementation without knowing how a ledger is structured.
+- **Out of scope**: building it. No capstone that constructs a system, no "implement X" exercise, no
+  scaffolded codebase the reader extends. A course may describe how a ledger system is architected;
+  it may not ask the reader to build one.
+
+The four courses this removes are `capstone-build-a-general-ledger-system`,
+`capstone-sharia-compliant-ledger`, `capstone-build-a-minimal-erp-core`, and
+`capstone-stand-up-and-integrate-an-open-source-erp`. The first three fail the build test; the fourth
+fails `A7` as well, being buyer-competence material.
+
+### A8 — licensing binds the whole programme
+
+`A8` originally read as a plan-06/07 concern because the standards bodies are most visibly
+restrictive there. That scoping was wrong: **every plan in the programme authors teaching material,
+and teaching material is where copyright exposure concentrates.** The careers corpus carries its own
+distinct hazards, and they are easy to miss precisely because programming content feels free:
+
+- **Code examples** copied from documentation, tutorials, blog posts or Stack Overflow. Stack
+  Overflow contributions are CC-BY-SA — attribution _and_ share-alike, which is a licence most course
+  material cannot satisfy. Author examples originally.
+- **Documentation prose** from a framework's official docs. Being free to read is not permission to
+  reproduce; most project docs carry their own licence, and it is frequently copyleft.
+- **Figures, diagrams and screenshots** lifted from vendor or project sites.
+- **Book and course structure.** Reproducing a well-known book's chapter progression, or a paid
+  course's module sequence, is the same derivative-work risk as `A12` addresses for syllabi.
+- **Trademarks.** Language, framework and vendor names may be used nominatively but never in a course
+  title, path segment, or anything that implies endorsement or affiliation.
+- **Datasets and sample data** — author them; do not lift a dataset whose licence is unexamined.
+
+The `A8` posture is therefore uniform across all seven plans: **describe, cite and link; never
+reproduce.** Where a reader needs the source text, send them to the source.
+
+### A12 — how a syllabus may and may not be confirmed
+
+`A12` exists because the confirmation step introduces the exact risk the rest of `A8` guards against.
+Published curricula — ACCA, CPA, CIMA, ASCM/APICS CPIM and CSCP, university course catalogues — are
+**copyrighted works**, and several are commercial products whose syllabus _is_ the product. Checking
+a syllabus against one is legitimate; deriving a syllabus from one is not.
+
+The order of operations is what keeps this clean, and it is not optional:
+
+1. Author the syllabus from domain reasoning and the plan's own research grounding.
+2. **Then** research externally to ask whether the coverage is right — what a practitioner would
+   expect that a draft omits, and what it includes that the field does not recognise.
+3. Treat the answer as **evidence about coverage**, never as a structure to adopt. A finding is
+   actionable as "this topic is missing"; it is never actionable as "reorder to match theirs."
+
+Confirmation must never reproduce a curriculum's text, its module titles, or its sequence. Naming a
+body as corroboration ("the topic appears in ASCM's CPIM outline") is nominative use and is fine;
+transcribing its outline is not.
 
 ## Design Decisions
 

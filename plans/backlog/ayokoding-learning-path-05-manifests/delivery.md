@@ -1,7 +1,7 @@
 # Delivery Checklist — Learning Path Manifests
 
 > **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
-> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+> [tech-docs §Programme decisions](./tech-docs.md#programme-decisions).
 >
 > **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
 > `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or

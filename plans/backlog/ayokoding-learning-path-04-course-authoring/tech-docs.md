@@ -16,6 +16,79 @@ architecture**: where each body's authoritative spec lives, what shape the produ
 scope contracts are locked before their target bodies exist, and how a landed band is handed to the
 plan that composes it.
 
+## Programme decisions
+
+_Folded from the retired shared programme file (deleted so each plan is self-contained). Only the ids this plan cites are reproduced — `R9`, `A6`, `A8`, `A9`, `A12` — copied verbatim from the programme's decision table, with the programme's prose expansions for `A6`, `A8`, and `A12`. These were **programme-scope decisions, not governance rule ids** — nothing under `../../repo-governance/` defines them, and they bind only this programme's plans. `A*` amendments are later than the `R*` rules and win on conflict. Per `A4`, research verification status is carried forward verbatim — an `[Unverified]` claim is never restated as fact._
+
+**Citation-label vocabulary mapping (for a literal Step-5f checker).** The corpus course bodies under `syllabus/courses/` predate the four canonical anti-hallucination labels and use their own vocabulary: `[Needs Verification]` maps to the canonical `[Unverified]` (a pre-authoring verification sweep is still pending), and `(web-verified)` maps to `[Web-cited]`. A checker reading the corpus should treat these as equivalents rather than as unlabelled claims.
+
+| Id  | Decision                                                                                                                                                                                    |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                              |
+| A6  | Plans 06-07 teach the **domain to build-founding depth** — enough to implement the software — but contain **no system-building courses**; building is out of scope for a path               |
+| A8  | **Strict clean-room licensing, programme-wide** — binds all seven plans, not only 06-07; nothing copyrighted is reproduced, and every concept is restated in original words with a citation |
+| A9  | Both corpora **expand past 20 courses** as the domain requires; every derived count follows                                                                                                 |
+| A12 | Every syllabus is **independently authored, then externally confirmed** — a published curriculum may corroborate coverage but must never supply the structure being written                 |
+
+### A6 — the build-founding-depth line
+
+`A6` draws a line that is easy to misread in both directions, so it is stated positively and
+negatively:
+
+- **In scope**: the domain knowledge an implementer needs — double-entry mechanics, the
+  subledger-to-general-ledger relationship, costing methods, period close, document state machines,
+  posting rules, the failure modes each of these produces. Architecture is domain knowledge here: you
+  cannot found an implementation without knowing how a ledger is structured.
+- **Out of scope**: building it. No capstone that constructs a system, no "implement X" exercise, no
+  scaffolded codebase the reader extends. A course may describe how a ledger system is architected;
+  it may not ask the reader to build one.
+
+The four courses this removes are `capstone-build-a-general-ledger-system`,
+`capstone-sharia-compliant-ledger`, `capstone-build-a-minimal-erp-core`, and
+`capstone-stand-up-and-integrate-an-open-source-erp`. The first three fail the build test; the fourth
+fails `A7` as well, being buyer-competence material.
+
+### A8 — licensing binds the whole programme
+
+`A8` originally read as a plan-06/07 concern because the standards bodies are most visibly
+restrictive there. That scoping was wrong: **every plan in the programme authors teaching material,
+and teaching material is where copyright exposure concentrates.** The careers corpus carries its own
+distinct hazards, and they are easy to miss precisely because programming content feels free:
+
+- **Code examples** copied from documentation, tutorials, blog posts or Stack Overflow. Stack
+  Overflow contributions are CC-BY-SA — attribution _and_ share-alike, which is a licence most course
+  material cannot satisfy. Author examples originally.
+- **Documentation prose** from a framework's official docs. Being free to read is not permission to
+  reproduce; most project docs carry their own licence, and it is frequently copyleft.
+- **Figures, diagrams and screenshots** lifted from vendor or project sites.
+- **Book and course structure.** Reproducing a well-known book's chapter progression, or a paid
+  course's module sequence, is the same derivative-work risk as `A12` addresses for syllabi.
+- **Trademarks.** Language, framework and vendor names may be used nominatively but never in a course
+  title, path segment, or anything that implies endorsement or affiliation.
+- **Datasets and sample data** — author them; do not lift a dataset whose licence is unexamined.
+
+The `A8` posture is therefore uniform across all seven plans: **describe, cite and link; never
+reproduce.** Where a reader needs the source text, send them to the source.
+
+### A12 — how a syllabus may and may not be confirmed
+
+`A12` exists because the confirmation step introduces the exact risk the rest of `A8` guards against.
+Published curricula — ACCA, CPA, CIMA, ASCM/APICS CPIM and CSCP, university course catalogues — are
+**copyrighted works**, and several are commercial products whose syllabus _is_ the product. Checking
+a syllabus against one is legitimate; deriving a syllabus from one is not.
+
+The order of operations is what keeps this clean, and it is not optional:
+
+1. Author the syllabus from domain reasoning and the plan's own research grounding.
+2. **Then** research externally to ask whether the coverage is right — what a practitioner would
+   expect that a draft omits, and what it includes that the field does not recognise.
+3. Treat the answer as **evidence about coverage**, never as a structure to adopt. A finding is
+   actionable as "this topic is missing"; it is never actionable as "reorder to match theirs."
+
+Confirmation must never reproduce a curriculum's text, its module titles, or its sequence. Naming a
+body as corroboration ("the topic appears in ASCM's CPIM outline") is nominative use and is fine;
+transcribing its outline is not.
+
 ## The manifest ownership invariant (binding)
 
 > **This plan never edits a manifest file.** Every file under
@@ -187,7 +260,7 @@ source plan states this explicitly and this plan preserves the ruling. See
 ### Licensing posture (programme A8)
 
 Programme
-[`A8`](../ayokoding-learning-path-programme.md#programme-decisions-r--a) binds every plan that
+[`A8`](#programme-decisions) binds every plan that
 authors teaching material, and this plan authors the most of it — 90 course bodies. **Describe, cite,
 and link; never reproduce.** Six concrete hazards apply to a `careers/` course body, each mapped to
 where the maker-checker-fixer pipeline above must catch it:
@@ -213,9 +286,8 @@ where the maker-checker-fixer pipeline above must catch it:
 - **Datasets and sample data.** Any dataset a worked example touches is authored for the example, not
   lifted from a source whose licence was not examined.
 
-This plan does not duplicate `A8`'s text; see
-[ayokoding-learning-path-programme.md#a8](../ayokoding-learning-path-programme.md#a8--licensing-binds-the-whole-programme)
-for the full rationale, and this plan's `brd.md` for the corresponding risk row and `delivery.md` for
+The full rationale is folded into [§Programme decisions §A8](#programme-decisions) above; see this
+plan's `brd.md` for the corresponding risk row and `delivery.md` for
 the grep-checkable acceptance clause applied per authored course.
 
 ### The `prerequisites` frontmatter contract (consumed, not owned)
@@ -489,7 +561,8 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
       re-verified against the live page).
     - [Web-cited] arXiv 2606.10106, "What makes a harness a harness: necessary and sufficient
       conditions for an agent harness" — confirmed real via WebSearch during the audit that produced
-      this finding.
+      this finding. [Web-cited: arXiv:2606.10106 — https://arxiv.org/abs/2606.10106 ; accessed
+      2026-07-22]. The id is well-formed, not anomalous (arXiv YYMM prefix: `26` = 2026, `06` = June).
     - [Web-cited] Anthropic, "Effective harnesses for long-running agents," 2025-11-26.
       <https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents> (accessed
       2026-07-21).
@@ -497,8 +570,14 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
       thoughts," 2026-04-02.
       <https://martinfowler.com/articles/exploring-gen-ai/harness-engineering-memo.html> (accessed
       2026-07-21).
-    - [Unverified] "OpenAI" — no specific OpenAI publication was identified to support this
-      attribution; treat as unsourced until a specific OpenAI URL is supplied.
+    - [Unverified] "OpenAI" — a candidate OpenAI publication exists at
+      <https://openai.com/index/harness-engineering/> ("Harness engineering: leveraging Codex in an
+      agent-first world," reported 2026-02-11), but the primary page returned **HTTP 403** and was
+      not read at verification time (2026-07-22); the date and content rest on third-party summaries
+      only. This stays **`[Unverified]`** pending a primary-source read — do not upgrade to a verified
+      fact. Note the reported date is **early 2026**, later than the surrounding "late 2025" framing on
+      the DD-29 line above (that framing is grounded on Anthropic 2025-11-26); the OpenAI attribution's
+      contribution to a "late 2025" onset is therefore **conditional**, not established.
 - **DD-30 · The capstone teaches the METR-vs-Scale-AI dispute as durable epistemic content (D10).**
   `capstone-build-your-own-coding-agent` teaches the contested evidence on whether harness quality even
   matters, as content that survives whatever happens to the vocabulary: **METR** (independent, no

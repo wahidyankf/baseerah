@@ -802,8 +802,8 @@ UI-gate-exempt; the three-tester retest is the mandatory non-vacuous substitute.
 ## Phase 10: Plan Archival
 
 - [ ] [AI] `git mv plans/backlog/ayokoding-learning-path-07-skills-erp plans/done/$(date +%Y-%m-%d)__ayokoding-learning-path-07-skills-erp`.
-- [ ] [AI] Update `plans/backlog/README.md` and `plans/backlog/ayokoding-learning-path-programme.md`
-      to remove this plan's backlog entry and reflect its completed status.
+- [ ] [AI] Update `plans/backlog/README.md` to remove this plan's backlog entry and reflect its
+      completed status.
 - [ ] [AI] Commit the archival move **to the still-open PR branch from Phase 8** — no dedicated
       follow-up archival PR. Phase 8 deliberately left the PR unmerged precisely so this commit lands
       inside it; the merge protocol requires archival committed in the PR **before** the merge, and a

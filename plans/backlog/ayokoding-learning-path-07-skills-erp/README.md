@@ -7,8 +7,15 @@ Delivers **two** `skills/` paths — **`skills/conventional-erp`** (27 courses) 
 corpus, teaching the domain to build-founding depth without ever asking the reader to build, install,
 or evaluate a system. This is the ERP half of the `skills/` category; the accounting half is
 [`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md).
-Both plans, and the shared programme decisions they cite (`R*`/`A*` ids), are indexed in the
-[AyoKoding Learning-Path Programme](../ayokoding-learning-path-programme.md).
+Both plans belong to the `skills/` category of the AyoKoding learning-path programme. The shared
+programme decisions this plan cites (`R*`/`A*` ids) are **folded in and owned locally** — see
+[tech-docs.md §Programme decisions](./tech-docs.md#programme-decisions). This plan sits in **Wave 3**
+of the programme's three-wave dependency DAG: it needs its Wave-2 predecessor
+[`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md)
+merged, an edge that is **soft overall and hard at specific stage gates**, expressed at **stage
+granularity** (never by course number) — see
+[delivery.md §Depends-on](./delivery.md#depends-on-and-start-preconditions) and
+[tech-docs.md §The 06→07 dependency edge](./tech-docs.md#the-0607-dependency-edge-stage-granularity-not-course-numbers).
 
 **Naming harmonisation**: the non-Sharia path is **`conventional-erp`**, matching plan 06's
 `conventional-accounting` — an earlier round of this plan called it "generic-erp"; that name is
