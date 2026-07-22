@@ -54,6 +54,7 @@ Builds on [`creating-ai-powered-apps`](./creating-ai-powered-apps.md) (the first
   task-specific … Automate when possible … Prioritize volume over quality"; the "prioritize volume"
   guidance is the one that most surprises engineers coming from hand-written unit tests. Source:
   [Anthropic develop tests](https://platform.claude.com/docs/en/test-and-evaluate/develop-tests)
+  `[Web-cited: Anthropic — Develop your tests (three principles quoted verbatim: "Be task-specific", "Automate when possible", "Prioritize volume over quality") — https://platform.claude.com/docs/en/test-and-evaluate/develop-tests ; accessed 2026-07-22]`
   (re-verify the wording at authoring).
 - 2026-07-20 — `[Needs Verification]` **volatile, accuracy-note only**: eval-framework names, hosted
   eval products, and their schemas change fast. This course deliberately uses a plain JSONL file and

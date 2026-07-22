@@ -68,8 +68,10 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
   (learn.microsoft.com/dotnet/fsharp/language-reference/type-inference)
 - **Expecto 11.1.0** is a current F# test framework used for the `dotnet test` examples; the built-in
   `dotnet test` runner (via `Microsoft.NET.Test.Sdk`) also works with no third-party dependency.
-  Pin the exact Expecto version **at authoring time** — treat 11.1.0 as `[Needs Verification]` when code
-  is written. (github.com/haf/expecto/releases, nuget.org/packages/Expecto)
+  Pin the exact Expecto version **at authoring time** (version-volatile) — 11.1.0 confirmed as the
+  current latest release `[Web-cited: NuGet Expecto gallery, latest 11.1.0 released 2026-06-17 —
+https://www.nuget.org/packages/Expecto ; accessed 2026-07-22]`; re-confirm at authoring since it floats.
+  (github.com/haf/expecto/releases, nuget.org/packages/Expecto)
 - **Ionide / FSAutoComplete** provides the F# LSP for Neovim/VSCode (DD-17); versions float, left
   unpinned. (ionide.io)
 

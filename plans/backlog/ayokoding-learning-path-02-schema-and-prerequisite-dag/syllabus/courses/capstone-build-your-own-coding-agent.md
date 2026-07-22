@@ -42,10 +42,10 @@ emergence` (deterministic engineering around a stochastic core), `security-by-de
 
 > Pre-authoring `web-researcher` sweep pending (per this plan's Anti-Hallucination verification recipe).
 
-- 2026-07-19 — `[Needs Verification]`: pin all cluster dependency versions (LLM SDK/adapter, MCP library,
-  vector store, sandbox runtime, tracing/TUI libraries) at authoring; keep the model name configurable,
-  never hard-coded. The integration architecture (loop + tools + context + permissions + observability)
-  is stable.
+- 2026-07-19 — version-volatile (pin at authoring): pin all cluster dependency versions (LLM SDK/adapter,
+  MCP library, vector store, sandbox runtime, tracing/TUI libraries) at authoring; keep the model name
+  configurable, never hard-coded. The integration architecture (loop + tools + context + permissions +
+  observability) is stable.
 
 ## Concepts integrated
 
@@ -67,8 +67,12 @@ This capstone integrates the cluster's concepts; it introduces none of its own:
   management, the guardrails, the observability — began to be called **harness engineering** from late 2025. Anthropic used the framing on **2025-11-26**, OpenAI adopted it in its own agent material, and
   Birgitta Böckeler's Thoughtworks write-up (**2026-04-02**) gave it wider currency. The only academic
   definition of an **agent harness** (arXiv **2606.10106**) states four necessary conditions, and this
-  cluster satisfies all four. `[Needs Verification]`: confirm every date, attribution, and the arXiv
-  identifier against the primary source at authoring.
+  cluster satisfies all four. The "harness engineering" term and its Anthropic / Böckeler-Thoughtworks
+  attribution are corroborated [Web-cited: Wikipedia — "Agent harness" —
+  https://en.wikipedia.org/wiki/Agent_harness ; accessed 2026-07-22]; however the **specific dates**
+  (2025-11-26, 2026-04-02) and the **arXiv identifier 2606.10106** could **not** be confirmed against a
+  primary source this pass (2026-07-22) and remain `[Unverified]` — confirm each at authoring, and do not
+  restate the unconfirmed dates or identifier as fact.
 - **The term is contested — teach the disagreement, do not resolve it**. At time of writing the term is
   roughly five months old and named practitioners use it in **mutually contradictory** ways. OpenAI and
   Anthropic treat the **harness as the umbrella**, with context management as one component inside it.
@@ -91,8 +95,15 @@ This capstone integrates the cluster's concepts; it introduces none of its own:
     **naive** ones, implying harness quality matters enormously **below a competence floor** and then
     flattens. **No single source makes this claim** — it is an inference across two bodies of evidence,
     and it is presented here as a synthesis the reader should interrogate, not as a result to memorize.
-  - `[Needs Verification]`: re-verify both studies, their dates, the specific percentages, and the model
-    versions evaluated at authoring. Benchmark results are revised and superseded.
+  - Both studies were verified this pass: METR (2026-02-13) — Claude Code beat a ReAct scaffold in
+    **50.7%** of bootstrap samples on Opus 4.5, and Codex beat Triframe in **14.5%** [Web-cited: METR —
+    "Measuring Time Horizon using Claude Code and Codex" —
+    https://metr.org/notes/2026-02-13-measuring-time-horizon-using-claude-code-and-codex/ ; accessed
+    2026-07-22]; Scale AI's SWE Atlas / SWE-bench Pro — models in their native scaffold perform ~1.5–2×
+    more exploration/search/execution than on a generic harness [Web-cited: Scale AI — "SWE Atlas is
+    Complete" — https://scale.com/blog/swe-atlas-complete ; accessed 2026-07-22]. Version-volatile:
+    re-verify dates, percentages, and model versions at authoring — benchmark results are revised and
+    superseded.
   - **Do NOT cite the widely circulated 42%→78% scaffold claim.** It traces to no primary source.
 - **Why this is durable content**: the vocabulary may turn over again and the benchmark numbers will be
   superseded, but the skill being taught here — weighing contested, vendor-interested evidence about a

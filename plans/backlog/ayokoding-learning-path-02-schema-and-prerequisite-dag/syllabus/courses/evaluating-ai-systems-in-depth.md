@@ -68,12 +68,14 @@ the statistical machinery taught in [`statistics-for-evaluation`](./statistics-f
   model to evaluate than the model used to generate", and its eval principles are "Be task-specific …
   Automate when possible … Prioritize volume over quality". Sources:
   [Anthropic develop tests](https://platform.claude.com/docs/en/test-and-evaluate/develop-tests)
+  `[Web-cited: Anthropic — Develop your tests (three principles + the "use a different model to evaluate than the model used to generate" note all confirmed verbatim) — https://platform.claude.com/docs/en/test-and-evaluate/develop-tests ; accessed 2026-07-22]`
   (re-verify wording at authoring).
 - 2026-07-20 — verified in the sibling course: LangSmith trajectory evaluation examines "the exact
   sequence of tool calls", scored either by a trajectory-match evaluator or an LLM judge. Treat the
   **trajectory-vs-outcome distinction as durable spine** and the **named product as volatile**. Source:
-  [LangSmith trajectory evals](https://docs.langchain.com/langsmith/trajectory-evals) (re-verify at
-  authoring).
+  [LangSmith trajectory evals](https://docs.langchain.com/langsmith/trajectory-evals)
+  `[Web-cited: LangSmith — Trajectory evaluation ("the exact sequence of messages, including tool calls"; scored by a trajectory-match evaluator or an LLM judge) — https://docs.langchain.com/langsmith/trajectory-evals ; accessed 2026-07-22]`
+  (re-verify at authoring).
 - 2026-07-20 — `[Needs Verification]` **volatile, accuracy-note only**: eval framework and hosted
   eval-product names, their schemas, and their default metrics. Teach the method against plain files and
   `pytest`; name a product only as an illustration.

@@ -64,8 +64,10 @@ model established by the FP thread ([`23-functional-programming`](./functional-p
   R7RS-large; implementations like Racket ship their own). Scheme **vectors** ARE core — teach vectors as
   core and flag hash tables as implementation-specific.
 - **Current implementations (verified live, re-pin at authoring)** — **Racket 9.2** (May 2026),
-  **Clojure 1.12.5** (May 2026), **SBCL 2.6.6** (Jun 2026). `#lang r7rs` in Racket may require a package
-  rather than shipping in the base distribution — `[Needs Verification]`; confirm before shipping that claim.
+  **Clojure 1.12.5** (May 2026), **SBCL 2.6.6** (Jun 2026); versions are volatile — re-pin at authoring.
+  `#lang r7rs` in Racket requires installing a separate package (`raco pkg install r7rs`), it does not
+  ship in the base distribution `[Web-cited: Racket package index, r7rs package — https://pkgs.racket-lang.org/package/r7rs
+; accessed 2026-07-22]`.
 - **Licenses (DD-15/DD-21)** — Racket = Apache-2.0/MIT; Clojure = EPL-1.0 (both OSS, no paid account).
 
 ## Concepts

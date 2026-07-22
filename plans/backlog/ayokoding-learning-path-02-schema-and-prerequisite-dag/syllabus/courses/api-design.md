@@ -82,15 +82,21 @@ type-annotated (DD-39) — every snippet carries type hints in the pyright-clean
   client-streaming, bidirectional. Source: [grpc.io core concepts](https://grpc.io/docs/what-is-grpc/core-concepts/).
 - **GraphQL** — single endpoint, client-specified fields, over/under-fetch solution; resolver **N+1** fixed
   by DataLoader batching + per-request cache ([graphql/dataloader](https://github.com/graphql/dataloader)).
-  graphql.org/spec.graphql.org were fetch-blocked (403) — the "no over/under-fetch" tagline is
-  `[Needs Verification]` by direct fetch (well-corroborated by secondary sources).
+  graphql.org / spec.graphql.org were fetch-blocked (403) — re-checked 2026-07-22, graphql.org/learn also
+  returned 403 — so the "no over/under-fetch" tagline stays `[Unverified]` by direct primary fetch
+  (well-corroborated by secondary sources; taught as the widely-documented GraphQL value proposition, not
+  quoted from the blocked primary).
 - **Hypermedia formats** — JSON:API v1.1 (`application/vnd.api+json`, [jsonapi.org](https://jsonapi.org/));
   HAL (`_links` required, `_embedded` optional, `application/hal+json`, Mike Kelly Internet-Draft, never an
-  RFC). Siret/Siren `[Needs Verification]` (no formal spec; GitHub repo only).
+  RFC). Siren `[Web-cited: kevinswiber/siren GitHub repo (media type`application/vnd.siren+json`, IANA-
+registered 2012-11-27; the spec lives in the repo README, never became an RFC) —
+https://github.com/kevinswiber/siren ; accessed 2026-07-22]` — confirmed: a GitHub-hosted hypermedia spec,
+  not a formal standards-track document.
 - **REST-vs-GraphQL-vs-gRPC positioning** — no single primary source states the three-way comparison; it
   is synthesized from each project's stated design goals (REST = cacheable/ubiquitous via RFC 9111,
   GraphQL = client-shaped queries, gRPC = typed internal service-to-service/streaming). Present as
-  synthesized guidance, `[Needs Verification]` for a single-source citation.
+  synthesized guidance, `[Unverified]` as a single-source citation — no primary source states the three-way
+  comparison; each leg traces to its own project's stated design goals (cited above), not to one authority.
 
 ## Concepts
 

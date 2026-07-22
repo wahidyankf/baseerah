@@ -66,8 +66,10 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
   parameter checks, `any`, type assertions), traded for JS interop; the TS handbook states type-checking is
   not a soundness guarantee. This is the concrete foil for ML soundness. (typescriptlang.org/docs/handbook/type-compatibility.html, "TypeScript Design Goals" non-goal #3)
 - **TypeScript 7.0 native port** ("tsgo", Project Corsa) is a Go rewrite of the compiler announced March 2025;
-  it changes the _implementation_, not the _type theory_. Treat its GA status as `[Needs Verification]` at
-  authoring time — cite it only as an implementation note, never as changing the type system. (devblogs.microsoft.com/typescript/typescript-native-port)
+  it changes the _implementation_, not the _type theory_. It reached **general availability on 2026-07-08**
+  `[Web-cited: TypeScript Dev Blog, "Announcing TypeScript 7" — https://devblogs.microsoft.com/typescript/ ; accessed 2026-07-22]`
+  (GA status is version-volatile — pin/re-confirm at authoring). Cite it only as an implementation note, never
+  as changing the type system. (devblogs.microsoft.com/typescript/typescript-native-port)
 - **Functor / applicative / monad laws** (identity, composition; left/right identity, associativity) are the
   standard laws verified against the Haskell `base` documentation. (hackage.haskell.org/package/base — Data.Functor, Control.Monad)
 

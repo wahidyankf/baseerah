@@ -35,6 +35,10 @@ License-aware (DD-15).
   `[Unverified]` pending the primary-source re-verification pass named in `tech-docs.md`; this course
   teaches the calculation as a **configured, jurisdiction-dependent module**, not a specific fixed
   formula.
+- What **is** corroborated (2026-07-22, coverage level only): zakat and Sharia-compliance accounting
+  are recognised concepts within the AAOIFI standards framework
+  `[Web-cited: AAOIFI — https://aaoifi.com/?lang=en ; accessed 2026-07-22]`. This corroborates the
+  concepts' existence only; the calculation specifics above stay `[Unverified]`.
 - Concepts co-07 and co-08 are placed on domain-reasoning grounds rather than sourced from the
   grounding research, and are `[Needs Verification]` pending the Phase 1.2a coverage pass.
 

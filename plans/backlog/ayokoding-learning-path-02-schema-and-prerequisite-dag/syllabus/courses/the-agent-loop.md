@@ -121,7 +121,11 @@ and the deep counterpart to the user-side `agentic-coding` and `agentic-ai`.
   cluster **names the term and cites the disagreement without adopting a side, and renames nothing**.
   The full treatment, including the contested evidence on whether harness quality measurably matters,
   is in the [coding-agent capstone](./capstone-build-your-own-coding-agent.md).
-  `[Needs Verification]`: confirm dates and attributions at authoring; treat the vocabulary as volatile.
+  The term as an emerging 2025-26 discipline, the Anthropic and Böckeler/Thoughtworks attributions, and the
+  context-engineering-vs-harness framing are coverage-corroborated
+  `[Web-cited: Thoughtworks, "What is harness engineering?" — https://www.thoughtworks.com/insights/podcasts/technology-podcasts/what-harness-engineering ; accessed 2026-07-22]`;
+  the **exact publication dates** (e.g. Anthropic 2025-11-26, Thoughtworks 2026-04-02) were not pinned to
+  primaries and stay `[Unverified]` — confirm dates at authoring and treat the vocabulary as volatile.
 
 ## Worked examples
 

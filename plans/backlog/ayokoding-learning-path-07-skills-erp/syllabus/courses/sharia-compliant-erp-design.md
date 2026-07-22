@@ -37,6 +37,13 @@ License-aware (DD-15).
   re-verification pass named in `tech-docs.md` — AAOIFI FAS numbers, PSAK Syariah series, and MASB/BNM
   positioning are all carried forward from the grounding file's own status, not restated as verified
   fact here.
+- What **is** corroborated (2026-07-22, coverage level only): that structurally different
+  Shariah-governance regimes coexist — AAOIFI, PSAK Syariah/Indonesia, and MFRS + Bank Negara
+  Malaysia's Shariah-governance framework/Malaysia
+  `[Web-cited: AAOIFI — https://aaoifi.com/?lang=en ; accessed 2026-07-22]`
+  `[Web-cited: Bank Negara Malaysia — Policy Document on Shariah Governance — https://www.bnm.gov.my/-/policy-document-on-shariah-governance ; accessed 2026-07-22]`.
+  Individual AAOIFI FAS / Shari'ah-Standard numbers and cell-level positioning remain `[Unverified]` /
+  `[Needs Verification]` per the row above and are not asserted as fact.
 - The structural claim (three coexisting models, none universal) is independent of the cell-level
   detail and does not itself require re-verification, per `tech-docs.md` DD-12.
 - Indonesian PSAK numbering is `[Verified]` — **PSAK 101-110 is the operative series; PSAK 59 was

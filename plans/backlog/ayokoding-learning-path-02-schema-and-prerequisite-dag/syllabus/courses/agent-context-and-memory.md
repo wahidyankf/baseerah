@@ -39,18 +39,24 @@ history is the raw context) and draws on `creating-ai-powered-apps` (embeddings/
 
 - 2026-07-18 — context windows, tokenization, retrieval-augmented generation, and the short-term vs
   long-term memory distinction are **stable, vendor-independent** concepts.
-- 2026-07-18 — `[Needs Verification]`: exact context-window sizes and tokenizer behavior are model-
-  specific — never hard-code a window size; read it from config and re-verify at authoring.
-- 2026-07-18 — `[Needs Verification]`: the chosen embedding model + vector store versions and APIs — pin
-  at authoring; the "lost-in-the-middle" degradation is a documented, evolving research finding — cite
-  the source read at authoring.
+- 2026-07-18 — `[Unverified]` by design (version-volatile): exact context-window sizes and tokenizer
+  behavior are model-specific with no single fixed value to pin — never hard-code a window size; read it
+  from config and re-verify at authoring.
+- 2026-07-18 — the chosen embedding model + vector store versions and APIs are `[Unverified]` (version-
+  volatile) — pin each at authoring. The "lost-in-the-middle" degradation is a documented research finding:
+  `[Web-cited: Liu et al., "Lost in the Middle: How Language Models Use Long Contexts", arXiv:2307.03172
+(2023; TACL 2024) — https://arxiv.org/abs/2307.03172 ; accessed 2026-07-22]` — performance is highest
+  when relevant information sits at the start or end of the context and degrades in the middle.
 - 2026-07-20 — **co-23 durability split**. The **principle** is durable spine: order context
   stable-before-variable so a reusable prefix survives across calls. The **mechanism** is volatile and
   belongs only in this note — providers differ, and at time of writing Anthropic uses **explicit cache
-  breakpoints** the caller places, while OpenAI applies an **automatic threshold reported as 1,024
-  tokens**. `[Needs Verification]`: both mechanisms, the threshold figure, and any discount or TTL
-  numbers are vendor-specific and change — re-verify against primary provider documentation at
-  authoring, and never state co-23 in terms of one vendor's mechanism.
+  breakpoints** the caller places, while OpenAI applies an **automatic threshold of 1,024
+  tokens**. Both mechanisms `[Web-cited: Anthropic prompt caching (explicit`cache_control`breakpoints) —
+https://platform.claude.com/docs/en/build-with-claude/prompt-caching ; and OpenAI prompt caching
+(automatic for prompts ≥ 1,024 tokens, cache hits in 128-token increments) —
+https://developers.openai.com/api/docs/guides/prompt-caching ; both accessed 2026-07-22]`. The specific
+  discount and TTL numbers (e.g. Anthropic cache-read ≈ 10% of input, 5-min default TTL) are vendor-
+  specific and volatile — re-verify at authoring, and never state co-23 in terms of one vendor's mechanism.
 
 ## Concepts
 
@@ -134,8 +140,13 @@ history is the raw context) and draws on `creating-ai-powered-apps` (embeddings/
   change when the vocabulary did, which is exactly why the spine is organized around budgeting,
   compaction, retrieval, and memory rather than around a term. The name is given here so a learner can
   connect this material to the job-market vocabulary they will meet.
-  `[Needs Verification]`: confirm each date and attribution against the primary source at authoring, and
-  treat the vocabulary itself as volatile — it shifted once within 2025 and may shift again.
+  `[Web-cited: Simon Willison, "Context engineering" (2025-06-27) — https://simonwillison.net/2025/Jun/27/context-engineering/ ;
+and Anthropic, "Effective context engineering for AI agents" (2025-09-29) —
+https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents ; both accessed 2026-07-22]`
+  — the term's mid-2025 emergence, Willison's write-up date, and Anthropic's 2025-09-29 methodology are
+  confirmed; the exact Lütke/Karpathy tweet timestamps (~2025-06-18/06-25) are corroborated but vary by
+  hours across secondary sources. Treat the vocabulary as volatile — it shifted once within 2025 and may
+  shift again.
 - **And what the industry calls the surrounding cluster**: from late 2025 the wider body of work — the
   loop, its tools, this course's context management, the guardrails, the observability — began to be
   called **harness engineering** (Anthropic 2025-11-26; OpenAI; Böckeler/Thoughtworks 2026-04-02). That

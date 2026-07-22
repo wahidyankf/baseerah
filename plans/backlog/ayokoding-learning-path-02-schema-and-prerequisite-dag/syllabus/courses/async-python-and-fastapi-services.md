@@ -40,13 +40,19 @@ target: `remotebrowser` (async Python + FastAPI + `fastmcp`), not a subject.
 > Pre-authoring `web-researcher` sweep pending (per this plan's Anti-Hallucination verification recipe). This stack moves fast — pin every
 > version at authoring.
 
-- 2026-07-18 — `[Needs Verification]`: exact current CVE-clean versions of FastAPI, Pydantic v2,
-  Starlette, `uvicorn`, `uv`, `ruff`, `pyright`, `httpx` — pin each before authoring; Pydantic v1 vs v2
-  APIs differ substantially, so the module must target v2 explicitly.
+- 2026-07-18 — `[Unverified]` by design (version-volatile): exact current CVE-clean versions of FastAPI,
+  Pydantic v2, Starlette, `uvicorn`, `uv`, `ruff`, `pyright`, `httpx` — pin each before authoring; Pydantic
+  v1 vs v2 APIs differ substantially, so the module must target v2 explicitly. Current-as-of-2026-07-22
+  reference points (re-verify at authoring — these ship on a weekly cadence): `[Web-cited: FastAPI ~0.138.x
+(latest line July 2026) — https://pypi.org/project/fastapi/ ; Pydantic V2 is the production line —
+https://pypi.org/project/pydantic/ ; both accessed 2026-07-22]`.
 - 2026-07-18 — `async`/`await`, the `asyncio` event loop, and ASGI are **stable** Python-language and
   ecosystem concepts.
-- 2026-07-18 — `[Needs Verification]`: `uv` command surface (it is evolving quickly) and `ruff`'s
-  default rule set — re-verify the exact commands and defaults at authoring.
+- 2026-07-18 — `[Unverified]` by design (version-volatile): `uv` command surface (it is evolving quickly,
+  still pre-1.0) and `ruff`'s default rule set — re-verify the exact commands and defaults at authoring.
+  Current-as-of-2026-07-22: `[Web-cited: uv ~0.11.x — https://github.com/astral-sh/uv/releases ; ruff
+~0.15.x — https://github.com/astral-sh/ruff/releases ; both accessed 2026-07-22]` (both are pre-1.0 and
+  change weekly — treat these as reference points, not pins).
 
 ## Concepts
 

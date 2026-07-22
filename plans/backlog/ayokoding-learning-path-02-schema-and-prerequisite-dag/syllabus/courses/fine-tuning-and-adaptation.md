@@ -78,7 +78,11 @@ takes seriously in both directions: **when to fine-tune and, far more often, whe
   year, and canonical formulation — and the published results attributed to it. The **principle** of
   low-rank adaptation is spine; the citation must be verified against the primary source before it is
   written, and the specific rank/alpha guidance quoted anywhere must be traced to the source read. Do
-  not reproduce a citation from memory.
+  not reproduce a citation from memory. `[Web-cited: Hu, Shen, Wallis, Allen-Zhu, Li, Wang, Wang & Chen,
+"LoRA: Low-Rank Adaptation of Large Language Models", arXiv:2106.09685 (submitted 2021-06-17) —
+https://arxiv.org/abs/2106.09685 ; accessed 2026-07-22]` anchors the originating paper's authors and
+  year; the exact rank/alpha guidance and reported result figures still must be traced to the source read
+  at authoring, so the `[Needs Verification]` hedge on those specifics remains.
 - 2026-07-20 — `[Needs Verification]` **at authoring**: Chip Huyen's fine-tuning framing referenced in the
   scope note above — verify the exact wording and locate it in the specific work before quoting it
   directly. The framing is used structurally here; the direct quotation must be sourced.

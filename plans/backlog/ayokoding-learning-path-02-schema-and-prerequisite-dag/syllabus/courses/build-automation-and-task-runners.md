@@ -54,10 +54,11 @@ here the build tool is the unit, not the pipeline.
   sensitive**) — license CC0-1.0. A **command runner, not a build system**: every recipe is treated as
   phony (always runs); no file-freshness model at all.
 - 2026-07-12 — verified: **npm 12.0.1** is the current latest (npm v12 shipped recently with breaking
-  security defaults; **version-sensitive**). The `scripts`/`run` behavior quoted below is from the
-  official `/cli/v11/` docs; whether a distinct `/v12/` docs path supersedes it is `[Needs Verification]`,
-  and the npm-CLI license (Artistic-2.0) was not re-verified against a primary source this pass —
-  `[Needs Verification]`.
+  security defaults; **version-sensitive**). The `scripts`/`run` behavior quoted below matches the
+  official docs; a distinct `/cli/v12/` docs path **does** exist and lists **Version 12.0.1 (Latest)**
+  [Web-cited: npm Docs — https://docs.npmjs.com/cli/v12/using-npm/scripts ; accessed 2026-07-22]. The
+  npm-CLI license is **Artistic-2.0** [Web-cited: npm License — https://docs.npmjs.com/policies/npm-license/
+  ; accessed 2026-07-22].
 - 2026-07-12 — verified: **Bazel 9.1.1** is the current active LTS (9.2.0rc2 is a release candidate, not
   stable) — license Apache-2.0 (some bundled components differ). **Content-hash, hermetic, cached.**
 - 2026-07-12 — verified: **Gradle 9.6.1** is current — license Apache-2.0. **Content-fingerprint
@@ -111,7 +112,7 @@ here the build tool is the unit, not the pipeline.
   scripts for any scripts … simply create another script _with a matching name_ and add 'pre' or 'post'
   to the beginning of them"; "This runs an arbitrary command from a package's `\"scripts\"` object." Sources:
   [npm scripts](https://docs.npmjs.com/cli/v11/using-npm/scripts),
-  [npm run](https://docs.npmjs.com/cli/v11/commands/npm-run/) (fetched, verbatim; v12-path `[Needs Verification]`).
+  [npm run](https://docs.npmjs.com/cli/v11/commands/npm-run/) (fetched, verbatim; a `/cli/v12/` docs path is confirmed to exist — [Web-cited: docs.npmjs.com/cli/v12 ; accessed 2026-07-22]).
 - **Bazel — hermeticity & hashing** — "When given the same input source code and product configuration, a
   hermetic build system always returns the same output by isolating the build from changes to the host
   system"; "Bazel and some other build systems address this problem by requiring a workspacewide manifest

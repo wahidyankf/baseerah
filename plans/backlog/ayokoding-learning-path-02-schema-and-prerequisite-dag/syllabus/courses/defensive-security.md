@@ -76,8 +76,10 @@ inter-topic capstones** (Pass-3 boundary + two cross-cutting), specified at the 
 - **MITRE ATT&CK — 15 Enterprise tactics (v19)** `[Verified]` — [attack.mitre.org tactics](https://attack.mitre.org/tactics/enterprise/):
   the former **Defense Evasion (TA0005)** split into **Stealth (TA0005)** + **Defense Impairment (TA0112)** →
   15 tactics. "a globally-accessible knowledge base of adversary tactics and techniques based on real-world
-  observations." Tactic = why (goal); technique = how. v19 released 2026-04-28 `[Needs Verification]` (exact
-  date search-only; the 15-tactic list is direct-fetch `[Verified]`).
+  observations." Tactic = why (goal); technique = how. v19 released **2026-04-28**, splitting the former
+  Defense Evasion tactic into **Stealth** + **Defense Impairment**
+  `[Web-cited: MITRE ATT&CK Updates — April 2026 — https://attack.mitre.org/resources/updates/updates-april-2026/ ; accessed 2026-07-22]`
+  (the 15-tactic list is direct-fetch `[Verified]`).
 - **Zero Trust — 7 tenets (verbatim)** `[Verified]` — [NIST SP 800-207 (PDF)](https://nvlpubs.nist.gov/nistpubs/specialpublications/NIST.SP.800-207.pdf)
   §2.1: (1) "All data sources and computing services are considered resources." (2) "All communication is
   secured regardless of network location." (3) "Access… granted on a per-session basis." (4) "Access…

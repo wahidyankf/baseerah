@@ -67,11 +67,12 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
   (dotnet.microsoft.com/download/dotnet/10.0, learn.microsoft.com/dotnet/fsharp)
 - **FParsec 1.1.1** is the current release of the F# parser-combinator library; its
   `OperatorPrecedenceParser` handles operator precedence/associativity declaratively. Pin the exact version
-  **at authoring time** — treat 1.1.1 as `[Needs Verification]` when code is written. (fsprojects.github.io/FParsec, nuget.org/packages/FParsec)
+  **at authoring time** (version-volatile) — 1.1.1 remains the latest stable release as of the check
+  [Web-cited: NuGet FParsec — https://www.nuget.org/packages/FParsec ; latest stable 1.1.1 (2020-02-01), accessed 2026-07-22]. (fsprojects.github.io/FParsec, nuget.org/packages/FParsec)
 - **FsLexYacc 11.4.0** is the lexer/parser-generator alternative (fslex/fsyacc) for contrast with the
-  hand-written and combinator parsers; version `[Needs Verification]` at authoring. (fsprojects.github.io/FsLexYacc, nuget.org/packages/FsLexYacc)
-- **Expecto 11.1.0** (or the built-in `dotnet test` runner) drives the per-stage tests; version
-  `[Needs Verification]` at authoring. (github.com/haf/expecto)
+  hand-written and combinator parsers; re-confirm the pin at authoring (version-volatile) [Web-cited: NuGet FsLexYacc — https://www.nuget.org/packages/FsLexYacc ; latest stable 11.4.0 (2026-07-06), accessed 2026-07-22]. (fsprojects.github.io/FsLexYacc, nuget.org/packages/FsLexYacc)
+- **Expecto 11.1.0** (or the built-in `dotnet test` runner) drives the per-stage tests; re-confirm the pin
+  at authoring (version-volatile) [Web-cited: NuGet Expecto — https://www.nuget.org/packages/Expecto ; latest stable 11.1.0 (2026-06-17), accessed 2026-07-22]. (github.com/haf/expecto)
 - **Pratt parsing** is Vaughan Pratt's "top-down operator precedence" (1973); Robert Nystrom's
   _Crafting Interpreters_ ch. 17 ("Compiling Expressions") is the canonical modern walkthrough of
   precedence-climbing. (craftinginterpreters.com/compiling-expressions.html)

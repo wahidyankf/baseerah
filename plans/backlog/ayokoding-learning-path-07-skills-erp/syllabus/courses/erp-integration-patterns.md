@@ -31,9 +31,16 @@ safety requires idempotency`, not just error handling.
 
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
-- Vendor-specific integration-surface details (e.g. current-generation OData/IDoc/dual-write status)
-  are `[Unverified]` per `tech-docs.md`'s verification table and require a dedicated `web-researcher`
-  pass before this course is finalized — not restated as fact here.
+- Vendor-specific integration-surface details were re-grounded 2026-07-22 (see `tech-docs.md`'s
+  verification table). Confirmed and safe to state:
+  - **IDoc** is absent from SAP S/4HANA Cloud **Public** Edition (release 2508); on-prem and private
+    cloud editions **retain** IDoc
+    `[Web-cited: SAP Community — IDOCs are Still Safe for SAP S/4HANA (Clean Core Level B) — https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-members/idocs-are-still-safe-for-sap-s-4hana-sap-clean-core-extensibility-level-b/ba-p/14225439 ; accessed 2026-07-22]`.
+    Any "IDoc is being retired everywhere" framing is blog commentary and stays `[Needs Verification]`
+    — not restated as fact.
+  - **Dataverse dual-write** is **active and being enhanced** (async dual-write); it is **not**
+    deprecated. The Dataverse/Dynamics **Web API is OData v4.0**
+    `[Web-cited: Microsoft Learn — Dual-write overview (updated 2026-04-03) — https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/data-entities/dual-write/dual-write-overview ; accessed 2026-07-22]`.
 
 ## Concepts
 

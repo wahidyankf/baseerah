@@ -58,7 +58,11 @@ the `swift`/`xcodebuild` CLI form where possible.
   SDK-build mandate** (build with the current iOS SDK/Xcode to submit to the App Store) is a recurring
   pattern independent of the app's deployment target. Keep versions UNPINNED; frame the mandate as a
   pattern, not a fixed date. `[Verified]` on the mandate pattern (developer.apple.com/news/upcoming-requirements);
-  `[Needs Verification]` on the exact current Xcode point-release at publish time.
+  `[Needs Verification]` on the exact current Xcode point-release at publish time. Current-as-of-2026-07-22
+  snapshot: **Xcode 26.6 (RC)** bundling **Swift 6.3** (iOS 26.5 SDK) is the latest available release
+  [Web-cited: Apple — What's New in Xcode, https://developer.apple.com/xcode/whats-new/ ; accessed
+  2026-07-22]. Keep UNPINNED and re-pull the then-current point-release at publish; the hedge stands
+  because the number moves.
 - **App/scene lifecycle** — developer.apple.com/documentation/swiftui/app: the `App` protocol +
   `@main` "the entry point for your app"; a `Scene` (e.g. `WindowGroup`) "a part of an app's user interface
   with a life cycle managed by the system"; scene phases via `@Environment(\.scenePhase)`. `[Verified]`

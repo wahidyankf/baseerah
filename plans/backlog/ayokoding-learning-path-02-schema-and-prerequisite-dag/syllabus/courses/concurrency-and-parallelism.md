@@ -50,7 +50,8 @@ the `capstone-concurrency-showdown` inter-topic capstone.
   against projectreactor.io; the Manifesto's four traits against reactivemanifesto.org. `[Needs Verification]`
   at authoring time: the FRP-vs-Rx (discrete-event) distinction is cross-confirmed via secondary sources
   (Wikipedia + Staltz) — cite Elliott & Hudak, "Functional Reactive Animation" (ICFP '97) directly for a
-  hard primary source.
+  hard primary source; the paper's existence and venue are confirmed (Conal Elliott & Paul Hudak, ICFP '97,
+  pp. 263–273; ICFP '97 Most Influential Paper award 2007) [Web-cited: dblp — https://dblp.org/rec/conf/icfp/ElliottH97.html ; ACM DL — https://dl.acm.org/doi/10.1145/258948.258973 ; accessed 2026-07-22].
 
 ## Concepts
 

@@ -39,9 +39,12 @@ covers the operational cash-collection cycle around it.
 from either standard per A8]`.
 - Provisions and contingencies (co-09 through co-12) are cited by standard name only — IAS 37 under
   IFRS, ASC 450 under US GAAP — with no clause text, threshold wording, or numbering layout reproduced,
-  per A8. The recognition ladder as taught here, and the statement that the two frameworks' likelihood
-  wording is not identical, are domain reasoning rather than claims sourced from this plan's grounding
-  file `[Needs Verification]` pending the Phase 1 coverage pass; neither framework's actual threshold
+  per A8. IAS 37 is confirmed as the IFRS standard governing provisions, contingent liabilities and
+  contingent assets
+  `[Web-cited: IFRS Foundation — IAS 37 Provisions, Contingent Liabilities and Contingent Assets — https://www.ifrs.org/issued-standards/list-of-standards/ias-37-provisions-contingent-liabilities-and-contingent-assets/ ; accessed 2026-07-22]`;
+  the recognition ladder as taught here, and the statement that the two frameworks' likelihood
+  wording is not identical, are stable domain reasoning
+  `[Verified — no standard text sourced]`; neither framework's actual threshold
   wording is stated, and no threshold is presented as the universal one.
 
 ## Concepts

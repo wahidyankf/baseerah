@@ -79,13 +79,15 @@ path is [`56-creating-ai-powered-apps`](./creating-ai-powered-apps.md).
     "which input column produced which output column, via what transform" (impact analysis).
   - **CDC** (Debezium) — log-based CDC reads the DB transaction log (MySQL binlog, Postgres logical
     replication) and captures inserts/updates/**deletes**; query-based polling misses deletes and
-    between-poll changes. `[Needs Verification]` — `debezium.io` returned HTTP 403 on direct fetch;
-    corroborated via Red Hat's mirror + consistent search, re-fetch before content lock.
+    between-poll changes. `[Needs Verification]` — `debezium.io` returned HTTP 403 on direct fetch (re-tried
+    2026-07-22, still HTTP 403); the CDC facts are corroborated via Red Hat's mirror + consistent search,
+    but keep `[Unverified]` on a Debezium-primary source and re-fetch before content lock.
   - **Modern data stack** (a16z, Bornstein/Li/Casado) — source → ingest (EL, e.g. Fivetran) → transform
     (dbt) → serve (BI); core = replication + cloud warehouse + SQL modeling. `[Needs Verification]` — the
     a16z page is a living document; cite the URL, not a fixed publication year.
-  - `[Needs Verification]` — the Jay Kreps "The Log" (2013) URL 404'd on this pass (likely transient; it
-    fetched earlier same day); re-confirm the live link before content lock.
+  - Jay Kreps, "The Log" (2013) — the earlier 404 was transient; the canonical LinkedIn Engineering URL is
+    live again as of 2026-07-22.
+    `[Web-cited: The Log: What every software engineer should know about real-time data's unifying abstraction — https://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying ; accessed 2026-07-22]`
 
 ## Concepts
 

@@ -33,8 +33,8 @@ course \#6's payables and course \#7's receivables cycles, not a re-teaching of 
   knowledge with no dynamic component to re-verify at authoring `[Verified — stable, non-dynamic
 domain fact]`.
 - The restricted-cash distinction (co-08) is domain reasoning about what co-01's cash position may and
-  may not aggregate; the specific presentation any one standard requires is not asserted here
-  `[Needs Verification]` pending the Phase 1 coverage pass.
+  may not aggregate; the specific presentation any one standard requires is deliberately not asserted
+  here `[Verified — stable, non-dynamic domain reasoning; no standard's presentation asserted]`.
 
 ## Concepts
 

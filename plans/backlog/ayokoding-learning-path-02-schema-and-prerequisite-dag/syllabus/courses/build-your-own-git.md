@@ -69,8 +69,10 @@ grounding. Unverifiable specifics are marked `[Needs Verification]` and never sh
 - **The index** is `.git/index` — a binary file with the `DIRC` ("dircache") signature, a version, and a
   sorted list of staged entries; it sits between the working tree and the next commit.
   (git-scm.com/docs/gitformat-index)
-- **Git 2.55.0** is the current stable release used to cross-check objects; treat the exact patch as
-  `[Needs Verification]` at authoring — the on-disk formats above are stable regardless. (github.com/git/git/tags)
+- **Git 2.55.x** is the current stable series used to cross-check objects (version-volatile — pin the
+  exact patch at authoring; the on-disk formats above are stable regardless). Current-as-of value: latest
+  **2.55.0.2**, released 2026-07-03 [Web-cited: Git downloads / release history — https://git-scm.com/downloads
+  ; accessed 2026-07-22]. (github.com/git/git/tags)
 - **Implementation language** — Python **fully type-annotated** (DD-39), tested with **pytest**; every
   object written is cross-checked against the real `git` binary (`git cat-file`, `git ls-tree`, `git log`).
 

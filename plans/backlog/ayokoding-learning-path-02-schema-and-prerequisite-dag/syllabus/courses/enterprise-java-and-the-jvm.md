@@ -54,9 +54,10 @@ current LTS JDK, Spring Boot, and a build tool (Maven/Gradle).
 > Anti-hallucination (DD-35): every version/API below traces to a primary source a
 > `web-researcher` fetched and read on 2026-07-12. Unverifiable claims are marked `[Needs Verification]`.
 
-- **Spring versions** — current is **Spring Boot 4.1.0** on **Spring Framework 7.0.8+**, with a **Java 17
-  baseline** (Java 25 LTS recommended); shipped prose keeps versions unpinned and re-pulls at authoring
-  time. Verified against spring.io / the Spring Boot reference docs.
+- **Spring versions** — current is **Spring Boot 4.1.0** (GA 2026-06-10) on **Spring Framework 7.0.8+**,
+  with a **Java 17 baseline** (Java 25 LTS recommended); shipped prose keeps versions unpinned and re-pulls
+  at authoring time (version-volatile).
+  `[Web-cited: Spring Boot 4.1.0 available now — https://spring.io/blog/2026/06/10/spring-boot-4/ ; accessed 2026-07-22]`
 - **Test-mock annotation renamed** — `@MockBean` is **deprecated/removed in favor of `@MockitoBean`**
   (Spring Framework 6.2+ / Boot 3.4+). Cite `@MockitoBean`, never `@MockBean`, for mocking beans in slice
   tests. Verified against the Spring Framework docs.

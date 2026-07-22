@@ -91,21 +91,26 @@ small statistics stack.
 - **Funnel / cohort / retention / DAU-MAU / North Star** — Amplitude documentation
   (amplitude.com/docs) and Amplitude's _North Star Playbook_. North Star = one metric with 3–5 input
   metrics forming a metric tree; standard product-analytics definitions of funnel, cohort, retention,
-  DAU/MAU. `[Needs Verification]` on exact current wording (vendor docs revise without version tags).
+  DAU/MAU. `[Unverified]` on exact current wording (Amplitude docs revise without version tags); the
+  concepts are taught generically, not quoted verbatim from the vendor page.
 - **Guardrail metrics** — Kohavi, Tang, Xu, _Trustworthy Online Controlled Experiments_ (2020): metrics
   that must NOT regress (latency, crash rate, unsubscribes) even when the OEC improves. `[Verified]`
-  (book is the standard reference; specific page wording `[Needs Verification]`).
+  (book is the standard reference, `[Verified]`; specific page wording `[Unverified]` — the book was not
+  re-paginated this pass, so guardrail-metric wording is taught, not quoted).
 - **Frequentist vs Bayesian A/B testing** — vendor engineering docs (LaunchDarkly, VWO). Directional
-  guidance only; treat as `[Needs Verification]` and teach the statistics from the peer-reviewed sources
+  guidance only; treat as `[Unverified]` (vendor engineering docs, not a primary statistical source) and teach the statistics from the peer-reviewed sources
   above, not the vendor framing.
 - **Feature flags as experiment delivery** — LaunchDarkly docs: a flag both gates rollout and assigns the
-  experiment bucket, so ramp % and holdout are the same mechanism. `[Needs Verification]` on exact wording.
-- **`[Needs Verification]` / currency risk** — Segment's `analytics-python` SDK is in **maintenance mode**;
-  do NOT teach it as the current recommended instrumentation path. Worked examples instrument via a
+  experiment bucket, so ramp % and holdout are the same mechanism. `[Unverified]` on exact wording (LaunchDarkly docs revise; mechanism taught, not quoted).
+- **Currency risk (confirmed)** — Segment's `analytics-python` SDK is in **maintenance mode**;
+  `[Web-cited: Segment/Twilio "Analytics for Python" library docs classify it as a maintenance library —
+"sends data as intended but receives no new feature support and only critical maintenance updates" —
+https://segment.com/docs/connections/sources/catalog/libraries/server/python/ ; accessed 2026-07-22]`.
+  Do NOT teach it as the current recommended instrumentation path. Worked examples instrument via a
   hand-rolled typed event writer to a local SQL table instead, so nothing depends on a stale vendor SDK.
-- **`[Needs Verification]` (paywalled / 403 at fetch time)** — Amazon's specific email-OEC formula, the
+- **`[Unverified]` (paywalled / 403 at fetch time)** — Amazon's specific email-OEC formula, the
   full Benjamini–Hochberg FDR original text, and several survivorship/p-hacking/HARKing papers could not be
-  fetched to source; the curriculum teaches Benjamini–Hochberg from its standard textbook statement and
+  fetched to a primary source (paywall / 403); the curriculum teaches Benjamini–Hochberg from its standard textbook statement and
   flags the rest rather than citing them as read.
 
 ## Concepts

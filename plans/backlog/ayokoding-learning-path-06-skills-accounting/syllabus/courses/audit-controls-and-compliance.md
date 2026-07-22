@@ -36,7 +36,13 @@ catch a trial balance that foots while being wrong.
   assessment, control activities, information and communication, monitoring) and the fraud triangle
   (pressure, opportunity, rationalization) are stable, widely taught domain knowledge
   `[Judgment call — cited generically, framework name and structure only, no text reproduced per A8]`.
-  Flagged `[Needs Verification]` pending the Phase 1 coverage pass.
+  COSO's Internal Control–Integrated Framework and its five components are confirmed
+  `[Web-cited: COSO — Internal Control (Integrated Framework) — https://www.coso.org/guidance-on-ic ; accessed 2026-07-22]`.
+- The IIA claim (co-11) — that its current **Global Internal Audit Standards** within the IPPF are
+  **effective January 2025** and supersede the older "International Standards for the Professional
+  Practice of Internal Auditing" — is a dated, version-sensitive claim carried nominatively and
+  re-verify-at-authoring
+  `[Web-cited: The Institute of Internal Auditors — Standards / IPPF — https://www.theiia.org/en/standards/ ; accessed 2026-07-22]`.
 
 ## Concepts
 
@@ -61,6 +67,12 @@ catch a trial balance that foots while being wrong.
   control are also the people best positioned to benefit from bypassing it.
 - **co-10 · fraud-triangle** — pressure, opportunity, and rationalization as the three conditions
   commonly present together when fraud occurs; a lens for where controls matter most.
+- **co-11 · internal-audit-standards-body** — internal audit has its own global standard-setter
+  alongside the COSO control framework: **The Institute of Internal Auditors (IIA)**, whose current
+  **Global Internal Audit Standards** (within the IPPF, effective January 2025) supersede the older
+  "International Standards for the Professional Practice of Internal Auditing." Named nominatively as
+  the reference for how the internal-audit function is professionally governed; no standard text is
+  reproduced.
 
 ## Tensions & trade-offs — when NOT to reach for more control
 
@@ -118,6 +130,10 @@ system is built — the synthesis is the paper control design and its justificat
 
 - **COSO — Internal Control–Integrated Framework** (coso.org). Named nominatively as the standard
   internal-control framework reference; framework structure only, no text reproduced.
+- **The Institute of Internal Auditors (IIA) — Global Internal Audit Standards / IPPF** (theiia.org).
+  Named nominatively as the internal-audit profession's standard-setter (current Global Internal Audit
+  Standards, IPPF, effective January 2025); no standard text reproduced
+  `[Web-cited: The Institute of Internal Auditors — Standards / IPPF — https://www.theiia.org/en/standards/ ; accessed 2026-07-22]`.
 - **Principles of Fraud Examination** — Wells (Wiley/ACFE). A standard text on the fraud triangle and
   fraud examination; cited nominatively.
 

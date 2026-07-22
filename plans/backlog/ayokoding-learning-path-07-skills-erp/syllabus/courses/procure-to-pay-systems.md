@@ -31,6 +31,13 @@ License-aware (DD-15).
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
 - Worked P2P example uses an originally-authored vendor, item, and pricing dataset.
+- "Procure-to-pay (P2P)" is confirmed as an industry-standard process term
+  `[Web-cited: Microsoft Learn — Dual-write overview — https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/data-entities/dual-write/dual-write-overview ; accessed 2026-07-22]`.
+  The related "record-to-report (R2R)" and "hire-to-retire (H2R)" labels are likewise confirmed as
+  named end-to-end business processes
+  `[Web-cited: Microsoft Learn — Overview of the record to report end-to-end business process — https://learn.microsoft.com/en-us/dynamics365/guidance/business-processes/record-to-report-overview ; accessed 2026-07-22]`
+  `[Web-cited: Microsoft Learn — Overview of the hire to retire end-to-end business process — https://learn.microsoft.com/en-us/dynamics365/guidance/business-processes/hire-to-retire-overview ; accessed 2026-07-22]`.
+  The "R2R"/"H2R" abbreviations themselves are common-usage shorthand, not asserted from these pages.
 
 ## Concepts
 

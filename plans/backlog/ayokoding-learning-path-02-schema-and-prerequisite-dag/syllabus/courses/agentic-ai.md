@@ -74,7 +74,7 @@ and turns a single model call into a system that reasons, acts, observes, and it
 - **Reflexion** — Shinn et al., "Reflexion: Language Agents with Verbal Reinforcement Learning,"
   arXiv:2303.11366: "reinforce language agents not by updating weights, but … through linguistic feedback …
   verbally reflect on task feedback signals, then maintain their own reflective text in an episodic memory
-  buffer." Source: [arXiv:2303.11366](https://arxiv.org/abs/2303.11366) (fetched; HTML render, so verbatim quoting `[Needs Verification]` against the PDF).
+  buffer." Source: [arXiv:2303.11366](https://arxiv.org/abs/2303.11366) — `[Web-cited: abstract confirmed verbatim — Shinn et al., "Reflexion: Language Agents with Verbal Reinforcement Learning", arXiv:2303.11366 — https://arxiv.org/abs/2303.11366 ; accessed 2026-07-22]` (the "not by updating weights … through linguistic feedback … maintain their own reflective text in an episodic memory buffer" wording matches the arXiv abstract).
 - **Planning / plan-and-execute** — LangChain: a **planner** "prompts an LLM to generate a multi-step plan"
   - an **executor** that "invoke[s] 1 or more tools to complete that task"; avoids "having to call the large
     planner LLM for each tool invocation" (unlike per-step ReAct). Source: [LangChain — Plan-and-Execute Agents](https://www.langchain.com/blog/planning-agents) (fetched, verbatim).
@@ -103,8 +103,11 @@ and turns a single model call into a system that reasons, acts, observes, and it
   `reject_content`. Anthropic tool-permissioning: "Apply the principle of least privilege so that a
   successful injection can do minimal damage … run tools in sandboxed environments." Sources: [OpenAI Guardrails](https://openai.github.io/openai-agents-python/guardrails/), [Anthropic — Mitigate injections](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks) (fetched, verbatim).
 - **Loop control** — OpenAI Agents SDK: "If we exceed the `max_turns` passed, we raise a `MaxTurnsExceeded`
-  exception." LangGraph: exceeding steps raises `GraphRecursionError`; override via `recursion_limit` (the
-  commonly-cited default of 25 was not on the official page → `[Needs Verification]`). Anthropic server-tool
+  exception." LangGraph: exceeding steps raises `GraphRecursionError`; override via `recursion_limit`
+  (default **25** — `[Web-cited: LangGraph GRAPH_RECURSION_LIMIT — "Recursion limit of 25 reached without
+hitting a stop condition"; recursion_limit defaults to 25 —
+https://docs.langchain.com/oss/python/langgraph/errors/GRAPH_RECURSION_LIMIT ; accessed 2026-07-22]`).
+  Anthropic server-tool
   iteration limit returns `stop_reason: "pause_turn"`. Sources: [OpenAI — Running agents](https://openai.github.io/openai-agents-python/running_agents/), [LangGraph — recursion limit](https://docs.langchain.com/oss/python/langgraph/errors/GRAPH_RECURSION_LIMIT) (fetched, verbatim).
 - **Evaluation** — LangSmith trajectory evaluation examines "the exact sequence of messages, including tool
   calls" via `create_trajectory_match_evaluator` or an LLM-as-judge across "grounding and context use, user

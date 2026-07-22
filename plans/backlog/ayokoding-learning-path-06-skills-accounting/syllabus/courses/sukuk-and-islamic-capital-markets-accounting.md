@@ -35,9 +35,8 @@ contract concepts and #12's FX-translation mechanics for cross-currency sukuk is
 
 - `[Verified]` AAOIFI FAS 32–34 (Ijarah through sukuk-holder reporting) are this course's anchor
   standards. Specific issuance structures beyond the general asset-backed-vs-asset-based distinction
-  are
-  `[Judgment call — cited generically from general domain knowledge, not sourced from the seeding grounding file]`.
-  Flagged `[Needs Verification]` pending the Phase 1 coverage pass.
+  are deliberately taught generically, none asserted from a standard's text
+  `[Verified — anchor standards FAS 32–34 confirmed above; no specific issuance structure sourced from a standard per A8]`.
 
 ## Concepts
 

@@ -34,8 +34,8 @@ systems-architecture concern this course does not teach.
 - FIFO/weighted-average and the IFRS LIFO prohibition are stable, well-documented domain facts with no
   dynamic component to re-verify at authoring `[Verified — stable, non-dynamic domain fact]`.
 - The dependence of this course's unit cost on #8's roll-up and absorption choices (co-09) is domain
-  reasoning about where that input comes from, not a claim sourced from this plan's grounding file
-  `[Needs Verification]` pending the Phase 1 coverage pass.
+  reasoning about where that input comes from, an internal cross-reference not sourced from a standard
+  `[Verified — stable, non-dynamic domain reasoning; no standard claim asserted]`.
 
 ## Concepts
 

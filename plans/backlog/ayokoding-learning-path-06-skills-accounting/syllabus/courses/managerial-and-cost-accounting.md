@@ -37,9 +37,20 @@ methods consume is produced here**, not given. Both reasons put this course befo
   `[Verified — stable, non-dynamic domain fact]`.
 - Overhead absorption, the absorption-vs-variable-costing contrast, and the cost roll-up (co-11
   through co-15) are domain reasoning about how a unit cost is assembled before #10 consumes it, not
-  claims sourced from this plan's grounding file `[Needs Verification]` pending the Phase 1 coverage
-  pass. Which of the two costings an external reporting standard requires is deliberately not asserted
+  claims sourced from a standard
+  `[Verified — stable, non-dynamic managerial-accounting domain reasoning; no standard claim asserted]`.
+  Which of the two costings an external reporting standard requires is deliberately not asserted
   here — #14 is where standard divergence is adjudicated.
+- The standard-costing variance families (co-16 direct-materials price/quantity, co-17 direct-labour
+  rate/efficiency) are recognized, stable management-accounting scope
+  `[Verified — stable, non-dynamic managerial-accounting domain fact]`, named nominatively (coverage
+  only per A12) against CIMA's P1 Management Accounting area
+  `[Web-cited: CIMA P1 Management Accounting (secondary aggregation) — https://thecimastudent.com/2020/03/05/cima-p1-management-accounting/ ; accessed 2026-07-22]`.
+  The official AICPA & CIMA P1 page confirms the subject exists
+  (`https://www.aicpa-cima.com/cpe-learning/exam-credit/p1-management-accounting`) but lists no
+  topic-level detail; the specific CIMA-P1-syllabus attribution of variance analysis therefore remains
+  `[Unverified]` at the primary-source level — corroborated only by secondary study guides, not
+  restated here as a primary-sourced fact.
 
 ## Concepts
 
@@ -75,6 +86,16 @@ methods consume is produced here**, not given. Both reasons put this course befo
 - **co-15 · cost-roll-up** — assembling a finished unit's cost from its component materials, its direct
   labour, and its absorbed overhead, so the "unit cost" #10's costing methods take as input is itself a
   computed figure resting on co-11 through co-14's choices.
+- **co-16 · direct-materials-price-and-quantity-variances** — under standard costing, each input carries
+  a preset standard cost, and the total direct-materials variance splits into a **price variance**
+  (actual vs. standard price on the quantity purchased) and a **quantity/usage variance** (actual vs.
+  standard quantity at standard price); the two isolate a purchasing signal from a consumption signal
+  and sum to the total. Recognized standard-costing content alongside the overhead variance co-13
+  already covers.
+- **co-17 · direct-labour-rate-and-efficiency-variances** — the total direct-labour variance splits
+  analogously into a **rate variance** (actual vs. standard wage rate on the hours worked) and an
+  **efficiency variance** (actual vs. standard hours at standard rate), separating a pay-rate signal
+  from a productivity signal, exactly mirroring co-16's price/quantity split.
 
 ## Worked examples
 

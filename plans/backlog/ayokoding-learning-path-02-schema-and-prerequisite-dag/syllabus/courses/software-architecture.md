@@ -65,8 +65,11 @@ Python where code appears, else annotated C4 diagrams.
   [Martin, The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) (2012); [Palermo, Onion Architecture](https://jeffreypalermo.com/2008/07/the-onion-architecture-part-1/) (2008).
 - **Coupling metric** — Stable Dependencies Principle "Depend in the direction of stability"; instability
   `I = Ce / (Ca + Ce)` (0 = maximally stable, 1 = maximally unstable). Source: R.C. Martin (SDP / _Clean
-  Architecture_). Constantine & Yourdon's original coupling/cohesion (_Structured Design_, 1979) is
-  `[Needs Verification]` (not directly fetched).
+  Architecture_). Constantine & Yourdon's _Structured Design_ (Yourdon Press/Prentice-Hall, 1975 & **1979**
+  editions) is `[Web-cited: Yourdon & Constantine, _Structured Design_ —
+https://www.goodreads.com/book/show/946145.Structured_Design ; accessed 2026-07-22]`; note the
+  coupling/cohesion vocabulary itself predates the book (Stevens, Myers & Constantine, "Structured Design,"
+  _IBM Systems Journal_, 1974) — attribute the terms to that lineage, the textbook to 1979.
 - **Dependency Inversion Principle** — "High-level modules should not depend on low-level modules. Both
   should depend on abstractions. Abstractions should not depend on details. Details should depend on
   abstractions." Source: R.C. Martin, DIP (_C++ Report_ 1996 / _Agile PPP_ 2002).

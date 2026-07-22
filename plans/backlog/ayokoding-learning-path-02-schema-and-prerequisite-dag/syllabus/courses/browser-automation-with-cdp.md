@@ -39,11 +39,13 @@ orchestration over CDP), not a subject.
 
 - 2026-07-18 — CDP is a **stable, documented** protocol (domains like `Page`, `Runtime`, `DOM`,
   `Network`, `Target`); the transport is a WebSocket carrying JSON messages + events.
-- 2026-07-18 — `[Needs Verification]`: exact CVE-clean versions of Chrome/Chromium and the chosen Python
-  CDP client library; the CDP domain surface evolves — pin and re-verify at authoring.
-- 2026-07-18 — `[Needs Verification]`: whether to demonstrate raw CDP directly vs a thin client library
-  — prefer showing the raw protocol once, then a thin client for the rest, and re-verify the library's
-  API.
+- 2026-07-18 — version-volatile (pin at authoring): exact CVE-clean versions of Chrome/Chromium and the
+  chosen Python CDP client library; the CDP domain surface evolves — pin and re-verify at authoring.
+  Current-as-of value: Chrome stable **150** (150.0.7871.x, July 2026) [Web-cited: Chrome Releases —
+  https://chromereleases.googleblog.com/ ; accessed 2026-07-22].
+- 2026-07-18 — design decision (not a web-verifiable factual claim): whether to demonstrate raw CDP
+  directly vs a thin client library — prefer showing the raw protocol once, then a thin client for the
+  rest, and re-verify the library's API at authoring.
 
 ## Concepts
 

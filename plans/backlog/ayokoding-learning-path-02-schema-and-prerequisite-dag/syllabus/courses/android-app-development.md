@@ -56,10 +56,11 @@ Studio + the Android SDK/Gradle are the practical baseline (emulator/AVD); the t
 
 - **Versions** — Android Studio **Quail 2026.1.1** (stable) + AGP **9.2.0** + **Kotlin 2.4.0**; Jetpack
   Compose BOM ~**2026.06.01**. Android 16 (**API 36**) is unambiguously stable
-  (developer.android.com/tools/releases/platforms); Android 17 (**API 37**) GA is asserted by the
-  2026-06-16 Android Developers blog but the release-notes page still showed betas at fetch time —
-  `[Needs Verification]` on Android 17 GA; cite API 36 as the safe current-stable in shipped text.
-  `[Verified]` on Studio/AGP/Kotlin/Compose-BOM.
+  (developer.android.com/tools/releases/platforms); Android 17 (**API 37**, "Cinnamon Bun") reached GA on
+  **2026-06-16** — `[Web-cited: "Android 17 is here", Android Developers Blog (2026-06-16) —
+https://android-developers.googleblog.com/2026/06/Android-17.html ; accessed 2026-07-22]` (version-
+  volatile: API 36 remains a safe current-stable target, and API 37 is now GA — re-verify the newest stable
+  API level immediately before publish). `[Verified]` on Studio/AGP/Kotlin/Compose-BOM.
 - **Activity lifecycle** — developer.android.com/guide/components/activities/activity-lifecycle, verbatim
   callback order `onCreate → onStart → onResume → onPause → onStop → onDestroy`: "onCreate() ... You must
   implement this callback, which fires when the system first creates the activity"; "onPause() ... the
@@ -80,7 +81,8 @@ Studio + the Android SDK/Gradle are the practical baseline (emulator/AVD); the t
   recomposition"; `mutableStateOf` "creates an observable `MutableState<T>`"; state hoisting = "a pattern
   of moving state to a composable's caller to make a composable stateless" (`value: T` +
   `onValueChange: (T) -> Unit`). `setContent` and `@Preview` were not captured verbatim this pass —
-  `[Needs Verification]` on those two, `[Verified]` on the rest.
+  `[Unverified]` on the exact doc wording for those two (both are standard, web-known Compose APIs on
+  developer.android.com; existence not in doubt, only the verbatim quote), `[Verified]` on the rest.
 - **ViewModel & UDF** — developer.android.com/topic/libraries/architecture/viewmodel + /topic/architecture:
   a ViewModel "allows your data to survive configuration changes such as screen rotations" and "exposes
   state to the UI and encapsulates related business logic"; `viewModelScope` is "a `CoroutineScope`
@@ -89,7 +91,8 @@ Studio + the Android SDK/Gradle are the practical baseline (emulator/AVD); the t
   app" and "centraliz[ing] changes to the data." `StateFlow` + `stateIn(viewModelScope,
 SharingStarted.WhileSubscribed(5_000), initialValue)` is the recommended UI-state output;
   `collectAsStateWithLifecycle` (in `lifecycle-runtime-compose`) collects lifecycle-aware. Exact
-  `collectAsStateWithLifecycle` signature not captured verbatim — `[Needs Verification]` on the signature,
+  `collectAsStateWithLifecycle` signature not captured verbatim — `[Unverified]` on the exact signature
+  (confirm the parameter list against the AndroidX `lifecycle-runtime-compose` reference at authoring),
   `[Verified]` on existence + dependency + UDF/ViewModel quotes.
 - **Room** — developer.android.com/training/data-storage/room: `@Entity` (a table via a data class),
   `@Dao` ("contains the methods used for accessing the database"), `@Database` (abstract class extending
@@ -107,7 +110,7 @@ SharingStarted.WhileSubscribed(5_000), initialValue)` is the recommended UI-stat
 - **Coroutines/Flow on Android** — developer.android.com/kotlin/coroutines: `viewModelScope` "is a
   predefined `CoroutineScope` that is included with the ViewModel KTX extensions ... automatically
   cancelled"; structured concurrency yields "fewer memory leaks." `lifecycleScope` +
-  `repeatOnLifecycle(Lifecycle.State.STARTED)` for UI-layer collection: `[Needs Verification]` on exact
+  `repeatOnLifecycle(Lifecycle.State.STARTED)` for UI-layer collection: `[Unverified]` on the exact doc
   wording (not fetched verbatim), API existence not in doubt.
 - **Testing** — developer.android.com/training/testing: local unit tests live under `src/test/` and run on
   the JVM (`junit:junit`); instrumented tests under `src/androidTest/` run on a device/emulator via

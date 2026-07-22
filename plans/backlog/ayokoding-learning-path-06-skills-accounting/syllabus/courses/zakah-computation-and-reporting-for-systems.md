@@ -36,11 +36,16 @@ the original catalog never taught despite AAOIFI FAS 9 being `[Verified]` in the
   nisab threshold value and zakatable-asset classification rules are jurisdiction- and
   institution-specific in practice
   `[Judgment call — this course teaches the computation pattern generically; no specific numeric nisab value is asserted as universal]`.
-  Any such value is flagged `[Needs Verification]` pending the Phase 1 coverage pass.
+  Any such value is version- and jurisdiction-volatile and remains `[Unverified]` — deliberately not
+  asserted as universal; re-verify at authoring against the governing jurisdiction's rule.
 - The holding-period condition and the calendar basis on which it is measured (co-08) are stated
-  generically: this course asserts no specific period length, no specific calendar, and no
-  jurisdiction's rule as universal, and teaches only that the Zakah period is modelled separately from
-  the reporting period `[Needs Verification]` pending the Phase 1 coverage pass.
+  generically: this course names the condition **hawl** but asserts no specific period length, no
+  specific calendar, and no jurisdiction's rule as universal, and teaches only that the Zakah period is
+  modelled separately from the reporting period
+  `[Verified — stated generically; no specific period length or calendar asserted as universal]`. The
+  naming of hawl (and of nisab at co-02) is corroborated against the anchor Zakah standards
+  `[Web-cited: AAOIFI — FAS 9 Zakah / FAS 39 — https://aaoifi.com/accounting-standards-2/?lang=en ; accessed 2026-07-22]`
+  `[Web-cited: IAI — PSAK 109 Akuntansi Zakat — https://web.iaiglobal.or.id/Berita-IAI/detail/pengesahan_revisi_psak_109_dan_psak_101 ; accessed 2026-07-22]`.
 
 ## Concepts
 
@@ -60,9 +65,11 @@ the original catalog never taught despite AAOIFI FAS 9 being `[Verified]` in the
   distinct from its role, where applicable, in facilitating individual shareholders' or depositors'
   own Zakah obligations — the two are not the same computation.
 - **co-08 · zakah-period-is-not-the-reporting-period** — the obligation is conditioned on wealth being
-  held across a defined period, and where that period is measured on a lunar rather than a Gregorian
-  calendar its boundaries drift against the entity's own fiscal year — so a system carries the Zakah
-  period as its own dimension and never reuses the reporting period's start and end dates by default.
+  held across a defined holding period, named **hawl** (the standard term for this condition, mirroring
+  how co-02 names the **nisab** threshold; no specific period length is asserted here), and where that
+  period is measured on a lunar rather than a Gregorian calendar its boundaries drift against the
+  entity's own fiscal year — so a system carries the Zakah period as its own dimension and never reuses
+  the reporting period's start and end dates by default.
 
 ## Worked examples
 

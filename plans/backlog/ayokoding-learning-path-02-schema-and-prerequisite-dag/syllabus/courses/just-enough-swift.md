@@ -45,10 +45,12 @@ protocols, closures, and an `async`/`await` _preview_.
 > page the pre-authoring `web-researcher` sweep fetched and read. `[Needs Verification]` marks items not
 > captured verbatim or with live currency risk. Re-pull the version line immediately before publish.
 
-- **Version** — current stable is **Swift 6.3** (initial 2026-03-24), with patch **6.3.3** on the release
-  track (~2026-06-30) and **6.4 in beta** at fetch time — `[Needs Verification]` on the exact patch/6.4-GA
-  status; keep the version UNPINNED in shipped prose. Swift is open source + cross-platform (an official
-  Android SDK shipped in the 6.3 line), so the Linux-`swiftc` framing holds. `[Verified]` on 6.3-stable +
+- **Version** — current stable is **Swift 6.3**, with **6.3.3** the latest patch on the release track and
+  6.4 **not yet GA** as of this pass `[Web-cited: swift.org blog/forums — Swift 6.3.3 announced as the
+current stable patch (announced early July 2026); no 6.4 GA announcement present — https://www.swift.org/blog/swift-6.3-released/
+; accessed 2026-07-22]`. Version-volatile: keep the version UNPINNED in shipped prose and re-pull the
+  version line before publish. Swift is open source + cross-platform (an official Android SDK shipped in
+  the 6.3 line), so the Linux-`swiftc` framing holds. `[Verified]` on 6.3-stable +
   open-source/cross-platform. (swift.org/blog, swift.org/download)
 - **Toolchain** — `swift` launches the REPL / runs a package; `swiftc file.swift` compiles a standalone
   executable. The exact `swiftc` man-page wording was not captured verbatim — `[Needs Verification]` on a

@@ -35,8 +35,13 @@ corpus. License-aware (DD-15).
 
 - The accounting-side course id `audit-controls-and-compliance` is as named in
   `ayokoding-learning-path-06-skills-accounting`'s own in-flight rewrite as of 2026-07-22.
-- COSO/SOX control-point terminology is treated at concept depth; specific COSO framework citations
-  are `[Needs Verification]` pending Phase 1.2a.
+- COSO/SOX control-point terminology is treated at concept depth. The COSO _Internal Control—Integrated
+  Framework_ and Sarbanes-Oxley Section 404 (management assessment of internal control over financial
+  reporting) are cited nominatively only — no framework text, component list, or principle numbering is
+  reproduced here (A8)
+  `[Web-cited: COSO — Internal Control—Integrated Framework — https://www.coso.org/guidance-on-ic ; accessed 2026-07-22]`.
+  Any claim about what a specific COSO component or principle prescribes stays `[Needs Verification]`
+  and is not asserted.
 - Concept co-08 is placed on domain-reasoning grounds rather than sourced from the grounding research,
   and is `[Needs Verification]` pending the Phase 1.2a coverage pass.
 

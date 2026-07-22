@@ -93,7 +93,8 @@ no paid cloud account is required (DD-20). Containers/K8s are [`50-containers-an
   quote — cite Kief Morris, _Infrastructure as Code_ (2nd ed.) for the taxonomy.
 - **Serverless / managed** — Lambda "is a serverless compute service that lets you run code without
   provisioning or managing servers"; a cold start is the environment-setup on first invocation (Init phase
-  "limited to 10 seconds" — `[Needs Verification]`, secondary-corroborated). Managed Kubernetes: EKS/GKE/AKS
+  is "limited to 10 seconds" — confirmed primary; the 10s cap does not apply to provisioned concurrency /
+  SnapStart / Managed Instances [Web-cited: AWS Lambda execution-environment lifecycle — https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html ; accessed 2026-07-22]). Managed Kubernetes: EKS/GKE/AKS
   each state "AWS/Google Cloud/Azure manages the … control plane." Sources: [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html), [EKS](https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html), [GKE](https://docs.cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview), [AKS](https://learn.microsoft.com/en-us/azure/aks/what-is-aks) (fetched).
 - **IAM / secrets** — "grant only the permissions required to perform a task … least-privilege permissions";
   roles deliver "temporary credentials" to workloads so "there is no need to distribute long lived
@@ -101,7 +102,7 @@ no paid cloud account is required (DD-20). Containers/K8s are [`50-containers-an
   Sources: [IAM best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html), [Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html), [HashiCorp Vault](https://developer.hashicorp.com/vault/docs/what-is-vault) (fetched, verbatim).
 - **Cost / FinOps** — FinOps = "an operational framework and cultural practice which maximizes the business
   value of technology … through collaboration between engineering, finance, and business teams"; maturity =
-  "Crawl, Walk, Run" (the "Inform/Optimize/Operate" phrasing is a _different_ FinOps page — `[Needs Verification]` if quoted here). Tagging whitepaper is dated 2023-03-30 (re-check currency). Sources:
+  "Crawl, Walk, Run" — confirmed distinct from the three FinOps Framework **phases** "Inform, Optimize, Operate" (a _different_ page; do not conflate the phases with the maturity model) [Web-cited: FinOps Framework phases — https://www.finops.org/framework/phases/ ; accessed 2026-07-22]. Tagging whitepaper is dated 2023-03-30 (re-check currency). Sources:
   [FinOps](https://www.finops.org/introduction/what-is-finops/), [AWS tagging](https://docs.aws.amazon.com/whitepapers/latest/tagging-best-practices/tagging-best-practices.html) (fetched).
 - **GitOps** — OpenGitOps v1.0.0 four principles verbatim: **Declarative**, **Versioned and Immutable**,
   **Pulled Automatically**, **Continuously Reconciled**. Source: [opengitops.dev](https://opengitops.dev/) (fetched, verbatim).

@@ -68,8 +68,11 @@ staleness corrections are flagged for the authoring pass.
   Deadline First), which **replaced CFS (the Completely Fair Scheduler) as the default in Linux 6.6**
   (2023) — authored content must NOT present CFS as the current scheduler; treat scheduling at the
   concept level (time-slicing, context switches, `nice` priority) and name EEVDF as current
-  (kernel.org sched docs, man7.org/…/man7/sched.7). `[Needs Verification]` at authoring — re-confirm the
-  scheduler name against the running kernel's docs.
+  (kernel.org sched docs, man7.org/…/man7/sched.7). EEVDF-replaces-CFS-in-6.6 confirmed `[Web-cited:
+EEVDF Scheduler — The Linux Kernel documentation ("transitioning to EEVDF in version 6.6 ... moving
+away from the earlier Completely Fair Scheduler (CFS)") — https://docs.kernel.org/scheduler/sched-eevdf.html
+; corroborated by kernelnewbies.org/Linux_6.6 "replaces the CFS process scheduler with ... EEVDF" ;
+accessed 2026-07-22]`. Still re-confirm the scheduler name against the running kernel's docs at authoring.
 - **Observation tools** — `[Verified]` `/proc` exposes per-process state (`/proc/<pid>/status`, `/fd`,
   `/maps`, `/cmdline`); `ps`/`top` list processes; `strace(1)` traces syscalls
   (man7.org/linux/man-pages/man5/proc.5, man1/strace.1).

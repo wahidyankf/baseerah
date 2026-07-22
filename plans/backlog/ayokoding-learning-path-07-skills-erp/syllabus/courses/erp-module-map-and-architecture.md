@@ -31,8 +31,15 @@ without re-explaining what ERPNext is each time. License-aware (DD-15).
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
 - Licence claims for the open-source landscape are `[Repo-grounded]` against the domain-research
-  grounding and `tech-docs.md`'s licensing table. Metasfresh's licence is `[Unverified]` and is not
-  asserted in this course.
+  grounding and `tech-docs.md`'s licensing table. Metasfresh's licence is **GPLv2**
+  `[Web-cited: metasfresh/metasfresh LICENSE.md — https://raw.githubusercontent.com/metasfresh/metasfresh/master/LICENSE.md ; accessed 2026-07-22]`;
+  its commercial offering is paid support on the same GPL code, **not** a separate proprietary
+  edition. The "GPLv2/GPLv3" characterization is grounded in the LICENSE.md's own "version 2 of the
+  License, or (at your option) any later version" clause (GPL-2.0-or-later, so GPLv3 use is permitted)
+  `[Web-cited: metasfresh/metasfresh LICENSE.md — https://raw.githubusercontent.com/metasfresh/metasfresh/master/LICENSE.md ; accessed 2026-07-22]`;
+  Wikipedia's infobox likewise records the licence as "GPLv2/GPLv3"
+  `[Web-cited: Wikipedia — Metasfresh — https://en.wikipedia.org/wiki/Metasfresh ; accessed 2026-07-22]`.
+  Described behaviourally only, never with copied code.
 - Concept co-13 is placed on domain-reasoning grounds rather than sourced from the grounding research,
   and remains `[Needs Verification]` pending the Phase 1.2a coverage pass **as a module-family naming
   claim**. Its prior open question — whether covering quality management at its touchpoints is

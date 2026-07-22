@@ -46,11 +46,11 @@ call, a hook, a trace span) clarifies. Caps the cluster built across
 - 2026-07-18 — subagents (isolated context returning a summary), orchestration patterns (sequential,
   parallel, hierarchical), tracing/observability, and evals for LLM systems are **stable, vendor-
   independent** concepts.
-- 2026-07-18 — `[Needs Verification]`: the chosen tracing library, TUI library, and any hooks/skills
-  extension mechanism differ by harness — keep the module principle-based and pin/verify the concrete
-  libraries at authoring.
-- 2026-07-18 — `[Needs Verification]`: eval frameworks/tooling evolve fast — teach the eval _principle_
-  (a graded test set for a stochastic system) and pin any named tool at authoring.
+- 2026-07-18 — `[Unverified]` by design (version-volatile): the chosen tracing library, TUI library, and
+  any hooks/skills extension mechanism differ by harness and have no single fixed value to pin — keep the
+  module principle-based and pin/verify the concrete libraries at authoring.
+- 2026-07-18 — `[Unverified]` by design (version-volatile): eval frameworks/tooling evolve fast — teach the
+  eval _principle_ (a graded test set for a stochastic system) and pin any named tool at authoring.
 
 ## Concepts
 
@@ -121,8 +121,12 @@ call, a hook, a trace span) clarifies. Caps the cluster built across
   OpenAI and Anthropic treat the harness as the umbrella containing context management, while HumanLayer
   treats it as a subset of context engineering — so this cluster **names the term and cites the
   disagreement without adopting a side, and renames nothing**. Full treatment in the
-  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Needs Verification]`: confirm
-  dates and attributions at authoring; treat the vocabulary as volatile.
+  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Web-cited: the term "harness
+engineering" and its attribution to Anthropic, OpenAI, and Birgitta Böckeler (Thoughtworks) are confirmed
+— Thoughtworks, "What is harness engineering?" — https://www.thoughtworks.com/insights/podcasts/technology-podcasts/what-harness-engineering ;
+Wikipedia, "Agent harness" — https://en.wikipedia.org/wiki/Agent_harness ; accessed 2026-07-22]`; the exact
+  publication dates (Anthropic 2025-11-26; Böckeler/Thoughtworks 2026-04-02) are corroborated but stay
+  `[Unverified]` to the day — spot-confirm at authoring. Treat the vocabulary as volatile.
 
 ## Worked examples
 

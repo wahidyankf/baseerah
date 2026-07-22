@@ -79,13 +79,16 @@ the pyright-clean spirit.
   adds multiple in/out events + a background coroutine. WWW sub-spec is "deliberately … a superset of
   the WSGI format" for HTTP. Source: [ASGI `docs/introduction.rst`](https://github.com/django/asgiref/blob/main/docs/introduction.rst).
   The spec text names WebSocket/async/long-lived connections as the drivers; an explicit SSE-rationale
-  sentence is `[Needs Verification]` (author synthesis, not a literal spec quote).
+  sentence is `[Unverified]` (author synthesis — the ASGI intro names WebSocket/async/long-poll but not
+  SSE specifically; confirmed 2026-07-22, kept as synthesis rather than restated as a spec quote).
 - **Routing / `@route`** — a decorator binds a function to a URL; path variables `/<name>` (Flask) /
   `/{id}` become handler arguments; Flask converters: `string` (default)/`int`/`float`/`path`/`uuid`.
   A decorator is standard Python: receives the handler, registers it, returns it unchanged. Source:
   [Flask quickstart routing](https://flask.palletsprojects.com/en/stable/quickstart/). Flask's actual
-  internal store is a Werkzeug `Map`/`Rule`, not a literal plain dict — teach "routes table" as a
-  pedagogical simplification (`[Needs Verification]` at implementation-detail level).
+  internal store is a Werkzeug `Map`/`Rule`, not a literal plain dict — [Web-cited: Flask exposes
+  `app.url_map` as a `werkzeug.routing.Map` holding `Rule` objects —
+  https://werkzeug.palletsprojects.com/en/stable/routing/ ; accessed 2026-07-22] — teach "routes table"
+  as a pedagogical simplification.
 - **Middleware onion** — "each middleware class is a 'layer' that wraps the view … request passes
   top-down, response passes back out in reverse order"; a layer that returns without calling the next
   short-circuits the inner layers. Ordering is a correctness property (e.g. auth must run after
@@ -109,8 +112,10 @@ the pyright-clean spirit.
   [Flask README](https://github.com/pallets/flask/blob/main/README.md),
   [FastAPI README](https://github.com/fastapi/fastapi/blob/master/README.md),
   [gunicorn.org](https://gunicorn.org/), [encode/uvicorn README](https://github.com/encode/uvicorn/blob/master/README.md).
-  The uvicorn README excerpt did not name Starlette explicitly — that specific pairing is
-  `[Needs Verification]` though well established.
+  The uvicorn README excerpt did not name Starlette explicitly, but FastAPI's own docs confirm the
+  Starlette+Pydantic pairing — [Web-cited: FastAPI — "FastAPI stands on the shoulders of giants:
+  Starlette for the web parts. Pydantic for the data parts." — https://fastapi.tiangolo.com/ ; accessed
+  2026-07-22].
 
 ## Concepts
 

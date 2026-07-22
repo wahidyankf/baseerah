@@ -61,27 +61,30 @@ host is the unit, not the cluster on top of it.
 > 2026-07-12. Fast-moving projects: treat every version number as "verify current".
 
 - 2026-07-12 — verified: **Proxmox VE** code is licensed under the **GNU Affero General Public License,
-  version 3** (primary quote below). Proxmox VE 9.x is current (point release ~9.2, ~2026-05-21) — the exact
-  point release and date are `[Needs Verification]` against a fetched Roadmap page this pass; treat as
-  "verify current". The "free without a subscription; the subscription only unlocks the enterprise repo and
-  support" characterization is widely documented but was **not** confirmed on the fetched FAQ page this pass
-  — `[Needs Verification]`.
+  version 3** (primary quote below). Proxmox VE 9.x is current — the point release **9.2** (released **2026-05-21**) is [Web-cited: Proxmox VE
+  Roadmap — https://pve.proxmox.com/wiki/Roadmap ; accessed 2026-07-22] (version-volatile: pin at authoring,
+  treat as "verify current"). The "free without a subscription; the subscription only unlocks the enterprise
+  repo and support" characterization is widely documented but remains `[Unverified]` — re-fetched the Proxmox
+  VE FAQ 2026-07-22 and it contains no subscription / enterprise-repo / free-use wording, so no primary
+  source confirms it this pass.
 - 2026-07-12 — verified: **Neither ZFS nor Ceph should sit behind a hardware RAID controller** — both want
   direct disk access via an HBA (primary quotes below).
 - 2026-07-12 — verified: Terraform **`bpg/proxmox`** is the actively-maintained provider — its README states
   it is a fork of the "no longer maintained" `danitso/terraform-provider-proxmox`. The specific resource
   counts (~111 for `bpg` vs ~5 RC-quality for `Telmate/proxmox`) come from the registry listings and were
   **not** re-counted from a fetched registry page this pass (the Terraform Registry page is a client-rendered
-  SPA that did not render to text) — `[Needs Verification]`; the maintained-vs-abandoned distinction is
-  verified.
+  SPA that did not render to text on re-attempt 2026-07-22) — `[Unverified]`; the maintained-vs-abandoned
+  distinction is verified.
 - 2026-07-12 — verified: the Ansible module moved — **`community.general.proxmox_kvm` is deprecated /
   redirected to `community.proxmox.proxmox_kvm`** (fetched); author against the `community.proxmox`
   collection.
 - 2026-07-12 — verified: **Terraform CLI is Business Source License 1.1 (BUSL-1.1)** post-August-2023;
-  **OpenTofu is MPL-2.0** (a Linux Foundation project) — the license-clean drop-in. The OpenTofu "fork of
-  Terraform" phrasing and the exact Terraform BUSL wording were **not** re-fetched from a primary license
-  file this pass (see topic 51's DD-35 pass, which verified the Terraform BUSL wording) — `[Needs
-Verification]` on the verbatim license text here; the OpenTofu MPL-2.0 / LF-governance fact is quoted below.
+  **OpenTofu is MPL-2.0** (a Linux Foundation project) — the license-clean drop-in. The **Terraform
+  BUSL-1.1** adoption (announced 2023-08-10, effective for releases thereafter) is [Web-cited: HashiCorp —
+  "HashiCorp adopts the Business Source License" —
+  https://www.hashicorp.com/blog/hashicorp-adopts-business-source-license ; accessed 2026-07-22]; the exact
+  **verbatim** license-file text was not re-fetched this pass — `[Unverified]` at the verbatim-quote level.
+  The OpenTofu MPL-2.0 / LF-governance fact is quoted below.
 - 2026-07-12 — verified: cloud-init, Packer, libvirt, ZFS, and Ceph core concepts (first-boot datasource,
   identical-image build, multi-hypervisor toolkit, RAID-Z parity, RADOS/CRUSH) are stable and quoted verbatim
   below.
@@ -167,7 +170,7 @@ Verification]` on the verbatim license text here; the OpenTofu MPL-2.0 / LF-gove
 - **OpenTofu** — "OpenTofu is an infrastructure as code tool that lets you define both cloud and on-prem
   resources in human-readable configuration files that you can version, reuse, and share"; documentation
   "licensed under the MPL-2.0 license"; governed as "a Series of LF Projects, LLC." Source:
-  [OpenTofu — Intro](https://opentofu.org/docs/intro/) (fetched, verbatim; "fork of Terraform" phrasing `[Needs Verification]`).
+  [OpenTofu — Intro](https://opentofu.org/docs/intro/) (fetched, verbatim; the "fork of Terraform" characterization is [Web-cited: en.wikipedia.org/wiki/OpenTofu — "The MPL-licensed version of Terraform was forked as OpenTofu in August 2023" — https://en.wikipedia.org/wiki/OpenTofu ; accessed 2026-07-22]. Note: opentofu.org/docs/intro and the OpenTofu GitHub README do not use the word "fork" verbatim on re-fetch 2026-07-22).
 
 ## Concepts
 

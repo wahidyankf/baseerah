@@ -41,7 +41,9 @@ worked design scenarios, and WCAG-accessible Mermaid diagrams.
 - 2026-07-18 — the round's spine (functional + non-functional requirements, capacity estimation,
   high-level design, data model, API sketch, deep dive, bottleneck + trade-off discussion) and the
   scoring axes (scoping, estimation, breadth, depth, communication, trade-offs) are **stable, vendor-
-  independent** practice.
+  independent** practice. (2026-07-22 — the clarify → estimate → high-level → deep-dive → bottleneck →
+  trade-off spine was coverage-confirmed against standard system-design-interview practice in an earlier
+  research pass; no structure imported, corroboration only.)
 - 2026-07-18 — `[Needs Verification]`: any specific numbers used in capacity estimates (QPS ranges,
   storage-per-record, typical latencies) — present them as illustrative order-of-magnitude figures and
   re-verify representative values at authoring.

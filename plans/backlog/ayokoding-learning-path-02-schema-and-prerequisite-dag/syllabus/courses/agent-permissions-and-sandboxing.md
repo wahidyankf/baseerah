@@ -40,10 +40,12 @@ draws on `security-essentials` forward-referenced from Phase 1 fundamentals.
 
 - 2026-07-18 — the deny/ask/allow permission model, sandboxing via containers/OS isolation, and
   prompt-injection as a threat class are **stable** security concepts; prompt injection is tracked by
-  the OWASP guidance for LLM/agentic applications. `[Needs Verification]`: the exact current OWASP entry
-  identifier + title — confirm against the published list at authoring.
-- 2026-07-18 — `[Needs Verification]`: the exact container/sandbox runtime versions + flags — pin at
-  authoring; sandbox escape surfaces evolve.
+  the OWASP guidance for LLM/agentic applications. `[Web-cited: OWASP Top 10 for LLM Applications 2025 —
+entry **LLM01:2025 Prompt Injection** (holds the top spot for a second consecutive edition) —
+https://owasp.org/www-project-top-10-for-large-language-model-applications/ ; accessed 2026-07-22]`;
+  re-confirm the entry identifier against the published list at authoring (editions revise).
+- 2026-07-18 — `[Unverified]` by design (version-volatile): the exact container/sandbox runtime versions +
+  flags have no single fixed value to pin — pin at authoring; sandbox escape surfaces evolve.
 - 2026-07-18 — permission-model specifics differ by harness — keep the module principle-based and
   tool-agnostic; name a concrete harness only as an illustration.
 
@@ -131,8 +133,12 @@ draws on `security-essentials` forward-referenced from Phase 1 fundamentals.
   OpenAI and Anthropic treat the harness as the umbrella containing context management, while HumanLayer
   treats it as a subset of context engineering — so this cluster **names the term and cites the
   disagreement without adopting a side, and renames nothing**. Full treatment in the
-  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Needs Verification]`: confirm
-  dates and attributions at authoring; treat the vocabulary as volatile. Note that co-23's
+  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Web-cited: the term "harness
+engineering" and its attribution to Anthropic, OpenAI, and Birgitta Böckeler (Thoughtworks) are confirmed
+— Thoughtworks, "What is harness engineering?" — https://www.thoughtworks.com/insights/podcasts/technology-podcasts/what-harness-engineering ;
+Wikipedia, "Agent harness" — https://en.wikipedia.org/wiki/Agent_harness ; accessed 2026-07-22]`; the exact
+  publication dates (Anthropic 2025-11-26; Böckeler/Thoughtworks 2026-04-02) are corroborated but stay
+  `[Unverified]` to the day — spot-confirm at authoring. Treat the vocabulary as volatile. Note that co-23's
   train-versus-production asymmetry is durable **precisely because** it rests on risk rather than on any
   of this vocabulary.
 

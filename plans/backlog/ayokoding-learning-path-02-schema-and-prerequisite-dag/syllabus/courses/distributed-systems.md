@@ -120,10 +120,15 @@ fully type-annotated (DD-39) — every snippet carries type hints in the pyright
   Raft; ephemeral/sequential znodes + watches; etcd Raft/MVCC/leases; Consul Serf/SWIM gossip; the
   ephemeral-sequential leader-election recipe that watches only the predecessor to avoid the herd effect)
   is well-established, but this rung was authored **without** a completed primary-source pass (the grounding
-  agent died on network errors). `[Needs Verification]` at authoring time — confirm against primary docs
-  before publishing: **ZooKeeper** ZAB + znode/watch semantics + Apache-2.0 (zookeeper.apache.org);
-  **etcd** Raft + MVCC + leases + CNCF-graduated + Apache-2.0 (etcd.io); **Consul** Raft + Serf gossip +
-  the **2023 license change to BUSL-1.1** (consul.io / hashicorp.com/license); **Chubby** (Burrows, OSDI 2006) as the coordination-service ancestor.
+  agent died on network errors). Licensing/status facts corroborated on 2026-07-22:
+  **etcd** is Apache-2.0 and a CNCF-graduated project (graduated Nov 2020)
+  `[Web-cited: etcd | CNCF — https://www.cncf.io/projects/etcd/ ; accessed 2026-07-22]`;
+  **Consul** relicensed to BUSL-1.1 in the HashiCorp-wide change announced **2023-08-10**
+  `[Web-cited: HashiCorp adopts the Business Source License — https://www.hashicorp.com/en/blog/hashicorp-adopts-business-source-license ; accessed 2026-07-22]`;
+  **ZooKeeper** is an Apache Software Foundation project under Apache-2.0 (zookeeper.apache.org). The
+  ZAB/znode/watch + etcd Raft/MVCC/lease + Consul Serf/SWIM **mechanism** prose remains
+  `[Needs Verification]` at authoring time — confirm against primary docs before publishing;
+  **Chubby** (Burrows, OSDI 2006) as the coordination-service ancestor.
 
 ## Concepts
 

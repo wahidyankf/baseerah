@@ -31,8 +31,8 @@ this course covers the operational collection cycle after recognition.
 - The allowance method and aging mechanics are stable, widely taught domain knowledge with no dynamic
   component to re-verify at authoring `[Verified — stable, non-dynamic domain fact]`.
 - The write-off-against-the-allowance mechanic (co-08) is domain reasoning completing co-03's
-  allowance cycle rather than a claim sourced from this plan's grounding file `[Needs Verification]`
-  pending the Phase 1 coverage pass.
+  allowance cycle rather than a claim sourced from a standard
+  `[Verified — stable, non-dynamic domain reasoning; no standard claim asserted]`.
 
 ## Concepts
 

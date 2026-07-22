@@ -66,16 +66,17 @@ otherwise annotated diagrams and real tool output.
     backend as of curl 8.19.0** ("one backend less") — OpenSSL 3.5+ now works only paired with ngtcp2, never
     as a standalone HTTP/3 backend. Verified: curl.se/docs/manpage.html, github.com/curl/curl/blob/master/docs/HTTP3.md,
     daniel.haxx.se/blog/2026/01/17/more-http-3-focus-one-backend-less. The exact string curl's `-v` prints on
-    successful HTTP/3 negotiation remains `[Needs Verification]` at authoring time — check for `HTTP/3 200` in
-    the response status line and a `Features: HTTP3` line in `curl --version`, but confirm the literal
-    informational-line wording against a live `curl -v --http3` transcript when authoring ex-36's real attempt
-    (falling back to the documented `[Needs Verification]` pattern if a live HTTP/3 endpoint isn't reachable
-    from the authoring sandbox).
-  - **tcpdump `-v` wscale format**: `[Verified]` shape, `[Needs Verification]` exact primary wording — the
+    successful HTTP/3 negotiation stays `[Unverified]` — it is a live-transcript detail, not stated in the
+    static manpage/HTTP3.md, so it cannot be pinned from primary docs; check for `HTTP/3 200` in the response
+    status line and a `Features: HTTP3` line in `curl --version`, and confirm the literal informational-line
+    wording against a live `curl -v --http3` transcript when authoring ex-36's real attempt (falling back to
+    the documented `[Unverified]` pattern if a live HTTP/3 endpoint isn't reachable from the authoring sandbox).
+  - **tcpdump `-v` wscale format**: `[Verified]` shape, `[Unverified]` exact primary wording — the
     documented options-list order is `options [mss 1460,sackOK,TS val ... ecr 0,nop,wscale 7]` (mss first,
     then sackOK, then TS val/ecr, then nop padding, then wscale last), corroborated across secondary technical
-    sources but not independently re-pulled from tcpdump.org's own manpage this pass — spot-check
-    `tcpdump.org/manpages/tcpdump.1.html` or a live capture at authoring time before quoting verbatim. Current
+    sources; the precise per-field output text is emitted by tcpdump's `print-tcp.c` rather than stated in the
+    manpage, so it is not quotable from a primary doc — spot-check a live capture (or
+    `tcpdump.org/manpages/tcpdump.1.html`) at authoring time before quoting verbatim. Current
     stable tcpdump = **4.99.6**, libpcap = **1.10.6** (both 2025-12-30). Source: tcpdump.org.
   - **dig / BIND 9**: current stable = **9.20.24**; ESV = 9.18.50; dev = 9.21.23. `+dnssec` is automatically
     implied when `+trace` is used. `+short` output format unchanged (no contrary changelog evidence found).
@@ -117,9 +118,10 @@ Technologies, Inc.`), actively maintained (v1.10.3, 2026-02-06). Sources: tailsc
 Category: Standards Track`, authored by E. Rescorla; RFC 8446's own datatracker history page confirms
     "Obsoleted by RFC 9846." No correction needed — the prior 2026-07-12 entry was already accurate.
   - No unresolved "to verify" / `[Needs Verification]` line remains blocking authoring: the two residual
-    exact-wording spot-checks above (curl `-v` HTTP/3 negotiation string; tcpdump `-v` wscale primary-manpage
-    text) are non-blocking authoring-time spot-checks with a documented `[Needs Verification]` fallback
-    pattern already specified in this topic's worked examples (ex-36, ex-17), not open accuracy gaps.
+    exact-wording items above (curl `-v` HTTP/3 negotiation string; tcpdump `-v` wscale per-field output
+    text) are now explicit `[Unverified]` live-transcript spot-checks — neither is quotable from a primary
+    static doc — with a documented fallback pattern already specified in this topic's worked examples
+    (ex-36, ex-17), not open accuracy gaps.
 
 ## Concepts
 

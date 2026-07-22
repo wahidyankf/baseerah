@@ -41,9 +41,12 @@ minimal app code (a small service from earlier courses) and focuses on ops/confi
 
 - 2026-07-18 — `ssh`, `systemd` unit files, reverse proxies, TLS via ACME/Let's Encrypt, and firewall
   basics are **stable, evergreen** operational concepts.
-- 2026-07-18 — `[Needs Verification]`: exact current CVE-clean versions and command surfaces of the
-  chosen reverse proxy (Caddy/Nginx) and PaaS (e.g. Dokku/Coolify or a managed buildpack platform) — pin
-  and re-verify at authoring; keep the module portable across a couple of proxy/PaaS choices.
+- 2026-07-18 — `[Needs Verification]` **version-volatile, pin at authoring**: exact current CVE-clean
+  versions and command surfaces of the chosen reverse proxy (Caddy/Nginx) and PaaS (e.g. Dokku/Coolify or a
+  managed buildpack platform) — pin and re-verify at authoring; keep the module portable across a couple of
+  proxy/PaaS choices. Current-as-of value for the hedge: Caddy latest stable **v2.11.4**
+  `[Web-cited: caddyserver/caddy releases — https://github.com/caddyserver/caddy/releases ; accessed
+2026-07-22]` (Nginx and the PaaS choice still to be pinned when a concrete version is drafted).
 - 2026-07-18 — `[Needs Verification]`: any provider-specific VM provisioning UI/CLI — keep the steps
   provider-agnostic where possible.
 

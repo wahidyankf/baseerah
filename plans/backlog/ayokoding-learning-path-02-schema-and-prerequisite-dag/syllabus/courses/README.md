@@ -1,7 +1,8 @@
 # Course Library Catalog — Fundamentally Strong Shared Course Library
 
-The **per-course-block detail layer**: the index of the **127-course catalog** and the folder that
-holds one **`<course-id>.md`** detail file per course. Start with the
+The **per-course-block detail layer**: the index of the catalog's **127 course ids** and the folder
+that holds one **`<course-id>.md`** detail file for each — **120 spec files** on disk, the remaining
+**7** ids being DD-20 capstones embedded in their host-topic files. Start with the
 **[syllabus root README](../README.md)** for the shared-library-plus-three-paths architecture, the
 legend, the authoring guarantees, the capstone policy, and the per-course file template. The
 [tech-docs §Course Library Catalog](../../tech-docs.md#course-library-catalog) is the single source of

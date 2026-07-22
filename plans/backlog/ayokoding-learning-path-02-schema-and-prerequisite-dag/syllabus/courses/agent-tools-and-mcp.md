@@ -38,20 +38,26 @@ exposed as an MCP tool — the `remotebrowser` pattern).
 > Pre-authoring `web-researcher` sweep pending (per this plan's Anti-Hallucination verification recipe).
 
 - 2026-07-18 — MCP is an **open protocol over JSON-RPC 2.0** with a Hosts / Clients / Servers
-  architecture exposing **Resources, Prompts, and Tools**; this architecture is stable. `[Needs
-Verification]`: the exact current spec revision (a dated schema is published) and any recent transport
-  changes — cite the exact revision read at authoring.
-- 2026-07-18 — `[Needs Verification]`: the tool/function-calling message schema differs by model
-  provider — build tools against an adapter and pin the SDK versions at authoring.
-- 2026-07-18 — `[Needs Verification]`: the chosen MCP library's API (`fastmcp` vs reference SDK) and its
-  version — pin and re-verify at authoring.
+  architecture exposing **Resources, Prompts, and Tools**; this architecture is stable. The spec uses
+  date-based revisions: `[Web-cited: current stable revision = **2025-11-25** (a 2026-07-28 revision was a
+release candidate, not yet final, as of this date) — https://modelcontextprotocol.io/specification/2025-11-25/changelog ;
+accessed 2026-07-22]` — cite the exact revision read at authoring, as revisions ship on a rolling cadence.
+- 2026-07-18 — `[Unverified]` by design (version-volatile): the tool/function-calling message schema differs
+  by model provider — build tools against an adapter and pin the SDK versions at authoring.
+- 2026-07-18 — `[Unverified]` by design (version-volatile): the chosen MCP library's API (`fastmcp` vs
+  reference SDK) and its version — pin and re-verify at authoring.
 - 2026-07-20 — **co-23 evidence, durability split**. The **effect** is durable spine: selection accuracy
   declines as tool count rises, so tool-surface size is a design constraint. The **measurements** are
   dated and belong here only. Reported evidence: the **Berkeley Function-Calling Leaderboard** shows a
-  universal decline across evaluated models as tool count increases; a **GeoEngine** benchmark reports a
-  model failing a task with **46 tools** available and succeeding with **19**. `[Needs Verification]`:
-  re-verify both sources, their exact figures, and the model set evaluated before authoring — leaderboard
-  contents and benchmark revisions change. Never place a specific tool-count threshold in the spine; the
+  decline in function-calling accuracy as tool complexity rises, and the **GeoEngine** benchmark (46
+  functions) is used to show that reducing the advertised tool set improves an LLM's function-calling
+  performance. `[Web-cited: directional effect confirmed — Berkeley Function Calling Leaderboard (Gorilla) —
+https://gorilla.cs.berkeley.edu/leaderboard.html ; and "Less is More: Optimizing Function Calling for LLM
+Execution on Edge Devices", arXiv:2411.15399 (selectively reducing tools significantly improves
+function-calling performance on the 46-function GeoEngine benchmark) — https://arxiv.org/abs/2411.15399 ;
+both accessed 2026-07-22]`. `[Unverified]`: the exact "46 available → succeeds with 19" figure is not in
+  the paper's abstract and was not confirmable this pass — re-verify the precise numbers and model set
+  against the full paper before authoring. Never place a specific tool-count threshold in the spine; the
   transferable claim is the direction of the effect, not a number.
 - 2026-07-20 — **co-24 durability**: that tool results consume recurring context budget is architectural
   and durable. Any per-provider cost, truncation default, or context-window figure used to quantify it is
@@ -148,8 +154,12 @@ Verification]`: the exact current spec revision (a dated schema is published) an
   OpenAI and Anthropic treat the harness as the umbrella containing context management, while HumanLayer
   treats it as a subset of context engineering — so this cluster **names the term and cites the
   disagreement without adopting a side, and renames nothing**. Full treatment in the
-  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Needs Verification]`: confirm
-  dates and attributions at authoring; treat the vocabulary as volatile.
+  [coding-agent capstone](./capstone-build-your-own-coding-agent.md). `[Web-cited: the term "harness
+engineering" and its attribution to Anthropic, OpenAI, and Birgitta Böckeler (Thoughtworks) are confirmed
+— Thoughtworks, "What is harness engineering?" — https://www.thoughtworks.com/insights/podcasts/technology-podcasts/what-harness-engineering ;
+Wikipedia, "Agent harness" — https://en.wikipedia.org/wiki/Agent_harness ; accessed 2026-07-22]`; the exact
+  publication dates (Anthropic 2025-11-26; Böckeler/Thoughtworks 2026-04-02) are corroborated but stay
+  `[Unverified]` to the day — spot-confirm at authoring. Treat the vocabulary as volatile.
 
 ## Worked examples
 

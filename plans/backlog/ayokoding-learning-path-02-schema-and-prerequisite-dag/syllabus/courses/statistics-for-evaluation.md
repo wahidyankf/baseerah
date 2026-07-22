@@ -58,11 +58,16 @@ mismatch for evals, not a substitute for this course.
   agreement coefficients, binomial confidence intervals, the bootstrap, and paired significance tests are
   settled classical statistics. Nothing here has a vendor, a version, or a deprecation risk — which is
   precisely why this course is safe to place in a spine while framework material is not.
-- 2026-07-20 — `[Needs Verification]` **at authoring**: the exact names, publication years, and canonical
-  formulations of the named agreement coefficients (Cohen's kappa, Krippendorff's alpha, Scott's pi,
-  Fleiss's kappa) and of the named significance tests (McNemar's test, the bootstrap percentile
-  interval, Wilson and Clopper-Pearson intervals) — verify each against a primary statistical reference
-  before authoring, and cite the reference read. This course must not ship a formula from memory.
+- 2026-07-20 — `[Needs Verification]` **at authoring** (existence + year coverage-corroborated 2026-07-22;
+  canonical formulations still to be verified against a primary before a formula ships): the named
+  agreement coefficients and significance tests are all real, distinct techniques with the following
+  publication years — **Scott's pi 1955, Cohen's kappa 1960, Fleiss's kappa 1971, Krippendorff's alpha
+  ~1970, McNemar's test 1947** `[Web-cited: Wikipedia "Fleiss' kappa" / "McNemar's test" / "Krippendorff's
+alpha" — https://en.wikipedia.org/wiki/Fleiss%27_kappa ; accessed 2026-07-22]`. The Wilson and
+  Clopper–Pearson binomial intervals and the bootstrap percentile interval likewise predate LLMs, but their
+  exact years were not re-verified this pass — treat those as `[Unverified]` until a primary is read. Still
+  verify each exact formula against a primary statistical reference before authoring, and cite the reference
+  read — this course must not ship a formula from memory.
 - 2026-07-20 — `[Needs Verification]` **volatile, accuracy-note only**: the statistical library's API
   surface and default parameterizations (in particular which interval method a library's default returns
   — several default to the normal approximation, which is the one this course teaches learners to avoid

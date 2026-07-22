@@ -69,7 +69,11 @@ security topics — [`59-offensive-security`](./offensive-security.md) and
   list verbatim-matches this file's note above. Injection def (A05) verbatim: "untrusted user input… sent to
   an interpreter… causes the interpreter to execute parts of that input as commands." Broken Access Control
   (A01) core sentence is word-for-word identical between the 2021 and 2025 editions (stable teaching quote).
-  Exact GA calendar date `[Needs Verification]` (RC 2025-11-06, GA early 2026 per secondary sources only).
+  A01–A10 order re-confirmed live against the official page [Web-cited: owasp.org/Top10/2025 —
+  https://owasp.org/Top10/2025/ ; accessed 2026-07-22] (matches this file's note verbatim). GA sequence:
+  RC announced 2025-11-06 at OWASP Global AppSec (Washington, D.C.); final released **January 2026**. The
+  official page states no calendar day, so the **exact GA date** stays `[Needs Verification]` (January-2026
+  final is secondary-source-corroborated only, not primary-dated).
 - **CWE weakness IDs** `[Verified]` — [CWE-89 SQLi](https://cwe.mitre.org/data/definitions/89.html),
   [CWE-78 OS Command Injection](https://cwe.mitre.org/data/definitions/78.html),
   [CWE-284 Improper Access Control](https://cwe.mitre.org/data/definitions/284.html),
@@ -104,8 +108,12 @@ security topics — [`59-offensive-security`](./offensive-security.md) and
   Spoofing/Tampering/Repudiation/Information Disclosure/Denial of Service/Elevation of Privilege, each with a
   verbatim definition; "a core element of the Microsoft Security Development Lifecycle (SDL)."
 - **Secure SDLC** `[Verified]` — [NIST SP 800-218 (SSDF v1.1)](https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-218.pdf):
-  practice groups "Prepare the Organization (PO)" and "Protect Software (PS)" confirmed verbatim from Table 1
-  (note "Protect Software", not "Protect **the** Software"); PW/RV group wording `[Needs Verification]`.
+  the four practice groups are **Prepare the Organization (PO)**, **Protect the Software (PS)**, **Produce
+  Well-Secured Software (PW)**, and **Respond to Vulnerabilities (RV)**. CORRECTION (2026-07-22): PS is
+  "Protect **the** Software" — an earlier note here dropped the "the"; the official group names are
+  [Web-cited: NIST CSRC SSDF project page — https://csrc.nist.gov/Projects/ssdf ; accessed 2026-07-22]
+  ("Protect the Software (PS): Protect all components of the software from tampering and unauthorized
+  access"). The verbatim per-task wording within each group still traces to Table 1 at authoring.
 - **CVE/CVSS/NVD** `[Verified]` — [NVD CVE process](https://nvd.nist.gov/general/cve-process): CVE = "a
   dictionary or glossary of vulnerabilities that have been identified for specific code bases";
   [FIRST CVSS](https://www.first.org/cvss/) current version = **v4.0**. Direct cve.org verbatim quote

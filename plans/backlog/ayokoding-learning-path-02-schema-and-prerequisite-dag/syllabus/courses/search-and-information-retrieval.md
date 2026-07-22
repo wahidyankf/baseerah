@@ -85,9 +85,12 @@ does, and the build-your-own tier makes the machinery concrete. `†`: Python, f
 - **Analyzer pipeline** — char filters → **one** tokenizer → token filters, in order (Elastic docs,
   [Anatomy of an analyzer](https://www.elastic.co/docs/manage-data/data-store/text-analysis/anatomy-of-an-analyzer)).
 - **BM25 as Lucene default since Lucene 6** — LUCENE-6789 changed `IndexSearcher`'s default
-  similarity to `BM25Similarity` in **Lucene 6.0.0**; the "April 2016" calendar date is
-  `[Needs Verification]` (Maven timestamp, not an Apache-authored dated changelog) — cite the
-  version, not the day.
+  similarity to `BM25Similarity` in **Lucene 6.0.0**
+  ([LUCENE-6789](https://issues.apache.org/jira/browse/LUCENE-6789)); the month **April 2016** is
+  corroborated `[Web-cited: Maven Central lucene-core 6.0.0 timestamp ~2016-04-07 —
+https://mvnrepository.com/artifact/org.apache.lucene/lucene-core/6.0.0 ; accessed 2026-07-22]`, but the
+  exact day rests on a Maven timestamp, not an Apache-authored dated changelog — cite the version, not the
+  day.
 - **Segments + near-real-time** — Lucene writes immutable segments merged over time; a "refresh"
   opens a new segment (~1 s default), hence _near_-real-time (Elastic
   [Near real-time search](https://www.elastic.co/docs/manage-data/data-store/near-real-time-search)).
@@ -108,20 +111,26 @@ does, and the build-your-own tier makes the machinery concrete. `†`: Python, f
   [1603.09320](https://arxiv.org/abs/1603.09320), 2016/2018); Lucene added HNSW-backed vector fields
   in **Lucene 9.0** (Dec 2021); Elasticsearch uses HNSW for kNN (Elastic
   [`dense_vector`](https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/dense-vector)).
-  The specific ES `dense_vector`-in-7.3 / native-kNN-in-8.0 versions are `[Needs Verification]`.
+  The ES `dense_vector`-in-7.3 / native-approximate-kNN-in-8.0 versions are
+  `[Web-cited: Elastic kNN search docs — https://www.elastic.co/docs/solutions/search/vector/knn ; accessed
+2026-07-22]` (dense-vector fields since 7.3; native HNSW-backed approximate kNN added in 8.0).
 - **PageRank** — Brin & Page, "The Anatomy of a Large-Scale Hypertextual Web Search Engine,"
   _Computer Networks_ 30(1–7):107–117, **1998** (7th WWW Conf.); link graph as a content-independent
   ranking signal complementary to term stats. Source:
   [Google Research](https://research.google/pubs/the-anatomy-of-a-large-scale-hypertextual-web-search-engine/).
-  The exact recursive PageRank formula was not re-verified from the fetched excerpt — teach the toy
-  power-iteration form as illustrative and flag the constant/damping specifics `[Needs Verification]`.
+  The damping constant is `[Web-cited: Brin & Page (1998), "The Anatomy of a Large-Scale Hypertextual Web
+Search Engine" — http://infolab.stanford.edu/pub/papers/google.pdf ; accessed 2026-07-22]`: the paper
+  gives `PR(A) = (1 − d) + d·(PR(T1)/C(T1) + … + PR(Tn)/C(Tn))` with the damping factor `d` normally set to
+  **0.85**. Teach the toy power-iteration form as illustrative.
 - **Elastic / OpenSearch licensing (month-level only)** — Apache 2.0 → dual SSPL + Elastic License v2
   from Elasticsearch **7.11 (January 2021)** → AWS forks **OpenSearch** from ES 7.10.2 under Apache
   2.0 (**April 2021**) → Elastic adds **AGPLv3** as a third option (**September 2024**). Sources:
   [Elastic license update](https://www.elastic.co/blog/elastic-license-update),
   [AWS Introducing OpenSearch](https://aws.amazon.com/blogs/opensource/introducing-opensearch/). The
-  exact January-2021 **day** is `[Needs Verification]` (sources disagree, Jan 14 vs 21) — cite the
-  month only.
+  announcement day is `[Web-cited: Elastic, "Doubling down on open, Part II" (published 2021-01-14) —
+https://www.elastic.co/blog/licensing-change ; accessed 2026-07-22]`: Elastic's own post is dated
+  **January 14, 2021** and states the change lands "before our upcoming 7.11 release" (7.11 itself shipped
+  February 2021). Prefer citing the announcement date (Jan 14) or the month.
 
 ## Concepts
 

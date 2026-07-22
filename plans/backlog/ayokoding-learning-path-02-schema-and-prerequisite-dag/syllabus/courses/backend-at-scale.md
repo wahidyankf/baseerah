@@ -84,9 +84,11 @@ system-level scaling is [`44-system-design`](./system-design.md).
   [AWS throttling docs](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html)),
   leaky bucket, fixed window (boundary-burst flaw), sliding window (Cloudflare production). Token-bucket
   and sliding-window are `[Verified]` against vendor sources; **leaky-bucket & fixed-window exact
-  attribution `[Needs Verification]`** (standard textbook material, aggregator-only sources found).
+  attribution `[Unverified]`** — re-searched 2026-07-22 for a primary/vendor source that nominatively
+  attributes these two algorithms; only aggregator/textbook material was found, so kept unverified
+  rather than cited to a secondary aggregator.
 - **Caching** — cache-aside (lazy load: miss → DB → populate) and write-through (update cache on write)
-  from [AWS Redis caching strategies](https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/caching-patterns.html); write-behind wording `[Needs Verification]`. HTTP caching:
+  from [AWS Redis caching strategies](https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/caching-patterns.html); write-behind wording `[Unverified]` — the fetched AWS whitepaper (accessed 2026-07-22) documents only cache-aside and write-through, not write-behind, so no primary source supports the write-behind wording this pass. HTTP caching:
   `Cache-Control`, `ETag` + `If-None-Match` → 304, cache invalidation on unsafe methods
   ([RFC 9111](https://www.rfc-editor.org/rfc/rfc9111.html), 2022).
 - **Observability** — OpenTelemetry = vendor-neutral traces/metrics/logs ([opentelemetry.io](https://opentelemetry.io/docs/what-is-opentelemetry/)); cross-service correlation via W3C
@@ -103,18 +105,22 @@ system-level scaling is [`44-system-design`](./system-design.md).
 - **WebSocket vs SSE** — WebSocket = full-duplex bidirectional over one TCP connection
   ([RFC 6455](https://www.rfc-editor.org/rfc/rfc6455.html), 2011); SSE = one-way server→client push,
   `text/event-stream`, `EventSource`, part of the WHATWG [HTML Living Standard](https://html.spec.whatwg.org/multipage/server-sent-events.html). Broker-backplane scale-out claim (sticky connections need
-  pub/sub to broadcast across nodes) is sound distributed-systems reasoning but has no single primary
-  citation — flag `[Needs Verification]`, cite a vendor scaling guide when drafted.
+  pub/sub to broadcast across nodes) is corroborated by the Socket.IO Redis adapter [Web-cited: Socket.IO
+  — Redis adapter, "relies on the Redis Pub/Sub mechanism … published in a Redis channel, and received by
+  the other Socket.IO servers of the cluster" — https://socket.io/docs/v4/redis-adapter/ ; accessed
+  2026-07-22].
 - **Contract testing / Testcontainers** — Pact = "code-first consumer-driven contract testing tool"; the
   contract "is generated during the execution of the automated consumer tests" ([pact.io](https://docs.pact.io/)). Testcontainers = "ephemeral, lightweight Docker container instances … for automated testing"
   ([testcontainers.com](https://testcontainers.com/)).
 - **Resilience** — circuit breaker: "wrap a protected call … once failures reach a threshold, the breaker
   trips" (closed/open/half-open), popularized by Nygard's _Release It!_ ([Fowler CircuitBreaker](https://martinfowler.com/bliki/CircuitBreaker.html)). Retries: plain exponential backoff clusters retries; use
   **Full Jitter** `sleep = random(0, min(cap, base·2^attempt))` ([AWS "Exponential Backoff and Jitter"](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/), Marc Brooker, 2015). Bulkhead
-  attribution to _Release It!_ is `[Needs Verification]` (not directly fetched).
+  attribution to _Release It!_ is [Web-cited: the Bulkhead pattern was introduced by Michael Nygard in
+  _Release It!_ (2007) — https://en.wikipedia.org/wiki/Bulkhead_pattern ; accessed 2026-07-22].
 - **N+1 query** — accessing related objects in a loop issues one query per row; fixed with a JOIN /
   batched prefetch (`select_related`/`prefetch_related`). Source: [Django QuerySet docs](https://docs.djangoproject.com/en/stable/ref/models/querysets/#select-related). Connection-pooling concept is standard
-  but lacked a strong primary source this pass — `[Needs Verification]` for a citation-grade reference.
+  but lacked a strong primary source this pass — `[Unverified]`; re-searched 2026-07-22, no single
+  citation-grade primary reference identified, kept unverified rather than cited to an aggregator.
 
 ## Concepts
 

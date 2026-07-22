@@ -34,9 +34,11 @@ consolidation depends on. See
 
 - Functional-currency determination and the current-rate/temporal translation mechanics are stable,
   widely documented domain knowledge `[Judgment call — the mechanics are cited generically under both
-ASC 830 and IAS 21; no clause or paragraph is reproduced from either standard per A8]`. This course's
-  placement is an A9 addition — concepts not directly sourced from the seeding research are flagged
-  `[Needs Verification]` pending the Phase 1 `web-researcher` coverage pass.
+ASC 830 and IAS 21; no clause or paragraph is reproduced from either standard per A8]`. IAS 21 is
+  confirmed as the IFRS standard covering functional-currency determination and translation of foreign
+  currency transactions and operations
+  `[Web-cited: IFRS Foundation — IAS 21 The Effects of Changes in Foreign Exchange Rates — https://www.ifrs.org/issued-standards/list-of-standards/ias-21-the-effects-of-changes-in-foreign-exchange-rates/ ; accessed 2026-07-22]`.
+  This course's placement is an A9 addition.
 
 ## Concepts
 

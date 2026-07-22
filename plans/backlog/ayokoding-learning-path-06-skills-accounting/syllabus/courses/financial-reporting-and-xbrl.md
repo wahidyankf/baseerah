@@ -35,8 +35,11 @@ standard's taxonomy applies.
 - XBRL's tagging model (elements, contexts, instance documents) and the existence of jurisdiction-
   specific mandates (e.g. SEC filing requirements in the US, ESMA's ESEF mandate in the EU) are
   documented `[Judgment call — cited generically, structure only, no taxonomy text reproduced per A8]`.
-  Flagged `[Needs Verification]` pending the Phase 1 coverage pass, since filing-mandate details
-  change over time and must be re-verified at authoring.
+  The ESMA ESEF mandate (XHTML annual financial reports with inline-XBRL tagging for issuers on EU
+  regulated markets) is confirmed current-as-of 2026-07-22
+  `[Web-cited: ESMA — Electronic Reporting (ESEF) — https://www.esma.europa.eu/issuer-disclosure/electronic-reporting ; accessed 2026-07-22]`;
+  the SEC's US inline-XBRL requirement and other filing-mandate details remain version-volatile and
+  must be re-verified at authoring.
 
 ## Concepts
 

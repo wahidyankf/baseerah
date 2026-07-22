@@ -74,9 +74,9 @@ error)`. `[Verified]`
 - **Errors** — pkg.go.dev/errors: `errors.New`, `errors.Is`, `errors.As`, `errors.Unwrap`, `errors.Join`;
   wrapping idiom `fmt.Errorf("... %w ...", err)`. `[Verified]`
 - **Generics** — go.dev/doc/tutorial/generics: type params in `[...]` before the arg list, union constraints
-  with `|`, `comparable` predeclared constraint for `==`/`!=`/map keys. (Introduced Go 1.18 — the "1.18"
-  attribution is well-established but was not re-confirmed against a primary changelog this pass:
-  `[Needs Verification]` on the version number only.) `[Verified]` on syntax.
+  with `|`, `comparable` predeclared constraint for `==`/`!=`/map keys. Introduced Go 1.18 `[Web-cited:
+Go 1.18 Release Notes — "Go 1.18 includes an implementation of generic features as described by the
+Type Parameters Proposal" — https://go.dev/doc/go1.18 ; accessed 2026-07-22]`. `[Verified]` on syntax.
 - **`encoding/json`** — pkg.go.dev/encoding/json: `Marshal`/`Unmarshal`; struct-tag `json:"name,omitempty"`
   and `json:"-"` semantics. `[Verified]`
 - **`go` tool** — pkg.go.dev/cmd/go: exact usage of `go run`, `go build`, `go test`, `go mod init/tidy`.
@@ -91,9 +91,10 @@ error)`. `[Verified]`
   pkg.go.dev. **Version-drift note**: `sync.WaitGroup.Go(f func())` was added in **Go 1.25** and pkg.go.dev
   now says "Callers should prefer WaitGroup.Go"; this primer teaches the classic, more explicit
   `wg.Add(1); go func(){ defer wg.Done(); ... }()` pattern (still fully valid) and mentions `wg.Go` as the
-  newer idiom. `[Verified]` (the "Go 1.25" attribution rests on the method existing in current pkg.go.dev
-  plus corroborating posts; `[Needs Verification]` on the exact introducing version against a primary
-  changelog). Concurrency DEPTH (select fairness, the memory model, pipelines, worker pools, the race
+  newer idiom. `[Verified]` — Go 1.25 attribution confirmed `[Web-cited: Go 1.25 Release Notes, sync
+section — "The new WaitGroup.Go method makes the common pattern of creating and counting goroutines
+more convenient" — https://go.dev/doc/go1.25 ; accessed 2026-07-22]`. Concurrency DEPTH (select
+  fairness, the memory model, pipelines, worker pools, the race
   detector) is deferred to [`65-csp-style-concurrency`](./csp-style-concurrency.md).
 
 ## Concepts

@@ -46,21 +46,35 @@ consequence of the riba prohibition without claiming the doctrinal debate is set
   restates OI-2 as resolved.
 - `[Verified]` AAOIFI Financial Accounting Standards numbers this corpus cites: FAS 3 (Mudaraba), FAS 4
   (Musharaka), FAS 7 (Salam), FAS 9 (Zakah — taught at #22), FAS 10 (Istisnaa), FAS 28 (Murabaha and
-  deferred payment sales), FAS 32–34 (Ijarah through sukuk-holder reporting — taught at #23).
+  deferred payment sales), FAS 32–34 (Ijarah through sukuk-holder reporting — taught at #23). This FAS
+  whitelist was externally matched against AAOIFI's published Financial Accounting Standards list
+  `[Web-cited: AAOIFI — Financial Accounting Standards — https://aaoifi.com/accounting-standards-2/?lang=en ; accessed 2026-07-22]`;
+  **FAS numbers outside this list are `[Unverified]`** and must be re-verified before being written.
+- The standards landscape a practitioner expects has **two** global standard-setters named alongside
+  each other, not one: **AAOIFI** (Accounting and Auditing Organization for Islamic Financial
+  Institutions, Bahrain) sets the accounting (FAS) and Shari'ah standards this course anchors on, while
+  the **IFSB** (Islamic Financial Services Board, Kuala Lumpur) is the global **prudential**
+  standard-setter — capital-adequacy, risk management, and Shariah-governance supervision — a distinct
+  remit from AAOIFI's accounting/Shari'ah standards, and **not** a contract-mechanics authority
+  `[Web-cited: IFSB — https://www.ifsb.org/ ; accessed 2026-07-22]`.
 - `[Verified, PSAK numbering — OI-1 resolved]` Indonesia's PSAK Syariah series (PSAK 101–110) is the
   currently operative numbering; the prior PSAK 59 generation is superseded. Residual: exact PPSAK
   ratification date not confirmed — cite the series only, not a specific date, until re-verified at
-  authoring.
+  authoring `[Web-cited: IAI — PSAK Syariah — https://web.iaiglobal.or.id/SAK-IAI/PSAK%20Syariah ; accessed 2026-07-22]`.
 - `[Verified, OI-3 resolved for the adoption-relationship claim]` Indonesia uses AAOIFI as a basis
-  (alongside its own PSAK Syariah series); Malaysia is **not** on AAOIFI's mandatory-adoption list.
-  Residual: governance mechanics beyond this specific relationship (e.g. Bank Negara Malaysia's
-  internal Shariah governance provisions) were not directly fetched and remain subject to the standing
-  re-verify-at-authoring rule.
+  (alongside its own PSAK Syariah series); Malaysia is **not** on AAOIFI's mandatory-adoption list —
+  MASB/MFRS standards are IFRS-converged with Sharia treatment layered via Bank Negara policy
+  documents. Residual: governance mechanics beyond this specific relationship (e.g. Bank Negara
+  Malaysia's internal Shariah governance provisions) were not directly fetched and remain subject to
+  the standing re-verify-at-authoring rule
+  `[Web-cited: AAOIFI — https://aaoifi.com/?lang=en ; accessed 2026-07-22]`
+  `[Web-cited: Bank Negara Malaysia — Policy Document on Shariah Governance — https://www.bnm.gov.my/-/policy-document-on-shariah-governance ; accessed 2026-07-22]`.
 - The contrast ex-06 draws — a deferred-payment sale's agreed markup presented as trade profit rather
   than as a return accrued on an outstanding balance — is domain reasoning restated in original words
   from co-01's substance test, with `[Verified]` FAS 28 named only as the standard governing the area.
   No recognition pattern, clause, or threshold from that standard is reproduced or asserted here
-  `[Needs Verification]` pending the Phase 1 coverage pass. The example is about presentation and
+  `[Verified — domain reasoning restated from co-01's substance test; FAS 28 already whitelisted above, no clause reproduced]`.
+  The example is about presentation and
   classification and leaves **OI-2 `OPEN`**, exactly as the first note above requires.
 
 ## Concepts
@@ -87,6 +101,11 @@ consequence of the riba prohibition without claiming the doctrinal debate is set
 - **co-09 · sharia-supervisory-board** — a Sharia-compliant institution's governance layer that
   reviews and approves products and transactions for compliance, distinct from a conventional audit
   committee.
+- **co-10 · aaoifi-vs-ifsb-remit** — the global standards landscape names **two** bodies with
+  different remits: AAOIFI sets **accounting and Shari'ah** standards ("what to book" / "what makes the
+  contract compliant"), while the IFSB (Islamic Financial Services Board) sets **prudential** standards
+  (capital adequacy, risk management, Shariah-governance supervision). A systems builder names both and
+  never treats the IFSB as a contract-mechanics authority.
 
 ## Tensions & trade-offs — what this course does and does not settle
 
@@ -161,6 +180,9 @@ question. No system is built — the synthesis is the hand-worked classification
 - **Indonesian Institute of Accountants (IAI) — PSAK Syariah** (iaiglobal.or.id). Named nominatively for
   the PSAK 101–110 series; IAI is the strictest of the four bodies this corpus touches, with no
   educational exception — named only, never reproduced or translated.
+- **Islamic Financial Services Board (IFSB)** (ifsb.org). Named nominatively as the global prudential
+  standard-setter (capital-adequacy, risk, Shariah-governance supervision), distinct from AAOIFI's
+  accounting/Shari'ah remit; no standard text reproduced.
 
 ## In which paths
 

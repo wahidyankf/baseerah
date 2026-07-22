@@ -41,11 +41,14 @@ ask the reader to build, scaffold, or extend one (A6). No separate linked SWE ed
   `[Judgment call — no single canonical textbook source for the architecture patterns themselves]`.
 - The profit-sharing-account-holder subledger (co-08) is architectural reasoning extending #21's
   `[Verified]` Mudaraba contract type; the balance-sheet presentation such balances receive under any
-  particular standards ecosystem is **not** asserted here `[Needs Verification]` pending the Phase 1
-  coverage pass.
+  particular standards ecosystem is **deliberately not** asserted here
+  `[Unverified — the specific balance-sheet presentation of profit-sharing investment-account balances is deliberately not asserted; it falls under AAOIFI investment-account standards, referenced only by remit, not restated as fact]`.
 - **Relationship to `DD-15`**: where this course names real software, the same precedent from #19
-  applies — permissively licensed examples (e.g. Apache Fineract, whose configurable product
-  framework is flexible enough to model Islamic-finance products `[Needs Verification]`) are named
+  applies — permissively licensed examples (e.g. Apache Fineract, an Apache-2.0 core-banking engine
+  whose configurable loan/product framework is confirmed
+  `[Web-cited: Apache Fineract — https://fineract.apache.org/ ; accessed 2026-07-22]`; whether that
+  framework extends to Islamic-finance products is **not** asserted here as a documented Fineract
+  feature) are named
   directly; copyleft projects are described behaviourally only, per
   [tech-docs §Licensing](../../tech-docs.md#licensing-and-ip-compliance-a8).
 
@@ -130,10 +133,11 @@ document itself.
 
 ## Read more
 
-- **Apache Fineract** (Apache-2.0) — a real, permissively licensed reference implementation whose
-  configurable product framework is flexible enough to model Islamic-finance products
-  `[Needs Verification]` — Islamic-banking support is **not** asserted here as a documented Fineract
-  feature; named nominatively per `DD-15`, never quoted from.
+- **Apache Fineract** (Apache-2.0) — a real, permissively licensed core-banking reference
+  implementation with a configurable loan/product framework
+  `[Web-cited: Apache Fineract — https://fineract.apache.org/ ; accessed 2026-07-22]`. Islamic-banking
+  support is **not** asserted here as a documented Fineract feature; named nominatively per `DD-15`,
+  never quoted from.
 - **Designing Data-Intensive Applications** — Martin Kleppmann (O'Reilly). Cited nominatively, as in
   #19, for the reconciliation and architectural-invariant reasoning applied here to Sharia-specific
   subledgers.

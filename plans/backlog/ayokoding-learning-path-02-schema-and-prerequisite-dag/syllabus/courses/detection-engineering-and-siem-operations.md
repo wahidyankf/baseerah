@@ -44,7 +44,10 @@ transferable skill is detection engineering, applicable to any SIEM.
   correlation, FP tuning, the detection-as-code lifecycle, MITRE ATT&CK mapping) are **stable, vendor-
   independent**; frameworks like Sigma (portable rule format) and MITRE ATT&CK are established.
 - 2026-07-19 — `[Needs Verification]`: exact Wazuh version + its decoder/rule XML schema + ruleset paths
-  — pin at authoring; the XML surface evolves across Wazuh versions.
+  — pin at authoring; the XML surface evolves across Wazuh versions. Current stable as of grounding is
+  **Wazuh 4.14.6** (2026-07-01; 5.0 in beta)
+  `[Web-cited: Wazuh 4.14.6 release notes — https://documentation.wazuh.com/current/release-notes/release-4-14-6.html ; accessed 2026-07-22]`
+  — re-pin the version and re-check the XML schema at authoring, since the 4.x→5.0 jump reworks the surface.
 - 2026-07-19 — `[Needs Verification]`: any sample dataset's license (must be free-to-use-and-teachable) —
   verify before use; do not reproduce proprietary rule content.
 

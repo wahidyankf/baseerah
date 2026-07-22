@@ -57,7 +57,7 @@ contrast with CSP ([`65-csp-style-concurrency`](./csp-style-concurrency.md)). Li
 - **Links vs monitors** — hexdocs `Process.html`: `spawn_link` establishes a bidirectional link (a crash
   propagates an exit signal); `Process.monitor/1` delivers a one-way `{:DOWN, ref, :process, object,
 reason}` message. "Links are bidirectional" is verbatim; the "monitors are unidirectional" wording is
-  inferred from the one-way `:DOWN` semantics: `[Needs Verification]` on wording, `[Verified]` on behaviour.
+  inferred from the one-way `:DOWN` semantics: `[Web-cited: hexdocs Process.html — https://elixir.hexdocs.pm/Process.html ; accessed 2026-07-22]` — `link/1` states "Links are bidirectional" verbatim, while `monitor/1` delivers `{:DOWN, ref, :process, object, reason}` only to the monitoring process (asymmetric, one-way); `[Verified]` on behaviour.
 - **GenServer** — hexdocs `GenServer.html` (verbatim callback return shapes): `init/1` →
   `{:ok, state} | {:ok, state, timeout | :hibernate | {:continue, arg}} | :ignore | {:stop, reason}`;
   `handle_call/3` → `{:reply, reply, new_state} | {:noreply, new_state} | {:stop, reason, reply,
@@ -79,13 +79,12 @@ new_state} | ...`. `GenServer.call/3` default timeout **5000 ms**; `cast/2` retu
   happens, it is best to let the exception happen, without rescuing it ... an unhandled exception in a
   process will never crash or corrupt the state of another process." `supervisor-and-application.html`:
   "Supervisors are processes that monitor workers. A supervisor can restart a worker if something goes
-  wrong." (Joe Armstrong's 2003 thesis is the origin but its PDF was not fetched: `[Needs Verification]`
-  for any verbatim thesis quote.) `[Verified]`
+  wrong." (Joe Armstrong's 2003 thesis is the origin but its PDF was not fetched this pass: `[Unverified]`
+  — no verbatim thesis quote is made; the thesis is cited nominatively only, erlang.org-hosted, in Read more.) `[Verified]`
 - **Agent & Task** — hexdocs `Agent.html`: "Agents are a simple abstraction around state"; `get/3`,
   `update/3`, `get_and_update/3` (third arg is `timeout()`). `Task.html`: "Tasks are processes meant to
   execute one particular action"; `Task.async/1` + `Task.await/2` (default timeout **5000 ms**);
-  `Task.Supervisor` for dynamically supervised tasks (`[Needs Verification]` on its exact description
-  wording). `[Verified]`
+  `Task.Supervisor` for dynamically supervised tasks (`[Web-cited: hexdocs Task.html — https://elixir.hexdocs.pm/Task.html ; accessed 2026-07-22]` — "The `Task.Supervisor` module allows developers to dynamically create multiple supervised tasks", verbatim). `[Verified]`
 - **Registry** — hexdocs `Registry.html`: "A local, decentralized and scalable key-value process storage";
   `:via` tuple `{:via, Registry, {MyApp.Registry, "name"}}`; `:unique` keys → "a key points to 0 or 1
   process" (duplicate register → `{:error, {:already_registered, pid}}`), `:duplicate` keys → any number.
@@ -97,11 +96,14 @@ new_state} | ...`. `GenServer.call/3` default timeout **5000 ms**; `cast/2` retu
   using a process for organisation (not runtime concurrency/isolation) "creates bottlenecks when call
   volume increases" (the GenServer-bottleneck pitfall). Blocking `handle_call` (from `genservers.html`:
   "the client is waiting" → don't block too long) and unbounded-mailbox growth are logically implied and
-  community-standard but not fetched as named-anti-pattern doc text: `[Needs Verification]`.
+  community-standard but are NOT named as distinct entries in hexdocs `process-anti-patterns.html` (only
+  "Code organization by process" is): `[Unverified]` — searched the anti-patterns page 2026-07-22; these
+  two pitfalls are implied, not named doc entries, so they are taught as community-standard, not quoted.
 - **Actor vs CSP** — grounded on two verified primaries: Go (go.dev/tour/concurrency/2) "sends and
   receives block until the other side is ready" (CSP synchronous rendezvous) vs Elixir `processes.html`
   "the sender does not block on `send/2`" (actor async mailbox). Sharper academic framing (Hewitt actor
-  formalism, Hoare CSP) is cited for provenance only: `[Needs Verification]` on any verbatim paraphrase.
+  formalism, Hoare CSP) is cited for provenance only: `[Unverified]` — no verbatim academic paraphrase is
+  made; Hewitt et al. (1973) and the Hoare CSP lineage appear nominatively in Read more only.
 
 ## Concepts
 

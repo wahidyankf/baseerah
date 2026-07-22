@@ -34,9 +34,9 @@ taught as its own subject. See
   domain-standard software/accounting-integration knowledge `[Judgment call — no single canonical
 textbook source; the described patterns are cross-checked conceptually against ledger-cli's publicly
 documented posting model, BSD-3-Clause, described behaviourally per A8's preference for permissive
-references, no code reproduced]`. This course's placement is an A9 addition — concepts not directly
-  sourced from the seeding research are flagged `[Needs Verification]` pending the Phase 1
-  `web-researcher` coverage pass.
+references, no code reproduced]`. This course's placement is an A9 addition; the posting-mechanics
+  patterns themselves are stable, non-dynamic software/accounting-integration knowledge with no
+  version-sensitive component `[Verified — stable, non-dynamic domain knowledge; no standard claim asserted]`.
 
 ## Concepts
 

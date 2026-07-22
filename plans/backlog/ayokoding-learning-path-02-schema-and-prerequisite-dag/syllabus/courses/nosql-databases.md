@@ -93,8 +93,8 @@ WITH (timescaledb.continuous)`; retention uses `add_retention_policy(rel, drop_a
     `MergeTree` engine, **Apache-2.0** (license confirmed via the GitHub repo, not the docs intro page).
     **DuckDB** = in-process columnar-vectorized OLAP DB, **MIT** (duckdb.org/why_duckdb). **Parquet**
     (columnar on-disk, Apache-2.0, parquet.apache.org) + **Arrow** (columnar in-memory, zero-copy;
-    Apache-2.0 per the ASF project — `[Needs Verification]`: `arrow.apache.org/overview` did not print the
-    literal license string, confirm against `github.com/apache/arrow/LICENSE.txt` at authoring time).
+    Apache-2.0 — license confirmed `[Web-cited: apache/arrow LICENSE.txt, "Apache License Version 2.0,
+January 2004" — https://github.com/apache/arrow/blob/main/LICENSE.txt ; accessed 2026-07-22]`).
     **co-36 distinction** (wide-column Cassandra = row/partition-oriented SSTables vs columnar OLAP =
     column-on-disk) verified against cassandra.apache.org storage-engine docs — keep the two as separate
     concepts, do not conflate.

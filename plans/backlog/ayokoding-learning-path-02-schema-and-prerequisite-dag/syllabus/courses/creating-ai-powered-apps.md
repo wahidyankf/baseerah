@@ -64,8 +64,8 @@ a local or mockable model so no paid key is required to learn the shapes (DD-20)
   difference, not a contradiction. Sources: [Anthropic prompting](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices), [OpenAI prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering) (fetched, verbatim).
 - **Tokens** — dedicated counting endpoint `POST /v1/messages/count_tokens` (free, separate pool); "The same
   input text produces approximately 30% more tokens" on newer-tokenizer models — teach that tokenizers are
-  **model-specific and not portable**, treat the 30% as version-bound. OpenAI's tokenizer page 403'd → the
-  "≈4 chars/token" rule is `[Needs Verification]`. Source: [Anthropic token counting](https://platform.claude.com/docs/en/build-with-claude/token-counting) (fetched, verbatim).
+  **model-specific and not portable**, treat the 30% as version-bound. OpenAI's own "≈4 chars/token" (≈¾ word)
+  English rule of thumb is confirmed [Web-cited: OpenAI Help Center "What are tokens and how to count them?" — https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them ; accessed 2026-07-22]. Source: [Anthropic token counting](https://platform.claude.com/docs/en/build-with-claude/token-counting) (fetched, verbatim).
 - **Sampling** — Anthropic `temperature` "Defaults to `1.0` … Ranges from `0.0` to `1.0` … even with
   `temperature` of `0.0`, the results will not be fully deterministic"; `top_p` nucleus sampling "cut it off
   once it reaches a particular probability"; `top_k` samples "from the top K options." OpenAI's range is
@@ -74,7 +74,7 @@ a local or mockable model so no paid key is required to learn the shapes (DD-20)
 - **Streaming** — Anthropic SSE order: `message_start` → (`content_block_start`, multiple
   `content_block_delta`, `content_block_stop`) → `message_delta` → `message_stop`; delta sub-types
   `text_delta`/`input_json_delta`/`thinking_delta`. OpenAI Chat Completions streams `chat.completion.chunk`
-  objects; the classic `data: [DONE]` terminator is `[Needs Verification]` (conflicting signal). The Responses
+  objects; the classic Chat Completions `data: [DONE]` stream terminator is confirmed [Web-cited: OpenAI API Reference — create chat completion — https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create ; accessed 2026-07-22]. The Responses
   API uses named semantic events (`response.output_text.delta`, `response.completed`) — a three-way teachable
   difference. Sources: [Anthropic streaming](https://platform.claude.com/docs/en/build-with-claude/streaming), [OpenAI streaming](https://developers.openai.com/api/docs/guides/streaming-responses) (fetched, verbatim).
 - **Structured output** — OpenAI Structured Outputs: `response_format: {type: "json_schema", json_schema:
@@ -118,11 +118,11 @@ a local or mockable model so no paid key is required to learn the shapes (DD-20)
 - **Cost / caching / batching** — Anthropic prompt caching `cache_control: {type: "ephemeral", ttl:
 "5m"|"1h"}`; 5-min write = 1.25× input, 1-hr = 2×, read = 0.1× (90% off); `total_input_tokens =
 cache_read + cache_creation + input`. Batch APIs give a **50% discount** (both providers). Sources:
-  [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching), [Anthropic batch](https://platform.claude.com/docs/en/build-with-claude/batch-processing) (fetched, verbatim; OpenAI caching numbers `[Needs Verification]`).
+  [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching), [Anthropic batch](https://platform.claude.com/docs/en/build-with-claude/batch-processing) (fetched, verbatim). OpenAI prompt caching is automatic (no code change), applies to prompts over **1,024 tokens** (growing in 128-token increments), and gives a **50% discount** on cached input — confirmed [Web-cited: OpenAI "Prompt Caching in the API" — https://openai.com/index/api-prompt-caching/ ; OpenAI prompt-caching guide — https://developers.openai.com/api/docs/guides/prompt-caching ; accessed 2026-07-22].
 - **Rate limits / moderation** — Anthropic uses a **token bucket** ("capacity is continuously replenished …
   rather than being reset at fixed intervals"); headers `retry-after`, `anthropic-ratelimit-*`. OpenAI headers
   `x-ratelimit-*` with exponential-backoff-with-jitter guidance. OpenAI moderation `POST /v1/moderations`
-  (`omni-moderation-latest`, free) → `flagged`/`categories`/`category_scores` (`[Needs Verification]`, search-sourced). Sources: [Anthropic rate limits](https://platform.claude.com/docs/en/api/rate-limits), [OpenAI rate limits](https://developers.openai.com/api/docs/guides/rate-limits) (fetched, verbatim).
+  (`omni-moderation-latest`, free) → `flagged`/`categories`/`category_scores` — confirmed [Web-cited: OpenAI moderation guide — https://developers.openai.com/api/docs/guides/moderation ; accessed 2026-07-22]. Sources: [Anthropic rate limits](https://platform.claude.com/docs/en/api/rate-limits), [OpenAI rate limits](https://developers.openai.com/api/docs/guides/rate-limits) (fetched, verbatim).
 - **Prompt injection** — OWASP LLM01:2025: "A Prompt Injection Vulnerability occurs when user prompts alter
   the LLM's behavior or output in unintended ways" (direct vs indirect via "external sources like websites or
   files"). Anthropic tool docs: "Treat that content as untrusted: an attacker who can influence it may embed

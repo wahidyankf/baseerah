@@ -35,8 +35,10 @@ already translated per #12.
   stable, widely taught domain knowledge `[Judgment call — the mechanics are cited generically; no
 clause or paragraph is reproduced from any standard per A8]`.
 - The equity-method treatment for an influenced-but-not-controlled investee (co-08) is domain
-  reasoning about what co-02's control test excludes, not a claim sourced from this plan's grounding
-  file `[Needs Verification]` pending the Phase 1 coverage pass.
+  reasoning about what co-02's control test excludes; IAS 28 is confirmed as the IFRS standard
+  requiring the equity method for associates (significant influence), named nominatively with no
+  clause text reproduced per A8
+  `[Web-cited: IFRS Foundation — IAS 28 Investments in Associates and Joint Ventures — https://www.ifrs.org/issued-standards/list-of-standards/ias-28-investments-in-associates-and-joint-ventures/ ; accessed 2026-07-22]`.
 
 ## Concepts
 

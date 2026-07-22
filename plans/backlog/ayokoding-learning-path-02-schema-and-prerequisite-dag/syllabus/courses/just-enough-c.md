@@ -54,11 +54,13 @@ flagged for re-verification at authoring time.
   published committee draft is **N1570 (C11)** at open-std.org (used for verbatim clause citations since
   ISO charges for the final text). C17 is the conservative portability baseline
   (open-std.org/jtc1/sc22/wg14).
-- **Compiler defaults** — `[Verified]` **GCC 15 (~Apr 2025) made `-std=gnu23` the default C dialect**;
-  **Clang has only partial C23 support** (`-std=c23` since Clang 18); MSVC lags
-  (gcc.gnu.org/projects/c-status.html, clang.llvm.org/c_status.html). **`[Needs Verification]` at
-  authoring** — re-check Clang's C23 completeness; keep shipped examples C17-portable unless a C23 feature
-  is the point.
+- **Compiler defaults** — `[Verified]` **GCC 15.1 (released 2025-04) changed the default C dialect from
+  `-std=gnu17` to `-std=gnu23`, and its C23 support is "essentially feature-complete"** [Web-cited: GCC 15
+  release notes / Porting to GCC 15 — https://gcc.gnu.org/gcc-15/porting_to.html ; accessed 2026-07-22];
+  **Clang still has only partial C23 support** (`-std=c23` since Clang 18) per clang.llvm.org/c_status.html;
+  MSVC lags (clang.llvm.org/c_status.html). **`[Needs Verification]` at authoring** — re-check Clang's C23
+  completeness (it advances release-to-release); keep shipped examples C17-portable unless a C23 feature is
+  the point.
 - **Toolchain** — `[Verified]` `gcc`/`clang` compile + link; `make` drives builds from a `Makefile`;
   `-Wall -Wextra` enable the standard warning set (gcc.gnu.org/onlinedocs/gcc/Warning-Options.html,
   gnu.org/software/make/manual).

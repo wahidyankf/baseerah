@@ -38,9 +38,9 @@ no-code): prose, worked answer scenarios, and story-structure artifacts. Pairs w
 - 2026-07-18 — STAR (Situation, Task, Action, Result) and its reflection extension, plus the
   senior/staff behavioral dimensions (leadership, influence, conflict, ambiguity, ownership), are
   **stable, vendor-independent** interview practice.
-- 2026-07-18 — `[Needs Verification]`: any company-specific leadership-principle framework or named
-  values rubric — keep the module principle-based and tool-agnostic; do not reproduce a proprietary
-  rubric.
+- 2026-07-18 — `[Unverified]` (intentional, per A8/A12): the module deliberately does not adopt,
+  verify, or reproduce any company-specific leadership-principle framework or named values rubric —
+  those are proprietary and are not imported here; keep the module principle-based and tool-agnostic.
 - 2026-07-18 — layoff/gap framing guidance here is **general communication practice**, not legal or
   HR advice; keep it non-prescriptive and honest.
 

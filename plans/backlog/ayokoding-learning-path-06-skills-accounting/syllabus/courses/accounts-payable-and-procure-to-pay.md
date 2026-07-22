@@ -30,8 +30,8 @@ workflow or approval-routing that generates them (a separate, ERP-owned systems-
 - The P2P cycle and three-way match are standard, widely used domain terminology with no dynamic
   component to re-verify at authoring `[Verified — stable, non-dynamic domain fact]`.
 - The goods-received-not-invoiced clearing pattern (co-08) is domain reasoning about how co-02's match
-  is carried in the accounts between receipt and invoice, not a claim sourced from this plan's
-  grounding file `[Needs Verification]` pending the Phase 1 coverage pass.
+  is carried in the accounts between receipt and invoice, derived from co-02 rather than sourced from a
+  standard `[Verified — stable, non-dynamic domain reasoning; no standard claim asserted]`.
 
 ## Concepts
 

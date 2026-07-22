@@ -39,6 +39,12 @@ centers (course 17) can absorb the work in the periods the plan assigns it. Tran
   coverage question for this course explicitly includes whether rough-cut and detailed capacity
   planning are recognised as belonging alongside material netting; ASCM/APICS outlines may be named as
   corroboration only, never transcribed or mirrored (`A8`, `A12`).
+- Coverage corroboration (2026-07-22): production-planning / MRP / MPS / RCCP / CRP are recognised as
+  belonging together in the ASCM/APICS CPIM body of knowledge
+  `[Web-cited: ASCM — CPIM — https://www.ascm.org/cpim-certification/ ; accessed 2026-07-22]`. This
+  corroborates **coverage only** — the CPIM outline is nominatively named, never transcribed or used
+  as a structure source (`A12`); the individual `co-NN` module-family naming stays `[Needs
+Verification]` as above.
 
 ## Concepts
 

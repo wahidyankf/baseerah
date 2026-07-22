@@ -131,12 +131,13 @@ carries type hints in the pyright-clean spirit.
   Source: [Nx — Affected](https://nx.dev/ci/features/affected) (fetched, verbatim).
 - **Progressive delivery + automated canary (co-33/co-34, ex-81–83)** — added 2026-07-12. The umbrella term
   "progressive delivery" (canary/blue-green/flags gated by metrics; decouple deploy from release) is
-  attributed to James Governor / RedMonk — `[Needs Verification]`: confirm the coinage against redmonk.com
-  before quoting. **Argo Rollouts** (canary/blue-green + `AnalysisTemplate` metric gating, auto-promote/
+  coined by James Governor at RedMonk (2018, with Adam Zimman of LaunchDarkly)
+  [Web-cited: RedMonk / James Governor "Towards Progressive Delivery" — https://redmonk.com/jgovernor/2018/08/06/towards-progressive-delivery/ ; accessed 2026-07-22]. **Argo Rollouts** (canary/blue-green + `AnalysisTemplate` metric gating, auto-promote/
   rollback) and **Flagger** (weighted traffic shift driven by success-rate/latency metric checks) are both
-  **Apache-2.0** CNCF-ecosystem controllers — `[Needs Verification]` at authoring: confirm each project's
-  current CRD field names + license against argoproj.github.io/argo-rollouts + fluxcd.io/flagger before
-  drafting the ex-81/ex-82 manifests. Existing blue-green/canary/feature-toggle citations above (Fowler/
+  **Apache-2.0**-licensed CNCF-ecosystem controllers, license confirmed
+  [Web-cited: Argo Rollouts — https://github.com/argoproj/argo-rollouts (Apache-2.0); Flagger — https://github.com/fluxcd/flagger (Apache-2.0); accessed 2026-07-22]. Re-confirm each project's
+  current CRD field names against argoproj.github.io/argo-rollouts + fluxcd.io/flagger before
+  drafting the ex-81/ex-82 manifests (CRD surface is version-volatile). Existing blue-green/canary/feature-toggle citations above (Fowler/
   Sato/Hodgson, all fetched-verbatim) remain the primary sources for co-23–25.
 
 ## Concepts

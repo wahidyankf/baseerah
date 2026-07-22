@@ -100,23 +100,27 @@ driving standard tooling (nmap, sqlmap, Burp/ZAP). Pairs with [`60-defensive-sec
 - **Password cracking** `[Verified]` — [hashcat.net](https://hashcat.net/hashcat/) ("World's fastest password
   cracker", MIT, 450+ hash types) + [NIST SP 800-115](https://nvlpubs.nist.gov/NISTpubs/Legacy/SP/NISTspecialpublication800-115.pdf)
   §5.1: dictionary/hybrid/brute-force/rainbow-table definitions verbatim; "Salting… decreases the likelihood
-  of identical passwords returning the same hash." John the Ripper's own flags `[Needs Verification]`
-  (openwall.com/john not independently fetched).
+  of identical passwords returning the same hash." John the Ripper's own flags
+  `[Web-cited: openwall.com/john — https://www.openwall.com/john/doc/OPTIONS.shtml ; accessed 2026-07-22]`
+  — the primary options doc confirms `--single`, `--wordlist=FILE`, `--rules`, `--incremental[=MODE]`,
+  `--format=NAME`, and `--show` verbatim.
 - **Buffer overflow** `[Verified]` — [CWE-787 Out-of-bounds Write](https://cwe.mitre.org/data/definitions/787.html)
   ("writes data past the end, or before the beginning, of the intended buffer") + NIST SP 800-115 §5.2.1.
 - **Network / MITM** `[Verified]` — [Wireshark User's Guide](https://www.wireshark.org/docs/wsug_html_chunked/ChapterIntroduction.html)
   ("a network packet analyzer… neither an intrusion detection system nor does it actively manipulate network
   traffic") + [RFC 826 ARP](https://datatracker.ietf.org/doc/html/rfc826) (the protocol ARP-spoofing abuses).
-  ARP-spoofing-as-attack-technique verbatim primary `[Needs Verification]` (MITRE ATT&CK T1557 not fetched).
+  ARP-spoofing-as-attack-technique `[Web-cited: MITRE ATT&CK T1557.002 ARP Cache Poisoning, a sub-technique
+of Adversary-in-the-Middle (T1557) — https://attack.mitre.org/techniques/T1557/002/ ; accessed 2026-07-22]`.
 - **CVSS / CVE / NVD / Exploit-DB** `[Verified]` — [FIRST CVSS](https://www.first.org/cvss/) (current **v4.0**;
   v3.1 Base/Temporal/Environmental still dominant) + [NVD CVE process](https://nvd.nist.gov/general/cve-process)
   (CVE = "a dictionary or glossary of vulnerabilities… for specific code bases") +
   [Exploit-DB About](https://exploit-db.com/about-exploit-db) ("a CVE compliant archive of public exploits").
   Direct cve.org verbatim quote `[Needs Verification]` (JS-render issue on fetch; NVD is the substitute).
-- **Social engineering / disclosure** `[Needs Verification]` — CISA (avoiding-phishing, CVD program) and
-  ISO/IEC 29147 all returned HTTP 403 to direct fetch; the social-engineering and responsible-disclosure
-  framing rests on search-summarized snippets, not a fetched-and-read primary. Teach conceptually; flag any
-  verbatim CISA/ISO quote until a browser-based fetch confirms it.
+- **Social engineering / disclosure** `[Unverified]` — CISA (avoiding-phishing, CVD program) and
+  ISO/IEC 29147 all returned HTTP 403 to direct fetch; re-checked 2026-07-22 (CISA CVD-process page still
+  HTTP 403 to automated fetch). The social-engineering and responsible-disclosure framing rests on
+  search-summarized snippets, not a fetched-and-read primary. Teach conceptually; flag any verbatim
+  CISA/ISO quote until a browser-based fetch confirms it.
 
 ## Concepts
 

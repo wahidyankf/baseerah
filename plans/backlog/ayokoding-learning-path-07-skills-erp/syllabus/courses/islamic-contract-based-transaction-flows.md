@@ -34,6 +34,13 @@ License-aware (DD-15).
 - Contract-mechanics claims carry the same `[Unverified]` status as course 28's jurisdictional table
   pending the primary-source re-verification pass; worked examples use originally-authored data and
   do not assert a specific jurisdiction's numeric detail as fact.
+- What **is** corroborated (2026-07-22, coverage level only): the recognised Islamic-contract set —
+  murabaha, ijarah, musharakah, mudarabah, salam, istisna and wakala — and the structural mechanics
+  of each are covered by the AAOIFI Shari'ah Standards
+  `[Web-cited: AAOIFI — https://aaoifi.com/?lang=en ; accessed 2026-07-22]`
+  `[Web-cited: AAOIFI — Shari'ah Standards — https://aaoifi.com/shariaa-standards/?lang=en ; accessed 2026-07-22]`.
+  Individual Shari'ah-Standard numbers remain `[Needs Verification]` and are not asserted; AAOIFI (not
+  IFSB, which is prudential) is the contract-mechanics authority cited here.
 - Concepts co-08 and co-09 are placed on domain-reasoning grounds rather than sourced from the
   grounding research, and are `[Needs Verification]` pending the Phase 1.2a coverage pass; both are
   framed as questions the document flow must answer under its jurisdictional configuration, not as a

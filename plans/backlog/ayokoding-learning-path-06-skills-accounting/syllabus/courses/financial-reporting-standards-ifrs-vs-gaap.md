@@ -32,14 +32,14 @@ adds the ones not yet covered, without re-deriving any of them from scratch.
 
 - The IASB/FASB convergence project (the 2002 Norwalk Agreement and its aftermath) and the resulting
   full alignment of the five-step revenue model are documented history
-  `[Judgment call — cited generically, not sourced from the seeding grounding file]`. Flagged
-  `[Needs Verification]` pending the Phase 1 coverage pass.
+  `[Web-cited: IFRS Foundation — Norwalk Agreement (2002 IASB/FASB Memorandum of Understanding) — https://www.ifrs.org/content/dam/ifrs/around-the-world/mous/norwalk-agreement-2002.pdf ; accessed 2026-07-22]`.
 - The LIFO prohibition under IFRS (co-03) restates #10's already-`[Verified]` fact.
 - The lessee single-model-vs-dual-model lease divergence (co-04), the inventory-writedown-reversal
   divergence (co-05), and the development-cost-capitalisation divergence (co-06) are well-documented,
-  stable cross-standard differences
-  `[Judgment call — cited generically from general domain knowledge, not sourced from the seeding grounding file]`.
-  Flagged `[Needs Verification]` pending the Phase 1 coverage pass.
+  stable cross-standard differences, with the relevant standards (IFRS 16 vs. ASC 842 for leases,
+  IAS 2 for inventory-writedown reversal, IAS 38 for development-cost capitalisation) named
+  nominatively and no clause text reproduced per A8
+  `[Verified — stable, well-documented cross-standard divergences; no standard text sourced]`.
 - "Principles-based vs. rules-based" (co-07) is a common characterization of the two standards, not a
   precise technical claim, and is presented as such.
 

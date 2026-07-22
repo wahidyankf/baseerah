@@ -53,27 +53,37 @@ grounding; anything not directly confirmed is flagged `[Needs Verification]` for
 - **WinUI 3 / Windows App SDK** — `[Verified]` WinUI 3 is Microsoft's current native Windows UI framework,
   shipped as part of the Windows App SDK (unified desktop app platform); MIT-licensed
   (learn.microsoft.com/windows/apps/winui/winui3, github.com/microsoft/WindowsAppSDK). Windows App SDK
-  version is **`[Needs Verification]` at authoring** — moves fast (2.2.0 seen 2026-06-09); do NOT pin a
-  version in authored content; re-pull from the GitHub releases page at authoring time.
+  version is **version-volatile — pin at authoring** (moves fast); current-as-of-2026-07-22 latest stable
+  is **2.3.1** (released 2026-07-17) on the 2.x line, with 1.8.10 the latest 1.8 servicing release
+  `[Web-cited: github.com/microsoft/WindowsAppSDK releases — https://github.com/microsoft/WindowsAppSDK/releases ; accessed 2026-07-22]`.
+  Do NOT pin a version in authored content; re-pull from the GitHub releases page at authoring time.
 - **WPF / WinForms** — `[Verified]` both remain supported .NET desktop UI stacks on Windows; WPF uses XAML
   - data binding, WinForms is the older designer-driven stack (learn.microsoft.com/dotnet/desktop). Both
     are Windows-only.
 - **XAML + data binding + MVVM** — `[Verified]` `{Binding}` (runtime) and `{x:Bind}` (compiled) are the two
   binding markup extensions; `INotifyPropertyChanged` drives change notification; MVVM is Microsoft's
-  documented desktop pattern (learn.microsoft.com/windows/apps/develop/data-binding). Exact per-control
-  binding-mode defaults are `[Needs Verification]` — confirm against the control's reference page at
-  authoring time (`{x:Bind}` defaults to OneTime; `{Binding}` defaults to OneWay for most).
+  documented desktop pattern (learn.microsoft.com/windows/apps/develop/data-binding). The default binding
+  modes are confirmed: **`{x:Bind}` defaults to OneTime; `{Binding}` defaults to OneWay**
+  `[Web-cited: Microsoft Learn, "Data binding in depth" (Mode table) — https://learn.microsoft.com/en-us/windows/uwp/data-binding/data-binding-in-depth ; accessed 2026-07-22]`.
+  Exact per-control binding-mode overrides still vary — confirm against the control's reference page at
+  authoring time.
 - **Dispatcher / UI thread** — `[Verified]` UI updates must occur on the UI thread; `DispatcherQueue`
   (WinUI 3) / `Dispatcher` (WPF) marshal work back to it. `async`/`await` resumes on the captured context
-  by default (learn.microsoft.com/windows/apps/design/threading). The exact `DispatcherQueue.TryEnqueue`
-  vs `Dispatcher.Invoke` API surface is `[Needs Verification]` per chosen stack (WinUI 3 vs WPF).
+  by default (learn.microsoft.com/windows/apps/design/threading). The WinUI 3 `DispatcherQueue` is confirmed
+  as the Windows App SDK class that lets a background thread run code on the UI thread (its enqueue method
+  is `TryEnqueue`)
+  `[Web-cited: Microsoft Learn, "DispatcherQueue" (Windows App SDK) — https://learn.microsoft.com/en-us/windows/apps/develop/dispatcherqueue ; accessed 2026-07-22]`;
+  the exact per-stack API spelling (`DispatcherQueue.TryEnqueue` vs WPF `Dispatcher.Invoke`/`BeginInvoke`)
+  still varies by chosen stack — confirm at authoring.
 - **Cancellation & progress** — `[Verified]` `CancellationToken`/`CancellationTokenSource` and `IProgress<T>`
   are the standard .NET async cancellation + progress primitives (learn.microsoft.com/dotnet/standard/
   parallel-programming/task-cancellation).
 - **Persistence** — `[Verified]` `Microsoft.Data.Sqlite` is Microsoft's SQLite ADO.NET provider
-  (learn.microsoft.com/dotnet/standard/data/sqlite). App-settings API differs by stack
-  (`ApplicationData.Current.LocalSettings` for packaged apps vs config files) — `[Needs Verification]` per
-  packaging model at authoring time.
+  (learn.microsoft.com/dotnet/standard/data/sqlite). App-settings API differs by stack:
+  `ApplicationData.Current.LocalSettings` is confirmed as the local-settings store for **packaged** apps
+  (unpackaged apps use direct file I/O or the registry)
+  `[Web-cited: Microsoft Learn, "Store and retrieve settings and other app data" — https://learn.microsoft.com/en-us/windows/apps/develop/data/store-and-retrieve-app-data ; accessed 2026-07-22]`.
+  Which mechanism applies depends on the packaging model — confirm per model at authoring time.
 - **MSIX packaging** — `[Verified]` MSIX is Microsoft's standard Windows app packaging format;
   `Package.appxmanifest` declares identity (learn.microsoft.com/windows/msix). Packaging depth kept at
   intuition level per the scope note.

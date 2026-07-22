@@ -62,9 +62,11 @@ are decades-stable interfaces (minimum-supported-client Windows XP/2000 on the r
   the security context of the calling process"; each process starts with one primary thread
   (…/api/processthreadsapi/nf-processthreadsapi-createprocessa, …/procthread/about-processes-and-threads).
   Windows has NO `fork()` equivalent — `CreateProcess` always starts a clean image (closest to POSIX
-  `posix_spawn`); the "no fork" contrast is `[Needs Verification]`-grade at the verbatim level (best primary
-  source: the MS Research "A fork() in the road" paper, not fetched verbatim) — present it as a well-
-  established design contrast, not a quoted claim.
+  `posix_spawn`). The "no fork" design contrast is coverage-corroborated by the peer-reviewed MS Research /
+  HotOS '19 paper "A fork() in the road" (Baumann, Appavoo, Krieger, Roscoe), which explicitly contrasts
+  Unix `fork()` with Windows `CreateProcess()`
+  `[Web-cited: Baumann et al., "A fork() in the road", HotOS '19 — https://www.microsoft.com/en-us/research/uploads/prod/2019/04/fork-hotos19.pdf ; accessed 2026-07-22]`.
+  Present it as a well-established design contrast, not a quoted verbatim claim.
 - **Threads** — `[Verified]` `CreateThread` "Creates a thread to execute within the virtual address space
   of the calling process"; Windows uses preemptive multitasking
   (…/api/processthreadsapi/nf-processthreadsapi-createthread).
