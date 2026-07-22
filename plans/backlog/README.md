@@ -6,17 +6,15 @@ that genuinely need a full plan's depth to answer.
 
 ## Planned Projects
 
-The seven `ayokoding-learning-path-*` plans deliver one programme in three dependency waves. Each
+The `ayokoding-learning-path-*` plans deliver one programme in three dependency waves. Each
 plan is **self-contained**: the shared programme decisions (the `R*`/`A*` ids) are folded into each
 plan's own `tech-docs.md` under a `## Programme decisions` section, and each plan's README carries its
 scope, counts, gates, and local wave position. The three waves are: **Wave 1** — `01`, `02` (no
 prerequisite); **Wave 2** — `03`, `04`, `06` (need both Wave 1 plans merged; `06` additionally
 hard-depends on `03`'s renderer); **Wave 3** — `05`, `07` (each needs its own Wave 2 predecessor
-merged).
+merged). **Wave-1 `01-url-restructure` is now [in progress](../in-progress/README.md)** and has left
+this backlog.
 
-- [ayokoding-learning-path-01-url-restructure](./ayokoding-learning-path-01-url-restructure/README.md)
-  — **Wave 1.** Removes the `/c/` namespace, resolves everything under `/en/learn` to three buckets,
-  and ships the per-course redirect table.
 - [ayokoding-learning-path-02-schema-and-prerequisite-dag](./ayokoding-learning-path-02-schema-and-prerequisite-dag/README.md)
   — **Wave 1.** The data layer: manifest schema, the pure `course-paths` core, the prerequisite
   contract, and custody of the `syllabus/` corpus.

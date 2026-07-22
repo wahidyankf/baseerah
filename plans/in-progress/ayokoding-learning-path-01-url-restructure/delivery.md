@@ -228,7 +228,7 @@ use are retained deliberately, not pruned):
       primitive set moved since authoring and §3.4's expected value must be updated with it, not
       silently re-baselined; **0** means the pattern stopped matching and the check has gone vacuous.
 - [ ] [AI] Confirm `learnings.md` scaffold exists in the plan folder — acceptance:
-      `test -f plans/backlog/ayokoding-learning-path-01-url-restructure/learnings.md` returns 0 and
+      `test -f plans/in-progress/ayokoding-learning-path-01-url-restructure/learnings.md` returns 0 and
       the file opens with its H1.
 
 ### Phase 0 Gate
@@ -621,15 +621,22 @@ deleted), re-pointing each entry to wherever the content now lives.
 > DD-45, and the BEFORE/AFTER trees at
 > [tech-docs §Content tree — AFTER](./tech-docs.md#content-tree--after-target-state).
 >
-> **Open questions.** Every step below executes the **recommended default** of its governing question
-> and names the alternative inline, so an overturned ruling is a bounded edit:
-> [Q-A](./tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive) (staging pen),
-> [Q-B](./tech-docs.md#q-b--does-the-id-locale-get-the-same-three-bucket-shape-now) (`id` out of
-> scope), [Q-C](./tech-docs.md#q-c--if-id-is-in-scope-are-the-bucket-segments-translated) (moot while
-> Q-B = A), [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy) (indexed + banner),
-> [Q-E](./tech-docs.md#q-e--what-happens-to-fundamentally-strongs-three-residual-index-pages) (fold
-> into the path landing — handed forward by Phase 2),
-> [Q-F](./tech-docs.md#q-f--what-happens-to-enlearnoverviewmd) (keep `overview.md`, rewritten).
+> **Open questions — RESOLVED 2026-07-23** (grill gate; see
+> [tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-resolved-2026-07-23)
+> for the full ruling table). Four took the recommended default; **two overturned it**:
+> [Q-A](./tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive) = **staging pen** (default),
+> [Q-B](./tech-docs.md#q-b--does-the-id-locale-get-the-same-three-bucket-shape-now) = **`id` out of
+> scope** (default), [Q-C](./tech-docs.md#q-c--if-id-is-in-scope-are-the-bucket-segments-translated) =
+> moot, [Q-D](./tech-docs.md#q-d--seo-treatment-of-legacy) = **`noindex` the whole bucket, no banner /
+> no landing notice** (OVERRIDE — §3.4 asserts `robots: noindex` and the _absence_ of any banner; prd
+> Screen 4 is now Selected: Option C),
+> [Q-E](./tech-docs.md#q-e--what-happens-to-fundamentally-strongs-three-residual-index-pages) =
+> **delete the three residual `fundamentally-strong` index pages and 308 their old URLs to
+> `/en/learn/courses`** (OVERRIDE — no fold-in to a path landing; Phase 2's preserve-and-hand-forward
+> step becomes a delete-plus-redirect step),
+> [Q-F](./tech-docs.md#q-f--what-happens-to-enlearnoverviewmd) = **keep `overview.md`, rewritten**
+> (default). §3.4 and the Phase-2 FS-residual step are edited to the overturned rulings **in the
+> worktree before Phase 3 executes**; steps still written to the old default are superseded by this note.
 
 ### 3.0 · De-namespacing — retire the `/c/` content route (DD-48)
 

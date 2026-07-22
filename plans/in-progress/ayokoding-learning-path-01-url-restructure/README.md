@@ -120,7 +120,7 @@ applied — `legacy/` as staging pen vs archive (Q-A), `id` scope (Q-B) and segm
 `legacy/` SEO treatment (Q-D), the three residual `fundamentally-strong` index pages (Q-E), and
 `en/learn/overview.md` (Q-F). **This plan owns all six verbatim**; the navigation-UI and
 course-authoring plans carry one-line "blocked-on" notes pointing back here. See
-[tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-unresolved).
+[tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-resolved-2026-07-23).
 
 ## Depends-on
 
@@ -286,7 +286,7 @@ citations must survive.
   (DD-44); and the extension is **`en`-only**, with the `id` deferral recorded rather than implied
   (DD-45). Delivered by **Phase 3** in [delivery.md](./delivery.md). **Six questions remain OPEN**
   with recommended defaults — Q-A through Q-F in
-  [tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-unresolved).
+  [tech-docs §Open Questions](./tech-docs.md#open-questions--learn-section-scope-extension-resolved-2026-07-23).
   **Decided 2026-07-21** (the six `Q-` items are explicitly _not_ decided).
 
 ### Cross-cutting (verbatim in all five split plans)

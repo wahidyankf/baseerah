@@ -4,7 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_No plans are currently in progress._
+- [ayokoding-learning-path-01-url-restructure](./ayokoding-learning-path-01-url-restructure/README.md)
+  — **Wave 1.** Removes the `/c/` namespace, resolves everything under `/en/learn` to three buckets
+  (`paths/`, `courses/`, `legacy/`), and ships the per-course + per-domain redirect tables.
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.

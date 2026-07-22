@@ -1240,14 +1240,30 @@ tree with different meanings, and `DD-36`/`DD-37`/`DD-38` are unused. **Do not r
 apparent gap.** DD-47 (three viewports per screen per option) governs this plan's Screen 4 renders and
 is restated where it binds, in [prd.md's asset matrix](./prd.md#hi-fi-asset-matrix--this-plans-slice).
 
-## Open Questions — Learn-Section Scope Extension (UNRESOLVED)
+## Open Questions — Learn-Section Scope Extension (RESOLVED 2026-07-23)
 
-These six decisions are **not made**. **This plan owns all six verbatim**;
-`ayokoding-learning-path-03-navigation-ui` and `ayokoding-learning-path-04-course-authoring` each
-carry a one-line "blocked-on" note pointing here. Each carries a recommended default and the reasoning
-behind it, so the maintainer can accept or overturn each in a single pass. Nothing below is silently
-applied: [delivery.md](./delivery.md) Phase 3 executes the **recommended default** for each and names
-the alternative inline, so an overturned ruling is a bounded edit rather than a rewrite.
+**All six resolved by the maintainer on 2026-07-23** (grill gate before plan execution). The
+per-question recommendation and reasoning below are retained as the decision record. Four accepted
+the recommended default; **two overturned it** (Q-D, Q-E) — each an intended bounded edit per the
+"names the alternative inline" design:
+
+| Q   | Ruling                                                                                                                                 | vs. recommendation   | Execution consequence                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q-A | **A — staging pen**                                                                                                                    | default              | `legacy/_index.md` states transitional status; re-homed courses name superseded pages; re-inventory at archival.                                                                                                                                                                                                                                                                                                                                                           |
+| Q-B | **A — `id` out of scope (en-only)**                                                                                                    | default              | `id/belajar/` untouched; deferral in `brd.md` Non-Goals. Q-C stays moot.                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Q-C | moot (Q-B = A)                                                                                                                         | —                    | No bucket-segment translation work.                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Q-D | **C — `noindex` the whole `legacy/` bucket**                                                                                           | **OVERRIDE** (was A) | `robots: noindex` for the whole bucket; **no per-page banner and no landing notice** (Screen 4's banner selection is retired — see prd.md Screen 4, now Selected: Option C). 308s still preserve link equity for in-site nav / direct links.                                                                                                                                                                                                                               |
+| Q-E | **C — delete the three residual `fundamentally-strong` index pages**, but redirect their old URLs to `courses/_index.md` (no bare 404) | **OVERRIDE** (was A) | `fundamentally-strong/_index.md`, `software-engineer/_index.md`, `software-engineer/overview.md` are deleted; their old URLs 308 to `/en/learn/courses` (the successor library landing) rather than 404. The DD-19 fold-in handoff to `ayokoding-learning-path-05-manifests` is dropped; the path-landing prose will be authored fresh there. `ayokoding-learning-path-03-navigation-ui`'s legacy-browse coexistence guard asserts these three URLs redirect, not resolve. |
+| Q-F | **A — keep `en/learn/overview.md` as the rewritten hub page**                                                                          | default              | `overview.md` rewritten from six-domain to three-bucket inventory (unchanged from plan).                                                                                                                                                                                                                                                                                                                                                                                   |
+
+> **Q-E redirect-target note.** The pure-delete option's stated consequence was "breaks two live URLs
+> with nothing to redirect to." Shipping bare 404s would fail the repo's quality gates and contradict
+> this plan's redirects-hold-everything thesis, so the maintainer-confirmed execution deletes the files
+> **and** 308s their old URLs to `/en/learn/courses` — the closest successor browse surface now that the
+> 37 topic bodies live flat under `courses/`.
+
+The original per-question analysis (retained verbatim below) is the rationale of record; where a ruling
+overturned the recommendation, the table above governs.
 
 ### Q-A — Is `legacy/` a staging pen or a permanent archive?
 
