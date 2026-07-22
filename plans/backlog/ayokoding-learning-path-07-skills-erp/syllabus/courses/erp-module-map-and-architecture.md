@@ -1,0 +1,101 @@
+# ERP Module Map and Architecture (Annotated-concept)
+
+**Course ID**: `erp-module-map-and-architecture` · **Format**: Annotated-concept · **Language**: — (domain, no code).
+
+**Short summary**: The module map, cross-module process flows, the open-source landscape
+
+**Scope note**: names the module families (finance, controlling, materials management, sales,
+production, human capital) and the process flows that cross them, and introduces the open-source
+landscape nominatively so later worked examples can reference "how ERPNext models X" without
+re-explaining what ERPNext is each time. License-aware (DD-15).
+
+## Why this exists · the big idea
+
+- **The problem before the solution**: a module-by-module treatment alone produces a reader who can
+  name parts but not explain how a transaction crosses them — this course fixes the map before any
+  process course goes deep on one flow.
+- **Keep-this-if-you-forget-everything**: naming the _flow_ (procure-to-pay, order-to-cash) is a more
+  useful unit of architectural reasoning than naming the _module_ it happens to touch.
+- **Big ideas touched**: `cross-module-process-flows`; `nominative-open-source-reference` — the
+  licence-aware posture that lets this corpus cite real systems without reproducing their content
+  (see [tech-docs.md §Licensing and IP Compliance](../../tech-docs.md#licensing-and-ip-compliance-a8)).
+
+## Prerequisites
+
+- **Prior topics**: [`erp-conceptual-data-model`](./erp-conceptual-data-model.md).
+- **Cross-domain prerequisites**: none.
+- **Assumed knowledge**: course 2's master-data and header/line vocabulary.
+
+## Accuracy notes (pending A4 verification)
+
+> The Phase 1.2a confirmation pass has not yet run for this course.
+
+- Licence claims for the open-source landscape are `[Repo-grounded]` against the domain-research
+  grounding and `tech-docs.md`'s licensing table. Metasfresh's licence is `[Unverified]` and is not
+  asserted in this course.
+
+## Concepts
+
+- **co-01 · finance-controlling-fi-co** — the accounting-facing module family (deep dive: courses 5-9,
+  13).
+- **co-02 · materials-management-mm** — the procurement/inventory-facing module family (deep dive:
+  courses 10, 12, 14-16).
+- **co-03 · sales-distribution-sd** — the sales-facing module family (deep dive: course 11).
+- **co-04 · production-planning-pp** — the manufacturing-facing module family (deep dive: courses 17-20).
+- **co-05 · human-capital-management-hcm** — the people-facing module family (deep dive: course 23).
+- **co-06 · generic-role-names** — FI/CO/MM/SD/PP/HCM are generic industry role names, not any single
+  vendor's proprietary terms.
+- **co-07 · procure-to-pay-flow** — the P2P cross-module flow at a glance (deep dive: course 10).
+- **co-08 · order-to-cash-flow** — the O2C cross-module flow at a glance (deep dive: course 11).
+- **co-09 · record-to-report-flow** — the R2R cross-module flow at a glance (deep dive: course 13).
+- **co-10 · hire-to-retire-flow** — the H2R cross-module flow at a glance (deep dive: course 23).
+- **co-11 · open-source-landscape-nominative** — Odoo, ERPNext, Tryton, Apache OFBiz, Dolibarr,
+  iDempiere named as reference points, licence noted per project, never in a course title or path
+  segment.
+- **co-12 · enterprise-it-boundary** — what sits outside the ERP boundary (CRM, standalone WMS, BI/data
+  warehouse, e-commerce front end) at a glance (deep dive: course 22).
+
+## Worked examples
+
+Prose-based worked scenarios (no runnable code). Every example cites the `co-NN` it exercises.
+
+### Beginner
+
+- **ex-01 · module-family-classification** — given ten business events, classify each into its module
+  family. (co-01–co-05)
+- **ex-02 · flow-vs-module-contrast** — trace one order through P2P, noting which module each step
+  belongs to versus the flow name that actually explains the sequence. (co-07)
+
+### Intermediate
+
+- **ex-03 · nominative-reference-drafting** — write one sentence describing "how ERPNext models a stock
+  ledger entry" that stays nominative (no reproduction of ERPNext's own docs). (co-11)
+- **ex-04 · it-boundary-scoping** — given a system landscape diagram, identify which boxes are inside
+  the ERP boundary and which are not. (co-12)
+
+## Synthesis exercise — intra-topic
+
+> Analysis and design only — never build, implement, or deploy a system (`A6`).
+
+- **Goal**: given a business scenario spanning three module families, diagram (in prose or an
+  originally-drawn Mermaid diagram, never a vendor screenshot) the cross-module flow it represents.
+- **Concepts exercised**: [ ] module families (co-01–co-05) [ ] a named flow (co-07–co-10).
+- **Ordered steps**: 1) identify the module families touched; 2) name the flow; 3) sequence the steps
+  across modules.
+- **Acceptance criteria**: the flow name matches a real cross-module flow (P2P/O2C/R2R/H2R); the
+  sequence is internally consistent.
+- **Done bar**: a written/diagrammed analysis, no code, no system stood up.
+
+## Read more
+
+> Populated during the Phase 1.2a `web-researcher` confirmation pass (`A12`) — coverage-check
+> citations only.
+
+## In which paths
+
+- `skills/conventional-erp` — Stage A, course 3 of 26.
+- `skills/sharia-erp` — Stage A, course 3 of 29.
+
+---
+
+← Back to the [syllabus index](../README.md)

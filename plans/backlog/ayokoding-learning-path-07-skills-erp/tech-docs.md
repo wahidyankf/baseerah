@@ -1,112 +1,220 @@
-# Technical Documentation — Skills Path: Enterprise Resource Planning
+# Technical Documentation — Skills Paths: Enterprise Resource Planning
 
 ## Overview
 
-This plan ships one path product over a **new 20-course corpus**, reusing every layer the careers
-category already built:
+This plan delivers **two `skills/` paths end-to-end** over **one 29-course ERP corpus**:
+`skills/conventional-erp` (26 courses) and `skills/sharia-erp` (26 shared + 3 Sharia-exclusive = 29
+courses). It is the ERP half of the `skills/` category; the accounting half is
+`ayokoding-learning-path-06-skills-accounting`, whose own two-path split
+(`skills/conventional-accounting` / `skills/sharia-accounting`) this plan mirrors structurally.
+
+It touches **no application code** beyond two YAML data files and their co-located unit test. Every
+component, resolver, schema, and route it depends on is built by plans 01–03 and consumed here.
 
 | Layer                                                                                             | Owner                                                    | This plan's relationship |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------ |
 | `courses/` + `paths/` content homes, structural `_index.md` files                                 | `ayokoding-learning-path-01-url-restructure`             | consumes                 |
 | `PathManifest` zod schema, pure `course-paths` core, integrity gates                              | `ayokoding-learning-path-02-schema-and-prerequisite-dag` | consumes                 |
 | `path-landing.tsx`, `path-card.tsx`, `manifest-repository.ts`, `?path=` wiring, all design assets | `ayokoding-learning-path-03-navigation-ui`               | consumes                 |
-| The accounting corpus, manifest, and landing                                                      | `ayokoding-learning-path-06-skills-accounting`           | depends on, never writes |
-| **The ERP corpus, manifest, and landing**                                                         | **this plan**                                            | **authors**              |
+| The accounting corpus, its two manifests, and its two landings                                    | `ayokoding-learning-path-06-skills-accounting`           | depends on, never writes |
+| **The ERP corpus, both manifests, both landings**                                                 | **this plan**                                            | **authors**              |
 
-### Path constants
+## The manifest ownership invariant (scoped to two data files)
+
+Per the programme's manifest-ownership invariant (each plan owns its own data file(s) plus their
+co-located unit test, never a sibling's), this plan owns **exactly two** YAML data files and **one**
+shared unit test that asserts both:
+
+| Plan | Owns                                                                                                                        | Never writes                                                                 |
+| ---- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 06   | `manifests/skills/conventional-accounting.yaml`, `manifests/skills/sharia-accounting.yaml` + their unit test(s)             | anything under `manifests/skills/conventional-erp.yaml` or `sharia-erp.yaml` |
+| 07   | `manifests/skills/conventional-erp.yaml`, `manifests/skills/sharia-erp.yaml` (**this plan**) + `erp-manifests.unit.test.ts` | `manifests/careers/**`, `manifests/skills/*accounting*.yaml`                 |
+
+Both ERP manifests are owned by the **same plan**, so — unlike the cross-plan case that motivated the
+2026-07-21 one-file-per-plan ruling — combining their assertions into **one** test file
+(`erp-manifests.unit.test.ts`) is not a cross-plan seam; it is one plan's own test file covering both
+of its own data files.
+
+## Path constants
 
 - `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/` — course bundles, served at
   `/en/learn/courses/<course-id>`
 - `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` — path landings and structural indexes
-- `<ERPLANDING>` = `<PATHS>skills/enterprise-resource-planning/_index.md` — **this plan's landing**
+- `<CONVLANDING>` = `<PATHS>skills/conventional-erp/_index.md` — **this plan's first landing**
+- `<SHARLANDING>` = `<PATHS>skills/sharia-erp/_index.md` — **this plan's second landing**
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/`
 - `<MANIFESTS>` = `<FEAT>manifests/`
-- `<ERPMAN>` = `<MANIFESTS>skills/enterprise-resource-planning.yaml` — **this plan's only YAML**
+- `<CONVMAN>` = `<MANIFESTS>skills/conventional-erp.yaml`
+- `<SHARMAN>` = `<MANIFESTS>skills/sharia-erp.yaml`
+- `<MTEST>` = `<MANIFESTS>skills/erp-manifests.unit.test.ts` — owned by this plan, asserts both
+  manifests
 - `<SYL>` = `plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/courses/` — this plan's own
-  per-course syllabus corpus (DD-2)
+  per-course syllabus corpus (DD-2), each carrying an explicit module/topic breakdown (DD-31)
 - `<SYLPATHS>` = `plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/paths/` — this plan's
-  path-manifest mirror; the file is `<SYLPATHS>manifest-skills-enterprise-resource-planning.md`
-  (DD-22)
-- `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/` [Repo-grounded — the
-  parent `gherkin/` directory exists today with `app-shell`, `content`, `i18n`, `navigation`,
-  `search`, `tools` subdirectories]
-- Path id: `skills/enterprise-resource-planning` — the **full** string including the category
-  segment; there is no separate `category` field, and **nothing keys on segment count** (R2 / DD-21)
+  two path-manifest mirrors: `manifest-skills-conventional-erp.md` and
+  `manifest-skills-sharia-erp.md` (DD-22)
+- `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`
+- Path ids: `skills/conventional-erp` and `skills/sharia-erp` — the **full** strings including the
+  category segment; there is no separate `category` field, and **nothing keys on segment count**
+  (R2 / DD-21)
 
 ### What this plan writes
 
-- `<ERPMAN>` — the single manifest file.
-- `<ERPLANDING>` — the single path landing.
-- `<COURSES><erp-course-id>/` — twenty new course bundles.
-- `<SYL><erp-course-id>.md` + `<SYL>README.md` — twenty-one syllabus files inside this plan folder.
-- `<SYLPATHS>manifest-skills-enterprise-resource-planning.md` — the authoritative ordering this plan's
-  `courseOrder` is transcribed from (DD-22).
-- One ERP card each in `<PATHS>_index.md` and `<PATHS>skills/_index.md` — **populate only**.
-- `<SPECS>skills-erp-path.feature` and its step definitions.
-- Twenty new rows in `<COURSES>_index.md` — the shared course-catalog index — **populate only**; the
-  file itself is created by `ayokoding-learning-path-01-url-restructure`, never by this plan.
+- `<CONVMAN>`, `<SHARMAN>` — the two manifest files.
+- `<CONVLANDING>`, `<SHARLANDING>` — the two path landings.
+- `<COURSES><erp-course-id>/` — twenty-nine new course bundles (26 shared + 3 Sharia-exclusive).
+- `<SYL><erp-course-id>.md` + `<SYL>README.md` — thirty syllabus files inside this plan folder.
+- `<SYLPATHS>manifest-skills-conventional-erp.md` and `<SYLPATHS>manifest-skills-sharia-erp.md` —
+  the authoritative orderings each manifest's `courseOrder` is transcribed from (DD-22).
+- One ERP card each in `<PATHS>_index.md` and `<PATHS>skills/_index.md` for **each** path (four card
+  insertions total) — **populate only**.
+- `<SPECS>skills-erp-paths.feature` and its step definitions.
+- Twenty-nine new rows in `<COURSES>_index.md` — the shared course-catalog index — **populate only**.
 
 ### What this plan never touches
 
-- Any file under `<MANIFESTS>careers/` or `<MANIFESTS>skills/accounting.yaml`.
+- Any file under `<MANIFESTS>careers/` or `<MANIFESTS>skills/*accounting*.yaml`.
 - Any accounting course bundle, syllabus spec, or landing.
-- Any structural `_index.md` — `<PATHS>_index.md`, `<PATHS>careers/_index.md`, the three
-  `<PATHS>careers/<arc>/_index.md`, and `<PATHS>skills/_index.md` are all **created** by plan 01
-  (A3). This plan edits two of them to add one card each and creates none.
+- Any structural `_index.md` — created by plan 01 (A3). This plan edits populated cards into two of
+  them and creates none.
 - Any component under `<FEAT>shell/` or `<FEAT>core/`.
 - Any design asset. This plan ships no `assets/` folder.
 
-## The ERP catalog (20 courses, settled)
+## Naming harmonisation (DD-24)
 
-Transcribed from the `web-researcher` corpus study of 2026-07-21. **Course ids, formats, prerequisite
-edges, and ramp order are decided** — Phase 1 transcribes them into syllabus specs and does not
-re-derive them.
+An earlier round of this plan called the non-Sharia path "generic-erp". **It is `conventional-erp`**,
+harmonised with `ayokoding-learning-path-06-skills-accounting`'s `conventional-accounting` — both
+plans now use the same adjective for "the path without a jurisdictional Sharia model attached". This
+section exists specifically so "generic-erp" is not reintroduced by a future edit that has not read
+this file end to end.
 
-`(SWE)` = an existing library course [Repo-grounded — all eight verified present under
+## Two paths, one corpus (A10 / A11)
+
+Per amendment `A10`, `skills/erp` splits into **`skills/conventional-erp`** (26 courses) and
+**`skills/sharia-erp`** (26 shared + 3 Sharia-exclusive = 29 courses). **Both paths cover all the
+basics** — `sharia-erp` is never an add-on module assuming the conventional path; a reader entering it
+cold gets full grounding, because its `courseOrder` **includes** all 26 shared ids.
+
+**A11 is the existing schema rule, not a new mechanism** — cited directly rather than re-derived:
+
+- _"No course ID appears twice **within one manifest**"_ [Repo-grounded —
+  `ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md:417`]. Uniqueness is
+  per-manifest, so the same course id may legally appear in both `<CONVMAN>` and `<SHARMAN>`.
+- _"No course body is duplicated per path (all manifests reference courses **by ID**, never copy a
+  body)"_ [Repo-grounded — same file, line 424].
+- _"One body cannot encode four orders; moving order to the manifest [is what enables the shared
+  library]"_ [Repo-grounded — same file, line 615, DD-1].
+
+**Consequence**: the 26 shared course bodies are authored **once**, under `<COURSES>`, exactly as
+every other course in the library is. `<SHARMAN>`'s `courseOrder` **interleaves** the 26 shared ids
+with the 3 Sharia-exclusive ids into one ordered array. **Never duplicate a course file to serve two
+paths** — a duplicated file desyncs silently: an edit to one copy that is never propagated to the
+other produces two courses that answer the same question differently, and nothing in the toolchain
+catches it, because the content checkers validate each file in isolation and there is no cross-file
+consistency gate for prose. Reference by id is the only safe mechanism, and it is the cheaper one too:
+29 bodies are authored, not 52.
+
+## The ERP catalog (29 courses, settled)
+
+Course ids, formats, prerequisite edges, and ramp order are **decided** here; Phase 1 transcribes them
+into syllabus specs and does not re-derive them. The catalog is built around four load-bearing
+concerns named in the domain-research grounding: the **cross-cutting spine** (master data, document
+state machines, posting rules and account determination, fiscal calendar, multi-entity, multi-currency,
+UoM conversion, numbering sequences, audit trail), the **module map**, the **subledger-to-GL
+relationship as the architectural crux**, and the **hard parts** (costing methods, negative stock and
+backdating, reservations/ATP, MRP netting, BOM explosion and phantom BOMs, three-way-match tolerances,
+partials, returns, period close, stock concurrency, and the EAV-vs-JSONB-vs-generated-schema
+extensibility axis).
+
+`(SWE)` = an existing library course [Repo-grounded — all ten verified present under
 `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/`].
-`(Acct)` = a course owned by `ayokoding-learning-path-06-skills-accounting`.
+`(Acct)` = a course owned by `ayokoding-learning-path-06-skills-accounting` — the seven ids below are
+as currently named in that plan's own in-flight rewrite (its README, read 2026-07-22); see
+[§Cross-plan coordination risk](#cross-plan-coordination-risk-accounting-course-id-stability).
 
-| #   | Course id                                            | Format            | ERP prereqs    | Existing-library prereqs                             | Accounting prereqs                                                                | Wave |
-| --- | ---------------------------------------------------- | ----------------- | -------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- | ---- |
-| 1   | `erp-foundations-and-history`                        | Annotated-concept | —              | —                                                    | —                                                                                 | A    |
-| 2   | `erp-conceptual-data-model`                          | Annotated-concept | 1              | —                                                    | —                                                                                 | A    |
-| 3   | `erp-platform-landscape`                             | Annotated-concept | 2              | —                                                    | —                                                                                 | A    |
-| 4   | `capstone-stand-up-and-integrate-an-open-source-erp` | By Example        | 3              | `backend-essentials`, `api-design`                   | —                                                                                 | A    |
-| 5   | `procure-to-pay-systems`                             | By Example        | 2              | —                                                    | —                                                                                 | A    |
-| 6   | `order-to-cash-systems`                              | By Example        | 2              | —                                                    | —                                                                                 | A    |
-| 7   | `record-to-report-systems`                           | By Example        | 2              | —                                                    | `financial-statements-and-close-cycle` — **HARD**                                 | B    |
-| 8   | `inventory-and-warehouse-management`                 | By Example        | 2              | —                                                    | `inventory-and-cogs-accounting`                                                   | B    |
-| 9   | `erp-extension-and-customization`                    | By Example        | 4              | —                                                    | —                                                                                 | A    |
-| 10  | `erp-integration-patterns`                           | By Example        | 4              | `event-driven-architecture`, `networking-essentials` | —                                                                                 | A    |
-| 11  | `production-planning-and-mrp`                        | By Example        | 8              | —                                                    | _(transitive via 8)_                                                              | B    |
-| 12  | `demand-and-supply-planning`                         | Annotated-concept | 11             | —                                                    | _(transitive via 11)_                                                             | B    |
-| 13  | `human-capital-management-and-hire-to-retire`        | Annotated-concept | 2              | —                                                    | `payroll-and-tax-accounting-essentials`                                           | C    |
-| 14  | `multi-company-and-multi-currency-erp`               | By Example        | 7              | —                                                    | `consolidation-and-multi-entity-accounting`                                       | C    |
-| 15  | `erp-security-and-controls`                          | Annotated-concept | 2              | `security-essentials`                                | `audit-controls-and-compliance`                                                   | C    |
-| 16  | `erp-analytics-and-reporting`                        | By Example        | 7              | `data-engineering`, `analytics-and-experimentation`  | _(transitive via 7)_                                                              | B    |
-| 17  | `erp-implementation-methodology`                     | Annotated-concept | 3, 5, 6        | `project-management`                                 | —                                                                                 | A    |
-| 18  | `evaluating-and-selecting-an-erp`                    | Annotated-concept | 3, 17          | —                                                    | —                                                                                 | A    |
-| 19  | `sharia-compliant-erp-design`                        | Annotated-concept | 14             | —                                                    | `islamic-contract-modeling-for-systems`, `sharia-accounting-and-aaoifi-standards` | D    |
-| 20  | `capstone-build-a-minimal-erp-core`                  | By Example        | 19, 9, 5, 6, 8 | —                                                    | `capstone-build-a-general-ledger-system`                                          | D    |
+**The 29-course count, and its partition into content stages, is curriculum judgment, not a sourced
+fact** [Judgment call] — per A9, the count is an output of covering the four load-bearing concerns
+above, not a target.
 
-**The 20-course count is curriculum judgment, not a sourced fact** [Judgment call] — carried forward
-verbatim from the research, which labels it so explicitly (A4).
+### 26 shared courses (conventional-erp, also in sharia-erp)
 
-**Standalone-useful subsets** (the immediately-effective promise, made concrete): #4 is the first
-payoff; #5 and #6 stand alone given #2; #9 and #10 stand alone for anyone integrating with an
-already-deployed ERP.
+| #   | Course id                                     | Format            | ERP prereqs | SWE prereqs                                                                               | Accounting prereqs                                | Authoring stage |
+| --- | --------------------------------------------- | ----------------- | ----------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------- | --------------- |
+| 1   | `erp-foundations-and-history`                 | Annotated-concept | —           | —                                                                                         | —                                                 | A               |
+| 2   | `erp-conceptual-data-model`                   | Annotated-concept | 1           | —                                                                                         | —                                                 | A               |
+| 3   | `erp-module-map-and-architecture`             | Annotated-concept | 2           | —                                                                                         | —                                                 | A               |
+| 4   | `erp-document-lifecycle-and-state-machines`   | Annotated-concept | 3           | `domain-driven-design`                                                                    | —                                                 | A               |
+| 5   | `erp-posting-rules-and-account-determination` | By Example        | 4           | —                                                                                         | —                                                 | A               |
+| 6   | `erp-subledger-to-gl-architecture`            | By Example        | 5           | —                                                                                         | —                                                 | A               |
+| 7   | `erp-fiscal-calendar-and-period-close`        | Annotated-concept | 6           | —                                                                                         | —                                                 | A               |
+| 8   | `erp-numbering-sequences-and-uom-conversion`  | Annotated-concept | 3           | —                                                                                         | —                                                 | A               |
+| 9   | `erp-audit-trail-and-change-tracking`         | Annotated-concept | 4           | —                                                                                         | —                                                 | A               |
+| 10  | `procure-to-pay-systems`                      | By Example        | 6           | —                                                                                         | —                                                 | A               |
+| 11  | `order-to-cash-systems`                       | By Example        | 6           | —                                                                                         | —                                                 | A               |
+| 12  | `erp-procurement-and-fulfillment-exceptions`  | By Example        | 10, 11      | —                                                                                         | —                                                 | A               |
+| 13  | `record-to-report-systems`                    | By Example        | 6, 7        | —                                                                                         | `financial-statements-and-close-cycle` — **HARD** | B               |
+| 14  | `inventory-and-warehouse-management`          | By Example        | 6           | —                                                                                         | `inventory-and-cogs-accounting`                   | B               |
+| 15  | `erp-inventory-costing-methods`               | By Example        | 14          | —                                                                                         | _(transitive via 14)_                             | B               |
+| 16  | `erp-inventory-integrity-and-concurrency`     | By Example        | 14          | —                                                                                         | _(transitive via 14)_                             | B               |
+| 17  | `erp-bom-and-routing-architecture`            | By Example        | 2           | —                                                                                         | —                                                 | A               |
+| 18  | `production-planning-and-mrp`                 | By Example        | 14, 17      | —                                                                                         | _(transitive via 14)_                             | B               |
+| 19  | `demand-and-supply-planning`                  | Annotated-concept | 18          | —                                                                                         | _(transitive via 18)_                             | B               |
+| 20  | `erp-availability-and-reservations`           | By Example        | 14, 18      | —                                                                                         | _(transitive via 14, 18)_                         | B               |
+| 21  | `erp-extension-and-customization`             | By Example        | 3           | `sql-essentials`                                                                          | —                                                 | A               |
+| 22  | `erp-integration-patterns`                    | By Example        | 21          | `event-driven-architecture`, `networking-essentials`, `backend-essentials`, `api-design`  | —                                                 | A               |
+| 23  | `human-capital-management-and-hire-to-retire` | Annotated-concept | 3           | —                                                                                         | `payroll-and-tax-accounting-essentials`           | B               |
+| 24  | `multi-company-and-multi-currency-erp`        | By Example        | 13          | —                                                                                         | `consolidation-and-multi-entity-accounting`       | B               |
+| 25  | `erp-security-and-controls`                   | Annotated-concept | 3           | `security-essentials`                                                                     | `audit-controls-and-compliance`                   | B               |
+| 26  | `erp-analytics-and-reporting`                 | By Example        | 13          | `data-engineering`, `analytics-and-experimentation`, `advanced-sql-and-query-performance` | _(transitive via 13)_                             | B               |
+
+### 3 Sharia-exclusive courses (sharia-erp only)
+
+| #   | Course id                                  | Format            | ERP prereqs | Accounting prereqs                                                                | Authoring stage |
+| --- | ------------------------------------------ | ----------------- | ----------- | --------------------------------------------------------------------------------- | --------------- |
+| 27  | `sharia-compliant-erp-design`              | Annotated-concept | 24          | `islamic-contract-modeling-for-systems`, `sharia-accounting-and-aaoifi-standards` | C               |
+| 28  | `islamic-contract-based-transaction-flows` | By Example        | 10, 11, 27  | _(transitive via 27)_                                                             | C               |
+| 29  | `zakat-and-sharia-compliance-modules`      | Annotated-concept | 25, 27      | _(transitive via 27)_                                                             | C               |
+
+**Format counts (29 total)**: 17 By Example, 12 Annotated-concept — each maps to an existing
+maker/checker/fixer agent trio (`apps-ayokoding-www-by-example-*`,
+`apps-ayokoding-www-annotated-concept-*`) [Repo-grounded — both trios verified present under
+`.claude/agents/`].
+
+**No id in the 29-course list is a substring of another**, and no id collides with an existing
+software-engineering or accounting course id, which is what makes the alternation-grep acceptance
+clauses in `delivery.md` sound.
+
+### What replaced the five removed courses (A6 / A7)
+
+The prior 20-course catalog is superseded. Five courses are removed and not replaced 1:1 — they are
+replaced by **twelve** domain-depth courses that cover the cross-cutting spine, the subledger-to-GL
+crux, and the hard parts instead:
+
+| Removed course                                       | Removed by    | Reason                                                                                        |
+| ---------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------- |
+| `capstone-build-a-minimal-erp-core`                  | A6            | A construction exercise — the corpus teaches to build-founding depth, never builds            |
+| `capstone-stand-up-and-integrate-an-open-source-erp` | A6 **and** A7 | Fails A6 (stands up/installs a running system) **and** A7 (buyer/consultant hands-on posture) |
+| `erp-platform-landscape`                             | A7            | Vendor-landscape/buyer-competence material                                                    |
+| `erp-implementation-methodology`                     | A7            | Buyer/consultant fit-gap-and-cutover material                                                 |
+| `evaluating-and-selecting-an-erp`                    | A7            | Procurement/evaluation material                                                               |
+
+**Direct consequence for the existing-library cross-domain surface**: `project-management` (existing
+library) had exactly one user in the old catalog — the now-removed `erp-implementation-methodology` —
+and drops out of this plan's cross-domain edges entirely as a result. It is not replaced; no remaining
+course in the 29-course catalog needs project-management competence. `backend-essentials` and
+`api-design`, previously the removed integrate-capstone's only edges, are **reassigned** to
+`erp-integration-patterns` (course 22), which needs them for the same underlying reason (building and
+consuming APIs against a real system) without requiring the reader to stand one up.
 
 ## The prerequisite graph — one DAG, ERP is a downstream-only subgraph
 
-R5 requires this plan to state whether the new subject domain **joins** the existing prerequisite DAG
-or forms a **disjoint component**. It joins.
-
-The ERP corpus declares eight edges into the existing software-engineering library and eight into the
-accounting corpus. **No edge runs the other way**: no software-engineering course and no accounting
-course declares an ERP course as a prerequisite. ERP is therefore a **downstream-only subgraph
-attached to the single library-wide DAG**, not a second disjoint graph — which is exactly why
-`checkPrerequisiteConsistency` can validate the ERP manifest against the same DAG the four careers
-manifests use, with no schema or gate change.
+R5 requires this plan to state whether the new subject domain joins the existing prerequisite DAG or
+forms a disjoint component. It joins. The ERP corpus declares ten edges into the existing
+software-engineering library and seven into the accounting corpus (nine distinct accounting ids
+across the two Sharia-exclusive courses' transitive chain, but only seven distinct **direct** ids —
+see the catalog tables above). **No edge runs the other way**: no software-engineering course and no
+accounting course declares an ERP course as a prerequisite. ERP is therefore a **downstream-only
+subgraph** attached to the single library-wide DAG, exactly as the 20-course predecessor catalog was.
 
 ```mermaid
 %% Cross-domain prerequisite structure. Node SHAPE encodes domain:
@@ -114,31 +222,28 @@ manifests use, with no schema or gate change.
 %% hexagon = ERP corpus (this plan). Every edge points INTO a prerequisite's domain,
 %% and no edge leaves the ERP subgraph — the coupling is acyclic by construction.
 flowchart LR
-    subgraph SWE["Existing library · 121 courses · plans 02/04"]
-        S1["backend-essentials<br/>api-design"]:::swe
-        S2["event-driven-architecture<br/>networking-essentials"]:::swe
-        S3["security-essentials<br/>data-engineering<br/>analytics-and-experimentation<br/>project-management"]:::swe
+    subgraph SWE["Existing library · plans 02/04"]
+        S1["DDD · SQL ·<br/>query perf"]:::swe
+        S2["Events · network ·<br/>backend · API"]:::swe
+        S3["Security · data eng ·<br/>analytics"]:::swe
     end
     subgraph ACC["Accounting corpus · plan 06"]
         A1(["financial-statements-<br/>and-close-cycle"]):::acc
         A2(["inventory-and-cogs<br/>payroll · consolidation<br/>audit-controls"]):::acc
-        A3(["sharia-accounting<br/>islamic-contracts<br/>capstone-general-ledger"]):::acc
+        A3(["sharia-accounting<br/>islamic-contracts"]):::acc
     end
     subgraph ERP["ERP corpus · THIS PLAN"]
-        E1{{"#1-#6 · #9 · #10<br/>#17 · #18<br/>Wave A"}}:::erp
-        E2{{"#7 · #8 · #11 · #12 · #16<br/>Wave B"}}:::erp
-        E3{{"#13 · #14 · #15<br/>Wave C"}}:::erp
-        E4{{"#19 · #20<br/>Wave D"}}:::erp
+        E1{{"Stage A · 15 courses<br/>accounting-free"}}:::erp
+        E2{{"Stage B · 11 courses"}}:::erp
+        E3{{"Stage C · 3 courses<br/>sharia-erp only"}}:::erp
     end
 
-    E1 -->|"#4 · #10 · #17"| S1
+    E1 -->|"doc-lifecycle · extension"| S1
     E1 --> S2
-    E3 -->|"#15"| S3
-    E2 -->|"#16"| S3
-    E2 -->|"#7 HARD · #8"| A1
+    E2 -->|"security · analytics"| S3
+    E2 -->|"HARD"| A1
     E2 --> A2
-    E3 -->|"#13 · #14 · #15"| A2
-    E4 -->|"#19 · #20"| A3
+    E3 --> A3
 
     classDef swe fill:#0173B2,stroke:#000000,color:#FFFFFF
     classDef acc fill:#DE8F05,stroke:#000000,color:#000000
@@ -146,472 +251,653 @@ flowchart LR
 ```
 
 **Accessibility note.** Domain is carried by node shape (rectangle / stadium / hexagon) **and** by the
-three labelled subgraph containers, never by colour alone; edge meaning is carried by the edge labels.
-Fills use the verified accessible palette per the
+three labelled subgraph containers, never by colour alone. Fills use the verified accessible palette
+per the
 [Color Accessibility Convention](../../../repo-governance/conventions/formatting/color-accessibility.md).
 
-## Authoring waves vs reading ramp (DD-3)
+## Authoring stages vs reading ramp (DD-3)
 
-**Authoring order is not reading order.** The manifest fixes what a reader walks; the delivery
-checklist fixes what an author writes next. Conflating them is what would produce the false conclusion
-"ERP is blocked by accounting".
+**Authoring order is not reading order.** The two manifests fix what a reader walks; the delivery
+checklist fixes what an author writes next. Three **named** authoring stages replace the prior
+lettered "waves" — named specifically so `ayokoding-learning-path-06-skills-accounting` can reference
+them without depending on ERP course numbers, which do not survive this rewrite (see
+[§The 06→07 dependency edge](#the-0607-dependency-edge-stage-granularity-not-course-numbers)).
 
-The waves are derived mechanically from the catalog: a course belongs to the **earliest** wave whose
-accounting preconditions cover its own accounting prerequisites **and** the accounting prerequisites
-of everything it transitively depends on.
-
-| Wave  | ERP courses (authoring order)   | Count | Accounting bundles that must resolve on `origin/main` first                                                                 | Concurrency with plan 06 |
-| ----- | ------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| **A** | 1, 2, 3, 4, 5, 6, 9, 10, 17, 18 | 10    | **none**                                                                                                                    | fully concurrent         |
-| **B** | 7, 8, 11, 12, 16                | 5     | `financial-statements-and-close-cycle`, `inventory-and-cogs-accounting`                                                     | gated                    |
-| **C** | 13, 14, 15                      | 3     | `consolidation-and-multi-entity-accounting`, `audit-controls-and-compliance`, `payroll-and-tax-accounting-essentials`       | gated                    |
-| **D** | 19, 20                          | 2     | `sharia-accounting-and-aaoifi-standards`, `islamic-contract-modeling-for-systems`, `capstone-build-a-general-ledger-system` | gated                    |
+| Authoring stage | Name                          | Courses (by id, authoring order)           | Count | Accounting precondition                                                                                                                                                                                                                                             |
+| --------------- | ----------------------------- | ------------------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A**           | Foundations & Architecture    | 1–12, 17, 21, 22                           | 15    | **none** — fully concurrent with plan 06                                                                                                                                                                                                                            |
+| **B**           | Conventional Enterprise Depth | 13, 14, 15, 16, 18, 19, 20, 23, 24, 25, 26 | 11    | accounting's **"conventional-accounting complete"** boundary — needs `financial-statements-and-close-cycle`, `inventory-and-cogs-accounting`, `payroll-and-tax-accounting-essentials`, `consolidation-and-multi-entity-accounting`, `audit-controls-and-compliance` |
+| **C**           | Sharia-Compliant Design       | 27, 28, 29                                 | 3     | accounting's **"sharia-accounting complete"** boundary — needs `islamic-contract-modeling-for-systems`, `sharia-accounting-and-aaoifi-standards`                                                                                                                    |
 
 Transitive derivations worth stating, because they are the ones an executor would get wrong:
 
-- **#11 and #12 look accounting-free** — their declared prerequisites are #8 and #11. But #8 requires
-  `inventory-and-cogs-accounting`, so both inherit that gate and belong to Wave B, not Wave A.
-- **#16 looks accounting-free** — its declared prerequisites are #7 plus two software-engineering
-  courses. #7 carries the hard edge, so #16 is Wave B.
-- **#14 carries two accounting gates**, one directly (`consolidation-and-multi-entity-accounting`) and
-  one transitively through #7 (`financial-statements-and-close-cycle`). Wave C covers both because
-  Wave B has already landed by then.
-- **#17 and #18 sit late in the reading ramp and early in the authoring order.** Nothing in either
-  touches accounting; deferring them to a later wave would idle work for no reason.
+- **Courses 18, 19, 20 (production planning, demand/supply planning, availability/reservations) look
+  accounting-free** — their own declared prerequisites never name an accounting id directly. But all
+  three transitively depend on course 14 (`inventory-and-warehouse-management`), which requires
+  `inventory-and-cogs-accounting`, so all three belong to Stage B.
+- **Course 26 (analytics and reporting) looks accounting-free** — its declared prerequisites are
+  course 13 plus three software-engineering courses. Course 13 carries the hard edge, so course 26 is
+  Stage B.
+- **Course 17 (BOM and routing architecture) sits late in the content-stage ordering (planning) and
+  early in the authoring order.** Its only prerequisite is course 2 (conceptual data model); deferring
+  it to Stage B would idle authorable work for no reason.
+- **Courses 24, 27, 28, 29 each carry a compound gate**: course 24 needs both course 13 (transitively
+  `financial-statements-and-close-cycle`) and directly `consolidation-and-multi-entity-accounting` —
+  both resolve by the time Stage B starts. Courses 27–29 each transitively need course 24's chain plus
+  their own direct Sharia accounting ids, all of which resolve once Stage C's own precondition holds.
 
 ```mermaid
-%% The wave gate as a decision. Each diamond is a mechanical test -d check against an
-%% accounting course bundle on origin/main; a red edge is the blocked branch.
+%% The stage gate as a decision. Each diamond is a mechanical test -d check against an
+%% accounting course bundle on origin/main; the wait branch polls rather than authors around the gap.
 %% Node SHAPE encodes kind: rectangle = authoring work, diamond = gate check.
-%% Oriented TD rather than the repo-default LR: the gate chain is seven ranks deep,
-%% which is over the LR horizontal budget and reads naturally top-down.
 flowchart TD
-    WA["Wave A<br/>10 bodies<br/>no accounting gate"]:::work
-    G1{"Acct #3 and #9<br/>bundles resolve?"}:::gate
-    WB["Wave B<br/>5 bodies"]:::work
-    G2{"Acct #11, #13, #14<br/>bundles resolve?"}:::gate
-    WC["Wave C<br/>3 bodies"]:::work
-    G3{"Acct #17, #18, #19<br/>bundles resolve?"}:::gate
-    WD["Wave D<br/>2 bodies"]:::work
+    SA["Stage A<br/>15 bodies<br/>no accounting gate"]:::work
+    G1{"Conventional-<br/>accounting gate<br/>(5 ids) resolve?"}:::gate
+    SB["Stage B<br/>11 bodies"]:::work
+    G2{"Sharia-accounting<br/>gate (2 ids)<br/>resolve?"}:::gate
+    SC["Stage C<br/>3 bodies · sharia-erp only"]:::work
     WAIT["wait on plan 06<br/>poll the gate"]:::wait
 
-    WA --> G1
-    G1 -->|yes| WB
+    SA --> G1
+    G1 -->|yes| SB
     G1 -->|no| WAIT
-    WB --> G2
-    G2 -->|yes| WC
+    SB --> G2
+    G2 -->|yes| SC
     G2 -->|no| WAIT
-    WC --> G3
-    G3 -->|yes| WD
-    G3 -->|no| WAIT
 
     classDef work fill:#029E73,stroke:#000000,color:#FFFFFF
     classDef gate fill:#56B4E9,stroke:#000000,color:#000000
     classDef wait fill:#CC79A7,stroke:#000000,color:#000000
 ```
 
-**Within a wave, bodies are content-independent** — each writes only its own subtree under
-`<COURSES>`, so they pipeline concurrently through review, bounded by the in-force subagent cap. The
-prerequisite edges between them are **reading** constraints satisfied by the manifest order, not
-authoring constraints, because every course's concepts, examples, and capstone are already settled in
-its syllabus spec before any body is written.
+**Within a stage, bodies are content-independent** — each writes only its own subtree under
+`<COURSES>`, so they pipeline concurrently through review, bounded by the in-force subagent cap.
+
+## The 06→07 dependency edge (stage granularity, not course numbers)
+
+The prior single-catalog plan's cross-plan handoff, and `ayokoding-learning-path-06-skills-accounting`'s
+prior `UNBLOCKS_ERP_COURSES` mapping, both keyed the edge to **ERP course numbers**. Both rewrites
+(this one and plan 06's own, in flight concurrently) invalidate that shape twice over: this plan's
+course numbers moved with the A9 expansion, and plan 06's own numbers moved with its A6/A9 changes too.
+**Course numbers do not survive either plan's renumbering; stage names do.**
+
+Per plan 06's own README (`ayokoding-learning-path-06-skills-accounting/README.md`, read 2026-07-22):
+_"The stage-signal contract... now names the ERP capability stage a given accounting stage unblocks —
+described functionally... rather than by an ERP course number this plan has no authority to assert."_
+This plan supplies the missing half of that contract — the **named ERP-side stages** plan 06 can point
+at:
+
+| Accounting stage (plan 06's naming)                                                                                                      | Unblocks ERP stage                                       | Mechanical gate (this plan's own, independent — never reads plan 06's `delivery.md`)                                                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Stage 1** — "Dangerous 1" (courses 1–3, `financial-statements-and-close-cycle` lands)                                                  | Stage A start (no gate — Stage A never depended on this) | —                                                                                                                                                                                                                                           |
+| **Stage 2** — "Dangerous 2" / **conventional-accounting complete** (courses 4–16 or 4–19, per plan 06's own numbering as of its rewrite) | **Stage B — Conventional Enterprise Depth**              | `test -d <COURSES>financial-statements-and-close-cycle`, `…inventory-and-cogs-accounting`, `…payroll-and-tax-accounting-essentials`, `…consolidation-and-multi-entity-accounting`, `…audit-controls-and-compliance` — all five must resolve |
+| **Stage 3** — "Dangerous 3" / **sharia-accounting complete**                                                                             | **Stage C — Sharia-Compliant Design**                    | `test -d <COURSES>islamic-contract-modeling-for-systems`, `…sharia-accounting-and-aaoifi-standards` — both must resolve                                                                                                                     |
+
+This table is a **human/audit-readable coordination note, exactly as plan 06's own stage-signal
+contract describes itself** — never a machine contract. This plan's actual gates in `delivery.md` are
+independent, mechanical `test -d` checks against specific accounting course ids on `origin/main`; they
+never parse plan 06's `delivery.md`, never read a "stage signal" record, and have no rejection logic
+beyond "the directory does or does not exist yet". The stage names above exist so a human reviewing
+either plan can see which side unblocks which without cross-referencing course numbers that neither
+plan can promise to keep stable.
+
+**The hard edge is `financial-statements-and-close-cycle → record-to-report-systems` (course 13).**
+Subledger-to-GL posting is meaningless without a balanced ledger. This is the single edge that keeps
+Stage A (15 courses) fully concurrent with plan 06 while Stage B (11 courses) waits.
+
+### Cross-plan coordination risk (accounting course-id stability)
+
+The seven accounting course ids cited above (`financial-statements-and-close-cycle`,
+`inventory-and-cogs-accounting`, `payroll-and-tax-accounting-essentials`,
+`consolidation-and-multi-entity-accounting`, `audit-controls-and-compliance`,
+`islamic-contract-modeling-for-systems`, `sharia-accounting-and-aaoifi-standards`) are as named in
+`ayokoding-learning-path-06-skills-accounting`'s own catalog as of its in-flight rewrite (README read
+2026-07-22; its `tech-docs.md` catalog table was not yet updated to the two-path split at that same
+read). **This is a genuine open coordination item, not a resolved fact**: if plan 06's rewrite renames
+or restructures any of these seven ids before execution, this plan's `ACCT_GATE_*` arrays in
+`delivery.md` must be updated to match before Phase 3 (Stage B) starts. The mechanical `test -d` gate
+design fails **safely** if this happens — a renamed id simply never resolves and Stage B waits
+indefinitely rather than authoring against a wrong assumption — but the wait would be for the wrong
+reason until the id list is corrected. Flagged here rather than resolved, per the refuse-on-uncertainty
+rule for a fact this plan cannot itself verify (only plan 06 can).
 
 ## Manifest format and lifecycle
 
-### Shape
+### Shape (both manifests share this shape; only the ids differ)
 
 ```yaml
-# apps/ayokoding-www/src/features/course-paths/manifests/skills/enterprise-resource-planning.yaml
-pathId: skills/enterprise-resource-planning
+# apps/ayokoding-www/src/features/course-paths/manifests/skills/conventional-erp.yaml
+pathId: skills/conventional-erp
 arc: immediately-effective
-title: Enterprise Resource Planning
+title: Enterprise Resource Planning (Conventional)
 description: >-
-  Become useful against a real ERP fast, then go deep enough to design and build one.
+  Learn the architecture, the cross-cutting spine, and the hard parts of a conventional ERP —
+  deep enough to found an implementation, never asked to build one.
 courseOrder:
   - erp-foundations-and-history
   - erp-conceptual-data-model
-  # ... in ramp order
+  # ... 26 ids in ramp order
 ```
 
-Four invariants specific to this manifest, three of them ruled by the schema owner
-`ayokoding-learning-path-02-schema-and-prerequisite-dag` and binding on this plan:
+```yaml
+# apps/ayokoding-www/src/features/course-paths/manifests/skills/sharia-erp.yaml
+pathId: skills/sharia-erp
+arc: immediately-effective
+title: Enterprise Resource Planning (Sharia-Compliant)
+description: >-
+  The same conventional-ERP grounding, plus jurisdiction-plural Sharia-compliant design —
+  covers all the basics; never assumes the conventional path.
+courseOrder:
+  - erp-foundations-and-history
+  # ... the same 26 shared ids, interleaved with the 3 Sharia-exclusive ids after multi-company-and-multi-currency-erp
+```
 
-- **`pathId` is the full string, category segment included** — `skills/enterprise-resource-planning`,
-  nothing shorter. There is **no separate `category` field**; the category is the first segment of the
-  id itself (DD-21).
-- **Validation is on the first-segment literal plus resolvability, never on arity.** `pathId` is
-  variable-depth by design — careers ids carry three segments, skills ids carry two — so no schema
-  rule, regex, route, glob, or acceptance clause in this plan may key on segment count. An
-  unresolvable or malformed id is a **hard `safeParse` rejection**: never silent coercion, never an
-  alias, never normalization (DD-21).
-- **`arc` is a separate required field, present even though the URL omits it** (R8 / DD-7). A skills
-  path is always the `immediately-effective` arc; the arc is recorded as **data**, not left implicit
-  in prose, and keeping the field is what makes a future `skills/<arc>/<subject>` grammar purely
-  additive.
-- **`courseOrder` is the file's only YAML sequence.** This is asserted at the REFACTOR step of the
-  publication cycle, and it is what makes a list-item count an exact `courseOrder` length rather than
-  an approximation. Its entries are **course ids**, a different namespace from path ids, carrying
-  **no** category prefix (DD-21).
+Four invariants specific to these manifests, three of them ruled by the schema owner
+`ayokoding-learning-path-02-schema-and-prerequisite-dag` and binding on this plan (carried unchanged
+from the prior design, DD-21):
+
+- **`pathId` is the full string, category segment included** — `skills/conventional-erp` or
+  `skills/sharia-erp`, nothing shorter. There is **no separate `category` field**.
+- **Validation is on the first-segment literal plus resolvability, never on arity.**
+- **`arc` is a separate required field, present even though the URL omits it** (R8 / DD-7).
+- **`courseOrder` is each file's only YAML sequence.** Asserted at the REFACTOR step of the
+  publication cycle.
+
+### courseOrder arrays at each growth boundary
+
+`<CONVMAN>` (26 ids, final; grows Stage A → B):
+
+1. Stage A publication (15 ids): `erp-foundations-and-history`, `erp-conceptual-data-model`,
+   `erp-module-map-and-architecture`, `erp-document-lifecycle-and-state-machines`,
+   `erp-posting-rules-and-account-determination`, `erp-subledger-to-gl-architecture`,
+   `erp-fiscal-calendar-and-period-close`, `erp-numbering-sequences-and-uom-conversion`,
+   `erp-audit-trail-and-change-tracking`, `procure-to-pay-systems`, `order-to-cash-systems`,
+   `erp-procurement-and-fulfillment-exceptions`, `erp-bom-and-routing-architecture`,
+   `erp-extension-and-customization`, `erp-integration-patterns`.
+2. Stage B growth (+11 ids → 26 total): insert `record-to-report-systems`,
+   `inventory-and-warehouse-management`, `erp-inventory-costing-methods`,
+   `erp-inventory-integrity-and-concurrency` after `erp-procurement-and-fulfillment-exceptions`;
+   insert `production-planning-and-mrp`, `demand-and-supply-planning`,
+   `erp-availability-and-reservations` after `erp-bom-and-routing-architecture`; append
+   `human-capital-management-and-hire-to-retire`, `multi-company-and-multi-currency-erp`,
+   `erp-security-and-controls`, `erp-analytics-and-reporting` at the end.
+
+`<SHARMAN>` (29 ids, final; grows Stage A → B → C):
+
+1. Stage A (15 ids) — identical to `<CONVMAN>`'s Stage A publication.
+2. Stage B growth (+11 → 26) — identical insertion positions to `<CONVMAN>`'s Stage B growth.
+3. Stage C growth (+3 → 29): insert `sharia-compliant-erp-design`,
+   `islamic-contract-based-transaction-flows`, `zakat-and-sharia-compliance-modules` immediately after
+   `multi-company-and-multi-currency-erp` and before `erp-security-and-controls`.
+
+**Never reorder an already-published id.** Every growth step inserts new ids at a fixed position
+relative to what already exists; any reading-smoothness regression a growth step surfaces is fixed by
+bridging prose **in place**, never by reordering.
 
 ### Lifecycle
 
 ```mermaid
-%% Manifest lifecycle across the four growth points. Each transition is a phase gate.
+%% Manifest lifecycle across the growth points shared by both manifests. Each transition is a phase gate.
 stateDiagram-v2
     [*] --> Absent
-    Absent --> Published10: Phase 2 gate<br/>Wave A landed<br/>boundary 1 live
-    Published10 --> Grown15: Phase 3 gate<br/>Wave B landed<br/>boundary 2 live
-    Grown15 --> Grown18: Phase 4 gate<br/>Wave C landed
-    Grown18 --> Complete20: Phase 5 gate<br/>Wave D landed<br/>boundary 3 live
-    Complete20 --> [*]: archived
+    Absent --> Published15: Phase 2 gate<br/>Stage A landed<br/>Dangerous 1
+    Published15 --> Grown26: Phase 3 gate<br/>Stage B landed<br/>conventional-erp COMPLETE<br/>Dangerous 2/3
+    Grown26 --> Grown29ShariaOnly: Phase 4 gate<br/>Stage C landed<br/>sharia-erp COMPLETE<br/>Dangerous 4
+    Grown29ShariaOnly --> [*]: archived
+    Grown26 --> [*]: conventional-erp<br/>archived, terminal
 ```
 
 Each transition carries a **falsifiable deferral check in both directions**: the ids added by the next
-wave must be provably absent before the transition and provably present after. A manifest that grows
-silently, or fails to grow, is caught at the gate that owns the transition rather than at archival.
+stage must be provably absent before the transition and provably present after.
 
 ## Landing content requirements (what plan 03 cannot infer)
 
-`ayokoding-learning-path-03-navigation-ui` owns **how the landing looks** — Screen 2 (path landing),
-Screen 1 (paths hub), and Screen 1a (category landing), together with every mockup and render in its
-`assets/` and `assets/src/` folders. This plan ships no design asset and no mockup.
+`ayokoding-learning-path-03-navigation-ui` owns **how the landings look**. This plan ships no design
+asset. What this plan owes plan 03 is a **content specification** for each of the two landings.
 
-What this plan owes plan 03 is a **content specification**, because two requirements are properties of
-the ERP domain that no navigation plan can derive from the manifest alone.
+### Requirement L-1 — the ramp must be visible on both landings
 
-### Requirement L-1 — the ramp must be visible on the landing
+| Boundary           | Reached after                                                                         | Can                                                                                                                                                                                         | Cannot                                                                                                                         | Path(s)                                |
+| ------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| **Dangerous 1** ⚡ | `erp-audit-trail-and-change-tracking` (course 9 of 26/29)                             | Read and reason about how any real ERP structures documents, postings, and account determination — informed enough to review an implementation's design or ask a vendor the right questions | Reason about inventory costing, closing the books, or multi-entity consolidation — the domain's characteristic silent failures | both                                   |
+| **Dangerous 2** ⚡ | `erp-inventory-integrity-and-concurrency` (course 16 of 26/29)                        | Explain the full subledger-to-GL relationship in practice (P2P/O2C/R2R) and the hard parts of inventory (costing methods, negative stock, backdating, concurrency)                          | Production planning, enterprise-scale concerns (multi-entity, payroll, security, analytics)                                    | both                                   |
+| **Dangerous 3** ⚡ | `erp-analytics-and-reporting` (course 26 of 26/29) — **`conventional-erp` ENDS HERE** | Full conventional-ERP domain competence — deep enough to found a conventional implementation                                                                                                | Jurisdiction-plural Sharia-compliant ERP design                                                                                | both (terminal for `conventional-erp`) |
+| **Dangerous 4** ⚡ | `zakat-and-sharia-compliance-modules` (course 29 of 29)                               | Full competence including jurisdiction-plural Sharia-compliant ERP design                                                                                                                   | —                                                                                                                              | `sharia-erp` only                      |
 
-A skills path answers a question a careers path never poses: **how far in do I become useful?** The
-landing must surface all three "dangerous by here" boundaries, each as a pair — what the reader **can**
-do and what they still **cannot**:
+Every "Reached after" cell names a **course id**, not a bare ordinal — both manifests publish
+partially before reaching full composition, and an ordinal would misresolve against a partially-grown
+`courseOrder`.
 
-| Boundary | Reached after                                                   | Can                                                                   | Cannot                                                                              |
-| -------- | --------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 1        | `capstone-stand-up-and-integrate-an-open-source-erp` (#4 of 20) | install, configure, integrate a real ERP through its API              | design correct P2P/O2C/R2R flows; extend without breaking upgrades; scope a rollout |
-| 2        | `erp-integration-patterns` (#10 of 20)                          | correct core process flows; safe extension; right integration pattern | production planning; multi-company/multi-currency; SoD enforcement; run a rollout   |
-| 3        | `capstone-build-a-minimal-erp-core` (#20 of 20)                 | full competence                                                       | —                                                                                   |
+### Requirement L-2 — the longer runway to Dangerous 1 must be justified, not hidden
 
-The "Reached after" column names the **course id**, not a bare ordinal — the manifest publishes with
-only ten of the twenty courses live (Phase 2), and an ordinal like "#4" or "#10" would silently
-misresolve against a partially-grown `courseOrder` before Phases 3 and 5 land boundaries 2 and 3. The
-parenthetical `(#N of 20)` is informational only.
-
-The **cannot** column is not decoration. Boundary 1's failure mode is a reader who mistakes "can
-integrate" for "can design the flows" and produces orphaned purchase orders, double-counted inventory,
-or GL entries that never reconcile — the silent failure class this corpus exists to prevent.
-
-### Requirement L-2 — the longer runway must be justified, not hidden
-
-ERP's first payoff is at course **#4**; the sibling accounting path's is at **#3**. **The two skills
-landings are therefore not interchangeable**, and plan 03 must not design one template that assumes
-they are.
-
-The landing must state the extra orientation step **and its reason** in the same breath: without the
-master/transactional data model (#2) and the platform landscape (#3), a reader integrates against the
-wrong abstractions and silently corrupts state. A landing that hides the runway reads as padded; a
-landing that names it without a reason reads as slow; a landing that justifies it reads as honest.
+ERP's Dangerous 1 lands after **9** courses; the sibling accounting path's Dangerous 1 lands after
+**3**. This asymmetry is real and must be stated with its reason, not smoothed over: unlike
+accounting's double-entry mechanics (a single, small, safe-to-assert foundation), ERP's cross-cutting
+spine — document lifecycle, posting rules, the subledger-to-GL architecture, fiscal calendar,
+numbering, and audit trail — has no small usable subset. Skipping any one of the six architecture-spine
+courses leaves a reader unable to distinguish sound account-determination logic from broken, which
+defeats the entire payoff: informed reasoning about a real system. A landing that hides this runway
+reads as padded; one that states it without a reason reads as slow; one that justifies it reads as
+honest.
 
 ### Requirement L-3 — the arc is stated once, not per URL
 
-The skills category states the immediately-effective promise once (R8). There is **no arc chooser** on
-a skills landing, unlike `careers/`, where the arc is a real three-way branch point.
+The skills category states the immediately-effective promise once (R8). Neither landing carries an arc
+chooser.
 
 ### Requirement L-4 — linked-not-walked prerequisites are outbound links
 
-The landing carries outbound links to the eight existing software-engineering courses and the eight
-accounting courses the corpus depends on, each to its canonical `/en/learn/courses/<id>` page. None of
-them appears in `courseOrder` (DD-9).
+Each landing carries outbound links to its own set of existing software-engineering and accounting
+prerequisites, each to its canonical `/en/learn/courses/<id>` page. None appears in either
+`courseOrder`.
+
+### Requirement L-5 — sharia-erp states explicitly that it covers all the basics (A10)
+
+The `sharia-erp` landing must state, in its own words, that it is **not** an add-on assuming the
+conventional path — a reader entering cold gets full grounding, because 26 of its 29 courses are the
+identical shared corpus `conventional-erp` teaches. This is a stated landing requirement precisely
+because a reader skimming "Sharia-Compliant" in the title could otherwise assume they need
+`conventional-erp` first; they do not.
 
 ## Verification status carried forward (A4)
 
-The corpus research marks only three items `[Verified]`, **none of them ERP**. This domain is almost
-entirely search-summarised `[Unverified]`. Every marker is carried into the syllabus specs and the
-course bodies with a named resolution step; **no `[Unverified]` claim is restated as fact**.
+The corpus research marks almost nothing ERP-specific `[Verified]`. Every marker is carried into the
+syllabus specs and the course bodies with a named resolution step; **no `[Unverified]` claim is
+restated as fact**.
 
 ### Safe to assert
 
-Module names (FI / CO / MM / SD / PP), process names (P2P / O2C / R2R / H2R), the MRP algorithm, and
-double-entry mechanics. These are stable and go in a course's **stable spine**.
+Module names (FI / CO / MM / SD / PP / HCM), process names (P2P / O2C / R2R / H2R), the MRP algorithm,
+double-entry mechanics, BOM explosion mechanics, and the EAV / JSONB / generated-schema extensibility
+trade-off as a design-axis description (not a vendor claim). These are stable and go in a course's
+**stable spine**.
 
 ### Requires re-verification at authoring time
 
-| Claim class                      | Status                                                                                                    | Resolution step                                                                         |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| ERP integration surfaces         | `[Unverified]` — IDoc retirement from SAP Cloud ERP Public Cloud, Dataverse dual-write, OData generations | `web-researcher` against vendor documentation before authoring #10                      |
-| Analyst positioning (Gartner MQ) | `[Unverified]` and **weakly sourced** — paywalled, triangulated from vendor and analyst coverage only     | do not state a ranking as fact; frame as market commentary with its provenance, or omit |
-| Platform version pins            | `[Unverified]`                                                                                            | dated accuracy-note sidebar, never the stable spine                                     |
-| The 20-course count              | `[Judgment call]` — curriculum judgment, explicitly not a sourced fact                                    | labelled as judgment wherever stated                                                    |
+| Claim class                                 | Status                                                                                                    | Resolution step                                                                                                                                                                                                                             |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ERP integration surfaces                    | `[Unverified]` — IDoc retirement from SAP Cloud ERP Public Cloud, Dataverse dual-write, OData generations | `web-researcher` against vendor documentation before authoring course 22                                                                                                                                                                    |
+| Analyst positioning (Gartner MQ)            | `[Unverified]` and **weakly sourced** — paywalled, triangulated from vendor and analyst coverage only     | never state a ranking as fact; frame as market commentary with its provenance, or omit — the corpus carries no evaluation/selection course to attach this to, so it should appear at most incidentally in `erp-module-map-and-architecture` |
+| Platform version pins                       | `[Unverified]`                                                                                            | dated accuracy-note sidebar, never the stable spine                                                                                                                                                                                         |
+| The 29-course count and its stage partition | `[Judgment call]` — curriculum judgment, explicitly not a sourced fact                                    | labelled as judgment wherever stated                                                                                                                                                                                                        |
 
-### Named open item — the SAP source gap
+### Load-bearing for courses 27–29 — there is no single "Sharia accounting standard"
 
-A direct SAP-owned source returned **HTTP 403** during the research. Closing that gap with a working
-**SAP Help Portal URL** is a tracked open item on this plan, resolved in Phase 1 before `#3
-erp-platform-landscape` and `#10 erp-integration-patterns` are authored. If it cannot be closed, the
-affected claims are framed with their provenance or dropped — they are not published unqualified.
-
-### Load-bearing for #19 — there is no single "Sharia accounting standard"
-
-Three structurally different jurisdictional models coexist. **The whole table is `[Unverified]`** —
-including the "AAOIFI used as basis, not adopted" claim for Indonesia and the "not on AAOIFI's
-mandatory-adoption list" claim for Malaysia — pending the primary-source re-verification pass in
-delivery.md's [Phase 1.2](./delivery.md#12--the-a4-verification-pass-before-any-spec-asserts-a-fact):
-
-| Model                                         | Jurisdiction | Shape                                                                                            |
-| --------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------ |
-| **AAOIFI**                                    | Bahrain      | standard-setting-body model; separate Financial Accounting and Shari'ah Standards series         |
-| **PSAK Syariah**                              | Indonesia    | parallel standard series; DSAS proposes, DSN-MUI ratifies; AAOIFI used as **basis**, not adopted |
-| **MFRS + BNM Shariah Governance Policy 2019** | Malaysia     | single-standard-plus-governance-overlay; **not** on AAOIFI's mandatory-adoption list             |
-
-The engineering lesson of `sharia-compliant-erp-design` is therefore **jurisdictional pluggability**:
-the chart of accounts, the recognition rules, and the disclosure set are configuration, not
-hardcoded constants. A course presenting AAOIFI as "the" standard would be wrong (DD-12) — this
+Three structurally different jurisdictional models coexist (AAOIFI/Bahrain, PSAK Syariah/Indonesia,
+MFRS + BNM Shariah Governance Policy 2019/Malaysia). **The whole table is `[Unverified]`** pending the
+primary-source re-verification pass in [delivery.md Phase 1.2](./delivery.md#12--the-a4-verification-pass-before-any-spec-asserts-a-fact).
+The engineering lesson of `sharia-compliant-erp-design` is **jurisdictional pluggability**: the chart
+of accounts, recognition rules, and disclosure set are configuration, not hardcoded constants. This
 structural claim (three coexisting models, none universal) is independent of the `[Unverified]` cell
-details above and does not itself require re-verification.
+details and does not itself require re-verification (DD-12).
 
 The Indonesian **PSAK numbering** is `[Needs Verification]` — sources show both a "PSAK 59 / SIFAS
-101-109" generation and a "PSAK 101-110" series. Resolve against IAI's published list before any
-standard number is written into #19. Both this and the `[Unverified]` table above are the same Phase
-1.2 delivery step; #19's spec may not state either as unqualified fact until that step closes.
+101-109" generation and a "PSAK 101-110" series; resolve against IAI's published list before course
+27's spec states a number.
+
+## Licensing and IP Compliance (A8)
+
+**Every course in this corpus is authored clean-room.** No standards text, proprietary schema, or
+copyleft code is reproduced anywhere. This section is the binding reference every syllabus and every
+authored body cites. `A8` is a **programme-wide** posture — see
+[Programme §A8 — licensing binds the whole programme](../ayokoding-learning-path-programme.md#a8--licensing-binds-the-whole-programme)
+— and this section is this plan's own instance of that posture, kept consistent with it rather than
+restating it. `A12`'s syllabus-confirmation order (below, and in
+[§Syllabus layer](#syllabus-layer--custody-and-shape-dd-31)) is the sharpest instance of `A8` this
+plan carries, because the confirmation step is exactly where a copyrighted curriculum's structure
+could otherwise leak in.
+
+**Reconciled with `DD-15` — a narrower, pre-existing decision, not a duplicate.** Every syllabus file
+inherited from `ayokoding-learning-path-02-schema-and-prerequisite-dag` ends its Scope note with
+"License-aware (DD-15)" — e.g. `syllabus/courses/actor-model-concurrency.md`'s Accuracy notes
+distinguishing Akka's BSL-1.1 relicensing from Apache Pekko's Apache-2.0 fork. Tracing that id: the
+`ayokoding-learning-path-02-schema-and-prerequisite-dag` plan's own current `DD-15` and `DD-27` govern
+an unrelated **build-order** decision — the id was reused across plans. The syllabus files' own
+"License-aware (DD-15)" phrasing is inherited from the earlier, now-archived
+`plans/done/2026-07-19__fundamentally-strong-software-engineer/tech-docs.md` `DD-15`, **"License-aware
+technology choices"**: when a reference tool or library's licence changes (its example: Terraform's
+move to BUSL-1.1, resolved by preferring OpenTofu, MPL-2.0), the syllabus names the current, actually
+open option rather than the legacy one. `DD-15` is therefore about **which reference technology a
+syllabus points to**; this plan's `A8` section is about **what content may be reproduced from a
+copyrighted source** (standards text, code, documentation, curricula). The two do not conflict —
+`DD-15`'s "prefer the actually-open tool" posture is the same judgment as safe-authoring rule 5 below
+("prefer permissive... describe copyleft projects behaviourally") — and this plan's syllabi carry both
+tags: every syllabus's Scope note ends `License-aware (DD-15)` per the inherited convention, and this
+`A8` section is the broader content-reproduction rule that additionally binds every course body. See
+[DD-34](#design-decisions).
+
+### Per-project licence table (from the domain-research grounding, `[Verified]`)
+
+| Project                                             | Licence            | Note                                                                |
+| --------------------------------------------------- | ------------------ | ------------------------------------------------------------------- |
+| Odoo Community                                      | LGPLv3             | permissive-ish copyleft; describe behaviourally, never quote code   |
+| Odoo Enterprise                                     | OEEL (proprietary) | never reference its internals beyond nominative naming              |
+| ERPNext                                             | GPLv3              | code is copyleft; docs are CC-BY-SA-3.0                             |
+| Frappe Framework                                    | MIT                | the only fully permissive project in the table                      |
+| Tryton                                              | GPLv3+             | copyleft; describe behaviourally                                    |
+| Apache OFBiz                                        | Apache-2.0         | permissive; still never paste verbatim without attribution          |
+| Dolibarr                                            | GPLv3+             | copyleft; describe behaviourally                                    |
+| iDempiere                                           | GPLv2              | copyleft; describe behaviourally                                    |
+| Metasfresh                                          | `[Unverified]`     | never cite a licence claim for this project without re-verifying it |
+| ledger-cli (reference for GL mechanics)             | BSD-3-Clause       | permissive; safe to reference more directly than the above          |
+| Apache Fineract (reference for subledger mechanics) | Apache-2.0         | permissive; safe to reference more directly than the above          |
+
+**No public-domain chart-of-accounts template was found in the grounding research.** Any chart of
+accounts anywhere in this corpus (course 2's data-model examples, course 5's posting-rule worked
+examples, and every By-Example course's sample company) must be **authored originally**.
+
+### The eleven safe-authoring rules (bind every course in this plan)
+
+1. Restate concepts in original words; never reproduce standards text, tables, or clause numbering
+   layouts.
+2. Cite standard number + title + official link where a standard is referenced at all; quote nothing.
+3. Never translate a standard.
+4. Author every chart of accounts, worked example, and dataset originally.
+5. Reference implementations: prefer permissive (ledger-cli BSD-3-Clause, Apache Fineract Apache-2.0);
+   describe copyleft projects (Odoo Community, ERPNext, Tryton, Dolibarr, iDempiere) behaviourally
+   rather than quoting their code.
+6. Never paste code from a copyleft codebase, in any quantity.
+7. Use vendor names nominatively only — never in a course title, path segment, or product name.
+8. Screenshots of proprietary software are out.
+9. Carry `[Verified]` / `[Unverified]` / `[Needs Verification]` markers verbatim into course
+   frontmatter or body where a claim depends on them.
+10. Where a doctrinal or jurisdictional claim rests on secondary sources only, say so in the course.
+11. When in doubt between describing and reproducing, describe.
+
+### Syllabus confirmation order (A12)
+
+A twelfth rule, specific to the syllabus layer and stated separately because it governs a step (Phase
+1.2a) rather than a category of content: **author from domain reasoning first, confirm coverage
+against a recognised curriculum second, and never let the confirmation step reorder or restructure
+what was already written.** ASCM/APICS CPIM and CSCP topic outlines are commercial products whose
+syllabus is the thing sold; treating them as a structure source rather than a coverage check is the
+exact derivative-work risk `A8` guards against everywhere else in this corpus. See
+[§Syllabus layer](#syllabus-layer--custody-and-shape-dd-31) for the three-step order and
+[DD-32](#design-decisions) for the decision record.
+
+### Legal basis
+
+- **17 U.S.C. §102(b)** and **EU Directive 2009/24/EC Art. 1(2)** both exclude ideas, procedures,
+  processes, and systems from copyright. Learning how a system works and reimplementing it is not
+  infringement.
+- **_Baker v. Selden_ (101 U.S. 99, 1879)** is **directly on point — it concerned a bookkeeping
+  system.** The Court held the system itself unprotectable even though the book describing it was
+  protected. This is the strongest authority for this corpus's clean-room posture, and it is
+  especially apt for an ERP corpus since the case's own subject matter is a ledger system.
+- Short identifiers such as table and field names fall outside copyright per **Copyright Office
+  Circular 34** (names, titles, and short phrases are not protected).
+- The genuinely contested zone is **non-literal structural copying**, tested under **_Computer
+  Associates v. Altai_** abstraction-filtration-comparison. Because A6 removes all building from this
+  corpus — no course asks the reader to construct a system whose structure could be compared to a
+  reference implementation's — the corpus never approaches this zone.
+- **_Google v. Oracle_ is deliberately not cited for the broader "APIs are uncopyrightable"
+  proposition.** That case turned on **fair use** and assumed copyrightability arguendo; citing it here
+  would overstate the settled law.
+
+### Trademarks
+
+SAP, Oracle, NetSuite, ERPNext, and Odoo are trademarks. Nominative reference (e.g. "how ERPNext models
+stock ledger entries") is fine in course body prose; using any of them in a course title, path segment,
+or product name is not. Neither `skills/conventional-erp` nor `skills/sharia-erp`, nor any of the 29
+course ids, carries a vendor name — verified by construction and re-checked mechanically at Phase 6
+(see [delivery.md](./delivery.md#phase-6-section-and-app-verification)).
 
 ## R9 gate posture (declared explicitly)
 
-Per R9, every plan in this programme declares its UI-gate and API-gate posture. A plan bearing neither
-surface is **not thereby exempt** — it must state the exemption and why.
-
 ### UI gate — exempt, with the exemption stated
 
-This plan is **exempt from [`ui-quality-gate`](../../../repo-governance/workflows/ui/ui-quality-gate.md)**.
-
-`swe-ui-checker` validates component **source**. This plan authors **no** file under `<FEAT>shell/` or
-`<FEAT>core/`; its user-visible output is content (`_index.md` prose) and data (one YAML file)
-rendered by components `ayokoding-learning-path-03-navigation-ui` owns. A checker run scoped to this
-plan's diff would scan zero component files and return zero findings — a **vacuous** pass, not a real
-one, so claiming the gate "ran and passed" would be misleading.
-
-**The exemption is scoped to the automated component gate only.** Because this plan does ship a
-user-visible surface, the **Rule-15 three-tester retest is mandatory** and runs in Phase 7. That is
-the non-vacuous UI check for a content-and-data plan.
+This plan authors **no** file under `<FEAT>shell/` or `<FEAT>core/`; its user-visible output is
+content and data rendered by components `ayokoding-learning-path-03-navigation-ui` owns. A
+component-scoped checker run would scan zero files and return a vacuous pass, so this plan is
+**exempt from [`ui-quality-gate`](../../../repo-governance/workflows/ui/ui-quality-gate.md)** with the
+Rule-15 three-tester retest as the mandatory non-vacuous substitute (Phase 7).
 
 ### API gate — NOT exempt
 
-Two candidate API surfaces exist here, and they resolve in opposite directions. Both are stated
-because the second one is the reflexive-exemption trap.
+Both manifests are **reachable behavior** — loaded, zod-validated, and integrity-checked at build time
+by `manifest-repository.ts`; a malformed or prerequisite-inconsistent manifest changes what the
+application serves. That behavior is exercised through the app's own interface (unit integrity checks
+plus the path-walk e2e), which this plan **names** rather than claiming a gate it cannot execute —
+`ayokoding-www` has no OpenAPI 3.x document, no GraphQL SDL, and its only route is the internal tRPC
+handler [Repo-grounded, R9's verified precondition state].
 
-**1. The manifest is reachable behavior — this is why the plan is not exempt.** `<ERPMAN>` is loaded,
-zod-validated, and integrity-checked at build time by `manifest-repository.ts`; a malformed or
-prerequisite-inconsistent manifest changes what the application serves. That behavior is exercised
-through the app's **own** interface — the unit-level integrity and prerequisite-consistency checks
-plus the path-walk e2e — and this plan **names** those runs rather than claiming a gate it cannot
-execute. `ayokoding-www` has no OpenAPI 3.x document and no GraphQL SDL, and its only API route is the
-internal tRPC handler [Repo-grounded, per R9's verified precondition state], so `api-quality-gate`
-cannot run as a loop here; the posture is a declaration plus a named substitute, not a claimed pass.
-
-**2. The third-party ERP APIs the capstones teach against are subject matter, not shipped surface.**
-Courses #4 (`capstone-stand-up-and-integrate-an-open-source-erp`) and #10
-(`erp-integration-patterns`) teach a reader to integrate against a real ERP's API. That API belongs to
-a vendor, not to this repo: this plan ships **no** reachable delta on it, exposes **no** endpoint
-because of it, and could not run `api-quality-gate` against it without depending on a third party's
-availability. It is subject matter in exactly the sense the syllabus already draws for target
-codebases — evidence that principles transfer, never a surface this repo owns.
-
-**The binding consequence of point 2 is a real delivery constraint (DD-14):** across all three
-touchpoints — courses `#4`, `#10`, and `#20` — no code sample may depend on a **live network call to
-a third-party ERP**. The `#4` and `#20` capstones each stand up a containerised or fixtured
-open-source ERP locally; recorded fixtures back every integration example, including `#10`'s. A
-course that needs someone else's SaaS to be up in order for CI to pass has turned subject matter into
-a build dependency.
+The third-party ERP APIs `erp-integration-patterns` teaches against are **subject matter, not shipped
+surface** — the same status the syllabus already draws for target codebases in other courses. **The
+binding consequence (DD-14) is a real delivery constraint**: no code sample in `erp-integration-patterns`,
+or in any other course's worked examples, may depend on a **live network call to a third-party ERP**.
+Every integration example runs on recorded fixtures or a containerised open-source ERP under the
+author's own control — never a vendor's live SaaS. Unlike the prior 20-course catalog, no course in
+this 29-course catalog stands up a live ERP as its own deliverable (A6/A7 removed the two courses that
+did), which narrows this constraint's practical footprint but does not remove it — worked examples in
+By Example courses can still show request/response payloads shaped like a real vendor's API.
 
 ## UI-design-funnel exemption (recorded explicitly)
 
-This plan adds **no net-new screen and no net-new component**. Every screen its output appears on —
-Screen 1 (paths hub), Screen 1a (category landing), Screen 2 (path landing) — has a complete design
-funnel owned by `ayokoding-learning-path-03-navigation-ui`, which holds the low-fi alternatives, the
-hi-fi finalists, the named selection, the rationale, and the responsive record, along with the whole
-`assets/` + `assets/src/` set.
+This plan adds **no net-new screen and no net-new component**. Every screen its output appears on
+(paths hub, category landing, and two path landings) is designed, mocked, and rendered by
+`ayokoding-learning-path-03-navigation-ui`. This plan's obligation to plan 03 is the content
+specification in [§Landing content requirements](#landing-content-requirements-what-plan-03-cannot-infer).
 
-This plan therefore ships **no `assets/` folder, no mockup, and no render**. Its obligation to plan 03
-is the content specification in
-[§Landing content requirements](#landing-content-requirements-what-plan-03-cannot-infer) — the two
-things plan 03 cannot infer from a manifest.
+## Syllabus layer — custody and shape (DD-31)
 
-The empty-state design for the skills category landing between plan 01 and this plan is likewise plan
-03's (A3). This plan's Phase-2 gate is the moment the ERP slot stops being empty, and it asserts that
-transition.
+Every one of the 29 courses carries a syllabus with an explicit **module/topic breakdown** — not just
+a spec's top matter and prerequisites, but the ordered list of modules and the concrete topics under
+each, at a granularity an author can write from directly. This mirrors both the **folder** convention
+and the **per-course file format** `ayokoding-learning-path-02-schema-and-prerequisite-dag` already
+established (`syllabus/courses/<id>.md` + `syllabus/paths/manifest-*.md`, and the internal section
+shape of each course file — verified against `syllabus/courses/actor-model-concurrency.md` and
+`syllabus/courses/computer-science-foundations.md` before authoring began) rather than inventing a new
+structure. **No stronger precedent was found**, so plan 02's format is followed rather than a lighter
+alternative:
+
+| Half             | Location     | Contents                                                                  |
+| ---------------- | ------------ | ------------------------------------------------------------------------- |
+| Per-course specs | `<SYL>`      | 29 `<course-id>.md` files plus a folder `README.md` index                 |
+| Path mirrors     | `<SYLPATHS>` | `manifest-skills-conventional-erp.md` and `manifest-skills-sharia-erp.md` |
+
+**Required per-course syllabus sections, in plan 02's own order** (DD-33): a `# Title (Format[,
+Language/domain tag])` header; a `**Course ID** · **Format** · **Language**` line; a **Short summary**;
+a **Scope note** ending `License-aware (DD-15)` per the inherited convention (see
+[§DD-15 and this plan's licensing section](#licensing-and-ip-compliance-a8)); **Why this exists · the
+big idea** (problem-before-solution, keep-this-if-you-forget-everything, big ideas touched);
+**Prerequisites** (prior ERP topics, cross-domain SWE/accounting ids, assumed knowledge); **Accuracy
+notes**, honestly stating the Phase 1.2a confirmation pass has not yet run rather than fabricating a
+verification date (A4); **Concepts** (`co-NN`, floor ≥ 10, each specific enough to confirm or refute —
+"Advanced topics" is forbidden as a concept or module name); **Worked examples** (`ex-NN`,
+Beginner/Intermediate/Advanced) for By Example courses only; a **Synthesis exercise — intra-topic**
+section in place of plan 02's "Capstone spec" — same position, **renamed** because `A6` forbids any
+build/implement/deploy framing even at intra-topic scope, so this plan's version is scoped to
+design/annotate/trace, never construct (see [DD-25](#design-decisions)); a **Read more** section left
+as an explicit pending placeholder rather than fabricated citations, since this plan's own
+confirmation pass has not yet run; and **In which paths**, naming `skills/conventional-erp` and, where
+applicable, `skills/sharia-erp` with each path's authoring stage.
+
+**Module and concept titles must be specific enough to be confirmed or refuted.** "Advanced topics" is
+forbidden as a module or concept title — it cannot be checked either way. Every module names the
+concrete mechanism it covers (e.g. "Account determination via condition tables" rather than "Posting
+concepts").
+
+**Authored first from domain reasoning and the grounding research — confirmed second, and only for
+coverage, never for structure (`A12`).** Per
+[Programme §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed), a
+published curriculum may corroborate that a syllabus's coverage is right; it must never supply the
+structure being written. The binding order, restated for this plan's own Phase 1:
+
+1. Phase 1.1 authors all 29 syllabi from the cross-cutting spine, the module map, the subledger-to-GL
+   crux, and the hard parts — the domain reasoning already settled in this file — with no external
+   curriculum open yet.
+2. Phase 1.2a runs a `web-researcher` **confirmation pass**, per-syllabus, asking a **coverage**
+   question only: for planning/operations-heavy courses, against **APICS/ASCM CPIM and CSCP topic
+   outlines**; for architecture/module-map content, against the **published module structures of the
+   open-source systems in the licensing table above**, named nominatively only. The pass returns
+   findings shaped as "topic X is missing" or "topic Y is not recognised in the field" — never as "
+   reorder module N to match theirs".
+3. A finding is actionable only as a coverage gap to fill by writing a new module or topic in this
+   plan's own words. **The pass never reproduces a curriculum's text, module titles, or sequence**,
+   and never lifts documentation prose — ERPNext's own docs, for example, carry a share-alike licence
+   (CC-BY-SA-3.0) that a syllabus cannot satisfy by copying from it.
+
+Where a topic is placed on domain-reasoning grounds rather than sourced from the grounding research,
+it is marked `[Needs Verification]` in the syllabus, giving the Phase 1.2a pass something concrete to
+confirm or refute without ever becoming the source of the syllabus's shape.
 
 ## Design Decisions
 
-- **DD-1 · Plan 07 owns the ERP half of the `skills/` category, end to end.** Landing, manifest,
-  syllabus specs, and course bodies. The accounting half — corpus, manifest, and landing — belongs to
-  `ayokoding-learning-path-06-skills-accounting`, and neither plan writes into the other's files.
-  _Source: amendment A2._ **Decided.**
-- **DD-2 · The 20 syllabus specs live in this plan's own `syllabus/courses/`, not plan 02's.** Plan 02
-  custodies the 121-spec careers corpus under a byte-stability obligation; writing twenty new files
-  into it would be a cross-plan mutation of a custodied corpus on a live seam. This plan mirrors plan
-  02's layout (`syllabus/courses/<id>.md` + a `README.md` catalog) inside its own folder, so the
-  authoring convention transfers unchanged while custody stays clean. The same folder also carries
-  `<SYLPATHS>manifest-skills-enterprise-resource-planning.md`, this path's manifest mirror (DD-22).
+- **DD-1 · Plan 07 owns both ERP paths end to end.** `conventional-erp` and `sharia-erp` — landing,
+  manifest, syllabus specs, and course bodies for both. The accounting half remains
+  `ayokoding-learning-path-06-skills-accounting`'s. _Source: A2, extended by A10._ **Decided.**
+- **DD-2 · The 29 syllabus specs live in this plan's own `syllabus/courses/`, not plan 02's.** Unchanged
+  rationale from the prior design: plan 02 custodies the careers corpus under a byte-stability
+  obligation. **Decided.**
+- **DD-3 · Authoring order is derived from dependencies; reading order is each manifest's ramp.** Three
+  named authoring stages (A: 15 bodies, B: 11, C: 3) replace the prior lettered waves, named
+  specifically so plan 06 can reference them without ERP course numbers. **Decided.**
+- **DD-4 · The `blockedBy` on plan 06 is soft overall and hard at two of the three stage gates.**
+  Stage A declares **zero** accounting preconditions; Stages B and C each gate on a named set of
+  accounting course bundles resolving on `origin/main`. **Decided.**
+- **DD-5 · Both manifests are published early and grown, never held back until complete.** `<CONVMAN>`
+  ships at 15 ids, grows to 26 (final). `<SHARMAN>` ships at 15, grows to 26, then to 29 (final). Every
+  deferred id carries a falsifiable before/after check written at publication time. **Decided.**
+- **DD-6 · The four "Dangerous N" boundaries are the delivery spine, not just manifest metadata.**
+  Dangerous 1 (course 9) closes Phase 2, Dangerous 2 (course 16) and the conventional-erp-complete
+  Dangerous 3 (course 26) close Phase 3, Dangerous 4 (course 29, sharia-erp only) closes Phase 4. Each
+  is also a landing content requirement (L-1). **Decided.**
+- **DD-7 · Both manifests record `arc: immediately-effective` even though the URL omits it.** Unchanged
+  rationale (R8/R2). **Decided.**
+- **DD-8 · The nine-course runway to Dangerous 1 is justified in the product, not shortened.** Unlike
+  accounting's small, safe-to-assert double-entry foundation, ERP's architecture spine has no small
+  usable subset; skipping any of its six courses defeats the "informed reasoning" payoff. Stated as a
+  landing requirement (L-2). **Decided.**
+- **DD-9 · Link, do not walk.** All ten software-engineering and seven accounting prerequisites are
+  linked from the landings to their canonical pages and never appear in either `courseOrder`.
   **Decided.**
-- **DD-3 · Authoring order is derived from dependencies; reading order is the manifest's ramp.** Four
-  authoring waves (A: 10 bodies, B: 5, C: 3, D: 2) versus one 20-course reading ramp. Conflating them
-  is what produces the false conclusion "ERP is blocked by accounting". See
-  [§Authoring waves](#authoring-waves-vs-reading-ramp-dd-3). **Decided.**
-- **DD-4 · The `blockedBy` on plan 06 is soft overall and hard at four named wave gates.** Wave A
-  declares **zero** accounting preconditions and runs fully concurrently with plan 06; Waves B, C, and
-  D each gate on a specific set of accounting course bundles resolving on `origin/main`, checked with
-  `test -d`. A blanket block would idle ten provably independent courses. **Decided.**
-- **DD-5 · The manifest is published early and grown, never held back until complete.** It ships with
-  the ten Wave-A ids at the boundary-1 gate, then grows to 15, 18, and 20. Every deferred id carries a
-  falsifiable before/after check written at publication time, so an early manifest cannot pass as a
-  finished one. **Decided.**
-- **DD-6 · The three "dangerous by here" boundaries are the delivery spine, not just manifest
-  metadata.** Boundary 1 (after #4) closes Phase 2, boundary 2 (after #10) closes Phase 3, and
-  boundary 3 (after #20) closes Phase 5. Each is also a landing content requirement (L-1). Cutting
-  phases anywhere else would produce pauses that are safe for git and meaningless for a reader.
-  **Decided.**
-- **DD-7 · The manifest records `arc: immediately-effective` even though the URL omits it.** Skills
-  paths are always this arc (R8); the URL drops the segment because the arc is constant, not absent.
-  Keeping the field in the data model is what makes a future `skills/<arc>/<subject>` grammar a
-  purely additive change rather than a breaking URL migration (R2). **Decided.**
-- **DD-8 · The three-course runway to first payoff is justified in the product, not shortened.**
-  Without the master/transactional data model and the platform landscape, a reader integrates against
-  the wrong abstractions and silently corrupts state. Shortening the runway would not make a reader
-  dangerous sooner; it would make them dangerous to their employer's books. The justification is a
-  stated landing requirement (L-2), not left to prose luck. **Decided.**
-- **DD-9 · Link, do not walk.** The eight existing software-engineering prerequisites and the eight
-  accounting prerequisites are linked from the landing to their canonical pages and never appear in
-  `courseOrder`. This is the established cross-domain pattern in this programme, and it keeps the ERP
-  spine short over a shared library. **Decided.**
-- **DD-10 · The three scope-boundary risks are grep-checkable acceptance criteria, not review-time
-  opinions.** `erp-analytics-and-reporting` keeps to ERP-specific CDC and delta extraction versus
+- **DD-10 · The remaining two scope-boundary risks are grep-checkable, not review-time opinions.**
+  `erp-analytics-and-reporting` keeps to ERP-specific CDC and delta extraction versus
   `data-engineering`; `erp-security-and-controls` keeps to RBAC/SoD and COSO-SOX specifics versus
-  `it-governance-grc`; `erp-implementation-methodology` keeps to fit-gap, cutover, and migration
-  versus `project-management`. Each affected body must name its neighbour in its own `overview.md`.
-  **Decided.**
-- **DD-11 · Verification status is carried forward verbatim and never laundered.** Every `[Unverified]`
-  and `[Needs Verification]` marker from the research reaches the syllabus specs with a named
-  resolution step; fast-moving claims live in dated accuracy-note sidebars, never the stable spine;
-  the 20-course count is labelled `[Judgment call]` wherever it appears. _Source: amendment A4._
-  **Decided.**
+  `it-governance-grc`. (The third prior risk, `erp-implementation-methodology` versus
+  `project-management`, no longer exists — that course is removed by A7.) **Decided.**
+- **DD-11 · Verification status is carried forward verbatim and never laundered.** Unchanged rationale
+  (A4). **Decided.**
 - **DD-12 · `sharia-compliant-erp-design` teaches jurisdictional pluggability, not one standard.**
-  AAOIFI, PSAK Syariah, and MFRS + BNM SGP 2019 are three structurally different models — that
-  structural claim, and the engineering requirement it drives (the chart of accounts, recognition
-  rules, and disclosure set are configuration; a course naming AAOIFI as "the" standard would be
-  factually wrong), are **Decided**. The cell-level factual detail that Malaysia specifically "is
-  not on AAOIFI's mandatory-adoption list" is not part of this design decision — it is
-  `[Unverified]`, pending the Phase 1.2 primary-source re-verification pass (see
-  [§Load-bearing for #19](#load-bearing-for-19--there-is-no-single-sharia-accounting-standard)),
-  and must not be stated as unqualified fact until that step closes.
-- **DD-13 · UI gate: exempt, with the exemption and its reason stated.** No component source is
-  authored here, so `swe-ui-checker` would scan zero files — a vacuous pass. The Rule-15 three-tester
-  retest remains mandatory as the non-vacuous UI check. **Decided.**
-- **DD-14 · API gate: NOT exempt for the manifest; third-party ERP APIs are subject matter.** The
-  manifest is reachable behavior exercised through this app's own integrity checks and path-walk e2e,
-  which the plan names rather than claiming a gate it cannot execute. The vendor ERP APIs taught in
-  #4, #10, and #20 are not a surface this repo ships — and the binding consequence is that **no code
-  sample in any of the three courses may depend on a live network call to a third-party ERP**.
-  Containerised or fixtured ERP only. **Decided.**
-- **DD-15 · "Never create an `_index.md`" means never create a _structural_ index.** A3 assigns
-  `<PATHS>_index.md`, `<PATHS>careers/_index.md`, the three arc indexes, and `<PATHS>skills/_index.md`
-  to plan 01. This plan's **path landing**, `<ERPLANDING>`, is also an `_index.md` file and **is**
-  this plan's to create — they are different artefacts sharing a filename convention. Stating the
-  disambiguation here prevents an executor freezing on an apparent contradiction. **Decided.**
-- **DD-16 · Course formats are taken from the research table as decided.** Eleven By-Example courses
-  and nine Annotated-concept courses, assigned per the catalog. Format drives which maker agent
-  authors the body (`apps-ayokoding-www-by-example-maker` versus
-  `apps-ayokoding-www-annotated-concept-maker`), so re-deciding format at authoring time would also
-  re-route the executor. **Decided.**
-- **DD-17 · Course bodies follow the seven-step NEW-course authoring convention, restated in this
-  plan.** The convention (accuracy pre-verify → skeleton → learning track → drilling track → checkers
-  → fixers → re-verify) is proven in `ayokoding-learning-path-04-course-authoring`. It is **restated**
-  in this plan's `delivery.md` rather than cross-referenced, because a plan whose authoring contract
-  lives in a sibling folder cannot be executed standalone. **Decided.**
-- **DD-18 · Content authoring is maker-checker-fixer; the code-bearing steps are TDD.** Twenty course
-  bodies and one landing are content and use no RED/GREEN/REFACTOR labels. The manifest publication,
-  each growth step, and the Gherkin/e2e work **are** code-bearing and use the full three-substep
-  cycle. **Decided.**
-- **DD-19 · The 127-course figure stays careers-only; ERP's 20 are additional.** R5 is explicit. This
-  plan never asserts a combined catalog count as a gate — a global count is fragile against the
-  landing order of plans 04, 06, and 07. It asserts the presence of its **own twenty** bundles by id
-  instead, which is exact and falsifiable in both directions. **Decided.**
-- **DD-20 · Locale scope is `en` only.** `apps/ayokoding-www/content/id/belajar/` holds no courses and
-  no paths [Repo-grounded], so an `id` manifest would compose nothing and an `id` verification walk
-  would be fabricated rather than performed. The navigation mechanism itself is locale-neutral; this
-  is a content-availability fact, recorded as a non-goal. **Decided.**
-- **DD-21 · `pathId` is the full category-prefixed string; nothing keys on segment count.** Ruled by
-  the schema owner and binding here: `pathId` is `skills/enterprise-resource-planning` exactly, with
-  no separate `category` field. Because `pathId` is variable-depth by design (careers = 3 segments,
-  skills = 2), validation asserts the **first-segment literal** (`careers` | `skills`) plus **manifest
-  resolvability** — never arity. No regex, route pattern, glob, or acceptance clause in this plan may
-  assume a segment count; every URL and id match in this plan is a **full-string literal** for exactly
-  that reason. An unresolvable or malformed id is a **hard `safeParse` rejection** — no coercion, no
-  aliasing, no normalization. **Course ids are a separate namespace and carry no category prefix**:
-  the eight accounting prerequisites this corpus declares
-  (`financial-statements-and-close-cycle`, `inventory-and-cogs-accounting`,
-  `payroll-and-tax-accounting-essentials`, `consolidation-and-multi-entity-accounting`,
-  `audit-controls-and-compliance`, `islamic-contract-modeling-for-systems`,
-  `sharia-accounting-and-aaoifi-standards`, `capstone-build-a-general-ledger-system`) are written
-  bare, never prefixed. This is a live defect class, not a hypothetical: a sibling plan shipped a
-  clause using `grep -oE '/en/learn/paths/[a-z-]+/[a-z0-9-]+'`, which stops at the first `/` inside a
-  three-segment careers URL and undercounts by one under `sort -u`. **Decided.**
-- **DD-22 · The path-manifest mirror is named `manifest-skills-<subject>.md`.** This plan's mirror is
-  `<SYLPATHS>manifest-skills-enterprise-resource-planning.md` — never a bare
-  `manifest-enterprise-resource-planning.md`. The four existing careers mirrors keep their current
-  un-prefixed names, because renaming them would be pure churn, so the `skills-` marker is what makes
-  the category unambiguous by construction. Ruled by the schema owner; binding here. **Decided.**
-- **DD-23 · This plan's specs use the canonical prefixed path id from the start; plan 02's 121
-  existing specs are not touched.** The 121 careers course specs under plan 02's `syllabus/courses/`
-  still carry stale un-prefixed path ids in their "In which paths" sections. Plan 02 deliberately left
-  them — custody-protected, informational metadata, not runtime behaviour — so this plan **does not
-  edit them**. Its own twenty specs write `skills/enterprise-resource-planning` in full, so the corpus
-  adds nothing to that debt. **Decided.**
+  Unchanged structural claim from the prior design; the cell-level detail remains `[Unverified]`
+  pending Phase 1.2. **Decided.**
+- **DD-13 · UI gate: exempt, with the exemption and its reason stated.** Unchanged rationale.
+  **Decided.**
+- **DD-14 · API gate: NOT exempt for the manifests; third-party ERP APIs are subject matter.** Restated
+  for the new catalog: no course in the 29-course catalog stands up a live ERP; the constraint narrows
+  to "no live network call to a third-party ERP in any worked example", scoped principally to
+  `erp-integration-patterns`. **Decided.**
+- **DD-15 · "Never create an `_index.md`" means never create a _structural_ index.** Both path
+  landings, `<CONVLANDING>` and `<SHARLANDING>`, are `_index.md` files this plan **does** create — they
+  are different artefacts from the structural indexes plan 01 owns. **Decided.**
+- **DD-16 · Course formats are taken from the catalog as decided.** 17 By-Example, 12 Annotated-concept.
+  **Decided.**
+- **DD-17 · Course bodies follow the seven-step NEW-course authoring convention, restated in
+  `delivery.md`.** Unchanged. **Decided.**
+- **DD-18 · Content authoring is maker-checker-fixer; the code-bearing steps are TDD.** Unchanged.
+  **Decided.**
+- **DD-19 · The 127-course careers figure stays careers-only; ERP's 29 are additional.** Unchanged
+  rationale (R5). **Decided.**
+- **DD-20 · Locale scope is `en` only.** Unchanged (`id/belajar/` holds no courses or paths).
+  **Decided.**
+- **DD-21 · `pathId` is the full category-prefixed string; nothing keys on segment count.** Unchanged,
+  now applies to both `skills/conventional-erp` and `skills/sharia-erp`. Accounting and
+  existing-library prerequisite ids remain bare (no category prefix). **Decided.**
+- **DD-22 · The path-manifest mirrors are named `manifest-skills-<subject>.md`.** Two files this time:
+  `manifest-skills-conventional-erp.md` and `manifest-skills-sharia-erp.md`. **Decided.**
+- **DD-23 · This plan's specs use the canonical prefixed path id(s) from the start; plan 02's 121
+  existing specs are not touched.** Unchanged. Shared-course specs name **both** path ids in their "In
+  which paths" section; Sharia-exclusive specs name `skills/sharia-erp` only. **Decided.**
+- **DD-24 · Naming harmonisation: `conventional-erp`, not `generic-erp`.** Harmonises with plan 06's
+  `conventional-accounting`. See [§Naming harmonisation](#naming-harmonisation-dd-24). **Decided.**
+- **DD-25 · A6: no build capstones.** `capstone-build-a-minimal-erp-core` is removed; the corpus
+  teaches to build-founding depth and never builds. No replacement capstone of any kind is introduced
+  — even a "design, not build" capstone risks conflating architecture depth with a construction
+  exercise, so the corpus simply ends its content stages with domain-depth courses instead of a
+  terminal capstone. **Decided.**
+- **DD-26 · A7: buyer/consultant material removed and replaced with domain-depth courses.**
+  `erp-platform-landscape`, `erp-implementation-methodology`, `evaluating-and-selecting-an-erp`, and
+  `capstone-stand-up-and-integrate-an-open-source-erp` (which fails both A6 and A7) are removed;
+  twelve new architecture/hard-parts courses replace them. `project-management` (existing library)
+  drops out of this plan's cross-domain edges as a direct consequence. **Decided.**
+- **DD-27 · A9 depth expansion: 20 → 29 courses.** The count is an output of covering the cross-cutting
+  spine, the module map, the subledger-to-GL crux, and the hard parts — not a target. **Decided.**
+- **DD-28 · A10/A11: two paths, shared-course-by-reference architecture.** Cites plan 02's existing
+  schema rule directly (`tech-docs.md:417`, `:424`, `:615`) rather than proposing a schema change; 26
+  shared courses authored once, referenced by both manifests; 3 Sharia-exclusive courses referenced
+  only by `<SHARMAN>`. **Decided.**
+- **DD-29 · The ramp-boundary promise is re-grounded from "operate a real ERP" to "read, reason about,
+  and design one".** A direct, honest consequence of A6/A7 removing all hands-on install/build/buy
+  content — no course in this catalog claims the reader can operate a live production system.
+  **Decided.**
+- **DD-30 · Licensing & IP compliance is a first-class section (A8).** Legal basis: §102(b), EU
+  Directive 2009/24/EC Art. 1(2), _Baker v. Selden_ (1879); the contested zone is
+  _Computer Associates v. Altai_, which this corpus never approaches because A6 removes all building;
+  _Google v. Oracle_ is deliberately not cited for API uncopyrightability, since that case decided on
+  fair use. Trademark nominative-use rule stated. **Decided.**
+- **DD-31 · Every course carries a syllabus module/topic breakdown, authored first from domain
+  reasoning, confirmed second by `web-researcher`.** APICS/ASCM CPIM & CSCP topic outlines for
+  planning/operations content; the open-source systems' published module structures (nominative
+  reference only) for architecture/module-map content. Module titles must be specific enough to
+  confirm or refute; a topic placed on domain-reasoning grounds alone is marked `[Needs
+Verification]`. **Decided.**
+- **DD-32 · The Phase 1.2a confirmation pass is coverage-only, per `A12`.** It may report a missing or
+  unrecognised topic; it may never reorder a syllabus's modules or adopt a curriculum's sequence,
+  because ASCM/APICS CPIM and CSCP outlines and the open-source systems' documentation (e.g. ERPNext's
+  CC-BY-SA-3.0-licensed docs) are themselves copyrighted works whose structure is not this corpus's to
+  copy. See [§Syllabus confirmation order](#syllabus-confirmation-order-a12). **Decided.**
+- **DD-33 · The per-course syllabus file format is inherited from
+  `ayokoding-learning-path-02-schema-and-prerequisite-dag`, not invented.** Verified against
+  `syllabus/courses/actor-model-concurrency.md` and `syllabus/courses/computer-science-foundations.md`
+  before authoring began; no stronger precedent was found. Section names, order, and the
+  problem-before-solution framing are matched; the one deliberate rename is "Capstone spec" →
+  "Synthesis exercise — intra-topic", required by `A6`'s no-build-exercise rule even at intra-topic
+  scope (a build/implement/deploy framing is exactly what `A6` forbids). **Decided.**
+- **DD-34 · `DD-15` (inherited syllabus convention) and this plan's `A8` section are reconciled, not
+  duplicated.** `DD-15` — traced to the archived
+  `plans/done/2026-07-19__fundamentally-strong-software-engineer/tech-docs.md` — governs **which
+  reference technology a syllabus names** (prefer the actually-open option, e.g. OpenTofu over
+  Terraform's BUSL-1.1); this plan's `A8` section governs **what content may be reproduced from a
+  copyrighted source**. Every ERP syllabus carries both: the inherited "License-aware (DD-15)" Scope
+  note tag, and this plan's eleven safe-authoring rules and per-project licence table. See
+  [§Licensing and IP Compliance](#licensing-and-ip-compliance-a8). **Decided.**
 
 ## File impact
 
-| Path                                                           | Change | Note                                                                                    |
-| -------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------- |
-| `<SYL>README.md` + `<SYL><id>.md` × 20                         | new    | this plan's own syllabus corpus (DD-2)                                                  |
-| `<SYLPATHS>manifest-skills-enterprise-resource-planning.md`    | new    | the manifest mirror this plan's courseOrder is transcribed from (DD-22)                 |
-| `<ERPMAN>`                                                     | new    | the single manifest; grown four times                                                   |
-| `<ERPLANDING>`                                                 | new    | the path landing (DD-15)                                                                |
-| `<COURSES><erp-course-id>/` × 20                               | new    | course bundles, four authoring waves                                                    |
-| `<PATHS>_index.md`                                             | edit   | add one ERP card — populate only                                                        |
-| `<PATHS>skills/_index.md`                                      | edit   | add one ERP card — populate only                                                        |
-| `<COURSES>_index.md`                                           | edit   | add twenty catalog rows — populate only; file created by plan 01                        |
-| `<SPECS>skills-erp-path.feature`                               | new    | this plan's Gherkin                                                                     |
-| `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-path.steps.ts` | new    | step bindings; created by this plan, pairing 1:1 with its own `skills-erp-path.feature` |
-| `<MANIFESTS>skills/erp-manifest.unit.test.ts`                  | new    | ERP manifest assertions; owned by this plan, scoped to its own manifest                 |
+| Path                                                              | Change | Note                                                                     |
+| ----------------------------------------------------------------- | ------ | ------------------------------------------------------------------------ |
+| `<SYL>README.md` + `<SYL><id>.md` × 29                            | new    | this plan's own syllabus corpus (DD-2, DD-31)                            |
+| `<SYLPATHS>manifest-skills-conventional-erp.md`, `…sharia-erp.md` | new    | the two manifest mirrors this plan's `courseOrder`s are transcribed from |
+| `<CONVMAN>`, `<SHARMAN>`                                          | new    | the two manifests; each grown across the authoring stages                |
+| `<CONVLANDING>`, `<SHARLANDING>`                                  | new    | the two path landings (DD-15)                                            |
+| `<COURSES><erp-course-id>/` × 29                                  | new    | course bundles, three authoring stages                                   |
+| `<PATHS>_index.md`                                                | edit   | add two ERP cards — populate only                                        |
+| `<PATHS>skills/_index.md`                                         | edit   | add two ERP cards — populate only                                        |
+| `<COURSES>_index.md`                                              | edit   | add twenty-nine catalog rows — populate only; file created by plan 01    |
+| `<SPECS>skills-erp-paths.feature`                                 | new    | this plan's Gherkin, covering both paths                                 |
+| `apps/ayokoding-www-fe-e2e/src/steps/skills-erp-paths.steps.ts`   | new    | step bindings; created by this plan, pairing 1:1 with the feature above  |
+| `<MTEST>`                                                         | new    | asserts both manifests; owned by this plan alone                         |
 
-**No shared code file (ruled 2026-07-21).** Each plan owns its own manifest **and that manifest's
-test**, mirroring the manifest-ownership invariant: plan 05 owns
-`<MANIFESTS>careers/careers-manifests.unit.test.ts`, plan 06 owns
-`<MANIFESTS>skills/accounting-manifest.unit.test.ts`, and this plan owns
-`<MANIFESTS>skills/erp-manifest.unit.test.ts`.
-
-An earlier draft had this plan **append** to a single root-level `published-manifests.unit.test.ts`
-owned by plan 05, falling back to its own file when that one was absent. Two defects killed it.
-First, a file on a **three-way cross-plan seam**: three independent PRs appending to one file
-conflict on merge, and plan 05's own gates would have to tolerate foreign assertions. Second, the
-fallback made the resulting layout depend on **merge order**, so the repository's structure would
-differ according to which PR landed first.
-
-The drift the shared file was meant to prevent — several tests each claiming to assert "every
-published manifest is valid" — is instead prevented by **scope**: no test here claims to cover every
-manifest. This one asserts the ERP manifest alone, and its name says so.
+**No shared code file with any sibling plan** — unchanged rationale from the prior design (a file on a
+cross-plan seam conflicts on merge and makes structure depend on merge order); this plan's own two
+manifests share one test file precisely because that is a **within-plan** concern, not a cross-plan one.
 
 ## Rollback
 
 Every phase is a separate PR, so rollback is per phase:
 
-- **Phases 1** (syllabus specs) — plan-folder-only; reverting the PR removes the specs and nothing
-  user-visible changes.
-- **Phase 2** (Wave A + publication) — reverting removes `<ERPMAN>`, `<ERPLANDING>`, the two cards,
-  and ten course bundles. The skills category landing returns to its plan-01 empty state, which plan
-  03 has designed for (A3), so the revert lands in a designed state rather than a broken one.
-- **Phases 3-5** (growth) — reverting a growth PR returns the manifest to its previous id set. The
-  deferral checks are written in both directions precisely so a reverted growth is detectable rather
-  than silent.
-- **Phases 6-10** — verification, retest, integration, knowledge capture, and archival ship no
-  product change; reverting affects evidence and plan documents only.
+- **Phase 1** (syllabus specs) — plan-folder-only; reverting removes the specs and nothing user-visible
+  changes.
+- **Phase 2** (Stage A + publication) — reverting removes both manifests (each at 15 ids), both
+  landings, the four cards, and 15 course bundles. The skills category landing returns to its plan-01
+  empty state for the ERP slot specifically, which plan 03 has designed for.
+- **Phase 3** (Stage B growth) — reverting a growth PR returns both manifests to their previous id set
+  (15 ids). The deferral checks are written in both directions precisely so a reverted growth is
+  detectable rather than silent. `<CONVMAN>` reaches its terminal 26-id state at the end of this phase.
+- **Phase 4** (Stage C growth) — reverting returns `<SHARMAN>` to 26 ids; `<CONVMAN>` is unaffected
+  since it never grows past Phase 3.
+- **Phases 5-10** — verification, retest, integration, knowledge capture, and archival ship no product
+  change; reverting affects evidence and plan documents only.
 
 No rollback path touches an accounting file, a careers manifest, or a component — this plan's blast
 radius is exactly the files listed above.
