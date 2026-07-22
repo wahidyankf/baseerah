@@ -95,8 +95,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 4 of 26.
-- `skills/sharia-erp` — Stage A, course 4 of 29.
+- `skills/conventional-erp` — Stage A, course 4 of 27.
+- `skills/sharia-erp` — Stage A, course 4 of 30.
 
 ---
 

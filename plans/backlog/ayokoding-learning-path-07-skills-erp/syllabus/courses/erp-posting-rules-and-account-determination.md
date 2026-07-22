@@ -100,8 +100,8 @@ accounts). Every example cites the `co-NN` it exercises.
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 5 of 26.
-- `skills/sharia-erp` — Stage A, course 5 of 29.
+- `skills/conventional-erp` — Stage A, course 5 of 27.
+- `skills/sharia-erp` — Stage A, course 5 of 30.
 
 ---
 

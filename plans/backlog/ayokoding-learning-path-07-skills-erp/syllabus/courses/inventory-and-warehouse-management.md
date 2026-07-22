@@ -52,7 +52,7 @@ movements, and warehouse structures, ending at the valuation touchpoint that fee
   unrestricted stock, where it counts as on-hand but not as available, until a usage decision either
   releases it to unrestricted stock or rejects it back to the supplier (exception handling: course
   12). This is the concrete reason on-hand and available are separate stock types rather than
-  synonyms.
+  synonyms (deep dive: course 21).
 
 ## Worked examples
 
@@ -98,8 +98,8 @@ the `co-NN` it exercises.
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage B, course 14 of 26.
-- `skills/sharia-erp` — Stage B, course 14 of 29.
+- `skills/conventional-erp` — Stage B, course 14 of 27.
+- `skills/sharia-erp` — Stage B, course 14 of 30.
 
 ---
 

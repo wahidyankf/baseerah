@@ -4,7 +4,7 @@
 
 **Short summary**: Murabaha, Ijarah, and Musharaka/Mudaraba flow variants, contrasted with conventional
 
-**Scope note**: the worked-example deep dive on course 27's contract-type-awareness concept — how
+**Scope note**: the worked-example deep dive on course 28's contract-type-awareness concept — how
 Murabaha, Ijarah, and Musharaka/Mudaraba each reshape the P2P/O2C document flow from courses 10-11.
 License-aware (DD-15).
 
@@ -24,14 +24,14 @@ License-aware (DD-15).
 - **ERP prereqs**: [`procure-to-pay-systems`](./procure-to-pay-systems.md),
   [`order-to-cash-systems`](./order-to-cash-systems.md),
   [`sharia-compliant-erp-design`](./sharia-compliant-erp-design.md).
-- **Assumed knowledge**: courses 10-11's chain vocabulary; course 27's jurisdictional-pluggability and
+- **Assumed knowledge**: courses 10-11's chain vocabulary; course 28's jurisdictional-pluggability and
   contract-type-awareness vocabulary.
 
 ## Accuracy notes (pending A4 verification)
 
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
-- Contract-mechanics claims carry the same `[Unverified]` status as course 27's jurisdictional table
+- Contract-mechanics claims carry the same `[Unverified]` status as course 28's jurisdictional table
   pending the primary-source re-verification pass; worked examples use originally-authored data and
   do not assert a specific jurisdiction's numeric detail as fact.
 - Concepts co-08 and co-09 are placed on domain-reasoning grounds rather than sourced from the
@@ -57,7 +57,7 @@ License-aware (DD-15).
   asset purchase) produces structurally different document flows depending on contract type.
 - **co-08 · overdue-amount-treatment-divergence** — a conventional flow's interest-accruing
   late-payment charge has no like-for-like counterpart here, so an overdue receivable must be modeled
-  by whatever the applicable jurisdictional configuration (course 27) prescribes; the divergence is
+  by whatever the applicable jurisdictional configuration (course 28) prescribes; the divergence is
   structural — a different document, not a renamed field on the same one. `[Needs Verification]`
 - **co-09 · early-settlement-and-remaining-profit** — settling a Murabaha or Ijarah obligation ahead of
   schedule raises the question of what happens to the not-yet-earned portion of the disclosed markup
@@ -117,7 +117,7 @@ the `co-NN` it exercises.
 
 ## In which paths
 
-- `skills/sharia-erp` only — Stage C, course 28 of 29.
+- `skills/sharia-erp` only — Stage C, course 29 of 30.
 
 ---
 

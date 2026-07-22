@@ -6,7 +6,7 @@
 
 **Scope note**: closes Stage A's cross-cutting-spine sequence — how an ERP captures who changed what
 and when, and why a reversal preserves history while a deletion would not. Introduces the audit trail
-as a control, with the deep SOX/COSO treatment deferred to course 25. License-aware (DD-15).
+as a control, with the deep SOX/COSO treatment deferred to course 26. License-aware (DD-15).
 
 ## Why this exists · the big idea
 
@@ -15,7 +15,7 @@ as a control, with the deep SOX/COSO treatment deferred to course 25. License-aw
 - **Keep-this-if-you-forget-everything**: reversal, not deletion, is how a posted document's effects
   are undone — the original record stays, offset by a new one.
 - **Big ideas touched**: `who-what-when-capture`; `audit-trail-as-a-control`, previewed here and
-  detailed in course 25's RBAC/SoD/COSO treatment.
+  detailed in course 26's RBAC/SoD/COSO treatment.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ as a control, with the deep SOX/COSO treatment deferred to course 25. License-aw
 
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
-- The deep SOX/COSO control-mapping treatment is deferred to course 25 and not duplicated here; this
+- The deep SOX/COSO control-mapping treatment is deferred to course 26 and not duplicated here; this
   course previews "audit trail as a control" conceptually only.
 
 ## Concepts
@@ -40,7 +40,7 @@ as a control, with the deep SOX/COSO treatment deferred to course 25. License-aw
 - **co-05 · change-document-vs-transaction-history** — change documents track master-data edits;
   transaction history tracks document lifecycle events — related but distinct records.
 - **co-06 · audit-trail-as-control-preview** — the audit trail is not just a log; it is a control an
-  auditor relies on (deep dive: course 25).
+  auditor relies on (deep dive: course 26).
 - **co-07 · immutable-posted-record** — once posted, a document's core fields are not editable in
   place, tying back to course 4's correction-avoids-mutation concept.
 - **co-08 · retention-and-accessibility** — the change record must remain accessible for the retention
@@ -86,8 +86,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 9 of 26.
-- `skills/sharia-erp` — Stage A, course 9 of 29.
+- `skills/conventional-erp` — Stage A, course 9 of 27.
+- `skills/sharia-erp` — Stage A, course 9 of 30.
 
 ---
 

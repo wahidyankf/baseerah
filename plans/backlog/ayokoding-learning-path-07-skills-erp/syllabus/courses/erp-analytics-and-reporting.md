@@ -106,9 +106,9 @@ Illustrative SQL fragments and prose scenarios (no runnable pipeline). Every exa
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage B, course 26 of 26. **Dangerous 3 ⚡ — `conventional-erp` ENDS
+- `skills/conventional-erp` — Stage B, course 27 of 27. **Dangerous 3 ⚡ — `conventional-erp` ENDS
   HERE.**
-- `skills/sharia-erp` — Stage B, course 26 of 29.
+- `skills/sharia-erp` — Stage B, course 27 of 30.
 
 ---
 

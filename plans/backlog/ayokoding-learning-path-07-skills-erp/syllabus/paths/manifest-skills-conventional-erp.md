@@ -1,7 +1,7 @@
 # Path Manifest — `skills/conventional-erp` (Enterprise Resource Planning, Conventional)
 
 The **ordered manifest** for the conventional-ERP skills path: a **curated, prerequisite-consistent**
-ordered list of **course IDs** over this plan's own 26-course conventional-ERP corpus (a subset of the
+ordered list of **course IDs** over this plan's own 27-course conventional-ERP corpus (a subset of the
 [syllabus index](../README.md), which additionally holds the 3 Sharia-exclusive courses referenced
 only by the sibling `skills/sharia-erp` manifest). This is the authoritative reading order for this
 path; a course page under `?path=skills/conventional-erp` follows it for prev/next + breadcrumb.
@@ -13,7 +13,7 @@ YAML data file in the `course-paths` feature, never `courseOrder` frontmatter on
 manifest also carries an explicit `arc: immediately-effective` field, present even though the URL
 grammar omits it (R8). Path landing served at `/en/learn/paths/skills/conventional-erp`.
 
-## Composition (26 courses, terminal — no further growth)
+## Composition (27 courses, terminal — no further growth)
 
 Entirely this plan's own corpus; no course is linked in from the existing software-engineering library
 or the accounting corpus — those are **linked, not included**, per
@@ -25,7 +25,7 @@ or the accounting corpus — those are **linked, not included**, per
 delivery checklist fixes what an _author_ writes next. Each entry is therefore annotated with its
 authoring stage rather than grouped by it. Grouping by stage would place
 `erp-bom-and-routing-architecture` (Stage A, read 17th) ahead of `record-to-report-systems` (Stage B,
-read 13th) and desynchronise every course's own self-declared "course N of 26" position.
+read 13th) and desynchronise every course's own self-declared "course N of 27" position.
 
 1. `erp-foundations-and-history` — Stage A
 2. `erp-conceptual-data-model` — Stage A
@@ -47,25 +47,26 @@ read 13th) and desynchronise every course's own self-declared "course N of 26" p
 18. `production-planning-and-mrp` — Stage B
 19. `demand-and-supply-planning` — Stage B
 20. `erp-availability-and-reservations` — Stage B
-21. `erp-extension-and-customization` — Stage A (authored early, read here)
-22. `erp-integration-patterns` — Stage A (authored early, read here)
-23. `human-capital-management-and-hire-to-retire` — Stage B
-24. `multi-company-and-multi-currency-erp` — Stage B
-25. `erp-security-and-controls` — Stage B
-26. `erp-analytics-and-reporting` — Stage B — **Dangerous 3 ⚡ — path ENDS HERE**
+21. `quality-management-and-inspection` — Stage B
+22. `erp-extension-and-customization` — Stage A (authored early, read here)
+23. `erp-integration-patterns` — Stage A (authored early, read here)
+24. `human-capital-management-and-hire-to-retire` — Stage B
+25. `multi-company-and-multi-currency-erp` — Stage B
+26. `erp-security-and-controls` — Stage B
+27. `erp-analytics-and-reporting` — Stage B — **Dangerous 3 ⚡ — path ENDS HERE**
 
 ## Growth history (falsifiable checks)
 
 - **Before Stage B growth**: `courseOrder` has exactly 15 entries — the Stage A ids only, holding
-  their relative reading order (final-ramp positions 1-12, 17, 21, 22); every Stage B id is
+  their relative reading order (final-ramp positions 1-12, 17, 22, 23); every Stage B id is
   **absent**.
-- **After Stage B growth**: `courseOrder` has exactly 26 entries; every Stage A id retains its
+- **After Stage B growth**: `courseOrder` has exactly 27 entries; every Stage A id retains its
   original relative order; every Stage B id is present exactly once, **inserted at its reading
   position rather than appended** — Stage B ids interleave with Stage A ids, they do not follow them.
 
 ## Order rationale
 
-See [tech-docs.md §The ERP catalog](../../tech-docs.md#the-erp-catalog-29-courses-settled) and
+See [tech-docs.md §The ERP catalog](../../tech-docs.md#the-erp-catalog-30-courses-settled) and
 [§Authoring stages vs reading ramp](../../tech-docs.md#authoring-stages-vs-reading-ramp-dd-3).
 
 ---

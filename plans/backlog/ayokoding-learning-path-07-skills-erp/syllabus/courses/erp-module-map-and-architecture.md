@@ -34,9 +34,11 @@ without re-explaining what ERPNext is each time. License-aware (DD-15).
   grounding and `tech-docs.md`'s licensing table. Metasfresh's licence is `[Unverified]` and is not
   asserted in this course.
 - Concept co-13 is placed on domain-reasoning grounds rather than sourced from the grounding research,
-  and is `[Needs Verification]` pending the Phase 1.2a coverage pass — specifically, whether covering
-  quality management at its inventory and procurement touchpoints is sufficient, or whether the field
-  would expect it as a module family in its own right.
+  and remains `[Needs Verification]` pending the Phase 1.2a coverage pass **as a module-family naming
+  claim**. Its prior open question — whether covering quality management at its touchpoints is
+  sufficient, or whether the field would expect it as a module family in its own right — is **settled
+  in favour of the latter** (DD-36): QM now carries its own course at reading position 21, and co-13
+  is the map-level pointer to it rather than the corpus's whole treatment of it.
 
 ## Concepts
 
@@ -46,24 +48,23 @@ without re-explaining what ERPNext is each time. License-aware (DD-15).
   courses 10, 12, 14-16).
 - **co-03 · sales-distribution-sd** — the sales-facing module family (deep dive: course 11).
 - **co-04 · production-planning-pp** — the manufacturing-facing module family (deep dive: courses 17-20).
-- **co-05 · human-capital-management-hcm** — the people-facing module family (deep dive: course 23).
+- **co-05 · human-capital-management-hcm** — the people-facing module family (deep dive: course 24).
 - **co-06 · generic-role-names** — FI/CO/MM/SD/PP/HCM are generic industry role names, not any single
   vendor's proprietary terms.
 - **co-07 · procure-to-pay-flow** — the P2P cross-module flow at a glance (deep dive: course 10).
 - **co-08 · order-to-cash-flow** — the O2C cross-module flow at a glance (deep dive: course 11).
 - **co-09 · record-to-report-flow** — the R2R cross-module flow at a glance (deep dive: course 13).
-- **co-10 · hire-to-retire-flow** — the H2R cross-module flow at a glance (deep dive: course 23).
+- **co-10 · hire-to-retire-flow** — the H2R cross-module flow at a glance (deep dive: course 24).
 - **co-11 · open-source-landscape-nominative** — Odoo, ERPNext, Tryton, Apache OFBiz, Dolibarr,
   iDempiere named as reference points, licence noted per project, never in a course title or path
   segment.
 - **co-12 · enterprise-it-boundary** — what sits outside the ERP boundary (CRM, standalone WMS, BI/data
-  warehouse, e-commerce front end) at a glance (deep dive: course 22).
+  warehouse, e-commerce front end) at a glance (deep dive: course 23).
 - **co-13 · quality-management-qm** — the inspection-and-release module family, named here because it
   sits _inside_ the boundary co-12 draws rather than outside it like CRM, standalone WMS and BI: a
   goods receipt can be routed to an inspection hold instead of straight into unrestricted stock, and a
-  usage decision then releases or rejects it. This corpus covers QM at that touchpoint rather than as
-  a standalone course — its mechanics land on the stock-type model (course 14) and its rejections on
-  the procurement exception flow (course 12).
+  usage decision then releases or rejects it. Its mechanics land on the stock-type model (course 14)
+  and its rejections on the procurement exception flow (course 12) — deep dive: course 21.
 
 ## Worked examples
 
@@ -106,8 +107,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 3 of 26.
-- `skills/sharia-erp` — Stage A, course 3 of 29.
+- `skills/conventional-erp` — Stage A, course 3 of 27.
+- `skills/sharia-erp` — Stage A, course 3 of 30.
 
 ---
 

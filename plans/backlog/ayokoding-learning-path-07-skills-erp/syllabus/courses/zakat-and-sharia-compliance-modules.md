@@ -6,7 +6,7 @@
 
 **Scope note**: closes Stage C and `sharia-erp` (Dangerous 4) — zakat calculation module architecture,
 Sharia-board approval workflow touchpoints, and compliance reporting distinct from conventional
-statutory reporting, tying back to course 27's jurisdictional-configuration design.
+statutory reporting, tying back to course 28's jurisdictional-configuration design.
 License-aware (DD-15).
 
 ## Why this exists · the big idea
@@ -15,7 +15,7 @@ License-aware (DD-15).
   concerns with no conventional-ERP analogue — treating them as an afterthought bolted onto a
   conventional module produces a design that cannot actually satisfy them.
 - **Keep-this-if-you-forget-everything**: zakat calculation depends on the same jurisdictional
-  configuration (course 27) as the chart of accounts — it is not a fixed formula, it is a configured
+  configuration (course 28) as the chart of accounts — it is not a fixed formula, it is a configured
   calculation.
 - **Big ideas touched**: `zakat-as-configured-calculation`, not a hardcoded formula;
   `sharia-board-as-an-approval-workflow-actor`, distinct from a conventional approval hierarchy.
@@ -24,7 +24,7 @@ License-aware (DD-15).
 
 - **ERP prereqs**: [`erp-security-and-controls`](./erp-security-and-controls.md),
   [`sharia-compliant-erp-design`](./sharia-compliant-erp-design.md).
-- **Assumed knowledge**: course 25's role/authorization-object vocabulary; course 27's
+- **Assumed knowledge**: course 26's role/authorization-object vocabulary; course 28's
   jurisdictional-pluggability and profit-sharing/zakat hooks.
 
 ## Accuracy notes (pending A4 verification)
@@ -41,18 +41,18 @@ License-aware (DD-15).
 ## Concepts
 
 - **co-01 · zakat-calculation-module** — a configurable calculation over zakatable assets, distinct
-  per jurisdictional configuration (course 27).
+  per jurisdictional configuration (course 28).
 - **co-02 · zakatable-asset-classification** — which asset types are included in a zakat calculation,
   itself a configuration point rather than a universal fixed list.
 - **co-03 · sharia-board-approval-workflow** — an approval actor distinct from a conventional approval
-  hierarchy (course 25's role concepts), specific to Sharia-compliance sign-off.
+  hierarchy (course 26's role concepts), specific to Sharia-compliance sign-off.
 - **co-04 · sharia-board-as-workflow-participant** — modeling the Sharia board as a participant in an
   approval-workflow state machine (course 4's state-machine concept, applied).
 - **co-05 · compliance-reporting-distinct-from-statutory** — Sharia-compliance reporting has its own
-  disclosure requirements, distinct from conventional statutory financial reporting (course 26's
+  disclosure requirements, distinct from conventional statutory financial reporting (course 27's
   reporting concepts, applied to a new report type).
 - **co-06 · jurisdictional-configuration-recap** — zakat and compliance-reporting modules both draw on
-  the same jurisdictional-configuration mechanism introduced in course 27, closing the corpus's
+  the same jurisdictional-configuration mechanism introduced in course 28, closing the corpus's
   Sharia-specific design arc.
 - **co-07 · zakat-valuation-date-as-configuration** — the point in time a zakat calculation reads
   balances at is itself configured against the fiscal-calendar variant (course 7), not fixed by the
@@ -78,7 +78,7 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 - **ex-03 · compliance-report-contrast** — given the same period's data, contrast what a
   Sharia-compliance report discloses versus what a conventional statutory report discloses. (co-05)
 - **ex-04 · jurisdictional-recap-trace** — given a business reconfigured from one jurisdictional model
-  to another (course 27), trace how its zakat calculation and compliance report both change as a
+  to another (course 28), trace how its zakat calculation and compliance report both change as a
   result. (co-06)
 - **ex-05 · valuation-date-sensitivity** — given the same set of balances and two entities configured
   on different fiscal-calendar variants (course 7), show that the zakat calculation reads a different
@@ -109,7 +109,7 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/sharia-erp` only — Stage C, course 29 of 29. **Dangerous 4 ⚡ — `sharia-erp` ENDS HERE.**
+- `skills/sharia-erp` only — Stage C, course 30 of 30. **Dangerous 4 ⚡ — `sharia-erp` ENDS HERE.**
 
 ---
 

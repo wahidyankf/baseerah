@@ -97,8 +97,8 @@ the `co-NN` it exercises.
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 11 of 26.
-- `skills/sharia-erp` — Stage A, course 11 of 29.
+- `skills/conventional-erp` — Stage A, course 11 of 27.
+- `skills/sharia-erp` — Stage A, course 11 of 30.
 
 ---
 

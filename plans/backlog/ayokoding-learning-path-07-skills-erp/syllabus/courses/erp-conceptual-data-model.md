@@ -5,7 +5,7 @@
 **Short summary**: Master data types, the header/line document shape, multi-entity accommodation
 
 **Scope note**: the shared vocabulary of master data and the header/line document pattern almost every
-ERP transaction reuses, plus a first introduction to the extensibility axis (deep dive: course 21).
+ERP transaction reuses, plus a first introduction to the extensibility axis (deep dive: course 22).
 Foundation for course 4's document-lifecycle treatment and course 17's BOM/routing treatment.
 License-aware (DD-15).
 
@@ -18,7 +18,7 @@ License-aware (DD-15).
   way to understand an unfamiliar document type.
 - **Big ideas touched**: `master-data-as-shared-identity` — a duplicate or malformed master record
   propagates errors into every transaction referencing it; `extensibility-as-open-axis` — EAV vs JSONB
-  vs generated schema, introduced here, resolved in course 21.
+  vs generated schema, introduced here, resolved in course 22.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ License-aware (DD-15).
 > The Phase 1.2a confirmation pass has not yet run for this course.
 
 - The extensibility axis (EAV vs JSONB vs generated schema) is `[Repo-grounded]` in the domain-research
-  grounding file, Part 2; its full trade-off analysis is deferred to course 21.
+  grounding file, Part 2; its full trade-off analysis is deferred to course 22.
 - Master-data and header/line terminology is generic across the industry `[Judgment call]`, not tied
   to any single vendor's proprietary field names.
 
@@ -52,7 +52,7 @@ License-aware (DD-15).
 - **co-07 · totals-and-rounding** — totals and rounding rules differ at the header level vs the line
   level, and the two must reconcile.
 - **co-08 · company-code-legal-entity** — the organizational dimension that scopes a document to one
-  legal entity (deep dive: course 24).
+  legal entity (deep dive: course 25).
 - **co-09 · multi-currency-fields** — currency fields at document, line, and local-reporting level,
   present even in a single-currency deployment.
 - **co-10 · extensibility-axis-introduced** — EAV, JSONB/schemaless columns, and generated schema as
@@ -100,8 +100,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 2 of 26.
-- `skills/sharia-erp` — Stage A, course 2 of 29.
+- `skills/conventional-erp` — Stage A, course 2 of 27.
+- `skills/sharia-erp` — Stage A, course 2 of 30.
 
 ---
 

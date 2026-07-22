@@ -4,7 +4,7 @@
 
 **Short summary**: The H2R process chain, organizational/position master data, payroll touchpoints
 
-**Scope note**: opens the enterprise-scale cluster (with courses 24-26) — the hire-to-retire flow and
+**Scope note**: opens the enterprise-scale cluster (with courses 25-27) — the hire-to-retire flow and
 the organizational master data it depends on. Requires `payroll-and-tax-accounting-essentials` from
 the accounting corpus. License-aware (DD-15).
 
@@ -97,8 +97,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage B, course 23 of 26.
-- `skills/sharia-erp` — Stage B, course 23 of 29.
+- `skills/conventional-erp` — Stage B, course 24 of 27.
+- `skills/sharia-erp` — Stage B, course 24 of 30.
 
 ---
 

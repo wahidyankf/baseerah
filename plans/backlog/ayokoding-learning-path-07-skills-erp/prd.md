@@ -5,8 +5,8 @@
 
 ## Product Overview
 
-Two products: `skills/conventional-erp` (26 courses) and `skills/sharia-erp` (29 courses — the same
-26 plus 3 Sharia-exclusive). Both promise the reader the ability to **read, reason about, and design**
+Two products: `skills/conventional-erp` (27 courses) and `skills/sharia-erp` (30 courses — the same
+27 plus 3 Sharia-exclusive). Both promise the reader the ability to **read, reason about, and design**
 an ERP system to build-founding depth — never to operate, install, evaluate, or select one (A6/A7).
 
 ## Personas
@@ -32,11 +32,11 @@ the honest framing that this corpus teaches architecture, not accounting itself.
 Wants ERP domain literacy specifically for Sharia-compliant deployments, and needs to know upfront
 that `sharia-erp` is a complete path, not an add-on requiring `conventional-erp` first — this is
 stated explicitly on the `<SHARLANDING>` landing (L-5) and reinforced by `courseOrder` actually
-including all 26 shared ids.
+including all 27 shared ids.
 
 ## Product Scope
 
-**In scope**: 29 course bodies, 2 manifests, 2 landings (content spec only), 30 syllabus files, the
+**In scope**: 30 course bodies, 2 manifests, 2 landings (content spec only), 31 syllabus files, the
 licensing section, and Gherkin coverage.
 
 **Out of scope**: any UI component (owned by plan 03), any accounting content (owned by plan 06), any
@@ -63,17 +63,17 @@ Feature: Skills ERP paths — landing, manifest, and ramp behavior
 
   Scenario: conventional-erp landing renders with its full course count
     Given the reader navigates to "/en/learn/paths/skills/conventional-erp"
-    Then the landing renders 26 courses in courseOrder order
+    Then the landing renders 27 courses in courseOrder order
     And the landing displays the Dangerous 1, Dangerous 2, and Dangerous 3 boundaries
 
   Scenario: sharia-erp landing renders with its full course count and states it covers the basics
     Given the reader navigates to "/en/learn/paths/skills/sharia-erp"
-    Then the landing renders 29 courses in courseOrder order
+    Then the landing renders 30 courses in courseOrder order
     And the landing displays the Dangerous 1 through Dangerous 4 boundaries
     And the landing states explicitly that the path covers all the basics without requiring
       "conventional-erp" first
 
-  Scenario: the shared 26 courses are identical bodies referenced from both manifests
+  Scenario: the shared 27 courses are identical bodies referenced from both manifests
     Given a course id present in both "skills/conventional-erp" and "skills/sharia-erp" courseOrder
     When the reader visits that course under either path context
     Then the rendered body content is byte-identical
@@ -84,15 +84,15 @@ Feature: Skills ERP paths — landing, manifest, and ramp behavior
     Then it parses against the PathManifest zod schema
     And its pathId equals "skills/conventional-erp"
     And its arc equals "immediately-effective"
-    And its courseOrder contains exactly 26 unique course ids
+    And its courseOrder contains exactly 27 unique course ids
 
   Scenario: sharia-erp manifest validates against the PathManifest schema
     Given the file "manifests/skills/sharia-erp.yaml"
     Then it parses against the PathManifest zod schema
     And its pathId equals "skills/sharia-erp"
-    And its courseOrder contains exactly 29 unique course ids
-    And its courseOrder position 26 equals "erp-analytics-and-reporting"
-    And its courseOrder positions 27 to 29 are the 3 Sharia-exclusive ids in catalog order
+    And its courseOrder contains exactly 30 unique course ids
+    And its courseOrder position 27 equals "erp-analytics-and-reporting"
+    And its courseOrder positions 28 to 30 are the 3 Sharia-exclusive ids in catalog order
     And its final courseOrder entry equals "zakat-and-sharia-compliance-modules"
 
   Scenario: record-to-report-systems declares its hard accounting prerequisite
@@ -100,7 +100,7 @@ Feature: Skills ERP paths — landing, manifest, and ramp behavior
     Then its frontmatter prerequisites include "financial-statements-and-close-cycle"
 
   Scenario: no course id, path id, or landing title contains a vendor trademark
-    Given every course id in the 29-course ERP catalog and both path ids
+    Given every course id in the 30-course ERP catalog and both path ids
     Then none of them matches "sap", "oracle", "netsuite", "erpnext", or "odoo" (case-insensitive)
 
   Scenario: the two scope-boundary-risk courses each carry a self-check worked example

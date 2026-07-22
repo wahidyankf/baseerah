@@ -2,8 +2,8 @@
 
 ## Overview
 
-Delivers **two** `skills/` paths — **`skills/conventional-erp`** (26 courses) and
-**`skills/sharia-erp`** (26 shared + 3 Sharia-exclusive = 29 courses) — over **one** 29-course ERP
+Delivers **two** `skills/` paths — **`skills/conventional-erp`** (27 courses) and
+**`skills/sharia-erp`** (27 shared + 3 Sharia-exclusive = 30 courses) — over **one** 30-course ERP
 corpus, teaching the domain to build-founding depth without ever asking the reader to build, install,
 or evaluate a system. This is the ERP half of the `skills/` category; the accounting half is
 [`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md).
@@ -18,12 +18,12 @@ retired. See [tech-docs.md §Naming harmonisation](./tech-docs.md#naming-harmoni
 %% Both paths over one corpus. Shape encodes role: hexagon = corpus (course bodies, authored once),
 %% stadium = manifest (an ordered reference list, never a copy).
 flowchart LR
-    CORPUS{{"29-course ERP corpus<br/>authored once, under courses/"}}:::corpus
-    CONV(["skills/conventional-erp<br/>26 ids referenced"]):::conv
-    SHAR(["skills/sharia-erp<br/>29 ids referenced<br/>(26 shared + 3 exclusive)"]):::shar
+    CORPUS{{"30-course ERP corpus<br/>authored once, under courses/"}}:::corpus
+    CONV(["skills/conventional-erp<br/>27 ids referenced"]):::conv
+    SHAR(["skills/sharia-erp<br/>30 ids referenced<br/>(27 shared + 3 exclusive)"]):::shar
 
-    CORPUS -->|"26 shared ids"| CONV
-    CORPUS -->|"26 shared + 3 exclusive"| SHAR
+    CORPUS -->|"27 shared ids"| CONV
+    CORPUS -->|"27 shared + 3 exclusive"| SHAR
 
     classDef corpus fill:#029E73,stroke:#000000,color:#FFFFFF
     classDef conv fill:#0173B2,stroke:#000000,color:#FFFFFF
@@ -32,8 +32,8 @@ flowchart LR
 
 ## Scope
 
-**In scope**: two path manifests, two path landings (content only — no new component), a 29-course
-corpus (17 By Example, 12 Annotated-concept), 29 syllabus specs with module/topic breakdowns, a
+**In scope**: two path manifests, two path landings (content only — no new component), a 30-course
+corpus (18 By Example, 12 Annotated-concept), 30 syllabus specs with module/topic breakdowns, a
 Licensing and IP Compliance section, and the Gherkin coverage for both paths' navigation.
 
 **Out of scope (A6/A7)**: no course builds, installs, or stands up an ERP system of any kind; no
@@ -47,12 +47,12 @@ per `A3`).
 
 ## Why two paths, one corpus (A10/A11)
 
-`sharia-erp` is not an add-on assuming the conventional path — it covers the same 26-course foundation
+`sharia-erp` is not an add-on assuming the conventional path — it covers the same 27-course foundation
 `conventional-erp` does, plus 3 Sharia-exclusive courses. Per `A11` — the schema's own existing rule,
 cited directly rather than reinvented (see
 [`ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md#design-decisions)
 lines 417, 424, 615) — a course id's uniqueness is per-manifest, not library-wide, and no manifest may
-copy a course body; every manifest references by id. The 26 shared course bodies are therefore
+copy a course body; every manifest references by id. The 27 shared course bodies are therefore
 authored **once**; `<SHARMAN>`'s `courseOrder` interleaves them with the 3 Sharia-exclusive ids rather
 than duplicating any file. Duplicating would desync silently — an edit to one copy never propagated
 to the other produces two courses answering the same question differently, with no cross-file
@@ -60,14 +60,14 @@ consistency gate to catch it.
 
 ## Depth (A9)
 
-The corpus expands past the originally-scoped 20 courses to **29**, sized by what the domain actually
+The corpus expands past the originally-scoped 20 courses to **30**, sized by what the domain actually
 requires: the cross-cutting spine (master data, document state machines, posting rules and account
 determination, fiscal calendar, multi-entity, multi-currency, UoM conversion, numbering sequences,
 audit trail), the module map, the subledger-to-GL relationship as the architectural crux, and the hard
 parts (costing methods, negative stock and backdating, reservations/ATP, MRP netting, BOM
 explosion/phantom BOMs, three-way-match tolerances/partials/returns, period close, stock concurrency,
 and the EAV-vs-JSONB-vs-generated-schema extensibility axis). See
-[tech-docs.md §The ERP catalog](./tech-docs.md#the-erp-catalog-29-courses-settled).
+[tech-docs.md §The ERP catalog](./tech-docs.md#the-erp-catalog-30-courses-settled).
 
 ## Licensing (A8)
 
@@ -99,10 +99,10 @@ before Phase 3/4).
 | Stage                                         | Courses | Accounting precondition          | Boundary reached                                                           |
 | --------------------------------------------- | ------- | -------------------------------- | -------------------------------------------------------------------------- |
 | A — Foundations & Architecture                | 15      | none                             | Dangerous 1 ⚡ (course 9)                                                  |
-| B — Conventional Enterprise Depth             | 11      | conventional-accounting complete | Dangerous 2 (course 16), Dangerous 3 (course 26 — `conventional-erp` ends) |
-| C — Sharia-Compliant Design (sharia-erp only) | 3       | sharia-accounting complete       | Dangerous 4 (course 29 — `sharia-erp` ends)                                |
+| B — Conventional Enterprise Depth             | 12      | conventional-accounting complete | Dangerous 2 (course 16), Dangerous 3 (course 27 — `conventional-erp` ends) |
+| C — Sharia-Compliant Design (sharia-erp only) | 3       | sharia-accounting complete       | Dangerous 4 (course 30 — `sharia-erp` ends)                                |
 
-**Total**: 29 courses (17 By Example, 12 Annotated-concept) — 26 in `skills/conventional-erp`, 29 in
+**Total**: 30 courses (18 By Example, 12 Annotated-concept) — 27 in `skills/conventional-erp`, 30 in
 `skills/sharia-erp`.
 
 ## Syllabus layer
@@ -124,10 +124,10 @@ structure. See [tech-docs.md §Syllabus confirmation order](./tech-docs.md#sylla
 | Existing course (library)                                                                 | Relationship                                             |
 | ----------------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | `domain-driven-design`                                                                    | prerequisite for course 4 (document state machines)      |
-| `sql-essentials`                                                                          | prerequisite for course 21 (extension and customization) |
-| `event-driven-architecture`, `networking-essentials`, `backend-essentials`, `api-design`  | prerequisites for course 22 (integration patterns)       |
-| `security-essentials`                                                                     | prerequisite for course 25 (security and controls)       |
-| `data-engineering`, `analytics-and-experimentation`, `advanced-sql-and-query-performance` | prerequisites for course 26 (analytics and reporting)    |
+| `sql-essentials`                                                                          | prerequisite for course 22 (extension and customization) |
+| `event-driven-architecture`, `networking-essentials`, `backend-essentials`, `api-design`  | prerequisites for course 23 (integration patterns)       |
+| `security-essentials`                                                                     | prerequisite for course 26 (security and controls)       |
+| `data-engineering`, `analytics-and-experimentation`, `advanced-sql-and-query-performance` | prerequisites for course 27 (analytics and reporting)    |
 
 `project-management` (existing library) is **no longer** a prerequisite of any course in this
 catalog — its only prior user, `erp-implementation-methodology`, is removed by `A7`. See
@@ -154,4 +154,4 @@ gate is declared; `[AI]` merges every phase once the PR-Review Maker→Fixer Cyc
 - [tech-docs.md](./tech-docs.md) — the full catalog, prerequisite graph, licensing section, and every
   Design Decision (DD-1 through DD-34).
 - [delivery.md](./delivery.md) — the 11-phase execution checklist.
-- [syllabus/](./syllabus/README.md) — the 29 per-course syllabus specs and two path-manifest mirrors.
+- [syllabus/](./syllabus/README.md) — the 30 per-course syllabus specs and two path-manifest mirrors.

@@ -38,7 +38,7 @@ License-aware (DD-15).
 - **co-03 · gapped-sequence** — a sequence that may legitimately skip numbers (e.g. on a cancelled
   draft), acceptable in most non-fiscal document types.
 - **co-04 · numbering-across-multi-entity** — how numbering ranges are scoped per legal entity in a
-  multi-entity system (preview of course 24).
+  multi-entity system (preview of course 25).
 - **co-05 · uom-conversion-table** — the table mapping one unit of measure to another for the same
   item (e.g. box to each).
 - **co-06 · rounding-in-conversion** — rounding rules applied during UoM conversion, and why they
@@ -88,8 +88,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 8 of 26.
-- `skills/sharia-erp` — Stage A, course 8 of 29.
+- `skills/conventional-erp` — Stage A, course 8 of 27.
+- `skills/sharia-erp` — Stage A, course 8 of 30.
 
 ---
 

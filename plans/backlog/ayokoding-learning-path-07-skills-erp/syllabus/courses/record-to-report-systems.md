@@ -18,7 +18,7 @@ subledger-to-GL posting is meaningless without a balanced ledger. License-aware 
 - **Keep-this-if-you-forget-everything**: a financial statement is the GL's summarized output; every
   number on it traces back through a control account to specific subledger transactions.
 - **Big ideas touched**: `convergence-of-subledgers`; `intercompany-elimination-preview` (full
-  multi-entity treatment in course 24).
+  multi-entity treatment in course 25).
 
 ## Prerequisites
 
@@ -51,7 +51,7 @@ subledger-to-GL posting is meaningless without a balanced ledger. License-aware 
 - **co-04 · close-dependency-on-subledgers** — the period cannot close (course 7) until subledgers are
   reconciled (course 6).
 - **co-05 · intercompany-transaction-preview** — a transaction between two related legal entities,
-  requiring elimination at consolidation (full treatment: course 24).
+  requiring elimination at consolidation (full treatment: course 25).
 - **co-06 · r2r-as-integration-point** — R2R is where every other process course's postings ultimately
   land, making it the natural place to verify the whole corpus's posting logic end to end.
 - **co-07 · control-account-reconciliation** — the check that proves convergence actually happened: a
@@ -84,7 +84,7 @@ the `co-NN` it exercises.
   period close is blocked until it resolves. (co-04)
 - **ex-03 · intercompany-transaction-flag** — given a transaction between two related entities,
   identify it as needing elimination and explain why (without performing the full consolidation,
-  deferred to course 24). (co-05)
+  deferred to course 25). (co-05)
 
 ### Advanced
 
@@ -122,8 +122,8 @@ the `co-NN` it exercises.
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage B, course 13 of 26.
-- `skills/sharia-erp` — Stage B, course 13 of 29.
+- `skills/conventional-erp` — Stage B, course 13 of 27.
+- `skills/sharia-erp` — Stage B, course 13 of 30.
 
 ---
 

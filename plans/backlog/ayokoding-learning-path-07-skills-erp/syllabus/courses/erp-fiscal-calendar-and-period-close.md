@@ -44,7 +44,7 @@ call]`.
 - **co-07 · reopening-a-period** — the (normally exceptional, tightly controlled) act of reopening a
   closed period, and why it is dangerous.
 - **co-08 · fiscal-calendar-and-multi-entity** — different legal entities may run different fiscal-year
-  variants concurrently (preview of course 24).
+  variants concurrently (preview of course 25).
 
 ## Worked examples
 
@@ -85,8 +85,8 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 7 of 26.
-- `skills/sharia-erp` — Stage A, course 7 of 29.
+- `skills/conventional-erp` — Stage A, course 7 of 27.
+- `skills/sharia-erp` — Stage A, course 7 of 30.
 
 ---
 

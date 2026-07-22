@@ -30,13 +30,13 @@ products with independent value, not one product with an optional add-on.
 - **Cross-domain reinforcement**: 10 existing software-engineering courses and, once
   `ayokoding-learning-path-06-skills-accounting` ships, 7 accounting courses gain a new downstream
   audience via this corpus's prerequisite edges.
-- **Shared-corpus efficiency**: 26 of 29 course bodies serve both products; `A11`'s
+- **Shared-corpus efficiency**: 27 of 30 course bodies serve both products; `A11`'s
   reference-by-id-never-duplicate architecture means the platform maintains one body per shared
   concept, not two — a direct cost avoidance versus a duplicated-content design.
 
 ## Affected Roles
 
-- **Content authors** (AI agents in the maker-checker-fixer pipeline) — author 29 new course bodies
+- **Content authors** (AI agents in the maker-checker-fixer pipeline) — author 30 new course bodies
   and 30 syllabus files against a settled catalog and prerequisite graph.
 - **Site readers** pursuing ERP domain literacy — two new personas, detailed in
   [prd.md](./prd.md#personas).
@@ -56,7 +56,7 @@ products with independent value, not one product with an optional add-on.
 | A vendor name appears in a course title, path segment, or product name (trademark exposure)                         | Low        | Medium | Nominative-use rule; Phase 6 grep clause scanning every id for vendor-name substrings                                                                         |
 | The accounting-side course ids this plan's Stage B/C gates cite change before plan 06 finalizes                     | Medium     | Medium | Mechanical `test -d` gates fail safely (wait, not silent wrong-authoring); coordination risk explicitly flagged in tech-docs.md, re-verified before Phase 3/4 |
 | A syllabus's "Advanced topics"-style vague module title makes the corpus unverifiable                               | Low        | Low    | Module-title specificity rule enforced at authoring time; Phase 1.2a confirmation pass would surface any surviving vagueness as unconfirmable                 |
-| A jurisdictional claim in the Sharia-exclusive courses (27-29) is stated as settled fact while still `[Unverified]` | Medium     | Medium | A4 verification-status carry-forward; explicit Phase 1.2 re-verification step gates Stage C authoring                                                         |
+| A jurisdictional claim in the Sharia-exclusive courses (28-30) is stated as settled fact while still `[Unverified]` | Medium     | Medium | A4 verification-status carry-forward; explicit Phase 1.2 re-verification step gates Stage C authoring                                                         |
 
 ## Success Criteria
 

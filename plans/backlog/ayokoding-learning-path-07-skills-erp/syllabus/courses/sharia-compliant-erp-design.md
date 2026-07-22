@@ -19,14 +19,14 @@ License-aware (DD-15).
 - **Keep-this-if-you-forget-everything**: pluggability is the design answer to jurisdictional
   plurality — the chart of accounts, recognition rules, and disclosure set must be configuration.
 - **Big ideas touched**: `jurisdictional-pluggability-as-the-design-principle`; `contract-type-aware-document-flow`
-  — Murabaha/Ijarah/Musharaka each imply a different document-flow variant (deep dive: course 28).
+  — Murabaha/Ijarah/Musharaka each imply a different document-flow variant (deep dive: course 29).
 
 ## Prerequisites
 
 - **ERP prereqs**: [`multi-company-and-multi-currency-erp`](./multi-company-and-multi-currency-erp.md).
 - **Accounting prereqs**: `islamic-contract-modeling-for-systems`, `sharia-accounting-and-aaoifi-standards`
   (from `ayokoding-learning-path-06-skills-accounting`).
-- **Assumed knowledge**: course 24's multi-entity structure vocabulary (a jurisdictional model is
+- **Assumed knowledge**: course 25's multi-entity structure vocabulary (a jurisdictional model is
   configured per legal entity, analogous to a fiscal-year variant).
 
 ## Accuracy notes (pending A4 verification)
@@ -57,14 +57,14 @@ License-aware (DD-15).
 - **co-02 · jurisdictional-pluggability** — the chart of accounts, recognition rules, and disclosure
   set are modeled as configuration, selected per legal entity, not hardcoded.
 - **co-03 · configurable-chart-of-accounts** — a chart of accounts structure that can vary by
-  jurisdiction without a schema change, applying course 21's extensibility-axis reasoning.
+  jurisdiction without a schema change, applying course 22's extensibility-axis reasoning.
 - **co-04 · configurable-disclosure-set** — which disclosures a financial statement must carry, varied
   by jurisdictional configuration.
 - **co-05 · contract-type-awareness** — a document flow that varies its shape based on the underlying
   contract type (Murabaha, Ijarah, Musharaka), previewed here.
 - **co-06 · profit-sharing-hook** — a configuration point for profit-sharing calculation logic
-  (Mudaraba/Musharaka), detailed in course 29.
-- **co-07 · zakat-hook** — a configuration point for zakat calculation, detailed in course 29.
+  (Mudaraba/Musharaka), detailed in course 30.
+- **co-07 · zakat-hook** — a configuration point for zakat calculation, detailed in course 30.
 - **co-08 · non-permissible-income-segregation-hook** — a configuration point that routes income the
   applicable jurisdictional model treats as non-permissible into its own account and its own
   disclosure line, rather than merging it into ordinary revenue; which items qualify is configuration,
@@ -88,7 +88,7 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 ### Intermediate
 
 - **ex-03 · contract-type-flow-preview** — given a Murabaha transaction and a conventional sale, note
-  where the document flow would need to diverge (full treatment: course 28). (co-05)
+  where the document flow would need to diverge (full treatment: course 29). (co-05)
 - **ex-04 · disclosure-configuration-trace** — given two jurisdictions with different disclosure
   requirements for the same transaction type, show how the configuration would differ. (co-04)
 - **ex-05 · segregation-hook-configuration-contrast** — given two jurisdictional configurations that
@@ -120,7 +120,7 @@ Prose-based worked scenarios (no runnable code). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/sharia-erp` only — Stage C, course 27 of 29.
+- `skills/sharia-erp` only — Stage C, course 28 of 30.
 
 ---
 

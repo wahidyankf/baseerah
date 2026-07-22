@@ -15,12 +15,12 @@ Four standing constraints govern every step below.
 
 > **Cross-plan source of truth**: the ERP catalog — course ids, formats, prerequisite edges, ramp
 > order — is settled in
-> [tech-docs.md §The ERP catalog](./tech-docs.md#the-erp-catalog-29-courses-settled). Transcribe it;
+> [tech-docs.md §The ERP catalog](./tech-docs.md#the-erp-catalog-30-courses-settled). Transcribe it;
 > do not re-derive it. The syllabus module/topic content is settled in
 > [`syllabus/courses/`](./syllabus/README.md). Transcribe it into course bodies; do not re-derive it.
 >
 > **The category ownership invariant (binding)**: this plan owns `<CONVMAN>`, `<SHARMAN>`,
-> `<CONVLANDING>`, `<SHARLANDING>`, the twenty-nine ERP course bundles, and `<SYL>`/`<SYLPATHS>`. It
+> `<CONVLANDING>`, `<SHARLANDING>`, the thirty ERP course bundles, and `<SYL>`/`<SYLPATHS>`. It
 > **never** writes an accounting file, a careers manifest, a component, a design asset, or a
 > structural `_index.md`. A step here that authors accounting material is a boundary violation and is
 > equally forbidden in the other direction.
@@ -116,13 +116,13 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
 
 ## Parallelization Model
 
-Two manifests share one 26-course corpus, so the corpus is the constraint and the manifests are not.
+Two manifests share one 27-course corpus, so the corpus is the constraint and the manifests are not.
 Within a stage, courses with no prerequisite edge between them author in parallel up to the
 concurrency cap; courses with an edge serialize. **Stage A (15 courses) carries no accounting
 precondition and runs fully concurrently with plan 06** — only Stage B and Stage C wait on their
 `ACCT_GATE_*` checks, which is what makes the 06→07 edge soft overall and hard only at those two
 gates. The two manifests' TDD growth cycles are separate, parallelizable sub-phases once their shared
-courses exist: `<CONVMAN>` stops growing at 26 while `<SHARMAN>` continues to 29, so after §3.2 they
+courses exist: `<CONVMAN>` stops growing at 27 while `<SHARMAN>` continues to 30, so after §3.2 they
 no longer contend. See
 [tech-docs §Authoring stages vs reading ramp](./tech-docs.md#authoring-stages-vs-reading-ramp-dd-3)
 for the topological ordering this parallelization respects.
@@ -163,11 +163,12 @@ ERP_STAGE_A=(
   erp-bom-and-routing-architecture erp-extension-and-customization erp-integration-patterns
 )
 
-# Stage B — 11 ids, gated on ACCT_GATE_B
+# Stage B — 12 ids, gated on ACCT_GATE_B
 ERP_STAGE_B=(
   record-to-report-systems inventory-and-warehouse-management erp-inventory-costing-methods
   erp-inventory-integrity-and-concurrency production-planning-and-mrp demand-and-supply-planning
-  erp-availability-and-reservations human-capital-management-and-hire-to-retire
+  erp-availability-and-reservations quality-management-and-inspection
+  human-capital-management-and-hire-to-retire
   multi-company-and-multi-currency-erp erp-security-and-controls erp-analytics-and-reporting
 )
 
@@ -207,7 +208,7 @@ ACCT_GATE_C=(
       `nx run ayokoding-www:test:quick`.
 - [ ] [AI] **Cardinality guard — run before the three checks below, which are all vacuous against an
       unset array**:
-      `[ "${#ERP_ALL[@]}" -eq 29 ] && [ "${#ACCT_GATE_B[@]}" -eq 5 ] && [ "${#ACCT_GATE_C[@]}" -eq 2 ] && echo GUARD-OK || echo GUARD-FAIL`
+      `[ "${#ERP_ALL[@]}" -eq 30 ] && [ "${#ACCT_GATE_B[@]}" -eq 5 ] && [ "${#ACCT_GATE_C[@]}" -eq 2 ] && echo GUARD-OK || echo GUARD-FAIL`
       — acceptance: prints `GUARD-OK`. If the constants block above was not sourced, every `for … in
 "${ERP_ALL[@]}"` sweep in this plan iterates zero times and reports success.
 - [ ] [AI] Verify no id in `ERP_ALL` already exists under `<COURSES>`:
@@ -234,10 +235,10 @@ ACCT_GATE_C=(
 Per [tech-docs.md §Syllabus layer](./tech-docs.md#syllabus-layer--custody-and-shape-dd-31), authoring
 precedes confirmation, and confirmation is coverage-only (`A12`).
 
-### 1.1 — Author all 29 syllabus specs (already drafted; this step verifies, not re-authors)
+### 1.1 — Author all 30 syllabus specs (already drafted; this step verifies, not re-authors)
 
 - [x] [AI] `${PLANDIR}syllabus/README.md` (the index sits one level **above** `<SYL>`, not inside it)
-      and all 29 `<SYL><id>.md` files exist, each with the required section set (header block, Scope
+      and all 30 `<SYL><id>.md` files exist, each with the required section set (header block, Scope
       note ending `License-aware (DD-15)`, Why this exists, Prerequisites, Accuracy notes, Concepts,
       Worked examples, Synthesis exercise, Read more, In which paths). Verify:
 
@@ -246,13 +247,13 @@ precedes confirmation, and confirmation is coverage-only (`A12`).
   for id in "${ERP_ALL[@]}"; do test -f "${SYL}${id}.md" || echo "MISSING: $id"; done
   ```
 
-  Acceptance: **empty output**. Guard first — `[ "${#ERP_ALL[@]}" -eq 29 ] && echo GUARD-OK` must
+  Acceptance: **empty output**. Guard first — `[ "${#ERP_ALL[@]}" -eq 30 ] && echo GUARD-OK` must
   print `GUARD-OK`, or the loop iterates zero times and the emptiness means nothing.
 
 - [x] [AI] Both path mirrors exist and **each** enumerates its own full `courseOrder` — the previous
       version of this clause checked only the Sharia mirror while claiming to check both, and its
-      command was corrupted by an unescaped backtick. `conventional-erp` carries 26 ids and
-      `sharia-erp` carries 29; together they cover all 29 distinct ids (26 shared + 3
+      command was corrupted by an unescaped backtick. `conventional-erp` carries 27 ids and
+      `sharia-erp` carries 30; together they cover all 30 distinct ids (27 shared + 3
       Sharia-exclusive):
 
   ```bash
@@ -262,16 +263,16 @@ precedes confirmation, and confirmation is coverage-only (`A12`).
   union=$(cat "${SYLPATHS}manifest-skills-conventional-erp.md" "${SYLPATHS}manifest-skills-sharia-erp.md" \
     | grep -oE '^[0-9]+\. `[a-z0-9-]+`' | sed 's/^[0-9]*\. //; s/`//g' | sort -u | grep -c .)
   echo "conv=$conv shar=$shar union=$union"
-  [ "$conv" -eq 26 ] && [ "$shar" -eq 29 ] && [ "$union" -eq 29 ] && echo PASS || echo FAIL
+  [ "$conv" -eq 27 ] && [ "$shar" -eq 30 ] && [ "$union" -eq 30 ] && echo PASS || echo FAIL
   ```
 
-  Acceptance: prints `conv=26 shar=29 union=29` then `PASS`. **Control probe**: delete one id line
+  Acceptance: prints `conv=27 shar=30 union=30` then `PASS`. **Control probe**: delete one id line
   from a scratch copy and re-run — it must print `FAIL`.
 
 ### 1.2 — The A4 verification pass before any spec asserts a fact
 
 - [ ] [AI] **Cardinality guard first — this clause is meaningless without it.**
-      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 29 ] && echo GUARD-OK || echo GUARD-FAIL` — acceptance:
+      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 30 ] && echo GUARD-OK || echo GUARD-FAIL` — acceptance:
       prints `GUARD-OK`. A wrong `$SYL` (for example, one still pointing at a lifecycle folder the
       plan has moved out of) makes every sweep below return empty and pass vacuously; this guard is
       what makes the emptiness meaningful.
@@ -283,7 +284,7 @@ precedes confirmation, and confirmation is coverage-only (`A12`).
       returns **0**. Do **not** use `grep -L` here: it lists files _without_ a match and exits 0 when
       it finds one, so the clause would be unfalsifiable.
       **Control probe before believing the zero**: append `x` to the pattern (making it match nothing)
-      and re-run — the count must jump to 29. If it does not, the sweep is not measuring what it
+      and re-run — the count must jump to 30. If it does not, the sweep is not measuring what it
       claims and the zero is false.
       A file whose Accuracy notes section is present but **empty** fails this clause even if a marker
       appears elsewhere in the file — check that section specifically.
@@ -298,7 +299,7 @@ precedes confirmation, and confirmation is coverage-only (`A12`).
 
 > Coverage-only. Never reorders a syllabus's modules or adopts a curriculum's sequence.
 
-- [ ] [AI] Dispatch `web-researcher` once per syllabus (29 dispatches, or batched by module-family
+- [ ] [AI] Dispatch `web-researcher` once per syllabus (30 dispatches, or batched by module-family
       where the underlying topic overlaps) asking exactly: "does APICS/ASCM's CPIM or CSCP topic
       outline (for planning/operations content) or the named open-source system's own published
       module structure (for architecture/module-map content, nominative reference only) suggest a
@@ -364,10 +365,10 @@ Scenario: conventional-erp manifest validates against the PathManifest schema
   Then it parses against the PathManifest zod schema
   And its pathId equals "skills/conventional-erp"
   And its arc equals "immediately-effective"
-  And its courseOrder contains exactly 26 unique course ids
+  And its courseOrder contains exactly 27 unique course ids
 ```
 
-The 26-id assertion is this scenario's **terminal** state, reached at §3.2; this sub-phase publishes
+The 27-id assertion is this scenario's **terminal** state, reached at §3.2; this sub-phase publishes
 the manifest at 15 ids and the scenario goes green once Stage B growth completes. `<SHARMAN>`'s own
 schema scenario is bound separately at §4.2 — one scenario per tag.
 
@@ -426,8 +427,8 @@ project'` stub and can never fail, so citing it would make this checkbox vacuous
 
 ## Phase 3: Stage B — Conventional Enterprise Depth
 
-11 courses, gated on `ACCT_GATE_B` resolving on `origin/main`. `conventional-erp` reaches its terminal
-26-id state at the end of this phase.
+12 courses, gated on `ACCT_GATE_B` resolving on `origin/main`. `conventional-erp` reaches its terminal
+27-id state at the end of this phase.
 
 ### 3.0 — Gate check (mechanical, independent of plan 06's own delivery tracking)
 
@@ -435,7 +436,7 @@ project'` stub and can never fail, so citing it would make this checkbox vacuous
       if `WAIT`, poll every 2 minutes (per CI-monitoring convention's cadence) rather than
       tight-looping; do not begin 3.1 until `READY`.
 
-### 3.1 — Author all 11 Stage B course bodies
+### 3.1 — Author all 12 Stage B course bodies
 
 Repeat the 2.1 seven-step cycle for each `id` in `ERP_STAGE_B`, transcribing from `<SYL>${id}.md`.
 Two of these ids (`erp-security-and-controls`, `erp-analytics-and-reporting`) additionally require the
@@ -444,12 +445,12 @@ scope-boundary self-check worked example (DD-10) to be present and reviewed by
 
 - [ ] [AI] `for id in "${ERP_STAGE_B[@]}"; do test -d "${COURSES}${id}" || echo "MISSING: $id"; done | grep -q . && echo FAIL || echo PASS` prints `PASS`.
 
-### 3.2 — TDD: grow both manifests to 26 ids
+### 3.2 — TDD: grow both manifests to 27 ids
 
-**Gherkin (binds) →** "the shared 26 courses are identical bodies referenced from both manifests"
+**Gherkin (binds) →** "the shared 27 courses are identical bodies referenced from both manifests"
 
 ```gherkin
-Scenario: the shared 26 courses are identical bodies referenced from both manifests
+Scenario: the shared 27 courses are identical bodies referenced from both manifests
   Given a course id present in both "skills/conventional-erp" and "skills/sharia-erp" courseOrder
   When the reader visits that course under either path context
   Then the rendered body content is byte-identical
@@ -457,13 +458,13 @@ Scenario: the shared 26 courses are identical bodies referenced from both manife
 ```
 
 This is `A11`'s one-body-two-references rule made reachable. `conventional-erp` reaches its terminal
-26 ids here and stops at `erp-analytics-and-reporting`.
+27 ids here and stops at `erp-analytics-and-reporting`.
 
 - [ ] [AI] **RED** — Extend `erp-manifests.unit.test.ts` asserting both `<CONVMAN>` and `<SHARMAN>`
-      each contain all 26 shared ids (Stage A's 15 plus Stage B's 11, at the insertion positions in
+      each contain all 27 shared ids (Stage A's 15 plus Stage B's 12, at the insertion positions in
       [tech-docs.md §courseOrder arrays](./tech-docs.md#courseorder-arrays-at-each-growth-boundary)),
       with every Stage A id's relative order unchanged — run the suite and verify it **fails**.
-- [ ] [AI] **GREEN** — Grow `<CONVMAN>` and `<SHARMAN>` to 26 ids each — run the suite and verify it
+- [ ] [AI] **GREEN** — Grow `<CONVMAN>` and `<SHARMAN>` to 27 ids each — run the suite and verify it
       **passes**.
 - [ ] [AI] **REFACTOR** — Re-run `checkManifestIntegrity`/`checkPrerequisiteConsistency`; verify zero
       violations, including the hard edge (`record-to-report-systems` requiring
@@ -479,9 +480,9 @@ This is `A11`'s one-body-two-references rule made reachable. `conventional-erp` 
 ### 3.4 — Landing update: Dangerous 2 and Dangerous 3 boundaries
 
 - [ ] [AI] Update `<CONVLANDING>` and `<SHARLANDING>` content to show the Dangerous 2 boundary
-      (course 16) and, for `<CONVLANDING>`, the terminal Dangerous 3 boundary (course 26, "ENDS
+      (course 16) and, for `<CONVLANDING>`, the terminal Dangerous 3 boundary (course 27, "ENDS
       HERE").
-- [ ] [AI] Populate 11 more rows in `<COURSES>_index.md` (26 total).
+- [ ] [AI] Populate 12 more rows in `<COURSES>_index.md` (27 total).
 
 ### 3.5 — Gherkin coverage for Stage B
 
@@ -491,15 +492,15 @@ This is `A11`'s one-body-two-references rule made reachable. `conventional-erp` 
 ### Phase 3 Gate
 
 - [ ] [AI] All Phase 2 Gate checks re-run and still green.
-- [ ] [AI] `<CONVMAN>` has exactly 26 `courseOrder` entries; `<SHARMAN>` has exactly 26 (Stage C not
-      yet grown) — `yq '.courseOrder | length' "${CONVMAN}"` prints `26`.
+- [ ] [AI] `<CONVMAN>` has exactly 27 `courseOrder` entries; `<SHARMAN>` has exactly 27 (Stage C not
+      yet grown) — `yq '.courseOrder | length' "${CONVMAN}"` prints `27`.
 - [ ] [AI] **Integration**: draft PR opened, 3-cycle PR-Review complete, CI green, `[AI]` merge,
       `ayokoding-www` deployed, post-deploy curl check confirms `<CONVLANDING>` shows "ENDS HERE".
 
-> **Pause Safety**: `conventional-erp` is terminal (26/26); `sharia-erp` is mid-growth (26/29). Safe
+> **Pause Safety**: `conventional-erp` is terminal (27/27); `sharia-erp` is mid-growth (27/30). Safe
 > to stop — `conventional-erp` readers get the complete path today. To resume:
 > `yq '.courseOrder | length' worktrees/ayokoding-learning-path-07-skills-erp/${SHARMAN}` and confirm
-> it reads `26`.
+> it reads `27`.
 
 ## Phase 4: Stage C — Sharia-Compliant Design
 
@@ -520,7 +521,7 @@ Every claim in the jurisdictional-model table carries its A4 marker into the cou
 
 - [ ] [AI] `for id in "${ERP_STAGE_C[@]}"; do test -d "${COURSES}${id}" || echo "MISSING: $id"; done | grep -q . && echo FAIL || echo PASS` prints `PASS`.
 
-### 4.2 — TDD: grow `<SHARMAN>` to 29 ids
+### 4.2 — TDD: grow `<SHARMAN>` to 30 ids
 
 **Gherkin (binds) →** "sharia-erp manifest validates against the PathManifest schema"
 
@@ -529,9 +530,9 @@ Scenario: sharia-erp manifest validates against the PathManifest schema
   Given the file "manifests/skills/sharia-erp.yaml"
   Then it parses against the PathManifest zod schema
   And its pathId equals "skills/sharia-erp"
-  And its courseOrder contains exactly 29 unique course ids
-  And its courseOrder position 26 equals "erp-analytics-and-reporting"
-  And its courseOrder positions 27 to 29 are the 3 Sharia-exclusive ids in catalog order
+  And its courseOrder contains exactly 30 unique course ids
+  And its courseOrder position 27 equals "erp-analytics-and-reporting"
+  And its courseOrder positions 28 to 30 are the 3 Sharia-exclusive ids in catalog order
   And its final courseOrder entry equals "zakat-and-sharia-compliance-modules"
 ```
 
@@ -539,18 +540,18 @@ The last three steps are load-bearing, not decorative: a set-membership assertio
 both the correct ordering and the superseded "insert before `erp-security-and-controls`" rule, so
 without them this scenario could not regression-guard the terminal boundary.
 
-- [ ] [AI] **RED** — Extend `erp-manifests.unit.test.ts` asserting `<SHARMAN>` contains all 29 ids at
+- [ ] [AI] **RED** — Extend `erp-manifests.unit.test.ts` asserting `<SHARMAN>` contains all 30 ids at
       the positions in
       [tech-docs.md §courseOrder arrays](./tech-docs.md#courseorder-arrays-at-each-growth-boundary)
-      (the 3 Sharia-exclusive ids **appended after the complete 26-id shared corpus**, i.e. after
-      `erp-analytics-and-reporting`, occupying positions 27-29 with
+      (the 3 Sharia-exclusive ids **appended after the complete 27-id shared corpus**, i.e. after
+      `erp-analytics-and-reporting`, occupying positions 28-30 with
       `zakat-and-sharia-compliance-modules` terminal), and that `<CONVMAN>` is **unaffected** (still
-      26, unchanged) — run the suite and verify it **fails**.
+      27, unchanged) — run the suite and verify it **fails**.
       Assert the terminal id explicitly, not just the set: the test must fail if
       `<SHARMAN>[28]` is anything other than `zakat-and-sharia-compliance-modules`. A set-membership
       assertion alone passes under both the correct and the superseded ordering and cannot
       regression-guard this.
-- [ ] [AI] **GREEN** — Grow `<SHARMAN>` to 29 ids — run the suite and verify it **passes**.
+- [ ] [AI] **GREEN** — Grow `<SHARMAN>` to 30 ids — run the suite and verify it **passes**.
 - [ ] [AI] **REFACTOR** — Re-run integrity checks on `<SHARMAN>` only; verify zero violations.
 
 ### 4.3 — Deferral-check assertion (both directions)
@@ -560,8 +561,8 @@ without them this scenario could not regression-guard the terminal boundary.
 
 ### 4.4 — Landing update: Dangerous 4 boundary
 
-- [ ] [AI] Update `<SHARLANDING>` to show the terminal Dangerous 4 boundary (course 29, "ENDS HERE").
-- [ ] [AI] Populate the final 3 rows in `<COURSES>_index.md` (29 total).
+- [ ] [AI] Update `<SHARLANDING>` to show the terminal Dangerous 4 boundary (course 30, "ENDS HERE").
+- [ ] [AI] Populate the final 3 rows in `<COURSES>_index.md` (30 total).
 
 ### 4.5 — Gherkin coverage for Stage C
 
@@ -570,13 +571,13 @@ without them this scenario could not regression-guard the terminal boundary.
 
 ### Phase 4 Gate
 
-- [ ] [AI] All Phase 3 Gate checks re-run and still green; `<CONVMAN>` unchanged at 26.
-- [ ] [AI] `yq '.courseOrder | length' "${SHARMAN}"` prints `29`.
+- [ ] [AI] All Phase 3 Gate checks re-run and still green; `<CONVMAN>` unchanged at 27.
+- [ ] [AI] `yq '.courseOrder | length' "${SHARMAN}"` prints `30`.
 - [ ] [AI] **Integration**: draft PR opened, 3-cycle PR-Review complete, CI green, `[AI]` merge,
       `ayokoding-www` deployed, post-deploy curl check confirms `<SHARLANDING>` shows "ENDS HERE".
 
-> **Pause Safety**: both paths are terminal (26/26 and 29/29). The full corpus is live. Safe to stop.
-> To resume: `yq '.courseOrder | length' ${SHARMAN}` reads `29` and
+> **Pause Safety**: both paths are terminal (27/27 and 30/30). The full corpus is live. Safe to stop.
+> To resume: `yq '.courseOrder | length' ${SHARMAN}` reads `30` and
 > `curl -sf https://ayokoding.com/en/learn/paths/skills/sharia-erp | grep -qi "covers all the basics"`.
 
 ## Phase 5: Cross-Path Integrity and Spec Coverage Verification
@@ -594,13 +595,13 @@ without them this scenario could not regression-guard the terminal boundary.
   done
   ```
 
-  Acceptance: **empty output**. Guard first — `[ "${#ERP_ALL[@]}" -eq 29 ] && echo GUARD-OK` must
+  Acceptance: **empty output**. Guard first — `[ "${#ERP_ALL[@]}" -eq 30 ] && echo GUARD-OK` must
   print `GUARD-OK`.
 
   Three notes on why this replaces the previous clause, which could not fail:
   - `find … -maxdepth 1 … | sort | uniq -d` was **vacuous by construction** — `find` lists each
     directory exactly once, so `uniq -d` had nothing to emit no matter what the tree contained.
-  - Its name globs (`erp-*`, `*-to-*-systems`, `*-erp*`) also missed 6 of the 29 ids outright,
+  - Its name globs (`erp-*`, `*-to-*-systems`, `*-erp*`) also missed 6 of the 30 ids outright,
     including `production-planning-and-mrp`, `demand-and-supply-planning`,
     `inventory-and-warehouse-management`, `human-capital-management-and-hire-to-retire`,
     `islamic-contract-based-transaction-flows` and `zakat-and-sharia-compliance-modules`.
@@ -649,7 +650,7 @@ never passes vacuously.
       than only the last.
       **This clause is only meaningful once the bundles exist** — run it after the Phase 5 authoring
       steps, never before, or it measures an empty tree. Guard:
-      `[ "$(for id in "${ERP_ALL[@]}"; do test -d "${COURSES}${id}" && echo x; done | grep -c .)" -eq 29 ] && echo GUARD-OK || echo GUARD-FAIL`
+      `[ "$(for id in "${ERP_ALL[@]}"; do test -d "${COURSES}${id}" && echo x; done | grep -c .)" -eq 30 ] && echo GUARD-OK || echo GUARD-FAIL`
       must print `GUARD-OK` first.
       Expected steady state is zero matches (this corpus ships no binary image assets, per its
       no-net-new-screen exemption); any match fails the clause and must be investigated.
@@ -673,15 +674,15 @@ never passes vacuously.
 
 - [ ] [AI] Read **both** layers against the eleven safe-authoring rules in
       [tech-docs §Licensing and IP Compliance](./tech-docs.md#licensing-and-ip-compliance-a8): every
-      file in `"${SYL}"` (29 syllabi) **and** every `overview.md` under `"${COURSES}"` for `ERP_ALL`
-      (29 course bodies) — 58 files total. Confirm none reproduces a standard's clause text or
+      file in `"${SYL}"` (30 syllabi) **and** every `overview.md` under `"${COURSES}"` for `ERP_ALL`
+      (30 course bodies) — 60 files total. Confirm none reproduces a standard's clause text or
       numbering layout, mirrors a commercial curriculum's module sequence (ASCM/APICS CPIM and CSCP
       outlines are copyrighted products — naming one as corroboration is nominative use and fine,
       transcribing or re-ordering to match it is not, per `A12`), pastes copyleft code, lifts a
       reference implementation's demo dataset, or uses a vendor name in a title.
       Cardinality guard first:
-      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 29 ] && echo GUARD-OK || echo GUARD-FAIL` must print
-      `GUARD-OK` — acceptance: `GUARD-OK`, then zero violations found across all 58 files; any
+      `[ "$(ls "${SYL}"*.md | wc -l)" -eq 30 ] && echo GUARD-OK || echo GUARD-FAIL` must print
+      `GUARD-OK` — acceptance: `GUARD-OK`, then zero violations found across all 60 files; any
       finding is fixed before this gate closes.
 
 ### Phase 6 Gate
@@ -734,12 +735,12 @@ UI-gate-exempt; the three-tester retest is the mandatory non-vacuous substitute.
 
 ## Phase 8: Full-Corpus Integration Verification
 
-- [ ] [AI] `nx run ayokoding-www:build` succeeds with both manifests and all 29 course bundles
+- [ ] [AI] `nx run ayokoding-www:build` succeeds with both manifests and all 30 course bundles
       present.
 - [ ] [AI] `nx affected -t build,test:quick,lint --base=main` is green for `ayokoding-www`.
 - [ ] [AI] End-to-end path-walk: navigate `/en/learn/paths/skills/conventional-erp`, step through
-      prev/next across all 26 courses via Playwright MCP, verify no broken link and no console error;
-      repeat for `/en/learn/paths/skills/sharia-erp` across all 29.
+      prev/next across all 27 courses via Playwright MCP, verify no broken link and no console error;
+      repeat for `/en/learn/paths/skills/sharia-erp` across all 30.
 - [ ] [AI] **Capture evidence for the walk — a walk with no artefact is unauditable.** Write to
       `${PLANDIR}evidence/`:
   - `browser_take_screenshot` of each path landing at three breakpoints (mobile 375px, tablet 768px,
@@ -747,8 +748,8 @@ UI-gate-exempt; the three-tester retest is the mandatory non-vacuous substitute.
     `phase8__<path-id>__<width>__landing.png`.
   - `browser_take_screenshot` of the first and last course page of each walk, named
     `phase8__<path-id>__<position>__<course-id>.png` — for `sharia-erp` the last is
-    `zakat-and-sharia-compliance-modules` (course 29), for `conventional-erp` it is
-    `erp-analytics-and-reporting` (course 26).
+    `zakat-and-sharia-compliance-modules` (course 30), for `conventional-erp` it is
+    `erp-analytics-and-reporting` (course 27).
   - `browser_console_messages` output for each walk saved as
     `phase8__<path-id>__console.txt`.
     Acceptance: `ls "${PLANDIR}evidence/" | grep -c '^phase8__'` returns **at least 11** (6

@@ -97,8 +97,8 @@ schema-shape illustration, not a system to run). Every example cites the `co-NN`
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 21 of 26.
-- `skills/sharia-erp` — Stage A, course 21 of 29.
+- `skills/conventional-erp` — Stage A, course 22 of 27.
+- `skills/sharia-erp` — Stage A, course 22 of 30.
 
 ---
 

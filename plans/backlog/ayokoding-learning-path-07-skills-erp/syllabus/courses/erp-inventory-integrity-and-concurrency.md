@@ -98,9 +98,9 @@ the `co-NN` it exercises.
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage B, course 16 of 26. **Dangerous 2 ⚡ boundary — inventory
+- `skills/conventional-erp` — Stage B, course 16 of 27. **Dangerous 2 ⚡ boundary — inventory
   hard-parts cluster complete.**
-- `skills/sharia-erp` — Stage B, course 16 of 29. **Dangerous 2 ⚡ boundary.**
+- `skills/sharia-erp` — Stage B, course 16 of 30. **Dangerous 2 ⚡ boundary.**
 
 ---
 

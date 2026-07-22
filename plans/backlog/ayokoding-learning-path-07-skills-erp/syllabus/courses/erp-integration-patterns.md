@@ -104,8 +104,8 @@ DD-14). Every example cites the `co-NN` it exercises.
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 22 of 26.
-- `skills/sharia-erp` — Stage A, course 22 of 29.
+- `skills/conventional-erp` — Stage A, course 23 of 27.
+- `skills/sharia-erp` — Stage A, course 23 of 30.
 
 ---
 

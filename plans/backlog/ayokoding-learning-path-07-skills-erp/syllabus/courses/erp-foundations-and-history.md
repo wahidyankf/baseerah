@@ -59,7 +59,7 @@ a system, `A7`). License-aware (DD-15).
 - **co-07 · no-buyer-content** — this corpus contains no evaluation, selection, or
   implementation-methodology material (`A7`).
 - **co-08 · two-path-relationship** — `skills/conventional-erp` and `skills/sharia-erp` share the same
-  26-course foundation; `sharia-erp` is not an add-on assuming the conventional path (`A10`/`A11`).
+  27-course foundation; `sharia-erp` is not an add-on assuming the conventional path (`A10`/`A11`).
 - **co-09 · single-source-of-truth-as-earned** — integration is a property the cross-cutting spine
   delivers, not an automatic consequence of installing software.
 - **co-10 · module-map-preview** — the module families (finance, logistics, production, people) named
@@ -86,7 +86,7 @@ example cites the `co-NN` concept(s) it exercises.
 - **ex-04 · single-source-of-truth-failure-mode** — a scenario where "integration" is claimed but the
   cross-cutting spine (course 4-9 concerns) is missing — identify what actually breaks. (co-09)
 - **ex-05 · two-path-scoping-check** — given a hypothetical reader who wants only Sharia-compliant ERP
-  knowledge, explain why they still need the shared 26-course foundation. (co-08)
+  knowledge, explain why they still need the shared 27-course foundation. (co-08)
 
 ## Synthesis exercise — intra-topic
 
@@ -113,8 +113,8 @@ example cites the `co-NN` concept(s) it exercises.
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 1 of 26.
-- `skills/sharia-erp` — Stage A, course 1 of 29.
+- `skills/conventional-erp` — Stage A, course 1 of 27.
+- `skills/sharia-erp` — Stage A, course 1 of 30.
 
 ---
 

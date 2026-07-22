@@ -104,8 +104,8 @@ Prose-based worked scenarios with originally-authored data (no runnable code). E
 
 ## In which paths
 
-- `skills/conventional-erp` — Stage A, course 6 of 26.
-- `skills/sharia-erp` — Stage A, course 6 of 29.
+- `skills/conventional-erp` — Stage A, course 6 of 27.
+- `skills/sharia-erp` — Stage A, course 6 of 30.
 
 ---
 
