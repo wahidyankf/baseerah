@@ -169,7 +169,17 @@ flowchart TD
       [tech-docs DD-04](./tech-docs.md#dd-04--the-required-layout-is-syllabuscourses--syllabuspaths-both-with-a-readme)
       — acceptance: `grep -c 'syllabus/paths' repo-governance/conventions/structure/learning-plan-syllabus.md`
       exits 0 printing a count ≥ 1
-- [ ] [AI] Write the **census + tiering** section reproducing the table in
+- [ ] [AI] **Re-measure the census before reproducing it.** The census in
+      [tech-docs §Section frequency](./tech-docs.md#section-frequency-the-tiering-evidence) is pinned
+      to commit `e398b8d39`, but corpora 06 and 07 remain under active authorship, so the live counts
+      may have drifted. Re-run the per-file measurement (iterate `*.md` under each corpus's
+      `syllabus/courses/`, skipping `README.md` and `surgery.md`, test each with `grep -q '<pattern>'`)
+      across all three corpora and reconcile any drift into **both** the tech-docs table and the
+      convention before writing it — acceptance: the live per-file counts for plans 02/06/07 match the
+      Total row and every per-plan column in the tech-docs §Section frequency table; if they differ,
+      update the tech-docs table (and the derived Totals/percentages) first, then proceed. Tiers are
+      re-derived from the fresh counts, not inherited
+- [ ] [AI] Write the **census + tiering** section reproducing the (reconciled) table in
       [tech-docs §Section frequency](./tech-docs.md#section-frequency-the-tiering-evidence), and state
       the derivation rule (REQUIRED ≥ 99%, RECOMMENDED ≥ 80%, OPTIONAL below) so the tiers can be
       re-measured rather than inherited

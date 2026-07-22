@@ -8,7 +8,7 @@ A governance product with four parts, all delivered as markdown:
    defining what makes a plan **learning-bearing**, the required `syllabus/` folder layout, the
    per-course file shape, the **Corpus Disposition** rule, and the **custody** rule.
 2. **A copy-paste course template**, embedded as a fenced block in that convention and derived from
-   the measured section census of the 173 existing course files `[Repo-grounded]`.
+   the measured section census of the 174 existing course files `[Repo-grounded]`.
 3. **Enforcement wiring** across `plan-maker` → `plan-checker` → `plan-fixer`, the
    `plan-creating-project-plans` skill, and the `plan-quality-gate` workflow — the same chain that
    already carries the UI-design-funnel rule.
@@ -44,7 +44,7 @@ therefore exempt, and the exemption is restated in
 - **US-5** — As a **maintainer archiving a custodian plan**, I want a written disposition rule, so
   that I know before pushing whether the corpus moves, stays, or blocks archival.
 - **US-6** — As a **maintainer of the existing corpora**, I want the convention derived from the
-  files that exist, so that adopting it costs no reformatting of 173 course files.
+  files that exist, so that adopting it costs no reformatting of 174 course files.
 - **US-7** — As a **checker or author**, I want a runnable conformance recipe, so that I can detect a
   missing required section today without waiting for a deterministic validator.
 

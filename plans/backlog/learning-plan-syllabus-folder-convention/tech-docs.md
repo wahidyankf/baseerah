@@ -39,9 +39,16 @@ flowchart LR
 
 ## Corpus Census — the derivation basis
 
-Every number below was measured on the current commit by counting files under each plan's
-`syllabus/courses/` directory, excluding `README.md` and `surgery.md` (a scope-contract document,
-not a course) `[Repo-grounded]`.
+Every number below was measured on commit `e398b8d39` (2026-07-22) by counting files under each
+plan's `syllabus/courses/` directory, excluding `README.md` and `surgery.md` (a scope-contract
+document, not a course) `[Repo-grounded]`.
+
+**Census pin.** Corpora 06 and 07 were under active authorship on 2026-07-22 — plan 07 gained its
+Quality Management course in `e398b8d39` after an earlier draft of this census was taken — so these
+counts are a snapshot, not a constant. The numbers below are pinned to `e398b8d39`. Phase 1 re-runs
+the per-file measurement at execution time and reconciles any drift into both this table and the
+convention before reproducing it (see DD-05 and the Phase 1 census step in
+[delivery.md](./delivery.md)).
 
 ### Corpus shapes
 
@@ -49,31 +56,31 @@ not a course) `[Repo-grounded]`.
 | ---------------------------------------------------------------------------------------------------------------------------------------- | -----------: | ------------------- | -------------: | ----------------- |
 | [`ayokoding-learning-path-02-schema-and-prerequisite-dag`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md) |          120 | present             |              4 | present           |
 | [`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md)                              |           24 | absent              |              2 | absent            |
-| [`ayokoding-learning-path-07-skills-erp`](../ayokoding-learning-path-07-skills-erp/README.md)                                            |           29 | absent              |              2 | absent            |
-| **Total**                                                                                                                                |      **173** | 1 of 3              |          **8** | 1 of 3            |
+| [`ayokoding-learning-path-07-skills-erp`](../ayokoding-learning-path-07-skills-erp/README.md)                                            |           30 | absent              |              2 | absent            |
+| **Total**                                                                                                                                |      **174** | 1 of 3              |          **8** | 1 of 3            |
 
 Plan 02's 120 standalone course files plus 7 capstones embedded in host-topic files make the
 **127-course catalog** its `syllabus/courses/README.md` documents `[Repo-grounded]`.
 
 ### Section frequency (the tiering evidence)
 
-| Section / header line      | 02 (of 120) | 06 (of 24) | 07 (of 29) | Total (of 173) |    % | Tier        |
+| Section / header line      | 02 (of 120) | 06 (of 24) | 07 (of 30) | Total (of 174) |    % | Tier        |
 | -------------------------- | ----------: | ---------: | ---------: | -------------: | ---: | ----------- |
-| `**Course ID**` line       |         120 |         24 |         29 |            173 |  100 | REQUIRED    |
-| `## Why this exists`       |         120 |         24 |         29 |            173 |  100 | REQUIRED    |
-| `## Prerequisites`         |         120 |         24 |         29 |            173 |  100 | REQUIRED    |
-| `## In which paths`        |         120 |         24 |         29 |            173 |  100 | REQUIRED    |
-| `## Accuracy notes`        |         120 |         24 |         29 |            173 |  100 | REQUIRED    |
-| `**Scope note**` line      |         119 |         24 |         29 |            172 | 99.4 | REQUIRED    |
-| `## Concepts`              |         119 |         24 |         29 |            172 | 99.4 | REQUIRED    |
-| `## Read more`             |         114 |         24 |         29 |            167 | 96.5 | RECOMMENDED |
-| `## Worked examples`       |         112 |         24 |         29 |            165 | 95.4 | RECOMMENDED |
-| `**Short summary**` line   |          95 |         24 |         29 |            148 | 85.5 | RECOMMENDED |
-| `## Capstone spec`         |         115 |          0 |          0 |            115 | 66.5 | OPTIONAL    |
-| `## Tensions & trade-offs` |          61 |          5 |          0 |             66 | 38.2 | OPTIONAL    |
-| `## Lineage`               |          62 |          0 |          0 |             62 | 35.8 | OPTIONAL    |
+| `**Course ID**` line       |         120 |         24 |         30 |            174 |  100 | REQUIRED    |
+| `## Why this exists`       |         120 |         24 |         30 |            174 |  100 | REQUIRED    |
+| `## Prerequisites`         |         120 |         24 |         30 |            174 |  100 | REQUIRED    |
+| `## In which paths`        |         120 |         24 |         30 |            174 |  100 | REQUIRED    |
+| `## Accuracy notes`        |         120 |         24 |         30 |            174 |  100 | REQUIRED    |
+| `**Scope note**` line      |         119 |         24 |         30 |            173 | 99.4 | REQUIRED    |
+| `## Concepts`              |         119 |         24 |         30 |            173 | 99.4 | REQUIRED    |
+| `## Read more`             |         114 |         24 |         30 |            168 | 96.6 | RECOMMENDED |
+| `## Worked examples`       |         112 |         24 |         30 |            166 | 95.4 | RECOMMENDED |
+| `**Short summary**` line   |          95 |         24 |         30 |            149 | 85.6 | RECOMMENDED |
+| `## Capstone spec`         |         115 |          0 |          0 |            115 | 66.1 | OPTIONAL    |
+| `## Tensions & trade-offs` |          61 |          5 |          0 |             66 | 37.9 | OPTIONAL    |
+| `## Lineage`               |          62 |          0 |          0 |             62 | 35.6 | OPTIONAL    |
 
-**Tiering rule** (DD-05): REQUIRED at ≥ 99% of all 173 files; RECOMMENDED at ≥ 80%; OPTIONAL below
+**Tiering rule** (DD-05): REQUIRED at ≥ 99% of all 174 files; RECOMMENDED at ≥ 80%; OPTIONAL below
 that. The rule is stated so a future author can re-derive the tiers from a larger corpus rather than
 inheriting a frozen list.
 
@@ -83,7 +90,7 @@ skipping `README.md` and `surgery.md`, and test each file for the section with
 **silently includes `README.md` and `surgery.md`** and produced a wrong figure during authoring — the
 per-file loop is the reliable method.
 
-**The only two REQUIRED-tier misses in all 173 files are the same file**:
+**The only two REQUIRED-tier misses in all 174 files are the same file**:
 `syllabus/courses/capstone-forge-ready.md` carries neither `**Scope note**` nor `## Concepts`
 `[Repo-grounded]`. It is a capstone, a legitimate structural variant, which is why the convention
 carries an explicit capstone carve-out rather than treating it as a defect.
@@ -219,7 +226,7 @@ stateDiagram-v2
 3. **The durable product is the shipped course body**, under `apps/ayokoding-www/content/`
    `[Repo-grounded]`, not the syllabus. The syllabus is to the course what the mockup is to the
    screen.
-4. **Moving now would cost a migration the plan explicitly excludes.** Promoting 173 files into
+4. **Moving now would cost a migration the plan explicitly excludes.** Promoting 174 files into
    `specs/` or `docs/` is precisely the retrofit the two-pager rules out, and would touch three plan
    folders under concurrent authorship.
 

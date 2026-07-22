@@ -28,7 +28,7 @@ named choice), Justify (a rationale table). The rule is written in
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------: | ------------------- | -----------------: |
 | [`ayokoding-learning-path-02-schema-and-prerequisite-dag`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md) |              120 | present             |                  4 |
 | [`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md)                              |               24 | absent              |                  2 |
-| [`ayokoding-learning-path-07-skills-erp`](../ayokoding-learning-path-07-skills-erp/README.md)                                            |               29 | absent              |                  2 |
+| [`ayokoding-learning-path-07-skills-erp`](../ayokoding-learning-path-07-skills-erp/README.md)                                            |               30 | absent              |                  2 |
 
 Plan 02's 120 standalone course files plus 7 capstones embedded in host-topic files make up the
 **127-course catalog** its `syllabus/courses/README.md` describes `[Repo-grounded]`. None of the
@@ -61,7 +61,7 @@ corpus when its custodian archives, are both unanswered.
   `repo-governance/conventions/structure/learning-plan-syllabus.md`, defining **learning-bearing**
   (the trigger analogous to UI-bearing), the required `syllabus/` layout, and the per-course shape.
 - A **copy-paste course template** embedded as a fenced block in that convention, derived from the
-  measured section census of the 173 existing course files — mirroring how
+  measured section census of the 174 existing course files — mirroring how
   [diagrams.md](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
   ships the funnel record as a copy-paste block.
 - A **Corpus Disposition** rule answering where a syllabus corpus goes on archival, with a
@@ -77,7 +77,7 @@ corpus when its custodian archives, are both unanswered.
 
 **Out of scope:**
 
-- **Retrofitting the 173 existing course files** to any newly specified shape. The convention is
+- **Retrofitting the 174 existing course files** to any newly specified shape. The convention is
   derived from them, so they are the reference, not the debt. The 17-file ordered-list cohort is
   explicitly grandfathered.
 - **Building a `rhino-cli` conformance validator.** A deterministic check should follow a settled
@@ -121,7 +121,7 @@ flowchart LR
     THIS["learning-plan-syllabus<br/>folder-convention (this plan)"]:::this
     P02["learning-path-02<br/>custodian · 120 course files"]:::corpus
     P06["learning-path-06<br/>custodian · 24 course files"]:::corpus
-    P07["learning-path-07<br/>custodian · 29 course files"]:::corpus
+    P07["learning-path-07<br/>custodian · 30 course files"]:::corpus
     P04["learning-path-04<br/>consumer"]:::consumer
     P05["learning-path-05<br/>consumer"]:::consumer
     NEXT["4th learning-bearing plan<br/>(not yet written)"]:::future

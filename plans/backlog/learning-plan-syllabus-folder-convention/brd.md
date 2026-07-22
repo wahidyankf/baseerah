@@ -19,7 +19,7 @@ example-based transmission has already failed twice in the tree.
   problem-before-solution / keep-this-if-you-forget-everything / big-ideas-touched, `## Prerequisites`,
   `## Concepts`, `## Worked examples`, `## In which paths`), and it is specified in exactly zero
   governance documents — [Repo-grounded] via a repo-wide search of `repo-governance/` for a governed
-  `syllabus` artifact, which returns nothing. It exists only as 173 worked examples.
+  `syllabus` artifact, which returns nothing. It exists only as 174 worked examples.
 - **P2 — The format has already forked, silently.** 17 of plan 02's 120 course files render `co-NN`
   and `ex-NN` as ordered lists rather than bullets, and those same 17 omit the `**Short summary**`
   line — a 17-of-17 overlap `[Repo-grounded]`. Nothing in the repo failed when that landed, because
@@ -94,7 +94,9 @@ nearest observable proxy is metric 4: a checker that can refuse the omission.
 ## Business-Scope Non-Goals
 
 - **Not a corpus migration.** No existing course file is reformatted, moved, or renamed. The 17-file
-  ordered-list cohort stays exactly as it is, explicitly grandfathered.
+  ordered-list cohort stays exactly as it is, explicitly grandfathered. (174 course files today;
+  corpora 06/07 remain under active authorship, so the count is pinned in the census — see
+  [tech-docs §Corpus Census](./tech-docs.md#corpus-census--the-derivation-basis).)
 - **Not a validator.** Building a deterministic `rhino-cli` conformance check is deliberately
   deferred; a format must settle before a machine polices it.
 - **Not a re-statement of the UI rule.** The `assets/` funnel is already governed and is out of
