@@ -114,4 +114,20 @@ declaration and rationale in [delivery.md](./delivery.md#delivery-mode-worktree-
 
 ## Status
 
-**In Progress** — promoted from `backlog/` on 2026-07-21.
+**Completed** — promoted from `backlog/` on 2026-07-21, archived to `done/` on 2026-07-22.
+
+Delivered byte-identically across all three repos in two rounds: the main changeset via
+`ose-public` [#79](https://github.com/wahidyankf/ose-public/pull/79),
+`ose-primer` [#14](https://github.com/wahidyankf/ose-primer/pull/14) and
+`ose-infra` [#16](https://github.com/wahidyankf/ose-infra/pull/16), then a Knowledge-Capture
+correction round via `ose-public` [#81](https://github.com/wahidyankf/ose-public/pull/81),
+`ose-primer` [#15](https://github.com/wahidyankf/ose-primer/pull/15) and
+`ose-infra` [#17](https://github.com/wahidyankf/ose-infra/pull/17). All three copies of
+`repo-governance/development/workflow/bare-repo-landing-method.md` are byte-identical at sha1
+`618e74ff8ebc5c0a0abf19b2a40c2af9ac2e01db`.
+
+**One gate is recorded as partially unmet rather than ticked**: "CI green on `main` in all three
+repos". `ose-public` is green. Both siblings' `main-ci` is schedule-triggered with no push trigger,
+so it has not run on either merge commit — unmeasured, not measured-and-green — and `ose-primer`'s
+last scheduled run is red on a pre-existing condition that predates this plan. See
+[delivery.md §Phase 7 Gate](./delivery.md#phase-7-gate).

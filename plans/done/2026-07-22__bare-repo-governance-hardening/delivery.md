@@ -2477,7 +2477,7 @@ apps/rhino-cli/Cargo.toml -- md links validate --staged-only` (no `--exclude` fl
       mv` itself broke would have shown up here and nowhere else
 - [x] [AI] Commit the archival:
       `git commit -m "chore(plans): move bare-repo-governance-hardening to done"`
-- [ ] [AI] **Land the archival commit on `origin/main`.** Archival is plan-document work, not
+- [x] [AI] **Land the archival commit on `origin/main`.** Archival is plan-document work, not
       implementation (see [Delivery Mode](#delivery-mode-worktree-to-pr) above) — it lands on the
       local `main` branch via direct push under the
       [Plan-Docs-Only Carve-Out](../../../repo-governance/workflows/plan/plan-planning.md#the-plan-docs-only-carve-out),
@@ -2486,6 +2486,14 @@ apps/rhino-cli/Cargo.toml -- md links validate --staged-only` (no `--exclude` fl
       `git push origin HEAD:main`
       — acceptance: `git rev-list --left-right --count origin/main...HEAD` prints `0` and `0`, and
       `git show --stat origin/main` lists the archival move
+      — **Result**: pushed as `97f86cb5f`. `git rev-list --left-right --count origin/main...main`
+      prints `0	0` after fetching, with `HEAD` and `origin/main` both at `97f86cb5f`, and
+      `git show --stat origin/main` lists the six renames plus the two README edits. The push was
+      issued **from inside this plan's clean worktree**, not from the primary checkout: the primary
+      checkout carries three other agents' uncommitted WIP, one file of which contains a broken
+      anchor that fails the pre-push link gate. Pushing from the clean worktree runs every hook in
+      full against the content actually being pushed — the alternative, `--no-verify`, is forbidden
+      here and was never used anywhere in this plan
   - _Note: this step's landing route follows standing repo policy (DD-4; the Plan-Docs-Only
     Carve-Out above), not the plan's `worktree-to-pr` Delivery Mode — that mode governs this plan's
     C1-C7 implementation only, and archival is plan-document work, not implementation. This departs
@@ -2505,21 +2513,35 @@ apps/rhino-cli/Cargo.toml -- md links validate --staged-only` (no `--exclude` fl
     for the full record, and
     [`plan-archival-in-pr-multi-repo-gap`](../../../plans/ideas/plan-archival-in-pr-multi-repo-gap.md)
     for the tracked follow-up proposing §8 gain an explicit multi-repo provision._
-- [ ] [AI] Verify CI is green on `main` after the archival push before removing anything —
+- [x] [AI] Verify CI is green on `main` after the archival push before removing anything —
       `gh run list --limit 5` shows the triggered runs at `completed/success`. Poll every **2
       minutes**; never `gh run watch`
-- [ ] [AI] Remove the plan worktree after archival and push, prompting the user first per the
+      — **Result**: green. All three workflows triggered by `97f86cb5f` — `publish-images`,
+      `validate-env`, and `pr-quality-gate` — report `completed/success`. Polled with a 2-minute
+      `until` loop issuing one `gh run list --json status` per wakeup; `gh run watch` was never used
+- [x] [AI] Remove the plan worktree after archival and push, prompting the user first per the
       plan-execution Step 0 contract:
       `git worktree remove worktrees/bare-repo-governance-hardening`
       — acceptance: `git worktree list` no longer lists it. Never `--force`, never `rm -rf`
+      — **Result**: removed with plain `git worktree remove` — no `--force`, no `rm -rf`. Checked for
+      uncommitted evidence first, because a merged PR does not imply an empty working tree:
+      `git status --porcelain` in the worktree was empty, and its branch head `067f0bd40` carries
+      `<C1>` at sha1 `618e74ff8ebc5c0a0abf19b2a40c2af9ac2e01db`, identical to `origin/main` — so
+      nothing was lost. `git diff --stat origin/main HEAD` confirmed the branch is strictly _behind_
+      `origin/main` (PR #81 having squash-merged its content), never ahead with unrecovered work
 
 ### Phase 7 Gate
 
 > Terminal gate — the plan is complete when every check below passes.
 
-- [ ] [AI] `test -d plans/done/YYYY-MM-DD__bare-repo-governance-hardening` exits 0, and both
+- [x] [AI] `test -d plans/done/YYYY-MM-DD__bare-repo-governance-hardening` exits 0, and both
       `test -d <PLANDIR>` and `test -d plans/backlog/bare-repo-governance-hardening` exit 1
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links
+      — **Result**: all three hold. `plans/done/2026-07-22__bare-repo-governance-hardening` exits 0;
+      `plans/in-progress/bare-repo-governance-hardening` and
+      `plans/backlog/bare-repo-governance-hardening` both exit 1. The two negative halves are what
+      make this falsifiable in both directions — a copy-instead-of-move would satisfy the first
+      clause alone
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links
 validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude
 apps/ose-www/content` exits 0 — the pre-push exclude form, not the bare repo-wide form:
       **re-measured during PR-review cycle 3**: exactly 138 pre-existing broken links (not "~93")
@@ -2530,11 +2552,46 @@ apps/ose-www/content` exits 0 — the pre-push exclude form, not the bare repo-w
       (see above), which scans exactly the newly-moved folder and the two edited READMEs with no
       exclusion. This gate item only re-confirms the rest of the repo (everything outside
       `plans/done/` and the two `apps/` excludes) is still clean after the archival commit
-- [ ] [AI] Exactly **one** plan folder was archived, in `ose-public` — per **DD-10**, no sibling ever
+      — **Result — does NOT exit 0, and the honest reason is recorded rather than the gate being
+      ticked past.** It reports exactly **1** broken link, and it is not this plan's:
+      `plans/backlog/ayokoding-learning-path-06-skills-accounting/delivery.md` line 289
+      `#design-decisions`, which exists **only in another agent's uncommitted working-tree
+      modification** — `git show HEAD:<that file>` has different content at that line, so nothing on
+      `origin/main` is broken. Left untouched under the standing constraint not to touch
+      `plans/backlog/ayokoding-learning-path-*`, and it will disappear from this measurement the
+      moment that agent finishes. The clause this gate actually needs — that the archival introduced
+      no broken link — is discharged by the `--staged-only` run above, which exits 0 with
+      `All links valid! No broken links found.` over exactly the moved folder and the two edited
+      READMEs
+- [x] [AI] Exactly **one** plan folder was archived, in `ose-public` — per **DD-10**, no sibling ever
       held one: `ls -d <PRIMER>/plans/*/bare-repo-governance-hardening` and
       `ls -d <INFRA>/plans/*/bare-repo-governance-hardening` both exit non-zero
+      — **Result**: confirmed against each sibling's `origin/main` tree rather than its filesystem,
+      since both siblings are bare and have no path to `ls`:
+      `git -C <SIBLING> ls-tree -r --name-only origin/main | grep -c bare-repo-governance-hardening`
+      prints `0` for `ose-primer` and `0` for `ose-infra`. No sibling ever held a plan folder, exactly
+      as DD-10 requires
 - [ ] [AI] CI green on `main` in all three repos
-- [ ] [AI] `git worktree list` shows no leftover worktree for this plan in any of the three repos
+      — **Result — green in `ose-public`; NOT uniformly green across all three, and this gate is
+      recorded as partially unmet rather than ticked.** `ose-public`: all three workflows triggered
+      by the archival commit `97f86cb5f` report `completed/success`. `ose-infra`: last scheduled
+      `main-ci` was `success` at `70a4a463c`, but has **not run** on its new merge commit
+      `1d64990bb`. `ose-primer`: `main-ci` is **red**, pre-existing since `53d9081b7` — before this
+      plan's Phase 4 — and likewise has not run on `cedabb2f1`. Both siblings' `main-ci` is
+      **schedule**-triggered with no push trigger, so for them "green on `main`" is currently
+      _unmeasured_, not measured-and-green. The `ose-primer` red is a CI-flag divergence, not a
+      content defect: it alone lacks `--exclude plans/done` on `md mermaid validate`, and the file it
+      fails on is byte-identical to `ose-public`'s copy. Full measurement and the follow-up route are
+      in the "quality gates" step above and in
+      [`ayokoding-mermaid-diagram-remediation`](../../ideas/ayokoding-mermaid-diagram-remediation.md)
+- [x] [AI] `git worktree list` shows no leftover worktree for this plan in any of the three repos
+      — **Result**: clean in all three. `ose-public` lists only its primary checkout at `main`;
+      `ose-primer` and `ose-infra` each list only their single `(bare)` line. Every removal used
+      plain `git worktree remove`. Two local branches are **deliberately retained** in `ose-public`
+      (`bare-repo-governance-hardening`, `bare-repo-governance-hardening-c1-followup`): both PRs
+      squash-merged, so ancestry checks cannot prove containment, and `e670331b0` on the first branch
+      exists specifically to preserve superseded Phase 4 drafts that were never meant to reach `main`.
+      Deleting them is not required by any gate and would risk unrecoverable content, so they stay
 
 > **Pause Safety**: the plan is archived, all three repos are consistent and green, and every
 > worktree is cleaned up. This is the terminal state. To verify later:
