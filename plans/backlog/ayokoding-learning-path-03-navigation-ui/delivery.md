@@ -1,5 +1,8 @@
 # Delivery Checklist — Path-Aware Navigation UI
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 This checklist delivers the **rendering layer** of the `course-paths` feature in `ayokoding-www`: the
 shell modules, the `?path=` route wiring, the Screen 3 left path rail, the landing hero's four goal
 cards, the paths hub, the path landing, and the accessibility contract for all of them — proven
@@ -141,8 +144,9 @@ nothing depends on distinguishing the fills.
   `software-engineer-to-ai-engineer` → `ai-engineer` per R3):
   `careers/interview-ready/software-engineer`, `careers/immediately-effective/software-engineer`,
   `careers/fundamentally-strong/software-engineer`, `careers/immediately-effective/ai-engineer`,
-  and — new, 2-segment, R2 — the two skills path ids: `skills/enterprise-resource-planning`,
-  `skills/accounting`
+  and — new, 2-segment, R2, **four** ids as of amendment A10 (up from two) — the skills path ids:
+  `skills/conventional-erp`, `skills/sharia-erp`, `skills/conventional-accounting`,
+  `skills/sharia-accounting`
 
 ## Markdown validation commands
 

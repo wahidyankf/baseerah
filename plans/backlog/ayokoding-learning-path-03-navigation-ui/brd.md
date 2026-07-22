@@ -1,5 +1,8 @@
 # Business Requirements — Path-Aware Navigation UI
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 ## Business Goal
 
 Make one canonical course body behave correctly under **four different reading orders** within the
@@ -11,17 +14,18 @@ reader where they are in an arc.
 > **2026-07-21 category-split ruling.** The maintainer ruled a `careers/` + `skills/` category split
 > (full record in [README.md §Category Split Ruling](./README.md#category-split-ruling-2026-07-21-r1r8)).
 > This plan stays **careers-only** for content (four manifests, four personas), but its rendering
-> components must be **category-agnostic** so a sibling plan can render the `skills/` category
+> components must be **category-agnostic** so sibling plans can render the `skills/` category
 > through the same code — that is why the paths hub and category landing below now speak of "the
-> **six** paths in **two** categories" rather than "the four paths."
+> **eight** paths in **two** categories" (amended 2026-07-21 by A10, up from six) rather than "the
+> four paths."
 
-Concretely, this plan delivers the **ayokoding-www rendering layer** for the six-path, two-category
-model (four `careers/` paths owned here; two `skills/` paths owned by a sibling plan and rendered
-through this plan's category-agnostic components):
+Concretely, this plan delivers the **ayokoding-www rendering layer** for the eight-path, two-category
+model (four `careers/` paths owned here; **four** `skills/` paths, amendment A10, owned by two
+sibling plans and rendered through this plan's category-agnostic components):
 
 - the **site landing hero** at `/en` that surfaces the four **career**-goal paths directly, so a
   goal-driven visitor is not dropped into a recall-heavy browse index;
-- the **category-grouped paths hub** at `/en/learn/paths` where all six paths, grouped into
+- the **category-grouped paths hub** at `/en/learn/paths` where all **eight** paths, grouped into
   `careers/` and `skills/`, are compared and chosen;
 - the **category landing** (`/en/learn/paths/careers/`, `/en/learn/paths/skills/`) and, for
   `careers/` only, the **arc landing** (`/en/learn/paths/careers/<arc>/`) — five new pages that make

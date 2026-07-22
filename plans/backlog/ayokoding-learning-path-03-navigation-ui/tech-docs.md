@@ -1,5 +1,8 @@
 # Technical Documentation — Path-Aware Navigation UI
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 ## Scope of this document
 
 This plan builds the **rendering layer** of the `course-paths` feature in `ayokoding-www`: the shell
@@ -560,6 +563,24 @@ Four rules make the fixtures trustworthy rather than a self-fulfilling stub:
 > reader auditing DD-47 against this folder alone must not read 36 as under-delivery, and no executor
 > may close the gap by copying the other plan's six renders here — a matrix duplicated across two
 > folders drifts.
+
+- **DD-50 · Skills accent hue is per-compliance-track, not per-subject (2026-07-22, amendment A10
+  ripple fix).** The pre-A10 design reserved 3 of the 6-hue palette for careers arcs, 2 for the
+  (then two) skills subjects, and 1 for the skills-section-level accent — a clean 3+2+1=6 budget. A10
+  quadruples the skills subject count to four (`conventional-accounting`, `sharia-accounting`,
+  `conventional-erp`, `sharia-erp`) without adding hues to the palette, so a naive "one hue per
+  subject" mapping needs a 4th and 5th skills hue that do not exist, and an earlier pass of this
+  ripple fix used all three remaining hues plus **reused `honey`** — the careers `interview-ready`
+  hue — for a fourth card, producing a same-page colour collision between an unrelated careers card
+  and a skills card. **Ruling**: pair the four subjects by **compliance track**, exactly mirroring
+  how the careers side already pairs Software Engineer and AI Engineer under one `immediately-effective`
+  hue (`teal`) and differentiates by name/badge, never colour alone. `conventional-accounting` and
+  `conventional-erp` share `terracotta`; `sharia-accounting` and `sharia-erp` share `plum`; `sky`
+  stays reserved for the section-level eyebrow/strap-line, unchanged from the pre-A10 design. Zero
+  hues are added, zero collide with a careers hue, and the "hue is never the sole signal" rule (every
+  card also carries its distinct name and badge) makes the shared hue-per-track unambiguous. See
+  [prd.md's Shared design legend accent-hue entry](./prd.md#shared-design-legend-all-six-screens)
+  for the resulting map and this plan's `assets/src/*.html` mockups for the corrected cards.
 
 ### Inherited verbatim (build order — no single plan owns it)
 

@@ -1,10 +1,14 @@
 # Product Requirements — Path-Aware Navigation UI
 
+> **Programme decisions** — the `R*` rules and `A*` amendments cited below are defined in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md).
+
 ## Product Overview
 
 `ayokoding-www` gains a **`course-paths` rendering layer** that makes one canonical, path-neutral
 course body behave correctly under four different **careers** reading orders, and renders (but does
-not author) two more under `skills/`. A **path** is an ordered manifest of course IDs; **path context
+not author) **four** more under `skills/` (amendment A10 — up from the original two). A **path** is
+an ordered manifest of course IDs; **path context
 rides in the `?path=<path-id>` query parameter**, never in the URL path segment, so a course keeps
 exactly one canonical URL (`/en/learn/courses/<course-id>`) no matter how many paths list it.
 
@@ -72,7 +76,8 @@ belong to the sibling skills-category plan (R4); not duplicated here.
   path context and must get a coherent standalone view (with its prerequisites surfaced) plus an
   obvious way to enter a path.
 - **Maintainer (content strategist / frontend engineer / content author / reviewer)** — owns the
-  six-path, two-category architecture, builds the category-agnostic navigation feature, and authors
+  eight-path (amended by A10), two-category architecture, builds the category-agnostic navigation
+  feature, and authors
   the NEW careers courses via the ayokoding maker agents (the skills corpus is a sibling plan's
   authoring scope, rendered through this plan's shared components).
 
@@ -467,10 +472,11 @@ library" links wrap under the grid on mobile. The four cards fit above the fold 
 one short scroll on mobile — no card is pushed below a fold-and-a-half the way Option B's strip is once
 the primary CTAs precede it.
 
-**Why still four cards, not six (careers + skills together).** The hero's whole job is the fastest
-possible goal-to-route decision, and Hick's Law / the jam-study threshold both argue for staying at the
-low end (see the Ergonomics rationale below) — doubling to six cards to fit skills in would undo the
-overload argument that won Option A. Skills gets a **tertiary escape-hatch link** ("Explore skills
+**Why still four cards, not eight (careers + skills together — amended by A10, up from six).** The
+hero's whole job is the fastest possible goal-to-route decision, and Hick's Law / the jam-study
+threshold both argue for staying at the low end (see the Ergonomics rationale below) — doubling to
+eight cards to fit skills in would undo the overload argument that won Option A. Skills gets a
+**tertiary escape-hatch link** ("Explore skills
 paths →" → `/en/learn/paths/skills/`) beside "Compare all paths" and "Browse the full library", the same
 weight class those two already occupy, rather than hero-card real estate.
 
@@ -496,7 +502,8 @@ one scroll below it like Option B — removes the single friction point every "g
 platform still has. The subordinate **"Compare all paths →"** link (→ Screen 1) is the escape hatch for
 undecided visitors (Codecademy's "sorting quiz alongside the grid" pattern) without diluting the
 four-card decision; **"Explore skills paths →"** (→ Screen 1a's skills instance) is the equivalent escape
-hatch for the six-path world the category split introduced, so a skills-seeking visitor is never forced
+hatch for the eight-path world the category split introduced (amended by A10, up from six), so a
+skills-seeking visitor is never forced
 through the careers-framed cards to get there; **"Browse the full library →"** preserves the non-path,
 self-directed entry (recognition-over-recall for learners who know the topic they want). The existing
 **Start learning / Explore tools** buttons are **not deleted** — they move into the global nav so the
@@ -510,11 +517,12 @@ RED/GREEN/REFACTOR triplet against `hero.tsx`, bound by the Gherkin scenario
 
 ### Screen 1 · Paths hub ("choose your path")
 
-**Redesigned by the 2026-07-21 category-split ruling (R6).** Entry screen at `/en/learn/paths` (the
-paths hub) now offers **six paths in two categories** at deliberately different URL depth —
-`careers/<arc>/<role>` (4 paths across 3 arcs) and `skills/<subject>` (2 paths, both the
+**Redesigned by the 2026-07-21 category-split ruling (R6), path count amended 2026-07-21 by A10.**
+Entry screen at `/en/learn/paths` (the paths hub) now offers **eight paths in two categories** at
+deliberately different URL depth — `careers/<arc>/<role>` (4 paths across 3 arcs) and
+`skills/<subject>` (**4** paths as of amendment A10 — up from the original two — all the
 `immediately-effective` arc per R8, though the arc is not itself a URL segment for skills). The old
-flat four-card, one-card-per-manifest design cannot express this: six paths do not tile a symmetric
+flat four-card, one-card-per-manifest design cannot express this: eight paths do not tile a symmetric
 four-card grid, and the two categories' different depth carries real information (skills has no arc
 choice; careers does) that a flat grid would erase. The fourth **careers** path still converges on a different endpoint than the
 other three (per-role convergence, DD-22), so the hub's `careers/` section copy states "converging
@@ -529,7 +537,7 @@ _Mobile — 375 px (`<sm`): one column; sections stack; no sidebar (`hidden` bel
 │ ☰  AyoKoding            ⌕  ☾       │
 ├────────────────────────────────────┤
 │ Choose your path.                  │
-│ Six paths, two ways in.            │
+│ Eight paths, two ways in.          │
 │                                     │
 │ CAREERS · converging within role   │
 │ ── Interview-Ready ──────────────  │
@@ -554,11 +562,19 @@ _Mobile — 375 px (`<sm`): one column; sections stack; no sidebar (`hidden` bel
 │                                     │
 │ SKILLS · up and running fast       │
 │ ┌────────────────────────────────┐ │
-│ │ Enterprise Resource Planning   │ │
+│ │ Conventional Accounting        │ │
 │ │ [ Start → ]                    │ │
 │ └────────────────────────────────┘ │
 │ ┌────────────────────────────────┐ │
-│ │ Accounting                     │ │
+│ │ Sharia Accounting              │ │
+│ │ [ Start → ]                    │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ Conventional ERP               │ │
+│ │ [ Start → ]                    │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ Sharia ERP                     │ │
 │ │ [ Start → ]                    │ │
 │ └────────────────────────────────┘ │
 │ Or browse the full library →       │
@@ -581,7 +597,10 @@ _Tablet — 768 px (`md`): sidebar appears; each category's cards go two-up_
 │              │ └──────────────────┘                            │
 │              │ SKILLS · up and running fast                    │
 │              │ ┌──────────────────┐ ┌──────────────────┐      │
-│              │ │ ERP     [Start]  │ │ Accounting[Start]│      │
+│              │ │ Conv. Acct[Start]│ │ Sharia Acct[Start]│     │
+│              │ └──────────────────┘ └──────────────────┘      │
+│              │ ┌──────────────────┐ ┌──────────────────┐      │
+│              │ │ Conv. ERP [Start]│ │ Sharia ERP [Start]│     │
 │              │ └──────────────────┘ └──────────────────┘      │
 │              │ Or browse the full course library →             │
 └──────────────┴────────────────────────────────────────────────┘
@@ -591,7 +610,7 @@ _Desktop — 1280 px (`xl`): each category is its own labelled section; Careers 
 
 ```text
 ┌────────────────────────────── AyoKoding · Learn ──────────────────────────────────┐
-│  Choose your path. Six paths, two ways in.                                         │
+│  Choose your path. Eight paths, two ways in.                                       │
 │                                                                                     │
 │  CAREERS · converging within your role                                             │
 │  Interview-Ready              Immediately-Effective         Fundamentally Strong   │
@@ -602,15 +621,19 @@ _Desktop — 1280 px (`xl`): each category is its own labelled section; Careers 
 │                                                                                     │
 │  SKILLS · get up and running fast, then go deeper                                  │
 │  ┌────────────────────────┐  ┌────────────────────────┐                           │
-│  │ Enterprise Resource    │  │ Accounting              │                           │
-│  │ Planning    [ Start → ]│  │              [ Start → ]│                           │
+│  │ Conventional           │  │ Sharia                  │                           │
+│  │ Accounting  [ Start → ]│  │ Accounting   [ Start → ]│                           │
+│  └────────────────────────┘  └────────────────────────┘                           │
+│  ┌────────────────────────┐  ┌────────────────────────┐                           │
+│  │ Conventional ERP       │  │ Sharia ERP              │                           │
+│  │             [ Start → ]│  │              [ Start → ]│                           │
 │  └────────────────────────┘  └────────────────────────┘                           │
 │                                                                                     │
 │  Or browse the full course library →                                               │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Low-fi Option B — Flat 6-card grid with category+arc badges**
+**Low-fi Option B — Flat 8-card grid with category+arc badges**
 
 _Mobile — 375 px: one column, badge is the only grouping signal_
 
@@ -634,11 +657,17 @@ _Mobile — 375 px: one column, badge is the only grouping signal_
 │ │ Software Engineer     ~121     │ │
 │ └────────────────────────────────┘ │
 │ ┌────────────────────────────────┐ │
-│ │ [skills]  Enterprise Resource  │ │
-│ │ Planning                       │ │
+│ │ [skills]  Conventional         │ │
+│ │ Accounting                     │ │
 │ └────────────────────────────────┘ │
 │ ┌────────────────────────────────┐ │
-│ │ [skills]  Accounting           │ │
+│ │ [skills]  Sharia Accounting    │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ [skills]  Conventional ERP     │ │
+│ └────────────────────────────────┘ │
+│ ┌────────────────────────────────┐ │
+│ │ [skills]  Sharia ERP           │ │
 │ └────────────────────────────────┘ │
 └────────────────────────────────────┘
 ```
@@ -651,24 +680,30 @@ _Tablet — 768 px: two-up, badges still the only grouping signal_
 │              │ [careers·imm-effective] SWE             [Start]│
 │              │ [careers·imm-effective] AI Eng.         [Start]│
 │              │ [careers·fund-strong] SWE               [Start]│
-│              │ [skills] ERP                            [Start]│
-│              │ [skills] Accounting                     [Start]│
+│              │ [skills] Conventional Accounting        [Start]│
+│              │ [skills] Sharia Accounting              [Start]│
+│              │ [skills] Conventional ERP               [Start]│
+│              │ [skills] Sharia ERP                     [Start]│
 └──────────────┴────────────────────────────────────────────────┘
 ```
 
-_Desktop — 1280 px: 3×2 uniform grid, no section headings at all_
+_Desktop — 1280 px: 3×3 uniform grid (last row partial — 8 cards), no section headings at all_
 
 ```text
 ┌────────────────────────────── AyoKoding · Learn ──────────────────────────────────┐
 │  Choose your path.                                                                 │
-│  ┌──────────────┐┌──────────────┐┌──────────────┐┌──────────────┐┌──────────────┐│
-│  │[careers·int-r]││[careers·im-e]││[careers·im-e]││[careers·fnd-s]││[skills] ERP  ││
-│  │SWE  [Start →] ││SWE  [Start →]││AI  [Start →] ││SWE  [Start →] ││   [Start →]  ││
-│  └──────────────┘└──────────────┘└──────────────┘└──────────────┘└──────────────┘│
-│  ┌──────────────┐                                                                  │
-│  │[skills] Acct ││                                                                 │
-│  │   [Start →]  ││                                                                 │
-│  └──────────────┘                                                                  │
+│  ┌──────────────┐┌──────────────┐┌──────────────┐                                 │
+│  │[careers·int-r]││[careers·im-e]││[careers·im-e]│                                 │
+│  │SWE  [Start →] ││SWE  [Start →]││AI  [Start →] │                                 │
+│  └──────────────┘└──────────────┘└──────────────┘                                 │
+│  ┌──────────────┐┌──────────────┐┌──────────────┐                                 │
+│  │[careers·fnd-s]││[skills] Conv.││[skills] Sharia│                                │
+│  │SWE  [Start →] ││Acct [Start →]││Acct [Start →] │                                │
+│  └──────────────┘└──────────────┘└──────────────┘                                 │
+│  ┌──────────────┐┌──────────────┐                                                 │
+│  │[skills] Conv. ││[skills] Sharia│                                                │
+│  │ERP  [Start →] ││ERP  [Start →] │                                                │
+│  └──────────────┘└──────────────┘                                                 │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -681,16 +716,16 @@ category's cards go to a comfortable two-up at `md`, and Careers' arc sub-groups
 so this is a **content change**, covered by the same generic mtime-based re-render check already in
 `delivery.md`):
 
-![Paths hub, Option A — a Careers section with three labelled arc sub-groups (Interview-Ready, Immediately-Effective showing two path cards, Fundamentally Strong) each containing hue-coded path cards with role name, course count, and a Start action, followed by a Skills section with two subject cards under a "get up and running fast, then go deeper" strap-line](./assets/paths-hub-option-a-desktop.png)
+![Paths hub, Option A — a Careers section with three labelled arc sub-groups (Interview-Ready, Immediately-Effective showing two path cards, Fundamentally Strong) each containing hue-coded path cards with role name, course count, and a Start action, followed by a Skills section with four subject cards (Conventional Accounting, Sharia Accounting, Conventional ERP, Sharia ERP) under a "get up and running fast, then go deeper" strap-line](./assets/paths-hub-option-a-desktop.png)
 
-![Paths hub, Option B — a uniform 3×2 grid of six path cards with no section headings, each distinguished only by a small category·arc badge above the role or subject name](./assets/paths-hub-option-b-desktop.png)
+![Paths hub, Option B — a uniform 3×3 grid (last row partial) of eight path cards with no section headings, each distinguished only by a small category·arc badge above the role or subject name](./assets/paths-hub-option-b-desktop.png)
 
 **Selected: Option A — Category sections, arc-grouped within Careers.**
 
 | Design                                | Why it won / lost                                                                                                                                                                                                                                 |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A — category sections, arc-grouped ✅ | Grouping is a visible section, not a decoded badge; the arc sub-heading gives `immediately-effective`'s two cards a shared home without inventing a second grid; skills reads as a simpler, separate offer, matching R8's "different job" framing |
-| B — flat 6-card grid                  | Uniform grid is simpler to build, but a reader must parse a compact `category·arc` badge to understand structure the section-header approach gives for free; also implies skills is "just another arc," which R8 explicitly rejects               |
+| B — flat 8-card grid                  | Uniform grid is simpler to build, but a reader must parse a compact `category·arc` badge to understand structure the section-header approach gives for free; also implies skills is "just another arc," which R8 explicitly rejects               |
 
 ### Screen 1a · Category landing (`careers/` and `skills/`)
 
@@ -782,10 +817,11 @@ ramp-boundary strip.** The skills promise is "get us up and running and become d
 possible, then get deeper and deeper" — a **ramp**, not a chooser — and the most useful thing a skills
 landing can show is **where in the ordering a reader becomes able to do real work**. Each subject card
 therefore carries a small **milestone strip** naming the courses after which the reader is minimally,
-comfortably, and confidently dangerous (course numbers per skills-plan manifest research, e.g.
-Accounting: dangerous after course 3, comfortable after 16, confident after 20; ERP: dangerous after
-course 4, comfortable after 10, confident after 20 — sourced from the sibling skills-plan's manifest
-design, not re-derived here; this plan's own scope is the rendering, not the milestone values):
+comfortably, and confidently dangerous (course numbers per skills-plan manifest research — each of the
+four skills paths (Conventional Accounting, Sharia Accounting, Conventional ERP, Sharia ERP) sets its
+own milestone course numbers, amended by A9 to reflect corpora exceeding 20 courses each; the exact
+numbers are sourced from the owning sibling skills-plan's manifest design, not re-derived or hardcoded
+here — this plan's own scope is the rendering, not the milestone values):
 
 ```text
 ┌──────────────────────── Skills · Learn ───────────────────────────────────┐
@@ -795,12 +831,19 @@ design, not re-derived here; this plan's own scope is the rendering, not the mil
 │ as fast as possible, then go deeper — no arc to choose here.              │
 │                                                                            │
 │ ┌───────────────────────────┐  ┌───────────────────────────┐             │
-│ │ Enterprise Resource       │  │ Accounting                 │             │
-│ │ Planning                  │  │                             │            │
-│ │ ●───●─────●  dangerous:4  │  │ ●──●───────●  dangerous:3   │            │
-│ │      comfortable:10       │  │     comfortable:16          │            │
-│ │           confident:20    │  │          confident:20        │           │
-│ │ [ Start → ]               │  │ [ Start → ]                 │            │
+│ │ Conventional               │  │ Sharia                     │            │
+│ │ Accounting                 │  │ Accounting                 │            │
+│ │ ●───●─────●  dangerous     │  │ ●──●───────●  dangerous     │           │
+│ │      comfortable           │  │     comfortable             │           │
+│ │           confident        │  │          confident          │           │
+│ │ [ Start → ]                │  │ [ Start → ]                 │           │
+│ └───────────────────────────┘  └───────────────────────────┘             │
+│ ┌───────────────────────────┐  ┌───────────────────────────┐             │
+│ │ Conventional ERP           │  │ Sharia ERP                 │            │
+│ │ ●───●─────●  dangerous     │  │ ●──●───────●  dangerous     │           │
+│ │      comfortable           │  │     comfortable             │           │
+│ │           confident        │  │          confident          │           │
+│ │ [ Start → ]                │  │ [ Start → ]                 │           │
 │ └───────────────────────────┘  └───────────────────────────┘             │
 │                                                                            │
 │ ← Back to all paths                                                       │
@@ -846,15 +889,16 @@ _Desktop — 1280 px, careers instance: a numbered/plain list rather than cards_
 
 **Responsive (mobile ↔ desktop)** — Option A's arc cards stack full-width below `sm`, go two-up at
 `md` with the third card wrapping full-width, and sit three-across at `lg+`. The skills instance
-never needs more than a two-up reflow (2 subjects), so it stacks at `<sm` and sits side by side from
-`md` up with no further breakpoint tension.
+never needs more than a two-up reflow (**4** subjects as of amendment A10 — up from two — wrapping
+into two rows of two), so it stacks at `<sm` and sits two-up from `md` up with no further breakpoint
+tension.
 
 **Hi-fi finalists** (Option A's render is a **three-frame composite** — careers instance, skills
 instance populated with ramp milestones, and skills instance empty state — following the same
 "one render, multiple documented states" pattern Screen 3 already uses for its rail states; Option B's
 render shows only the careers instance, sufficient to demonstrate why it lost):
 
-![Category landing, Option A — three stacked browser-chrome frames: the Careers instance with three arc cards side by side (Immediately-Effective visibly showing two member roles, Software Engineer and AI Engineer, where the other two arcs show one), the Skills instance with two subject cards each carrying a dangerous/comfortable/confident milestone strip, and the Skills empty state showing a friendly "being written, check back soon" message with a fallback link to Careers](./assets/category-landing-option-a-desktop.png)
+![Category landing, Option A — three stacked browser-chrome frames: the Careers instance with three arc cards side by side (Immediately-Effective visibly showing two member roles, Software Engineer and AI Engineer, where the other two arcs show one), the Skills instance with four subject cards (Conventional Accounting, Sharia Accounting, Conventional ERP, Sharia ERP) each carrying a dangerous/comfortable/confident milestone strip, and the Skills empty state showing a friendly "being written, check back soon" message with a fallback link to Careers](./assets/category-landing-option-a-desktop.png)
 
 ![Category landing, Option B — a plain numbered list of the three careers arcs with inline description text instead of cards](./assets/category-landing-option-b-desktop.png)
 
@@ -1448,19 +1492,21 @@ Screens 0, 1, and 2 selected Option A; **Screen 3 selected Option B** (left path
   `text-foreground` / `text-muted-foreground` / `text-card-foreground` / `text-primary`; borders
   `border-border`; focus `ring-ring`. AyoKoding brand primary is **honey/amber**
   (`--color-primary: var(--hue-honey)`).
-- **Accent hue (2026-07-21 category-split ruling — hue is now per-arc for careers, per-subject for
-  skills, not per-path uniformly)**: the 6-hue system (`-wash` fill / `-ink` text variants) is now
-  fully spoken for. **Careers arcs** (3 of 6 hues, shared by every role inside the arc — the arc is
-  the meaningful grouping signal): `interview-ready` → `honey`, `immediately-effective` → `teal`
-  (covers **both** Software Engineer and AI Engineer — differentiated by name/badge, never by colour,
-  which the "hue is never the sole signal" rule below already requires), `fundamentally-strong` →
-  `sage`. **Skills subjects** (2 of 6 hues, one per subject — skills has no arc grouping to lean on, so
-  each card needs its own accent): `enterprise-resource-planning` → `terracotta`,
-  `accounting` → `plum`. **Skills section accent** (the 6th hue, used once for the section-level
-  eyebrow/strap-line, not per-card): `sky`. Used as `bg-[var(--hue-<h>-wash)]` fills and
-  `text-[var(--hue-<h>-ink)]` accents. Hue is **never the sole signal** (always paired with the path
-  name/number/icon); the final hue↔entity map is confirmed at draw time and must hold WCAG-AA for
-  `-ink` text on `-wash`.
+- **Accent hue (2026-07-21 category-split ruling, re-ruled 2026-07-22 for amendment A10's four-subject
+  skills split — hue is per-arc for careers, per-compliance-track for skills, not per-path uniformly;
+  see [DD-50](./tech-docs.md#design-decisions))**: the 6-hue system (`-wash` fill / `-ink` text variants) is now fully
+  spoken for. **Careers arcs** (3 of 6 hues, shared by every role inside the arc — the arc is the
+  meaningful grouping signal): `interview-ready` → `honey`, `immediately-effective` → `teal` (covers
+  **both** Software Engineer and AI Engineer — differentiated by name/badge, never by colour, which the
+  "hue is never the sole signal" rule below already requires), `fundamentally-strong` → `sage`. **Skills
+  subjects** (2 of the remaining 3 hues, one per **compliance track**, shared across both subjects in
+  that track — four subjects, no fourth or fifth hue left to spend after the careers arcs and the
+  section accent, so this plan pairs by track exactly as the careers side already pairs by arc):
+  `conventional-accounting` and `conventional-erp` → `terracotta`; `sharia-accounting` and `sharia-erp`
+  → `plum`. **Skills section accent** (the 6th hue, used once for the section-level eyebrow/strap-line,
+  not per-card): `sky`. Used as `bg-[var(--hue-<h>-wash)]` fills and `text-[var(--hue-<h>-ink)]`
+  accents. Hue is **never the sole signal** (always paired with the path name/number/icon); the final
+  hue↔entity map is confirmed at draw time and must hold WCAG-AA for `-ink` text on `-wash`.
 - **Radius / elevation**: cards `rounded-xl` (20px on the AyoKoding scale); insets `rounded-lg`;
   `shadow-sm` at rest → `shadow-md` on hover.
 - **Breakpoints**: `sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280 — the only prefixes this app uses. The
@@ -1522,7 +1568,7 @@ Screens 0, 1, and 2 selected Option A; **Screen 3 selected Option B** (left path
 
 - **Container**: content column; inner `<section className="mx-auto max-w-6xl px-6 py-8 lg:px-8">`.
   Header: `<h1 className="text-4xl font-extrabold tracking-tight">` "Choose your path" +
-  `<p className="mt-2 text-muted-foreground">` "Six paths, two ways in."
+  `<p className="mt-2 text-muted-foreground">` "Eight paths, two ways in."
 - **`CategorySection`** (net-new, one per category, in document order Careers then Skills): a
   `<section aria-labelledby="{category}-heading">` with an eyebrow `<h2 id="{category}-heading"
 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">` — "Careers ·
@@ -1533,7 +1579,8 @@ font-medium uppercase tracking-wide text-muted-foreground">` arc name followed b
   `<ul className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">` containing that arc's
   role `PathCard`s (1 for `interview-ready` / `fundamentally-strong`, 2 for `immediately-effective`).
 - **Skills section body**: no `ArcGroup` wrapper — a flat `<ul className="mt-4 grid grid-cols-1 gap-4
-md:grid-cols-2">` of the two subject `PathCard`s directly under the section heading.
+md:grid-cols-2">` of the **four** subject `PathCard`s (amendment A10 — up from two) directly under
+  the section heading.
 - **`PathCard`** (net-new, composes the existing **`SectionCard` pattern** — the whole card is a single
   `<Link className="group block focus-visible:outline-none">`, so there is **no** nested button and no
   link-in-link trap): wraps `Card`
@@ -1553,8 +1600,9 @@ md:grid-cols-2">` of the two subject `PathCard`s directly under the section head
   `<a className="mt-6 inline-flex text-sm text-muted-foreground hover:text-foreground">` "Browse the
   full course library →" → `/en/learn/courses`.
 - **Responsive**: Careers arc rows go `grid-cols-1` `<md`, `md:grid-cols-2`, `lg:grid-cols-3` (so the
-  three arcs never crowd below `lg`); Skills stays `grid-cols-1` `<md`, `md:grid-cols-2` (only ever 2
-  cards, never needs a third breakpoint tier). Section headings and arc sub-headings never collapse or
+  three arcs never crowd below `lg`); Skills stays `grid-cols-1` `<md`, `md:grid-cols-2` (**four**
+  cards as of amendment A10 — up from two — wrap into two rows of two at `md+`, never needing a third
+  breakpoint tier). Section headings and arc sub-headings never collapse or
   hide at any width — the grouping signal must survive to mobile.
 - **A11y**: `<section aria-labelledby>` per category, `<h3>` per arc group (correct heading nesting
   under the `<h2>` category heading, never skipped); `<ul>`/`<li>`; each card
@@ -1595,7 +1643,8 @@ md:grid-cols-2">` of the two subject `PathCard`s directly under the section head
   interval the skills category is far more likely to hit than careers, since plan 01's amendment A3
   creates `paths/skills/_index.md` structurally ahead of the skills-populating plans).
 - **Responsive**: careers `ArcCard`s go `grid-cols-1` `<md`, `md:grid-cols-2`, `lg:grid-cols-3`; skills
-  cards stay `grid-cols-1` `<md`, `md:grid-cols-2` (never more than 2). `RampMilestoneStrip` wraps to
+  cards stay `grid-cols-1` `<md`, `md:grid-cols-2` (**four** cards as of amendment A10 — up from two —
+  wrapping into two rows of two, never a third grid-column tier). `RampMilestoneStrip` wraps to
   two lines on mobile rather than truncating a milestone label.
 - **A11y**: `<nav aria-label="Careers arcs">` / `<nav aria-label="Skills paths">` wrapping the
   respective `<ul>`; each `ArcCard` link `<a aria-label="Explore the {arc} arc — {role list}">`; the
@@ -1642,8 +1691,10 @@ md:grid-cols-2">` of the two subject `PathCard`s directly under the section head
   (plan 07 §Requirement L-1/L-2/L-4; plan 06 §Landing content contract):
   **(a)** a can/cannot pair per "dangerous by here" boundary, authored as an ordinary markdown table;
   **(b)** a one-paragraph runway-justification when the path's first boundary is not the ramp's minimum
-  across the category (ERP's course #4 vs. accounting's course #3 — this plan renders whichever prose
-  the skills plan authors and authors none of it itself, per
+  across the category (the ERP paths' dangerous-boundary course vs. the accounting paths' — each of the
+  four skills paths' exact boundary course number is owned by its authoring plan, amended by A10, and
+  is not restated here — this plan renders whichever prose the skills plan authors and authors none of
+  it itself, per
   `ayokoding-learning-path-06-skills-accounting` §DD-611's "content only" boundary);
   **(c)** an outbound "Prerequisites (not included in this path)" link block to the linked-not-walked
   courses, authored as ordinary markdown links to their canonical `/en/learn/courses/<id>` URLs.
