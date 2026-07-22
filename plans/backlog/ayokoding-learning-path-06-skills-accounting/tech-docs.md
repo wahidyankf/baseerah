@@ -1,41 +1,74 @@
-# Technical Documentation — Skills Path: Accounting
+# Technical Documentation — Skills Paths: Accounting
 
 ## Overview
 
-This plan delivers one `skills/` path end-to-end: a twenty-course accounting corpus, its manifest,
-and its landing content. It is the **first non-software-engineering subject** on the platform and the
-**first 2-segment `pathId`** ever instantiated — plan 02 exercises that shape only through unit-test
-fixtures.
+This plan delivers **two** `skills/` paths end-to-end (A10): a nineteen-course conventional spine
+shared by both, and a five-course Sharia-specific extension exclusive to `sharia-accounting` —
+twenty-four authored bodies total (A9). It is the **first non-software-engineering subject** on the
+platform, the **first pair of 2-segment `pathId`s** ever instantiated, and the **first instance of one
+course belonging to two manifests** in the programme.
 
 It touches **no application code**. Its artefacts are markdown page bundles under
-`apps/ayokoding-www/content/`, one YAML data file under
-`apps/ayokoding-www/src/features/course-paths/manifests/skills/`, and twenty markdown spec files
+`apps/ayokoding-www/content/`, two YAML data files under
+`apps/ayokoding-www/src/features/course-paths/manifests/skills/`, and twenty-four markdown spec files
 inside this plan folder. Every component, resolver, schema, and route it depends on is built by
 plans 01–03 and consumed here.
 
-## The manifest ownership invariant (scoped to one data file)
+## The manifest ownership invariant (scoped to two data files, one plan)
 
 The programme's manifest-ownership invariant is scoped **per category**, and within `skills/` it is
-scoped **per subject**. The invariant counts **data files** — each plan owns exactly one YAML
-manifest under its own subtree, plus that manifest's co-located unit test (`<MTEST>`, a TypeScript
-file living alongside it, never a second data file):
+scoped **per plan** — this plan owns **two** data files, both under its own subject subtree, plus
+each manifest's co-located unit test:
 
-| Plan | Owns                                                                                                                           | Never writes                                                                 |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| 05   | `manifests/careers/**` (four files)                                                                                            | anything under `manifests/skills/`                                           |
-| 06   | `manifests/skills/accounting.yaml` (**this plan** — exactly one data file) + its co-located `accounting-manifest.unit.test.ts` | `manifests/careers/**`, `manifests/skills/enterprise-resource-planning.yaml` |
-| 07   | `manifests/skills/enterprise-resource-planning.yaml`                                                                           | `manifests/careers/**`, `manifests/skills/accounting.yaml`                   |
+| Plan | Owns                                                                                                                                                                                                                                      | Never writes                                                                  |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 05   | `manifests/careers/**` (four files)                                                                                                                                                                                                       | anything under `manifests/skills/`                                            |
+| 06   | `manifests/skills/conventional-accounting.yaml` + `conventional-accounting-manifest.unit.test.ts`, **and** `manifests/skills/sharia-accounting.yaml` + `sharia-accounting-manifest.unit.test.ts` (**this plan** — exactly two data files) | `manifests/careers/**`, `manifests/skills/enterprise-resource-planning*.yaml` |
+| 07   | `manifests/skills/enterprise-resource-planning*.yaml`                                                                                                                                                                                     | `manifests/careers/**`, either accounting manifest                            |
 
 **No plan among 05, 06 and 07 creates an `_index.md` under `paths/`.** Every structural index —
 `paths/_index.md`, `paths/careers/_index.md`, the three `paths/careers/<arc>/_index.md`, and
 `paths/skills/_index.md` — belongs to `ayokoding-learning-path-01-url-restructure` (A3 ruling,
-2026-07-21). A path **landing** (`paths/skills/accounting/_index.md`) is this plan's; the **bucket**
-it sits in is not.
+2026-07-21). Both path **landings** (`paths/skills/conventional-accounting/_index.md` and
+`paths/skills/sharia-accounting/_index.md`) are this plan's; the **bucket** they sit in is not.
 
 **Consequence this plan must design for, not discover** (A3): `paths/skills/_index.md` renders
-**empty** between plan 01 landing and this plan's Phase 2 publishing the first skills manifest. That
-empty state is real and user-visible, and **plan 03 owns designing it**. This plan does not paper
-over it, does not create a placeholder index, and does not treat it as a defect of its own.
+**empty** between plan 01's landing and this plan's Phase 2 publishing the first skills manifest.
+That empty state is real and user-visible, and **plan 03 owns designing it**. This plan does not
+paper over it, does not create a placeholder index, and does not treat it as a defect of its own.
+
+## Two manifests, nineteen shared courses (A10 + A11)
+
+**A11 is the schema's existing rule, not a new mechanism this plan invents.** Plan 02's own
+`tech-docs.md` already establishes exactly the invariants this design needs:
+
+- _"No course ID appears twice **within one manifest**"_ [Repo-grounded —
+  `ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md:417`]. The uniqueness
+  constraint is **per manifest**. The same ID appearing in both `conventional-accounting.yaml` and
+  `sharia-accounting.yaml` violates nothing.
+- _"No course body is duplicated per path (all manifests reference courses **by ID**, never copy a
+  body)"_ [Repo-grounded — same file, line 424]. Reference-by-ID across manifests is already
+  mandatory, not optional.
+- _"One body cannot encode four orders; moving order to the manifest [is what enables the shared
+  library]"_ [Repo-grounded — same file, line 615, DD-1]. Order is a manifest property; the same
+  body can sit at position 5 in one manifest's `courseOrder` and be entirely absent from another's.
+
+**Consequence**: the nineteen shared courses (`ACCT_SHARED`, catalog #1–#19) are authored **once**,
+under `<COURSES>`, exactly like every other library course. `conventional-accounting.yaml`'s
+`courseOrder` is those nineteen IDs. `sharia-accounting.yaml`'s `courseOrder` is those **same**
+nineteen IDs, in the same order, followed by the five Sharia-specific IDs (`ACCT_S3`, catalog
+\#20–#24). No file under `<COURSES>` is ever written twice.
+
+**"Interleaves" resolves to shared-then-Sharia composition, not mid-ramp alternation — a decision,
+stated explicitly** (see [DD-601](#design-decisions)). A10's own wording says the Sharia path's
+`courseOrder` "interleaves shared and Sharia-specific ids rather than duplicating files." Read as
+composition mechanics — an array built by combining IDs from two different authored-once pools — this
+is exactly what shared-then-Sharia ordering does: the array is not homogeneous, it interleaves two
+provenances into one sequence. Read as a pedagogical instruction to scatter Sharia content through
+the conventional spine, it would contradict the load-bearing silent-failure argument that put the
+Sharia stage at the end of the original single path (see
+[prd.md §The silent-failure constraint](./prd.md#the-silent-failure-constraint-the-corpus-shaping-fact)),
+an argument A10/A11 neither mention nor override. This plan adopts the composition-mechanics reading.
 
 ## Path constants
 
@@ -43,120 +76,326 @@ over it, does not create a placeholder index, and does not treat it as a defect 
   `/en/learn/courses/<course-id>` _(created by plan 01)_
 - `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` — path landings; served at
   `/en/learn/paths/<path-id>` _(created by plan 01)_
-- `<LANDING>` = `<PATHS>skills/accounting/` — **this plan's only content home outside `<COURSES>`**
+- `<LANDING_CA>` = `<PATHS>skills/conventional-accounting/` — this plan's first content home outside
+  `<COURSES>`
+- `<LANDING_SA>` = `<PATHS>skills/sharia-accounting/` — this plan's second
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/` _(created by plans 02 and 03)_
 - `<MANIFESTS>` = `<FEAT>manifests/` — YAML data files, nested to mirror slash path IDs
-- `<MANIFEST>` = `<MANIFESTS>skills/accounting.yaml` — **this plan's only _data_ file under
-  `<FEAT>`**; the one other file it writes there is `<MTEST>`, this manifest's co-located unit test
-- `<MTEST>` = `<MANIFESTS>skills/accounting-manifest.unit.test.ts` — the unit test for `<MANIFEST>`,
-  owned by this plan and living beside the manifest it covers. It matches the vitest `unit` project's
-  `**/*.unit.{test,spec}.{ts,tsx}` include [Repo-grounded — `apps/ayokoding-www/vitest.config.ts`] and
-  is excluded from the coverage denominator by that config's `**/*.{test,spec}.{ts,tsx}` exclude.
-  **Not shared**: per the 2026-07-21 ruling each manifest-owning plan owns its own test file, so there
-  is no root-level `published-manifests.unit.test.ts` and this plan appends to no sibling's test file
-  (plan 05 owns the `careers/` test, plan 07 owns the ERP one)
+- `<MANIFEST_CA>` = `<MANIFESTS>skills/conventional-accounting.yaml`
+- `<MANIFEST_SA>` = `<MANIFESTS>skills/sharia-accounting.yaml`
+- `<MTEST_CA>` = `<MANIFESTS>skills/conventional-accounting-manifest.unit.test.ts`
+- `<MTEST_SA>` = `<MANIFESTS>skills/sharia-accounting-manifest.unit.test.ts` — both match the vitest
+  `unit` project's `**/*.unit.{test,spec}.{ts,tsx}` include [Repo-grounded —
+  `apps/ayokoding-www/vitest.config.ts`] and are excluded from the coverage denominator by that
+  config's `**/*.{test,spec}.{ts,tsx}` exclude. **Not shared with any sibling plan**: plan 05 owns
+  the `careers/` test(s), plan 07 owns the ERP one(s) (2026-07-21 ruling, extended here to two files
+  within one plan — see [DD-602](#design-decisions))
 - `<PLANDIR>` = this plan's folder — `plans/backlog/ayokoding-learning-path-06-skills-accounting/`
   today, `plans/in-progress/…` once promoted for execution, `plans/done/YYYY-MM-DD__…` after Phase 10.
-  Every plan-folder constant below is derived from it, and
   [delivery.md §Path constants](./delivery.md#path-constants) carries the shell block that detects the
-  current stage and re-derives them all in one command
-- `<SPEC>` = `<PLANDIR>syllabus/courses/` — this plan's own 20-file spec layer
-  _(see [DD-601](#design-decisions))_
-- `<SPECPATHS>` = `<PLANDIR>syllabus/paths/` — this plan's own path mirror, holding exactly
-  `manifest-skills-accounting.md`
-- `<DELIVERY>` = `<PLANDIR>delivery.md` — named through the constant, never as a bare `delivery.md`,
-  in every clause that greps it
-- Path ID: **`skills/accounting`** — the full slash string, category segment included, with no
-  separate `category` field. Arc: `immediately-effective`, a required manifest field, recorded as
-  data and omitted from the URL. **Nothing keys on segment count** — see
-  [§`pathId` conformance rules](#pathid-conformance-rules-plan-02s-ruling--binding-not-re-derived-here).
+  current stage and re-derives every dependent constant in one command
+- `<SPEC>` = `<PLANDIR>syllabus/courses/` — this plan's own 24-file spec layer, each carrying a
+  module/topic breakdown _(see [DD-603](#design-decisions) and [§Syllabus layer](#syllabus-layer--custody-and-shape))_
+- `<SPECPATHS>` = `<PLANDIR>syllabus/paths/` — this plan's own path mirrors, holding exactly
+  `manifest-skills-conventional-accounting.md` and `manifest-skills-sharia-accounting.md`
+- `<DELIVERY>` = `<PLANDIR>delivery.md` — named through the constant, never as a bare `delivery.md`
+- Path IDs: **`skills/conventional-accounting`** and **`skills/sharia-accounting`** — full slash
+  strings, category segment included, no separate `category` field. Arc: `immediately-effective` on
+  both, a required manifest field, recorded as data and omitted from the URL. **Nothing keys on
+  segment count** — see [§`pathId` conformance rules](#pathid-conformance-rules-plan-02s-ruling--binding-not-re-derived-here).
 
-## The twenty-course catalog
-
-Reproduced from the 2026-07-21 `web-researcher` corpus research, which is the **decided** syllabus
-seed for this plan. Course IDs, formats, prerequisite edges, and ramp order are **not re-derived
-here** — authoring transcribes them.
-
-> **The count of twenty is curriculum judgment, not a sourced fact** [Judgment call]. So is the
-> partition into three stages. What is sourced is the dependency structure and the domain facts each
-> course teaches; the packaging is an editorial decision.
+## The twenty-four-course catalog
 
 `(SWE)` marks a **linked** cross-domain prerequisite into the existing software-engineering library —
-linked, never walked ([DD-602](#design-decisions)).
+linked, never walked ([DD-604](#design-decisions)). **Shared** means the course is authored once and
+referenced by both manifests. **Sharia** means the course exists only in `sharia-accounting.yaml`.
 
-| #   | Course ID                                    | Format            | Prerequisites                    | Stage |
-| --- | -------------------------------------------- | ----------------- | -------------------------------- | ----- |
-| 1   | `accounting-foundations`                     | By Example        | —                                | 1     |
-| 2   | `chart-of-accounts-and-data-modeling`        | By Example        | 1, `sql-essentials` (SWE)        | 1     |
-| 3   | `financial-statements-and-close-cycle`       | By Example        | 2                                | 1     |
-| 4   | `accrual-accounting-and-revenue-recognition` | By Example        | 3                                | 2     |
-| 5   | `accounts-payable-and-procure-to-pay`        | By Example        | 2                                | 2     |
-| 6   | `accounts-receivable-and-order-to-cash`      | By Example        | 2, 4                             | 2     |
-| 7   | `managerial-and-cost-accounting`             | By Example        | 3                                | 2     |
-| 8   | `fixed-assets-and-depreciation`              | By Example        | 2                                | 2     |
-| 9   | `inventory-and-cogs-accounting`              | By Example        | 2, 7                             | 2     |
-| 10  | `lease-and-intangible-asset-accounting`      | By Example        | 8                                | 2     |
-| 11  | `consolidation-and-multi-entity-accounting`  | By Example        | 3, 2                             | 2     |
-| 12  | `financial-reporting-standards-ifrs-vs-gaap` | Annotated-concept | 4, 10                            | 2     |
-| 13  | `audit-controls-and-compliance`              | Annotated-concept | 3                                | 2     |
-| 14  | `payroll-and-tax-accounting-essentials`      | By Example        | 2                                | 2     |
-| 15  | `treasury-and-cash-management`               | By Example        | 5, 6                             | 2     |
-| 16  | `financial-reporting-and-xbrl`               | Annotated-concept | 12                               | 2     |
-| 17  | `sharia-accounting-and-aaoifi-standards`     | Annotated-concept | 4, 12                            | 3     |
-| 18  | `islamic-contract-modeling-for-systems`      | By Example        | 17, 2                            | 3     |
-| 19  | `capstone-build-a-general-ledger-system`     | By Example        | 2, 3, `backend-essentials` (SWE) | 3     |
-| 20  | `capstone-sharia-compliant-ledger`           | By Example        | 18, 19                           | 3     |
+> **The count of twenty-four is curriculum judgment, not a sourced fact** [Judgment call], as is the
+> partition into nineteen-shared-plus-five-Sharia and the three-stage grouping. What is sourced is the
+> dependency structure and the domain facts each course teaches (see each course's syllabus at
+> `<SPEC>`); the packaging is an editorial decision. Every module/topic claim inside a syllabus that
+> is not directly sourced from the seeding research is marked `[Needs Verification]` there, not here —
+> this table states IDs, formats, prerequisites, and stage only.
 
-**Format counts**: 16 By Example, 4 Annotated-concept. Each maps to an existing maker/checker/fixer
+| #   | Course ID                                      | Manifest    | Format            | Prerequisites                    | Stage |
+| --- | ---------------------------------------------- | ----------- | ----------------- | -------------------------------- | ----- |
+| 1   | `accounting-foundations`                       | shared      | By Example        | —                                | 1     |
+| 2   | `chart-of-accounts-and-data-modeling`          | shared      | By Example        | 1, `sql-essentials` (SWE)        | 1     |
+| 3   | `financial-statements-and-close-cycle`         | shared      | By Example        | 2                                | 1     |
+| 4   | `journal-entries-and-posting-mechanics`        | shared      | By Example        | 3                                | 2     |
+| 5   | `accrual-accounting-and-revenue-recognition`   | shared      | By Example        | 4                                | 2     |
+| 6   | `accounts-payable-and-procure-to-pay`          | shared      | By Example        | 4                                | 2     |
+| 7   | `accounts-receivable-and-order-to-cash`        | shared      | By Example        | 4, 5                             | 2     |
+| 8   | `managerial-and-cost-accounting`               | shared      | By Example        | 3                                | 2     |
+| 9   | `fixed-assets-and-depreciation`                | shared      | By Example        | 2                                | 2     |
+| 10  | `inventory-and-cogs-accounting`                | shared      | By Example        | 2, 8                             | 2     |
+| 11  | `lease-and-intangible-asset-accounting`        | shared      | By Example        | 9                                | 2     |
+| 12  | `multi-currency-accounting-and-fx-translation` | shared      | By Example        | 3                                | 2     |
+| 13  | `consolidation-and-multi-entity-accounting`    | shared      | By Example        | 3, 2, 12                         | 2     |
+| 14  | `financial-reporting-standards-ifrs-vs-gaap`   | shared      | Annotated-concept | 5, 11                            | 2     |
+| 15  | `audit-controls-and-compliance`                | shared      | Annotated-concept | 3                                | 2     |
+| 16  | `payroll-and-tax-accounting-essentials`        | shared      | By Example        | 2                                | 2     |
+| 17  | `treasury-and-cash-management`                 | shared      | By Example        | 6, 7                             | 2     |
+| 18  | `financial-reporting-and-xbrl`                 | shared      | Annotated-concept | 14                               | 2     |
+| 19  | `general-ledger-system-architecture`           | shared      | By Example        | 2, 3, `backend-essentials` (SWE) | 2     |
+| 20  | `sharia-accounting-and-aaoifi-standards`       | Sharia only | Annotated-concept | 5, 14                            | 3     |
+| 21  | `islamic-contract-modeling-for-systems`        | Sharia only | By Example        | 20, 2                            | 3     |
+| 22  | `zakah-computation-and-reporting-for-systems`  | Sharia only | By Example        | 21                               | 3     |
+| 23  | `sukuk-and-islamic-capital-markets-accounting` | Sharia only | Annotated-concept | 21, 12                           | 3     |
+| 24  | `sharia-ledger-system-architecture`            | Sharia only | By Example        | 21, 19                           | 3     |
+
+**Format counts**: 19 By Example, 5 Annotated-concept. Each maps to an existing maker/checker/fixer
 agent trio (`apps-ayokoding-www-by-example-*`, `apps-ayokoding-www-annotated-concept-*`)
 [Repo-grounded — all six agent files verified present under `.claude/agents/`].
 
-**The ramp order is a valid topological order.** Every numbered prerequisite of course _n_ is a
-course with a lower number, so `courseOrder` in catalog order satisfies
-`checkPrerequisiteConsistency` by construction. Verified by inspection of the table above; re-checked
+**The ramp order is a valid topological order** for every prerequisite edge above — every numbered
+prerequisite of course _n_ is a course with a lower number, so `courseOrder` in catalog order (the
+first 19 rows for `conventional-accounting.yaml`; all 24 for `sharia-accounting.yaml`) satisfies
+`checkPrerequisiteConsistency` by construction. Verified by inspection of the table; re-checked
 mechanically at every phase gate.
 
 **No course ID collides with an existing library course** and no ID is a substring of another, which
 is what makes the alternation-grep acceptance clauses in `delivery.md` sound.
 
-## The ramp and its three stages
+### What changed from the original twenty-course single-path catalog, and why
 
-| Stage | Courses | Boundary           | Delivery phase | Reader outcome                                                                         |
-| ----- | ------- | ------------------ | -------------- | -------------------------------------------------------------------------------------- |
-| 1     | #1–#3   | **Dangerous 1** ⚡ | Phase 2        | Working, correctly balancing ledger; routine postings; three statements, single entity |
-| 2     | #4–#16  | **Dangerous 2** ⚡ | Phase 3        | Most conventional systems a mid-size company runs                                      |
-| 3     | #17–#20 | **Dangerous 3** ⚡ | Phase 5        | Full competence, including a Sharia-compliant ledger                                   |
+- **Deleted (A6)**: `capstone-build-a-general-ledger-system`, `capstone-sharia-compliant-ledger` —
+  both asked the reader to build a system.
+- **Added, replacing the deleted capstones' domain knowledge without the build instruction**:
+  `general-ledger-system-architecture` (carries the same `backend-essentials` (SWE) linked edge the
+  deleted conventional capstone carried) and `sharia-ledger-system-architecture` (the Sharia
+  equivalent).
+- **Added to the shared spine (A9)**: `journal-entries-and-posting-mechanics` (posting-rule mechanics
+  the original catalog implied but never taught as its own subject) and
+  `multi-currency-accounting-and-fx-translation` (a real domain gap — the original catalog named
+  consolidation, which cannot be taught honestly without FX translation, but never taught FX
+  translation itself).
+- **Added to the Sharia stage (A9)**: `zakah-computation-and-reporting-for-systems` (AAOIFI FAS 9 is
+  `[Verified]` in the seeding research; the original corpus never taught it) and
+  `sukuk-and-islamic-capital-markets-accounting` (AAOIFI FAS 32–34 are `[Verified]`; also never
+  taught).
+- **Unchanged in identity**: every other course ID, its format, and its position relative to its own
+  prerequisites.
 
-**Standalone-useful subsets**, stated because they are what makes the immediately-effective claim
-honest rather than rhetorical:
+## Syllabus layer — custody and shape
+
+This plan's syllabus layer follows the same folder convention
+`ayokoding-learning-path-02-schema-and-prerequisite-dag` already established for custodied
+human-readable mirrors (`syllabus/paths/manifest-*.md`), applied inside this plan's own folder rather
+than a new structure. **The per-course file shape is inherited from plan 02's 123 existing
+`syllabus/courses/*.md` files, not invented here** (DD-627) — same header fields, same section names
+and order, same problem-before-solution framing, so the accounting corpus reads as one corpus with
+the careers corpus rather than forking the format.
+
+| Half             | Location                                                                                                   | Contents                                                                                                  |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Per-course specs | `<SPEC>`                                                                                                   | 24 `<course-id>.md` files plus a folder `README.md`                                                       |
+| Path mirrors     | `<SPECPATHS>manifest-skills-conventional-accounting.md`, `<SPECPATHS>manifest-skills-sharia-accounting.md` | The human-readable orderings this plan transcribes into `<MANIFEST_CA>` / `<MANIFEST_SA>`'s `courseOrder` |
+
+**Path ids inside every spec use the canonical prefixed form from the start** — `skills/conventional-accounting`
+or `skills/sharia-accounting`, never a bare subject slug. Plan 02's 121 existing course specs still
+carry stale un-prefixed ids in their "In which paths" sections; this plan does not edit them and does
+not add to that debt.
+
+Each per-course spec is one `<course-id>.md` file, sectioned exactly as plan 02's own files are, in
+the same order, adapted for a non-code domain (DD-627):
+
+- **H1 + top matter** — `# <Title> (<Format>)` and a `**Course ID**` / `**Format**` line. No
+  `**Language**` field — plan 02's files carry one because every careers course is language-scoped;
+  nothing in this corpus is. A short summary and scope note follow, in prose, exactly as plan 02's
+  files carry them.
+- **`## Why this exists · the big idea`** — three bullets, verbatim in shape from plan 02: **the
+  problem before the solution**, **keep-this-if-you-forget-everything**, and **big ideas touched**
+  (citing this plan's own fixed five-token vocabulary — see DD-627 — the accounting-corpus analogue of
+  plan 02's `taming-state` / `abstraction-and-its-cost` cross-cutting themes).
+- **`## Prerequisites`** — prior courses (including any linked `(SWE)` edge) and assumed knowledge.
+- **`## Accuracy notes`** — every claim this course depends on that is dated, standard-specific, or
+  jurisdiction-specific, carried with its `[Verified]` / `[Unverified]` / `[Needs Verification]` tag
+  from the grounding file or `verification-log.md`; where nothing beyond stable, decades-old domain
+  mechanics is asserted, this section says so explicitly rather than being silently dropped.
+- **`## Concepts`** — the `co-NN` enumeration plan 02 uses, one 1:1-numbered bullet per concept, floor
+  ≥ 8 (scaled from plan 02's ≥ 10 — see DD-627 on why). Concepts are **domain knowledge and
+  architecture, never build exercises** (A6 stays in force at concept granularity, not just course
+  granularity — a concept phrased as "implement a posting engine" is as much a violation as a whole
+  course would be).
+- **`## Worked examples`** — `ex-NN`, each citing the `co-NN` it exercises and closing on an explicit
+  **verify** clause. By Example courses use plan 02's Beginner/Intermediate/Advanced bands; the five
+  Annotated-concept courses (#14, #15, #18, #20, #23) use plan 02's themed grouping instead, per its
+  own convention for that format. Because this corpus has no runnable code, "verify" means **recompute
+  by hand or in a spreadsheet and compare against a stated expected figure**, not "run and observe
+  output" — the domain-appropriate reading of the same instruction plan 02's code-verify clauses give.
+- **No `## Capstone spec` section.** Plan 02's inherited Capstone Policy (its own DD-27: a full
+  runnable intra-topic capstone per course) is **deliberately not inherited here** — A6 forbids a
+  build exercise at any granularity. In its place: **`## Applied synthesis (no build — A6)`** — one
+  integrative worked scenario that traces a single transaction or scenario through several of the
+  course's concepts to a checkable numeric or classificatory outcome, without asking the reader to
+  build, scaffold, or extend any software. See DD-627 for the full DD-15/DD-27 reconciliation.
+- **`## Read more`** — 2–3 real, citable sources (textbooks, official standard-body pages), nominative
+  citation only, matching plan 02's own `## Read more` shape and the A8/A12 no-reproduction rule.
+- **`## In which paths`** — replaces the top-matter "which manifest(s)" field with plan 02's own
+  bottom-of-file convention: one line per consuming manifest (`conventional-accounting`,
+  `sharia-accounting`), each stating its stage and a short thematic label.
+- **Scope boundary** and **silent failure modes** (for every course from #4 onward) are folded into
+  `## Why this exists · the big idea` and `## Accuracy notes` respectively rather than kept as
+  separate headings plan 02's format does not have — content unchanged, placement conformed.
+
+**Post-authoring verification (A12-compliant)**: every syllabus is **authored first**, from domain
+reasoning and this plan's own grounding file — never from an external curriculum. Only **after** a
+syllabus exists does Phase 1 dispatch `web-researcher`, and only to check **coverage**: what a
+practitioner would expect that the draft omits, and what it includes that the field does not
+recognise. A coverage finding is actionable only as "add/remove this concept"; it is never actionable
+as "reorder to match theirs," and no syllabus is rewritten to mirror an external curriculum's module
+titles or sequence. Naming a body as corroboration ("this appears in ASCM's CPIM body of knowledge")
+is nominative use and is fine; the syllabus text itself never transcribes one. A syllabus with vague
+concept or worked-example descriptions cannot be checked for coverage either way and is itself a
+Phase 1 finding. See [`ayokoding-learning-path-programme.md` §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed)
+for the full rule this section implements.
+
+## Licensing and IP Compliance (A8)
+
+**`A8` binds the whole seven-plan programme, not only this plan** — see
+[`ayokoding-learning-path-programme.md` §A8](../ayokoding-learning-path-programme.md#a8--licensing-binds-the-whole-programme)
+for the canonical, programme-wide statement (code examples, documentation prose, figures, book/course
+structure, trademarks, datasets). What follows is this plan's own **specialization** of that rule for
+the accounting/Sharia-accounting standards bodies specifically — it restates nothing the programme
+doc already states generally.
+
+**Strict clean-room licensing binds every course in both paths.** No standards text, proprietary
+schema, or copyleft code is ever reproduced; every concept is restated in original words citing
+number and title only.
+
+**Relationship to `DD-15` (inherited via plan 02's `syllabus/courses/**`, originating in the closed
+`fundamentally-strong-software-engineer`plan).**`DD-15`is "License-aware technology choices" —
+when a course names a real tool, it explains that tool's current license and the free/teachable
+option it drives (the Redis→SSPL, Akka→BSL precedent). That is a **different axis** from this
+section:`DD-15`governs which **third-party tools** are safe to name and teach; this section (and`A8`) governs whether **this corpus's own teaching material** may reproduce a **standards body's**
+copyrighted text. Both apply together wherever this corpus names real accounting software —
+`general-ledger-system-architecture`and`sharia-ledger-system-architecture`extend`DD-15`'s
+precedent rather than re-deriving a rule: ledger-cli (BSD-3-Clause) and Apache Fineract (Apache-2.0)
+are named as permissively-licensed examples; GnuCash (GPLv2+), hledger (GPLv3), and Beancount
+(GPL-2.0-only) are described behaviourally, never quoted from. `DD-27` (plan 02's inherited Capstone
+Policy) is the one FS-SE-origin decision this plan explicitly does **not** inherit — see
+[DD-627](#design-decisions).
+
+### Posture per body
+
+| Body            | Posture                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------- |
+| IFRS Foundation | The **only** one with an explicit free-educational-use carve-out; attribution required                |
+| AAOIFI          | Free to **read**; **no published permission-to-reproduce policy** — treated as closed                 |
+| IAI (Indonesia) | **Strictest of the four — no educational exception at all.** Terms forbid reproduction or translation |
+| MASB, FASB      | Closed copyright                                                                                      |
+
+**No public-domain chart of accounts exists anywhere.** [Verified, 2026-07-22 grounding run]. Every
+chart of accounts that appears in this corpus — course #2 onward — is **originally authored**, never
+copied from any textbook, standard, or reference implementation.
+
+### The eleven safe-authoring rules (bind every course in this plan)
+
+1. Restate concepts in original words; never reproduce standards text, tables, or clause numbering
+   layouts.
+2. Cite standard number + title + official link; quote nothing.
+3. Never translate a standard.
+4. Author every chart of accounts, worked example and dataset originally.
+5. Reference implementations: prefer permissive (ledger-cli BSD-3-Clause, Apache Fineract
+   Apache-2.0); describe copyleft projects (GnuCash GPLv2+, hledger GPLv3, Beancount GPL-2.0-only)
+   behaviourally rather than quoting their code.
+6. Never paste code from a copyleft codebase, in any quantity.
+7. Use vendor names nominatively only — never in a title or path segment.
+8. Screenshots of proprietary software are out.
+9. Carry `[Verified]` / `[Unverified]` / `[Needs Verification]` markers verbatim into course
+   frontmatter or body where a claim depends on them.
+10. Where a doctrinal claim rests on secondary sources only (OI-2), say so in the course.
+11. When in doubt between describing and reproducing, describe.
+
+### The _Baker v. Selden_ basis — why domain reimplementation is lawful
+
+- **17 U.S.C. §102(b)** and **EU Directive 2009/24/EC Art. 1(2)** both exclude ideas, procedures,
+  processes and systems from copyright. Learning how a system works and reimplementing it is not
+  infringement.
+- **_Baker v. Selden_** (101 U.S. 99, 1879) is **directly on point — it concerned a bookkeeping
+  system.** The Court held the system itself unprotectable even though the book describing it was
+  protected. This is the strongest authority for this corpus's posture, and it is the reason
+  `general-ledger-system-architecture` and `sharia-ledger-system-architecture` can teach how a ledger
+  system is architected in detail without infringing any accounting-software vendor's copyright — the
+  **system** (double-entry mechanics, posting rules, document state machines) is the unprotectable
+  layer; only a vendor's **particular expression** of it (its actual source code, its actual UI) is
+  protected, and this corpus never reproduces either.
+- Short identifiers such as table and field names fall outside copyright per **Copyright Office
+  Circular 34** (names, titles and short phrases are not protected) — a chart-of-accounts account
+  code like `1100` or a field name like `posting_date` carries no copyright on its own.
+- The genuinely contested zone is **non-literal structural copying**, tested under **_Computer
+  Associates v. Altai_** abstraction-filtration-comparison. Because A6 removes all building from the
+  corpus, the corpus never approaches this zone — there is no codebase this corpus produces that
+  could be compared structurally against a vendor's.
+- **_Google v. Oracle_** did **not** hold APIs uncopyrightable — it decided on fair use and assumed
+  copyrightability arguendo. This corpus does not cite it for the broader proposition.
+
+### Trademarks
+
+SAP, Oracle, NetSuite, QuickBooks, Xero and similar accounting-software vendors are trademarks.
+Nominative reference ("how a ledger system like the one behind common ERP suites models a
+subledger-to-GL relationship") is fine; using a vendor name in a course title, path name, or product
+name is not, and no course in this corpus does.
+
+### Where this binds mechanically
+
+Phase 1's syllabus authoring records each course's licensing-sensitive sources (which standard
+numbers it cites, whether it references any reference implementation) so Phase 6's licensing reading
+audit has a concrete list to check against rather than re-deriving it from twenty-four bodies cold.
+See [delivery.md Phase 6](./delivery.md#phase-6-section-and-app-verification) for the audit step.
+
+## The ramp and its stages (per path)
+
+| Stage | Courses | Boundary           | Path(s)                                              | Delivery phase | Reader outcome                                                                                       |
+| ----- | ------- | ------------------ | ---------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------- |
+| 1     | #1–#3   | **Dangerous 1** ⚡ | both                                                 | Phase 2        | Working, correctly balancing ledger; routine postings; three statements, single entity               |
+| 2     | #4–#19  | **Dangerous 2** ⚡ | both — `conventional-accounting` **terminates here** | Phase 3        | Most conventional systems a mid-size company runs, plus how to architect (not build) a ledger system |
+| 3     | #20–#24 | **Dangerous 3** ⚡ | `sharia-accounting` only                             | Phase 5        | Full competence, including how to architect (not build) a Sharia-compliant ledger                    |
+
+**Standalone-useful subsets**, unchanged in kind from the original single-path design:
 
 - **#1 alone** — correct cash-basis hand-posting.
 - **#1 + #2** — designing a real ledger schema.
 - **#1–#3** — the first genuinely dangerous point.
+- **The whole `conventional-accounting` path (#1–#19)** — a complete, shippable competence in its own
+  right, not a truncated on-ramp.
 
-**Why the ramp is fast then slow.** Three courses to the first boundary, thirteen to the second. That
-asymmetry is the direct consequence of the domain's silent-failure property (see
-[prd.md §The silent-failure constraint](./prd.md#the-silent-failure-constraint-the-corpus-shaping-fact)):
-a hand-built single-entity ledger fails **loudly** — it does not balance — while everything after it
-fails **quietly**. Accelerating past #3 would hand a reader a tool that produces confident wrong
-answers.
+**Why the ramp is fast then slow.** Unchanged: a hand-built single-entity ledger fails **loudly**;
+everything after it fails **quietly** (see
+[prd.md §The silent-failure constraint](./prd.md#the-silent-failure-constraint-the-corpus-shaping-fact)).
+
+### Landing content contract — what each landing must convey
+
+Each of the two landings states, in prose, before any rendered course list: (1) its arc promise,
+stated once, with no arc chooser; (2) every ramp boundary its manifest has reached so far, each naming
+both the capability the boundary confers and the limit the reader has not yet cleared;
+(3) `sharia-accounting`'s landing additionally states the **path-choice affordance** distinguishing it
+from `conventional-accounting`, so a reader lands on the correct path deliberately rather than by
+guessing; and (4) the two linked cross-domain prerequisites (`sql-essentials`, `backend-essentials`),
+linked at their canonical `/en/learn/courses/<id>` URLs once each course carrying the linked edge is
+authored. The **rendered course list itself is never hand-listed in the landing** — it is rendered by
+plan 03's component from the loaded manifest, so "before the list" means the landing's prose ends
+before that render slot. See [DD-611](#design-decisions) for the ownership split (this plan states the
+contract; plan 03 owns the rendering) and
+[delivery.md Phase 2 §2.3](./delivery.md#23--both-landings-content--maker-checker-fixer-not-tdd) /
+[Phase 5 §5.3](./delivery.md#53--update-the-sharia-accounting-landing-to-reflect-all-three-stages) for
+where each landing is authored and grown.
 
 ## How accounting joins the library DAG
 
-R5 requires this plan to state explicitly whether the new subject domain **joins** the existing
-prerequisite DAG or forms a **disjoint component**, and why.
-
 **Ruling: it joins, as a near-disjoint leaf cluster with exactly two inbound edges and zero outbound
-edges into software engineering.**
+edges into software engineering** — unchanged from the original single-path finding; the split does
+not add or remove a cross-domain edge, because both linked prerequisites sit in the **shared** spine
+(#2 and #19), reachable identically from either manifest.
 
 ```mermaid
-%% Inbound cross-domain prerequisite edges. Exactly two, both LINKED not walked.
-%% Node SHAPE encodes domain: rectangle = existing library course, hexagon = accounting course.
+%% Inbound cross-domain prerequisite edges. Exactly two, both LINKED not walked, both in the shared spine.
 flowchart LR
     SQL["sql-essentials<br/>library, re-homed by 01"]:::lib
     BE["backend-essentials<br/>library, re-homed by 01"]:::lib
-    A2{{"Acct 2<br/>chart-of-accounts"}}:::acct
-    A19{{"Acct 19<br/>general-ledger capstone"}}:::acct
+    A2{{"Acct 2 (shared)<br/>chart-of-accounts"}}:::acct
+    A19{{"Acct 19 (shared)<br/>gl-system-architecture"}}:::acct
 
     SQL -->|"linked, not in courseOrder"| A2
     BE -->|"linked, not in courseOrder"| A19
@@ -168,51 +407,50 @@ flowchart LR
 **Accessibility note.** Domain is carried by node **shape** (rectangle = existing library course,
 hexagon = accounting course) and by every edge's explicit label, never by colour alone.
 
-Three properties follow, and each matters downstream:
+Three properties follow:
 
-1. **Two inbound edges only.** `sql-essentials` → #2 and `backend-essentials` → #19. Both source
-   courses are among plan 01's **37 re-homed bundles** [Repo-grounded — both directories present
-   today under `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`], which
-   is why this plan carries **no dependency on `ayokoding-learning-path-04-course-authoring`**
-   ([DD-605](#design-decisions)).
+1. **Two inbound edges only, both in the shared spine** — reachable from both manifests, authored
+   once. Both source courses are among plan 01's **37 re-homed bundles** [Repo-grounded — both
+   directories present today under
+   `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`], which is why this
+   plan carries **no dependency on `ayokoding-learning-path-04-course-authoring`** ([DD-605](#design-decisions)).
 2. **Zero outbound edges into software engineering.** No existing library course gains an accounting
-   prerequisite. The library DAG is unchanged for every reader who never enters this path — a
-   property that makes rollback total and side-effect-free.
-3. **The accounting subgraph is internally dense and externally sparse.** 19 of the 20 courses have
-   only in-domain prerequisites. That is what makes the path a _short spine over the shared library_
-   rather than a second curriculum.
+   prerequisite from either path.
+3. **The accounting subgraph is internally dense and externally sparse.** 22 of the 24 courses have
+   only in-domain prerequisites.
 
-The outbound direction — accounting into ERP — is the plan-07 handoff, and it is substantial:
+The outbound direction — accounting into ERP — is now named by **ERP capability**, not ERP course
+number, because plan 07 has not yet undergone its own A9 rewrite and any course number this plan
+cited would be invalidated the moment it does:
 
 ```mermaid
-%% Outbound cross-domain edges into the ERP corpus owned by plan 07.
-%% Node SHAPE encodes plan: hexagon = this plan, stadium = plan 07.
+%% Outbound cross-domain edges into the ERP capability areas owned by plan 07. Functional names, not course numbers.
 flowchart LR
-    A3{{"Acct 3<br/>close cycle"}}:::acct
-    A9{{"Acct 9<br/>inventory and COGS"}}:::acct
-    A11{{"Acct 11<br/>consolidation"}}:::acct
-    A13{{"Acct 13<br/>audit and controls"}}:::acct
-    A14{{"Acct 14<br/>payroll and tax"}}:::acct
-    A17{{"Acct 17<br/>Sharia standards"}}:::acct
-    A18{{"Acct 18<br/>contract modelling"}}:::acct
-    A19{{"Acct 19<br/>GL capstone"}}:::acct
+    A3{{"Acct 3 (shared)<br/>close cycle"}}:::acct
+    A10c{{"Acct 10 (shared)<br/>inventory and COGS"}}:::acct
+    A13{{"Acct 13 (shared)<br/>consolidation"}}:::acct
+    A15{{"Acct 15 (shared)<br/>audit and controls"}}:::acct
+    A16{{"Acct 16 (shared)<br/>payroll and tax"}}:::acct
+    A20{{"Acct 20 (Sharia)<br/>Sharia standards"}}:::acct
+    A21{{"Acct 21 (Sharia)<br/>contract modelling"}}:::acct
+    A19{{"Acct 19 (shared)<br/>GL architecture"}}:::acct
 
-    E7(["ERP 7 record-to-report"]):::erp
-    E8(["ERP 8 inventory"]):::erp
-    E13(["ERP 13 hire-to-retire"]):::erp
-    E14(["ERP 14 multi-company"]):::erp
-    E15(["ERP 15 security"]):::erp
-    E19(["ERP 19 Sharia ERP"]):::erp
-    E20(["ERP 20 minimal ERP"]):::erp
+    ERecord(["ERP: record-to-report<br/>capability"]):::erp
+    EInv(["ERP: inventory-costing<br/>capability"]):::erp
+    EHire(["ERP: hire-to-retire<br/>capability"]):::erp
+    EMulti(["ERP: multi-company<br/>capability"]):::erp
+    ESec(["ERP: segregation-of-duties<br/>capability"]):::erp
+    ESharia(["ERP: Sharia-compliant ERP<br/>capability"]):::erp
+    EFound(["ERP: founding architecture<br/>capability"]):::erp
 
-    A3 -->|"HARD"| E7
-    A9 --> E8
-    A14 --> E13
-    A11 --> E14
-    A13 --> E15
-    A17 --> E19
-    A18 --> E19
-    A19 --> E20
+    A3 -->|"HARD"| ERecord
+    A10c --> EInv
+    A16 --> EHire
+    A13 --> EMulti
+    A15 --> ESec
+    A20 --> ESharia
+    A21 --> ESharia
+    A19 --> EFound
 
     classDef acct fill:#029E73,stroke:#000000,color:#FFFFFF
     classDef erp fill:#DE8F05,stroke:#000000,color:#000000
@@ -221,199 +459,150 @@ flowchart LR
 **Accessibility note.** Plan ownership is carried by node **shape** (hexagon = this plan, stadium =
 plan 07); the one hard edge carries an explicit `HARD` label rather than relying on styling.
 
-**The hard edge is `Acct 3 → ERP 7`.** Subledger-to-GL posting is meaningless without a balanced
-ledger. Every other edge is a soft ordering preference. This is the whole reason Stage 1 publishes
-before Stages 2 and 3 exist.
+**The hard edge is `Acct 3 → ERP's record-to-report capability`.** Subledger-to-GL posting is
+meaningless without a balanced ledger. Every other edge is a soft ordering preference. This is the
+whole reason Stage 1 publishes before Stages 2 and 3 exist, and it is unchanged by the two-path
+split, since course #3 sits in the shared spine reachable at the same point from either manifest.
 
 ## Link, do not walk (the cross-domain composition rule)
 
-`courseOrder` contains **only accounting course IDs**. `sql-essentials` and `backend-essentials` are
-**linked** — declared in the dependent course's `prerequisites:` frontmatter, surfaced on that
-course's page by plan 03's prerequisite display, and linked from the landing — but never inserted
-into the path's walk.
-
-**Why** ([DD-602](#design-decisions)):
-
-- A subject path that walks its cross-domain prerequisites stops being a subject path. Twenty
-  accounting courses plus a software-engineering on-ramp is a different product.
-- The reader persona is a **systems builder**. Assuming zero accounting knowledge is correct;
-  assuming zero SQL is not.
-- Course **#1 has no prerequisites at all**, so a reader with neither accounting nor SQL still has a
-  real entry point and only meets the library edge at #2 — where the prerequisite display tells them
-  exactly what to go and read.
-
-**A stale justification, corrected.** The research justified this rule by analogy: _"The existing AI
-path already links rather than re-walks its shared SWE prerequisites."_ That analogy **no longer
-holds** — the 2026-07-21 A1 amendment made `careers/immediately-effective/ai-engineer` a from-scratch
-path that **includes** its prerequisites in `courseOrder`. The rule survives on its own reasoning
-above; the analogy is recorded here as retired so nobody re-derives it from the same stale premise.
-
-**A cross-plan wording conflict, recorded not diverged from** — see [OI-4](#open-verification-items-oi-1-through-oi-4).
+Unchanged in mechanism from the original single-path design ([DD-604](#design-decisions)): neither
+manifest's `courseOrder` contains `sql-essentials` or `backend-essentials`. Both are **linked** —
+declared in the dependent course's `prerequisites:` frontmatter, surfaced on that course's page by
+plan 03's prerequisite display, and linked from **both** landings.
 
 ## Manifest format
 
 ```yaml
-# apps/ayokoding-www/src/features/course-paths/manifests/skills/accounting.yaml
-pathId: skills/accounting
+# apps/ayokoding-www/src/features/course-paths/manifests/skills/conventional-accounting.yaml
+pathId: skills/conventional-accounting
 arc: immediately-effective
-title: "Accounting for Systems Builders"
-description: "Build a ledger that balances, then learn the mistakes that still balance."
+title: "Conventional Accounting for Systems Builders"
+description: "Build a ledger that balances, then learn the mistakes that still balance — the complete conventional path."
 courseOrder:
   - accounting-foundations
   - chart-of-accounts-and-data-modeling
   - financial-statements-and-close-cycle
-  # … grows to 16 at Stage 2 and to 20 at Stage 3 …
+  # … grows to 19 at Stage 2, then STOPS — this manifest never grows again …
 ```
 
-Five properties this manifest must hold, each asserted at a gate:
+```yaml
+# apps/ayokoding-www/src/features/course-paths/manifests/skills/sharia-accounting.yaml
+pathId: skills/sharia-accounting
+arc: immediately-effective
+title: "Sharia-Compliant Accounting for Systems Builders"
+description: "Every basic the conventional path teaches, plus murabaha, ijara, mudaraba, musharaka, zakah and sukuk modelled correctly."
+courseOrder:
+  - accounting-foundations
+  - chart-of-accounts-and-data-modeling
+  - financial-statements-and-close-cycle
+  # … the SAME 16 remaining shared IDs as the conventional manifest, in the same order, growing to 19 at Stage 2 …
+  # … then 5 Sharia-specific IDs, growing to 24 at Stage 3 …
+```
 
-1. **`pathId` is the FULL slash string, category segment included** — `skills/accounting`, exactly
-   that. Not `accounting`, not a bare subject slug, and **never** a separate `category` field
-   alongside a shortened id. The category lives inside the id.
-2. **`arc` is a separate required field, present and set to `immediately-effective`**, even though
-   the URL omits it (R8). It is recorded **as data**, never left implicit in landing prose. Modelling
-   a skills path as arc-less would make a future second skills arc both a schema migration and a URL
-   migration — exactly what R2 forbids.
+Six properties both manifests must hold, each asserted at a gate:
+
+1. **`pathId` is the FULL slash string, category segment included** — `skills/conventional-accounting`
+   or `skills/sharia-accounting`, exactly that. Never a bare subject slug, never a separate
+   `category` field.
+2. **`arc` is a separate required field, present and set to `immediately-effective`** on both.
 3. **Every `courseOrder` entry is a plain course-ID string.** No `{ id, framing }` mappings
-   ([DD-619](#design-decisions)): per-course framing exists so several careers paths can wrap one
-   shared body differently, and every accounting body is exclusive to this path, so framing has
-   nothing to disambiguate. Keeping entries plain also makes the line-shaped grep acceptance clauses
-   in `delivery.md` sound.
-4. **Neither `sql-essentials` nor `backend-essentials` appears in `courseOrder`.**
-5. **Nothing anywhere keys on segment count** — see the rule below.
+   ([DD-606](#design-decisions)).
+4. **Neither manifest's `courseOrder` contains `sql-essentials` or `backend-essentials`.**
+5. **The first 19 entries of `sharia-accounting.yaml`'s `courseOrder` are byte-identical, in order,
+   to the entirety of `conventional-accounting.yaml`'s `courseOrder`.** This is the mechanical
+   expression of "shared, authored once, referenced by both."
+6. **`conventional-accounting.yaml` does not change after Phase 3.** Its terminal state is 19 IDs;
+   any later phase touching it is itself a defect.
 
 ### `pathId` conformance rules (plan 02's ruling — binding, not re-derived here)
 
-`ayokoding-learning-path-02-schema-and-prerequisite-dag` owns the `pathId` contract. This plan
-conforms to it; it does not restate a variant of it.
+Unchanged from the original single-path design: variable-depth by design, validation on the
+first-segment literal plus resolvability, no clause anywhere in this plan keys on segment count, and
+an unresolvable or malformed id is a hard `safeParse` rejection. See
+[delivery.md §Path constants](./delivery.md#path-constants) for the full restated rule; this plan now
+has **two** ids exercising the 2-segment shape instead of one, which strengthens rather than weakens
+the smoke test.
 
-- **Variable-depth by design.** Careers ids are 3 segments (`careers/<arc>/<role>`); skills ids are 2
-  (`skills/<subject>`). **Validation is on the first-segment literal (`careers` | `skills`) plus
-  manifest resolvability — never on arity.**
-- **No clause, regex, route, glob, or check in this plan may assume a fixed number of segments.**
-  Every pattern matches the **full id**. This is a live defect class, not a hypothetical: a sibling
-  plan shipped a clause using a two-group path regex that silently stopped at the first `/` inside a
-  3-segment careers URL and undercounted by one under `sort -u`. Every acceptance clause in this
-  plan's `delivery.md` was written to avoid that shape and was proven falsifiable in both directions
-  before landing.
-- **"2-segment" is a fact about this instance, never an asserted invariant.** Where this document
-  calls `skills/accounting` a 2-segment id, it is describing what this manifest happens to contain —
-  not a property any check enforces. A future `skills/<arc>/<subject>` must be purely additive.
-- **An unresolvable or malformed id is a HARD `safeParse` rejection.** Never silent coercion, never
-  an alias, never normalization, never a nearest-match fallback. **This plan describes no lenient
-  resolution behaviour anywhere.** The one adjacent behaviour it does verify — an invalid
-  `?path=` on a course URL — is rejection **plus** the course's own canonical no-path view, which is
-  the absence of a path context rather than a coerced one.
+### Syllabus mirror filenames (plan 02's ruling — binding, extended for two paths)
 
-### Syllabus mirror filename (plan 02's ruling — binding)
+`manifest-skills-conventional-accounting.md` and `manifest-skills-sharia-accounting.md`, both
+carrying the `skills-` category marker.
 
-The human-readable path mirror for this manifest is **`manifest-skills-accounting.md`**, carrying the
-`skills-` category marker. A bare `manifest-accounting.md` is **not** acceptable.
+## Stage-signal contract (the plan-07 handoff, stage granularity)
 
-The four existing careers mirrors keep their current un-prefixed names
-(`manifest-immediately-effective-ai-engineer.md` and siblings) — renaming them would be pure churn
-against a custody-frozen corpus — so the `skills-` marker is what makes the category unambiguous by
-construction rather than by convention. Plan 07's mirror is
-`manifest-skills-enterprise-resource-planning.md` by the same rule.
+**This record is a human/audit-readable handoff note, not a machine contract** — unchanged in kind
+from the original design. What changed is the **vocabulary of the `UNBLOCKS_ERP_*` field**:
 
-### Manifest growth lifecycle
+**The original single-path plan named ERP courses by number** (`UNBLOCKS_ERP_COURSES: 7`). **This
+rewrite invalidates that mapping twice over**: this plan's own course numbers moved (A9's expansion,
+A6's capstone removal), and plan 07 will undergo the identical A9 expansion when it is rewritten,
+invalidating whatever ERP course numbers this plan might have cited fresh. **Course numbers do not
+survive either plan's renumbering; stage names and capability descriptions do.** The field is
+therefore renamed `UNBLOCKS_ERP_CAPABILITY` and its value is a short functional description, not a
+number:
 
 ```mermaid
-%% States the single accounting manifest passes through, and the phase that drives each transition.
-%% Labels only, no colour classes, so the diagram reads identically in monochrome.
-stateDiagram-v2
-    [*] --> Absent
-    Absent --> Stage1: Phase 2 publishes 3 IDs
-    Stage1 --> Stage2: Phase 3 grows to 16 IDs
-    Stage2 --> Stage3: Phase 5 grows to 20 IDs
-    Stage3 --> [*]
+%% Order of operations across the two skills plans when a stage lands. Unchanged mechanism; renamed field.
+sequenceDiagram
+    autonumber
+    participant A6 as accounting (this plan)
+    participant Main as origin/main
+    participant P7 as ERP (plan 07)
 
-    Absent: No manifest file exists
-    Stage1: Published - 3 course IDs
-    Stage2: Grown - 16 course IDs
-    Stage3: Complete - 20 course IDs
+    A6->>A6: Author every body in Stage N from its syllabus spec
+    A6->>A6: Run content checkers, apply fixers, re-verify
+    A6->>Main: Push branch, draft PR, 3-cycle review, AI merge
+    A6->>A6: Grow the relevant manifest(s) and record the five-field stage signal
+    Note over A6,P7: The record lives in this plan's delivery.md only - plan 07 never reads that file
+    P7->>Main: At its own gate, independently test -d each course ID its own stage needs
+    Note over P7: A missing course ID blocks plan 07's own gate directly - no signal is parsed or rejected
 ```
 
-Every transition carries a **falsifiable before/after deferred-ID check**: the IDs that are
-deliberately absent at publication are asserted absent then, and asserted present after their growth
-step. A manifest that stalls at three courses cannot pass as complete.
+**Five fields, all required**:
 
-## Landing content contract — what it must convey
+| Field                     | Meaning                                                                                                       |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `STAGE`                   | `1`, `2`, or `3`                                                                                              |
+| `PLAN`                    | `ayokoding-learning-path-06-skills-accounting`                                                                |
+| `LANDED_COURSE_IDS`       | Every accounting course ID authored in this stage                                                             |
+| `UNBLOCKS_ERP_CAPABILITY` | A functional description of the ERP capability this stage clears — **never** an ERP course number (see below) |
+| `MERGED_COMMIT`           | A real 40-character SHA on `origin/main`, checkable with `git cat-file -e`                                    |
 
-**Scope note.** This section specifies **what the landing says**, not **how it looks**. Every visual
-decision — layout, component choice, mockups, renders, responsive behaviour — belongs to
-`ayokoding-learning-path-03-navigation-ui`, which owns the programme's `assets/` and `assets/src/`
-set. This plan ships no `assets/` folder.
+**Values for `UNBLOCKS_ERP_CAPABILITY`, one per stage** — deliberately descriptive rather than a
+citation of plan 07's stage names, since plan 07 has not been rewritten and its post-rewrite stage
+titles are not this plan's to assert:
 
-The landing at `<LANDING>_index.md` must carry, in this order:
+- **Stage 1**: "the ERP stage delivering subledger-to-GL posting and record-to-report capability
+  (the hard edge)"
+- **Stage 2**: "the ERP stages delivering inventory-costing, multi-company/consolidation,
+  hire-to-retire/payroll, and segregation-of-duties/security capability — and the whole
+  `conventional-accounting` path is complete at this point"
+- **Stage 3**: "the ERP stages delivering Sharia-compliant ERP capability and founding-architecture
+  capability"
 
-1. **The arc promise, stated once.** "Get up and running and become dangerous as fast as possible,
-   then go deeper and deeper, on solid ground." There is **no arc chooser** on a skills landing —
-   unlike `careers/`, where the arc is a real three-way branch point. The arc is constant (R8) and is
-   stated, not selected.
-2. **The ramp — the distinguishing requirement.** All three "dangerous by here" boundaries, each
-   naming **both** what a reader can do and what they cannot yet do. This is the concept a skills
-   path has and a careers path does not: a careers path converges on a role, a skills path converges
-   on a capability with named intermediate landings. **This is the requirement handed to plan 03** as
-   the skills-landing affordance worth designing.
-3. **Why the ramp slows after #3.** One short paragraph on the silent-failure property. Without it,
-   the slowdown reads as padding.
-4. **The two linked prerequisites**, at their canonical `/en/learn/courses/<id>` URLs, with the
-   course each one gates named (#2 and #19 respectively).
-5. **Nothing that duplicates the manifest.** **No `courseOrder` in the landing.** The ordered course
-   list renders from the loaded manifest; a hand-written list is a second source of truth that drifts.
+**Recording format (grep-checkable — mirrors the OI-line convention).** Record the five fields as
+their own paragraph in `delivery.md`, each field name anchored at **column 0**, outside any table,
+bullet, or blockquote — never as a bulleted sub-list, a table row, or an inline-code span. Literal
+shape, shown once for Stage 1:
 
-**What the landing must not read like**: a table of contents. A reader arriving on a skills landing
-is asking "how fast do I become useful, and how far does that get me?" — not "what topics are
-covered?" Ordering the arc and the ramp **ahead of** the list is the mechanism that answers the
-question actually being asked.
-
-**Degradation is acceptable and planned for.** If plan 03 ships no dedicated ramp component, the
-ramp is expressible as landing prose plus a markdown table. This plan ships **content only** and
-never builds a component to close the gap ([DD-611](#design-decisions)).
-
-## Sharia accounting — three models, not one
-
-**There is no single "Sharia accounting standard."** Three structurally different jurisdictional
-models coexist. A course presenting AAOIFI as "the" standard would be wrong, and this is a content
-invariant asserted per course at #17, #18 and #20.
-
-| Jurisdiction  | Model                                        | The fact most often got wrong                                                                                                                                                                    |
-| ------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Bahrain**   | AAOIFI — standard-setting-body model         | AAOIFI keeps **two separate series**: Financial Accounting Standards ("what to book") and Shari'ah Standards ("what makes the contract compliant"). Conflating them is the common error.         |
-| **Indonesia** | PSAK Syariah — parallel standard series      | DSAS proposes, DSN-MUI ratifies. AAOIFI is used as a **basis**, **not adopted**. The standard numbering itself is [Needs Verification] — see [OI-1](#open-verification-items-oi-1-through-oi-4). |
-| **Malaysia**  | MFRS plus BNM Shariah Governance Policy 2019 | Single-standard-plus-governance-overlay. **Malaysia is not on AAOIFI's mandatory-adoption list.**                                                                                                |
-
-### The load-bearing modelling fact
-
-In murabaha the markup is **fixed and disclosed at the point of sale, in a trade with an underlying
-asset changing hands** — not accrued over time on an outstanding balance. AAOIFI FAS 28 therefore
-treats it as a **trading transaction**: a receivable and revenue from a sale, not interest income
-from a loan.
-
-**A murabaha receivable schedule and a conventional amortising loan schedule can look numerically
-similar and must be modelled and recognised completely differently.** This is the core of
-`islamic-contract-modeling-for-systems` (#18), and it is the domain's silent-failure property in its
-sharpest form: the wrong model produces plausible numbers.
-
-`[Verified]` **AAOIFI FAS numbers** for the contract types this corpus covers: FAS 3 (Mudaraba),
-FAS 4 (Musharaka), FAS 7 (Salam), FAS 9 (Zakah), FAS 10 (Istisnaa), FAS 28 (Murabaha and deferred
-payment sales), FAS 32–34 (Ijarah through sukuk-holder reporting). **FAS numbers outside this list
-are `[Unverified]`** and must be re-verified against AAOIFI's own index before being written.
+```
+STAGE: 1
+PLAN: ayokoding-learning-path-06-skills-accounting
+LANDED_COURSE_IDS: accounting-foundations, chart-of-accounts-and-data-modeling, financial-statements-and-close-cycle
+UNBLOCKS_ERP_CAPABILITY: the ERP stage delivering subledger-to-GL posting and record-to-report capability (the hard edge)
+MERGED_COMMIT: <40-character SHA>
+```
 
 ## Open verification items (OI-1 through OI-4)
 
-The seeding research marked only **three** items `[Verified]`: the AAOIFI FAS index, AAOIFI's
-adoption-by-country page, and IAI's PSAK Syariah index. Everything else is search-summarised
-`[Unverified]`. Those markers are carried into this plan **as open items with named primary sources
-and named resolution steps** — never restated as fact, never silently promoted.
+The 2026-07-22 `web-researcher` grounding run **resolves OI-1** and **confirms the core of OI-3**.
+**OI-2 remains OPEN** — A4 forbids restating it as fact regardless.
 
 ### The rule every authoring step follows
 
 ```mermaid
-%% Decision branch applied to every external claim before it is written into a spec or a body.
-%% Node SHAPE encodes kind: diamond = decision, stadium = terminal outcome, rectangle = input.
-%% TD required: the chain is 4 deep, and LR would push horizontal depth past MaxWidth=4.
+%% Decision branch applied to every external claim before it is written into a spec or a body. Unchanged mechanism.
 flowchart TD
     CLAIM["External claim<br/>bound for a spec or body"]:::input
     Q1{"Primary source fetched<br/>and quoted?"}:::decide
@@ -434,462 +623,347 @@ flowchart TD
     classDef warn fill:#CC78BC,stroke:#000000,color:#000000
 ```
 
-**Accessibility note.** Node kind is carried by **shape** (diamond = decision, stadium = outcome,
-rectangle = input) and every edge carries an explicit `yes` / `no` label. Square brackets are omitted
-from the tag names inside labels because Mermaid would parse them as node syntax; the tags are
-`[Verified]`, `[Needs Verification]` and `[Unverified]` in prose.
-
 ### The four items
 
-| ID       | Status                       | Claim at risk                                                                                                                                                                                                                                                                                | Named primary source to check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Blocks                                                        |
-| -------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **OI-1** | `[Needs Verification]`       | **Indonesian PSAK numbering.** Sources show both a "PSAK 59 / SIFAS 101-109" generation and a "PSAK 101-110" series. Both cannot be current.                                                                                                                                                 | **IAI's published PSAK Syariah standard list** (`iaiglobal.or.id`) — the index that was directly fetched, re-read for the numbering generation and its effective dates.                                                                                                                                                                                                                                                                                                                                                                            | Course #17 authoring                                          |
-| **OI-2** | `[Needs Verification]`       | **Riba doctrinal basis.** Currently sourced only from Wikipedia, which is not a primary source.                                                                                                                                                                                              | An **AAOIFI Shari'ah Standard** or an **IFSB publication**. The _practical_ consequence is well-attested (all standards bodies follow the orthodox position: profit must arise from trade, leasing, partnership or service risk, never a predetermined return on a pure loan); the minority time-value-of-money position is **not settled** and is not this corpus's to settle.                                                                                                                                                                    | Course #17 authoring                                          |
-| **OI-3** | `[Unverified]`               | Every three-jurisdiction detail **beyond** the three fetched indexes — governance-process descriptions, adoption mechanics, effective dates.                                                                                                                                                 | The three fetched indexes plus **Bank Negara Malaysia's Shariah Governance Policy 2019** document itself.                                                                                                                                                                                                                                                                                                                                                                                                                                          | Courses #17, #18, #20                                         |
-| **OI-4** | routed, **already answered** | Plan 02's `tech-docs.md` used to state a doc-level rule: _"A path may omit a prerequisite only if it also omits every course that needs it."_ Read literally, that forbade this plan's link-don't-walk manifest — plan 02 has since published a dated ruling resolving the seam (see below). | Not a research item — a **wording seam**, now closed on plan 02's side. Plan 02's `tech-docs.md` §"Link-don't-walk: prerequisite omission is permitted (OI-4 ruling, 2026-07-21)" rules Direction A **PERMITTED** and names this plan's OI-4 explicitly as the trigger. Plan 02's implemented `checkPrerequisiteConsistency` already permitted it before the ruling (its own RED step asserts _"a prerequisite that is declared but omitted from the manifest is **not** reported"_); the ruling brings the prose in line with the implementation. | Nothing mechanically; Phase 0 confirms and records the ruling |
+| ID       | Status                                                                                                | Claim at risk                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Named primary source                                                                                                                                              | Blocks                                                        |
+| -------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **OI-1** | `RESOLVED`                                                                                            | **Indonesian PSAK numbering.** Resolved by the 2026-07-22 grounding run: the operative series is **PSAK 101-110**; **PSAK 59 is superseded**. The exact PPSAK ratification date for PSAK 101 remains `[Needs Verification]` — course #20 cites the **series**, never a specific ratification date, until that residual is separately resolved.                                                                                                                                                                                                                                      | IAI's published PSAK Syariah standard list (`iaiglobal.or.id`), re-confirmed 2026-07-22.                                                                          | Was course #17 (original numbering); now course #20 authoring |
+| **OI-2** | `OPEN`                                                                                                | **Riba doctrinal basis.** Still sourced only from Wikipedia, not a primary source. **A4 forbids restating this as fact regardless of any other resolution in this rewrite.**                                                                                                                                                                                                                                                                                                                                                                                                        | An **AAOIFI Shari'ah Standard** or an **IFSB publication** — not yet fetched.                                                                                     | Course #20 authoring                                          |
+| **OI-3** | `RESOLVED` (adoption-relationship claim; governance minutiae beyond it remain re-verify-at-authoring) | **Three-jurisdiction adoption relationship.** Confirmed by the 2026-07-22 grounding run: **Malaysia is not on AAOIFI's mandatory-adoption list**; MASB standards are IFRS-converged with Sharia treatment via Bank Negara policy documents; **Indonesia uses AAOIFI as a basis, not an adoption.** Governance-mechanics minutiae beyond this specific relationship (e.g. the internal provisions of BNM's Shariah Governance Policy 2019) were not directly fetched by the grounding run and remain subject to the standing "fast-moving facts, re-verify at authoring" rule below. | AAOIFI's adoption-by-country index, re-confirmed 2026-07-22.                                                                                                      | Courses #20, #21, #24                                         |
+| **OI-4** | `OPEN` (routed, already answered — Phase 0 flips it)                                                  | Plan 02's `tech-docs.md` used to state a doc-level rule forbidding this plan's link-don't-walk manifests, read literally. Plan 02 has since published a dated ruling resolving it.                                                                                                                                                                                                                                                                                                                                                                                                  | Not a research item — a wording seam, closed on plan 02's side (`tech-docs.md` §"Link-don't-walk: prerequisite omission is permitted (OI-4 ruling, 2026-07-21)"). | Nothing mechanically; Phase 0 confirms and records the ruling |
 
-**OI-4 is routed and already answered, not fixed here.** Plan 02 custodies its own documents and this
-plan does not edit a sibling plan folder. Phase 0 does not negotiate a resolution — it confirms plan
-02's published 2026-07-21 ruling and records it in `verification-log.md`. Should the ruling ever be
-reverted, this plan's manifest would still pass every implemented gate, so the seam would remain a
-documentation-consistency concern rather than a blocker.
+**OI-1's residual**: the grounding run explicitly could not confirm the exact PPSAK ratification
+date for PSAK 101 — "cite the series, not a date" is the corpus's operative rule for this residual,
+not a blocking condition. Course #20 states the series (PSAK 101-110) and never states a specific
+ratification date.
 
-**Escape hatch for OI-1 and OI-2.** If a primary source cannot be reached, the affected course
-**scopes around the unresolved claim** — teaching the structure (a parallel standard series exists;
-profit must arise from real economic activity) without publishing a specific standard number or a
-doctrinal derivation. Refusing to write the claim is always available and always preferred over
-writing it unlabelled.
+**OI-3's scope, stated precisely**: what the grounding run confirmed is the **adoption-relationship**
+claim — the single fact that DD-608 [renumbered; see the successor DD in this rewrite] names as most
+commonly got wrong. It did not re-fetch Bank Negara Malaysia's Shariah Governance Policy 2019
+document itself, so any claim about that document's internal governance mechanics (rather than the
+adoption-relationship fact) still follows the "fast-moving facts, re-verify at authoring" rule below,
+same as before this rewrite.
+
+**Escape hatch for OI-2.** If a primary source cannot be reached before course #20 is authored, the
+course **scopes around the unresolved claim** — teaching that profit must arise from real economic
+activity (trade, leasing, partnership or service risk) without asserting the specific doctrinal
+derivation. Refusing to write the claim is always available and always preferred.
 
 ### Fast-moving facts, re-verify at authoring
 
 Stable and safe to state: double-entry mechanics, the ASC 606 / IFRS 15 five-step model, process
-names (P2P / O2C / R2R). Volatile and requiring a dated accuracy-note sidebar rather than the stable
-spine: any tooling version pin, any XBRL taxonomy release, and any standard's effective date.
+names (P2P / O2C / R2R), FX translation method names (current-rate vs. temporal). Volatile and
+requiring a dated accuracy-note sidebar: any tooling version pin, any XBRL taxonomy release, any
+standard's effective date, and — newly relevant with the Sukuk/Zakah additions — any AAOIFI FAS
+number not already on the `[Verified]` list below.
 
-## Stage-signal contract (the plan-07 handoff)
+## Sharia accounting — three models, not one
 
-**This record is a human/audit-readable handoff note, not a machine contract.** Plan 07's own Wave
-B/C/D gates verify accounting readiness **independently**, via a direct `test -d <COURSES>$course_id`
-check against `origin/main` for every course its `ACCT_GATE_*` arrays name (see
-`plans/backlog/ayokoding-learning-path-07-skills-erp/delivery.md`). Plan 07 never reads this plan's
-`delivery.md`, never parses the fields below, and has no rejection logic — because it has no
-signal-reading logic at all. The diagram below shows both plans' actual, independent mechanics
-side by side; the two paths converge only through `origin/main`.
+Unchanged from the original single-path design, now asserted per course across five Sharia-specific
+courses instead of three.
 
-```mermaid
-%% Order of operations across the two skills plans when a stage lands.
-sequenceDiagram
-    autonumber
-    participant A6 as accounting (this plan)
-    participant Main as origin/main
-    participant P7 as ERP (plan 07)
+| Jurisdiction  | Model                                        | The fact most often got wrong                                                                                                                                                                  |
+| ------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bahrain**   | AAOIFI — standard-setting-body model         | AAOIFI keeps **two separate series**: Financial Accounting Standards ("what to book") and Shari'ah Standards ("what makes the contract compliant"). Conflating them is the common error.       |
+| **Indonesia** | PSAK Syariah — parallel standard series      | DSAS proposes, DSN-MUI ratifies. AAOIFI is used as a **basis**, **not adopted**. The operative series is **PSAK 101-110** (OI-1, `RESOLVED`); the exact PPSAK ratification date is not stated. |
+| **Malaysia**  | MFRS plus BNM Shariah Governance Policy 2019 | Single-standard-plus-governance-overlay. **Malaysia is not on AAOIFI's mandatory-adoption list** (OI-3, `RESOLVED` for this claim).                                                            |
 
-    A6->>A6: Author every body in Stage N from its syllabus spec
-    A6->>A6: Run content checkers, apply fixers, re-verify
-    A6->>Main: Push branch, draft PR, 3-cycle review, AI merge
-    A6->>A6: Grow the manifest and record the five-field stage signal as a human/audit-readable note
-    Note over A6,P7: The record lives in this plan's delivery.md only - plan 07 never reads that file
-    P7->>Main: At its own gate, independently test -d each course ID its Wave needs
-    Note over P7: A missing course ID blocks plan 07's own gate directly - no signal is parsed or rejected
-```
+### The load-bearing modelling fact
 
-**Five fields, all required** (recorded for the human/audit trail; plan 07 does not read them):
+Unchanged: in murabaha the markup is **fixed and disclosed at the point of sale, in a trade with an
+underlying asset changing hands** — not accrued over time. AAOIFI FAS 28 treats it as a **trading
+transaction**.
 
-| Field                  | Meaning                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| `STAGE`                | `1`, `2`, or `3`                                                                                  |
-| `PLAN`                 | `ayokoding-learning-path-06-skills-accounting`                                                    |
-| `LANDED_COURSE_IDS`    | Every accounting course ID authored in this stage                                                 |
-| `UNBLOCKS_ERP_COURSES` | The ERP course numbers this stage clears (Stage 1 → 7; Stage 2 → 8, 13, 14, 15; Stage 3 → 19, 20) |
-| `MERGED_COMMIT`        | A real 40-character SHA on `origin/main`, checkable with `git cat-file -e`                        |
-
-**Recording format (grep-checkable — mirrors the OI-line convention in
-[`verification-log.md`](./verification-log.md#status-lines-grep-checkable--one-per-item-first-column-anchored)).**
-Record the five fields as their own paragraph in `delivery.md`, immediately following the signal's
-checklist item — **never** as a bulleted sub-list, a table row, or an inline-code span inside prose.
-Each field name is anchored at **column 0**, outside any table, bullet, or blockquote: this is what
-makes Phase 8's `grep -oE '^STAGE: [123]$' <DELIVERY> | wc -l` count meaningful — and the
-`<DELIVERY>` constant is what makes it **resolvable**, since a bare `delivery.md` argument would miss
-the file from the repo root, where every clause in that file runs. A `- **STAGE**: 1`
-bullet, a table row, or a bolded inline label all satisfy this section's prose but fail that grep
-silently, because none of them puts the literal text `STAGE: 1` at the start of a line. The literal
-shape, shown once for Stage 1 (Stages 2 and 3 use this identical shape with their own field values):
-
-```
-STAGE: 1
-PLAN: ayokoding-learning-path-06-skills-accounting
-LANDED_COURSE_IDS: accounting-foundations, chart-of-accounts-and-data-modeling, financial-statements-and-close-cycle
-UNBLOCKS_ERP_COURSES: 7
-MERGED_COMMIT: <40-character SHA>
-```
-
-## Syllabus layer — custody and shape
-
-This plan's syllabus layer has **two** halves, both **inside this plan folder** and never inside
-`ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/` ([DD-601](#design-decisions)):
-
-| Half             | Location                                   | Contents                                                                            |
-| ---------------- | ------------------------------------------ | ----------------------------------------------------------------------------------- |
-| Per-course specs | `<SPEC>`                                   | 20 `<course-id>.md` files plus a folder `README.md`                                 |
-| Path mirror      | `<SPECPATHS>manifest-skills-accounting.md` | The human-readable ordering this plan transcribes into `<MANIFEST>`'s `courseOrder` |
-
-**The mirror filename is fixed by plan 02's ruling**: `manifest-skills-accounting.md`, with the
-`skills-` category marker. A bare `manifest-accounting.md` is not acceptable. See
-[§Syllabus mirror filename](#syllabus-mirror-filename-plan-02s-ruling--binding).
-
-**Path ids inside every spec use the canonical prefixed form from the start** — `skills/accounting`,
-never a bare `accounting`. Plan 02 flagged that its 121 existing course specs still carry stale
-un-prefixed ids in their "In which paths" sections; it deliberately left them (custody-protected,
-informational metadata, not runtime behaviour). **This plan does not edit them, and does not add to
-that debt**: every path id this plan writes is prefixed on first authoring.
-
-Each per-course spec is one `<course-id>.md` file stating:
-
-- **Top matter** — course ID, format (By Example / Annotated-concept), primary language(s), short
-  summary, and the stage it belongs to.
-- **Scope note** — the usable slice, and what is deliberately deferred to a later course.
-- **Why this exists** — the problem before the solution, and the keep-this-if-you-forget-everything
-  idea.
-- **Prerequisites** — transcribed exactly, including any linked `(SWE)` edge, in the shape the
-  authored `_index.md` frontmatter will carry.
-- **Scope boundary** — the named sibling course (accounting, library, or ERP) this course could be
-  confused with, and the line between them.
-- **Silent failure modes** — for every course from #4 onward, at least one outcome that still
-  balances while being substantively wrong, and the observable signal (if any) that would reveal it.
-  This is the section the authored `overview.md` must carry through.
-- **Verification markers** — every external claim carried with its `[Verified]` / `[Unverified]` /
-  `[Needs Verification]` tag from the research, never laundered.
+`[Verified]` **AAOIFI FAS numbers** for the contract types this corpus covers: FAS 3 (Mudaraba),
+FAS 4 (Musharaka), FAS 7 (Salam), FAS 9 (Zakah — now taught, course #22), FAS 10 (Istisnaa), FAS 28
+(Murabaha and deferred payment sales), FAS 32–34 (Ijarah through sukuk-holder reporting — Sukuk now
+taught, course #23). **FAS numbers outside this list are `[Unverified]`** and must be re-verified
+before being written.
 
 ## Design Decisions
 
-> **Numbering note.** This plan uses the **`DD-6NN`** range: `6` marks plan 06, `NN` is the decision
-> number. The five-way-split plans (01–05) share an inherited `DD-1`…`DD-45` space in which several
-> tokens (`DD-34`, `DD-35`, `DD-39`) already carry two unrelated meanings. Starting at `DD-601`
-> guarantees every decision token in this folder is unambiguous for an execution-grade reader and can
-> never collide with a sibling plan's. Plan 07 is expected to use `DD-7NN` for the same reason.
+> **Numbering note.** This plan uses the `DD-6NN` range, same as before this rewrite. This section
+> supersedes the pre-split single-path decision set in full — the amendments (A6, A8, A9, A10, A11)
+> that triggered this rewrite invalidated or extended most of the original DD-601 through DD-623
+> decisions, so this is a fresh, internally consistent sequence rather than a patch over the old one.
+> Any prior decision whose substance is unchanged is restated here rather than cross-referenced by its
+> old number, to keep this document self-contained for an execution-grade reader.
 
-- **DD-601 · The 20 syllabus specs live in this plan's own folder, not plan 02's corpus.** Plan 02
-  custodies `syllabus/` under a **binding freeze**: _"This plan owns the folder and edits nothing
-  inside it, with exactly one recorded exception."_ [Repo-grounded — plan 02
-  `tech-docs.md §Custody rules`]. Adding 20 accounting specs would either violate that freeze or
-  force a second custody exception for a subject plan 02 knows nothing about, and it would put a
-  shared directory on a cross-plan seam — the exact failure mode A3 eliminated for `paths/skills/_index.md`.
-  This plan therefore authors `<SPEC>` inside its own folder, mirroring plan 02's spec shape so a
-  later consolidation is a pure move. Plan 07 does the same for ERP.
-- **DD-602 · Link, do not walk.** `courseOrder` holds accounting IDs only; `sql-essentials` and
-  `backend-essentials` are declared as frontmatter prerequisites and linked from the landing. Full
-  reasoning in [§Link, do not walk](#link-do-not-walk-the-cross-domain-composition-rule), including
-  the retirement of the research's now-stale AI-path analogy.
-- **DD-603 · The manifest publishes at Stage 1 and grows twice, rather than publishing once at the
-  end.** Three independent reasons: (a) the immediately-effective arc demands early payoff, and a
-  path whose manifest appears only when all twenty bodies exist cannot express it; (b) this is the
-  **first 2-segment `pathId` ever instantiated** — plan 02 exercises the shape only through unit-test
-  fixtures — so publishing early is the architecture smoke test for the R2 variable-depth ruling, and
-  discovering a depth assumption at course 20 would be far more expensive than at course 3; (c) it
-  emits the Stage-1 signal that clears ERP #7 at the earliest possible moment. The silent-truncation
-  risk this creates is mitigated by falsifiable before/after deferred-ID checks at every transition.
-- **DD-604 · Three stage-completion signals, modelled on plan 04's band-signal record shape.** Same
-  five-field discipline, recorded as a human/audit-readable note in `delivery.md`. Plan 07 does not
-  parse or reject this record — it verifies accounting readiness independently via its own `test -d`
-  checks against `origin/main` (see [§Stage-signal contract](#stage-signal-contract-the-plan-07-handoff)
-  for the corrected mechanism). Reusing an established five-field shape costs nothing even though the
-  downstream mechanism is direct filesystem verification, not signal consumption.
+- **DD-601 · "Interleaves" (A11) resolves to shared-then-Sharia composition, not mid-ramp
+  alternation.** See [§Two manifests, nineteen shared courses](#two-manifests-nineteen-shared-courses-a10--a11)
+  for the full reasoning. The silent-failure argument that put the Sharia stage at the end of the
+  original single path survives the split unchanged, because nothing in A10 or A11 addresses or
+  overrides it.
+- **DD-602 · Each of this plan's two manifests owns its own co-located unit test; no test file is
+  shared even within this plan.** The 2026-07-21 cross-plan ruling ("each manifest-owning plan owns
+  its manifest and that manifest's test") is extended here at the file level: two manifests, two
+  tests, mirroring the one-test-per-data-file granularity used everywhere else in the programme
+  rather than inventing a combined test file that would need updating from two different authoring
+  phases.
+- **DD-603 · The 24 syllabus specs live in this plan's own folder, not plan 02's corpus**, and now
+  carry a mandatory module/topic breakdown. Plan 02 custodies `syllabus/` under a binding freeze; this
+  plan authors `<SPEC>` inside its own folder, mirroring plan 02's spec shape so a later consolidation
+  is a pure move.
+- **DD-604 · Link, do not walk.** Both `courseOrder`s hold accounting IDs only; `sql-essentials` and
+  `backend-essentials` are declared as frontmatter prerequisites and linked from both landings.
+  Unchanged in mechanism from the pre-split design.
 - **DD-605 · This plan has NO dependency on `ayokoding-learning-path-04-course-authoring`.**
-  Accounting's only two cross-domain prerequisite edges resolve to `sql-essentials` and
-  `backend-essentials`, both among plan 01's 37 re-homed bundles. Verified rather than assumed, and
-  re-verified as a Phase 0 start precondition. The consequence is scheduling, not paperwork: this
-  plan runs concurrently with plans 04 and 05 instead of behind a 90-body authoring run, which pulls
-  ERP's unblock forward by the whole of that run.
-- **DD-606 · `business/accounting.md` is mined, not transplanted.** Course #1 harvests the article's
+  Unchanged: both cross-domain prerequisite edges resolve to courses among plan 01's 37 re-homed
+  bundles, both edges sitting in the shared spine reachable identically from either manifest.
+- **DD-606 · `courseOrder` entries are plain ID strings, with no `framing` mappings.** Per-course
+  framing exists so several careers paths can wrap one shared body differently; the accounting shared
+  spine has exactly two consumers (both accounting manifests, not the careers category), and neither
+  needs to frame a course differently from the other — a reader on `sharia-accounting` sees the exact
+  same course #1 body a `conventional-accounting` reader sees, which is precisely the "both paths
+  cover all the basics identically" guarantee.
+- **DD-607 · Two capstones deleted, two architecture courses added, in their place (A6).** Full
+  reasoning: [tech-docs §What changed from the original catalog](#what-changed-from-the-original-twenty-course-single-path-catalog-and-why).
+  The linked cross-domain prerequisite each deleted capstone carried survives on its replacement
+  course, unchanged.
+- **DD-608 · Two courses added to the shared spine, three to the Sharia stage (A9).** Full reasoning:
+  same section as DD-607. Every addition traces to either a domain gap the seeding research already
+  evidenced (`[Verified]` AAOIFI FAS 9 for Zakah, FAS 32–34 for Sukuk) or a structural requirement of
+  the split itself (the two architecture courses).
+- **DD-609 · Every course from #4 onward, across both stages, carries a "what still balances while
+  being wrong" section.** Twenty-one courses total (`ACCT_SILENT` = Stage 2's sixteen plus Stage 3's
+  five). Unchanged in mechanism, expanded in scope from the original seventeen.
+- **DD-610 · Formats are transcribed from this plan's own catalog design, not the original research
+  table verbatim** (the original table only covered the pre-split twenty courses). The five
+  Annotated-concept courses (#14, #15, #18, #20, #23) are the ones whose subject is a landscape or a
+  judgment framework rather than a mechanism a reader can execute.
+- **DD-611 · The ramp is content, and its design is plan 03's, for both landings.** This plan states
+  what each landing must convey (see [§Landing content contract](#landing-content-contract--what-each-landing-must-convey))
+  and hands the **ramp affordance** plus the **new path-choice affordance** (distinguishing
+  `conventional-accounting` from `sharia-accounting` before entry) to
+  `ayokoding-learning-path-03-navigation-ui`. If plan 03 ships no dedicated component, both degrade
+  gracefully to landing prose plus a markdown table.
+- **DD-612 · Mixed TDD posture, per manifest.** Both manifests' publication and growth steps **are**
+  RED → GREEN → REFACTOR cycles against their own co-located unit test. Course bodies and landings
+  are **content**, produced by maker-checker-fixer with no RED/GREEN/REFACTOR labels.
+- **DD-613 · The corpus is authored stage-by-stage, one course per sub-phase**, unchanged in
+  mechanism. Each course writes only its own subtree, so each gets its own branch, draft PR, 3-cycle
+  review, and `[AI]` merge, pipelining up to the in-force concurrency cap.
+- **DD-614 · The 24-course count, the nineteen-plus-five split, and the three-stage partition are all
+  labelled `[Judgment call]`** everywhere they appear.
+- **DD-615 · Ownership is two manifest data files (each plus its own co-located unit test), and no
+  `_index.md` under `paths/`.** Asserted mechanically at the Phase 6 gate as an **authorship-scoped
+  commit-footprint check**, unchanged in mechanism from the pre-split design, now checking against
+  two manifest paths instead of one.
+- **DD-616 · Both landings read as an arc, not a table of contents.** Unchanged in mechanism.
+- **DD-617 · Accounting joins the library DAG as a near-disjoint leaf cluster** — two inbound edges,
+  both in the shared spine; zero outbound edges into software engineering. Unchanged.
+- **DD-618 · Course-existence is asserted by ID, never by a global directory count.** Unchanged
+  mechanism; the loop now runs over 24 IDs instead of 20 for `sharia-accounting`'s terminal assertion,
+  19 for `conventional-accounting`'s.
+- **DD-619 · No accounting course cites an ERP course.** Unchanged.
+- **DD-620 · This plan conforms to plan 02's `pathId` and mirror-filename rulings rather than
+  restating a variant of them**, extended to two path ids and two mirror filenames. Unchanged
+  mechanism otherwise.
+- **DD-621 · "Never create an `_index.md`" means never create a STRUCTURAL index — both path landings
+  ARE this plan's.** Extended from the single-landing original to cover both
+  `<LANDING_CA>_index.md` and `<LANDING_SA>_index.md`; the position-not-filename distinction is
+  unchanged.
+- **DD-622 · Every id list in `delivery.md` is a shell ARRAY, never a space-separated string.**
+  Unchanged HARD rule, now covering six arrays instead of five (`ACCT_S1`, `ACCT_S2`, `ACCT_S3`,
+  `ACCT_SHARED`, `ACCT_ALL`, `ACCT_SILENT`).
+- **DD-623 · The stage-signal contract is expressed at ERP-capability granularity, never ERP course
+  numbers.** See [§Stage-signal contract](#stage-signal-contract-the-plan-07-handoff-stage-granularity)
+  for the full reasoning: course numbers do not survive either plan's own renumbering, and this plan
+  has no authority to assert plan 07's post-rewrite stage names, so a functional capability
+  description is used instead.
+- **DD-624 · Licensing is a first-class, gated concern (A8), not an afterthought.** The eleven
+  safe-authoring rules bind every course; a Phase 6 reading audit checks against the per-course
+  licensing-sensitive-sources list Phase 1 records; no course reproduces standards text, a
+  proprietary chart-of-accounts structure, or copyleft reference-implementation code.
+- **DD-625 · Every syllabus carries a concept/worked-example breakdown, authored first, coverage-checked
+  second (A12).** New requirement, addressing that a course table row alone is insufficient for an
+  author to write from. The order of operations is fixed and not optional: (1) author from domain
+  reasoning and this plan's own grounding file; (2) only then dispatch `web-researcher` to check
+  **coverage** — what a practitioner would expect that is missing, what is present that the field
+  does not recognise; (3) a coverage finding is actionable only as "add/remove a concept," never as
+  "reorder to match theirs." Concepts asserted on domain-reasoning grounds rather than sourced from
+  the seeding research carry `[Needs Verification]` at the concept level, not just the course level.
+  Supersedes this DD's earlier "verified against recognised curricula" framing, which read as license
+  to adopt an external curriculum's structure and was corrected before any syllabus was authored under
+  it.
+- **DD-626 · `business/accounting.md` is mined, not transplanted.** Course #1 harvests the article's
   **running example** and its **narrative sequencing** (the order a first-time reader meets debits,
   credits, and the accounting equation), then discards the small-business-owner register and reframes
   for a systems builder. The schema and data-modelling layer the article lacks is **not** back-filled
   into #1 — that is course #2's subject, and pulling it forward would collapse the first ramp
-  boundary. No paragraph moves verbatim. The article is `[Repo-grounded]` at 34.2 KB and is being
+  boundary. No paragraph moves verbatim. The article is `[Repo-grounded]` at 34.2 KB and has been
   relocated to `legacy/business/` by plan 01, so the mining happens against its post-move path.
-- **DD-607 · Verification debt is resolved in a dedicated phase gating the Sharia stage, not up
-  front.** OI-1 and OI-2 bite only at courses #17–#20. Front-loading them would delay the first ramp
-  boundary — and therefore ERP's unblock — for claims that Stages 1 and 2 never make. Front-loading
-  is also fragile: research resolved in Phase 1 and consumed in Phase 5 has had time to drift. The
-  markers are carried verbatim into the Phase 1 specs so nothing is laundered in the meantime.
-- **DD-608 · Three jurisdictional models, always three.** Courses #17, #18 and #20 each name AAOIFI,
-  PSAK Syariah, and MFRS-plus-BNM, and none describes AAOIFI as "the" standard. Two specific facts
-  are stated explicitly rather than left to inference, because both are commonly got wrong: Malaysia
-  is **not** on AAOIFI's mandatory-adoption list, and Indonesia uses AAOIFI as a **basis** rather than
-  adopting it. Asserted per course, and again at the Phase 5 gate.
-- **DD-609 · Every course from #4 onward carries a "what still balances while being wrong"
-  section.** A required `overview.md` section, not an author's-discretion callout, verified by a
-  grep-checkable acceptance clause at its authoring step. Courses #1–#3 are exempt: a hand-built
-  single-entity ledger fails loudly, so there is no silent failure to name yet, and inventing one
-  would teach a false pattern. This is the single most direct encoding of the corpus-shaping
-  constraint.
-- **DD-610 · Formats are transcribed from the research table, not re-derived.** 16 By Example, 4
-  Annotated-concept. The four Annotated-concept courses (#12, #13, #16, #17) are the ones whose
-  subject is a landscape or a judgment framework rather than a mechanism a reader can execute — a
-  worked example of "IFRS versus GAAP" would be a fiction. Each format routes to its existing maker /
-  checker / fixer agent trio.
-- **DD-611 · The ramp is content, and its design is plan 03's.** This plan states what the landing
-  must convey (see [§Landing content contract](#landing-content-contract--what-it-must-convey)) and
-  hands the **ramp affordance** to `ayokoding-learning-path-03-navigation-ui` as the distinguishing
-  requirement of a skills landing. If plan 03 ships no dedicated component, the ramp degrades
-  gracefully to landing prose plus a markdown table. **This plan never builds a component to close
-  the gap** and ships no `assets/` folder, mockup, or render.
-- **DD-612 · Mixed TDD posture, stated rather than assumed.** The manifest publication and both
-  growth steps **are** RED → GREEN → REFACTOR cycles against this plan's own
-  `<MANIFESTS>skills/accounting-manifest.unit.test.ts`, because a YAML data file loaded and
-  validated by application code is testable behaviour. Course bodies and the landing are **content**,
-  produced by the maker-checker-fixer pipeline with no RED/GREEN/REFACTOR labels, because there is no
-  failing assertion to write first for prose. Both postures appear in the same `delivery.md`, each
-  labelled at its step.
-- **DD-613 · The corpus is authored stage-by-stage, one course per sub-phase.** Each course is
-  content-independent (it writes only its own subtree), so each gets its own branch, draft PR,
-  3-cycle review, and `[AI]` merge, pipelining through review up to the in-force concurrency cap. The
-  manifest mutation is the **only** serial sync point in each stage, and it happens once, at the
-  stage's end.
-- **DD-614 · The 20-course count and the three-stage partition are labelled `[Judgment call]`
-  everywhere they appear**, including inside the catalog table. The dependency structure and the
-  domain facts are sourced; the packaging is editorial.
-- **DD-615 · Ownership is one manifest data file (plus its co-located unit test), and no `_index.md`
-  under `paths/`.** See
-  [§The manifest ownership invariant](#the-manifest-ownership-invariant-scoped-to-one-data-file).
-  Asserted mechanically at the Phase 6 gate as an **authorship-scoped commit-footprint check** — this
-  plan's own merged-PR file list, not a commit-range directory diff, because plans 04, 05 and 07 merge
-  into the same `main` while this plan runs — so a boundary violation is a failing check rather than a
-  review opinion, and a sibling's concurrent merge is not a false failure.
-- **DD-616 · The landing reads as an arc, not a table of contents.** The arc promise and the three
-  ramp boundaries appear **before** the course list, and the list itself renders from the manifest.
-  A skills-path reader is asking how fast they become useful and how far that gets them; a topic
-  inventory does not answer that question.
-- **DD-617 · Accounting joins the library DAG as a near-disjoint leaf cluster** — two inbound edges,
-  zero outbound edges into software engineering. Stated explicitly because R5 requires this plan to
-  say which, and because the answer has a consequence: the library DAG is unchanged for every reader
-  who never enters this path, which makes rollback total and side-effect-free.
-- **DD-618 · Course-existence is asserted by ID, never by a global directory count.** Plan 04 is
-  authoring 90 bodies into `<COURSES>` **concurrently** with this plan, so
-  `find <COURSES> -maxdepth 1 -type d | wc -l` is a moving target and any fixed expected total would
-  be either wrong or accidentally right. Every acceptance clause therefore loops the 20 known IDs and
-  counts misses. Corollary: **the 121-course figure — the current software-engineering library total,
-  the same count as plan 02's 121 existing course specs cited elsewhere in this plan — is never
-  inclusive of this plan's 20 accounting courses, and this plan's 20 courses are never folded into
-  it** (R5). _(An earlier draft of this corollary cited "127" here; that figure had no independent
-  grounding anywhere in this plan and is corrected to match the repo-grounded 121 count used
-  consistently in `brd.md`, `README.md`, and elsewhere in this file.)_
-- **DD-619 · `courseOrder` entries are plain ID strings, with no `framing` mappings.** Per-course
-  framing exists so several careers paths can wrap one shared body differently; every accounting body
-  belongs to exactly one path, so framing has nothing to disambiguate. This also keeps the
-  line-shaped grep clauses in `delivery.md` sound.
-- **DD-620 · No accounting course cites an ERP course.** The dependency is strictly one-directional,
-  which is what lets the two skills plans proceed without a cycle. A scope-boundary statement against
-  an ERP course is allowed and required where the subjects abut; a **prerequisite edge** into ERP is
-  forbidden.
-- **DD-621 · This plan conforms to plan 02's `pathId` and mirror-filename rulings rather than
-  restating a variant of them.** Five consequences, each binding: (a) `pathId` is the **full slash
-  string** `skills/accounting`, category segment included, with no separate `category` field;
-  (b) `arc` is a **separate required field** recorded as data, not left implicit in landing prose;
-  (c) **no clause, regex, route, glob, or check in this plan keys on segment count** — validation is
-  first-segment literal plus resolvability, and every pattern matches the full id (the sibling-plan
-  defect where a two-group path regex undercounted 3-segment careers ids is the reason this is stated
-  as a rule rather than assumed); (d) an unresolvable or malformed id is a **hard `safeParse`
-  rejection** — no coercion, alias, normalization, or nearest-match fallback appears anywhere in this
-  plan; (e) the syllabus mirror is **`manifest-skills-accounting.md`**, carrying the `skills-`
-  category marker, because the four careers mirrors keep their un-prefixed names and the marker is
-  what disambiguates the category by construction. Corollary: this plan writes every path id in its
-  own specs in the **canonical prefixed form from the start**, and never edits the 121 plan-02 specs
-  that still carry stale un-prefixed ids in their "In which paths" sections — those are
-  custody-protected informational metadata, and touching them would be a custody violation, not a fix.
-
-- **DD-622 · "Never create an `_index.md`" means never create a STRUCTURAL index — the path landing
-  is an `_index.md` and it IS this plan's.** A3 assigns `paths/_index.md`, `paths/careers/_index.md`,
-  the three `paths/careers/<arc>/_index.md`, and `paths/skills/_index.md` to plan 01: those are
-  **buckets**, and creating a bucket is IA work. `<LANDING>_index.md`
-  (`content/en/learn/paths/skills/accounting/_index.md`) is a **landing**, is the content this plan
-  exists to ship, and is created here. The two are distinguished by **position, not by filename**:
-  anything at or above `paths/skills/` is structural and plan 01's; the leaf bundle at
-  `paths/skills/accounting/` is this plan's. Recorded explicitly because an execution-grade reader
-  hitting a bare "never create an `_index.md`" rule at the landing-authoring step would otherwise
-  freeze or, worse, skip the deliverable. The mechanical check in
-  [delivery.md Phase 6](./delivery.md#phase-6-section-and-app-verification) encodes exactly this
-  split: it allows `paths/skills/accounting/_index.md` and fails on every other `_index.md` under
-  `<PATHS>`.
-- **DD-623 · Every id list in `delivery.md` is a shell ARRAY, never a space-separated string.** This
-  repo's shell is **zsh** [Repo-grounded — `$ZSH_VERSION` is `5.9`, `$BASH_VERSION` unset], and zsh
-  **does not word-split an unquoted parameter**: `X="a b c"; for i in $X` iterates **once**. A
-  string-backed loop therefore makes every derived count read `1` instead of `20` while still exiting
-  0 — a check that passes while measuring nothing, which is strictly worse than no check. All lists
-  are arrays iterated as `"${NAME[@]}"`, the alternation strings are **derived from those arrays** so
-  they cannot drift, and Phase 0 opens with a **length self-check** on all five arrays. That
-  self-check is what makes every other count in `delivery.md` trustworthy; it is not optional
-  boilerplate.
+  Unchanged from the pre-split design's equivalent decision; renumbered into this rewrite's sequence.
+- **DD-627 · Syllabus file shape is inherited from plan 02's `syllabus/courses/*.md`, not invented,
+  and adapted for a non-code, no-build domain.** Inherited unchanged: the header shape (`Course ID` /
+  `Format`, short summary, scope note), `## Why this exists · the big idea` (problem-before-solution
+  framing), `## Prerequisites`, `## Accuracy notes`, `## Concepts` (`co-NN`), `## Worked examples`
+  (`ex-NN`, Beginner/Intermediate/Advanced for By Example, themed grouping for the five
+  Annotated-concept courses), `## Read more`, `## In which paths`. Dropped: the `**Language**` field
+  (no course in this corpus is language-scoped). Adapted: a "verify" clause means recompute by hand or
+  spreadsheet against a stated figure, not run-and-observe. Deliberately **not** inherited: plan 02's
+  own `DD-27` Capstone Policy (a full runnable intra-topic capstone per course) — A6 forbids a build
+  exercise at any granularity, so no course in this plan has a `## Capstone spec` section; each has
+  `## Applied synthesis (no build — A6)` instead, an integrative worked scenario with a checkable
+  numeric or classificatory outcome and no software construction. This plan also fixes its own
+  five-token cross-cutting vocabulary, the accounting-corpus analogue of plan 02's `taming-state` /
+  `abstraction-and-its-cost` themes, cited from `## Why this exists · the big idea` wherever it
+  applies: **silent-failure** (internally consistent yet substantively wrong — the corpus's headline
+  theme, see DD-609), **form-vs-substance** (economic reality over legal/documentary form), **
+  estimation-under-uncertainty** (a defensible estimate reported as if it were a measured fact), **
+  standard-plurality** (more than one valid standard governs the same transaction, and a systems
+  builder must model the divergence rather than assume one universal number), and
+  **subledger-to-ledger-integrity** (where systems architecture and accounting mechanics meet).
+  Per-course concept counts are scaled to a floor of 8 (from plan 02's 10) and worked-example counts
+  to what each course needs to be concretely checkable rather than matched 1:1 to plan 02's
+  most-elaborated files — structure is mirrored exactly; volume is proportionate to a first-authored
+  corpus, not to plan 02's multi-pass-refined one.
+- **DD-628 · `DD-15` (License-aware technology choices, FS-SE-inherited via plan 02's corpus) and
+  `DD-27` (Capstone Policy, same origin) are reconciled, not silently diverged from.** `DD-15` binds
+  wherever this corpus names real accounting/ERP-adjacent software — see
+  [§Relationship to `DD-15`](#licensing-and-ip-compliance-a8) in the Licensing section — and is cited
+  there rather than re-derived. `DD-27` is the one inherited decision this plan explicitly departs
+  from; DD-627 above records why and what replaces it. Both citations resolve the numbering collision
+  tech-docs.md's own `syllabus/` custody note already flags for `DD-34`/`DD-35`/`DD-39`: `DD-15` and
+  `DD-27` carry a **different** meaning inside `syllabus/courses/**` (FS-SE-inherited) than inside
+  plan 02's own `README.md`/`tech-docs.md` ("Build order," "Build order amended") — this plan cites
+  only the FS-SE-inherited meaning, matching the sense the syllabus corpus itself uses.
 
 ## UI-gate and API-gate posture (R9)
 
-Both postures are declared explicitly. Per the
-[api-quality-gate workflow](../../../repo-governance/workflows/api/api-quality-gate.md)'s
-§Relationship to Other Gates, a plan bearing neither surface **is not thereby exempt** — exemption
-belongs only to a plan with no reachable behavioural delta at all, and it must be stated here.
+Unchanged reasoning from the pre-split design, restated for two manifests and two landings.
 
 ### UI gate — **exempt**, and here is the reasoning rather than the assertion
 
 `swe-ui-checker` validates component **source**. This plan authors **zero** files under
-`apps/ayokoding-www/src/features/course-paths/` other than one YAML **data** file — no `.tsx`, no
-hook, no style. A checker run scoped to this plan's diff would scan zero component files and return
-zero findings: a **vacuous pass**, which is worse than a recorded exemption because it looks like
-evidence.
-
-The components that render this plan's output (`path-landing.tsx`, `path-card.tsx`,
-`prerequisite-list.tsx`, the `?path=` wiring) are authored and gated by
-`ayokoding-learning-path-03-navigation-ui`, which is the programme's only component-bearing plan and
-runs the gate itself.
+`apps/ayokoding-www/src/features/course-paths/` other than two YAML **data** files — no `.tsx`, no
+hook, no style. A checker run scoped to this plan's diff would scan zero component files: a
+**vacuous pass**, recorded as an exemption instead of asserted as evidence.
 
 **The exemption is narrow.** It covers the `ui-quality-gate` **only**. Manual behavioural
-verification via Playwright MCP is **mandatory and performed** (Phase 7), with committed screenshot
-evidence, and the **Rule-15 three-tester retest is mandatory and performed** — this plan ships a
-user-visible landing and twenty user-visible course pages.
+verification via Playwright MCP is **mandatory and performed** (Phase 7, both landings), with
+committed screenshot evidence, and the **Rule-15 three-tester retest is mandatory and performed**.
 
 ### API gate — **NOT exempt**
 
-This plan has a reachable behavioural delta: **manifest integrity is behaviour.** A malformed or
-inconsistent `skills/accounting.yaml` changes what the application resolves, renders, and links, and
-it does so through code paths that fail closed (a manifest that does not validate is not loaded).
-That the delta is exercised through a build-time loader rather than an HTTP endpoint does not make it
-unreachable.
+Unchanged: **manifest integrity is behaviour**, now for two manifests. Exercised through both
+manifests' zod validation, `checkManifestIntegrity`, and `checkPrerequisiteConsistency`, run as unit
+assertions at every publication and growth step and re-run as a sweep at the Phase 6 gate, plus the
+path-walk e2e for both `pathId`s.
 
-**How it is exercised, named explicitly**: the manifest's zod validation, `checkManifestIntegrity`,
-and `checkPrerequisiteConsistency`, run as unit assertions at every manifest publication and growth
-step and re-run as a sweep at the Phase 6 gate; plus the path-walk e2e that proves the 2-segment
-`pathId` resolves end-to-end.
+**What cannot run, and why**: unchanged — `ayokoding-www` publishes no OpenAPI 3.x document and no
+GraphQL SDL; `api-quality-gate` is therefore not claimed as run and passed.
 
-**What cannot run, and why** [Repo-grounded, verified 2026-07-21]: `api-quality-gate` requires a
-running service and an identified contract. `ayokoding-www` publishes **no OpenAPI 3.x document and
-no GraphQL SDL**; its only API route is `src/app/api/trpc/[trpc]/route.ts` (internal tRPC). The
-workflow states an unreachable service is a `fail`, never a `pass`. **This plan therefore does not
-claim the gate was run and passed.** It records what it exercises instead, which is what the
-workflow's own §Relationship to Other Gates asks for.
-
-**Rule-16 API exploratory retest — not applicable.** No REST or GraphQL endpoint changes;
-`api-exploratory-tester` has nothing to exercise.
+**Rule-16 API exploratory retest — not applicable.** Unchanged.
 
 ## Other exemptions (stated, not silently taken)
 
 ### Specs and Gherkin (app-code)
 
-The [Feature Change Completeness Convention](../../../repo-governance/development/quality/feature-change-completeness.md)
-binds app and lib **code** changes to companion `specs/` Gherkin. This plan's app/lib-code footprint
-is small but not zero: one YAML data file (`<MANIFEST>`), plus two TypeScript test-layer files it
-creates alongside it — `<MTEST>` (`accounting-manifest.unit.test.ts`, the §2.2 unit test asserting
-the manifest's shape) and `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts`
-(the §2.4 step-definition file, **new**, created by this plan, pairing 1:1 with this plan's own
-`<SPECS>skills-path-composition.feature`). Both TypeScript files are themselves test code rather than
-production code, and both are covered by this plan's own Gherkin scenarios (bound at §2.2 and §2.4
-respectively) rather than needing a further companion. The remaining content lives under
-`apps/ayokoding-www/content/`, which the programme classifies as content (exempt from
-`specs:coverage`). The `course-paths` Gherkin companion for the underlying manifest/resolver
-machinery is owned by plans 02 and 03; `skills-path-composition.feature` is this plan's own companion
-for the scenario it binds at the code layer.
-
-The eleven scenarios in [`prd.md`](./prd.md#acceptance-criteria-gherkin) are therefore a mixture: the
-manifest and path-resolution scenarios bind to real unit and e2e assertions; the content scenarios
-are **content-level acceptance criteria** bound to grep-checkable clauses and the ayokoding content
-checkers. Each scenario's binding is named at its delivery step. The plan still runs
-`npx nx affected -t specs:behavior:coverage` in verification to prove it introduced no regression.
+This plan's app/lib-code footprint is small but not zero: two YAML data files, plus four
+TypeScript test-layer files — two co-located unit tests (`<MTEST_CA>`, `<MTEST_SA>`) and two
+step-definition files pairing 1:1 with this plan's two Gherkin feature files (one per path). All four
+TypeScript files are test code, covered by this plan's own Gherkin scenarios rather than needing a
+further companion.
 
 ### UI-design funnel
 
 Recorded in [prd.md §UI-design-funnel disposition](./prd.md#ui-design-funnel-disposition). No net-new
-screen, no net-new component, no `assets/` folder.
+screen, no net-new component, no `assets/` folder, for either path.
 
 ## File Impact
 
-| Path                                                                   | Kind        | Note                                                                                           |
-| ---------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| `<SPEC><course-id>.md` × 20                                            | _New files_ | This plan's own spec layer (DD-601)                                                            |
-| `<SPEC>../README.md`                                                   | _New file_  | Syllabus-folder index                                                                          |
-| `<SPECPATHS>manifest-skills-accounting.md`                             | _New file_  | Path mirror; filename fixed by plan 02's ruling                                                |
-| `<COURSES><course-id>/**` × 20                                         | _New dirs_  | Full page bundles, one per course                                                              |
-| `<LANDING>_index.md`                                                   | _New file_  | Path landing content — **no `courseOrder`**                                                    |
-| `<MANIFEST>`                                                           | _New file_  | The only **data** file this plan writes under `<FEAT>`                                         |
-| `<MTEST>`                                                              | _New file_  | `<MANIFEST>`'s co-located unit test — owned by this plan, shared with no sibling               |
-| `<SPECS>skills-path-composition.feature`                               | _New file_  | This plan's only Gherkin feature file                                                          |
-| `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts` | _New file_  | Step definitions, pairing 1:1 with the feature above; created by this plan, **not** by plan 03 |
-| `<COURSES>_index.md`                                                   | Existing    | 20 catalog rows appended (created by plan 01)                                                  |
-| `learnings.md`, `evidence/`                                            | _New_       | Knowledge-capture log and screenshot evidence                                                  |
+| Path                                                    | Kind        | Note                                                                            |
+| ------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
+| `<SPEC><course-id>.md` × 24                             | _New files_ | This plan's own spec layer, each with a module/topic breakdown (DD-603, DD-625) |
+| `<SPEC>../README.md`                                    | _New file_  | Syllabus-folder index                                                           |
+| `<SPECPATHS>manifest-skills-conventional-accounting.md` | _New file_  | Path mirror; filename fixed by plan 02's ruling                                 |
+| `<SPECPATHS>manifest-skills-sharia-accounting.md`       | _New file_  | Path mirror; filename fixed by plan 02's ruling                                 |
+| `<COURSES><course-id>/**` × 24                          | _New dirs_  | Full page bundles, one per course — never duplicated (DD-601)                   |
+| `<LANDING_CA>_index.md`                                 | _New file_  | `conventional-accounting` landing content — **no `courseOrder`**                |
+| `<LANDING_SA>_index.md`                                 | _New file_  | `sharia-accounting` landing content — **no `courseOrder`**                      |
+| `<MANIFEST_CA>`                                         | _New file_  | 19-entry manifest, terminal after Phase 3                                       |
+| `<MANIFEST_SA>`                                         | _New file_  | 24-entry manifest, continues past Phase 3 to Phase 5                            |
+| `<MTEST_CA>`, `<MTEST_SA>`                              | _New files_ | Co-located unit tests — one per manifest (DD-602)                               |
+| Two Gherkin feature files + two step-definition files   | _New files_ | Pairing 1:1 with each path's composition scenario                               |
+| `<COURSES>_index.md`                                    | Existing    | 24 catalog rows appended (created by plan 01)                                   |
+| `learnings.md`, `evidence/`                             | _New_       | Knowledge-capture log and screenshot evidence                                   |
 
-**Never touched**: any `_index.md` under `<PATHS>` other than this plan's own landing bundle; any
-existing library course; `manifests/careers/**` **including plan 05's `careers`-manifest unit test**;
-`manifests/skills/enterprise-resource-planning.yaml` **and plan 07's ERP-manifest unit test**;
-any file inside `ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`; any component,
-schema, or resolver.
+**Never touched**: any `_index.md` under `<PATHS>` other than this plan's own two landing bundles; any
+existing library course; `manifests/careers/**` **including plan 05's test(s)**;
+`manifests/skills/enterprise-resource-planning*.yaml` **and plan 07's test(s)**; any file inside
+`ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`; any component, schema, or
+resolver.
 
-**No new package dependency.** No entry is added to `package.json`, `Cargo.toml`, or any other
-manifest.
+**No new package dependency.**
 
 ## Testing / Verification Strategy
 
-| Level                     | What it verifies                                                                                           | Mechanism                                                                                                                                                                                                                                            |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Manifest unit (TDD)       | Loads, zod-validates, integrity, prerequisite-consistency, exact `courseOrder` length                      | `npx nx run ayokoding-www:test:unit`                                                                                                                                                                                                                 |
-| Path-walk e2e             | The 2-segment `pathId` resolves; `?path=` persists; prev/next follows manifest order                       | `npx nx run ayokoding-www-fe-e2e:test:e2e`                                                                                                                                                                                                           |
-| Composition assertions    | Linked prerequisites absent from `courseOrder` **and** present in frontmatter                              | Grep-checkable clauses on the manifest steps                                                                                                                                                                                                         |
-| Per-course content checks | Concept coverage, register, format, worked-example volume, scope boundary                                  | Matching `apps-ayokoding-www-*-checker`                                                                                                                                                                                                              |
-| Silent-failure assertion  | Every course #4+ carries its "what still balances while being wrong" section                               | Grep-checkable clause on each authoring step                                                                                                                                                                                                         |
-| Sharia content assertions | Three named models per course; AAOIFI never "the" standard; the two commonly-wrong facts                   | Grep-checkable clauses plus `apps-ayokoding-www-facts-checker`                                                                                                                                                                                       |
-| Verification hygiene      | No open `[Needs Verification]` item when the Sharia stage begins                                           | Phase 4 gate                                                                                                                                                                                                                                         |
-| Structural                | Bundle anatomy present; `prerequisites` declared                                                           | `test -d` / `test -f` plus frontmatter grep                                                                                                                                                                                                          |
-| Ownership footprint       | One manifest data file plus its co-located unit test; zero `_index.md` under `<PATHS>` outside the landing | This plan's own merged-PR file list (`gh pr view --json files`) plus the in-flight branch diff, filtered at the Phase 6 gate — **authorship-scoped**, never a commit-range diff, because plans 04, 05 and 07 merge into the same `main` concurrently |
-| Section build             | The authored tree renders                                                                                  | `npx nx run ayokoding-www:build`                                                                                                                                                                                                                     |
-| Markdown quality          | markdownlint, link validation, heading hierarchy                                                           | `npm run lint:md` plus the two `rhino-cli md` subcommands                                                                                                                                                                                            |
-| Regression                | No existing project's gates broke                                                                          | `npx nx affected -t typecheck lint test:quick specs:behavior:coverage`                                                                                                                                                                               |
-| Manual behavioural        | Landing, ramp, and sample courses render at three breakpoints in `en`                                      | Playwright MCP plus committed `evidence/` screenshots                                                                                                                                                                                                |
-| Live-site retest          | Rule-15 EWT / UWT / DWT against the running landing and path walk                                          | The three live-site testers                                                                                                                                                                                                                          |
+| Level                         | What it verifies                                                                                             | Mechanism                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Manifest unit (TDD, ×2)       | Loads, zod-validates, integrity, prerequisite-consistency, exact `courseOrder` length, per manifest          | `npx nx run ayokoding-www:test:unit`                                       |
+| Path-walk e2e (×2)            | Both 2-segment `pathId`s resolve; `?path=` persists; prev/next follows manifest order                        | `npx nx run ayokoding-www-fe-e2e:test:e2e`                                 |
+| Composition assertions        | Linked prerequisites absent from both `courseOrder`s **and** present in frontmatter; shared-19 byte-identity | Grep-checkable clauses                                                     |
+| Per-course content checks     | Concept coverage, register, format, worked-example volume, scope boundary                                    | Matching `apps-ayokoding-www-*-checker`                                    |
+| Silent-failure assertion      | Every course #4+ (both stages) carries its section                                                           | Grep-checkable clause on each authoring step                               |
+| Sharia content assertions     | Three named models per Sharia course; AAOIFI never "the" standard                                            | Grep-checkable clauses plus `apps-ayokoding-www-facts-checker`             |
+| Licensing audit               | No verbatim standards text, no proprietary CoA structure, no copyleft code pasted                            | Reading audit against Phase 1's licensing-sensitive-sources list (Phase 6) |
+| Verification hygiene          | No open `[Needs Verification]` item when the Sharia stage begins                                             | Phase 4 gate                                                               |
+| Structural                    | Bundle anatomy present; `prerequisites` declared                                                             | `test -d` / `test -f` plus frontmatter grep                                |
+| Ownership footprint           | Two manifest data files plus their tests; zero `_index.md` under `<PATHS>` outside the two landings          | This plan's own merged-PR file list, authorship-scoped                     |
+| Shared-course non-duplication | Exactly 24 directories under `<COURSES>` at Phase 5, never 43                                                | `find <COURSES> -maxdepth 1 -type d` intersected against `ACCT_ALL`        |
+| Section build                 | The authored tree renders                                                                                    | `npx nx run ayokoding-www:build`                                           |
+| Markdown quality              | markdownlint, link validation, heading hierarchy                                                             | `npm run lint:md` plus the two `rhino-cli md` subcommands                  |
+| Regression                    | No existing project's gates broke                                                                            | `npx nx affected -t typecheck lint test:quick specs:behavior:coverage`     |
+| Manual behavioural            | Both landings and sample courses render at three breakpoints in `en`                                         | Playwright MCP plus committed `evidence/` screenshots                      |
+| Live-site retest              | Rule-15 EWT/UWT/DWT against both running landings and path walks                                             | The three live-site testers                                                |
 
 **Deliberately not cited as evidence anywhere**: `ayokoding-www:test:e2e` and
-`ayokoding-www:test:integration` are no-op echo targets in this workspace and can never fail. The
-real e2e project is `ayokoding-www-fe-e2e` [Repo-grounded — `apps/ayokoding-www-fe-e2e/` present].
+`ayokoding-www:test:integration` are no-op echo targets. The real e2e project is
+`ayokoding-www-fe-e2e` [Repo-grounded — `apps/ayokoding-www-fe-e2e/` present].
 
-**Locale scope**: `en` only. `id/belajar/` holds zero courses and zero paths [Repo-grounded —
-`apps/ayokoding-www/content/id/` contains `belajar/`, `celoteh/`, `konten-video/` and no path
-bucket], so an `id` walk-through would be fabricated rather than verified. The supported-locale set
-is `["en", "id"]` [Repo-grounded — `apps/ayokoding-www/src/features/i18n/core/config.ts`]; the
-`id` deferral is a recorded non-goal in
-[brd.md §Business-Scope Non-Goals](./brd.md#business-scope-non-goals), not a skipped locale.
+**Locale scope**: `en` only, unchanged reasoning — `id/belajar/` holds zero courses and zero paths.
 
 ## Dependencies
 
-| Dependency                                                               | Kind       | Note                                                                           |
-| ------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------ |
-| `ayokoding-learning-path-01-url-restructure` merged                      | hard, plan | `<COURSES>` namespace, `<PATHS>skills/_index.md`, the two linked prerequisites |
-| `ayokoding-learning-path-02-schema-and-prerequisite-dag` merged          | hard, plan | `PathManifest` zod with `arc` + variable-depth `pathId`; integrity functions   |
-| `ayokoding-learning-path-03-navigation-ui` merged                        | hard, plan | `path-landing.tsx`, `path-card.tsx`, `manifest-repository.ts`, `?path=` wiring |
-| `apps-ayokoding-www-by-example-maker` + checker + fixer                  | agent      | The 16 By-Example bodies                                                       |
-| `apps-ayokoding-www-annotated-concept-maker` + checker + fixer           | agent      | The 4 Annotated-concept bodies                                                 |
-| `apps-ayokoding-www-general-maker` / `-general-checker`                  | agent      | Landing prose and `drilling/overview.md`                                       |
-| `apps-ayokoding-www-facts-checker`                                       | agent      | Every standard number, jurisdiction claim, and doctrinal statement             |
-| `apps-ayokoding-www-link-checker`                                        | agent      | Intra-course, cross-course, and outbound prerequisite links                    |
-| `web-researcher`                                                         | agent      | OI-1, OI-2, OI-3, and every per-course accuracy pre-verify                     |
-| `apps-ayokoding-www-deployer`                                            | agent      | Post-merge deploy to `prod-ayokoding-www`                                      |
-| `repo-setup-manager`                                                     | agent      | Phase 0                                                                        |
-| `nx run ayokoding-www:build` / `:test:unit` / `:specs:behavior:coverage` | Nx target  | [Repo-grounded — all three present in `apps/ayokoding-www/project.json`]       |
-| `nx run ayokoding-www-fe-e2e:test:e2e`                                   | Nx target  | The real e2e project                                                           |
-| `rhino-cli md links validate` / `md heading-hierarchy validate`          | CLI        | Run as raw `cargo run`, never as Nx targets                                    |
-| `npm run lint:md`                                                        | npm script | markdownlint over the authored tree                                            |
+| Dependency                                                               | Kind       | Note                                                                                                                             |
+| ------------------------------------------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `ayokoding-learning-path-01-url-restructure` merged                      | hard, plan | `<COURSES>` namespace, `<PATHS>skills/_index.md`, the two linked prerequisites                                                   |
+| `ayokoding-learning-path-02-schema-and-prerequisite-dag` merged          | hard, plan | `PathManifest` zod with `arc` + variable-depth `pathId`; integrity functions; cross-manifest ID reuse                            |
+| `ayokoding-learning-path-03-navigation-ui` merged                        | hard, plan | `path-landing.tsx`, `path-card.tsx`, `manifest-repository.ts`, `?path=` wiring                                                   |
+| `apps-ayokoding-www-by-example-maker` + checker + fixer                  | agent      | The 19 By-Example bodies                                                                                                         |
+| `apps-ayokoding-www-annotated-concept-maker` + checker + fixer           | agent      | The 5 Annotated-concept bodies                                                                                                   |
+| `apps-ayokoding-www-general-maker` / `-general-checker`                  | agent      | Landing prose (both) and syllabus prose                                                                                          |
+| `apps-ayokoding-www-facts-checker`                                       | agent      | Every standard number, jurisdiction claim, and doctrinal statement                                                               |
+| `apps-ayokoding-www-link-checker`                                        | agent      | Intra-course, cross-course, and outbound prerequisite links, both paths                                                          |
+| `web-researcher`                                                         | agent      | OI-1 (residual), OI-2, OI-3 (residual), per-course accuracy pre-verify, and the post-authoring syllabus module-verification pass |
+| `apps-ayokoding-www-deployer`                                            | agent      | Post-merge deploy to `prod-ayokoding-www`                                                                                        |
+| `repo-setup-manager`                                                     | agent      | Phase 0                                                                                                                          |
+| `nx run ayokoding-www:build` / `:test:unit` / `:specs:behavior:coverage` | Nx target  | [Repo-grounded — all three present in `apps/ayokoding-www/project.json`]                                                         |
+| `nx run ayokoding-www-fe-e2e:test:e2e`                                   | Nx target  | The real e2e project                                                                                                             |
+| `rhino-cli md links validate` / `md heading-hierarchy validate`          | CLI        | Run as raw `cargo run`, never as Nx targets                                                                                      |
+| `npm run lint:md`                                                        | npm script | markdownlint over the authored tree                                                                                              |
 
 ## Rollback
 
-Every artefact is **additive**. Nothing is moved, renamed, or deleted, so rollback is subtractive and
-total — and because the accounting subgraph has **zero outbound edges into software engineering**
-([DD-617](#design-decisions)), removing it cannot break any library course or any `careers/` manifest.
+Every artefact is **additive**, unchanged in kind. Rollback is subtractive and total, and because
+the accounting subgraph has **zero outbound edges into software engineering** ([DD-617](#design-decisions)),
+removing it cannot break any library course or any `careers/` manifest.
 
-- **Per course**: `git rm -r <COURSES><course-id>/`, remove its row from `<COURSES>_index.md`, and
-  remove its ID from `<MANIFEST>`. Safe in either order **only if the manifest edit lands first** —
-  the reference direction is manifest → body, so a manifest entry with no bundle fails
-  `checkManifestIntegrity` while a bundle with no manifest entry is merely unlisted.
-- **Per stage**: revert that stage's merge commits in reverse order, then shrink `courseOrder` back
-  to the previous stage's ID list. The corresponding stage signal is reverted with it, so plan 07
-  never sees a stale signal.
-- **Whole plan**: revert every merge in reverse order and delete `<MANIFEST>` and `<LANDING>`.
-  `paths/skills/_index.md` survives — it is plan 01's, and it returns to the empty state plan 03
-  designed.
+- **Per shared course**: `git rm -r <COURSES><course-id>/`, remove its row from `<COURSES>_index.md`,
+  and remove its ID from **both** manifests (since shared courses appear in both). Safe in either
+  order **only if both manifest edits land first**.
+- **Per Sharia-only course**: same, but only `<MANIFEST_SA>` needs the ID removed.
+- **Per stage**: revert that stage's merge commits in reverse order, then shrink the affected
+  manifest(s) back to the previous stage's ID list. The corresponding stage signal is reverted with
+  it.
+- **`conventional-accounting` alone**: revertible independently of `sharia-accounting` only up
+  through Phase 3 — after Phase 5, `sharia-accounting`'s shared 19 entries reference the same bodies,
+  so removing a shared course now affects both paths simultaneously; this is the direct consequence of
+  authoring once and referencing twice (A11), and is the accepted cost of avoiding desync.
+- **Whole plan**: revert every merge in reverse order and delete both manifests and both landings.
+  `paths/skills/_index.md` survives — it is plan 01's.
 
 **The one-way door**: once `ayokoding-learning-path-07-skills-erp` has authored an ERP course against
-a stage signal, deleting that accounting course breaks plan 07's manifest downstream. Coordinate any
-stage-level rollback with plan 07 before applying it.
+a stage signal, deleting the corresponding accounting course(s) breaks plan 07's manifest downstream.
+Coordinate any stage-level rollback with plan 07 before applying it.

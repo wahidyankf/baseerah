@@ -1,15 +1,100 @@
-# Skills Path — Accounting for Systems Builders
+# Skills Paths — Accounting for Systems Builders
 
-> **This plan owns one path end-to-end**: `/en/learn/paths/skills/accounting` — its landing content,
-> its manifest, and the twenty-course corpus underneath it (syllabus specs **and** authored bodies).
-> It creates **no `_index.md`** (plan 01 owns every structural index under `paths/`, per the
-> 2026-07-21 A3 ruling) and authors **no ERP content** (plan 07 owns that, and it is `blockedBy` this
-> plan).
+> **This plan owns two paths end-to-end**: `/en/learn/paths/skills/conventional-accounting` and
+> `/en/learn/paths/skills/sharia-accounting` (A10) — their landing content, their two manifests, and
+> the twenty-four-course corpus underneath them (syllabus specs **and** authored bodies). It creates
+> **no `_index.md`** (plan 01 owns every structural index under `paths/`, per the 2026-07-21 A3
+> ruling) and authors **no ERP content** (plan 07 owns that, and it is `blockedBy` this plan).
 
-This is plan **06** of the six-plan `ayokoding-learning-path-*` programme. Plans 01–05 deliver the
+This is plan **06** of the seven-plan `ayokoding-learning-path-*` programme. Plans 01–05 deliver the
 `careers/` category and the shared machinery; plans 06 and 07 deliver the `skills/` category, one
 subject each. Accounting lands first because **ERP depends on Accounting one-directionally and
 nothing in Accounting needs ERP** — see [§Where this plan sits](#where-this-plan-sits).
+
+> **Programme decisions** — this plan cites the shared `R*`/`A*` decision ids (`A6`, `A8`, `A9`, `A10`,
+> `A11`, `A12`, and so on) throughout; their definitions and the wave DAG live in
+> [ayokoding-learning-path-programme.md](../ayokoding-learning-path-programme.md), not in this file.
+
+## Prior art
+
+_(Repo convention: every promoted plan states what already exists and how it is used.)_
+
+| Prior artefact                                                                      | Size    | Relationship to this plan                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/ayokoding-www/content/en/legacy/business/accounting.md` [Repo-grounded]       | 34.2 KB | Covers nearly all of course **#1**'s scope via a running example — but is written **for small-business owners, not systems builders**, and never touches schema, data modelling, multi-currency, or Sharia treatment. **A source to mine, not a drop-in body.** Plan 01 relocated it to `legacy/business/`.                                                      |
+| `apps/ayokoding-www/content/en/learn/business/corporate-finance.md` [Repo-grounded] | 41.1 KB | Adjacent, **not** a source. Corporate finance is valuation and capital structure; this corpus is bookkeeping, recognition, and reporting. No course in this plan re-teaches it or cites it as a prerequisite.                                                                                                                                                    |
+| The 121-course software-engineering library                                         | —       | **No course duplicates it.** Two courses link it as a cross-domain prerequisite (`sql-essentials`, `backend-essentials`); no other library course is cited.                                                                                                                                                                                                      |
+| `ayokoding-learning-path-05-manifests`                                              | —       | **Structural analogue, not a content source.** This plan matches its file set and gate shape; it copies none of its content.                                                                                                                                                                                                                                     |
+| The original single-path `skills/accounting` design (pre-A10/A6/A8/A9 rewrite)      | —       | **The direct predecessor of this rewrite.** Its twenty-course catalog, ramp reasoning, and stage-signal mechanism are the baseline this document restates, corrects, and extends — see [§Why two paths](#why-two-paths-not-one-a10--a11) and [tech-docs §What changed](./tech-docs.md#what-changed-from-the-original-twenty-course-single-path-catalog-and-why). |
+
+**How `business/accounting.md` is used, concretely** (see [tech-docs DD-626](./tech-docs.md#design-decisions)):
+course #1 harvests its **running example** and its **narrative sequencing** (the order in which a
+first-time reader meets debits, credits, and the accounting equation), then discards the
+small-business-owner register and reframes for a systems builder. The schema and data-modelling
+layer the article lacks is **not** back-filled into #1 — it is course **#2**'s subject. The article is
+read at authoring time and never transplanted; no paragraph moves verbatim.
+
+## Why two paths, not one (A10 + A11)
+
+A single `skills/accounting` path cannot honestly serve both readers this domain has: the systems
+builder who will never touch a Sharia contract, and the systems builder building specifically for
+Bahrain, Indonesia or Malaysia. Bundling both into one path either pads the conventional reader with
+material they will never use, or — worse — buries the Sharia depth as an optional tail nobody
+reaches. **A10** splits the corpus into two paths instead:
+
+- **`/en/learn/paths/skills/conventional-accounting`** — the conventional spine alone, nineteen
+  courses, terminal in itself.
+- **`/en/learn/paths/skills/sharia-accounting`** — **the same nineteen courses plus five
+  Sharia-specific ones**, twenty-four courses total. **Both paths cover all the basics.** A reader
+  entering `sharia-accounting` cold gets the full grounding — it is never an add-on module that
+  assumes the conventional path.
+
+**A11 governs how, and it is the schema's existing rule, not a new mechanism.** Plan 02's own
+`tech-docs.md` already establishes that manifest uniqueness is scoped **per manifest**, not globally,
+and that every manifest references course bodies **by ID** — never by copy:
+
+- _"No course ID appears twice **within one manifest**"_ [Repo-grounded —
+  `ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md:417`] — the scope is
+  per-manifest, so the same ID may appear in both this plan's manifests.
+- _"No course body is duplicated per path (all manifests reference courses **by ID**, never copy a
+  body)"_ [Repo-grounded — same file, line 424].
+- _"One body cannot encode four orders; moving order to the manifest [is what enables the shared
+  library]"_ [Repo-grounded — same file, line 615, DD-1].
+
+So the nineteen shared courses are **authored once**, under `<COURSES>`, exactly as every other
+course in the library is. `sharia-accounting.yaml`'s `courseOrder` **interleaves** the shared IDs
+with the five Sharia-specific IDs into one ordered array — the array mixes two authored-once pools
+into a single sequence rather than the manifest forking a second copy of any body. See
+[tech-docs §Two manifests, nineteen shared courses](./tech-docs.md#two-manifests-nineteen-shared-courses-a10--a11)
+for the full mechanics, and [tech-docs DD-601](./tech-docs.md#design-decisions) for why "interleave"
+resolves to shared-then-Sharia ordering rather than mid-ramp alternation — the silent-failure
+reasoning that put the Sharia stage at the end of the old single path survives the split unchanged.
+
+**Never duplicate a course file to serve two paths.** A duplicated file desyncs silently: an edit to
+one copy that is never propagated to the other produces two courses that answer the same question
+differently, and nothing in the toolchain would catch it — the checkers validate each file in
+isolation, and there is no cross-file consistency gate for prose. Reference by ID is the only safe
+mechanism, and it is also the cheaper one: nineteen bodies are authored, not thirty-eight.
+
+## No building — architecture, not construction (A6)
+
+`A6` draws a line between **founding** an implementation and **building** one. This plan teaches to
+the founding depth and stops there:
+
+- **In scope**: double-entry mechanics, the subledger-to-general-ledger relationship, costing methods,
+  period close, document state machines, posting rules, and the failure modes each produces.
+  Architecture is domain knowledge here — a course may describe **how** a ledger system is
+  architected.
+- **Out of scope**: **building** it. No capstone that constructs a system, no "implement X" exercise,
+  no scaffolded codebase the reader extends.
+
+Two courses in the original research seed — `capstone-build-a-general-ledger-system` and
+`capstone-sharia-compliant-ledger` — asked the reader to build. Both are **deleted**. In their place,
+two architecture courses that teach the same domain knowledge **without** the build instruction:
+`general-ledger-system-architecture` (conventional, closes the shared spine) and
+`sharia-ledger-system-architecture` (Sharia-specific, closes the Sharia stage). Both carry the same
+linked cross-domain prerequisites the deleted capstones carried — see
+[tech-docs §The twenty-four-course catalog](./tech-docs.md#the-twenty-four-course-catalog).
 
 ## The one constraint that shapes everything
 
@@ -29,9 +114,9 @@ That single property is why this corpus is shaped the way it is:
 - It is why every course from #4 onward carries an explicit **"what still balances while being
   wrong"** section as an authoring requirement, not as optional colour (see
   [tech-docs DD-609](./tech-docs.md#design-decisions)).
-- It is why the Sharia stage sits at the **end** rather than being sprinkled through: applying
-  conventional accrual/interest models to murabaha, ijara, mudaraba or musharaka is the exact silent
-  mistake AAOIFI and PSAK Syariah exist to prevent.
+- It is why the Sharia stage sits at the **end** of the `sharia-accounting` path rather than being
+  sprinkled through: applying conventional accrual/interest models to murabaha, ijara, mudaraba or
+  musharaka is the exact silent mistake AAOIFI and PSAK Syariah exist to prevent.
 
 The full statement, with its consequences for personas and acceptance criteria, is in
 [prd.md §The silent-failure constraint](./prd.md#the-silent-failure-constraint-the-corpus-shaping-fact).
@@ -40,66 +125,84 @@ The full statement, with its consequences for personas and acceptance criteria, 
 
 **In scope**
 
-- The path landing **content** at `apps/ayokoding-www/content/en/learn/paths/skills/accounting/_index.md`
-  — its copy, its ramp narrative, and its outbound links. _(Content and data only; the landing's
-  visual design is owned by `ayokoding-learning-path-03-navigation-ui`. This plan ships no `assets/`
-  folder, no mockup, and no render.)_
-- The single manifest **data file**
-  `apps/ayokoding-www/src/features/course-paths/manifests/skills/accounting.yaml`, **plus that
-  manifest's own co-located unit test** `…/manifests/skills/accounting-manifest.unit.test.ts`. Each
-  manifest-owning plan owns its manifest and that manifest's test (2026-07-21 ruling) — there is no
-  shared root-level `published-manifests.unit.test.ts` and no plan appends to a sibling's test file.
-- One Gherkin feature (`…/gherkin/course-paths/skills-path-composition.feature`) and its 1:1
-  step-definition file `apps/ayokoding-www-fe-e2e/src/steps/skills-path-composition.steps.ts`.
-- **20 syllabus specs** under this plan's own `syllabus/courses/` folder — the per-course contract
-  layer (id, format, prerequisites, concept enumeration, scope boundary).
-- **One path mirror** at `syllabus/paths/manifest-skills-accounting.md` — the human-readable ordering
-  the manifest transcribes. The `skills-` prefixed filename is fixed by plan 02's ruling; a bare
-  `manifest-accounting.md` is not acceptable.
-- **20 course bodies** under `apps/ayokoding-www/content/en/learn/courses/<course-id>/`.
-- The three stage-completion signals that unblock `ayokoding-learning-path-07-skills-erp`.
+- The two path landing **contents** at
+  `apps/ayokoding-www/content/en/learn/paths/skills/conventional-accounting/_index.md` and
+  `…/paths/skills/sharia-accounting/_index.md` — copy, ramp narrative, and outbound links.
+  _(Content and data only; visual design is owned by `ayokoding-learning-path-03-navigation-ui`. This
+  plan ships no `assets/` folder, no mockup, and no render.)_
+- **Two manifest data files** —
+  `apps/ayokoding-www/src/features/course-paths/manifests/skills/conventional-accounting.yaml` and
+  `…/manifests/skills/sharia-accounting.yaml` — **plus each manifest's own co-located unit test**.
+  Each manifest-owning plan owns its manifests and their tests (2026-07-21 ruling, extended here to
+  two files within one plan — see [tech-docs DD-602](./tech-docs.md#design-decisions)).
+- Two Gherkin feature companions and their step-definition files (one per path; see
+  [tech-docs §File Impact](./tech-docs.md#file-impact)).
+- **Twenty-four syllabus specs** under this plan's own `syllabus/courses/` folder — the per-course
+  contract layer, now carrying an explicit **module/topic breakdown** an author can write from
+  without re-deriving scope (see [§Syllabus layer](#syllabus-layer-new-requirement)).
+- **Two path mirrors** at `syllabus/paths/manifest-skills-conventional-accounting.md` and
+  `syllabus/paths/manifest-skills-sharia-accounting.md`.
+- **Twenty-four course bodies** under `apps/ayokoding-www/content/en/learn/courses/<course-id>/` —
+  nineteen shared, five Sharia-specific.
+- The stage-completion signals that unblock `ayokoding-learning-path-07-skills-erp`, now expressed at
+  **stage granularity** rather than ERP course numbers — see
+  [§The 06→07 dependency edge](#the-0607-dependency-edge-stage-granularity-not-course-numbers).
 
 **Out of scope**
 
 - **Any `_index.md` under `paths/`** — `paths/_index.md`, `paths/careers/_index.md`, the three
   `paths/careers/<arc>/_index.md`, and `paths/skills/_index.md` are **all** plan 01's (A3). This plan
-  creates its own path-landing bundle only.
-- **Any ERP content** — the 20-course ERP corpus, the ERP manifest, and the ERP landing belong to
+  creates its own two path-landing bundles only.
+- **Any ERP content** — the ERP corpus, its manifest(s), and its landing(s) belong to
   `ayokoding-learning-path-07-skills-erp`.
 - **Re-authoring any existing library course.** `sql-essentials` and `backend-essentials` are
-  **linked**, never re-walked (see [tech-docs DD-602](./tech-docs.md#design-decisions)).
+  **linked**, never re-walked (see [tech-docs DD-603](./tech-docs.md#design-decisions)).
 - **The `PathManifest` schema, the `course-paths` core modules, and every rendering component** —
   owned by plans 02 and 03. This plan consumes them.
-- **The `careers/` manifests** — owned by `ayokoding-learning-path-05-manifests`. The manifest
-  ownership invariant is scoped per category: 05 owns `manifests/careers/`, this plan owns
-  `manifests/skills/accounting.yaml`, plan 07 owns
-  `manifests/skills/enterprise-resource-planning.yaml`. Neither skills plan writes the other's file.
-- **An Indonesian mirror.** `id/belajar/` holds zero courses and zero paths; a manifest over it would
-  compose nothing.
+- **The `careers/` manifests** — owned by `ayokoding-learning-path-05-manifests`.
+- **An Indonesian mirror.** `id/belajar/` holds zero courses and zero paths.
+- **Any building exercise, capstone, or scaffolded codebase** (A6) — see above.
 
-## Prior art
+## Syllabus layer (new requirement)
 
-_(Repo convention: every promoted plan states what already exists and how it is used.)_
+Every one of the twenty-four courses now carries a syllabus with an explicit **concept/worked-example
+breakdown** — not just a spec's top matter and prerequisites, but the enumerated concepts (`co-NN`)
+and worked examples (`ex-NN`) an author can write from directly. **The file shape itself is inherited
+from `ayokoding-learning-path-02-schema-and-prerequisite-dag`'s 123 existing `syllabus/courses/*.md`
+files, not invented here** — same header fields, same section names and order, same
+problem-before-solution framing (see [tech-docs DD-627](./tech-docs.md#design-decisions)), adapted for
+a non-code, no-build domain: no `Language` field, and no `Capstone spec` section (A6 forbids a build
+exercise at any granularity; each course carries `Applied synthesis (no build — A6)` instead). This
+plan authors its own corpus inside its own folder — `syllabus/courses/<course-id>.md` per course,
+`syllabus/paths/manifest-skills-*.md` for the two path mirrors — per `A3`'s ownership split, rather
+than editing plan 02's custody-frozen corpus. See
+[tech-docs §Syllabus layer](./tech-docs.md#syllabus-layer--custody-and-shape) for the required section
+shape and [§Verification](#verification-status-carried-forward-never-laundered) below for how each
+concept's placement claims are marked.
 
-| Prior artefact                                                                      | Size    | Relationship to this plan                                                                                                                                                                                                                                                |
-| ----------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `apps/ayokoding-www/content/en/learn/business/accounting.md` [Repo-grounded]        | 34.2 KB | Covers nearly all of course **#1**'s scope via a running example — but is written **for small-business owners, not systems builders**, and never touches schema or data modelling. **A source to mine, not a drop-in body.** Plan 01 relocates it to `legacy/business/`. |
-| `apps/ayokoding-www/content/en/learn/business/corporate-finance.md` [Repo-grounded] | 41.1 KB | Adjacent, **not** a source. Corporate finance is valuation and capital structure; this corpus is bookkeeping, recognition, and reporting. No course in this plan re-teaches it, and no course cites it as a prerequisite.                                                |
-| The 121-course software-engineering library                                         | —       | **No course duplicates accounting.** Two courses are linked as cross-domain prerequisites (`sql-essentials`, `backend-essentials`); the other twelve library courses named by the research are ERP's edges, not this plan's.                                             |
-| `ayokoding-learning-path-05-manifests`                                              | —       | **Structural analogue, not a content source.** This plan matches its file set, gate shape, and Gherkin style; it copies none of its content.                                                                                                                             |
+**Every syllabus is authored first, confirmed second (A12).** Each syllabus is written from domain
+reasoning and this plan's own grounding file **before** any external research touches it. Only after a
+syllabus exists does Phase 1 dispatch `web-researcher`, and only to check **coverage** — what a
+practitioner would expect that is missing, what is present that the field does not recognise — never
+to supply or correct the syllabus's structure, module order, or wording. A concept or worked example
+asserted on domain-reasoning grounds rather than sourced from the seeding research is marked `[Needs
+Verification]` so the coverage pass has something concrete to confirm or refute; a vague concept
+cannot be checked either way. See
+[`ayokoding-learning-path-programme.md` §A12](../ayokoding-learning-path-programme.md#a12--how-a-syllabus-may-and-may-not-be-confirmed).
 
-**How `business/accounting.md` is used, concretely** (see
-[tech-docs DD-606](./tech-docs.md#design-decisions)): course #1 harvests its **running example** and
-its **narrative sequencing** (the order in which a first-time reader meets debits, credits, and the
-accounting equation), then discards the small-business-owner register and reframes for a systems
-builder. The schema and data-modelling layer the article lacks is **not** back-filled into #1 — it is
-course **#2**'s subject. The article is read at authoring time and never transplanted; no paragraph
-moves verbatim.
+## Licensing (A8) — read before authoring any standards content
+
+**IAI (Indonesia) is the strictest of the four bodies this corpus touches — it forbids reproduction
+or translation with no educational exception at all.** AAOIFI is free to read but has no published
+permission-to-reproduce policy (treated as closed). **No public-domain chart of accounts exists
+anywhere** — every chart of accounts in this corpus is originally authored. Full posture table, the
+eleven safe-authoring rules, and the _Baker v. Selden_ basis for why domain reimplementation is
+lawful: [tech-docs §Licensing and IP Compliance](./tech-docs.md#licensing-and-ip-compliance-a8).
 
 ## Where this plan sits
 
 ```mermaid
-%% Dependency position of plan 06 in the six-plan programme.
+%% Dependency position of plan 06 in the seven-plan programme.
 %% Node SHAPE encodes role: rectangle = upstream dependency, hexagon = this plan,
 %% stadium = downstream consumer, parallelogram = concurrent sibling with no edge.
 %% Colours are redundant with shape and with the explicit edge labels.
@@ -109,15 +212,15 @@ flowchart LR
     P3["03 navigation-ui"]:::up
     P4[/"04 course-authoring"/]:::none
     P5[/"05 careers manifests"/]:::none
-    P6{{"06 skills accounting<br/>THIS PLAN"}}:::mine
+    P6{{"06 skills accounting<br/>THIS PLAN<br/>2 paths, 24 courses"}}:::mine
     P7(["07 skills ERP"]):::down
 
     P1 -->|"courses/ + paths/skills/ homes"| P3
     P2 -->|"PathManifest zod + core"| P3
     P1 -->|"sql-essentials re-homed"| P6
-    P2 -->|"2-segment pathId support"| P6
+    P2 -->|"2-segment pathId support, x2 IDs"| P6
     P3 -->|"landing + card + repository"| P6
-    P6 -->|"Acct 3 unblocks ERP 7"| P7
+    P6 -->|"Acct conventional-spine stage unblocks ERP"| P7
 
     classDef up fill:#0173B2,stroke:#000000,color:#FFFFFF
     classDef mine fill:#029E73,stroke:#000000,color:#FFFFFF
@@ -135,72 +238,59 @@ borders and WCAG-AA-contrasting text, per the
 
 1. **This plan is NOT blocked by `ayokoding-learning-path-04-course-authoring`.** Accounting draws
    exactly **two** prerequisite edges into the software-engineering library — `sql-essentials`
-   (course #2) and `backend-essentials` (course #19) — and **both are among the 37 bundles plan 01
-   re-homes** [Repo-grounded — both directories are present today under
-   `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`]. Plan 04 authors
-   the other 90 bodies and none of them is on this plan's critical path. This plan therefore runs
-   **concurrently** with plans 04 and 05 rather than behind them. See
-   [tech-docs DD-605](./tech-docs.md#design-decisions).
-2. **ERP #7 is where the hard edge bites, and this plan's first three courses clear it.** ERP
-   `record-to-report-systems` (#7) requires Accounting `financial-statements-and-close-cycle` (#3),
-   because subledger→GL posting is meaningless without a balanced ledger. ERP #1–4 and Accounting
-   #1–3 are parallel-authorable; convergence is only required by ERP's stage 2. Shipping this plan's
-   **Stage 1** therefore unblocks most of plan 07's early work — which is why the manifest publishes
-   at three courses rather than waiting for twenty.
+   (`chart-of-accounts-and-data-modeling`) and `backend-essentials`
+   (`general-ledger-system-architecture`) — and **both are among the 37 bundles plan 01 re-homes**
+   [Repo-grounded — both directories present today under
+   `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/`]. This plan therefore
+   runs **concurrently** with plans 04 and 05 rather than behind them.
+2. **ERP is where the hard edge bites, and this plan's first three courses clear it — same as
+   before the split.** The Dangerous-1 boundary (courses #1–#3) is shared by both paths and lands in
+   Phase 2, unchanged by the two-path restructuring.
 
-## The ramp — the spine of this path's pedagogy
+## The ramp — the spine of both paths' pedagogy
 
-Every path under `/en/learn/paths/skills/` is the **immediately-effective** arc, always (R8): get up
-and running and become dangerous as fast as possible, then go deeper and deeper, on solid ground.
-The arc is constant, which is why it is omitted from the URL — **not** because skills paths lack a
-pedagogy. The manifest still records `arc: immediately-effective`.
-
-For this subject the arc has three named boundaries. They come from the research, they are decided,
-and they are the structure of both the corpus and this plan's delivery phases.
+Every path under `/en/learn/paths/skills/` is the **immediately-effective** arc, always (R8). For
+this subject the arc has boundaries that now differ by path, because `conventional-accounting`
+terminates where `sharia-accounting` continues:
 
 ```mermaid
-%% The reader's capability ramp. Each transition is a named "dangerous by here" boundary.
-%% Labels only, no colour classes, so the diagram reads identically in monochrome.
+%% The reader's capability ramp, both paths. Sharia continues past the conventional terminus.
 stateDiagram-v2
     [*] --> Zero
-    Zero --> Useful: courses 1-3
-    Useful --> Broad: courses 4-16
-    Broad --> Full: courses 17-20
+    Zero --> Useful: courses 1-3 shared
+    Useful --> Broad: courses 4-19 shared
+    Broad --> [*]: conventional path ends
+    Broad --> Full: courses 20-24 Sharia-only
     Full --> [*]
 
     Zero: No accounting background
     Useful: Dangerous 1 - balanced ledger
-    Broad: Dangerous 2 - conventional systems
-    Full: Dangerous 3 - full competence
+    Broad: Dangerous 2 - conventional systems + architecture
+    Full: Dangerous 3 - full Sharia competence
 ```
 
-| Boundary           | After | A reader **can**                                                                                                             | A reader **cannot yet**                                                                                                                                                                           |
-| ------------------ | ----- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Dangerous 1** ⚡ | #3    | Build a working, correctly balancing ledger; make routine postings; produce the three statements for a simple single entity. | Safely recognise multi-period or variable-consideration revenue (#4), cost inventory (#9), handle capitalisation and leases (#8/#10), consolidate (#11), or support IFRS-and-GAAP together (#12). |
-| **Dangerous 2** ⚡ | #16   | Model most conventional systems a mid-size company runs.                                                                     | Build or reason about a Sharia-compliant ledger — conventional accrual/interest models applied to murabaha, ijara, mudaraba or musharaka produce plausible, substantively wrong numbers.          |
-| **Dangerous 3** ⚡ | #20   | Full competence across the corpus, including a Sharia-compliant ledger.                                                      | —                                                                                                                                                                                                 |
+| Boundary           | After | Path(s)                                              | A reader **can**                                                                                                      | A reader **cannot yet**                                                                                                                                                                                |
+| ------------------ | ----- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Dangerous 1** ⚡ | #3    | both                                                 | Build a working, correctly balancing ledger; make routine postings; produce the three statements for a single entity. | Safely recognise multi-period revenue, cost inventory, handle leases, consolidate, or translate multi-currency balances.                                                                               |
+| **Dangerous 2** ⚡ | #19   | both (`conventional-accounting` **terminates here**) | Model most conventional systems a mid-size company runs, **and architect (not build) a general-ledger system**.       | Build or reason about a Sharia-compliant ledger — conventional accrual/interest models applied to murabaha, ijara, mudaraba, musharaka, zakah or sukuk produce plausible, substantively wrong numbers. |
+| **Dangerous 3** ⚡ | #24   | `sharia-accounting` only                             | Full competence across both corpora, including architecting (not building) a Sharia-compliant ledger.                 | —                                                                                                                                                                                                      |
 
-**#1 alone is standalone-useful** (correct cash-basis hand-posting). **#2 with #1** is
-standalone-useful for designing a real ledger schema. This is what makes the arc honest: an early
-subset genuinely pays off rather than only making sense end-to-end.
-
-**Note the shape.** The ramp is deliberately **fast then slow** — three courses to first payoff,
-thirteen to the second boundary. That is not padding. It is the direct consequence of the
-silent-failure property above: the fast start is safe precisely because a hand-built single-entity
-ledger fails loudly, and everything after it fails quietly.
+**#1 alone is standalone-useful** (correct cash-basis hand-posting). **#1 + #2** is standalone-useful
+for designing a real ledger schema. **The whole `conventional-accounting` path is standalone-useful
+at #19** — it is not a truncated on-ramp to the Sharia path, it is a complete, shippable product in
+its own right, and its manifest **stops growing** at that point while `sharia-accounting`'s continues.
 
 ## Delivery flow
 
 ```mermaid
 %% Phase progression. Every phase ends in a gate and a safe stopping point.
-%% TD required: an 11-phase chain would exceed MaxWidth=4 on the horizontal axis under LR.
 flowchart TD
     P0["Phase 0<br/>baseline + preconditions"]:::setup
-    P1["Phase 1<br/>20 syllabus specs"]:::spec
-    P2["Phase 2<br/>Stage 1 bodies 1-3<br/>publish manifest"]:::author
-    P3["Phase 3<br/>Stage 2 bodies 4-16<br/>grow manifest"]:::author
+    P1["Phase 1<br/>24 syllabus specs"]:::spec
+    P2["Phase 2<br/>shared 1-3<br/>publish BOTH manifests"]:::author
+    P3["Phase 3<br/>shared 4-19<br/>grow BOTH to 19<br/>conventional-accounting DONE"]:::author
     P4["Phase 4<br/>verification debt"]:::spec
-    P5["Phase 5<br/>Stage 3 bodies 17-20<br/>grow manifest"]:::author
+    P5["Phase 5<br/>sharia 20-24<br/>grow sharia-accounting to 24"]:::author
     P6["Phase 6<br/>section verification"]:::verify
     P7["Phase 7<br/>manual UI + rule-15"]:::verify
     P8["Phase 8<br/>main integration + CI"]:::verify
@@ -216,96 +306,51 @@ flowchart TD
     classDef final fill:#029E73,stroke:#000000,color:#FFFFFF
 ```
 
-**Accessibility note.** Every phase carries its number in its own label, so the sequence reads
-without colour; fill is a redundant grouping cue only.
+| Phase | Closing gate                                                                                                    |
+| ----- | --------------------------------------------------------------------------------------------------------------- |
+| 0     | Three start preconditions hold; baselines recorded green                                                        |
+| 1     | 24 specs exist, each with a module/topic breakdown; every prerequisite edge transcribed                         |
+| 2     | Both manifests live with 3 shared courses; the first 2-segment `pathId`s resolve end-to-end                     |
+| 3     | Both manifests at 19 IDs; **`conventional-accounting` is DONE and production-serving**; Stage-2 signal recorded |
+| 4     | Zero `[Needs Verification]` items remain open in this folder                                                    |
+| 5     | `sharia-accounting` at 24 IDs; Stage-3 signal recorded                                                          |
+| 6     | Integrity, prerequisite-consistency, licensing, smoothness and ownership sweeps all green                       |
+| 7     | Both landings + ramp verified live at three breakpoints; zero open rule-15 defects                              |
+| 8     | CI green on `main`; production serves both accounting paths                                                     |
+| 9     | Every `learnings.md` entry terminal                                                                             |
+| 10    | Archived; plan 07 is unblocked end-to-end                                                                       |
 
-| Phase | Closing gate                                                                      |
-| ----- | --------------------------------------------------------------------------------- |
-| 0     | Three start preconditions hold; baselines recorded green                          |
-| 1     | 20 specs exist; every prerequisite edge transcribed; verification markers carried |
-| 2     | Manifest live with 3 courses; the first 2-segment `pathId` resolves end-to-end    |
-| 3     | Manifest at 16 courses; Stage-2 signal recorded                                   |
-| 4     | Zero `[Needs Verification]` items remain open in this folder                      |
-| 5     | Manifest at 20 courses; Stage-3 signal recorded                                   |
-| 6     | Integrity, prerequisite-consistency, smoothness and ownership sweeps all green    |
-| 7     | Landing + ramp verified live at three breakpoints; zero open rule-15 defects      |
-| 8     | CI green on `main`; production serves the accounting path                         |
-| 9     | Every `learnings.md` entry terminal                                               |
-| 10    | Archived; plan 07 is unblocked end-to-end                                         |
+## The 06→07 dependency edge (stage granularity, not course numbers)
 
-**Why the manifest publishes at Phase 2 rather than Phase 5** — three independent reasons, recorded
-in [tech-docs DD-603](./tech-docs.md#design-decisions): the immediately-effective arc demands early
-payoff; this is the **first 2-segment `pathId` ever instantiated** in the system (plan 02 only
-exercises the shape via unit-test fixtures), so publishing early is the architecture smoke test for
-the variable-depth ruling; and it emits the Stage-1 signal that unblocks ERP #7 soonest.
-
-> **"2-segment" is descriptive, never an invariant.** `pathId` is variable-depth by design and
-> **nothing keys on segment count** — validation is the first-segment literal (`careers` | `skills`)
-> plus manifest resolvability. This plan's id is the full slash string `skills/accounting`, with no
-> separate `category` field, and every pattern in this plan matches the full id. An unresolvable or
-> malformed id is a hard `safeParse` rejection — no coercion, alias, or normalization. Plan 02 owns
-> this contract; see
-> [tech-docs §`pathId` conformance rules](./tech-docs.md#pathid-conformance-rules-plan-02s-ruling--binding-not-re-derived-here).
+The original single-path plan expressed the handoff to plan 07 as `UNBLOCKS_ERP_COURSES: 7` (and
+similar course-number lists). **This rewrite invalidates that mapping twice over**: plan 06's own
+course numbers moved (A9's expansion, A6's capstone removal), and plan 07 will undergo the identical
+A9 expansion when it is rewritten, invalidating whatever ERP course numbers this plan cited. **Course
+numbers do not survive either plan's renumbering; stage names do.** The stage-signal contract
+therefore now names the **ERP capability stage** a given accounting stage unblocks — described
+functionally (e.g. "the ERP stage delivering subledger-to-GL posting / record-to-report capability")
+rather than by an ERP course number this plan has no authority to assert, since plan 07 has not yet
+been rewritten and its post-rewrite stage names are not this plan's to invent. Full mechanics:
+[tech-docs §Stage-signal contract](./tech-docs.md#stage-signal-contract-the-plan-07-handoff-stage-granularity).
 
 ## Depends-on
 
 | Direction   | Plan (full folder name)                                  | Strength                                                                                        |
 | ----------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `blockedBy` | `ayokoding-learning-path-01-url-restructure`             | **hard** — the `courses/` namespace, `paths/skills/_index.md`, and the two linked prerequisites |
-| `blockedBy` | `ayokoding-learning-path-02-schema-and-prerequisite-dag` | **hard** — `PathManifest` schema with `arc` + variable-depth `pathId` support                   |
+| `blockedBy` | `ayokoding-learning-path-02-schema-and-prerequisite-dag` | **hard** — `PathManifest` schema with `arc` + variable-depth `pathId` support, x2 manifests     |
 | `blockedBy` | `ayokoding-learning-path-03-navigation-ui`               | **hard** — a manifest with no renderer is invisible                                             |
-| `blocks`    | `ayokoding-learning-path-07-skills-erp`                  | **soft overall, hard from ERP #7** — see the stage-signal contract below                        |
+| `blocks`    | `ayokoding-learning-path-07-skills-erp`                  | **soft overall, hard at the record-to-report stage** — stage-granularity contract, see above    |
 | _(none)_    | `ayokoding-learning-path-04-course-authoring`            | **no edge** — verified: both linked prerequisites are plan 01's re-homed bundles                |
 | _(none)_    | `ayokoding-learning-path-05-manifests`                   | **no edge** — disjoint manifest subtrees; neither is on the other's critical path               |
 
-### Stage-signal contract (the handoff to plan 07)
-
-Plan 07 does not wait for this plan to archive. Its own Wave B/C/D gates verify readiness
-**independently** — a direct `test -d <COURSES>$course_id` check against `origin/main` for every
-course its `ACCT_GATE_*` arrays name — and they never read this plan's `delivery.md`. This plan still
-records three **stage-completion signals** in `delivery.md` at the closing gate of each authoring
-phase, as a **human/audit-readable handoff note**: modelled on
-`ayokoding-learning-path-04-course-authoring`'s band-completion signal shape (five fields), but not a
-machine contract plan 07 parses.
-
-| Signal      | Emitted at | `LANDED_COURSE_IDS` includes                                                                                                                           | Unblocks in plan 07                               |
-| ----------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| **Stage 1** | Phase 2    | `financial-statements-and-close-cycle`                                                                                                                 | ERP #7 `record-to-report-systems` (the hard edge) |
-| **Stage 2** | Phase 3    | `inventory-and-cogs-accounting`, `consolidation-and-multi-entity-accounting`, `audit-controls-and-compliance`, `payroll-and-tax-accounting-essentials` | ERP #8, #13, #14, #15                             |
-| **Stage 3** | Phase 5    | `sharia-accounting-and-aaoifi-standards`, `islamic-contract-modeling-for-systems`, `capstone-build-a-general-ledger-system`                            | ERP #19, #20                                      |
-
-Landing these course IDs on `origin/main` genuinely unblocks the named ERP work — that dependency is
-real and load-bearing — but plan 07 confirms it by checking the filesystem itself, never by parsing
-or rejecting this record. Full detail in
-[tech-docs §Stage-signal contract](./tech-docs.md#stage-signal-contract-the-plan-07-handoff).
-
 ## Verification status carried forward (never laundered)
 
-The research seeding this plan marked only **three** items `[Verified]`. Everything else is
-search-summarised `[Unverified]`, and two items are `[Needs Verification]`. Those markers travel into
-this plan's own documents as **open items with named primary sources and named resolution steps** —
-they are not restated as fact anywhere, and Phase 4 exists to close them before the Sharia stage is
-authored.
-
-| ID       | Status                   | Item                                                                                                                                                                                                                                                                                        | Resolves in                                                   |
-| -------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **OI-1** | `[Needs Verification]`   | Indonesian PSAK numbering — "PSAK 59 / SIFAS 101-109" vs "PSAK 101-110"                                                                                                                                                                                                                     | Phase 4                                                       |
-| **OI-2** | `[Needs Verification]`   | Riba doctrinal basis — currently Wikipedia-sourced only, not a primary source                                                                                                                                                                                                               | Phase 4                                                       |
-| **OI-3** | `[Unverified]`           | The three-jurisdiction model claim beyond the three fetched indexes                                                                                                                                                                                                                         | Phase 4                                                       |
-| **OI-4** | routed, already answered | Plan 02's doc-level "a path may omit a prerequisite only if it omits every course that needs it" rule vs this plan's link-don't-walk manifest — already resolved by plan 02's dated ruling, `tech-docs.md §"Link-don't-walk: prerequisite omission is permitted (OI-4 ruling, 2026-07-21)"` | Phase 0 (confirms and records the ruling, does not negotiate) |
-
-Full detail, primary sources, and the exact resolution steps:
-[tech-docs §Open verification items](./tech-docs.md#open-verification-items-oi-1-through-oi-4).
-
-**Also non-negotiable in the content**: there is **no single "Sharia accounting standard."** Three
-structurally different jurisdictional models coexist — AAOIFI (Bahrain), PSAK Syariah (Indonesia,
-which uses AAOIFI as a **basis**, not an adoption), and MFRS plus Bank Negara Malaysia's Shariah
-Governance Policy 2019. **Malaysia is not on AAOIFI's mandatory-adoption list.** The three Sharia
-courses (17, 18 and 20) present three models; a course presenting AAOIFI as "the" standard would be
-wrong.
-
-**The 20-course count is curriculum judgment, not a sourced fact** [Judgment call]. It is labelled as
-such everywhere it appears, including in the catalog table itself.
+The 2026-07-22 `web-researcher` grounding run **resolves OI-1** (the operative Indonesian series is
+PSAK 101-110, not PSAK 59) and **confirms the core of OI-3** (Malaysia is absent from AAOIFI's
+mandatory-adoption list; Indonesia uses AAOIFI as a basis, not an adoption). **OI-2 (the riba
+doctrinal basis) remains OPEN** — only secondary sources were located, and A4 forbids restating it as
+fact. Full status ledger, with sources and access dates: [verification-log.md](./verification-log.md).
 
 ## Delivery Mode: worktree-to-pr
 
@@ -318,15 +363,17 @@ each merge. See [delivery.md](./delivery.md#delivery-mode-worktree-to-pr) for th
 
 ## Navigation
 
-- [Business Requirements (brd.md)](./brd.md) — why accounting is its own path, why it lands before
-  ERP, and what "done" means in business terms.
+- [Business Requirements (brd.md)](./brd.md) — why accounting splits into two paths, why it lands
+  before ERP, and what "done" means in business terms.
 - [Product Requirements (prd.md)](./prd.md) — the silent-failure constraint, personas, user stories,
-  the Gherkin acceptance criteria, and product scope.
-- [Technical Docs (tech-docs.md)](./tech-docs.md) — the 20-course catalog, the DAG join, the landing
-  content contract, the open verification items, the design decisions, and the UI/API gate postures.
+  the Gherkin acceptance criteria, and product scope for both paths.
+- [Technical Docs (tech-docs.md)](./tech-docs.md) — the twenty-four-course catalog, the two-manifest
+  mechanics, the licensing posture, the DAG join, the landing content contracts, the open
+  verification items, the design decisions, and the UI/API gate postures.
 - [Delivery Checklist (delivery.md)](./delivery.md) — the eleven-phase executable checklist.
 - [Learnings (learnings.md)](./learnings.md) — knowledge-capture running log.
 - [Verification Log (verification-log.md)](./verification-log.md) — the grep-checkable ledger for the
   four carried open items (OI-1 through OI-4).
-- `syllabus/courses/` and `syllabus/paths/` — created by Phase 1; the 20 per-course specs and the
-  `manifest-skills-accounting.md` path mirror this plan authors and owns.
+- `syllabus/courses/` and `syllabus/paths/` — created by Phase 1; the 24 per-course specs (each with
+  a module/topic breakdown) and the two `manifest-skills-*.md` path mirrors this plan authors and
+  owns.
