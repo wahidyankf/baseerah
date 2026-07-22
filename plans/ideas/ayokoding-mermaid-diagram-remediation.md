@@ -44,6 +44,31 @@ with a **directory-scoped** local gate guarantees a class of failure that is str
 until CI runs. The two scopes should match, or the local gate should state which paths it
 deliberately does not cover.
 
+#### Root cause re-measured 2026-07-22: divergent CI flags, not divergent content
+
+The account above named the local-gate scope as the cause. That is a real contributing factor but
+**not** why `ose-primer` alone is red. Measured directly, the three repos invoke the same validator
+with three different flag sets in `.github/workflows/main-ci.yml`:
+
+| Repo         | `md mermaid validate` flags                                                                         | `main-ci` on `main` |
+| ------------ | --------------------------------------------------------------------------------------------------- | ------------------- |
+| `ose-public` | `--exclude apps/rhino-cli/tests/fixtures --exclude plans/done --exclude apps/ayokoding-www/content` | green               |
+| `ose-infra`  | `--max-depth=4 --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`                        | green               |
+| `ose-primer` | `--exclude apps/rhino-cli/tests/fixtures`                                                           | **red**             |
+
+`ose-primer` is the only one missing `--exclude plans/done`. The file it fails on,
+`plans/done/2026-07-03__unify-rhino-cli-sdlc-parity/tech-docs.md`, is **byte-identical** in
+`ose-public` and `ose-primer` (`diff` of both `origin/main` blobs reports no difference), and
+`ose-infra` carries 423 files under `plans/done/` of its own. So identical content passes in two
+repos and fails in the third purely on a flag. `--max-depth=4` is a second divergence, present only
+in `ose-infra`.
+
+This reframes the fix. Editing the three violations in an archived plan document treats the symptom
+and leaves the divergence in place; the root-cause fix is deciding which flag set is correct and
+bringing all three to it. That is a CI-parity question, not a diagram question — and it is worth
+asking whether `ose-primer`'s stricter form is the right one and the other two repos' `plans/done`
+excludes are the drift, rather than assuming the majority is correct.
+
 ## Why now
 
 A temporary `--exclude apps/ayokoding-www/content` is in place in `.github/workflows/main-ci.yml` and

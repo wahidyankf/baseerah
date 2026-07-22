@@ -286,6 +286,18 @@ the secret/sensitivity gate before it is ever written. Entry shape:
   directly against `ose-infra`, and the two agreed at `0 violation(s)`. That measurement also
   established `ose-infra` has **no** equivalent exposure: both its workflows use the qualified form
   and its scheduled runs were green, so the Phase 4 finding does not generalize to it.
+- **Root cause corrected at Phase 7 (2026-07-22)** — the account above blamed the local gate's
+  directory scope. That is a contributing factor, not the reason `ose-primer` alone is red. The three
+  repos invoke the same validator with three different flag sets in `main-ci.yml`: `ose-public` uses
+  `--exclude apps/rhino-cli/tests/fixtures --exclude plans/done --exclude apps/ayokoding-www/content`,
+  `ose-infra` uses `--max-depth=4 --exclude plans/done --exclude apps/rhino-cli/tests/fixtures`, and
+  `ose-primer` uses only `--exclude apps/rhino-cli/tests/fixtures`. `ose-primer` is the sole repo
+  missing `--exclude plans/done`, and the file it fails on is **byte-identical** to `ose-public`'s
+  copy (`diff` of both `origin/main` blobs: no difference). Identical content, opposite verdicts,
+  decided by a flag. Editing the archived diagram would treat the symptom; the root-cause fix is a
+  CI-parity decision about which flag set is correct — and `ose-primer`'s stricter form may well be
+  the right one, with the other two repos' `plans/done` excludes being the drift. The corrected
+  measurement is folded into the same brief.
 
 ## Learning: a bare repo cannot push at all — the pre-push hook needs a work tree the repo does not have
 
