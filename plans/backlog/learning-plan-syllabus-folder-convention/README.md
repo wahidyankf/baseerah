@@ -105,9 +105,12 @@ corpus when its custodian archives, are both unanswered.
    convention and file the deterministic validator as a two-pager.
 6. **Phase 5 — Quality gates, draft PR, CI, and the three PR-review cycles.** The PR is deliberately
    left open: under the Archival-in-PR rule, knowledge capture and archival land inside this same PR.
-7. **Phase 6 — Knowledge capture**, committed to the PR branch.
-8. **Phase 7 — Plan archival**, also committed to the PR branch, then the merge, then worktree
-   removal.
+7. **Phase 6 — Cross-repo propagation.** One worktree and one PR each for `ose-primer` and
+   `ose-infra`, carrying the convention and its enforcement — not the `plans/` corpora. Reviewed and
+   green, but deliberately unmerged.
+8. **Phase 7 — Knowledge capture**, committed to the PR branch.
+9. **Phase 8 — Plan archival**, also committed to the PR branch, then the `ose-public` merge, then the
+   two sibling merges in that order, then worktree removal.
 
 ## Where this plan sits
 
@@ -152,8 +155,9 @@ flowchart TD
     P3["Phase 3<br/>Worked example"]:::build
     P4["Phase 4<br/>Conformance recipe"]:::build
     P5["Phase 5<br/>Quality gates + PR"]:::gate
-    P6["Phase 6<br/>Knowledge capture"]:::gate
-    P7["Phase 7<br/>Archival"]:::done
+    P6["Phase 6<br/>Cross-repo propagation"]:::gate
+    P7["Phase 7<br/>Knowledge capture"]:::gate
+    P8["Phase 8<br/>Archival"]:::done
 
     P0 -->|"gate: baseline clean"| P1
     P1 -->|"gate: convention indexed + linted"| P2
@@ -161,7 +165,8 @@ flowchart TD
     P3 -->|"gate: 3 corpora declared"| P4
     P4 -->|"gate: recipe runs, idea filed"| P5
     P5 -->|"gate: CI green + review cycles"| P6
-    P6 -->|"gate: learnings terminal"| P7
+    P6 -->|"gate: 3 PRs open + green"| P7
+    P7 -->|"gate: learnings terminal"| P8
 
     classDef setup fill:#CA9161,stroke:#000000,color:#000000
     classDef build fill:#0173B2,stroke:#000000,color:#FFFFFF

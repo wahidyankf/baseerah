@@ -106,6 +106,15 @@ and plans 02/07. Plans 06 and 07 are uniformly bullets `[Repo-grounded]`.
 
 ## Design Decisions
 
+> **Provenance.** This plan was promoted by an agent that had no interactive question tool, so the
+> [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md)'s
+> mandatory pre-write and post-write grills did not run when the decisions below were first written —
+> all twelve were the promoting agent's defaults. They were put to the user afterwards. `DD-07`
+> (corpus disposition), `DD-08` (custody), `DD-09`/`DD-10` (checker step at HIGH, no validator) and
+> `DD-11` (no retrofit) were **ratified as written**. `DD-12` was **overturned** — cross-repo
+> propagation is now in scope. Recording this because a decision an agent made alone and a decision a
+> human ratified are not the same artifact, and a later reader cannot otherwise tell them apart.
+
 ### DD-01 — The convention is a new standalone file, not a section of `plans.md`
 
 `plans.md` is already 1127 lines `[Repo-grounded]` and covers the plan lifecycle generally. A
@@ -306,37 +315,62 @@ body of any existing course or manifest file. The only edits to existing corpora
 `**Custodian**` line in each `syllabus/README.md` and the `## Corpus Disposition` section in each
 custodian plan's `tech-docs.md`.
 
-### DD-12 — No cross-repo propagation in this plan
+### DD-12 — Cross-repo propagation is in scope, and lands in Phase 6
 
-`ose-primer` and `ose-infra` carry no learning-bearing plan today, so there is nothing for the rule to
-govern there. If one appears, propagation follows the existing
+**Superseded during promotion review.** The original decision excluded propagation because
+`ose-primer` and `ose-infra` carry no learning-bearing plan today, so "there is nothing for the rule to
+govern there."
+
+That reasoning does not hold. It conflates whether the rule has anything to **govern** in a sibling
+with whether the rule's **text and enforcement** must exist there. The convention document, the two
+governance index entries, the `plans.md` cross-reference, and the `plan-maker` / `plan-checker` /
+`plan-fixer` edits are shared governance surfaces carried by all three repos. Leaving them out of the
+siblings means `plan-maker` there emits plans that `plan-checker` here would reject — drift created by
+construction, not discovered later.
+
+Propagation therefore runs as [Phase 6](./delivery.md) of this plan, following the
 [plan-multi-repo-parity-planning](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
-workflow rather than a bespoke step here.
+workflow, with one worktree and one PR per sibling. The `ose-public` PR merges first; the sibling PRs
+merge after it, in Phase 8.
+
+What is **not** propagated: anything under `plans/` — the `ayokoding-learning-path-*` corpora and their
+custody declarations are `ose-public` content with no counterpart in a sibling. The propagated surface
+is the convention and its enforcement, nothing else.
+
+Two constraints inherited from the siblings' topology, both verified rather than assumed: each is a
+**bare** repository (`git rev-parse --is-bare-repository` reports `true`), so every git operation runs
+through a worktree per the
+[bare-repo landing method](../../../repo-governance/development/workflow/bare-repo-landing-method.md);
+and this plan's own folder is archived inside the `ose-public` PR while sibling PRs may still be open,
+a known structural limitation filed as
+[plan-archival-in-pr-multi-repo-gap](../../ideas/plan-archival-in-pr-multi-repo-gap.md).
 
 ## File Impact
 
-| Path                                                                                      | Change     | Notes                                                                   |
-| ----------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------- |
-| `repo-governance/conventions/structure/learning-plan-syllabus.md`                         | **create** | _New file_ — the convention, template, disposition, custody             |
-| `repo-governance/conventions/structure/README.md`                                         | edit       | Index entry, alphabetical among the Documents list                      |
-| `repo-governance/conventions/README.md`                                                   | edit       | Top-level convention index entry                                        |
-| `repo-governance/conventions/structure/plans.md`                                          | edit       | Cross-reference beside the UI-bearing sentence in §Multi-File Structure |
-| `.claude/agents/plan-maker.md`                                                            | edit       | Learning-bearing requirement + delivery steps to emit                   |
-| `.claude/agents/plan-checker.md`                                                          | edit       | New Step 5n                                                             |
-| `.claude/agents/plan-fixer.md`                                                            | edit       | Scaffold action for a missing syllabus record                           |
-| `.claude/skills/plan-creating-project-plans/SKILL.md`                                     | edit       | Learning-bearing section beside the UI-bearing one                      |
-| `repo-governance/workflows/plan/plan-quality-gate.md`                                     | edit       | Add Step 5n to the validation-scope list                                |
-| `.opencode/agents/plan-{maker,checker,fixer}.md`                                          | regenerate | Never hand-edited; produced by `npm run generate:bindings`              |
-| `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md` | edit       | `**Custodian**` line                                                    |
-| `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md`       | edit       | `## Corpus Disposition` section                                         |
-| `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/README.md`           | edit       | `**Custodian**` line                                                    |
-| `plans/backlog/ayokoding-learning-path-06-skills-accounting/tech-docs.md`                 | edit       | `## Corpus Disposition` section                                         |
-| `plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/README.md`                  | edit       | `**Custodian**` line                                                    |
-| `plans/backlog/ayokoding-learning-path-07-skills-erp/tech-docs.md`                        | edit       | `## Corpus Disposition` section                                         |
-| `plans/backlog/ayokoding-learning-path-04-course-authoring/tech-docs.md`                  | edit       | `custodied-by:` consumer declaration                                    |
-| `plans/backlog/ayokoding-learning-path-05-manifests/tech-docs.md`                         | edit       | `custodied-by:` consumer declaration                                    |
-| `plans/ideas/syllabus-conformance-validator.md`                                           | **create** | _New file_ — the deferred deterministic check                           |
-| `plans/ideas/README.md`                                                                   | edit       | Index line for the new two-pager                                        |
+| Path                                                                                      | Change            | Notes                                                                   |
+| ----------------------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
+| `repo-governance/conventions/structure/learning-plan-syllabus.md`                         | **create**        | _New file_ — the convention, template, disposition, custody             |
+| `repo-governance/conventions/structure/README.md`                                         | edit              | Index entry, alphabetical among the Documents list                      |
+| `repo-governance/conventions/README.md`                                                   | edit              | Top-level convention index entry                                        |
+| `repo-governance/conventions/structure/plans.md`                                          | edit              | Cross-reference beside the UI-bearing sentence in §Multi-File Structure |
+| `.claude/agents/plan-maker.md`                                                            | edit              | Learning-bearing requirement + delivery steps to emit                   |
+| `.claude/agents/plan-checker.md`                                                          | edit              | New Step 5n                                                             |
+| `.claude/agents/plan-fixer.md`                                                            | edit              | Scaffold action for a missing syllabus record                           |
+| `.claude/skills/plan-creating-project-plans/SKILL.md`                                     | edit              | Learning-bearing section beside the UI-bearing one                      |
+| `repo-governance/workflows/plan/plan-quality-gate.md`                                     | edit              | Add Step 5n to the validation-scope list                                |
+| `.opencode/agents/plan-{maker,checker,fixer}.md`                                          | regenerate        | Never hand-edited; produced by `npm run generate:bindings`              |
+| `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md` | edit              | `**Custodian**` line                                                    |
+| `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/tech-docs.md`       | edit              | `## Corpus Disposition` section                                         |
+| `plans/backlog/ayokoding-learning-path-06-skills-accounting/syllabus/README.md`           | edit              | `**Custodian**` line                                                    |
+| `plans/backlog/ayokoding-learning-path-06-skills-accounting/tech-docs.md`                 | edit              | `## Corpus Disposition` section                                         |
+| `plans/backlog/ayokoding-learning-path-07-skills-erp/syllabus/README.md`                  | edit              | `**Custodian**` line                                                    |
+| `plans/backlog/ayokoding-learning-path-07-skills-erp/tech-docs.md`                        | edit              | `## Corpus Disposition` section                                         |
+| `plans/backlog/ayokoding-learning-path-04-course-authoring/tech-docs.md`                  | edit              | `custodied-by:` consumer declaration                                    |
+| `plans/backlog/ayokoding-learning-path-05-manifests/tech-docs.md`                         | edit              | `custodied-by:` consumer declaration                                    |
+| `plans/ideas/syllabus-conformance-validator.md`                                           | **create**        | _New file_ — the deferred deterministic check                           |
+| `plans/ideas/README.md`                                                                   | edit              | Index line for the new two-pager                                        |
+| `ose-primer` — same convention, index, `plans.md`, 3 plan-agents, workflow entry          | **create** + edit | Phase 6 propagation; adapted to that repo's own step numbering          |
+| `ose-infra` — same set                                                                    | **create** + edit | Phase 6 propagation; record any surface that legitimately differs       |
 
 No file under `apps/`, `libs/`, `specs/`, or any `syllabus/courses/*.md` body is modified.
 

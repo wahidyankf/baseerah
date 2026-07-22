@@ -73,7 +73,7 @@ incidental:
 Because there is exactly one independent node set, the plan is **one worktree → one branch → one
 PR**, consistent with the 1-PR ↔ 1-worktree rule for a plan whose nodes cannot be separated.
 
-**Cleanup is the terminal node**: worktree removal (Phase 7) depends on every delivery node and on
+**Cleanup is the terminal node**: worktree removal (Phase 8) depends on every delivery node and on
 the archival commit being pushed.
 
 ```mermaid
@@ -85,8 +85,8 @@ flowchart TD
     P3["Phase 3<br/>worked example"]:::work
     P4["Phase 4<br/>recipe + deferral"]:::work
     P5["Phase 5<br/>gates + PR cycle"]:::gate
-    P6["Phase 6<br/>knowledge capture"]:::gate
-    P7["Phase 7<br/>archival + cleanup"]:::term
+    P6["Phase 7<br/>knowledge capture"]:::gate
+    P7["Phase 8<br/>archival + cleanup"]:::term
 
     P0 --> P1
     P1 -->|"writes the rule P2 enforces"| P2
@@ -440,8 +440,8 @@ flowchart TD
       exit `escalated`
 
 > **Do NOT merge here.** Under the `*-to-pr` Archival-in-PR rule, the Knowledge Capture commit
-> (Phase 6) and the archival move (Phase 7) land **inside this same PR**, on the PR branch, before
-> the merge. The merge is the final step of Phase 7. See
+> (Phase 7) and the archival move (Phase 8) land **inside this same PR**, on the PR branch, before
+> the merge. The merge is the final step of Phase 8. See
 > [plan-execution §8 Archival-in-PR](../../../repo-governance/workflows/plan/plan-execution.md#8-finalization-and-archival-sequential).
 
 ### Phase 5 Gate
@@ -459,7 +459,88 @@ flowchart TD
 > green — but nothing is merged, so `main` is untouched and the branch can be abandoned without
 > consequence. Safe to stop. To resume: re-read `learnings.md` and continue with Phase 6.
 
-## Phase 6: Knowledge Capture
+## Phase 6: Cross-Repo Propagation to `ose-primer` and `ose-infra`
+
+> **Why this phase exists.** The convention document, its two governance index entries, the
+> `plans.md` cross-reference, and the `plan-maker` / `plan-checker` / `plan-fixer` edits are **shared
+> governance surfaces**, not `ose-public` content. `DD-12` originally excluded propagation on the
+> grounds that neither sibling carries a learning-bearing plan today. That reasoning conflates two
+> different things: whether the rule has anything to _govern_ there, and whether the rule's _text and
+> enforcement_ must exist there. They must — otherwise `plan-maker` in a sibling repo emits plans that
+> `plan-checker` in `ose-public` would reject, which is drift by construction. Ratified by the user.
+>
+> **Sequencing.** Phase 5 deliberately leaves the `ose-public` PR **open and unmerged**, and Phase 8
+> merges it as its final step. The sibling PRs are authored and reviewed _here_, concurrently, and
+> merge in Phase 8 **after** `ose-public` merges — the convention's home repo lands first. Note the
+> known structural limitation: this plan's folder is archived inside the `ose-public` PR while the
+> sibling PRs may still be open, filed as
+> [plan-archival-in-pr-multi-repo-gap](../../ideas/plan-archival-in-pr-multi-repo-gap.md).
+>
+> **Both siblings are bare repositories.** `git -C <repo> rev-parse --is-bare-repository` reports
+> `true` for each. Every git and tooling invocation below must therefore follow
+> [the bare-repo landing method](../../../repo-governance/development/workflow/bare-repo-landing-method.md);
+> a plain `git -C` write against either repo root will not behave as it does in `ose-public`.
+
+### 6.1 — Confirm the propagation surface before copying anything
+
+- [ ] [AI] Enumerate the exact files this plan created or edited that are shared surfaces, from the
+      File Impact table in [tech-docs.md](./tech-docs.md) — acceptance: the list contains the
+      convention document, the two index entries, the `plans.md` cross-reference, the three
+      plan-agent definitions, and the `plan-quality-gate` workflow entry; it contains **no**
+      `plans/backlog/ayokoding-learning-path-*` path and no `plans/` corpus file, because those are
+      `ose-public` content that does not exist in a sibling.
+- [ ] [AI] For each sibling, confirm the target file either exists or is legitimately absent:
+      `for r in ose-primer ose-infra; do for p in <each shared path>; do git -C "/Users/wkf/ose-projects/$r" cat-file -e "main:$p" 2>/dev/null || echo "ABSENT $r $p"; done; done`
+      — acceptance: every `ABSENT` line is one you can justify in writing before proceeding. A silent
+      empty result here is **not** a pass: run it once with a deliberately fake path appended to the
+      list and confirm that path prints `ABSENT`, proving the probe reports absence at all.
+
+### 6.2 — `ose-primer`: worktree, apply, PR
+
+- [ ] [AI] Create a worktree off `origin/main` per the bare-repo landing method — acceptance:
+      `git -C /Users/wkf/ose-projects/ose-primer worktree list` lists the new path
+- [ ] [AI] Run `npm install` **and** `npm run doctor -- --fix` in the new worktree, per
+      [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md)
+      — acceptance: both exit 0
+- [ ] [AI] Apply the convention document and every shared-surface edit, **adapted to that repo's own
+      existing text** — this is not a blind file copy. Where a sibling's `plan-checker.md` numbers its
+      steps differently, the new step takes that repo's next free number, not `ose-public`'s
+      — acceptance: the convention's normative content is identical; only numbering and surrounding
+      prose differ
+- [ ] [AI] Regenerate platform bindings in the worktree: `npm run generate:bindings`
+      — acceptance: exits 0, and `git status --porcelain` shows the `.opencode/` and `.amazonq/`
+      artifacts regenerated rather than hand-edited
+- [ ] [AI] Run the repo's own gates: `npm run lint:md`, plus `md links validate`,
+      `md heading-hierarchy validate` — acceptance: all exit 0
+- [ ] [AI] Open a draft PR — acceptance: `gh pr view --json state` reports `OPEN`
+- [ ] [AI] Run the PR-Review Maker→Fixer Cycle, **maximum 3 cycles** — acceptance: 0 CRITICAL +
+      0 HIGH outstanding, every inline thread answered
+- [ ] [AI] **Do NOT merge.** The merge is ordered in Phase 8.
+
+### 6.3 — `ose-infra`: worktree, apply, PR
+
+- [ ] [AI] Repeat every step of 6.2 against `/Users/wkf/ose-projects/ose-infra`
+      — acceptance: same criteria, same 3-cycle review ceiling, same do-not-merge rule
+- [ ] [AI] Record any surface that legitimately differs in `ose-infra` (it is the private
+      infrastructure repo and does not participate in every parity loop) — acceptance: each
+      difference is written down with a reason, not silently skipped
+
+### Phase 6 Gate
+
+> All checks below must pass before starting Phase 7.
+
+- [ ] [AI] Both sibling PRs report `OPEN`, with every check `conclusion: success`
+- [ ] [AI] The convention's normative text is byte-identical across all three repos:
+      `for r in ose-public ose-primer ose-infra; do git -C "/Users/wkf/ose-projects/$r" show "<branch>:repo-governance/conventions/structure/learning-plan-syllabus.md" | shasum; done`
+      prints **one distinct hash**. Negative control: appending a single character to any one copy
+      makes it print two — run that mutation once and confirm it does, then revert it.
+- [ ] [AI] No sibling worktree holds uncommitted work: `git status --porcelain` prints nothing in each
+- [ ] [AI] `ose-public`'s PR is still `OPEN` and unmerged — propagation must not have merged it early
+
+> **Pause Safety**: three PRs are open, reviewed and green; nothing is merged in any repo. Safe to
+> stop. To resume: re-read `learnings.md` and continue with Phase 7.
+
+## Phase 7: Knowledge Capture
 
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
@@ -482,7 +563,7 @@ flowchart TD
       `No generalizable learnings — <one-line reason>`
       — acceptance: `learnings.md` is never silently empty
 
-### Phase 6 Gate
+### Phase 7 Gate
 
 > All checks below must pass before Plan Archival.
 
@@ -494,12 +575,12 @@ flowchart TD
 > process depends on querying it later. Safe to stop. To resume: re-read `learnings.md` and confirm
 > every entry is terminal.
 
-## Phase 7: Plan Archival
+## Phase 8: Plan Archival
 
 - [ ] [AI] Verify every delivery checklist item in Phases 0-6 is ticked
       — acceptance: reading `plans/in-progress/learning-plan-syllabus-folder-convention/delivery.md`
-      from its top through the end of the Phase 6 Gate shows no `- [ ]` line; the only unticked boxes
-      remaining are the ones in this Phase 7 section, which tick as they are performed
+      from its top through the end of the Phase 7 Gate shows no `- [ ]` line; the only unticked boxes
+      remaining are the ones in this Phase 8 section, which tick as they are performed
 - [ ] [AI] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a
       terminal state or the file records the explicit `No generalizable learnings — <reason>` escape,
       and both safety gates were applied
@@ -534,12 +615,22 @@ flowchart TD
       `origin/main`; all quality gates green; tester gates exempt per
       [tech-docs §Exemptions](./tech-docs.md#exemptions-declared))
       — acceptance: `gh pr view --json state` reports `MERGED`
+- [ ] [AI] **Merge the two sibling PRs from Phase 6, in that order and only now** — `ose-public` is the
+      convention's home repo and lands first, so neither sibling can be the sole carrier of a rule its
+      origin has not yet adopted — acceptance: `gh pr view --json state` reports `MERGED` for the
+      `ose-primer` PR and for the `ose-infra` PR, and each merge commit's CI reports `conclusion: success`
+- [ ] [AI] Re-run the byte-identity check from the Phase 6 Gate against the **merged** `main` of all
+      three repos — acceptance: one distinct hash. This is the check that would catch a sibling PR
+      that drifted between review and merge, which the Phase 6 Gate could not see.
 - [ ] [AI] Remove the worktree **after** the merge completes:
       `git worktree remove worktrees/learning-plan-syllabus-folder-convention`
       — acceptance: `git worktree list` no longer prints a line containing
       `worktrees/learning-plan-syllabus-folder-convention`
+- [ ] [AI] Remove both sibling worktrees created in Phase 6, after their merges complete
+      — acceptance: `git -C /Users/wkf/ose-projects/ose-primer worktree list` and the same for
+      `ose-infra` no longer print this plan's worktree path
 
-### Phase 7 Gate
+### Phase 8 Gate
 
 > The terminal gate. All checks below must pass for the plan to be considered delivered.
 

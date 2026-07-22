@@ -140,8 +140,9 @@ Feature: Learning-bearing plans carry a governed syllabus
   cross-reference if the checker step numbering requires it.
 - Authoring course bodies, changing the course catalog, or touching `apps/ayokoding-www/content/`.
 - Moving any existing corpus out of `plans/`.
-- Cross-repo propagation to `ose-primer` / `ose-infra` (those repos carry no learning-bearing plan
-  today; propagation follows the existing parity workflow if and when they do).
+- Propagating anything under `plans/` to `ose-primer` / `ose-infra` — the `ayokoding-learning-path-*`
+  corpora and their custody declarations are `ose-public` content with no sibling counterpart.
+  Propagation of the convention and its enforcement **is** in scope; see `DD-12` and Phase 6.
 
 ## Product Risks
 
