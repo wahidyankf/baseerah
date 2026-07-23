@@ -139,10 +139,21 @@ after all three repos are done.
       governance; new tradeoff → architecture; domain-intent → correctness)
       — acceptance: file exists; `grep -c "tie-breaker" <path>` ≥ 1; the architecture↔correctness
       boundary is named as the coordinator's re-categorization responsibility
-- [ ] [AI] Embed the four grey-zone rulings verbatim (new cross-module dependency; naming format vs.
-      should-this-boundary-exist; error-handling shape vs. domain error scenarios; spec-file presence
-      vs. scenario completeness)
-      — acceptance: all four rulings present; `grep -c "→" <path>` ≥ 4
+- [ ] [AI] Embed the six grey-zone rulings verbatim (four core: new cross-module dependency; naming
+      format vs. should-this-boundary-exist; error-handling shape vs. domain error scenarios; spec-file
+      presence vs. scenario completeness — plus the two D1-added: performance↔architecture and
+      docs↔governance)
+      — acceptance: all six rulings present; `grep -c "→" <path>` ≥ 6
+- [ ] [AI] Document the **Cloudflare-folded cost/noise mechanics** in the convention, mirroring
+      [tech-docs.md §Cost-Control & Noise-Control Mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23):
+      the **risk-tier fan-out** (D12: trivial/lite/full → 2/4/7 agents, security paths force full), the
+      **diff-filter + generated-file exclusion list + shared-context + large-diff slicing** (D13), the
+      per-specialist **`SUPPRESS` block** requirement, the **instruction-decay** governance charter
+      (D14), the **human-dismissal-respect** re-review rule, and the **boundary-tag-strip**
+      untrusted-input hardening
+      — acceptance: `grep -cE "risk-tier|SUPPRESS|instruction-decay|generated-file" <path>` ≥ 4; the
+      generated-exclusion list names `.opencode`/`.amazonq`/`generated`/lock files and states
+      `.claude/agents` + `repo-governance` are never excluded
 - [ ] [AI] Add the accessible Mermaid boundary-decision flowchart (color-blind palette) mirroring
       [tech-docs.md](./tech-docs.md#boundary-decision-the-tie-breaker-as-a-flowchart)
       — acceptance: `npx rhino-cli md mermaid validate <path>` (or repo md-mermaid gate) exits 0
@@ -184,9 +195,12 @@ after all three repos are done.
       routes to governance + architecture per the charter table
   - _Suggested executor: `agent-maker`_
 - [ ] [AI] Author `.claude/agents/pr-review-governance-maker.md` (mechanical `repo-governance/`
-      conformance, naming/structure, spec-file presence), same inheritance + charter
+      conformance, naming/structure, spec-file presence, **plus the instruction-decay charter (D14,
+      recommended home)** — flags a framework/build-tool/CI/env change not reflected in
+      `AGENTS.md`/`CLAUDE.md`/`.claude/`), same inheritance + charter
       — acceptance: file present; explicitly routes "should a new rule exist" to architecture and
-      "scenario completeness" to logic
+      "scenario completeness" to logic; carries the instruction-decay responsibility (or D14 resolved to
+      an eighth `pr-review-instruction-maker` file instead)
   - _Suggested executor: `agent-maker`_
 - [ ] [AI] Author `.claude/agents/pr-review-security-maker.md` (secrets, injection, untrusted-input,
       git-fixture isolation, unsafe git/FS ops), same inheritance + charter
@@ -206,6 +220,13 @@ after all three repos are done.
       — acceptance: file present; NOT-its-job routes mechanical doc-convention conformance to governance
       per the charter table (docs↔governance grey-zone)
   - _Suggested executor: `agent-maker`_
+- [ ] [AI] Give every specialist file an explicit **`SUPPRESS` block** (what it must NOT raise at all —
+      nitpicks, style already enforced by a mechanical gate, speculative "consider adding X" when X is
+      present, defense-in-depth on adequately-defended paths), distinct from its NOT-its-job routing
+      column, and inherit the two sharpened rules (re-review **does not re-raise a human-dismissed
+      finding**; untrusted-input **strips user-supplied boundary tags** from PR body/comment/issue text)
+      — acceptance: `grep -lc "SUPPRESS" .claude/agents/pr-review-*-maker.md` lists all seven specialist
+      files; each also references the human-dismissal-respect and boundary-tag-strip rules
 - [ ] [AI] Register all seven in `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
       under the appropriate section
       — acceptance: `grep -c "pr-review-architecture-maker\|pr-review-logic-maker\|pr-review-governance-maker\|pr-review-security-maker\|pr-review-integrity-maker\|pr-review-performance-maker\|pr-review-docs-maker" AGENTS.md` = 7 (or all present)
@@ -243,6 +264,15 @@ after all three repos are done.
       exactly one consolidated review; top model tier justified in a Model Selection Justification block
       — acceptance: file present; frontmatter names the top tier (inherited opus); charter states it
       produces ONE consolidated review consumed by `pr-review-fixer`
+  - _Suggested executor: `agent-maker`_
+- [ ] [AI] Give the coordinator the folded pre/post-fan-out duties (D12/D13): **classify the PR risk-tier**
+      (trivial/lite/full, security paths force full) and select the specialist set accordingly; **assemble
+      the shared-context brief once** (PR metadata + linked-plan/issue + filtered diff with generated files
+      excluded) rather than each specialist re-deriving it; **read prior-cycle thread resolution status**
+      (including human "won't fix") before fanning out; record the tier + any diff-slicing in the
+      consolidated review header
+      — acceptance: charter names the risk-tier classification, the shared-context assembly, the
+      generated-file exclusion, and the human-dismissal read; the review header format includes the tier
   - _Suggested executor: `agent-maker`_
 - [ ] [AI] Register the coordinator in `AGENTS.md` and `.claude/agents/README.md`
       — acceptance: coordinator listed in both registers
@@ -357,9 +387,10 @@ after all three repos are done.
 
 - [ ] [AI] Author the post-cutover monitoring section in the convention: precision, per-discipline
       acceptance rate (watching the two added lenses `performance`/`docs` and the catch-all
-      `governance`/`logic`), BitsAI-CR "Outdated Rate", and cost/latency per review across seven
-      specialists × three cycles
-      — acceptance: `grep -ci "Outdated Rate\|acceptance rate\|precision" <convention>` ≥ 1; the section
+      `governance`/`logic`), BitsAI-CR "Outdated Rate", cost/latency per review **tracked per risk-tier**
+      (D12 — a flat cost across tiers means the tiering is not taking effect), and the **human-override
+      rate** (Cloudflare's break-glass trust proxy, an early trust-erosion signal)
+      — acceptance: `grep -ci "Outdated Rate\|acceptance rate\|precision\|override rate\|risk-tier" <convention>` ≥ 2; the section
       is framed as post-cutover monitoring, not a pre-cutover gate
 - [ ] [AI] Document the **rollback trigger** (per D6): the rollback bar, the monitoring window, and the
       exact restore procedure (`git revert`/`git checkout` of the deleted `pr-review-maker.md` + register

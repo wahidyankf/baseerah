@@ -45,6 +45,13 @@ governance/workflow markdown + register/binding updates** — there is no runtim
   trustworthy.
 - **US-8** — As the trunk integrator, I want a merge queue adopted so that merge-precondition (c)
   holds under concurrent worktree-to-PR merges, not only when PRs merge one at a time.
+- **US-9** — As the cost owner, I want the fan-out scaled to diff size (risk-tier) and generated/
+  emitted files excluded from the review diff, so that a trivial or docs-only PR does not pay for a
+  full seven-specialist review and a giant restructure stays reviewable.
+- **US-10** — As the reviewer-set author, I want each specialist to carry an explicit "what NOT to
+  flag" suppression block, the governance lens to catch instruction-decay, and re-reviews to respect a
+  human "won't fix", so that the consolidated review stays high-signal and does not nag on dismissed
+  or out-of-scope points.
 
 ## Acceptance Criteria
 
@@ -154,12 +161,39 @@ Scenario: The identical shared-scaffolding artifacts propagate from ose-public t
   And no infra-private content is cross-routed out of ose-infra
 ```
 
+### AC-10: The fan-out is risk-tiered and the review diff excludes generated files
+
+```gherkin
+Scenario: Review scope scales to diff size and skips generated output
+  Given the reviewer-discipline convention defines the trivial, lite, and full risk tiers and the generated-file exclusion list
+  When a PR is classified for review
+  Then a trivial-sized PR with no security-sensitive path fans out to fewer agents than a full-sized one
+  And any path touching secrets, git identity, or CI is forced to the full tier regardless of size
+  And emitted or generated files (.opencode, .amazonq, generated, lock, minified) are excluded from the review diff while .claude/agents and repo-governance are never excluded
+  And CI still runs over the entire change unaffected by the review-scope filter
+```
+
+### AC-11: Suppression, instruction-decay, and human-dismissal rules are in effect
+
+```gherkin
+Scenario: The consolidated review stays high-signal and respects human dismissal
+  Given each specialist charter carries a SUPPRESS block and the governance lens carries an instruction-decay charter
+  When a review cycle runs on a PR whose diff changes a build tool without updating AGENTS.md and whose author dismissed a prior finding
+  Then the governance specialist flags the instruction-decay drift
+  And no specialist raises a nitpick or a point already enforced by a mechanical gate
+  And the re-review does not re-raise the finding the human explicitly dismissed on its thread
+  And user-supplied structural boundary tags in the PR body are stripped before any model reads them
+```
+
 ## Product Scope
 
 **In scope (features)**:
 
 - Eight new agent-definition files (seven specialists + one coordinator).
-- One new governance convention (reviewer disciplines + tie-breaker + quality-gate enhancements).
+- One new governance convention (reviewer disciplines + tie-breaker + quality-gate enhancements +
+  the Cloudflare-folded cost/noise mechanics: risk-tier fan-out (D12), diff-filter/generated-exclusion
+  - shared-context + large-diff posture (D13), per-specialist SUPPRESS blocks, instruction-decay (D14),
+    human-dismissal-respect, and boundary-tag-strip).
 - Revision of `pr-review-quality-gate.md` and cross-references in `pr-merge-protocol.md` where the
   reviewer count/shape is described; the monolith retired and de-registered at cutover.
 - Register + binding updates.

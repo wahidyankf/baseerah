@@ -80,6 +80,11 @@ an afterthought.
 - Quality-gate enhancements: confidence-calibration spot-check, selective adversarial verification
   for high-risk diffs, a CRITICAL-requires-reproduction rule, and a documented rationale for the
   3-cycle/no-early-exit policy.
+- **Cloudflare-folded cost/noise mechanics** (added 2026-07-23, verified via `web-researcher`):
+  risk-tier fan-out that scales agents to diff size (D12), diff-filter + generated-file exclusion +
+  shared-context + large-diff slicing (D13), per-specialist `SUPPRESS` blocks, instruction-decay
+  coverage (D14), human-dismissal-respect on re-review, and boundary-tag-strip untrusted-input
+  hardening. See [tech-docs.md §Cost-Control & Noise-Control Mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
 - A **post-cutover monitoring plan** (precision, acceptance rate, BitsAI-CR "Outdated Rate") with a
   documented **rollback trigger** that restores the monolith from git history if metrics regress.
 - **Adopt a merge queue** (D7) to harden merge-precondition (c) under concurrent worktree-to-PR

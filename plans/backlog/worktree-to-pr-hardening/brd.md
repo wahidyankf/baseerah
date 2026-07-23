@@ -97,10 +97,12 @@ already-observed number.
   bar; see deferred decision D6.]_
 - **No unresolved-finding regression** (observable fact): after cutover, a `worktree-to-pr` PR still
   reaches the 5 hardened merge preconditions with 0 CRITICAL + 0 HIGH outstanding, exactly as today.
-- **Review cost stays bounded** (observable, tracked): per-PR review cost is budgeted and monitored,
-  given the fan-out multiplies per-cycle agent invocations (Cloudflare median ≈ $0.98/review for its
-  7-agent+coordinator system) [Web-cited]. See the cost/latency risk in
-  [tech-docs.md](./tech-docs.md#risks).
+- **Review cost stays bounded** (observable, tracked): per-PR review cost is budgeted and monitored
+  **per risk-tier**, given the fan-out multiplies per-cycle agent invocations but the risk-tier
+  mechanism (D12) scales the agent count to diff size — Cloudflare's median ≈ $0.98/review holds
+  precisely _because_ most PRs never trigger the full 7-agent fan-out [Web-cited]. See the cost/latency
+  and giant-diff risks in [tech-docs.md](./tech-docs.md#risks) and the
+  [cost/noise mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
 - **Concurrent trunk integration is queue-hardened** (observable fact once executed): a merge queue is
   adopted so merge-precondition (c) holds under concurrent worktree-to-PR merges, not just serially.
 
@@ -113,13 +115,14 @@ already-observed number.
 
 ## Business Risks and Mitigations
 
-| Risk                                                   | Likelihood            | Mitigation                                                                                                                 |
-| ------------------------------------------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Naive fan-out regresses review quality (SWR-Bench)     | High if uncoordinated | Coordinator is mandatory; post-cutover monitoring + a documented rollback trigger restores the monolith if metrics regress |
-| Cost balloons N× per cycle                             | Medium                | Cost budget + monitoring workstream; specialist model-tier is a tuning lever (deferred decision D5)                        |
-| More agents raise raw false-positive volume            | Medium                | Coordinator reasonableness-filter + tool-verify; confidence ≥ 80 bar inherited by every specialist                         |
-| Boundary grey-zones cause duplicate/mis-filed findings | Medium                | Written tie-breaker rule + coordinator owns re-categorization (esp. architecture↔correctness)                              |
-| Governance drift across the two mirror harnesses       | Low                   | `npm run generate:bindings` + sync-validation gate on every phase touching an agent file                                   |
+| Risk                                                   | Likelihood            | Mitigation                                                                                                                                           |
+| ------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Naive fan-out regresses review quality (SWR-Bench)     | High if uncoordinated | Coordinator is mandatory; post-cutover monitoring + a documented rollback trigger restores the monolith if metrics regress                           |
+| Cost balloons N× per cycle                             | Medium                | Risk-tier fan-out scales agents to diff size (D12) + generated-file exclusion / shared-context (D13); then budget/monitoring + model-tier lever (D5) |
+| Instruction docs drift out of date                     | Medium                | `governance-maker` gains an instruction-decay charter (D14) — flags framework/CI changes not reflected in `AGENTS.md`/`.claude/`                     |
+| More agents raise raw false-positive volume            | Medium                | Coordinator reasonableness-filter + tool-verify; confidence ≥ 80 bar inherited by every specialist                                                   |
+| Boundary grey-zones cause duplicate/mis-filed findings | Medium                | Written tie-breaker rule + coordinator owns re-categorization (esp. architecture↔correctness)                                                        |
+| Governance drift across the two mirror harnesses       | Low                   | `npm run generate:bindings` + sync-validation gate on every phase touching an agent file                                                             |
 
 The cross-cutting factual claims behind these risks live here; the corresponding **testable
 scenarios** live in [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria).

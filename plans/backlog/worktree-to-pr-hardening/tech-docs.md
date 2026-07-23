@@ -172,16 +172,27 @@ as `COMMENT` (blocking status carried in the severity label); re-reviews the ful
 re-checks the fixer's new commits for fix-induced regressions. [Repo-grounded — all sourced from the
 current `pr-review-maker.md`.]
 
-| Agent                          | Owns (in-charter)                                                                                                                     | Explicitly NOT its job (routes to)                                                                                                                              |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pr-review-architecture-maker` | New tradeoffs, module boundaries, reversibility, blast radius, quality-attribute effects, novel dependencies                          | Existing-rule layering violations → governance; domain-scenario gaps → logic                                                                                    |
-| `pr-review-logic-maker`        | Behavior vs. domain intent + Gherkin acceptance-criteria conformance across edge/error cases                                          | Error-handling _shape_ rules → governance; should-this-boundary-exist → architecture                                                                            |
-| `pr-review-governance-maker`   | Mechanical conformance to already-documented `repo-governance/` conventions, naming/structure, ADRs, spec-file presence               | Whether a _new_ rule should exist → architecture; scenario _completeness_ → logic                                                                               |
-| `pr-review-security-maker`     | Secrets in diffs, injection, untrusted-input handling, git-fixture isolation, unsafe git/FS operations                                | Non-security convention text → governance                                                                                                                       |
-| `pr-review-integrity-maker`    | CI-gaming (weakened/skipped/narrowed tests, coverage-gaming), missing regression tests (regression-test-mandate)                      | Whether the _behavior_ is correct → logic                                                                                                                       |
-| `pr-review-performance-maker`  | Concrete or likely performance regressions, hot-path changes, algorithmic-complexity growth, resource (memory/IO/alloc) concerns      | A _quality-attribute tradeoff decision_ (whether to accept a perf cost) → architecture; a perf-relevant convention (e.g. a documented budget rule) → governance |
-| `pr-review-docs-maker`         | Substantive documentation quality and completeness: README/docs/Diátaxis fit, doc drift vs. code, clarity, doc alt-text/accessibility | Mechanical doc-convention conformance (heading hierarchy, linking, naming) → governance; whether the documented _behavior_ is correct → logic                   |
-| `pr-review-synthesis-maker`    | Dedup, re-categorize (owns architecture↔correctness boundary), reasonableness-filter, tool-verify, emit ONE review                    | Finding _discovery_ → the seven specialists                                                                                                                     |
+Every specialist ALSO carries, beyond the "NOT its job → routes to X" column below (which is
+**inter-agent routing**), an explicit **`SUPPRESS` block** — what it must not raise _at all_
+(nitpicks; style already enforced by a mechanical gate; speculative "consider adding X" when X is
+present; defense-in-depth on an adequately-defended path). This is Cloudflare's highest-value noise
+lever (negative instruction) and is distinct from routing. Two inherited rules are sharpened
+repo-wide: the re-review **must not re-raise a finding a human explicitly dismissed** on its thread
+(human "won't fix" resolves it, mirroring the fixer's reasoned-reject), and the untrusted-input rule
+**strips user-supplied structural boundary tags** (fabricated `<mr_input>`/`<system>`/`<review>`
+delimiters) from PR body/comment/linked-issue text before it reaches a model. See
+[Cost-Control & Noise-Control Mechanics](#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
+
+| Agent                          | Owns (in-charter)                                                                                                                                                                                                                                                                                 | Explicitly NOT its job (routes to)                                                                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pr-review-architecture-maker` | New tradeoffs, module boundaries, reversibility, blast radius, quality-attribute effects, novel dependencies                                                                                                                                                                                      | Existing-rule layering violations → governance; domain-scenario gaps → logic                                                                                    |
+| `pr-review-logic-maker`        | Behavior vs. domain intent + Gherkin acceptance-criteria conformance across edge/error cases                                                                                                                                                                                                      | Error-handling _shape_ rules → governance; should-this-boundary-exist → architecture                                                                            |
+| `pr-review-governance-maker`   | Mechanical conformance to already-documented `repo-governance/` conventions, naming/structure, ADRs, spec-file presence; **instruction-decay** — a change (test framework, build tool, package manager, env vars, CI) not reflected in `AGENTS.md`/`CLAUDE.md`/`.claude/` (D14, recommended home) | Whether a _new_ rule should exist → architecture; scenario _completeness_ → logic                                                                               |
+| `pr-review-security-maker`     | Secrets in diffs, injection, untrusted-input handling, git-fixture isolation, unsafe git/FS operations                                                                                                                                                                                            | Non-security convention text → governance                                                                                                                       |
+| `pr-review-integrity-maker`    | CI-gaming (weakened/skipped/narrowed tests, coverage-gaming), missing regression tests (regression-test-mandate)                                                                                                                                                                                  | Whether the _behavior_ is correct → logic                                                                                                                       |
+| `pr-review-performance-maker`  | Concrete or likely performance regressions, hot-path changes, algorithmic-complexity growth, resource (memory/IO/alloc) concerns                                                                                                                                                                  | A _quality-attribute tradeoff decision_ (whether to accept a perf cost) → architecture; a perf-relevant convention (e.g. a documented budget rule) → governance |
+| `pr-review-docs-maker`         | Substantive documentation quality and completeness: README/docs/Diátaxis fit, doc drift vs. code, clarity, doc alt-text/accessibility                                                                                                                                                             | Mechanical doc-convention conformance (heading hierarchy, linking, naming) → governance; whether the documented _behavior_ is correct → logic                   |
+| `pr-review-synthesis-maker`    | Dedup, re-categorize (owns architecture↔correctness boundary), reasonableness-filter, tool-verify, emit ONE review                                                                                                                                                                                | Finding _discovery_ → the seven specialists                                                                                                                     |
 
 ### Why performance and docs-quality ARE their own agents (D1)
 
@@ -260,6 +271,107 @@ otherwise have provided.
    choice, **not** research-derived — the data would actually permit early exit. This rationale is
    recorded explicitly so the policy is not mistaken for an evidence-backed optimum.
 
+## Cost-Control & Noise-Control Mechanics (Cloudflare production learnings — folded 2026-07-23)
+
+The Cloudflare system [Web-cited — re-verified via `web-researcher` 2026-07-23,
+[blog.cloudflare.com/ai-code-review](https://blog.cloudflare.com/ai-code-review/)] runs the same
+fan-out/coordinator shape this plan adopts, but at 131,246 runs / 48,095 MRs / 30 days it also carries
+a set of **cost- and noise-control mechanics** that the initial draft of this plan omitted. They are
+folded in here because the plan's own risk table flagged "cost balloons up to 7×" with only
+budget-monitoring + a model-tier lever as mitigation — these mechanics are the missing structural
+mitigations, and one of them (large-diff handling) is evidenced by live experience: a
+concurrently-running content-restructure PR in this repo was **5,041 files**, exactly the "500-file
+refactor × 7 frontier calls costs real money" ceiling Cloudflare names as unsolved.
+
+### Risk-tier fan-out (D12) — the primary cost lever
+
+Cloudflare's dominant cost control is **diff-size tiering**, not model choice: it classifies each MR
+into `trivial` / `lite` / `full` by line + file count (plus a security-path override) and fans out
+**2 / 4 / 7+ agents** respectively — which is why its median review is ≈$0.98 despite a 7-agent
+ceiling. This plan adopts the same tiering (D12):
+
+- **trivial** (≤10 changed lines AND ≤20 files, no security-sensitive path) → coordinator + a single
+  generalist pass (the coordinator running one consolidated review itself).
+- **lite** (≤100 lines AND ≤20 files) → a reduced specialist set (the four highest-yield lenses for
+  this repo: `governance`, `logic`, `security`, `integrity`) + coordinator.
+- **full** (>100 lines OR >20 files OR touches a security-sensitive path — secrets/`.env`, git
+  identity, CI/workflow, `pr-merge-protocol`) → all seven specialists + coordinator.
+
+The tier is computed once per PR (re-evaluated each cycle, since the fixer's commits change the diff)
+and recorded in the consolidated review header so the tier decision is auditable. Security-sensitive
+paths **force `full`** regardless of size — this repo's hard no-secrets iron rule and git-identity
+guardrail make that non-negotiable.
+
+### Diff filtering + generated-file exclusion (D13)
+
+Cloudflare strips lock files, minified assets, and source maps, and auto-detects generated files
+(exempting DB migrations) before any reviewer sees the diff. This repo generates an unusually large
+share of its tree, so the fan-out **MUST NOT** spend a specialist (or a token) reviewing regenerated
+output. Excluded from the review diff by default:
+
+- `.opencode/agents/**`, `.amazonq/**` (emitted by `npm run generate:bindings` from `.claude/`)
+- `generated/**`, `**/generated/**` (e.g. `search-data.json`)
+- `package-lock.json`, other lock files, `*.min.js` / `*.min.css`, source maps
+- files carrying a first-line `@generated` / "DO NOT EDIT" marker
+
+**Never excluded**: `.claude/agents/**` and `repo-governance/**` (this plan's own source-of-truth
+surface), and anything under `apps/`/`libs/`/`specs/`. The exclusion is a review-scope filter, not a
+merge-gate bypass — CI still runs over everything.
+
+### Shared-context extract-once + large-diff posture (D13 companion)
+
+- **Shared context, extracted once.** Cloudflare's early design fed full MR context separately into
+  each of 7 reviewers, multiplying token cost 7×; the fix was a single extracted `shared-mr-context`
+  artifact all reviewers read. In this plan the orchestrator (quality-gate workflow) assembles the PR
+  metadata + linked-plan/issue context + the filtered diff **once** and hands the same brief to every
+  specialist, rather than each specialist re-deriving it. Specialists still pull additional repo
+  context on demand via their own tools.
+- **Large-diff posture.** For a `full`-tier PR whose filtered diff still exceeds a specialist's
+  comfortable context budget (Cloudflare warns at 50% of the model window), the specialist reviews
+  **per-domain-relevant file slices** rather than the whole diff, and the coordinator's review header
+  records that the diff was sliced. A giant docs/content restructure (the 5,041-file case) tiers to
+  `full` but its generated-file exclusion + per-slice review keep it tractable; if it still cannot be
+  reviewed in one fan-out, the coordinator emits an explicit "diff exceeds single-review scope —
+  reviewed in N slices" note rather than silently under-covering.
+
+### Per-specialist "what NOT to flag" suppression blocks (noise control)
+
+Cloudflare's single highest-value noise lever is **negative instruction** — every sub-reviewer prompt
+carries an explicit _what-not-to-flag_ block (e.g. security "only flag exploitable/concretely
+dangerous; exclude defense-in-depth when primary defenses are adequate"). The plan's charter table
+already has a "NOT its job → routes to X" column, but that is **inter-agent routing**, a different
+mechanism from **suppress-entirely**. Each specialist charter therefore ALSO carries a `SUPPRESS`
+block naming what it must not raise at all (nitpicks, style already enforced by a mechanical gate,
+speculative "consider adding X" when X is present, defense-in-depth on adequately-defended paths). The
+system targets **few, high-confidence findings** (Cloudflare averages 1.2/review as a deliberate
+precision-over-recall choice), not maximal coverage — reinforcing the existing `raw-finding-count is an
+anti-goal` non-goal.
+
+### Instruction-decay coverage (D14)
+
+Cloudflare built a **dedicated `AGENTS.md` reviewer** that flags "instruction decay" — when a major
+change (test framework, build tool, package manager, new env vars, CI/CD) is not reflected in the
+repo's instruction docs — and penalizes instruction bloat (>200 lines / generic filler). This repo is
+unusually instruction-heavy (`AGENTS.md`, `CLAUDE.md`, the whole `.claude/` + `repo-governance/`
+surface, RTK notes), so instruction decay is a real, high-value defect class here. The plan's
+`governance-maker` today checks _conformance to_ the docs but nothing checks _staleness of_ them.
+D14 decides whether this is a new eighth specialist or an explicit charter line on `governance-maker`
+(**recommended**: fold into `governance-maker`, to avoid adding an eighth reviewer that works against
+the D12 cost concern).
+
+### Human-dismissal respect + boundary-tag hardening (loop + security)
+
+- **Respect a human "won't fix" on re-review.** Cloudflare treats a developer's "won't fix" / "I
+  disagree" reply as **resolving** the thread on re-review. This plan's maker re-reviews the full PR
+  each cycle; the charter is amended so a re-review **must not re-raise a finding a human explicitly
+  dismissed** on its thread (the `pr-review-fixer`'s reasoned-reject already covers the agent side;
+  this adds the human side). The coordinator reads prior-cycle thread resolution status before fanning
+  out.
+- **Strip user-controlled boundary tags.** The inherited untrusted-input rule is sharpened with
+  Cloudflare's concrete technique: before any PR body / comment / linked-issue text reaches a model,
+  **strip user-supplied structural boundary tags** (e.g. fabricated `<mr_input>`, `<system>`,
+  `<review>` delimiters) that a PR author could inject to spoof the prompt frame.
+
 ## Post-Cutover Monitoring Plan + Rollback Trigger
 
 Per D2, the monolith is retired at cutover; this plan is therefore **post-cutover quality
@@ -274,7 +386,12 @@ tracking [Web-cited], the metrics tracked on live post-cutover PRs are:
 - **Outdated Rate (BitsAI-CR)** — the share of findings that become stale/irrelevant, an adoption
   signal.
 - **Cost/latency per review** — tracked against a budget, given the fan-out multiplies invocations
-  (now across seven specialists × three cycles).
+  (now across seven specialists × three cycles). Tracked **per risk-tier** (D12), since a trivial-tier
+  PR should cost a fraction of a full-tier one — a flat cost across tiers means the tiering is not
+  taking effect.
+- **Human-override rate** — the share of PRs where a human explicitly dismisses or overrides a
+  consolidated finding (Cloudflare's "break glass" proxy, 0.6% in production). A rising override rate
+  is an early trust-erosion signal, cheaper to read than precision and complementary to it.
 
 **Rollback trigger**: the monitoring plan documents a **rollback bar** (D6). If post-cutover
 precision/acceptance regress below that bar over a monitoring window, the monolith is **restored from
@@ -394,16 +511,18 @@ before execution per the [Plan Anti-Hallucination Convention](../../../repo-gove
 
 ## Risks
 
-| Risk                                         | Impact                          | Mitigation                                                                       |
-| -------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------- |
-| Naive fan-out regresses quality              | Worse review than the monolith  | Mandatory coordinator + post-cutover monitoring + rollback trigger               |
-| Immediate retirement ships a regression (D2) | Bad reviews before measured     | Documented rollback trigger; monolith restorable from git history                |
-| Cost balloons (7 specialists × 3 cycles)     | Review cost up to 7× today      | Budget + monitoring workstream; specialist model-tier lever (D5)                 |
-| Raw false-positive volume rises              | Fixer noise                     | Coordinator reasonableness-filter + tool-verify; inherited ≥80 bar               |
-| Coordinator is a single point of failure     | One bad synth spoils the review | Top model tier + tool-verify + post-cutover monitoring + rollback                |
-| Catch-all/added specialist over-reports      | Skewed findings                 | Per-discipline acceptance-rate tracking flags an over-reporting specialist       |
-| Merge-queue misconfig blocks integration     | Trunk merges stall              | GitHub-native queue's auto-eviction; `[HUMAN]` verifies settings before enabling |
-| Binding drift across 3 harnesses             | Broken cross-harness invocation | `generate:bindings` + sync-validation gate every agent-touching phase            |
+| Risk                                                                        | Impact                          | Mitigation                                                                                                                                                                   |
+| --------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Naive fan-out regresses quality                                             | Worse review than the monolith  | Mandatory coordinator + post-cutover monitoring + rollback trigger                                                                                                           |
+| Immediate retirement ships a regression (D2)                                | Bad reviews before measured     | Documented rollback trigger; monolith restorable from git history                                                                                                            |
+| Cost balloons (7 specialists × 3 cycles)                                    | Review cost up to 7× today      | **Risk-tier fan-out (D12, 2/4/7 agents by diff size)** + diff-filter/generated-exclusion (D13) + shared-context extract-once; then budget/monitoring + model-tier lever (D5) |
+| Giant diff (e.g. 5,041-file restructure)                                    | Fan-out infeasible / cost spike | Generated-file exclusion (D13) + per-slice review + coordinator "reviewed in N slices" note; tiers to `full` but stays tractable                                             |
+| Instruction docs go stale (framework/CI drift not reflected in `AGENTS.md`) | Agents follow stale rules       | `governance-maker` instruction-decay charter (D14)                                                                                                                           |
+| Raw false-positive volume rises                                             | Fixer noise                     | Coordinator reasonableness-filter + tool-verify; inherited ≥80 bar                                                                                                           |
+| Coordinator is a single point of failure                                    | One bad synth spoils the review | Top model tier + tool-verify + post-cutover monitoring + rollback                                                                                                            |
+| Catch-all/added specialist over-reports                                     | Skewed findings                 | Per-discipline acceptance-rate tracking flags an over-reporting specialist                                                                                                   |
+| Merge-queue misconfig blocks integration                                    | Trunk merges stall              | GitHub-native queue's auto-eviction; `[HUMAN]` verifies settings before enabling                                                                                             |
+| Binding drift across 3 harnesses                                            | Broken cross-harness invocation | `generate:bindings` + sync-validation gate every agent-touching phase                                                                                                        |
 
 ## File Impact (targets)
 
@@ -413,7 +532,11 @@ before execution per the [Plan Anti-Hallucination Convention](../../../repo-gove
   `_New file_`s — seven specialists + coordinator; sibling reference: existing `pr-review-maker.md`).
 - **New**: a reviewer-discipline convention under `repo-governance/development/` (parent dir exists;
   `_New file_`; sibling reference: `repo-governance/development/pattern/maker-checker-fixer.md`).
-  Exact path is deferred decision D8.
+  Exact path is deferred decision D8. It also documents the folded Cloudflare mechanics: the
+  **risk-tier fan-out** (D12), the **diff-filter / generated-file exclusion + shared-context +
+  large-diff posture** (D13), each specialist's **`SUPPRESS` block**, the **instruction-decay**
+  charter (D14), the **human-dismissal-respect** re-review rule, and the **boundary-tag-strip**
+  untrusted-input hardening.
 - **Edit**: `repo-governance/workflows/pr/pr-review-quality-gate.md` (fan-out → synthesize → fixer),
   `repo-governance/development/workflow/pr-merge-protocol.md` — reviewer-count/shape references, plus
   **precondition (c)** reworded to be satisfied by the merge queue (the five preconditions otherwise
@@ -442,9 +565,10 @@ the right suffix (vs. a `-checker` framing, given its filter/verify function) is
 This plan was authored non-interactively, so the following forks were **not** grilled at authoring
 time. Each is a multiple-choice decision with a **recommended** option marked. The maintainer has since
 reviewed the draft and **decided D1, D2, D4, and D7** — those carry a `**MAINTAINER DECISION**` line and
-the plan has been revised accordingly. D3, D5, D6, D8, D9, and the new sub-decision **D10** remain open;
-resolve them before (or at the start of) execution — several change the delivery checklist's shape.
-Format follows the
+the plan has been revised accordingly. D3, D5, D6, D8, D9, the sub-decision **D10**, and the three
+Cloudflare-folded decisions **D12** (risk-tier fan-out), **D13** (diff-filter/generated-exclusion), and
+**D14** (instruction-decay home) remain open; resolve them before (or at the start of) execution —
+several change the delivery checklist's shape. Format follows the
 [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md).
 
 ### D1 — Exact specialist set & granularity
@@ -589,4 +713,51 @@ source.
   `plans/backlog/` parity plan after `ose-public` lands. Cleaner source-of-truth PR, but breaks the
   "propagate in the same plan" posture of the prior `standardize-repo-toolchain-parity` /
   `lint-safety-parity` deliverables and risks parity drift while the follow-up waits.
+- **Other — type your own.** | **Chat about this.**
+
+### D12 — Risk-tier fan-out (folded from Cloudflare, 2026-07-23)
+
+> Adopting Cloudflare's diff-size tiering as the primary cost lever — see
+> [Cost-Control & Noise-Control Mechanics](#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
+
+- **A (Recommended)** — Adopt three tiers: `trivial` (≤10 lines AND ≤20 files) → coordinator-only
+  consolidated pass; `lite` (≤100 lines AND ≤20 files) → 4 lenses (governance, logic, security,
+  integrity) + coordinator; `full` (larger, OR any security-sensitive path) → all 7 + coordinator.
+  Security paths force `full`. Trade-off: directly bounds the 7× cost the risk table flagged; adds a
+  tier-classification step to the workflow and a tier line to the review header.
+- **B** — Two tiers only (`lite` / `full`). Trade-off: simpler; leaves trivial doc-only PRs paying for
+  four reviewers.
+- **C** — No tiering; always fan out all 7. Trade-off: simplest workflow; the cost risk stays
+  mitigated only by budget + model-tier, as in the original draft.
+- **Other — type your own.** | **Chat about this.**
+
+### D13 — Diff filtering, generated-file exclusion & large-diff handling (folded 2026-07-23)
+
+- **A (Recommended)** — Exclude generated/emitted files (`.opencode/**`, `.amazonq/**`,
+  `generated/**`, lock files, minified/source-map, `@generated`-marked) from the review diff; assemble
+  a shared-context brief once for all specialists; slice a too-large `full`-tier diff per-domain with a
+  coordinator "reviewed in N slices" note. Never exclude `.claude/agents/**` or `repo-governance/**`.
+  Trade-off: matches Cloudflare; a small risk a genuinely hand-edited "generated" file is skipped
+  (mitigated because CI still runs over everything and `.claude/` source is never excluded).
+- **B** — Exclude only lock files + minified assets (the uncontroversial subset), no shared-context or
+  slicing. Trade-off: leaner rule; the binding-emit output (`.opencode`/`.amazonq`) still burns
+  reviewers on a giant `generate:bindings` diff.
+- **C** — No filtering. Trade-off: simplest; reviewers waste budget on regenerated output and giant
+  diffs stay infeasible.
+- **Other — type your own.** | **Chat about this.**
+
+### D14 — Instruction-decay coverage: eighth agent or governance charter? (folded 2026-07-23)
+
+> Cloudflare runs a dedicated `AGENTS.md` reviewer for instruction decay. This repo is unusually
+> instruction-heavy, so the defect class is real here — the open question is where it lives.
+
+- **A (Recommended)** — Fold instruction-decay into `pr-review-governance-maker` as an explicit
+  charter line (already reflected in the charter table). Trade-off: no eighth reviewer, so it does not
+  work against the D12 cost concern; governance is the natural owner since it already reads the
+  instruction surface.
+- **B** — Add an eighth specialist `pr-review-instruction-maker`. Trade-off: closest to Cloudflare's
+  design and a sharper single-purpose charter; adds a reviewer to every `full`-tier fan-out and one
+  more file across all three repos + bindings.
+- **C** — Defer instruction-decay to future work. Trade-off: cheapest now; leaves a real,
+  repo-specific defect class uncovered.
 - **Other — type your own.** | **Chat about this.**
