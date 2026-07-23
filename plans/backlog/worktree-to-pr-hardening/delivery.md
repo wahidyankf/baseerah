@@ -166,13 +166,13 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       sibling reference `repo-governance/development/quality/ci-blocker-resolution.md`) defining the
       eight disciplines, each discipline's owned/not-owned scope, and the **boundary tie-breaker rule**
       (documented rule → governance; new tradeoff → architecture; domain-intent → correctness)
-      — acceptance: file exists; `grep -c "tie-breaker" <path>` ≥ 1; the architecture↔correctness
+      — acceptance: file exists; `grep -c "tie-breaker" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; the architecture↔correctness
       boundary is named as the coordinator's re-categorization responsibility
 - [ ] [AI] Embed the six grey-zone rulings verbatim (four core: new cross-module dependency; naming
       format vs. should-this-boundary-exist; error-handling shape vs. domain error scenarios; spec-file
       presence vs. scenario completeness — plus the two D1-added: performance↔architecture and
       docs↔governance)
-      — acceptance: all six rulings present; `grep -c "→" <path>` ≥ 6
+      — acceptance: all six rulings present; `grep -c "→" repo-governance/development/quality/pr-review-disciplines.md` ≥ 6
 - [ ] [AI] Document the **Cloudflare-folded cost/noise mechanics** in the convention, mirroring
       [tech-docs.md §Cost-Control & Noise-Control Mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23):
       the **risk-tier fan-out** (D12: trivial → coordinator-only, lite → 4 specialists, full → all 8
@@ -181,12 +181,12 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       generated-file exclusion — reviewers see the full diff), the per-specialist **`SUPPRESS` block**
       requirement, the **instruction-decay** dedicated specialist (D14), the **human-dismissal-respect**
       re-review rule, and the **boundary-tag-strip** untrusted-input hardening
-      — acceptance: `grep -cE "risk-tier|SUPPRESS|instruction-decay|shared-context" <path>` ≥ 4; the
+      — acceptance: `grep -cE "risk-tier|SUPPRESS|instruction-decay|shared-context" repo-governance/development/quality/pr-review-disciplines.md` ≥ 4; the
       convention states D13 chose no generated-file exclusion (reviewers see the full diff) and CI runs
       over everything regardless
 - [ ] [AI] Add the accessible Mermaid boundary-decision flowchart (color-blind palette) mirroring
       [tech-docs.md](./tech-docs.md#boundary-decision-the-tie-breaker-as-a-flowchart)
-      — acceptance: `npx rhino-cli md mermaid validate <path>` (or repo md-mermaid gate) exits 0
+      — acceptance: `npx rhino-cli md mermaid validate repo-governance/development/quality/pr-review-disciplines.md` (or repo md-mermaid gate) exits 0
 - [ ] [AI] Cross-link the new convention from `repo-governance/development/README.md` index if the repo
       indexes conventions there (verify with `grep -rn "ci-blocker-resolution" repo-governance/development/README.md`)
       — acceptance: new convention linked, or its absence confirmed as not-indexed with a note
@@ -270,7 +270,9 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       files; each also references the human-dismissal-respect and boundary-tag-strip rules
 - [ ] [AI] Register all eight in `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
       under the appropriate section
-      — acceptance: `grep -c "pr-review-architecture-maker\|pr-review-logic-maker\|pr-review-governance-maker\|pr-review-security-maker\|pr-review-integrity-maker\|pr-review-performance-maker\|pr-review-docs-maker\|pr-review-instruction-maker" AGENTS.md` = 8 (or all present)
+      — acceptance: `grep -o "pr-review-architecture-maker\|pr-review-logic-maker\|pr-review-governance-maker\|pr-review-security-maker\|pr-review-integrity-maker\|pr-review-performance-maker\|pr-review-docs-maker\|pr-review-instruction-maker" AGENTS.md | wc -l` = 8
+      (occurrence-count via `grep -o` + `wc -l`, not `grep -c`, so multiple names on one register line
+      are each counted — `grep -c` counts matching LINES, which would undercount if 2+ names share a line)
 - [ ] [AI] Regenerate bindings: `npm run generate:bindings`
       — acceptance: `.opencode/agents/pr-review-*-maker.md` and `.amazonq/` artifacts created; exits 0
 - [ ] [AI] Verify binding sync: `git status --porcelain` shows only intended new/edited files and the
@@ -414,16 +416,16 @@ affected` no-op noted in Phase 8)
 - [ ] [AI] Add the **confidence-calibration spot-check** procedure to the reviewer-discipline
       convention (sample past findings, compare stated confidence vs. fixer triage outcome, recalibrate
       the ≥80 threshold)
-      — acceptance: `grep -ci "calibration" <convention>` ≥ 1; procedure is a documented manual step
+      — acceptance: `grep -ci "calibration" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; procedure is a documented manual step
 - [ ] [AI] Add the **selective adversarial verification** rule scoped to high-risk diffs per **D4**
       (auth/payments/migrations/security/public-API), including the cross-model-diversity note
-      — acceptance: `grep -ci "adversarial\|high-risk" <convention>` ≥ 1; scope stated explicitly
+      — acceptance: `grep -ci "adversarial\|high-risk" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; scope stated explicitly
 - [ ] [AI] Add the **CRITICAL-requires-reproduction** rule (CRITICAL findings carry a reproduction, not
       agreement-counting)
-      — acceptance: `grep -ci "reproduction" <convention>` ≥ 1
+      — acceptance: `grep -ci "reproduction" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1
 - [ ] [AI] Document the **3-cycle / no-early-exit rationale** explicitly as a predictability policy
       choice, NOT research-derived
-      — acceptance: `grep -ci "predictability" <convention>` ≥ 1; the note disclaims research-backing
+      — acceptance: `grep -ci "predictability" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; the note disclaims research-backing
 
 ### Phase 5 Gate
 
@@ -450,7 +452,7 @@ affected` no-op noted in Phase 8)
       `governance`/`logic`), BitsAI-CR "Outdated Rate", cost/latency per review **tracked per risk-tier**
       (D12 — a flat cost across tiers means the tiering is not taking effect), and the **human-override
       rate** (Cloudflare's break-glass trust proxy, an early trust-erosion signal)
-      — acceptance: `grep -ci "Outdated Rate\|acceptance rate\|precision\|override rate\|risk-tier" <convention>` ≥ 2; the section
+      — acceptance: `grep -ci "Outdated Rate\|acceptance rate\|precision\|override rate\|risk-tier" repo-governance/development/quality/pr-review-disciplines.md` ≥ 2; the section
       is framed as post-cutover monitoring, not a pre-cutover gate
 - [ ] [AI] Document the **rollback trigger** (D6 decided — absolute thresholds): the **fixed absolute
       bar** (proposed, maintainer-tunable: consolidated-finding precision < 50% over a rolling N-PR
@@ -458,7 +460,7 @@ affected` no-op noted in Phase 8)
       monolith baseline required**), the monitoring window N, and the exact restore procedure
       (`git revert`/`git checkout` of the deleted `pr-review-maker.md` + register entries, then
       `npm run generate:bindings`)
-      — acceptance: `grep -ci "rollback\|precision <\|override-rate\|absolute" <convention>` ≥ 2; the
+      — acceptance: `grep -ci "rollback\|precision <\|override-rate\|absolute" repo-governance/development/quality/pr-review-disciplines.md` ≥ 2; the
       restore procedure is a non-destructive forward operation (no history rewrite); the absolute bar is
       recorded in the convention and `learnings.md`, and the doc explicitly notes it needs no pre-cutover
       baseline (D2×D6 contradiction resolved)
@@ -482,18 +484,22 @@ affected` no-op noted in Phase 8)
 
 > _Suggested executor: `repo-rules-maker`_
 
-- [ ] [AI] Cross-reference the existing bot-identity two-pager
+- [ ] [AI] Add a `## Future Work` section to `repo-governance/development/quality/pr-review-disciplines.md`
+      (the convention created in Phase 1) and cross-reference the existing bot-identity two-pager
       [`plans/ideas/pr-review-bot-identity.md`](../../ideas/pr-review-bot-identity.md) as the owner of
       the AI-attribution / `REQUEST_CHANGES` gap
-      — acceptance: `test -f plans/ideas/pr-review-bot-identity.md` passes and the future-work section links it
+      — acceptance: `grep -c "## Future Work" repo-governance/development/quality/pr-review-disciplines.md` = 1;
+      `test -f plans/ideas/pr-review-bot-identity.md` passes and the `## Future Work` section links it
 - [ ] [AI] Add the **cost/latency budgeting** note (≈$1 × 8 specialists × 3 cycles, bounded by the
-      D12 risk-tier fan-out; monitor per-PR review cost) referencing the Cloudflare median
-      — acceptance: `grep -ci "cost\|budget" <future-work section>` ≥ 1
+      D12 risk-tier fan-out; monitor per-PR review cost) referencing the Cloudflare median, inside the
+      `## Future Work` section of `repo-governance/development/quality/pr-review-disciplines.md`
+      — acceptance: `grep -ci "cost\|budget" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1
 - [ ] [AI] Record the **deferred merge queue** (D7/D10): a merge queue was researched (GitHub-native vs
       Graphite) but **NOT adopted** — the repo's branch settings do not expose a merge-queue toggle, so
       precondition (c) stays the manual branch-up-to-date check. The deferred work is owned by the
-      standalone [`merge-queue-adoption`](../merge-queue-adoption/README.md) backlog plan
-      — acceptance: `grep -ci "merge queue" <future-work section>` ≥ 1; the note states it is deferred,
+      standalone [`merge-queue-adoption`](../merge-queue-adoption/README.md) backlog plan; record this
+      inside the same `## Future Work` section of `repo-governance/development/quality/pr-review-disciplines.md`
+      — acceptance: `grep -ci "merge queue" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; the note states it is deferred,
       not delivered, links `merge-queue-adoption`, and confirms precondition (c) is unchanged
 
 ### Phase 7 Gate

@@ -103,6 +103,15 @@ it:
   folder's own PR could archive itself immediately on its own merge — see
   [§Single-folder adaptation](#repo-scope--propagation-three-repo-parity) above for why this plan chose
   the single-folder shape anyway.
+- **Accepted, documented carve-out (ratified, not a gap to re-flag)**: a strict reading of
+  archival-in-PR would ask for the `git mv` inside Phase 8's PR regardless of the two pending
+  downstream propagations. This plan explicitly declines that literal reading in favor of the DAG
+  pattern [AGENTS.md §Agent Workflow Orchestration](../../../AGENTS.md#agent-workflow-orchestration)
+  already names for exactly this shape — **"cleanup is the terminal node"** — where Phases 9/10
+  (the two independent downstream propagation branches) must both complete before the shared plan
+  folder's own archival cleanup can run truthfully. Deferring `git mv` to Phase 12 is that terminal
+  cleanup node, not a violation of archival-in-PR; a future checker re-flagging this line should treat
+  it as already resolved by this note, not as an open finding.
 
 ## Architecture Overview
 
@@ -125,6 +134,8 @@ flowchart LR
 
 ```mermaid
 %% Color palette: Blue #0173B2 (specialists), Purple #CC78BC (coordinator), Yellow #DE8F05 (fixer)
+%% FANOUT deliberately lists all 8 specialists (exceeds the 6-node mobile-guidance rule of thumb) —
+%% this diagram's purpose is to faithfully depict D1's "8 concurrent specialists" decision; do not split.
 flowchart LR
   subgraph FANOUT["Per-cycle fan-out (8 concurrent specialists)"]
     A["architecture-maker"]:::blue
