@@ -132,19 +132,19 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Provision the worktree from latest `origin/main`: `git worktree add worktrees/worktree-to-pr-hardening origin/main`
+- [x] [AI] Provision the worktree from latest `origin/main`: `git worktree add worktrees/worktree-to-pr-hardening origin/main`
       — acceptance: `worktrees/worktree-to-pr-hardening/` exists and is on a fresh branch off `origin/main`
-- [ ] [AI] Install dependencies in the root worktree: `npm install`
+- [x] [AI] Install dependencies in the root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized
-- [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
+- [x] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift
-- [ ] [AI] Record the markdown/binding baseline: `npx nx affected -t lint` and `npm run lint:md:fix` (dry read)
+- [x] [AI] Record the markdown/binding baseline: `npx nx affected -t lint` and `npm run lint:md:fix` (dry read)
       — acceptance: baseline pass/fail recorded; any preexisting failures documented
-- [ ] [AI] Confirm the binding sync baseline is clean: run `npm run generate:bindings` then `git status --porcelain`
+- [x] [AI] Confirm the binding sync baseline is clean: run `npm run generate:bindings` then `git status --porcelain`
       — acceptance: no diff (bindings already in sync before any change)
-- [ ] [AI] Resolve all preexisting failures before proceeding
+- [x] [AI] Resolve all preexisting failures before proceeding
       — acceptance: no preexisting failures remain unresolved
-- [ ] [AI] Delegate to `web-researcher`: re-verify the remaining ~7 unverified `[Web-cited]` claims in
+- [x] [AI] Delegate to `web-researcher`: re-verify the remaining ~7 unverified `[Web-cited]` claims in
       [tech-docs.md §Research Grounding](./tech-docs.md#research-grounding-citations) — BitsAI-CR
       ([arXiv 2501.15134](https://arxiv.org/abs/2501.15134)), CodeAgent
       ([arXiv 2402.02172](https://arxiv.org/abs/2402.02172)), the two confidence-calibration papers
@@ -161,10 +161,10 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] `npm run generate:bindings` produces zero diff against a clean tree (baseline sync confirmed)
-- [ ] [AI] Markdown/lint baseline recorded and every preexisting failure resolved
-- [ ] [AI] All ~7 remaining `[Web-cited]` claims in `tech-docs.md` §Research Grounding are re-verified
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
+- [x] [AI] `npm run generate:bindings` produces zero diff against a clean tree (baseline sync confirmed)
+- [x] [AI] Markdown/lint baseline recorded and every preexisting failure resolved
+- [x] [AI] All ~7 remaining `[Web-cited]` claims in `tech-docs.md` §Research Grounding are re-verified
       and labeled `[Verified]`/`[Outdated]`/`[Error]`; any inaccuracy is corrected
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no plan work
@@ -177,18 +177,18 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 
 > _Suggested executor: `repo-rules-maker`_
 
-- [ ] [AI] Create the reviewer-discipline convention (D8 → `repo-governance/development/quality/pr-review-disciplines.md`,
+- [x] [AI] Create the reviewer-discipline convention (D8 → `repo-governance/development/quality/pr-review-disciplines.md`,
       sibling reference `repo-governance/development/quality/ci-blocker-resolution.md`) defining the
       eight disciplines, each discipline's owned/not-owned scope, and the **boundary tie-breaker rule**
       (documented rule → governance; new tradeoff → architecture; domain-intent → correctness)
       — acceptance: file exists; `grep -c "tie-breaker" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; the architecture↔correctness
       boundary is named as the coordinator's re-categorization responsibility
-- [ ] [AI] Embed the six grey-zone rulings verbatim (four core: new cross-module dependency; naming
+- [x] [AI] Embed the six grey-zone rulings verbatim (four core: new cross-module dependency; naming
       format vs. should-this-boundary-exist; error-handling shape vs. domain error scenarios; spec-file
       presence vs. scenario completeness — plus the two D1-added: performance↔architecture and
       docs↔governance)
       — acceptance: all six rulings present; `grep -c "→" repo-governance/development/quality/pr-review-disciplines.md` ≥ 6
-- [ ] [AI] Document the **Cloudflare-folded cost/noise mechanics** in the convention, mirroring
+- [x] [AI] Document the **Cloudflare-folded cost/noise mechanics** in the convention, mirroring
       [tech-docs.md §Cost-Control & Noise-Control Mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23):
       the **risk-tier fan-out** (D12: trivial → coordinator-only, lite → 4 specialists, full → all 8
       specialists; security-sensitive paths force full), the
@@ -199,10 +199,10 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       — acceptance: `grep -cE "risk-tier|SUPPRESS|instruction-decay|shared-context" repo-governance/development/quality/pr-review-disciplines.md` ≥ 4; the
       convention states D13 chose no generated-file exclusion (reviewers see the full diff) and CI runs
       over everything regardless
-- [ ] [AI] Add the accessible Mermaid boundary-decision flowchart (color-blind palette) mirroring
+- [x] [AI] Add the accessible Mermaid boundary-decision flowchart (color-blind palette) mirroring
       [tech-docs.md](./tech-docs.md#boundary-decision-the-tie-breaker-as-a-flowchart)
       — acceptance: `npx rhino-cli md mermaid validate repo-governance/development/quality/pr-review-disciplines.md` (or repo md-mermaid gate) exits 0
-- [ ] [AI] Cross-link the new convention from `repo-governance/development/README.md` index if the repo
+- [x] [AI] Cross-link the new convention from `repo-governance/development/README.md` index if the repo
       indexes conventions there (verify with `grep -rn "ci-blocker-resolution" repo-governance/development/README.md`)
       — acceptance: new convention linked, or its absence confirmed as not-indexed with a note
   - _Suggested executor: `repo-rules-maker`_
@@ -211,13 +211,13 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `npx nx affected -t lint` (or `npm run lint:md:fix` + markdownlint) passes on the new convention
-- [ ] [AI] `rhino-cli md links validate` and `md mermaid validate` pass for the new file
-- [ ] [AI] Invoke `repo-rules-checker` against `repo-governance/development/quality/pr-review-disciplines.md`
+- [x] [AI] `npx nx affected -t lint` (or `npm run lint:md:fix` + markdownlint) passes on the new convention
+- [x] [AI] `rhino-cli md links validate` and `md mermaid validate` pass for the new file
+- [x] [AI] Invoke `repo-rules-checker` against `repo-governance/development/quality/pr-review-disciplines.md`
       — acceptance: audit report generated in `generated-reports/`; 0 CRITICAL/HIGH findings (this is
       the substantively meaningful gate for this plan's own new governance artifact — the `nx affected`
       checks above are expected to report zero affected projects for a `repo-governance/`-only diff)
-- [ ] [AI] Commit created: `docs(governance): add PR reviewer-discipline convention + tie-breaker` and pushed to the plan branch
+- [x] [AI] Commit created: `docs(governance): add PR reviewer-discipline convention + tie-breaker` and pushed to the plan branch
 
 > **Pause Safety**: the convention is a standalone governance doc with no dangling references; the repo
 > is coherent with it present. Safe to stop. To resume: re-run the md link/mermaid validators on the
@@ -233,7 +233,7 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 > [AI Agents Convention](../../../repo-governance/development/agents/ai-agents.md) role-color mapping)
 > for all eight, matching the retired monolith's own `color: blue`.
 
-- [ ] [AI] Author `.claude/agents/pr-review-architecture-maker.md` (sibling reference
+- [x] [AI] Author `.claude/agents/pr-review-architecture-maker.md` (sibling reference
       `.claude/agents/pr-review-maker.md`) with the architecture charter from
       [tech-docs.md §Agent Charters](./tech-docs.md#agent-charters-non-overlapping), inheriting the
       monolith's hard rules verbatim (confidence ≥ 80, evidence, anti-sycophancy, scope-guard,
@@ -241,36 +241,36 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       — acceptance: file present; frontmatter `name: pr-review-architecture-maker`; suffix matches the
       naming regex `-(maker|checker|fixer|dev|deployer|manager|tester|researcher)$`
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Author `.claude/agents/pr-review-logic-maker.md` (business-logic/correctness incl. Gherkin
+- [x] [AI] Author `.claude/agents/pr-review-logic-maker.md` (business-logic/correctness incl. Gherkin
       acceptance-criteria conformance), same inheritance + charter
       — acceptance: file present; charter names logic/correctness as its sole discipline; NOT-its-job
       routes to governance + architecture per the charter table
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Author `.claude/agents/pr-review-governance-maker.md` (mechanical `repo-governance/`
+- [x] [AI] Author `.claude/agents/pr-review-governance-maker.md` (mechanical `repo-governance/`
       conformance, naming/structure, spec-file presence), same inheritance + charter — instruction-decay
       is **NOT** its job (D14 → B gave that its own eighth specialist; route it to `pr-review-instruction-maker`)
       — acceptance: file present; explicitly routes "should a new rule exist" to architecture,
       "scenario completeness" to logic, and instruction-decay to `pr-review-instruction-maker`
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Author `.claude/agents/pr-review-security-maker.md` (secrets, injection, untrusted-input,
+- [x] [AI] Author `.claude/agents/pr-review-security-maker.md` (secrets, injection, untrusted-input,
       git-fixture isolation, unsafe git/FS ops), same inheritance + charter
       — acceptance: file present; cites the git-fixture-isolation + no-secrets rules as in-charter
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Author `.claude/agents/pr-review-integrity-maker.md` (CI-gaming/test-integrity +
+- [x] [AI] Author `.claude/agents/pr-review-integrity-maker.md` (CI-gaming/test-integrity +
       regression-test-mandate), same inheritance + charter
       — acceptance: file present; cites the regression-test-mandate + ci-blocker-resolution rules
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Author `.claude/agents/pr-review-performance-maker.md` (concrete/likely perf regressions,
+- [x] [AI] Author `.claude/agents/pr-review-performance-maker.md` (concrete/likely perf regressions,
       hot paths, algorithmic complexity, resource use), same inheritance + charter
       — acceptance: file present; NOT-its-job routes a quality-attribute tradeoff to architecture per
       the charter table (performance↔architecture grey-zone)
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Author `.claude/agents/pr-review-docs-maker.md` (substantive doc quality/completeness,
+- [x] [AI] Author `.claude/agents/pr-review-docs-maker.md` (substantive doc quality/completeness,
       README/docs/Diátaxis fit, doc drift, doc alt-text/a11y), same inheritance + charter
       — acceptance: file present; NOT-its-job routes mechanical doc-convention conformance to governance
       per the charter table (docs↔governance grey-zone)
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Author `.claude/agents/pr-review-instruction-maker.md` (D14 → B: **instruction-decay** — a
+- [x] [AI] Author `.claude/agents/pr-review-instruction-maker.md` (D14 → B: **instruction-decay** — a
       framework/build-tool/package-manager/env-var/CI change in the diff not reflected in
       `AGENTS.md`/`CLAUDE.md`/`.claude/`; instruction bloat >200 lines / generic filler), same
       inheritance + charter + the `sonnet` specialist tier (D5)
@@ -278,21 +278,21 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       instruction-decay as its sole discipline; NOT-its-job routes mechanical convention conformance to
       governance and "should a new rule exist" to architecture per the charter table
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Give every specialist file an explicit **`SUPPRESS` block** (what it must NOT raise at all —
+- [x] [AI] Give every specialist file an explicit **`SUPPRESS` block** (what it must NOT raise at all —
       nitpicks, style already enforced by a mechanical gate, speculative "consider adding X" when X is
       present, defense-in-depth on adequately-defended paths), distinct from its NOT-its-job routing
       column, and inherit the two sharpened rules (re-review **does not re-raise a human-dismissed
       finding**; untrusted-input **strips user-supplied boundary tags** from PR body/comment/issue text)
       — acceptance: `grep -lc "SUPPRESS" .claude/agents/pr-review-*-maker.md` lists all eight specialist
       files; each also references the human-dismissal-respect and boundary-tag-strip rules
-- [ ] [AI] Register all eight in `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
+- [x] [AI] Register all eight in `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
       under the appropriate section
       — acceptance: `grep -o "pr-review-architecture-maker\|pr-review-logic-maker\|pr-review-governance-maker\|pr-review-security-maker\|pr-review-integrity-maker\|pr-review-performance-maker\|pr-review-docs-maker\|pr-review-instruction-maker" AGENTS.md | wc -l` = 8
       (occurrence-count via `grep -o` + `wc -l`, not `grep -c`, so multiple names on one register line
       are each counted — `grep -c` counts matching LINES, which would undercount if 2+ names share a line)
-- [ ] [AI] Regenerate bindings: `npm run generate:bindings`
+- [x] [AI] Regenerate bindings: `npm run generate:bindings`
       — acceptance: `.opencode/agents/pr-review-*-maker.md` and `.amazonq/` artifacts created; exits 0
-- [ ] [AI] Verify binding sync: `git status --porcelain` shows only intended new/edited files and the
+- [x] [AI] Verify binding sync: `git status --porcelain` shows only intended new/edited files and the
       sync-validation gate is green
       — acceptance: `npx nx run rhino-cli:instruction-size:validation` (if applicable) and the
       validate:sync check pass with zero drift
@@ -301,11 +301,11 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] All eight specialist files pass the agent-naming regex and carry valid frontmatter
+- [x] [AI] All eight specialist files pass the agent-naming regex and carry valid frontmatter
       (including `color: blue`, the Maker role)
-- [ ] [AI] `npm run generate:bindings` re-run produces zero _additional_ diff (bindings settled)
-- [ ] [AI] `npx nx affected -t lint` passes; registers list all eight agents
-- [ ] [AI] Commit created: `feat(agents): add eight specialist PR-review reviewer agents` and pushed
+- [x] [AI] `npm run generate:bindings` re-run produces zero _additional_ diff (bindings settled)
+- [x] [AI] `npx nx affected -t lint` passes; registers list all eight agents
+- [x] [AI] Commit created: `feat(agents): add eight specialist PR-review reviewer agents` and pushed
 
 > **Pause Safety**: the eight specialists exist and are registered but are not yet wired into any
 > workflow — they are inert until Phase 4 references them, and the monolith is still the live reviewer.
@@ -321,14 +321,14 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 > above the `sonnet` specialists. Frontmatter `color: blue` (Maker role — the model tier does not
 > change the role-color mapping), matching the retired monolith's own `color: blue`.
 
-- [ ] [AI] Author `.claude/agents/pr-review-synthesis-maker.md` (name per D3) implementing the four
+- [x] [AI] Author `.claude/agents/pr-review-synthesis-maker.md` (name per D3) implementing the four
       coordination functions from [tech-docs.md §Coordinator Contract](./tech-docs.md#coordinator-contract-the-mandatory-synthesizer):
       dedup, re-categorize (owns architecture↔correctness), reasonableness-filter, tool-verify; emits
       exactly one consolidated review; top model tier justified in a Model Selection Justification block
       — acceptance: file present; frontmatter names the top tier (inherited opus); charter states it
       produces ONE consolidated review consumed by `pr-review-fixer`
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Give the coordinator the folded pre/post-fan-out duties (D12/D13): **classify the PR risk-tier**
+- [x] [AI] Give the coordinator the folded pre/post-fan-out duties (D12/D13): **classify the PR risk-tier**
       (trivial/lite/full, security paths force full) and select the specialist set accordingly; **assemble
       the shared-context brief once** (PR metadata + linked-plan/issue + the **full diff**, D13: no
       generated-file exclusion — reviewers see everything) rather than each specialist re-deriving it;
@@ -337,20 +337,20 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       — acceptance: charter names the risk-tier classification, the shared-context assembly, the
       **no-exclusion full-diff posture (D13)**, and the human-dismissal read; the review header format includes the tier
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] Register the coordinator in `AGENTS.md` and `.claude/agents/README.md`
+- [x] [AI] Register the coordinator in `AGENTS.md` and `.claude/agents/README.md`
       — acceptance: coordinator listed in both registers
-- [ ] [AI] Regenerate + verify bindings: `npm run generate:bindings` then `git status --porcelain`
+- [x] [AI] Regenerate + verify bindings: `npm run generate:bindings` then `git status --porcelain`
       — acceptance: OpenCode + Amazon-Q mirrors created; sync-validation green with zero drift
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] Coordinator file passes the naming regex and carries a Model Selection Justification block;
+- [x] [AI] Coordinator file passes the naming regex and carries a Model Selection Justification block;
       frontmatter includes `color: blue` (Maker role)
-- [ ] [AI] `npm run generate:bindings` re-run produces zero additional diff
-- [ ] [AI] `npx nx affected -t lint` passes; registers list the coordinator
-- [ ] [AI] Commit created: `feat(agents): add pr-review-synthesis-maker coordinator` and pushed
+- [x] [AI] `npm run generate:bindings` re-run produces zero additional diff
+- [x] [AI] `npx nx affected -t lint` passes; registers list the coordinator
+- [x] [AI] Commit created: `feat(agents): add pr-review-synthesis-maker coordinator` and pushed
 
 > **Pause Safety**: all nine new agents (eight specialists + coordinator) exist and are registered but
 > still unwired — the live review gate remains the untouched monolith. Safe to stop. To resume: re-run
@@ -364,16 +364,16 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 > coordinator become the live reviewer and the monolith is **retired immediately** (D2), in one
 > coherent phase.
 
-- [ ] [AI] Revise `repo-governance/workflows/pr/pr-review-quality-gate.md`: replace the single-maker
+- [x] [AI] Revise `repo-governance/workflows/pr/pr-review-quality-gate.md`: replace the single-maker
       per-cycle pass with **fan-out to the eight specialists → `pr-review-synthesis-maker` → one
       consolidated review → `pr-review-fixer`**; keep the 3-cycle hard ceiling, no-early-exit, and the
       CI-green gate between cycles verbatim
       — acceptance: `grep -c "pr-review-synthesis-maker" pr-review-quality-gate.md` ≥ 1; the Loop
       Algorithm block shows fan-out→synthesize→fixer; the "3, hard ceiling" wording is unchanged
-- [ ] [AI] Update the Participants + sequence diagram in that workflow to show the eight specialists +
+- [x] [AI] Update the Participants + sequence diagram in that workflow to show the eight specialists +
       coordinator (accessible Mermaid palette)
       — acceptance: `rhino-cli md mermaid validate` passes; diagram lists all nine agents
-- [ ] [AI] Update `repo-governance/development/workflow/pr-merge-protocol.md`: the **structural shape**
+- [x] [AI] Update `repo-governance/development/workflow/pr-merge-protocol.md`: the **structural shape**
       of the five hardened preconditions — five preconditions, same `(a)-(e)` lettering, same
       substantive gates — stays intact; **only the reviewer-agent name inside precondition (a)** is
       repointed from the retired `pr-review-maker` to the new pipeline (e.g. "the configured PR-review
@@ -384,35 +384,35 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
       — acceptance: `grep -c "all five" pr-merge-protocol.md` unchanged; precondition lettering (a)-(e)
       intact (`grep -c "\*\*(a)\*\*\|\*\*(b)\*\*\|\*\*(c)\*\*\|\*\*(d)\*\*\|\*\*(e)\*\*" pr-merge-protocol.md` unchanged);
       precondition (a)'s text no longer names the retired `pr-review-maker` as the live reviewer
-- [ ] [AI] **Retire the monolith (D2)**: `git rm .claude/agents/pr-review-maker.md` and delete its
+- [x] [AI] **Retire the monolith (D2)**: `git rm .claude/agents/pr-review-maker.md` and delete its
       entries from `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
       — acceptance: `test ! -f .claude/agents/pr-review-maker.md`; `grep -c "pr-review-maker\b" AGENTS.md`
       returns `0` (the specialist/coordinator names like `pr-review-synthesis-maker` do not match the
       bounded `pr-review-maker` pattern, so any non-zero count would flag a residual monolith reference)
-- [ ] [AI] Regenerate bindings so the monolith's mirrors are also removed: `npm run generate:bindings`
+- [x] [AI] Regenerate bindings so the monolith's mirrors are also removed: `npm run generate:bindings`
       — acceptance: `test ! -f .opencode/agents/pr-review-maker.md`; `git status --porcelain` shows the
       deletion and zero unexpected drift
-- [ ] [AI] Grep the repo for any dangling reference to the retired monolith and repoint it to the
+- [x] [AI] Grep the repo for any dangling reference to the retired monolith and repoint it to the
       synthesizer or the specialist set: `grep -rn "pr-review-maker" repo-governance/ .claude/ AGENTS.md CLAUDE.md`
       — acceptance: no reference points to the monolith as a live reviewer (workflow/name references now
       read `pr-review-synthesis-maker` + the specialists); `CLAUDE.md`'s "Delivery Mode default
       (Claude-Code binding)" note (which names `pr-review-maker` and `pr-review-fixer` explicitly) is
       updated to name the new coordinator/specialist set in place of the retired monolith
-- [ ] [AI] Edit `AGENTS.md`'s "PR Review Cycle" catalog line (the brace-notation
+- [x] [AI] Edit `AGENTS.md`'s "PR Review Cycle" catalog line (the brace-notation
       `pr-review-{maker,fixer}` line, currently ~line 327) specifically — the plain-substring grep above
       does not match it because the brace `{` breaks the literal `pr-review-maker` substring, so this
       line survives that sweep undetected. Update it to name the new coordinator + specialist set (e.g.
       `pr-review-synthesis-maker` + the eight `pr-review-*-maker` specialists)
       — acceptance: `grep -c "pr-review-{maker" AGENTS.md` returns `0`; the "PR Review Cycle" line names
       `pr-review-synthesis-maker` and/or the specialist set instead
-- [ ] [AI] Edit `.claude/agents/pr-review-fixer.md` — repoint all 8 references to the retired
+- [x] [AI] Edit `.claude/agents/pr-review-fixer.md` — repoint all 8 references to the retired
       `pr-review-maker` (frontmatter `description` + 7 body sites) to name `pr-review-synthesis-maker`
       and/or "the eight specialists" as contextually appropriate (e.g. the frontmatter `description`'s
       "posted by `pr-review-maker`" and line 175's "the same trust boundary `pr-review-maker`
       [establishes]" each need their own contextually-correct rewrite, not a single mechanical
       find-replace) — acceptance: `grep -c "pr-review-maker" .claude/agents/pr-review-fixer.md` returns
       `0`; the file's core triage contract (4-way triage) is otherwise unchanged
-- [ ] [AI] Cross-check every inbound reference to the workflow still resolves:
+- [x] [AI] Cross-check every inbound reference to the workflow still resolves:
       `rhino-cli md links validate repo-governance/workflows/pr/pr-review-quality-gate.md`
       — acceptance: exits 0, no broken links
 
@@ -420,21 +420,21 @@ and Phase 11-12 are single-threaded by construction (each is one worktree, one P
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] The workflow describes fan-out→synthesize→fixer and preserves the 3-cycle ceiling + CI gate
-- [ ] [AI] `pr-merge-protocol.md` preconditions (a)-(e) keep their structural shape — five
+- [x] [AI] The workflow describes fan-out→synthesize→fixer and preserves the 3-cycle ceiling + CI gate
+- [x] [AI] `pr-merge-protocol.md` preconditions (a)-(e) keep their structural shape — five
       preconditions, same lettering, same substantive gates — with only precondition (a)'s
       reviewer-agent name updated to the new pipeline; no other precondition's text changed
-- [ ] [AI] The monolith is gone: `test ! -f .claude/agents/pr-review-maker.md` and no register or
+- [x] [AI] The monolith is gone: `test ! -f .claude/agents/pr-review-maker.md` and no register or
       binding lists it; `npm run generate:bindings` produces zero additional diff
-- [ ] [AI] `rhino-cli md links validate` + `md mermaid validate` pass on all edited docs; no dangling
+- [x] [AI] `rhino-cli md links validate` + `md mermaid validate` pass on all edited docs; no dangling
       `pr-review-maker` reference remains anywhere in `repo-governance/`, `.claude/`, `AGENTS.md`, or
       `CLAUDE.md`
-- [ ] [AI] Invoke `repo-workflow-checker` against the revised
+- [x] [AI] Invoke `repo-workflow-checker` against the revised
       `repo-governance/workflows/pr/pr-review-quality-gate.md`
       — acceptance: audit report generated in `generated-reports/`; 0 CRITICAL/HIGH findings (the
       substantively meaningful gate for this phase's revised workflow doc, complementing the `nx
 affected` no-op noted in Phase 8)
-- [ ] [AI] Commit created: `refactor(workflow): cut over PR review to specialists + synthesizer, retire monolith` and pushed
+- [x] [AI] Commit created: `refactor(workflow): cut over PR review to specialists + synthesizer, retire monolith` and pushed
 
 > **Pause Safety**: cutover is complete and self-consistent — the eight specialists + coordinator are
 > the documented live reviewer, the monolith is deleted (recoverable from git history), and no dangling
@@ -447,17 +447,17 @@ affected` no-op noted in Phase 8)
 
 > _Suggested executor: `repo-rules-maker`_
 
-- [ ] [AI] Add the **confidence-calibration spot-check** procedure to the reviewer-discipline
+- [x] [AI] Add the **confidence-calibration spot-check** procedure to the reviewer-discipline
       convention (sample past findings, compare stated confidence vs. fixer triage outcome, recalibrate
       the ≥80 threshold)
       — acceptance: `grep -ci "calibration" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; procedure is a documented manual step
-- [ ] [AI] Add the **selective adversarial verification** rule scoped to high-risk diffs per **D4**
+- [x] [AI] Add the **selective adversarial verification** rule scoped to high-risk diffs per **D4**
       (auth/payments/migrations/security/public-API), including the cross-model-diversity note
       — acceptance: `grep -ci "adversarial\|high-risk" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; scope stated explicitly
-- [ ] [AI] Add the **CRITICAL-requires-reproduction** rule (CRITICAL findings carry a reproduction, not
+- [x] [AI] Add the **CRITICAL-requires-reproduction** rule (CRITICAL findings carry a reproduction, not
       agreement-counting)
       — acceptance: `grep -ci "reproduction" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1
-- [ ] [AI] Document the **3-cycle / no-early-exit rationale** explicitly as a predictability policy
+- [x] [AI] Document the **3-cycle / no-early-exit rationale** explicitly as a predictability policy
       choice, NOT research-derived
       — acceptance: `grep -ci "predictability" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1; the note disclaims research-backing
 
@@ -465,9 +465,9 @@ affected` no-op noted in Phase 8)
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] All four enhancements present in the convention and internally cross-linked
-- [ ] [AI] `npx nx affected -t lint` + `rhino-cli md links validate` pass
-- [ ] [AI] Commit created: `docs(governance): add PR-review quality-gate enhancements` and pushed
+- [x] [AI] All four enhancements present in the convention and internally cross-linked
+- [x] [AI] `npx nx affected -t lint` + `rhino-cli md links validate` pass
+- [x] [AI] Commit created: `docs(governance): add PR-review quality-gate enhancements` and pushed
 
 > **Pause Safety**: the enhancements are additive documentation; nothing depends on them being wired
 > to code. Safe to stop. To resume: re-run the md link validator on the convention.
@@ -481,14 +481,14 @@ affected` no-op noted in Phase 8)
 > retired at cutover (Phase 4); this phase documents how the split is watched afterward and the fixed
 > thresholds that trip a rollback.
 
-- [ ] [AI] Author the post-cutover monitoring section in the convention: precision, per-discipline
+- [x] [AI] Author the post-cutover monitoring section in the convention: precision, per-discipline
       acceptance rate (watching the two added lenses `performance`/`docs` and the catch-all
       `governance`/`logic`), BitsAI-CR "Outdated Rate", cost/latency per review **tracked per risk-tier**
       (D12 — a flat cost across tiers means the tiering is not taking effect), and the **human-override
       rate** (Cloudflare's break-glass trust proxy, an early trust-erosion signal)
       — acceptance: `grep -ci "Outdated Rate\|acceptance rate\|precision\|override rate\|risk-tier" repo-governance/development/quality/pr-review-disciplines.md` ≥ 2; the section
       is framed as post-cutover monitoring, not a pre-cutover gate
-- [ ] [AI] Document the **rollback trigger** (D6 decided — absolute thresholds): the **fixed absolute
+- [x] [AI] Document the **rollback trigger** (D6 decided — absolute thresholds): the **fixed absolute
       bar** (proposed, maintainer-tunable: consolidated-finding precision < 50% over a rolling N-PR
       window, OR human-override-rate > 5%, OR any CRITICAL false-positive reaching the fixer — **no
       monolith baseline required**), the monitoring window N, and the exact restore procedure
@@ -503,10 +503,10 @@ affected` no-op noted in Phase 8)
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] The monitoring plan defines the metric families and is framed as post-cutover (not a gate)
-- [ ] [AI] The rollback trigger, bar, and non-destructive restore procedure are documented
-- [ ] [AI] `npx nx affected -t lint` + `rhino-cli md links validate` pass
-- [ ] [AI] Commit created: `docs(governance): add PR-review post-cutover monitoring + rollback trigger` and pushed
+- [x] [AI] The monitoring plan defines the metric families and is framed as post-cutover (not a gate)
+- [x] [AI] The rollback trigger, bar, and non-destructive restore procedure are documented
+- [x] [AI] `npx nx affected -t lint` + `rhino-cli md links validate` pass
+- [x] [AI] Commit created: `docs(governance): add PR-review post-cutover monitoring + rollback trigger` and pushed
 
 > **Pause Safety**: the monitoring plan and rollback path are documented; the split is the live reviewer
 > and the monolith stays recoverable from git history. Safe to stop. To resume: re-run the md link
@@ -518,17 +518,17 @@ affected` no-op noted in Phase 8)
 
 > _Suggested executor: `repo-rules-maker`_
 
-- [ ] [AI] Add a `## Future Work` section to `repo-governance/development/quality/pr-review-disciplines.md`
+- [x] [AI] Add a `## Future Work` section to `repo-governance/development/quality/pr-review-disciplines.md`
       (the convention created in Phase 1) and cross-reference the existing bot-identity two-pager
       [`plans/ideas/pr-review-bot-identity.md`](../../ideas/pr-review-bot-identity.md) as the owner of
       the AI-attribution / `REQUEST_CHANGES` gap
       — acceptance: `grep -c "## Future Work" repo-governance/development/quality/pr-review-disciplines.md` = 1;
       `test -f plans/ideas/pr-review-bot-identity.md` passes and the `## Future Work` section links it
-- [ ] [AI] Add the **cost/latency budgeting** note (≈$1 × 8 specialists × 3 cycles, bounded by the
+- [x] [AI] Add the **cost/latency budgeting** note (≈$1 × 8 specialists × 3 cycles, bounded by the
       D12 risk-tier fan-out; monitor per-PR review cost) referencing the Cloudflare median, inside the
       `## Future Work` section of `repo-governance/development/quality/pr-review-disciplines.md`
       — acceptance: `grep -ci "cost\|budget" repo-governance/development/quality/pr-review-disciplines.md` ≥ 1
-- [ ] [AI] Record the **deferred merge queue** (D7/D10): a merge queue was researched (GitHub-native vs
+- [x] [AI] Record the **deferred merge queue** (D7/D10): a merge queue was researched (GitHub-native vs
       Graphite) but **NOT adopted** — the repo's branch settings do not expose a merge-queue toggle, so
       precondition (c) stays the manual branch-up-to-date check. The deferred work is owned by the
       standalone [`merge-queue-adoption`](../../backlog/merge-queue-adoption/README.md) backlog plan; record this
@@ -540,10 +540,10 @@ affected` no-op noted in Phase 8)
 
 > All checks below must pass before starting Phase 8.
 
-- [ ] [AI] Future-work section covers the bot-identity cross-ref, cost budgeting, and the deferred
+- [x] [AI] Future-work section covers the bot-identity cross-ref, cost budgeting, and the deferred
       merge queue (researched, not adopted — no branch-protection merge-queue setting available)
-- [ ] [AI] `rhino-cli md links validate` passes (bot-identity link resolves); `npx nx affected -t lint` passes
-- [ ] [AI] Commit created: `docs(governance): add worktree-to-PR future-work workstream` and pushed
+- [x] [AI] `rhino-cli md links validate` passes (bot-identity link resolves); `npx nx affected -t lint` passes
+- [x] [AI] Commit created: `docs(governance): add worktree-to-PR future-work workstream` and pushed
 
 > **Pause Safety**: all substantive content is authored and committed to the plan branch; the draft PR
 > (if already open) reflects the full change set. Safe to stop. To resume: re-run the md link validator
@@ -570,13 +570,13 @@ affected` no-op noted in Phase 8)
 > this plan's own governance/agent artifacts are the markdown gate below plus the `repo-rules-checker`
 > (Phase 1 Gate) and `repo-workflow-checker` (Phase 4 Gate) invocations.
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0 (zero affected projects expected)
-- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0 (zero affected projects expected)
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0 (zero affected projects expected)
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0 (docs/agents plan;
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0 (zero affected projects expected)
+- [x] [AI] Run affected linting: `npx nx affected -t lint` — exits 0 (zero affected projects expected)
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0 (zero affected projects expected)
+- [x] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0 (docs/agents plan;
       confirm no `specs/` regression)
-- [ ] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
+- [x] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes.
 > This follows the root cause orientation principle — proactively fix preexisting errors encountered
@@ -584,20 +584,20 @@ affected` no-op noted in Phase 8)
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically (convention doc, specialist agents, coordinator, workflow
+- [x] [AI] Commit changes thematically (convention doc, specialist agents, coordinator, workflow
       cutover + monolith retirement, enhancements, monitoring/rollback, future-work as separate
       cohesive commits)
-- [ ] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
-- [ ] [AI] Keep any preexisting fixes in their own commits, separate from plan work
+- [x] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
+- [x] [AI] Keep any preexisting fixes in their own commits, separate from plan work
 
 ### Open Draft PR + Post-Push CI Verification
 
-- [ ] [AI] Open a draft PR against `main`: `gh pr create --draft --base main`
+- [x] [AI] Open a draft PR against `main`: `gh pr create --draft --base main`
       — acceptance: draft PR exists; its diff carries all nine new agents, the monolith deletion, and
       the governance/workflow edits
-- [ ] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
+- [x] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
       — acceptance: all CI checks green; no exceptions
-- [ ] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
+- [x] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
 
 ### PR-Review Maker→Fixer Cycle (mandatory for `worktree-to-pr`)
 
@@ -607,10 +607,10 @@ affected` no-op noted in Phase 8)
 > `pr-review-synthesis-maker`, which posts the consolidated review that `pr-review-fixer` consumes. This
 > is the plan dogfooding its own reviewer redesign; record the dogfooding observation in `learnings.md`.
 
-- [ ] [AI] Cycle 1: run the reviewer (per the live workflow) → `pr-review-fixer` triages, fixes,
+- [x] [AI] Cycle 1: run the reviewer (per the live workflow) → `pr-review-fixer` triages, fixes,
       pushes, resolves → wait for CI green — acceptance: cycle 1 complete, CI green
-- [ ] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
-- [ ] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
+- [x] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
+- [x] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
 - [ ] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
 
 ### Merge (once the five hardened preconditions hold)
