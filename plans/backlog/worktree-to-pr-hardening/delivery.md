@@ -1,6 +1,6 @@
 # Delivery Checklist — Worktree-to-PR Hardening
 
-This checklist ships the decomposition of `pr-review-maker` into seven specialist reviewers plus a
+This checklist ships the decomposition of `pr-review-maker` into eight specialist reviewers plus a
 mandatory `pr-review-synthesis-maker` coordinator, a reviewer-discipline convention with the boundary
 tie-breaker, the workflow revision, the quality-gate enhancements, and the measurement/eval plan. It
 ships **no application code** — every artifact is agent-definition markdown or governance/workflow
@@ -17,24 +17,33 @@ markdown plus register/binding updates.
 
 <!-- -->
 
-> **Execution prerequisite** — the maintainer has decided **D1** (7 specialists), **D2** (retire the
-> monolith at cutover), **D4** (adversarial verification on high-risk diffs only), **D5** (specialists
-> `sonnet`, coordinator opus), **D6** (absolute-threshold rollback bar — no monolith baseline), **D7**
-> (adopt a merge queue now), and **D10** (GitHub-native, kept in-plan); this delivery.md reflects those.
-> Still resolve the open decisions in
-> [tech-docs.md §Grilling Deferred](./tech-docs.md#grilling-deferred--decisions-for-maintainer)
-> before their phases: **D3** (coordinator name) + **D8** (convention path) before Phases 2–3;
-> **D11** (parallel-vs-sequential downstream propagation — parallel recommended) before Phases 10–11;
-> **D9** (split the fixer) any time; and the three Cloudflare-folded decisions **D12** (risk-tier
-> fan-out), **D13** (diff-filter/generated-exclusion), **D14** (instruction-decay home) before Phase 1.
+> **Execution prerequisite** — **all decisions D1–D14 are now decided**; this delivery.md reflects
+> every one. In particular: **D1** (7 specialists) + **D14** (an eighth specialist,
+> `pr-review-instruction-maker`, for instruction-decay) → **8 specialists + coordinator**; **D2** (retire
+> the monolith at cutover); **D3** (coordinator name `pr-review-synthesis-maker`); **D4** (adversarial
+> verification on high-risk diffs only); **D5** (specialists `sonnet`, coordinator opus); **D6**
+> (absolute-threshold rollback bar — no monolith baseline); **D7 / D10** (merge queue — **NOT adopted;
+> dropped from scope**: the repo's branch settings do not expose a merge-queue toggle, so it is deferred
+> to future-work and precondition (c) stays the manual branch-up-to-date check); **D8**
+> (convention at `repo-governance/development/quality/pr-review-disciplines.md`, 4-tier severity kept);
+> **D9** (keep one `pr-review-fixer`); **D11** (parallel downstream propagation); **D12** (3-tier risk
+> fan-out); **D13** (**no** diff filtering / **no** generated-file exclusion — reviewers see the full
+> diff). See
+> [tech-docs.md §Grilling Deferred](./tech-docs.md#grilling-deferred--decisions-for-maintainer) for the
+> full decision record.
 >
-> **Three-repo parity scope** — Phases 0–9 deliver the change set in `ose-public` (the **source of
-> truth**). Phases 10 (`ose-primer`) and 11 (`ose-infra`) then propagate the identical shared-scaffolding
+> **Three-repo parity scope** — Phases 0–8 deliver the change set in `ose-public` (the **source of
+> truth**). Phases 9 (`ose-primer`) and 10 (`ose-infra`) then propagate the identical shared-scaffolding
 > artifacts to the two downstream repos, **each as its own `worktree-to-pr` delivery in its own repo**,
-> per the [multi-repo parity workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md).
-> The two downstream phases are independent of each other (D11). The `## Worktree` and
-> `## Delivery Mode` sections below describe the **`ose-public`** delivery; each downstream phase
-> provisions its own worktree in its own repo.
+> delivered in the spirit of the [multi-repo parity workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md)
+> but adapted to this plan's single shared plan folder rather than that workflow's canonical
+> one-folder-per-repo output — see [tech-docs.md §Repo Scope & Propagation](./tech-docs.md#repo-scope--propagation-three-repo-parity)
+> for the rationale. The two downstream phases are independent of each other (D11). Because Phases 9–11
+> have not yet run at Phase 8 merge time, **Phase 12's archival is deliberately deferred** past Phase
+> 8's merge — a documented exception to the Archival-in-PR default, landed as a trailing direct-push
+> commit to `ose-public` `main` (see [tech-docs.md §Archival Timing](./tech-docs.md#archival-timing--a-documented-exception-to-archival-in-pr)).
+> The `## Worktree` and `## Delivery Mode` sections below describe the **`ose-public`** delivery; each
+> downstream phase provisions its own worktree in its own repo.
 
 ## Worktree
 
@@ -67,19 +76,18 @@ finalization phase opens the draft PR; git-mechanical steps are `[AI]`.
 %% Color palette: Teal #029E73 (setup/downstream), Blue #0173B2 (ose-public build), Orange #DE8F05 (finalize/archival), Purple #CC78BC (downstream private)
 flowchart TD
   P0["Phase 0<br/>setup + baseline"]:::teal --> P1["Phase 1<br/>discipline convention<br/>+ tie-breaker"]:::blue
-  P1 --> P2["Phase 2<br/>7 specialist agents<br/>+ bindings"]:::blue
+  P1 --> P2["Phase 2<br/>8 specialist agents<br/>+ bindings"]:::blue
   P2 --> P3["Phase 3<br/>synthesizer agent<br/>+ bindings"]:::blue
   P3 --> P4["Phase 4<br/>workflow revision +<br/>monolith retirement (cutover)"]:::blue
   P4 --> P5["Phase 5<br/>quality-gate<br/>enhancements"]:::blue
   P5 --> P6["Phase 6<br/>post-cutover monitoring<br/>+ rollback trigger"]:::blue
-  P6 --> P7["Phase 7<br/>merge queue<br/>adoption (D7, ose-public)"]:::blue
-  P7 --> P8["Phase 8<br/>future-work<br/>(bot id + cost)"]:::blue
-  P8 --> P9["Phase 9 — SOURCE OF TRUTH<br/>ose-public finalize<br/>(PR cycle + merge)"]:::orange
-  P9 --> P10["Phase 10<br/>propagate to ose-primer<br/>(own worktree-to-pr)"]:::teal
-  P9 --> P11["Phase 11<br/>propagate to ose-infra<br/>(own worktree-to-pr, private)"]:::purple
-  P10 --> P12["Phase 12<br/>knowledge capture"]:::orange
-  P11 --> P12
-  P12 --> P13["Phase 13<br/>archival"]:::orange
+  P6 --> P7["Phase 7<br/>future-work<br/>(bot id, cost, merge queue)"]:::blue
+  P7 --> P8["Phase 8 — SOURCE OF TRUTH<br/>ose-public finalize<br/>(PR cycle + merge)"]:::orange
+  P8 --> P9["Phase 9<br/>propagate to ose-primer<br/>(own worktree-to-pr)"]:::teal
+  P8 --> P10["Phase 10<br/>propagate to ose-infra<br/>(own worktree-to-pr, private)"]:::purple
+  P9 --> P11["Phase 11<br/>knowledge capture"]:::orange
+  P10 --> P11
+  P11 --> P12["Phase 12<br/>archival"]:::orange
 
   classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF
   classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF
@@ -87,15 +95,35 @@ flowchart TD
   classDef purple fill:#CC78BC,stroke:#000000,color:#000000
 ```
 
-**ose-public (source of truth)**: Phases 0–8 are strictly sequential, delivered in one worktree and
-one draft PR; Phase 9 runs the review cycle + merge once for that PR. Phase 7 (merge queue) carries
-`[HUMAN]` steps for the GitHub settings changes an agent must not make.
+**ose-public (source of truth)**: Phases 0–7 are strictly sequential, delivered in one worktree and
+one draft PR; Phase 8 runs the review cycle + merge once for that PR.
 
-**Propagation (downstream)**: Phases 10 (ose-primer) and 11 (ose-infra) both depend on Phase 9's
+**Propagation (downstream)**: Phases 9 (ose-primer) and 10 (ose-infra) both depend on Phase 8's
 merge and are **independent of each other** — they may run in parallel (D11). Each is its own
-`worktree-to-pr` delivery in its own repo, each with its own per-repo binding-emit and its own
-`[HUMAN]` merge-queue settings toggle. Knowledge Capture (Phase 12) and Archival (Phase 13) run once,
-after all three repos are done.
+`worktree-to-pr` delivery in its own repo, each with its own per-repo binding-emit. Knowledge Capture
+(Phase 11) and Archival (Phase 12) run once, after all three repos are done.
+
+## Parallelization Model
+
+**Serial spine (Phases 0-8)**: Phase 0 through Phase 8 are strictly **serial** in `ose-public` — each
+phase's artifacts are the source of truth the next phase builds on (the convention → the specialists →
+the coordinator → the workflow cutover → the enhancements → the monitoring plan → future-work → the
+`ose-public` PR merge). No fan-out inside this spine.
+
+**Parallel branch (Phase 9 / Phase 10)**: once Phase 8 merges, Phase 9 (`ose-primer`) and Phase 10
+(`ose-infra`) are the plan's only concurrent pair — both `blockedBy: Phase 8`, no edge between them
+(D11) — because they touch different repos, share no files, and neither reads what the other writes.
+
+**Join + terminal (Phase 11 / Phase 12)**: Phase 11 (Knowledge Capture) depends on both Phase 9 and
+Phase 10 completing; Phase 12 (Archival) is the **terminal node**, depending on Phase 11 — it never
+runs while a delivery node it depends on is still in flight. See
+[tech-docs.md §Archival Timing](./tech-docs.md#archival-timing--a-documented-exception-to-archival-in-pr)
+for why Phase 12 is deliberately deferred this far past Phase 8's merge.
+
+**Chosen N**: this plan's only fan-out point is the Phase 9/Phase 10 pair — **N=2**, well under the
+[Agent Workflow Orchestration Convention](../../../repo-governance/development/agents/agent-workflow-orchestration.md)'s
+default N=3 (1 main thread + N background agents). No other point in this plan fans out; Phases 0-8
+and Phase 11-12 are single-threaded by construction (each is one worktree, one PR, one repo).
 
 ---
 
@@ -134,11 +162,10 @@ after all three repos are done.
 
 > _Suggested executor: `repo-rules-maker`_
 
-- [ ] [AI] Create the reviewer-discipline convention (path per decision **D8**; default
-      `repo-governance/development/quality/pr-review-disciplines.md`, sibling reference
-      `repo-governance/development/quality/ci-blocker-resolution.md`) defining the five disciplines,
-      each discipline's owned/not-owned scope, and the **boundary tie-breaker rule** (documented rule →
-      governance; new tradeoff → architecture; domain-intent → correctness)
+- [ ] [AI] Create the reviewer-discipline convention (D8 → `repo-governance/development/quality/pr-review-disciplines.md`,
+      sibling reference `repo-governance/development/quality/ci-blocker-resolution.md`) defining the
+      eight disciplines, each discipline's owned/not-owned scope, and the **boundary tie-breaker rule**
+      (documented rule → governance; new tradeoff → architecture; domain-intent → correctness)
       — acceptance: file exists; `grep -c "tie-breaker" <path>` ≥ 1; the architecture↔correctness
       boundary is named as the coordinator's re-categorization responsibility
 - [ ] [AI] Embed the six grey-zone rulings verbatim (four core: new cross-module dependency; naming
@@ -148,14 +175,15 @@ after all three repos are done.
       — acceptance: all six rulings present; `grep -c "→" <path>` ≥ 6
 - [ ] [AI] Document the **Cloudflare-folded cost/noise mechanics** in the convention, mirroring
       [tech-docs.md §Cost-Control & Noise-Control Mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23):
-      the **risk-tier fan-out** (D12: trivial/lite/full → 2/4/7 agents, security paths force full), the
-      **diff-filter + generated-file exclusion list + shared-context + large-diff slicing** (D13), the
-      per-specialist **`SUPPRESS` block** requirement, the **instruction-decay** governance charter
-      (D14), the **human-dismissal-respect** re-review rule, and the **boundary-tag-strip**
-      untrusted-input hardening
-      — acceptance: `grep -cE "risk-tier|SUPPRESS|instruction-decay|generated-file" <path>` ≥ 4; the
-      generated-exclusion list names `.opencode`/`.amazonq`/`generated`/lock files and states
-      `.claude/agents` + `repo-governance` are never excluded
+      the **risk-tier fan-out** (D12: trivial → coordinator-only, lite → 4 specialists, full → all 8
+      specialists; security-sensitive paths force full), the
+      **shared-context extract-once + coordinator-discretion large-diff handling** (D13: NO
+      generated-file exclusion — reviewers see the full diff), the per-specialist **`SUPPRESS` block**
+      requirement, the **instruction-decay** dedicated specialist (D14), the **human-dismissal-respect**
+      re-review rule, and the **boundary-tag-strip** untrusted-input hardening
+      — acceptance: `grep -cE "risk-tier|SUPPRESS|instruction-decay|shared-context" <path>` ≥ 4; the
+      convention states D13 chose no generated-file exclusion (reviewers see the full diff) and CI runs
+      over everything regardless
 - [ ] [AI] Add the accessible Mermaid boundary-decision flowchart (color-blind palette) mirroring
       [tech-docs.md](./tech-docs.md#boundary-decision-the-tie-breaker-as-a-flowchart)
       — acceptance: `npx rhino-cli md mermaid validate <path>` (or repo md-mermaid gate) exits 0
@@ -170,6 +198,10 @@ after all three repos are done.
 
 - [ ] [AI] `npx nx affected -t lint` (or `npm run lint:md:fix` + markdownlint) passes on the new convention
 - [ ] [AI] `rhino-cli md links validate` and `md mermaid validate` pass for the new file
+- [ ] [AI] Invoke `repo-rules-checker` against `repo-governance/development/quality/pr-review-disciplines.md`
+      — acceptance: audit report generated in `generated-reports/`; 0 CRITICAL/HIGH findings (this is
+      the substantively meaningful gate for this plan's own new governance artifact — the `nx affected`
+      checks above are expected to report zero affected projects for a `repo-governance/`-only diff)
 - [ ] [AI] Commit created: `docs(governance): add PR reviewer-discipline convention + tie-breaker` and pushed to the plan branch
 
 > **Pause Safety**: the convention is a standalone governance doc with no dangling references; the repo
@@ -178,10 +210,11 @@ after all three repos are done.
 
 ---
 
-## Phase 2: Seven Specialist Reviewer Agents + Bindings
+## Phase 2: Eight Specialist Reviewer Agents + Bindings
 
-> _Suggested executor: `agent-maker`_ — one checkbox each for the seven agents (D1 = 7). Model tier per
-> D5 (decided): every specialist inherits **`sonnet`**; the coordinator (Phase 3) inherits **opus**.
+> _Suggested executor: `agent-maker`_ — one checkbox each for the eight agents (D1 = 7 + D14
+> instruction-decay = 8). Model tier per D5 (decided): every specialist inherits **`sonnet`**; the
+> coordinator (Phase 3) inherits **opus**.
 
 - [ ] [AI] Author `.claude/agents/pr-review-architecture-maker.md` (sibling reference
       `.claude/agents/pr-review-maker.md`) with the architecture charter from
@@ -197,12 +230,10 @@ after all three repos are done.
       routes to governance + architecture per the charter table
   - _Suggested executor: `agent-maker`_
 - [ ] [AI] Author `.claude/agents/pr-review-governance-maker.md` (mechanical `repo-governance/`
-      conformance, naming/structure, spec-file presence, **plus the instruction-decay charter (D14,
-      recommended home)** — flags a framework/build-tool/CI/env change not reflected in
-      `AGENTS.md`/`CLAUDE.md`/`.claude/`), same inheritance + charter
-      — acceptance: file present; explicitly routes "should a new rule exist" to architecture and
-      "scenario completeness" to logic; carries the instruction-decay responsibility (or D14 resolved to
-      an eighth `pr-review-instruction-maker` file instead)
+      conformance, naming/structure, spec-file presence), same inheritance + charter — instruction-decay
+      is **NOT** its job (D14 → B gave that its own eighth specialist; route it to `pr-review-instruction-maker`)
+      — acceptance: file present; explicitly routes "should a new rule exist" to architecture,
+      "scenario completeness" to logic, and instruction-decay to `pr-review-instruction-maker`
   - _Suggested executor: `agent-maker`_
 - [ ] [AI] Author `.claude/agents/pr-review-security-maker.md` (secrets, injection, untrusted-input,
       git-fixture isolation, unsafe git/FS ops), same inheritance + charter
@@ -222,16 +253,24 @@ after all three repos are done.
       — acceptance: file present; NOT-its-job routes mechanical doc-convention conformance to governance
       per the charter table (docs↔governance grey-zone)
   - _Suggested executor: `agent-maker`_
+- [ ] [AI] Author `.claude/agents/pr-review-instruction-maker.md` (D14 → B: **instruction-decay** — a
+      framework/build-tool/package-manager/env-var/CI change in the diff not reflected in
+      `AGENTS.md`/`CLAUDE.md`/`.claude/`; instruction bloat >200 lines / generic filler), same
+      inheritance + charter + the `sonnet` specialist tier (D5)
+      — acceptance: file present; frontmatter `name: pr-review-instruction-maker`; charter names
+      instruction-decay as its sole discipline; NOT-its-job routes mechanical convention conformance to
+      governance and "should a new rule exist" to architecture per the charter table
+  - _Suggested executor: `agent-maker`_
 - [ ] [AI] Give every specialist file an explicit **`SUPPRESS` block** (what it must NOT raise at all —
       nitpicks, style already enforced by a mechanical gate, speculative "consider adding X" when X is
       present, defense-in-depth on adequately-defended paths), distinct from its NOT-its-job routing
       column, and inherit the two sharpened rules (re-review **does not re-raise a human-dismissed
       finding**; untrusted-input **strips user-supplied boundary tags** from PR body/comment/issue text)
-      — acceptance: `grep -lc "SUPPRESS" .claude/agents/pr-review-*-maker.md` lists all seven specialist
+      — acceptance: `grep -lc "SUPPRESS" .claude/agents/pr-review-*-maker.md` lists all eight specialist
       files; each also references the human-dismissal-respect and boundary-tag-strip rules
-- [ ] [AI] Register all seven in `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
+- [ ] [AI] Register all eight in `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
       under the appropriate section
-      — acceptance: `grep -c "pr-review-architecture-maker\|pr-review-logic-maker\|pr-review-governance-maker\|pr-review-security-maker\|pr-review-integrity-maker\|pr-review-performance-maker\|pr-review-docs-maker" AGENTS.md` = 7 (or all present)
+      — acceptance: `grep -c "pr-review-architecture-maker\|pr-review-logic-maker\|pr-review-governance-maker\|pr-review-security-maker\|pr-review-integrity-maker\|pr-review-performance-maker\|pr-review-docs-maker\|pr-review-instruction-maker" AGENTS.md` = 8 (or all present)
 - [ ] [AI] Regenerate bindings: `npm run generate:bindings`
       — acceptance: `.opencode/agents/pr-review-*-maker.md` and `.amazonq/` artifacts created; exits 0
 - [ ] [AI] Verify binding sync: `git status --porcelain` shows only intended new/edited files and the
@@ -243,12 +282,12 @@ after all three repos are done.
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] All seven specialist files pass the agent-naming regex and carry valid frontmatter
+- [ ] [AI] All eight specialist files pass the agent-naming regex and carry valid frontmatter
 - [ ] [AI] `npm run generate:bindings` re-run produces zero _additional_ diff (bindings settled)
-- [ ] [AI] `npx nx affected -t lint` passes; registers list all seven agents
-- [ ] [AI] Commit created: `feat(agents): add seven specialist PR-review reviewer agents` and pushed
+- [ ] [AI] `npx nx affected -t lint` passes; registers list all eight agents
+- [ ] [AI] Commit created: `feat(agents): add eight specialist PR-review reviewer agents` and pushed
 
-> **Pause Safety**: the seven specialists exist and are registered but are not yet wired into any
+> **Pause Safety**: the eight specialists exist and are registered but are not yet wired into any
 > workflow — they are inert until Phase 4 references them, and the monolith is still the live reviewer.
 > The repo is coherent (agents can be invoked by name but nothing calls them). Safe to stop. To resume:
 > re-run `npm run generate:bindings && git status --porcelain`.
@@ -270,12 +309,12 @@ after all three repos are done.
   - _Suggested executor: `agent-maker`_
 - [ ] [AI] Give the coordinator the folded pre/post-fan-out duties (D12/D13): **classify the PR risk-tier**
       (trivial/lite/full, security paths force full) and select the specialist set accordingly; **assemble
-      the shared-context brief once** (PR metadata + linked-plan/issue + filtered diff with generated files
-      excluded) rather than each specialist re-deriving it; **read prior-cycle thread resolution status**
-      (including human "won't fix") before fanning out; record the tier + any diff-slicing in the
-      consolidated review header
+      the shared-context brief once** (PR metadata + linked-plan/issue + the **full diff**, D13: no
+      generated-file exclusion — reviewers see everything) rather than each specialist re-deriving it;
+      **read prior-cycle thread resolution status** (including human "won't fix") before fanning out;
+      record the tier + any coordinator-discretion diff-slicing in the consolidated review header
       — acceptance: charter names the risk-tier classification, the shared-context assembly, the
-      generated-file exclusion, and the human-dismissal read; the review header format includes the tier
+      **no-exclusion full-diff posture (D13)**, and the human-dismissal read; the review header format includes the tier
   - _Suggested executor: `agent-maker`_
 - [ ] [AI] Register the coordinator in `AGENTS.md` and `.claude/agents/README.md`
       — acceptance: coordinator listed in both registers
@@ -291,7 +330,7 @@ after all three repos are done.
 - [ ] [AI] `npx nx affected -t lint` passes; registers list the coordinator
 - [ ] [AI] Commit created: `feat(agents): add pr-review-synthesis-maker coordinator` and pushed
 
-> **Pause Safety**: all eight new agents (seven specialists + coordinator) exist and are registered but
+> **Pause Safety**: all nine new agents (eight specialists + coordinator) exist and are registered but
 > still unwired — the live review gate remains the untouched monolith. Safe to stop. To resume: re-run
 > the binding sync check.
 
@@ -299,35 +338,44 @@ after all three repos are done.
 
 ## Phase 4: Workflow Revision + Monolith Retirement (Cutover)
 
-> _Suggested executor: `repo-workflow-maker`_ — this is the **cutover** phase: the seven specialists +
+> _Suggested executor: `repo-workflow-maker`_ — this is the **cutover** phase: the eight specialists +
 > coordinator become the live reviewer and the monolith is **retired immediately** (D2), in one
 > coherent phase.
 
 - [ ] [AI] Revise `repo-governance/workflows/pr/pr-review-quality-gate.md`: replace the single-maker
-      per-cycle pass with **fan-out to the seven specialists → `pr-review-synthesis-maker` → one
+      per-cycle pass with **fan-out to the eight specialists → `pr-review-synthesis-maker` → one
       consolidated review → `pr-review-fixer`**; keep the 3-cycle hard ceiling, no-early-exit, and the
       CI-green gate between cycles verbatim
       — acceptance: `grep -c "pr-review-synthesis-maker" pr-review-quality-gate.md` ≥ 1; the Loop
       Algorithm block shows fan-out→synthesize→fixer; the "3, hard ceiling" wording is unchanged
-- [ ] [AI] Update the Participants + sequence diagram in that workflow to show the seven specialists +
+- [ ] [AI] Update the Participants + sequence diagram in that workflow to show the eight specialists +
       coordinator (accessible Mermaid palette)
-      — acceptance: `rhino-cli md mermaid validate` passes; diagram lists all eight agents
-- [ ] [AI] Update `repo-governance/development/workflow/pr-merge-protocol.md` **only** where it
-      describes the reviewer count/shape; the five hardened preconditions (a)-(e) stay byte-identical
-      (precondition (c)'s merge-queue rewording happens in Phase 7, not here)
+      — acceptance: `rhino-cli md mermaid validate` passes; diagram lists all nine agents
+- [ ] [AI] Update `repo-governance/development/workflow/pr-merge-protocol.md`: the **structural shape**
+      of the five hardened preconditions — five preconditions, same `(a)-(e)` lettering, same
+      substantive gates — stays intact; **only the reviewer-agent name inside precondition (a)** is
+      repointed from the retired `pr-review-maker` to the new pipeline (e.g. "the configured PR-review
+      cycle (fan-out → `pr-review-synthesis-maker` → `pr-review-fixer`) is complete (default 3)"), since
+      leaving `pr-review-maker` as live text inside (a) would itself be the dangling reference the sweep
+      step below exists to catch. No other precondition's substance changes (the merge queue was dropped
+      from scope, so precondition (c) keeps its manual branch-up-to-date form)
       — acceptance: `grep -c "all five" pr-merge-protocol.md` unchanged; precondition lettering (a)-(e)
-      intact (`grep -c "\*\*(a)\*\*\|\*\*(b)\*\*\|\*\*(c)\*\*\|\*\*(d)\*\*\|\*\*(e)\*\*" pr-merge-protocol.md` unchanged)
+      intact (`grep -c "\*\*(a)\*\*\|\*\*(b)\*\*\|\*\*(c)\*\*\|\*\*(d)\*\*\|\*\*(e)\*\*" pr-merge-protocol.md` unchanged);
+      precondition (a)'s text no longer names the retired `pr-review-maker` as the live reviewer
 - [ ] [AI] **Retire the monolith (D2)**: `git rm .claude/agents/pr-review-maker.md` and delete its
       entries from `AGENTS.md` §AI Agents lists and `.claude/agents/README.md` catalog
       — acceptance: `test ! -f .claude/agents/pr-review-maker.md`; `grep -c "pr-review-maker\b" AGENTS.md`
-      returns only the specialist/coordinator names, not the bare `pr-review-maker` monolith
+      returns `0` (the specialist/coordinator names like `pr-review-synthesis-maker` do not match the
+      bounded `pr-review-maker` pattern, so any non-zero count would flag a residual monolith reference)
 - [ ] [AI] Regenerate bindings so the monolith's mirrors are also removed: `npm run generate:bindings`
       — acceptance: `test ! -f .opencode/agents/pr-review-maker.md`; `git status --porcelain` shows the
       deletion and zero unexpected drift
 - [ ] [AI] Grep the repo for any dangling reference to the retired monolith and repoint it to the
-      synthesizer or the specialist set: `grep -rn "pr-review-maker" repo-governance/ .claude/ AGENTS.md`
+      synthesizer or the specialist set: `grep -rn "pr-review-maker" repo-governance/ .claude/ AGENTS.md CLAUDE.md`
       — acceptance: no reference points to the monolith as a live reviewer (workflow/name references now
-      read `pr-review-synthesis-maker` + the specialists)
+      read `pr-review-synthesis-maker` + the specialists); `CLAUDE.md`'s "Delivery Mode default
+      (Claude-Code binding)" note (which names `pr-review-maker` and `pr-review-fixer` explicitly) is
+      updated to name the new coordinator/specialist set in place of the retired monolith
 - [ ] [AI] Cross-check every inbound reference to the workflow still resolves:
       `rhino-cli md links validate repo-governance/workflows/pr/pr-review-quality-gate.md`
       — acceptance: exits 0, no broken links
@@ -337,14 +385,22 @@ after all three repos are done.
 > All checks below must pass before starting Phase 5.
 
 - [ ] [AI] The workflow describes fan-out→synthesize→fixer and preserves the 3-cycle ceiling + CI gate
-- [ ] [AI] `pr-merge-protocol.md` preconditions (a)-(e) are byte-identical to before this phase
+- [ ] [AI] `pr-merge-protocol.md` preconditions (a)-(e) keep their structural shape — five
+      preconditions, same lettering, same substantive gates — with only precondition (a)'s
+      reviewer-agent name updated to the new pipeline; no other precondition's text changed
 - [ ] [AI] The monolith is gone: `test ! -f .claude/agents/pr-review-maker.md` and no register or
       binding lists it; `npm run generate:bindings` produces zero additional diff
 - [ ] [AI] `rhino-cli md links validate` + `md mermaid validate` pass on all edited docs; no dangling
-      `pr-review-maker` reference remains
+      `pr-review-maker` reference remains anywhere in `repo-governance/`, `.claude/`, `AGENTS.md`, or
+      `CLAUDE.md`
+- [ ] [AI] Invoke `repo-workflow-checker` against the revised
+      `repo-governance/workflows/pr/pr-review-quality-gate.md`
+      — acceptance: audit report generated in `generated-reports/`; 0 CRITICAL/HIGH findings (the
+      substantively meaningful gate for this phase's revised workflow doc, complementing the `nx
+affected` no-op noted in Phase 8)
 - [ ] [AI] Commit created: `refactor(workflow): cut over PR review to specialists + synthesizer, retire monolith` and pushed
 
-> **Pause Safety**: cutover is complete and self-consistent — the seven specialists + coordinator are
+> **Pause Safety**: cutover is complete and self-consistent — the eight specialists + coordinator are
 > the documented live reviewer, the monolith is deleted (recoverable from git history), and no dangling
 > reference remains. Safe to stop. To resume: re-run `npm run generate:bindings && git status --porcelain`
 > and the md link validators.
@@ -422,55 +478,7 @@ after all three repos are done.
 
 ---
 
-## Phase 7: Merge-Queue Adoption (D7)
-
-> _Suggested executor: `repo-rules-maker`_ (docs/YAML) — resolve **D10** (mechanism; GitHub-native
-> recommended) first. This phase **carries `[HUMAN]` steps**: enabling a merge queue changes GitHub
-> repository settings, which an agent must not do. See
-> [tech-docs.md §Merge-Queue Design](./tech-docs.md#merge-queue-design-delivered--d7).
-
-- [ ] [AI] Document the chosen mechanism (per D10; default GitHub-native) in the reviewer-discipline
-      convention (or a dedicated `repo-governance/development/workflow/` doc), including how it satisfies
-      precondition (c) under concurrent worktree-to-PR integration
-      — acceptance: `grep -ci "merge queue\|merge_group" <doc>` ≥ 1; the doc names the mechanism and ties
-      it to precondition (c)
-- [ ] [AI] Reword `repo-governance/development/workflow/pr-merge-protocol.md` precondition **(c)** so
-      "up-to-date with `origin/main`" is satisfied by the merge queue's speculative merge; keep the
-      (a)-(e) lettering and the other four preconditions byte-identical
-      — acceptance: precondition (c) text references the queue; `grep -c "\*\*(a)\*\*\|\*\*(b)\*\*\|\*\*(c)\*\*\|\*\*(d)\*\*\|\*\*(e)\*\*" pr-merge-protocol.md` unchanged
-- [ ] [AI] Add/adjust the CI workflow config under `.github/workflows/` to handle the `merge_group`
-      trigger event (verify the exact workflow file first: `grep -rln "on:" .github/workflows/`)
-      — acceptance: a workflow lists `merge_group` under its `on:` triggers; `actionlint` passes
-  - _Suggested executor: `ci-fixer`_
-- [ ] [AI] Prepare the exact GitHub settings to toggle (queue enablement, required checks, FIFO/
-      auto-eviction options) and write them into the doc as a `[HUMAN]` runbook
-      — acceptance: the runbook lists each setting and its target value
-- [ ] [HUMAN] Enable the merge queue in GitHub repository settings (branch-protection → merge queue) per
-      the runbook — an agent must not change repo security/settings
-      — handoff: the agent surfaces the runbook and stops; **resume signal**: the human confirms
-      "merge queue enabled" and the queue appears active in repo settings, after which the agent continues
-- [ ] [AI] Verify the queue is live by reading repo state: `gh api repos/{owner}/{repo}/rulesets` (or
-      `gh api repos/{owner}/{repo}/branches/main/protection`) and confirm the merge-queue rule is present
-      — acceptance: the API response shows the merge queue enabled on `main`
-
-### Phase 7 Gate
-
-> All checks below must pass before starting Phase 8.
-
-- [ ] [AI] Precondition (c) reworded to the queue; (a)-(e) lettering intact
-- [ ] [AI] A `.github/workflows/` workflow handles `merge_group`; `actionlint` passes
-- [ ] [AI] Merge queue confirmed enabled on `main` — the agent verifies the `[HUMAN]` enablement landed
-      by reading repo state via `gh api` (the step above); the toggle itself was the human's `[HUMAN]` step
-- [ ] [AI] Commit created: `feat(ci): adopt merge queue to harden merge-precondition (c)` and pushed
-
-> **Pause Safety**: the merge-queue docs + CI trigger are committed and the queue is enabled in
-> settings; concurrent integration is now queue-serialized. If the `[HUMAN]` enable step has not yet
-> happened, the repo is still coherent (the CI workflow accepts `merge_group` but no queue routes to it
-> yet). Safe to stop. To resume: re-check `gh api .../branches/main/protection` for the queue rule.
-
----
-
-## Phase 8: Future-Work Workstream
+## Phase 7: Future-Work Workstream
 
 > _Suggested executor: `repo-rules-maker`_
 
@@ -478,16 +486,22 @@ after all three repos are done.
       [`plans/ideas/pr-review-bot-identity.md`](../../ideas/pr-review-bot-identity.md) as the owner of
       the AI-attribution / `REQUEST_CHANGES` gap
       — acceptance: `test -f plans/ideas/pr-review-bot-identity.md` passes and the future-work section links it
-- [ ] [AI] Add the **cost/latency budgeting** note (≈$1 × 7 specialists × 3 cycles; monitor per-PR
-      review cost) referencing the Cloudflare median
+- [ ] [AI] Add the **cost/latency budgeting** note (≈$1 × 8 specialists × 3 cycles, bounded by the
+      D12 risk-tier fan-out; monitor per-PR review cost) referencing the Cloudflare median
       — acceptance: `grep -ci "cost\|budget" <future-work section>` ≥ 1
+- [ ] [AI] Record the **deferred merge queue** (D7/D10): a merge queue was researched (GitHub-native vs
+      Graphite) but **NOT adopted** — the repo's branch settings do not expose a merge-queue toggle, so
+      precondition (c) stays the manual branch-up-to-date check. The deferred work is owned by the
+      standalone [`merge-queue-adoption`](../merge-queue-adoption/README.md) backlog plan
+      — acceptance: `grep -ci "merge queue" <future-work section>` ≥ 1; the note states it is deferred,
+      not delivered, links `merge-queue-adoption`, and confirms precondition (c) is unchanged
 
-### Phase 8 Gate
+### Phase 7 Gate
 
-> All checks below must pass before starting Phase 9.
+> All checks below must pass before starting Phase 8.
 
-- [ ] [AI] Future-work section covers the bot-identity cross-ref and cost budgeting (merge-queue is now
-      delivered in Phase 7, not future work)
+- [ ] [AI] Future-work section covers the bot-identity cross-ref, cost budgeting, and the deferred
+      merge queue (researched, not adopted — no branch-protection merge-queue setting available)
 - [ ] [AI] `rhino-cli md links validate` passes (bot-identity link resolves); `npx nx affected -t lint` passes
 - [ ] [AI] Commit created: `docs(governance): add worktree-to-PR future-work workstream` and pushed
 
@@ -497,17 +511,25 @@ after all three repos are done.
 
 ---
 
-## Phase 9: ose-public Finalization — Source of Truth (PR-Review Cycle + Merge)
+## Phase 8: ose-public Finalization — Source of Truth (PR-Review Cycle + Merge)
 
-> This is the **blocking source-of-truth node**: the two downstream propagation phases (10 & 11)
+> This is the **blocking source-of-truth node**: the two downstream propagation phases (9 & 10)
 > cannot start until this PR merges to `ose-public` `main`. See
 > [tech-docs.md §Repo Scope & Propagation](./tech-docs.md#repo-scope--propagation-three-repo-parity).
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
+> **Expected outcome note**: this plan's diff lives entirely under `.claude/agents/**`,
+> `repo-governance/**`, and root `AGENTS.md`/`CLAUDE.md`/`.claude/agents/README.md` — none of which sit
+> inside an Nx project root or `sharedGlobals`. The four `nx affected` steps below are therefore
+> expected to legitimately report **zero affected projects** and exit 0 without validating this plan's
+> actual deliverable; do not treat that as a tooling failure. The substantively meaningful checks for
+> this plan's own governance/agent artifacts are the markdown gate below plus the `repo-rules-checker`
+> (Phase 1 Gate) and `repo-workflow-checker` (Phase 4 Gate) invocations.
+
+- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0 (zero affected projects expected)
+- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0 (zero affected projects expected)
+- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0 (zero affected projects expected)
 - [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0 (docs/agents plan;
       confirm no `specs/` regression)
 - [ ] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
@@ -520,16 +542,16 @@ after all three repos are done.
 ### Commit Guidelines
 
 - [ ] [AI] Commit changes thematically (convention doc, specialist agents, coordinator, workflow
-      cutover + monolith retirement, enhancements, monitoring/rollback, merge queue, future-work as
-      separate cohesive commits)
+      cutover + monolith retirement, enhancements, monitoring/rollback, future-work as separate
+      cohesive commits)
 - [ ] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
 - [ ] [AI] Keep any preexisting fixes in their own commits, separate from plan work
 
 ### Open Draft PR + Post-Push CI Verification
 
 - [ ] [AI] Open a draft PR against `main`: `gh pr create --draft --base main`
-      — acceptance: draft PR exists; its diff carries all eight new agents, the monolith deletion, and
-      the governance/workflow/CI edits
+      — acceptance: draft PR exists; its diff carries all nine new agents, the monolith deletion, and
+      the governance/workflow edits
 - [ ] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
       — acceptance: all CI checks green; no exceptions
 - [ ] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
@@ -538,7 +560,7 @@ after all three repos are done.
 
 > Runs the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md)
 > — 3 strictly sequential cycles, each CI-gated. **Because the monolith was retired at cutover (Phase 4),
-> this plan's own PR is reviewed by the NEW pipeline** — the seven specialists fan out to
+> this plan's own PR is reviewed by the NEW pipeline** — the eight specialists fan out to
 > `pr-review-synthesis-maker`, which posts the consolidated review that `pr-review-fixer` consumes. This
 > is the plan dogfooding its own reviewer redesign; record the dogfooding observation in `learnings.md`.
 
@@ -556,70 +578,107 @@ after all three repos are done.
       date with `origin/main`; (d) all gates green; (e) tester gates run or no-reachable-behavior
       exemption recorded (this plan changes no reachable behavior — record the docs/agents exemption
       explicitly) — acceptance: all five hold and are surfaced in the merge summary
-- [ ] [AI] Merge the PR through the merge queue adopted in Phase 7 (`[AI]` is the default actor once
-      preconditions hold; precondition (c) is now satisfied by the queue's speculative merge)
-      — acceptance: PR enters the queue, its speculative CI is green, and it merges to `main`; branch integrated
+- [ ] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold; precondition (c) is the
+      manual non-destructive branch-up-to-date check — the merge queue was dropped from scope)
+      — acceptance: PR merges to `main`; branch integrated
 
-### Phase 9 Gate
+### Phase 8 Gate
 
-> All checks below must pass before starting the propagation phases (10 & 11).
+> All checks below must pass before starting the propagation phases (9 & 10).
 
 - [ ] [AI] Draft PR opened, CI green, 3 review cycles complete with no `escalated` exit
 - [ ] [AI] Five merge preconditions (a)-(e) verified and surfaced; the (e) docs/agents exemption recorded
-- [ ] [AI] PR merged to `ose-public` `main` via the merge queue (or a `[HUMAN]` merge gate reached only
-      if the plan later opts in — this plan does not)
+- [ ] [AI] PR merged to `ose-public` `main` (or a `[HUMAN]` merge gate reached only if the plan later
+      opts in — this plan does not)
 
 > **Pause Safety**: the source-of-truth change set is either fully merged to `ose-public` `main` or
 > sitting green-and-ready on the draft PR. Safe to stop between cycles (the loop is CI-gated) and safe
 > to stop indefinitely after merge — the two downstream propagation phases are independent follow-on
-> deliveries. To resume: re-check `gh pr checks <PR>`, or (post-merge) start Phase 10 and/or Phase 11.
+> deliveries. To resume: re-check `gh pr checks <PR>`, or (post-merge) start Phase 9 and/or Phase 10.
 
 ---
 
-## Phase 10: Propagate to ose-primer (own worktree-to-pr)
+## Phase 9: Propagate to ose-primer (own worktree-to-pr)
 
-> _Suggested executor: `repo-harness-compatibility-maker`_ (parity propagation). Depends on Phase 9
-> merge; **independent of Phase 11** — may run in parallel (D11). This is a **separate `worktree-to-pr`
-> delivery in the `ose-primer` repo** (its own worktree, PR, review cycle, and merge), following the
-> [multi-repo parity planning-and-execution workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md).
-> **Re-verify the bare-repo topology at execution time** — `ose-primer` is a BARE repo with worktrees;
-> use the bare-repo git method (`-c core.bare=false --work-tree=…`, or `GIT_DIR`/`GIT_WORK_TREE` for
-> rhino-cli/bindings). See [tech-docs.md §Bare-repo topology caveat](./tech-docs.md#bare-repo-topology-caveat-re-verify-at-execution-time).
+> _Suggested executor: `repo-harness-compatibility-fixer`_ (parity propagation — applies the
+> `ose-public`-validated change set to `ose-primer` as a parity-restoring fix). Depends on Phase 8
+> merge; **independent of Phase 10** — may run in parallel (D11). This is a **separate `worktree-to-pr`
+> delivery in the `ose-primer` repo** (its own worktree, PR, review cycle, and merge), delivered in the
+> spirit of the [multi-repo parity planning-and-execution workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md)
+> — see [tech-docs.md §Repo Scope & Propagation](./tech-docs.md#repo-scope--propagation-three-repo-parity)
+> for the single-folder adaptation rationale. **Re-verify the bare-repo topology at execution time** —
+> `ose-primer` is a BARE repo with worktrees; use the bare-repo git method (`-c core.bare=false
+--work-tree=…`, or `GIT_DIR`/`GIT_WORK_TREE` for rhino-cli/bindings). See
+> [tech-docs.md §Bare-repo topology caveat](./tech-docs.md#bare-repo-topology-caveat-re-verify-at-execution-time).
+
+### Setup + Port
 
 - [ ] [AI] Re-verify `ose-primer`'s topology before any git op: confirm bare-vs-normal
       (`git -C <ose-primer> rev-parse --is-bare-repository`) and locate the worktrees root
       — acceptance: topology confirmed and the correct git-invocation method selected
-- [ ] [AI] Provision a worktree from the latest `origin/main` of `ose-primer` and initialize the
-      toolchain: `npm install` then `npm run doctor -- --fix`
+- [ ] [AI] Provision a worktree from the latest `origin/main` of `ose-primer`
+      — acceptance: worktree exists on a fresh branch off `origin/main`
+- [ ] [AI] Initialize the toolchain: `npm install` then `npm run doctor -- --fix`
       — acceptance: both exit 0; `node_modules/` synchronized
-- [ ] [AI] Port the identical artifacts landed in `ose-public` Phase 9 (the reviewer-discipline
-      convention, the seven specialist agents, `pr-review-synthesis-maker`, the `pr-review-quality-gate`
-      workflow revision + monolith retirement, the `pr-merge-protocol.md` precondition-(c) edit, the
-      quality-gate enhancements, the monitoring/rollback doc, and the merge-queue docs/CI) into
-      `ose-primer` — acceptance: the diff matches `ose-public`'s agent/governance/workflow change set
-      (no rhino-cli files touched — see the byte-identity note)
+- [ ] [AI] Port the identical artifacts landed in `ose-public` Phase 8 (the reviewer-discipline
+      convention, the eight specialist agents, `pr-review-synthesis-maker`, the `pr-review-quality-gate`
+      workflow revision + monolith retirement, the `pr-merge-protocol.md` reviewer-count/shape edits, the
+      quality-gate enhancements, and the monitoring/rollback doc) into `ose-primer`
+      — acceptance: the diff matches `ose-public`'s agent/governance/workflow change set (no rhino-cli
+      files touched — see the byte-identity note)
 - [ ] [AI] Regenerate the platform bindings **in `ose-primer`**: `npm run generate:bindings`
       — acceptance: `.opencode/` and `.amazonq/` mirrors updated; sync-validation gate passes
-- [ ] [AI] Configure the merge queue's CI trigger (`merge_group`) in `ose-primer`'s `.github/workflows/`
-      and write the per-repo `[HUMAN]` settings runbook
-      — acceptance: a workflow lists `merge_group`; `actionlint` passes; runbook present
-- [ ] [HUMAN] Enable the merge queue in `ose-primer` GitHub repository settings per the runbook — an
-      agent must not change repo settings
-      — handoff: the agent surfaces the runbook and stops; **resume signal**: the human confirms
-      "ose-primer merge queue enabled", after which the agent verifies via `gh api` and continues
-- [ ] [AI] Run local quality gates in the `ose-primer` worktree (`npx nx affected -t typecheck lint
-test:quick specs:coverage` + markdown gate), open a draft PR, run the PR-Review Maker→Fixer Cycle
-      (3 cycles), and merge once the five preconditions hold
-      — acceptance: `ose-primer` PR merged to its `main`; CI green
 
-### Phase 10 Gate
+### Local Quality Gates (Before Push)
+
+> **Expected outcome note**: as in Phase 8, this repo's diff is `.claude/`/`repo-governance/`-only —
+> none of it sits inside an Nx project root, so the four `nx affected` steps below are expected to
+> legitimately report **zero affected projects** and exit 0; do not treat that as a tooling failure.
+> The markdown gate below plus the Phase-gate checker invocations are the substantive checks here.
+
+- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
+- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
+- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
+- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
+- [ ] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
+- [ ] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
+
+### Commit Guidelines
+
+- [ ] [AI] Commit changes thematically (ported convention, agents, workflow-cutover edits as separate
+      cohesive commits, mirroring `ose-public`'s Phase 8 commit shape)
+- [ ] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
+
+### Open Draft PR + Post-Push CI Verification
+
+- [ ] [AI] Open a draft PR against `ose-primer`'s `main`: `gh pr create --draft --base main`
+      — acceptance: draft PR exists; its diff matches the ported change set
+- [ ] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
+      — acceptance: all CI checks green; no exceptions
+- [ ] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
+
+### PR-Review Maker→Fixer Cycle (mandatory for `worktree-to-pr`)
+
+- [ ] [AI] Cycle 1: run the reviewer (per the live `ose-primer` workflow) → `pr-review-fixer` triages,
+      fixes, pushes, resolves → wait for CI green — acceptance: cycle 1 complete, CI green
+- [ ] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
+- [ ] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
+- [ ] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
+
+### Merge (once the five hardened preconditions hold)
+
+- [ ] [AI] Verify the five hardened merge preconditions (a)-(e) hold for the `ose-primer` PR
+      — acceptance: all five hold and are surfaced in the merge summary
+- [ ] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold)
+      — acceptance: `ose-primer` PR merges to its `main`; branch integrated
+
+### Phase 9 Gate
 
 > All checks below must pass before this propagation node is considered done.
 
 - [ ] [AI] `ose-primer` carries the identical agent/governance/workflow change set as `ose-public`
       (no rhino-cli byte-identity boundary crossed)
-- [ ] [AI] `ose-primer` bindings regenerated and sync-validation green; merge queue confirmed enabled
-      via `gh api`
+- [ ] [AI] `ose-primer` bindings regenerated and sync-validation green
 - [ ] [AI] `ose-primer` PR merged to its `main`; CI green
 
 > **Pause Safety**: `ose-primer` is either fully propagated-and-merged or green-and-ready on its own
@@ -628,10 +687,11 @@ test:quick specs:coverage` + markdown gate), open a draft PR, run the PR-Review 
 
 ---
 
-## Phase 11: Propagate to ose-infra (own worktree-to-pr, private)
+## Phase 10: Propagate to ose-infra (own worktree-to-pr, private)
 
-> _Suggested executor: `repo-harness-compatibility-maker`_ (parity propagation). Depends on Phase 9
-> merge; **independent of Phase 10** — may run in parallel (D11). This is a **separate `worktree-to-pr`
+> _Suggested executor: `repo-harness-compatibility-fixer`_ (parity propagation — applies the
+> `ose-public`-validated change set to `ose-infra` as a parity-restoring fix). Depends on Phase 8
+> merge; **independent of Phase 9** — may run in parallel (D11). This is a **separate `worktree-to-pr`
 > delivery in the private `ose-infra` repo** (its own worktree, PR, review cycle, and merge). `ose-infra`
 > does **not** participate in the content-parity loop for infra-private material, but it **does** carry
 > the same `.claude/agents/`, `repo-governance/`, and binding scaffolding this plan changes, so it
@@ -639,38 +699,73 @@ test:quick specs:coverage` + markdown gate), open a draft PR, run the PR-Review 
 > topology at execution time** — `ose-infra` is a BARE repo with worktrees; use the bare-repo git method.
 > See [tech-docs.md §Bare-repo topology caveat](./tech-docs.md#bare-repo-topology-caveat-re-verify-at-execution-time).
 
+### Setup + Port
+
 - [ ] [AI] Re-verify `ose-infra`'s topology before any git op: confirm bare-vs-normal
       (`git -C <ose-infra> rev-parse --is-bare-repository`) and locate the worktrees root
       — acceptance: topology confirmed and the correct git-invocation method selected
-- [ ] [AI] Provision a worktree from the latest `origin/main` of `ose-infra` and initialize the
-      toolchain: `npm install` then `npm run doctor -- --fix`
+- [ ] [AI] Provision a worktree from the latest `origin/main` of `ose-infra`
+      — acceptance: worktree exists on a fresh branch off `origin/main`
+- [ ] [AI] Initialize the toolchain: `npm install` then `npm run doctor -- --fix`
       — acceptance: both exit 0; `node_modules/` synchronized
-- [ ] [AI] Port the identical shared-scaffolding artifacts landed in `ose-public` Phase 9 into
+- [ ] [AI] Port the identical shared-scaffolding artifacts landed in `ose-public` Phase 8 into
       `ose-infra`; keep all infra-private content (Terraform, k3s, Proxmox, real hostnames) untouched and
       never cross-route it — acceptance: the diff matches `ose-public`'s agent/governance/workflow change
       set; no infra-private material altered; no rhino-cli files touched
 - [ ] [AI] Regenerate the platform bindings **in `ose-infra`**: `npm run generate:bindings`
       — acceptance: `.opencode/` and `.amazonq/` mirrors updated; sync-validation gate passes
-- [ ] [AI] Configure the merge queue's CI trigger (`merge_group`) in `ose-infra`'s `.github/workflows/`
-      and write the per-repo `[HUMAN]` settings runbook (note: `ose-infra` is a **private** repo — merge
-      queue availability follows its plan/settings) — acceptance: a workflow lists `merge_group`;
-      `actionlint` passes; runbook present
-- [ ] [HUMAN] Enable the merge queue in `ose-infra` GitHub repository settings per the runbook — an
-      agent must not change repo settings
-      — handoff: the agent surfaces the runbook and stops; **resume signal**: the human confirms
-      "ose-infra merge queue enabled", after which the agent verifies via `gh api` and continues
-- [ ] [AI] Run local quality gates in the `ose-infra` worktree, open a draft PR, run the PR-Review
-      Maker→Fixer Cycle (3 cycles), and merge once the five preconditions hold
-      — acceptance: `ose-infra` PR merged to its `main`; CI green
 
-### Phase 11 Gate
+### Local Quality Gates (Before Push)
+
+> **Expected outcome note**: as in Phase 8, this repo's diff is `.claude/`/`repo-governance/`-only —
+> none of it sits inside an Nx project root, so the four `nx affected` steps below are expected to
+> legitimately report **zero affected projects** and exit 0; do not treat that as a tooling failure.
+> The markdown gate below plus the Phase-gate checker invocations are the substantive checks here.
+
+- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
+- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
+- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
+- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
+- [ ] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
+- [ ] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
+
+### Commit Guidelines
+
+- [ ] [AI] Commit changes thematically (ported convention, agents, workflow-cutover edits as separate
+      cohesive commits, mirroring `ose-public`'s Phase 8 commit shape)
+- [ ] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
+
+### Open Draft PR + Post-Push CI Verification
+
+- [ ] [AI] Open a draft PR against `ose-infra`'s `main`: `gh pr create --draft --base main`
+      — acceptance: draft PR exists; its diff matches the ported change set; no infra-private material
+      is included in the diff
+- [ ] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
+      — acceptance: all CI checks green; no exceptions
+- [ ] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
+
+### PR-Review Maker→Fixer Cycle (mandatory for `worktree-to-pr`)
+
+- [ ] [AI] Cycle 1: run the reviewer (per the live `ose-infra` workflow) → `pr-review-fixer` triages,
+      fixes, pushes, resolves → wait for CI green — acceptance: cycle 1 complete, CI green
+- [ ] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
+- [ ] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
+- [ ] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
+
+### Merge (once the five hardened preconditions hold)
+
+- [ ] [AI] Verify the five hardened merge preconditions (a)-(e) hold for the `ose-infra` PR
+      — acceptance: all five hold and are surfaced in the merge summary
+- [ ] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold)
+      — acceptance: `ose-infra` PR merges to its `main`; branch integrated
+
+### Phase 10 Gate
 
 > All checks below must pass before this propagation node is considered done.
 
 - [ ] [AI] `ose-infra` carries the identical agent/governance/workflow change set as `ose-public`
       (no rhino-cli byte-identity boundary crossed; no infra-private content altered)
-- [ ] [AI] `ose-infra` bindings regenerated and sync-validation green; merge queue confirmed enabled
-      via `gh api`
+- [ ] [AI] `ose-infra` bindings regenerated and sync-validation green
 - [ ] [AI] `ose-infra` PR merged to its `main`; CI green
 
 > **Pause Safety**: `ose-infra` is either fully propagated-and-merged or green-and-ready on its own
@@ -679,7 +774,7 @@ test:quick specs:coverage` + markdown gate), open a draft PR, run the PR-Review 
 
 ---
 
-## Phase 12: Knowledge Capture
+## Phase 11: Knowledge Capture
 
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
@@ -700,7 +795,7 @@ test:quick specs:coverage` + markdown gate), open a draft PR, run the PR-Review 
 - [ ] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
       `No generalizable learnings — <one-line reason>` — acceptance: `learnings.md` is never silently empty
 
-### Phase 12 Gate
+### Phase 11 Gate
 
 > All checks below must pass before Plan Archival.
 
@@ -714,11 +809,18 @@ test:quick specs:coverage` + markdown gate), open a draft PR, run the PR-Review 
 
 ---
 
-## Phase 13: Plan Archival
+## Phase 12: Plan Archival
+
+> Archival is intentionally deferred to this final phase — Phases 9-11 must complete first so all
+> three repos carry the identical change set before the folder moves to `plans/done/`. This is a
+> documented exception to the Archival-in-PR default; the archival commit below lands as a **direct,
+> trailing push to `ose-public` `main`** (no new PR, no new review cycle). See
+> [tech-docs.md §Archival Timing](./tech-docs.md#archival-timing--a-documented-exception-to-archival-in-pr)
+> for the full rationale.
 
 - [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify all three repos delivered: `ose-public` (Phase 9), `ose-primer` (Phase 10), and
-      `ose-infra` (Phase 11) each merged the identical change set to their respective `main`
+- [ ] [AI] Verify all three repos delivered: `ose-public` (Phase 8), `ose-primer` (Phase 9), and
+      `ose-infra` (Phase 10) each merged the identical change set to their respective `main`
 - [ ] [AI] Verify the Knowledge Capture phase is complete (every `learnings.md` entry terminal or the
       explicit "none" escape present; both safety gates applied)
 - [ ] [AI] Verify ALL quality gates pass (local + CI) and the PR merged
@@ -729,7 +831,30 @@ test:quick specs:coverage` + markdown gate), open a draft PR, run the PR-Review 
       passed through `in-progress`, `plans/in-progress/README.md`
 - [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
 - [ ] [AI] Update any other READMEs referencing this plan
-- [ ] [AI] Commit the archival: `chore(plans): move worktree-to-pr-hardening to done`
+- [ ] [AI] Commit and push the archival directly to `ose-public` `main` (trailing commit, no new PR —
+      the substantive change already passed review in Phase 8's PR): `chore(plans): move
+worktree-to-pr-hardening to done`
+
+### Phase 12 Gate
+
+> All checks below must pass to consider the plan fully delivered.
+
+- [ ] [AI] All delivery checklist items across all thirteen phases (Phase 0 through Phase 12) are ticked
+- [ ] [AI] All three repos (`ose-public`, `ose-primer`, `ose-infra`) have merged the identical change
+      set to their respective `main` — verified against the Phase 8, Phase 9, and Phase 10 Gates
+- [ ] [AI] Knowledge Capture (Phase 11) is complete — every `learnings.md` entry terminal or the
+      explicit "none" escape recorded
+- [ ] [AI] The plan folder is relocated to `plans/done/YYYY-MM-DD__worktree-to-pr-hardening/` and every
+      referencing README (`plans/backlog/README.md` or `plans/in-progress/README.md`,
+      `plans/done/README.md`) is updated
+- [ ] [AI] The archival commit is pushed directly to `ose-public` `main` (trailing commit, no new PR)
+
+> **Pause Safety**: the plan is fully archived across all three repos; nothing further depends on this
+> folder's location. This is the plan's terminal state. To resume (if interrupted mid-archival):
+> re-run `git status --porcelain` in the `ose-public` root worktree and confirm the `git mv` + README
+> updates landed and were pushed to `origin main`.
+
+<!-- -->
 
 > **Note**: This plan starts in `plans/backlog/`. When work begins it moves to `plans/in-progress/`
 > (pure move, no date prefix) per the [Plans Organization Convention](../../../repo-governance/conventions/structure/plans.md);

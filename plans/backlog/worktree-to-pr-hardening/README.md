@@ -30,8 +30,8 @@ it **dogfoods the very workflow it improves**.
 ## Repo Scope — Three-Repo Parity Deliverable
 
 Everything this plan changes — the new PR-review agents, the `pr-review-synthesis-maker` coordinator,
-the `pr-review-quality-gate` workflow revision, the reviewer-discipline convention, the
-`pr-merge-protocol.md` changes, and the merge-queue adoption — is part of the **shared scaffolding
+the `pr-review-quality-gate` workflow revision, the reviewer-discipline convention, and the
+`pr-merge-protocol.md` changes — is part of the **shared scaffolding
 layer** (governance / AI agents / conventions / CI harness) that stays in **parity** across all three
 sibling repos, exactly like the prior `standardize-repo-toolchain-parity` and `lint-safety-parity`
 3-repo plans [Repo-grounded — AGENTS.md §Related Repositories].
@@ -45,14 +45,18 @@ sibling repos, exactly like the prior `standardize-repo-toolchain-parity` and `l
   identical artifacts.
 
 All three carry the `.claude/agents/`, `repo-governance/`, and OpenCode/Amazon-Q binding scaffolding
-this plan touches. Propagation follows the
+this plan touches. Propagation is delivered **in the spirit of** the
 [multi-repo parity planning-and-execution workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md)
 (and its planning companion
-[plan-multi-repo-parity-planning.md](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)):
-`ose-public` merges first, then the same change set propagates to `ose-primer` and `ose-infra`, **each
-via its own `worktree-to-pr` delivery** (own worktree + PR + review cycle + merge) with a per-repo
-binding-emit step. See [tech-docs.md §Repo Scope & Propagation](./tech-docs.md#repo-scope--propagation-three-repo-parity)
-for the bare-repo topology caveat and the rhino-cli byte-identity note.
+[plan-multi-repo-parity-planning.md](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)),
+**adapted to a single shared plan folder** rather than that workflow's canonical one-folder-per-repo
+output — the same single-folder posture the precedent `standardize-repo-toolchain-parity` and
+`lint-safety-parity` 3-repo plans used. `ose-public` merges first, then the same change set propagates
+to `ose-primer` and `ose-infra`, **each via its own `worktree-to-pr` delivery** (own worktree + PR +
+review cycle + merge) with a per-repo binding-emit step. See
+[tech-docs.md §Repo Scope & Propagation](./tech-docs.md#repo-scope--propagation-three-repo-parity) for
+the bare-repo topology caveat, the rhino-cli byte-identity note, and the single-folder /
+archival-timing rationale.
 
 ## The Pivotal Constraint (why a coordinator is non-negotiable)
 
@@ -81,15 +85,16 @@ an afterthought.
   for high-risk diffs, a CRITICAL-requires-reproduction rule, and a documented rationale for the
   3-cycle/no-early-exit policy.
 - **Cloudflare-folded cost/noise mechanics** (added 2026-07-23, verified via `web-researcher`):
-  risk-tier fan-out that scales agents to diff size (D12), diff-filter + generated-file exclusion +
-  shared-context + large-diff slicing (D13), per-specialist `SUPPRESS` blocks, instruction-decay
-  coverage (D14), human-dismissal-respect on re-review, and boundary-tag-strip untrusted-input
-  hardening. See [tech-docs.md §Cost-Control & Noise-Control Mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
+  risk-tier fan-out that scales agents to diff size (D12), shared-context + large-diff handling
+  (D13: no generated-file exclusion), per-specialist `SUPPRESS` blocks, instruction-decay coverage via
+  a dedicated `pr-review-instruction-maker` specialist (D14), human-dismissal-respect on re-review, and
+  boundary-tag-strip untrusted-input hardening. See [tech-docs.md §Cost-Control & Noise-Control Mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
 - A **post-cutover monitoring plan** (precision, acceptance rate, BitsAI-CR "Outdated Rate") with a
   documented **rollback trigger** that restores the monolith from git history if metrics regress.
-- **Adopt a merge queue** (D7) to harden merge-precondition (c) under concurrent worktree-to-PR
-  integration (GitHub-native recommended; see D10).
-- A future-work workstream: the AI-attribution/bot-identity gap and cost/latency budgeting.
+- A future-work workstream: the AI-attribution/bot-identity gap, cost/latency budgeting, and the
+  **deferred merge queue** (D7/D10 — researched but NOT adopted here; the repo exposes no merge-queue
+  branch setting, so it is split into its own backlog plan:
+  [`merge-queue-adoption`](../merge-queue-adoption/README.md)).
 - Register/index/binding updates for every new agent (`AGENTS.md`, `.claude/agents/README.md`,
   `npm run generate:bindings`).
 
@@ -103,21 +108,24 @@ an afterthought.
 
 ## Proposed Agent Set (refine via the deferred decisions)
 
-| Agent                          | Discipline                     | Charter (one line)                                                                    |
-| ------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------- |
-| `pr-review-architecture-maker` | Architecture / design          | Is this a sound _new_ tradeoff? Reversibility, blast radius, quality-attributes       |
-| `pr-review-logic-maker`        | Business-logic / correctness   | Does behavior match domain intent + Gherkin acceptance criteria across edges          |
-| `pr-review-governance-maker`   | Convention / rules-conformance | Does the diff mechanically conform to an already-documented `repo-governance/` rule   |
-| `pr-review-security-maker`     | Security                       | Secrets, injection, untrusted-input, git-fixture isolation, unsafe operations         |
-| `pr-review-integrity-maker`    | CI-gaming / test integrity     | Weakened/skipped tests, missing regression tests, coverage-gaming                     |
-| `pr-review-performance-maker`  | Performance                    | Concrete/likely regressions, hot paths, algorithmic complexity, resource use          |
-| `pr-review-docs-maker`         | Documentation quality          | README/docs/Diátaxis conformance, doc drift, completeness/clarity, doc alt-text/a11y  |
-| `pr-review-synthesis-maker`    | **Coordinator (mandatory)**    | Dedup + re-categorize + reasonableness-filter + tool-verify → one consolidated review |
+| Agent                          | Discipline                     | Charter (one line)                                                                      |
+| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------- |
+| `pr-review-architecture-maker` | Architecture / design          | Is this a sound _new_ tradeoff? Reversibility, blast radius, quality-attributes         |
+| `pr-review-logic-maker`        | Business-logic / correctness   | Does behavior match domain intent + Gherkin acceptance criteria across edges            |
+| `pr-review-governance-maker`   | Convention / rules-conformance | Does the diff mechanically conform to an already-documented `repo-governance/` rule     |
+| `pr-review-security-maker`     | Security                       | Secrets, injection, untrusted-input, git-fixture isolation, unsafe operations           |
+| `pr-review-integrity-maker`    | CI-gaming / test integrity     | Weakened/skipped tests, missing regression tests, coverage-gaming                       |
+| `pr-review-performance-maker`  | Performance                    | Concrete/likely regressions, hot paths, algorithmic complexity, resource use            |
+| `pr-review-docs-maker`         | Documentation quality          | README/docs/Diátaxis conformance, doc drift, completeness/clarity, doc alt-text/a11y    |
+| `pr-review-instruction-maker`  | Instruction decay              | Framework/CI/env change not reflected in AGENTS.md/CLAUDE.md/.claude; instruction bloat |
+| `pr-review-synthesis-maker`    | **Coordinator (mandatory)**    | Dedup + re-categorize + reasonableness-filter + tool-verify → one consolidated review   |
 
 The maintainer chose the **7-specialist** set (D1): performance and docs-quality are their own agents,
 not folded — meaningful here because this repo is content/markdown-heavy (docs) and has real hot-path
-code in its polyglot CLIs/backends (performance). The non-overlap boundaries that keep them out of
-architecture and governance are in [tech-docs.md §Agent Charters](./tech-docs.md#agent-charters-non-overlapping).
+code in its polyglot CLIs/backends (performance). **D14 then added an eighth specialist,
+`pr-review-instruction-maker`** (instruction-decay), so the set is now **8 specialists + the
+coordinator**. The non-overlap boundaries that keep them out of architecture and governance are in
+[tech-docs.md §Agent Charters](./tech-docs.md#agent-charters-non-overlapping).
 
 ## Navigation
 

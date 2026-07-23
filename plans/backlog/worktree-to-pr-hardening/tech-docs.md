@@ -18,10 +18,24 @@ Every artifact this plan produces is **shared scaffolding** held in parity acros
 repos [Repo-grounded — AGENTS.md §Related Repositories]: `ose-public` (source of truth),
 `ose-primer` (downstream public template), and `ose-infra` (private infrastructure). `ose-public` is
 authored and validated first; the identical artifacts then propagate to the two downstream repos, each
-via its own `worktree-to-pr` delivery (own worktree + PR + review cycle + merge), following the
+via its own `worktree-to-pr` delivery (own worktree + PR + review cycle + merge), delivered **in the
+spirit of** the
 [multi-repo parity planning-and-execution workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md)
 and its planning companion
 [plan-multi-repo-parity-planning.md](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md).
+
+**Single-folder adaptation (explicit, not a literal instantiation of that workflow)**: the cited
+workflow's own `plans-created` output contract is **one plan folder per target repo**, each
+independently gated and archived. This plan instead uses **one shared plan folder living only in
+`ose-public`**, with propagation expressed as embedded `delivery.md` phases (Phase 9 for `ose-primer`,
+Phase 10 for `ose-infra`) rather than three separate plan folders. This is a **deliberate, defensible
+choice**, not an oversight: it follows the same single-folder posture the precedent
+`plans/done/2026-06-13__standardize-repo-toolchain-parity/` and `lint-safety-parity` 3-repo plans used
+for this exact class of shared-scaffolding-parity work, and it keeps one Task list, one set of Gherkin
+acceptance criteria, and one Grilling-Deferred decision record covering the whole deliverable, instead
+of splitting a single design decision (e.g. D1's specialist count) across three independently-editable
+plan files that could drift out of sync with each other. The trade-off this choice accepts, and its
+concrete consequence for archival timing, is documented next.
 
 ```mermaid
 %% Color palette: Blue #0173B2 (source of truth), Teal #029E73 (downstream public), Purple #CC78BC (downstream private)
@@ -47,19 +61,48 @@ topology **changes over time and MUST be re-verified at execution time** (do not
 holds, git operations in those two repos use the **bare-repo method** — explicit work-tree / `GIT_DIR`
 handling (e.g. `git -c core.bare=false --work-tree=<wt> …`, or `GIT_DIR` / `GIT_WORK_TREE` env for
 tooling) — rather than a plain checkout. Treat this as an execution-note/risk, not an assumption baked
-into the steps: Phase 8/9 begin by re-verifying each downstream repo's topology and selecting the
+into the steps: Phase 9/10 begin by re-verifying each downstream repo's topology and selecting the
 matching git method.
 
 ### rhino-cli byte-identity note
 
 This plan touches **no `apps/rhino-cli` code and none of its specs** — it changes only
-`.claude/agents/`, `repo-governance/` docs, and (in the merge-queue phase) `.github/workflows/` CI
-config. Therefore the [SDLC Gate Standard's rhino-cli byte-identity boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)
+`.claude/agents/` and `repo-governance/` docs. Therefore the [SDLC Gate Standard's rhino-cli byte-identity boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)
 is **not engaged by this plan's artifacts**, and the three-repo parity check is scoped to the
-governance/agent/CI scaffolding only. Stated explicitly so the parity check is scoped correctly: if a
+governance/agent scaffolding only. Stated explicitly so the parity check is scoped correctly: if a
 later revision were to extend a `rhino-cli` governance validator or binding emitter, that change WOULD
 fall under the byte-identity boundary and must stay byte-identical across all three repos — but nothing
 in the current scope does.
+
+### Archival Timing — a documented exception to Archival-in-PR
+
+The [PR Review Quality Gate workflow's done-definition](../../../repo-governance/workflows/pr/pr-review-quality-gate.md#done-definition-for--to-pr-modes)
+expects a `*-to-pr` plan whose folder is tracked in the repo carrying the PR to commit its
+`git mv … plans/done/` archival move **inside that same delivering PR** — which, taken literally, would
+be Phase 8's `ose-public` PR for this plan, since `worktree-to-pr-hardening/` is tracked in
+`ose-public`. This plan takes a **documented exception** to that default instead of silently violating
+it:
+
+- At Phase 8 merge time, Phases 9 (`ose-primer`) and 10 (`ose-infra`) have not yet run — the plan is
+  genuinely not done. Archiving the folder inside Phase 8's PR would mark `worktree-to-pr-hardening/`
+  `done` while two of the three repos still carry the retired-monolith reviewer, which is worse than
+  the defect the rule exists to prevent.
+- Archival is therefore **deferred to Phase 12**, after Phase 9, Phase 10, and Phase 11 (Knowledge
+  Capture) have all completed and all three repos carry the identical change set.
+- The Phase 12 archival commit (`git mv` + README/index updates) is pushed as a **direct, trailing
+  commit to `ose-public` `main`** — it does **not** open a new PR or run a new PR-Review Maker→Fixer
+  Cycle, because it carries no substantive change; the substantive change already passed full review in
+  Phase 8's PR. This mirrors the direct-push delivery modes' merge authority (`[AI]` pushes directly)
+  for a mechanical, non-substantive move, exactly as the
+  [Git Push Default Convention](../../../repo-governance/development/workflow/git-push-default.md)
+  treats git-mechanical operations.
+- This exception applies specifically to **single-shared-folder, multi-repo-parity plans** whose
+  propagation phases are embedded in the same `delivery.md` as the source-of-truth repo's own delivery —
+  the same shape as the `standardize-repo-toolchain-parity` precedent. A plan using three independent
+  per-repo folders (the cited workflow's canonical output) would not need this exception, since each
+  folder's own PR could archive itself immediately on its own merge — see
+  [§Single-folder adaptation](#repo-scope--propagation-three-repo-parity) above for why this plan chose
+  the single-folder shape anyway.
 
 ## Architecture Overview
 
@@ -83,7 +126,7 @@ flowchart LR
 ```mermaid
 %% Color palette: Blue #0173B2 (specialists), Purple #CC78BC (coordinator), Yellow #DE8F05 (fixer)
 flowchart LR
-  subgraph FANOUT["Per-cycle fan-out (7 concurrent specialists)"]
+  subgraph FANOUT["Per-cycle fan-out (8 concurrent specialists)"]
     A["architecture-maker"]:::blue
     L["logic-maker"]:::blue
     G["governance-maker"]:::blue
@@ -91,6 +134,7 @@ flowchart LR
     I["integrity-maker"]:::blue
     P["performance-maker"]:::blue
     D["docs-maker"]:::blue
+    N["instruction-maker"]:::blue
   end
   A --> C
   L --> C
@@ -98,6 +142,7 @@ flowchart LR
   S --> C
   I --> C
   P --> C
+  N --> C
   D --> C["pr-review-synthesis-maker<br/>dedup/recat/filter/verify"]:::purple
   C -->|"one consolidated review<br/>via GitHub Reviews API"| FX["pr-review-fixer<br/>(unchanged)"]:::yellow
   FX -->|"CI-green gate · 3 cycles, hard ceiling"| FANOUT
@@ -112,7 +157,7 @@ flowchart LR
 ```mermaid
 sequenceDiagram
   participant O as Orchestrator (quality-gate workflow)
-  participant SP as 7 specialist-makers
+  participant SP as 8 specialist-makers
   participant SY as pr-review-synthesis-maker
   participant GH as GitHub Reviews API
   participant FX as pr-review-fixer
@@ -183,21 +228,23 @@ repo-wide: the re-review **must not re-raise a finding a human explicitly dismis
 delimiters) from PR body/comment/linked-issue text before it reaches a model. See
 [Cost-Control & Noise-Control Mechanics](#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
 
-| Agent                          | Owns (in-charter)                                                                                                                                                                                                                                                                                 | Explicitly NOT its job (routes to)                                                                                                                              |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pr-review-architecture-maker` | New tradeoffs, module boundaries, reversibility, blast radius, quality-attribute effects, novel dependencies                                                                                                                                                                                      | Existing-rule layering violations → governance; domain-scenario gaps → logic                                                                                    |
-| `pr-review-logic-maker`        | Behavior vs. domain intent + Gherkin acceptance-criteria conformance across edge/error cases                                                                                                                                                                                                      | Error-handling _shape_ rules → governance; should-this-boundary-exist → architecture                                                                            |
-| `pr-review-governance-maker`   | Mechanical conformance to already-documented `repo-governance/` conventions, naming/structure, ADRs, spec-file presence; **instruction-decay** — a change (test framework, build tool, package manager, env vars, CI) not reflected in `AGENTS.md`/`CLAUDE.md`/`.claude/` (D14, recommended home) | Whether a _new_ rule should exist → architecture; scenario _completeness_ → logic                                                                               |
-| `pr-review-security-maker`     | Secrets in diffs, injection, untrusted-input handling, git-fixture isolation, unsafe git/FS operations                                                                                                                                                                                            | Non-security convention text → governance                                                                                                                       |
-| `pr-review-integrity-maker`    | CI-gaming (weakened/skipped/narrowed tests, coverage-gaming), missing regression tests (regression-test-mandate)                                                                                                                                                                                  | Whether the _behavior_ is correct → logic                                                                                                                       |
-| `pr-review-performance-maker`  | Concrete or likely performance regressions, hot-path changes, algorithmic-complexity growth, resource (memory/IO/alloc) concerns                                                                                                                                                                  | A _quality-attribute tradeoff decision_ (whether to accept a perf cost) → architecture; a perf-relevant convention (e.g. a documented budget rule) → governance |
-| `pr-review-docs-maker`         | Substantive documentation quality and completeness: README/docs/Diátaxis fit, doc drift vs. code, clarity, doc alt-text/accessibility                                                                                                                                                             | Mechanical doc-convention conformance (heading hierarchy, linking, naming) → governance; whether the documented _behavior_ is correct → logic                   |
-| `pr-review-synthesis-maker`    | Dedup, re-categorize (owns architecture↔correctness boundary), reasonableness-filter, tool-verify, emit ONE review                                                                                                                                                                                | Finding _discovery_ → the seven specialists                                                                                                                     |
+| Agent                          | Owns (in-charter)                                                                                                                                                                                 | Explicitly NOT its job (routes to)                                                                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pr-review-architecture-maker` | New tradeoffs, module boundaries, reversibility, blast radius, quality-attribute effects, novel dependencies                                                                                      | Existing-rule layering violations → governance; domain-scenario gaps → logic                                                                                    |
+| `pr-review-logic-maker`        | Behavior vs. domain intent + Gherkin acceptance-criteria conformance across edge/error cases                                                                                                      | Error-handling _shape_ rules → governance; should-this-boundary-exist → architecture                                                                            |
+| `pr-review-governance-maker`   | Mechanical conformance to already-documented `repo-governance/` conventions, naming/structure, ADRs, spec-file presence                                                                           | Whether a _new_ rule should exist → architecture; scenario _completeness_ → logic; instruction-decay (stale instruction docs) → instruction                     |
+| `pr-review-security-maker`     | Secrets in diffs, injection, untrusted-input handling, git-fixture isolation, unsafe git/FS operations                                                                                            | Non-security convention text → governance                                                                                                                       |
+| `pr-review-integrity-maker`    | CI-gaming (weakened/skipped/narrowed tests, coverage-gaming), missing regression tests (regression-test-mandate)                                                                                  | Whether the _behavior_ is correct → logic                                                                                                                       |
+| `pr-review-performance-maker`  | Concrete or likely performance regressions, hot-path changes, algorithmic-complexity growth, resource (memory/IO/alloc) concerns                                                                  | A _quality-attribute tradeoff decision_ (whether to accept a perf cost) → architecture; a perf-relevant convention (e.g. a documented budget rule) → governance |
+| `pr-review-docs-maker`         | Substantive documentation quality and completeness: README/docs/Diátaxis fit, doc drift vs. code, clarity, doc alt-text/accessibility                                                             | Mechanical doc-convention conformance (heading hierarchy, linking, naming) → governance; whether the documented _behavior_ is correct → logic                   |
+| `pr-review-instruction-maker`  | **Instruction-decay** — a framework/build-tool/package-manager/env-var/CI change in the diff not reflected in `AGENTS.md`/`CLAUDE.md`/`.claude/`; instruction bloat (>200 lines / generic filler) | Mechanical convention conformance → governance; whether a _new_ rule should exist → architecture                                                                |
+| `pr-review-synthesis-maker`    | Dedup, re-categorize (owns architecture↔correctness boundary), reasonableness-filter, tool-verify, emit ONE review                                                                                | Finding _discovery_ → the eight specialists                                                                                                                     |
 
 ### Why performance and docs-quality ARE their own agents (D1)
 
-The maintainer chose the 7-specialist set. The two extra reviewers earn their place here, and the
-honest counter-considerations are recorded rather than buried:
+The maintainer chose the 7-specialist set (D1) — later extended to eight by D14's standalone
+`pr-review-instruction-maker`. The two extra D1 reviewers earn their place here, and the honest
+counter-considerations are recorded rather than buried:
 
 - **Performance** — this repo has no high-throughput runtime service yet (Next.js sites, F#/Rust/Go
   CLIs and backends) [Repo-grounded — AGENTS.md Web Sites table], so a perf reviewer reports less
@@ -232,9 +279,9 @@ honest counter-considerations are recorded rather than buried:
 
 **Model tiering (D5 → B, MAINTAINER DECISION 2026-07-23)**: coordinator inherits **opus** (top tier)
 — the research is explicit that the coordinator carries the top-tier model and is the single quality
-chokepoint — while the seven **specialists inherit `sonnet`**, matching Cloudflare's production
+chokepoint — while the eight **specialists inherit `sonnet`**, matching Cloudflare's production
 tiering (standard-tier specialists, top-tier coordinator only). The maintainer overturned the draft's
-opus-everywhere default: with seven specialists × three cycles, an all-opus fan-out is a heavy per-PR
+opus-everywhere default: with eight specialists × three cycles, an all-opus fan-out is a heavy per-PR
 cost for this repo's PR volume, and Cloudflare reached its 1.2-findings/review quality with
 standard-tier specialists + negative-instruction prompting + the opus coordinator's tool-verify pass.
 The residual risk — a `sonnet` specialist missing a subtle finding — is backstopped by the opus
@@ -248,7 +295,7 @@ flags.
 ## Fate of the Monolithic `pr-review-maker` (retire immediately at cutover — D2)
 
 The maintainer chose **immediate retirement at cutover** (D2), not a prove-before-retire eval gate.
-Concretely: when the seven specialists + coordinator are wired into the revised workflow (Phase 4
+Concretely: when the eight specialists + coordinator are wired into the revised workflow (Phase 4
 cutover), `pr-review-maker.md` is **removed and de-registered in the same phase** — retirement is not
 gated on any measurement. The eval instead runs **post-cutover** as ongoing quality monitoring
 (precision, per-discipline acceptance rate, BitsAI-CR "Outdated Rate") with a documented **rollback
@@ -283,10 +330,12 @@ The Cloudflare system [Web-cited — re-verified via `web-researcher` 2026-07-23
 [blog.cloudflare.com/ai-code-review](https://blog.cloudflare.com/ai-code-review/)] runs the same
 fan-out/coordinator shape this plan adopts, but at 131,246 runs / 48,095 MRs / 30 days it also carries
 a set of **cost- and noise-control mechanics** that the initial draft of this plan omitted. They are
-folded in here because the plan's own risk table flagged "cost balloons up to 7×" with only
+folded in here because the plan's own risk table flagged "cost balloons up to 8×" with only
 budget-monitoring + a model-tier lever as mitigation — these mechanics are the missing structural
 mitigations, and one of them (large-diff handling) is evidenced by live experience: a
-concurrently-running content-restructure PR in this repo was **5,041 files**, exactly the "500-file
+concurrently-running content-restructure PR in this repo was **5,041 files**
+[Judgment call — maintainer-observed at authoring time, not independently re-verifiable after the fact],
+exactly the "500-file
 refactor × 7 frontier calls costs real money" ceiling Cloudflare names as unsolved.
 
 ### Risk-tier fan-out (D12) — the primary cost lever
@@ -301,44 +350,47 @@ ceiling. This plan adopts the same tiering (D12):
 - **lite** (≤100 lines AND ≤20 files) → a reduced specialist set (the four highest-yield lenses for
   this repo: `governance`, `logic`, `security`, `integrity`) + coordinator.
 - **full** (>100 lines OR >20 files OR touches a security-sensitive path — secrets/`.env`, git
-  identity, CI/workflow, `pr-merge-protocol`) → all seven specialists + coordinator.
+  identity, CI/workflow, `pr-merge-protocol`) → all eight specialists + coordinator.
 
 The tier is computed once per PR (re-evaluated each cycle, since the fixer's commits change the diff)
 and recorded in the consolidated review header so the tier decision is auditable. Security-sensitive
 paths **force `full`** regardless of size — this repo's hard no-secrets iron rule and git-identity
 guardrail make that non-negotiable.
 
-### Diff filtering + generated-file exclusion (D13)
+### Diff filtering + generated-file exclusion (D13 → C: no filtering chosen)
 
 Cloudflare strips lock files, minified assets, and source maps, and auto-detects generated files
-(exempting DB migrations) before any reviewer sees the diff. This repo generates an unusually large
-share of its tree, so the fan-out **MUST NOT** spend a specialist (or a token) reviewing regenerated
-output. Excluded from the review diff by default:
+(exempting DB migrations) before any reviewer sees the diff. **The maintainer chose NOT to filter
+(D13 → C)**, reversing the draft's exclusion recommendation. The rationale is **explicitness**: nothing
+is silently skipped, so a hand-edited "generated" file is never missed — consistent with the repo's
+explicit-over-convention preference. Reviewers therefore see the **full diff**, including regenerated
+output:
 
 - `.opencode/agents/**`, `.amazonq/**` (emitted by `npm run generate:bindings` from `.claude/`)
 - `generated/**`, `**/generated/**` (e.g. `search-data.json`)
 - `package-lock.json`, other lock files, `*.min.js` / `*.min.css`, source maps
 - files carrying a first-line `@generated` / "DO NOT EDIT" marker
 
-**Never excluded**: `.claude/agents/**` and `repo-governance/**` (this plan's own source-of-truth
-surface), and anything under `apps/`/`libs/`/`specs/`. The exclusion is a review-scope filter, not a
-merge-gate bypass — CI still runs over everything.
+The **cost consequence** — reviewers spend budget on regenerated diffs, and a giant `generate:bindings`
+diff reaches the fan-out — is **accepted** and leaned instead on the D12 risk-tier and D5 `sonnet`
+levers, plus the shared-context extract-once mechanic (below). CI still runs over everything regardless.
 
 ### Shared-context extract-once + large-diff posture (D13 companion)
 
 - **Shared context, extracted once.** Cloudflare's early design fed full MR context separately into
   each of 7 reviewers, multiplying token cost 7×; the fix was a single extracted `shared-mr-context`
   artifact all reviewers read. In this plan the orchestrator (quality-gate workflow) assembles the PR
-  metadata + linked-plan/issue context + the filtered diff **once** and hands the same brief to every
-  specialist, rather than each specialist re-deriving it. Specialists still pull additional repo
-  context on demand via their own tools.
-- **Large-diff posture.** For a `full`-tier PR whose filtered diff still exceeds a specialist's
-  comfortable context budget (Cloudflare warns at 50% of the model window), the specialist reviews
-  **per-domain-relevant file slices** rather than the whole diff, and the coordinator's review header
-  records that the diff was sliced. A giant docs/content restructure (the 5,041-file case) tiers to
-  `full` but its generated-file exclusion + per-slice review keep it tractable; if it still cannot be
-  reviewed in one fan-out, the coordinator emits an explicit "diff exceeds single-review scope —
-  reviewed in N slices" note rather than silently under-covering.
+  metadata + linked-plan/issue context + the **full diff** (D13: no generated-file exclusion) **once**
+  and hands the same brief to every specialist, rather than each specialist re-deriving it. Specialists
+  still pull additional repo context on demand via their own tools.
+- **Large-diff posture (coordinator discretion — D13 chose no auto-exclusion).** For a `full`-tier PR
+  whose (unfiltered) diff exceeds a specialist's comfortable context budget (Cloudflare warns at 50% of
+  the model window), the coordinator **MAY** note the very large diff and have specialists review
+  **per-domain-relevant file slices** rather than the whole diff, recording in the review header that
+  the diff was sliced. A giant docs/content restructure (the 5,041-file case) tiers to `full`; because
+  nothing is auto-excluded, the coordinator's per-slice review at its discretion is what keeps it
+  tractable — and if it still cannot be reviewed in one fan-out, the coordinator emits an explicit "diff
+  exceeds single-review scope — reviewed in N slices" note rather than silently under-covering.
 
 ### Per-specialist "what NOT to flag" suppression blocks (noise control)
 
@@ -359,11 +411,15 @@ Cloudflare built a **dedicated `AGENTS.md` reviewer** that flags "instruction de
 change (test framework, build tool, package manager, new env vars, CI/CD) is not reflected in the
 repo's instruction docs — and penalizes instruction bloat (>200 lines / generic filler). This repo is
 unusually instruction-heavy (`AGENTS.md`, `CLAUDE.md`, the whole `.claude/` + `repo-governance/`
-surface, RTK notes), so instruction decay is a real, high-value defect class here. The plan's
-`governance-maker` today checks _conformance to_ the docs but nothing checks _staleness of_ them.
-D14 decides whether this is a new eighth specialist or an explicit charter line on `governance-maker`
-(**recommended**: fold into `governance-maker`, to avoid adding an eighth reviewer that works against
-the D12 cost concern).
+surface, RTK notes), so instruction decay is a real, high-value defect class here. `governance-maker`
+checks _conformance to_ the docs but nothing checks _staleness of_ them. **D14 → B (MAINTAINER DECISION
+2026-07-23)**: instruction-decay gets a **dedicated eighth specialist, `pr-review-instruction-maker`**,
+rather than being folded into `governance-maker` — so **governance no longer owns instruction-decay**.
+It flags a framework/build-tool/package-manager/env-var/CI change in the diff not reflected in
+`AGENTS.md`/`CLAUDE.md`/`.claude/`, and penalizes instruction bloat (>200 lines / generic filler); it
+inherits the same hard rules as the other specialists and the `sonnet` tier (D5). This brings the set
+to **eight specialists + one coordinator**; the added reviewer joins every `full`-tier fan-out, a cost
+accepted for the sharper single-purpose charter.
 
 ### Human-dismissal respect + boundary-tag hardening (loop + security)
 
@@ -392,7 +448,7 @@ tracking [Web-cited], the metrics tracked on live post-cutover PRs are:
 - **Outdated Rate (BitsAI-CR)** — the share of findings that become stale/irrelevant, an adoption
   signal.
 - **Cost/latency per review** — tracked against a budget, given the fan-out multiplies invocations
-  (now across seven specialists × three cycles). Tracked **per risk-tier** (D12), since a trivial-tier
+  (now across eight specialists × three cycles). Tracked **per risk-tier** (D12), since a trivial-tier
   PR should cost a fraction of a full-tier one — a flat cost across tiers means the tiering is not
   taking effect.
 - **Human-override rate** — the share of PRs where a human explicitly dismisses or overrides a
@@ -415,38 +471,29 @@ Because retirement is a git deletion, rollback is a bounded, non-destructive for
 history rewrite. There is no before-cutover A/B comparison; the monolith and the split never run
 concurrently under D2, and the absolute bar is what makes that safe without a baseline.
 
-## Merge-Queue Design (delivered — D7)
+## Merge-Queue — Researched, NOT Adopted (deferred — D7/D10)
 
-The maintainer chose to **adopt a merge queue now** (D7), promoting it from future-work into a
-delivered phase (Phase 7). Its purpose is to harden **merge-precondition (c)** — "the branch is
+A merge queue was researched as a way to harden **merge-precondition (c)** — "the branch is
 up-to-date with the latest `origin/main` at merge time" — which a static per-PR check cannot guarantee
 under **concurrent** worktree-to-PR merges: two PRs each green against yesterday's `main` can both be
-stale against each other the instant the first merges.
+stale against each other the instant the first merges. **It is NOT adopted by this plan** — the repo's
+GitHub branch settings do not expose a merge-queue toggle, so there is nothing for the plan to enable.
+It is therefore **dropped from delivered scope and recorded in the Phase 7 future-work workstream** for
+re-evaluation if the setting becomes available. Precondition (c) keeps its existing manual
+branch-up-to-date form unchanged; no `pr-merge-protocol.md` reword and no `.github/workflows/`
+`merge_group` change ships in this plan.
 
-### Recommended mechanism (sub-decision D10)
+### Mechanism research (for the deferred future-work note)
 
-| Mechanism                                     | Fit                                                                                                                                                                                                           | Trade                                               |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| **GitHub-native merge queue** _(Recommended)_ | Speculative `merge_group` CI, FIFO, auto-eviction on failure; the repo already uses `gh`/GitHub, so no new vendor                                                                                             | Less sophisticated batching than stack-aware queues |
-| **Graphite stack-aware queue**                | CI once on the stack head, binary-search failure isolation, each PR still an independent merge point — maps cleanly onto the strict 1-PR↔1-worktree model; Ramp reported 74% faster median merges [Web-cited] | Adds a third-party vendor dependency                |
+| Mechanism                      | Fit                                                                                                                                                                                                           | Trade                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **GitHub-native merge queue**  | Speculative `merge_group` CI, FIFO, auto-eviction on failure; the repo already uses `gh`/GitHub, so no new vendor                                                                                             | Less sophisticated batching than stack-aware queues |
+| **Graphite stack-aware queue** | CI once on the stack head, binary-search failure isolation, each PR still an independent merge point — maps cleanly onto the strict 1-PR↔1-worktree model; Ramp reported 74% faster median merges [Web-cited] | Adds a third-party vendor dependency                |
 
-**Recommendation: GitHub-native**, because it is the lowest-friction option given the existing
-GitHub/`gh` toolchain and it directly provides speculative `merge_group` CI + auto-eviction. The
-GitHub-native-vs-Graphite choice is surfaced as sub-decision **D10** below; either way, each PR remains
-an independent merge point, preserving the strict 1-PR↔1-worktree model.
-
-### What the merge-queue phase changes
-
-- **`pr-merge-protocol.md` precondition (c)** — reworded so "up-to-date with `origin/main`" is
-  satisfied by the queue's speculative merge rather than by a manual branch-up-to-date check. The
-  (a)-(e) lettering and the other four preconditions stay verbatim.
-- **CI workflow config** (`.github/workflows/`) — handle the `merge_group` trigger event so the
-  speculative merge result is CI-gated. This is an `[AI]` doc/YAML change.
-- **GitHub branch-protection / merge-queue settings** — enabling the queue in repo settings is a
-  `[HUMAN]` step; an agent must not change repository security/settings. The agent prepares the exact
-  settings to toggle and the human enables them, then confirms the queue is active.
-
-This plan dogfoods the queue: once enabled, this plan's own PR merges through the queue.
+Were a queue ever adopted, GitHub-native would be the lowest-friction option given the existing
+GitHub/`gh` toolchain (speculative `merge_group` CI + auto-eviction); either mechanism keeps each PR
+an independent merge point, preserving the strict 1-PR↔1-worktree model. This is captured only as
+research grounding for the deferred future-work item, not as a delivered decision.
 
 ## Research Grounding (citations)
 
@@ -464,15 +511,16 @@ before execution per the [Plan Anti-Hallucination Convention](../../../repo-gove
   findings. 3-tier finding severity kept separate from a PR-level approval rubric. No adversarial
   agent (coordinator self-verify only). Admits it cannot do deep architectural / subtle-concurrency
   analysis. [Web-cited]
-- **SWR-Bench** (arXiv 2509.01494, Zeng et al., FSE 2026) — naive multi-agent CR-Agent baseline **F1
-  9.22% vs. single-pass 18.73%**; cause = interaction overhead + error propagation. All techniques
-  <10% precision. **→ the coordinator/dedup/verify layer is the difference; make it first-class.**
-  [Web-cited]
-- Supporting: **BitsAI-CR** (arXiv 2501.15134, ByteDance, FSE 2025) — RuleChecker→ReviewFilter,
-  75% precision, "Outdated Rate" metric. **CodeAgent** (arXiv 2402.02172) — a supervisory QA-Checker
-  gate. **Google Tricorder** (ICSE 2015) — 110 analyzers → one surface (pre-LLM N-checkers-one-surface
-  precedent). **GitHub Copilot code review** (2026-03) and **CodeRabbit** — single-context-rich
-  reviewer counter-examples; acknowledge both. [Web-cited]
+- **SWR-Bench** ([arXiv 2509.01494](https://arxiv.org/abs/2509.01494), Zeng et al., FSE 2026) — naive
+  multi-agent CR-Agent baseline **F1 9.22% vs. single-pass 18.73%**; cause = interaction overhead +
+  error propagation. All techniques <10% precision. **→ the coordinator/dedup/verify layer is the
+  difference; make it first-class.** [Web-cited]
+- Supporting: **BitsAI-CR** ([arXiv 2501.15134](https://arxiv.org/abs/2501.15134), ByteDance,
+  FSE 2025) — RuleChecker→ReviewFilter, 75% precision, "Outdated Rate" metric. **CodeAgent**
+  ([arXiv 2402.02172](https://arxiv.org/abs/2402.02172)) — a supervisory QA-Checker gate. **Google
+  Tricorder** (ICSE 2015) — 110 analyzers → one surface (pre-LLM N-checkers-one-surface precedent).
+  **GitHub Copilot code review** (2026-03) and **CodeRabbit** — single-context-rich reviewer
+  counter-examples; acknowledge both. [Web-cited]
 
 ### Finding 2 — three review disciplines are genuinely distinct
 
@@ -505,62 +553,62 @@ before execution per the [Plan Anti-Hallucination Convention](../../../repo-gove
 
 ### Finding 3 — quality-gate mechanics
 
-- **Confidence calibration** — ECE 0.163 → 0.034 after calibration; "80%" true only ≈64–96% (arXiv
-  2603.06604; 2604.06723 Platt-scaling). [Web-cited]
-- **Adversarial/critic** — Refute-or-Promote 79–83% kill-rate (arXiv 2604.19049); reserve for
-  high-risk diffs; CRITICAL needs empirical reproduction (10 reviewers endorsed a non-existent bug);
-  use cross-model diversity. Multi-agent debate (Du et al. ICML 2024) is directional, not code-review
-  tested. [Web-cited]
-- **3-cycle ceiling** — repair-loop diminishing returns (arXiv 2607.05197): step-1 ≈ 66.7%; steps 2–3
-  single-digit; step-4+ <1%. Supportive by analogy; the no-early-exit policy is a predictability
-  choice, not research-derived. [Web-cited]
+- **Confidence calibration** — ECE 0.163 → 0.034 after calibration; "80%" true only ≈64–96%
+  ([arXiv 2603.06604](https://arxiv.org/abs/2603.06604);
+  [arXiv 2604.06723](https://arxiv.org/abs/2604.06723) Platt-scaling). [Web-cited]
+- **Adversarial/critic** — Refute-or-Promote 79–83% kill-rate
+  ([arXiv 2604.19049](https://arxiv.org/abs/2604.19049)); reserve for high-risk diffs; CRITICAL needs
+  empirical reproduction (10 reviewers endorsed a non-existent bug); use cross-model diversity.
+  Multi-agent debate (Du et al. ICML 2024) is directional, not code-review tested. [Web-cited]
+- **3-cycle ceiling** — repair-loop diminishing returns
+  ([arXiv 2607.05197](https://arxiv.org/abs/2607.05197)): step-1 ≈ 66.7%; steps 2–3 single-digit;
+  step-4+ <1%. Supportive by analogy; the no-early-exit policy is a predictability choice, not
+  research-derived. [Web-cited]
 - **Severity taxonomy** — industry converges on 3 finding tiers + a separate blocking rubric; the
   repo's 4-tier CRITICAL/HIGH/MEDIUM/LOW + 5-precondition merge gate already separates finding-severity
-  from merge-decision correctly. Option to fold MEDIUM+LOW into one advisory tier (deferred D8).
-  [Web-cited]
+  from merge-decision correctly. The option to fold MEDIUM+LOW into one advisory tier was declined
+  (D8 → keep the 4-tier severity). [Web-cited]
 - **Merge-queue** — static "branch up to date" (precondition (c)) doesn't scale under concurrent
   merges; GitHub merge queue (speculative `merge_group` CI), **Graphite** stack-aware queue (CI once
   on stack head, binary-search isolation, each PR still an independent merge point — matches the strict
-  1-PR↔1-worktree model; Ramp 74% faster median merges), Aviator parallel queues. **Delivered in this
-  plan (D7)** — see [Merge-Queue Design](#merge-queue-design-delivered--d7) below. [Web-cited]
+  1-PR↔1-worktree model; Ramp 74% faster median merges), Aviator parallel queues. **NOT adopted in this
+  plan (D7/D10)** — the repo's branch settings expose no merge-queue toggle, so it is deferred to a
+  separate backlog plan — see [Merge-Queue — Researched, NOT Adopted](#merge-queue--researched-not-adopted-deferred--d7d10) above. [Web-cited]
 
 ## Risks
 
-| Risk                                                                        | Impact                          | Mitigation                                                                                                                                                                   |
-| --------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Naive fan-out regresses quality                                             | Worse review than the monolith  | Mandatory coordinator + post-cutover monitoring + rollback trigger                                                                                                           |
-| Immediate retirement ships a regression (D2)                                | Bad reviews before measured     | Documented rollback trigger; monolith restorable from git history                                                                                                            |
-| Cost balloons (7 specialists × 3 cycles)                                    | Review cost up to 7× today      | **Risk-tier fan-out (D12, 2/4/7 agents by diff size)** + diff-filter/generated-exclusion (D13) + shared-context extract-once; then budget/monitoring + model-tier lever (D5) |
-| Giant diff (e.g. 5,041-file restructure)                                    | Fan-out infeasible / cost spike | Generated-file exclusion (D13) + per-slice review + coordinator "reviewed in N slices" note; tiers to `full` but stays tractable                                             |
-| Instruction docs go stale (framework/CI drift not reflected in `AGENTS.md`) | Agents follow stale rules       | `governance-maker` instruction-decay charter (D14)                                                                                                                           |
-| Raw false-positive volume rises                                             | Fixer noise                     | Coordinator reasonableness-filter + tool-verify; inherited ≥80 bar                                                                                                           |
-| Coordinator is a single point of failure                                    | One bad synth spoils the review | Top model tier + tool-verify + post-cutover monitoring + rollback                                                                                                            |
-| Catch-all/added specialist over-reports                                     | Skewed findings                 | Per-discipline acceptance-rate tracking flags an over-reporting specialist                                                                                                   |
-| Merge-queue misconfig blocks integration                                    | Trunk merges stall              | GitHub-native queue's auto-eviction; `[HUMAN]` verifies settings before enabling                                                                                             |
-| Binding drift across 3 harnesses                                            | Broken cross-harness invocation | `generate:bindings` + sync-validation gate every agent-touching phase                                                                                                        |
+| Risk                                                                        | Impact                          | Mitigation                                                                                                                                                       |
+| --------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Naive fan-out regresses quality                                             | Worse review than the monolith  | Mandatory coordinator + post-cutover monitoring + rollback trigger                                                                                               |
+| Immediate retirement ships a regression (D2)                                | Bad reviews before measured     | Documented rollback trigger; monolith restorable from git history                                                                                                |
+| Cost balloons (8 specialists × 3 cycles)                                    | Review cost up to 8× today      | **Risk-tier fan-out (D12: coordinator-only / 4 / 8 specialists by diff size)** + `sonnet` specialists (D5) + shared-context extract-once; then budget/monitoring |
+| Giant diff (e.g. 5,041-file restructure)                                    | Fan-out infeasible / cost spike | Risk-tier `full` + coordinator per-slice review at its discretion (D13: no exclusion chosen); cost accepted; still tiers to `full`                               |
+| Instruction docs go stale (framework/CI drift not reflected in `AGENTS.md`) | Agents follow stale rules       | Dedicated `pr-review-instruction-maker` specialist (D14)                                                                                                         |
+| Raw false-positive volume rises                                             | Fixer noise                     | Coordinator reasonableness-filter + tool-verify; inherited ≥80 bar                                                                                               |
+| Coordinator is a single point of failure                                    | One bad synth spoils the review | Top model tier + tool-verify + post-cutover monitoring + rollback                                                                                                |
+| Catch-all/added specialist over-reports                                     | Skewed findings                 | Per-discipline acceptance-rate tracking flags an over-reporting specialist                                                                                       |
+| Binding drift across 3 harnesses                                            | Broken cross-harness invocation | `generate:bindings` + sync-validation gate every agent-touching phase                                                                                            |
 
 ## File Impact (targets)
 
 - **New**: `.claude/agents/pr-review-architecture-maker.md`, `pr-review-logic-maker.md`,
   `pr-review-governance-maker.md`, `pr-review-security-maker.md`, `pr-review-integrity-maker.md`,
-  `pr-review-performance-maker.md`, `pr-review-docs-maker.md`, `pr-review-synthesis-maker.md` (eight
-  `_New file_`s — seven specialists + coordinator; sibling reference: existing `pr-review-maker.md`).
-- **New**: a reviewer-discipline convention under `repo-governance/development/` (parent dir exists;
+  `pr-review-performance-maker.md`, `pr-review-docs-maker.md`, `pr-review-instruction-maker.md`,
+  `pr-review-synthesis-maker.md` (nine `_New file_`s — eight specialists + coordinator; sibling
+  reference: existing `pr-review-maker.md`).
+- **New**: a reviewer-discipline convention at
+  `repo-governance/development/quality/pr-review-disciplines.md` (D8 → A; parent dir exists;
   `_New file_`; sibling reference: `repo-governance/development/pattern/maker-checker-fixer.md`).
-  Exact path is deferred decision D8. It also documents the folded Cloudflare mechanics: the
-  **risk-tier fan-out** (D12), the **diff-filter / generated-file exclusion + shared-context +
-  large-diff posture** (D13), each specialist's **`SUPPRESS` block**, the **instruction-decay**
-  charter (D14), the **human-dismissal-respect** re-review rule, and the **boundary-tag-strip**
-  untrusted-input hardening.
+  It also documents the folded Cloudflare mechanics: the **risk-tier fan-out** (D12), the
+  **shared-context + coordinator-discretion large-diff handling** (D13: no generated-file exclusion
+  adopted), each specialist's **`SUPPRESS` block**, the **instruction-decay** dedicated specialist
+  (D14), the **human-dismissal-respect** re-review rule, and the **boundary-tag-strip** untrusted-input
+  hardening.
 - **Edit**: `repo-governance/workflows/pr/pr-review-quality-gate.md` (fan-out → synthesize → fixer),
-  `repo-governance/development/workflow/pr-merge-protocol.md` — reviewer-count/shape references, plus
-  **precondition (c)** reworded to be satisfied by the merge queue (the five preconditions otherwise
-  stay verbatim, and the (a)-(e) lettering is preserved).
+  `repo-governance/development/workflow/pr-merge-protocol.md` — reviewer-count/shape references only
+  (the five preconditions and their (a)-(e) lettering stay verbatim; precondition (c) is **not**
+  reworded, since the merge queue is not adopted by this plan).
 - **Edit**: `AGENTS.md` (§AI Agents lists), `.claude/agents/README.md` (catalog).
-- **Edit (merge queue, D7)**: the repo's CI workflow config under `.github/workflows/` to handle the
-  `merge_group` trigger event (parent dir exists; `_verify path before editing_`), and GitHub
-  branch-protection/merge-queue **settings** (a `[HUMAN]` step — an agent must not change repo
-  security/settings).
 - **Regenerated**: `.opencode/agents/*`, `.amazonq/*` via `npm run generate:bindings`.
 - **Deleted at cutover (Phase 4, D2)**: `.claude/agents/pr-review-maker.md` and its register/binding
   entries — removed immediately when the split lands, restorable from git history via the rollback
@@ -570,8 +618,9 @@ before execution per the [Plan Anti-Hallucination Convention](../../../repo-gove
 
 The allowed role suffixes are `(maker|checker|fixer|dev|deployer|manager|tester|researcher)`
 [Repo-grounded — agent-naming.md]. "Coordinator"/"synthesizer" is not a role suffix, so the
-coordinator is named `pr-review-synthesis-maker` — it _makes_ the consolidated review. Whether that is
-the right suffix (vs. a `-checker` framing, given its filter/verify function) is deferred decision D3.
+coordinator is named `pr-review-synthesis-maker` — it _makes_ the consolidated review. The suffix
+question (vs. a `-checker` framing, given its filter/verify function) is settled by D3 → A:
+`pr-review-synthesis-maker`.
 
 ---
 
@@ -579,23 +628,27 @@ the right suffix (vs. a `-checker` framing, given its filter/verify function) is
 
 This plan was authored non-interactively, so the following forks were **not** grilled at authoring
 time. Each is a multiple-choice decision with a **recommended** option marked. The maintainer has since
-grilled the draft and **decided D1, D2, D4, D5, D6, D7, and the sub-decision D10** — those carry a
+grilled the draft and **all decisions D1–D14 are now decided; none remain open** — each carries a
 `**MAINTAINER DECISION**` line and the plan has been revised accordingly (D5 → sonnet specialists /
 opus coordinator; D6 → absolute-threshold rollback bar, resolving the D2×D6 baseline contradiction;
-D10 → GitHub-native, kept in-plan; D1 → 7-specialist split, re-confirmed). **D3** (coordinator suffix),
-**D8** (convention location / severity tiers), **D9** (split the fixer too), and the three
-Cloudflare-folded decisions **D12** (risk-tier fan-out), **D13** (diff-filter/generated-exclusion), and
-**D14** (instruction-decay home) remain open; resolve them before (or at the start of) execution —
-several change the delivery checklist's shape. Format follows the
+D7/D10 → merge queue researched but **NOT adopted** (deferred to the separate `merge-queue-adoption`
+plan; GitHub-native would be the mechanism if ever revisited); D1 → 7-specialist split, re-confirmed
+(D14 added the eighth); D3 → `pr-review-synthesis-maker`;
+D8 → `pr-review-disciplines.md`, 4-tier CRITICAL/HIGH/MEDIUM/LOW severity kept; D9 → keep one
+`pr-review-fixer`; D12 → 3-tier risk fan-out; D13 → **no** diff filtering / **no** generated-file
+exclusion; D14 → dedicated eighth specialist `pr-review-instruction-maker` for instruction-decay).
+Format follows the
 [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md).
 
 ### D1 — Exact specialist set & granularity
 
 > **MAINTAINER DECISION** (re-confirmed 2026-07-23 under a hard cost/value grill that offered
 > slim-to-4-5 and augment-the-monolith alternatives): chose **B — 7 specialists** (added
-> `pr-review-performance-maker` + `pr-review-docs-maker` to the five). The plan reflects the
-> 7-specialist + coordinator set throughout; the fan-out cost this raises is bounded by the risk-tier
-> mechanism (D12) and the `sonnet`-specialist tier (D5), not by trimming the set.
+> `pr-review-performance-maker` + `pr-review-docs-maker` to the five). **D14 later added an eighth
+> specialist (`pr-review-instruction-maker`), so the plan reflects the eight-specialist + coordinator
+> set throughout** (this D1 record captures the seven-specialist decision; the eighth is D14's). The
+> fan-out cost this raises is bounded by the risk-tier mechanism (D12) and the `sonnet`-specialist tier
+> (D5), not by trimming the set.
 
 - **A** — 5 specialists (architecture, logic, governance, security, integrity), folding
   performance + docs-quality. Trade-off: leanest set that still gives the large governance surface its
@@ -627,8 +680,12 @@ several change the delivery checklist's shape. Format follows the
 
 ### D3 — Coordinator naming / role suffix
 
-- **A (Recommended)** — `pr-review-synthesis-maker`. Trade-off: it produces (makes) the consolidated
-  review; fits the suffix rule cleanly.
+> **MAINTAINER DECISION 2026-07-23**: chose **A — `pr-review-synthesis-maker`** (the name already used
+> throughout the plan). It _makes_ the consolidated review, fitting the allowed maker suffix cleanly; no
+> design change.
+
+- **A (Recommended, chosen)** — `pr-review-synthesis-maker`. Trade-off: it produces (makes) the
+  consolidated review; fits the suffix rule cleanly.
 - **B** — `pr-review-synthesis-checker`. Trade-off: its filter/verify function is checker-like, but it
   authors a new artifact (the consolidated review), which is maker-like.
 - **C** — `pr-review-coordination-manager`. Trade-off: "manager" reads as orchestration, but the repo
@@ -649,7 +706,7 @@ several change the delivery checklist's shape. Format follows the
 ### D5 — Model tier per specialist
 
 > **MAINTAINER DECISION 2026-07-23**: chose **B — specialists `sonnet`, coordinator opus** (Cloudflare's
-> production tiering), overturning the draft's recommended A. Rationale: 7 opus specialists × 3 cycles
+> production tiering), overturning the draft's recommended A. Rationale: eight opus specialists × 3 cycles
 > is a heavy per-PR cost at this repo's PR volume; Cloudflare reached its quality with standard-tier
 > specialists + the opus coordinator's tool-verify. A lagging lens can be promoted to opus later off
 > the per-discipline acceptance-rate metric.
@@ -689,20 +746,30 @@ several change the delivery checklist's shape. Format follows the
 
 ### D7 — Adopt a merge queue now, or defer?
 
-> **MAINTAINER DECISION**: chose **B — adopt now**. Merge-queue is promoted from future-work into a
-> delivered phase (Phase 7); it hardens merge-precondition (c) under concurrent worktree-to-PR
-> integration. The mechanism choice is the new sub-decision **D10** (GitHub-native recommended).
+> **MAINTAINER DECISION (revised 2026-07-23)**: chose **A — defer / drop from this plan's scope**. The
+> repo's GitHub branch settings expose **no merge-queue toggle**, so there is nothing for the plan to
+> enable and precondition (c) cannot be hardened by a queue right now. The merge queue is therefore
+> **NOT adopted here** — it moves to a **separate `plans/backlog/` plan** for re-evaluation if/when the
+> setting becomes available. Precondition (c) keeps its manual branch-up-to-date form unchanged, and no
+> `.github/workflows/` `merge_group` change ships in this plan. (This supersedes the earlier "adopt now"
+> decision; D10 below is retained only as mechanism research for the deferred plan.)
 
-- **A** — Defer to a future-work workstream (evaluate Graphite/GitHub/Aviator; recommend only).
-  Trade-off: keeps this plan focused on the reviewer split; precondition (c) still holds today at
-  current concurrency.
-- **B (chosen)** — Adopt a merge queue in this plan. Trade-off: hardens (c) under concurrency now; adds
-  scope (CI YAML + `[HUMAN]` settings + precondition (c) rewording) beyond the reviewer decomposition.
+- **A (chosen, revised)** — Defer to a separate backlog plan (evaluate Graphite/GitHub/Aviator;
+  recommend only). Trade-off: keeps this plan focused on the reviewer split; precondition (c) still
+  holds today at current concurrency; the queue is picked up when the branch-protection toggle exists.
+- **B** — Adopt a merge queue in this plan. Trade-off: hardens (c) under concurrency now; adds
+  scope (CI YAML + `[HUMAN]` settings + precondition (c) rewording) beyond the reviewer decomposition —
+  **declined** because the repo exposes no merge-queue setting to enable.
 - **Other — type your own.** | **Chat about this.**
 
 ### D8 — Reviewer-discipline convention location & severity-tier question
 
-- **A (Recommended)** — New convention at
+> **MAINTAINER DECISION 2026-07-23**: chose **A** — new convention at
+> `repo-governance/development/quality/pr-review-disciplines.md`, **keeping the 4-tier
+> CRITICAL/HIGH/MEDIUM/LOW severity** (no fold to a 3-tier norm). No churn to the existing severity
+> taxonomy across the other docs.
+
+- **A (Recommended, chosen)** — New convention at
   `repo-governance/development/quality/pr-review-disciplines.md`; keep the 4-tier
   CRITICAL/HIGH/MEDIUM/LOW severity. Trade-off: sits beside `ci-blocker-resolution.md` and
   `criticality-levels.md`; no churn to the existing severity taxonomy.
@@ -714,20 +781,25 @@ several change the delivery checklist's shape. Format follows the
 
 ### D9 — Split `pr-review-fixer` too?
 
-- **A (Recommended)** — No; keep one fixer consuming the consolidated review. Trade-off: preserves the
-  proven 4-way triage; the fixer's job is bounded already.
+> **MAINTAINER DECISION 2026-07-23**: chose **A — keep one `pr-review-fixer`** (do not split it). It
+> keeps consuming the single consolidated review; preserving the proven 4-way triage avoids the
+> push/CI-coordination overhead and the interaction-overhead SWR-Bench warns about.
+
+- **A (Recommended, chosen)** — No; keep one fixer consuming the consolidated review. Trade-off:
+  preserves the proven 4-way triage; the fixer's job is bounded already.
 - **B** — Split the fixer per discipline to mirror the makers. Trade-off: symmetric, but multiplies
   push/CI coordination and re-introduces the interaction-overhead SWR-Bench warns about.
 - **Other — type your own.** | **Chat about this.**
 
-### D10 — Merge-queue mechanism (new sub-decision, follows from D7)
+### D10 — Merge-queue mechanism (research only; the queue is deferred per revised D7)
 
-> **MAINTAINER DECISION 2026-07-23**: chose **A — GitHub-native merge queue**, kept in this plan (the
-> Q4 "split into its own plan" alternative was declined). Lowest friction given the existing `gh`
-> toolchain; the one `[HUMAN]` GitHub-settings toggle stays in this plan, bracketed by agent-authored
-> CI-workflow prep + post-enable verification.
+> **MAINTAINER DECISION 2026-07-23 (superseded by revised D7)**: the merge queue is **not adopted in
+> this plan** — the repo exposes no merge-queue branch setting — so this mechanism choice carries
+> forward only as **research grounding for the separate deferred backlog plan**. Were a queue ever
+> adopted, **GitHub-native** would be the recommended mechanism (lowest friction given the existing
+> `gh` toolchain).
 
-- **A (chosen)** — GitHub-native merge queue. Trade-off: lowest friction given the existing
+- **A (recommended for the future plan)** — GitHub-native merge queue. Trade-off: lowest friction given the existing
   GitHub/`gh` toolchain; speculative `merge_group` CI, FIFO, auto-eviction on failure; less
   sophisticated batching than stack-aware queues.
 - **B** — Graphite stack-aware queue. Trade-off: maps most cleanly onto the strict 1-PR↔1-worktree model
@@ -738,16 +810,16 @@ several change the delivery checklist's shape. Format follows the
 
 ### D11 — Downstream propagation order (new sub-decision, follows from the three-repo parity scope)
 
-Once `ose-public` (the source of truth) merges in Phase 9, the identical shared-scaffolding artifacts
-propagate to `ose-primer` (Phase 10) and `ose-infra` (Phase 11). These two downstream deliveries touch
+Once `ose-public` (the source of truth) merges in Phase 8, the identical shared-scaffolding artifacts
+propagate to `ose-primer` (Phase 9) and `ose-infra` (Phase 10). These two downstream deliveries touch
 different repos, share no files, and have no dependency on each other — only on the merged `ose-public`
 source.
 
-- **A (Recommended)** — **Parallel**. Run Phase 10 and Phase 11 concurrently (each its own
+- **A (Recommended)** — **Parallel**. Run Phase 9 and Phase 10 concurrently (each its own
   `worktree-to-pr` delivery in its own repo). Trade-off: fastest wall-clock and matches the
   `worktree-to-pr`-default rationale that independent units become independent PRs that gate and merge
   independently; costs two simultaneous review cycles on the shared machine. This is the recommended
-  posture and what the DAG in `delivery.md` encodes (both nodes depend on Phase 9, neither on the other).
+  posture and what the DAG in `delivery.md` encodes (both nodes depend on Phase 8, neither on the other).
 - **B** — **Sequential** (`ose-primer` then `ose-infra`, or vice-versa). Trade-off: one review cycle at
   a time, lighter concurrent machine load, easier to babysit; strictly slower and serializes work that
   has no real dependency.
@@ -761,21 +833,35 @@ source.
 
 > Adopting Cloudflare's diff-size tiering as the primary cost lever — see
 > [Cost-Control & Noise-Control Mechanics](#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
+>
+> **MAINTAINER DECISION 2026-07-23**: chose **A — the 3-tier risk fan-out** (trivial → coordinator-only;
+> lite → 4 lenses; full → all specialists; security-sensitive paths force `full`). This is the primary
+> cost lever bounding the fan-out cost the risk table flagged.
 
-- **A (Recommended)** — Adopt three tiers: `trivial` (≤10 lines AND ≤20 files) → coordinator-only
+- **A (Recommended, chosen)** — Adopt three tiers: `trivial` (≤10 lines AND ≤20 files) → coordinator-only
   consolidated pass; `lite` (≤100 lines AND ≤20 files) → 4 lenses (governance, logic, security,
-  integrity) + coordinator; `full` (larger, OR any security-sensitive path) → all 7 + coordinator.
-  Security paths force `full`. Trade-off: directly bounds the 7× cost the risk table flagged; adds a
+  integrity) + coordinator; `full` (larger, OR any security-sensitive path) → all 8 + coordinator.
+  Security paths force `full`. Trade-off: directly bounds the 8× cost the risk table flagged; adds a
   tier-classification step to the workflow and a tier line to the review header.
 - **B** — Two tiers only (`lite` / `full`). Trade-off: simpler; leaves trivial doc-only PRs paying for
   four reviewers.
-- **C** — No tiering; always fan out all 7. Trade-off: simplest workflow; the cost risk stays
+- **C** — No tiering; always fan out all 8. Trade-off: simplest workflow; the cost risk stays
   mitigated only by budget + model-tier, as in the original draft.
 - **Other — type your own.** | **Chat about this.**
 
 ### D13 — Diff filtering, generated-file exclusion & large-diff handling (folded 2026-07-23)
 
-- **A (Recommended)** — Exclude generated/emitted files (`.opencode/**`, `.amazonq/**`,
+> **MAINTAINER DECISION 2026-07-23**: chose **C — no diff filtering / no generated-file exclusion**,
+> **reversing the drafted recommendation A**. Rationale: **explicitness** — nothing is silently skipped,
+> so a hand-edited "generated" file is never missed — consistent with the repo's explicit-over-convention
+> preference. Reviewers see the **full diff**, including regenerated output (`.opencode/**`, `.amazonq/**`,
+> `generated/**`, lock/minified). The cost consequence (reviewers spend budget on regenerated diffs, and
+> giant `generate:bindings` diffs reach the fan-out) is **accepted** and leaned instead on the D12
+> risk-tier and D5 `sonnet` levers. The **shared-context extract-once** mechanic is retained (it is a
+> token-dedup, not filtering); the coordinator MAY note a very large diff and review it in slices at its
+> discretion, but nothing is auto-excluded.
+
+- **A (Recommended, superseded)** — Exclude generated/emitted files (`.opencode/**`, `.amazonq/**`,
   `generated/**`, lock files, minified/source-map, `@generated`-marked) from the review diff; assemble
   a shared-context brief once for all specialists; slice a too-large `full`-tier diff per-domain with a
   coordinator "reviewed in N slices" note. Never exclude `.claude/agents/**` or `repo-governance/**`.
@@ -784,22 +870,31 @@ source.
 - **B** — Exclude only lock files + minified assets (the uncontroversial subset), no shared-context or
   slicing. Trade-off: leaner rule; the binding-emit output (`.opencode`/`.amazonq`) still burns
   reviewers on a giant `generate:bindings` diff.
-- **C** — No filtering. Trade-off: simplest; reviewers waste budget on regenerated output and giant
-  diffs stay infeasible.
+- **C (chosen)** — No filtering. Trade-off: simplest and most explicit — nothing is silently skipped and
+  a hand-edited "generated" file is never missed; reviewers spend budget on regenerated output and giant
+  diffs stay large (cost accepted, bounded by the D12 risk-tier + D5 sonnet levers + shared-context, with
+  coordinator-discretion slicing on very large diffs).
 - **Other — type your own.** | **Chat about this.**
 
 ### D14 — Instruction-decay coverage: eighth agent or governance charter? (folded 2026-07-23)
 
 > Cloudflare runs a dedicated `AGENTS.md` reviewer for instruction decay. This repo is unusually
 > instruction-heavy, so the defect class is real here — the open question is where it lives.
+>
+> **MAINTAINER DECISION 2026-07-23**: chose **B — a dedicated eighth specialist
+> `pr-review-instruction-maker`** for instruction-decay, **overturning the drafted recommendation A**.
+> It gets the sharpest single-purpose charter (closest to Cloudflare's design). Consequently the
+> instruction-decay charter line is **removed from `pr-review-governance-maker`** — governance no longer
+> owns instruction-decay; it belongs to the new standalone agent. The result is **eight specialists + one
+> coordinator = nine agents total**; the eighth reviewer joins every `full`-tier fan-out and adds one
+> more file across all three repos + bindings, a cost accepted for the sharper charter.
 
-- **A (Recommended)** — Fold instruction-decay into `pr-review-governance-maker` as an explicit
-  charter line (already reflected in the charter table). Trade-off: no eighth reviewer, so it does not
-  work against the D12 cost concern; governance is the natural owner since it already reads the
-  instruction surface.
-- **B** — Add an eighth specialist `pr-review-instruction-maker`. Trade-off: closest to Cloudflare's
-  design and a sharper single-purpose charter; adds a reviewer to every `full`-tier fan-out and one
-  more file across all three repos + bindings.
+- **A (Recommended, superseded)** — Fold instruction-decay into `pr-review-governance-maker` as an
+  explicit charter line. Trade-off: no eighth reviewer, so it does not work against the D12 cost concern;
+  governance is the natural owner since it already reads the instruction surface.
+- **B (chosen)** — Add an eighth specialist `pr-review-instruction-maker`. Trade-off: closest to
+  Cloudflare's design and a sharper single-purpose charter; adds a reviewer to every `full`-tier fan-out
+  and one more file across all three repos + bindings.
 - **C** — Defer instruction-decay to future work. Trade-off: cheapest now; leaves a real,
   repo-specific defect class uncovered.
 - **Other — type your own.** | **Chat about this.**

@@ -10,8 +10,8 @@ review quality, exploding review cost, or drowning the fixer in low-value findin
 ## Repo Scope — Three-Repo Parity
 
 This is a **three-repo parity deliverable**, not an `ose-public`-only change. The PR-review agents,
-coordinator, workflow revision, reviewer-discipline convention, `pr-merge-protocol.md` changes, and
-merge-queue adoption are all **shared scaffolding** (governance / AI agents / conventions / CI
+coordinator, workflow revision, reviewer-discipline convention, and `pr-merge-protocol.md` changes
+are all **shared scaffolding** (governance / AI agents / conventions / CI
 harness) held in parity across `ose-public`, `ose-primer`, and `ose-infra` — the same posture as the
 prior `standardize-repo-toolchain-parity` and `lint-safety-parity` 3-repo plans [Repo-grounded —
 AGENTS.md §Related Repositories].
@@ -21,12 +21,14 @@ AGENTS.md §Related Repositories].
 - **`ose-infra`** — private infrastructure repo; also carries the `.claude/agents/`,
   `repo-governance/`, and binding scaffolding, and receives identical artifacts.
 
-Propagation to the two downstream repos follows the
-[multi-repo parity planning-and-execution workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md),
-each downstream repo delivered via its own `worktree-to-pr` cycle. Business rationale for the parity
-posture: the review gate that guards `main` must be **identical** in every repo, or a PR in one repo
-merges under a weaker gate than the same change would face in another — the exact drift the parity
-loop exists to prevent.
+Propagation to the two downstream repos is delivered **in the spirit of** the
+[multi-repo parity planning-and-execution workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md)
+— adapted to this plan's single shared `ose-public` plan folder rather than that workflow's canonical
+one-folder-per-repo output (see [tech-docs.md §Repo Scope & Propagation](./tech-docs.md#repo-scope--propagation-three-repo-parity)
+for the rationale) — with each downstream repo still delivered via its own `worktree-to-pr` cycle.
+Business rationale for the parity posture: the review gate that guards `main` must be **identical** in
+every repo, or a PR in one repo merges under a weaker gate than the same change would face in another —
+the exact drift the parity loop exists to prevent.
 
 ## Business Rationale (why this exists)
 
@@ -47,7 +49,7 @@ uniquely valuable here.
 The decisive caveat is that a _naive_ split makes things worse, not better (SWR-Bench: F1 9.22% vs.
 18.73% single-pass) [Web-cited]. The business value is therefore realized **only** if the
 coordinator/synthesizer is built as a first-class component. Per the maintainer's decision (D2), the
-monolith is **retired immediately at cutover** when the seven specialists + coordinator land — it is
+monolith is **retired immediately at cutover** when the eight specialists + coordinator land — it is
 not gated on an eval. The eval instead runs **post-cutover** as ongoing quality monitoring with a
 documented **rollback trigger**: if post-cutover precision/acceptance regress below the rollback bar,
 the monolith is restored from git history.
@@ -56,8 +58,8 @@ the monolith is restored from git history.
 
 **Pain points addressed**:
 
-- **Diluted review attention** — one agent, seven disciplines, uneven coverage. Specialists give each
-  discipline its own budget and charter.
+- **Diluted review attention** — one agent covering every discipline at once, uneven coverage. The
+  eight specialists give each discipline its own budget and charter.
 - **No dedicated governance-conformance lens** — the repo's largest quality surface (its own
   conventions) shares attention with everything else in the monolith.
 - **Grey-zone mis-categorization** — architecture-vs-correctness-vs-governance boundary calls are made
@@ -79,8 +81,8 @@ the monolith is restored from git history.
 - **Agent author** — scaffolds the specialist + coordinator agent-definition files.
 - **Workflow author** — revises `pr-review-quality-gate.md` for the fan-out → synthesize → fixer shape.
 - **Consuming agents** — `plan-execution` (invokes the review workflow at finalization),
-  `pr-review-fixer` (consumes the consolidated review), the eight new reviewer agents themselves
-  (seven specialists + one coordinator), and the binding generators (`.opencode/`, `.amazonq/`) that
+  `pr-review-fixer` (consumes the consolidated review), the nine new reviewer agents themselves
+  (eight specialists + one coordinator), and the binding generators (`.opencode/`, `.amazonq/`) that
   mirror the new agents.
 
 This is a solo-maintainer repo — there is no sign-off ceremony, sponsor, or stakeholder gate. The
@@ -104,8 +106,6 @@ already-observed number.
   precisely _because_ most PRs never trigger the full 7-agent fan-out [Web-cited]. See the cost/latency
   and giant-diff risks in [tech-docs.md](./tech-docs.md#risks) and the
   [cost/noise mechanics](./tech-docs.md#cost-control--noise-control-mechanics-cloudflare-production-learnings--folded-2026-07-23).
-- **Concurrent trunk integration is queue-hardened** (observable fact once executed): a merge queue is
-  adopted so merge-precondition (c) holds under concurrent worktree-to-PR merges, not just serially.
 
 ## Business-Scope Non-Goals
 
@@ -116,14 +116,14 @@ already-observed number.
 
 ## Business Risks and Mitigations
 
-| Risk                                                   | Likelihood            | Mitigation                                                                                                                                                                          |
-| ------------------------------------------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Naive fan-out regresses review quality (SWR-Bench)     | High if uncoordinated | Coordinator is mandatory; post-cutover monitoring + a documented rollback trigger restores the monolith if metrics regress                                                          |
-| Cost balloons N× per cycle                             | Medium                | Risk-tier fan-out scales agents to diff size (D12) + generated-file exclusion / shared-context (D13) + `sonnet` specialists / opus coordinator (D5 decided); then budget/monitoring |
-| Instruction docs drift out of date                     | Medium                | `governance-maker` gains an instruction-decay charter (D14) — flags framework/CI changes not reflected in `AGENTS.md`/`.claude/`                                                    |
-| More agents raise raw false-positive volume            | Medium                | Coordinator reasonableness-filter + tool-verify; confidence ≥ 80 bar inherited by every specialist                                                                                  |
-| Boundary grey-zones cause duplicate/mis-filed findings | Medium                | Written tie-breaker rule + coordinator owns re-categorization (esp. architecture↔correctness)                                                                                       |
-| Governance drift across the two mirror harnesses       | Low                   | `npm run generate:bindings` + sync-validation gate on every phase touching an agent file                                                                                            |
+| Risk                                                   | Likelihood            | Mitigation                                                                                                                                                                            |
+| ------------------------------------------------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Naive fan-out regresses review quality (SWR-Bench)     | High if uncoordinated | Coordinator is mandatory; post-cutover monitoring + a documented rollback trigger restores the monolith if metrics regress                                                            |
+| Cost balloons N× per cycle                             | Medium                | Risk-tier fan-out scales agents to diff size (D12) + shared-context (D13: no generated-file exclusion) + `sonnet` specialists / opus coordinator (D5 decided); then budget/monitoring |
+| Instruction docs drift out of date                     | Medium                | Dedicated `pr-review-instruction-maker` specialist (D14) — flags framework/CI changes not reflected in `AGENTS.md`/`.claude/`                                                         |
+| More agents raise raw false-positive volume            | Medium                | Coordinator reasonableness-filter + tool-verify; confidence ≥ 80 bar inherited by every specialist                                                                                    |
+| Boundary grey-zones cause duplicate/mis-filed findings | Medium                | Written tie-breaker rule + coordinator owns re-categorization (esp. architecture↔correctness)                                                                                         |
+| Governance drift across the two mirror harnesses       | Low                   | `npm run generate:bindings` + sync-validation gate on every phase touching an agent file                                                                                              |
 
 The cross-cutting factual claims behind these risks live here; the corresponding **testable
 scenarios** live in [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria).

@@ -22,8 +22,6 @@ governance/workflow markdown + register/binding updates** — there is no runtim
 - **The Maintainer running the cutover** — retires the monolith at cutover and needs post-cutover
   monitoring with a documented rollback trigger, so a regression can be caught and reverted to the
   monolith from git history.
-- **The Trunk integrator** — needs merge-precondition (c) to hold under concurrent worktree-to-PR
-  merges, which a merge queue provides.
 
 ## User Stories
 
@@ -43,15 +41,13 @@ governance/workflow markdown + register/binding updates** — there is no runtim
 - **US-7** — As the quality-gate owner, I want calibration, selective adversarial verification, and a
   CRITICAL-requires-reproduction rule, so that high-confidence and high-severity findings are
   trustworthy.
-- **US-8** — As the trunk integrator, I want a merge queue adopted so that merge-precondition (c)
-  holds under concurrent worktree-to-PR merges, not only when PRs merge one at a time.
-- **US-9** — As the cost owner, I want the fan-out scaled to diff size (risk-tier) and generated/
-  emitted files excluded from the review diff, so that a trivial or docs-only PR does not pay for a
-  full seven-specialist review and a giant restructure stays reviewable.
-- **US-10** — As the reviewer-set author, I want each specialist to carry an explicit "what NOT to
-  flag" suppression block, the governance lens to catch instruction-decay, and re-reviews to respect a
-  human "won't fix", so that the consolidated review stays high-signal and does not nag on dismissed
-  or out-of-scope points.
+- **US-8** — As the cost owner, I want the fan-out scaled to diff size (risk-tier), so that a trivial
+  or docs-only PR does not pay for a full eight-specialist review and a giant restructure stays
+  reviewable via coordinator-discretion slicing (D13 chose no generated-file exclusion).
+- **US-9** — As the reviewer-set author, I want each specialist to carry an explicit "what NOT to
+  flag" suppression block, a dedicated instruction-decay lens (`pr-review-instruction-maker`), and
+  re-reviews to respect a human "won't fix", so that the consolidated review stays high-signal and does
+  not nag on dismissed or out-of-scope points.
 
 ## Acceptance Criteria
 
@@ -62,7 +58,7 @@ Each acceptance criterion below follows the step-keyword cardinality HARD rule: 
 
 ```gherkin
 Scenario: Specialist charters partition the review disciplines
-  Given the seven specialist reviewer-maker agent files exist under .claude/agents/
+  Given the eight specialist reviewer-maker agent files exist under .claude/agents/
   And a written reviewer-discipline convention defines each discipline
   When a reviewer opens each specialist's "Core Responsibility" section
   Then each specialist names exactly one discipline it owns
@@ -74,7 +70,7 @@ Scenario: Specialist charters partition the review disciplines
 
 ```gherkin
 Scenario: The synthesizer consolidates specialist findings before the fixer sees them
-  Given the seven specialists have each posted their raw findings for one review cycle
+  Given the eight specialists have each posted their raw findings for one review cycle
   When pr-review-synthesis-maker runs against those raw findings
   Then it deduplicates overlapping findings into one
   And it re-categorizes any misfiled finding to the correct discipline
@@ -109,9 +105,9 @@ Scenario: A grey-zone finding is routed by the written tie-breaker
 
 ```gherkin
 Scenario: Registers and bindings stay in sync after adding the agents
-  Given the eight new agent files have been added under .claude/agents/
+  Given the nine new agent files have been added under .claude/agents/
   When npm run generate:bindings runs and the registers are updated
-  Then AGENTS.md and .claude/agents/README.md list all eight new agents
+  Then AGENTS.md and .claude/agents/README.md list all nine new agents
   And the OpenCode and Amazon-Q bindings mirror them
   And the binding sync-validation check passes with zero drift
 ```
@@ -120,7 +116,7 @@ Scenario: Registers and bindings stay in sync after adding the agents
 
 ```gherkin
 Scenario: Cutover retires the monolith and arms the rollback trigger
-  Given the seven specialists and the coordinator are live in the revised workflow
+  Given the eight specialists and the coordinator are live in the revised workflow
   When the cutover phase removes and de-registers pr-review-maker
   Then the monolith no longer appears in any register or binding
   And a post-cutover monitoring plan defines precision, acceptance-rate, and Outdated-Rate metrics
@@ -139,47 +135,35 @@ Scenario: Calibration, adversarial verification, and reproduction rules are docu
   And the 3-cycle no-early-exit policy carries an explicit rationale flagged as a predictability choice, not a research-derived one
 ```
 
-### AC-8: A merge queue is adopted to harden precondition (c)
-
-```gherkin
-Scenario: A merge queue governs concurrent worktree-to-PR integration
-  Given the merge-queue phase has selected a mechanism and updated pr-merge-protocol.md precondition (c)
-  When two worktree-to-PR PRs are ready to merge concurrently
-  Then the merge queue serializes their integration with CI on the speculative merge result
-  And a PR that fails the queued CI is auto-evicted without breaking main
-  And precondition (c) is documented as satisfied by the queue rather than by a manual branch-up-to-date check
-```
-
-### AC-9: The change set reaches all three sibling repos in parity
+### AC-8: The change set reaches all three sibling repos in parity
 
 ```gherkin
 Scenario: The identical shared-scaffolding artifacts propagate from ose-public to both downstream repos
-  Given the reviewer agents, coordinator, workflow revision, convention, and merge-queue changes have merged to ose-public main
+  Given the reviewer agents, coordinator, workflow revision, and convention have merged to ose-public main
   When the propagation phases deliver the identical change set to ose-primer and ose-infra, each via its own worktree-to-pr cycle with a per-repo generate:bindings step
   Then all three repos carry byte-parity of the shared PR-review agent/governance/workflow scaffolding
   And no rhino-cli file is touched in any repo, preserving the rhino-cli byte-identity boundary
   And no infra-private content is cross-routed out of ose-infra
 ```
 
-### AC-10: The fan-out is risk-tiered and the review diff excludes generated files
+### AC-9: The fan-out is risk-tiered
 
 ```gherkin
-Scenario: Review scope scales to diff size and skips generated output
-  Given the reviewer-discipline convention defines the trivial, lite, and full risk tiers and the generated-file exclusion list
+Scenario: Review scope scales to diff size
+  Given the reviewer-discipline convention defines the trivial, lite, and full risk tiers
   When a PR is classified for review
   Then a trivial-sized PR with no security-sensitive path fans out to fewer agents than a full-sized one
   And any path touching secrets, git identity, or CI is forced to the full tier regardless of size
-  And emitted or generated files (.opencode, .amazonq, generated, lock, minified) are excluded from the review diff while .claude/agents and repo-governance are never excluded
-  And CI still runs over the entire change unaffected by the review-scope filter
+  And CI still runs over the entire change (D13 chose no generated-file exclusion — reviewers see the full diff)
 ```
 
-### AC-11: Suppression, instruction-decay, and human-dismissal rules are in effect
+### AC-10: Suppression, instruction-decay, and human-dismissal rules are in effect
 
 ```gherkin
 Scenario: The consolidated review stays high-signal and respects human dismissal
-  Given each specialist charter carries a SUPPRESS block and the governance lens carries an instruction-decay charter
+  Given each specialist charter carries a SUPPRESS block and the dedicated pr-review-instruction-maker lens carries an instruction-decay charter
   When a review cycle runs on a PR whose diff changes a build tool without updating AGENTS.md and whose author dismissed a prior finding
-  Then the governance specialist flags the instruction-decay drift
+  Then the instruction specialist flags the instruction-decay drift
   And no specialist raises a nitpick or a point already enforced by a mechanical gate
   And the re-review does not re-raise the finding the human explicitly dismissed on its thread
   And user-supplied structural boundary tags in the PR body are stripped before any model reads them
@@ -189,18 +173,17 @@ Scenario: The consolidated review stays high-signal and respects human dismissal
 
 **In scope (features)**:
 
-- Eight new agent-definition files (seven specialists + one coordinator).
+- Nine new agent-definition files (eight specialists + one coordinator).
 - One new governance convention (reviewer disciplines + tie-breaker + quality-gate enhancements +
-  the Cloudflare-folded cost/noise mechanics: risk-tier fan-out (D12), diff-filter/generated-exclusion
-  - shared-context + large-diff posture (D13), per-specialist SUPPRESS blocks, instruction-decay (D14),
-    human-dismissal-respect, and boundary-tag-strip).
+  the Cloudflare-folded cost/noise mechanics: risk-tier fan-out (D12), shared-context + large-diff
+  handling (D13: no generated-file exclusion), per-specialist SUPPRESS blocks, instruction-decay via a
+  dedicated specialist (D14), human-dismissal-respect, and boundary-tag-strip).
 - Revision of `pr-review-quality-gate.md` and cross-references in `pr-merge-protocol.md` where the
   reviewer count/shape is described; the monolith retired and de-registered at cutover.
 - Register + binding updates.
 - A post-cutover monitoring plan with a documented rollback trigger for the monolith.
-- Adoption of a merge queue (delivered phase) to harden merge-precondition (c) under concurrent
-  integration, updating `pr-merge-protocol.md` precondition (c) and the CI workflow config.
-- A future-work section (bot identity, cost budgeting).
+- A future-work section (bot identity, cost budgeting, and the deferred merge queue — split into its
+  own backlog plan because the repo exposes no merge-queue branch setting to enable).
 - **Three-repo parity propagation**: after `ose-public` (source of truth) merges, the identical
   shared-scaffolding artifacts are delivered to `ose-primer` and `ose-infra`, each via its own
   `worktree-to-pr` cycle with a per-repo `npm run generate:bindings` step (per the multi-repo parity
@@ -221,7 +204,7 @@ Scenario: The consolidated review stays high-signal and respects human dismissal
 - **Immediate retirement risk (no eval gate)** — retiring the monolith at cutover (D2) means a
   regression ships before it is measured. Mitigated by the documented rollback trigger and the
   monolith's recoverability from git history.
-- **Binding drift** — eight new agents across three harnesses. Mitigated by the sync-validation gate
+- **Binding drift** — nine new agents across three harnesses. Mitigated by the sync-validation gate
   on every agent-touching phase (AC-5).
 
 The **factual claims / judgments** behind these risks live in
