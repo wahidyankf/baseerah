@@ -20,9 +20,9 @@ most importantly, **no manifest**.
 > (same wave, no dependency edge in either direction).
 >
 > **Cross-plan source of truth** — the authoritative per-course and per-path specs live in
-> `plans/backlog/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
+> `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
 > them; do not author from any other source. Every course body in this plan is authored **from** its
-> [`syllabus/courses/<course-id>.md`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md)
+> [`syllabus/courses/<course-id>.md`](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md)
 > spec file — never from a fresh judgment call.
 
 ## The manifest ownership invariant (binding — read before anything else)
@@ -400,15 +400,15 @@ forbidden.
 - [Delivery Checklist (delivery.md)](./delivery.md) — the phased, executable checklist.
 - [Learnings (learnings.md)](./learnings.md) — knowledge-capture running log.
 - **Cross-plan**:
-  [`syllabus/` source of truth](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md)
+  [`syllabus/` source of truth](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md)
   ·
-  [`syllabus/courses/` catalog](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md)
+  [`syllabus/courses/` catalog](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md)
   ·
-  [`syllabus/paths/` manifests](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/README.md)
+  [`syllabus/paths/` manifests](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/README.md)
   · [manifest plan](../ayokoding-learning-path-05-manifests/README.md)
   · [URL-restructure plan](../../done/2026-07-23__ayokoding-learning-path-01-url-restructure/README.md)
   · [navigation-UI plan](../ayokoding-learning-path-03-navigation-ui/README.md)
-  · [schema plan](../ayokoding-learning-path-02-schema-and-prerequisite-dag/README.md)
+  · [schema plan](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/README.md)
 
 ## Provenance
 

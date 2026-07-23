@@ -357,7 +357,7 @@ See [prd.md §Personas](./prd.md#personas-one-per-path) for the authoritative co
   `?path=` propagation, prev/next and breadcrumb resolution, the path rail's two hosts, the
   accessibility contract, design decisions, file impact, and the testing strategy.
 - [Delivery Checklist (delivery.md)](./delivery.md) — the phased executable checklist.
-- [Syllabus (cross-plan)](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md)
+- [Syllabus (cross-plan)](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md)
   — the per-course and per-path detail layer, owned by
   `ayokoding-learning-path-02-schema-and-prerequisite-dag`. Read-only from here; never copied.
 - [Learnings (learnings.md)](./learnings.md) — knowledge-capture running log.

@@ -16,7 +16,7 @@ construction rather than as a retrofit.
 > [tech-docs §The manifest ownership invariant](./tech-docs.md#the-manifest-ownership-invariant-binding).
 >
 > **Cross-plan source of truth** — the 128-file `syllabus/` detail layer lives in
-> [`../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md).
+> [`../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/README.md).
 > Every course body is authored **from** its `syllabus/courses/<course-id>.md` spec. **Never copy
 > those files into this plan** — a copy forks the source of truth for 121 course specs.
 >
@@ -155,7 +155,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 - `<SE_OLD>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/` (legacy home of the 33 shipped topics + 4 existing capstones — **read-only here**; the re-home is the URL-restructure plan's work)
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/` (**never written here**)
 - `<MANIFESTS>` = `<FEAT>manifests/` (**never written here** — manifest-plan property; read-only reference only)
-- `<SYLLABUS>` = `../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/` (cross-plan authoring source of truth — **never copied**)
+- `<SYLLABUS>` = `../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/` (cross-plan authoring source of truth — **never copied**)
 
 ---
 
@@ -387,7 +387,7 @@ subagents capped per the orchestration convention). The main thread self-promote
   ```
 
   — acceptance: the `grep` finds **no** matching line (exits 1). Falsifiable both ways: adding one
-  bad `../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/nope.md` link makes the
+  bad `../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/nope.md` link makes the
   same command print that file and exit 0. `md links validate` accepts **no positional path**
   (passing one errors out) and the bare repo-wide form is unsatisfiable (a pre-existing, non-zero
   backlog of broken links, nearly all under `plans/done/`, unrelated to this work — 137 of 138
@@ -428,7 +428,7 @@ subagents capped per the orchestration convention). The main thread self-promote
 > content-independent (each writes only its own subtree) and **pipeline concurrently** through review
 > (bounded by the cap). Per-course concept/example/prerequisite/capstone detail is **already settled**
 > in the cross-plan
-> [`syllabus/courses/`](../ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md) —
+> [`syllabus/courses/`](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md) —
 > each of the six has a complete 295–425-line spec file with concrete `co-NN` concept enumeration,
 > `ex-NN` worked examples, a concrete prerequisite chain, and a capstone spec. **Author each course
 > body from its `$SYLLABUS_ROOT/<id>.md` spec, not from a fresh judgment call.**

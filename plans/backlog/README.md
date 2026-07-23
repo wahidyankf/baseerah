@@ -12,12 +12,10 @@ plan's own `tech-docs.md` under a `## Programme decisions` section, and each pla
 scope, counts, gates, and local wave position. The three waves are: **Wave 1** — `01`, `02` (no
 prerequisite); **Wave 2** — `03`, `04`, `06` (need both Wave 1 plans merged; `06` additionally
 hard-depends on `03`'s renderer); **Wave 3** — `05`, `07` (each needs its own Wave 2 predecessor
-merged). **Wave-1 `01-url-restructure` is now [in progress](../in-progress/README.md)** and has left
-this backlog.
+merged). **Both Wave-1 plans have left this backlog**: `01-url-restructure` is
+[complete](../done/2026-07-23__ayokoding-learning-path-01-url-restructure/README.md) and
+`02-schema-and-prerequisite-dag` is [in progress](../in-progress/README.md).
 
-- [ayokoding-learning-path-02-schema-and-prerequisite-dag](./ayokoding-learning-path-02-schema-and-prerequisite-dag/README.md)
-  — **Wave 1.** The data layer: manifest schema, the pure `course-paths` core, the prerequisite
-  contract, and custody of the `syllabus/` corpus.
 - [ayokoding-learning-path-03-navigation-ui](./ayokoding-learning-path-03-navigation-ui/README.md)
   — **Wave 2.** The design funnel and every rendered surface: path landings, cards, and the
   prev/next/breadcrumb wiring.
