@@ -230,14 +230,20 @@ honest counter-considerations are recorded rather than buried:
 4. **Tool-verify** — when uncertain about a finding, re-read the cited source (and, if needed,
    delegate to `web-researcher`) rather than passing an unverified finding through.
 
-**Model tiering**: coordinator inherits **opus** (top tier) — the research is explicit that the
-coordinator carries the top-tier model. Specialists inherit **opus** by default (matching the current
-monolith's opus justification — PR review is judgment-heavy here) with **sonnet as the primary cost
-lever** (deferred decision D5). This diverges deliberately from Cloudflare's "standard-tier
-specialists": this repo's review is genuinely judgment-heavy, and cost is instead bounded by the
-budget/monitoring workstream and the post-cutover rollback trigger. With seven specialists rather than
-five, the cost lever (D5) matters more — the eval's per-discipline acceptance-rate tracking watches
-whether the two added lenses (performance, docs) earn their invocations.
+**Model tiering (D5 → B, MAINTAINER DECISION 2026-07-23)**: coordinator inherits **opus** (top tier)
+— the research is explicit that the coordinator carries the top-tier model and is the single quality
+chokepoint — while the seven **specialists inherit `sonnet`**, matching Cloudflare's production
+tiering (standard-tier specialists, top-tier coordinator only). The maintainer overturned the draft's
+opus-everywhere default: with seven specialists × three cycles, an all-opus fan-out is a heavy per-PR
+cost for this repo's PR volume, and Cloudflare reached its 1.2-findings/review quality with
+standard-tier specialists + negative-instruction prompting + the opus coordinator's tool-verify pass.
+The residual risk — a `sonnet` specialist missing a subtle finding — is backstopped by the opus
+coordinator (which tool-verifies uncertain findings and owns re-categorization) and by the selective
+adversarial-verification pass on high-risk diffs (D4, cross-model diversity). Per-discipline
+acceptance-rate tracking (post-cutover monitoring) watches whether any specialist's `sonnet` tier is
+under-performing; a specific lens can be promoted to opus later if its acceptance rate lags. This is
+the concrete cost lever that, with the risk-tier fan-out (D12), bounds the fan-out cost the risk table
+flags.
 
 ## Fate of the Monolithic `pr-review-maker` (retire immediately at cutover — D2)
 
@@ -393,12 +399,21 @@ tracking [Web-cited], the metrics tracked on live post-cutover PRs are:
   consolidated finding (Cloudflare's "break glass" proxy, 0.6% in production). A rising override rate
   is an early trust-erosion signal, cheaper to read than precision and complementary to it.
 
-**Rollback trigger**: the monitoring plan documents a **rollback bar** (D6). If post-cutover
-precision/acceptance regress below that bar over a monitoring window, the monolith is **restored from
-git history** (`git revert`/`git checkout` of the deleted `pr-review-maker.md` and its register
-entries, then `npm run generate:bindings`) and the split revised. Because retirement is a git deletion,
-rollback is a bounded, non-destructive forward operation — no history rewrite. There is no
-before-cutover A/B comparison; the monolith and the split never run concurrently under D2.
+**Rollback trigger (D6 → absolute-threshold bar, MAINTAINER DECISION 2026-07-23)**: the monitoring
+plan documents a set of **fixed absolute thresholds** that need **no pre-cutover monolith baseline** —
+deliberately, because D2 retires the monolith on day one and never captures one (this resolves the
+D2×D6 contradiction the draft carried). The rollback fires when any threshold trips over a rolling
+monitoring window (proposed defaults, maintainer-tunable at execution):
+
+- consolidated-finding **precision < 50%** over the last N post-cutover PRs, OR
+- **human-override-rate > 5%** (vs Cloudflare's observed 0.6%), OR
+- any **CRITICAL false-positive** that reached the fixer.
+
+On a trip, the monolith is **restored from git history** (`git revert`/`git checkout` of the deleted
+`pr-review-maker.md` and its register entries, then `npm run generate:bindings`) and the split revised.
+Because retirement is a git deletion, rollback is a bounded, non-destructive forward operation — no
+history rewrite. There is no before-cutover A/B comparison; the monolith and the split never run
+concurrently under D2, and the absolute bar is what makes that safe without a baseline.
 
 ## Merge-Queue Design (delivered — D7)
 
@@ -564,8 +579,11 @@ the right suffix (vs. a `-checker` framing, given its filter/verify function) is
 
 This plan was authored non-interactively, so the following forks were **not** grilled at authoring
 time. Each is a multiple-choice decision with a **recommended** option marked. The maintainer has since
-reviewed the draft and **decided D1, D2, D4, and D7** — those carry a `**MAINTAINER DECISION**` line and
-the plan has been revised accordingly. D3, D5, D6, D8, D9, the sub-decision **D10**, and the three
+grilled the draft and **decided D1, D2, D4, D5, D6, D7, and the sub-decision D10** — those carry a
+`**MAINTAINER DECISION**` line and the plan has been revised accordingly (D5 → sonnet specialists /
+opus coordinator; D6 → absolute-threshold rollback bar, resolving the D2×D6 baseline contradiction;
+D10 → GitHub-native, kept in-plan; D1 → 7-specialist split, re-confirmed). **D3** (coordinator suffix),
+**D8** (convention location / severity tiers), **D9** (split the fixer too), and the three
 Cloudflare-folded decisions **D12** (risk-tier fan-out), **D13** (diff-filter/generated-exclusion), and
 **D14** (instruction-decay home) remain open; resolve them before (or at the start of) execution —
 several change the delivery checklist's shape. Format follows the
@@ -573,8 +591,11 @@ several change the delivery checklist's shape. Format follows the
 
 ### D1 — Exact specialist set & granularity
 
-> **MAINTAINER DECISION**: chose **B — 7 specialists** (added `pr-review-performance-maker` +
-> `pr-review-docs-maker` to the five). The plan reflects the 7-specialist + coordinator set throughout.
+> **MAINTAINER DECISION** (re-confirmed 2026-07-23 under a hard cost/value grill that offered
+> slim-to-4-5 and augment-the-monolith alternatives): chose **B — 7 specialists** (added
+> `pr-review-performance-maker` + `pr-review-docs-maker` to the five). The plan reflects the
+> 7-specialist + coordinator set throughout; the fan-out cost this raises is bounded by the risk-tier
+> mechanism (D12) and the `sonnet`-specialist tier (D5), not by trimming the set.
 
 - **A** — 5 specialists (architecture, logic, governance, security, integrity), folding
   performance + docs-quality. Trade-off: leanest set that still gives the large governance surface its
@@ -627,27 +648,43 @@ several change the delivery checklist's shape. Format follows the
 
 ### D5 — Model tier per specialist
 
+> **MAINTAINER DECISION 2026-07-23**: chose **B — specialists `sonnet`, coordinator opus** (Cloudflare's
+> production tiering), overturning the draft's recommended A. Rationale: 7 opus specialists × 3 cycles
+> is a heavy per-PR cost at this repo's PR volume; Cloudflare reached its quality with standard-tier
+> specialists + the opus coordinator's tool-verify. A lagging lens can be promoted to opus later off
+> the per-discipline acceptance-rate metric.
+
 - **A (Recommended)** — Specialists inherit opus, coordinator inherits opus. Trade-off: matches the
   monolith's judgment-heavy justification; highest cost; strongest quality.
-- **B** — Specialists `sonnet`, coordinator opus (Cloudflare's tiering). Trade-off: materially cheaper
-  fan-out; risks weaker specialist judgment on subtle findings.
+- **B (chosen)** — Specialists `sonnet`, coordinator opus (Cloudflare's tiering). Trade-off: materially
+  cheaper fan-out; risks weaker specialist judgment on subtle findings, backstopped by the opus
+  coordinator + high-risk adversarial pass.
 - **C** — Mixed: opus for architecture+logic+security, sonnet for governance+integrity (more
   rule-mechanical). Trade-off: cost-aware compromise; adds per-agent tier bookkeeping.
 - **Other — type your own.** | **Chat about this.**
 
-### D6 — Rollback threshold (post-cutover; still open)
+### D6 — Rollback threshold (post-cutover)
 
-> **Reframed by D2**: this no longer gates retirement (the monolith is retired at cutover). It now sets
-> the **rollback bar** for post-cutover monitoring — the level of regression that triggers restoring the
-> monolith from git history. Still open.
+> **MAINTAINER DECISION 2026-07-23**: chose an **absolute-threshold bar with immediate retirement** —
+> this **resolves the D2×D6 contradiction** the draft carried (D2 retires the monolith on day one, so
+> the original D6-A "regress below the pre-cutover monolith's observed level" referenced a baseline
+> that would never be captured). The rollback bar is now a set of **fixed absolute thresholds** needing
+> no monolith baseline (see [Post-Cutover Monitoring Plan](#post-cutover-monitoring-plan--rollback-trigger)).
+> This is a new option beyond the three drafted below.
 
-- **A (Recommended)** — Roll back if post-cutover precision OR acceptance rate regresses below the
-  pre-cutover monolith's observed level. Trade-off: guards against regression; needs a monolith baseline
-  captured before cutover.
+- **A (Recommended, superseded)** — Roll back if post-cutover precision OR acceptance rate regresses
+  below the pre-cutover monolith's observed level. Trade-off: guards against regression; **needs a
+  monolith baseline captured before cutover — which D2's immediate retirement never captures** (the
+  contradiction the chosen absolute-bar option removes).
 - **B** — Roll back only on a sustained multi-window regression past a fixed margin. Trade-off: fewer
   false rollbacks; tolerates a longer bad window.
 - **C** — Maintainer judgment after reading the monitoring dashboard. Trade-off: flexible; less
   mechanical.
+- **Chosen — absolute-threshold bar**: retire immediately; roll back when any fixed threshold trips
+  (proposed, maintainer-tunable: consolidated-finding **precision < 50%** over a rolling window of N
+  post-cutover PRs, OR **human-override-rate > 5%** — vs Cloudflare's 0.6% — OR any **CRITICAL
+  false-positive** that reached the fixer). No monolith baseline required. Trade-off: mechanical and
+  contradiction-free; the thresholds are judgment-seeded rather than derived from a measured baseline.
 - **Other — type your own.** | **Chat about this.**
 
 ### D7 — Adopt a merge queue now, or defer?
@@ -685,7 +722,12 @@ several change the delivery checklist's shape. Format follows the
 
 ### D10 — Merge-queue mechanism (new sub-decision, follows from D7)
 
-- **A (Recommended)** — GitHub-native merge queue. Trade-off: lowest friction given the existing
+> **MAINTAINER DECISION 2026-07-23**: chose **A — GitHub-native merge queue**, kept in this plan (the
+> Q4 "split into its own plan" alternative was declined). Lowest friction given the existing `gh`
+> toolchain; the one `[HUMAN]` GitHub-settings toggle stays in this plan, bracketed by agent-authored
+> CI-workflow prep + post-enable verification.
+
+- **A (chosen)** — GitHub-native merge queue. Trade-off: lowest friction given the existing
   GitHub/`gh` toolchain; speculative `merge_group` CI, FIFO, auto-eviction on failure; less
   sophisticated batching than stack-aware queues.
 - **B** — Graphite stack-aware queue. Trade-off: maps most cleanly onto the strict 1-PR↔1-worktree model

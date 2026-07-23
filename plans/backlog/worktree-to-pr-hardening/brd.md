@@ -93,8 +93,9 @@ already-observed number.
 
 - **Clean cutover with a working rollback path** (observable fact once executed): the monolith is
   removed at cutover and post-cutover monitoring is live, with the rollback trigger documented and the
-  monolith restorable from git history if the rollback bar is breached. _[Judgment call on the rollback
-  bar; see deferred decision D6.]_
+  monolith restorable from git history if the rollback bar is breached. \_[D6 decided 2026-07-23: an
+  absolute-threshold bar needing no pre-cutover monolith baseline — precision < 50% / override-rate
+  > 5% / any CRITICAL false-positive — which resolves the D2×D6 baseline contradiction.]\_
 - **No unresolved-finding regression** (observable fact): after cutover, a `worktree-to-pr` PR still
   reaches the 5 hardened merge preconditions with 0 CRITICAL + 0 HIGH outstanding, exactly as today.
 - **Review cost stays bounded** (observable, tracked): per-PR review cost is budgeted and monitored
@@ -115,14 +116,14 @@ already-observed number.
 
 ## Business Risks and Mitigations
 
-| Risk                                                   | Likelihood            | Mitigation                                                                                                                                           |
-| ------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Naive fan-out regresses review quality (SWR-Bench)     | High if uncoordinated | Coordinator is mandatory; post-cutover monitoring + a documented rollback trigger restores the monolith if metrics regress                           |
-| Cost balloons N× per cycle                             | Medium                | Risk-tier fan-out scales agents to diff size (D12) + generated-file exclusion / shared-context (D13); then budget/monitoring + model-tier lever (D5) |
-| Instruction docs drift out of date                     | Medium                | `governance-maker` gains an instruction-decay charter (D14) — flags framework/CI changes not reflected in `AGENTS.md`/`.claude/`                     |
-| More agents raise raw false-positive volume            | Medium                | Coordinator reasonableness-filter + tool-verify; confidence ≥ 80 bar inherited by every specialist                                                   |
-| Boundary grey-zones cause duplicate/mis-filed findings | Medium                | Written tie-breaker rule + coordinator owns re-categorization (esp. architecture↔correctness)                                                        |
-| Governance drift across the two mirror harnesses       | Low                   | `npm run generate:bindings` + sync-validation gate on every phase touching an agent file                                                             |
+| Risk                                                   | Likelihood            | Mitigation                                                                                                                                                                          |
+| ------------------------------------------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Naive fan-out regresses review quality (SWR-Bench)     | High if uncoordinated | Coordinator is mandatory; post-cutover monitoring + a documented rollback trigger restores the monolith if metrics regress                                                          |
+| Cost balloons N× per cycle                             | Medium                | Risk-tier fan-out scales agents to diff size (D12) + generated-file exclusion / shared-context (D13) + `sonnet` specialists / opus coordinator (D5 decided); then budget/monitoring |
+| Instruction docs drift out of date                     | Medium                | `governance-maker` gains an instruction-decay charter (D14) — flags framework/CI changes not reflected in `AGENTS.md`/`.claude/`                                                    |
+| More agents raise raw false-positive volume            | Medium                | Coordinator reasonableness-filter + tool-verify; confidence ≥ 80 bar inherited by every specialist                                                                                  |
+| Boundary grey-zones cause duplicate/mis-filed findings | Medium                | Written tie-breaker rule + coordinator owns re-categorization (esp. architecture↔correctness)                                                                                       |
+| Governance drift across the two mirror harnesses       | Low                   | `npm run generate:bindings` + sync-validation gate on every phase touching an agent file                                                                                            |
 
 The cross-cutting factual claims behind these risks live here; the corresponding **testable
 scenarios** live in [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria).

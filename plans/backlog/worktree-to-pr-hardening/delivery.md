@@ -18,13 +18,15 @@ markdown plus register/binding updates.
 <!-- -->
 
 > **Execution prerequisite** — the maintainer has decided **D1** (7 specialists), **D2** (retire the
-> monolith at cutover), **D4** (adversarial verification on high-risk diffs only), and **D7** (adopt a
-> merge queue now); this delivery.md reflects those. Still resolve the open decisions in
+> monolith at cutover), **D4** (adversarial verification on high-risk diffs only), **D5** (specialists
+> `sonnet`, coordinator opus), **D6** (absolute-threshold rollback bar — no monolith baseline), **D7**
+> (adopt a merge queue now), and **D10** (GitHub-native, kept in-plan); this delivery.md reflects those.
+> Still resolve the open decisions in
 > [tech-docs.md §Grilling Deferred](./tech-docs.md#grilling-deferred--decisions-for-maintainer)
-> before their phases: **D3** (coordinator name) + **D5** (model tiers) + **D8** (convention path)
-> before Phases 2–3; **D6** (rollback bar) before Phase 6; **D10** (merge-queue mechanism —
-> GitHub-native recommended) before Phase 7; **D11** (parallel-vs-sequential downstream propagation —
-> parallel recommended) before Phases 10–11; **D9** (split the fixer) any time.
+> before their phases: **D3** (coordinator name) + **D8** (convention path) before Phases 2–3;
+> **D11** (parallel-vs-sequential downstream propagation — parallel recommended) before Phases 10–11;
+> **D9** (split the fixer) any time; and the three Cloudflare-folded decisions **D12** (risk-tier
+> fan-out), **D13** (diff-filter/generated-exclusion), **D14** (instruction-decay home) before Phase 1.
 >
 > **Three-repo parity scope** — Phases 0–9 deliver the change set in `ose-public` (the **source of
 > truth**). Phases 10 (`ose-primer`) and 11 (`ose-infra`) then propagate the identical shared-scaffolding
@@ -178,14 +180,14 @@ after all three repos are done.
 
 ## Phase 2: Seven Specialist Reviewer Agents + Bindings
 
-> _Suggested executor: `agent-maker`_ — one checkbox each for the seven agents (D1 = 7). Resolve **D5**
-> (model tier) first.
+> _Suggested executor: `agent-maker`_ — one checkbox each for the seven agents (D1 = 7). Model tier per
+> D5 (decided): every specialist inherits **`sonnet`**; the coordinator (Phase 3) inherits **opus**.
 
 - [ ] [AI] Author `.claude/agents/pr-review-architecture-maker.md` (sibling reference
       `.claude/agents/pr-review-maker.md`) with the architecture charter from
       [tech-docs.md §Agent Charters](./tech-docs.md#agent-charters-non-overlapping), inheriting the
       monolith's hard rules verbatim (confidence ≥ 80, evidence, anti-sycophancy, scope-guard,
-      untrusted-input, Reviews-API `COMMENT`, cross-cycle re-review) and the model tier from D5
+      untrusted-input, Reviews-API `COMMENT`, cross-cycle re-review) and the `sonnet` specialist tier (D5)
       — acceptance: file present; frontmatter `name: pr-review-architecture-maker`; suffix matches the
       naming regex `-(maker|checker|fixer|dev|deployer|manager|tester|researcher)$`
   - _Suggested executor: `agent-maker`_
@@ -255,8 +257,9 @@ after all three repos are done.
 
 ## Phase 3: Coordinator / Synthesizer Agent + Bindings
 
-> _Suggested executor: `agent-maker`_ — resolve **D3** (name; default `pr-review-synthesis-maker`),
-> **D5** (coordinator inherits opus / top tier).
+> _Suggested executor: `agent-maker`_ — resolve **D3** (name; default `pr-review-synthesis-maker`).
+> Per D5 (decided) the coordinator inherits **opus** (top tier) — it is the single quality chokepoint
+> above the `sonnet` specialists.
 
 - [ ] [AI] Author `.claude/agents/pr-review-synthesis-maker.md` (name per D3) implementing the four
       coordination functions from [tech-docs.md §Coordinator Contract](./tech-docs.md#coordinator-contract-the-mandatory-synthesizer):
@@ -381,9 +384,10 @@ after all three repos are done.
 
 ## Phase 6: Post-Cutover Monitoring Plan + Rollback Trigger
 
-> _Suggested executor: `repo-rules-maker`_ — resolve **D6** (rollback bar). The monolith was already
-> retired at cutover (Phase 4); this phase documents how the split is watched afterward and when to
-> roll back.
+> _Suggested executor: `repo-rules-maker`_ — D6 is **decided**: an **absolute-threshold rollback bar**
+> with no pre-cutover monolith baseline (resolving the D2×D6 contradiction). The monolith was already
+> retired at cutover (Phase 4); this phase documents how the split is watched afterward and the fixed
+> thresholds that trip a rollback.
 
 - [ ] [AI] Author the post-cutover monitoring section in the convention: precision, per-discipline
       acceptance rate (watching the two added lenses `performance`/`docs` and the catch-all
@@ -392,11 +396,16 @@ after all three repos are done.
       rate** (Cloudflare's break-glass trust proxy, an early trust-erosion signal)
       — acceptance: `grep -ci "Outdated Rate\|acceptance rate\|precision\|override rate\|risk-tier" <convention>` ≥ 2; the section
       is framed as post-cutover monitoring, not a pre-cutover gate
-- [ ] [AI] Document the **rollback trigger** (per D6): the rollback bar, the monitoring window, and the
-      exact restore procedure (`git revert`/`git checkout` of the deleted `pr-review-maker.md` + register
-      entries, then `npm run generate:bindings`)
-      — acceptance: `grep -ci "rollback" <convention>` ≥ 1; the restore procedure is a non-destructive
-      forward operation (no history rewrite); the bar (D6) is recorded in the convention and `learnings.md`
+- [ ] [AI] Document the **rollback trigger** (D6 decided — absolute thresholds): the **fixed absolute
+      bar** (proposed, maintainer-tunable: consolidated-finding precision < 50% over a rolling N-PR
+      window, OR human-override-rate > 5%, OR any CRITICAL false-positive reaching the fixer — **no
+      monolith baseline required**), the monitoring window N, and the exact restore procedure
+      (`git revert`/`git checkout` of the deleted `pr-review-maker.md` + register entries, then
+      `npm run generate:bindings`)
+      — acceptance: `grep -ci "rollback\|precision <\|override-rate\|absolute" <convention>` ≥ 2; the
+      restore procedure is a non-destructive forward operation (no history rewrite); the absolute bar is
+      recorded in the convention and `learnings.md`, and the doc explicitly notes it needs no pre-cutover
+      baseline (D2×D6 contradiction resolved)
 
 ### Phase 6 Gate
 
