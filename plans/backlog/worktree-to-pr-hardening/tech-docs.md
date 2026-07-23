@@ -1,0 +1,592 @@
+# Technical Design — Worktree-to-PR Hardening
+
+## Exemptions (state up front)
+
+- **Specs/Gherkin mandate — EXEMPT.** This plan changes no observable behavior under `apps/`,
+  `libs/`, or `specs/`. It ships agent-definition markdown and governance/workflow markdown, which are
+  docs-class changes; the [Feature Change Completeness Convention](../../../repo-governance/development/quality/feature-change-completeness.md)
+  exempts pure docs/governance changes. The plan's own Gherkin (in [prd.md](./prd.md)) is
+  plan-acceptance criteria, not app/lib behavior specs, and does not require `specs/` step definitions.
+- **UI-design-funnel — EXEMPT.** No user-facing screen or component under `apps/` or `libs/` is added
+  or changed. Not a UI-bearing plan.
+- **Syllabus record — EXEMPT.** No course/tutorial/curriculum corpus is authored or restructured. Not
+  a learning-bearing plan.
+
+## Repo Scope & Propagation (three-repo parity)
+
+Every artifact this plan produces is **shared scaffolding** held in parity across the three sibling
+repos [Repo-grounded — AGENTS.md §Related Repositories]: `ose-public` (source of truth),
+`ose-primer` (downstream public template), and `ose-infra` (private infrastructure). `ose-public` is
+authored and validated first; the identical artifacts then propagate to the two downstream repos, each
+via its own `worktree-to-pr` delivery (own worktree + PR + review cycle + merge), following the
+[multi-repo parity planning-and-execution workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md)
+and its planning companion
+[plan-multi-repo-parity-planning.md](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md).
+
+```mermaid
+%% Color palette: Blue #0173B2 (source of truth), Teal #029E73 (downstream public), Purple #CC78BC (downstream private)
+flowchart LR
+  SRC["ose-public<br/>(source of truth)<br/>author + validate + merge"]:::blue --> PRM["ose-primer<br/>(downstream public template)<br/>own worktree-to-pr"]:::teal
+  SRC --> INF["ose-infra<br/>(downstream private)<br/>own worktree-to-pr"]:::purple
+
+  classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF
+  classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF
+  classDef purple fill:#CC78BC,stroke:#000000,color:#000000
+```
+
+Each downstream repo runs its own per-repo binding-emit (`npm run generate:bindings`, or the repo's
+equivalent binding-emit command) so its OpenCode/Amazon-Q mirrors regenerate from the propagated
+`.claude/agents/` source. The two downstream propagations are independent of each other and may run in
+**parallel** once `ose-public` merges (sub-decision D11).
+
+### Bare-repo topology caveat (re-verify at execution time)
+
+At the time of writing, **`ose-primer` and `ose-infra` are BARE repositories with worktrees** — only
+`ose-public` has a normal working tree [Repo-grounded — matches the repo's own operational notes]. This
+topology **changes over time and MUST be re-verified at execution time** (do not hard-code it). When it
+holds, git operations in those two repos use the **bare-repo method** — explicit work-tree / `GIT_DIR`
+handling (e.g. `git -c core.bare=false --work-tree=<wt> …`, or `GIT_DIR` / `GIT_WORK_TREE` env for
+tooling) — rather than a plain checkout. Treat this as an execution-note/risk, not an assumption baked
+into the steps: Phase 8/9 begin by re-verifying each downstream repo's topology and selecting the
+matching git method.
+
+### rhino-cli byte-identity note
+
+This plan touches **no `apps/rhino-cli` code and none of its specs** — it changes only
+`.claude/agents/`, `repo-governance/` docs, and (in the merge-queue phase) `.github/workflows/` CI
+config. Therefore the [SDLC Gate Standard's rhino-cli byte-identity boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)
+is **not engaged by this plan's artifacts**, and the three-repo parity check is scoped to the
+governance/agent/CI scaffolding only. Stated explicitly so the parity check is scoped correctly: if a
+later revision were to extend a `rhino-cli` governance validator or binding emitter, that change WOULD
+fall under the byte-identity boundary and must stay byte-identical across all three repos — but nothing
+in the current scope does.
+
+## Architecture Overview
+
+### Current state (monolith)
+
+```mermaid
+%% Color palette: Blue #0173B2 (maker), Yellow #DE8F05 (fixer), Teal #029E73 (gate)
+flowchart LR
+  M["pr-review-maker<br/>(one agent, six disciplines)"]:::blue --> GH["GitHub Reviews API<br/>(line-anchored threads)"]:::teal
+  GH --> F["pr-review-fixer<br/>(4-way triage)"]:::yellow
+  F --> CI["CI-green gate<br/>(between cycles)"]:::teal
+  CI -->|"3 cycles, hard ceiling"| M
+
+  classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF
+  classDef yellow fill:#DE8F05,stroke:#000000,color:#000000
+  classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF
+```
+
+### Target state (specialists + mandatory coordinator)
+
+```mermaid
+%% Color palette: Blue #0173B2 (specialists), Purple #CC78BC (coordinator), Yellow #DE8F05 (fixer)
+flowchart LR
+  subgraph FANOUT["Per-cycle fan-out (7 concurrent specialists)"]
+    A["architecture-maker"]:::blue
+    L["logic-maker"]:::blue
+    G["governance-maker"]:::blue
+    S["security-maker"]:::blue
+    I["integrity-maker"]:::blue
+    P["performance-maker"]:::blue
+    D["docs-maker"]:::blue
+  end
+  A --> C
+  L --> C
+  G --> C
+  S --> C
+  I --> C
+  P --> C
+  D --> C["pr-review-synthesis-maker<br/>dedup/recat/filter/verify"]:::purple
+  C -->|"one consolidated review<br/>via GitHub Reviews API"| FX["pr-review-fixer<br/>(unchanged)"]:::yellow
+  FX -->|"CI-green gate · 3 cycles, hard ceiling"| FANOUT
+
+  classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF
+  classDef purple fill:#CC78BC,stroke:#000000,color:#000000
+  classDef yellow fill:#DE8F05,stroke:#000000,color:#000000
+```
+
+### Per-cycle sequence
+
+```mermaid
+sequenceDiagram
+  participant O as Orchestrator (quality-gate workflow)
+  participant SP as 7 specialist-makers
+  participant SY as pr-review-synthesis-maker
+  participant GH as GitHub Reviews API
+  participant FX as pr-review-fixer
+  participant CI as CI on PR
+
+  O->>SP: pin head SHA, fan out (fed prior consolidated findings)
+  SP-->>SY: raw findings per discipline
+  SY->>SY: dedup + re-categorize + reasonableness-filter + tool-verify
+  SY->>GH: post ONE consolidated review (line-anchored)
+  GH->>FX: unresolved threads
+  FX->>GH: push fixes, reply, resolve
+  FX->>CI: trigger checks
+  CI-->>O: must be GREEN before next cycle
+```
+
+### Finding lifecycle (per finding, inside one cycle)
+
+```mermaid
+stateDiagram-v2
+  [*] --> Raw: specialist emits (conf >= 80)
+  Raw --> Dropped: coordinator filters out
+  Raw --> Recategorized: coordinator re-categorizes
+  Recategorized --> Verified
+  Raw --> Verified: coordinator tool-verifies
+  Verified --> Posted: consolidated review to GitHub
+  Posted --> Resolved: fixer fixes + pushes
+  Posted --> Rejected: fixer reasoned-reject
+  Posted --> Deferred: fixer scope-defer
+  Dropped --> [*]
+  Resolved --> [*]
+```
+
+### Boundary decision (the tie-breaker as a flowchart)
+
+```mermaid
+%% Color palette: Blue #0173B2 (governance), Orange #DE8F05 (architecture), Teal #029E73 (correctness)
+flowchart TD
+  Q["Finding under review"] --> R{"Is there a documented,<br/>mechanically-checkable<br/>rule for this?"}
+  R -->|Yes| GOV["Governance"]:::blue
+  R -->|No| N{"Does it need a NEW<br/>tradeoff judgment<br/>(structure/boundary)?"}
+  N -->|Yes| ARCH["Architecture<br/>(decide, then WRITE<br/>the rule for next time)"]:::orange
+  N -->|No| CORR["Correctness<br/>(satisfies domain intent?)"]:::teal
+
+  classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF
+  classDef orange fill:#DE8F05,stroke:#000000,color:#000000
+  classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF
+```
+
+## Agent Charters (non-overlapping)
+
+Every specialist **inherits** the retired monolith's hard rules verbatim: numeric confidence 0–100
+with findings below 80 hard-dropped; CRITICAL/HIGH/MEDIUM/LOW severity; every finding line-anchored
+with `file:line` + a link to the specific `repo-governance/` rule where the finding cites one;
+anti-sycophantic framing; scope-guard (only the PR's own declared plan/issue scope); untrusted-input
+/ prompt-injection filtering of PR body/comments/linked-issue text; posts via the GitHub Reviews API
+as `COMMENT` (blocking status carried in the severity label); re-reviews the full PR each cycle and
+re-checks the fixer's new commits for fix-induced regressions. [Repo-grounded — all sourced from the
+current `pr-review-maker.md`.]
+
+| Agent                          | Owns (in-charter)                                                                                                                     | Explicitly NOT its job (routes to)                                                                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pr-review-architecture-maker` | New tradeoffs, module boundaries, reversibility, blast radius, quality-attribute effects, novel dependencies                          | Existing-rule layering violations → governance; domain-scenario gaps → logic                                                                                    |
+| `pr-review-logic-maker`        | Behavior vs. domain intent + Gherkin acceptance-criteria conformance across edge/error cases                                          | Error-handling _shape_ rules → governance; should-this-boundary-exist → architecture                                                                            |
+| `pr-review-governance-maker`   | Mechanical conformance to already-documented `repo-governance/` conventions, naming/structure, ADRs, spec-file presence               | Whether a _new_ rule should exist → architecture; scenario _completeness_ → logic                                                                               |
+| `pr-review-security-maker`     | Secrets in diffs, injection, untrusted-input handling, git-fixture isolation, unsafe git/FS operations                                | Non-security convention text → governance                                                                                                                       |
+| `pr-review-integrity-maker`    | CI-gaming (weakened/skipped/narrowed tests, coverage-gaming), missing regression tests (regression-test-mandate)                      | Whether the _behavior_ is correct → logic                                                                                                                       |
+| `pr-review-performance-maker`  | Concrete or likely performance regressions, hot-path changes, algorithmic-complexity growth, resource (memory/IO/alloc) concerns      | A _quality-attribute tradeoff decision_ (whether to accept a perf cost) → architecture; a perf-relevant convention (e.g. a documented budget rule) → governance |
+| `pr-review-docs-maker`         | Substantive documentation quality and completeness: README/docs/Diátaxis fit, doc drift vs. code, clarity, doc alt-text/accessibility | Mechanical doc-convention conformance (heading hierarchy, linking, naming) → governance; whether the documented _behavior_ is correct → logic                   |
+| `pr-review-synthesis-maker`    | Dedup, re-categorize (owns architecture↔correctness boundary), reasonableness-filter, tool-verify, emit ONE review                    | Finding _discovery_ → the seven specialists                                                                                                                     |
+
+### Why performance and docs-quality ARE their own agents (D1)
+
+The maintainer chose the 7-specialist set. The two extra reviewers earn their place here, and the
+honest counter-considerations are recorded rather than buried:
+
+- **Performance** — this repo has no high-throughput runtime service yet (Next.js sites, F#/Rust/Go
+  CLIs and backends) [Repo-grounded — AGENTS.md Web Sites table], so a perf reviewer reports less
+  often than the catch-all lenses. It still earns a seat because the polyglot CLIs/backends carry real
+  hot-path code where an algorithmic or resource regression is a distinct discipline from an
+  architecture tradeoff. **Non-overlap rule**: a _quality-attribute tradeoff decision_ (should we
+  accept this perf cost for that benefit?) is **architecture**; a _concrete or likely measured
+  regression_ on a hot path is **performance**.
+- **Docs-quality** — the repo already has a docs maker/checker/fixer family and a markdownlint +
+  prettier + `rhino-cli md *` gate wired into hooks and CI [Repo-grounded — AGENTS.md], so a docs
+  reviewer must NOT re-run those mechanical gates. It earns a seat because this repo is
+  content/markdown-heavy and **substantive** doc quality — completeness, drift vs. code, clarity,
+  Diátaxis fit — is not mechanically checkable. **Non-overlap rule**: mechanical doc-_convention_
+  conformance (heading hierarchy, linking, naming) is **governance**; substantive doc
+  _completeness/clarity_ is **docs**.
+
+## Coordinator Contract (the mandatory synthesizer)
+
+`pr-review-synthesis-maker` implements the four Cloudflare-proven coordination functions
+[Web-cited]:
+
+1. **Deduplicate** — collapse findings from different specialists that name the same `file:line`
+   defect into one consolidated thread.
+2. **Re-categorize** — reassign a misfiled finding to the correct discipline; it explicitly **owns the
+   architecture↔correctness boundary**, the highest-risk boundary per both the discipline research and
+   the tool research.
+3. **Reasonableness-filter** — drop speculative/nitpick/false-positive/convention-contradicted
+   findings before they reach the fixer (this is the direct antidote to "more agents = more raw
+   findings without more value").
+4. **Tool-verify** — when uncertain about a finding, re-read the cited source (and, if needed,
+   delegate to `web-researcher`) rather than passing an unverified finding through.
+
+**Model tiering**: coordinator inherits **opus** (top tier) — the research is explicit that the
+coordinator carries the top-tier model. Specialists inherit **opus** by default (matching the current
+monolith's opus justification — PR review is judgment-heavy here) with **sonnet as the primary cost
+lever** (deferred decision D5). This diverges deliberately from Cloudflare's "standard-tier
+specialists": this repo's review is genuinely judgment-heavy, and cost is instead bounded by the
+budget/monitoring workstream and the post-cutover rollback trigger. With seven specialists rather than
+five, the cost lever (D5) matters more — the eval's per-discipline acceptance-rate tracking watches
+whether the two added lenses (performance, docs) earn their invocations.
+
+## Fate of the Monolithic `pr-review-maker` (retire immediately at cutover — D2)
+
+The maintainer chose **immediate retirement at cutover** (D2), not a prove-before-retire eval gate.
+Concretely: when the seven specialists + coordinator are wired into the revised workflow (Phase 4
+cutover), `pr-review-maker.md` is **removed and de-registered in the same phase** — retirement is not
+gated on any measurement. The eval instead runs **post-cutover** as ongoing quality monitoring
+(precision, per-discipline acceptance rate, BitsAI-CR "Outdated Rate") with a documented **rollback
+trigger**: if post-cutover metrics regress below the rollback bar (D6), the monolith is **restored
+from git history** and the split revised. Because the monolith lives in git history, immediate
+retirement is reversible — the rollback path is the safety net that a pre-cutover eval gate would
+otherwise have provided.
+
+## Quality-Gate Enhancements
+
+1. **Confidence-calibration spot-check** — raw LLM confidence is poorly calibrated (one study: ECE
+   0.163 uncalibrated → 0.034 after calibration; a stated "80%" could be right only ≈64–96%)
+   [Web-cited]. The `confidence ≥ 80` bar is defensible **only** with a periodic calibration check:
+   sample past findings, compare stated confidence against the fixer's actual triage outcome, and
+   recalibrate the threshold. Authored as a documented procedure, not an automated job, in this plan.
+2. **Selective adversarial verification** — an adversarial critic works (Refute-or-Promote: 79–83%
+   candidate kill-rate) [Web-cited] but is reserved for **high-risk diffs** (auth, payments,
+   migrations, security-sensitive, public-API/contract changes) for cost/value. Use cross-model
+   diversity if critic and maker would otherwise share a model family (correlated blind spots).
+3. **CRITICAL-requires-reproduction** — a cautionary result: 10 reviewers _unanimously_ endorsed a
+   non-existent bug; only empirical reproduction caught it [Web-cited]. Therefore **CRITICAL findings
+   MUST carry a reproduction/verification step, not mere agreement-counting.**
+4. **3-cycle / no-early-exit rationale (documented as a policy choice)** — the diminishing-returns
+   data (step-1 ≈ 66.7% of gains; steps 2–3 single-digit; step-4+ <1%) [Web-cited] is for a _repair_
+   loop, supportive by analogy only. The repo's "run all 3, no early exit" is a **predictability**
+   choice, **not** research-derived — the data would actually permit early exit. This rationale is
+   recorded explicitly so the policy is not mistaken for an evidence-backed optimum.
+
+## Post-Cutover Monitoring Plan + Rollback Trigger
+
+Per D2, the monolith is retired at cutover; this plan is therefore **post-cutover quality
+monitoring**, not a pre-cutover gate. Borrowing BitsAI-CR's adoption metric and standard precision
+tracking [Web-cited], the metrics tracked on live post-cutover PRs are:
+
+- **Precision** — fraction of consolidated findings the fixer accepts (fix) vs. rejects.
+- **Acceptance rate** — fixes / total findings, per discipline, to spot an over-reporting specialist
+  (Cloudflare's Code-Quality bucket produced 47% of findings — a warning to watch the catch-all
+  specialists here, `governance` and `logic`, and to check that the two added lenses `performance`
+  and `docs` are pulling their weight).
+- **Outdated Rate (BitsAI-CR)** — the share of findings that become stale/irrelevant, an adoption
+  signal.
+- **Cost/latency per review** — tracked against a budget, given the fan-out multiplies invocations
+  (now across seven specialists × three cycles).
+
+**Rollback trigger**: the monitoring plan documents a **rollback bar** (D6). If post-cutover
+precision/acceptance regress below that bar over a monitoring window, the monolith is **restored from
+git history** (`git revert`/`git checkout` of the deleted `pr-review-maker.md` and its register
+entries, then `npm run generate:bindings`) and the split revised. Because retirement is a git deletion,
+rollback is a bounded, non-destructive forward operation — no history rewrite. There is no
+before-cutover A/B comparison; the monolith and the split never run concurrently under D2.
+
+## Merge-Queue Design (delivered — D7)
+
+The maintainer chose to **adopt a merge queue now** (D7), promoting it from future-work into a
+delivered phase (Phase 7). Its purpose is to harden **merge-precondition (c)** — "the branch is
+up-to-date with the latest `origin/main` at merge time" — which a static per-PR check cannot guarantee
+under **concurrent** worktree-to-PR merges: two PRs each green against yesterday's `main` can both be
+stale against each other the instant the first merges.
+
+### Recommended mechanism (sub-decision D10)
+
+| Mechanism                                     | Fit                                                                                                                                                                                                           | Trade                                               |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **GitHub-native merge queue** _(Recommended)_ | Speculative `merge_group` CI, FIFO, auto-eviction on failure; the repo already uses `gh`/GitHub, so no new vendor                                                                                             | Less sophisticated batching than stack-aware queues |
+| **Graphite stack-aware queue**                | CI once on the stack head, binary-search failure isolation, each PR still an independent merge point — maps cleanly onto the strict 1-PR↔1-worktree model; Ramp reported 74% faster median merges [Web-cited] | Adds a third-party vendor dependency                |
+
+**Recommendation: GitHub-native**, because it is the lowest-friction option given the existing
+GitHub/`gh` toolchain and it directly provides speculative `merge_group` CI + auto-eviction. The
+GitHub-native-vs-Graphite choice is surfaced as sub-decision **D10** below; either way, each PR remains
+an independent merge point, preserving the strict 1-PR↔1-worktree model.
+
+### What the merge-queue phase changes
+
+- **`pr-merge-protocol.md` precondition (c)** — reworded so "up-to-date with `origin/main`" is
+  satisfied by the queue's speculative merge rather than by a manual branch-up-to-date check. The
+  (a)-(e) lettering and the other four preconditions stay verbatim.
+- **CI workflow config** (`.github/workflows/`) — handle the `merge_group` trigger event so the
+  speculative merge result is CI-gated. This is an `[AI]` doc/YAML change.
+- **GitHub branch-protection / merge-queue settings** — enabling the queue in repo settings is a
+  `[HUMAN]` step; an agent must not change repository security/settings. The agent prepares the exact
+  settings to toggle and the human enables them, then confirms the queue is active.
+
+This plan dogfoods the queue: once enabled, this plan's own PR merges through the queue.
+
+## Research Grounding (citations)
+
+Access date for all web citations below: **2026-07-23**. External claims are drawn from the research
+brief supplied to this plan; each carries `[Web-cited]` and SHOULD be re-verified via `web-researcher`
+before execution per the [Plan Anti-Hallucination Convention](../../../repo-governance/development/quality/plan-anti-hallucination.md#web-research-delegation-lower-threshold-for-plans).
+
+### Finding 1 — the split is production-proven but CONDITIONAL on a coordinator
+
+- **Cloudflare, "Orchestrating AI Code Review at scale"** (blog.cloudflare.com/ai-code-review,
+  2026-04-20) — 7 concurrent specialized reviewers + a coordinator (dedup, re-categorize,
+  reasonableness-filter, tool-verify). Top-tier model for the coordinator only; standard-tier for
+  specialists; lightweight for trivial tasks. Production: 131,246 runs / 48,095 MRs / 30 days; median
+  3m39s; median $0.98 (avg $1.19)/review; 1.2 findings/review; Code-Quality reviewer alone = 47% of
+  findings. 3-tier finding severity kept separate from a PR-level approval rubric. No adversarial
+  agent (coordinator self-verify only). Admits it cannot do deep architectural / subtle-concurrency
+  analysis. [Web-cited]
+- **SWR-Bench** (arXiv 2509.01494, Zeng et al., FSE 2026) — naive multi-agent CR-Agent baseline **F1
+  9.22% vs. single-pass 18.73%**; cause = interaction overhead + error propagation. All techniques
+  <10% precision. **→ the coordinator/dedup/verify layer is the difference; make it first-class.**
+  [Web-cited]
+- Supporting: **BitsAI-CR** (arXiv 2501.15134, ByteDance, FSE 2025) — RuleChecker→ReviewFilter,
+  75% precision, "Outdated Rate" metric. **CodeAgent** (arXiv 2402.02172) — a supervisory QA-Checker
+  gate. **Google Tricorder** (ICSE 2015) — 110 analyzers → one surface (pre-LLM N-checkers-one-surface
+  precedent). **GitHub Copilot code review** (2026-03) and **CodeRabbit** — single-context-rich
+  reviewer counter-examples; acknowledge both. [Web-cited]
+
+### Finding 2 — three review disciplines are genuinely distinct
+
+- **Architecture** — ATAM quality-attribute tradeoffs (SEI/Kazman), ADRs (Nygard 2011; Fowler),
+  fitness functions (Ford/Parsons/Kua), reflexion models (Murphy/Notkin/Sullivan). Tooling analogue:
+  ArchUnit, dependency-cruiser. [Web-cited]
+- **Business-logic / correctness** — Google eng-practices "Functionality" (distinct from Design and
+  Style), DDD invariants/aggregates (Evans), Mäntylä & Lassenius (IEEE TSE 2009: **75% of
+  review-found defects are evolvability, not functional** — evidence the lenses are separable),
+  BDD/Gherkin conformance. No single canonical checklist — synthesize one. [Web-cited]
+- **Governance / rules-conformance** — policy-as-code (OPA/Rego), ArchUnit/dependency-cruiser custom
+  rules, Semgrep custom rules, Danger.js. The dimension most repos don't separate but uniquely
+  valuable here given the large governance surface. [Web-cited]
+- **The tie-breaker rule** (front-and-center; see the boundary flowchart above): documented +
+  mechanically-checkable rule → **Governance**; new tradeoff judgment → **Architecture** (resolve by
+  making the call, then writing the rule); "does it satisfy domain intent" → **Correctness**. The
+  **architecture↔correctness boundary is the highest-risk**; the coordinator's re-categorization owns
+  it. [Web-cited]
+- **Grey-zones for the two added disciplines (D1)** — with performance and docs as their own lenses,
+  two further boundaries need explicit rulings so they do not overlap the core three:
+  - **performance ↔ architecture**: a _quality-attribute tradeoff decision_ (accept a perf cost for a
+    design benefit) → **Architecture**; a _concrete or likely measured regression_ on a hot path →
+    **Performance**.
+  - **docs ↔ governance**: mechanical doc-_convention_ conformance (heading hierarchy, linking,
+    naming, alt-text as a rule) → **Governance**; substantive doc _completeness/clarity/drift_ →
+    **Docs**.
+
+  These two rulings join the four core grey-zone rulings the reviewer-discipline convention embeds
+  (Phase 1), for six documented rulings total.
+
+### Finding 3 — quality-gate mechanics
+
+- **Confidence calibration** — ECE 0.163 → 0.034 after calibration; "80%" true only ≈64–96% (arXiv
+  2603.06604; 2604.06723 Platt-scaling). [Web-cited]
+- **Adversarial/critic** — Refute-or-Promote 79–83% kill-rate (arXiv 2604.19049); reserve for
+  high-risk diffs; CRITICAL needs empirical reproduction (10 reviewers endorsed a non-existent bug);
+  use cross-model diversity. Multi-agent debate (Du et al. ICML 2024) is directional, not code-review
+  tested. [Web-cited]
+- **3-cycle ceiling** — repair-loop diminishing returns (arXiv 2607.05197): step-1 ≈ 66.7%; steps 2–3
+  single-digit; step-4+ <1%. Supportive by analogy; the no-early-exit policy is a predictability
+  choice, not research-derived. [Web-cited]
+- **Severity taxonomy** — industry converges on 3 finding tiers + a separate blocking rubric; the
+  repo's 4-tier CRITICAL/HIGH/MEDIUM/LOW + 5-precondition merge gate already separates finding-severity
+  from merge-decision correctly. Option to fold MEDIUM+LOW into one advisory tier (deferred D8).
+  [Web-cited]
+- **Merge-queue** — static "branch up to date" (precondition (c)) doesn't scale under concurrent
+  merges; GitHub merge queue (speculative `merge_group` CI), **Graphite** stack-aware queue (CI once
+  on stack head, binary-search isolation, each PR still an independent merge point — matches the strict
+  1-PR↔1-worktree model; Ramp 74% faster median merges), Aviator parallel queues. **Delivered in this
+  plan (D7)** — see [Merge-Queue Design](#merge-queue-design-delivered--d7) below. [Web-cited]
+
+## Risks
+
+| Risk                                         | Impact                          | Mitigation                                                                       |
+| -------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------- |
+| Naive fan-out regresses quality              | Worse review than the monolith  | Mandatory coordinator + post-cutover monitoring + rollback trigger               |
+| Immediate retirement ships a regression (D2) | Bad reviews before measured     | Documented rollback trigger; monolith restorable from git history                |
+| Cost balloons (7 specialists × 3 cycles)     | Review cost up to 7× today      | Budget + monitoring workstream; specialist model-tier lever (D5)                 |
+| Raw false-positive volume rises              | Fixer noise                     | Coordinator reasonableness-filter + tool-verify; inherited ≥80 bar               |
+| Coordinator is a single point of failure     | One bad synth spoils the review | Top model tier + tool-verify + post-cutover monitoring + rollback                |
+| Catch-all/added specialist over-reports      | Skewed findings                 | Per-discipline acceptance-rate tracking flags an over-reporting specialist       |
+| Merge-queue misconfig blocks integration     | Trunk merges stall              | GitHub-native queue's auto-eviction; `[HUMAN]` verifies settings before enabling |
+| Binding drift across 3 harnesses             | Broken cross-harness invocation | `generate:bindings` + sync-validation gate every agent-touching phase            |
+
+## File Impact (targets)
+
+- **New**: `.claude/agents/pr-review-architecture-maker.md`, `pr-review-logic-maker.md`,
+  `pr-review-governance-maker.md`, `pr-review-security-maker.md`, `pr-review-integrity-maker.md`,
+  `pr-review-performance-maker.md`, `pr-review-docs-maker.md`, `pr-review-synthesis-maker.md` (eight
+  `_New file_`s — seven specialists + coordinator; sibling reference: existing `pr-review-maker.md`).
+- **New**: a reviewer-discipline convention under `repo-governance/development/` (parent dir exists;
+  `_New file_`; sibling reference: `repo-governance/development/pattern/maker-checker-fixer.md`).
+  Exact path is deferred decision D8.
+- **Edit**: `repo-governance/workflows/pr/pr-review-quality-gate.md` (fan-out → synthesize → fixer),
+  `repo-governance/development/workflow/pr-merge-protocol.md` — reviewer-count/shape references, plus
+  **precondition (c)** reworded to be satisfied by the merge queue (the five preconditions otherwise
+  stay verbatim, and the (a)-(e) lettering is preserved).
+- **Edit**: `AGENTS.md` (§AI Agents lists), `.claude/agents/README.md` (catalog).
+- **Edit (merge queue, D7)**: the repo's CI workflow config under `.github/workflows/` to handle the
+  `merge_group` trigger event (parent dir exists; `_verify path before editing_`), and GitHub
+  branch-protection/merge-queue **settings** (a `[HUMAN]` step — an agent must not change repo
+  security/settings).
+- **Regenerated**: `.opencode/agents/*`, `.amazonq/*` via `npm run generate:bindings`.
+- **Deleted at cutover (Phase 4, D2)**: `.claude/agents/pr-review-maker.md` and its register/binding
+  entries — removed immediately when the split lands, restorable from git history via the rollback
+  trigger (not gated on an eval).
+
+## Agent-Naming Note
+
+The allowed role suffixes are `(maker|checker|fixer|dev|deployer|manager|tester|researcher)`
+[Repo-grounded — agent-naming.md]. "Coordinator"/"synthesizer" is not a role suffix, so the
+coordinator is named `pr-review-synthesis-maker` — it _makes_ the consolidated review. Whether that is
+the right suffix (vs. a `-checker` framing, given its filter/verify function) is deferred decision D3.
+
+---
+
+## Grilling Deferred — Decisions for Maintainer
+
+This plan was authored non-interactively, so the following forks were **not** grilled at authoring
+time. Each is a multiple-choice decision with a **recommended** option marked. The maintainer has since
+reviewed the draft and **decided D1, D2, D4, and D7** — those carry a `**MAINTAINER DECISION**` line and
+the plan has been revised accordingly. D3, D5, D6, D8, D9, and the new sub-decision **D10** remain open;
+resolve them before (or at the start of) execution — several change the delivery checklist's shape.
+Format follows the
+[Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md).
+
+### D1 — Exact specialist set & granularity
+
+> **MAINTAINER DECISION**: chose **B — 7 specialists** (added `pr-review-performance-maker` +
+> `pr-review-docs-maker` to the five). The plan reflects the 7-specialist + coordinator set throughout.
+
+- **A** — 5 specialists (architecture, logic, governance, security, integrity), folding
+  performance + docs-quality. Trade-off: leanest set that still gives the large governance surface its
+  own lens; matches this repo's actual risk profile.
+- **B (chosen)** — 7 specialists: add standalone `performance` + `docs`. Trade-off: closer to
+  Cloudflare's set; adds two lower-yield reviewers and more cost/dedup burden, justified here by the
+  content/markdown-heavy repo (docs) and real hot-path polyglot code (performance).
+- **C** — 4 specialists: fold security into governance+integrity. Trade-off: cheaper, but security
+  loses a dedicated lens (weakest for a repo with a hard no-secrets iron rule).
+- **Other — type your own set.** | **Chat about this.**
+
+### D2 — Fate of the monolithic `pr-review-maker`
+
+> **MAINTAINER DECISION**: chose **B — retire immediately at cutover**. The eval is reframed as
+> **post-cutover monitoring + a rollback trigger** (not a gate that delays retirement); the monolith is
+> removed and de-registered in Phase 4 when the split lands, and restored from git history if the
+> rollback bar (D6) is breached.
+
+- **A** — Keep during a prove-before-retire eval, then retire. Trade-off: honors SWR-Bench; costs a
+  validation window running both.
+- **B (chosen)** — Retire immediately at cutover; eval is post-hoc monitoring + rollback trigger.
+  Trade-off: simplest and cheapest; a regression ships before it is measured, mitigated by the rollback
+  path and git-history recoverability.
+- **C** — Keep permanently as a generalist fallback alongside specialists. Trade-off: safety net, but
+  permanent double-review cost and unclear precedence.
+- **D** — Convert the monolith file _into_ the synthesizer. Trade-off: reuses its hard-rules prose, but
+  conflates "discover" and "coordinate" roles.
+- **Other — type your own.** | **Chat about this.**
+
+### D3 — Coordinator naming / role suffix
+
+- **A (Recommended)** — `pr-review-synthesis-maker`. Trade-off: it produces (makes) the consolidated
+  review; fits the suffix rule cleanly.
+- **B** — `pr-review-synthesis-checker`. Trade-off: its filter/verify function is checker-like, but it
+  authors a new artifact (the consolidated review), which is maker-like.
+- **C** — `pr-review-coordination-manager`. Trade-off: "manager" reads as orchestration, but the repo
+  reserves `-manager` for setup/ops (e.g. `repo-setup-manager`).
+- **Other — type your own.** | **Chat about this.**
+
+### D4 — Adversarial-verification stage scope
+
+> **MAINTAINER DECISION**: chose **A — high-risk diffs only** (matches the recommendation; no design
+> change). Recorded as the maintainer's decision.
+
+- **A (chosen)** — High-risk diffs only (auth, payments, migrations, security, public-API/
+  contract). Trade-off: best cost/value per the research; needs a "high-risk" detector.
+- **B** — Every CRITICAL finding. Trade-off: stronger CRITICAL trust, higher cost.
+- **C** — None in this plan; document as future work. Trade-off: cheapest now, defers a proven lever.
+- **Other — type your own.** | **Chat about this.**
+
+### D5 — Model tier per specialist
+
+- **A (Recommended)** — Specialists inherit opus, coordinator inherits opus. Trade-off: matches the
+  monolith's judgment-heavy justification; highest cost; strongest quality.
+- **B** — Specialists `sonnet`, coordinator opus (Cloudflare's tiering). Trade-off: materially cheaper
+  fan-out; risks weaker specialist judgment on subtle findings.
+- **C** — Mixed: opus for architecture+logic+security, sonnet for governance+integrity (more
+  rule-mechanical). Trade-off: cost-aware compromise; adds per-agent tier bookkeeping.
+- **Other — type your own.** | **Chat about this.**
+
+### D6 — Rollback threshold (post-cutover; still open)
+
+> **Reframed by D2**: this no longer gates retirement (the monolith is retired at cutover). It now sets
+> the **rollback bar** for post-cutover monitoring — the level of regression that triggers restoring the
+> monolith from git history. Still open.
+
+- **A (Recommended)** — Roll back if post-cutover precision OR acceptance rate regresses below the
+  pre-cutover monolith's observed level. Trade-off: guards against regression; needs a monolith baseline
+  captured before cutover.
+- **B** — Roll back only on a sustained multi-window regression past a fixed margin. Trade-off: fewer
+  false rollbacks; tolerates a longer bad window.
+- **C** — Maintainer judgment after reading the monitoring dashboard. Trade-off: flexible; less
+  mechanical.
+- **Other — type your own.** | **Chat about this.**
+
+### D7 — Adopt a merge queue now, or defer?
+
+> **MAINTAINER DECISION**: chose **B — adopt now**. Merge-queue is promoted from future-work into a
+> delivered phase (Phase 7); it hardens merge-precondition (c) under concurrent worktree-to-PR
+> integration. The mechanism choice is the new sub-decision **D10** (GitHub-native recommended).
+
+- **A** — Defer to a future-work workstream (evaluate Graphite/GitHub/Aviator; recommend only).
+  Trade-off: keeps this plan focused on the reviewer split; precondition (c) still holds today at
+  current concurrency.
+- **B (chosen)** — Adopt a merge queue in this plan. Trade-off: hardens (c) under concurrency now; adds
+  scope (CI YAML + `[HUMAN]` settings + precondition (c) rewording) beyond the reviewer decomposition.
+- **Other — type your own.** | **Chat about this.**
+
+### D8 — Reviewer-discipline convention location & severity-tier question
+
+- **A (Recommended)** — New convention at
+  `repo-governance/development/quality/pr-review-disciplines.md`; keep the 4-tier
+  CRITICAL/HIGH/MEDIUM/LOW severity. Trade-off: sits beside `ci-blocker-resolution.md` and
+  `criticality-levels.md`; no churn to the existing severity taxonomy.
+- **B** — Same location, but fold MEDIUM+LOW into one advisory tier (industry 3-tier norm).
+  Trade-off: simpler triage; a repo-wide severity change touching many other docs.
+- **C** — Put the disciplines inside the existing `maker-checker-fixer.md` pattern doc. Trade-off:
+  fewer files; overloads a general pattern doc with PR-review specifics.
+- **Other — type your own.** | **Chat about this.**
+
+### D9 — Split `pr-review-fixer` too?
+
+- **A (Recommended)** — No; keep one fixer consuming the consolidated review. Trade-off: preserves the
+  proven 4-way triage; the fixer's job is bounded already.
+- **B** — Split the fixer per discipline to mirror the makers. Trade-off: symmetric, but multiplies
+  push/CI coordination and re-introduces the interaction-overhead SWR-Bench warns about.
+- **Other — type your own.** | **Chat about this.**
+
+### D10 — Merge-queue mechanism (new sub-decision, follows from D7)
+
+- **A (Recommended)** — GitHub-native merge queue. Trade-off: lowest friction given the existing
+  GitHub/`gh` toolchain; speculative `merge_group` CI, FIFO, auto-eviction on failure; less
+  sophisticated batching than stack-aware queues.
+- **B** — Graphite stack-aware queue. Trade-off: maps most cleanly onto the strict 1-PR↔1-worktree model
+  (CI once on stack head, binary-search failure isolation, each PR an independent merge point; Ramp
+  reported 74% faster median merges) but adds a third-party vendor dependency.
+- **C** — Aviator parallel queues. Trade-off: strong monorepo support; another vendor and more setup.
+- **Other — type your own.** | **Chat about this.**
+
+### D11 — Downstream propagation order (new sub-decision, follows from the three-repo parity scope)
+
+Once `ose-public` (the source of truth) merges in Phase 9, the identical shared-scaffolding artifacts
+propagate to `ose-primer` (Phase 10) and `ose-infra` (Phase 11). These two downstream deliveries touch
+different repos, share no files, and have no dependency on each other — only on the merged `ose-public`
+source.
+
+- **A (Recommended)** — **Parallel**. Run Phase 10 and Phase 11 concurrently (each its own
+  `worktree-to-pr` delivery in its own repo). Trade-off: fastest wall-clock and matches the
+  `worktree-to-pr`-default rationale that independent units become independent PRs that gate and merge
+  independently; costs two simultaneous review cycles on the shared machine. This is the recommended
+  posture and what the DAG in `delivery.md` encodes (both nodes depend on Phase 9, neither on the other).
+- **B** — **Sequential** (`ose-primer` then `ose-infra`, or vice-versa). Trade-off: one review cycle at
+  a time, lighter concurrent machine load, easier to babysit; strictly slower and serializes work that
+  has no real dependency.
+- **C** — **Batch into a single follow-up plan**. Trade-off: defers both propagations to a separate
+  `plans/backlog/` parity plan after `ose-public` lands. Cleaner source-of-truth PR, but breaks the
+  "propagate in the same plan" posture of the prior `standardize-repo-toolchain-parity` /
+  `lint-safety-parity` deliverables and risks parity drift while the follow-up waits.
+- **Other — type your own.** | **Chat about this.**
