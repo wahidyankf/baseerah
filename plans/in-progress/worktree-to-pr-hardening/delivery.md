@@ -611,17 +611,17 @@ affected` no-op noted in Phase 8)
       pushes, resolves → wait for CI green — acceptance: cycle 1 complete, CI green
 - [x] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
 - [x] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
-- [ ] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
+- [x] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
 
 ### Merge (once the five hardened preconditions hold)
 
-- [ ] [AI] Verify the five hardened merge preconditions (a)-(e) per
+- [x] [AI] Verify the five hardened merge preconditions (a)-(e) per
       [pr-merge-protocol.md](../../../repo-governance/development/workflow/pr-merge-protocol.md): (a)
       3 cycles complete + not escalated; (b) 0 CRITICAL + 0 HIGH; (c) branch non-destructively up to
       date with `origin/main`; (d) all gates green; (e) tester gates run or no-reachable-behavior
       exemption recorded (this plan changes no reachable behavior — record the docs/agents exemption
       explicitly) — acceptance: all five hold and are surfaced in the merge summary
-- [ ] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold; precondition (c) is the
+- [x] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold; precondition (c) is the
       manual non-destructive branch-up-to-date check — the merge queue was dropped from scope)
       — acceptance: PR merges to `main`; branch integrated
 
@@ -629,9 +629,9 @@ affected` no-op noted in Phase 8)
 
 > All checks below must pass before starting the propagation phases (9 & 10).
 
-- [ ] [AI] Draft PR opened, CI green, 3 review cycles complete with no `escalated` exit
-- [ ] [AI] Five merge preconditions (a)-(e) verified and surfaced; the (e) docs/agents exemption recorded
-- [ ] [AI] PR merged to `ose-public` `main` (or a `[HUMAN]` merge gate reached only if the plan later
+- [x] [AI] Draft PR opened, CI green, 3 review cycles complete with no `escalated` exit
+- [x] [AI] Five merge preconditions (a)-(e) verified and surfaced; the (e) docs/agents exemption recorded
+- [x] [AI] PR merged to `ose-public` `main` (or a `[HUMAN]` merge gate reached only if the plan later
       opts in — this plan does not)
 
 > **Pause Safety**: the source-of-truth change set is either fully merged to `ose-public` `main` or
