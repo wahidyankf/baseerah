@@ -1972,7 +1972,7 @@ evidence is not lost; per Rule-15 they are not this plan's merge blockers.
 - [x] [AI] Every `learnings.md` entry is terminal (routed inline / filed as backlog / discarded with
       reason), or the explicit "none" escape is present.
 - [x] [AI] No code-homed learning landed inline in this plan's own commits/PR.
-- [ ] [AI] Draft PR opened (`learnings.md` triage); 3-cycle PR-Review complete; CI green; PR
+- [x] [AI] Draft PR opened (`learnings.md` triage); 3-cycle PR-Review complete; CI green; PR
       `[AI]`-merged; deployed (no-op).
 
 > **Pause Safety**: `learnings.md` is fully triaged; nothing depends on querying it later. Safe to
@@ -1982,10 +1982,10 @@ evidence is not lost; per Rule-15 they are not this plan's merge blockers.
 
 ## Phase 8: Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked.
+- [x] [AI] Verify ALL delivery checklist items are ticked.
 - [x] [AI] Verify the Knowledge Capture phase is complete (every entry terminal or the explicit "none"
       escape; both safety gates applied).
-- [ ] [AI] Verify ALL quality gates pass (local + CI) and the build is green.
+- [x] [AI] Verify ALL quality gates pass (local + CI) and the build is green.
 - [x] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `evidence/`;
       the `en` locale exercised (per brd.md's recorded `id` deferral, DD-45).
 - [x] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires
@@ -2094,7 +2094,7 @@ evidence is not lost; per Rule-15 they are not this plan's merge blockers.
       path. Note `grep -c` exits 1 on a zero count — read the printed number, never `&&`-chain it.
 - [x] [AI] Commit the archival:
       `chore(plans): move ayokoding-learning-path-01-url-restructure to done`.
-- [ ] [AI] Remove the worktree once the archival PR is merged:
+- [x] [AI] Remove the worktree once the archival PR is merged:
       `git worktree remove worktrees/ayokoding-learning-path-01-url-restructure` — acceptance:
       `git worktree list` no longer names it.
 
@@ -2107,7 +2107,7 @@ evidence is not lost; per Rule-15 they are not this plan's merge blockers.
       prints `All links valid! No broken links found.`).
 - [x] [AI] Plan folder is under `plans/done/YYYY-MM-DD__…`; all READMEs updated; sibling references
       repointed; archival committed.
-- [ ] [AI] Draft PR opened (archival move); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged;
+- [x] [AI] Draft PR opened (archival move); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged;
       deployed (no-op). Worktree removed.
 
 > **Pause Safety**: the plan is archived and its final PR `[AI]`-merged to `main`. Terminal state. To
