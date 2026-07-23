@@ -654,20 +654,20 @@ affected` no-op noted in Phase 8)
 
 ### Setup + Port
 
-- [ ] [AI] Re-verify `ose-primer`'s topology before any git op: confirm bare-vs-normal
+- [x] [AI] Re-verify `ose-primer`'s topology before any git op: confirm bare-vs-normal
       (`git -C <ose-primer> rev-parse --is-bare-repository`) and locate the worktrees root
       — acceptance: topology confirmed and the correct git-invocation method selected
-- [ ] [AI] Provision a worktree from the latest `origin/main` of `ose-primer`
+- [x] [AI] Provision a worktree from the latest `origin/main` of `ose-primer`
       — acceptance: worktree exists on a fresh branch off `origin/main`
-- [ ] [AI] Initialize the toolchain: `npm install` then `npm run doctor -- --fix`
+- [x] [AI] Initialize the toolchain: `npm install` then `npm run doctor -- --fix`
       — acceptance: both exit 0; `node_modules/` synchronized
-- [ ] [AI] Port the identical artifacts landed in `ose-public` Phase 8 (the reviewer-discipline
+- [x] [AI] Port the identical artifacts landed in `ose-public` Phase 8 (the reviewer-discipline
       convention, the eight specialist agents, `pr-review-synthesis-maker`, the `pr-review-quality-gate`
       workflow revision + monolith retirement, the `pr-merge-protocol.md` reviewer-count/shape edits, the
       quality-gate enhancements, and the monitoring/rollback doc) into `ose-primer`
       — acceptance: the diff matches `ose-public`'s agent/governance/workflow change set (no rhino-cli
       files touched — see the byte-identity note)
-- [ ] [AI] Regenerate the platform bindings **in `ose-primer`**: `npm run generate:bindings`
+- [x] [AI] Regenerate the platform bindings **in `ose-primer`**: `npm run generate:bindings`
       — acceptance: `.opencode/` and `.amazonq/` mirrors updated; sync-validation gate passes
 
 ### Local Quality Gates (Before Push)
@@ -677,50 +677,50 @@ affected` no-op noted in Phase 8)
 > legitimately report **zero affected projects** and exit 0; do not treat that as a tooling failure.
 > The markdown gate below plus the Phase-gate checker invocations are the substantive checks here.
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
-- [ ] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
+- [x] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
+- [x] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
+- [x] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically (ported convention, agents, workflow-cutover edits as separate
+- [x] [AI] Commit changes thematically (ported convention, agents, workflow-cutover edits as separate
       cohesive commits, mirroring `ose-public`'s Phase 8 commit shape)
-- [ ] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
+- [x] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
 
 ### Open Draft PR + Post-Push CI Verification
 
-- [ ] [AI] Open a draft PR against `ose-primer`'s `main`: `gh pr create --draft --base main`
+- [x] [AI] Open a draft PR against `ose-primer`'s `main`: `gh pr create --draft --base main`
       — acceptance: draft PR exists; its diff matches the ported change set
-- [ ] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
+- [x] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
       — acceptance: all CI checks green; no exceptions
-- [ ] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
+- [x] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
 
 ### PR-Review Maker→Fixer Cycle (mandatory for `worktree-to-pr`)
 
-- [ ] [AI] Cycle 1: run the reviewer (per the live `ose-primer` workflow) → `pr-review-fixer` triages,
+- [x] [AI] Cycle 1: run the reviewer (per the live `ose-primer` workflow) → `pr-review-fixer` triages,
       fixes, pushes, resolves → wait for CI green — acceptance: cycle 1 complete, CI green
-- [ ] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
-- [ ] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
-- [ ] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
+- [x] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
+- [x] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
+- [x] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
 
 ### Merge (once the five hardened preconditions hold)
 
-- [ ] [AI] Verify the five hardened merge preconditions (a)-(e) hold for the `ose-primer` PR
+- [x] [AI] Verify the five hardened merge preconditions (a)-(e) hold for the `ose-primer` PR
       — acceptance: all five hold and are surfaced in the merge summary
-- [ ] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold)
+- [x] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold)
       — acceptance: `ose-primer` PR merges to its `main`; branch integrated
 
 ### Phase 9 Gate
 
 > All checks below must pass before this propagation node is considered done.
 
-- [ ] [AI] `ose-primer` carries the identical agent/governance/workflow change set as `ose-public`
+- [x] [AI] `ose-primer` carries the identical agent/governance/workflow change set as `ose-public`
       (no rhino-cli byte-identity boundary crossed)
-- [ ] [AI] `ose-primer` bindings regenerated and sync-validation green
-- [ ] [AI] `ose-primer` PR merged to its `main`; CI green
+- [x] [AI] `ose-primer` bindings regenerated and sync-validation green
+- [x] [AI] `ose-primer` PR merged to its `main`; CI green
 
 > **Pause Safety**: `ose-primer` is either fully propagated-and-merged or green-and-ready on its own
 > draft PR; `ose-public` (source of truth) is already merged and unaffected. Safe to stop. To resume:
@@ -741,18 +741,18 @@ affected` no-op noted in Phase 8)
 
 ### Setup + Port
 
-- [ ] [AI] Re-verify `ose-infra`'s topology before any git op: confirm bare-vs-normal
+- [x] [AI] Re-verify `ose-infra`'s topology before any git op: confirm bare-vs-normal
       (`git -C <ose-infra> rev-parse --is-bare-repository`) and locate the worktrees root
       — acceptance: topology confirmed and the correct git-invocation method selected
-- [ ] [AI] Provision a worktree from the latest `origin/main` of `ose-infra`
+- [x] [AI] Provision a worktree from the latest `origin/main` of `ose-infra`
       — acceptance: worktree exists on a fresh branch off `origin/main`
-- [ ] [AI] Initialize the toolchain: `npm install` then `npm run doctor -- --fix`
+- [x] [AI] Initialize the toolchain: `npm install` then `npm run doctor -- --fix`
       — acceptance: both exit 0; `node_modules/` synchronized
-- [ ] [AI] Port the identical shared-scaffolding artifacts landed in `ose-public` Phase 8 into
+- [x] [AI] Port the identical shared-scaffolding artifacts landed in `ose-public` Phase 8 into
       `ose-infra`; keep all infra-private content (Terraform, k3s, Proxmox, real hostnames) untouched and
       never cross-route it — acceptance: the diff matches `ose-public`'s agent/governance/workflow change
       set; no infra-private material altered; no rhino-cli files touched
-- [ ] [AI] Regenerate the platform bindings **in `ose-infra`**: `npm run generate:bindings`
+- [x] [AI] Regenerate the platform bindings **in `ose-infra`**: `npm run generate:bindings`
       — acceptance: `.opencode/` and `.amazonq/` mirrors updated; sync-validation gate passes
 
 ### Local Quality Gates (Before Push)
@@ -762,51 +762,51 @@ affected` no-op noted in Phase 8)
 > legitimately report **zero affected projects** and exit 0; do not treat that as a tooling failure.
 > The markdown gate below plus the Phase-gate checker invocations are the substantive checks here.
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
-- [ ] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
+- [x] [AI] Run affected linting: `npx nx affected -t lint` — exits 0
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick` — exits 0
+- [x] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` — exits 0
+- [x] [AI] Run the full markdown gate: `npm run lint:md:fix` then markdownlint — zero violations
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by this plan — then re-run to confirm
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically (ported convention, agents, workflow-cutover edits as separate
+- [x] [AI] Commit changes thematically (ported convention, agents, workflow-cutover edits as separate
       cohesive commits, mirroring `ose-public`'s Phase 8 commit shape)
-- [ ] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
+- [x] [AI] Follow Conventional Commits `<type>(<scope>): <description>`
 
 ### Open Draft PR + Post-Push CI Verification
 
-- [ ] [AI] Open a draft PR against `ose-infra`'s `main`: `gh pr create --draft --base main`
+- [x] [AI] Open a draft PR against `ose-infra`'s `main`: `gh pr create --draft --base main`
       — acceptance: draft PR exists; its diff matches the ported change set; no infra-private material
       is included in the diff
-- [ ] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
+- [x] [AI] Monitor ALL GitHub Actions workflows on the PR (poll every 2 min per `ci-monitoring`)
       — acceptance: all CI checks green; no exceptions
-- [ ] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
+- [x] [AI] If any CI check fails, fix at root cause and push a follow-up commit; repeat until green
 
 ### PR-Review Maker→Fixer Cycle (mandatory for `worktree-to-pr`)
 
-- [ ] [AI] Cycle 1: run the reviewer (per the live `ose-infra` workflow) → `pr-review-fixer` triages,
+- [x] [AI] Cycle 1: run the reviewer (per the live `ose-infra` workflow) → `pr-review-fixer` triages,
       fixes, pushes, resolves → wait for CI green — acceptance: cycle 1 complete, CI green
-- [ ] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
-- [ ] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
-- [ ] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
+- [x] [AI] Cycle 2: fresh reviewer pass (fed prior findings) → fixer → CI green — acceptance: cycle 2 complete
+- [x] [AI] Cycle 3: fresh reviewer pass → fixer → CI green — acceptance: cycle 3 complete, no early exit
+- [x] [AI] Flip the PR to ready: `gh pr ready` once the done-definition holds — acceptance: PR is ready-for-review
 
 ### Merge (once the five hardened preconditions hold)
 
-- [ ] [AI] Verify the five hardened merge preconditions (a)-(e) hold for the `ose-infra` PR
+- [x] [AI] Verify the five hardened merge preconditions (a)-(e) hold for the `ose-infra` PR
       — acceptance: all five hold and are surfaced in the merge summary
-- [ ] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold)
+- [x] [AI] Merge the PR (`[AI]` is the default actor once preconditions hold)
       — acceptance: `ose-infra` PR merges to its `main`; branch integrated
 
 ### Phase 10 Gate
 
 > All checks below must pass before this propagation node is considered done.
 
-- [ ] [AI] `ose-infra` carries the identical agent/governance/workflow change set as `ose-public`
+- [x] [AI] `ose-infra` carries the identical agent/governance/workflow change set as `ose-public`
       (no rhino-cli byte-identity boundary crossed; no infra-private content altered)
-- [ ] [AI] `ose-infra` bindings regenerated and sync-validation green
-- [ ] [AI] `ose-infra` PR merged to its `main`; CI green
+- [x] [AI] `ose-infra` bindings regenerated and sync-validation green
+- [x] [AI] `ose-infra` PR merged to its `main`; CI green
 
 > **Pause Safety**: `ose-infra` is either fully propagated-and-merged or green-and-ready on its own
 > draft PR; `ose-public` and `ose-primer` are unaffected. Safe to stop. To resume: re-check the
@@ -819,29 +819,29 @@ affected` no-op noted in Phase 8)
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
 
-- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
+- [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
       catch this automatically next time; discard the rest with a one-line reason
       — acceptance: every entry has either a route or a discard reason
-- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret/token/
+- [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret/token/
       private hostname to a `<placeholder>`, or discard if unsanitizable
       — acceptance: `learnings.md` contains no raw secret
-- [ ] [AI] Apply the **repo-relevance gate** — infra-private content stays in `ose-infra` only; public
+- [x] [AI] Apply the **repo-relevance gate** — infra-private content stays in `ose-infra` only; public
       governance content may propagate via the parity loop; never cross-route private content here
       — acceptance: no infra-private content in routed output
-- [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing matrix —
+- [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing matrix —
       non-code homes may land inline (small) or as a `plans/backlog/` follow-up (large); code homes
       (`apps/`, `libs/`, tests) are ALWAYS a separate `plans/backlog/<slug>/` plan, NEVER inline
       — acceptance: every entry records its terminal routing state
-- [ ] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
+- [x] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
       `No generalizable learnings — <one-line reason>` — acceptance: `learnings.md` is never silently empty
 
 ### Phase 11 Gate
 
 > All checks below must pass before Plan Archival.
 
-- [ ] [AI] Every `learnings.md` entry is terminal (routed inline, filed as backlog, or discarded), or
+- [x] [AI] Every `learnings.md` entry is terminal (routed inline, filed as backlog, or discarded), or
       the explicit "none" escape is present
-- [ ] [AI] No code-homed learning landed inline in this plan's own commits/PR
+- [x] [AI] No code-homed learning landed inline in this plan's own commits/PR
 
 > **Pause Safety**: `learnings.md` is fully triaged (or explicitly recorded empty); no future process
 > depends on querying it. Safe to stop. To resume: re-read `learnings.md` and confirm every entry is
