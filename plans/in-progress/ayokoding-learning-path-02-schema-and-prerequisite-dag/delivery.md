@@ -41,14 +41,17 @@ the worktree after the plan is archived and pushed.
 Every phase branches from the **latest `origin/main`** inside this one worktree
 (`git fetch origin && git checkout main && git pull && git checkout -b
 ayokoding-learning-path-02-schema-and-prerequisite-dag/<phase-slug>`), authors its work there,
-commits, pushes that branch, and opens **its own draft PR**.
+commits, pushes that branch, and opens **its own draft PR** — from **Phase 1 onward**. **Phase 0 is
+excluded**: it is setup and baseline, pushes no branch and opens no PR, and its evidence artifacts
+ride the Phase 1 PR.
 
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and
 [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
 ## Delivery Mode: worktree-to-pr
 
-Each phase works in the worktree on its **own branch**, opens a **draft PR** against `main`, runs the
+Each **delivery** phase — **Phase 1 onward**; Phase 0 opens none — works in the worktree on its
+**own branch**, opens a **draft PR** against `main`, runs the
 **PR-Review Maker→Fixer Cycle** (fan-out → `pr-review-synthesis-maker` → `pr-review-fixer`, 3 sequential CI-gated
 cycles), flips the PR to ready, and `[AI]` **merges it automatically once all quality gates are
 green**. Mode inherited from the source plan at tier-2 ("plan field") precedence — not re-derived.
@@ -68,7 +71,10 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
 > since been changed to match, so **DN-11 = AI-auto-merge** now simply confirms the repo default rather
 > than deviating from it. The preconditions are unchanged either way — only the actor differs.
 
-**Per-Phase Integration Protocol** (each phase's gate lists these as must-pass):
+**Per-Phase Integration Protocol — Phase 1 onward** (each delivery phase's gate lists these as
+must-pass). **Phase 0 is excluded**: it is Environment Setup and Baseline, opens no PR, pushes no
+branch, runs no review cycle, and merges nothing; its evidence artifacts ride the Phase 1 PR
+([§Phase 0 Opens No PR](../../../repo-governance/conventions/structure/plans.md#phase-0-opens-no-pr--the-earliest-pr-is-phase-1-hard-rule)).
 
 1. [AI] Sync the worktree to latest `origin/main` and branch:
    `git fetch origin && git checkout main && git pull && git checkout -b
@@ -499,10 +505,18 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       a stray empty untracked directory at either path returns 0 from `test -d` while holding no
       content, which would be a false red (see the Phase 0 start-precondition step).
 - [ ] [AI] `find …/syllabus -type f | wc -l` returns **128**.
-- [ ] [AI] Draft PR opened; CI triggered; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged.
+- [ ] [AI] **No PR was opened for this phase and nothing was pushed** — read the printed number from
+      each (never `&&`-chained, since `grep -c` exits 1 on a zero count):
+      `git ls-remote --heads origin "$(git branch --show-current)" | grep -c .` returns **0**, and
+      `gh pr list --head "$(git branch --show-current)" --json number --jq 'length'` returns **0**.
+      Falsifiable both ways: pushing this branch makes the first return **1**; opening a PR for it
+      makes the second return **1** — either fails the gate. Phase 0 is setup and baseline only, so
+      the evidence files written here ride the **Phase 1** PR
+      ([§Phase 0 Opens No PR](../../../repo-governance/conventions/structure/plans.md#phase-0-opens-no-pr--the-earliest-pr-is-phase-1-hard-rule)).
 
 > **Pause Safety**: only the toolchain was verified and the current state snapshotted — no code, no
-> schema, no spec exists yet. Safe to stop indefinitely. To resume: re-run
+> schema, no spec exists yet, nothing is pushed, and no PR exists. Safe to stop indefinitely. To
+> resume: re-run
 > `npx nx run ayokoding-www:build && npx nx run ayokoding-www:test:unit` and confirm both still exit 0.
 
 ---
