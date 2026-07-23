@@ -133,12 +133,12 @@ merge point.
    (c) is **restated in multiple governance surfaces that must stay congruent** — editing only
    `pr-merge-protocol.md` would recreate the exact (a)-(d)-vs-(a)-(e) drift those docs explicitly warn
    against. The reword must land congruently in **all** of: `pr-merge-protocol.md` (which states (c)
-   **three times** — §The Rule, §Agent Workflow §Before Merging, and the illustrative example under
-   §The Precondition Summary); **`pr-review-quality-gate.md`** — the file `pr-merge-protocol.md` names
+   **four times** — §The Rule, §Agent Workflow §Before Merging, the illustrative example under
+   §The Precondition Summary, and the `## Examples` PASS worked example); **`pr-review-quality-gate.md`** — the file `pr-merge-protocol.md` names
    as the **normative source** of the preconditions, and where `pr-review-maker`/`pr-review-fixer`
    actually read them; `plan-quality-gate.md`; `plans.md` §Delivery Mode; and **`AGENTS.md` §Delivery
    Mode** (repo root) — the same (c) restatement, on a single unwrapped line, a site the original
-   enumeration omitted despite it being a root-level surface every agent reads. All six keep (a), (b),
+   enumeration omitted despite it being a root-level surface every agent reads. All five keep (a), (b),
    (d), (e) verbatim. `repo-governance/development/workflow/README.md`'s one-line index blurb also
    contains the phrase and is matched by the Task-1 grep in `delivery.md` Phase 2, but it is a catalog
    summary of `pr-merge-protocol.md`'s content — never itself read normatively by any agent — so it is
@@ -205,9 +205,9 @@ holds.
   repo; `_verify path before editing_`; `actionlint`-clean). `[AI]` YAML.
 - **Edit (precondition-(c) reword, congruent across all restatement sites)** — queue-satisfiable +
   manual fallback; (a)–(e) lettering and (a)/(b)/(d)/(e) preserved verbatim in each. `[AI]` docs:
-  - `repo-governance/development/workflow/pr-merge-protocol.md` — states (c) **three times** (§The
-    Rule, §Agent Workflow §Before Merging, and the illustrative example under §The Precondition
-    Summary); reword all three.
+  - `repo-governance/development/workflow/pr-merge-protocol.md` — states (c) **four times** (§The
+    Rule, §Agent Workflow §Before Merging, the illustrative example under §The Precondition
+    Summary, and the `## Examples` PASS worked example); reword all four.
   - `repo-governance/workflows/pr/pr-review-quality-gate.md` §Hardened Merge Preconditions — the
     **normative** source `pr-merge-protocol.md` defers to; where the PR-review agents read (c).
   - `repo-governance/workflows/plan/plan-quality-gate.md` — its inline (a)-(e) restatement.

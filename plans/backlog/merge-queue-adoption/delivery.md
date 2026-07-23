@@ -183,20 +183,24 @@ Applies to every phase's commits in every repo (`ose-public`, `ose-primer`, `ose
       `repo-governance/conventions/structure/plans.md`, and `AGENTS.md`, run
       `grep -c "up-to-date with the latest\|non-destructively up to date" <file>` and confirm it
       returns ≥ 1 for every file (`pr-merge-protocol.md` returns 2 via this token — §The Rule and
-      §Agent Workflow §Before Merging — **plus** a third restatement, the compact worked example under
-      §The Precondition Summary, that must be checked manually since its "up to date (fast-forwarded,
-      no rewrite)" phrasing does not share the literal searched token); the reword targets **all five**
-      files (`pr-merge-protocol.md`'s three sites, plus one each in the other four), not just
+      §Agent Workflow §Before Merging — **plus two further restatements** that must be checked manually
+      because their phrasing does not share the literal searched token: the compact worked example under
+      §The Precondition Summary ("up to date (fast-forwarded, no rewrite)") **and** the `## Examples`
+      PASS worked example ("(c) branch vs main: up to date")); the reword targets **all five**
+      files (`pr-merge-protocol.md`'s four sites, plus one each in the other four), not just
       `pr-merge-protocol.md`
 - [ ] [AI] Reword **precondition (c)** congruently in each enumerated file so it is satisfied by the
       queue's speculative merge where a queue is enabled, **retaining the manual non-destructive
       branch-up-to-date form as the explicit fallback** — acceptance: in every file, (c)'s text names
-      both the queue path and the manual fallback; `grep -c "merge queue" <each file>` ≥ 1 for each
-- [ ] [AI] Update the illustrative worked example under `pr-merge-protocol.md` §The Precondition
-      Summary (the `(c) branch vs main:    up to date (fast-forwarded, no rewrite)` line inside the
-      fenced example) so it shows **both** the queue-satisfied path and the manual-fallback path for
-      (c) — acceptance: the example line names the queue's speculative-merge satisfaction and the
-      non-destructive-forward-update fallback, consistent with the reworded (c) prose above it
+      both the queue path and the manual fallback; `grep -c "merge queue" <each file>` returns `0`
+      **before** the reword and **≥ 1 after**, for each
+- [ ] [AI] Update **both** worked-example `(c)` lines in `pr-merge-protocol.md` — the one under
+      §The Precondition Summary (`(c) branch vs main:    up to date (fast-forwarded, no rewrite)`) **and**
+      the one in the `## Examples` → PASS block (`(c) branch vs main: up to date`) — so each shows the
+      queue-satisfied path alongside the manual-fallback path for (c) — acceptance: both example lines
+      name the queue's speculative-merge satisfaction and the non-destructive-forward-update fallback,
+      consistent with the reworded (c) prose above them; `grep -c "(c) branch vs main" pr-merge-protocol.md`
+      = 2 and neither line is left in the old queue-unaware form
 - [ ] [AI] Verify preconditions (a), (b), (d), (e) and the `(a)`–`(e)` lettering are **unchanged in
       every edited file** — acceptance: a `git diff` across all reworded files shows edits confined to
       the (c) block(s); `pr-merge-protocol.md`'s §Agent-Workflow copy and the normative
