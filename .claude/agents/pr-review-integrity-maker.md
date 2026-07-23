@@ -15,7 +15,7 @@ skills: []
 
 **Model Selection Justification**: This agent uses `model: sonnet` per the maintainer's D5 decision
 (2026-07-23, recorded in
-[tech-docs.md §Coordinator Contract](../../plans/in-progress/worktree-to-pr-hardening/tech-docs.md#coordinator-contract-the-mandatory-synthesizer)):
+[PR Reviewer-Discipline Convention](../../repo-governance/development/quality/pr-review-disciplines.md)):
 eight specialists running across three cycles makes an all-opus fan-out a heavy per-PR cost, and
 Cloudflare's production system reached its precision target with standard-tier specialists plus a
 top-tier coordinator, not top-tier specialists everywhere. Sonnet is sufficient here because:

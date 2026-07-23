@@ -19,7 +19,7 @@ color: primary
 
 **Model Selection Justification**: This agent uses `model: opus` — the top model tier — per the
 maintainer's D5 decision (2026-07-23, recorded in
-[tech-docs.md §Coordinator Contract](../../plans/in-progress/worktree-to-pr-hardening/tech-docs.md#coordinator-contract-the-mandatory-synthesizer)):
+[PR Reviewer-Discipline Convention](../../repo-governance/development/quality/pr-review-disciplines.md)):
 the eight discipline specialists inherit `sonnet`, and this agent is deliberately the **single
 quality chokepoint above them** — Cloudflare's production system reaches its precision target with
 exactly this shape (standard-tier specialists, top-tier coordinator only), not top-tier everywhere.

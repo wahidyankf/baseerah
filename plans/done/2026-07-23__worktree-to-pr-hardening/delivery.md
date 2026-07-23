@@ -860,20 +860,20 @@ affected` no-op noted in Phase 8)
 > [tech-docs.md §Archival Timing](./tech-docs.md#archival-timing--a-documented-exception-to-archival-in-pr)
 > for the full rationale.
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify all three repos delivered: `ose-public` (Phase 8), `ose-primer` (Phase 9), and
+- [x] [AI] Verify ALL delivery checklist items are ticked
+- [x] [AI] Verify all three repos delivered: `ose-public` (Phase 8), `ose-primer` (Phase 9), and
       `ose-infra` (Phase 10) each merged the identical change set to their respective `main`
-- [ ] [AI] Verify the Knowledge Capture phase is complete (every `learnings.md` entry terminal or the
+- [x] [AI] Verify the Knowledge Capture phase is complete (every `learnings.md` entry terminal or the
       explicit "none" escape present; both safety gates applied)
-- [ ] [AI] Verify ALL quality gates pass (local + CI) and the PR merged
-- [ ] [AI] Move and date-stamp: `git mv plans/in-progress/worktree-to-pr-hardening plans/done/YYYY-MM-DD__worktree-to-pr-hardening`
+- [x] [AI] Verify ALL quality gates pass (local + CI) and the PR merged
+- [x] [AI] Move and date-stamp: `git mv plans/in-progress/worktree-to-pr-hardening plans/done/YYYY-MM-DD__worktree-to-pr-hardening`
       using today's date as the completion date
       — acceptance: folder relocated under `plans/done/` with a date prefix
-- [ ] [AI] Update `plans/backlog/README.md` (remove the entry if it was listed there) and, if the plan
+- [x] [AI] Update `plans/backlog/README.md` (remove the entry if it was listed there) and, if the plan
       passed through `in-progress`, `plans/in-progress/README.md`
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
-- [ ] [AI] Update any other READMEs referencing this plan
-- [ ] [AI] Commit and push the archival directly to `ose-public` `main` (trailing commit, no new PR —
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date
+- [x] [AI] Update any other READMEs referencing this plan
+- [x] [AI] Commit and push the archival directly to `ose-public` `main` (trailing commit, no new PR —
       the substantive change already passed review in Phase 8's PR): `chore(plans): move
 worktree-to-pr-hardening to done`
 
@@ -881,15 +881,15 @@ worktree-to-pr-hardening to done`
 
 > All checks below must pass to consider the plan fully delivered.
 
-- [ ] [AI] All delivery checklist items across all thirteen phases (Phase 0 through Phase 12) are ticked
-- [ ] [AI] All three repos (`ose-public`, `ose-primer`, `ose-infra`) have merged the identical change
+- [x] [AI] All delivery checklist items across all thirteen phases (Phase 0 through Phase 12) are ticked
+- [x] [AI] All three repos (`ose-public`, `ose-primer`, `ose-infra`) have merged the identical change
       set to their respective `main` — verified against the Phase 8, Phase 9, and Phase 10 Gates
-- [ ] [AI] Knowledge Capture (Phase 11) is complete — every `learnings.md` entry terminal or the
+- [x] [AI] Knowledge Capture (Phase 11) is complete — every `learnings.md` entry terminal or the
       explicit "none" escape recorded
-- [ ] [AI] The plan folder is relocated to `plans/done/YYYY-MM-DD__worktree-to-pr-hardening/` and every
+- [x] [AI] The plan folder is relocated to `plans/done/YYYY-MM-DD__worktree-to-pr-hardening/` and every
       referencing README (`plans/backlog/README.md` or `plans/in-progress/README.md`,
       `plans/done/README.md`) is updated
-- [ ] [AI] The archival commit is pushed directly to `ose-public` `main` (trailing commit, no new PR)
+- [x] [AI] The archival commit is pushed directly to `ose-public` `main` (trailing commit, no new PR)
 
 > **Pause Safety**: the plan is fully archived across all three repos; nothing further depends on this
 > folder's location. This is the plan's terminal state. To resume (if interrupted mid-archival):

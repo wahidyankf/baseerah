@@ -4,6 +4,17 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-07-23: worktree-to-pr-hardening](./2026-07-23__worktree-to-pr-hardening/README.md) —
+  Hardened the `worktree-to-pr` delivery workflow by decomposing the monolithic `pr-review-maker` into
+  eight specialist reviewer agents plus a mandatory `pr-review-synthesis-maker` coordinator (specialists
+  are read-only finding producers; the coordinator is the sole poster of record). Added a
+  reviewer-discipline convention, revised the `pr-review-quality-gate` workflow to fan-out→synthesize→fixer
+  and retired the monolith at cutover, added quality-gate enhancements and a post-cutover monitoring +
+  rollback trigger, and recorded a future-work workstream. Delivered as a **three-repo parity** change:
+  `ose-public` (PR #88, dogfooded by its own new pipeline — the mandated third review cycle caught a real
+  HIGH where specialists had over-inherited the monolith's direct-post behavior), then propagated to
+  `ose-primer` (PR #17) and `ose-infra` (PR #19), each via its own `worktree-to-pr` cycle. Decisions
+  D1–D15 resolved; archival deferred to this final step per D15.
 - [2026-07-23: ayokoding-learning-path-01-url-restructure](./2026-07-23__ayokoding-learning-path-01-url-restructure/README.md) —
   **Wave 1** of the ayokoding learning-path programme. Removed the `/c/` namespace and resolved
   everything under `/en/learn` into a three-bucket IA (`paths/`, `courses/`, `legacy/`): relocated the

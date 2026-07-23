@@ -4,13 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [worktree-to-pr-hardening](./worktree-to-pr-hardening/README.md)
-  — Hardens the `worktree-to-pr` delivery workflow by decomposing the monolithic `pr-review-maker`
-  into eight specialist reviewer agents plus a mandatory `pr-review-synthesis-maker` coordinator, with
-  a reviewer-discipline convention, workflow revision (retiring the monolith at cutover), quality-gate
-  enhancements, and a post-cutover monitoring + rollback trigger. Scoped as a **three-repo parity
-  deliverable** (`ose-public` source of truth → `ose-primer` + `ose-infra` downstream, each propagated
-  via its own `worktree-to-pr` cycle). Decisions D1–D15 resolved; passed the strict plan-quality-gate.
+_None currently._
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.
