@@ -8,9 +8,14 @@ const { Given, When, Then } = createBdd();
  * fenced code block on this page, so it is always the block `annotatedCodeBlock` below resolves to.
  * It carries several `-- =>` output annotations, making it a stable target for the verbatim-clipboard
  * and success-confirmation scenarios below (source:
- * `content/en/learn/fundamentally-strong/software-engineer/just-enough-lua/learning/advanced.md`).
+ * `content/en/learn/courses/just-enough-lua/learning/advanced.md` — re-homed from
+ * `fundamentally-strong/software-engineer/just-enough-lua/` by
+ * `ayokoding-learning-path-01-url-restructure` Phase 2; the bundle — root AND every nested
+ * sub-page, via `course-rehome.ts`'s `:path*` per-course redirect — now lives at this re-homed
+ * `courses/<slug>` path, so this fixture references the canonical path directly rather than the
+ * old `fundamentally-strong/software-engineer/<slug>/...` path that 308s here).
  */
-const ANNOTATED_LUA_PAGE = "/en/learn/fundamentally-strong/software-engineer/just-enough-lua/learning/advanced";
+const ANNOTATED_LUA_PAGE = "/en/learn/courses/just-enough-lua/learning/advanced";
 
 /** The page's first `CodeBlock` wrapper (`data-slot="code-block"`, per `code-block.tsx`) whose source
  * contains a `-- =>` annotation — i.e. Example 59. */
