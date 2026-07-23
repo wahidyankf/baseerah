@@ -4,6 +4,7 @@ import path from "node:path";
 import { learnReorgRedirects } from "./src/redirects/learn-reorg";
 import { courseRehomeRedirects } from "./src/redirects/course-rehome";
 import { contentNamespaceRedirects } from "./src/redirects/content-namespace";
+import { learnThreeBucketRedirects } from "./src/redirects/learn-three-bucket";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -37,12 +38,13 @@ const nextConfig: NextConfig = {
     ];
   },
   async redirects() {
-    // Temporary intermediate order (Phase 2 of ayokoding-learning-path-01-url-restructure):
-    // contentNamespaceRedirects is still forward-direction and stays LAST here. Phase 3.0
-    // inverts it in place and moves it to the FRONT of this array (DD-48), and Phase 3.1
-    // inserts a fourth learn-three-bucket module right after the middle spread below,
-    // converging on [namespace, learn-reorg, course-rehome, learn-three-bucket].
-    return [...learnReorgRedirects, ...courseRehomeRedirects, ...contentNamespaceRedirects];
+    // Order is load-bearing (DD-48, re-derived from first principles): contentNamespaceRedirects
+    // FIRST so any stale /c/-prefixed request is stripped to its bare form before any other rule
+    // evaluates — a rule positioned after it would never see a /c/-prefixed URL, since bare-only
+    // rules can't match one. learnReorgRedirects next so historical within-/en/learn/ renames
+    // resolve to their canonical domain. courseRehomeRedirects before the six-domain legacy-bucket
+    // module last, so its more specific per-course rules win over the broader per-domain wildcard.
+    return [...contentNamespaceRedirects, ...learnReorgRedirects, ...courseRehomeRedirects, ...learnThreeBucketRedirects];
   },
 };
 
