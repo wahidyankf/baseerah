@@ -135,7 +135,7 @@ merge point.
    against. The reword must land congruently in **all** of: `pr-merge-protocol.md` (which states (c)
    **four times** — §The Rule, §Agent Workflow §Before Merging, the illustrative example under
    §The Precondition Summary, and the `## Examples` PASS worked example); **`pr-review-quality-gate.md`** — the file `pr-merge-protocol.md` names
-   as the **normative source** of the preconditions, and where `pr-review-maker`/`pr-review-fixer`
+   as the **normative source** of the preconditions, and where `pr-review-synthesis-maker`/`pr-review-fixer`
    actually read them; `plan-quality-gate.md`; `plans.md` §Delivery Mode; and **`AGENTS.md` §Delivery
    Mode** (repo root) — the same (c) restatement, on a single unwrapped line, a site the original
    enumeration omitted despite it being a root-level surface every agent reads. All five keep (a), (b),

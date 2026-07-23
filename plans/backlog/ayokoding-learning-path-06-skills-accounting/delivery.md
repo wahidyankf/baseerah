@@ -47,7 +47,7 @@ claude --worktree ayokoding-learning-path-06-skills-accounting-unit-<unit-id>
 ## Delivery Mode: worktree-to-pr
 
 Each course-authoring sub-phase (Phase 2, 3, 5) is its own **DAG leaf**: its own branch, its own draft
-PR, its own 3-cycle `pr-review-maker`/`pr-review-fixer` review, its own `[AI]` merge — strict
+PR, its own 3-cycle fan-out → `pr-review-synthesis-maker` → `pr-review-fixer` review, its own `[AI]` merge — strict
 1-PR-per-course, pipelined up to the in-force concurrency cap (N=3 unless the programme has since
 escalated it — check the latest `AGENTS.md` §Agent Workflow Orchestration value before starting).
 Manifest-growth TDD cycles and landing authoring are each their own PR too, sequenced after the
@@ -1277,7 +1277,7 @@ auditable. A tester's summary verdict is not a substitute for the per-finding ch
 ### Post-Push Verification
 
 - [ ] [AI] Push the final integration branch, open the draft PR, run the 3-cycle
-      `pr-review-maker`/`pr-review-fixer` review — acceptance: 0 CRITICAL + 0 HIGH outstanding, branch
+      fan-out → `pr-review-synthesis-maker` → `pr-review-fixer` review — acceptance: 0 CRITICAL + 0 HIGH outstanding, branch
       non-destructively up to date with `origin/main`, all quality gates green.
 - [ ] [AI] Monitor GitHub Actions for this PR's check run — poll every 2 minutes, one
       `gh run view --json status,conclusion` per wakeup.

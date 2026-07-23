@@ -49,7 +49,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 ## Delivery Mode: worktree-to-pr
 
 Each phase works in the worktree on its **own branch**, opens a **draft PR** against `main`, runs the
-**PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3 sequential CI-gated
+**PR-Review Maker→Fixer Cycle** (fan-out → `pr-review-synthesis-maker` → `pr-review-fixer`, 3 sequential CI-gated
 cycles), flips the PR to ready, and `[AI]` **merges it automatically once all quality gates are
 green**. Mode inherited from the source plan at tier-2 ("plan field") precedence — not re-derived.
 See
@@ -142,12 +142,19 @@ expanded is not executable.
 > position**. Since the two plans merge independently and nothing serialises them:
 >
 > - **Whichever merges second must rebase onto the other's `content-url.ts` and
->   `content-url.test.ts`** before its own gate is meaningful.
-> - If `01` merged first, this plan's Phase-0 baseline of the pre-existing assertions is **stale**.
->   Re-take it after rebasing, and read cycle 2.4's acceptance as "every pre-existing assertion **as
->   of this plan's rebased base** still passes unchanged" — not as of the original Phase-0 snapshot.
->   The `/c/`-shaped assertions will legitimately have changed, and that is `01`'s change, not a
->   regression introduced here.
+>   `content-url.test.ts`** before its own gate is meaningful. **Update (2026-07-23): `01` has merged
+>   first, so THIS plan is unambiguously the second merger and MUST rebase onto `01`'s `content-url.ts`
+>   before its cycle-2.4 gate is meaningful.** Verified on `origin/main` 2026-07-23: `content-url.ts`
+>   now contains **zero** `/c/` occurrences (01's `R0` inversion deleted the segment), and
+>   `content-url.test.ts` holds **7** `it(` blocks of which **2** name `/c/` (down from the pre-01
+>   count of 4).
+> - Because `01` merged first, this plan's original Phase-0 baseline of the pre-existing assertions is
+>   **stale**. Re-take it after rebasing, and read cycle 2.4's acceptance as "every pre-existing
+>   assertion **as of this plan's rebased base** still passes unchanged" — not as of the original
+>   Phase-0 snapshot. The `/c/`-shaped assertions have already legitimately changed on `main`, and that
+>   is `01`'s change, not a regression introduced here. The tech-docs `/{locale}/c/{slug}` examples in
+>   this plan (e.g. `/en/c/learn/courses/<course-id>`) predate that inversion and are illustrative only;
+>   this plan appends `?path=` to whatever URL shape `content-url.ts` emits on the rebased base.
 > - Cycle 2.4's "dropping or relocating the `/c/` segment makes the seven assertions fail"
 >   falsifiability note describes **this plan's own edit in isolation**. It is not a claim that the
 >   segment survives the wave.
@@ -173,14 +180,14 @@ expanded is not executable.
   recorded by the first Phase 0 step. After the Phase 7 `git mv` the folder sits at
   `plans/done/YYYY-MM-DD__ayokoding-learning-path-02-schema-and-prerequisite-dag`; Phase 7 names that
   destination literally rather than through `<PLAN>`, because the move is what changes it.
-- `<PLAN01>` = the **Wave-1 sibling** plan's folder at its current stage —
-  `plans/in-progress/ayokoding-learning-path-01-url-restructure` once promoted,
-  `plans/backlog/ayokoding-learning-path-01-url-restructure` before then. Resolved by the same Phase 0
-  step that resolves `<PLAN>`, and expanded textually the same way. It gets its own constant for the
-  same reason `<PLAN>` does, and more urgently: `ayokoding-learning-path-01-url-restructure` runs
-  **concurrently** with this plan (see [Parallelization model](#parallelization-model)), so it is the
-  folder most likely to be promoted **while this plan executes**. A hardcoded `plans/backlog/` prefix
-  for it is stale the moment that happens.
+- `<PLAN01>` = the **Wave-1 sibling** plan's folder. **Update (2026-07-23): this sibling has merged
+  first and is now archived** at `plans/done/2026-07-23__ayokoding-learning-path-01-url-restructure`,
+  so `<PLAN01>` is now a **fixed literal** at that path — it will not move again. It keeps its own
+  constant (rather than being hardcoded inline) so the Phase 0 resolver can assert the archive path
+  actually exists, and so every step that names it stays consistent if the archive is ever renamed.
+  The original rationale — that the sibling ran **concurrently** and could be promoted mid-execution —
+  is now historical: the two plans were both Wave 1 with no blocking edge, and 01 simply reached merge
+  first. See [Parallelization model](#parallelization-model).
 - `<BASELINE_SHA>` = the 40-hex commit SHA this execution's `syllabus/` custody checks are measured
   **against**, resolved once by Phase 0 and expanded textually everywhere — **never** the live
   `origin/main` ref. The ref moves: the **Per-Phase Integration Protocol** declared above under
@@ -358,18 +365,21 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       tool calls here, and an empty expansion makes a `git diff` pathspec match nothing and pass
       vacuously.
 - [ ] [AI] **Resolve the `<PLAN01>` path constant — the Wave-1 sibling's folder — in the same way, and
-      for the same reason.** Resolve it with — command (single line):
-      `test -d plans/in-progress/ayokoding-learning-path-01-url-restructure && echo plans/in-progress/ayokoding-learning-path-01-url-restructure || echo plans/backlog/ayokoding-learning-path-01-url-restructure`
+      for the same reason.** **Update (2026-07-23): the sibling has merged first and is now archived**, so
+      `<PLAN01>` is a **fixed literal** — `plans/done/2026-07-23__ayokoding-learning-path-01-url-restructure`
+      — not a live in-progress/backlog stage. The resolver keeps all three arms (done first) so it stays
+      self-checking and would still fire correctly if the archive were ever renamed. Resolve it with —
+      command (single line):
+      `test -d plans/done/2026-07-23__ayokoding-learning-path-01-url-restructure && echo plans/done/2026-07-23__ayokoding-learning-path-01-url-restructure || (test -d plans/in-progress/ayokoding-learning-path-01-url-restructure && echo plans/in-progress/ayokoding-learning-path-01-url-restructure || echo plans/backlog/ayokoding-learning-path-01-url-restructure)`
       — acceptance: it prints exactly one path, **and** `test -d <the printed path>` returns 0. Record
       the printed value as the `<PLAN01>` expansion for this execution, writing it into
       `<PLAN>/evidence/phase-0-baseline.txt` once the last step of this phase creates that folder.
-      Falsifiable both ways: if the sibling sits in neither stage the command still prints the
+      Falsifiable both ways: if the sibling sits in none of the three stages the command still prints the
       `plans/backlog/` fallback, but the follow-up `test -d` on that printed path returns non-zero, so
-      the step fails loudly instead of proceeding with a stale path. This matters more than for
-      `<PLAN>`: the sibling runs **concurrently**, so it can be promoted at any point during this
-      execution, and a stale pathspec handed to `git log` prints **no SHA** and **exits 0** (under
-      RTK the executor sees a single blank line, not truly empty output — which is why step 1.1
-      asserts with `grep -qE "^[0-9a-f]{40}$"` rather than an emptiness test) — see step 1.1.
+      the step fails loudly instead of proceeding with a stale path. A stale pathspec handed to `git log`
+      still prints **no SHA** and **exits 0** (under RTK the executor sees a single blank line, not truly
+      empty output — which is why step 1.1 asserts with `grep -qE "^[0-9a-f]{40}$"` rather than an
+      emptiness test) — see step 1.1.
 - [ ] [AI] **Record the `<BASELINE_SHA>` constant — the commit every later `syllabus/` custody check is
       measured against.** Resolve it here, before any worktree file is modified — command:
       `git rev-parse origin/main`
@@ -514,22 +524,28 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — command:
       `grep -qF "The prerequisite frontmatter contract (canonical here)" <PLAN>/tech-docs.md`
       — acceptance: exits 0. Falsifiable both ways: renaming or deleting the heading makes it exit 1.
-- [ ] [AI] **Verify the Wave-1 sibling's copy agrees** — read
-      `<PLAN01>/tech-docs.md` (expand `<PLAN01>` to the value Phase 0 resolved — **never** hardcode
-      `plans/backlog/`; the sibling runs concurrently and may already be promoted) and compare its
-      reproduction of the `prerequisites:` frontmatter contract against this plan's canonical
-      statement, clause by clause (key name, value type, empty-list rule, ID referent, unordered
-      rule, resolver-miss rule)
-      — acceptance: `test -f <PLAN01>/tech-docs.md` returns 0 **and** the two statements agree on all
-      six clauses. **If they diverge, this plan's wins**: correct the sibling plan's copy in this
-      phase's commit and note the correction in `learnings.md`. Falsifiable both ways: introducing a
-      deliberate one-word change in either copy makes the comparison fail, and a `<PLAN01>` expanded
-      to a stage the sibling no longer sits in fails the `test -f` loudly instead of being read as
-      "nothing to compare".
-  - _Suggested executor: `plan-fixer` (if a correction to the sibling plan doc is needed)_
-- [ ] [AI] Record in `<PLAN>/evidence/phase-1-contract-agreement.txt` the exact six-clause comparison
-      result and the commit SHA of the sibling plan folder at the time of comparison — command (single
-      line): `git log -1 --format=%H -- <PLAN01>`
+- [ ] [AI] **Verify the shipped frontmatter conforms — the binding check now that `01` has merged.**
+      **Update (2026-07-23):** `01` merged first and wrote `prerequisites:` into its 37 re-homed
+      `_index.md` files, so the binding proof of contract agreement is now those **shipped bytes**, not
+      a prose comparison against a still-in-flight sibling. On the rebased base, confirm every re-homed
+      file carries a conforming value — two commands; **read each printed number** (never `&&`-chain a
+      `grep -c`, which exits 1 on a legitimate zero — Phase 0 preamble trap (i)):
+      (a) `grep -rl "^prerequisites:" <COURSES> | grep -c "_index.md"` prints **37**;
+      (b) `grep -rEn "^prerequisites:[^]]*,[^]]*$" <COURSES> | grep -c .` prints **0** — no value is a
+      bare comma-separated string outside a `[...]` sequence, the one shape the resolver would silently
+      read as empty.
+      — acceptance: (a) prints 37 **and** (b) prints 0 (verified 2026-07-23: both hold on `origin/main`,
+      and every one of the 37 values is inline `[...]`/`[]` flow-sequence form). Falsifiable both ways:
+      a re-homed file dropping the key drops (a) below 37; a comma-string value makes (b) non-zero.
+      `01`'s archived `<PLAN01>/tech-docs.md` reproduces the same contract as a **non-contradicting
+      subset** (4 of the 6 clauses; it names this plan the canonical owner and defers to it) and is
+      **read-only — do not edit `plans/done/` history**. If a genuine _contradiction_ (not a mere
+      omission) is ever found, record it in `learnings.md` and fix it in **this** plan's canonical
+      statement, never in the archived copy. `test -f <PLAN01>/tech-docs.md` returning 0 confirms the
+      reference copy is reachable at the resolved (archived) path.
+- [ ] [AI] Record in `<PLAN>/evidence/phase-1-contract-agreement.txt` the shipped-frontmatter
+      conformance result (both counts from the step above: 37 and 0) and the archival commit SHA of the
+      sibling plan folder — command (single line): `git log -1 --format=%H -- <PLAN01>`
       — acceptance: the file exists and the recorded value is a **non-empty 40-hex SHA**, asserted with
       `git log -1 --format=%H -- <PLAN01> | grep -qE "^[0-9a-f]{40}$"` exiting 0. **The non-empty
       assertion is load-bearing**: a `git` pathspec that matches nothing prints **no SHA and exits 0**
@@ -765,10 +781,10 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 - [ ] [AI] `test -d apps/ayokoding-www/src/features/course-paths/manifests` returns 0,
       `test -f …/manifests/README.md` returns 0, and
       `find …/manifests -name '*.yaml' | wc -l` returns **0**.
-- [ ] [AI] The six-clause contract-agreement comparison against
-      `ayokoding-learning-path-01-url-restructure` is recorded in
-      `<PLAN>/evidence/phase-1-contract-agreement.txt` with a non-empty 40-hex SHA, and any divergence
-      was corrected in favour of this plan.
+- [ ] [AI] The shipped-frontmatter conformance check against `01`'s merged output (counts 37 and 0)
+      is recorded in `<PLAN>/evidence/phase-1-contract-agreement.txt` with a non-empty 40-hex archival
+      SHA; `01`'s archived copy was treated as read-only (no `plans/done/` edit) and any genuine
+      contradiction was corrected in **this** plan's canonical statement.
 - [ ] [AI] The Stage 0 ordering (1.4) is complete:
       `grep -ci "not yet ordered\|pending" <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
       prints **`0`** (it prints `9` before 1.4 runs; note `grep -c` exits 1 on a zero count, so do
@@ -1942,11 +1958,12 @@ stale prefix; 7.1 (c)'s positive `--name-only` count-plus-content check remains 
 guard against any pathspec that silently matches nothing.
 
 **The same rule binds every _other_ plan folder this checklist names, not just this one.** The
-Wave-1 sibling `ayokoding-learning-path-01-url-restructure` runs **concurrently** (see
-[§Parallelization Model](#parallelization-model)), so it can be promoted to `plans/in-progress/`
-mid-execution — making a hardcoded `plans/backlog/` prefix for it stale in exactly the same way, and
-sooner. Step 1.1 therefore writes it as `<PLAN01>`, resolved by the same Phase 0 step. Its
-`git log -1 --format=%H -- <PLAN01>` clause is the sharpest instance of the vacuous-pass shape: a
+Wave-1 sibling `ayokoding-learning-path-01-url-restructure` was authored to run **concurrently** (see
+[§Parallelization Model](#parallelization-model)); **as of 2026-07-23 it has merged first and is
+archived** at `plans/done/2026-07-23__ayokoding-learning-path-01-url-restructure`, so a hardcoded
+`plans/backlog/` prefix for it is now doubly stale. Step 1.1 therefore writes it as `<PLAN01>`,
+resolved by the same Phase 0 step (now to the fixed `plans/done/…` literal). Its
+`git log -1 --format=%H -- <PLAN01>` clause remains the sharpest instance of the vacuous-pass shape: a
 stale pathspec makes `git log` print **nothing and exit 0**, and because the executor is the one
 writing the resulting evidence file, the step would "pass" with an empty SHA line — silently
 destroying the plan's only audit trail for failure mode F-6. The explicit

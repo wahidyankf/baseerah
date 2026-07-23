@@ -59,7 +59,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 ## Delivery Mode: worktree-to-pr
 
 Each phase works in the shared worktree on its **own branch**, opens a **draft PR** against `main`,
-runs the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3 sequential CI-gated
+runs the **PR-Review Maker→Fixer Cycle** (fan-out → `pr-review-synthesis-maker` → `pr-review-fixer`, 3 sequential CI-gated
 cycles), flips the PR to ready, and `[AI]` **merges it once all quality gates are green** — then
 `[AI]` **deploys `ayokoding-www` to `prod-ayokoding-www` after every merge** (this plan ships to
 ayokoding.com). This plan declares **no** `[HUMAN]` merge gate. See

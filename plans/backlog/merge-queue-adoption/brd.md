@@ -86,7 +86,7 @@ choose how to proceed rather than assume availability anywhere.
 - **Governance author** — rewords `pr-merge-protocol.md` precondition (c) and writes the operations doc.
 - **The Maintainer enabling the queue** — performs the `[HUMAN]` settings toggle an agent must not touch.
 - **Consuming agents** — `plan-execution` and the **PR-Review Maker→Fixer Cycle** agents
-  (`pr-review-maker` / `pr-review-fixer`), whose 3-cycle loop and 5-precondition gate must be preserved
+  (fan-out → `pr-review-synthesis-maker` → `pr-review-fixer`), whose 3-cycle loop and 5-precondition gate must be preserved
   verbatim, now with (c) satisfiable by the queue.
 
 This is a solo-maintainer repo — no sign-off ceremony; the maintainer wears each hat in sequence.

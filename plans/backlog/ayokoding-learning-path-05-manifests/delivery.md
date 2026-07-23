@@ -54,7 +54,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 ## Delivery Mode: worktree-to-pr
 
 Each phase works in the shared worktree on its **own branch**, opens a **draft PR** against `main`,
-runs the **PR-Review Maker→Fixer Cycle** (`pr-review-maker` / `pr-review-fixer`, 3 sequential
+runs the **PR-Review Maker→Fixer Cycle** (fan-out → `pr-review-synthesis-maker` → `pr-review-fixer`, 3 sequential
 CI-gated cycles), flips the PR to ready, and `[AI]` **merges it automatically once all quality gates
 are green** — then `[AI]` **deploys `ayokoding-www` to `prod-ayokoding-www` after every merge** (this
 plan ships to ayokoding.com). See
@@ -81,7 +81,7 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
    thematically (Conventional Commits, imperative, no period), push the branch, open a **draft PR**
    against `main` (`gh pr create --draft --base main ...`) — CI runs on the PR.
 3. [AI] Run the **PR-Review Maker→Fixer Cycle** (3 sequential CI-gated cycles), resolve every finding,
-   then `gh pr ready` — acceptance: three `pr-review-maker` reviews have been posted and answered, and
+   then `gh pr ready` — acceptance: three consolidated `pr-review-synthesis-maker` reviews have been posted and answered, and
    `gh pr view --json reviewThreads --jq '[.reviewThreads[] | select(.isResolved == false)] | length'`
    returns **0**, with **zero CRITICAL and zero HIGH** findings outstanding. Falsifiable both ways: an
    unanswered thread or an unresolved CRITICAL/HIGH returns non-zero and blocks the merge.
