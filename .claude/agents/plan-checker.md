@@ -199,10 +199,14 @@ not declare as a boundary in its `### Delivery Boundaries` table.
 grep -oE 'yes[^|]*Phase [0-9]+' delivery.md | grep -oE '[0-9]+$' | sort -un | tr '\n' ' '
 
 # (2) phases that ACTUALLY carry an integration step
-awk '/^## Phase [0-9]+/{n=$3; sub(/[^0-9].*$/,"",n)} n!="" {print n"\t"$0}' delivery.md \
-  | grep -Ei 'gh pr create|gh pr ready|open (a )?(draft )?pr|create pr|PR-Review|review cycle|merge(d)? (the )?PR' \
+awk '/^## Phase [0-9]+/{n=$3; sub(/[^0-9].*$/,"",n)} /^ *- \[[ x]\]/ && n!="" {print n"\t"$0}' delivery.md \
+  | grep -Ei 'gh pr create|gh pr ready|open (a )?(draft )?pr|draft pr opened|PR-Review|review cycle|\[AI\]`?-merged|auto-merge' \
   | cut -f1 | sort -un | tr '\n' ' '
 ```
+
+Command (2) restricts itself to `- [ ]` checklist lines on purpose: an integration step is always
+a checkbox, while prose inside a phase ("…false-negatives on every merged PR") is not, and an
+unrestricted match reports that prose as a violation.
 
 Acceptance: every number printed by (2) also appears in (1) — set (2) is a subset of set (1).
 Falsifiable both ways: adding `gh pr create` to an intermediate phase makes that phase number
