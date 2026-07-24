@@ -451,7 +451,7 @@ and therefore always a boundary.
   repo-wide as of 2026-07-22) — use this exact form.
 
 - [ ] [AI] **Confirm no manifest file changed in this phase** — this phase only writes
-      `evidence/` toolchain-baseline files, and it opens **no** PR (the Per-Phase Integration
+      `evidence/` toolchain-baseline files, and it opens **no** PR (the Delivery-Boundary Integration
       Protocol applies from Phase 1 onward), but the manifest-isolation assertion still holds here:
       `git diff --name-only origin/main...HEAD -- 'apps/ayokoding-www/src/features/course-paths/manifests/' | grep -c .`
       — acceptance: returns **0**. Falsifiable both ways: touching any file under that path makes the
@@ -470,7 +470,7 @@ and therefore always a boundary.
       recorded in `evidence/phase-0-snapshot.txt`.
 - [ ] [AI] Cross-plan link gate green (no line naming this plan's folder).
 - [ ] [AI] Zero manifest files touched (`git diff --name-only ... | grep -c .` returns 0).
-- [ ] [AI] **No PR was opened for this phase and nothing was pushed** — the Per-Phase Integration
+- [ ] [AI] **No PR was opened for this phase and nothing was pushed** — the Delivery-Boundary Integration
       Protocol applies from **Phase 1 onward** and explicitly excludes Phase 0. Read the printed
       number from each (never `&&`-chained, since `grep -c` exits 1 on a zero count):
       `git ls-remote --heads origin "$(git branch --show-current)" | grep -c .` returns **0**, and

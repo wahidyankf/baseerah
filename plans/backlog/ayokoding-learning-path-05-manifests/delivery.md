@@ -298,7 +298,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       green in `evidence/phase-0-snapshot.txt`; zero preexisting failures unresolved.
 - [ ] [AI] Manifest inventory recorded as empty; hub card count recorded as **0**; the four syllabus
       mirrors reachable at their cross-plan path.
-- [ ] [AI] **No PR was opened for this phase and nothing was pushed** — the Per-Phase Integration
+- [ ] [AI] **No PR was opened for this phase and nothing was pushed** — the Delivery-Boundary Integration
       Protocol applies from **Phase 1 onward** and explicitly excludes Phase 0. Read the printed
       number from each (never `&&`-chained, since `grep -c` exits 1 on a zero count):
       `git ls-remote --heads origin "$(git branch --show-current)" | grep -c .` returns **0**, and
