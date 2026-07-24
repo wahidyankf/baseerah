@@ -19,7 +19,7 @@
 Two standing constraints govern every step below.
 
 > **Cross-plan source of truth**: the authoritative per-course and per-path specs live in
-> `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
+> `plans/done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/`. Do not copy
 > them; do not author from any other source.
 >
 > **The manifest ownership invariant (binding)**: this plan owns **every** file under
@@ -278,7 +278,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       (`software-engineer` and `ai-engineer`) into one match under `sort -u` (DD-34).
 - [ ] [AI] **Syllabus mirror reachability** — confirm the four authoritative orderings are readable
       at their cross-plan path:
-      `ls ../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-*.md | wc -l`
+      `ls ../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-*.md | wc -l`
       run from this plan's folder — acceptance: returns **4**. If the schema plan has archived,
       re-resolve the path under `plans/done/YYYY-MM-DD__…` and update every reference in this folder
       in the same commit.
@@ -360,7 +360,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] **GREEN** — author `<MANIFESTS>careers/interview-ready/software-engineer.yaml` _(new file)_ with
       `pathId: careers/interview-ready/software-engineer`, a `title`, a `description`, and an ordered
       `courseOrder` transcribed from
-      [`../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-interview-ready-software-engineer.md`](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-interview-ready-software-engineer.md),
+      [`../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-interview-ready-software-engineer.md`](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-interview-ready-software-engineer.md),
       **restricted to the 33 re-homed topics + 4 existing capstones already live under `<COURSES>`**
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0, AND the five deferred IDs are absent —
@@ -488,9 +488,9 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 > superseded for this path). Per **DD-33** (still holding in scope) this path's `courseOrder` also
 > **walks**, never links, the existing nine-course AI/harness cluster, plus the six new
 > AI-engineer-role courses. The path's **full** composition is therefore no longer a fixed "15
-> courses" figure — it is the (still-being-ordered) included SWE-fundamentals set **plus** the
-> walked AI/harness cluster **plus** the six new AI-engineer-role courses; see DD-35 for why this
-> plan does not fabricate a total.
+> courses" figure — it is the (now-ordered, at plan 02's Phase 1.4) included SWE-fundamentals set
+> **plus** the walked AI/harness cluster **plus** the six new AI-engineer-role courses; see DD-35 for
+> why this plan does not fabricate a total.
 >
 > **Cross-plan dependency (new, 2026-07-21):** the prerequisite-consistent stage-by-stage ordering of
 > the included SWE-fundamentals set is authored by
@@ -537,8 +537,9 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       `pathId: careers/immediately-effective/ai-engineer`, a `title`, a `description`, and an ordered
       `courseOrder` whose **head** is the prerequisite-consistent ordering of the included
       SWE-fundamentals set — transcribed verbatim (never re-derived) from
-      [`../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md`](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md)'s
-      Stage 0 once that plan's own Phase 1.4 lands it — at minimum the 11 named courses
+      [`../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md`](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md)'s
+      Stage 0, now that that plan's own Phase 1.4 has landed it (that plan is archived) — at minimum
+      the 11 named courses
       `just-enough-python`, `software-testing`, `cicd-and-release-engineering`, `backend-at-scale`,
       `containers-and-orchestration`, `computer-architecture`, `site-reliability-engineering`,
       `data-engineering`, `data-structures-and-algorithms-essentials`, `software-product-engineering`,
@@ -669,7 +670,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 > Adds **no new course body** — it composes existing library courses into the immediately-effective
 > arc (editor → one language → **build a real app first** → then deepen). Authored over the
 > currently-available library and grown through Bands 1–8 **and Band 9** in Phase 5 — per the
-> [mirror's own "Optional tail" note](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md#optional-tail--ready-to-job-hunt-bridge-into-the-interview-courses),
+> [mirror's own "Optional tail" note](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md#optional-tail--ready-to-job-hunt-bridge-into-the-interview-courses),
 > this manifest's optional job-hunt tail lands here exactly like `fundamentally-strong`'s.
 
 ### 3.1 · TDD cycle — publish the manifest data file
@@ -699,7 +700,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] **GREEN** — author `<MANIFESTS>careers/immediately-effective/software-engineer.yaml` _(new file)_
       with `pathId: careers/immediately-effective/software-engineer`, a `title`, a `description`, and an
       ordered `courseOrder` transcribed from
-      [`../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md`](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md),
+      [`../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md`](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-software-engineer.md),
       **restricted to the mirror's main body (114 courses), excluding the five optional-tail Band-9
       IDs (`coding-interview`, `take-home-and-live-coding`, `system-design-interview`,
       `behavioral-and-leadership-interviews`, `capstone-interview-loop`) deferred to
@@ -812,7 +813,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
 - [ ] [AI] **GREEN** — author `<MANIFESTS>careers/fundamentally-strong/software-engineer.yaml` _(new file)_
       with `pathId: careers/fundamentally-strong/software-engineer`, a `title`, a `description`, and an
       ordered `courseOrder` transcribed from
-      [`../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md`](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md),
+      [`../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md`](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-fundamentally-strong-software-engineer.md),
       **restricted to the mirror's main body (116 courses), excluding the five optional-tail Band-9
       IDs (`coding-interview`, `take-home-and-live-coding`, `system-design-interview`,
       `behavioral-and-leadership-interviews`, `capstone-interview-loop`) deferred to
@@ -1065,7 +1066,7 @@ See [tech-docs.md's File Impact table](./tech-docs.md#file-impact).
       have landed, insert all nine into
       `<MANIFESTS>careers/immediately-effective/ai-engineer.yaml` at their correct
       topological positions per the
-      [manifest mirror](../../in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md)
+      [manifest mirror](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md)
       (already renamed and corrected for the from-scratch model; this step only inserts the
       AI/harness cluster the mirror's "AI-specialization spine" section still names unchanged) —
       command: `npx nx run ayokoding-www:test:unit`
