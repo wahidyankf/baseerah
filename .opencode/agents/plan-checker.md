@@ -205,14 +205,38 @@ not declare as a boundary in its `### Delivery Boundaries` table.
 grep -oE 'yes[^|]*Phase [0-9]+' delivery.md | grep -oE '[0-9]+$' | sort -un | tr '\n' ' '
 
 # (2) phases that ACTUALLY carry an integration step
-awk '/^## Phase [0-9]+/{n=$3; sub(/[^0-9].*$/,"",n)} /^ *- \[[ x]\]/ && n!="" {print n"\t"$0}' delivery.md \
+awk '
+  /^## Phase [0-9]+/ { n=$3; sub(/[^0-9].*$/,"",n) }
+  /^ *- \[ \]/       { if (buf) print buf; buf = n "\t" $0; next }
+  /^ *- \[x\]/ || /^ *$/ || /^#/ { if (buf) print buf; buf = ""; next }
+  buf                { buf = buf " " $0 }
+  END                { if (buf) print buf }
+' delivery.md \
+  | grep -viE 'gh pr list|no PR (here|at this gate)' \
   | grep -Ei 'gh pr create|gh pr ready|open (a )?(draft )?pr|draft pr opened|PR-Review|review cycle|\[AI\]`?-merged|auto-merge' \
   | cut -f1 | sort -un | tr '\n' ' '
 ```
 
-Command (2) restricts itself to `- [ ]` checklist lines on purpose: an integration step is always
-a checkbox, while prose inside a phase ("…false-negatives on every merged PR") is not, and an
-unrestricted match reports that prose as a violation.
+Command (2) restricts itself to **unticked** `- [ ]` checklist lines, and both halves of that
+restriction are deliberate. _Checklist_ excludes prose: an integration step is always a checkbox,
+while a sentence inside a phase ("…false-negatives on every merged PR") is not, and an unrestricted
+match reports that prose as a violation. _Unticked_ excludes history: a `- [x]` integration step is a
+merge that already happened, so reporting it is unactionable — the plan cannot un-merge it — and on a
+part-executed plan it would fire forever. Judge executed phases by whether their record is honest,
+not by this command; the rule binds the PRs a plan has **yet** to open.
+
+The awk accumulates each checklist **item** — its `- [ ]` line plus every wrapped continuation line
+under it — and only then matches. This is load-bearing, not tidiness: a boundary step typically reads
+`- [ ] [AI] **Delivery boundary …PR opens.** Draft PR` with `opened…; 3-cycle PR-Review complete; CI
+green; PR [AI]-merged.` on the _following_ indented lines. Matching line-by-line puts every keyword
+out of reach and reports **zero** integration steps on a plan that has three — a silent pass, the
+worst failure mode for a checker. The `grep -viE 'gh pr list|no PR (here|at this gate)'` pre-filter
+drops steps that _query_ integration rather than cause it: a `gh pr list --state open` step asserting
+no PR is still open matches `[AI]-merged` in its own acceptance clause otherwise.
+
+Sanity-check the command on a plan you already trust before believing a zero: if a plan with a
+populated `### Delivery Boundaries` table reports no integration steps at all, suspect the command,
+not the plan.
 
 Acceptance: every number printed by (2) also appears in (1) — set (2) is a subset of set (1).
 Falsifiable both ways: adding `gh pr create` to an intermediate phase makes that phase number
