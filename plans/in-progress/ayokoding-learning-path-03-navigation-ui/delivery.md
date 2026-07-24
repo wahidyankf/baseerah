@@ -597,7 +597,7 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
 
 ### Cycle 2.2 — Route wiring + path-aware prev/next
 
-- [ ] [AI] **RED** — write a failing test at `<NAV>prev-next.test.tsx` _(New test)_ asserting that, with
+- [ ] [AI] **RED** — write a failing test at `<NAV>prev-next.test.tsx` _(existing test, extended)_ asserting that, with
       an active fixture path context, `prev`/`next` are the fixture manifest's neighbours (not the
       weight-based siblings) and both hrefs carry `?path=<path-id>` — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: the assertion fails (today `prev-next.tsx` has
@@ -613,13 +613,21 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
     And both links preserve the path context query parameter
   ```
 
-- [ ] [AI] **GREEN** — add the optional `pathId` parameter to
-      `apps/ayokoding-www/src/features/content/core/content-url.ts` (appends `?path=<path-id>`), add the
-      optional path-context prop to `<NAV>prev-next.tsx` (**markup unchanged** — data source and href
+- [ ] [AI] **GREEN** — **Correction (2026-07-25)**: the optional `pathId` parameter on
+      `apps/ayokoding-www/src/features/content/core/content-url.ts` already exists — shipped by the
+      archived sibling plan `ayokoding-learning-path-02-schema-and-prerequisite-dag` (commit
+      `39606c066`, its own Cycle 2.4): an optional third `pathId?: string` argument that appends
+      `?path=<path-id>` to `contentUrl`'s existing return value, matching exactly what this sub-clause
+      would have built. **Verify** that shape rather than re-implementing it
+      (`grep -n "pathId" apps/ayokoding-www/src/features/content/core/content-url.ts` shows the
+      parameter and its `?path=` append). The genuinely new work in this cycle remains: add the optional
+      path-context prop to `<NAV>prev-next.tsx` (**markup unchanged** — data source and href
       construction only), and wire `<ROUTE>` to read `searchParams.path`, call the upstream
       `parsePathContext`, and resolve prev/next via `resolvePathNav` when a valid context resolves —
       command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:build` — acceptance: both
-      exit 0; the canonical (no-path) prev/next output is byte-identical to the Phase 0 snapshot.
+      exit 0; `content-url.ts`'s exported `contentUrl` signature already includes the optional third
+      `pathId` parameter (no edit needed there); the canonical (no-path) prev/next output is
+      byte-identical to the Phase 0 snapshot.
 - [ ] [AI] **REFACTOR** — route every path-preserving href through `contentUrl` so no component
       hand-concatenates `?path=` — command:
       `grep -ro -- "?path=" apps/ayokoding-www/src/features --include=*.tsx | wc -l` — acceptance: every
@@ -628,7 +636,7 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
 
 ### Cycle 2.3 — Path-aware breadcrumb
 
-- [ ] [AI] **RED** — write a failing test at `<NAV>breadcrumb.test.tsx` _(New test)_ asserting that with
+- [ ] [AI] **RED** — write a failing test at `<NAV>breadcrumb.test.tsx` _(existing test, extended)_ asserting that with
       an active fixture path context the trail renders `Home / Learn / <Path Title> / <Course Title>`
       and the path crumb links to `/en/learn/paths/<path-id>` with the context preserved — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: the assertion fails (today's breadcrumb is the
@@ -851,19 +859,34 @@ f="<PLAN>assets/$s-option-$o-desktop"; test "$f.png" -nt "$f.html" || echo "STAL
 
 ### Specs & Gherkin Delivery
 
-- [ ] [AI] **RED (specs)** — author the `course-paths` Gherkin companion under `<SPECS>` _(New folder;
-      sibling `.../gherkin/navigation/` exists — Repo-grounded)_, one `.feature` per behavior group
-      (path-order nav, breadcrumb, canonical fallback, invalid-path fallback, omitted course,
-      prerequisite display, rail desktop, rail drawer, no-path regression, a11y, build-green,
-      paths-hub category grouping, category-landing arc-chooser, skills fixed-arc statement,
-      category-landing empty-state, arc-landing two-role, arc-landing one-role, skills-path
-      landing-body content), copied verbatim from
-      [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin), plus `<SPECS>README.md` —
-      command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits non-zero
-      (scenarios present, no step definitions yet).
+- [ ] [AI] **RED (specs)** — `<SPECS>` already exists (created by the archived
+      `ayokoding-learning-path-02-schema-and-prerequisite-dag`; handoff documented in
+      `<SPECS>README.md`). (a) **Edit** the 6 pre-existing, in-scope files to remove `@wip` and add
+      their real level tag(s) — `path-order-nav.feature`, `omitted-course.feature`,
+      `canonical-fallback.feature`, `invalid-path-fallback.feature`, `breadcrumb.feature`,
+      `prerequisite-display.feature`. Do NOT touch `manifest-integrity.feature` or
+      `prerequisite-consistent-ordering.feature` — those are plan-02-owned pure-core scenarios, out of
+      scope for this plan. (b) **Author** 10 new `.feature` files, one per remaining behavior group
+      (landing hero, skills-path landing-body content, a11y, build-green, paths-hub category grouping,
+      category-landing arc-chooser, skills fixed-arc statement, category-landing empty-state,
+      arc-landing two-role, arc-landing one-role), copied verbatim from
+      [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin), with real level tags
+      (never `@wip` — that tag is reserved for cross-plan deferral, not this plan's own TDD
+      sequencing). Do NOT re-author "rail desktop"/"rail drawer"/"no-path regression" as new files —
+      those three are word-for-word identical to scenarios already inside `path-order-nav.feature`
+      (its desktop and phone-drawer scenarios) and `canonical-fallback.feature` (its "generic sidebar
+      unchanged" scenario), all three already covered by item (a)'s edit. Update `<SPECS>README.md` to
+      list the 10 new files and drop the "every scenario in this domain is `@wip`" framing for the
+      scenarios now un-`@wip`'d — command: `npx nx run ayokoding-www:specs:behavior:coverage` —
+      acceptance: exits non-zero. This is reliable specifically because none of the 20 in-scope
+      scenarios (10 edited + 10 new) carries `@wip`:
+      `apps/rhino-cli/src/application/speccoverage/checker.rs`'s shared-steps mode exempts only
+      `@wip`-tagged scenarios from step-gap detection, so all 20 correctly trip step-gap violations
+      while no step bindings exist yet.
   - _Suggested executor: `specs-maker`_
-- [ ] [AI] **GREEN (specs)** — implement the step bindings so every `<SPECS>` scenario executes —
-      command: `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits 0.
+- [ ] [AI] **GREEN (specs)** — implement the step bindings so every `<SPECS>` scenario executes, and
+      add the `@covers` markers to the 20 in-scope scenarios (10 edited + 10 new) — command:
+      `npx nx run ayokoding-www:specs:behavior:coverage` — acceptance: exits 0.
 
 ### Local Quality Gates (Before Push)
 
@@ -1598,8 +1621,9 @@ plans/done/YYYY-MM-DD__ayokoding-learning-path-03-navigation-ui/` using today's 
 
 ### Note: plan location at execution time
 
-This plan is authored in `plans/backlog/ayokoding-learning-path-03-navigation-ui/`. When work starts it
-is promoted to `plans/in-progress/ayokoding-learning-path-03-navigation-ui/` (pure move, no date
-prefix); the `git mv` in Phase 8 then archives it to
+This plan was authored in `plans/backlog/ayokoding-learning-path-03-navigation-ui/` and has already
+been promoted (pure move, no date prefix) to its current location,
+`plans/in-progress/ayokoding-learning-path-03-navigation-ui/`, where execution proceeds. The `git mv`
+in Phase 8 archives it from there to
 `plans/done/YYYY-MM-DD__ayokoding-learning-path-03-navigation-ui/` using the completion date. Substitute
 the current location wherever `<PLAN>` appears.

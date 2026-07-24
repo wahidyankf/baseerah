@@ -30,9 +30,12 @@ The new model **moves order out of the body and into the manifest**, and makes p
 `ayokoding-www` is a **Next.js app** [Repo-grounded — `apps/ayokoding-www/next.config.ts`,
 `src/app/[locale]/(content)/[...slug]/page.tsx`] following the repo's
 **functional-core/imperative-shell** feature layout (`src/features/<name>/{core,shell}`)
-[Repo-grounded — `src/features/{content,navigation}/{core,shell}`]. The `course-paths` feature is
-**new** — no such feature directory exists today [Repo-grounded — verified absent at
-`apps/ayokoding-www/src/features/course-paths`].
+[Repo-grounded — `src/features/{content,navigation}/{core,shell}`]. **Correction (2026-07-25)** — the
+`course-paths` feature's `core/` subdirectory is no longer new: it now exists on disk, populated by the
+merged, archived upstream plan `ayokoding-learning-path-02-schema-and-prerequisite-dag` (six pure
+modules plus `manifests/README.md`). The `shell/` subdirectory **this plan itself owns** remains absent
+today [Repo-grounded — verified absent at `apps/ayokoding-www/src/features/course-paths/shell`,
+matching `delivery.md`'s own Phase 0 precondition check].
 
 ## New feature: `course-paths` (functional core + imperative shell)
 
@@ -330,21 +333,32 @@ This plan's rendering layer must never hardcode a depth invariant. Concretely:
 **2026-07-21 category-split ruling — breadcrumb depth finding.** A careers path is now 3 URL segments
 deep, so a course-in-path breadcrumb can reach **6 crumbs**: `Home / Learn / Careers / <Arc> / <Role> /
 <Course>`. [Repo-grounded — read directly:
-`apps/ayokoding-www/src/features/navigation/shell/breadcrumb.tsx`, 56 lines.] Findings:
+`apps/ayokoding-www/src/features/navigation/shell/breadcrumb.tsx`, current as of 2026-07-25.] Findings:
 
 - **No hardcoded depth ceiling exists in the component.** `Breadcrumb` accepts a generic
-  `segments: {label, slug, href?}[]` prop with no length check, and renders via
-  `<nav aria-label="Breadcrumb"><ol className="flex flex-wrap items-center gap-1">` — `flex-wrap`
-  means it **degrades by wrapping to additional lines**, never by breaking or truncating, at any
-  segment count. Six segments will render without a code change.
-- **Residual, not-yet-resolved tension**: this plan's own
+  `segments: {label, slug, href?}[]` prop with no length check. **Correction (2026-07-25) — the
+  markup this finding originally cited is stale.** A sibling plan's own Rule-15 web-design-tester
+  retest (tagged `DWT-001` in the component's doc comment, sourced from
+  `ayokoding-learning-path-01-url-restructure`'s `prd.md` Screen 4 acceptance criterion and mockup
+  assets) landed **after** this passage was authored and removed `flex-wrap` entirely: the `<ol>` now
+  renders `className="flex items-center gap-1 overflow-x-auto whitespace-nowrap"`, and beyond 3
+  visible crumbs the middle ones collapse behind a single mobile-only ellipsis crumb
+  (`hasMobileCollapse`), reappearing at `sm:` and up. The row **never wraps to a second line at any
+  width** — it either shows every crumb on one line (with horizontal scroll as the tablet-band overflow
+  fallback) or, below `sm`, collapses the middle crumbs behind one `…`. Six segments will render without
+  a further code change.
+- **Residual tension, now largely resolved by the code itself**: this plan's own
   [Learner Journey](./prd.md#learner-journey-end-to-end) states a "no multi-line breadcrumb wrap on
-  small screens" principle. A full 6-segment careers trail under `?path=` at 375 px is a **plausible
-  violation** of that stated principle even though nothing crashes — `flex-wrap` will happily produce
-  2+ lines. This is flagged, not resolved, here: the 375 px Screen 3 manual-verification step
-  (Playwright MCP) must empirically confirm how many lines the real breadcrumb wraps to at 6 segments
-  and whether that reading is acceptable, rather than this document asserting either outcome without
-  evidence. See the corresponding entry in [prd.md §Product-Level Risks](./prd.md#product-level-risks).
+  small screens" principle — the current component **structurally guarantees** this (`overflow-x-auto
+whitespace-nowrap` forbids wrapping outright), so the "how many lines does it wrap to" question this
+  section originally flagged is now moot. The residual, still-open question is narrower: does the
+  mobile ellipsis-collapse read correctly at a full 6-segment careers trail (does the single `…` crumb
+  communicate the hidden middle segments clearly), and is the tablet-band horizontal-scroll fallback
+  acceptable rather than distracting? This is flagged, not resolved, here: the 375 px Screen 3
+  manual-verification step (Playwright MCP) must empirically confirm the ellipsis-collapse rendering and
+  the horizontal-scroll fallback at 6 segments, rather than this document asserting either outcome
+  without evidence. See the corresponding entry in
+  [prd.md §Product-Level Risks](./prd.md#product-level-risks).
 
 ## Prerequisite display
 
@@ -648,8 +662,8 @@ for paths that list the course) without re-deciding either.
 
 ## Programme decisions
 
-The decision ids this plan cites (`R1`, `R2`, `R3`, `R4`, `R5`, `R6`, `R7`, `R8`, `R9`, `A3`, `A5`,
-`A9`, `A10`) were **folded verbatim from the now-retired shared programme file and are owned locally here** — that
+The decision ids this plan cites (`R1`, `R2`, `R3`, `R4`, `R5`, `R6`, `R7`, `R8`, `R9`, `A1`, `A2`,
+`A3`, `A5`, `A9`, `A10`) were **folded verbatim from the now-retired shared programme file and are owned locally here** — that
 shared programme file no longer exists, so these definitions live in this section. They are **programme-scope decisions, not governance rule ids**; each `A*` amendment is
 later than the `R*` rules and wins on conflict. The wave/DAG position is stated locally in
 [README §Wave and dependency position](./README.md#wave-and-dependency-position) and
@@ -666,10 +680,23 @@ later than the `R*` rules and wins on conflict. The wave/DAG position is stated 
 | R7  | **Every URL segment must render** — no orphan segments                                                                                                                                       |
 | R8  | Every `skills/` path uses the **immediately-effective** arc, always                                                                                                                          |
 | R9  | Every plan declares its **UI-gate and API-gate posture explicitly**; a plan bearing neither surface is _not_ thereby exempt and must state why                                               |
+| A1  | `careers/immediately-effective/ai-engineer` assumes **no** prior software-engineering competence; prerequisites are included in `courseOrder`, not linked                                    |
+| A2  | The skills category splits into **two** plans — 06 (accounting) and 07 (ERP), the latter `blockedBy` the former                                                                              |
 | A3  | Plan 01 owns **every structural `_index.md`** under `paths/`; plans 05-07 own only their path landings, manifests and corpora                                                                |
 | A5  | Plan 03 owns **all** design assets **except plan 01's Screen 4 funnel and its six renders**; a `.png` is a baked render and desynchronises silently when its `.html` changes                 |
 | A9  | Both corpora **expand past 20 courses** as the domain requires; every derived count follows                                                                                                  |
 | A10 | The skills category carries **four** paths — `conventional-accounting`, `sharia-accounting`, `conventional-erp`, `sharia-erp`; each Sharia path covers the basics too, and `A11` governs how |
+
+> **`A1`/`A2` canonical ownership.** `A1` is added here only to resolve this table's own `R3` row
+> above ("superseded in part by `A1`"); it is defined verbatim in
+> `ayokoding-learning-path-07-skills-erp/tech-docs.md` — the only sibling plan whose own copy of
+> this table carries an `A1` row, making that plan `A1`'s canonical owner. `A2` is added to resolve
+> this table's own `R4` row ("revised by `A2`"); it is reproduced byte-identically across
+> `ayokoding-learning-path-05-manifests`, `-06-skills-accounting`, `-07-skills-erp`, and the archived
+> `-02-schema-and-prerequisite-dag` — no single plan is `A2`'s sole canonical owner, it is a
+> programme-wide fact all four already carry. This plan does not act on either decision; both rows
+> exist solely so this table's own forward-references resolve without leaving the reader to consult
+> a sibling plan, consistent with this section's own "owned locally here" framing.
 
 ## File Impact
 
@@ -679,16 +706,27 @@ later than the `R*` rules and wins on conflict. The wave/DAG position is stated 
 `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`;
 `<E2E>` = `apps/ayokoding-www-fe-e2e/`.
 
-| Area                    | Change                                            | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ----------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `course-paths` shell    | New app code (TDD)                                | `<FEAT>shell/{manifest-repository.ts,path-landing.tsx,path-card.tsx,category-landing.tsx,arc-landing.tsx,empty-path-list-state.tsx,ramp-milestone-strip.tsx,syllabus-preview.tsx,path-rail.tsx,path-banner.tsx,prerequisite-list.tsx,path-course-links.tsx}` _(all New files — `category-landing.tsx`, `arc-landing.tsx`, `empty-path-list-state.tsx`, `ramp-milestone-strip.tsx`, `syllabus-preview.tsx` added 2026-07-21)_ + colocated `*.test.tsx` |
-| Route wiring            | Edit                                              | `apps/ayokoding-www/src/app/[locale]/(content)/[...slug]/page.tsx` [Repo-grounded]                                                                                                                                                                                                                                                                                                                                                                    |
-| Extended nav components | Additive props, no fork                           | `<NAV>prev-next.tsx`, `<NAV>breadcrumb.tsx`, `apps/ayokoding-www/src/features/content/core/content-url.ts` [all Repo-grounded]                                                                                                                                                                                                                                                                                                                        |
-| Screen 3 hosts          | `children` swap only                              | `<NAV>resizable-sidebar.tsx`, `<SHELL>mobile-nav.tsx` [both Repo-grounded]                                                                                                                                                                                                                                                                                                                                                                            |
-| Screen 0 hero           | Edit — `PathCard` grid + skills escape-hatch link | `<SHELL>hero.tsx` [Repo-grounded]; existing `<SHELL>landing.test.tsx` extended                                                                                                                                                                                                                                                                                                                                                                        |
-| Specs (Gherkin)         | New domain folder                                 | `<SPECS>*.feature` + `<SPECS>README.md` _(New files; sibling `navigation/` exists — Repo-grounded)_                                                                                                                                                                                                                                                                                                                                                   |
-| E2E                     | New fixture + step defs                           | `<E2E>` careers-shaped and skills-shaped fixture manifests _(New files)_ + `course-paths` step definitions _(New files; sibling `resizable-sidebar.steps.ts` exists — Repo-grounded)_                                                                                                                                                                                                                                                                 |
-| Plan artefacts          | Funnel + evidence                                 | `assets/*.png` (**36 total**: 8 pre-existing HTML sources content-fixed in place for R6/R8, 4 new HTML source stems added for Screens 1a/1b — all 36 `.png` pending render/re-render), `prd.md` embeds, `evidence/*.png`                                                                                                                                                                                                                              |
+| Area                    | Change                                            | Files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `course-paths` shell    | New app code (TDD)                                | `<FEAT>shell/{manifest-repository.ts,path-landing.tsx,path-card.tsx,category-landing.tsx,arc-landing.tsx,empty-path-list-state.tsx,ramp-milestone-strip.tsx,syllabus-preview.tsx,path-rail.tsx,path-banner.tsx,prerequisite-list.tsx,path-course-links.tsx}` _(all New files — `category-landing.tsx`, `arc-landing.tsx`, `empty-path-list-state.tsx`, `ramp-milestone-strip.tsx`, `syllabus-preview.tsx` added 2026-07-21)_ + colocated `*.test.tsx`                                                                                                                                                                                                                                                                                                              |
+| Route wiring            | Edit                                              | `apps/ayokoding-www/src/app/[locale]/(content)/[...slug]/page.tsx` [Repo-grounded]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Extended nav components | Additive props, no fork                           | `<NAV>prev-next.tsx`, `<NAV>breadcrumb.tsx`, `apps/ayokoding-www/src/features/content/core/content-url.ts` [all Repo-grounded]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Screen 3 hosts          | `children` swap only                              | `<NAV>resizable-sidebar.tsx`, `<SHELL>mobile-nav.tsx` [both Repo-grounded]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Screen 0 hero           | Edit — `PathCard` grid + skills escape-hatch link | `<SHELL>hero.tsx` [Repo-grounded]; existing `<SHELL>landing.test.tsx` extended                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Specs (Gherkin)         | Edit pre-existing domain folder + add new files   | `<SPECS>` already exists, created by the archived `ayokoding-learning-path-02-schema-and-prerequisite-dag`, which handed off step-binding ownership to this plan (documented in `<SPECS>README.md` — Repo-grounded); **edit** the 6 in-scope existing files (10 scenarios) to remove `@wip` and add real level tags (`path-order-nav.feature`, `omitted-course.feature`, `canonical-fallback.feature`, `invalid-path-fallback.feature`, `breadcrumb.feature`, `prerequisite-display.feature`); **author** 10 new `.feature` files for the remaining behavior groups plan-02 did not scaffold; excludes `manifest-integrity.feature` and `prerequisite-consistent-ordering.feature` (plan-02-owned pure-core scenarios, out of scope for this plan) [Repo-grounded] |
+| E2E                     | New fixture + step defs                           | `<E2E>` careers-shaped and skills-shaped fixture manifests _(New files)_ + `course-paths` step definitions _(New files; sibling `resizable-sidebar.steps.ts` exists — Repo-grounded)_                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Plan artefacts          | Funnel + evidence                                 | `assets/*.png` (**36 total**: 8 pre-existing HTML sources content-fixed in place for R6/R8, 4 new HTML source stems added for Screens 1a/1b — all 36 `.png` pending render/re-render), `prd.md` embeds, `evidence/*.png`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+
+> **Correction (2026-07-25) — the `content-url.ts` cell in the "Extended nav components" row above is
+> partially already shipped.** The additive `pathId` parameter on
+> `apps/ayokoding-www/src/features/content/core/content-url.ts` was already implemented and merged by
+> the archived sibling plan `ayokoding-learning-path-02-schema-and-prerequisite-dag` (commit
+> `39606c066`, its own Cycle 2.4): an optional third `pathId?: string` argument that appends
+> `?path=<path-id>` to `contentUrl`'s existing return value — matching exactly what this plan's Cycle
+> 2.2 GREEN step describes. This plan's remaining work on `content-url.ts` is to **verify** that shape
+> (not re-implement it); the genuinely new work in Cycle 2.2 — the path-context prop on
+> `<NAV>prev-next.tsx` and the route wiring — is unaffected. See `delivery.md`'s Cycle 2.2 GREEN step
+> for the adjusted instruction.
 
 **Not touched by this plan**: any file under `apps/ayokoding-www/content/`, `<FEAT>core/`,
 `<FEAT>shell/manifests/`, `apps/ayokoding-www/src/redirects/`, or `next.config.ts`. If a delivery step

@@ -329,7 +329,7 @@ The site landing hero at `/en`
 ([`app-shell/shell/hero.tsx`](../../../apps/ayokoding-www/src/features/app-shell/shell/hero.tsx),
 rendered by [`landing.tsx`](../../../apps/ayokoding-www/src/features/app-shell/shell/landing.tsx) via
 `<Hero locale={locale} />`) [Repo-grounded — both files exist today]. **Today** it offers only two
-generic CTAs — **Start learning** → `/en/c` (a recall-heavy browse index of sections) and **Explore
+generic CTAs — **Start learning** → `/en/browse` (a recall-heavy browse index of sections) and **Explore
 tools** — so a goal-driven learner ("I want to get interview-ready") has **zero path scent** above the
 fold. This screen fixes that: the hero must **surface `/paths` directly**, turning the landing page
 into the first step of the learner journey rather than a dead-drop into a taxonomy.
@@ -2344,12 +2344,15 @@ Scenario: A category landing with no populated manifest renders an explicit empt
   states of Screen 1a (not a shared prop-driven template) in both the hi-fi spec and two dedicated
   Gherkin scenarios.
 - **A `?path=` breadcrumb reaching 6 segments (`Home / Learn / Careers / <Arc> / <Role> / <Course>`)
-  wraps awkwardly on mobile.** [Repo-grounded — `breadcrumb.tsx` has no hardcoded depth ceiling; it
-  renders via `<ol className="flex flex-wrap items-center gap-1">`, so it degrades by wrapping to
-  multiple lines rather than breaking, at any depth.] The residual risk is **not** breakage but a
-  **design-intent tension**: this plan's own Learner Journey section states a "no multi-line breadcrumb
-  wrap on small screens" principle elsewhere, and a full 6-segment careers breadcrumb under `?path=` on
-  a 375 px viewport is a plausible violation of that principle even though nothing crashes. **Not
-  resolved here** — flagged for the 375 px Screen 3 manual-verification step to confirm empirically
-  (does the real component wrap to 2 lines, and is 2-line wrap acceptable) rather than assumed either
-  way in this document.
+  may read awkwardly on mobile.** **Correction (2026-07-25)** — `breadcrumb.tsx` no longer has a
+  `flex-wrap` class at all [Repo-grounded]: a sibling plan's Rule-15 web-design-tester retest
+  (`DWT-001`) replaced it with `overflow-x-auto whitespace-nowrap` plus a mobile ellipsis-collapse
+  (beyond 3 visible crumbs the middle ones collapse behind one `…` below `sm:`, reappearing at `sm:`
+  and up), so the component **structurally cannot wrap to a second line** at any depth — the original
+  "wraps awkwardly" premise is moot. The residual, still-open risk is narrower: does the
+  ellipsis-collapse read correctly at a full 6-segment careers trail, and is the tablet-band
+  horizontal-scroll fallback acceptable rather than distracting? This plan's own Learner Journey
+  "no multi-line breadcrumb wrap on small screens" principle is now satisfied by construction, not
+  merely by design intent. **Not resolved here** — flagged for the 375 px Screen 3
+  manual-verification step to confirm empirically (does the ellipsis-collapse and horizontal scroll
+  read acceptably at 6 segments) rather than assumed either way in this document.
