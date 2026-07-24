@@ -4,7 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_(none currently)_
+- [ayokoding-learning-path-03-navigation-ui](./ayokoding-learning-path-03-navigation-ui/README.md)
+  — **Wave 2** of the `ayokoding-learning-path-*` programme. The design funnel and every rendered
+  surface: path landings, cards, and the prev/next/breadcrumb wiring.
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.
