@@ -20,12 +20,12 @@ archival.
 >
 > **Phase Gate** — every phase ends with a `### Phase N Gate` (must-pass verification) plus a
 > `> **Pause Safety**:` note (safe-to-stop state + resume command). Every gate covers the phase's
-> **code correctness** (tests, checkers, build). A gate ending a **delivery-boundary** phase (see the
-> `### Delivery Boundaries` table under `## Parallelization Model`) additionally covers
-> **integration** (draft PR opened, 3-cycle PR-Review, CI green, `[AI]` merge); an intermediate
-> phase's gate instead confirms the work is committed to its delivery unit's branch, with no PR of
-> its own. A phase is not complete until every gate check is green, and phase N+1 does not start
-> while any phase N gate check is failing.
+> **code correctness** (tests, checkers, build). Only the gate that **closes a natural delivery stop
+> point** (`DN-14` — Phases 1+2, 3+4, and 6+7; not every phase) also covers **integration** (draft PR
+> opened, 3-cycle PR-Review, CI green, `[AI]` merge); an earlier phase inside the same stop point
+> instead notes that its work continues on the same branch into the next phase. A phase is not
+> complete until every gate check is green, and phase N+1 does not start while any phase N gate check
+> is failing.
 
 ## Worktree
 
@@ -41,25 +41,51 @@ The plan-execution Step 0 gate enters this worktree by default: it auto-provisio
 `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting
 the worktree after the plan is archived and pushed.
 
-Each **delivery unit** — see the `### Delivery Boundaries` table under `## Parallelization Model` —
-branches from the **latest `origin/main`** inside this one worktree
-(`git fetch origin && git checkout main && git pull && git checkout -b
-ayokoding-learning-path-02-schema-and-prerequisite-dag/<unit-slug>`), authors every phase inside that
-unit on the same branch, commits per phase, and opens **its own draft PR at its declared boundary
-phase** — from **Phase 1 onward**. **Phase 0 is excluded**: it is setup and baseline, pushes no
-branch and opens no PR, and its evidence artifacts ride the first delivery unit's PR.
+Each **natural delivery stop point** branches from the **latest `origin/main`** inside this one
+worktree (`git fetch origin && git checkout main && git pull && git checkout -b
+ayokoding-learning-path-02-schema-and-prerequisite-dag/<stop-point-slug>`), authors every phase in
+that stop point on the SAME branch, commits, pushes that branch, and opens **its own draft PR** —
+**one PR per stop point, not one PR per phase** (`DN-14`, see below). **Phase 0 is excluded**: it is
+setup and baseline, pushes no branch and opens no PR, and its evidence artifacts ride the first
+stop point's PR.
+
+> **DN-14 DECIDED — one PR per natural delivery stop point, not one PR per phase** (2026-07-24,
+> maintainer directive, in-session): a phase is a checkpoint inside the plan's own checklist, not
+> automatically an independent, reviewable, mergeable unit — opening a full 3-cycle PR-review gate
+> for every phase, including phases that are serially dependent on the one before them or that ship
+> no independently-reviewable diff, multiplies review-cycle overhead without a matching increase in
+> reviewability. This plan's four stop points, applying the "genuinely dependent nodes stay one PR"
+> clause of [Delivery Mode](../../../repo-governance/conventions/structure/plans.md#delivery-mode)
+> to this plan's own already-documented [Parallelization Model](#parallelization-model):
+>
+> 1. **Phases 1 + 2** — one PR, merging at the Phase 2 Gate. Phase 2's every RED step imports from
+>    what Phase 1 created (Parallelization Model), so Phase 1 alone is not independently reviewable
+>    against its own final shape; the pair is this plan's core "data layer" handoff point.
+> 2. **Phases 3 + 4** — one PR, merging at the Phase 4 Gate. Both are verification passes over the
+>    already-shipped Phase 1+2 code (automated quality gates, then a manual no-regression sweep) —
+>    no new schema or core logic ships in either.
+> 3. **Phase 5** — no PR of its own. It is a **gate-only** verification phase confirming the prior
+>    stop point's PR is merged and integrated (`Zero open plan PRs; every prior phase merged to
+main`, Phase 5 Gate) — it ships no diff to review.
+> 4. **Phases 6 + 7** — one PR, merging at the Phase 7 Gate. `learnings.md` triage (6) and the
+>    archival move + link repoint (7) are both docs-only, serially dependent (7 checks that 6 is
+>    fully triaged first), and together form the plan's closing stop point.
+>
+> Net effect: **4 PRs across Phases 0-7** (Phase 0's PR #90, already merged — see its own
+> grandfathered-exception note below — plus the three stop points above) instead of the
+> one-PR-per-phase default this section previously declared.
 
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and
 [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
 ## Delivery Mode: worktree-to-pr
 
-Each **delivery unit** — the three named in the `### Delivery Boundaries` table under
-`## Parallelization Model` below; Phase 0 opens none — works in the worktree on its **own branch**,
-opens a **draft PR at its declared boundary phase** against `main`, runs the
-**PR-Review Maker→Fixer Cycle** (fan-out → `pr-review-synthesis-maker` → `pr-review-fixer`, 3 sequential CI-gated
-cycles), flips the PR to ready, and `[AI]` **merges it automatically once all quality gates are
-green**. Mode inherited from the source plan at tier-2 ("plan field") precedence — not re-derived.
+Each **natural delivery stop point** — Phases 1+2, Phases 3+4, and Phases 6+7 (Phase 0's PR #90
+already merged; Phase 5 opens none — see `DN-14` above) — works in the worktree on its **own
+branch**, opens a **draft PR** against `main`, runs the **PR-Review Maker→Fixer Cycle** (fan-out →
+`pr-review-synthesis-maker` → `pr-review-fixer`, 3 sequential CI-gated cycles), flips the PR to
+ready, and `[AI]` **merges it automatically once all quality gates are green**. Mode inherited from
+the source plan at tier-2 ("plan field") precedence — not re-derived.
 See
 [Plans Organization Convention §Delivery Mode](../../../repo-governance/conventions/structure/plans.md#delivery-mode)
 and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md).
@@ -76,25 +102,22 @@ and the [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/
 > since been changed to match, so **DN-11 = AI-auto-merge** now simply confirms the repo default rather
 > than deviating from it. The preconditions are unchanged either way — only the actor differs.
 
-**Delivery-Boundary Integration Protocol** (each **delivery-boundary** phase's gate lists these as
-must-pass — see the `### Delivery Boundaries` table under `## Parallelization Model` for exactly
-which phases those are; **Phase 1 onward** carries boundary phases, never Phase 0). **Phase 0 is
-excluded**: it is Environment Setup and Baseline, opens no PR, pushes no branch, runs no review
-cycle, and merges nothing; its evidence artifacts ride the first delivery unit's PR
-([§Phase 0 Opens No PR](../../../repo-governance/conventions/structure/plans.md#phase-0-opens-no-pr--the-earliest-pr-is-phase-1-hard-rule)).
-An **intermediate** phase inside a delivery unit — one that is not itself a declared boundary, per
-[§PRs Open at Delivery Boundaries](../../../repo-governance/conventions/structure/plans.md#prs-open-at-delivery-boundaries-not-every-phase-hard-rule)
-— commits its work to that unit's branch and still passes its own `### Phase N Gate`, but runs none
-of the four steps below; those fire only once, at the unit's declared boundary phase.
+**Per-Stop-Point Integration Protocol** (each stop point's closing gate lists these as must-pass;
+per `DN-14` this runs once per stop point, not once per phase). **Phase 0 is excluded**: it already
+completed this protocol as a one-time grandfathered exception (PR #90, merged — see its own note
+under the Phase 0 Gate). **Phase 5 is excluded**: it opens no PR of its own (gate-only verification
+that the prior stop point's PR merged) — see `DN-14` above.
 
-1. [AI] Sync the worktree to latest `origin/main` and branch, once per delivery unit, at that unit's
-   first phase:
+1. [AI] **At the start of a stop point's first phase only**: sync the worktree to latest
+   `origin/main` and branch:
    `git fetch origin && git checkout main && git pull && git checkout -b
-ayokoding-learning-path-02-schema-and-prerequisite-dag/<unit-slug>`.
-2. [AI] Stage only this unit's paths per phase (`git add <explicit paths>` — never `git add -A`),
-   committing thematically as each phase completes (Conventional Commits, imperative, no period); at
-   the unit's declared boundary phase, push the branch and open a **draft PR** against `main`
-   (`gh pr create --draft --base main ...`) — CI runs on the PR.
+ayokoding-learning-path-02-schema-and-prerequisite-dag/<stop-point-slug>`. Every later phase inside
+   the same stop point continues committing to this SAME branch — no new branch, no new PR, until
+   the stop point's closing phase.
+2. [AI] Stage only the current phase's paths (`git add <explicit paths>` — never `git add -A`),
+   commit thematically per phase (Conventional Commits, imperative, no period), push the branch
+   after each phase's commits. **Only at the stop point's closing phase**: open a **draft PR**
+   against `main` (`gh pr create --draft --base main ...`) — CI runs on the PR.
 3. [AI] Run the **PR-Review Maker→Fixer Cycle** (3 sequential CI-gated cycles), resolve every finding,
    then `gh pr ready`.
 4. [AI] **Merge** once all quality gates are green (typecheck, lint, `test:quick`, `test:unit`,
@@ -121,27 +144,39 @@ deploy would be a pure no-op. The first split plan to change a rendered surface 
 subagents capped per the orchestration convention). The main thread self-promotes nothing.
 
 - **Phases 0 → 1 → 2 are serial.** Phase 1 defines the schema Phase 2's core is written against;
-  Phase 2's every RED step imports from what Phase 1 created.
+  Phase 2's every RED step imports from what Phase 1 created. **Per `DN-14`, Phases 1+2 are one
+  stop point and one PR** — Phase 1 alone has no independently-reviewable final shape.
 - **Inside Phase 2, the eight TDD cycles (2.1-2.5, 2.6a, 2.6b, 2.7) are serial by convention, not by
   necessity.** Cycles 2.2 (`path-nav`), 2.3 (`path-context`), 2.4 (`content-url`) and 2.5
   (`resolvePrerequisites`) touch disjoint files and could pipeline through review under the cap;
   2.6a, 2.6b and 2.7 depend on cycle 2.1's normalized course-ref shape, and **2.6b depends on 2.6a**
   (same function, same result object). Keep them serial unless the cap has genuine headroom — the
-  Phase 1-2 delivery unit is one PR either way (see Delivery Boundaries below).
-- **Phases 3 → 4 → 5 → 6 → 7 are serial.**
+  phase is one PR either way (and, per `DN-14`, so is the Phase 1+2 pair around it).
+- **Phases 3 → 4 → 5 → 6 → 7 are serial.** Per `DN-14`: **Phases 3+4 are one stop point/one PR**
+  (both are verification passes over already-shipped code); **Phase 5 opens no PR** (gate-only,
+  confirms the prior PR merged); **Phases 6+7 are one stop point/one PR** (docs-only closing pair).
 - **This plan runs in parallel with `ayokoding-learning-path-01-url-restructure`** (the other Wave-1
   plan). Do not serialize them for convenience — the split exists to buy that parallelism.
 
 ### Delivery Boundaries
 
-| Phase(s) | Delivery unit                                               | Worktree / branch                                                                     | PR opens         |
-| -------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
-| 0        | — (setup and baseline)                                      | —                                                                                     | no               |
-| 1-2      | Data layer — prerequisite schema + `course-paths` pure core | `worktrees/ayokoding-learning-path-02-schema-and-prerequisite-dag` / `.../data-layer` | yes — at Phase 2 |
-| 3-4      | Verification and no-regression evidence                     | same worktree / `.../verification-evidence`                                           | yes — at Phase 4 |
-| 5        | — (final `origin/main` integration check)                   | —                                                                                     | no               |
-| 6-7      | Knowledge capture and plan archival                         | same worktree / `.../archival`                                                        | yes — at Phase 7 |
+| Phase(s) | Delivery unit                                               | Worktree / branch                                                                                                                                                          | PR opens         |
+| -------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| 0        | — (setup and baseline)                                      | —                                                                                                                                                                          | no               |
+| 1-2      | Data layer — prerequisite schema + `course-paths` pure core | `worktrees/ayokoding-learning-path-02-schema-and-prerequisite-dag` / `.../<stop-point-slug>` (`DN-14`; this stop point's actual branch is `.../phase-1-schema-foundation`) | yes — at Phase 2 |
+| 3-4      | Verification and no-regression evidence                     | same worktree / `.../<stop-point-slug>` (`DN-14`; resolved once that stop point's first phase begins)                                                                      | yes — at Phase 4 |
+| 5        | — (final `origin/main` integration check)                   | —                                                                                                                                                                          | no               |
+| 6-7      | Knowledge capture and plan archival                         | same worktree / `.../<stop-point-slug>` (`DN-14`; resolved once that stop point's first phase begins)                                                                      | yes — at Phase 7 |
 
+**Branch column note**: each `<stop-point-slug>` is a per-stop-point placeholder — see the
+[Worktree](#worktree) section and `DN-14` above — resolved to a concrete branch name once that stop
+point's first phase runs, not fixed in advance. This table previously named stale pre-`DN-14` slugs
+(`.../data-layer`, `.../verification-evidence`, `.../archival`); `DN-14` (2026-07-24) superseded that
+one-PR-per-phase-implied naming with the stop-point grouping below, and this table now uses the same
+`<stop-point-slug>` vocabulary the rest of this document uses.
+
+The per-delivery-unit reasoning below is the boundary-test justification underlying `DN-14`'s own
+Phases-1+2/3+4/6+7 stop-point grouping above — restated here per row rather than per stop point.
 Phase 1 fails the boundary test alone — it is the schema Phase 2's pure core is written against, and
 the Parallelization Model above already treats it as intermediate — so it cannot be its own unit;
 Phase 2 completes the entire data-layer deliverable this plan exists to ship and is the plan's own
@@ -235,15 +270,15 @@ expanded is not executable.
   first. See [Parallelization model](#parallelization-model).
 - `<BASELINE_SHA>` = the 40-hex commit SHA this execution's `syllabus/` custody checks are measured
   **against**, resolved once by Phase 0 and expanded textually everywhere — **never** the live
-  `origin/main` ref. The ref moves: the **Delivery-Boundary Integration Protocol** declared above
-  under `## Delivery Mode` merges the Phase 1-2 delivery unit's PR to `main` at Phase 2's boundary
-  (Phase 1's 1.4 edit rides that same PR — it does not merge separately), so from Phase 3 onward
-  `origin/main` already contains step 1.4's edit and a diff against it prints **zero** lines — which
-  the custody checks would read as "1.4 never ran", blocking the Phase 3 gate and, at 7.1 (c), blocking
-  archival permanently. A SHA pinned **before** Phase 1 does not move under that merge, so the same
+  `origin/main` ref. The ref moves: the **Per-Stop-Point Integration Protocol** declared above under
+  `## Delivery Mode` merges the Phase 1+2 stop point's one PR to `main` at the Phase 2 Gate (`DN-14`
+  — not one PR per phase), so from Phase 3 onward `origin/main` already contains step 1.4's edit
+  (authored in Phase 1, merged with Phase 2) and a diff against it prints **zero** lines — which the
+  custody checks would read as "1.4 never ran", blocking the Phase 3 gate and, at 7.1 (c), blocking
+  archival permanently. A SHA pinned **before** Phase 1 does not move under those merges, so the same
   three checks stay falsifiable in both directions at every phase that runs them.
-- `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/` (course bundles; served at `/en/c/learn/courses/<course-id>`)
-- `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` (thin path-landing anchors; served at `/en/c/learn/paths/<path-id>`)
+- `<COURSES>` = `apps/ayokoding-www/content/en/learn/courses/` (course bundles; served at `/en/learn/courses/<course-id>` — no `/c/`, DD-48)
+- `<PATHS>` = `apps/ayokoding-www/content/en/learn/paths/` (thin path-landing anchors; served at `/en/learn/paths/<path-id>` — no `/c/`, DD-48)
 - `<SE_OLD>` = `apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/` (legacy home of the 33 shipped topics + 4 existing capstones, incl. `capstone-solid-core` — the re-home source)
 - `<FEAT>` = `apps/ayokoding-www/src/features/course-paths/`
 - `<MANIFESTS>` = `<FEAT>manifests/` (standalone YAML data files, nested to mirror the **variable-depth**
@@ -252,7 +287,7 @@ expanded is not executable.
   `<MANIFESTS>skills/conventional-accounting.yaml` — this plan's schema/resolvers validate only the first segment
   (`careers`/`skills`) and manifest resolvability, never depth — see
   [tech-docs.md §Variable-depth `pathId`](./tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8), R2/R8)
-- `<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension; served at `/en/c/learn/legacy/<domain>/…`)
+- `<LEGACY>` = `apps/ayokoding-www/content/en/learn/legacy/` (**new bucket**, scope extension; served at `/en/learn/legacy/<domain>/…` — no `/c/`, DD-48)
 - `<REDIR>` = `apps/ayokoding-www/src/redirects/`
 - `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/`
 - `<NAVSPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/` (existing domain — the three-bucket Gherkin lands beside `content-namespace-redirects.feature`)
@@ -665,6 +700,14 @@ to the source plan is recorded here so a reader auditing the split can trace eve
   and [§PRs Open at Delivery Boundaries](../../../repo-governance/conventions/structure/plans.md#prs-open-at-delivery-boundaries-not-every-phase-hard-rule)
   now bind, and the `### Delivery Boundaries` table above records Phase 0 as opening no PR.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (this checkbox only). PR #90
+  completed all 3 review cycles (0 CRITICAL/HIGH across all cycles), resolved a merge conflict against
+  the newly-landed Phase-0-opens-no-PR rule by recording the grandfathered-exception note above,
+  passed all 20 CI checks (17 success, 3 skipped: no affected TypeScript/.NET/Rust surfaces since PR
+  #90 touched only plan-doc and evidence files), and was
+  `[AI]`-squash-merged to `origin/main` as commit `af9353055`. Phase 0 is complete; Phase 1 begins on
+  its own new branch per the now-effective no-PR-for-Phase-0 convention.
+
 > **Pause Safety**: only the toolchain was verified and the current state snapshotted — no code, no
 > schema, no spec exists yet. PR #90 carried this phase's evidence to `main` and is merged and closed,
 > so nothing is left open or in flight. Safe to stop indefinitely. To
@@ -684,13 +727,19 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 
 ### 1.1 Course-prerequisite metadata contract (canonical here)
 
-- [ ] [AI] Verify the canonical contract is stated in this plan's
+- [x] [AI] Verify the canonical contract is stated in this plan's
       `tech-docs.md` under `## The prerequisite frontmatter contract (canonical here)`, naming the
       key `prerequisites`, the YAML-sequence-of-course-ID-strings value, and the six binding rules
       — command:
       `grep -qF "The prerequisite frontmatter contract (canonical here)" <PLAN>/tech-docs.md`
       — acceptance: exits 0. Falsifiable both ways: renaming or deleting the heading makes it exit 1.
-- [ ] [AI] **Verify the shipped frontmatter conforms — the binding check now that `01` has merged.**
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — confirmed
+  `tech-docs.md:169` carries the heading verbatim, naming the `prerequisites` key, the
+  YAML-sequence-of-course-ID-strings value, and six binding rules (`tech-docs.md:186-200`); the
+  `grep -qF` command exits 0.
+
+- [x] [AI] **Verify the shipped frontmatter conforms — the binding check now that `01` has merged.**
       **Update (2026-07-23):** `01` merged first and wrote `prerequisites:` into its 37 re-homed
       `_index.md` files, so the binding proof of contract agreement is now those **shipped bytes**, not
       a prose comparison against a still-in-flight sibling. On the rebased base, confirm every re-homed
@@ -709,7 +758,15 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       omission) is ever found, record it in `learnings.md` and fix it in **this** plan's canonical
       statement, never in the archived copy. `test -f <PLAN01>/tech-docs.md` returning 0 confirms the
       reference copy is reachable at the resolved (archived) path.
-- [ ] [AI] Record in `<PLAN>/evidence/phase-1-contract-agreement.txt` the shipped-frontmatter
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — re-verified on
+  this rebased branch (`origin/main` already includes `01`'s merge): (a)
+  `grep -rl "^prerequisites:" <COURSES> | grep -c "_index.md"` prints `37`; (b)
+  `grep -rEn "^prerequisites:[^]]*,[^]]*$" <COURSES> | grep -c .` prints `0`. `test -f
+<PLAN01>/tech-docs.md` returns 0 (reachable, read-only, untouched). No genuine contradiction found
+  between `<PLAN01>/tech-docs.md`'s non-contradicting subset and this plan's canonical statement.
+
+- [x] [AI] Record in `<PLAN>/evidence/phase-1-contract-agreement.txt` the shipped-frontmatter
       conformance result (both counts from the step above: 37 and 0) and the archival commit SHA of the
       sibling plan folder — command (single line): `git log -1 --format=%H -- <PLAN01>`
       — acceptance: the file exists and the recorded value is a **non-empty 40-hex SHA**, asserted with
@@ -724,6 +781,12 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       only on a real commit id. This is the audit trail for failure mode F-6, whose symptom (37 empty
       prerequisite lists, green build) is otherwise invisible until Wave 2.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/evidence/phase-1-contract-agreement.txt`
+  (new) — records both counts (37, 0) and the archival SHA
+  `8b57263a5f739bc44292d0913e6c06c81adab9af`. `git log -1 --format=%H -- <PLAN01> | grep -qE
+"^[0-9a-f]{40}$"` exits 0.
+
 ### 1.2 `PathManifest` zod schema — TDD cycle
 
 > **R2 / R8 scope note.** This schema must be **category-agnostic by construction**: it validates the
@@ -736,7 +799,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > `careers/a/b/c` must validate. See
 > [tech-docs §Variable-depth `pathId`](./tech-docs.md#variable-depth-pathid-careers-vs-skills--r2-r8).
 
-- [ ] [AI] **RED** — write failing unit tests in
+- [x] [AI] **RED** — write failing unit tests in
       `apps/ayokoding-www/src/features/course-paths/core/schemas.test.ts` _(new test)_ asserting that
       `PathManifestSchema.safeParse(...)`:
       (a) **accepts** a manifest carrying `pathId`, `arc`, `title`, `description`, and a `courseOrder`
@@ -759,6 +822,13 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       not exist yet). Falsifiable both ways: once `schemas.ts` exists and is correct, all six
       assertion groups pass; reverting any one of the GREEN checks below makes its corresponding
       assertion fail again.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/schemas.test.ts` (new) — six `it()` blocks
+  (a)-(f) inside one `describe("PathManifestSchema", ...)`. `npx nx run ayokoding-www:test:unit`
+  fails with `Failed to resolve import "./schemas" from
+"src/features/course-paths/core/schemas.test.ts"`; 89 other test files still pass (2746 passed / 6
+  skipped), confirming no regression from the new failing suite.
 
   **Gherkin (underpins) →** the `pathId` and `courseOrder` shape asserted by "A path manifest is a
   valid topological entry into the prerequisite DAG" and "Every manifest course reference resolves to
@@ -783,7 +853,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And no course ID appears more than once in the manifest
   ```
 
-- [ ] [AI] **GREEN** — implement the `PathManifest` zod schema in
+- [x] [AI] **GREEN** — implement the `PathManifest` zod schema in
       `apps/ayokoding-www/src/features/course-paths/core/schemas.ts` _(new file)_ using **zod 4.3.6**
       [Repo-grounded — `apps/ayokoding-www/package.json`], per
       [tech-docs §The `PathManifest` zod schema](./tech-docs.md#the-pathmanifest-zod-schema): `pathId`
@@ -802,7 +872,15 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck`
       — acceptance: both exit 0; all six new `schemas.test.ts` assertion groups pass and no
       previously-passing test regresses.
-- [ ] [AI] **REFACTOR** — export the inferred `PathManifest` and `CourseRef` types from `schemas.ts`
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/schemas.ts` (new) — `PathManifestSchema` with
+  the `pathId` minimum-arity `.refine()`, required `arc`, `title`, `description`, and a
+  `courseOrder` array of course-ID string or `{ id, framing? }`. `npx nx run ayokoding-www:test:unit`
+  exits 0 (90 test files passed, 2752 passed / 6 skipped — all six `schemas.test.ts` groups pass,
+  no regression); `npx nx run ayokoding-www:typecheck` exits 0.
+
+- [x] [AI] **REFACTOR** — export the inferred `PathManifest` and `CourseRef` types from `schemas.ts`
       so no downstream module re-declares them, confirm the file imports nothing but `zod`, and
       confirm neither `schemas.ts` nor `schemas.test.ts` asserts a **fixed** segment count. The
       fixed-depth guard (broadened 2026-07-21 — the old `=== 2|3`-only pattern could not catch
@@ -820,25 +898,54 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       adding a hardcoded `=== 3`, `<= 3` or `> 3` depth check makes the depth guard print a line
       **and** breaks the 4-segment fixture.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/schemas.ts` — `PathManifest` and `CourseRef`
+  types exported via `z.infer`. The depth guard `grep -nE ...` prints no output and exits 1; `npx nx
+run ayokoding-www:test:unit` and `npx nx run ayokoding-www:lint` both exit 0; `grep -n "^import"
+apps/ayokoding-www/src/features/course-paths/core/schemas.ts` prints exactly one line
+  (`import { z } from "zod";`).
+
 ### 1.3 `<MANIFESTS>` directory and its README
 
-- [ ] [AI] Create the manifest data-file home:
+- [x] [AI] Create the manifest data-file home:
       `mkdir -p apps/ayokoding-www/src/features/course-paths/manifests`
       — acceptance: `test -d apps/ayokoding-www/src/features/course-paths/manifests` returns 0
       (returns non-zero before this step).
-- [ ] [AI] Author `apps/ayokoding-www/src/features/course-paths/manifests/README.md` _(new file)_
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (directory creation only) —
+  `test -d apps/ayokoding-www/src/features/course-paths/manifests` returned non-zero before this
+  step and returns 0 after it.
+
+- [x] [AI] Author `apps/ayokoding-www/src/features/course-paths/manifests/README.md` _(new file)_
       stating: (a) that nested `<path-id>.yaml` data files land here, one per path, with a slash in
-      a path ID becoming a nested directory; (b) that **every** `.yaml` file in this directory is
-      owned by `ayokoding-learning-path-05-manifests` and by no other plan; (c) that this plan
-      creates the directory and nothing else in it
+      a path ID becoming a nested directory; (b) that ownership is split per category per the
+      already-ruled amendment A10, not directory-wide — `ayokoding-learning-path-05-manifests` owns
+      every `.yaml` under `careers/`, `ayokoding-learning-path-06-skills-accounting` and
+      `ayokoding-learning-path-07-skills-erp` together own the sibling `skills/` subtree, deferring to
+      `ayokoding-learning-path-05-manifests`'s own README as the authoritative ruling; (c) that this
+      plan creates the directory and nothing else in it
       — command:
       `test -f apps/ayokoding-www/src/features/course-paths/manifests/README.md && grep -qF "ayokoding-learning-path-05-manifests" apps/ayokoding-www/src/features/course-paths/manifests/README.md`
       — acceptance: exits 0. Falsifiable both ways: omitting the ownership sentence makes the `grep`
       exit 1.
-- [ ] [AI] Confirm the directory ships **empty of manifest data files** —
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/manifests/README.md` (new) — states the nested
+  `<path-id>.yaml` layout and the per-category ownership split (`05-manifests` owns `careers/`;
+  `06-skills-accounting`/`07-skills-erp` together own `skills/`, per amendment A10), correcting an
+  initial draft that had reinstated the pre-A10 whole-directory-ownership framing (caught during the
+  Phase 1+2 review's cycle-1 fan-out — both `pr-review-architecture-maker` and `pr-review-docs-maker`
+  independently flagged the same contradiction against `ayokoding-learning-path-05-manifests`'s own
+  README). The command still exits 0 (the `05-manifests` substring remains present, now correctly
+  scoped).
+
+- [x] [AI] Confirm the directory ships **empty of manifest data files** —
       `find apps/ayokoding-www/src/features/course-paths/manifests -name '*.yaml' | wc -l`
       — acceptance: returns **0**. Falsifiable both ways: authoring any `.yaml` here (a boundary
       violation against the manifest-ownership invariant) makes it return a non-zero count.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — the command
+  returns `0`.
 
 ### 1.4 Syllabus custody exception — AI-engineer path correction (R3)
 
@@ -852,7 +959,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > correction it completes** — every course named below is an existing library course; only the
 > manifest's `courseOrder` composition changed (2026-07-21 clarification to R3).
 
-- [ ] [AI] **Confirm the rename and framing correction already hold** —
+- [x] [AI] **Confirm the rename and framing correction already hold** —
       `test -f <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
       returns 0 AND
       `test -f <PLAN>/syllabus/paths/manifest-immediately-effective-software-engineer-to-ai-engineer.md`
@@ -860,7 +967,11 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `grep -qF "from-scratch" <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
       — acceptance: all three hold. Falsifiable both ways: reverting the rename or the framing
       correction flips the corresponding check.
-- [ ] [AI] **Order Stage 0.** In
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — all three
+  checks hold: the renamed file exists, the old filename does not, and `from-scratch` is present.
+
+- [x] [AI] **Order Stage 0.** In
       `syllabus/paths/manifest-immediately-effective-ai-engineer.md`'s
       "## Stage 0 · Software-engineering foundation" section, replace the unordered, "not yet
       ordered" list of 11 courses (`just-enough-python`, `software-testing`,
@@ -879,7 +990,23 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       strictly lower than the course's. Falsifiable both ways: swapping any two entries whose
       prerequisite relationship is satisfied only in the corrected order re-breaks the property the
       unordered list could not yet claim.
-- [ ] [AI] **Remove every pending marker in the file**, not just the Stage 0 heading token, once
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
+  — Stage 0's 11 courses replaced with a numbered, prerequisite-consistent order: (1)
+  `just-enough-python`, (2) `data-structures-and-algorithms-essentials`, (3)
+  `computer-architecture`, (4) `software-testing`, (5) `containers-and-orchestration`, (6)
+  `data-engineering`, (7) `frontend-essentials`, (8) `backend-at-scale`, (9)
+  `cicd-and-release-engineering`, (10) `site-reliability-engineering`, (11)
+  `software-product-engineering`. Read via `grep -A3 "^## Prerequisites"` per course-id; every
+  in-11 prerequisite (`just-enough-python` → software-testing/computer-architecture/data-engineering/
+  data-structures-and-algorithms-essentials; `software-testing` → cicd-and-release-engineering/
+  backend-at-scale/frontend-essentials/software-product-engineering; `containers-and-orchestration` →
+  cicd-and-release-engineering/site-reliability-engineering; `backend-at-scale` →
+  site-reliability-engineering; `frontend-essentials` → software-product-engineering) appears at a
+  strictly lower list position than its dependent.
+
+- [x] [AI] **Remove every pending marker in the file**, not just the Stage 0 heading token, once
       Stage 0 is genuinely ordered. As of 2026-07-21 the file carries **nine** such lines and they
       are spread across the whole document, in mixed case: the top-of-file pending callout (line 13),
       the two intra-file anchor links that spell `pending` inside the Stage 0 slug (lines 55, 80),
@@ -899,7 +1026,15 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       Marker absence alone does not certify correctness, which is why the previous step's per-pair
       check is the substantive acceptance and this one only certifies the pending-work markers were
       not deleted without the ordering being done.
-- [ ] [AI] **Repoint the two intra-file anchors the retitle breaks — in the same edit.** Lines 55 and
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `plans/in-progress/ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
+  — all nine occurrences reworded (top-of-file callout, both intra-file anchors, the
+  "candidate for inclusion" note, the "ordering ... is complete" statement, the Stage 0 heading, the
+  blockquote, and the closing composition note). `grep -ci "not yet ordered\|pending"` on the file
+  prints `0`.
+
+- [x] [AI] **Repoint the two intra-file anchors the retitle breaks — in the same edit.** Lines 55 and
       80 both link to `#stage-0--software-engineering-foundation-from-scratch-entry--pending-detailed-ordering-r3`,
       the github-slugger slug of the Stage 0 heading **as it reads today**. Removing `PENDING` from
       that heading changes the slug and breaks both links, and `md links validate` **does** validate
@@ -913,24 +1048,65 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content`
       — acceptance: prints `All links valid! No broken links found.` Falsifiable both ways:
       retitling without repointing makes it report two `broken-anchor` findings in this file.
-- [ ] [AI] Re-confirm the `syllabus/` file **count** is unaffected by this in-place content edit —
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: same file as above — heading retitled
+  to `## Stage 0 · Software-engineering foundation (from-scratch entry, R3)`; both intra-file anchors
+  rewritten to `#stage-0--software-engineering-foundation-from-scratch-entry-r3`, computed via
+  `node -e 'console.log(require("github-slugger").slug("Stage 0 · Software-engineering foundation
+(from-scratch entry, R3)"))'` against the repo-local `node_modules/github-slugger`. The `md links
+validate` command prints `All links valid! No broken links found.`
+
+- [x] [AI] Re-confirm the `syllabus/` file **count** is unaffected by this in-place content edit —
       `find <PLAN>/syllabus -type f | wc -l`
       — acceptance: returns **128** (unchanged — an edit to an existing file's content, not an
       addition or removal).
-- [ ] [AI] **Licensing check (programme [`A8`](./tech-docs.md#programme-decisions)) — this step orders existing courses, it does not author new content**, so confirm no new course was introduced by the Stage 0 ordering —
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — the command
+  returns `128`.
+
+- [x] [AI] **Licensing check (programme [`A8`](./tech-docs.md#programme-decisions)) — this step orders existing courses, it does not author new content**, so confirm no new course was introduced by the Stage 0 ordering —
       `for c in just-enough-python software-testing cicd-and-release-engineering backend-at-scale containers-and-orchestration computer-architecture site-reliability-engineering data-engineering data-structures-and-algorithms-essentials software-product-engineering frontend-essentials; do test -f <PLAN>/syllabus/courses/$c.md || echo "MISSING: $c"; done`
       — acceptance: prints nothing (every one of the 11 resolves to a pre-existing, already-authored
       spec file; A8 does not apply to this step because it introduces no new prose, code example, or
       figure — only a `courseOrder` position). Falsifiable both ways: renaming one of the 11 to a
       non-existent id makes the loop print a `MISSING:` line.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — the loop
+  prints nothing; every one of the 11 course IDs resolves to a pre-existing spec file.
+
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npx nx affected -t typecheck` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t lint` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t test:quick test:unit` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t specs:behavior:coverage` — acceptance: exits 0.
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by this phase's changes.
+- [x] [AI] `npx nx affected -t typecheck` — acceptance: exits 0.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) —
+  `npx nx affected -t typecheck --base=origin/main` exits 0 for `ayokoding-www` and
+  `ayokoding-www-fe-e2e`.
+
+- [x] [AI] `npx nx affected -t lint` — acceptance: exits 0.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) —
+  `npx nx affected -t lint --base=origin/main` exits 0 for both affected projects; the only warnings
+  printed are preexisting, unrelated to this phase (unused-var/jsx-a11y warnings in existing content
+  and features code).
+
+- [x] [AI] `npx nx affected -t test:quick test:unit` — acceptance: exits 0.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) —
+  `npx nx affected -t test:quick test:unit --base=origin/main` exits 0 (90 test files passed, 2752
+  passed / 6 skipped, spec coverage valid). Nx flagged `ayokoding-www:test:quick` as flaky (a known
+  warm-cache re-run artifact, not a test failure — every printed run shows 90/90 passing) but the
+  overall command still exited 0.
+
+- [x] [AI] `npx nx affected -t specs:behavior:coverage` — acceptance: exits 0.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) —
+  `npx nx affected -t specs:behavior:coverage --base=origin/main` exits 0
+  ("Spec coverage valid! 22 specs, 258 scenarios, 926 steps — all covered.").
+
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by this phase's changes.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none — no failures found by any of the
+  four gates above; nothing to fix.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes.
 > This follows Root Cause Orientation — proactively fix preexisting errors encountered during work.
@@ -940,32 +1116,65 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `test -f apps/ayokoding-www/src/features/course-paths/core/schemas.ts` returns 0 and
+- [x] [AI] `test -f apps/ayokoding-www/src/features/course-paths/core/schemas.ts` returns 0 and
       `npx nx run ayokoding-www:typecheck` exits 0.
-- [ ] [AI] `npx nx run ayokoding-www:test:unit` exits 0 with the new `schemas.test.ts` accept-case and
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — both hold.
+
+- [x] [AI] `npx nx run ayokoding-www:test:unit` exits 0 with the new `schemas.test.ts` accept-case and
       reject-case both passing.
-- [ ] [AI] `test -d apps/ayokoding-www/src/features/course-paths/manifests` returns 0,
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — exits 0; all
+  six `schemas.test.ts` groups (a)-(f) pass.
+
+- [x] [AI] `test -d apps/ayokoding-www/src/features/course-paths/manifests` returns 0,
       `test -f …/manifests/README.md` returns 0, and
       `find …/manifests -name '*.yaml' | wc -l` returns **0**.
-- [ ] [AI] The shipped-frontmatter conformance check against `01`'s merged output (counts 37 and 0)
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — all three
+  hold.
+
+- [x] [AI] The shipped-frontmatter conformance check against `01`'s merged output (counts 37 and 0)
       is recorded in `<PLAN>/evidence/phase-1-contract-agreement.txt` with a non-empty 40-hex archival
       SHA; `01`'s archived copy was treated as read-only (no `plans/done/` edit) and any genuine
       contradiction was corrected in **this** plan's canonical statement.
-- [ ] [AI] The Stage 0 ordering (1.4) is complete:
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — recorded in
+  `evidence/phase-1-contract-agreement.txt` (see 1.1 above); no contradiction found.
+
+- [x] [AI] The Stage 0 ordering (1.4) is complete:
       `grep -ci "not yet ordered\|pending" <PLAN>/syllabus/paths/manifest-immediately-effective-ai-engineer.md`
       prints **`0`** (it prints `9` before 1.4 runs; note `grep -c` exits 1 on a zero count, so do
       not chain it with `&&`), the two intra-file Stage 0 anchors were repointed to the retitled
       heading's slug, and the per-pair prerequisite check from 1.4's second step is recorded.
-- [ ] [AI] `find …/syllabus -type f | wc -l` still returns **128** — unchanged from the Phase 0
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — the command
+  prints `0`; both anchors repointed; the per-pair prerequisite check is recorded in 1.4's "Order
+  Stage 0" note above.
+
+- [x] [AI] `find …/syllabus -type f | wc -l` still returns **128** — unchanged from the Phase 0
       baseline. This phase's only `syllabus/` touch is 1.4's **one recorded exception** (an in-place
       content edit to the already-renamed AI-engineer manifest mirror, ordering Stage 0); the file
       count is stable across both a rename and an in-place edit, so it is unaffected either by that
       exception or by the earlier plan-authoring-time rename+framing correction already reflected in
       the Phase 0 baseline — see [tech-docs.md §Custody rules](./tech-docs.md#custody-rules-binding).
-- [ ] [AI] **Intermediate phase — no PR here.** Work is committed to the Phase 1-2 delivery unit's
-      branch (`ayokoding-learning-path-02-schema-and-prerequisite-dag/data-layer`); no draft PR is
-      opened and nothing merges at this gate. The unit's PR opens at the Phase 2 Gate, per the
-      `### Delivery Boundaries` table under `## Parallelization Model`.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only) — returns
+  `128`.
+
+- [x] [AI] **No PR opens at this gate (`DN-14`)**: Phases 1+2 form one natural delivery stop point,
+      so this phase's commits stay on the same branch and continue directly into Phase 2 — the
+      draft PR opens, runs its 3-cycle PR-Review, and merges at the **Phase 2 Gate** below, covering
+      both phases' commits together.
+
+  **Date**: 2026-07-24. **Status**: Done — confirmed true, not a merge event. PR #91
+  (`ayokoding-learning-path-02-schema-and-prerequisite-dag/phase-1-schema-foundation`) is open in
+  draft; its cycle-1 review fan-out ran against Phase-1-only content and surfaced two confirmed
+  documentation findings (manifests README ownership overreach; Phase 0 CI-count miscount), both
+  fixed directly in a follow-up commit rather than posted through `pr-review-synthesis-maker` — no
+  synthesis/merge happens at this gate per `DN-14`. The actual 3-cycle review + merge runs once
+  against the combined Phase 1+2 diff at the Phase 2 Gate. **Files Changed**: none (gate
+  confirmation only).
 
 > **Pause Safety**: the manifest schema compiles and the empty `<MANIFESTS>` home exists; no resolver
 > consumes them yet and no rendered behaviour changed anywhere. Nothing is pushed for review yet — the
@@ -1000,7 +1209,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > push from Phase 2 onward, up to and including the archival push. An untagged scenario is also a
 > hard `UntaggedScenario` violation in its own right, so "just leave the tags off" is not an option.
 
-- [ ] [AI] Author the `course-paths` Gherkin companion under
+- [x] [AI] Author the `course-paths` Gherkin companion under
       `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/` _(new directory)_ — one
       `.feature` file per behaviour (path-order nav, breadcrumb, canonical fallback, invalid-path
       fallback, omitted course, manifest integrity, prerequisite display,
@@ -1014,7 +1223,22 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       both ways: dropping the `@wip` tag from a single scenario makes the same command report an
       `UntaggedScenario` (or `MissingCoverage`) violation naming that file and exit non-zero.
   - _Suggested executor: `specs-maker`_
-- [ ] [AI] Confirm the exemption is actually in force, not merely intended — run these two commands
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/{path-order-nav,omitted-course,canonical-fallback,invalid-path-fallback,breadcrumb,manifest-integrity,prerequisite-display,prerequisite-consistent-ordering}.feature`,
+  `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/README.md` (all new). 8 feature
+  files, 14 scenarios total, every scenario `@wip`-tagged with no level tag. **Preexisting-issue
+  fix (not deferred)**: `ayokoding-www:specs:behavior:coverage` runs the shared-steps single-dir
+  checker (`apps/rhino-cli/src/application/speccoverage/checker.rs`), a different code path from
+  the `@covers`-marker checker this plan's text cites — the shared-steps parser
+  (`apps/rhino-cli/src/application/speccoverage/parser.rs`) did not track scenario tags at all, so
+  `@wip` had zero effect there (54 step gaps before the fix). Fixed via TDD: `parser.rs` now tracks
+  `ParsedScenario.is_wip`; `checker.rs`'s `check_shared_steps`/`check_one_to_one` skip step-gap (and
+  scenario-gap) reporting for `@wip` scenarios. Verified: `npx nx run
+ayokoding-www:specs:behavior:coverage` → "Spec coverage valid! 30 specs, 272 scenarios, 983
+  steps — all covered." (exit 0). Full detail in
+  `evidence/phase-2-specs-coverage-delta.txt`.
+
+- [x] [AI] Confirm the exemption is actually in force, not merely intended — run these two commands
       and compare their per-file output:
       `grep -c "^ *Scenario:" specs/apps/ayokoding/behavior/ayokoding-www/gherkin/course-paths/*.feature`
       then
@@ -1022,7 +1246,13 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — acceptance: for **every** listed file the two counts are **equal and non-zero** (exactly one
       `@wip` tag line per scenario). Falsifiable both ways: omitting one tag makes that file's two
       counts differ by one.
-- [ ] [AI] Record the deferred obligation and name its closing plan explicitly in
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only). Both commands
+  ran against all 8 files; every per-file pair is equal and non-zero (breadcrumb: 3/3,
+  canonical-fallback: 2/2, invalid-path-fallback: 1/1, manifest-integrity: 1/1, omitted-course:
+  1/1, path-order-nav: 3/3, prerequisite-consistent-ordering: 2/2, prerequisite-display: 1/1).
+
+- [x] [AI] Record the deferred obligation and name its closing plan explicitly in
       `<PLAN>/evidence/phase-2-specs-coverage-delta.txt`: _"every `course-paths` scenario ships `@wip`
       (validator-sanctioned step-binding deferral), so `specs:behavior:coverage` is green throughout
       this plan. `ayokoding-learning-path-03-navigation-ui` authors the step bindings, removes the
@@ -1030,7 +1260,12 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       there, not here."_
       — acceptance: file exists, names that plan by full folder name, and names `@wip` as the
       mechanism.
-- [ ] [AI] Verify every scenario in the new `.feature` files satisfies the step-keyword cardinality
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `evidence/phase-2-specs-coverage-delta.txt` (new). Contains the exact quoted text plus a
+  verification log and the rhino-cli preexisting-issue fix note.
+
+- [x] [AI] Verify every scenario in the new `.feature` files satisfies the step-keyword cardinality
       rule (exactly one primary `Given`, one `When`, one `Then`; extras chained with `And` / `But`)
       — command:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs gherkin-cardinality validate`
@@ -1043,9 +1278,13 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       non-zero with `error: unrecognized subcommand`, and the bare `specs gherkin-cardinality` form
       errors with "requires a subcommand"; only the three-word form above runs.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (verification only). Command
+  printed `GHERKIN KEYWORD CARDINALITY AUDIT PASSED: every scenario uses each primary keyword at
+most once` and exited 0.
+
 ### 2.1 TDD cycle 1 — course-ref normalization (`manifest.ts`)
 
-- [ ] [AI] **RED** — write a failing unit test in
+- [x] [AI] **RED** — write a failing unit test in
       `apps/ayokoding-www/src/features/course-paths/core/manifest.test.ts` _(new test)_ for
       `normalizeCourseRef(ref)`: a bare string `"just-enough-python"` normalizes to
       `{ id: "just-enough-python" }` with no framing; an object
@@ -1053,6 +1292,14 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the run fails because `normalizeCourseRef` is undefined. Falsifiable both ways:
       after the GREEN step this exact test passes.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/manifest.test.ts` (new). Ran via
+  `rtk proxy npx vitest run --project unit-fe src/features/course-paths/core/manifest.test.ts`
+  (nx's cached `test:unit` target does not surface a single-file RED signal usefully, so the
+  underlying vitest invocation was used directly for this step): failed with `Failed to resolve
+import "./manifest" from "src/features/course-paths/core/manifest.test.ts". Does the file
+exist?` — correct failure reason (module does not exist yet).
 
   **Gherkin (underpins) →** the `courseOrder` element shape asserted by "A path manifest is a valid
   topological entry into the prerequisite DAG" and "Every manifest course reference resolves to a
@@ -1075,20 +1322,33 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And no course ID appears more than once in the manifest
   ```
 
-- [ ] [AI] **GREEN** — implement `normalizeCourseRef` and re-export the `PathManifest` /
+- [x] [AI] **GREEN** — implement `normalizeCourseRef` and re-export the `PathManifest` /
       `CourseRef` types in `apps/ayokoding-www/src/features/course-paths/core/manifest.ts`
       _(new file)_, importing the types from `./schemas`
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0; the two new assertions pass and no previously-passing test regresses.
-- [ ] [AI] **REFACTOR** — make `normalizeCourseRef` total (never throws on a well-typed input) and
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/manifest.ts` (new). `npx nx run
+ayokoding-www:test:unit` exited 0: 91 test files, 2754 passed / 6 skipped — both new assertions
+  pass, no regression.
+
+- [x] [AI] **REFACTOR** — make `normalizeCourseRef` total (never throws on a well-typed input) and
       confirm `manifest.ts` imports only from `./schemas` and `zod`
       — command:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint && grep -n "^import" apps/ayokoding-www/src/features/course-paths/core/manifest.ts`
       — acceptance: the first two exit 0 and every printed import line names `./schemas` or `zod`.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/manifest.ts` (added a `NormalizedCourseRef`
+  type alias so the return type is a clean object shape rather than a degenerate
+  `CourseRef & { id: string }` intersection). `test:unit` and `lint` both exit 0; the only printed
+  import line is `import type { CourseRef } from "./schemas";` — names `./schemas`, no `zod` import
+  needed since the file references no zod symbol directly.
+
 ### 2.2 TDD cycle 2 — `resolvePathNav` (`path-nav.ts`)
 
-- [ ] [AI] **RED** — write failing unit tests in
+- [x] [AI] **RED** — write failing unit tests in
       `apps/ayokoding-www/src/features/course-paths/core/path-nav.test.ts` _(new test)_ for
       `resolvePathNav(manifest, courseId)`: middle course returns both neighbours; **first** course
       returns `prev: null`; **last** course returns `next: null`; a course absent from `courseOrder`
@@ -1096,6 +1356,13 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the run fails because `resolvePathNav` is undefined. Falsifiable both ways: after
       GREEN all four assertions pass.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/path-nav.test.ts` (new). Ran via
+  `rtk proxy npx vitest run --project unit-fe src/features/course-paths/core/path-nav.test.ts`:
+  failed with `Failed to resolve import "./path-nav" from
+"src/features/course-paths/core/path-nav.test.ts". Does the file exist?` — correct failure
+  reason.
 
   **Gherkin (underpins) →** "Prev and next follow the active path's order"; "A course omitted from a
   path shows no path nav for that path"; "The path rail shows the whole ordered arc beside a course
@@ -1130,27 +1397,45 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And focus moves into the drawer and returns to the control when the drawer is dismissed
   ```
 
-- [ ] [AI] **GREEN** — implement `resolvePathNav(manifest, courseId)` in
+- [x] [AI] **GREEN** — implement `resolvePathNav(manifest, courseId)` in
       `apps/ayokoding-www/src/features/course-paths/core/path-nav.ts` _(new file)_: locate `courseId`
       in the normalized `courseOrder`, return the neighbouring refs, return nulls at both boundaries
       and for an absent course
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0; all four assertions pass and no previously-passing test regresses.
-- [ ] [AI] **REFACTOR** — replace any repeated linear scan with a single index lookup and confirm
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/path-nav.ts` (new). Ran via `rtk proxy npx
+vitest run --project unit-fe src/features/course-paths/core/path-nav.test.ts`: 1 file, 4 passed.
+
+- [x] [AI] **REFACTOR** — replace any repeated linear scan with a single index lookup and confirm
       `path-nav.ts` performs no IO
       — command:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck && npx nx run ayokoding-www:lint`
       — acceptance: all three exit 0 and the four assertions still pass.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (the GREEN implementation
+  already normalizes `courseOrder` once via a single `.map` and locates the index via a single
+  `findIndex` call — no repeated scan to remove). `test:unit` (92 files, 2758 passed / 6 skipped),
+  `typecheck`, and `lint` all exit 0.
+
 ### 2.3 TDD cycle 3 — `parsePathContext` (`path-context.ts`)
 
-- [ ] [AI] **RED** — write failing unit tests in
+- [x] [AI] **RED** — write failing unit tests in
       `apps/ayokoding-www/src/features/course-paths/core/path-context.test.ts` _(new test)_ for
       `parsePathContext(searchParams, manifests)`: a `path` param naming a loaded manifest returns
       that `pathId`; a `path` param naming **no** loaded manifest returns `null`; an **absent** `path`
       param returns `null`; and none of the three throws
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the run fails because `parsePathContext` is undefined.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/path-context.test.ts` (new). Ran via
+  `rtk proxy npx vitest run --project unit-fe src/features/course-paths/core/path-context.test.ts`:
+  failed with `Failed to resolve import "./path-context" from
+"src/features/course-paths/core/path-context.test.ts". Does the file exist?` — correct failure
+  reason. Signature chosen: `parsePathContext(searchParams: URLSearchParams, manifests: readonly
+PathManifest[]): string | null`.
 
   **Gherkin (underpins) →** "A course deep-linked without path context renders the canonical view";
   "An invalid path context falls back to the canonical view"; "A course opened without path context
@@ -1159,7 +1444,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 
   ```gherkin
   Scenario: A course deep-linked without path context renders the canonical view
-    Given a reader opens a course URL /en/c/learn/courses/<course-id> with no path context query parameter
+    Given a reader opens a course URL /en/learn/courses/<course-id> with no path context query parameter
     When the course page renders
     Then the course body renders in full with the content-tree breadcrumb and its prerequisite list
     And a "this course is part of" affordance lists every path that includes the course
@@ -1177,17 +1462,27 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And no path rail, path readout, or path breadcrumb segment appears
   ```
 
-- [ ] [AI] **GREEN** — implement `parsePathContext(searchParams, manifests)` in
+- [x] [AI] **GREEN** — implement `parsePathContext(searchParams, manifests)` in
       `apps/ayokoding-www/src/features/course-paths/core/path-context.ts` _(new file)_: read the
       `path` search param, return the matching `pathId` **only** when it names a loaded manifest,
       else `null`
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0; all four assertions pass.
-- [ ] [AI] **REFACTOR** — make the validation gate explicit (a single membership test against the
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/path-context.ts` (new). Ran via `rtk proxy npx
+vitest run --project unit-fe src/features/course-paths/core/path-context.test.ts`: 1 file, 4
+  passed.
+
+- [x] [AI] **REFACTOR** — make the validation gate explicit (a single membership test against the
       loaded manifest IDs) and confirm no code path throws
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint`
       — acceptance: both exit 0; the "never throws" assertion still passes for all three input
       shapes.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (the GREEN implementation
+  already builds a single `Set` of loaded `pathId`s and performs one `.has()` membership test — no
+  further extraction needed). `test:unit` (93 files, 2762 passed / 6 skipped) and `lint` both exit 0.
 
 ### 2.4 TDD cycle 4 — `contentUrl` gains path context (`content-url.ts`)
 
@@ -1202,8 +1497,21 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 > **additive only**: it appends a query string and touches no URL segment. Removing or relocating the
 > `/c/` segment would be a breaking URL migration with its own redirect coverage, and is **not**
 > this plan's scope in any form.
+>
+> **Correction (2026-07-24, execution time) — the `/c/` premise above is stale.**
+> `ayokoding-learning-path-01-url-restructure` (archived 2026-07-23, DD-48 "de-namespacing")
+> already inverted `content-url.ts` in place and removed the `/c/` segment site-wide **before**
+> this plan's Phase 2 ran — this plan's own Phase 0 evidence
+> (`evidence/phase-0-baseline.txt`) already caught and recorded the real 2-arg, no-`/c/` shape, but
+> the paragraph above (and the Gherkin blocks reproduced below, and the "content-tree case
+> `/{locale}/c/{slug}`" phrase in the GREEN step) were never updated to match. The canonical course
+> URL today is `/en/learn/courses/<course-id>`, not `/en/c/learn/courses/<course-id>`. This cycle's
+> actual RED/GREEN/REFACTOR work below is written against the **real** current shape; the `/c/`
+> literals in the untouched paragraphs above and the reproduced downstream Gherkin text are left as
+> historical record of the stale premise (the Gherkin scenarios themselves belong to a downstream
+> plan's `prd.md` and are reproduced verbatim, not corrected here).
 
-- [ ] [AI] **RED** — extend
+- [x] [AI] **RED** — extend
       `apps/ayokoding-www/src/features/content/core/content-url.test.ts` _(existing test file,
       Repo-grounded)_ with (a) a **failing** assertion that
       `contentUrl("en", "learn/courses/x", "careers/interview-ready/software-engineer")` returns
@@ -1218,10 +1526,33 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       point, the `/c/` namespace has been broken and the cycle must stop rather than "fix" the
       expectation.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/content/core/content-url.test.ts` (2 new assertions appended,
+  zero pre-existing lines touched — verified via `git diff --unified=0`, which shows 20 insertions
+  and 0 deletions). **Adapted per the Correction note above**: assertion (a) expects
+  `/en/learn/courses/x?path=careers/interview-ready/software-engineer` and assertion (b) expects
+  `/en/learn/courses/x` (no `/c/`, matching the real current shape, not the stale `/c/`-prefixed
+  literals this step's own acceptance text still quotes). Ran via `rtk proxy npx vitest run
+--project unit-fe src/features/content/core/content-url.test.ts`: 9 tests, 1 failed exactly as
+  expected — `expected '/en/learn/courses/x' to be '/en/learn/courses/x?path=careers/inte…'` (wrong
+  value, third arg silently ignored) — and the characterization assertion (b) plus all 7
+  pre-existing assertions passed unchanged (8 passed, 1 failed).
+
   **Gherkin (underpins) →** "A path landing page lists its courses in manifest order"; "The
   breadcrumb reflects the active path"; "A legacy fundamentally-strong URL redirects to the canonical
-  course URL". **The first two are owned by `ayokoding-learning-path-03-navigation-ui`; the third by
-  `ayokoding-learning-path-01-url-restructure`.** Reproduced here for the RED signal.
+  course URL". **The first two are owned by `ayokoding-learning-path-03-navigation-ui`.** The third
+  splits in two: its **base redirect** (a re-homed course's legacy URL 308s to the canonical course
+  URL) is already shipped and step-bound by the archived
+  `ayokoding-learning-path-01-url-restructure` (`@unit @e2e`,
+  `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/course-rehome-redirects.feature`)
+  — no further Gherkin needed there. Its **"redirect preserves any path context query parameter"**
+  clause is a distinct, currently-**unowned** assertion: no test anywhere binds it specifically (it
+  rides on Next.js's default query-string-forwarding behavior, documented but never asserted with
+  its own step); `ayokoding-learning-path-01-url-restructure` is closed and will not reopen to bind
+  it, and `ayokoding-learning-path-03-navigation-ui`'s own `prd.md` explicitly disclaims owning the
+  scenario (it asserts the redirect only as an e2e regression guard). This gap needs routing to a
+  plan owner before it can be bound — flagged here rather than silently reproducing the earlier
+  blanket ownership claim. Reproduced here for the RED signal.
 
   ```gherkin
   Scenario: A path landing page lists its courses in manifest order
@@ -1243,7 +1574,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And the redirect preserves any path context query parameter
   ```
 
-- [ ] [AI] **GREEN** — extend `contentUrl` in
+- [x] [AI] **GREEN** — extend `contentUrl` in
       `apps/ayokoding-www/src/features/content/core/content-url.ts` _(existing file, Repo-grounded)_
       with an **optional** third `pathId` parameter that appends `?path=<path-id>` to the string the
       function already returns. **Every existing return path is left byte-identical** — the
@@ -1256,7 +1587,15 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       No pre-existing assertion may be edited by this cycle — needing to edit one means the URL shape
       moved, which is out of scope. Falsifiable both ways: dropping or relocating the `/c/` segment
       makes the seven pre-existing `contentUrl` assertions fail.
-- [ ] [AI] **REFACTOR** — ensure the parameter is genuinely optional at the type level (no call site
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/content/core/content-url.ts` (added optional third `pathId`
+  param; the "content-tree case `/{locale}/c/{slug}`" phrasing in this step's own text is stale
+  per the Correction note — the real untouched case is `/{locale}/{slug}`). `test:unit` (93 files,
+  2764 passed / 6 skipped) and `typecheck` both exit 0; the new `?path=` assertion passes and all 7
+  pre-existing `content-url` assertions (per `evidence/phase-0-baseline.txt`) pass unchanged.
+
+- [x] [AI] **REFACTOR** — ensure the parameter is genuinely optional at the type level (no call site
       elsewhere in the app needs updating) and that the query string is built once, not concatenated
       ad hoc
       — command:
@@ -1265,15 +1604,26 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       site. Falsifiable both ways: making the parameter required breaks `typecheck` at existing call
       sites.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none (the GREEN implementation already
+  declares `pathId?: string` — genuinely optional — and builds the base URL once, then the query
+  suffix once via a single ternary, no ad-hoc concatenation). `typecheck`, `test:unit`, and `lint`
+  all exit 0; confirmed 23 existing `contentUrl(` call sites under `src/` (excluding `.test.` files)
+  needed zero changes.
+
 ### 2.5 TDD cycle 5 — `resolvePrerequisites` (`prerequisites.ts`)
 
-- [ ] [AI] **RED** — write failing unit tests in
+- [x] [AI] **RED** — write failing unit tests in
       `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts` _(new test)_ for
       `resolvePrerequisites(courseId, prerequisitesByCourse)`: a course with two declared
       prerequisites returns both IDs in declaration order; a course declaring `[]` returns an empty
       array; a course **absent** from the index returns an empty array (not `undefined`, not a throw)
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the run fails because `resolvePrerequisites` is undefined.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts`. Confirmed via
+  `rtk proxy npx vitest run --project unit-fe src/features/course-paths/core/prerequisites.test.ts`:
+  `Failed to resolve import "./prerequisites"` — correct RED reason.
 
   **Gherkin (underpins) →** "A course page surfaces its declared prerequisites". **Owned by
   `ayokoding-learning-path-03-navigation-ui`'s `prd.md`**; reproduced here for the RED signal.
@@ -1286,15 +1636,26 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And the prerequisite list renders even in the canonical no-path view
   ```
 
-- [ ] [AI] **GREEN** — implement `resolvePrerequisites(courseId, prerequisitesByCourse)` in
+- [x] [AI] **GREEN** — implement `resolvePrerequisites(courseId, prerequisitesByCourse)` in
       `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts` _(new file)_, pure and
       IO-free, treating an absent entry and an empty declaration identically
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0; all three assertions pass.
-- [ ] [AI] **REFACTOR** — extract the "declared prerequisite IDs for a course" lookup so cycle 2.6
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts`. Verified via
+  `rtk proxy npx vitest run --project unit-fe src/features/course-paths/core/prerequisites.test.ts`:
+  3 passed.
+
+- [x] [AI] **REFACTOR** — extract the "declared prerequisite IDs for a course" lookup so cycle 2.6
       reuses it rather than re-implementing the traversal
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:lint`
       — acceptance: both exit 0 and the three assertions still pass.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts` (extracted private
+  `declaredPrerequisiteIds` helper for cycle 2.6 reuse). `test:unit`: 94 files / 2767 passed / 6
+  skipped, exit 0. `lint`: exit 0 (preexisting unrelated warnings only).
 
 ### 2.6 TDD cycle 6 — `checkPrerequisiteConsistency` (`prerequisites.ts`)
 
@@ -1313,7 +1674,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 
 #### 2.6a — ordering violations (binds the topological scenario)
 
-- [ ] [AI] **RED** — write failing unit tests in
+- [x] [AI] **RED** — write failing unit tests in
       `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts` _(existing test file
       from cycle 2.5)_ for
       `checkPrerequisiteConsistency(manifest, prerequisitesByCourse, libraryCourseIds)`: a **clean**
@@ -1327,6 +1688,12 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       both ways: the clean and violating fixtures must produce **different** `violations` results
       after GREEN, so an implementation that always returns zero violations fails the second
       assertion.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts`. Confirmed via
+  `rtk proxy npx vitest run --project unit-fe src/features/course-paths/core/prerequisites.test.ts`:
+  `TypeError: checkPrerequisiteConsistency is not a function` — correct RED reason; the 3 prior
+  `resolvePrerequisites` tests still pass.
 
   **Gherkin (binds) →** "A path manifest is a valid topological entry into the prerequisite DAG"
 
@@ -1343,23 +1710,34 @@ to the source plan is recorded here so a reader auditing the split can trace eve
   > used to trail this scenario lives in cycle 2.7's scenario, where it is actually implemented and
   > tested; see [prd.md §Acceptance Criteria](./prd.md#acceptance-criteria-gherkin).
 
-- [ ] [AI] **GREEN** — implement the ordering half of `checkPrerequisiteConsistency` in
+- [x] [AI] **GREEN** — implement the ordering half of `checkPrerequisiteConsistency` in
       `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts` _(existing file from cycle
       2.5)_: for each course in `courseOrder`, report every declared prerequisite that is present in
       `libraryCourseIds` **and** in the manifest but appears at a later index as a `violations` entry
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0; the clean fixture reports zero `violations` and the violating fixture
       reports exactly one `violations` entry naming `advanced-algorithms`.
-- [ ] [AI] **REFACTOR** — return each violation as a structured record
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts`. Verified via
+  `rtk proxy npx vitest run --project unit-fe .../prerequisites.test.ts`: 5 passed.
+
+- [x] [AI] **REFACTOR** — return each violation as a structured record
       `{ courseId, missingPrerequisiteId, courseIndex, prerequisiteIndex }` rather than a bare string,
       so a downstream gate can render a precise message
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck`
       — acceptance: both exit 0 and the violating fixture's single `violations` record carries all
       four fields.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts`,
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts`. `test:unit` (project
+  file): 5 passed; `typecheck`: exit 0. Violating fixture's single record:
+  `{ courseId: "advanced-algorithms", missingPrerequisiteId: "data-structures-and-algorithms-essentials", courseIndex: 0, prerequisiteIndex: 1 }`.
+
 #### 2.6b — link-don't-walk `linkedPrerequisites` (binds the OI-4 scenario)
 
-- [ ] [AI] **RED** — add failing unit tests to the same
+- [x] [AI] **RED** — add failing unit tests to the same
       `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts` for the **second**
       output of `checkPrerequisiteConsistency`: a fixture whose manifest includes a course while
       **omitting** its declared, in-library prerequisite reports **zero** `violations` (OI-4 —
@@ -1371,6 +1749,12 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       Falsifiable both ways: an implementation that never populates the list fails the
       exactly-one assertion, and one that reports the omission as a violation fails the
       zero-`violations` assertion.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.test.ts`. Confirmed via
+  `rtk proxy npx vitest run --project unit-fe .../prerequisites.test.ts`:
+  `AssertionError: expected undefined to deeply equal []` on `result.linkedPrerequisites` —
+  correct RED reason; the 4 prior tests still pass.
 
   **Gherkin (binds) →** "A path may link a prerequisite it does not include, without failing
   integrity" — see the matching scenario in
@@ -1384,7 +1768,7 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And the absent prerequisite appears in the check's informational linkedPrerequisites list
   ```
 
-- [ ] [AI] **GREEN** — implement the `linkedPrerequisites` half in the same
+- [x] [AI] **GREEN** — implement the `linkedPrerequisites` half in the same
       `prerequisites.ts`: for each course in `courseOrder`, collect every declared prerequisite that
       is present in `libraryCourseIds` **but absent** from the manifest (informational only — never a
       violation, never affects pass/fail)
@@ -1392,7 +1776,13 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — acceptance: exits 0; the omitted-prerequisite fixture reports zero `violations` and exactly
       one `linkedPrerequisites` entry, and 2.6a's two fixtures still report exactly what they did
       before.
-- [ ] [AI] **REFACTOR** — return one structured result
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts`. Verified via
+  `rtk proxy npx vitest run --project unit-fe .../prerequisites.test.ts`: 6 passed (all 2.6a
+  fixtures unchanged).
+
+- [x] [AI] **REFACTOR** — return one structured result
       `{ violations: { courseId, missingPrerequisiteId, courseIndex, prerequisiteIndex }[], linkedPrerequisites: { courseId, missingPrerequisiteId }[] }`
       so a downstream gate can render a precise message for a real violation and a reviewer-facing
       diagnostic list for linked prerequisites without conflating the two
@@ -1401,9 +1791,14 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       fields, and the omitted-prerequisite fixture's single `linkedPrerequisites` record carries both
       fields.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/prerequisites.ts` (the GREEN step already
+  produced this exact structured shape — no further change needed). `test:unit` (project file): 6
+  passed; `typecheck`: exit 0.
+
 ### 2.7 TDD cycle 7 — `checkManifestIntegrity` (`manifest-integrity.ts`)
 
-- [ ] [AI] **RED** — write failing unit tests in
+- [x] [AI] **RED** — write failing unit tests in
       `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.test.ts` _(new test)_ for
       `checkManifestIntegrity(manifest, libraryCourseIds)`: a **clean** fixture reports no unresolved
       and no duplicate IDs; a fixture whose `courseOrder` names a course absent from
@@ -1413,6 +1808,11 @@ to the source plan is recorded here so a reader auditing the split can trace eve
       — acceptance: the run fails because `checkManifestIntegrity` is undefined. Falsifiable both
       ways: an implementation returning empty sets unconditionally fails the second and third
       assertions.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.test.ts`. Confirmed via
+  `rtk proxy npx vitest run --project unit-fe .../manifest-integrity.test.ts`:
+  `Failed to resolve import "./manifest-integrity"` — correct RED reason.
 
   **Gherkin (binds) →** "Every manifest course reference resolves to a real course"
 
@@ -1424,46 +1824,103 @@ to the source plan is recorded here so a reader auditing the split can trace eve
     And no course ID appears more than once in the manifest
   ```
 
-- [ ] [AI] **GREEN** — implement `checkManifestIntegrity(manifest, libraryCourseIds)` in
+- [x] [AI] **GREEN** — implement `checkManifestIntegrity(manifest, libraryCourseIds)` in
       `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.ts` _(new file)_, pure,
       returning the unresolved-ID set and the duplicate-ID set
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: exits 0; all three assertions pass.
-- [ ] [AI] **REFACTOR** — normalize each `courseOrder` entry through `normalizeCourseRef` (cycle 2.1)
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.ts`. Verified via
+  `rtk proxy npx vitest run --project unit-fe .../manifest-integrity.test.ts`: 3 passed.
+
+- [x] [AI] **REFACTOR** — normalize each `courseOrder` entry through `normalizeCourseRef` (cycle 2.1)
       instead of branching on the string-or-object shape inline
       — command: `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck`
       — acceptance: both exit 0; the object-form `courseOrder` fixture is handled identically to the
       string form.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**:
+  `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.ts`,
+  `apps/ayokoding-www/src/features/course-paths/core/manifest-integrity.test.ts` (added
+  object-form fixture test). `test:unit` (project file): 4 passed; `typecheck`: exit 0.
+
 ### 2.8 Closing REFACTOR — the purity guard
 
-- [ ] [AI] **REFACTOR** — extract any shared course-ref type still declared in more than one module
+- [x] [AI] **REFACTOR** — extract any shared course-ref type still declared in more than one module
       into `manifest.ts`, and confirm the core is IO-free
       — command:
       `grep -rnE "from ['\"](node:)?(fs|path)['\"]|from ['\"]react['\"]" apps/ayokoding-www/src/features/course-paths/core`
       — acceptance: the command prints **nothing** and exits 1. Falsifiable both ways: adding a
       single `import fs from "fs"` to any file under `core/` makes it print that line and exit 0.
-- [ ] [AI] Confirm the whole core still passes after the extraction —
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none — `CourseRef` is already declared
+  exactly once (in `schemas.ts`) and re-exported by `manifest.ts`; no other module redeclares it, so
+  nothing to extract. The purity-guard grep printed nothing and exited 1, confirmed.
+
+- [x] [AI] Confirm the whole core still passes after the extraction —
       command:
       `npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:typecheck && npx nx run ayokoding-www:lint`
       — acceptance: all three exit 0.
 
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. `test:unit`: 94 files / 2774
+  passed / 6 skipped, exit 0. `typecheck`: exit 0. `lint`: exit 0 (preexisting unrelated content/
+  warnings only).
+
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npx nx affected -t typecheck` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t lint` — acceptance: exits 0.
-- [ ] [AI] `npx nx affected -t test:quick test:unit test:integration test:e2e` — acceptance: exits 0.
+- [x] [AI] `npx nx affected -t typecheck` — acceptance: exits 0.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. Exit 0 for 25 affected projects
+  and 6 dependency tasks (re-confirmed after the two `next.config.ts` fixes below).
+
+- [x] [AI] `npx nx affected -t lint` — acceptance: exits 0.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. Exit 0 for 25 affected projects.
+  Only preexisting warnings remain (content-file `no-unused-vars`, one `jsx-a11y` warning each in
+  `cost-of-living-calculator/shell/controls.tsx` and `search/shell/search-dialog.test.tsx`, plus
+  auto-generated `.features-gen` `no-empty-pattern` warnings for the `ose` platform-web suite) — none
+  introduced by this phase.
+
+- [x] [AI] `npx nx affected -t test:quick test:unit test:integration test:e2e` — acceptance: exits 0.
       **`test:integration` and `test:e2e` prove nothing here and are not cited as evidence anywhere
       in this plan**: for `ayokoding-www` both targets are `echo` no-op stubs that always exit 0
       [Repo-grounded — `apps/ayokoding-www/project.json`: `echo 'no-op: integration tier not used for
       this content app'` and `echo 'no-op: target not applicable for this project'`]. They are listed
       for completeness only. The regression evidence for the `content-url.ts` change is
       `content-url.test.ts` (under `test:unit`) plus the Phase 4 Playwright sweep.
-- [ ] [AI] `npx nx affected -t specs:behavior:coverage` — acceptance: **exits 0**. Every
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: `apps/organiclever-app-web/next.config.ts`,
+  `apps/ose-app-web/next.config.ts` (pinned `outputFileTracingRoot` — preexisting worktree
+  ambiguous-lockfile-root bug),
+  `apps/ayokoding-www-fe-e2e/src/steps/cost-of-living-calculator.steps.ts` (added missing
+  `waitForLoadState` — preexisting race condition). `NX Successfully ran targets test:quick,
+test:unit, test:integration, test:e2e for 25 projects and 11 tasks they depend on`, exit 0. All 25
+  `test:e2e` projects passed (78/39/42/2/2/29/18/12/1/1/578 across projects, plus the smaller
+  suites), after root-causing and fixing: a stale leftover `ayokoding-www` production server holding
+  a broken build; five apps in this worktree (`organiclever-app-web`, `ose-app-web`,
+  `organiclever-www`, `wahidyankf-www`, `ose-www`) never having been built; `ose-www-be-e2e`/
+  `ose-www-fe-e2e` needing a manually-started `ose-www` server; a resource-contention flake in
+  `ayokoding-www-be-e2e` under `--parallel=3` (confirmed non-code via isolated rerun); the
+  `outputFileTracingRoot` ambiguity for `organiclever-app-web`/`ose-app-web`; and the
+  cost-of-living-calculator race condition (reproduced deterministically before the fix, passed
+  deterministically 3x plus a full 578/578 suite rerun after).
+
+- [x] [AI] `npx nx affected -t specs:behavior:coverage` — acceptance: **exits 0**. Every
       `course-paths` scenario ships `@wip` (see 2.0), which the validator treats as a full coverage
       exemption, so there is no delta to tolerate and no hedge in this clause. Falsifiable both ways:
       dropping `@wip` from one scenario makes this exit non-zero.
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by this phase's changes.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. Exit 0 for all 25 affected
+  projects; `ayokoding-www`: "Spec coverage valid! 30 specs, 272 scenarios, 983 steps — all covered."
+
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by this phase's changes.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: `apps/organiclever-app-web/next.config.ts`
+  (commit `ac5e335d5`), `apps/ose-app-web/next.config.ts` (commit `7d29f8737`),
+  `apps/ayokoding-www-fe-e2e/src/steps/cost-of-living-calculator.steps.ts` (commit `2ea23fcd1`),
+  plus the earlier rhino-cli `@wip` shared-steps-checker fix (commit `c406935d4`). All eight
+  originally-failing `test:e2e` projects root-caused and fixed; none deferred.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes.
 > This follows Root Cause Orientation. Commit preexisting fixes separately with appropriate
@@ -1471,48 +1928,105 @@ to the source plan is recorded here so a reader auditing the split can trace eve
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically — group related changes into logically cohesive commits
+- [x] [AI] Commit changes thematically — group related changes into logically cohesive commits
       (one per TDD cycle is the natural grain here).
-- [ ] [AI] Follow Conventional Commits: `<type>(<scope>): <description>` (imperative, no period).
-- [ ] [AI] Keep the `content-url.ts` change (cycle 2.4) in its **own** commit — it is the only shipped-code
-      change in the plan and must be revertable in isolation.
-- [ ] [AI] Preexisting fixes get their own commits, separate from plan work.
-- [ ] [AI] Do NOT bundle unrelated changes into a single commit.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. One commit per TDD cycle:
+  `f0afa7bab` (2.5 `resolvePrerequisites`), `c6db0ba5b` (2.6a ordering violations), `d106df1a9`
+  (2.6b link-don't-walk), `e95f16ca2` (2.7 `checkManifestIntegrity`), `aa66e64c4` (2.8 purity-guard
+  docs), plus `ac5e335d5`/`7d29f8737`/`2ea23fcd1` for the three preexisting fixes.
+
+- [x] [AI] Follow Conventional Commits: `<type>(<scope>): <description>` (imperative, no period).
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. All commits use
+  `feat(ayokoding-www): ...`, `fix(<app>): ...`, or `docs(plans): ...`, imperative mood, no period.
+
+- [x] [AI] Keep the `content-url.ts` change (cycle 2.4) in its **own** commit — it is the only shipped-code
+      change in the plan and must be reviewable and revertable in isolation before the PR merges (this
+      repo squash-merges every PR — see `worktree-and-artifact-cleanup.md`'s Test-1 note — so the
+      isolation benefit is scoped to PR review and pre-merge revert, not post-merge; after merge only
+      the whole squashed PR is revertible as one commit).
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. Landed in its own commit
+  `39606c066` (`feat(ayokoding-www): add optional pathId param to contentUrl`), before this segment.
+
+- [x] [AI] Preexisting fixes get their own commits, separate from plan work.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. `ac5e335d5`, `7d29f8737`,
+  `2ea23fcd1` (this segment) and `c406935d4` (rhino-cli `@wip` fix, earlier in Phase 2) are each
+  separate `fix(...)` commits, none bundled with plan TDD-cycle commits.
+
+- [x] [AI] Do NOT bundle unrelated changes into a single commit.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. Verified via `git status`
+  before each commit — only the intended file(s) staged per commit; the two auto-generated
+  `next-env.d.ts` build-mode diffs (dev-vs-build tracing-root toggling) were reverted rather than
+  committed, since they are not meaningful source changes.
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] All six core modules exist:
+- [x] [AI] All six core modules exist:
       `test -f` returns 0 for each of `schemas.ts`, `manifest.ts`, `path-nav.ts`, `path-context.ts`,
       `prerequisites.ts`, `manifest-integrity.ts` under
       `apps/ayokoding-www/src/features/course-paths/core/`.
-- [ ] [AI] `resolvePathNav`, `parsePathContext`, `resolvePrerequisites`,
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. All six `test -f` checks return 0.
+
+- [x] [AI] `resolvePathNav`, `parsePathContext`, `resolvePrerequisites`,
       `checkPrerequisiteConsistency`, `checkManifestIntegrity`, `normalizeCourseRef` and
       `contentUrl(locale, slug, pathId)` are all implemented with green unit tests —
       `npx nx run ayokoding-www:test:unit` exits 0.
-- [ ] [AI] Both integrity checks are falsifiable in both directions: the clean fixture reports zero
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. All seven functions implemented;
+  `test:unit` exit 0 (94 files / 2774 passed / 6 skipped).
+
+- [x] [AI] Both integrity checks are falsifiable in both directions: the clean fixture reports zero
       findings AND the deliberately-violating fixture reports exactly the expected finding, for
       `checkPrerequisiteConsistency` **and** `checkManifestIntegrity`.
-- [ ] [AI] The purity guard prints nothing:
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. `checkPrerequisiteConsistency`:
+  `cleanManifest` → zero violations/zero linked; `violatingManifest` → exactly one structured
+  violation; `omittedPrerequisiteManifest` → zero violations/exactly one `linkedPrerequisites`
+  entry. `checkManifestIntegrity`: clean fixture → zero unresolved/zero duplicate; unresolved
+  fixture → exactly the one absent ID; duplicate fixture → exactly the one repeated ID.
+
+- [x] [AI] The purity guard prints nothing:
       `grep -rnE "from ['\"](node:)?(fs|path)['\"]|from ['\"]react['\"]" apps/ayokoding-www/src/features/course-paths/core`
       exits 1.
-- [ ] [AI] `course-paths` Gherkin authored under `<SPECS>` with **one `@wip` tag per scenario**
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. Command prints nothing, exit 1.
+
+- [x] [AI] `course-paths` Gherkin authored under `<SPECS>` with **one `@wip` tag per scenario**
       (per-file `Scenario:` and `@wip` counts equal and non-zero);
       `npx nx run ayokoding-www:specs:behavior:coverage` **exits 0**; the
       `specs gherkin-cardinality validate` audit exits 0; the deferred obligation is
       recorded in `<PLAN>/evidence/phase-2-specs-coverage-delta.txt` naming
       `ayokoding-learning-path-03-navigation-ui` as the plan that removes the `@wip` tags and adds
       the `@covers` markers.
-- [ ] [AI] `npx nx run ayokoding-www:typecheck` + `:lint` + `:build` exit 0.
-- [ ] [AI] `find …/syllabus -type f | wc -l` still returns **128** — unchanged from the Phase 0
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none new (all recorded earlier in
+  Phase 2). Evidence in `evidence/phase-2-specs-coverage-delta.txt`, re-verified this segment:
+  `specs:behavior:coverage` exits 0 ("Spec coverage valid! 30 specs, 272 scenarios, 983 steps — all
+  covered"); per-file `Scenario:`/`@wip` counts equal and non-zero across all 8 files (14 scenarios
+  total); `gherkin-cardinality validate` passes; deferred obligation correctly names
+  `ayokoding-learning-path-03-navigation-ui`.
+
+- [x] [AI] `npx nx run ayokoding-www:typecheck` + `:lint` + `:build` exit 0.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. All three exit 0. `build`
+  regenerated 1856 static pages; only preexisting content-lint and LaTeX-strict-mode warnings.
+
+- [x] [AI] `find …/syllabus -type f | wc -l` still returns **128** — unchanged from the Phase 0
       baseline (no delivery step in this phase touches `syllabus/`; the file count is stable across a
       rename, so it is unaffected by the one-time, plan-authoring-time R3 custody exception already
       reflected in that baseline — see [tech-docs.md §Custody rules](./tech-docs.md#custody-rules-binding)).
-- [ ] [AI] **Delivery boundary — this is where the Phase 1-2 delivery unit's PR opens.** Draft PR
-      opened (covering Phases 1-2: the prerequisite schema plus the `course-paths` pure core, per the
-      `### Delivery Boundaries` table under `## Parallelization Model`); 3-cycle PR-Review complete;
-      CI green; PR `[AI]`-merged.
+
+  **Date**: 2026-07-24. **Status**: Done. **Files Changed**: none. Command returns **128**.
+
+- [ ] [AI] **Draft PR opened (covers both Phase 1 and Phase 2 commits, `DN-14`)**; 3-cycle
+      PR-Review complete; CI green; PR `[AI]`-merged.
 
 > **Pause Safety**: the pure ordering, context, prerequisite and integrity logic is implemented and
 > unit-tested; no route or component consumes it, so the only shipped-behaviour change is
@@ -1612,11 +2126,11 @@ found.` precisely so that a non-zero residue must be explained rather than exclu
       output reaches `wc -l` raw. (Only a **bare** `find` is rewritten to `rtk find` and reformatted;
       see the Phase 0 preamble.)
       **The comparison is against `<BASELINE_SHA>`, the SHA Phase 0 pinned — never the live
-      `origin/main` ref.** The Phase 1-2 delivery unit's PR is merged to `main` at Phase 2's boundary,
-      before this phase starts (Delivery-Boundary Integration Protocol), so `origin/main` already
-      contains 1.4's edit by now and a diff against it would print **zero** lines, which this very
-      clause reads as "1.4 never ran" — a false red that blocks the gate. The pinned SHA predates that
-      merge, so both directions stay meaningful here and at every later phase.
+      `origin/main` ref.** The Phase 1+2 stop point's one PR (`DN-14`) is merged to `main` before this
+      phase starts (Per-Stop-Point Integration Protocol), so `origin/main` already contains 1.4's edit
+      by now and a diff against it would print **zero** lines, which this very clause reads as "1.4
+      never ran" — a false red that blocks the gate. The pinned SHA predates that merge, so both
+      directions stay meaningful here and at every later phase.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
 > (Root Cause Orientation). Commit preexisting fixes separately with conventional-commit messages.
@@ -1638,10 +2152,11 @@ found.` precisely so that a non-zero residue must be explained rather than exclu
       already carries that edit, and counted **by path prefix** rather than by lines because RTK's
       `git diff` filter appends a `--- Changes ---` trailer to non-empty output, which inflates
       `wc -l` to **4** and a bare `grep -c .` to **2** on the one-changed-file state.
-- [ ] [AI] **Intermediate phase — no PR here.** Work is committed to the Phase 3-4 delivery unit's
-      branch (`ayokoding-learning-path-02-schema-and-prerequisite-dag/verification-evidence`); no
-      draft PR is opened and nothing merges at this gate. The unit's PR opens at the Phase 4 Gate, per
-      the `### Delivery Boundaries` table under `## Parallelization Model`.
+- [ ] [AI] **No PR opens at this gate (`DN-14`)**: Phases 3+4 form one natural delivery stop point
+      (both are verification passes over already-shipped Phase 1+2 code), so this phase's commits
+      stay on the same branch and continue directly into Phase 4 — the draft PR opens, runs its
+      3-cycle PR-Review, and merges at the **Phase 4 Gate** below, covering both phases' commits
+      together.
 
 > **Pause Safety**: the whole data layer passes every automated gate and the plan's ownership
 > boundary is proven intact. Safe to stop indefinitely. To resume: re-run the affected quality gates
@@ -1730,10 +2245,8 @@ found.` precisely so that a non-zero residue must be explained rather than exclu
 - [ ] [AI] The Rule-15 exemption **and** the Rule-16 non-applicability are recorded with reasons in
       `<PLAN>/evidence/phase-4-rule-15-exemption.txt`, each naming the plan that carries the obligation
       instead (or stating that none does).
-- [ ] [AI] **Delivery boundary — this is where the Phase 3-4 delivery unit's PR opens.** Draft PR
-      opened (covering Phases 3-4: automated verification plus the manual no-regression evidence and
-      Rule-15/16 exemption record, per the `### Delivery Boundaries` table under
-      `## Parallelization Model`); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged.
+- [ ] [AI] **Draft PR opened (covers both Phase 3 and Phase 4 commits — evidence + any fixes,
+      `DN-14`)**; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged.
 
 > **Pause Safety**: the one shipped-code change is proven non-regressive against both locales at
 > three breakpoints, with committed evidence, and the tester exemptions are on the record rather than
@@ -1824,11 +2337,10 @@ found.` precisely so that a non-zero residue must be explained rather than exclu
       `plans/backlog/` plan, or discarded with a reason), or the file records the explicit "none"
       escape.
 - [ ] [AI] No code-homed learning landed inline in this plan's own commits or PR.
-- [ ] [AI] **Intermediate phase — no PR here.** Work (the triaged `learnings.md`, and any small
-      non-code learning routed inline) is committed to the Phase 6-7 delivery unit's branch
-      (`ayokoding-learning-path-02-schema-and-prerequisite-dag/archival`); no draft PR is opened and
-      nothing merges at this gate. The unit's PR opens at the Phase 7 Gate, together with the archival
-      move, per the `### Delivery Boundaries` table under `## Parallelization Model`.
+- [ ] [AI] **No PR opens at this gate (`DN-14`)**: Phases 6+7 form one natural delivery stop point
+      (both are docs-only closing work), so this phase's `learnings.md` triage commit stays on the
+      same branch and continues directly into Phase 7 — the draft PR opens, runs its 3-cycle
+      PR-Review, and merges at the **Phase 7 Gate** below, covering both phases' commits together.
 
 > **Pause Safety**: `learnings.md` is fully triaged (or explicitly recorded as empty); no future
 > process depends on querying it later. Nothing is pushed for review yet — the Phase 6-7 delivery
@@ -2094,10 +2606,8 @@ found.` precisely so that a non-zero residue must be explained rather than exclu
 - [ ] [AI] The stage index README the plan left (`plans/backlog/README.md` or
       `plans/in-progress/README.md`), `plans/done/README.md`, and any other referencing README are
       updated.
-- [ ] [AI] **Delivery boundary — this is where the Phase 6-7 delivery unit's PR opens.** Draft PR
-      opened (covering Phases 6-7: the `learnings.md` triage plus the archival move and repoint, per
-      the `### Delivery Boundaries` table under `## Parallelization Model`); 3-cycle PR-Review
-      complete; CI green; PR `[AI]`-merged.
+- [ ] [AI] **Draft PR opened (covers both Phase 6 `learnings.md` triage and Phase 7 archival move +
+      repoint, `DN-14`)**; 3-cycle PR-Review complete; CI green; PR `[AI]`-merged.
 - [ ] [AI] After the archival PR merges, prompt the user before deleting
       `worktrees/ayokoding-learning-path-02-schema-and-prerequisite-dag/`.
 
