@@ -3970,8 +3970,22 @@ plans/done/YYYY-MM-DD__ayokoding-learning-path-03-navigation-ui/` using today's 
       DD-47 note intact so 36 is not misread as under-delivery.
 - [x] [AI] Plan folder is under `plans/done/YYYY-MM-DD__ayokoding-learning-path-03-navigation-ui/`; all
       READMEs updated; archival committed.
-- [ ] [AI] Draft PR opened (`learnings.md` triage + archival move — this delivery unit's Phase 7-8
+- [x] [AI] Draft PR opened (`learnings.md` triage + archival move — this delivery unit's Phase 7-8
       PR); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed (no-op).
+      **Evidence**: PR [#96](https://github.com/wahidyankf/ose-public/pull/96). 3-cycle PR-Review
+      Maker→Fixer Cycle run to completion: Cycle 1 — all 8 discipline specialists found 3
+      evidence-annotation errors in this file (CI job count 20→19, `learnings.md` entry count
+      miscounted 4→3 real `## Learning:` entries, EWT/UWT/DWT finding count 18→14), fixed in commit
+      `e0fd93a09a8492d8efa41b6b1ece5a67ed02a069`. Cycle 2 — all 8 specialists independently
+      re-verified the fix against live ground truth and found zero new issues; synthesis-maker
+      posted a clean-cycle review. Cycle 3 (final) — 7 of 8 specialists found nothing; the logic
+      specialist found one further evidence-annotation error (this file's own `evidence/` file count
+      stated 114, ground truth was 115 — the Phase-8 no-path-invariant screenshot and two earlier
+      process-note files were omitted from the count), fixed in commit
+      `6d16dc73e47ebdf008f3676f27740d498cf650f6`. CI green on that commit (17/17 checks passed); all
+      review threads resolved; `mergeStateStatus: CLEAN`. PR squash-merged to `main` as commit
+      `3dcd9530f`. Deploy is a no-op — this delivery unit touches only `plans/` and
+      `repo-governance/`/`.claude/`/`.opencode/` doc surfaces, no `ayokoding-www` app code.
 
 > **Pause Safety**: the plan is archived and its final PR `[AI]`-merged to `main`. Terminal state. To
 > resume: nothing — the plan is complete.
