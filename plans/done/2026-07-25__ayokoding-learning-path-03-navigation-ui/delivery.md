@@ -1874,7 +1874,7 @@ getBySlug` for the resolved path's slug (best-effort, silent no-op on `NOT_FOUND
 
 ### Cycle 3.2 — Landing hero (Screen 0)
 
-- [ ] [AI] **RED (Screen 0 hero)** — write a failing Playwright spec in `<E2E>` asserting the landing
+- [x] [AI] **RED (Screen 0 hero)** — write a failing Playwright spec in `<E2E>` asserting the landing
       hero at `/en` renders a "Choose your path" eyebrow with a `PathCard` grid (populated from the same
       fixture manifests as the other `course-paths` specs) and a "Compare all paths" link to
       `/en/learn/paths`, per
@@ -1929,7 +1929,7 @@ app-shell/shell/hero.tsx` (adds the "Choose your path" eyebrow + `HERO_CAREERS_C
 
 ### Cycle 3.3 — Accessibility
 
-- [ ] [AI] **RED (a11y)** — this suite is **playwright-bdd**, so the a11y scenario is authored as Gherkin
+- [x] [AI] **RED (a11y)** — this suite is **playwright-bdd**, so the a11y scenario is authored as Gherkin
       under `<SPECS>` and bound by a step definition at `<E2E>src/steps/course-paths-a11y.steps.ts`
       _(New file; follow the existing `accessibility.steps.ts` pattern — Repo-grounded)_. The steps
       assert, on a course rendered in path context: the path rail, path banner, path breadcrumb,
@@ -3752,8 +3752,10 @@ ayokoding-www:test:unit`/`typecheck`/`lint` all green. Re-verified live at
 - [x] [AI] Rail responsive contract, mobile drawer, and no-path regression sweep all verified with
       committed evidence.
 - [x] [AI] All rule-15 EWT/UWT/DWT defect findings fixed (ticked) or explicitly permitted to defer.
-- [ ] [AI] Draft PR opened (retest evidence + any fixes); 3-cycle PR-Review complete; CI green; PR
+- [x] [AI] Draft PR opened (retest evidence + any fixes); 3-cycle PR-Review complete; CI green; PR
       `[AI]`-merged; deployed.
+      Evidence: PR #95, 3 review cycles complete (all findings fixed/deferred-with-reason), CI green
+      (run `30162860098`), `[AI]`-merged (squash, commit `0834ac1b7`), deployed to `prod-ayokoding-www`.
 
 > **Pause Safety**: the navigation UI is verified live and defect-clean in `en`. Safe to stop. To
 > resume: re-run the three testers against the running app.
@@ -3762,31 +3764,60 @@ ayokoding-www:test:unit`/`typecheck`/`lint` all green. Re-verified live at
 
 ## Phase 6: Final `origin/main` Integration & CI Verification
 
-- [ ] [AI] Confirm no plan PR is still open — `gh pr list --search "ayokoding-learning-path-03-navigation-ui" --state open`
+- [x] [AI] Confirm no plan PR is still open — `gh pr list --search "ayokoding-learning-path-03-navigation-ui" --state open`
       returns zero rows — acceptance: no open plan PRs remain. (Do **not** use
       `git merge-base --is-ancestor` to prove a phase merged: squash-merge here rewrites the commit, so
       that check false-negatives on every merged PR.)
-- [ ] [AI] Sync the worktree to latest `origin/main` and run the full affected suite:
+      Evidence: `gh pr list --search "ayokoding-learning-path-03-navigation-ui" --state open` → `[]`.
+- [x] [AI] Sync the worktree to latest `origin/main` and run the full affected suite:
       `npx nx affected -t typecheck lint test:quick test:unit test:e2e specs:behavior:coverage` +
       `npx nx run ayokoding-www:build` — acceptance: all exit 0 on the integrated `main`.
-- [ ] [AI] Monitor the final `main` CI run (poll every ~2 min; one
+      Evidence: worktree synced to `origin/main` tip `0834ac1b7` (PR #95 squash commit). Full affected
+      run (base `e740ec998`, head `0834ac1b7`, 25 projects) initially showed 5 e2e failures under
+      `--parallel=2` load; each was isolated and re-run individually after a fresh rebuild and passed
+      clean: `ayokoding-www-fe-e2e` (622 passed, 0 failed — the flaking test,
+      `course-rehome-redirects.feature`, fires many concurrent HTTP requests via `Promise.all` and hit
+      `ECONNRESET`/`TimeoutError` only under the 25-project parallel load; 3/3 browsers pass in
+      isolation), `ose-www-fe-e2e` (42 passed — prior failure was a stale/evicted build artifact, not a
+      code issue), `wahidyankf-www-fe-e2e` (29 passed), `organiclever-www-fe-e2e` (39 passed),
+      `organiclever-app-web-e2e` (78 passed). One target, `ose-app-web-e2e:test:e2e`, cannot run
+      standalone locally by design — its `playwright.config.ts` has no `webServer` block at all (unlike
+      sibling `organiclever-app-web-e2e`, which does) and requires an externally-running `WEB_BASE_URL`
+      (its own staging CI workflow supplies this). This is pre-existing, unrelated to this plan's diff
+      (PR #95 never touched `ose-app-web`), and outside the actual CI required-check surface (the
+      `TypeScript quality gate` job's `nx affected` invocation excludes `test:e2e` entirely — see CI job
+      command in the Phase 6 CI evidence below). Routed to Phase 7 Knowledge Capture as a
+      `plans/backlog/` candidate rather than fixed inline (out of this plan's scope). `nx run
+ayokoding-www:build` — exit 0.
+- [x] [AI] Monitor the final `main` CI run (poll every ~2 min; one
       `gh run view --json status,conclusion` per wakeup; never `gh run watch`) — acceptance: all GitHub
       Actions green; fix root causes and push follow-ups (own PR → review → `[AI]` merge) until green.
-- [ ] [AI] Confirm `prod-ayokoding-www` serves the landing hero and the paths hub without error, and that
+      Evidence: PR #95 pre-merge CI run `30162860098` — all 19 jobs green (TypeScript quality gate took
+      16m42s, the heaviest job). Post-merge `pr-quality-gate` run on `main` at commit `0834ac1b7`
+      (`30163586230`) — all 19 jobs green, `conclusion: success`. `validate-env` and `publish-images`
+      workflows on the same commit — both `success`.
+- [x] [AI] Confirm `prod-ayokoding-www` serves the landing hero and the paths hub without error, and that
       a canonical course URL with no `?path=` renders exactly as before this plan; re-dispatch
       `apps-ayokoding-www-deployer` if any earlier deploy lagged — acceptance: production serves the
       rendering layer with no regression for no-path readers.
-- [ ] [AI] Fast-forward local `main` after the last side-worktree push (`git checkout main && git pull
+      Evidence: `apps-ayokoding-www-deployer` force-pushed `main`@`0834ac1b7` to `prod-ayokoding-www`
+      (`a103eb8b5..0834ac1b7`). Direct verification: `https://www.ayokoding.com/en` → 200, `.../en
+/learn/paths` → 200 (`<title>Paths | AyoKoding</title>`), `.../en/learn/courses/just-enough-nvim`
+      (no `?path=`) → 200, final URL unchanged (no redirect to a `?path=`-bearing URL),
+      `<title>1 · Just Enough Nvim | AyoKoding</title>`.
+- [x] [AI] Fast-forward local `main` after the last side-worktree push (`git checkout main && git pull
 --ff-only`) so the primary checkout does not silently diverge — acceptance: `git status` reports
       `main` up to date with `origin/main`.
+      Evidence: base checkout (`/Users/wkf/ose-projects/ose-public`) `git status` → `On branch main...
+      Your branch is up to date with 'origin/main'` at `0834ac1b7`, working tree clean.
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] Zero open plan PRs; every prior phase merged to `main`.
-- [ ] [AI] Full affected suite + build green on integrated `main`; final `main` CI run green.
-- [ ] [AI] `prod-ayokoding-www` serving the rendering layer; no-path pages unchanged.
+- [x] [AI] Zero open plan PRs; every prior phase merged to `main`.
+- [x] [AI] Full affected suite + build green on integrated `main`; final `main` CI run green.
+- [x] [AI] `prod-ayokoding-www` serving the rendering layer; no-path pages unchanged.
 
 > **Pause Safety**: the whole plan is integrated on `main`, green in CI, and live in production. Safe to
 > stop. To resume: re-run the affected suite on `main` and check CI/prod status.
@@ -3798,33 +3829,48 @@ ayokoding-www:test:unit`/`typecheck`/`lint` all green. Re-verified live at
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
 
-- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
+- [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
       catch this automatically next time; discard the rest with a one-line reason — acceptance: every
       entry has either a route or a discard reason.
-- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
+      Evidence: 4 entries triaged — 3 survive (gh `-f`/`-F`, zsh 1-indexed arrays, parallel-affected-run
+      contention flakes), 1 discarded (`ose-app-web-e2e` "failure" — already documented in its own
+      README, litmus fails since nothing new would be caught).
+- [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
       credential, token, or private hostname to a `<placeholder>` token, or discard if unsanitizable —
       acceptance: `learnings.md` contains no raw secret.
-- [ ] [AI] Apply the **repo-relevance gate** — infra-private content (Terraform, k3s, Proxmox, real
+      Evidence: none of the 3 surviving entries reference any secret, credential, token, or hostname —
+      all are shell/tooling/environment behavior notes.
+- [x] [AI] Apply the **repo-relevance gate** — infra-private content (Terraform, k3s, Proxmox, real
       hostnames/inventories) stays in `ose-infra` only and is NEVER cross-routed into
       `ose-public`/`ose-primer`; public-governance content may propagate via the existing parity loop —
       acceptance: no infra-private content appears in this repo's routed output.
-- [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing matrix —
+      Evidence: none of the 3 surviving entries reference `ose-infra`-private content (no Terraform,
+      k3s, Proxmox, or real inventory data) — all are generic shell/CI/agent-instruction behavior.
+- [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing matrix —
       non-code homes may land inline (small edit) or as a `plans/backlog/` follow-up (large); **code
       homes (`apps/`, `libs/`, tests) are ALWAYS filed as a separate `plans/backlog/<slug>/` plan and
       NEVER landed inline** in this plan's commits or PR — acceptance: every `learnings.md` entry records
       its terminal routing state.
-- [ ] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
+      Evidence: all 3 surviving entries are non-code (`.claude/agents/`, workflow docs) and small —
+      routed inline: 2 to `.claude/agents/pr-review-fixer.md`, 1 to `repo-governance/workflows/plan/
+plan-execution.md`. No code-homed (`apps/`/`libs/`/tests) learning surfaced, so no new
+      `plans/backlog/` filing was needed — the one candidate that would have been code-homed
+      (`course-rehome-redirects.feature` concurrency) is already tracked by the existing backlog plan
+      `harden-ayokoding-www-fe-e2e-bulk-link-concurrency`.
+- [x] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
       `No generalizable learnings — <one-line reason>` — acceptance: `learnings.md` is never silently
       empty.
+      N/A — 3 generalizable learnings did surface and are recorded above with terminal routing states;
+      `learnings.md` is not empty.
 
 ### Phase 7 Gate
 
 > All checks below must pass before Plan Archival.
 
-- [ ] [AI] Every `learnings.md` entry is in a terminal state (routed inline, filed as backlog, or
+- [x] [AI] Every `learnings.md` entry is in a terminal state (routed inline, filed as backlog, or
       discarded with reason), or the file records the explicit "none" escape.
-- [ ] [AI] No code-homed learning landed inline in this plan's own commits/PR.
-- [ ] [AI] `learnings.md` triage is committed to `ayokoding-learning-path-03-navigation-ui/archival`
+- [x] [AI] No code-homed learning landed inline in this plan's own commits/PR.
+- [x] [AI] `learnings.md` triage is committed to `ayokoding-learning-path-03-navigation-ui/archival`
       (this delivery unit's branch, Phases 7-8); every check above in this Phase 7 Gate is green;
       nothing has been pushed for review yet — the unit's PR opens at Phase 8 per
       [Delivery Boundaries](#delivery-boundaries).
@@ -3837,24 +3883,48 @@ ayokoding-www:test:unit`/`typecheck`/`lint` all green. Re-verified live at
 
 ## Phase 8: Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked.
-- [ ] [AI] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a terminal
+- [x] [AI] Verify ALL delivery checklist items are ticked.
+      **Evidence**: `grep -n "^- \[ \]" delivery.md` shows only Phase 8's own in-progress items (this
+      phase) and the standing cross-cutting "Commit Guidelines" / "Local Quality Gates" sections
+      (continuously-applied practices, not one-time deliverables). Phases 0-7 are fully ticked; 3 gaps
+      found during this sweep (2 Phase 3 RED-step ticks, 1 Phase 5 Gate PR-merge/deploy tick — each
+      genuinely done, just never ticked) were fixed.
+- [x] [AI] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a terminal
       state or the file records the explicit "none" escape; both the secret/sensitivity gate and the
       repo-relevance gate were applied to every surviving entry.
-- [ ] [AI] Verify ALL quality gates pass (local + CI) and the build is green.
-- [ ] [AI] **Cross-plan link gate (BF-8)** — run **both** commands 1 and 2 in
+      **Evidence**: `learnings.md` has 3 `## Learning:` + 1 `## Discarded:` entries, 4 `Terminal state`
+      lines — every entry terminal (3 routed inline, 1 discarded); both gates applied per Phase 7.
+- [x] [AI] Verify ALL quality gates pass (local + CI) and the build is green.
+      **Evidence**: `nx show projects --affected` (base `0834ac1b7` merge-base → head) returns zero
+      projects — this branch's diff is docs-only (delivery.md/learnings.md/agent-md/workflow-md), so
+      `nx affected -t typecheck lint test:quick test:unit specs:behavior:coverage` reports "No tasks
+      were run", exit 0. CI on `main`'s tip (`0834ac1b7`, this branch's base) is green (run
+      `30163586230` and 2 sibling jobs, all `conclusion: success`) — same evidence already recorded in
+      Phase 6.
+- [x] [AI] **Cross-plan link gate (BF-8)** — run **both** commands 1 and 2 in
       [Markdown validation commands](#markdown-validation-commands) — acceptance: command 1 prints
       `All links valid! No broken links found.` AND command 2's `grep` finds no matching line (exit 1).
       This is the check that catches a stale `../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/…`
       link after that plan archives into `plans/done/YYYY-MM-DD__…` — command 1 alone cannot see it,
       because it excludes `plans/done`.
-- [ ] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in
+      **Evidence**: command 1 → `All links valid! No broken links found.` Command 2 → `grep -F
+"ayokoding-learning-path-03-navigation-ui"` on command-1's output, exit 1 (no match). Command 3
+      (`md heading-hierarchy validate` + `markdownlint-cli2`, scoped to `<PLAN>`) → both exit 0, 6 files
+      linted, 0 errors.
+- [x] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in
       `<PLAN>evidence/`; the `en` content locale exercised (per brd.md's Indonesian-mirror-deferred
       non-goal). Manual API verification is not applicable — this plan adds no endpoint.
-- [ ] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit
+      **Evidence**: `<PLAN>evidence/` has 115 files — 112 screenshots from Phase 5's full 3-breakpoint
+      walk across all screens (`en` locale), plus `phase-0-snapshot.txt`, `phase-2-specs-coverage-delta.txt`,
+      and the Phase 8 no-path-invariant production screenshot (`phase-8-prod-no-path-invariant-en-1280px.png`)
+      — committed across Phases 0/2/5/8, re-confirmed present here.
+- [x] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit
       user permission (only when genuinely impossible); SG-###/USS-### may be triaged or deferred with
       rationale.
-- [ ] [AI] **Verify this plan's design-funnel artefacts are complete (DD-46 / DD-47)** —
+      **Evidence**: 14 EWT/UWT/DWT finding checkboxes in Phase 5, all ticked `[x]`; the one remaining
+      `- [ ]` grep match is the section's own template-example line (`EWT-NNN:` placeholder text), not a
+      real finding.
+- [x] [AI] **Verify this plan's design-funnel artefacts are complete (DD-46 / DD-47)** —
       `find <PLAN>assets -name '*-option-*-*.png' | wc -l` returns **36** (6 screens × 2 options × 3
       viewports: hero, paths hub, category landing, arc landing, path landing, course path); every one
       is embedded in `prd.md` with viewport-specific alt text; Screen 3's selection reads **Option B —
@@ -3863,24 +3933,42 @@ ayokoding-www:test:unit`/`typecheck`/`lint` all green. Re-verified live at
       **36 is the complete deliverable for this plan.** DD-47's total of 42 is a two-plan total: the
       remaining 6 (Screen 4) belong to `ayokoding-learning-path-01-url-restructure`. Do NOT copy that
       plan's renders into this folder to make the number read 42 — a duplicated matrix drifts.
-- [ ] [AI] Verify the no-path invariant one last time on production: a canonical course URL renders the
+      **Evidence**: `find <PLAN>assets -name '*-option-*-*.png' | wc -l` → `36`. `grep -o -- "Selected:
+Option B — Left path rail" <PLAN>prd.md | wc -l` → `1`. `grep -c "Selection: PENDING" <PLAN>prd.md`
+      → `0`.
+- [x] [AI] Verify the no-path invariant one last time on production: a canonical course URL renders the
       generic sidebar with no path chrome — acceptance: confirmed with a committed screenshot.
-- [ ] [AI] Move: `git mv plans/in-progress/ayokoding-learning-path-03-navigation-ui/
+      **Evidence**: Playwright MCP navigated to `https://www.ayokoding.com/en/learn/courses/just-enough-nvim`
+      (no `?path=`) on production — final URL unchanged (no redirect), title `1 · Just Enough Nvim |
+AyoKoding`. Screenshot committed:
+      ![Production canonical course URL with no `?path=` renders the generic sidebar with no path chrome](./evidence/phase-8-prod-no-path-invariant-en-1280px.png)
+- [x] [AI] Move: `git mv plans/in-progress/ayokoding-learning-path-03-navigation-ui/
 plans/done/YYYY-MM-DD__ayokoding-learning-path-03-navigation-ui/` using today's completion date (the
       `evidence/` and `assets/` subfolders move with it).
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
-- [ ] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`,
+      **Evidence**: `git mv` to `plans/done/2026-07-25__ayokoding-learning-path-03-navigation-ui/` — 169
+      files renamed (README/brd/prd/tech-docs/delivery/learnings + `assets/` + `evidence/`).
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
+      **Evidence**: "Active Plans" section now reads "No plans currently in progress."
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
+      **Evidence**: entry added at the top of "Completed Projects", dated 2026-07-25.
+- [x] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`,
       `plans/backlog/README.md`), and the four sibling split plans' `Depends-on` sections if they name
       this plan's location.
-- [ ] [AI] Commit the archival:
+      **Evidence**: rewrote the stale `in-progress/` link path in `plans/backlog/README.md` (1 site) and
+      `plans/backlog/ayokoding-learning-path-04-course-authoring/{README,prd,tech-docs,delivery,learnings}.md`
+      (6 sites) to the new `plans/done/2026-07-25__…` location; `plans/05-manifests`,
+      `-06-skills-accounting`, `-07-skills-erp` reference this plan only by plain-text slug in
+      Depends-on tables (no markdown links), so nothing there needed a path fix. A repo-wide grep for
+      `in-progress/ayokoding-learning-path-03-navigation-ui` outside `plans/done/` returns no matches.
+- [x] [AI] Commit the archival:
       `chore(plans): move ayokoding-learning-path-03-navigation-ui to done`.
+      **Evidence**: commit `903f88acc`.
 
 ### Phase 8 Gate
 
-- [ ] [AI] All 36 funnel renders present and embedded; Screen 3 recorded as Option B; the cross-plan
+- [x] [AI] All 36 funnel renders present and embedded; Screen 3 recorded as Option B; the cross-plan
       DD-47 note intact so 36 is not misread as under-delivery.
-- [ ] [AI] Plan folder is under `plans/done/YYYY-MM-DD__ayokoding-learning-path-03-navigation-ui/`; all
+- [x] [AI] Plan folder is under `plans/done/YYYY-MM-DD__ayokoding-learning-path-03-navigation-ui/`; all
       READMEs updated; archival committed.
 - [ ] [AI] Draft PR opened (`learnings.md` triage + archival move — this delivery unit's Phase 7-8
       PR); 3-cycle PR-Review complete; CI green; PR `[AI]`-merged; deployed (no-op).
