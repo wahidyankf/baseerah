@@ -47,9 +47,9 @@ number on a change before shipping it.
 > analysis, LLM-as-judge with measured human agreement, judge reliability, and CI gating are **out
 > of scope here** -- if a technique requires computing an agreement statistic, deriving criteria
 > from observed failure modes, or defending a judge's scope, it belongs to
-> `evaluating-ai-systems-in-depth` -- `[Unverified]` not yet present in the AyoKoding course
-> library on disk, so no link is given here -- which runs after agents, not here. If a technique is
-> "write the expectation down, run it twice, compare," it belongs here.
+> [`evaluating-ai-systems-in-depth`](../evaluating-ai-systems-in-depth/overview.md) -- which runs
+> after agents, not here. If a technique is "write the expectation down, run it twice, compare," it
+> belongs here.
 
 ## How this topic is organized
 
@@ -129,9 +129,8 @@ never a fabricated one.
   ordinary test suite is the right tool, not eval machinery. Reaching for eval machinery there adds
   ceremony without adding information.
 - **When this gate is not enough**: the moment you are asked "why is it failing?" or you want to
-  score something subjective, this course is out of road. Go to `evaluating-ai-systems-in-depth`
-  -- `[Unverified]` not yet present in the AyoKoding course library on disk, so no link is given
-  here.
+  score something subjective, this course is out of road. Go to
+  [`evaluating-ai-systems-in-depth`](../evaluating-ai-systems-in-depth/overview.md).
 
 ## Accuracy notes
 
