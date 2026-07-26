@@ -496,8 +496,8 @@ worked example that demonstrates the failure at each stage.
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 graph LR
-    P["Population<br/>every real case, co-07"]:::blue --> F["Frame<br/>what you CAN sample from, co-07"]:::orange
-    F --> S["Sample<br/>random / stratified / convenience, co-07"]:::teal
+    P["Population<br/>every real case, co-07"]:::blue --> F["Frame<br/>what you can sample, co-07"]:::orange
+    F --> S["Sample<br/>random/stratified/<br/>convenience, co-07"]:::teal
     S --> E["Estimate<br/>rate + interval, co-24"]:::purple
 
     P -.->|"frame mismatch, ex-18:<br/>frame excludes real cases (e.g. timeouts)"| F
