@@ -132,3 +132,7 @@ weight: 95
   - [Overview](/en/learn/courses/product-patterns-for-probabilistic-systems/overview)
   - [Learning](/en/learn/courses/product-patterns-for-probabilistic-systems/learning)
   - [Drilling](/en/learn/courses/product-patterns-for-probabilistic-systems/drilling)
+- [Statistics for Evaluation](/en/learn/courses/statistics-for-evaluation)
+  - [Overview](/en/learn/courses/statistics-for-evaluation/overview)
+  - [Learning](/en/learn/courses/statistics-for-evaluation/learning)
+  - [Drilling](/en/learn/courses/statistics-for-evaluation/drilling)

@@ -48,6 +48,7 @@ weight: 10
   - [Pass 2 Capstone · SOLID Core](/en/learn/courses/capstone-solid-core)
   - [Evaluating AI Output — Essentials](/en/learn/courses/evaluating-ai-output-essentials)
   - [Product Patterns for Probabilistic Systems](/en/learn/courses/product-patterns-for-probabilistic-systems)
+  - [Statistics for Evaluation](/en/learn/courses/statistics-for-evaluation)
 - [Legacy](/en/learn/legacy)
   - [Overview](/en/learn/legacy/overview)
   - [Software Engineering](/en/learn/legacy/software-engineering)
