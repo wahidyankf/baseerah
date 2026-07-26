@@ -186,7 +186,9 @@ from statsmodels.stats.contingency_tables import mcnemar  # => co-18: the paired
 from statsmodels.stats.proportion import proportions_ztest  # => co-18: the SAME unpaired test ex-36 used, run here on paired data to make the contrast concrete
 
 
-def build_paired_dataset(n: int, *, seed: int, baseline_rate: float, candidate_rate: float, correlation: float) -> tuple[list[bool], list[bool]]:  # => co-18: SAME items, two verdicts each -- baseline and candidate are correlated because they share per-item difficulty
+def build_paired_dataset(
+    n: int, *, seed: int, baseline_rate: float, candidate_rate: float, correlation: float
+) -> tuple[list[bool], list[bool]]:  # => co-18: SAME items, two verdicts each -- baseline and candidate are correlated because they share per-item difficulty
     """Build paired baseline/candidate outcomes over n SHARED items, correlated by per-item difficulty."""  # => co-18: documents build_paired_dataset's contract -- no runtime output, just sets its __doc__
     rng = random.Random(seed)  # => co-18: drives each item's shared difficulty draw
     baseline: list[bool] = []  # => co-18: baseline's verdict, one per item
@@ -542,7 +544,9 @@ if __name__ == "__main__":  # => co-20: entry point -- runs only when this file 
 
     arr = np.array(sample, dtype=float)  # => co-20: scipy's bootstrap resamples this array with replacement
     for n_resamples in (1000, 5000):  # => co-20: checks whether the interval has already STABILIZED at a modest resample count
-        result = bootstrap((arr,), median_statistic, vectorized=True, confidence_level=0.95, n_resamples=n_resamples, method="percentile", rng=np.random.default_rng(42))  # => co-20: resamples the 50 latencies with replacement, recomputes the median each time
+        result = bootstrap(
+            (arr,), median_statistic, vectorized=True, confidence_level=0.95, n_resamples=n_resamples, method="percentile", rng=np.random.default_rng(42)
+        )  # => co-20: resamples the 50 latencies with replacement, recomputes the median each time
         low, high = result.confidence_interval  # => co-20: unpacks the interval's two ends
         print(f"n_resamples={n_resamples}: bootstrap 95% CI on median = [{low:.1f}, {high:.1f}]ms")  # => co-20: the honest report -- a range around the median, not a bare point
 
@@ -840,7 +844,9 @@ if __name__ == "__main__":  # => co-22: entry point -- runs only when this file 
         generation_rates.append(sum(outcomes) / N)  # => co-23: this regeneration's own pass rate
     generation_variance_empirical = statistics.pvariance(generation_rates)  # => co-23: the SPREAD of pass rates across regenerations, cases held fixed -- pure generation noise
     generation_variance_closed_form = sum(p * (1 - p) for p in fixed_p) / (N**2)  # => co-23: the EXACT closed form -- mean per-case Bernoulli variance, divided by n
-    print(f"Generation variance (fixed cases, regenerated {K_REGENERATIONS}x): empirical={generation_variance_empirical:.6f} closed-form={generation_variance_closed_form:.6f}")  # => co-23: computed twice, same as every other named quantity in this course
+    print(
+        f"Generation variance (fixed cases, regenerated {K_REGENERATIONS}x): empirical={generation_variance_empirical:.6f} closed-form={generation_variance_closed_form:.6f}"
+    )  # => co-23: computed twice, same as every other named quantity in this course
 
     case_sampling_means: list[float] = []  # => co-22: one mean TRUE probability per DIFFERENT case sample, with NO generation noise mixed in
     for m in range(M_RESAMPLES):  # => co-22: draws a DIFFERENT set of 30 cases each time, from the SAME population

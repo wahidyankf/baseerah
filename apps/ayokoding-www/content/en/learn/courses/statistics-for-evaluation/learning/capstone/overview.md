@@ -262,7 +262,14 @@ def build_report(criterion: str, params: CriterionParams) -> ConcordanceReport: 
     judge_arr = np.array(judge)  # => co-13: scipy's bootstrap resamples paired arrays by matching indices
     human1_arr = np.array(human1)  # => co-13: must stay index-aligned with judge_arr
     result = bootstrap(  # => co-13: resamples (item, item) pairs with replacement
-        (judge_arr, human1_arr), kappa_statistic, paired=True, vectorized=True, confidence_level=0.95, n_resamples=2000, method="percentile", rng=np.random.default_rng(params["seed"])  # => co-13: the SAME bootstrap procedure as ex-30/ex-34
+        (judge_arr, human1_arr),
+        kappa_statistic,
+        paired=True,
+        vectorized=True,
+        confidence_level=0.95,
+        n_resamples=2000,
+        method="percentile",
+        rng=np.random.default_rng(params["seed"]),  # => co-13: the SAME bootstrap procedure as ex-30/ex-34
     )  # => co-13: closes the bootstrap() call -- every keyword above is a deliberate, named choice
     low, high = result.confidence_interval  # => co-13: unpacks the interval's two ends
 
