@@ -140,3 +140,7 @@ weight: 95
   - [Overview](/en/learn/courses/inference-serving-and-model-deployment/overview)
   - [Learning](/en/learn/courses/inference-serving-and-model-deployment/learning)
   - [Drilling](/en/learn/courses/inference-serving-and-model-deployment/drilling)
+- [Fine-Tuning & Adaptation](/en/learn/courses/fine-tuning-and-adaptation)
+  - [Overview](/en/learn/courses/fine-tuning-and-adaptation/overview)
+  - [Learning](/en/learn/courses/fine-tuning-and-adaptation/learning)
+  - [Drilling](/en/learn/courses/fine-tuning-and-adaptation/drilling)
