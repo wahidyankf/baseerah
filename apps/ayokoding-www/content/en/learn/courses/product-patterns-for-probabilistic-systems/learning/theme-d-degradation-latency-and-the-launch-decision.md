@@ -136,8 +136,10 @@ design from quietly reintroducing the same failure mode at one specific rung. Th
 
 ### Worked Scenario 38: Latency as Material
 
-**Context**: Exercises co-17. Nimbus's structured-answer generation genuinely takes 8-12 seconds.
-This scenario compares three treatments of that same wait on the same slow response.
+**Context**: Exercises co-17. The primary model has already run slow enough to trip Scenario 35's
+rung-2 fallback trigger, so Nimbus is running on the fast-mode fallback model (labelled per
+Scenario 37) -- and that fallback model's own structured-answer generation genuinely takes 8-12
+seconds. This scenario compares three treatments of that same wait on the same slow response.
 
 **Decision artifact**:
 
@@ -147,10 +149,10 @@ This scenario compares three treatments of that same wait on the same slow respo
 | Streaming              | Answer text appears progressively, field by field, as each is generated.                                                      | Users report the wait as "fast," even though total completion time is unchanged. |
 | Honest staged progress | Explicit stage labels -- "Reading documents... Extracting terms... Verifying citations..." -- update as each stage completes. | Users report confidence the system is working, and re-click rate drops sharply.  |
 
-**Verify**: the comparison is drawn from the same underlying 8-12 second response time across all
-three treatments, isolating the treatment itself as the variable, and reports a distinct perceived
-result for each -- satisfying co-17's rule that latency is shaped by treatment, not only by raw
-duration.
+**Verify**: the comparison is drawn from the same underlying 8-12 second fallback-model response
+time across all three treatments, isolating the treatment itself as the variable, and reports a
+distinct perceived result for each -- satisfying co-17's rule that latency is shaped by treatment,
+not only by raw duration.
 
 **Key takeaway**: The actual wait time did not change across any of the three treatments -- only
 what filled it did, and that alone was enough to change both perceived speed and user confidence
@@ -211,8 +213,8 @@ not a single headline number.
 > **Ship-criteria sheet -- Nimbus contract-metadata extraction**
 >
 > - **Primary threshold**: pass rate ≥ 95% on the 120-case eval set, with a 95% confidence interval
->   no wider than ±3 percentage points (per `evaluating-ai-output-essentials`'s pass-rate-with-an-
->   interval framing).
+>   no wider than ±3 percentage points (extending `evaluating-ai-output-essentials`'s pass-rate
+>   framing with the confidence interval this course's co-21 teaches).
 > - **Named acceptable worst case**: of the failing cases, none may be a confidently-wrong answer
 >   with no citation attached -- every failing case in the eval set must at minimum have surfaced an
 >   uncertainty signal (co-06) or a citation the user could have used to catch it (co-09).

@@ -20,7 +20,8 @@ always."
   `[Unverified]` not yet present in the AyoKoding course library on disk, so no link is given here);
   [Evaluating AI Output -- Essentials](../evaluating-ai-output-essentials/overview.md) (you cannot
   set a ship criterion without a measurement -- this course's Theme D leans directly on that
-  course's pass-rate-with-an-interval framing);
+  course's pass-rate framing, then extends it with the confidence interval Theme D teaches
+  directly (co-21));
   [32 · Software Product Engineering](../software-product-engineering/learning/overview.md) (product
   framing, scoping, and release practice this course applies to a non-deterministic component);
   [14 · Frontend Essentials](../frontend-essentials/learning/overview.md) (interface vocabulary and
@@ -30,8 +31,8 @@ always."
   feature -- your own or a public one -- to critique across this course's worked scenarios. Written
   artefacts are the deliverable throughout.
 - **Assumed knowledge**: what an LLM-backed feature does and roughly how it fails; the ability to
-  read an eval report and interpret a pass rate alongside an interval; basic interface and
-  accessibility vocabulary (a WCAG contrast ratio, a screen-reader label).
+  read an eval report and interpret a pass rate; basic interface and accessibility vocabulary (a
+  WCAG contrast ratio, a screen-reader label).
 
 ## Why this exists -- the big idea
 

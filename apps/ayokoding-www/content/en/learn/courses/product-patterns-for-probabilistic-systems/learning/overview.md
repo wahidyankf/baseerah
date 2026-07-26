@@ -9,8 +9,8 @@ weight: 1
 
 - **Prior topics**: `creating-ai-powered-apps` (what the model can and cannot be asked for --
   `[Unverified]` not yet present in the AyoKoding course library on disk);
-  [Evaluating AI Output -- Essentials](../overview.md) for the pass-rate-with-an-interval framing
-  Theme D's ship criteria build on directly;
+  [Evaluating AI Output -- Essentials](../../evaluating-ai-output-essentials/learning/overview.md)
+  for the pass-rate framing Theme D's ship criteria extend with a confidence interval (co-21);
   [32 · Software Product Engineering](../../software-product-engineering/learning/overview.md) for
   product framing, scoping, and release practice; [14 · Frontend Essentials](../../frontend-essentials/learning/overview.md)
   for interface vocabulary and the accessibility baseline every uncertainty signal in this course
@@ -20,7 +20,7 @@ weight: 1
   feature to critique across this course's scenarios. There is no runtime to install -- every
   deliverable in this course is a design document or a decision artifact, not a program.
 - **Assumed knowledge**: what an LLM-backed feature does and roughly how it fails; the ability to
-  read an eval report and interpret a pass rate with an interval; basic interface and accessibility
+  read an eval report and interpret a pass rate; basic interface and accessibility
   vocabulary.
 
 ## Why this exists -- the big idea
@@ -423,8 +423,9 @@ somewhere a later error-analysis pass can actually use it, not merely applied an
 
 - **Designing Machine Learning Systems** -- Chip Huyen (2022). Practitioner-oriented treatment of a
   probabilistic feature as a product with a measured failure rate, not a model with an accuracy.
-- **Evaluating AI Output -- Essentials** -- the pass-rate-with-an-interval framing Theme D's ship
-  criteria (co-21) apply directly to a launch decision. [Course overview](../overview.md).
+- **Evaluating AI Output -- Essentials** -- the pass-rate framing Theme D's ship criteria (co-21)
+  extend with a confidence interval for a launch decision.
+  [Course overview](../../evaluating-ai-output-essentials/overview.md).
 
 ---
 

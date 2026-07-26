@@ -26,8 +26,9 @@ claim types the model was measurably unreliable on.
   uncertainty badge (co-06) or carried a citation Dana could have used to catch it (co-09).
 - **Measured result at this review**: pass rate 96.1%, interval ±2.4 points; zero failing cases
   lacked a citation or an uncertainty signal. Source: the narrowed-scope eval report, produced
-  following [Evaluating AI Output -- Essentials](../../overview.md)'s pass-rate-with-an-interval
-  method.
+  following [Evaluating AI Output -- Essentials](../../../evaluating-ai-output-essentials/overview.md)'s
+  pass-rate method, with the confidence interval computed per this course's own ship-criteria
+  practice (co-21).
 - **Verdict**: criteria met, cleared for staged rollout.
 
 ## Staged rollout with guardrails
