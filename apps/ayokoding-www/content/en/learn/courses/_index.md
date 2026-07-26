@@ -128,3 +128,7 @@ weight: 95
   - [Overview](/en/learn/courses/evaluating-ai-output-essentials/overview)
   - [Learning](/en/learn/courses/evaluating-ai-output-essentials/learning)
   - [Drilling](/en/learn/courses/evaluating-ai-output-essentials/drilling)
+- [Statistics for Evaluation](/en/learn/courses/statistics-for-evaluation)
+  - [Overview](/en/learn/courses/statistics-for-evaluation/overview)
+  - [Learning](/en/learn/courses/statistics-for-evaluation/learning)
+  - [Drilling](/en/learn/courses/statistics-for-evaluation/drilling)
