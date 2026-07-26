@@ -322,9 +322,11 @@ Reducing numeric precision (fp16 to INT8 to INT4) shrinks both weights and cache
 speed at a measurable quality cost that must be evaluated on your own workload, never assumed from a
 published number.
 
-**Why it matters**: this is the syllabus's clearest case for measuring rather than trusting -- a
-published degradation figure for one task does not transfer to a different one, which is exactly why
-this topic's own quality numbers are synthetic and illustrative rather than cited benchmark claims.
+**Why it matters**: this topic's own
+[Tensions & trade-offs](../overview.md#tensions--trade-offs----when-not-to-reach-for-this) section
+calls this the clearest case in the course for measuring rather than trusting -- a published
+degradation figure for one task does not transfer to a different one, which is exactly why this
+topic's own quality numbers are synthetic and illustrative rather than cited benchmark claims.
 
 **Verify it**: Example 51 quantizes a tiny weight vector and measures reconstruction error directly;
 Example 52 prices the quality/memory trade across three precision levels; Example 53 turns a quality
@@ -425,9 +427,11 @@ Self-hosting wins on sustained high utilization, data residency, latency floors,
 and loses on operational burden, idle cost, and elasticity -- the decision depends entirely on which
 side of that trade your traffic and organization sit on.
 
-**Why it matters**: the syllabus is explicit that comparing hourly GPU cost against per-token API
-price at full utilization is "almost always wrong" -- Example 65's calculation is correct, but every
-input number in it must be re-sourced and the utilization assumption must be realistic (co-28).
+**Why it matters**: this topic's own
+[Tensions & trade-offs](../overview.md#tensions--trade-offs----when-not-to-reach-for-this) section is
+explicit that comparing hourly GPU cost against per-token API price at full utilization is "almost
+always wrong" -- Example 65's calculation is correct, but every input number in it must be re-sourced
+and the utilization assumption must be realistic (co-28).
 
 **Verify it**: Example 65 prices self-hosted cost against a hosted API at full utilization directly.
 
