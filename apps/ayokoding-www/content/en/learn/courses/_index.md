@@ -128,3 +128,7 @@ weight: 95
   - [Overview](/en/learn/courses/evaluating-ai-output-essentials/overview)
   - [Learning](/en/learn/courses/evaluating-ai-output-essentials/learning)
   - [Drilling](/en/learn/courses/evaluating-ai-output-essentials/drilling)
+- [Product Patterns for Probabilistic Systems](/en/learn/courses/product-patterns-for-probabilistic-systems)
+  - [Overview](/en/learn/courses/product-patterns-for-probabilistic-systems/overview)
+  - [Learning](/en/learn/courses/product-patterns-for-probabilistic-systems/learning)
+  - [Drilling](/en/learn/courses/product-patterns-for-probabilistic-systems/drilling)
