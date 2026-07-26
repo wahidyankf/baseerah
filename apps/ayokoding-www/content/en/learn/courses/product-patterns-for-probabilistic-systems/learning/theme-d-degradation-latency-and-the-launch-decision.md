@@ -355,7 +355,8 @@ the full [Capstone](./capstone/overview.md) applies to a different, independentl
 
 > **Design-dossier index -- Nimbus contract-metadata extraction**
 >
-> 1. **Failure catalogue** (co-02, co-19): the six failure modes from Scenario 2, with Scenario 3's
+> 1. **Failure catalogue** (co-01, co-02, co-19): Scenario 1's interface-state audit establishing why
+>    a failure catalogue is needed at all, the six failure modes from Scenario 2, and Scenario 3's
 >    silent-failure trace as the confidently-wrong path walked to its consequence.
 > 2. **Expectation-setting and trust-calibration plan** (co-03, co-04, co-05): Scenario 4's
 >    first-contact copy, Scenario 6's trust-calibration diagram, and Scenario 7-8's automation-bias
@@ -368,8 +369,9 @@ the full [Capstone](./capstone/overview.md) applies to a different, independentl
 >    29's preview-and-diff, and Scenario 30's complete-undo investment.
 > 6. **Fallback hierarchy** (co-16 through co-18): Scenario 35's ladder and Scenario 37's per-rung
 >    visibility audit.
-> 7. **Ship, guardrail, and rollback criteria** (co-21 through co-23): Scenario 40's criteria,
->    Scenario 42's staged-rollout guardrails, and Scenario 43's rollback sheet.
+> 7. **Scope, ship, guardrail, and rollback criteria** (co-20 through co-23): Scenario 10's
+>    narrowed-scope proposal and Scenario 11's no-ship decision, Scenario 40's ship criteria, Scenario
+>    42's staged-rollout guardrails, and Scenario 43's rollback sheet.
 > 8. **Correction affordance and feedback routing** (co-24): Scenario 32's design and Scenario 33's
 >    routing plan into eval regression cases.
 
