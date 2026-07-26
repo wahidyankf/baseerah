@@ -128,3 +128,7 @@ weight: 95
   - [Overview](/en/learn/courses/evaluating-ai-output-essentials/overview)
   - [Learning](/en/learn/courses/evaluating-ai-output-essentials/learning)
   - [Drilling](/en/learn/courses/evaluating-ai-output-essentials/drilling)
+- [Inference Serving & Model Deployment](/en/learn/courses/inference-serving-and-model-deployment)
+  - [Overview](/en/learn/courses/inference-serving-and-model-deployment/overview)
+  - [Learning](/en/learn/courses/inference-serving-and-model-deployment/learning)
+  - [Drilling](/en/learn/courses/inference-serving-and-model-deployment/drilling)
