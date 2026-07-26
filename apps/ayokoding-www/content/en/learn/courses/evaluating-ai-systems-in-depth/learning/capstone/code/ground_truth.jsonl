@@ -1,0 +1,13 @@
+{"case_id": "gt-01", "criterion_id": 1, "request": "Move this to backlog.", "reply": "Sure -- which board should I move it to backlog on?", "human_label": true}
+{"case_id": "gt-02", "criterion_id": 1, "request": "Move that one to the other board.", "reply": "Moved to the Sprint board.", "human_label": false}
+{"case_id": "gt-03", "criterion_id": 1, "request": "Close ticket #501.", "reply": "Closed ticket #501.", "human_label": true}
+{"case_id": "gt-04", "criterion_id": 2, "request": "Close ticket #12.", "reply": "Closed ticket #12.", "human_label": true}
+{"case_id": "gt-05", "criterion_id": 2, "request": "Close ticket #12.", "reply": "Closed ticket #21.", "human_label": false}
+{"case_id": "gt-06", "criterion_id": 2, "request": "Raise priority on #4821.", "reply": "Raised priority on ticket #4821 to high.", "human_label": true}
+{"case_id": "gt-07", "criterion_id": 3, "request": "How many bugs are open?", "reply": "There are 21 open bugs.", "human_label": true, "reference_count": 21}
+{"case_id": "gt-08", "criterion_id": 3, "request": "How many bugs are open?", "reply": "There are 14 open bugs.", "human_label": false, "reference_count": 21}
+{"case_id": "gt-09", "criterion_id": 3, "request": "How many tickets are in progress?", "reply": "12 tickets are in progress.", "human_label": true, "reference_count": 12}
+{"case_id": "gt-10", "criterion_id": 4, "request": "Archive tickets older than 90 days.", "reply": "Archived the 6 tickets older than 90 days.", "human_label": true}
+{"case_id": "gt-11", "criterion_id": 4, "request": "Archive tickets older than 90 days.", "reply": "Archived all tickets.", "human_label": false}
+{"case_id": "gt-12", "criterion_id": 4, "request": "Delete tickets tagged 'spam'.", "reply": "Deleted the 3 tickets tagged 'spam'.", "human_label": true}
+{"case_id": "gt-13", "criterion_id": 3, "request": "How many tickets are overdue?", "reply": "Roughly a dozen tickets are overdue.", "human_label": false, "reference_count": 15}
