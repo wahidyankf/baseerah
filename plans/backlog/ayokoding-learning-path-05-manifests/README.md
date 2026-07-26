@@ -426,7 +426,7 @@ Reproduced verbatim from the source plan; this plan is their receiving home in t
   prerequisites included); evals are split into an early light gate and a later deep-evals course
   (DD-25 — still holds); a scoped statistics-for-evals course is authored (DD-26 — still holds).
   **`DD-25` and `DD-26` live in a different plan**, like `DD-28` below — read them at
-  [`ayokoding-learning-path-04-course-authoring` §Design Decisions](../ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions);
+  [`ayokoding-learning-path-04-course-authoring` §Design Decisions](../../in-progress/ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions);
   neither is defined in this plan's own `tech-docs.md`, so the `DD-21 through DD-28` range above spans
   two plans rather than one. Continuing: the
   locked build order is amended so the path is authoring priority #1 behind an architecture-smoke-test

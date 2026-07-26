@@ -583,7 +583,7 @@ ruling.
   half of this invariant**: course surgery (update/merge/split against an _existing_ course) is now
   permitted, subject to a mandatory four-path blast-radius statement.
   - **DD-28 lives in a different plan.** Read it at
-    [`ayokoding-learning-path-04-course-authoring` §Design Decisions](../ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions).
+    [`ayokoding-learning-path-04-course-authoring` §Design Decisions](../../in-progress/ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions).
     See [the DD-7 and DD-28 amendment pair](#the-dd-7-and-dd-28-amendment-pair) below.
 - **DD-13 · Harness-engineering cluster as a marquee build-your-own track** (manifest half). The five
   harness courses + `capstone-build-your-own-coding-agent`, in **Python** (matching `remotebrowser`),
@@ -767,7 +767,7 @@ mechanical, not stylistic:
    > mandatory four-path blast-radius statement.
 
 2. This plan's DD-7 carries a working cross-plan link to DD-28 at
-   [`../ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions`](../ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions).
+   [`../../in-progress/ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions`](../../in-progress/ayokoding-learning-path-04-course-authoring/tech-docs.md#design-decisions).
 3. That plan's DD-28 carries the reciprocal link back to this DD-7 and restates DD-7's **surviving
    half** — no body fork; per-path framing is a callout — so a course-authoring-only reader does not
    read "surgery permitted" as "forking permitted".

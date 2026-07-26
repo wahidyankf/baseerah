@@ -4,7 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-No plans currently in progress.
+- [ayokoding-learning-path-04-course-authoring](./ayokoding-learning-path-04-course-authoring/README.md)
+  — Wave 2. Authors the `careers/` course bodies band by band, each from its `syllabus/` spec.
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.
