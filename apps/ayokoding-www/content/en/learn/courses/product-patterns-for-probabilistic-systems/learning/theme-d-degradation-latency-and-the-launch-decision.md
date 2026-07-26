@@ -361,14 +361,15 @@ the full [Capstone](./capstone/overview.md) applies to a different, independentl
 > 2. **Expectation-setting and trust-calibration plan** (co-03, co-04, co-05): Scenario 4's
 >    first-contact copy, Scenario 6's trust-calibration diagram, and Scenario 7-8's automation-bias
 >    findings.
-> 3. **Selective uncertainty and provenance policy** (co-06 through co-10): Scenario 17's policy,
->    Scenario 18's citation design, and Scenario 22's accessible treatment, all meeting WCAG AA.
+> 3. **Selective uncertainty and provenance policy** (co-06 through co-10): Scenario 15's
+>    numeric-vs-band reading test, Scenario 17's policy, Scenario 18's citation design, Scenario 20's
+>    cheap-verification structure, and Scenario 22's accessible treatment, all meeting WCAG AA.
 > 4. **Human-review design** (co-11, co-12): Scenario 23's timed review flow and Scenario 25's
 >    vigilance-decrement mitigations.
 > 5. **Friction, preview, and undo** (co-13 through co-15): Scenario 27's friction table, Scenario
 >    29's preview-and-diff, and Scenario 30's complete-undo investment.
-> 6. **Fallback hierarchy** (co-16 through co-18): Scenario 35's ladder and Scenario 37's per-rung
->    visibility audit.
+> 6. **Fallback hierarchy** (co-16 through co-18): Scenario 35's ladder, Scenario 37's per-rung
+>    visibility audit, and Scenario 38's latency-as-material treatment.
 > 7. **Scope, ship, guardrail, and rollback criteria** (co-20 through co-23): Scenario 10's
 >    narrowed-scope proposal and Scenario 11's no-ship decision, Scenario 40's ship criteria, Scenario
 >    42's staged-rollout guardrails, and Scenario 43's rollback sheet.
