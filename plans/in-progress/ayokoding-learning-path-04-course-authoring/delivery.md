@@ -604,7 +604,7 @@ links validate` exited 0 with "All links valid! No broken links found."; grep fo
 Each course below is its own sub-phase (own branch → draft PR → 3-cycle review → `[AI]` merge →
 deploy), applying the convention:
 
-- [ ] [AI] Light eval gate (`evaluating-ai-output-essentials` — Annotated-concept, Python, settled per
+- [x] [AI] Light eval gate (`evaluating-ai-output-essentials` — Annotated-concept, Python, settled per
       `$SYLLABUS_ROOT/evaluating-ai-output-essentials.md`, 295 lines) — sits right after the first
       working LLM call, before RAG/agents; answers "how will you know this works?" (DD-25) —
       acceptance: all 9 convention steps complete; checkers report zero CRITICAL/HIGH/MEDIUM;
@@ -614,6 +614,16 @@ deploy), applying the convention:
       missing path and 1 only on a genuine no-match (measured 2026-07-22, and true under both the ugrep
       and BSD `grep` engines this harness may route to) — the two are never the same observation; and once the file exists it exits **1** if the boundary line is
       dropped. Only exit 0 satisfies this clause, so either failure mode fails it.
+      **Date**: 2026-07-26. **Status**: Done. **Files Changed**: 76 files under
+      `apps/ayokoding-www/content/en/learn/courses/evaluating-ai-output-essentials/` plus
+      `apps/ayokoding-www/content/en/learn/{_index.md,courses/_index.md}`.
+      Authored via `apps-ayokoding-www-annotated-concept-maker`, checker/fixer cycle clean (zero
+      CRITICAL/HIGH/MEDIUM). Own branch `ayokoding-learning-path-04-course-authoring/evaluating-ai-output-essentials`,
+      draft PR [#98](https://github.com/wahidyankf/ose-public/pull/98), 3-cycle PR review (8 findings
+      raised across governance/logic/docs disciplines, all fixed; 0 CRITICAL/HIGH outstanding at
+      merge), squash-merged to `main` and deployed to `prod-ayokoding-www`. Acceptance clause verified
+      post-merge: `grep -F -q 'evaluating-ai-systems-in-depth' "<COURSES>evaluating-ai-output-essentials/overview.md"`
+      exits 0.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
 - [ ] [AI] Statistics for evals (`statistics-for-evaluation` — Annotated-concept, code-bearing, Python,
       settled per `$SYLLABUS_ROOT/statistics-for-evaluation.md`, 368 lines) — scoped tightly to what
