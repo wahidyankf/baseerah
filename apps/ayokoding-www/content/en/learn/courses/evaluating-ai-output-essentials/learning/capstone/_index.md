@@ -5,4 +5,4 @@ draft: false
 weight: 900
 ---
 
-- [Capstone](/en/learn/courses/evaluating-ai-output-essentials/learning/capstone/overview)
+- [Overview](/en/learn/courses/evaluating-ai-output-essentials/learning/capstone/overview)
