@@ -2,7 +2,7 @@
 title: "Fine-Tuning & Adaptation"
 date: 2026-07-26T00:00:00+07:00
 draft: false
-weight: 445
+weight: 446
 prerequisites:
   [
     "creating-ai-powered-apps",

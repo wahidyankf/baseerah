@@ -12,11 +12,11 @@ weight: 1
   present in the AyoKoding course library on disk, so no link is given here; `evaluating-ai-systems-in-depth`
   (**hard prerequisite**: a fine-tune with no eval is unfalsifiable, and every decision in this
   course is an eval comparison) -- `[Unverified]` this course is not yet present in the AyoKoding
-  course library on disk, so no link is given here; `statistics-for-evaluation` (the base-versus-adapted
-  comparison is a paired significance test, not two printed numbers) -- `[Unverified]` this course is
-  not yet present in the AyoKoding course library on disk, so no link is given here;
-  `inference-serving-and-model-deployment` (where an adapter is actually served) -- `[Unverified]`
-  this course is not yet present in the AyoKoding course library on disk, so no link is given here;
+  course library on disk, so no link is given here;
+  [Statistics for Evaluation](../statistics-for-evaluation/overview.md) (the base-versus-adapted
+  comparison is a paired significance test, not two printed numbers);
+  [Inference Serving & Model Deployment](../inference-serving-and-model-deployment/overview.md)
+  (where an adapter is actually served);
   `data-engineering` (the dataset pipeline) -- `[Unverified]` this course is not yet present in the
   AyoKoding course library on disk, so no link is given here; **just enough python**
   ([4 · Just Enough Python](../just-enough-python/learning/overview.md)) is assumed for reading and
@@ -181,9 +181,8 @@ artefact so the analysis stays reproducible without one.
 - **co-28 -- distillation-limits** -- the student inherits the teacher's errors and cannot exceed it;
   distillation is a cost optimization, not a quality one.
 - **co-29 -- serving-an-adapted-model** -- adapters are loaded, swapped, and served against the
-  stack from `inference-serving-and-model-deployment` -- `[Unverified]` not yet present in the
-  AyoKoding course library on disk, so no link is given here -- with their own memory and routing
-  implications.
+  stack from [Inference Serving & Model Deployment](../inference-serving-and-model-deployment/overview.md)
+  -- with their own memory and routing implications.
 - **co-30 -- the-maintenance-obligation** -- a fine-tune is pinned to a base-model version and to a
   data distribution; both drift, and re-adaptation is a recurring cost owned by whoever shipped it.
 - **co-31 -- licensing-and-data-rights** -- base-model licences and training-data rights constrain

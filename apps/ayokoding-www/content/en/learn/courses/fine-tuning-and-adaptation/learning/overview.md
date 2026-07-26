@@ -12,10 +12,10 @@ weight: 1
   present in the AyoKoding course library on disk, so no link is given here; `evaluating-ai-systems-in-depth`
   (**hard prerequisite**: a fine-tune with no eval is unfalsifiable, and every decision in this
   course is an eval comparison) -- `[Unverified]` not yet present in the AyoKoding course library on
-  disk; `statistics-for-evaluation` (the base-versus-adapted comparison is a paired significance
-  test, not two printed numbers) -- `[Unverified]` not yet present in the AyoKoding course library on
-  disk; `inference-serving-and-model-deployment` (where an adapter is actually served) --
-  `[Unverified]` not yet present in the AyoKoding course library on disk; `data-engineering` (the
+  disk; [Statistics for Evaluation](../../statistics-for-evaluation/overview.md) (the
+  base-versus-adapted comparison is a paired significance test, not two printed numbers);
+  [Inference Serving & Model Deployment](../../inference-serving-and-model-deployment/overview.md)
+  (where an adapter is actually served); `data-engineering` (the
   dataset pipeline) -- `[Unverified]` not yet present in the AyoKoding course library on disk; **just
   enough python** ([4 · Just Enough Python](../../just-enough-python/learning/overview.md)) is
   assumed for reading and writing fully type-annotated Python.
