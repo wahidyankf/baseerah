@@ -29,7 +29,7 @@ most importantly, **no manifest**.
 
 > **This plan never edits a manifest file.** Every file under
 > `apps/ayokoding-www/src/features/course-paths/manifests/` is owned by
-> [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/README.md).
+> [`ayokoding-learning-path-05-manifests`](../../backlog/ayokoding-learning-path-05-manifests/README.md).
 > A step in this plan that creates, appends to, reorders, or re-verifies a `.yaml` manifest is a
 > **boundary violation**, not a convenience.
 
@@ -309,7 +309,7 @@ The source plan's `## Decisions Locked` list holds **17** entries (`DL-1`…`DL-
   permitted, superseding the original zero-new-bodies invariant, subject to the four-path blast-radius
   rule. **Decided; amended 2026-07-20.**
   - _Amendment split across plans_: DL-6 is amended by **DL-15**, which lands in
-    [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/README.md).
+    [`ayokoding-learning-path-05-manifests`](../../backlog/ayokoding-learning-path-05-manifests/README.md).
     The re-home half of DL-6 is executed by
     [`ayokoding-learning-path-01-url-restructure`](../../done/2026-07-23__ayokoding-learning-path-01-url-restructure/README.md);
     the native-authoring half is executed here.
@@ -408,7 +408,7 @@ forbidden.
   [`syllabus/courses/` catalog](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/courses/README.md)
   ·
   [`syllabus/paths/` manifests](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/syllabus/paths/README.md)
-  · [manifest plan](../ayokoding-learning-path-05-manifests/README.md)
+  · [manifest plan](../../backlog/ayokoding-learning-path-05-manifests/README.md)
   · [URL-restructure plan](../../done/2026-07-23__ayokoding-learning-path-01-url-restructure/README.md)
   · [navigation-UI plan](../../done/2026-07-25__ayokoding-learning-path-03-navigation-ui/README.md)
   · [schema plan](../../done/2026-07-24__ayokoding-learning-path-02-schema-and-prerequisite-dag/README.md)

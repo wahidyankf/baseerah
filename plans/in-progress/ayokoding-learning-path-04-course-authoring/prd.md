@@ -10,8 +10,8 @@ track.
 A **course** is the unit of reading. A **path** is an ordered manifest of course IDs. This plan owns
 the former and never the latter. Four **`careers/`** paths compose these bodies — the two
 **`skills/`** paths and their corpora belong to
-[`ayokoding-learning-path-06-skills-accounting`](../ayokoding-learning-path-06-skills-accounting/README.md)
-and [`ayokoding-learning-path-07-skills-erp`](../ayokoding-learning-path-07-skills-erp/README.md),
+[`ayokoding-learning-path-06-skills-accounting`](../../backlog/ayokoding-learning-path-06-skills-accounting/README.md)
+and [`ayokoding-learning-path-07-skills-erp`](../../backlog/ayokoding-learning-path-07-skills-erp/README.md),
 and are explicitly **not** authored here:
 
 - **`careers/interview-ready/software-engineer`** — the **interview/job-prep-first** arc for an
@@ -30,7 +30,7 @@ and are explicitly **not** authored here:
   > competence, and its prerequisites are **included** in `courseOrder`. The consequence for this
   > plan is bounded — the included prerequisites are **existing library courses**, so no additional
   > body is authored here; the growth lands in the path's manifest, which
-  > [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/README.md) owns.
+  > [`ayokoding-learning-path-05-manifests`](../../backlog/ayokoding-learning-path-05-manifests/README.md) owns.
   > **DD-24** ("fourth path's entry point: linked, not included, prerequisites") is superseded by
   > this amendment.
 
@@ -78,7 +78,7 @@ plan's bodies serve most directly — every authored course is reached by reader
 > The end-to-end **Learner Journey** walk-through is not duplicated here. It belongs to the two plans
 > that build and populate that journey — see the
 > [navigation-UI plan](../../done/2026-07-25__ayokoding-learning-path-03-navigation-ui/prd.md) and the
-> [manifest plan](../ayokoding-learning-path-05-manifests/prd.md).
+> [manifest plan](../../backlog/ayokoding-learning-path-05-manifests/prd.md).
 
 ## User Stories
 

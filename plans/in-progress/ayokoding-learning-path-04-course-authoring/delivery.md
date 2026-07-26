@@ -8,7 +8,7 @@ contracts** (evals forward-link, D9 naming/citation, D11 concept additions) so B
 construction rather than as a retrofit.
 
 > **This plan never edits a manifest file.** Every file under `<MANIFESTS>` belongs to
-> [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/README.md). This
+> [`ayokoding-learning-path-05-manifests`](../../backlog/ayokoding-learning-path-05-manifests/README.md). This
 > plan's only outbound artefact is the **band-completion signal** recorded at the end of each band
 > phase. See
 > [README §The manifest ownership invariant](./README.md#the-manifest-ownership-invariant-binding)
@@ -1668,7 +1668,7 @@ rows as part of "convention complete".
       Re-dispatch `apps-ayokoding-www-deployer` if any earlier deploy lagged.
 - [ ] [AI] **Notify the downstream manifest plan** — confirm all ten band-completion signals are
       present in this file on `origin/main` and reachable by
-      [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/delivery.md)
+      [`ayokoding-learning-path-05-manifests`](../../backlog/ayokoding-learning-path-05-manifests/delivery.md)
       — acceptance: two steps. (a) Resolve the literal path on `origin/main` — command (single line):
       `git ls-tree -r --name-only origin/main -- plans | grep -F 'ayokoding-learning-path-04-course-authoring/delivery.md'`
       — it prints **exactly one** path. (b) Feed that literal path to `git show` — command (single line):

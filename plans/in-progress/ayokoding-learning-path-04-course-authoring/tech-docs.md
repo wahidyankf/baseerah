@@ -93,7 +93,7 @@ transcribing its outline is not.
 
 > **This plan never edits a manifest file.** Every file under
 > `apps/ayokoding-www/src/features/course-paths/manifests/` is owned by
-> [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/README.md). A
+> [`ayokoding-learning-path-05-manifests`](../../backlog/ayokoding-learning-path-05-manifests/README.md). A
 > step here that creates, appends to, reorders, or re-verifies a `.yaml` manifest is a **boundary
 > violation**, not a convenience.
 
@@ -519,7 +519,7 @@ This plan owns **sixteen** design decisions and carries **two** cross-cutting on
   capstones catalogued) to **127**.
   - **Amendment pair split across plans (binding — read both halves).** DD-28 is the **amendment**;
     the invariant it amends, **DD-7**, lands in
-    [`ayokoding-learning-path-05-manifests`](../ayokoding-learning-path-05-manifests/tech-docs.md#design-decisions).
+    [`ayokoding-learning-path-05-manifests`](../../backlog/ayokoding-learning-path-05-manifests/tech-docs.md#design-decisions).
     **DD-28 supersedes the "create-only, never modify existing" half of DD-7.**
   - **DD-7's surviving half still binds here**, restated so a reader of this plan alone cannot read
     "surgery permitted" as "forking permitted": _a path omits a course that does not fit and creates a
