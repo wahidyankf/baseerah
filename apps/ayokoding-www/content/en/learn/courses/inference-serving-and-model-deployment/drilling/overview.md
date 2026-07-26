@@ -69,9 +69,10 @@ gets no benefit from more FLOPs.
 <details>
 <summary>Answer</summary>
 
-Without a cache, generating the Nth token would require reprocessing all N-1 prior tokens' attention
-every single step, scaling quadratically with sequence length. Caching avoids that recomputation
-entirely.
+Without a cache, generating the Nth token would require re-projecting all N-1 prior tokens' key/value
+tensors every single step, scaling quadratically with sequence length. Caching avoids that
+re-projection -- but not attention scoring itself, which still costs O(t) per step even with the
+cache in place.
 
 </details>
 

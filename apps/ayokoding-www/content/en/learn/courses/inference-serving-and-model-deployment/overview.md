@@ -53,12 +53,13 @@ within a single release cycle.
 
 > **Scope guard -- serving infrastructure, not model application.** This topic is about **running**
 > a model you already have -- the scheduler, the cache, the memory budget, the deployment. It does
-> not teach prompting, retrieval, agents, or evaluation; those live in `creating-ai-powered-apps`,
-> `evaluating-ai-output-essentials`, and their siblings -- `[Unverified]` not yet present in the
-> AyoKoding course library on disk, so no links are given here. It also does not teach fine-tuning a
-> model's weights, which lives in `fine-tuning-and-adaptation` -- `[Unverified]` not yet present. If a
-> question is "how do I make the model answer better," it belongs to those courses. If it is "how do
-> I keep the GPU serving that model busy, fast, and within budget," it belongs here.
+> not teach prompting, retrieval, or agents; those live in `creating-ai-powered-apps` --
+> `[Unverified]` not yet present in the AyoKoding course library on disk, so no link is given here.
+> It also does not teach evaluation, which lives in
+> [evaluating-ai-output-essentials](../evaluating-ai-output-essentials/overview.md), nor fine-tuning
+> a model's weights, which lives in `fine-tuning-and-adaptation` -- `[Unverified]` not yet present. If
+> a question is "how do I make the model answer better," it belongs to those courses. If it is "how
+> do I keep the GPU serving that model busy, fast, and within budget," it belongs here.
 
 ## How this topic is organized
 

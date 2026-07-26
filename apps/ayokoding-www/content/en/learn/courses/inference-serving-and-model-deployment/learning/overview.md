@@ -139,13 +139,16 @@ constant and varying the memory-access pattern.
 
 ### co-05 · KV-Cache Purpose
 
-Caching each token's key and value tensors avoids recomputing attention over the entire sequence on
-every single decode step -- without a cache, generating the Nth token would require reprocessing all
-N-1 tokens that came before it, every single time.
+Caching each token's key and value tensors avoids re-projecting them from every prior token's
+activations on every single decode step -- without a cache, generating the Nth token would require
+re-projecting all N-1 tokens' key/value tensors that came before it, every single time. This does
+not make attention itself O(1): scoring the new token against every cached position still costs
+O(t) per step even with the cache in place.
 
 **Why it matters**: this is the mechanism that makes autoregressive decoding practical at all; the
-alternative (recomputing from scratch every step) scales quadratically with sequence length instead of
-linearly.
+re-projection work the alternative repeats every step (recomputing key/value tensors from scratch)
+scales quadratically with sequence length instead of linearly -- what stays O(t) per step regardless
+is the attention-scoring pass itself.
 
 **Verify it**: Example 9 measures the cost of the no-cache, full-recomputation approach directly;
 Example 10 adds the cache and shows the cost drop.
@@ -449,7 +452,7 @@ each against the hosted-API price point from Example 65.
 
 ## Examples by Level
 
-### Beginner (Examples 1-28)
+### Beginner (Examples 1–28)
 
 - [Example 1: Serve a Model Locally](/en/learn/courses/inference-serving-and-model-deployment/learning/beginner#example-1-serve-a-model-locally)
 - [Example 2: Token Is the Unit of Work](/en/learn/courses/inference-serving-and-model-deployment/learning/beginner#example-2-token-is-the-unit-of-work)
@@ -480,7 +483,7 @@ each against the hosted-API price point from Example 65.
 - [Example 27: Cache Budget vs Sequence Length](/en/learn/courses/inference-serving-and-model-deployment/learning/beginner#example-27-cache-budget-vs-sequence-length)
 - [Example 28: Beginner Recap -- the End-to-End Admission Pipeline](/en/learn/courses/inference-serving-and-model-deployment/learning/beginner#example-28-beginner-recap----the-end-to-end-admission-pipeline)
 
-### Intermediate (Examples 29-50)
+### Intermediate (Examples 29–50)
 
 - [Example 29: Static Batching](/en/learn/courses/inference-serving-and-model-deployment/learning/intermediate#example-29-static-batching)
 - [Example 30: Static Batching -- Idle Waste](/en/learn/courses/inference-serving-and-model-deployment/learning/intermediate#example-30-static-batching----idle-waste)
@@ -505,7 +508,7 @@ each against the hosted-API price point from Example 65.
 - [Example 49: Fairness Across Request Classes](/en/learn/courses/inference-serving-and-model-deployment/learning/intermediate#example-49-fairness-across-request-classes)
 - [Example 50: Cache Block Size Tradeoff](/en/learn/courses/inference-serving-and-model-deployment/learning/intermediate#example-50-cache-block-size-tradeoff)
 
-### Advanced (Examples 51-75)
+### Advanced (Examples 51–75)
 
 - [Example 51: Quantize a Model](/en/learn/courses/inference-serving-and-model-deployment/learning/advanced#example-51-quantize-a-model)
 - [Example 52: Quantization Quality Cost](/en/learn/courses/inference-serving-and-model-deployment/learning/advanced#example-52-quantization-quality-cost)
