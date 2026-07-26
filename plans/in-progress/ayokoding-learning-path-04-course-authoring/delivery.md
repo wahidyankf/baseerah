@@ -1192,7 +1192,7 @@ rows as part of "convention complete".
       to an `rtk grep -h` call, which prints a ~19-line usage banner and exits **0**, so a line count
       taken over it reads 19 no matter what the file contains. Inside `<(...)` the hook does not
       rewrite the call, so real grep semantics apply. [Repo-grounded — measured 2026-07-22:
-      `cat <(grep -h '^# ' plans/backlog/ayokoding-learning-path-04-course-authoring/README.md) | wc -l`
+      `cat <(grep -h '^# ' plans/in-progress/ayokoding-learning-path-04-course-authoring/README.md) | wc -l`
       returns **1**, that README's single `#` heading, while the same grep issued bare returns the
       banner.] If this clause is ever restructured out of the wrappers, use `command grep -h`, or drop
       `-h` altogether and strip the `filename:` prefix with `sed 's/^[^:]*://'`.
@@ -1456,7 +1456,7 @@ rows as part of "convention complete".
       "Recommendation") by the time this phase runs: Phase 0 already verified that plan is merged to
       `origin/main`, and its own archival gate requires all six Q-A…Q-F rulings recorded in its
       `tech-docs.md`. Read the ruled option in the
-      [Q-A record](../ayokoding-learning-path-01-url-restructure/tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive)
+      [Q-A record](../../done/2026-07-23__ayokoding-learning-path-01-url-restructure/tech-docs.md#q-a--is-legacy-a-staging-pen-or-a-permanent-archive)
       before branching:
   - **If ruled A (staging pen) or C (hybrid, for the overlapping subjects)**: for every course in
     `evidence/authored-body-slugs.txt` whose subject overlaps a remaining

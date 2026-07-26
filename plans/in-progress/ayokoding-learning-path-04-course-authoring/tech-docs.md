@@ -1008,7 +1008,7 @@ UI-design-funnel for Screens 0–3 (low-fi alternatives, hi-fi `.excalidraw.png`
 selections, rationale records, responsive strategies) is owned by
 [`ayokoding-learning-path-03-navigation-ui`](../../done/2026-07-25__ayokoding-learning-path-03-navigation-ui/prd.md);
 Screen 4's funnel is owned by
-[`ayokoding-learning-path-01-url-restructure`](../ayokoding-learning-path-01-url-restructure/prd.md).
+[`ayokoding-learning-path-01-url-restructure`](../../done/2026-07-23__ayokoding-learning-path-01-url-restructure/prd.md).
 **This plan carries no `assets/` folder and produces no render.**
 
 ### Specs & Gherkin (app-code) exemption
