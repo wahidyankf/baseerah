@@ -9,7 +9,7 @@ weight: 1
 
 - **Prior topics**: [Evaluating AI Output -- Essentials](../../evaluating-ai-output-essentials/overview.md)
   -- you must have a pass rate in hand before its uncertainty is a meaningful question; [Just Enough
-  Python](../../just-enough-python/overview.md) for fully type-annotated Python; [Data Structures and
+  Python](../../just-enough-python/learning/overview.md) for fully type-annotated Python; [Data Structures and
   Algorithms Essentials](../../data-structures-and-algorithms-essentials/overview.md) for loops,
   arrays, and the cost of a resampling procedure. No prior statistics course is assumed.
 - **Tools & environment**: a macOS/Linux terminal; **Python 3.13**; a pinned, CVE-clean-at-authoring

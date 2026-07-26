@@ -6,5 +6,5 @@ weight: 900
 ---
 
 - [Capstone](/en/learn/courses/statistics-for-evaluation/learning/capstone/overview)
-- [Artifact: Sampling Plan](/en/learn/courses/statistics-for-evaluation/learning/capstone/sampling_plan)
+- [Artifact: Sampling Plan](/en/learn/courses/statistics-for-evaluation/learning/capstone/sampling-plan)
 - [Artifact: Evaluation Report](/en/learn/courses/statistics-for-evaluation/learning/capstone/report)

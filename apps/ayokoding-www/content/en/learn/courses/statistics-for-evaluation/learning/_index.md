@@ -12,5 +12,5 @@ weight: 100
 - [Theme D: Comparing Runs and Gating on Them](/en/learn/courses/statistics-for-evaluation/learning/theme-d-comparing-runs-and-gating-on-them)
 - [Capstone](/en/learn/courses/statistics-for-evaluation/learning/capstone)
   - [Capstone](/en/learn/courses/statistics-for-evaluation/learning/capstone/overview)
-  - [Artifact: Sampling Plan](/en/learn/courses/statistics-for-evaluation/learning/capstone/sampling_plan)
+  - [Artifact: Sampling Plan](/en/learn/courses/statistics-for-evaluation/learning/capstone/sampling-plan)
   - [Artifact: Evaluation Report](/en/learn/courses/statistics-for-evaluation/learning/capstone/report)
