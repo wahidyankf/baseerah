@@ -591,9 +591,12 @@ disproportionately, and eventually prohibitively, expensive.
 
 _ex-10 &middot; exercises co-05_
 
-Caching each token's key and value tensors turns per-step attention cost from an O(t) rescan into O(1)
-work against already-computed history, making the total cost linear instead of quadratic. This example
-contrasts the cached and uncached costs directly, on the same sequence length.
+Caching each token's key and value tensors eliminates the need to re-project every prior token's
+key/value from scratch at each step, turning that piece of per-step work from an O(t) rescan into O(1)
+work against already-computed history. Attention itself still scores the new token's query against
+every cached key and sums over every cached value, so that part of decode remains O(t) per step -- this
+example measures the re-projection work the cache removes, on the same sequence length as Example 9's
+uncached rescan.
 
 **`learning/code/ex-10-add-the-kv-cache/example.py`**
 
@@ -601,13 +604,15 @@ contrasts the cached and uncached costs directly, on the same sequence length.
 """Example 10: Add the KV Cache."""
 
 
-def attention_cost_with_cache(seq_len: int) -> int:  # => co-05: each NEW token does O(1) work with a cache
-    # => the cache already holds every PREVIOUS token's key/value -- only the new token is processed
-    return seq_len  # => O(n) total: one constant-cost step per token, not one O(t) scan per token
+def attention_cost_with_cache(seq_len: int) -> int:  # => co-05: each NEW token's K/V projection is O(1) with a cache
+    # => the cache already holds every PREVIOUS token's key/value -- only the new token's K/V is projected
+    # => this measures projection work only: scoring the new query against every cached key/value
+    # => (the attention step itself) still costs O(t) per step and is NOT eliminated by caching
+    return seq_len  # => O(n) total: one constant-cost projection per token, not one O(t) re-projection per token
 
 
 def attention_cost_without_cache(seq_len: int) -> int:  # => same formula as Example 9, for comparison
-    return sum(range(1, seq_len + 1))  # => O(n^2) total -- every step rescans everything from scratch
+    return sum(range(1, seq_len + 1))  # => O(n^2) total -- every step re-projects everything from scratch
 
 
 seq_len = 20  # => same sequence length fed to both cost functions, for an apples-to-apples comparison
@@ -615,8 +620,8 @@ cached_cost = attention_cost_with_cache(seq_len)  # => the cache-backed path
 uncached_cost = attention_cost_without_cache(seq_len)  # => the no-cache path, same input
 print(cached_cost, uncached_cost)  # => Output: 20 210
 
-assert cached_cost == seq_len  # => co-05: linear in sequence length, not quadratic
-assert cached_cost < uncached_cost  # => the SAME final attention result, far cheaper to reach
+assert cached_cost == seq_len  # => co-05: K/V projection work is linear in sequence length, not quadratic
+assert cached_cost < uncached_cost  # => the SAME final K/V projections, far cheaper to reach
 print("ex-10 OK")  # => a self-check marker confirming the cache/no-cache comparison held
 
 ```
@@ -630,9 +635,12 @@ print("ex-10 OK")  # => a self-check marker confirming the cache/no-cache compar
 ex-10 OK
 ```
 
-**Key takeaway**: The KV cache converts attention's per-token cost from O(t) to O(1), collapsing total
-generation cost from quadratic to linear in sequence length -- at the price of memory to hold the
-cache, which is the entire subject of the next several examples.
+**Key takeaway**: The KV cache converts the _re-projection_ of prior tokens' key/value tensors from an
+O(t) rescan into O(1) work per step -- it does not make attention itself O(1). Scoring the new token
+against every cached position, and reading the growing cache to do so, still costs O(t) per step (see
+`learning/overview.md`'s co-04). What collapses from quadratic to linear is the wasted re-projection
+work this example measures -- at the price of memory to hold the cache, which is the entire subject of
+the next several examples.
 
 **Why it matters**: This is the trade every serving framework makes without exception: pay memory,
 save recomputation. It is also why the cache -- not the model's raw compute throughput -- becomes the

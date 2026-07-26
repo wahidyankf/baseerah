@@ -76,6 +76,30 @@ Every example is a complete, self-contained `.py` file colocated under `learning
 with `python3 example.py` and self-checked with `assert` statements -- there is no pseudocode
 anywhere in this topic, and no example requires a GPU to run.
 
+## Tensions & trade-offs -- when NOT to reach for this
+
+- **Throughput vs latency**: every lever in this course moves the same slider. Larger batches serve
+  more users per GPU-hour and make each user wait longer between tokens. There is no configuration
+  that optimizes both, only a configuration chosen deliberately against a stated SLO -- which means
+  you cannot tune a serving stack without first deciding which metric (co-16) you are accountable
+  for.
+- **Quantization vs quality**: lower precision buys real capacity and costs real quality (co-19), and
+  the cost is task-dependent enough that a published degradation figure does not transfer to your
+  workload. This is the clearest case in the course for measuring rather than trusting -- evaluate
+  the quantized model on your own eval suite before accepting the trade.
+- **Self-hosting vs an API**: self-hosting looks cheaper the moment you compare hourly GPU cost
+  against per-token API pricing at full utilization (co-27, co-28), and that comparison is almost
+  always wrong. Real utilization is spiky, idle GPUs bill continuously, and the operational load is a
+  standing engineering commitment. The build-versus-buy calculation must use realistic utilization or
+  it is not a calculation.
+- **When NOT to reach for this**: if your traffic is low, spiky, or unpredictable, a hosted API is
+  cheaper, faster to ship, and more elastic -- and the correct engineering decision. This topic
+  exists to make that a reasoned conclusion rather than a default, and to equip you for the cases
+  where it flips.
+- **When NOT to self-host at all**: a team without GPU operations experience, without on-call
+  coverage, and without a data-residency or model-control requirement forcing the issue should not be
+  operating inference infrastructure. Recognising that is part of the material.
+
 ## Accuracy notes
 
 > Dated per this topic's own accuracy-note discipline: every volatile, version-pinned, or

@@ -140,10 +140,11 @@ real, monotonically-worsening quality cost -- neither side of the trade is free,
 Accuracy notes flag exactly why the specific numbers here are illustrative rather than a benchmark
 claim.
 
-**Why it matters**: The syllabus's Tensions & trade-offs is explicit that a published degradation
-figure does not transfer to your workload -- this example's job is to show the _shape_ of the trade
-(monotonic, both directions), which is durable, while treating any specific quality number as something
-you must measure on your own task, never trust from a table.
+**Why it matters**: This topic's [Tensions & trade-offs](../overview.md#tensions--trade-offs----when-not-to-reach-for-this)
+section is explicit that a published degradation figure does not transfer to your workload -- this
+example's job is to show the _shape_ of the trade (monotonic, both directions), which is durable,
+while treating any specific quality number as something you must measure on your own task, never
+trust from a table.
 
 ---
 
@@ -1056,10 +1057,11 @@ ex-65 OK
 tokens than the illustrative hosted-API price here -- but that comparison assumes the GPU is running at
 full utilization every hour it is billed for, which Example 75 shows is rarely true.
 
-**Why it matters**: This calculation is the one the syllabus's Tensions & trade-offs explicitly warns
-is "almost always wrong" when done at full-utilization assumptions -- the calculation itself is durable
-and correct, but every input number here is `[Unverified]` and must be re-sourced against current
-pricing and REAL observed utilization before it informs a real decision.
+**Why it matters**: This calculation is the one this topic's
+[Tensions & trade-offs](../overview.md#tensions--trade-offs----when-not-to-reach-for-this) section
+explicitly warns is "almost always wrong" when done at full-utilization assumptions -- the calculation
+itself is durable and correct, but every input number here is `[Unverified]` and must be re-sourced
+against current pricing and REAL observed utilization before it informs a real decision.
 
 ---
 
@@ -1703,10 +1705,11 @@ ex-75 OK
 its billed time is actually spent serving tokens -- utilization is not a footnote to the build-versus-buy
 calculation, it is the calculation.
 
-**Why it matters**: This is the honest total-cost-of-ownership comparison the syllabus's Tensions &
-trade-offs insists on: not hourly GPU price against per-token API price at full load, but the same
-comparison made at the utilization you will realistically achieve -- which, for spiky or unpredictable
-traffic, is frequently much closer to 10% than 90%.
+**Why it matters**: This is the honest total-cost-of-ownership comparison this topic's
+[Tensions & trade-offs](../overview.md#tensions--trade-offs----when-not-to-reach-for-this) section
+insists on: not hourly GPU price against per-token API price at full load, but the same comparison
+made at the utilization you will realistically achieve -- which, for spiky or unpredictable traffic,
+is frequently much closer to 10% than 90%.
 
 ---
 

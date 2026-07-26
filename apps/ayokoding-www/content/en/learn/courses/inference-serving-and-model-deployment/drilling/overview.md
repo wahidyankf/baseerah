@@ -422,8 +422,9 @@ wrong with the comparison?
 The comparison used full-load utilization instead of realistic utilization (co-27, co-28) -- real
 traffic is spiky, and a GPU bills for every hour it is on regardless of how busy it actually is during
 that hour. The honest comparison divides the same hourly rate by REALISTIC (not peak) effective
-throughput, which the syllabus's own tensions section calls out as "almost always wrong" when done at
-full load.
+throughput, which this topic's own
+[Tensions & trade-offs](../overview.md#tensions--trade-offs----when-not-to-reach-for-this) section
+calls out as "almost always wrong" when done at full load.
 
 </details>
 

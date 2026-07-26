@@ -20,5 +20,6 @@ prerequisites:
   - [Beginner Examples](/en/learn/courses/inference-serving-and-model-deployment/learning/beginner)
   - [Intermediate Examples](/en/learn/courses/inference-serving-and-model-deployment/learning/intermediate)
   - [Advanced Examples](/en/learn/courses/inference-serving-and-model-deployment/learning/advanced)
+  - [Capstone](/en/learn/courses/inference-serving-and-model-deployment/learning/capstone)
 - [Drilling](/en/learn/courses/inference-serving-and-model-deployment/drilling)
   - [Overview](/en/learn/courses/inference-serving-and-model-deployment/drilling/overview)

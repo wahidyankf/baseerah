@@ -763,7 +763,7 @@ ex-39 OK
 from 1000ms to 100ms -- a 10x reduction achieved with no change to total prefill work, purely by
 interleaving it with decode steps instead of running it as one uninterruptible block.
 
-**Why it matters**: This is the mechanism that reconciles co-38's tension without forcing a strict
+**Why it matters**: This is the mechanism that reconciles co-17's tension without forcing a strict
 choice between TTFT and ITL -- chunked prefill is why a modern serving stack can admit large prompts
 without every in-flight user's inter-token latency spiking every time one arrives.
 

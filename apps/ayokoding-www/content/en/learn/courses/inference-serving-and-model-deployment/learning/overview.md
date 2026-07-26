@@ -285,7 +285,7 @@ Time-to-first-token (TTFT), inter-token latency (ITL), per-user tokens/sec, and 
 are four distinct metrics, each optimized by opposing serving choices -- "improve latency" means
 nothing concrete until you specify which of these four you mean.
 
-**Why it matters**: co-17's TTFT-versus-ITL tension, co-26's observability dashboard, and co-70's
+**Why it matters**: co-17's TTFT-versus-ITL tension, co-26's observability dashboard, and Example 70's
 percentile analysis are all built directly on this four-metric vocabulary; conflating any two of them
 produces an incoherent SLO.
 

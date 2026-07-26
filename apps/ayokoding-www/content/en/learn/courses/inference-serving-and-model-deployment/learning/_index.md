@@ -9,3 +9,5 @@ weight: 446
 - [Beginner Examples](/en/learn/courses/inference-serving-and-model-deployment/learning/beginner)
 - [Intermediate Examples](/en/learn/courses/inference-serving-and-model-deployment/learning/intermediate)
 - [Advanced Examples](/en/learn/courses/inference-serving-and-model-deployment/learning/advanced)
+- [Capstone](/en/learn/courses/inference-serving-and-model-deployment/learning/capstone)
+  - [Capstone](/en/learn/courses/inference-serving-and-model-deployment/learning/capstone/overview)
