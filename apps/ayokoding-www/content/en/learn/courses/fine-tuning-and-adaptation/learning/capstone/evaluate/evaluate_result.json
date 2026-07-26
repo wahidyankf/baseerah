@@ -1,0 +1,12 @@
+{
+  "base_model_id": "qwen2.5-0.5b-instruct-r1",
+  "discordant_b": 18,
+  "discordant_c": 2,
+  "forgetting_detected": false,
+  "p_value": 0.0004024505615234375,
+  "regression_pass_rate_adapted": 0.9,
+  "regression_pass_rate_base": 1.0,
+  "significant": true,
+  "target_pass_rate_adapted": 0.9,
+  "target_pass_rate_base": 0.6
+}

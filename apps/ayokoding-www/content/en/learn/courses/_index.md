@@ -132,3 +132,7 @@ weight: 95
   - [Overview](/en/learn/courses/product-patterns-for-probabilistic-systems/overview)
   - [Learning](/en/learn/courses/product-patterns-for-probabilistic-systems/learning)
   - [Drilling](/en/learn/courses/product-patterns-for-probabilistic-systems/drilling)
+- [Fine-Tuning & Adaptation](/en/learn/courses/fine-tuning-and-adaptation)
+  - [Overview](/en/learn/courses/fine-tuning-and-adaptation/overview)
+  - [Learning](/en/learn/courses/fine-tuning-and-adaptation/learning)
+  - [Drilling](/en/learn/courses/fine-tuning-and-adaptation/drilling)

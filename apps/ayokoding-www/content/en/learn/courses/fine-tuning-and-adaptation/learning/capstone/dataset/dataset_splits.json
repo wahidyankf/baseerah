@@ -1,0 +1,26 @@
+{
+  "audit_clean": true,
+  "base_model_id": "qwen2.5-0.5b-instruct-r1",
+  "decision_confirmed": true,
+  "leakage_found": false,
+  "production_traffic_share": 0.65,
+  "test_ids": ["case-18", "case-19", "case-20"],
+  "total_examples": 20,
+  "train_ids": [
+    "case-01",
+    "case-02",
+    "case-03",
+    "case-04",
+    "case-05",
+    "case-06",
+    "case-07",
+    "case-08",
+    "case-09",
+    "case-10",
+    "case-11",
+    "case-12",
+    "case-13",
+    "case-14"
+  ],
+  "val_ids": ["case-15", "case-16", "case-17"]
+}
