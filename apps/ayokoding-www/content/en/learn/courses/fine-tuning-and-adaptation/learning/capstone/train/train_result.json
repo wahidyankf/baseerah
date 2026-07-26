@@ -1,0 +1,17 @@
+{
+  "adapter_size_mb": 2.32,
+  "base_model_id": "qwen2.5-0.5b-instruct-r1",
+  "chosen_epoch": 3,
+  "chosen_rank": 8,
+  "rank_sweep": {
+    "1": 0.78,
+    "16": 0.945,
+    "2": 0.85,
+    "32": 0.95,
+    "4": 0.9,
+    "64": 0.95,
+    "8": 0.94
+  },
+  "val_curve": [0.7, 0.84, 0.91, 0.88, 0.83],
+  "val_pass_rate": 0.91
+}
