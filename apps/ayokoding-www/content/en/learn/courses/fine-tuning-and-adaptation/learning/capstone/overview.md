@@ -706,6 +706,7 @@ Active adapter after rollout: triage-v1 (previous: 75%, new: 90%)
 Served: True | Hot-swap verified: True | Version-pinned to 'qwen2.5-0.5b-instruct-r1': True
 Re-adaptation trigger concrete: True | Retirement trigger concrete: True
 Adaptation is justified end to end: True
+MATCH: operation result committed to operate_result.json -- served, hot-swapped, version-pinned, and both maintenance triggers concrete
 ```
 
 **Acceptance criteria**: the rollout swaps from `triage-v0` (`75%`) to `triage-v1` (`90%`) with no
