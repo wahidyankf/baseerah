@@ -2,6 +2,9 @@
 
 from __future__ import annotations  # => hygiene: postpones annotation evaluation, interpreter-version-agnostic
 
+import math  # => co-11: isclose -- verifies the from-definition and library alphas agree, same as ex-24 does for kappa
+from collections import Counter  # => co-11: tallies each value's marginal frequency for the expected-disagreement term
+
 import numpy as np  # => co-11: builds the missing-data branch's own worked case
 import krippendorff  # => co-11: the pinned library's own coefficient for the missing-data branch
 
@@ -17,6 +20,17 @@ def choose_coefficient(*, rater_count: int, label_type: str, has_missing_data: b
     if rater_count > 2:  # => co-11: more than two raters, regardless of label type in this simplified table
         return "fleiss_kappa"  # => co-11: ex-27's own coefficient
     raise ValueError(f"no rule covers rater_count={rater_count}, label_type={label_type}")  # => co-11: an unhandled combination is a bug, not a silent guess
+
+
+def krippendorffs_alpha_from_definition(rater_x: list[float], rater_y: list[float]) -> float:  # => co-11: the textbook coincidence-matrix formula, in code -- the SAME pattern ex-24's cohen_kappa_from_definition uses
+    """Return Krippendorff's alpha (nominal, two raters), from its coincidence-matrix definition."""  # => co-11: documents krippendorffs_alpha_from_definition's contract -- no runtime output, just sets its __doc__
+    paired = [(x, y) for x, y in zip(rater_x, rater_y) if not (math.isnan(x) or math.isnan(y))]  # => co-11: only units BOTH raters rated are pairable -- an orphan single rating carries no agreement information
+    observed_disagreement = sum(1 for x, y in paired for _ in (0, 1) if x != y) / (2 * len(paired))  # => co-11: each pairable unit counted in both rater orderings, matching the library's own coincidence-matrix convention
+    all_ratings = [v for pair in paired for v in pair]  # => co-11: every individual rating from a pairable unit -- the marginal pool the expected term draws from
+    n = len(all_ratings)  # => co-11: total pairable ratings
+    counts = Counter(all_ratings)  # => co-11: how often each value appears in the marginal pool
+    expected_disagreement = sum(counts[c] * counts[k] for c in counts for k in counts if c != k) / (n * (n - 1))  # => co-11: chance-level disagreement, from the SAME marginal frequencies as the observed term, not a fresh assumption
+    return 1 - observed_disagreement / expected_disagreement  # => co-11: alpha itself -- 1 minus how much worse than chance the raters actually disagree
 
 
 if __name__ == "__main__":  # => co-11: entry point -- runs only when this file executes directly, not on import
@@ -38,8 +52,10 @@ if __name__ == "__main__":  # => co-11: entry point -- runs only when this file 
 
     rater_x = [1, 1, 0, 1, np.nan, 0, 1, 1, 0, np.nan]  # => co-11: rater X left two items unlabeled -- a real missing-data pattern
     rater_y = [1, np.nan, 0, 1, 1, 0, 0, 1, 0, 1]  # => co-11: rater Y independently left a DIFFERENT item unlabeled
-    alpha = krippendorff.alpha(reliability_data=np.array([rater_x, rater_y]), level_of_measurement="nominal")  # => co-11: the branch-4 coefficient, actually computed
-    print(f"Krippendorff's alpha on this missing-data case: {alpha:.4f}")  # => co-11: proves branch 4 is a real, callable coefficient, not just a label
-    assert -1.0 <= alpha <= 1.0, "Krippendorff's alpha must fall within its valid [-1, 1] range"  # => co-11
-    print("MATCH: all four branches route to the correct coefficient, and the missing-data branch is independently verified as a real, computable statistic")  # => co-11
+    alpha_def = krippendorffs_alpha_from_definition(rater_x, rater_y)  # => co-11: computed from the formula directly, same as ex-24 does for kappa
+    print(f"Krippendorff's alpha, from definition: {alpha_def:.4f}")  # => co-11: the hand-derived coefficient this file derives itself
+    alpha_lib = krippendorff.alpha(reliability_data=np.array([rater_x, rater_y]), level_of_measurement="nominal")  # => co-11: the SAME computation, called from the pinned library
+    print(f"Krippendorff's alpha, from krippendorff library: {alpha_lib:.4f}")  # => co-11: the library's answer to the identical question
+    assert math.isclose(alpha_def, alpha_lib, abs_tol=1e-9), "the from-definition and library alpha must agree"  # => co-11: computed twice, verified equal -- the SAME invariant every other coefficient in this course holds
+    print("MATCH: all four branches route to the correct coefficient, and the missing-data branch's alpha is verified equal between its from-definition formula and the pinned library")  # => co-11
     # => co-11: rater count, label type, and missing data are three independent axes -- picking the wrong coefficient on any one axis produces a number that answers a different question

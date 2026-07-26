@@ -36,7 +36,28 @@ deeply misleading on its own.
 from __future__ import annotations  # => hygiene: postpones annotation evaluation, interpreter-version-agnostic
 
 RATER_A = ["pass", "fail", "pass", "pass", "fail", "pass", "fail", "pass", "pass", "fail", "pass", "pass", "fail", "pass", "pass", "fail", "pass", "fail", "pass", "pass"]  # => co-09: labeler A's 20 verdicts
-RATER_B = ["pass", "fail", "pass", "fail", "fail", "pass", "pass", "pass", "pass", "fail", "fail", "pass", "fail", "pass", "pass", "fail", "pass", "fail", "fail", "pass"]  # => co-09: labeler B's 20 verdicts on the SAME 20 items, in the same order
+RATER_B = [
+    "pass",
+    "fail",
+    "pass",
+    "fail",
+    "fail",
+    "pass",
+    "pass",
+    "pass",
+    "pass",
+    "fail",
+    "fail",
+    "pass",
+    "fail",
+    "pass",
+    "pass",
+    "fail",
+    "pass",
+    "fail",
+    "fail",
+    "pass",
+]  # => co-09: labeler B's 20 verdicts on the SAME 20 items, in the same order
 
 
 def raw_agreement(rater_x: list[str], rater_y: list[str]) -> float:  # => co-09: the plain arithmetic definition -- no library needed for this one
@@ -383,6 +404,9 @@ verifies the missing-data branch against a real computation.
 
 from __future__ import annotations  # => hygiene: postpones annotation evaluation, interpreter-version-agnostic
 
+import math  # => co-11: isclose -- verifies the from-definition and library alphas agree, same as ex-24 does for kappa
+from collections import Counter  # => co-11: tallies each value's marginal frequency for the expected-disagreement term
+
 import numpy as np  # => co-11: builds the missing-data branch's own worked case
 import krippendorff  # => co-11: the pinned library's own coefficient for the missing-data branch
 
@@ -398,6 +422,17 @@ def choose_coefficient(*, rater_count: int, label_type: str, has_missing_data: b
     if rater_count > 2:  # => co-11: more than two raters, regardless of label type in this simplified table
         return "fleiss_kappa"  # => co-11: ex-27's own coefficient
     raise ValueError(f"no rule covers rater_count={rater_count}, label_type={label_type}")  # => co-11: an unhandled combination is a bug, not a silent guess
+
+
+def krippendorffs_alpha_from_definition(rater_x: list[float], rater_y: list[float]) -> float:  # => co-11: the textbook coincidence-matrix formula, in code -- the SAME pattern ex-24's cohen_kappa_from_definition uses
+    """Return Krippendorff's alpha (nominal, two raters), from its coincidence-matrix definition."""  # => co-11: documents krippendorffs_alpha_from_definition's contract -- no runtime output, just sets its __doc__
+    paired = [(x, y) for x, y in zip(rater_x, rater_y) if not (math.isnan(x) or math.isnan(y))]  # => co-11: only units BOTH raters rated are pairable -- an orphan single rating carries no agreement information
+    observed_disagreement = sum(1 for x, y in paired for _ in (0, 1) if x != y) / (2 * len(paired))  # => co-11: each pairable unit counted in both rater orderings, matching the library's own coincidence-matrix convention
+    all_ratings = [v for pair in paired for v in pair]  # => co-11: every individual rating from a pairable unit -- the marginal pool the expected term draws from
+    n = len(all_ratings)  # => co-11: total pairable ratings
+    counts = Counter(all_ratings)  # => co-11: how often each value appears in the marginal pool
+    expected_disagreement = sum(counts[c] * counts[k] for c in counts for k in counts if c != k) / (n * (n - 1))  # => co-11: chance-level disagreement, from the SAME marginal frequencies as the observed term, not a fresh assumption
+    return 1 - observed_disagreement / expected_disagreement  # => co-11: alpha itself -- 1 minus how much worse than chance the raters actually disagree
 
 
 if __name__ == "__main__":  # => co-11: entry point -- runs only when this file executes directly, not on import
@@ -419,10 +454,12 @@ if __name__ == "__main__":  # => co-11: entry point -- runs only when this file 
 
     rater_x = [1, 1, 0, 1, np.nan, 0, 1, 1, 0, np.nan]  # => co-11: rater X left two items unlabeled -- a real missing-data pattern
     rater_y = [1, np.nan, 0, 1, 1, 0, 0, 1, 0, 1]  # => co-11: rater Y independently left a DIFFERENT item unlabeled
-    alpha = krippendorff.alpha(reliability_data=np.array([rater_x, rater_y]), level_of_measurement="nominal")  # => co-11: the branch-4 coefficient, actually computed
-    print(f"Krippendorff's alpha on this missing-data case: {alpha:.4f}")  # => co-11: proves branch 4 is a real, callable coefficient, not just a label
-    assert -1.0 <= alpha <= 1.0, "Krippendorff's alpha must fall within its valid [-1, 1] range"  # => co-11
-    print("MATCH: all four branches route to the correct coefficient, and the missing-data branch is independently verified as a real, computable statistic")  # => co-11
+    alpha_def = krippendorffs_alpha_from_definition(rater_x, rater_y)  # => co-11: computed from the formula directly, same as ex-24 does for kappa
+    print(f"Krippendorff's alpha, from definition: {alpha_def:.4f}")  # => co-11: the hand-derived coefficient this file derives itself
+    alpha_lib = krippendorff.alpha(reliability_data=np.array([rater_x, rater_y]), level_of_measurement="nominal")  # => co-11: the SAME computation, called from the pinned library
+    print(f"Krippendorff's alpha, from krippendorff library: {alpha_lib:.4f}")  # => co-11: the library's answer to the identical question
+    assert math.isclose(alpha_def, alpha_lib, abs_tol=1e-9), "the from-definition and library alpha must agree"  # => co-11: computed twice, verified equal -- the SAME invariant every other coefficient in this course holds
+    print("MATCH: all four branches route to the correct coefficient, and the missing-data branch's alpha is verified equal between its from-definition formula and the pinned library")  # => co-11
     # => co-11: rater count, label type, and missing data are three independent axes -- picking the wrong coefficient on any one axis produces a number that answers a different question
 ```
 
@@ -435,14 +472,17 @@ if __name__ == "__main__":  # => co-11: entry point -- runs only when this file 
 2 raters, ordinal, no missing data -> weighted_cohens_kappa
 3 raters, nominal, no missing data -> fleiss_kappa
 2 raters, nominal, WITH missing data -> krippendorffs_alpha
-Krippendorff's alpha on this missing-data case: 0.7347
-MATCH: all four branches route to the correct coefficient, and the missing-data branch is independently verified as a real, computable statistic
+Krippendorff's alpha, from definition: 0.7347
+Krippendorff's alpha, from krippendorff library: 0.7347
+MATCH: all four branches route to the correct coefficient, and the missing-data branch's alpha is verified equal between its from-definition formula and the pinned library
 ```
 
 **Verify**: `choose_coefficient()` routes all four representative cases to their correct
-coefficient name, and `krippendorff.alpha()` returns a genuine `0.7347` on a real missing-data
-matrix, satisfying co-11's rule that the choice of coefficient is a deterministic lookup, not a
-default.
+coefficient name, and on a real missing-data matrix, `krippendorffs_alpha_from_definition()` --
+this file's own coincidence-matrix implementation of Krippendorff's alpha -- agrees with
+`krippendorff.alpha()` to within floating-point precision (both `0.7347`), satisfying co-11's rule
+that the choice of coefficient is a deterministic lookup, not a default, and this course's own
+computed-twice invariant for every named quantity.
 
 **Key takeaway**: rater count, label type, and missing data are three separate yes/no facts about
 a dataset, and together they fully determine which agreement coefficient is defensible to use.
@@ -820,7 +860,11 @@ def generate_ratings(n: int, *, seed: int, truth_pass_rate: float, human_noise: 
 
 if __name__ == "__main__":  # => co-14: entry point -- runs only when this file executes directly, not on import
     human1, _human2, judge = generate_ratings(  # => co-14: one criterion -- "faithfulness" -- human2 unused here, reintroduced in ex-33
-        n=40, seed=6, truth_pass_rate=0.75, human_noise=0.06, judge_noise=0.20  # => co-14: a fairly reliable human (6% flip rate) against a noisier judge (20% flip rate)
+        n=40,
+        seed=6,
+        truth_pass_rate=0.75,
+        human_noise=0.06,
+        judge_noise=0.20,  # => co-14: a fairly reliable human (6% flip rate) against a noisier judge (20% flip rate)
     )
 
     judge_human_kappa = cohen_kappa_score(judge, human1)  # => co-14: EXACTLY the same function call Theme C used for human1 vs human2
