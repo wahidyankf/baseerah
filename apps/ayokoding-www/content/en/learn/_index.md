@@ -50,6 +50,7 @@ weight: 10
   - [Statistics for Evaluation](/en/learn/courses/statistics-for-evaluation)
   - [Evaluating AI Systems In Depth](/en/learn/courses/evaluating-ai-systems-in-depth)
   - [Product Patterns for Probabilistic Systems](/en/learn/courses/product-patterns-for-probabilistic-systems)
+  - [Inference Serving & Model Deployment](/en/learn/courses/inference-serving-and-model-deployment)
 - [Legacy](/en/learn/legacy)
   - [Overview](/en/learn/legacy/overview)
   - [Software Engineering](/en/learn/legacy/software-engineering)

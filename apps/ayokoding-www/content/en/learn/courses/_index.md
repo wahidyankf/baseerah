@@ -140,3 +140,7 @@ weight: 95
   - [Overview](/en/learn/courses/product-patterns-for-probabilistic-systems/overview)
   - [Learning](/en/learn/courses/product-patterns-for-probabilistic-systems/learning)
   - [Drilling](/en/learn/courses/product-patterns-for-probabilistic-systems/drilling)
+- [Inference Serving & Model Deployment](/en/learn/courses/inference-serving-and-model-deployment)
+  - [Overview](/en/learn/courses/inference-serving-and-model-deployment/overview)
+  - [Learning](/en/learn/courses/inference-serving-and-model-deployment/learning)
+  - [Drilling](/en/learn/courses/inference-serving-and-model-deployment/drilling)
