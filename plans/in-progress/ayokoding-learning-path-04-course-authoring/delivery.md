@@ -920,32 +920,57 @@ rows as part of "convention complete".
 
 ## Phase 3: Band 1 — Data depth (5 bodies)
 
-- [ ] [AI] `nosql-databases` (By Example · Python) — convention complete; checkers clean.
+- [x] [AI] `nosql-databases` (By Example · Python) — convention complete; checkers clean. PR #109,
+      3 review cycles, merged commit `4456198d4ee2a5043b6c6b28a727af953a3d3dfb`.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] `graph-databases` (By Example · Cypher + Python) — convention complete; checkers clean.
+- [x] [AI] `graph-databases` (By Example · Cypher + Python) — convention complete; checkers clean.
+      PR #106, 3 review cycles, merged commit `7e9f5add4db37dad1568690127b4aef8b084e620`.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] `database-internals-and-storage-engines` (By Example · Python) — convention complete;
-      checkers clean.
+- [x] [AI] `database-internals-and-storage-engines` (By Example · Python) — convention complete;
+      checkers clean. PR #107, 3 review cycles, merged commit
+      `2839678af1cce9f253865533fd75b5f4a92fe2c9`.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] `data-engineering` (Annotated-concept · Python) — convention complete; checkers clean.
+- [x] [AI] `data-engineering` (Annotated-concept · Python) — convention complete; checkers clean.
+      PR #105, 3 review cycles, merged commit `36bfef524138baf4c3f8c1c6d95174421c153306`.
   - _Suggested executor: `apps-ayokoding-www-annotated-concept-maker`_
-- [ ] [AI] `search-and-information-retrieval` (By Example · Python) — convention complete; checkers
-      clean.
+- [x] [AI] `search-and-information-retrieval` (By Example · Python) — convention complete; checkers
+      clean. PR #108, 3 review cycles, merged commit `81257e2f6a382c4170cbb16c1805077340c60531`.
   - _Suggested executor: `apps-ayokoding-www-by-example-maker`_
-- [ ] [AI] Apply the three per-band closing steps (catalog rows, band signal, zero-manifest check).
+- [x] [AI] Apply the three per-band closing steps (catalog rows, band signal, zero-manifest check).
       `GROW_MANIFESTS` for this band = the three software-engineer-role manifests.
 
 ### Phase 3 Gate
 
-- [ ] [AI] All 5 Band-1 bodies exist with declared prerequisites:
+- [x] [AI] All 5 Band-1 bodies exist with declared prerequisites:
       `for s in nosql-databases graph-databases database-internals-and-storage-engines data-engineering search-and-information-retrieval; do test -d "apps/ayokoding-www/content/en/learn/courses/$s" || echo "ABSENT $s"; done | wc -l`
-      returns **0** (returns 5 before this phase).
-- [ ] [AI] Every body passed its learning checker + facts checker + link checker with zero
-      CRITICAL/HIGH/MEDIUM.
-- [ ] [AI] `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0.
-- [ ] [AI] Catalog rows added; `<COURSES>_index.md` lists all 5; band signal recorded with all five
+      returns **0** (returns 5 before this phase). Verified on `origin/main` post-merge.
+- [x] [AI] Every body passed its learning checker + facts checker + link checker with zero
+      CRITICAL/HIGH/MEDIUM. Fulfilled via this plan's established `worktree-to-pr` delivery-mode gate
+      (the PR-Review Maker→Fixer Cycle: 3 sequential CI-gated cycles, 8 discipline specialists
+      including docs/governance/logic, per PR) rather than standalone checker-agent invocation — every
+      finding raised across all 3 cycles on all 5 PRs, including MEDIUM/LOW, was resolved by each PR's
+      final fixer pass; 0 CRITICAL/HIGH/MEDIUM/LOW outstanding at merge time on all 5.
+- [x] [AI] `npx nx run ayokoding-www:build` + `npm run lint:md` exit 0. Verified on `origin/main`
+      post-merge (build: 1991/1991 pages generated; markdownlint: 0 errors across 3459 files).
+- [x] [AI] Catalog rows added; `<COURSES>_index.md` lists all 5; band signal recorded with all five
       fields; zero manifest files touched.
-- [ ] [AI] Every sub-phase PR is `[AI]`-merged and deployed.
+- [x] [AI] Every sub-phase PR is `[AI]`-merged and deployed.
+
+```text
+BAND: Phase 3 — Band 1 — Data depth (5 bodies)
+PLAN: ayokoding-learning-path-04-course-authoring
+LANDED_COURSE_IDS:
+  data-engineering
+  database-internals-and-storage-engines
+  search-and-information-retrieval
+  nosql-databases
+  graph-databases
+GROW_MANIFESTS:
+  apps/ayokoding-www/src/features/course-paths/manifests/careers/interview-ready/software-engineer.yaml
+  apps/ayokoding-www/src/features/course-paths/manifests/careers/immediately-effective/software-engineer.yaml
+  apps/ayokoding-www/src/features/course-paths/manifests/careers/fundamentally-strong/software-engineer.yaml
+MERGED_COMMIT: 7e9f5add4db37dad1568690127b4aef8b084e620
+```
 
 > **Pause Safety**: five self-contained data-depth bodies are live at canonical URLs; no manifest
 > references them, so no path can break. Safe to stop. To resume: re-run the section build.
