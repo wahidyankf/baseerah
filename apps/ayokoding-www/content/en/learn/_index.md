@@ -54,6 +54,7 @@ weight: 10
   - [Product Patterns for Probabilistic Systems](/en/learn/courses/product-patterns-for-probabilistic-systems)
   - [Inference Serving & Model Deployment](/en/learn/courses/inference-serving-and-model-deployment)
   - [Fine-Tuning & Adaptation](/en/learn/courses/fine-tuning-and-adaptation)
+  - [NoSQL Databases](/en/learn/courses/nosql-databases)
   - [Database Internals and Storage Engines](/en/learn/courses/database-internals-and-storage-engines)
 - [Legacy](/en/learn/legacy)
   - [Overview](/en/learn/legacy/overview)
