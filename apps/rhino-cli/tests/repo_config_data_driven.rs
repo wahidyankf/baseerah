@@ -14,8 +14,10 @@
 use std::path::{Path, PathBuf};
 
 use cucumber::{World as _, given, then, when};
+use rhino_cli::application::repo_config::{self, HarnessEntry};
 use rhino_cli::application::specs::required_spec_folders;
 use rhino_cli::commands::specs_validate_counts::{ValidateCountsArgs, run_at_root};
+use rhino_cli::infrastructure::git::root::find_root_from;
 use tempfile::TempDir;
 
 #[derive(cucumber::World)]
@@ -27,6 +29,8 @@ struct RepoConfigDataWorld {
     ran_ok: bool,
     /// Captured stdout of the run.
     output: String,
+    /// Cursor harness entry loaded from the real repository config.
+    cursor_entry: Option<HarnessEntry>,
 }
 
 impl std::fmt::Debug for RepoConfigDataWorld {
@@ -42,6 +46,7 @@ impl RepoConfigDataWorld {
             repo: TempDir::new().expect("temp repo"),
             ran_ok: false,
             output: String::new(),
+            cursor_entry: None,
         }
     }
 }
@@ -97,6 +102,39 @@ fn then_reads_from_repo_config(w: &mut RepoConfigDataWorld) {
         "the config-declared widget-app tree is clean, so the run must succeed; got output: {}",
         w.output
     );
+}
+
+#[given("the harness registry section of repo-config.yml")]
+fn given_harness_registry_section(w: &mut RepoConfigDataWorld) {
+    let root = find_root_from(None).expect("repo root");
+    let config = repo_config::load(&root).expect("load repo-config.yml");
+    w.cursor_entry = config.harness.iter().find(|h| h.name == "cursor").cloned();
+}
+
+#[when("the cursor entry is read")]
+fn when_cursor_entry_is_read(w: &mut RepoConfigDataWorld) {
+    assert!(
+        w.cursor_entry.is_some(),
+        "cursor harness entry must exist in repo-config.yml"
+    );
+}
+
+#[then("the entry declares the generated tier")]
+fn then_cursor_entry_generated_tier(w: &mut RepoConfigDataWorld) {
+    let entry = w.cursor_entry.as_ref().expect("cursor entry loaded");
+    assert_eq!(entry.tier, "generated");
+}
+
+#[then("the entry declares .cursor/agents as its agent directory")]
+fn then_cursor_entry_agent_dir(w: &mut RepoConfigDataWorld) {
+    let entry = w.cursor_entry.as_ref().expect("cursor entry loaded");
+    assert_eq!(entry.agent_dir.as_deref(), Some(".cursor/agents"));
+}
+
+#[then("the entry declares .claude/agents as the source it mirrors")]
+fn then_cursor_entry_mirror_source(w: &mut RepoConfigDataWorld) {
+    let entry = w.cursor_entry.as_ref().expect("cursor entry loaded");
+    assert_eq!(entry.mirrors.as_deref(), Some(".claude/agents"));
 }
 
 #[tokio::main]

@@ -46,7 +46,12 @@ harness:
       shadow: .github/copilot-instructions.md,
       instruction: [AGENTS.md, .github/copilot-instructions.md],
     }
-  - { name: cursor, tier: native, shadow: .cursor/rules, instruction: [AGENTS.md, .cursor/rules] }
+  - name: cursor
+    tier: generated
+    agent-dir: .cursor/agents
+    mirrors: .claude/agents
+    shadow: .cursor/rules
+    instruction: [AGENTS.md, .cursor/rules]
   - { name: windsurf, tier: native, shadow: .windsurf/rules, instruction: [AGENTS.md, .windsurf/rules] }
   - { name: junie, tier: native, shadow: .junie/guidelines.md, instruction: [AGENTS.md, .junie/guidelines.md] }
   - { name: antigravity, tier: native, shadow: GEMINI.md, instruction: [AGENTS.md, GEMINI.md] }
