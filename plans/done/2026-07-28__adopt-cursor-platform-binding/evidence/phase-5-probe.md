@@ -10,11 +10,11 @@ subagent configured with **Composer 2.5** (non-fast), matching the pinned litera
 
 ## Three required fields
 
-| Field | Value |
-| ----- | ----- |
-| **Model reported for delegated subagent** | `composer-2.5` |
-| **Matched pinned literal?** | **Yes** — all 90 committed `.cursor/agents/*.md` files carry `model: composer-2.5`; the executing subagent session used Composer 2.5 per user mandate |
-| **Staff-confirmed defect if mismatch** | N/A — probe matched; no amendment to `brd.md` or `platform-bindings.md` required |
+| Field                                     | Value                                                                                                                                                 |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Model reported for delegated subagent** | `composer-2.5`                                                                                                                                        |
+| **Matched pinned literal?**               | **Yes** — all 90 committed `.cursor/agents/*.md` files carry `model: composer-2.5`; the executing subagent session used Composer 2.5 per user mandate |
+| **Staff-confirmed defect if mismatch**    | N/A — probe matched; no amendment to `brd.md` or `platform-bindings.md` required                                                                      |
 
 ## Repo-local assertions (Phase 5 cheap facts)
 

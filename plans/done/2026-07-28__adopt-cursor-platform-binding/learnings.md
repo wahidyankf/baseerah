@@ -61,18 +61,32 @@ so the executor recognises a learning when it appears.
 - **Context**: Running `rhino-cli` release builds in ose-primer/ose-infra worktrees after copying from ose-public
 - **Observation**: `serde_norway` E0460 when sandbox/shared cache mixes artifacts from different repo checkouts
 - **Why it might generalize**: Any sibling landing that rsyncs rhino-cli while sharing `CARGO_TARGET_DIR` or ose-public cache paths will hit stale rlib mismatches
-- **Routing**: docs/how-to/worktree-setup.md or rhino-cli README — note per-worktree `apps/rhino-cli/target` isolation
+- **Routing**: **discard** — worktree-setup.md already covers per-checkout toolchain init; anecdote unless we add explicit CARGO_TARGET_DIR guidance
 
 ## Learning: ose-primer pre-push blocked on broken anchor in copied platform-bindings.md
 
 - **Context**: Phase 6 push after copying ose-public governance verbatim
-- **Observation**: `#platform-binding-color-translation` anchor missing in ose-primer's `ai-agents.md`; correct anchor is `#color-translation-table`
+- **Observation**: `#platform-binding-color-translation` anchor missing in ose-primer's `ai-agents.md`; fixed by adding `### Platform Binding Color Translation` heading
 - **Why it might generalize**: Shared-surface copies from ose-public must not assume identical heading anchors across repos
-- **Routing**: plan backlog — add cross-repo link validation to parity workflow
+- **Routing**: **backlog** — `plans/backlog/cross-repo-governance-link-parity/` (link validator scoped to shared docs during multi-repo landings)
 
 ## Learning: composer-2.5-fast grep false positive in generated checker agent
 
 - **Context**: Phase 5 repo-local assertion `grep -r composer-2.5-fast .cursor/agents/`
 - **Observation**: Documentation in `repo-harness-compatibility-checker.md` contained the literal string, failing the gate
 - **Why it might generalize**: Any grep-based "must not exist" gate applies to prose mentions, not just frontmatter values
-- **Routing**: model-selection.md prohibition section — reference `^model:` scoped grep pattern
+- **Routing**: **inline** — model-selection.md prohibition already documents scoped `^model:` grep; no change needed
+
+## Learning: repo-config.yml byte-copy from ose-public breaks sibling env validate
+
+- **Context**: Phase 7 commit aligning harness registry copied full ose-public `repo-config.yml` into ose-infra
+- **Observation**: `env validate` failed reading `apps/organiclever-be/.env.example` because infra only ships coralpolyp apps
+- **Why it might generalize**: Multi-repo landings must flip only the `harness:` cursor entry, not replace repo-specific coverage/env sections
+- **Routing**: **inline** — plan tech-docs DD-12 already states values reflect each repo's project set; reinforced in delivery.md S1 step
+
+## Learning: ose-infra orphan ci-monitor-subagent in .opencode/agents/
+
+- **Context**: Phase 7 governance sweep row I14
+- **Observation**: Stale `.opencode/agents/ci-monitor-subagent.md` exists without a `.claude/agents/` source mirror
+- **Why it might generalize**: Infra roster drift is independent of Cursor binding; naming validate may flag on future pushes
+- **Routing**: **backlog** — `plans/backlog/ose-infra-opencode-ci-monitor-orphan/` (remove or restore claude mirror)

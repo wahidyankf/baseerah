@@ -4,6 +4,14 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-07-28: adopt-cursor-platform-binding](./2026-07-28__adopt-cursor-platform-binding/README.md) —
+  Landed generated `.cursor/agents/` mirrors across all three repositories via `rhino-cli` Cursor
+  converter with full tier collapse to `composer-2.5` (never `composer-2.5-fast`). Delivered as three
+  delivery-boundary PRs — `ose-public` PR #111, `ose-primer` PR #18, `ose-infra` PR #20 — each
+  flipping `repo-config.yml` cursor harness to `tier: generated` and running governance sweeps.
+  Phase 5 live Cursor subagent probe matched the pinned literal. Knowledge Capture routed two backlog
+  plans (`cross-repo-governance-link-parity`, `ose-infra-opencode-ci-monitor-orphan`) and discarded
+  or inlined the rest. Delivery Mode: `worktree-to-pr`. Completed 2026-07-28.
 - [2026-07-25: ayokoding-learning-path-03-navigation-ui](./2026-07-25__ayokoding-learning-path-03-navigation-ui/README.md) —
   **Wave 2, plan #3 of 5** in the split of the closed `shared-course-library-and-learning-paths`
   plan. Delivered the path-aware navigation UI atop plan 02's `course-paths` data layer: a 36-render

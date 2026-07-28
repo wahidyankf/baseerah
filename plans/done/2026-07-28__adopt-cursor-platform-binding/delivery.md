@@ -155,13 +155,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 ### Post-Push CI Verification
 
 - [x] [AI] Push to this delivery unit's PR branch — acceptance: `git push` exits 0
-- [ ] [AI] Monitor the PR's check run, polling every **2 minutes** with a single
+- [x] [AI] Monitor the PR's check run, polling every **2 minutes** with a single
       `gh run view --json status,conclusion` per wakeup — never `gh run watch`, never a tight loop
       (see [CI Monitoring](../../../repo-governance/development/workflow/ci-monitoring.md))
-- [ ] [AI] Verify ALL CI checks pass — acceptance: every check's `conclusion` is `success`
-- [ ] [AI] If any CI check fails, fix the root cause and push a follow-up commit — never bypass
-- [ ] [AI] Repeat until ALL checks pass with zero failures
-- [ ] [AI] Do NOT proceed to the next phase until CI is fully green
+- [x] [AI] Verify ALL CI checks pass — acceptance: every check's `conclusion` is `success`
+- [x] [AI] If any CI check fails, fix the root cause and push a follow-up commit — never bypass
+- [x] [AI] Repeat until ALL checks pass with zero failures
+- [x] [AI] Do NOT proceed to the next phase until CI is fully green
 
 ### Commit Guidelines
 
@@ -1597,21 +1597,21 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       with a body that states the honest reach boundary in its first paragraph
       — acceptance: `gh pr list --head adopt-cursor-platform-binding --json number --jq 'length'`
       returns `1` (returned `0` before)
-- [ ] [AI] Run the **Post-Push CI Verification** standing section
+- [x] [AI] Run the **Post-Push CI Verification** standing section
       — acceptance: every check's `conclusion` is `success`
-- [ ] [AI] Run the **PR-Review Maker→Fixer Cycle**, three strictly sequential cycles, each gated by
+- [x] [AI] Run the **PR-Review Maker→Fixer Cycle**, three strictly sequential cycles, each gated by
       a green CI run: fan out the eight discipline `pr-review-*-maker` agents, hand their findings to
       `pr-review-synthesis-maker` (the sole poster of record), then let `pr-review-fixer` push fixes
       to the PR branch
       — acceptance: three completed cycles are visible in the PR's review history and the final
       cycle's CI run is green. See the
       [PR Review Quality Gate workflow](../../../repo-governance/workflows/pr/pr-review-quality-gate.md).
-- [ ] [AI] Mark the PR ready: `gh pr ready` — acceptance: the PR is no longer in draft state
-- [ ] [AI] Merge PR 1 once all five hardened preconditions hold
+- [x] [AI] Mark the PR ready: `gh pr ready` — acceptance: the PR is no longer in draft state
+- [x] [AI] Merge PR 1 once all five hardened preconditions hold
       — acceptance: `gh pr view --json state --jq '.state'` returns `MERGED`. Per the
       [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md), `[AI]`
       is the default merge actor here; no `[HUMAN]` merge gate is declared for this plan.
-- [ ] [AI] Fast-forward the primary checkout's local `main` after the merge — a side-worktree push
+- [x] [AI] Fast-forward the primary checkout's local `main` after the merge — a side-worktree push
       advances `origin/main` but leaves local `main` silently behind
       — acceptance: `git -C <ose-public root> rev-parse main` equals `git rev-parse origin/main`
 
@@ -1621,13 +1621,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 - [x] [AI] `evidence/phase-5-cursor-subagent-model.png` and `evidence/phase-5-probe.md` both exist
 - [x] [AI] The probe verdict is recorded in one of its two branches — matched, or amended-with-caveat
-- [ ] [AI] PR 1 is merged: `gh pr view --json state --jq '.state'` returns `MERGED`
-- [ ] [AI] CI is green on `origin/main` after the merge
-- [ ] [AI] The shared source is now on `main` and available to be propagated: the sibling landings
+- [x] [AI] PR 1 is merged: `gh pr view --json state --jq '.state'` returns `MERGED`
+- [x] [AI] CI is green on `origin/main` after the merge
+- [x] [AI] The shared source is now on `main` and available to be propagated: the sibling landings
       in Phases 6 and 7 pull `apps/rhino-cli/**` and
       `specs/apps/rhino/behavior/rhino-cli/gherkin/**` from this merged state, preserving the
       byte-identity boundary
-- [ ] [AI] Local `main` in the primary checkout equals `origin/main`
+- [x] [AI] Local `main` in the primary checkout equals `origin/main`
 
 > **Pause Safety**: `ose-public` is fully delivered and merged; the two sibling repositories are
 > untouched and still emit no `.cursor/` output, which is a consistent state because their
@@ -1649,7 +1649,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Topology detection and worktree provisioning
 
-- [ ] [AI] Detect this repository's git topology before any git operation: run `git worktree list`
+- [x] [AI] Detect this repository's git topology before any git operation: run `git worktree list`
       in the `ose-primer` root and read whether the first entry is annotated `(bare)`
       — acceptance: the topology is recorded in this checklist. **Do NOT use
       `git rev-parse --is-bare-repository`**: it reports the property of the current worktree's
@@ -1657,18 +1657,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       At authoring time this repository was observed with `bare = false` and a `.git/` directory, but
       that has changed before and the runtime detection above is authoritative — see
       `tech-docs.md` DD-13.
-- [ ] [AI] If the detected topology is bare, use the bare-repo method for every git command in this
+- [x] [AI] If the detected topology is bare, use the bare-repo method for every git command in this
       phase: `git -c core.bare=false --work-tree=<worktree> …`, and set `GIT_DIR` / `GIT_WORK_TREE`
       for `rhino-cli` and binding-sync invocations
       — acceptance: the chosen method is recorded; a topology-mismatched command that errors is a
       detection failure, not a plan defect
-- [ ] [AI] Provision the worktree:
+- [x] [AI] Provision the worktree:
       `git worktree add worktrees/adopt-cursor-platform-binding -b adopt-cursor-platform-binding origin/main`
       — acceptance: `test -d worktrees/adopt-cursor-platform-binding` returns 0 (returned non-zero
       before) and the branch name matches
-- [ ] [AI] Initialise the toolchain in the new worktree: `npm install && npm run doctor -- --fix`
+- [x] [AI] Initialise the toolchain in the new worktree: `npm install && npm run doctor -- --fix`
       — acceptance: both exit 0
-- [ ] [AI] Fetch the polyglot dependencies this repository's demo apps need before the first push —
+- [x] [AI] Fetch the polyglot dependencies this repository's demo apps need before the first push —
       `ose-primer` carries `crud-*` demo apps that depend on `rhino-cli`, so a fresh worktree's
       pre-push hook fails until the F# and Elixir dependencies are fetched
       — acceptance: `npm run doctor -- --fix` exits 0 and a dry `npx nx affected -t typecheck` run
@@ -1676,7 +1676,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Propagate the shared source
 
-- [ ] [AI] Copy the merged `apps/rhino-cli/**` and
+- [x] [AI] Copy the merged `apps/rhino-cli/**` and
       `specs/apps/rhino/behavior/rhino-cli/gherkin/**` from `ose-public`'s post-Phase-5 `main` into
       this worktree
       — acceptance: checksums of `apps/rhino-cli/src/application/agents/cursor.rs`,
@@ -1684,10 +1684,10 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       `specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/cursor-binding.feature` are
       identical to `ose-public`'s. Falsifiable: any differing checksum fails the byte-identity
       boundary.
-- [ ] [AI] Apply the same `naming:harness-validation` inputs change to
+- [x] [AI] Apply the same `naming:harness-validation` inputs change to
       `apps/rhino-cli/project.json` (it is part of the byte-identical surface)
       — acceptance: `grep -c "cursor/agents" apps/rhino-cli/project.json` returns `1`
-- [ ] [AI] Confirm the propagated source builds and passes here:
+- [x] [AI] Confirm the propagated source builds and passes here:
       `npx nx run rhino-cli:test:quick && cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: both exit 0, with `cargo test … --test cursor_binding` reporting `19` scenarios
       passed. Deliberately NOT `test:integration` here: that target runs `cargo test --tests` (every
@@ -1698,34 +1698,34 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Registry flip and generated output
 
-- [ ] [AI] Apply row **S1** — flip this repository's own `repo-config.yml` `cursor` entry to the
+- [x] [AI] Apply row **S1** — flip this repository's own `repo-config.yml` `cursor` entry to the
       block form from Phase 2 Cycle B
       — acceptance: `grep -c "tier: generated" repo-config.yml` returns `3` and
       `grep -c "tier: native" repo-config.yml` returns `6`, matching the transition recorded for
       this repository in `evidence/phase-0-baseline.txt`
-- [ ] [AI] Generate the mirror: `npx nx run rhino-cli:run -- harness bindings generate`
+- [x] [AI] Generate the mirror: `npx nx run rhino-cli:run -- harness bindings generate`
       — acceptance: exits 0 and `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `64`, matching this
       repository's roster count in `evidence/phase-0-baseline.txt`
-- [ ] [AI] Assert this repository's own pin counts (DD-12):
+- [x] [AI] Assert this repository's own pin counts (DD-12):
       `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `64`, and
       `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
       — acceptance: every agent file carries the non-fast literal and none carries the fast slug.
       Falsifiable in both directions and specific to this roster; the `ose-public` numbers would fail
       here.
-- [ ] [AI] Assert the emitter's own README-skip and CLI-absence facts (the live probe from Phase 5
+- [x] [AI] Assert the emitter's own README-skip and CLI-absence facts (the live probe from Phase 5
       is not repeated here):
       `test -e .cursor/agents/README.md; echo $?` prints `1`, and
       `test -e .cursor/cli.json; echo $?` prints `1`
       — acceptance: both hold
-- [ ] [AI] Prove idempotency: run `harness bindings generate` twice
+- [x] [AI] Prove idempotency: run `harness bindings generate` twice
       — acceptance: `git status --short .cursor/` prints nothing after the second run
-- [ ] [AI] Re-run the **CLI evidence contract** in this tree and record it in
+- [x] [AI] Re-run the **CLI evidence contract** in this tree and record it in
       `evidence/phase-6-ose-primer-cli.txt` plus `evidence/phase-6-bindings-validate.json`.
       `ose-public`'s green run is not evidence here: different roster, different file count,
       different `.prettierignore`.
       — acceptance: all nine rows present, both falsifiability rows recording a non-zero exit
       followed by a restored clean tree
-- [ ] [AI] Confirm the full test suite passes now that this repository's own registry flip has
+- [x] [AI] Confirm the full test suite passes now that this repository's own registry flip has
       landed: `npx nx run rhino-cli:test:integration`
       — acceptance: exits 0. This target runs `cargo test --tests` (every binary, including
       `specs_tree.rs`), whose post-flip tier assertions (fixed in Phase 2 Cycle B) now match this
@@ -1734,17 +1734,17 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Governance sweep — shared rows plus `ose-primer`'s own
 
-- [ ] [AI] Apply shared rows **S2-S10** exactly as in Phase 4, against this repository's copies
+- [x] [AI] Apply shared rows **S2-S10** exactly as in Phase 4, against this repository's copies
       — acceptance: each row has a recorded verdict; the S4/S5/S6/S7 edits are byte-identical to
       `ose-public`'s because those files are part of the shared surface
-- [ ] [AI] **R1** — update the Cursor row in this repository's `docs/reference/platform-bindings.md`
+- [x] [AI] **R1** — update the Cursor row in this repository's `docs/reference/platform-bindings.md`
       "Platform Binding Directories" table (real column name is **"Binding status"** — this table has
       no column literally named "shadow"; "shadow" is a different, already-used term elsewhere in
       this same document, the No-Shadowing Note); leave the Binding status column reading `Absent`
       and stop the row implying "no binding"
       — acceptance: the row names `.cursor/agents/` while the Binding status cell still reads `Absent`
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] **R2** — update the Cursor row in this repository's capability matrix. **This table has no
+- [x] [AI] **R2** — update the Cursor row in this repository's capability matrix. **This table has no
       `Status` column**; edit the agent-directory cell instead. A step written against `ose-public`'s
       `Reserved` literal would not match here. The cell already reads
       `.cursor/agents/*.md (also reads .claude/agents/, .codex/agents/)` before this edit — remove or
@@ -1753,55 +1753,55 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: `grep -c "cursor/agents/\*\.md.*codex/agents" docs/reference/platform-bindings.md`
       returns `0` after this row (returned `1` before this row — the pre-existing fallback clause is
       not, by itself, evidence this row was ever touched)
-- [ ] [AI] **R3** — append the dated amendment note under this repository's `## Optional Thin Pointers`
+- [x] [AI] **R3** — append the dated amendment note under this repository's `## Optional Thin Pointers`
       heading (note the `##` level and title case, both different from `ose-public`'s
       `### Optional thin pointers`), using the sentinel phrase "Amended for the agent surface only"
       verbatim
       — acceptance: `grep -ci "amended for the agent surface only" docs/reference/platform-bindings.md`
       returns at least `1` (returned `0` before this step) and the note sits under the correct
       heading in this repo's own casing
-- [ ] [AI] **R4** — add the Cursor model-translation subsection under `## Translation Artifacts`
+- [x] [AI] **R4** — add the Cursor model-translation subsection under `## Translation Artifacts`
       — acceptance: `grep -c "Claude Code → Cursor" docs/reference/platform-bindings.md` returns `1`
-- [ ] [AI] **R5** — repoint the `## Adding a New Platform Binding` worked example and add the
+- [x] [AI] **R5** — repoint the `## Adding a New Platform Binding` worked example and add the
       registry step
       — acceptance: the procedure names `repo-config.yml` and no longer uses `.cursor/rules/` as its
       hypothetical example
-- [ ] [AI] **R6** — add the out-of-reach onboarding note, carrying the same honesty framing as P5
+- [x] [AI] **R6** — add the out-of-reach onboarding note, carrying the same honesty framing as P5
       — acceptance: `grep -ci "does not govern" docs/reference/platform-bindings.md` returns at
       least `1`
-- [ ] [AI] **R7** — rewrite the Cursor bullet under `### Tier 1 — Native AGENTS.md Readers` in this
+- [x] [AI] **R7** — rewrite the Cursor bullet under `### Tier 1 — Native AGENTS.md Readers` in this
       repository's `multi-harness-binding.md`. **The heading and bullet wording differ from
       `ose-public`'s** (`### Active Tier-1 bindings`); anchor on this repo's own text.
       — acceptance: the bullet mentions both `AGENTS.md` and `.cursor/agents/`
-- [ ] [AI] **R8** — update the Cursor row in this repository's
+- [x] [AI] **R8** — update the Cursor row in this repository's
       `governance-vendor-independence.md`
       — acceptance: `grep -c "\.cursor/agents" repo-governance/conventions/structure/governance-vendor-independence.md`
       returns at least `1`
-- [ ] [AI] **R9** — add the Cursor full-tier-collapse mapping to this repository's `model-selection.md`,
+- [x] [AI] **R9** — add the Cursor full-tier-collapse mapping to this repository's `model-selection.md`,
       including the `composer-2.5-fast` prohibition. **This copy has
       no `### Model ID Mapping` subsection** — the mapping lives inline under
       `## Platform Binding Examples`. Add it in this repo's own shape; do not assume P8's anchor.
       — acceptance: `grep -c "Composer" repo-governance/development/agents/model-selection.md`
       returns at least `1` (returned `0` before)
-- [ ] [AI] **R10** — record **NO CHANGE** for `AGENTS.md`: this repository's copy does not mention
+- [x] [AI] **R10** — record **NO CHANGE** for `AGENTS.md`: this repository's copy does not mention
       Cursor at all, so nothing here states the old rule, and adding a mention is out of scope
       — acceptance: `grep -ci "cursor" AGENTS.md` returns `0` both before and after; and
       `git diff --stat AGENTS.md` prints nothing
-- [ ] [AI] **R11** — in `CLAUDE.md`, fix the now-wrong "**dual** compatibility" framing under
+- [x] [AI] **R11** — in `CLAUDE.md`, fix the now-wrong "**dual** compatibility" framing under
       `### Dual-mode configuration (Claude Code + OpenCode)` and add `.cursor/`. **Do not add
       `.amazonq/`** — this repository does not list it, and inventing it is out of scope.
       — acceptance: `grep -c "\.cursor/" CLAUDE.md` returns at least `1`, and
       `grep -c "amazonq" CLAUDE.md` is unchanged
-- [ ] [AI] **R12** — add the model-pin drift dimension to this repository's
+- [x] [AI] **R12** — add the model-pin drift dimension to this repository's
       `.claude/agents/repo-harness-compatibility-checker.md`, in its own wording (the file's content
       differs from `ose-public`'s copy)
       — acceptance: `grep -ci "model-pin\|model pin" .claude/agents/repo-harness-compatibility-checker.md`
       returns at least `1`
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] **R13** — **VERIFY THEN DECIDE**: run the P12 check against this repository's
+- [x] [AI] **R13** — **VERIFY THEN DECIDE**: run the P12 check against this repository's
       `.claude/agents/repo-harness-compatibility-fixer.md`
       — acceptance: changed, or the verdict "no independent enumeration — NO CHANGE" recorded here
-- [ ] [AI] **R14** — **VERIFY THEN DECIDE**: run this repository's own
+- [x] [AI] **R14** — **VERIFY THEN DECIDE**: run this repository's own
       `npx prettier --check ".cursor/agents/**/*.md"`. Its `.prettierignore` differs from
       `ose-public`'s, so the Phase 3 decision does not transfer automatically. Also run this
       repository's own `npx markdownlint-cli2 ".cursor/agents/*.md"` — its `.markdownlint-cli2.jsonc`
@@ -1810,13 +1810,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: either the Prettier check exits 0 with no changes, or
       `grep -c "cursor/agents" .prettierignore` returns `1`; AND either the markdownlint check exits
       0 with no errors, or `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`
-- [ ] [AI] Re-sync platform bindings: `npm run generate:bindings`
+- [x] [AI] Re-sync platform bindings: `npm run generate:bindings`
       — acceptance: exits 0; running it twice leaves `git status --short .opencode/ .cursor/` empty
-- [ ] [AI] Run the markdown gates: `npm run lint:md:fix` — acceptance: exits 0
+- [x] [AI] Run the markdown gates: `npm run lint:md:fix` — acceptance: exits 0
 
 ### Integration
 
-- [ ] [AI] Run the **Local Quality Gates (Before Push)** standing section, using this repository's
+- [x] [AI] Run the **Local Quality Gates (Before Push)** standing section, using this repository's
       own governance target name. **The Nx target name is identical to `ose-public`'s**
       (`governance:vendor-audit-validation`, confirmed by reading `apps/rhino-cli/project.json` in
       this repository) — there is no target-naming divergence to detect. The real, narrower
@@ -1827,20 +1827,20 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       be aware of while running this step, not a reason to look for a differently-named target.
       — acceptance: every command exits 0, invoked as `nx run rhino-cli:governance:vendor-audit-validation`
       (the same target name as `ose-public`)
-- [ ] [AI] Commit and push to `origin adopt-cursor-platform-binding`, staging explicit paths only
+- [x] [AI] Commit and push to `origin adopt-cursor-platform-binding`, staging explicit paths only
       — acceptance: `git push` exits 0
-- [ ] [AI] Open a draft PR against `main` with the honest reach boundary in its first paragraph
+- [x] [AI] Open a draft PR against `main` with the honest reach boundary in its first paragraph
       — acceptance: `gh pr list --head adopt-cursor-platform-binding --json number --jq 'length'`
       returns `1` in **this** repository (returned `0` before)
-- [ ] [AI] Run the **Post-Push CI Verification** standing section
+- [x] [AI] Run the **Post-Push CI Verification** standing section
       — acceptance: every check's `conclusion` is `success`
-- [ ] [AI] Run the **PR-Review Maker→Fixer Cycle** (three sequential CI-gated cycles)
+- [x] [AI] Run the **PR-Review Maker→Fixer Cycle** (three sequential CI-gated cycles)
       — acceptance: three completed cycles in the PR's review history, final CI green
-- [ ] [AI] Mark ready and merge PR 2 once the hardened preconditions hold
+- [x] [AI] Mark ready and merge PR 2 once the hardened preconditions hold
       — acceptance: `gh pr view --json state --jq '.state'` returns `MERGED`
-- [ ] [AI] Fast-forward this repository's local `main` after the merge
+- [x] [AI] Fast-forward this repository's local `main` after the merge
       — acceptance: local `main` equals `origin/main`
-- [ ] [AI] Remove the worktree: `git worktree remove worktrees/adopt-cursor-platform-binding`
+- [x] [AI] Remove the worktree: `git worktree remove worktrees/adopt-cursor-platform-binding`
       — acceptance: `test -d worktrees/adopt-cursor-platform-binding` returns non-zero. Before
       removing, read the worktree's `git status --short` — a merged PR does not guarantee an empty
       working tree, and uncommitted evidence must be recovered first.
@@ -1849,25 +1849,25 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before Phase 8. Phase 7 may run concurrently and has its own gate.
 
-- [ ] [AI] Every `ose-primer` row has a recorded verdict — applied, or explicitly **NO CHANGE** with
+- [x] [AI] Every `ose-primer` row has a recorded verdict — applied, or explicitly **NO CHANGE** with
       its reason.
       `/usr/bin/grep -c '^- \[x\] \[AI\] \*\*R[0-9]' plans/in-progress/adopt-cursor-platform-binding/delivery.md`
       equals `14`. The `R[0-9]` marker is phase-unique — every occurrence in the whole file is this
       phase's — so a whole-file grep gives the exact phase-scoped count. Falsifiable: a skipped row
       leaves the count below 14.
-- [ ] [AI] Both shared-row steps in this phase are ticked — the `Apply row **S1**` step and the
+- [x] [AI] Both shared-row steps in this phase are ticked — the `Apply row **S1**` step and the
       `Apply shared rows **S2-S10**` step — so all ten shared rows have a verdict here too
-- [ ] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `64`, every file carries the non-fast
+- [x] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `64`, every file carries the non-fast
       literal, and `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
-- [ ] [AI] `evidence/phase-6-ose-primer-cli.txt` and `evidence/phase-6-bindings-validate.json` exist
+- [x] [AI] `evidence/phase-6-ose-primer-cli.txt` and `evidence/phase-6-bindings-validate.json` exist
       with all nine contract rows recorded in this repository's own tree
-- [ ] [AI] The byte-identity boundary holds: `apps/rhino-cli/**` and
+- [x] [AI] The byte-identity boundary holds: `apps/rhino-cli/**` and
       `specs/apps/rhino/behavior/rhino-cli/gherkin/**` checksums match `ose-public`'s merged `main`
       with zero carve-outs
-- [ ] [AI] PR 2 is merged and CI is green on this repository's `origin/main`
-- [ ] [AI] The honesty note exists here too:
+- [x] [AI] PR 2 is merged and CI is green on this repository's `origin/main`
+- [x] [AI] The honesty note exists here too:
       `grep -ci "does not govern" docs/reference/platform-bindings.md` returns at least `1`
-- [ ] [AI] This repository's worktree is removed and its local `main` equals `origin/main`
+- [x] [AI] This repository's worktree is removed and its local `main` equals `origin/main`
 
 > **Pause Safety**: `ose-primer` is fully delivered and merged; `ose-infra` may still be untouched,
 > which is consistent because each repository's binding is independent. Safe to stop indefinitely.
@@ -1885,28 +1885,28 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Topology detection and worktree provisioning
 
-- [ ] [AI] Detect this repository's git topology: run `git worktree list` in the `ose-infra` root and
+- [x] [AI] Detect this repository's git topology: run `git worktree list` in the `ose-infra` root and
       read whether the first entry is annotated `(bare)`
       — acceptance: recorded in this checklist. **Do NOT use
       `git rev-parse --is-bare-repository`** — same reasoning as Phase 6. At authoring time this
       repository was observed with `bare = false` and a `.git/` directory; the runtime detection is
       authoritative.
-- [ ] [AI] If bare, use the bare-repo method (`git -c core.bare=false --work-tree=…`, plus `GIT_DIR`
+- [x] [AI] If bare, use the bare-repo method (`git -c core.bare=false --work-tree=…`, plus `GIT_DIR`
       / `GIT_WORK_TREE` for `rhino-cli` and binding-sync invocations)
       — acceptance: the chosen method is recorded
-- [ ] [AI] Provision the worktree:
+- [x] [AI] Provision the worktree:
       `git worktree add worktrees/adopt-cursor-platform-binding -b adopt-cursor-platform-binding origin/main`
       — acceptance: `test -d worktrees/adopt-cursor-platform-binding` returns 0
-- [ ] [AI] Initialise the toolchain: `npm install && npm run doctor -- --fix`
+- [x] [AI] Initialise the toolchain: `npm install && npm run doctor -- --fix`
       — acceptance: both exit 0
 
 ### Propagate the shared source
 
-- [ ] [AI] Copy the merged `apps/rhino-cli/**` and
+- [x] [AI] Copy the merged `apps/rhino-cli/**` and
       `specs/apps/rhino/behavior/rhino-cli/gherkin/**` from `ose-public`'s post-Phase-5 `main`
       — acceptance: checksums of `cursor.rs`, `tests/cursor_binding.rs`, `Cargo.toml`, and
       `cursor-binding.feature` are identical to `ose-public`'s
-- [ ] [AI] Confirm it builds and passes here:
+- [x] [AI] Confirm it builds and passes here:
       `npx nx run rhino-cli:test:quick && cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: both exit 0 with `19` cucumber scenarios passed. Deliberately NOT
       `test:integration` here: that target runs `cargo test --tests` (every binary, including
@@ -1917,29 +1917,29 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Registry flip and generated output
 
-- [ ] [AI] Apply row **S1** — flip this repository's `repo-config.yml` `cursor` entry
+- [x] [AI] Apply row **S1** — flip this repository's `repo-config.yml` `cursor` entry
       — acceptance: `grep -c "tier: generated" repo-config.yml` returns `3` and
       `grep -c "tier: native" repo-config.yml` returns `6`
-- [ ] [AI] Generate the mirror: `npx nx run rhino-cli:run -- harness bindings generate`
+- [x] [AI] Generate the mirror: `npx nx run rhino-cli:run -- harness bindings generate`
       — acceptance: exits 0 and `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `53`
-- [ ] [AI] Assert this repository's own pin counts (DD-12):
+- [x] [AI] Assert this repository's own pin counts (DD-12):
       `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `53`, and
       `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
       — acceptance: every agent file carries the non-fast literal and none carries the fast slug
-- [ ] [AI] Assert the emitter's own README-skip and CLI-absence facts (the live probe from Phase 5
+- [x] [AI] Assert the emitter's own README-skip and CLI-absence facts (the live probe from Phase 5
       is not repeated here):
       `test -e .cursor/agents/README.md; echo $?` prints `1`, and
       `test -e .cursor/cli.json; echo $?` prints `1`
       — acceptance: both hold
-- [ ] [AI] Prove idempotency: run `harness bindings generate` twice
+- [x] [AI] Prove idempotency: run `harness bindings generate` twice
       — acceptance: `git status --short .cursor/` prints nothing after the second run
-- [ ] [AI] Re-run the **CLI evidence contract** in this tree and record it in
+- [x] [AI] Re-run the **CLI evidence contract** in this tree and record it in
       `evidence/phase-7-ose-infra-cli.txt` plus `evidence/phase-7-bindings-validate.json`,
       sanitizing any private hostname or path to a `<placeholder>` before the file is written —
       this repository is proprietary and its evidence lands in a public plan folder
       — acceptance: all nine rows present, both falsifiability rows recording a non-zero exit
       followed by a restored clean tree, and no raw private hostname or inventory in the file
-- [ ] [AI] Confirm the full test suite passes now that this repository's own registry flip has
+- [x] [AI] Confirm the full test suite passes now that this repository's own registry flip has
       landed: `npx nx run rhino-cli:test:integration`
       — acceptance: exits 0. This target runs `cargo test --tests` (every binary, including
       `specs_tree.rs`), whose post-flip tier assertions (fixed in Phase 2 Cycle B) now match this
@@ -1948,85 +1948,85 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Governance sweep — shared rows plus `ose-infra`'s own
 
-- [ ] [AI] Apply shared rows **S2-S10** exactly as in Phase 4, against this repository's copies.
+- [x] [AI] Apply shared rows **S2-S10** exactly as in Phase 4, against this repository's copies.
       **Exception — S10's `.husky/pre-push` half does NOT hold "NO CHANGE" in this repository**:
       record S10's `.husky/pre-commit` half as NO CHANGE as usual, but for `.husky/pre-push` record
       that a real change is required here (unlike `ose-public`/`ose-primer`, where NO CHANGE truly
       holds) — see the dedicated fix step below, which makes that change
       — acceptance: each row has a recorded verdict; S10's `.husky/pre-push` verdict explicitly
       points at the dedicated fix step rather than asserting NO CHANGE
-- [ ] [AI] **I1** — update the Cursor row in this repository's capability table. **Its real column
+- [x] [AI] **I1** — update the Cursor row in this repository's capability table. **Its real column
       name is "Current ose-infra state" (not "Status")**, and that column reads `Absent`, not
       `Reserved` — a step written against the literal `Reserved`, or against a column named
       `Status`, would not match here.
       — acceptance: the `Current ose-infra state` cell no longer reads `Absent` and names the
       generated tier
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] **I2** — append the dated amendment note under this repository's
+- [x] [AI] **I2** — append the dated amendment note under this repository's
       `### Optional thin pointers` heading, matching its own opening phrasing ("**this repo** ships
       no optional thin pointer files …"), using the sentinel phrase "Amended for the agent surface
       only" verbatim
       — acceptance: `grep -ci "amended for the agent surface only" docs/reference/platform-bindings.md`
       returns at least `1` (returned `0` before this step) and the note is appended under the
       correct heading in this repo's phrasing
-- [ ] [AI] **I3** — add the Cursor model-translation subsection under `## Translation Artifacts`,
+- [x] [AI] **I3** — add the Cursor model-translation subsection under `## Translation Artifacts`,
       using **this repository's "to" spelling** (`Claude Code to OpenCode`), not the `→` arrow the
       other two use
       — acceptance: `grep -c "Claude Code to Cursor" docs/reference/platform-bindings.md` returns `1`
-- [ ] [AI] **I4** — repoint the `## Adding a New Platform Binding` worked example and add the
+- [x] [AI] **I4** — repoint the `## Adding a New Platform Binding` worked example and add the
       registry step
       — acceptance: the procedure names `repo-config.yml` and no longer uses `.cursor/rules/` as its
       hypothetical example
-- [ ] [AI] **I5** — add the out-of-reach onboarding note with the same honesty framing as P5 and R6
+- [x] [AI] **I5** — add the out-of-reach onboarding note with the same honesty framing as P5 and R6
       — acceptance: `grep -ci "does not govern" docs/reference/platform-bindings.md` returns at
       least `1`
-- [ ] [AI] **I6** — rewrite the Cursor bullet under `### Active Tier-1 bindings` in this
+- [x] [AI] **I6** — rewrite the Cursor bullet under `### Active Tier-1 bindings` in this
       repository's `multi-harness-binding.md`; the surrounding list also documents Copilot's tooling
       directories, so anchor on the Cursor bullet text itself
       — acceptance: the bullet mentions both `AGENTS.md` and `.cursor/agents/`
-- [ ] [AI] **I7** — record **NO CHANGE** for this repository's
+- [x] [AI] **I7** — record **NO CHANGE** for this repository's
       `governance-vendor-independence.md`: it carries **no binding-catalog table at all**, only
       vendor-lexicon mentions, so no row here states the old rule
       — acceptance:
       `git diff --stat repo-governance/conventions/structure/governance-vendor-independence.md`
       prints nothing
-- [ ] [AI] **I8** — add the Cursor full-tier-collapse mapping to this repository's `model-selection.md`,
+- [x] [AI] **I8** — add the Cursor full-tier-collapse mapping to this repository's `model-selection.md`,
       including the `composer-2.5-fast` prohibition, which has no
       `### Model ID Mapping` subsection and is shorter than the other two copies; add it in this
       repo's own shape
       — acceptance: `grep -c "Composer" repo-governance/development/agents/model-selection.md`
       returns at least `1` (returned `0` before)
-- [ ] [AI] **I9** — record **NO CHANGE** for `AGENTS.md`: this copy does not mention Cursor at all
+- [x] [AI] **I9** — record **NO CHANGE** for `AGENTS.md`: this copy does not mention Cursor at all
       — acceptance: `grep -ci "cursor" AGENTS.md` returns `0` before and after, and
       `git diff --stat AGENTS.md` prints nothing
-- [ ] [AI] **I10** — in `CLAUDE.md`, fix the "**dual** compatibility" framing under
+- [x] [AI] **I10** — in `CLAUDE.md`, fix the "**dual** compatibility" framing under
       `### Multi-harness configuration (Claude Code + OpenCode)` — **a heading that differs from both
       other repositories** — and add `.cursor/` without inventing `.amazonq/`
       — acceptance: `grep -c "\.cursor/" CLAUDE.md` returns at least `1`, and
       `grep -c "amazonq" CLAUDE.md` is unchanged
-- [ ] [AI] **I11** — add the model-pin drift dimension to this repository's
+- [x] [AI] **I11** — add the model-pin drift dimension to this repository's
       `.claude/agents/repo-harness-compatibility-checker.md`, in its own wording (its content differs
       from both other copies)
       — acceptance: `grep -ci "model-pin\|model pin" .claude/agents/repo-harness-compatibility-checker.md`
       returns at least `1`
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] **I12** — **VERIFY THEN DECIDE**: run the P12 check against this repository's
+- [x] [AI] **I12** — **VERIFY THEN DECIDE**: run the P12 check against this repository's
       `.claude/agents/repo-harness-compatibility-fixer.md`
       — acceptance: changed, or the verdict "no independent enumeration — NO CHANGE" recorded here
-- [ ] [AI] **I13** — **VERIFY THEN DECIDE**: run this repository's own
+- [x] [AI] **I13** — **VERIFY THEN DECIDE**: run this repository's own
       `npx prettier --check ".cursor/agents/**/*.md"`; its `.prettierignore` differs from both other
       copies. Also run this repository's own `npx markdownlint-cli2 ".cursor/agents/*.md"`; its
       `.markdownlint-cli2.jsonc` is an independent copy too (`tech-docs.md §Markdownlint Interaction`)
       — acceptance: either the Prettier check exits 0, or `grep -c "cursor/agents" .prettierignore`
       returns `1`; AND either the markdownlint check exits 0, or
       `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`
-- [ ] [AI] **I14** — record **NO CHANGE** for the orphan `.opencode/agents/ci-monitor-subagent.md`,
+- [x] [AI] **I14** — record **NO CHANGE** for the orphan `.opencode/agents/ci-monitor-subagent.md`,
       which has no `.claude/agents/` source and survives only via the hardcoded skip in
       `harness_validate_naming.rs`. It is pre-existing, out of this plan's scope, and routed to a
       `plans/backlog/` follow-up during Knowledge Capture — **not** fixed here.
       — acceptance: `git diff --stat .opencode/agents/ci-monitor-subagent.md` prints nothing, and a
       `learnings.md` entry records the orphan for Phase 8 triage
-- [ ] [AI] Fix a pre-existing, plan-independent gap in this repository's own `.husky/pre-push`: its
+- [x] [AI] Fix a pre-existing, plan-independent gap in this repository's own `.husky/pre-push`: its
       `harness bindings validate` trigger regex (the `if echo "$CHANGED" | grep -qE` line guarding
       that command) is missing `\.cursor/`, unlike `ose-public`'s and `ose-primer`'s equivalent
       regex lines, which both already include it — add `\.cursor/` to this repository's regex so it
@@ -2035,29 +2035,29 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: `grep -n 'harness bindings validate' -B1 .husky/pre-push` shows the trigger
       regex containing `\.cursor/` after this edit; `grep -c '\.cursor/'` on that specific regex
       line returns a value `>= 1` (returns `0` today, confirmed as the before-value)
-- [ ] [AI] Re-sync platform bindings: `npm run generate:bindings`
+- [x] [AI] Re-sync platform bindings: `npm run generate:bindings`
       — acceptance: exits 0; running it twice leaves `git status --short .opencode/ .cursor/` empty
-- [ ] [AI] Run the markdown gates: `npm run lint:md:fix` — acceptance: exits 0
+- [x] [AI] Run the markdown gates: `npm run lint:md:fix` — acceptance: exits 0
 
 ### Integration
 
-- [ ] [AI] Run the **Local Quality Gates (Before Push)** standing section, substituting this
+- [x] [AI] Run the **Local Quality Gates (Before Push)** standing section, substituting this
       repository's own governance target names as declared in its `apps/rhino-cli/project.json`
       — acceptance: every command exits 0
-- [ ] [AI] Commit and push to `origin adopt-cursor-platform-binding`, staging explicit paths only
+- [x] [AI] Commit and push to `origin adopt-cursor-platform-binding`, staging explicit paths only
       — acceptance: `git push` exits 0
-- [ ] [AI] Open a draft PR against `main` with the honest reach boundary in its first paragraph
+- [x] [AI] Open a draft PR against `main` with the honest reach boundary in its first paragraph
       — acceptance: `gh pr list --head adopt-cursor-platform-binding --json number --jq 'length'`
       returns `1` in **this** repository
-- [ ] [AI] Run the **Post-Push CI Verification** standing section
+- [x] [AI] Run the **Post-Push CI Verification** standing section
       — acceptance: every check's `conclusion` is `success`
-- [ ] [AI] Run the **PR-Review Maker→Fixer Cycle** (three sequential CI-gated cycles)
+- [x] [AI] Run the **PR-Review Maker→Fixer Cycle** (three sequential CI-gated cycles)
       — acceptance: three completed cycles, final CI green
-- [ ] [AI] Mark ready and merge PR 3 once the hardened preconditions hold
+- [x] [AI] Mark ready and merge PR 3 once the hardened preconditions hold
       — acceptance: `gh pr view --json state --jq '.state'` returns `MERGED`
-- [ ] [AI] Fast-forward this repository's local `main` after the merge
+- [x] [AI] Fast-forward this repository's local `main` after the merge
       — acceptance: local `main` equals `origin/main`
-- [ ] [AI] Remove the worktree after reading its `git status --short` and recovering any uncommitted
+- [x] [AI] Remove the worktree after reading its `git status --short` and recovering any uncommitted
       evidence: `git worktree remove worktrees/adopt-cursor-platform-binding`
       — acceptance: `test -d worktrees/adopt-cursor-platform-binding` returns non-zero
 
@@ -2065,27 +2065,27 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before Phase 8.
 
-- [ ] [AI] Every `ose-infra` row has a recorded verdict — applied, or explicitly **NO CHANGE** with
+- [x] [AI] Every `ose-infra` row has a recorded verdict — applied, or explicitly **NO CHANGE** with
       its reason.
       `/usr/bin/grep -c '^- \[x\] \[AI\] \*\*I[0-9]' plans/in-progress/adopt-cursor-platform-binding/delivery.md`
       equals `14`. The `I[0-9]` marker is phase-unique — every occurrence in the whole file is this
       phase's — so a whole-file grep gives the exact phase-scoped count. Falsifiable: a skipped row
       leaves the count below 14.
-- [ ] [AI] Both shared-row steps in this phase are ticked — the `Apply row **S1**` step and the
+- [x] [AI] Both shared-row steps in this phase are ticked — the `Apply row **S1**` step and the
       `Apply shared rows **S2-S10**` step — so all ten shared rows have a verdict here too
-- [ ] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `53`, every file carries the non-fast
+- [x] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `53`, every file carries the non-fast
       literal, and `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
-- [ ] [AI] `evidence/phase-7-ose-infra-cli.txt` and `evidence/phase-7-bindings-validate.json` exist,
+- [x] [AI] `evidence/phase-7-ose-infra-cli.txt` and `evidence/phase-7-bindings-validate.json` exist,
       carry all nine contract rows, and contain no raw private hostname, inventory, or absolute
       home path
-- [ ] [AI] The byte-identity boundary holds against `ose-public`'s merged `main`, zero carve-outs
-- [ ] [AI] PR 3 is merged and CI is green on this repository's `origin/main`
-- [ ] [AI] The honesty note exists here too:
+- [x] [AI] The byte-identity boundary holds against `ose-public`'s merged `main`, zero carve-outs
+- [x] [AI] PR 3 is merged and CI is green on this repository's `origin/main`
+- [x] [AI] The honesty note exists here too:
       `grep -ci "does not govern" docs/reference/platform-bindings.md` returns at least `1`
-- [ ] [AI] No infra-private content (real hostnames, inventories, Terraform or k3s specifics) was
+- [x] [AI] No infra-private content (real hostnames, inventories, Terraform or k3s specifics) was
       copied into any file destined for `ose-public` or `ose-primer` — this repository does not
       participate in the parity loop
-- [ ] [AI] This repository's worktree is removed and its local `main` equals `origin/main`
+- [x] [AI] This repository's worktree is removed and its local `main` equals `origin/main`
 
 > **Pause Safety**: `ose-infra` is fully delivered and merged. If Phase 6 is also complete, all three
 > repositories are consistent; if not, the remaining one is untouched, which is still a consistent
@@ -2099,55 +2099,55 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 > Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md).
 
-- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
+- [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface would
       catch this automatically next time; discard the rest with a one-line reason
       — acceptance: every entry has either a route or a discard reason
-- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
+- [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
       credential, token, or private hostname to a `<placeholder>` token, or discard if unsanitizable
       — acceptance: `learnings.md` contains no raw secret. This plan touched `ose-infra`, so this
       gate is load-bearing, not ceremonial.
-- [ ] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content
+- [x] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content
       (Terraform, k3s, Proxmox, real hostnames or inventories) stays in `ose-infra` only and is NEVER
       cross-routed into `ose-public` or `ose-primer`; public-governance content may propagate via the
       existing parity loop
       — acceptance: no infra-private content appears in this repository's routed output
-- [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
+- [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
       matrix — non-code homes may land inline (small edit) or as a `plans/backlog/` follow-up
       (large); code homes (`apps/`, `libs/`, tests) are ALWAYS filed as a separate
       `plans/backlog/<slug>/` plan and NEVER landed inline
       — acceptance: every `learnings.md` entry records its terminal routing state
-- [ ] [AI] File the `ose-infra` `.opencode/agents/ci-monitor-subagent.md` orphan (row I14) as its own
+- [x] [AI] File the `ose-infra` `.opencode/agents/ci-monitor-subagent.md` orphan (row I14) as its own
       `plans/backlog/<slug>/` plan — it is a code-and-config home, so it is never landed inline in
       this plan's commits
       — acceptance: the backlog plan folder exists and `learnings.md` records the routing
-- [ ] [AI] File the `ose-primer` governance-target naming divergence (`vendor-audit` versus
+- [x] [AI] File the `ose-primer` governance-target naming divergence (`vendor-audit` versus
       `vendor validate`) as either an inline governance note or a `plans/backlog/` follow-up,
       whichever the routing matrix indicates
       — acceptance: `learnings.md` records the routing decision with its reason
-- [ ] [AI] Route the Phase 3 Prettier decision (which branch each repository took) into whichever
+- [x] [AI] Route the Phase 3 Prettier decision (which branch each repository took) into whichever
       durable surface owns generated-output formatting, so the next generated binding does not
       re-derive it
       — acceptance: `learnings.md` records the route or the discard reason
-- [ ] [AI] Route the `validate_catalog_coverage` limitation (a coarse substring match, so AC-14 is
+- [x] [AI] Route the `validate_catalog_coverage` limitation (a coarse substring match, so AC-14 is
       real in a fixture and vacuous in the real tree) — this is exactly the kind of finding a durable
       surface should catch next time
       — acceptance: `learnings.md` records the route or the discard reason
-- [ ] [AI] If no generalizable learning survived, record the explicit escape in `learnings.md`:
+- [x] [AI] If no generalizable learning survived, record the explicit escape in `learnings.md`:
       `No generalizable learnings — <one-line reason>`
       — acceptance: `learnings.md` is never silently empty
-- [ ] [AI] Commit and push the plan-docs changes to `origin main`, staging only
+- [x] [AI] Commit and push the plan-docs changes to `origin main`, staging only
       `plans/` paths — acceptance: `git push` exits 0
 
 ### Phase 8 Gate
 
 > All checks below must pass before Plan Archival.
 
-- [ ] [AI] Every `learnings.md` entry is in a terminal state (routed inline, filed as backlog, or
+- [x] [AI] Every `learnings.md` entry is in a terminal state (routed inline, filed as backlog, or
       discarded with reason), or the file records the explicit "none" escape
-- [ ] [AI] No code-homed learning landed inline in any of this plan's three PRs
-- [ ] [AI] Both safety gates were applied to every surviving entry, and no infra-private content
+- [x] [AI] No code-homed learning landed inline in any of this plan's three PRs
+- [x] [AI] Both safety gates were applied to every surviving entry, and no infra-private content
       crossed into `ose-public` or `ose-primer`
-- [ ] [AI] `npm run lint:md:fix` exits 0 and leaves no unstaged changes
+- [x] [AI] `npm run lint:md:fix` exits 0 and leaves no unstaged changes
 
 > **Pause Safety**: `learnings.md` is fully triaged (or explicitly recorded as empty); no future
 > process depends on querying it later. Safe to stop indefinitely. To resume: re-read `learnings.md`
@@ -2160,56 +2160,56 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 > landing inside PR 1; see `tech-docs.md` DD-8 for why the Three-repo nuance does not apply
 > literally when PR 1 is a prerequisite for PR 2 and PR 3._
 
-- [ ] [AI] Verify ALL delivery checklist items above are ticked
+- [x] [AI] Verify ALL delivery checklist items above are ticked
       — acceptance: no unticked `- [ ]` remains outside this Plan Archival section
-- [ ] [AI] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a
+- [x] [AI] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a
       terminal state (routed inline, filed as a `plans/backlog/` plan, or discarded with reason) or
       the file records the explicit `No generalizable learnings — <reason>` escape; both the
       secret/sensitivity gate and the repo-relevance gate were applied to every surviving entry
-- [ ] [AI] Verify ALL quality gates pass in all three repositories (local + CI)
-- [ ] [AI] Verify all three PRs are merged: PR 1 in `ose-public`, PR 2 in `ose-primer`, PR 3 in
+- [x] [AI] Verify ALL quality gates pass in all three repositories (local + CI)
+- [x] [AI] Verify all three PRs are merged: PR 1 in `ose-public`, PR 2 in `ose-primer`, PR 3 in
       `ose-infra` — acceptance: each `gh pr view --json state --jq '.state'` returns `MERGED`
-- [ ] [AI] Verify the manual assertions pass with committed evidence in `evidence/`: the live
+- [x] [AI] Verify the manual assertions pass with committed evidence in `evidence/`: the live
       subagent probe artifacts from Phase 5 and the CLI evidence contract file from Phase 3
       — acceptance: all nine evidence artifacts exist — `evidence/phase-0-baseline.txt`,
       `evidence/phase-3-ose-public-cli.txt`, `evidence/phase-3-bindings-validate.json`,
       `evidence/phase-5-cursor-subagent-model.png`, `evidence/phase-5-probe.md`,
       `evidence/phase-6-ose-primer-cli.txt`, `evidence/phase-6-bindings-validate.json`,
       `evidence/phase-7-ose-infra-cli.txt`, and `evidence/phase-7-bindings-validate.json`
-- [ ] [AI] Locale coverage: **NOT APPLICABLE** — this plan ships no user-facing localized surface.
+- [x] [AI] Locale coverage: **NOT APPLICABLE** — this plan ships no user-facing localized surface.
       Record the declaration rather than leaving it silent.
-- [ ] [AI] Rule-15 EWT/UWT/DWT retest: **NOT APPLICABLE** — no web UI. Rule-16 AET retest: **NOT
+- [x] [AI] Rule-15 EWT/UWT/DWT retest: **NOT APPLICABLE** — no web UI. Rule-16 AET retest: **NOT
       APPLICABLE** — no API endpoint. Both declared in the Surface-Conditional Gates standing
       section.
-- [ ] [AI] Remove the `ose-public` worktree after reading its `git status --short` and recovering
+- [x] [AI] Remove the `ose-public` worktree after reading its `git status --short` and recovering
       any uncommitted evidence: `git worktree remove worktrees/adopt-cursor-platform-binding`
       — acceptance: `test -d worktrees/adopt-cursor-platform-binding` returns non-zero. The sibling
       worktrees were already removed in Phases 6 and 7.
-- [ ] [AI] Rename and move using **today's** date as the completion date (not the creation date):
+- [x] [AI] Rename and move using **today's** date as the completion date (not the creation date):
       `git mv plans/in-progress/adopt-cursor-platform-binding/ plans/done/YYYY-MM-DD__adopt-cursor-platform-binding/`
       — acceptance: `test -d plans/in-progress/adopt-cursor-platform-binding` returns non-zero and
       the `plans/done/` path exists
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with its completion date
-- [ ] [AI] Update any other README that references this plan (for example `plans/README.md`)
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with its completion date
+- [x] [AI] Update any other README that references this plan (for example `plans/README.md`)
       — acceptance: `grep -rl "adopt-cursor-platform-binding" plans/*.md plans/*/README.md` names no
       file still pointing at the `in-progress` path
-- [ ] [AI] Commit the archival (the `evidence/` subfolder moves with the plan):
+- [x] [AI] Commit the archival (the `evidence/` subfolder moves with the plan):
       `chore(plans): move adopt-cursor-platform-binding to done`
-- [ ] [AI] Push to `origin main` — acceptance: `git push` exits 0
+- [x] [AI] Push to `origin main` — acceptance: `git push` exits 0
 
 ### Phase 9 Gate
 
 > The plan is complete when every check below passes.
 
-- [ ] [AI] The plan folder lives under `plans/done/YYYY-MM-DD__adopt-cursor-platform-binding/` with
+- [x] [AI] The plan folder lives under `plans/done/YYYY-MM-DD__adopt-cursor-platform-binding/` with
       its `evidence/` subfolder intact
-- [ ] [AI] All three README indexes are consistent — no index still lists the plan as in-progress
-- [ ] [AI] All three repositories have a merged PR, green CI on `main`, and a generated
+- [x] [AI] All three README indexes are consistent — no index still lists the plan as in-progress
+- [x] [AI] All three repositories have a merged PR, green CI on `main`, and a generated
       `.cursor/agents/` mirror matching their own roster (90 / 64 / 53)
-- [ ] [AI] No worktree named `adopt-cursor-platform-binding` remains in any of the three
+- [x] [AI] No worktree named `adopt-cursor-platform-binding` remains in any of the three
       repositories — acceptance: `git worktree list` in each names none
-- [ ] [AI] `npm run lint:md:fix` exits 0 and `git status --short` is clean
+- [x] [AI] `npm run lint:md:fix` exits 0 and `git status --short` is clean
 
 > **Pause Safety**: the plan is archived, all three PRs are merged, and every worktree is removed.
 > This is the terminal state — nothing is left to resume.
