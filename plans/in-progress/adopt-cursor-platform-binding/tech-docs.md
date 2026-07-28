@@ -125,17 +125,27 @@ sequenceDiagram
     Dev->>PP: git push
     PP->>RC: harness bindings validate (path-gated on .cursor/ etc.)
     RC-->>PP: byte-parity + catalog coverage verdict
-    PP-->>Dev: push blocked on any mismatch
+    PP-->>Dev: push blocked on any mismatch — the ONLY gate for bindings parity
     Dev->>CI: PR opened
-    CI->>RC: harness bindings validate (server-side)
-    RC-->>CI: same verdict, recomputed
+    CI->>CI: runs harness naming/duplication/instruction-size checks — NOT bindings validate
 ```
+
+`harness bindings validate` runs **only** in the client-side `.husky/pre-push` hook
+[Repo-grounded — `grep -rn "bindings" .github/workflows/` returns zero hits across all of
+`ose-public`'s workflow files]. No GitHub Actions workflow re-runs it server-side; `pr-quality-gate.yml`
+runs sibling `rhino-cli` checks (`harness naming validate`, `harness duplication validate`,
+`instruction-size validate`, and others) but never `harness bindings validate` itself. A push made
+with `--no-verify` (bypassing the pre-push hook) would therefore reach the PR with no independent
+CI re-check of binding parity.
 
 Every repository's pre-commit hook already runs `harness bindings generate` and auto-stages its
 output — step 3 in `ose-public` and `ose-primer`, step 5 in `ose-infra` [Repo-grounded — the three
-`.husky/pre-commit` files]. Every repository's pre-push hook already triggers
-`harness bindings validate` and `harness naming validate` [Repo-grounded — the three `.husky/pre-push`
-files]. **No hook or workflow file needs editing in any repo.**
+`.husky/pre-commit` files]. `ose-public`'s and `ose-primer`'s pre-push hooks already trigger
+`harness bindings validate` on any `.cursor/` change [Repo-grounded — the two `.husky/pre-push`
+files]. **`ose-infra`'s pre-push hook is the one exception**: its `harness bindings validate`
+trigger regex omits `\.cursor/` [Repo-grounded — `ose-infra`'s `.husky/pre-push`], so Phase 7 makes
+one hook edit there to add it, matching the other two repositories' pattern exactly. No other hook
+or workflow file needs editing in any repo.
 
 ## The Three-Repo Landing Model
 
@@ -537,13 +547,15 @@ under `specs/apps/rhino/behavior/rhino-cli/gherkin/` follows a shape consistent 
 `repo-config`, `repo-config-validate`, `repo-governance`, `spec-coverage`, `specs`, `test-coverage`,
 and `workflows` are each consumed by exactly one binary via a directory-mode `feature_dir()`
 [Repo-grounded — read each directory's owning `tests/*.rs`'s `feature_dir()` directly; a directory
-listing alone cannot establish which binary consumes which file, only reading `feature_dir()` can].
+listing alone cannot establish which binary consumes which file, only reading each binary's own
+`feature_dir()` or `feature_file()` can].
 `system/` is the lone exception: it holds **two** feature files, `cargo-target-share.feature` and
 `doctor.feature`, each bound file-by-file (not directory-mode) to its own dedicated binary —
 `apps/rhino-cli/tests/cargo_target_share.rs` and `apps/rhino-cli/tests/doctor.rs` respectively, each
-of which points `feature_dir()` at the single named `.feature` file rather than the parent `system/`
-directory, with an explicit comment in both files noting the sibling file its own binary does not
-consume [Repo-grounded — read `apps/rhino-cli/tests/cargo_target_share.rs` lines 981-991 and
+of which defines its own `feature_file()` — not `feature_dir()` — pointed at the single named
+`.feature` file rather than the parent `system/` directory, with an explicit comment in both files
+noting the sibling file its own binary does not consume [Repo-grounded — read
+`apps/rhino-cli/tests/cargo_target_share.rs` lines 981-991 and
 `apps/rhino-cli/tests/doctor.rs` lines 449-460 directly]. This is an equally safe shape, since the
 actual invariant this plan relies on is "no two binaries directory-scan the same leaf," not "one
 binary per directory." `harness/` was never meant to be a shared directory; it is simply
@@ -689,6 +701,40 @@ different checksums [Repo-grounded], all three lack any `cursor` entry (count 0 
 three already ignore `.amazonq/` (count 1 in each). The starting position is therefore the same but
 the surrounding rules are not, so `ose-public`'s exit code is not evidence for the other two. Each
 landing phase records its own exit code and its own decision.
+
+## Markdownlint Interaction — Verify, Do Not Assume
+
+The Prettier hazard above has an identical sibling hazard in markdownlint. `.markdownlint-cli2.jsonc`'s
+`ignores` array contains no `.cursor/` entry [Repo-grounded — `.markdownlint-cli2.jsonc`'s `ignores`
+list], and `npm run lint:md:fix` (`markdownlint-cli2 --fix "**/*.md"`) is invoked by several of this
+plan's own delivery/gate steps across all three landing phases. Since `.cursor/agents/*.md` files are
+markdown and not excluded, a `markdownlint --fix` run during this plan's own execution could silently
+rewrite the generated `.cursor/agents/*.md` files, breaking the same byte-identity and idempotency
+assumptions (`harness bindings generate` run twice leaves `git status --short .cursor/` empty) the
+Prettier section above already reasoned through.
+
+**Baseline evidence, not a substitute for the real check**: the structurally-analogous existing
+generated tier, `.opencode/agents/*.md` (91 files, same generator, no explicit
+`.markdownlint-cli2.jsonc` exclusion), passes `npx markdownlint-cli2 ".opencode/agents/*.md"` today
+with **0 errors** [Repo-grounded — command run against the live tree]. This is evidence the
+generator's output shape is markdownlint-clean by default, but it is Cursor-specific frontmatter
+(the model-pin encoding, the field-dropping rules) that could differ from OpenCode's, so the
+conclusion is not assumed to transfer automatically — the delivery step runs the same falsifiable
+check against the actual `.cursor/agents/*.md` output:
+
+```bash
+npx markdownlint-cli2 ".cursor/agents/*.md"
+```
+
+- **Exit 0** → markdownlint considers the generated output already clean; record "no
+  `.markdownlint-cli2.jsonc` exclusion needed" (matching the `.opencode/` precedent) with the command
+  output pasted into `delivery.md`.
+- **Non-zero** → add a `.cursor/agents/**/*.md` entry to `.markdownlint-cli2.jsonc`'s `ignores` array
+  (with the same explanatory comment style as its existing entries), re-run, and confirm exit 0.
+
+Both outcomes are acceptable; guessing between them is not. **Run the check three times, once per
+repository**, for the same reason as the Prettier check: the three `.markdownlint-cli2.jsonc` files
+are independent copies and a decision in one repository is not evidence for the other two.
 
 ## Testing Strategy
 
@@ -883,14 +929,18 @@ otherwise.
 | `CLAUDE.md`                                                               | Row P10       | Row R11 ("dual" framing)   | Row I10            |
 | `.claude/agents/repo-harness-compatibility-checker.md`                    | Row P11       | Row R12                    | Row I11            |
 | `.prettierignore`                                                         | Row P13       | Row R14                    | Row I13            |
+| `.markdownlint-cli2.jsonc`                                                | Row P13       | Row R14                    | Row I13            |
 
 ### Files deliberately untouched, in every repo
 
-`.husky/pre-push`, `.husky/pre-commit`, `.github/workflows/*`, `docs/reference/sdlc-gate-standard.md`,
+`.husky/pre-commit`, `.github/workflows/*`, `docs/reference/sdlc-gate-standard.md`,
 `repo-governance/conventions/structure/instruction-file-size-budget.md`, the `instruction-size`
 section of `repo-config.yml`, and `apps/rhino-cli/src/internal/agents.rs` (a re-export shim) — all
 already correct for this change, per verdict rows S2, S8, S9, S10 and the path-correction note in the
-Architecture section.
+Architecture section. **`.husky/pre-push` is untouched in `ose-public` and `ose-primer` only** — both
+already trigger `harness bindings validate` on `.cursor/` changes. `ose-infra`'s copy is the one
+exception: Phase 7 edits it to add the missing `\.cursor/` trigger (see
+`tech-docs.md §Gate sequence` above).
 
 `ose-infra`'s `.opencode/agents/ci-monitor-subagent.md` is also deliberately untouched (verdict row
 I14) — pre-existing, recorded, routed to backlog rather than fixed inside this plan.

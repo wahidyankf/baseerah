@@ -466,8 +466,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 - [ ] [AI] **RED (specs_tree.rs regression)**: `apps/rhino-cli/tests/specs_tree.rs` is the sole
       other test file that loads this repository's own `repo-config.yml` via `find_root_from(None)`
-      plus `repo_config::load` (confirmed the only hit via `grep -rn
-"find_root_from(None)\|repo_config::load" apps/rhino-cli/tests/*.rs`). Its
+      plus `repo_config::load` (confirmed the only hit via `grep -rn "find_root_from(None)\|repo_config::load" apps/rhino-cli/tests/*.rs`). Its
       `then_hb_generated_tier` and `then_hb_native_tier` step definitions hardcode the pre-flip tier
       counts and membership, so the registry rewrite in the GREEN step above breaks them
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test specs_tree`
@@ -483,8 +482,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       `assert_eq!(generated.len(), 3, ...)` and add `assert!(generated.contains(&"cursor"));`
       alongside the existing `opencode`/`amazonq` assertions; in `then_hb_native_tier`, change
       `assert_eq!(native.len(), 7, ...)` to `assert_eq!(native.len(), 6, ...)` and remove `"cursor"`
-      from the expected-names array (`["copilot", "cursor", "windsurf", "junie", "antigravity",
-"pi", "aider"]` drops `"cursor"`)
+      from the expected-names array (`["copilot", "cursor", "windsurf", "junie", "antigravity", "pi", "aider"]` drops `"cursor"`)
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test specs_tree`
       — acceptance: all `specs_tree` scenarios pass, including `then_hb_all_11_listed` (unaffected —
       Cursor still appears among the 11 harness names regardless of tier)
@@ -1278,6 +1276,15 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: either `npx prettier --check ".cursor/agents/**/*.md"` exits 0 with no changes,
       or `grep -c "cursor/agents" .prettierignore` returns `1`; record which branch was taken in
       `learnings.md`
+- [ ] [AI] Decide the markdownlint disposition for `.cursor/agents/**` — the same hazard class as
+      the Prettier step above, since six-plus delivery steps in this plan invoke `npm run lint:md:fix`
+      (`markdownlint-cli2 --fix "**/*.md"`), and `.markdownlint-cli2.jsonc`'s `ignores` array has no
+      `.cursor/` entry today. Run `npx markdownlint-cli2 ".cursor/agents/*.md"` — if it reports errors,
+      add a `.cursor/agents/**/*.md` entry to `.markdownlint-cli2.jsonc`'s `ignores` array (see
+      `tech-docs.md §Markdownlint Interaction`)
+      — acceptance: either `npx markdownlint-cli2 ".cursor/agents/*.md"` exits 0 with no errors, or
+      `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`; record which branch was taken in
+      `learnings.md`
 - [ ] [AI] Prove idempotency on the real tree: run
       `npx nx run rhino-cli:run -- harness bindings generate` a second time
       — acceptance: `git status --short .cursor/` prints nothing after the second run
@@ -1356,10 +1363,24 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       in count while `git diff` shows only comment lines altered
 - [ ] [AI] **S4** — move Cursor out of the native-tier clause in
       `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/harness-bindings.feature` (the clause naming
-      "the native tier (Copilot, Cursor, Windsurf, …)") into the generated-tier clause
-      — acceptance: `npx nx run rhino-cli:specs:behavior:coverage` still exits 0, and
-      `grep -c "Cursor" specs/apps/rhino/behavior/rhino-cli/gherkin/specs/harness-bindings.feature`
-      is unchanged
+      "the native tier (Copilot, Cursor, Windsurf, …)") into the generated-tier clause, so the
+      generated-tier clause reads "the generated tier (OpenCode, Amazon Q, Cursor) is regenerated and
+      byte-parity-validated" and the native-tier clause drops Cursor from its parenthetical list. In
+      the SAME step, update the two `#[then("...")]` literal-string matchers in
+      `apps/rhino-cli/tests/specs_tree.rs` (currently at the lines matching `the generated tier (OpenCode, Amazon Q) is regenerated...`
+      and `the native tier (Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider) is validated...`)
+      so both literal strings are byte-identical,
+      word for word, to the rewritten feature-file clauses — `specs_tree.rs`'s `main` runs
+      `.fail_on_skipped()`, so a feature-text edit with no matching step-matcher edit makes the whole
+      `specs_tree` binary fail on an unmatched step
+      — acceptance: `grep -c 'the generated tier (OpenCode, Amazon Q, Cursor)' specs/apps/rhino/behavior/rhino-cli/gherkin/specs/harness-bindings.feature`
+      returns `1` (returns `0` before this step); the identical literal string
+      `the generated tier (OpenCode, Amazon Q, Cursor) is regenerated and byte-parity-validated`
+      appears exactly once inside a `#[then("...")]` attribute in `apps/rhino-cli/tests/specs_tree.rs`
+      (proving the feature text and the step matcher are in sync); and
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test specs_tree` exits `0` after this
+      edit (falsifiable: it exits non-zero — an unmatched-step failure, not an assertion failure — if
+      the feature text is edited without updating the matcher, or vice versa)
 - [ ] [AI] **S5** — create `specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/README.md`
       _New file_ indexing the new directory's sole `cursor-binding.feature` file, following the
       shape of an existing sibling topic README (e.g.
@@ -1437,9 +1458,22 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       returns at least `1` (returned `0` before)
 - [ ] [AI] **P9** — amend the `AGENTS.md` line that groups Cursor with tools that "read root
       `AGENTS.md` natively … no per-tool instruction file", so it still says Cursor reads
-      `AGENTS.md` but now also carries a generated agent binding
+      `AGENTS.md` but now also carries a generated agent binding. **Byte-budget constraint —
+      verify before writing, do not assume it fits**: `wc -c AGENTS.md` measures `29978` bytes
+      today against `repo-config.yml`'s `instruction-size.surfaces` `AGENTS.md` (and `**/AGENTS.md`)
+      `fail: 30000` threshold — only `22` bytes of headroom. Word the added Cursor-exception clause
+      as tightly as possible; if it still doesn't net to `<= 22` added bytes (likely — even a short
+      clause such as ", but also emits a generated Cursor agent binding" exceeds 22 bytes), trim an
+      equal or greater number of bytes from adjacent wording in the same paragraph or another
+      low-value sentence nearby, in this SAME step, so the file nets to zero or negative growth. Do
+      not defer the trim to a later step or leave the file over budget.
       — acceptance: `grep -c "Cursor" AGENTS.md` is unchanged while `git diff AGENTS.md` shows the
-      grouping line rewritten
+      grouping line rewritten; `wc -c AGENTS.md` returns a value `<= 30000` (hard falsifiable
+      ceiling — the pre-edit value is `29978`, record the post-edit value and the net byte delta in
+      this step's completion notes); and `npx nx run rhino-cli:instruction-size:validation` exits
+      `0`. FYI (not a separate acceptance clause, only 439 bytes of slack so watch it on any future
+      CLAUDE.md edit): the `resolved_tree` composite (`CLAUDE.md` + its `@AGENTS.md` import) measures
+      `37561` bytes against a `fail: 38000` threshold in the same `repo-config.yml` section.
 - [ ] [AI] **P10** — in `CLAUDE.md`, add `.cursor/` to the secondary generated-artifact set under
       `### Multi-harness configuration (Claude Code + OpenCode + Amazon Q)` and extend the heading to
       name Cursor
@@ -1455,9 +1489,12 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       or bindings independently of the catalog
       — acceptance: either the file is changed and `git diff` shows the enumeration updated, or the
       verdict "no independent enumeration — NO CHANGE" is recorded in this checklist
-- [ ] [AI] **P13** — **VERIFY THEN DECIDE**: apply whichever Prettier branch Phase 3 selected
-      — acceptance: matches the Phase 3 Prettier decision exactly; if `.prettierignore` gained a
-      `.cursor/agents/` line, `grep -c "cursor/agents" .prettierignore` returns `1`
+- [ ] [AI] **P13** — **VERIFY THEN DECIDE**: apply whichever Prettier branch Phase 3 selected, and
+      the same for the markdownlint check (`tech-docs.md §Markdownlint Interaction`)
+      — acceptance: matches the Phase 3 Prettier decision exactly (if `.prettierignore` gained a
+      `.cursor/agents/` line, `grep -c "cursor/agents" .prettierignore` returns `1`) and matches the
+      Phase 3 markdownlint decision exactly (if `.markdownlint-cli2.jsonc` gained a
+      `.cursor/agents/**/*.md` entry, `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`)
 - [ ] [AI] Re-sync the platform bindings after touching `.claude/agents/`:
       `npm run generate:bindings`
       — acceptance: exits 0 and `git status --short .opencode/ .amazonq/` reflects only the expected
@@ -1752,9 +1789,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: changed, or the verdict "no independent enumeration — NO CHANGE" recorded here
 - [ ] [AI] **R14** — **VERIFY THEN DECIDE**: run this repository's own
       `npx prettier --check ".cursor/agents/**/*.md"`. Its `.prettierignore` differs from
-      `ose-public`'s, so the Phase 3 decision does not transfer automatically.
-      — acceptance: either the check exits 0 with no changes, or
-      `grep -c "cursor/agents" .prettierignore` returns `1`
+      `ose-public`'s, so the Phase 3 decision does not transfer automatically. Also run this
+      repository's own `npx markdownlint-cli2 ".cursor/agents/*.md"` — its `.markdownlint-cli2.jsonc`
+      is an independent copy, so the Phase 3 markdownlint decision does not transfer automatically
+      either (`tech-docs.md §Markdownlint Interaction`)
+      — acceptance: either the Prettier check exits 0 with no changes, or
+      `grep -c "cursor/agents" .prettierignore` returns `1`; AND either the markdownlint check exits
+      0 with no errors, or `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`
 - [ ] [AI] Re-sync platform bindings: `npm run generate:bindings`
       — acceptance: exits 0; running it twice leaves `git status --short .opencode/ .cursor/` empty
 - [ ] [AI] Run the markdown gates: `npm run lint:md:fix` — acceptance: exits 0
@@ -1893,8 +1934,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Governance sweep — shared rows plus `ose-infra`'s own
 
-- [ ] [AI] Apply shared rows **S2-S10** exactly as in Phase 4, against this repository's copies
-      — acceptance: each row has a recorded verdict
+- [ ] [AI] Apply shared rows **S2-S10** exactly as in Phase 4, against this repository's copies.
+      **Exception — S10's `.husky/pre-push` half does NOT hold "NO CHANGE" in this repository**:
+      record S10's `.husky/pre-commit` half as NO CHANGE as usual, but for `.husky/pre-push` record
+      that a real change is required here (unlike `ose-public`/`ose-primer`, where NO CHANGE truly
+      holds) — see the dedicated fix step below, which makes that change
+      — acceptance: each row has a recorded verdict; S10's `.husky/pre-push` verdict explicitly
+      points at the dedicated fix step rather than asserting NO CHANGE
 - [ ] [AI] **I1** — update the Cursor row in this repository's capability table. **Its real column
       name is "Current ose-infra state" (not "Status")**, and that column reads `Absent`, not
       `Reserved` — a step written against the literal `Reserved`, or against a column named
@@ -1954,15 +2000,26 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: changed, or the verdict "no independent enumeration — NO CHANGE" recorded here
 - [ ] [AI] **I13** — **VERIFY THEN DECIDE**: run this repository's own
       `npx prettier --check ".cursor/agents/**/*.md"`; its `.prettierignore` differs from both other
-      copies
-      — acceptance: either the check exits 0, or `grep -c "cursor/agents" .prettierignore` returns
-      `1`
+      copies. Also run this repository's own `npx markdownlint-cli2 ".cursor/agents/*.md"`; its
+      `.markdownlint-cli2.jsonc` is an independent copy too (`tech-docs.md §Markdownlint Interaction`)
+      — acceptance: either the Prettier check exits 0, or `grep -c "cursor/agents" .prettierignore`
+      returns `1`; AND either the markdownlint check exits 0, or
+      `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`
 - [ ] [AI] **I14** — record **NO CHANGE** for the orphan `.opencode/agents/ci-monitor-subagent.md`,
       which has no `.claude/agents/` source and survives only via the hardcoded skip in
       `harness_validate_naming.rs`. It is pre-existing, out of this plan's scope, and routed to a
       `plans/backlog/` follow-up during Knowledge Capture — **not** fixed here.
       — acceptance: `git diff --stat .opencode/agents/ci-monitor-subagent.md` prints nothing, and a
       `learnings.md` entry records the orphan for Phase 8 triage
+- [ ] [AI] Fix a pre-existing, plan-independent gap in this repository's own `.husky/pre-push`: its
+      `harness bindings validate` trigger regex (the `if echo "$CHANGED" | grep -qE` line guarding
+      that command) is missing `\.cursor/`, unlike `ose-public`'s and `ose-primer`'s equivalent
+      regex lines, which both already include it — add `\.cursor/` to this repository's regex so it
+      matches the other two repositories' pattern exactly. This is independent of whether this plan
+      ever executes: the gap exists in `ose-infra` today regardless.
+      — acceptance: `grep -n 'harness bindings validate' -B1 .husky/pre-push` shows the trigger
+      regex containing `\.cursor/` after this edit; `grep -c '\.cursor/'` on that specific regex
+      line returns a value `>= 1` (returns `0` today, confirmed as the before-value)
 - [ ] [AI] Re-sync platform bindings: `npm run generate:bindings`
       — acceptance: exits 0; running it twice leaves `git status --short .opencode/ .cursor/` empty
 - [ ] [AI] Run the markdown gates: `npm run lint:md:fix` — acceptance: exits 0
