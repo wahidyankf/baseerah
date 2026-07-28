@@ -1,9 +1,11 @@
-//! `harness bindings generate` — runs `OpenCode` sync then Amazon Q emit-bindings.
+//! `harness bindings generate` — runs `OpenCode` sync, Cursor emit, then Amazon Q emit-bindings.
 //!
-//! Combines the `OpenCode` sync (`.claude/` → `.opencode/`) and Amazon Q emit-bindings
-//! (`.claude/` → `.amazonq/`) into a single idempotent command.  Use `--harness opencode`
-//! or `--harness amazonq` to regenerate only one platform binding.  Legacy per-step flags
-//! `--opencode=false` and `--amazonq=false` are still accepted for compatibility.
+//! Combines the `OpenCode` sync (`.claude/` → `.opencode/`), Cursor emit
+//! (`.claude/` → `.cursor/agents/`), and Amazon Q emit-bindings
+//! (`.claude/` → `.amazonq/`) into a single idempotent command. Use
+//! `--harness opencode`, `--harness cursor`, or `--harness amazonq` to
+//! regenerate only one platform binding. Legacy per-step flags `--opencode=false`
+//! and `--amazonq=false` are still accepted for compatibility.
 
 use std::path::Path;
 
@@ -12,8 +14,10 @@ use clap::Args;
 
 use crate::domain::cliout::OutputFormat;
 use crate::internal::agents::bindings::{emit_bindings, expected_bindings};
+use crate::internal::agents::converter::ConvertAllResult;
+use crate::internal::agents::cursor::convert_all_cursor_agents;
 use crate::internal::agents::reporter::{format_sync_json, format_sync_markdown, format_sync_text};
-use crate::internal::agents::sync::{SyncOptions, sync_all};
+use crate::internal::agents::sync::{SyncOptions, SyncResult, sync_all};
 use crate::internal::git;
 
 /// CLI arguments for `harness bindings generate`.
@@ -22,14 +26,17 @@ pub struct GenerateBindingsArgs {
     /// Run the `OpenCode` sync step (`.claude/` → `.opencode/`).
     #[arg(long, default_value = "true")]
     pub opencode: bool,
+    /// Run the Cursor emit step (`.claude/` → `.cursor/agents/`).
+    #[arg(long, default_value = "true")]
+    pub cursor: bool,
     /// Run the Amazon Q emit-bindings step (`.claude/` → `.amazonq/`).
     #[arg(long, default_value = "true")]
     pub amazonq: bool,
-    /// Regenerate only the named harness binding: `opencode` or `amazonq`.
-    /// Overrides `--opencode` / `--amazonq` flags when present.
+    /// Regenerate only the named harness binding: `opencode`, `cursor`, or `amazonq`.
+    /// Overrides `--opencode` / `--cursor` / `--amazonq` flags when present.
     #[arg(long, value_name = "NAME")]
     pub harness: Option<String>,
-    /// Preview changes without modifying files (applies to `OpenCode` sync).
+    /// Preview changes without modifying files (applies to `OpenCode` and Cursor sync).
     #[arg(long = "dry-run")]
     pub dry_run: bool,
     /// Verbose output.
@@ -40,14 +47,14 @@ pub struct GenerateBindingsArgs {
     pub quiet: bool,
 }
 
-/// Runs `OpenCode` sync and Amazon Q emit-bindings in sequence.  If neither
-/// `--opencode` nor `--amazonq` is effectively enabled the command exits
-/// with an error.
+/// Runs `OpenCode` sync, Cursor emit, and Amazon Q emit-bindings in sequence. If
+/// none of the steps is effectively enabled the command exits with an error.
 ///
 /// # Errors
 ///
 /// Returns an error if the git repository root cannot be found, if the
-/// `OpenCode` sync fails, or if the Amazon Q emit-bindings step fails.
+/// `OpenCode` sync fails, if the Cursor emit step fails, or if the Amazon Q
+/// emit-bindings step fails.
 pub fn run(
     args: &GenerateBindingsArgs,
     output_format: OutputFormat,
@@ -55,23 +62,28 @@ pub fn run(
     // --harness <name> overrides the per-step flags when present.
     let run_opencode = match args.harness.as_deref() {
         Some("opencode") => true,
-        Some("amazonq") => false,
+        Some("cursor" | "amazonq") => false,
         Some(other) => {
             return Err(anyhow!(
-                "unknown harness name '{other}'; expected 'opencode' or 'amazonq'"
+                "unknown harness name '{other}'; expected 'opencode', 'cursor', or 'amazonq'"
             ));
         }
         None => args.opencode,
     };
+    let run_cursor = match args.harness.as_deref() {
+        Some("cursor") => true,
+        Some("opencode" | "amazonq") => false,
+        _ => args.cursor,
+    };
     let run_amazonq = match args.harness.as_deref() {
-        Some("opencode") => false,
         Some("amazonq") => true,
+        Some("opencode" | "cursor") => false,
         _ => args.amazonq,
     };
 
-    if !run_opencode && !run_amazonq {
+    if !run_opencode && !run_cursor && !run_amazonq {
         return Err(anyhow!(
-            "at least one of --opencode or --amazonq must be enabled"
+            "at least one of --opencode, --cursor, or --amazonq must be enabled"
         ));
     }
 
@@ -80,6 +92,10 @@ pub fn run(
 
     if run_opencode {
         run_opencode_sync(args, &repo_root, output_format)?;
+    }
+
+    if run_cursor {
+        run_cursor_emit(args, &repo_root, output_format)?;
     }
 
     if run_amazonq {
@@ -122,6 +138,53 @@ fn run_opencode_sync(
         ));
     }
     Ok(())
+}
+
+/// Run the Cursor emit sub-step.
+fn run_cursor_emit(
+    args: &GenerateBindingsArgs,
+    repo_root: &Path,
+    output_format: OutputFormat,
+) -> std::result::Result<(), Error> {
+    let result = convert_all_cursor_agents(repo_root, args.dry_run)
+        .map_err(|e| anyhow!("cursor emit failed: {e}"))?;
+
+    if !args.quiet {
+        let sync_result = cursor_result_to_sync(&result);
+        match output_format {
+            OutputFormat::Text => {
+                print!(
+                    "{}",
+                    format_sync_text(&sync_result, args.verbose, args.quiet)
+                        .replace("OpenCode", "Cursor")
+                );
+            }
+            OutputFormat::Json => println!("{}", format_sync_json(&sync_result)?),
+            OutputFormat::Markdown => print!(
+                "{}",
+                format_sync_markdown(&sync_result).replace("OpenCode", "Cursor")
+            ),
+        }
+    }
+
+    if !result.failed_files.is_empty() {
+        return Err(anyhow!(
+            "cursor emit completed with {} failures",
+            result.failed_files.len()
+        ));
+    }
+    Ok(())
+}
+
+/// Map a Cursor `ConvertAllResult` into the shared sync reporter shape.
+fn cursor_result_to_sync(result: &ConvertAllResult) -> SyncResult {
+    SyncResult {
+        agents_converted: result.converted,
+        agents_failed: result.failed,
+        failed_files: result.failed_files.clone(),
+        warnings: result.warnings.clone(),
+        ..SyncResult::default()
+    }
 }
 
 /// Run the Amazon Q emit-bindings sub-step.
@@ -233,6 +296,7 @@ mod tests {
     fn args_defaults() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: true,
             amazonq: true,
             harness: None,
             dry_run: false,
@@ -248,6 +312,7 @@ mod tests {
     fn both_disabled_is_error() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: false,
@@ -264,6 +329,7 @@ mod tests {
     fn opencode_only_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: false,
@@ -278,6 +344,7 @@ mod tests {
     fn amazonq_only_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: None,
             dry_run: false,
@@ -292,6 +359,7 @@ mod tests {
     fn both_enabled_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: true,
             amazonq: true,
             harness: None,
             dry_run: false,
@@ -305,6 +373,7 @@ mod tests {
     fn verbose_flag_set_correctly() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: false,
@@ -319,6 +388,7 @@ mod tests {
     fn dry_run_flag_set_correctly() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: true,
@@ -332,6 +402,7 @@ mod tests {
     fn quiet_flag_set_correctly() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: false,
@@ -345,6 +416,7 @@ mod tests {
     fn opencode_json_output_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: false,
@@ -358,6 +430,7 @@ mod tests {
     fn opencode_markdown_output_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: false,
@@ -371,6 +444,7 @@ mod tests {
     fn amazonq_json_output_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: None,
             dry_run: false,
@@ -384,6 +458,7 @@ mod tests {
     fn amazonq_markdown_output_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: None,
             dry_run: false,
@@ -397,6 +472,7 @@ mod tests {
     fn dry_run_opencode_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: None,
             dry_run: true,
@@ -410,6 +486,7 @@ mod tests {
     fn harness_opencode_overrides_amazonq_flag() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: Some("opencode".to_string()),
             dry_run: false,
@@ -425,6 +502,7 @@ mod tests {
     fn harness_amazonq_overrides_opencode_flag() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: false,
             amazonq: false,
             harness: Some("amazonq".to_string()),
             dry_run: false,
@@ -438,6 +516,7 @@ mod tests {
     fn harness_unknown_name_is_error() {
         let a = GenerateBindingsArgs {
             opencode: true,
+            cursor: true,
             amazonq: true,
             harness: Some("unknown".to_string()),
             dry_run: false,
@@ -458,6 +537,7 @@ mod tests {
     fn amazonq_dry_run_text_output_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: None,
             dry_run: true,
@@ -475,6 +555,7 @@ mod tests {
     fn amazonq_dry_run_json_output_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: None,
             dry_run: true,
@@ -489,6 +570,7 @@ mod tests {
     fn amazonq_dry_run_markdown_output_runs_without_panic() {
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: None,
             dry_run: true,
@@ -506,6 +588,7 @@ mod tests {
         // `emit_bindings`).
         let a = GenerateBindingsArgs {
             opencode: false,
+            cursor: false,
             amazonq: true,
             harness: Some("amazonq".to_string()),
             dry_run: true,

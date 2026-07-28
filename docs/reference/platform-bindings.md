@@ -30,7 +30,7 @@ adding support for a given tool.
 | OpenCode                                                | Yes                                                                                                                                                                                    | `.opencode/agents/` (auto-synced); reads `.claude/skills/` natively                                            | `opencode.json`                                                                                 | `.opencode/agents/*.md`                                                                                             | reads `.claude/skills/`                   | Active                                                   |
 | OpenAI Codex CLI                                        | Yes (since Apr 2025)                                                                                                                                                                   | `AGENTS.override.md` (overrides), `.codex/config.toml`                                                         | `.codex/config.toml` `[mcp_servers]`                                                            | `[agents.<name>]` in `config.toml` (with optional `config_file` pointer to a TOML layer, e.g. `.codex/<name>.toml`) | `.agents/skills/`                         | Partial (`.codex/` exists)                               |
 | GitHub Copilot                                          | Yes (nearest file wins)                                                                                                                                                                | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`                                    | `.vscode/mcp.json`                                                                              | `.github/agents/*.agent.md`                                                                                         | n/a                                       | Reserved (reads root `AGENTS.md`; `.github/` is CI-only) |
-| Cursor                                                  | Yes                                                                                                                                                                                    | `.cursor/rules/*.mdc` (+ legacy `.cursorrules`)                                                                | `.cursor/mcp.json`                                                                              | `.cursor/agents/*.md` (also reads `.claude/agents/`, `.codex/agents/`)                                              | `.cursor/skills/`                         | Reserved                                                 |
+| Cursor                                                  | Yes                                                                                                                                                                                    | `.cursor/rules/*.mdc` (+ legacy `.cursorrules`)                                                                | `.cursor/mcp.json`                                                                              | `.cursor/agents/*.md` (generated from `.claude/agents/`)                                                            | `.cursor/skills/`                         | Active (generated agent surface)                         |
 | Windsurf                                                | Yes                                                                                                                                                                                    | `.windsurf/rules/*.md`, `.windsurf/workflows/`                                                                 | global only                                                                                     | not officially documented                                                                                           | `.windsurf/skills/` (unverified)          | Reserved                                                 |
 | JetBrains Junie                                         | Yes — `.junie/AGENTS.md` outranks root `AGENTS.md`                                                                                                                                     | `.junie/AGENTS.md`, `.junie/rules/*.md` (imports `.claude/agents/`, `.codex/agents/`, `.claude/skills/`)       | `.junie/mcp/mcp.json`                                                                           | `.junie/agents/`, `.agents/`                                                                                        | `.junie/skills/<name>/SKILL.md`           | Reserved                                                 |
 | Amazon Q Developer (superseded by Kiro CLI — see below) | Q Developer CLI: No (feature request #2712, still open and never resolved for that product). **Kiro CLI: Yes** — `AGENTS.md` at workspace root or `~/.kiro/steering/`, always included | Q Developer: `.amazonq/rules/*.md` (via agent JSON `resources`) → Kiro: `.kiro/steering/`, `~/.kiro/steering/` | Q Developer: `.amazonq/mcp.json` → Kiro: `.kiro/settings/mcp.json`, `~/.kiro/settings/mcp.json` | Q Developer: JSON in `.amazonq/` / `~/.aws/amazonq/cli-agents/` → Kiro: `.kiro/agents/`, `~/.kiro/agents/`          | Q Developer: none → Kiro: `.kiro/skills/` | Sunsetting (IDE plugins EOS 2027-04-30)                  |
@@ -178,10 +178,15 @@ bridge is generated, because Amazon Q does not read `AGENTS.md` natively. If a t
 later, it must be a pure `AGENTS.md` pointer emitted by `rhino-cli agents emit-bindings` and covered
 by `rhino-cli agents validate-bindings`.
 
+**Amended for the agent surface only (2026-07-28):** the standing "no thin pointer files" decision
+is amended for the agent surface only — `.cursor/agents/` is generated from `.claude/agents/` and is
+not an instruction-surface thin pointer. The instruction surface (rules, `AGENTS.md` read) is unchanged;
+no `.cursor/rules/*.mdc` files are shipped by default.
+
 ## Translation Artifacts
 
 Mechanical translations that platform bindings apply when generating output from upstream sources.
-All translations are performed by `rhino-cli agents sync` (`npm run generate:bindings`).
+All translations are performed by `rhino-cli harness bindings generate` (`npm run generate:bindings`).
 
 ### Color Translation (Claude Code → OpenCode)
 
@@ -223,6 +228,32 @@ planning-grade inheritance. OpenCode uses Zhipu AI GLM model IDs.
 | `sonnet`/omit (inherit) | `opencode-go/glm-5.2`    | Execution                           |
 | `haiku`                 | `opencode-go/minimax-m3` | Fast                                |
 
+### Model ID Translation (Claude Code → Cursor)
+
+Cursor agent frontmatter uses Cursor-native model IDs. The emitter implements **full tier collapse**
+onto the non-fast Composer 2.5 identifier — every Claude alias maps to the same pin.
+
+- **Source**: `.claude/agents/<name>.md` frontmatter `model:` field (or omitted)
+- **Transform**: `convert_cursor_model` in `apps/rhino-cli/src/application/agents/cursor.rs`
+- **Sink**: `.cursor/agents/<name>.md` frontmatter `model:` field
+- **Policy**: [Model Selection Convention](../../repo-governance/development/agents/model-selection.md)
+  ("Platform Binding Examples" section — Cursor full-tier collapse)
+
+| Claude Code alias       | Cursor model ID | Capability tier                     |
+| ----------------------- | --------------- | ----------------------------------- |
+| `opus`                  | `composer-2.5`  | Thinking (collapsed onto execution) |
+| `sonnet`/omit (inherit) | `composer-2.5`  | Execution                           |
+| `haiku`                 | `composer-2.5`  | Fast (collapsed — avoids 6× toggle) |
+
+**The emitter must never write `composer-2.5-fast`.** That slug is the six-times-priced fast
+inference toggle; this binding exists to pin delegated subagents off it.
+
+### Cursor model-pin reach
+
+The `model:` pin in `.cursor/agents/` governs **delegated subagents** launched from those files. It
+**does not govern** the interactive Cursor Agent session's model, the `cursor-agent` CLI default,
+or anything running under Auto/Router mode — those surfaces are outside repository-file control.
+
 ### Tool Translation (Claude Code → OpenCode)
 
 Claude Code agent frontmatter lists tools as an array of string names. OpenCode uses a
@@ -235,12 +266,12 @@ Claude Code agent frontmatter lists tools as an array of string names. OpenCode 
 
 ## Adding a New Platform Binding
 
-To add a new binding (e.g., `.cursor/rules/`):
+To add a new generated binding:
 
-1. Create the binding directory and its root instruction file (or confirm `AGENTS.md` suffices).
+1. Add a `harness:` entry to `repo-config.yml` (tier, agent-dir, mirrors, instruction surfaces, shadow globs).
 2. Add a row to the Platform Binding Directories table above.
-3. Identify any per-field translations needed (`rhino-cli agents sync` applies them).
-4. Implement translations in `apps/rhino-cli/src/internal/agents/converter.rs` and add Rust integration tests.
+3. Implement the converter in `apps/rhino-cli/src/application/agents/` and wire it into `harness bindings generate`.
+4. Add Rust integration tests and Gherkin scenarios under `specs/apps/rhino/behavior/rhino-cli/gherkin/`.
 5. Update this document's Translation Artifacts section.
 
 ## Related

@@ -915,7 +915,7 @@ fn then_hb_all_11_listed(w: &mut SpecsTreeWorld) {
     }
 }
 
-#[then("the generated tier (OpenCode, Amazon Q) is regenerated and byte-parity-validated")]
+#[then("the generated tier (OpenCode, Amazon Q, Cursor) is regenerated and byte-parity-validated")]
 fn then_hb_generated_tier(w: &mut SpecsTreeWorld) {
     let generated: Vec<&str> = w
         .hb_harness
@@ -923,9 +923,10 @@ fn then_hb_generated_tier(w: &mut SpecsTreeWorld) {
         .filter(|h| h.tier == "generated")
         .map(|h| h.name.as_str())
         .collect();
-    assert_eq!(generated.len(), 2, "generated tier: {generated:?}");
+    assert_eq!(generated.len(), 3, "generated tier: {generated:?}");
     assert!(generated.contains(&"opencode"));
     assert!(generated.contains(&"amazonq"));
+    assert!(generated.contains(&"cursor"));
 
     let result = w.hb_result.as_ref().expect("validate_bindings ran");
     assert_eq!(result.failed_checks, 0, "result: {result:#?}");
@@ -941,21 +942,13 @@ fn then_hb_generated_tier(w: &mut SpecsTreeWorld) {
 }
 
 #[then(
-    "the native tier (Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget"
+    "the native tier (Copilot, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget"
 )]
 fn then_hb_native_tier(w: &mut SpecsTreeWorld) {
     let native: Vec<&HarnessEntry> = w.hb_harness.iter().filter(|h| h.tier == "native").collect();
     let native_names: Vec<&str> = native.iter().map(|h| h.name.as_str()).collect();
-    assert_eq!(native.len(), 7, "native tier: {native_names:?}");
-    for expected in [
-        "copilot",
-        "cursor",
-        "windsurf",
-        "junie",
-        "antigravity",
-        "pi",
-        "aider",
-    ] {
+    assert_eq!(native.len(), 6, "native tier: {native_names:?}");
+    for expected in ["copilot", "windsurf", "junie", "antigravity", "pi", "aider"] {
         assert!(
             native_names.contains(&expected),
             "missing native harness {expected:?} in {native_names:?}"

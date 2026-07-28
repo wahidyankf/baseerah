@@ -210,7 +210,7 @@ command surface accounts for **all eleven**, each at its tier. [Repo-grounded �
 | Amazon Q Developer     | **generated**       | `.amazonq/rules/`, `.amazonq/cli-agents/` (emitted bridge) | `harness bindings generate --harness amazonq` writes · `harness bindings validate` byte-parity  |
 | OpenAI Codex CLI       | **source + config** | `.codex/config.toml` (+ subagent toml); reads `AGENTS.md`  | `harness bindings validate` — config present, **no** `.codex/agents/` dir                       |
 | GitHub Copilot         | **native**          | none (reads `AGENTS.md`); `.vscode/mcp.json` only          | `harness bindings validate` — **no-shadowing** + `AGENTS.md` budget                             |
-| Cursor                 | **native**          | none (reads `AGENTS.md`); `.cursor/mcp.json` only          | `harness bindings validate` — **no-shadowing** (`.cursor/rules`) + budget                       |
+| Cursor                 | **generated**       | `.cursor/agents/` (synced from `.claude/`)                  | `harness bindings validate` — byte-parity + naming mirror                                       |
 | Windsurf               | **native**          | none (reads `AGENTS.md`)                                   | `harness bindings validate` — **no-shadowing** (`.windsurf/rules`) + budget                     |
 | JetBrains Junie        | **native**          | none (reads `AGENTS.md`; `.junie/AGENTS.md` ranks above)   | `harness bindings validate` — **no-shadowing** (`.junie/guidelines.md`) + budget                |
 | Google Antigravity CLI | **native**          | none (reads `AGENTS.md`; `GEMINI.md` ranks above)          | `harness bindings validate` — **no-shadowing** (`GEMINI.md`) + budget                           |
@@ -238,7 +238,7 @@ driven by the `harness:` registry (not hard-coded):
    invariants already coded (`.codex/config.toml` present, no `.codex/agents/` directory) plus
    `.claude/` format via the **merged** `harness claude validate`
    ([§3.3](#merge-and-drop-recommendations)).
-3. **Native tier** (Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider) —
+3. **Native tier** (Copilot, Windsurf, Junie, Antigravity, Pi, Aider) —
    `harness bindings validate` asserts the **no-shadowing rule** (no per-tool instruction file masks
    `AGENTS.md`: `.github/copilot-instructions.md`, `.cursor/rules`, `.windsurf/rules`,
    `.junie/guidelines.md`, `GEMINI.md`, `CONVENTIONS.md` either **absent** or a thin pointer) **and**

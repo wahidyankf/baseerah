@@ -203,7 +203,7 @@ Each AI coding platform that integrates with this repository has a dedicated bin
 | -------------- | ----------------------------------------- | ----------------------------------------- | -------- |
 | Claude Code    | `.claude/`                                | `CLAUDE.md` (shim → `AGENTS.md`)          | Active   |
 | OpenCode       | `.opencode/agents/`                       | `AGENTS.md` (read natively)               | Active   |
-| Cursor         | `.cursor/rules/`                          | `AGENTS.md` (also reads `.cursor/rules/`) | Reserved |
+| Cursor         | `.cursor/agents/` (generated), `.cursor/rules/` (optional) | `AGENTS.md` (read natively)               | Active   |
 | GitHub Copilot | `.github/copilot-instructions.md`         | `AGENTS.md` (coding-agent mode)           | Reserved |
 | Others         | see `docs/reference/platform-bindings.md` | `AGENTS.md`                               | Varies   |
 
