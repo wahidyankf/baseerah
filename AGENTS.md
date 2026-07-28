@@ -489,8 +489,7 @@ Concrete tool integrations live **outside** `repo-governance/` in platform-bindi
 - **OpenCode** → `.opencode/agents/` (auto-synced from `.claude/`); reads this file (`AGENTS.md`)
   natively; reads agent skill files at `.claude/skills/<name>/SKILL.md` natively
 - **OpenAI Codex CLI** → reads `AGENTS.md` natively (`.codex/config.toml` present)
-- **GitHub Copilot, Cursor, Windsurf, JetBrains Junie, Google Antigravity CLI, Pi** → read root
-  `AGENTS.md` natively (Tier-1); no per-tool instruction file shipped by default (see no-shadowing rule)
+- **GitHub Copilot, Cursor, Windsurf, Junie, Antigravity CLI, Pi** → read `AGENTS.md` natively (Tier-1); Cursor also emits `.cursor/agents/`; no other per-tool file (no-shadowing)
 - **Amazon Q Developer** (sunsetting — IDE plugins EOS 2027-04-30; succeeded by **Kiro CLI**, which
   reads `AGENTS.md` natively) → does not read `AGENTS.md` natively; receives a generated bridge under
   `.amazonq/` (`rules/00-agents-md.md` + a default agent config), emitted by `rhino-cli agents emit-bindings`

@@ -255,7 +255,8 @@ of 2026-05-24. They must not be committed with content that diverges from `AGENT
   `.claude/skills/`.
 - **OpenAI Codex CLI** — reads `AGENTS.md` natively since April 2025.
 - **GitHub Copilot** — reads `AGENTS.md` natively in coding-agent mode.
-- **Cursor** — reads `AGENTS.md` natively.
+- **Cursor** — reads `AGENTS.md` natively for instructions; agent definitions are generated at
+  `.cursor/agents/` from `.claude/agents/` by `rhino-cli agents sync`.
 - **Windsurf** — reads `AGENTS.md` natively.
 - **JetBrains Junie** — reads `AGENTS.md` natively (`.junie/AGENTS.md` takes precedence if present;
   Rule 3 prohibits creating `.junie/AGENTS.md` with divergent content).

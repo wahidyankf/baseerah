@@ -203,6 +203,20 @@ harness docs.
 
 **Default criticality**: MEDIUM (runtime behaviour may silently degrade)
 
+#### D7 — Cursor model-pin conformance (Cursor only)
+
+For the Cursor generated binding, every `.cursor/agents/*.md` file's `model:` field must match the
+pinned literal (`composer-2.5` per `apps/rhino-cli/src/application/agents/cursor.rs`). Report any
+agent whose `model:` drifts from the pin as a **model-pin drift** finding.
+
+- **Tool**: `grep -h "^model:" .cursor/agents/*.md | sort -u` and
+  `grep -r "composer-2.5-fast" .cursor/agents/`
+- **Pass**: exactly one distinct `model:` value and it equals the pinned literal; the fast slug is
+  absent
+- **Fail**: any other value or `composer-2.5-fast` present
+- **Default criticality**: HIGH (wrong pin may bill at 6× fast rates)
+- **Confidence**: HIGH (mechanical comparison)
+
 ## Workflow
 
 ### Step 0: Initialize Report
