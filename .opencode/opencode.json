@@ -34,10 +34,6 @@
     }
   },
   "mcp": {
-    "perplexity": {
-      "type": "local",
-      "command": ["npx", "-y", "@perplexity-ai/mcp-server"]
-    },
     "nx-mcp": {
       "type": "local",
       "command": ["npx", "-y", "nx-mcp"],

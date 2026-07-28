@@ -57,7 +57,7 @@ Repo maintains **multi-harness compatibility** with Claude Code, OpenCode, and A
 - **Skills**: NOT mirrored — OpenCode reads `.claude/skills/{name}/SKILL.md` natively per [opencode.ai/docs/skills](https://opencode.ai/docs/skills/). The validate:sync `No Synced Skill Mirror` check fails if a stale `.opencode/skill/` or `.opencode/skills/<claude-name>` mirror reappears.
 - **Permissions**: Claude Code uses `settings.json` permissions, OpenCode uses `opencode.json` permission block (both configured with equivalent access)
 - **Colors**: Claude Code agents use named colors (`blue`, `green`, `yellow`, `purple`, etc.) written by hand in `.claude/agents/*.md`. `rhino-cli agents sync` translates these to OpenCode theme tokens (`primary`, `success`, `warning`, `secondary`, etc.) when generating `.opencode/agents/*.md` — current OpenCode rejects named colors. See [Platform Binding Color Translation](./repo-governance/development/agents/ai-agents.md#platform-binding-color-translation) for the full mapping.
-- **MCP/Plugins**: Claude Code uses plugins (Context7, Playwright, Nx, LSPs), OpenCode uses MCP servers (Playwright, Nx, Perplexity)
+- **MCP/Plugins**: Claude Code uses plugins (Context7, Playwright, Nx, LSPs), OpenCode uses MCP servers (Playwright, Nx)
 
 **Security policy**: Only use skills from trusted sources. All skills in this repo maintained by project team.
 
