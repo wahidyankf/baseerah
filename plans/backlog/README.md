@@ -30,11 +30,18 @@ is now [in progress](../in-progress/ayokoding-learning-path-04-course-authoring/
   — **Wave 3, terminal for `skills/`.** The `conventional-erp` and `sharia-erp` paths, their corpus
   and their manifests.
 
-Standalone plan (outside the `ayokoding-learning-path-*` programme):
+Standalone plans (outside the `ayokoding-learning-path-*` programme):
 
 - [harden-ayokoding-www-fe-e2e-bulk-link-concurrency](./harden-ayokoding-www-fe-e2e-bulk-link-concurrency/README.md)
   — Bounds concurrency (and retries transient failures) in `ayokoding-www-fe-e2e`'s bulk-link-check
   helper, which currently fires every collected `href` at once.
+- [merge-queue-adoption](./merge-queue-adoption/README.md)
+  — Hardens merge-precondition (c) under concurrent integration; owns the merge-queue work deferred
+  from `worktree-to-pr-hardening`.
+- [ayokoding-www-tools-ai-benchmark](./ayokoding-www-tools-ai-benchmark/README.md)
+  — A public `/tools/ai-benchmark` page comparing capability and token price across the models
+  exposed by Codex, Claude Code, Cursor, OpenCode Go and OpenCode Zen, banded into `opus` /
+  `sonnet` / `light` classes.
 
 Other candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md); promote one
 here when it is ripe.
