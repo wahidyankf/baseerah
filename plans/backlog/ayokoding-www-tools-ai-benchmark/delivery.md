@@ -340,6 +340,39 @@ rev-parse --show-toplevel` prints the worktree path
 > **refines** the two committed SVG sources against the real design tokens it defines below, then
 > re-renders their `.png` artifacts, rather than producing either from nothing.
 
+### Band Design Tokens
+
+- [ ] [AI] **T-1 RED**: add `<FEAT>shell/band-tokens.unit.test.ts` asserting that `<TOKENS>` declares
+      `--chart-band-opus`, `--chart-band-sonnet`, `--chart-band-light`, and `--chart-band-unrated`
+      **in both** the light `@theme` block and the dark override block, by reading the file as text
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: the test fails, reporting the four missing declarations
+  - _Gherkin (underpins) → AC-38 ("Band colours meet contrast in both themes"), whose live-page
+    assertion lands in Phase 9._
+- [ ] [AI] **T-2 GREEN**: add the four tokens to `<TOKENS>` — in the `@theme` block aliasing
+      `var(--hue-plum)`, `var(--hue-teal)`, `var(--hue-honey)`, `var(--warm-400)` respectively, plus
+      the matching `-ink` and `-wash` aliases, and add the dark-mode counterparts inside the existing
+      `[data-theme="dark"], .dark` block
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: `band-tokens.unit.test.ts` passes and no other test regresses
+- [ ] [AI] **T-3 REFACTOR**: group the four band declarations under a single
+      `/* ── Chart band tokens ── */` comment in both blocks, matching the file's existing section
+      style — command: `npx nx run ayokoding-www:test:unit` — acceptance: all tests still pass
+- [ ] [AI] **T-4**: verify colour-blind separability and AA contrast of the three band hues against
+      both `--color-background` values, and additionally compute each of the four bands' (`opus`,
+      `sonnet`, `light`, `unrated`) approximate resolved sRGB hex value from its OKLCH definition —
+      record the computed OKLCH lightness deltas, contrast ratios, **and the four resolved hex
+      approximations** (one per band, under a `### Resolved hex approximations` heading, each as a
+      standalone `#`-prefixed 6-digit hex on its own line) in `<EV>phase-1-band-contrast.md`. D-1/D-2
+      below consume these four hex values to replace the mockup SVGs' placeholder fills.
+      — acceptance: the file records a ratio ≥ 4.5:1 for each band's `-ink` against its `-wash`, a hue
+      separation ≥ 105° between every band pair, **and exactly four distinct resolved hex values** —
+      `grep -oE "#[0-9A-Fa-f]{6}" <EV>phase-1-band-contrast.md | sort -u | wc -l` prints `4`. Any band
+      failing the contrast/hue checks is replaced with another existing hue and the file re-recorded.
+- [ ] [AI] **T-5**: confirm no new hex literal was introduced — acceptance:
+      `git diff -- <TOKENS> | grep -c '^+.*#[0-9a-fA-F]\{6\}'` prints `0` (the tokens alias existing
+      `--hue-*` and `--warm-*` variables). Falsifiable both ways: adding a raw hex makes it print ≥ 1.
+
 ### UI Design Funnel Delivery
 
 - [ ] [AI] **D-0 — Survey (R5)**: re-read `libs/web-ui/src/` component inventory, `<TOKENS>`, and
@@ -351,7 +384,7 @@ rev-parse --show-toplevel` prints the worktree path
     `swe-developing-frontend-ui` skill_
 - [ ] [AI] **D-1 — Refine hi-fi finalist A**: `<ASSETS>ai-benchmark-option-a-banded-panels.svg` (the
       editable source) and its rendered `<ASSETS>ai-benchmark-option-a-banded-panels.png` (the
-      artifact `prd.md` §Narrow embeds) already exist. Once T-1…T-5 below define the real
+      artifact `prd.md` §Narrow embeds) already exist. Once T-1…T-5 above define the real
       `--chart-band-*` tokens, re-open the SVG and replace its approximated hex fill values
       (`#CC78BC`/`#029E73`/`#DE8F05`/`#808080`) with the four resolved hex approximations T-4 records
       under `### Resolved hex approximations` in `<EV>phase-1-band-contrast.md`, then
@@ -389,46 +422,13 @@ rev-parse --show-toplevel` prints the worktree path
       — acceptance: `grep -ci "responsive" <PLAN>prd.md` prints at least `1` **and** the responsive
       table carries a row for every element in the selected layout
 
-### Band Design Tokens
-
-- [ ] [AI] **T-1 RED**: add `<FEAT>shell/band-tokens.unit.test.ts` asserting that `<TOKENS>` declares
-      `--chart-band-opus`, `--chart-band-sonnet`, `--chart-band-light`, and `--chart-band-unrated`
-      **in both** the light `@theme` block and the dark override block, by reading the file as text
-      — command: `npx nx run ayokoding-www:test:unit`
-      — acceptance: the test fails, reporting the four missing declarations
-  - _Gherkin (underpins) → AC-38 ("Band colours meet contrast in both themes"), whose live-page
-    assertion lands in Phase 9._
-- [ ] [AI] **T-2 GREEN**: add the four tokens to `<TOKENS>` — in the `@theme` block aliasing
-      `var(--hue-plum)`, `var(--hue-teal)`, `var(--hue-honey)`, `var(--warm-400)` respectively, plus
-      the matching `-ink` and `-wash` aliases, and add the dark-mode counterparts inside the existing
-      `[data-theme="dark"], .dark` block
-      — command: `npx nx run ayokoding-www:test:unit`
-      — acceptance: `band-tokens.unit.test.ts` passes and no other test regresses
-- [ ] [AI] **T-3 REFACTOR**: group the four band declarations under a single
-      `/* ── Chart band tokens ── */` comment in both blocks, matching the file's existing section
-      style — command: `npx nx run ayokoding-www:test:unit` — acceptance: all tests still pass
-- [ ] [AI] **T-4**: verify colour-blind separability and AA contrast of the three band hues against
-      both `--color-background` values, and additionally compute each of the four bands' (`opus`,
-      `sonnet`, `light`, `unrated`) approximate resolved sRGB hex value from its OKLCH definition —
-      record the computed OKLCH lightness deltas, contrast ratios, **and the four resolved hex
-      approximations** (one per band, under a `### Resolved hex approximations` heading, each as a
-      standalone `#`-prefixed 6-digit hex on its own line) in `<EV>phase-1-band-contrast.md`. D-1/D-2
-      above consume these four hex values to replace the mockup SVGs' placeholder fills.
-      — acceptance: the file records a ratio ≥ 4.5:1 for each band's `-ink` against its `-wash`, a hue
-      separation ≥ 105° between every band pair, **and exactly four distinct resolved hex values** —
-      `grep -oE "#[0-9A-Fa-f]{6}" <EV>phase-1-band-contrast.md | sort -u | wc -l` prints `4`. Any band
-      failing the contrast/hue checks is replaced with another existing hue and the file re-recorded.
-- [ ] [AI] **T-5**: confirm no new hex literal was introduced — acceptance:
-      `git diff -- <TOKENS> | grep -c '^+.*#[0-9a-fA-F]\{6\}'` prints `0` (the tokens alias existing
-      `--hue-*` and `--warm-*` variables). Falsifiable both ways: adding a raw hex makes it print ≥ 1.
-
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2. This is a **boundary** phase.
 
 - [ ] [AI] Both `.png` finalists (rendered from their `.svg` sources) exist under `<ASSETS>`, are
       embedded in `prd.md`, and their band colours reconcile with the real `--chart-band-*` tokens
-      defined below (D-1/D-2)
+      defined above (D-1/D-2)
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` exits 0
 - [ ] [AI] `npx nx affected -t typecheck lint` exits 0
 - [ ] [AI] `<EV>phase-1-band-contrast.md` records a passing contrast ratio and hue separation for
@@ -1243,7 +1243,7 @@ rev-parse --show-toplevel` prints the worktree path
       variant and the `md`/`lg` table variant render the same set of figures for every model
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails because `<SHELL>model-table.tsx` has no responsive branch yet
-- [ ] [AI] **W-26 GREEN**: implement the responsive table strategy from
+- [ ] [AI] **W-27 GREEN**: implement the responsive table strategy from
       [prd §Responsive strategy](./prd.md#responsive-strategy--mobile-first-per-breakpoint) — stacked
       definition cards below `md`, a horizontally-scrollable `<table>` with a sticky first column at
       `md`, full width with a sticky header row at `lg`
@@ -1371,21 +1371,21 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
       renders model names as a labelled text list beneath the three bands and emits no `<rect>` for
       those models — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails, because `unrated` models currently fall through as zero-length bars
-- [ ] [AI] **A-13 GREEN**: render the `unrated` group as a labelled text list beneath the three
+- [ ] [AI] **A-14 GREEN**: render the `unrated` group as a labelled text list beneath the three
       bands — never as zero-length bars — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: passes, and the component test asserts the group renders model names as text and
       emits no `<rect>` for those models
-- [ ] [AI] **A-14 RED**: extend `<SHELL>capability-chart.test.tsx` asserting both the mobile label
+- [ ] [AI] **A-15 RED**: extend `<SHELL>capability-chart.test.tsx` asserting both the mobile label
       placement (label and value above each bar below `md`) and the `md`/`lg` label placement
       (left-gutter labels, axis ticks every 20 units at `lg`) render the same text content
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails because the chart has no responsive label-placement branch yet
-- [ ] [AI] **A-14 GREEN**: implement the responsive capability-chart strategy — label and value
+- [ ] [AI] **A-16 GREEN**: implement the responsive capability-chart strategy — label and value
       **above** each bar below `md`, left-gutter labels at `md`, axis ticks every 20 units at `lg`
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: passes, and the component test asserts both label placements render the same
       text content
-- [ ] [AI] **A-15 REFACTOR**: move every colour reference to the `--chart-band-*` tokens from Phase 1;
+- [ ] [AI] **A-17 REFACTOR**: move every colour reference to the `--chart-band-*` tokens from Phase 1;
       no component may name a hue directly — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass and
       `grep -rn "hue-plum\|hue-teal\|hue-honey\|#[0-9a-fA-F]\{6\}" <SHELL>` prints nothing
@@ -1469,11 +1469,11 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
       sharing a row, wider plot area with axis ticks at `lg`) render the same rate values
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails because the price chart has no responsive layout branch yet
-- [ ] [AI] **Y-9 GREEN**: implement the responsive price-chart strategy — a two-line `in` / `out`
+- [ ] [AI] **Y-10 GREEN**: implement the responsive price-chart strategy — a two-line `in` / `out`
       block per model below `md`, two bars sharing a row at `md`, wider plot area with axis ticks at
       `lg` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: passes, and the component test asserts both variants render the same rate values
-- [ ] [AI] **Y-10 REFACTOR**: hoist anything both charts now duplicate into
+- [ ] [AI] **Y-11 REFACTOR**: hoist anything both charts now duplicate into
       `<SHELL>chart-primitives.tsx` — this is the step that proves the primitive abstraction, which is
       why Phase 6 and Phase 7 share one PR
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: all tests still pass and
@@ -1606,12 +1606,12 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
       `md`/`lg` variant (an inline wrapping bar at `md`, a single-row bar with the result count at
       `lg`) expose the same accessible control names — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails because the filter bar has no responsive layout branch yet
-- [ ] [AI] **N-17 GREEN**: implement the responsive filter strategy — a collapsed `<details>`
+- [ ] [AI] **N-18 GREEN**: implement the responsive filter strategy — a collapsed `<details>`
       disclosure with an active-filter count below `md`, an inline wrapping bar at `md`, a
       single-row bar with the result count at `lg` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: passes, and the component test asserts both variants expose the same accessible
       control names
-- [ ] [AI] **N-18 REFACTOR**: collapse the two selectors onto one generic `<FilterSelect>` taking a
+- [ ] [AI] **N-19 REFACTOR**: collapse the two selectors onto one generic `<FilterSelect>` taking a
       label, an option list, and an `onChange`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: all tests still pass
 
