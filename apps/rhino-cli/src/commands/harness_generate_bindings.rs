@@ -53,7 +53,8 @@ pub struct GenerateBindingsArgs {
 /// # Errors
 ///
 /// Returns an error if the git repository root cannot be found, if the
-/// `OpenCode` sync fails, or if the Amazon Q emit-bindings step fails.
+/// `OpenCode` sync fails, if the Cursor emit step fails, or if the Amazon Q
+/// emit-bindings step fails.
 pub fn run(
     args: &GenerateBindingsArgs,
     output_format: OutputFormat,

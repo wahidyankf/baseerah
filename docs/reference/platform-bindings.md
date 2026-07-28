@@ -186,7 +186,7 @@ no `.cursor/rules/*.mdc` files are shipped by default.
 ## Translation Artifacts
 
 Mechanical translations that platform bindings apply when generating output from upstream sources.
-All translations are performed by `rhino-cli agents sync` (`npm run generate:bindings`).
+All translations are performed by `rhino-cli harness bindings generate` (`npm run generate:bindings`).
 
 ### Color Translation (Claude Code → OpenCode)
 
