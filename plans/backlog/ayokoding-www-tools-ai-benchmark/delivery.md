@@ -188,6 +188,7 @@ into an unresolvable placeholder.
   execution, `plans/done/YYYY-MM-DD__ayokoding-www-tools-ai-benchmark/` after archival
 - `<EV>` = `<PLAN>evidence/`
 - `<ASSETS>` = `<PLAN>assets/`
+- `<REPO>` = the primary repository checkout (not a worktree)
 
 ## Standing gate blocks
 
@@ -248,7 +249,7 @@ own PR merges, below — never a worktree shared across units, never deferred to
 - [ ] [AI] Merge the PR once all five hardened preconditions hold
       — acceptance: `gh pr view <number> --json state --jq '.state'` returns `MERGED`
 - [ ] [AI] Fast-forward local `main` after the merge so the side-worktree push does not leave local
-      `main` silently behind — acceptance: `git -C <repo-root> rev-parse main origin/main` prints
+      `main` silently behind — acceptance: `git -C <REPO> rev-parse main origin/main` prints
       two identical hashes
 - [ ] [AI] Remove this unit's worktree now that its PR has merged — the worktree is the unit of
       cleanup, removed when its own PR lands, never deferred to plan end:
@@ -332,12 +333,12 @@ rev-parse --show-toplevel` prints the worktree path
 > [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)._
 >
 > The low-fidelity tier, the named selection, the decision record, the responsive strategy, and both
-> hi-fidelity finalists (committed as hand-authored `.svg` mockups, per `prd.md`'s disclosed,
-> non-silent divergence from the convention's literal `.excalidraw.png` naming — see the
-> [Authoring note](./prd.md#narrow--the-two-hi-fidelity-finalists) in `prd.md` §Narrow) are **already
-> complete** in [`prd.md` §UI design funnel](./prd.md#ui-design-funnel). This phase **refines** the
-> two committed SVG finalists against the real design tokens it defines below, rather than producing
-> them from nothing.
+> hi-fidelity finalists (each committed as a hand-authored `.svg` source rendered via `rsvg-convert`
+> to the embedded `.png` artifact — the convention's approved plain-`.png`-screenshot format — see
+> the [Authoring note](./prd.md#narrow--the-two-hi-fidelity-finalists) in `prd.md` §Narrow) are
+> **already complete** in [`prd.md` §UI design funnel](./prd.md#ui-design-funnel). This phase
+> **refines** the two committed SVG sources against the real design tokens it defines below, then
+> re-renders their `.png` artifacts, rather than producing either from nothing.
 
 ### UI Design Funnel Delivery
 
@@ -348,24 +349,30 @@ rev-parse --show-toplevel` prints the worktree path
       net-new list in `prd.md`, and any newly-discovered reusable primitive is added
   - _Suggested executor: `web-researcher` for the R7 prior-art refresh, plus the
     `swe-developing-frontend-ui` skill_
-- [ ] [AI] **D-1 — Refine hi-fi finalist A**: `<ASSETS>ai-benchmark-option-a-banded-panels.svg`
-      already exists and is already embedded in `prd.md` §Narrow. Once T-1…T-5 below define the real
+- [ ] [AI] **D-1 — Refine hi-fi finalist A**: `<ASSETS>ai-benchmark-option-a-banded-panels.svg` (the
+      editable source) and its rendered `<ASSETS>ai-benchmark-option-a-banded-panels.png` (the
+      artifact `prd.md` §Narrow embeds) already exist. Once T-1…T-5 below define the real
       `--chart-band-*` tokens, re-open the SVG and replace its approximated hex fill values
-      (`#CC78BC`/`#029E73`/`#DE8F05`/`#808080`) with the token's actual resolved colour so the mockup
-      and the shipped page cannot drift — acceptance: `test -f
-<ASSETS>ai-benchmark-option-a-banded-panels.svg` exits 0 **and** `grep -c
-"ai-benchmark-option-a-banded-panels.svg" <PLAN>prd.md` prints at least `1` (the existing image
-      embed). Falsifiable both ways: with the file absent `test -f` exits 1, and with the embed
-      missing the count prints `0`.
-- [ ] [AI] **D-2 — Refine hi-fi finalist C**: `<ASSETS>ai-benchmark-option-c-side-by-side.svg`
-      already exists and is already embedded in `prd.md` §Narrow; reconcile its band colours with the
-      real tokens the same way as D-1 — acceptance: `test -f
-<ASSETS>ai-benchmark-option-c-side-by-side.svg` exits 0 and the filename appears at least once
-      in `<PLAN>prd.md`
-- [ ] [AI] **D-3 — Format check**: confirm neither finalist is an `.excalidraw.svg`, inline HTML+CSS,
-      MDX, or a Mermaid diagram, and that both are the plain hand-authored `.svg` files this plan
-      committed at authoring time — acceptance: `/bin/ls <ASSETS>` lists exactly two `.svg` files and
-      no `.excalidraw.svg`, no `.excalidraw.png`
+      (`#CC78BC`/`#029E73`/`#DE8F05`/`#808080`) with the token's actual resolved colour, then
+      re-render: `rsvg-convert -w 1600 <ASSETS>ai-benchmark-option-a-banded-panels.svg -o
+<ASSETS>ai-benchmark-option-a-banded-panels.png` so the mockup and the shipped page cannot drift
+      — acceptance: `test -s <ASSETS>ai-benchmark-option-a-banded-panels.png` exits 0 (file exists
+      and is non-empty) **and** `grep -c "ai-benchmark-option-a-banded-panels.png" <PLAN>prd.md`
+      prints at least `1` (the existing image embed). Falsifiable both ways: with the file absent or
+      empty `test -s` exits 1, and with the embed missing the count prints `0`.
+- [ ] [AI] **D-2 — Refine hi-fi finalist C**: `<ASSETS>ai-benchmark-option-c-side-by-side.svg` (the
+      editable source) and its rendered `<ASSETS>ai-benchmark-option-c-side-by-side.png` (the
+      embedded artifact) already exist; reconcile the SVG's band colours with the real tokens and
+      re-render the PNG the same way as D-1 — acceptance: `test -s
+<ASSETS>ai-benchmark-option-c-side-by-side.png` exits 0 and the `.png` filename appears at least
+      once in `<PLAN>prd.md`
+- [ ] [AI] **D-3 — Format check**: confirm each finalist's embedded artifact is a real, non-empty
+      `.png` image (the convention's approved plain-`.png`-screenshot fallback format) rendered from
+      its hand-authored `.svg` source, and that neither is an `.excalidraw.svg`, inline HTML+CSS,
+      MDX, or a Mermaid diagram — acceptance: `file <ASSETS>ai-benchmark-option-a-banded-panels.png
+<ASSETS>ai-benchmark-option-c-side-by-side.png` reports `PNG image data` for both, and `/bin/ls
+<ASSETS>` lists exactly two `.svg` files (the editable sources) and two `.png` files (the embedded
+      artifacts), with no `.excalidraw.svg` and no `.excalidraw.png`
 - [ ] [AI] **D-4 — Responsive record**: confirm `prd.md` §Responsive strategy names, per element,
       what happens at mobile (`< 768px`), tablet (`md ≥ 768px`), and desktop (`lg ≥ 1024px`)
       — acceptance: `grep -ci "responsive" <PLAN>prd.md` prints at least `1` **and** the responsive
@@ -403,8 +410,9 @@ rev-parse --show-toplevel` prints the worktree path
 
 > All checks below must pass before starting Phase 2. This is a **boundary** phase.
 
-- [ ] [AI] Both `.svg` finalists exist under `<ASSETS>`, are embedded in `prd.md`, and their band
-      colours reconcile with the real `--chart-band-*` tokens defined below (D-1/D-2)
+- [ ] [AI] Both `.png` finalists (rendered from their `.svg` sources) exist under `<ASSETS>`, are
+      embedded in `prd.md`, and their band colours reconcile with the real `--chart-band-*` tokens
+      defined below (D-1/D-2)
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` exits 0
 - [ ] [AI] `npx nx affected -t typecheck lint` exits 0
 - [ ] [AI] `<EV>phase-1-band-contrast.md` records a passing contrast ratio and hue separation for
@@ -424,6 +432,12 @@ rev-parse --show-toplevel` prints the worktree path
 
 > _Suggested executor: `swe-typescript-dev` for the module; `web-researcher` for every primary-source
 > re-check; `docs-maker` for the runbook._
+
+- [ ] [AI] Provision this unit's worktree from the latest `origin/main` — this phase is both the
+      unit's first phase and its boundary, so the worktree must exist before this phase's own work
+      begins: `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-2-dataset
+origin/main` — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-2-dataset
+rev-parse --show-toplevel` prints the worktree path
 
 ### Dataset schema (TDD)
 
@@ -529,6 +543,12 @@ rev-parse --show-toplevel` prints the worktree path
 > DD-18: `<REF>` stops being hand-maintained data and becomes generated from `<DATA>models.ts`, with
 > its hand-written prose preserved. This phase is DAG-independent of Phases 4–8.
 
+- [ ] [AI] Provision this unit's worktree from the latest `origin/main` — this phase is both the
+      unit's first phase and its boundary, so the worktree must exist before this phase's own work
+      begins:
+      `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-3-reference-derivation
+origin/main` — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-3-reference-derivation
+rev-parse --show-toplevel` prints the worktree path
 - [ ] [AI] **G-1 RED**: create `apps/ayokoding-www/scripts/generate-benchmark-reference.unit.test.mjs`
       asserting that the generator (a) replaces only the text between a
       `<!-- BEGIN GENERATED: <name> -->` / `<!-- END GENERATED: <name> -->` pair, (b) leaves every
@@ -605,6 +625,20 @@ rev-parse --show-toplevel` prints the worktree path
 >
 > Every module in this phase is pure — no React, no router, no side effects — mirroring
 > `src/features/cost-of-living-calculator/core/`.
+
+- [ ] [AI] Provision this unit's worktree from the latest `origin/main` — this phase is both the
+      unit's first phase and its boundary, so the worktree must exist before this phase's own work
+      begins: `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-4-core origin/main`
+      — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-4-core rev-parse
+--show-toplevel` prints the worktree path
+- [ ] [AI] **Z-0**: create `<SPECS>ai-benchmark.feature` containing the eight capability-scoring
+      scenarios this phase implements (AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11) plus the
+      shared `Background`, and index it from `<SPECS>README.md` — acceptance:
+      `npx nx run ayokoding-www:specs:structure-validation` exits 0
+  - This phase runs before Phase 5 in the DAG, so it creates the feature file rather than Phase 5;
+    Phase 5's `W-0` step extends this same file with its own scenarios, and every later phase
+    appends theirs the same way — the incremental per-phase authoring pattern the plan already uses.
+  - _Suggested executor: `specs-maker`_
 
 ### Normalization and composite (`<CORE>score.ts`)
 
@@ -752,6 +786,69 @@ rev-parse --show-toplevel` prints the worktree path
       `anchors(dataset)` helper so no caller re-derives them
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: all tests still pass
 
+### Gherkin bindings — capability scoring and bands (AC-4–AC-11)
+
+> These eight scenarios are pure-logic (fixture data in, an assignment or index out) and need no
+> page render, so they bind here in Phase 4 against `<CORE>score.ts`/`<CORE>bands.ts` rather than
+> waiting for the route Phase 5 builds. `<USTEPS>ai-benchmark.steps.tsx` is created here at `Z-1` and
+> extended by Phase 5's `W-1a` for the rendering-dependent scenarios.
+
+- [ ] [AI] **Z-1 RED**: create `<USTEPS>ai-benchmark.steps.tsx` binding AC-4, loading
+      `<SPECS>ai-benchmark.feature` and calling `assignBand` from `<CORE>bands.ts` against a fixture
+      dataset (no page render — this scenario is pure-logic)
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: fails because `<USTEPS>ai-benchmark.steps.tsx` does not exist
+  - _Gherkin (binds) → AC-4 "A model reaching the opus anchor renders in the opus band" — same
+    scenario as B-1 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-2 GREEN**: wire `assignBand`'s opus comparison into the AC-4 step definition
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-4 passes
+- [ ] [AI] **Z-3 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-5
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-5 "A model between the two anchors renders in the sonnet band" — same
+    scenario as B-3 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-4 GREEN**: wire `assignBand`'s sonnet comparison into the AC-5 step definition
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-5 passes
+- [ ] [AI] **Z-5 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-6
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-6 "A model below the sonnet anchor renders in the light band" — same
+    scenario as B-5 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-6 GREEN**: wire `assignBand`'s light fallthrough into the AC-6 step definition
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-6 passes
+- [ ] [AI] **Z-7 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-7
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-7 "Each anchor model occupies the band it defines" — same scenario as
+    B-7 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-8 GREEN**: wire the anchor-pinning short-circuit into the AC-7 step definition
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-7 passes
+- [ ] [AI] **Z-9 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-8
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-8 "A model with no published benchmark score renders in the unrated
+    group" — same scenario as C-7 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-10 GREEN**: wire the zero-coverage case from `<CORE>score.ts` into the AC-8 step
+      definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-8 passes
+- [ ] [AI] **Z-11 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-9
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-9 "Every roster model belongs to exactly one capability group" — same
+    scenario as B-9 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-12 GREEN**: wire `groupByBand(dataset)` over the full roster into the AC-9 step
+      definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-9 passes
+- [ ] [AI] **Z-13 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-10
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-10 "A model missing a benchmark is scored over the benchmarks it has" —
+    same scenario as C-5 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-14 GREEN**: wire `computeIndex`/`coverage` from `<CORE>score.ts` into the AC-10 step
+      definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-10 passes
+- [ ] [AI] **Z-15 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-11
+      — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-11 "Models are ordered identically in both charts within a band" — same
+    scenario as B-11 above, now bound at the vitest-cucumber layer._
+- [ ] [AI] **Z-16 GREEN**: wire `groupByBand`'s canonical per-band ordering into the AC-11 step
+      definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-11 passes
+- [ ] [AI] **Z-17 REFACTOR**: extract the fixture-dataset builder shared by Z-1…Z-16 into one helper
+      in `<USTEPS>ai-benchmark.steps.tsx`, so each step definition stays a thin call into the
+      already-tested `<CORE>` functions — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: all tests still pass
+
 ### Harness price selection (`<CORE>price.ts`)
 
 - [ ] [AI] **P-1 RED**: create `<CORE>price.unit.test.ts` asserting `lowestRate(model)` returns the
@@ -854,6 +951,8 @@ rev-parse --show-toplevel` prints the worktree path
 > All checks below must pass before starting Phase 5. This is a **boundary** phase.
 
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` exits 0
+- [ ] [AI] `npx nx run ayokoding-www:specs:behavior:coverage` exits 0 — AC-4 through AC-11 (the only
+      scenarios currently in `<SPECS>ai-benchmark.feature`) each have a `@covers`-annotated step
 - [ ] [AI] Every module under `<CORE>` is free of React and router imports — acceptance:
       `grep -rn "from \"react\"\|next/navigation\|next/router" <CORE>` prints nothing
 - [ ] [AI] `npx nx run ayokoding-www:test:coverage` meets the project's configured threshold
@@ -877,12 +976,19 @@ rev-parse --show-toplevel` prints the worktree path
 > **Link gate active**: this phase creates the route but adds **no** link from `<TOOLSIDX>` or
 > `<FOOTER>`. The page is reachable only by direct URL until Phase 10's reveal step.
 
+- [ ] [AI] Provision this unit's worktree from the latest `origin/main` — this phase is both the
+      unit's first phase and its boundary, so the worktree must exist before this phase's own work
+      begins:
+      `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-5-page-and-table origin/main`
+      — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-5-page-and-table
+rev-parse --show-toplevel` prints the worktree path
+
 ### Feature file and step scaffolds
 
-- [ ] [AI] **W-0**: create `<SPECS>ai-benchmark.feature` containing **only** the scenarios this phase
-      implements (AC-1, AC-2, AC-19, AC-20, AC-21, AC-29, AC-30, AC-31, AC-32, AC-33, AC-34, AC-35)
-      plus the shared `Background`, and index it from `<SPECS>README.md`
-      — acceptance: `npx nx run ayokoding-www:specs:structure-validation` exits 0
+- [ ] [AI] **W-0**: extend `<SPECS>ai-benchmark.feature` (created at Phase 4's `Z-0` with
+      AC-4–AC-11) by appending the scenarios this phase implements (AC-1, AC-2, AC-19, AC-20, AC-21,
+      AC-29, AC-30, AC-31, AC-32, AC-33, AC-34, AC-35) — acceptance:
+      `npx nx run ayokoding-www:specs:structure-validation` exits 0
   - Scenarios for later phases are added by those phases; adding them now would red
     `specs:behavior:coverage` at every intervening gate.
   - _Suggested executor: `specs-maker`_
@@ -893,8 +999,9 @@ rev-parse --show-toplevel` prints the worktree path
 > one cycle per scenario, never bundled. AC-1 (English) and AC-2 (Indonesian) each get their own
 > RED → GREEN cycle, for both the unit binding and the `@e2e` binding._
 
-- [ ] [AI] **W-1a RED**: create `<USTEPS>ai-benchmark.steps.tsx` binding **only** AC-1, loading
-      `<SPECS>ai-benchmark.feature` and rendering the page for the `en` locale
+- [ ] [AI] **W-1a RED**: extend `<USTEPS>ai-benchmark.steps.tsx` (created at Phase 4's `Z-1`
+      binding AC-4–AC-11) binding **only** AC-1, loading `<SPECS>ai-benchmark.feature` and rendering
+      the page for the `en` locale
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails because `<ROUTE>page.tsx` does not exist
   - _Gherkin (binds) → AC-1 "The English page renders its localized heading"_
@@ -1334,6 +1441,8 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-17 passes
 - [ ] [AI] **Y-7 RED**: bind the price half of AC-36
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-36 "Each chart exposes an accessible name" — same scenario as A-11
+    above, now bound for the price chart._
 - [ ] [AI] **Y-8 GREEN**: give the price SVG `role="img"` and a localized `<title>`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-36 passes in full
 - [ ] [AI] **Y-9 RED**: extend `<SHELL>price-chart.test.tsx` asserting both the mobile variant
@@ -1378,6 +1487,13 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
 
 > _Suggested executor: `swe-ui-maker`._
 
+- [ ] [AI] Provision this unit's worktree from the latest `origin/main` — this phase is both the
+      unit's first phase and its boundary, and the prior unit's worktree
+      (`ayokoding-www-tools-ai-benchmark-phase-6-7-charts`) was already removed at Phase 7's own
+      gate, so this worktree must exist before this phase's own work begins:
+      `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-8-filters origin/main`
+      — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-8-filters rev-parse
+--show-toplevel` prints the worktree path
 - [ ] [AI] **N-0**: append AC-18, AC-22, AC-23, AC-24, AC-25, AC-26, AC-27, AC-28 to
       `<SPECS>ai-benchmark.feature` — acceptance:
       `npx nx run ayokoding-www:specs:structure-validation` exits 0
@@ -1417,6 +1533,8 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
 - [ ] [AI] **N-6 GREEN**: add the class selector — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: AC-24 passes
 - [ ] [AI] **N-7 RED**: bind AC-25 — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-25 "Harness and class parameters intersect" — same scenario as F-1
+    above, now bound at the UI layer._
 - [ ] [AI] **N-8 GREEN**: intersect both filters over one filtered dataset, so the bands re-scale to
       what remains (DD-11) — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-25 passes
 - [ ] [AI] **N-9 RED**: bind AC-18 in both the unit and e2e step files
@@ -1433,6 +1551,8 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
 - [ ] [AI] **N-10 GREEN**: pass the active harness into `rateFor` so the price chart switches rate set
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-18 passes
 - [ ] [AI] **N-11 RED**: bind AC-26 — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+  - _Gherkin (binds) → AC-26 "An unrecognized filter value falls back to the unfiltered view" —
+    same scenario as F-5 above, now bound at the UI layer._
 - [ ] [AI] **N-12 GREEN**: confirm the sanitizer path surfaces no error to the reader
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-26 passes
 - [ ] [AI] **N-13 RED**: bind AC-28 — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails

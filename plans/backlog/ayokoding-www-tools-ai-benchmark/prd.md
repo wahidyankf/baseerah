@@ -271,39 +271,31 @@ MOBILE — the two chart columns cannot survive < 768px; they stack, which
 
 Hi-fi finalists:
 
-![Option A — banded stacked panels, capability chart above price chart, each grouped into opus, sonnet, light and unrated bands, with the how-to-read disclosure, filters bar, full data table, and sources section stacked beneath, at desktop width](./assets/ai-benchmark-option-a-banded-panels.svg)
+![Option A — banded stacked panels, capability chart above price chart, each grouped into opus, sonnet, light and unrated bands, with the how-to-read disclosure, filters bar, full data table, and sources section stacked beneath, at desktop width](./assets/ai-benchmark-option-a-banded-panels.png)
 
 _Option A — Banded Stacked Panels (winner). See [Select](#select) and [Justify](#justify--decision-record) below._
 
-![Option C — aligned side-by-side comparison grid, one row per model with the capability-index bar and the input/output price bars sharing a row, grouped into opus, sonnet, light and unrated bands, with an annotated note on why it degenerates into Option A below 768px](./assets/ai-benchmark-option-c-side-by-side.svg)
+![Option C — aligned side-by-side comparison grid, one row per model with the capability-index bar and the input/output price bars sharing a row, grouped into opus, sonnet, light and unrated bands, with an annotated note on why it degenerates into Option A below 768px](./assets/ai-benchmark-option-c-side-by-side.png)
 
 _Option C — Aligned Side-by-Side Comparison Grid (runner-up). See [Justify](#justify--decision-record) below for why it lost._
 
 > **Authoring note** — both tiers are now complete and binding as authored: the low-fidelity ASCII
-> wireframes above, and the two hi-fidelity finalists as committed, hand-authored `.svg` mockups,
-> produced now at plan-authoring time rather than deferred to a Phase 1 delivery step. Colours use
-> the verified colour-blind-friendly palette, approximating the eventual `--chart-band-opus`
-> (`#CC78BC`), `--chart-band-sonnet` (`#029E73`), `--chart-band-light` (`#DE8F05`), and
-> `--chart-band-unrated` (`#808080`) tokens Phase 1 defines — a static SVG cannot reference a CSS
-> custom property directly, so the literal hex values stand in for the tokens by name.
->
-> **Known divergence from the letter of the convention (disclosed, not silent)**: the
-> [UI Mockups in Plan Docs §Both-Tiers Rule](../../../repo-governance/conventions/formatting/diagrams.md#the-both-tiers-rule)
-> names the Tier-2 format specifically as "Excalidraw `.excalidraw.png` via `![]()`", not a
-> hand-authored `.svg`. This plan uses `.svg` instead because (a) the convention's own
-> Rendering-Support Matrix shows a plain `.svg` via `![]()` renders correctly on GitHub — the
-> `.excalidraw.svg` ruled-out reason is Excalidraw's CDN-loaded custom fonts falling back under
-> GitHub's CSP, which does not apply to a hand-authored SVG using standard system fonts; (b) it
-> satisfies every functional property the rule names (real spacing, colour, typography, visual
-> hierarchy, editability — arguably more editable than an opaque binary PNG, since it is plain text
-> and diffable); and (c) it lets `plan-maker`/`plan-fixer` produce the artefact directly, without
-> requiring a human with the Excalidraw VSCode extension. It does **not** literally match the
-> convention's named format string, so a strict, literal reading of the Both-Tiers Rule — and any
-> automated check that pattern-matches on the `.excalidraw.png` extension specifically — may still
-> flag this as non-conformant until the convention is amended to name `.svg` as an accepted
-> alternative for text/data-visualization-style mockups. Phase 1's D-1/D-2 steps no longer produce
-> these assets from nothing — they **refine** the committed SVGs against the real design tokens once
-> Phase 1 defines them.
+> wireframes above, and the two hi-fidelity finalists, each committed as a hand-authored `.svg`
+> source (`assets/ai-benchmark-option-a-banded-panels.svg`,
+> `assets/ai-benchmark-option-c-side-by-side.svg`) rendered via `rsvg-convert` to the `.png` files
+> embedded above. Per the
+> [UI Mockups in Plan Docs §Both-Tiers Rule](../../../repo-governance/conventions/formatting/diagrams.md#the-both-tiers-rule),
+> "Plain `.png` screenshot is the high-fidelity fallback once a design is final and no longer
+> iterating — it renders everywhere but is binary and must be replaced on every change"; the
+> embedded `.png` satisfies this named format, and the `.svg` is kept alongside it purely as the
+> editable, diffable source used to regenerate the `.png` whenever the mockup changes (rather than
+> being the artefact `prd.md` embeds). Colours use the verified colour-blind-friendly palette,
+> approximating the eventual `--chart-band-opus` (`#CC78BC`), `--chart-band-sonnet` (`#029E73`),
+> `--chart-band-light` (`#DE8F05`), and `--chart-band-unrated` (`#808080`) tokens Phase 1 defines —
+> a static image cannot reference a CSS custom property directly, so the literal hex values stand in
+> for the tokens by name. Phase 1's D-1/D-2 steps no longer produce these assets from nothing — they
+> **refine** the committed SVG sources against the real design tokens once Phase 1 defines them, then
+> re-render the `.png` artifacts so the mockup and the shipped page cannot drift.
 
 ### Select
 
