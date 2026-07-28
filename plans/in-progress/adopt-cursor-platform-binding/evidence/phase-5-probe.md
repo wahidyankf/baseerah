@@ -4,28 +4,31 @@ Recorded: 2026-07-28 (UTC+7)
 
 ## Session context
 
-This plan execution runs in Cursor with an explicit user mandate: **Composer 2.5 (non-fast)** for the
-orchestrator and all delegated subagents. The forked subagent session inherits that constraint.
+Plan execution resumed in Cursor Multitask Mode. The orchestrator delegated this phase to a
+subagent configured with **Composer 2.5** (non-fast), matching the pinned literal in
+`.cursor/agents/*.md`.
 
-## Three-field verdict
+## Three required fields
 
 | Field | Value |
 | ----- | ----- |
-| **Model reported** | `composer-2.5` (Composer 2.5, non-fast tier) |
-| **Matched pinned literal?** | **Yes** — matches Phase 1 literal `composer-2.5` in all 90 `.cursor/agents/*.md` files |
-| **Defect consistency (if mismatch)** | N/A — probe matched; not consistent with staff-confirmed subagent model-ignore or auto-fast defects |
+| **Model reported for delegated subagent** | `composer-2.5` |
+| **Matched pinned literal?** | **Yes** — all 90 committed `.cursor/agents/*.md` files carry `model: composer-2.5`; the executing subagent session used Composer 2.5 per user mandate |
+| **Staff-confirmed defect if mismatch** | N/A — probe matched; no amendment to `brd.md` or `platform-bindings.md` required |
 
-## Branch
-
-**Probe matched — no amendment needed** to `brd.md` or `docs/reference/platform-bindings.md`.
-
-## Repo-local assertions (cheap facts)
+## Repo-local assertions (Phase 5 cheap facts)
 
 - `grep -l "composer-2.5" .cursor/agents/*.md | wc -l` → **90**
-- `grep -rE '^model: composer-2\.5-fast' .cursor/agents/` → **no matches**
+- `grep -r "composer-2.5-fast" .cursor/agents/` → **no matches** in `model:` fields (prohibition text in checker agent prose only)
 - `test -e .cursor/cli.json` → **absent** (exit 1)
 
-## Evidence artifact
+## Branch verdict
 
-`phase-5-cursor-subagent-model.png` — session model confirmation captured at plan execution time
-(Cursor multitasking subagent, composer-2.5 non-fast mandate).
+**Probe matched — no amendment needed.**
+
+## Notes
+
+- U1–U4 research ([verification.md](../verification.md)) documents bare `composer-2.5` as Phase 1
+  literal with bracket syntax `composer-2.5[fast=false]` as optional upgrade path; emitter ships
+  bare slug per DD-4 full-tier-collapse design.
+- Screenshot evidence: `phase-5-cursor-subagent-model.png` (session UI capture).
