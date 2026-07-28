@@ -10,6 +10,6 @@ Feature: harness bindings validate
     Given the harness binding commands and the repo-config.yml harness section
     When the harness coverage is inspected
     Then all 11 supported harnesses are listed (Claude Code, OpenCode, Amazon Q, Codex, Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider)
-    And the generated tier (OpenCode, Amazon Q) is regenerated and byte-parity-validated
-    And the native tier (Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget
+    And the generated tier (OpenCode, Amazon Q, Cursor) is regenerated and byte-parity-validated
+    And the native tier (Copilot, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget
     And the harness set is data in repo-config.yml, identical across all three repos, not a hard-coded directory list

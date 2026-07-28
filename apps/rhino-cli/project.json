@@ -158,7 +158,8 @@
       "inputs": [
         "{projectRoot}/src/**/*.rs",
         "{workspaceRoot}/.claude/agents/**/*.md",
-        "{workspaceRoot}/.opencode/agents/**/*.md"
+        "{workspaceRoot}/.opencode/agents/**/*.md",
+        "{workspaceRoot}/.cursor/agents/**/*.md"
       ]
     },
     "naming:workflows-validation": {

@@ -915,7 +915,7 @@ fn then_hb_all_11_listed(w: &mut SpecsTreeWorld) {
     }
 }
 
-#[then("the generated tier (OpenCode, Amazon Q) is regenerated and byte-parity-validated")]
+#[then("the generated tier (OpenCode, Amazon Q, Cursor) is regenerated and byte-parity-validated")]
 fn then_hb_generated_tier(w: &mut SpecsTreeWorld) {
     let generated: Vec<&str> = w
         .hb_harness
@@ -942,7 +942,7 @@ fn then_hb_generated_tier(w: &mut SpecsTreeWorld) {
 }
 
 #[then(
-    "the native tier (Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget"
+    "the native tier (Copilot, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget"
 )]
 fn then_hb_native_tier(w: &mut SpecsTreeWorld) {
     let native: Vec<&HarnessEntry> = w.hb_harness.iter().filter(|h| h.tier == "native").collect();
