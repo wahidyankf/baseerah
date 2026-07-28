@@ -225,10 +225,10 @@ pinned literal (`composer-2.5` per `apps/rhino-cli/src/application/agents/cursor
 agent whose `model:` drifts from the pin as a **model-pin drift** finding.
 
 - **Tool**: `grep -h "^model:" .cursor/agents/*.md | sort -u` and
-  `grep -r "composer-2.5-fast" .cursor/agents/`
-- **Pass**: exactly one distinct `model:` value and it equals the pinned literal; the fast slug is
-  absent
-- **Fail**: any other value or `composer-2.5-fast` present
+  `grep -rE '^model: composer-2\.5-fast' .cursor/agents/` (the prohibited fast-variant pin)
+- **Pass**: exactly one distinct `model:` value and it equals the pinned literal; the fast-variant
+  pin is absent
+- **Fail**: any other value or a `model:` line using the fast variant
 - **Default criticality**: HIGH (wrong pin may bill at 6× fast rates)
 - **Confidence**: HIGH (mechanical comparison)
 
