@@ -1,0 +1,37 @@
+=== Phase 7 CLI Evidence Contract (ose-infra) ===
+Captured: 2026-07-28T11:19:42Z
+Host: <placeholder>
+--- generate cursor run 1 ---
+
+
+Your AI agent configuration is outdated. Run "nx configure-ai-agents" to update.
+
+exit: 0
+--- generate cursor run 2 ---
+
+
+Your AI agent configuration is outdated. Run "nx configure-ai-agents" to update.
+
+exit: 0
+--- generate cursor run 3 ---
+
+
+Your AI agent configuration is outdated. Run "nx configure-ai-agents" to update.
+
+exit: 0
+--- validate json ---
+
+> nx run rhino-cli:run harness bindings validate --format json
+
+> cargo run --manifest-path apps/rhino-cli/Cargo.toml -- harness bindings validate --format json
+
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.21s
+     Running `apps/rhino-cli/target/debug/rhino-cli harness bindings validate --format json`
+error: unexpected argument '--format' found
+--- naming validate ---
+Your AI agent configuration is outdated. Run "nx configure-ai-agents" to update.
+
+--- sync validate ---
+
+Your AI agent configuration is outdated. Run "nx configure-ai-agents" to update.
+

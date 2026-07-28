@@ -1,0 +1,775 @@
+{
+  "status": "success",
+  "timestamp": "2026-07-28T18:30:44+07:00",
+  "total_checks": 152,
+  "passed_checks": 152,
+  "warning_checks": 0,
+  "failed_checks": 0,
+  "duration_ms": 108,
+  "checks": [
+    {
+      "name": "Binding: .amazonq/rules/00-agents-md.md",
+      "status": "passed",
+      "message": ".amazonq/rules/00-agents-md.md matches generated content"
+    },
+    {
+      "name": "Binding: .amazonq/cli-agents/ose-default.json",
+      "status": "passed",
+      "message": ".amazonq/cli-agents/ose-default.json matches generated content"
+    },
+    {
+      "name": "No Stale Agent Directory",
+      "status": "passed",
+      "message": "Legacy singular .opencode/agent does not exist"
+    },
+    {
+      "name": "Agent Count",
+      "status": "passed",
+      "expected": ">= 64 agents",
+      "actual": "64 agents",
+      "message": "OpenCode agents directory contains every Claude agent"
+    },
+    {
+      "name": "Agent: agent-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: api-exploratory-tester.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: ci-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: ci-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-file-manager.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-link-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-software-engineering-separation-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-software-engineering-separation-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-tutorial-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-tutorial-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: docs-tutorial-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: plan-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: plan-execution-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: plan-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: plan-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-architecture-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-docs-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-governance-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-instruction-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-integrity-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-logic-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-performance-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-security-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: pr-review-synthesis-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: readme-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: readme-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: readme-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-harness-compatibility-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-harness-compatibility-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-rules-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-rules-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-rules-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-setup-manager.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-workflow-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-workflow-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: repo-workflow-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: social-linkedin-post-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: specs-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: specs-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: specs-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-clojure-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-code-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-csharp-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-dart-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-e2e-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-elixir-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-fsharp-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-golang-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-java-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-kotlin-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-python-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-rust-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-typescript-dev.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-ui-checker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-ui-fixer.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: swe-ui-maker.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: web-design-tester.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: web-exploratory-tester.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: web-researcher.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "Agent: web-usability-tester.md",
+      "status": "passed",
+      "message": "Agent is semantically equivalent"
+    },
+    {
+      "name": "No Synced Skill Mirror",
+      "status": "passed",
+      "message": "No rhino-cli-managed skill copies under .opencode/skill or .opencode/skills"
+    },
+    {
+      "name": "Cursor Agent Count",
+      "status": "passed",
+      "expected": ">= 64 agents",
+      "actual": "64 agents",
+      "message": "Cursor agents directory contains every Claude agent"
+    },
+    {
+      "name": "Cursor Agent: agent-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: api-exploratory-tester.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: ci-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: ci-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-file-manager.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-link-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-software-engineering-separation-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-software-engineering-separation-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-tutorial-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-tutorial-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: docs-tutorial-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: plan-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: plan-execution-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: plan-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: plan-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-architecture-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-docs-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-governance-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-instruction-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-integrity-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-logic-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-performance-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-security-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: pr-review-synthesis-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: readme-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: readme-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: readme-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-harness-compatibility-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-harness-compatibility-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-rules-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-rules-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-rules-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-setup-manager.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-workflow-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-workflow-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: repo-workflow-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: social-linkedin-post-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: specs-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: specs-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: specs-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-clojure-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-code-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-csharp-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-dart-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-e2e-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-elixir-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-fsharp-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-golang-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-java-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-kotlin-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-python-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-rust-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-typescript-dev.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-ui-checker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-ui-fixer.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: swe-ui-maker.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: web-design-tester.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: web-exploratory-tester.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: web-researcher.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Cursor Agent: web-usability-tester.md",
+      "status": "passed",
+      "message": "Cursor mirror matches generated content"
+    },
+    {
+      "name": "Catalog Coverage: .claude",
+      "status": "passed",
+      "message": ".claude referenced in docs/reference/platform-bindings.md"
+    },
+    {
+      "name": "Catalog Coverage: .opencode",
+      "status": "passed",
+      "message": ".opencode referenced in docs/reference/platform-bindings.md"
+    },
+    {
+      "name": "Catalog Coverage: .codex",
+      "status": "passed",
+      "message": ".codex referenced in docs/reference/platform-bindings.md"
+    },
+    {
+      "name": "Catalog Coverage: .github",
+      "status": "passed",
+      "message": ".github referenced in docs/reference/platform-bindings.md"
+    },
+    {
+      "name": "Catalog Coverage: .amazonq",
+      "status": "passed",
+      "message": ".amazonq referenced in docs/reference/platform-bindings.md"
+    },
+    {
+      "name": "Catalog Coverage: .cursor",
+      "status": "passed",
+      "message": ".cursor referenced in docs/reference/platform-bindings.md"
+    },
+    {
+      "name": "Catalog Coverage: .windsurf",
+      "status": "passed",
+      "message": ".windsurf absent on disk; no catalog row required"
+    },
+    {
+      "name": "Catalog Coverage: .junie",
+      "status": "passed",
+      "message": ".junie absent on disk; no catalog row required"
+    },
+    {
+      "name": "Catalog Coverage: GEMINI.md",
+      "status": "passed",
+      "message": "GEMINI.md absent on disk; no catalog row required"
+    },
+    {
+      "name": "Catalog Coverage: CONVENTIONS.md",
+      "status": "passed",
+      "message": "CONVENTIONS.md absent on disk; no catalog row required"
+    },
+    {
+      "name": "No Codex Agents Dir: .codex/agents",
+      "status": "passed",
+      "message": ".codex/agents absent; Codex CLI agents configured via config.toml sub-tables"
+    },
+    {
+      "name": "Color translation: blue",
+      "status": "passed",
+      "message": "'blue' is mapped in ai-agents.md"
+    },
+    {
+      "name": "Color translation: green",
+      "status": "passed",
+      "message": "'green' is mapped in ai-agents.md"
+    },
+    {
+      "name": "Color translation: purple",
+      "status": "passed",
+      "message": "'purple' is mapped in ai-agents.md"
+    },
+    {
+      "name": "Color translation: yellow",
+      "status": "passed",
+      "message": "'yellow' is mapped in ai-agents.md"
+    },
+    {
+      "name": "Tier mapping: haiku",
+      "status": "passed",
+      "message": "'haiku' is mapped in model-selection.md"
+    },
+    {
+      "name": "Tier mapping: opus",
+      "status": "passed",
+      "message": "'opus' is mapped in model-selection.md"
+    },
+    {
+      "name": "Tier mapping: sonnet",
+      "status": "passed",
+      "message": "'sonnet' is mapped in model-selection.md"
+    }
+  ]
+}
