@@ -483,9 +483,9 @@ reachable by navigation and not discoverable by a reader. There are exactly two 
 The route is not in the sitemap either way: `apps/ayokoding-www/src/app/sitemap.ts` enumerates only
 content-driven pages and already excludes `/tools/cost-of-living-calculator` `[Repo-grounded]`.
 
-**Gate removal is a named step** — Phase 10 step R-1 adds both links, and the Rule-15 three-tester
-retest runs **after** removal so the testers evaluate the shipped navigation path rather than a
-direct-URL-only page.
+**Gate removal is a named step** — Phase 10 steps R-2 and R-3 add both links, and the Rule-15
+three-tester retest runs **after** removal so the testers evaluate the shipped navigation path rather
+than a direct-URL-only page.
 
 ## Testing strategy
 

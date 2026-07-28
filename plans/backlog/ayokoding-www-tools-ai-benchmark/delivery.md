@@ -353,19 +353,30 @@ rev-parse --show-toplevel` prints the worktree path
       editable source) and its rendered `<ASSETS>ai-benchmark-option-a-banded-panels.png` (the
       artifact `prd.md` §Narrow embeds) already exist. Once T-1…T-5 below define the real
       `--chart-band-*` tokens, re-open the SVG and replace its approximated hex fill values
-      (`#CC78BC`/`#029E73`/`#DE8F05`/`#808080`) with the token's actual resolved colour, then
+      (`#CC78BC`/`#029E73`/`#DE8F05`/`#808080`) with the four resolved hex approximations T-4 records
+      under `### Resolved hex approximations` in `<EV>phase-1-band-contrast.md`, then
       re-render: `rsvg-convert -w 1600 <ASSETS>ai-benchmark-option-a-banded-panels.svg -o
 <ASSETS>ai-benchmark-option-a-banded-panels.png` so the mockup and the shipped page cannot drift
-      — acceptance: `test -s <ASSETS>ai-benchmark-option-a-banded-panels.png` exits 0 (file exists
-      and is non-empty) **and** `grep -c "ai-benchmark-option-a-banded-panels.png" <PLAN>prd.md`
-      prints at least `1` (the existing image embed). Falsifiable both ways: with the file absent or
-      empty `test -s` exits 1, and with the embed missing the count prints `0`.
+      — acceptance: `grep -c "#CC78BC\|#029E73\|#DE8F05\|#808080"
+<ASSETS>ai-benchmark-option-a-banded-panels.svg` prints `0` (none of the four placeholder hex
+      literals remain) **and**
+      `comm -12 <(grep -oE "#[0-9A-Fa-f]{6}" <EV>phase-1-band-contrast.md | sort -u) <(grep -oE
+      "#[0-9A-Fa-f]{6}" <ASSETS>ai-benchmark-option-a-banded-panels.svg | sort -u) | wc -l` prints `4`
+      (all four of T-4's resolved hex values now appear in the SVG). Falsifiable both ways: before
+      this step runs, the placeholder-count check prints a number ≥ `1` (not `0`) and the `comm`
+      intersection prints `0` (the real hexes are absent from the still-placeholder SVG) — both fail
+      the target state; a no-op leaves both checks failing. After a correct edit, the placeholder
+      count is `0` and the intersection is `4`.
 - [ ] [AI] **D-2 — Refine hi-fi finalist C**: `<ASSETS>ai-benchmark-option-c-side-by-side.svg` (the
       editable source) and its rendered `<ASSETS>ai-benchmark-option-c-side-by-side.png` (the
-      embedded artifact) already exist; reconcile the SVG's band colours with the real tokens and
-      re-render the PNG the same way as D-1 — acceptance: `test -s
-<ASSETS>ai-benchmark-option-c-side-by-side.png` exits 0 and the `.png` filename appears at least
-      once in `<PLAN>prd.md`
+      embedded artifact) already exist; reconcile the SVG's band colours with the same four resolved
+      hex approximations D-1 consumes from `<EV>phase-1-band-contrast.md` (T-4) and re-render the PNG
+      the same way as D-1 — acceptance: `grep -c "#CC78BC\|#029E73\|#DE8F05\|#808080"
+<ASSETS>ai-benchmark-option-c-side-by-side.svg` prints `0` **and**
+      `comm -12 <(grep -oE "#[0-9A-Fa-f]{6}" <EV>phase-1-band-contrast.md | sort -u) <(grep -oE
+      "#[0-9A-Fa-f]{6}" <ASSETS>ai-benchmark-option-c-side-by-side.svg | sort -u) | wc -l` prints `4`.
+      Falsifiable both ways, identical to D-1: a no-op leaves the placeholder count ≥ `1` and the
+      intersection at `0`; a correct edit flips both to `0` and `4` respectively.
 - [ ] [AI] **D-3 — Format check**: confirm each finalist's embedded artifact is a real, non-empty
       `.png` image (the convention's approved plain-`.png`-screenshot fallback format) rendered from
       its hand-authored `.svg` source, and that neither is an `.excalidraw.svg`, inline HTML+CSS,
@@ -397,11 +408,16 @@ rev-parse --show-toplevel` prints the worktree path
       `/* ── Chart band tokens ── */` comment in both blocks, matching the file's existing section
       style — command: `npx nx run ayokoding-www:test:unit` — acceptance: all tests still pass
 - [ ] [AI] **T-4**: verify colour-blind separability and AA contrast of the three band hues against
-      both `--color-background` values, recording the computed OKLCH lightness deltas and contrast
-      ratios in `<EV>phase-1-band-contrast.md`
-      — acceptance: the file records a ratio ≥ 4.5:1 for each band's `-ink` against its `-wash`, and
-      a hue separation ≥ 105° between every band pair; any band failing either is replaced with
-      another existing hue and the file re-recorded
+      both `--color-background` values, and additionally compute each of the four bands' (`opus`,
+      `sonnet`, `light`, `unrated`) approximate resolved sRGB hex value from its OKLCH definition —
+      record the computed OKLCH lightness deltas, contrast ratios, **and the four resolved hex
+      approximations** (one per band, under a `### Resolved hex approximations` heading, each as a
+      standalone `#`-prefixed 6-digit hex on its own line) in `<EV>phase-1-band-contrast.md`. D-1/D-2
+      above consume these four hex values to replace the mockup SVGs' placeholder fills.
+      — acceptance: the file records a ratio ≥ 4.5:1 for each band's `-ink` against its `-wash`, a hue
+      separation ≥ 105° between every band pair, **and exactly four distinct resolved hex values** —
+      `grep -oE "#[0-9A-Fa-f]{6}" <EV>phase-1-band-contrast.md | sort -u | wc -l` prints `4`. Any band
+      failing the contrast/hue checks is replaced with another existing hue and the file re-recorded.
 - [ ] [AI] **T-5**: confirm no new hex literal was introduced — acceptance:
       `git diff -- <TOKENS> | grep -c '^+.*#[0-9a-fA-F]\{6\}'` prints `0` (the tokens alias existing
       `--hue-*` and `--warm-*` variables). Falsifiable both ways: adding a raw hex makes it print ≥ 1.
@@ -502,7 +518,7 @@ rev-parse --show-toplevel` prints the worktree path
 
 ### Refresh runbook
 
-- [ ] [AI] **R-1**: create `<RUNBOOK>` following the structure of
+- [ ] [AI] **RB-1**: create `<RUNBOOK>` following the structure of
       `apps/ayokoding-www/docs/cost-of-living-calculator/data-sourcing-prompt.md` — frontmatter
       (`title`, `description`, `category: how-to`), a purpose section, an output-to-destination table,
       the non-negotiable conventions (roster rule DD-7a, pricing rules DD-12/16/17a, evidence grades
@@ -510,7 +526,7 @@ rev-parse --show-toplevel` prints the worktree path
       benchmarks, prices)
       — acceptance: `test -f <RUNBOOK>` exits 0 and `npx nx run ayokoding-www:lint` exits 0
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] **R-2**: index `<RUNBOOK>` from `apps/ayokoding-www/docs/README.md` (or the nearest
+- [ ] [AI] **RB-2**: index `<RUNBOOK>` from `apps/ayokoding-www/docs/README.md` (or the nearest
       indexing README) — acceptance:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate`
       exits 0
@@ -1272,8 +1288,9 @@ rev-parse --show-toplevel` prints the worktree path
       `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-6-7-charts origin/main`
       — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-6-7-charts rev-parse
 --show-toplevel` prints the worktree path
-- [ ] [AI] **A-0**: append AC-12, AC-13, AC-14, AC-36 (capability half) and AC-37 to
-      `<SPECS>ai-benchmark.feature` — acceptance:
+- [ ] [AI] **A-0**: append AC-12, AC-13, AC-14, AC-36 (in full — the scenario covers both charts in
+      one `Scenario:` block, so it is authored here exactly once and not repeated at Phase 7's `Y-0`)
+      and AC-37 to `<SPECS>ai-benchmark.feature` — acceptance:
       `npx nx run ayokoding-www:specs:structure-validation` exits 0
 - [ ] [AI] **A-1 RED**: create `<SHELL>chart-primitives.test.tsx` asserting `scaleLinear(domainMax,
 pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in between
@@ -1394,9 +1411,11 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
 
 > _Suggested executor: `swe-ui-maker`._
 
-- [ ] [AI] **Y-0**: append AC-15, AC-16, AC-17 and the price half of AC-36 to
-      `<SPECS>ai-benchmark.feature` — acceptance:
-      `npx nx run ayokoding-www:specs:structure-validation` exits 0
+- [ ] [AI] **Y-0**: append AC-15, AC-16 and AC-17 to `<SPECS>ai-benchmark.feature`. AC-36 is **not**
+      appended again here — Phase 6's `A-0` already appended it in full (the scenario covers both
+      charts in one `Scenario:` block; see `A-11`'s full embed), mirroring how `Y-7` below binds it
+      without re-embedding it — acceptance: `npx nx run ayokoding-www:specs:structure-validation`
+      exits 0
 - [ ] [AI] **Y-1 RED**: bind AC-15 — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-15 "A metered model shows separate labelled input and output bars"_
 
