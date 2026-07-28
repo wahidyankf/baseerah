@@ -177,10 +177,10 @@ stable as the harness matrix grows.
 
 **Canonical example**:
 
-| PASS: Correct                                                         | FAIL: Incorrect                               | Reason for failure                                     |
-| --------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------ |
-| `"generate:bindings": "rhino-cli agents emit-bindings"`               | `"sync:vendor-a-to-vendor-b": "..."`          | Contains vendor names; implies per-harness             |
-| `"harness:bindings-validation": "rhino-cli agents validate-bindings"` | `"validate:specific-harness-bindings": "..."` | Names a specific harness rather than the logical check |
+| PASS: Correct                                                          | FAIL: Incorrect                               | Reason for failure                                     |
+| ---------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------ |
+| `"generate:bindings": "rhino-cli harness bindings generate"`           | `"sync:vendor-a-to-vendor-b": "..."`          | Contains vendor names; implies per-harness             |
+| `"harness:bindings-validation": "rhino-cli harness bindings validate"` | `"validate:specific-harness-bindings": "..."` | Names a specific harness rather than the logical check |
 
 ### Rule 7 — Catalog Requirement
 
@@ -275,18 +275,16 @@ of 2026-05-24. They must not be committed with content that diverges from `AGENT
 
 ## Tools and Automation
 
-- **`rhino-cli agents sync`** — existing generator; produces agent definition files for secondary
-  platform bindings from the primary binding source. Extended under AD4 to emit Tier-2 bridge files.
-- **`rhino-cli agents emit-bindings`** — generator subcommand; emits all platform-binding artifacts
-  from `AGENTS.md` in a single invocation (AD4). Invoked by the `generate:bindings` npm script.
+- **`rhino-cli harness bindings generate`** — generator subcommand; emits all platform-binding
+  artifacts (generated agent mirrors and Tier-2 bridge files) from the primary binding source
+  in a single invocation (AD4). Invoked by the `generate:bindings` npm script.
 - **`generate:bindings`** npm script — harness-neutral name for the single binding-generation
-  operation (AD8). Runs `rhino-cli agents emit-bindings`; re-run whenever `AGENTS.md` changes.
-- **`rhino-cli agents validate-bindings`** — deterministic subcommand (AD7); re-derives each
+  operation (AD8). Runs `rhino-cli harness bindings generate`; re-run whenever binding sources change.
+- **`rhino-cli harness bindings validate`** — deterministic subcommand (AD7); re-derives each
   generated binding in memory, asserts byte-equality, asserts catalog completeness. Exits non-zero on
   any mismatch.
-- **`harness:bindings-validation`** npm script — wraps `rhino-cli agents validate-bindings`; appended
-  to the pre-push hook alongside `governance:vendor-audit-validation` and
-  `cross-vendor:parity-validation` (AD8).
+- **`harness:bindings-validation`** npm script — wraps `rhino-cli harness bindings validate`; invoked
+  from the pre-push hook when binding surfaces change (AD8).
 - **`repo-harness-compatibility-checker`** / **`repo-harness-compatibility-fixer`** agents — run on
   demand or on a schedule; use web research to detect external upstream convention drift (distinct
   from the deterministic parity guard above).
