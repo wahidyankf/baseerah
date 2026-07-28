@@ -3,13 +3,13 @@
 // Covers all 11 supported coding-agent harnesses:
 //   Generated tier (byte-parity enforced):
 //     - OpenCode (.opencode/agents/ mirrors .claude/agents/)
+//     - Cursor (.cursor/agents/ mirrors .claude/agents/)
 //     - Amazon Q (.amazonq/rules/ + .amazonq/cli-agents/ — static bridge files)
 //
 //   Native tier (catalog coverage + no-shadowing rule enforced):
 //     - Claude Code (.claude/) — source of truth
 //     - Codex (.codex/)
 //     - Copilot (.github/)
-//     - Cursor (.cursor/)
 //     - Windsurf (.windsurf/)
 //     - Junie (.junie/)
 //     - Antigravity/Gemini (GEMINI.md thin-pointer surface)
@@ -23,7 +23,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use super::sync_validator::validate_sync;
+use super::sync_validator::{validate_cursor_sync, validate_sync};
 use super::types::{ValidationCheck, ValidationResult};
 
 /// Relative path of the Amazon Q rules pointer file (POSIX separators; joined
@@ -48,7 +48,7 @@ const AGENT_DEFINITION_CONTENT: &str = "{\n  \"name\": \"ose-default\",\n  \"des
 ///   - Amazon Q (.amazonq) — generated bridge
 ///   - Codex (.codex) — native reads AGENTS.md directly
 ///   - Copilot (.github) — native reads AGENTS.md directly
-///   - Cursor (.cursor) — native-tier, no-shadowing rule
+///   - Cursor (.cursor) — generated mirror of `.claude/agents/`
 ///   - Windsurf (.windsurf) — native-tier, no-shadowing rule
 ///   - Junie (.junie) — native-tier, no-shadowing rule
 ///   - Antigravity / Gemini (GEMINI.md) — native-tier thin-pointer surface
@@ -136,6 +136,7 @@ pub fn emit_bindings(repo_root: &Path) -> Result<EmitResult, String> {
 /// Validates all 11 harnesses:
 /// - Amazon Q bridge files: byte-for-byte parity with `expected_bindings()`
 /// - `OpenCode` mirror: `.opencode/agents/` mirrors `.claude/agents/` (via `validate_sync`)
+/// - Cursor mirror: `.cursor/agents/` mirrors `.claude/agents/` (via `validate_cursor_sync`)
 /// - Catalog coverage: every present binding dir referenced in the platform-bindings doc
 /// - No-Codex-agents-dir: `.codex/agents/` must not exist (Codex reads AGENTS.md natively)
 /// - Color/tier translation maps: every `color:` and `model:` value in `.claude/agents/*.md`
@@ -153,6 +154,12 @@ pub fn validate_bindings(repo_root: &Path) -> ValidationResult {
     // OpenCode agent mirror parity (.claude/ ↔ .opencode/)
     let sync_result = validate_sync(repo_root);
     for check in sync_result.checks {
+        result.tally(check);
+    }
+
+    // Cursor agent mirror parity (.claude/ ↔ .cursor/agents/)
+    let cursor_result = validate_cursor_sync(repo_root);
+    for check in cursor_result.checks {
         result.tally(check);
     }
 

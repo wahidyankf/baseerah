@@ -15,6 +15,7 @@ use std::sync::OnceLock;
 
 use serde_norway::Value;
 
+use super::field_policy::{FieldAction, FieldPolicy};
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 
 /// Relative path of the `OpenCode` agent directory (plural `agents/`).
@@ -48,27 +49,6 @@ pub struct OpenCodeAgent {
     pub steps: i64,
     /// Skill names (omitted when empty).
     pub skills: Vec<String>,
-}
-
-/// How a Claude frontmatter field should be handled during conversion.
-#[derive(Debug, Clone, Copy, PartialEq)]
-enum FieldAction {
-    /// Copy to `OpenCode` output unchanged.
-    Preserve,
-    /// Transform the value before writing to `OpenCode` output.
-    Translate,
-    /// Silently discard the field.
-    Drop,
-    /// Discard the field and emit a conversion warning.
-    DropWarn,
-}
-
-/// Per-field conversion policy entry.
-struct FieldPolicy {
-    /// What to do with this field.
-    action: FieldAction,
-    /// Human-readable reason, used in conversion warnings.
-    reason: &'static str,
 }
 
 /// Static (field, action, reason) table powering `claude_agent_field_policy()`.
