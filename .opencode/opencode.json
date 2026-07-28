@@ -9,40 +9,51 @@
       }
     }
   },
+  "tools": {
+    "websearch": true,
+    "codesearch": true
+  },
   "permission": {
-    "read": "allow",
-    "edit": "allow",
-    "todowrite": "allow",
-    "question": "allow",
-    "webfetch": "allow",
-    "websearch": "allow",
-    "task": "allow",
-    "bash": {
+    "read": {
       "*": "allow",
-      "rm *": "ask",
-      "rm -*": "ask",
-      "trash *": "ask",
-      "trash -*": "ask",
-      "unlink *": "ask"
+      "**/.env": "deny",
+      "**/.env.local": "deny",
+      "**/.env.development": "deny",
+      "**/.env.production": "deny",
+      "**/.env.staging": "deny",
+      "**/.env.test": "deny",
+      "**/.env.example": "allow"
+    },
+    "edit": {
+      "*": "allow",
+      "**/.env": "deny",
+      "**/.env.local": "deny",
+      "**/.env.development": "deny",
+      "**/.env.production": "deny",
+      "**/.env.staging": "deny",
+      "**/.env.test": "deny",
+      "**/.env.example": "allow"
+    },
+    "bash": {
+      "*": "allow"
     },
     "glob": "allow",
     "grep": "allow",
     "list": "allow",
     "skill": "allow",
+    "todowrite": "allow",
+    "question": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "task": "allow",
     "external_directory": {
       "/tmp/**": "allow"
     }
   },
   "mcp": {
-    "nx-mcp": {
-      "type": "local",
-      "command": ["npx", "-y", "nx-mcp"],
-      "enabled": true
-    },
     "playwright": {
       "type": "local",
       "command": ["npx", "-y", "@playwright/mcp@latest"]
     }
-  },
-  "plugin": ["@zilliz/memsearch-opencode"]
+  }
 }
