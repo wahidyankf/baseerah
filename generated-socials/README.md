@@ -9,7 +9,7 @@ tags:
   - content
   - automation
 created: 2026-01-25
-updated: 2026-01-25
+updated: 2026-07-27
 ---
 
 # Generated Social Media Content
@@ -24,15 +24,22 @@ This directory contains **auto-generated and curated LinkedIn posts** that commu
 
 ## Directory Structure
 
-Platform-specific posts are organized into subdirectories by platform:
+Posts are organized by platform, then by publication year:
 
 ```
 generated-socials/
-  linkedin/   ← all LinkedIn posts
-  README.md   ← this file
+  linkedin/     ← all LinkedIn posts
+    2025/       ← posts published in 2025
+    2026/       ← posts published in 2026
+  README.md     ← this file
 ```
 
-New platforms (e.g. `twitter/`, `bluesky/`) would each get their own subdirectory.
+The year folder is the four-digit year of the `YYYY-MM-DD` prefix in the filename — a post always
+lives in the year it was published, never the year its reporting window opened. A new year folder is
+created by the first post published in that year; no folder is created ahead of time.
+
+New platforms (e.g. `twitter/`, `bluesky/`) would each get their own subdirectory and follow the same
+year grouping.
 
 ## File Naming Convention
 
@@ -54,10 +61,10 @@ YYYY-MM-DD__linkedin__ose-update-{identifier}.md
 
 **Examples**:
 
-- `linkedin/2025-12-15__linkedin__ose-update-init.md` - Initial platform announcement
-- `linkedin/2025-12-21__linkedin__ose-update-week-0005.md` - Week 5 progress update
-- `linkedin/2026-01-25__linkedin__ose-update-week-0010.md` - Week 10 progress update
-- `linkedin/2026-04-30__linkedin__ose-update-month-2026-04.md` - April 2026 monthly oseplatform-web update
+- `linkedin/2025/2025-12-15__linkedin__ose-update-init.md` - Initial platform announcement
+- `linkedin/2025/2025-12-21__linkedin__ose-update-week-0005.md` - Week 5 progress update
+- `linkedin/2026/2026-01-25__linkedin__ose-update-week-0010.md` - Week 10 progress update
+- `linkedin/2026/2026-04-30__linkedin__ose-update-month-2026-04.md` - April 2026 monthly oseplatform-web update
 
 ## Content Structure
 
@@ -304,4 +311,4 @@ Potential improvements to the social media workflow:
 - Posting workflow changes
 - Integration with other platforms is added
 
-**Last Updated**: 2026-01-25
+**Last Updated**: 2026-07-27

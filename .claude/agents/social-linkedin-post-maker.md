@@ -22,7 +22,7 @@ Create LinkedIn posts in `generated-socials/linkedin/` from project updates.
 
 Use this agent **every time** a LinkedIn post is created in `generated-socials/linkedin/`. It owns the file format, the data-gathering window, and the hard character limit. Do not hand-author posts in that directory without it.
 
-**Canonical exemplar**: model every new post on [`generated-socials/linkedin/2026-05-25__linkedin__ose-update-week-0027.md`](../../generated-socials/linkedin/2026-05-25__linkedin__ose-update-week-0027.md) — match its header, section structure, tone, and length. Always read the latest existing post before drafting so format and voice stay consistent.
+**Canonical exemplar**: model every new post on [`generated-socials/linkedin/2026/2026-05-25__linkedin__ose-update-week-0027.md`](../../generated-socials/linkedin/2026/2026-05-25__linkedin__ose-update-week-0027.md) — match its header, section structure, tone, and length. Always read the latest existing post before drafting so format and voice stay consistent.
 
 ## Hard Constraints
 
@@ -46,7 +46,7 @@ Use this agent **every time** a LinkedIn post is created in `generated-socials/l
 
 ## File Format
 
-Filename: `YYYY-MM-DD__linkedin__ose-update-week-NNNN.md` (ISO date of posting; zero-padded 4-digit week number).
+Path: `generated-socials/linkedin/YYYY/YYYY-MM-DD__linkedin__ose-update-week-NNNN.md` — posts are grouped into a four-digit **year folder** matching the filename's date prefix (the year of posting, not the year the reporting window opened). Create the year folder if the new post is the first of its year. Filename: ISO date of posting; zero-padded 4-digit week number.
 
 ```
 Posted: <Weekday, Month D, YYYY>
@@ -90,7 +90,7 @@ The header lines above the `---` are bookkeeping only. Keep them accurate but re
 
 ## Workflow
 
-1. **Establish the window.** Read the most recent file in `generated-socials/linkedin/`; take its `Window:` end timestamp as the new window start, and its week number + 1 as the new week. New window end = now (+0700).
+1. **Establish the window.** Read the most recent file across every year folder under `generated-socials/linkedin/` (`ls generated-socials/linkedin/*/ | sort | tail -1`, or read the highest year folder's last file — do not stop at the current year, which is empty every January); take its `Window:` end timestamp as the new window start, and its week number + 1 as the new week. New window end = now (+0700).
 2. **Gather commits** across the three sibling repos at `~/ose-projects/{ose-public,ose-primer,ose-infra}`. Use `git -C <repo> rev-list --count --since=<start> HEAD` for accurate totals and `git -C <repo> log --since=<start>` for subjects. Note: RTK caps `git log` output at ~50 lines — use `rtk proxy git -C <repo> log ...` or `rev-list --count` when you need the full count.
 3. **Draft the body** using the structure above. Lead with the most significant structural changes; compress routine churn into single clauses. Active voice, professional tone, benefits-focused.
 4. **Measure** the body (command above) and **trim until ≤ 3,000** characters.
