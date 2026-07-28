@@ -35,7 +35,8 @@ just because another repository states it correctly.
 ## Context
 
 Each of the three sibling repositories maintains multi-harness compatibility across eleven
-coding-agent harnesses, with `.claude/` as the single source of truth and `rhino-cli` generating
+coding-agent harnesses [Repo-grounded — 11 entries under `repo-config.yml` `harness:`], with
+`.claude/` as the single source of truth and `rhino-cli` generating
 every secondary binding. Two generated bindings exist today in each repo: `.opencode/agents/` (a full
 agent mirror with model, colour, and permission translation) and `.amazonq/` (a static bridge).
 Cursor currently has **no committed binding at all** in any of them — `test -e .cursor` returns
@@ -71,8 +72,9 @@ extension of this plan — it is the only self-consistent shape it can take.
 
 - A `.cursor/agents/` emitter in `apps/rhino-cli`, a sibling of the existing OpenCode converter,
   wired into `harness bindings generate` and guarded by mirror-parity validation.
-- The tier mapping: thinking-grade and execution-grade both pin the non-fast Composer 2.5 identifier;
-  fast-grade pins Cursor's cheapest-input model.
+- The tier mapping: **full tier collapse** — every Claude alias (`opus`, `sonnet`, `haiku`, and
+  model-omitted) pins the same non-fast Composer 2.5 identifier. The emitter must never write
+  `composer-2.5-fast`.
 - Companion Gherkin under a new, dedicated `specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/`
   directory — sibling to the existing `harness/` directory, never nested inside it (see
   [`tech-docs.md`](./tech-docs.md) DD-15) — inside the three-repo byte-identity boundary and

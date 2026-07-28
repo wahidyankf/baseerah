@@ -47,12 +47,13 @@ The exposure is proportional to each repo's roster, and the rosters are not the 
 
 | Repository   | Agents | `opus` | `sonnet` | `haiku` | `model:` omitted | Non-fast-pinned after this plan |
 | ------------ | ------ | ------ | -------- | ------- | ---------------- | ------------------------------- |
-| `ose-public` | 90     | 1      | 75       | 11      | 3                | 79                              |
-| `ose-primer` | 64     | 1      | 58       | 2       | 3                | 62                              |
-| `ose-infra`  | 53     | 1      | 47       | 2       | 3                | 51                              |
+| `ose-public` | 90     | 1      | 75       | 11      | 3                | 90 (all agents)                 |
+| `ose-primer` | 64     | 1      | 58       | 2       | 3                | 64 (all agents)                 |
+| `ose-infra`  | 53     | 1      | 47       | 2       | 3                | 53 (all agents)                 |
 
 Do not treat `ose-public`'s roster as representative: `ose-primer` carries roughly two thirds of it
-and `ose-infra` roughly half, and the fast-tier share differs by more than fivefold.
+and `ose-infra` roughly half. Every agent in every repo receives the same non-fast Composer 2.5 pin —
+`composer-2.5-fast` is never emitted.
 
 Cursor's documentation never states what it does with an unrecognised `model:` value. Silently
 falling back to `inherit`, erroring, or mapping onto some Claude release are all plausible and none
@@ -89,13 +90,14 @@ directory costs a permanent drift liability.
 - **Determinism**: Cursor stops relying on undefined handling of an unrecognised `model:` value.
 - **Consistency**: three generated bindings, one generator, one guard, one registry.
 
-### Cross-vendor cost caveat, stated honestly
+### Full tier collapse — no `composer-2.5-fast`
 
-The fast tier maps to Gemini 2.5 Flash at $0.30 input / $2.50 output [Web-cited —
-<https://cursor.com/docs/models/cursor-composer-2-5>, accessed 2026-07-28]. Against Composer 2.5
-standard's $0.50 / $2.50, the saving is **input-side only** — output price is identical. That choice
-also introduces a **cross-vendor dependency** into the binding: the fast tier is no longer a Cursor
-first-party model. Both facts are stated in the mapping table rather than buried.
+Every Claude alias — including `haiku` — maps to the same non-fast Composer 2.5 identifier. The
+emitter never writes `composer-2.5-fast`; that slug is the 6x-priced toggle this plan exists to
+avoid. Haiku agents therefore trade a hypothetical input-cost saving for deterministic,
+first-party pinning — the same tier-collapse shape OpenCode already documents for thinking and
+execution grades [Repo-grounded —
+`repo-governance/development/agents/model-selection.md` "Tier Collapse"].
 
 ## Affected Roles
 
@@ -122,9 +124,9 @@ is asserted as a measured fact, because no baseline exists. Signals 1, 2, 3, 5, 
 1. **Observable, per repo** — `.cursor/agents/` contains exactly one file per `.claude/agents/*.md`
    agent (excluding `README.md`): 90 in `ose-public`, 64 in `ose-primer`, 53 in `ose-infra`,
    verifiable by comparing the two counts in each tree.
-2. **Observable, per repo** — every emitted `.cursor/agents/*.md` file whose Claude source is
-   thinking-grade, execution-grade, or model-omitted carries the non-fast Composer 2.5 identifier:
-   79 files in `ose-public`, 62 in `ose-primer`, 51 in `ose-infra`, verifiable with a count.
+2. **Observable, per repo** — every emitted `.cursor/agents/*.md` file carries the non-fast Composer
+   2.5 identifier and none carries `composer-2.5-fast`: 90 files in `ose-public`, 64 in
+   `ose-primer`, 53 in `ose-infra`, verifiable with a count and a negative grep.
 3. **Observable, per repo** — `cargo run --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness bindings validate`
    and `… -- harness naming validate` both exit 0 with the Cursor mirror present, and
    `harness naming validate` exits non-zero after a single file is removed from the mirror.
@@ -171,19 +173,19 @@ is asserted as a measured fact, because no baseline exists. Signals 1, 2, 3, 5, 
 
 ## Business Risks and Mitigations
 
-| Risk                                                                              | Likelihood         | Mitigation                                                                                                   |
-| --------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Cursor ignores the `model:` frontmatter (staff-confirmed defect)                  | Confirmed to occur | Phase 5 verifies empirically against a live subagent; Phase 1 re-checks the changelog before locking in      |
-| The canonical model-ID slug differs from `composer-2.5`                           | Unknown            | Phase 1 spike U1 resolves it with a stated fallback; no emitter code is written until it is answered         |
-| Cursor rejects or mishandles the bracket parameter syntax in a file               | Unknown            | Phase 1 spike U2 resolves it; fallback is to emit the bare slug and document the residual exposure           |
-| Cursor renames or retires the Composer 2.5 slug later                             | Plausible          | The pin lives in one function and one governance table; `repo-harness-compatibility-checker` gains this axis |
-| Adding a cross-vendor model to the fast tier couples the binding to a third party | Certain            | Stated explicitly in the mapping table and in this document rather than buried                               |
-| `apps/rhino-cli` drifts out of byte-identity across the three repos               | Real               | Phases 6 and 7 land the identical source and Gherkin; the SDLC Gate Standard boundary is cited in each       |
-| The generated directory trips pre-commit Prettier and breaks byte-equality        | Real precedent     | Phase 3 verifies with a falsifiable check before deciding whether `.prettierignore` needs an entry           |
-| A sibling repo lands the emitter but not its governance record                    | Real               | Each repo's landing is one PR carrying emitter, generated output, and that repo's verdict table together     |
-| One repo's honesty caveat is written and the other two overstate the guarantee    | Real               | The out-of-reach note is a per-repo delivery step with its own acceptance check in each landing phase        |
-| A shared step assumes symmetry and fails in a repo whose document differs         | Confirmed to occur | Every governance surface differs per repo; the plan carries three verdict tables, not one shared step list   |
-| Sibling-repo git topology is assumed rather than detected                         | Real               | Each landing phase detects topology with `git worktree list` and branches on the `(bare)` marker             |
+| Risk                                                                                            | Likelihood         | Mitigation                                                                                                   |
+| ----------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Cursor ignores the `model:` frontmatter (staff-confirmed defect)                                | Confirmed to occur | Phase 5 verifies empirically against a live subagent; Phase 1 re-checks the changelog before locking in      |
+| The canonical model-ID slug differs from `composer-2.5`                                         | Unknown            | Phase 1 spike U1 resolves it with a stated fallback; no emitter code is written until it is answered         |
+| Cursor rejects or mishandles the bracket parameter syntax in a file                             | Unknown            | Phase 1 spike U2 resolves it; fallback is to emit the bare slug and document the residual exposure           |
+| Cursor renames or retires the Composer 2.5 slug later                                           | Plausible          | The pin lives in one function and one governance table; `repo-harness-compatibility-checker` gains this axis |
+| Full tier collapse pins haiku agents at standard Composer 2.5 input cost, not the cheapest tier | Certain            | Stated explicitly in DD-4 and DD-5; the bill-payer accepts deterministic pinning over input savings          |
+| `apps/rhino-cli` drifts out of byte-identity across the three repos                             | Real               | Phases 6 and 7 land the identical source and Gherkin; the SDLC Gate Standard boundary is cited in each       |
+| The generated directory trips pre-commit Prettier and breaks byte-equality                      | Real precedent     | Phase 3 verifies with a falsifiable check before deciding whether `.prettierignore` needs an entry           |
+| A sibling repo lands the emitter but not its governance record                                  | Real               | Each repo's landing is one PR carrying emitter, generated output, and that repo's verdict table together     |
+| One repo's honesty caveat is written and the other two overstate the guarantee                  | Real               | The out-of-reach note is a per-repo delivery step with its own acceptance check in each landing phase        |
+| A shared step assumes symmetry and fails in a repo whose document differs                       | Confirmed to occur | Every governance surface differs per repo; the plan carries three verdict tables, not one shared step list   |
+| Sibling-repo git topology is assumed rather than detected                                       | Real               | Each landing phase detects topology with `git worktree list` and branches on the `(bare)` marker             |
 
 ## Related
 

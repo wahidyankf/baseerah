@@ -62,6 +62,13 @@ push direct to `origin main` from the primary checkout, opening no PR, per the
 [plan-planning workflow](../../../repo-governance/workflows/plan/plan-planning.md). That is a
 deliberate exception recorded in `tech-docs.md` DD-8, not an oversight.
 
+**Archival-in-PR exception (DD-8 extension).** Under `worktree-to-pr`, archival (`git mv` to
+`plans/done/`, README index updates) normally lands inside the delivery PR. This plan **defers**
+archival to Phase 9 (plan-docs-only direct push) because PR 1 is a prerequisite for PRs 2 and 3 —
+archiving inside PR 1 would declare the plan complete while two-thirds of its delivery units remain
+unopened. See `tech-docs.md` DD-8 for the full rationale and the
+[PR Review Quality Gate workflow §Done-Definition, Three-repo nuance](../../../repo-governance/workflows/pr/pr-review-quality-gate.md#done-definition-for--to-pr-modes).
+
 See [Plans Organization Convention §Delivery Mode](../../../repo-governance/conventions/structure/plans.md#delivery-mode).
 
 ## Parallelization Model
@@ -184,8 +191,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 >
 > **No PR for this phase.** Phase 0 is local setup and baseline only: it opens no PR, pushes no
 > branch, runs no PR-Review Maker→Fixer Cycle, and merges nothing — under every Delivery Mode. The
-> earliest phase that may open a PR is Phase 1; any evidence file written here rides that first
-> integration.
+> earliest phase that may open a PR is **Phase 5** (the first delivery boundary, PR 1); any evidence
+> file written here rides the Phase 1 direct push (plan-docs carve-out), not a PR.
 
 - [ ] [AI] Install dependencies in the `ose-public` root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized
@@ -287,8 +294,12 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: `## U2` records a `[Web-cited]` answer, or records the fallback "emit the bare
       slug" together with one sentence naming the residual fast-toggle exposure that fallback leaves
 - [ ] [AI] Resolve **U3 — what Cursor does with an unrecognised `model:` value such as `sonnet`**
-      — acceptance: `## U3` records a `[Web-cited]` answer or an explicit `[Unverified]` label; a
-      guess presented as fact fails this step
+      via `web-researcher` documentation survey only (the empirical scratch-agent probe described in
+      `tech-docs.md` is **deferred to Phase 5** — the live subagent session there is the authoritative
+      runtime check)
+      — acceptance: `## U3` records a `[Web-cited]` answer or an explicit `[Unverified]` label, plus
+      a **Deferred to Phase 5** line naming the empirical probe; a guess presented as fact fails this
+      step
 - [ ] [AI] Resolve **U4 — whether the two staff-confirmed defects are fixed in the installed Cursor
       version** by re-checking the Cursor changelog and recording the installed version string
       — acceptance: `## U4` records the changelog verdict, the installed version string, and the
@@ -367,7 +378,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
   **Gherkin (underpins) →** "A thinking-grade agent pins Composer 2.5 with fast disabled",
   "An execution-grade agent pins Composer 2.5 with fast disabled", "An agent that omits the model
-  field pins Composer 2.5 with fast disabled", "A fast-grade agent pins the fast-tier model"
+  field pins Composer 2.5 with fast disabled", "A fast-grade agent pins Composer 2.5 with fast disabled"
 
   ```gherkin
   Scenario: A thinking-grade agent pins Composer 2.5 with fast disabled
@@ -394,11 +405,11 @@ These blocks are referenced by name from the phase gates below. Run them whereve
   ```
 
   ```gherkin
-  Scenario: A fast-grade agent pins the fast-tier model
+  Scenario: A fast-grade agent pins Composer 2.5 with fast disabled
     Given a Claude agent whose frontmatter declares the fast-grade model alias
     When the developer runs harness bindings generate
-    Then the emitted Cursor agent frontmatter declares the fast-tier Cursor model identifier
-    And the emitted identifier differs from the non-fast Composer 2.5 identifier
+    Then the emitted Cursor agent frontmatter declares the non-fast Composer 2.5 model identifier
+    And the emitted identifier is byte-identical to the thinking-grade agent's identifier
   ```
 
 - [ ] [AI] **GREEN**: implement `pub fn convert_cursor_model(claude_model: &str) -> String` in
@@ -408,9 +419,9 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib cursor_model`
       — acceptance: all four tests pass, and
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib` reports no newly failing test
-- [ ] [AI] **REFACTOR**: hoist the two model-ID literals into named `const` items at the top of
-      `cursor.rs` so a future model change edits one line each, and document the deliberate
-      thinking/execution tier collapse in a `///` comment
+- [ ] [AI] **REFACTOR**: hoist the non-fast Composer 2.5 model-ID literal into a named `const` at the
+      top of `cursor.rs` so a future model change edits one line, and document the full tier collapse
+      in a `///` comment
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib`
       — acceptance: all tests still pass and `npx nx run rhino-cli:lint` exits 0
 
@@ -787,27 +798,27 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
-### TDD Cycle E4 — a fast-grade agent pins the fast-tier model
+### TDD Cycle E4 — a fast-grade agent pins Composer 2.5 with fast disabled
 
 - [ ] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
       `apps/rhino-cli/tests/cursor_binding.rs`, reusing the shared fixture builder and `Given`/`When`
       steps, leaving each body as `todo!("bind in GREEN")`
-      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A fast-grade agent pins the fast-tier model"`
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A fast-grade agent pins Composer 2.5 with fast disabled"`
       — acceptance: exits non-zero with a panic from `todo!`
 
-  **Gherkin (binds) →** "A fast-grade agent pins the fast-tier model"
+  **Gherkin (binds) →** "A fast-grade agent pins Composer 2.5 with fast disabled"
 
   ```gherkin
-  Scenario: A fast-grade agent pins the fast-tier model
+  Scenario: A fast-grade agent pins Composer 2.5 with fast disabled
     Given a Claude agent whose frontmatter declares the fast-grade model alias
     When the developer runs harness bindings generate
-    Then the emitted Cursor agent frontmatter declares the fast-tier Cursor model identifier
-    And the emitted identifier differs from the non-fast Composer 2.5 identifier
+    Then the emitted Cursor agent frontmatter declares the non-fast Composer 2.5 model identifier
+    And the emitted identifier is byte-identical to the thinking-grade agent's identifier
   ```
 
 - [ ] [AI] **GREEN**: confirm the fast-grade branch of `convert_cursor_model` (Cycle A) reaches the
-      CLI path and emits the fast-tier literal
-      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A fast-grade agent pins the fast-tier model"`
+      CLI path and emits the same non-fast literal as every other tier
+      — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A fast-grade agent pins Composer 2.5 with fast disabled"`
       — acceptance: exits 0
 - [ ] [AI] **REFACTOR**: run all four model-tier scenarios together and confirm none regressed
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "pins"`
@@ -1257,14 +1268,14 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       literal 90 if the roster moved.
 - [ ] [AI] Verify the pin actually landed in the generated output:
       `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l`
-      — acceptance: reads `79` — the 75 `sonnet` agents plus the 1 `opus` agent plus the 3 agents
-      that omit `model:`. Falsifiable in both directions: `11` files must instead carry the fast-tier
-      literal, and `79 + 11 = 90`. Never use `grep -L` here; in this shell `-L` means
+      — acceptance: reads `90` — every agent file in the roster. Also confirm the fast slug never
+      appears: `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` exits non-zero (no matches).
+      Never use `grep -L` here; in this shell `-L` means
       files-without-match and exits 0, silently reading as a pass. Never use `grep -lc` either (same
       hazard class): `-l` and `-c` are contradictory output modes that different implementations
       resolve differently — `grep -lc "foo" *.md | wc -l` on a 3-file/2-match fixture returns `2`
       under this shell's ugrep-backed function but `5` under `/usr/bin/grep` (BSD); at this roster's
-      real scale (`90` files, `79` matches), `/usr/bin/grep -lc … | wc -l` would read `169`, not `79`.
+      real scale (`90` files, `90` matches), `/usr/bin/grep -lc … | wc -l` would read `169`, not `90`.
       Plain `-l` (no `-c`) is unambiguous under every implementation — use it, pinned to
       `/usr/bin/grep` for consistency with the phase gates elsewhere in this file.
 - [ ] [AI] Confirm the generated tree carries no README:
@@ -1451,9 +1462,9 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       generated agent surface
       — acceptance: `grep -c "\.cursor/agents" repo-governance/conventions/structure/governance-vendor-independence.md`
       returns at least `1`
-- [ ] [AI] **P8** — add the Cursor mapping to `### Model ID Mapping` in
-      `repo-governance/development/agents/model-selection.md`, together with the DD-5 cross-vendor
-      caveat that the fast tier resolves to a non-Cursor-authored model
+- [ ] [AI] **P8** — add the Cursor full-tier-collapse mapping to `### Model ID Mapping` in
+      `repo-governance/development/agents/model-selection.md`, including the explicit prohibition
+      against emitting `composer-2.5-fast`
       — acceptance: `grep -c "Composer" repo-governance/development/agents/model-selection.md`
       returns at least `1` (returned `0` before)
 - [ ] [AI] **P9** — amend the `AGENTS.md` line that groups Cursor with tools that "read root
@@ -1567,7 +1578,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: the amended sentence exists, or the checklist records "probe matched — no
       amendment needed". Both branches are recorded; silence is not acceptable.
 - [ ] [AI] Assert the two cheap repo-local facts for `ose-public`:
-      `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `79`, and
+      `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `90`, and
+      `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches, and
       `test -e .cursor/cli.json; echo $?` prints `1`
       — acceptance: both hold. The second confirms this plan did not silently take on the CLI
       surface, which it explicitly does not govern.
@@ -1627,8 +1639,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 > _Repository: `ose-primer`. **Delivery unit D2, one PR.** Runs concurrently with Phase 7 — different
 > repository, different git object store, no shared file._
 >
-> **Roster: 64 agents.** 1 `opus` + 58 `sonnet` + 3 with `model:` omitted = **62** files carrying the
-> non-fast pin; 2 `haiku` carrying the fast-tier literal. Never reuse `ose-public`'s 90/79/11.
+> **Roster: 64 agents.** Every file carries the non-fast pin; `composer-2.5-fast` appears in none.
+> Never reuse `ose-public`'s roster count without re-measuring.
 >
 > **Byte-identity boundary.** `apps/rhino-cli/**` and
 > `specs/apps/rhino/behavior/rhino-cli/gherkin/**` must end this phase byte-identical to
@@ -1695,10 +1707,11 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: exits 0 and `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `64`, matching this
       repository's roster count in `evidence/phase-0-baseline.txt`
 - [ ] [AI] Assert this repository's own pin counts (DD-12):
-      `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `62`, and
-      the fast-tier literal appears in `2` files
-      — acceptance: `62 + 2 = 64`. Falsifiable in both directions and specific to this roster; the
-      `ose-public` numbers would fail here.
+      `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `64`, and
+      `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
+      — acceptance: every agent file carries the non-fast literal and none carries the fast slug.
+      Falsifiable in both directions and specific to this roster; the `ose-public` numbers would fail
+      here.
 - [ ] [AI] Assert the emitter's own README-skip and CLI-absence facts (the live probe from Phase 5
       is not repeated here):
       `test -e .cursor/agents/README.md; echo $?` prints `1`, and
@@ -1764,7 +1777,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       `governance-vendor-independence.md`
       — acceptance: `grep -c "\.cursor/agents" repo-governance/conventions/structure/governance-vendor-independence.md`
       returns at least `1`
-- [ ] [AI] **R9** — add the Cursor mapping to this repository's `model-selection.md`. **This copy has
+- [ ] [AI] **R9** — add the Cursor full-tier-collapse mapping to this repository's `model-selection.md`,
+      including the `composer-2.5-fast` prohibition. **This copy has
       no `### Model ID Mapping` subsection** — the mapping lives inline under
       `## Platform Binding Examples`. Add it in this repo's own shape; do not assume P8's anchor.
       — acceptance: `grep -c "Composer" repo-governance/development/agents/model-selection.md`
@@ -1843,7 +1857,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       leaves the count below 14.
 - [ ] [AI] Both shared-row steps in this phase are ticked — the `Apply row **S1**` step and the
       `Apply shared rows **S2-S10**` step — so all ten shared rows have a verdict here too
-- [ ] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `64`, with `62` non-fast and `2` fast
+- [ ] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `64`, every file carries the non-fast
+      literal, and `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
 - [ ] [AI] `evidence/phase-6-ose-primer-cli.txt` and `evidence/phase-6-bindings-validate.json` exist
       with all nine contract rows recorded in this repository's own tree
 - [ ] [AI] The byte-identity boundary holds: `apps/rhino-cli/**` and
@@ -1862,8 +1877,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > _Repository: `ose-infra`. **Delivery unit D3, one PR.** Runs concurrently with Phase 6._
 >
-> **Roster: 53 agents.** 1 `opus` + 47 `sonnet` + 3 with `model:` omitted = **51** files carrying the
-> non-fast pin; 2 `haiku` carrying the fast-tier literal.
+> **Roster: 53 agents.** Every file carries the non-fast pin; `composer-2.5-fast` appears in none.
 >
 > **This repository is private and proprietary**, with a different app set (`coralpolyp`, the runner
 > stack). It does **not** participate in the `ose-public` ↔ `ose-primer` content-parity loop. Its
@@ -1909,9 +1923,9 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 - [ ] [AI] Generate the mirror: `npx nx run rhino-cli:run -- harness bindings generate`
       — acceptance: exits 0 and `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `53`
 - [ ] [AI] Assert this repository's own pin counts (DD-12):
-      `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `51`, and
-      the fast-tier literal appears in `2` files
-      — acceptance: `51 + 2 = 53`
+      `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `53`, and
+      `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
+      — acceptance: every agent file carries the non-fast literal and none carries the fast slug
 - [ ] [AI] Assert the emitter's own README-skip and CLI-absence facts (the live probe from Phase 5
       is not repeated here):
       `test -e .cursor/agents/README.md; echo $?` prints `1`, and
@@ -1976,7 +1990,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance:
       `git diff --stat repo-governance/conventions/structure/governance-vendor-independence.md`
       prints nothing
-- [ ] [AI] **I8** — add the Cursor mapping to this repository's `model-selection.md`, which has no
+- [ ] [AI] **I8** — add the Cursor full-tier-collapse mapping to this repository's `model-selection.md`,
+      including the `composer-2.5-fast` prohibition, which has no
       `### Model ID Mapping` subsection and is shorter than the other two copies; add it in this
       repo's own shape
       — acceptance: `grep -c "Composer" repo-governance/development/agents/model-selection.md`
@@ -2058,7 +2073,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       leaves the count below 14.
 - [ ] [AI] Both shared-row steps in this phase are ticked — the `Apply row **S1**` step and the
       `Apply shared rows **S2-S10**` step — so all ten shared rows have a verdict here too
-- [ ] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `53`, with `51` non-fast and `2` fast
+- [ ] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `53`, every file carries the non-fast
+      literal, and `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches
 - [ ] [AI] `evidence/phase-7-ose-infra-cli.txt` and `evidence/phase-7-bindings-validate.json` exist,
       carry all nine contract rows, and contain no raw private hostname, inventory, or absolute
       home path

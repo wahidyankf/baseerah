@@ -74,7 +74,7 @@ below names the real filesystem path; the shim needs no edit.
 | Sink                 | `.opencode/agents/*.md`                  | `.cursor/agents/*.md`                                        |
 | `name`               | Dropped ("filename carries name")        | **Preserved** — Cursor documents `name` in its schema        |
 | `description`        | Preserved                                | Preserved                                                    |
-| `model`              | `convert_model` → GLM / MiniMax IDs      | `convert_cursor_model` → Composer 2.5 / fast-tier IDs        |
+| `model`              | `convert_model` → GLM / MiniMax IDs      | `convert_cursor_model` → non-fast Composer 2.5 only          |
 | `color`              | `convert_color` → theme token            | **Dropped with a warning** — Cursor documents no color field |
 | `tools`              | `convert_permission` → `permission:` map | Dropped with a warning — Cursor documents no tools field     |
 | `readonly`           | n/a                                      | **Omitted** — see DD-6                                       |
@@ -250,12 +250,12 @@ stateDiagram-v2
     Recorded --> [*]
 ```
 
-| ID  | Unknown                                                                           | How Phase 1 resolves it                                                                                                  | Fallback if unresolved                                                                                                          |
-| --- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| U1  | The canonical Cursor model-ID slug for Composer 2.5                               | Delegate to `web-researcher` against Cursor's model docs and subagent docs; corroborate with two first-party sources     | Emit `composer-2.5` (the slug both first-party sources use in literal examples) and label it `[Unverified]` in the catalog      |
-| U2  | Whether the bracket parameter syntax is accepted in an agent-file `model:` field  | Same research pass plus a live emit-and-launch probe in Phase 5                                                          | Emit the bare slug without brackets and record the residual fast-toggle exposure in the catalog                                 |
-| U3  | What Cursor does with an unrecognised `model:` value such as `sonnet`             | Probe: place a deliberately-invalid value in a scratch agent under a temp dir, launch it, read the served model          | Record as `[Unverified]` — it stops mattering once `.cursor/agents/` wins precedence, but the answer sizes the current exposure |
-| U4  | Whether the two staff-confirmed defects are fixed in the installed Cursor version | Re-check the Cursor changelog via `web-researcher` at execution time; record the installed version alongside the verdict | Ship anyway with the defect documented; Phase 5's empirical check is the real gate, not the changelog                           |
+| ID  | Unknown                                                                           | How Phase 1 resolves it                                                                                                                                                             | Fallback if unresolved                                                                                                        |
+| --- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| U1  | The canonical Cursor model-ID slug for Composer 2.5                               | Delegate to `web-researcher` against Cursor's model docs and subagent docs; corroborate with two first-party sources                                                                | Emit `composer-2.5` (the slug both first-party sources use in literal examples) and label it `[Unverified]` in the catalog    |
+| U2  | Whether the bracket parameter syntax is accepted in an agent-file `model:` field  | Same research pass plus a live emit-and-launch probe in Phase 5                                                                                                                     | Emit the bare slug without brackets and record the residual fast-toggle exposure in the catalog                               |
+| U3  | What Cursor does with an unrecognised `model:` value such as `sonnet`             | Phase 1: `web-researcher` documentation survey only. Empirical probe (scratch agent with invalid `model:`, launch, read served model) **deferred to Phase 5** live subagent session | Record as `[Unverified]` in Phase 1 if docs are silent; Phase 5 probe is the authoritative runtime check for alias resolution |
+| U4  | Whether the two staff-confirmed defects are fixed in the installed Cursor version | Re-check the Cursor changelog via `web-researcher` at execution time; record the installed version alongside the verdict                                                            | Ship anyway with the defect documented; Phase 5's empirical check is the real gate, not the changelog                         |
 
 **Refuse-on-uncertainty applies.** No emitted governance prose may state U1 or U2 as fact until
 Phase 1 records a verified answer. Where Phase 1 lands on a fallback, the catalog row and the
@@ -322,28 +322,29 @@ delivery steps anchor on the entry text rather than a line number.
 
 ### DD-4 — Model mapping mirrors the OpenCode tier-collapse shape
 
-| Claude alias                 | Cursor model ID                     | Tier      |
-| ---------------------------- | ----------------------------------- | --------- |
-| `opus`                       | `composer-2.5[fast=false]`          | Thinking  |
-| `sonnet` / omitted (inherit) | `composer-2.5[fast=false]`          | Execution |
-| `haiku`                      | Cursor's fast-tier Gemini 2.5 Flash | Fast      |
+| Claude alias                 | Cursor model ID            | Tier      |
+| ---------------------------- | -------------------------- | --------- |
+| `opus`                       | `composer-2.5[fast=false]` | Thinking  |
+| `sonnet` / omitted (inherit) | `composer-2.5[fast=false]` | Execution |
+| `haiku`                      | `composer-2.5[fast=false]` | Fast      |
 
-The thinking and execution branches deliberately resolve to the same identifier — the identical
-**tier collapse** the OpenCode mapping already documents and defends [Repo-grounded —
-`repo-governance/development/agents/model-selection.md` "Tier Collapse"]. `convert_cursor_model` is
-implemented as three explicit branches (`haiku` / `opus` / else) so that a future Cursor model
-clearing a higher bar needs only one literal changed.
+All three branches resolve to the **same identifier** — full tier collapse. The emitter must never
+write `composer-2.5-fast`; that slug is the 6x-priced toggle this plan exists to avoid. The identical
+**tier collapse** shape the OpenCode mapping already documents and defends [Repo-grounded —
+`repo-governance/development/agents/model-selection.md` "Tier Collapse"]. `convert_cursor_model` keeps
+three explicit branches (`haiku` / `opus` / else) so a future per-tier split needs only one literal
+changed per branch.
 
 **The exact literals are set in Phase 1, not here.** This table names the intent; the delivery step
 writes the verified slug.
 
-### DD-5 — The fast tier's cross-vendor dependency is stated, not hidden
+### DD-5 — `composer-2.5-fast` is never emitted
 
-Gemini 2.5 Flash is $0.30 input / $2.50 output on Cursor [Web-cited —
-<https://cursor.com/docs/models/cursor-composer-2-5>, accessed 2026-07-28]. Against Composer 2.5
-standard's $0.50 / $2.50 the saving is **input-side only**; output price is identical. It is also a
-third-party model, so the fast branch introduces a cross-vendor dependency the other two branches do
-not have. Both facts go into the mapping table in `model-selection.md`, not just into this plan.
+The binding writes exactly one model identifier for every agent. A negative assertion — no emitted
+file contains the substring `composer-2.5-fast` — is part of the Phase 3 pin-count gate and the Phase
+5 live probe acceptance criteria. Cursor's own defects can still auto-switch a running subagent to
+`composer-2.5-fast` despite the pin; that is why the empirical verification phase exists, not why the
+emitter should ever write the fast slug.
 
 ### DD-6 — `readonly` and `is_background` are omitted
 
@@ -425,9 +426,20 @@ three PRs. Phase 9's own gate re-verifies all three merges before archiving.
 
 Cursor staff have confirmed that subagent `model:` frontmatter "can currently be ignored under
 certain conditions", and that CLI subagents have been observed auto-switching to
-`composer-2.5-fast` on their own [Web-cited — Cursor staff forum replies, as recent as 2026-06-26,
-per the 2026-07-28 research pass]. A plan that ships the frontmatter and declares victory would be
-asserting something the vendor has already said may not hold.
+`composer-2.5-fast` on their own [Web-cited — Cursor Community Forum, accessed 2026-07-28]:
+
+- **Frontmatter ignored**: Dean Rie (Cursor staff), 2026-07-15 —
+  <https://forum.cursor.com/t/subagent-model-choice-not-respected/163645> — _"The `model` in
+  frontmatter can sometimes be ignored and the subagent inherits the parent model. That's a separate
+  known bug."_
+- **CLI auto-switch to fast**: Dean Rie (Cursor staff), 2026-06-19 —
+  <https://forum.cursor.com/t/cli-subagents-changing-model-to-composer-2-5-fast-mode-by-itself/162752>
+  — _"This is a known bug. In some cases, subagents resolve to the fast variant `composer-2.5-fast`
+  instead of the regular `composer-2.5` when the model isn't explicitly set in the subagent
+  frontmatter."_
+
+A plan that ships the frontmatter and declares victory would be asserting something the vendor has
+already said may not hold.
 
 Phase 5 therefore launches a real subagent from a `.cursor/agents/` definition and reads back which
 model actually served it, committing the record under `evidence/`. That phase is the delivery
@@ -487,8 +499,8 @@ The plan therefore splits the question in two:
 | Does **this** repo's generated output carry the pin? | About the repository — **per repo** | Each landing phase, by counting the emitted files |
 
 The per-repo assertion is cheap and genuinely falsifiable: count how many `.cursor/agents/*.md` files
-carry the pinned literal and compare against that repo's known non-fast-tier agent count (79 / 62 /
-51). Each landing phase also confirms that no `.cursor/cli.json` exists in that tree that could
+carry the pinned literal and compare against that repo's agent count (90 / 64 / 53). Each landing
+phase also confirms that no `.cursor/cli.json` exists in that tree that could
 interpose a different default — a repo-specific condition the shared probe genuinely cannot cover.
 
 ### DD-13 — Sibling-repo topology is detected per landing, never assumed
@@ -592,36 +604,36 @@ time; delivery steps anchor on **text**, not line numbers, because the offsets d
 These sit inside the byte-identity boundary or are textually identical across the three trees
 [Repo-grounded — checksum or literal comparison], so the same edit applies in each repo's own PR.
 
-| #   | Surface                                                                 | What it says today                                                               | Verdict                                                                                                                 |
-| --- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| S1  | `repo-config.yml` `harness:` registry, `cursor` entry                   | `tier: native, shadow: .cursor/rules`                                            | **CHANGE** — per DD-3. Entry text identical in all three; line 49 / 50 / 49                                             |
-| S2  | `repo-config.yml` `instruction-size` glob `.cursor/rules/*.mdc`         | Byte thresholds for an instruction surface                                       | **NO CHANGE** — this plan adds no instruction surface                                                                   |
-| S3  | `apps/rhino-cli/src/application/agents/bindings.rs` doc comments        | Classify Cursor as native tier; `KNOWN_BINDING_DIRS` lists `.cursor`             | **CHANGE** — reclassify in the comments; the `KNOWN_BINDING_DIRS` entry itself stays                                    |
-| S4  | `specs/…/gherkin/specs/harness-bindings.feature` lines 13-14            | Cursor named in "the native tier (Copilot, Cursor, Windsurf, …)"                 | **CHANGE** — move Cursor into the generated-tier clause on line 13; byte-identical in all three                         |
-| S5  | `specs/…/gherkin/cursor-binding/README.md`                              | Does not exist yet — new dedicated topic directory, sibling to `harness/`        | **NEW FILE** — index the new `cursor-binding.feature`; `harness/README.md` stays untouched; byte-identical in all three |
-| S6  | `docs/reference/rhino-cli-command-triage.md` line 213                   | Cursor row: tier **native**, "none (reads `AGENTS.md`); `.cursor/mcp.json` only" | **CHANGE** — tier and artifact columns; line 213 in all three [Repo-grounded]                                           |
-| S7  | `docs/reference/rhino-cli-command-triage.md` lines 228, 241, 243, 272   | `.cursor/rules` named as an instruction / no-shadowing surface                   | **NO CHANGE** at 228/243/272; **CHANGE** at 241 (native-tier list); same lines in all three                             |
-| S8  | `docs/reference/sdlc-gate-standard.md` instruction-size surface list    | Includes `.cursor/rules`                                                         | **NO CHANGE** — same reason as S2                                                                                       |
-| S9  | `repo-governance/conventions/structure/instruction-file-size-budget.md` | `.cursor/rules/*.mdc` byte thresholds                                            | **NO CHANGE** — same reason as S2                                                                                       |
-| S10 | `.husky/pre-push` and `.husky/pre-commit`                               | `.cursor/` already triggers bindings validate; generate already runs pre-commit  | **NO CHANGE** — already correct in all three; step numbering differs but behaviour does not                             |
+| #   | Surface                                                                 | What it says today                                                               | Verdict                                                                                                                                                                     |
+| --- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S1  | `repo-config.yml` `harness:` registry, `cursor` entry                   | `tier: native, shadow: .cursor/rules`                                            | **CHANGE** — per DD-3. Entry text identical in all three; line 49 / 50 / 49                                                                                                 |
+| S2  | `repo-config.yml` `instruction-size` glob `.cursor/rules/*.mdc`         | Byte thresholds for an instruction surface                                       | **NO CHANGE** — this plan adds no instruction surface                                                                                                                       |
+| S3  | `apps/rhino-cli/src/application/agents/bindings.rs` doc comments        | Classify Cursor as native tier; `KNOWN_BINDING_DIRS` lists `.cursor`             | **CHANGE** — reclassify in the comments; the `KNOWN_BINDING_DIRS` entry itself stays                                                                                        |
+| S4  | `specs/…/gherkin/specs/harness-bindings.feature` lines 13-14            | Cursor named in "the native tier (Copilot, Cursor, Windsurf, …)"                 | **CHANGE** — move Cursor into the generated-tier clause on line 13; byte-identical in all three                                                                             |
+| S5  | `specs/…/gherkin/cursor-binding/README.md`                              | Does not exist yet — new dedicated topic directory, sibling to `harness/`        | **NEW FILE** — index the new `cursor-binding.feature`; `harness/README.md` stays untouched; byte-identical in all three                                                     |
+| S6  | `docs/reference/rhino-cli-command-triage.md` line 213                   | Cursor row: tier **native**, "none (reads `AGENTS.md`); `.cursor/mcp.json` only" | **CHANGE** — tier and artifact columns; line 213 in all three [Repo-grounded]                                                                                               |
+| S7  | `docs/reference/rhino-cli-command-triage.md` lines 228, 241, 243, 272   | `.cursor/rules` named as an instruction / no-shadowing surface                   | **NO CHANGE** at 228/243/272; **CHANGE** at 241 (native-tier list); same lines in all three                                                                                 |
+| S8  | `docs/reference/sdlc-gate-standard.md` instruction-size surface list    | Includes `.cursor/rules`                                                         | **NO CHANGE** — same reason as S2                                                                                                                                           |
+| S9  | `repo-governance/conventions/structure/instruction-file-size-budget.md` | `.cursor/rules/*.mdc` byte thresholds                                            | **NO CHANGE** — same reason as S2                                                                                                                                           |
+| S10 | `.husky/pre-push` and `.husky/pre-commit`                               | `.cursor/` already triggers bindings validate; generate already runs pre-commit  | **NO CHANGE** for `ose-public` and `ose-primer`; **CHANGE** for `ose-infra` pre-push (add `\.cursor/` to the trigger regex) — see `tech-docs.md` §Gate sequence and Phase 7 |
 
 ### `ose-public` — repo-specific rows
 
-| #   | Surface                                                                           | What it says today                                                                  | Verdict                                                                               |
-| --- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| P1  | `docs/reference/platform-bindings.md` line 33 (single capability table)           | Cursor row, `Status` column reads `Reserved`                                        | **CHANGE** — `Status` becomes the generated tier for the agent surface                |
-| P2  | `docs/reference/platform-bindings.md` `### Optional thin pointers` (line 168)     | "the repo ships no optional thin pointer files … `.cursor/rules/*.mdc`"             | **AMEND** — append a dated note; the instruction-surface decision is unchanged (DD-2) |
-| P3  | `docs/reference/platform-bindings.md` `## Translation Artifacts` (line 181)       | `### Color / Model ID / Tool Translation (Claude Code → OpenCode)` subsections      | **CHANGE** — add a Cursor model-translation subsection in the same shape              |
-| P4  | `docs/reference/platform-bindings.md` `## Adding a New Platform Binding` (236)    | Five-step procedure whose worked example is `.cursor/rules/`                        | **CHANGE** — the example is now a real binding; repoint it and add the registry step  |
-| P5  | `docs/reference/platform-bindings.md` — new section                               | (absent)                                                                            | **ADD** — the out-of-reach onboarding note (US-5)                                     |
-| P6  | `multi-harness-binding.md` `### Active Tier-1 bindings`, Cursor bullet (line 258) | "**Cursor** — reads `AGENTS.md` natively."                                          | **CHANGE** — scope to instructions and add the generated agent surface                |
-| P7  | `governance-vendor-independence.md` line 206                                      | Cursor row: `.cursor/rules/`, `AGENTS.md` (also reads `.cursor/rules/`)             | **CHANGE** — reflect the generated agent surface                                      |
-| P8  | `model-selection.md` `### Model ID Mapping` (line 279) + `### Tier Collapse`      | Claude → OpenCode mapping with a tier-collapse rationale                            | **CHANGE** — add the Cursor mapping with the DD-5 cross-vendor caveat                 |
-| P9  | `AGENTS.md` line 492                                                              | Cursor grouped with "read root `AGENTS.md` natively … no per-tool instruction file" | **CHANGE** — still reads `AGENTS.md`, now also carries a generated agent binding      |
-| P10 | `CLAUDE.md` `### Multi-harness configuration (Claude Code + OpenCode + Amazon Q)` | Names `.claude/`, `.opencode/`, `.amazonq/` as the binding set                      | **CHANGE** — add `.cursor/` as a secondary generated artifact; heading gains Cursor   |
-| P11 | `.claude/agents/repo-harness-compatibility-checker.md`                            | Table-driven from the catalog; no model-pin drift axis                              | **CHANGE** — add the model-pin drift dimension                                        |
-| P12 | `.claude/agents/repo-harness-compatibility-fixer.md`                              | Companion fixer                                                                     | **VERIFY THEN DECIDE** — change only if it enumerates tiers or bindings independently |
-| P13 | `.prettierignore`                                                                 | `.amazonq/` ignored; `.opencode/` not                                               | **VERIFY THEN DECIDE** — see the Prettier section below                               |
+| #   | Surface                                                                           | What it says today                                                                  | Verdict                                                                                        |
+| --- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| P1  | `docs/reference/platform-bindings.md` line 33 (single capability table)           | Cursor row, `Status` column reads `Reserved`                                        | **CHANGE** — `Status` becomes the generated tier for the agent surface                         |
+| P2  | `docs/reference/platform-bindings.md` `### Optional thin pointers` (line 168)     | "the repo ships no optional thin pointer files … `.cursor/rules/*.mdc`"             | **AMEND** — append a dated note; the instruction-surface decision is unchanged (DD-2)          |
+| P3  | `docs/reference/platform-bindings.md` `## Translation Artifacts` (line 181)       | `### Color / Model ID / Tool Translation (Claude Code → OpenCode)` subsections      | **CHANGE** — add a Cursor model-translation subsection in the same shape                       |
+| P4  | `docs/reference/platform-bindings.md` `## Adding a New Platform Binding` (236)    | Five-step procedure whose worked example is `.cursor/rules/`                        | **CHANGE** — the example is now a real binding; repoint it and add the registry step           |
+| P5  | `docs/reference/platform-bindings.md` — new section                               | (absent)                                                                            | **ADD** — the out-of-reach onboarding note (US-5)                                              |
+| P6  | `multi-harness-binding.md` `### Active Tier-1 bindings`, Cursor bullet (line 258) | "**Cursor** — reads `AGENTS.md` natively."                                          | **CHANGE** — scope to instructions and add the generated agent surface                         |
+| P7  | `governance-vendor-independence.md` line 206                                      | Cursor row: `.cursor/rules/`, `AGENTS.md` (also reads `.cursor/rules/`)             | **CHANGE** — reflect the generated agent surface                                               |
+| P8  | `model-selection.md` `### Model ID Mapping` (line 279) + `### Tier Collapse`      | Claude → OpenCode mapping with a tier-collapse rationale                            | **CHANGE** — add the Cursor full-tier-collapse mapping and the `composer-2.5-fast` prohibition |
+| P9  | `AGENTS.md` line 492                                                              | Cursor grouped with "read root `AGENTS.md` natively … no per-tool instruction file" | **CHANGE** — still reads `AGENTS.md`, now also carries a generated agent binding               |
+| P10 | `CLAUDE.md` `### Multi-harness configuration (Claude Code + OpenCode + Amazon Q)` | Names `.claude/`, `.opencode/`, `.amazonq/` as the binding set                      | **CHANGE** — add `.cursor/` as a secondary generated artifact; heading gains Cursor            |
+| P11 | `.claude/agents/repo-harness-compatibility-checker.md`                            | Table-driven from the catalog; no model-pin drift axis                              | **CHANGE** — add the model-pin drift dimension                                                 |
+| P12 | `.claude/agents/repo-harness-compatibility-fixer.md`                              | Companion fixer                                                                     | **VERIFY THEN DECIDE** — change only if it enumerates tiers or bindings independently          |
+| P13 | `.prettierignore`                                                                 | `.amazonq/` ignored; `.opencode/` not                                               | **VERIFY THEN DECIDE** — see the Prettier section below                                        |
 
 ### `ose-primer` — repo-specific rows
 
@@ -862,7 +874,8 @@ Knowledge Capture phase.
 landing phase then makes the two repo-local assertions the shared probe cannot make:
 
 1. that this repository's generated files actually carry the pinned literal, by counting them against
-   that repo's known non-fast-tier agent count (79 / 62 / 51);
+   that repo's agent count (90 / 64 / 53), and that `grep -r composer-2.5-fast .cursor/agents/`
+   returns no matches;
 2. that this repository holds no `.cursor/cli.json` that could interpose a different default —
    `test -e .cursor/cli.json` must return non-zero, which it does in all three trees today
    [Repo-grounded — `.cursor` does not exist in any of them].

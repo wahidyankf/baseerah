@@ -6,8 +6,9 @@ A third generated platform binding, delivered into **each of the three sibling r
 `.cursor/agents/`, emitted from that repository's own `.claude/agents/` by
 `rhino-cli harness bindings generate` and guarded by `rhino-cli harness naming validate` and
 `rhino-cli harness bindings validate`, in which every agent's `model:` field is rewritten from the
-Anthropic capability-tier alias into a Cursor model ID that pins the non-fast Composer 2.5 toggle for
-the thinking and execution tiers.
+Anthropic capability-tier alias into the same Cursor model ID that pins the non-fast Composer 2.5
+toggle — full tier collapse across thinking, execution, and fast grades. The emitter never writes
+`composer-2.5-fast`.
 
 The product is the emitter, the guard, and the governance record — not a promise about Cursor's
 interactive UI.
@@ -97,7 +98,7 @@ is a cross-reference aid only:
 | AC-2  | A thinking-grade agent pins Composer 2.5 with fast disabled                  | Emission   |
 | AC-3  | An execution-grade agent pins Composer 2.5 with fast disabled                | Emission   |
 | AC-4  | An agent that omits the model field pins Composer 2.5 with fast disabled     | Emission   |
-| AC-5  | A fast-grade agent pins the fast-tier model                                  | Emission   |
+| AC-5  | A fast-grade agent pins Composer 2.5 with fast disabled                      | Emission   |
 | AC-6  | The Claude color field is dropped from the Cursor frontmatter                | Emission   |
 | AC-7  | The Claude name field is preserved in the Cursor frontmatter                 | Emission   |
 | AC-8  | The agent body is copied unchanged below the frontmatter                     | Emission   |
@@ -149,11 +150,11 @@ Scenario: An agent that omits the model field pins Composer 2.5 with fast disabl
 ```
 
 ```gherkin
-Scenario: A fast-grade agent pins the fast-tier model
+Scenario: A fast-grade agent pins Composer 2.5 with fast disabled
   Given a Claude agent whose frontmatter declares the fast-grade model alias
   When the developer runs harness bindings generate
-  Then the emitted Cursor agent frontmatter declares the fast-tier Cursor model identifier
-  And the emitted identifier differs from the non-fast Composer 2.5 identifier
+  Then the emitted Cursor agent frontmatter declares the non-fast Composer 2.5 model identifier
+  And the emitted identifier is byte-identical to the thinking-grade agent's identifier
 ```
 
 ```gherkin
@@ -319,7 +320,7 @@ Scenario: The cursor registry entry declares the generated tier and its mirror s
 | Bracket parameters are rejected inside a frontmatter file                     | The pin degrades to plain Composer 2.5 (still non-fast in name, unverified in effect) | Phase 1 spike U2; fallback is the bare slug plus a recorded residual exposure                     |
 | A contributor hand-edits `.cursor/agents/` and pushes                         | Divergence between binding and source                                                 | AC-11 makes it a pre-push failure; AC-18 and AC-19 add a second, registry-driven line of defence  |
 | The catalog row is forgotten when the directory first appears                 | The directory ships undocumented in that repo                                         | AC-14 covers the fixture case; the coarse substring guard is discussed honestly in `tech-docs.md` |
-| The fast tier's cross-vendor model is retired or repriced                     | The fast branch needs a new target                                                    | One function, one governance table; the compat checker gains this drift axis                      |
+| Cursor retires or renames the non-fast Composer 2.5 slug                      | Every emitted file carries a wrong identifier                                         | One `const`, one governance table; the compat checker gains this drift axis                       |
 | Emitting a third mirror slows the pre-commit `harness bindings generate` step | Slower commits                                                                        | The OpenCode mirror already emits the same roster; the added cost is one more pass over it        |
 | The emitter is propagated to a sibling repo without its governance record     | That repo silently grows an undocumented generated directory on its next commit       | Each repo's landing is a single PR carrying emitter, generated output, and governance together    |
 | A per-repo governance step assumes `ose-public`'s document structure          | The step is unexecutable in the repo whose document differs                           | Three separate verdict tables in `tech-docs.md`; no shared governance step across repos           |
