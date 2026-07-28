@@ -42,6 +42,10 @@ Standalone plans (outside the `ayokoding-learning-path-*` programme):
   — A public `/tools/ai-benchmark` page comparing capability and token price across the models
   exposed by Codex, Claude Code, Cursor, OpenCode Go and OpenCode Zen, banded into `opus` /
   `sonnet` / `light` classes.
+- [ayokoding-www-cost-reduction](./ayokoding-www-cost-reduction/README.md)
+  — Runtime-and-hosting cost reduction for `apps/ayokoding-www`: Pagefind migration, build-time
+  Mermaid, `html-react-parser` removal, calculator lazy-load, Docker/trace narrowing, and a
+  dependency modernization sweep bound to the repo's bump policy.
 
 Other candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md); promote one
 here when it is ripe.
