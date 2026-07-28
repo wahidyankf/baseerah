@@ -138,23 +138,23 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — acceptance: exits 0
-- [ ] [AI] Run affected linting: `npx nx affected -t lint` — acceptance: exits 0
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — acceptance: exits 0
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck` — acceptance: exits 0
+- [x] [AI] Run affected linting: `npx nx affected -t lint` — acceptance: exits 0
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick` — acceptance: exits 0
       (for `rhino-cli` this chains `typecheck`, `lint`, `test:unit`, `test:coverage`, `test:specs`)
-- [ ] [AI] Run `npx nx run rhino-cli:test:specs` — acceptance: exits 0 (chains
+- [x] [AI] Run `npx nx run rhino-cli:test:specs` — acceptance: exits 0 (chains
       `specs:structure-validation` then `specs:behavior:coverage`; this repo has no `specs:coverage`
       target on `rhino-cli`, so naming the real target avoids a vacuous pass)
-- [ ] [AI] Run `npx nx run rhino-cli:test:integration` — acceptance: exits 0 (this is the target that
+- [x] [AI] Run `npx nx run rhino-cli:test:integration` — acceptance: exits 0 (this is the target that
       compiles and runs the cucumber suites under `tests/`)
-- [ ] [AI] Run `npx nx run rhino-cli:specs:gherkin-cardinality-validation` — acceptance: exits 0
-- [ ] [AI] Run `npx nx run rhino-cli:naming:harness-validation` — acceptance: exits 0
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by these changes
-- [ ] [AI] Re-run every failing check to confirm resolution — acceptance: zero failures
+- [x] [AI] Run `npx nx run rhino-cli:specs:gherkin-cardinality-validation` — acceptance: exits 0
+- [x] [AI] Run `npx nx run rhino-cli:naming:harness-validation` — acceptance: exits 0
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by these changes
+- [x] [AI] Re-run every failing check to confirm resolution — acceptance: zero failures
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Push to this delivery unit's PR branch — acceptance: `git push` exits 0
+- [x] [AI] Push to this delivery unit's PR branch — acceptance: `git push` exits 0
 - [ ] [AI] Monitor the PR's check run, polling every **2 minutes** with a single
       `gh run view --json status,conclusion` per wakeup — never `gh run watch`, never a tight loop
       (see [CI Monitoring](../../../repo-governance/development/workflow/ci-monitoring.md))
@@ -165,12 +165,12 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically — group related changes into logically cohesive commits
-- [ ] [AI] Follow Conventional Commits: `<type>(<scope>): <description>`, imperative, no period
-- [ ] [AI] Split domains into separate commits: Rust source, specs, governance docs, generated
+- [x] [AI] Commit changes thematically — group related changes into logically cohesive commits
+- [x] [AI] Follow Conventional Commits: `<type>(<scope>): <description>`, imperative, no period
+- [x] [AI] Split domains into separate commits: Rust source, specs, governance docs, generated
       `.cursor/` output
-- [ ] [AI] Preexisting fixes get their own commits, separate from plan work
-- [ ] [AI] Do NOT bundle unrelated changes into a single commit
+- [x] [AI] Preexisting fixes get their own commits, separate from plan work
+- [x] [AI] Do NOT bundle unrelated changes into a single commit
 
 ### Surface-Conditional Gates — declared not applicable
 
@@ -194,25 +194,25 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 > earliest phase that may open a PR is **Phase 5** (the first delivery boundary, PR 1); any evidence
 > file written here rides the Phase 1 direct push (plan-docs carve-out), not a PR.
 
-- [ ] [AI] Install dependencies in the `ose-public` root worktree: `npm install`
+- [x] [AI] Install dependencies in the `ose-public` root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized
-- [ ] [AI] Converge the full polyglot toolchain in the `ose-public` root worktree:
+- [x] [AI] Converge the full polyglot toolchain in the `ose-public` root worktree:
       `npm run doctor -- --fix` — acceptance: exits 0 with no unresolved drift
-- [ ] [AI] Confirm the Rust toolchain builds every target:
+- [x] [AI] Confirm the Rust toolchain builds every target:
       `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
       — acceptance: exits 0
-- [ ] [AI] Record the `ose-public` unit baseline: `npx nx run rhino-cli:test:quick`
+- [x] [AI] Record the `ose-public` unit baseline: `npx nx run rhino-cli:test:quick`
       — acceptance: exits 0; if it does not, record every preexisting failure verbatim in this
       checklist before proceeding
-- [ ] [AI] Record the `ose-public` integration baseline: `npx nx run rhino-cli:test:integration`
+- [x] [AI] Record the `ose-public` integration baseline: `npx nx run rhino-cli:test:integration`
       — acceptance: exits 0; preexisting failures recorded verbatim
-- [ ] [AI] Resolve all preexisting failures before proceeding
+- [x] [AI] Resolve all preexisting failures before proceeding
       — acceptance: both commands above exit 0 with zero unresolved failures
-- [ ] [AI] Create the evidence folder:
+- [x] [AI] Create the evidence folder:
       `mkdir -p plans/in-progress/adopt-cursor-platform-binding/evidence`
       — acceptance: `test -d plans/in-progress/adopt-cursor-platform-binding/evidence` returns 0
       (returned non-zero before this step)
-- [ ] [AI] Record the three-repo baseline into
+- [x] [AI] Record the three-repo baseline into
       `plans/in-progress/adopt-cursor-platform-binding/evidence/phase-0-baseline.txt`, capturing for
       **each** of `ose-public`, `ose-primer`, `ose-infra`: the absolute repository root, the full
       output of `git worktree list` (the topology marker), the non-README agent count under
@@ -220,28 +220,28 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: the file names all three repositories; the agent counts read 90, 64, 53; every
       `test -e .cursor` line reads `1` (absent). A count that differs from 90/64/53 means the roster
       moved since authoring — record the new number and carry it forward instead of the old one.
-- [ ] [AI] Record the per-repository registry baseline into the same evidence file, running in each
+- [x] [AI] Record the per-repository registry baseline into the same evidence file, running in each
       repository: `grep -c "tier: generated" repo-config.yml` and
       `grep -c "tier: native" repo-config.yml`
       — acceptance: each repository reads `2` generated and `7` native. Falsifiable in both
       directions: after the Phase 2 / 6 / 7 flip the same commands read `3` and `6`.
-- [ ] [AI] Record the harness feature-file baseline in each repository:
+- [x] [AI] Record the harness feature-file baseline in each repository:
       `/bin/ls -1 specs/apps/rhino/behavior/rhino-cli/gherkin/harness/*.feature | wc -l`
       — acceptance: each reads `10`. This is a whole-plan invariant, not a phase-scoped one:
       `harness/` is never written to by this plan (Phase 0 through Phase 9, all three repos) and
       must still read `10` at the plan's final gate. Use `/bin/ls`, not the shell's `ls` alias,
       whose OSC-8 hyperlinks corrupt piped output.
-- [ ] [AI] Record the dedicated `cursor-binding/` directory baseline in each repository:
+- [x] [AI] Record the dedicated `cursor-binding/` directory baseline in each repository:
       `test -d specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding; echo $?`
       — acceptance: each reads `1` (directory does not exist yet). This directory is created in
       Phase 3 and becomes the sole home for `cursor-binding.feature` — never `harness/`.
-- [ ] [AI] Confirm the shared-source byte-identity starting point across the three repositories by
+- [x] [AI] Confirm the shared-source byte-identity starting point across the three repositories by
       comparing checksums of `apps/rhino-cli/src/application/agents/bindings.rs`,
       `apps/rhino-cli/src/application/agents/converter.rs`, and
       `specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature`
       — acceptance: each file's checksum is identical across all three repositories; any mismatch is
       a pre-existing byte-identity break that must be recorded and resolved before Phase 2
-- [ ] [AI] Confirm `learnings.md` carries its mandatory H1:
+- [x] [AI] Confirm `learnings.md` carries its mandatory H1:
       `grep -c "^# Learnings: adopt-cursor-platform-binding" plans/in-progress/adopt-cursor-platform-binding/learnings.md`
       — acceptance: returns `1`. Falsifiable: returns `0` if the H1 is lost, which would fail
       markdownlint MD041 on the plan's first commit.
@@ -250,13 +250,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] `npx nx run rhino-cli:test:quick` and `npx nx run rhino-cli:test:integration` both exit 0
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
+- [x] [AI] `npx nx run rhino-cli:test:quick` and `npx nx run rhino-cli:test:integration` both exit 0
       in `ose-public`, with zero unresolved preexisting failures
-- [ ] [AI] `evidence/phase-0-baseline.txt` exists and records all three repositories' roots,
+- [x] [AI] `evidence/phase-0-baseline.txt` exists and records all three repositories' roots,
       topologies, agent counts, `.cursor` absence, registry counts, and feature-file counts
-- [ ] [AI] The three shared-source checksums match across all three repositories
-- [ ] [AI] Nothing was pushed and no PR exists for this branch — run both, reading the printed
+- [x] [AI] The three shared-source checksums match across all three repositories
+- [x] [AI] Nothing was pushed and no PR exists for this branch — run both, reading the printed
       number (never `&&`-chaining, since `grep -c` exits 1 on a zero count):
       `git ls-remote --heads origin "$(git branch --show-current)" | grep -c .` returns `0`, and
       `gh pr list --head "$(git branch --show-current)" --json number --jq 'length'` returns `0`.
@@ -276,7 +276,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 > No emitter code is written until every unknown below is either verified or explicitly recorded as
 > having fallen back to its stated fallback.
 
-- [ ] [AI] Create `plans/in-progress/adopt-cursor-platform-binding/verification.md` _New file_ with
+- [x] [AI] Create `plans/in-progress/adopt-cursor-platform-binding/verification.md` _New file_ with
       an H1 `# Cursor Verification Record` and one `## U1` … `## U4` section per unknown, each
       carrying **Question**, **Method**, **Finding**, **Confidence label**, **Source URL + access
       date**, and **Fallback taken? yes/no**
@@ -284,37 +284,37 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       returns `4`. Falsifiable: the file does not exist before this step, so the same command errors
       or returns `0`.
   - _Suggested executor: `web-researcher` for the research itself_
-- [ ] [AI] Resolve **U1 — the canonical Cursor model-ID slug for Composer 2.5** by delegating to
+- [x] [AI] Resolve **U1 — the canonical Cursor model-ID slug for Composer 2.5** by delegating to
       `web-researcher` against Cursor's model and subagent documentation, requiring two
       corroborating first-party sources
       — acceptance: `## U1` records either a `[Web-cited]` slug with both URLs and access dates, or
       the fallback slug explicitly labelled `[Unverified]`
-- [ ] [AI] Resolve **U2 — whether a bracket parameter suffix is accepted inside an agent file's
+- [x] [AI] Resolve **U2 — whether a bracket parameter suffix is accepted inside an agent file's
       `model:` field** in the same research pass
       — acceptance: `## U2` records a `[Web-cited]` answer, or records the fallback "emit the bare
       slug" together with one sentence naming the residual fast-toggle exposure that fallback leaves
-- [ ] [AI] Resolve **U3 — what Cursor does with an unrecognised `model:` value such as `sonnet`**
+- [x] [AI] Resolve **U3 — what Cursor does with an unrecognised `model:` value such as `sonnet`**
       via `web-researcher` documentation survey only (the empirical scratch-agent probe described in
       `tech-docs.md` is **deferred to Phase 5** — the live subagent session there is the authoritative
       runtime check)
       — acceptance: `## U3` records a `[Web-cited]` answer or an explicit `[Unverified]` label, plus
       a **Deferred to Phase 5** line naming the empirical probe; a guess presented as fact fails this
       step
-- [ ] [AI] Resolve **U4 — whether the two staff-confirmed defects are fixed in the installed Cursor
+- [x] [AI] Resolve **U4 — whether the two staff-confirmed defects are fixed in the installed Cursor
       version** by re-checking the Cursor changelog and recording the installed version string
       — acceptance: `## U4` records the changelog verdict, the installed version string, and the
       access date
-- [ ] [AI] Write the two decided model literals into `tech-docs.md` DD-4's mapping table, replacing
+- [x] [AI] Write the two decided model literals into `tech-docs.md` DD-4's mapping table, replacing
       the placeholder sentence `The exact literals are set in Phase 1, not here.`
       — acceptance: `grep -c "The exact literals are set in Phase 1" tech-docs.md` returns `0`.
       Falsifiable: it returns `1` before this step.
-- [ ] [AI] If any unknown landed on its fallback, attach an `[Unverified]` label beside the
+- [x] [AI] If any unknown landed on its fallback, attach an `[Unverified]` label beside the
       corresponding claim in `README.md`, `brd.md`, and `tech-docs.md`
       — acceptance: every fallback-derived claim carries a visible `[Unverified]` label; if no
       fallback was taken, `verification.md` records the sentence `No fallback taken` instead
-- [ ] [AI] Run the markdown gates over the plan folder: `npm run lint:md:fix`
+- [x] [AI] Run the markdown gates over the plan folder: `npm run lint:md:fix`
       — acceptance: exits 0 and leaves the plan folder clean
-- [ ] [AI] Commit and push to `origin main` from the primary checkout, staging only
+- [x] [AI] Commit and push to `origin main` from the primary checkout, staging only
       `plans/in-progress/adopt-cursor-platform-binding/` (never `git add -A`; sibling repositories
       and other plan folders carry unrelated WIP)
       — acceptance: `git push` exits 0; `git status --short plans/in-progress/adopt-cursor-platform-binding/`
@@ -324,13 +324,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `grep -c "^## U[1-4]" plans/in-progress/adopt-cursor-platform-binding/verification.md`
+- [x] [AI] `grep -c "^## U[1-4]" plans/in-progress/adopt-cursor-platform-binding/verification.md`
       returns `4`
-- [ ] [AI] Every `## U` section contains a **Confidence label** line reading exactly one of
+- [x] [AI] Every `## U` section contains a **Confidence label** line reading exactly one of
       `[Web-cited]`, `[Unverified]`, or `[Judgment call]` — a section with no label fails the gate
-- [ ] [AI] `grep -c "The exact literals are set in Phase 1" tech-docs.md` returns `0`
-- [ ] [AI] `npm run lint:md:fix` exits 0 and leaves no unstaged changes in the plan folder
-- [ ] [AI] No PR was opened for this work —
+- [x] [AI] `grep -c "The exact literals are set in Phase 1" tech-docs.md` returns `0`
+- [x] [AI] `npm run lint:md:fix` exits 0 and leaves no unstaged changes in the plan folder
+- [x] [AI] No PR was opened for this work —
       `gh pr list --head "$(git branch --show-current)" --json number --jq 'length'` returns `0`
 
 > **Pause Safety**: the plan folder now carries a verification record and the decided model
@@ -353,18 +353,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 > `--lib` does compile; Cycle B extends `repo_config_data_driven.rs`, which the target names
 > explicitly.
 
-- [ ] [AI] Provision the worktree from the latest `origin/main`:
+- [x] [AI] Provision the worktree from the latest `origin/main`:
       `git worktree add worktrees/adopt-cursor-platform-binding -b adopt-cursor-platform-binding origin/main`
       — acceptance: `test -d worktrees/adopt-cursor-platform-binding` returns 0 (returned non-zero
       before), and `git -C worktrees/adopt-cursor-platform-binding branch --show-current` prints
       `adopt-cursor-platform-binding`
-- [ ] [AI] Initialise the toolchain for the new worktree: `npm install && npm run doctor -- --fix`
+- [x] [AI] Initialise the toolchain for the new worktree: `npm install && npm run doctor -- --fix`
       — acceptance: both exit 0 (see
       [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md))
 
 ### TDD Cycle A — the Cursor model-tier mapping
 
-- [ ] [AI] **RED**: create `apps/rhino-cli/src/application/agents/cursor.rs` _New file_ (sibling of
+- [x] [AI] **RED**: create `apps/rhino-cli/src/application/agents/cursor.rs` _New file_ (sibling of
       `converter.rs`) holding only a `#[cfg(test)] mod tests` block with four tests _New tests_ —
       `cursor_model_maps_opus`, `cursor_model_maps_sonnet`, `cursor_model_maps_omitted`,
       `cursor_model_maps_haiku` — each calling `convert_cursor_model` and asserting the literals
@@ -412,14 +412,14 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted identifier is byte-identical to the thinking-grade agent's identifier
   ```
 
-- [ ] [AI] **GREEN**: implement `pub fn convert_cursor_model(claude_model: &str) -> String` in
+- [x] [AI] **GREEN**: implement `pub fn convert_cursor_model(claude_model: &str) -> String` in
       `apps/rhino-cli/src/application/agents/cursor.rs` as three explicit branches (`haiku` /
       `opus` / everything-else-including-absent), mirroring the shape of `convert_model` in
       `converter.rs`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib cursor_model`
       — acceptance: all four tests pass, and
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib` reports no newly failing test
-- [ ] [AI] **REFACTOR**: hoist the non-fast Composer 2.5 model-ID literal into a named `const` at the
+- [x] [AI] **REFACTOR**: hoist the non-fast Composer 2.5 model-ID literal into a named `const` at the
       top of `cursor.rs` so a future model change edits one line, and document the full tier collapse
       in a `///` comment
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib`
@@ -427,7 +427,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### TDD Cycle B — the registry entry
 
-- [ ] [AI] **RED**: `apps/rhino-cli/tests/repo_config_data_driven.rs` is a cucumber binary
+- [x] [AI] **RED**: `apps/rhino-cli/tests/repo_config_data_driven.rs` is a cucumber binary
       (`harness = false` in `Cargo.toml`; its only entry point is
       `RepoConfigDataWorld::cucumber().fail_on_skipped().run_and_exit(feature_dir())`), so a plain
       `#[test]`-annotated function added to this file would never execute — libtest discovery is
@@ -458,7 +458,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the entry declares .claude/agents as the source it mirrors
   ```
 
-- [ ] [AI] **GREEN**: rewrite the `cursor` entry in `repo-config.yml`, anchoring on the literal text
+- [x] [AI] **GREEN**: rewrite the `cursor` entry in `repo-config.yml`, anchoring on the literal text
       `name: cursor` inside the `harness:` block (do not anchor on a line number), to:
 
   ```yaml
@@ -475,7 +475,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
   returned `2` at the Phase 0 baseline) and `grep -c "tier: native" repo-config.yml` returns `6`
   (it returned `7`)
 
-- [ ] [AI] **RED (specs_tree.rs regression)**: `apps/rhino-cli/tests/specs_tree.rs` is the sole
+- [x] [AI] **RED (specs_tree.rs regression)**: `apps/rhino-cli/tests/specs_tree.rs` is the sole
       other test file that loads this repository's own `repo-config.yml` via `find_root_from(None)`
       plus `repo_config::load` (confirmed the only hit via `grep -rn "find_root_from(None)\|repo_config::load" apps/rhino-cli/tests/*.rs`). Its
       `then_hb_generated_tier` and `then_hb_native_tier` step definitions hardcode the pre-flip tier
@@ -487,7 +487,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       confirms the registry flip is a real regression against this second hardcoded test file, not
       only against `repo_config_data_driven.rs`.
 
-- [ ] [AI] **GREEN (specs_tree.rs regression)**: update the two hardcoded assertions in
+- [x] [AI] **GREEN (specs_tree.rs regression)**: update the two hardcoded assertions in
       `apps/rhino-cli/tests/specs_tree.rs` to match the post-flip registry: in
       `then_hb_generated_tier`, change `assert_eq!(generated.len(), 2, ...)` to
       `assert_eq!(generated.len(), 3, ...)` and add `assert!(generated.contains(&"cursor"));`
@@ -498,7 +498,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: all `specs_tree` scenarios pass, including `then_hb_all_11_listed` (unaffected —
       Cursor still appears among the 11 harness names regardless of tier)
 
-- [ ] [AI] **REFACTOR**: confirm no other registry entry was disturbed by diffing the `harness:`
+- [x] [AI] **REFACTOR**: confirm no other registry entry was disturbed by diffing the `harness:`
       block against the Phase 0 baseline record
       — command: `npx nx run rhino-cli:test:unit`
       — acceptance: exits 0, and the number of entries under `harness:` is unchanged at 11
@@ -511,7 +511,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### TDD Cycle C — the Cursor field policy
 
-- [ ] [AI] **RED**: add tests `cursor_policy_preserves_name`, `cursor_policy_drops_color_with_warning`
+- [x] [AI] **RED**: add tests `cursor_policy_preserves_name`, `cursor_policy_drops_color_with_warning`
       and `cursor_policy_drops_tools_with_warning` _New tests_ to the `#[cfg(test)] mod tests` block
       in `apps/rhino-cli/src/application/agents/cursor.rs`, asserting a `CURSOR_FIELD_POLICY_TABLE`
       maps `name` to preserve, and `color` and `tools` to drop-with-warning
@@ -538,13 +538,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted frontmatter declares the same description value
   ```
 
-- [ ] [AI] **GREEN**: define `CURSOR_FIELD_POLICY_TABLE` in
+- [x] [AI] **GREEN**: define `CURSOR_FIELD_POLICY_TABLE` in
       `apps/rhino-cli/src/application/agents/cursor.rs`, reusing the field-action enum already used
       by `FIELD_POLICY_TABLE` in `converter.rs`, with `name` and `description` preserved, `model`
       translated, and `color`, `tools`, `skills`, `maxTurns` dropped with a warning
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib cursor_policy`
       — acceptance: all three tests pass
-- [ ] [AI] **REFACTOR**: if the field-action enum is private to `converter.rs`, promote it into the
+- [x] [AI] **REFACTOR**: if the field-action enum is private to `converter.rs`, promote it into the
       shared `agents` module rather than duplicating it; leave `FIELD_POLICY_TABLE` itself untouched
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib`
       — acceptance: all tests pass, `npx nx run rhino-cli:lint` exits 0, and the OpenCode policy
@@ -552,7 +552,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### TDD Cycle D — the frontmatter encoder byte-shape
 
-- [ ] [AI] **RED**: add a test `cursor_encoder_emits_single_delimiter_and_verbatim_body` _New test_
+- [x] [AI] **RED**: add a test `cursor_encoder_emits_single_delimiter_and_verbatim_body` _New test_
       to the `#[cfg(test)] mod tests` block in
       `apps/rhino-cli/src/application/agents/cursor.rs`, feeding a fixture agent whose body holds a
       markdown heading and a fenced code block, and asserting the encoder output opens with `---`,
@@ -571,12 +571,12 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted file separates frontmatter from body with a single delimiter line
   ```
 
-- [ ] [AI] **GREEN**: implement `encode_cursor_agent` in
+- [x] [AI] **GREEN**: implement `encode_cursor_agent` in
       `apps/rhino-cli/src/application/agents/cursor.rs`, emitting `name`, `description`, and `model`
       in that fixed order and omitting `readonly` and `is_background` per `tech-docs.md` DD-6
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib cursor_encoder`
       — acceptance: the test passes
-- [ ] [AI] **REFACTOR**: extract the delimiter and field-order constants, and add `///` docs naming
+- [x] [AI] **REFACTOR**: extract the delimiter and field-order constants, and add `///` docs naming
       the three emitted fields and the two deliberately-omitted ones
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib`
       — acceptance: all tests pass and `npx nx run rhino-cli:lint` exits 0
@@ -585,26 +585,26 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib` exits 0 with the eight new
+- [x] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib` exits 0 with the eight new
       `cursor.rs` unit tests passing
-- [ ] [AI] `npx nx run rhino-cli:test:unit` exits 0 — this target compiles `--lib` plus
+- [x] [AI] `npx nx run rhino-cli:test:unit` exits 0 — this target compiles `--lib` plus
       `repo_config_data_driven`, covering Cycles A, C, D and Cycle B respectively
-- [ ] [AI] `npx nx run rhino-cli:test:coverage` exits 0 — `application/agents/` is **not** in that
+- [x] [AI] `npx nx run rhino-cli:test:coverage` exits 0 — `application/agents/` is **not** in that
       target's `--ignore-filename-regex`, so the new `cursor.rs` must clear the
       `--fail-under-lines 90` threshold on its own unit tests
       [Repo-grounded — `apps/rhino-cli/project.json` `test:coverage`]
-- [ ] [AI] `npx nx run rhino-cli:typecheck` and `npx nx run rhino-cli:lint` both exit 0
-- [ ] [AI] `npx nx run rhino-cli:test:specs` exits 0, and
+- [x] [AI] `npx nx run rhino-cli:typecheck` and `npx nx run rhino-cli:lint` both exit 0
+- [x] [AI] `npx nx run rhino-cli:test:specs` exits 0, and
       `/bin/ls -1 specs/apps/rhino/behavior/rhino-cli/gherkin/harness/*.feature | wc -l` still reads
       `10` — no `.feature` file was added in this phase, so behavior coverage must not have moved.
       This invariant now holds for the whole plan, not just this phase: `harness/` is a fixed,
       untouched directory for the plan's full lifetime — the new `cursor-binding.feature` lands in
       its own dedicated `cursor-binding/` directory instead (see Phase 3)
-- [ ] [AI] `grep -c "tier: generated" repo-config.yml` returns `3` and
+- [x] [AI] `grep -c "tier: generated" repo-config.yml` returns `3` and
       `grep -c "tier: native" repo-config.yml` returns `6`
-- [ ] [AI] `test -e .cursor; echo $?` still prints `1` — no generated output exists yet, because the
+- [x] [AI] `test -e .cursor; echo $?` still prints `1` — no generated output exists yet, because the
       emitter is not wired into `harness bindings generate` until Phase 3
-- [ ] [AI] No PR exists for this branch —
+- [x] [AI] No PR exists for this branch —
       `gh pr list --head adopt-cursor-platform-binding --json number --jq 'length'` returns `0`
 
 > **Pause Safety**: the worktree holds a compiling, fully unit-tested Cursor converter core and a
@@ -628,7 +628,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Phase 3 setup — the cucumber target and its falsifiability check
 
-- [ ] [AI] Add the cucumber test target to `apps/rhino-cli/Cargo.toml`, beside the existing
+- [x] [AI] Add the cucumber test target to `apps/rhino-cli/Cargo.toml`, beside the existing
       `[[test]]` blocks:
 
   ```toml
@@ -641,7 +641,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
   — acceptance: the command reports `error: no test target named \`cursor_binding\`` **before** this
   step and progresses past target resolution after it
 
-- [ ] [AI] Create `apps/rhino-cli/tests/cursor_binding.rs` _New file_ with a `CursorWorld` struct
+- [x] [AI] Create `apps/rhino-cli/tests/cursor_binding.rs` _New file_ with a `CursorWorld` struct
       reusing the TempDir-rooted git-fixture pattern already used by the existing harness-binding
       cucumber suite under `apps/rhino-cli/tests/`, a `main` that runs the feature directory with
       `.fail_on_skipped()` enabled, and a dedicated `feature_dir()` function mirroring
@@ -682,7 +682,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
   0, which would make every RED step below vacuous.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] Author `specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/cursor-binding.feature`
+- [x] [AI] Author `specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/cursor-binding.feature`
       _New file_ (create the new dedicated `cursor-binding/` directory first — sibling to
       `harness/`, never nested inside it) containing all **19** scenarios from
       `prd.md §Acceptance Criteria`, verbatim, under a single `Feature:` heading
@@ -691,16 +691,16 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       `*.feature` count stays pinned at `10`, unaffected by this step — see Phase 0 baseline); and
       `grep -c "^  Scenario:" specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/cursor-binding.feature`
       returns `19`
-- [ ] [AI] Confirm the new feature file passes the cardinality gate:
+- [x] [AI] Confirm the new feature file passes the cardinality gate:
       `npx nx run rhino-cli:specs:gherkin-cardinality-validation`
       — acceptance: exits 0. Falsifiable: adding a second primary `Given` to any scenario makes it
       exit non-zero.
-- [ ] [AI] Confirm the aggregate binder is genuinely red before any step definition exists:
+- [x] [AI] Confirm the aggregate binder is genuinely red before any step definition exists:
       `npx nx run rhino-cli:specs:behavior:coverage`
       — acceptance: exits **non-zero**, naming `cursor-binding.feature` scenarios as uncovered.
       Falsifiable in both directions: it exited 0 at the Phase 0 baseline and must exit 0 again at
       this phase's gate.
-- [ ] [AI] Verify the per-scenario name filter used by every cycle below actually discriminates, by
+- [x] [AI] Verify the per-scenario name filter used by every cycle below actually discriminates, by
       running it against a scenario that has no step definitions yet:
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "Generating twice is byte-identical"`
       — acceptance: exits non-zero. If it exits 0 at this point the filter or `.fail_on_skipped()`
@@ -708,7 +708,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### TDD Cycle E1 — a thinking-grade agent pins Composer 2.5 with fast disabled
 
-- [ ] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
+- [x] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
       `apps/rhino-cli/tests/cursor_binding.rs`, reusing the shared fixture builder and `Given`/`When`
       steps added above, leaving each body as `todo!("bind in GREEN")`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A thinking-grade agent pins Composer 2.5 with fast disabled"`
@@ -724,7 +724,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted frontmatter carries no other model field
   ```
 
-- [ ] [AI] **GREEN**: implement the step bodies by invoking the real binary path through the same
+- [x] [AI] **GREEN**: implement the step bodies by invoking the real binary path through the same
       in-process entry point the existing harness-binding suite uses, and add the Cursor branch to
       `generate_bindings` in `apps/rhino-cli/src/commands/harness_generate_bindings.rs` — extend
       `GenerateBindingsArgs` with a `--cursor` flag, accept `"cursor"` in the `--harness` value
@@ -734,7 +734,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A thinking-grade agent pins Composer 2.5 with fast disabled"`
       — acceptance: exits 0
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: align the new `--cursor` flag and value-parser branch with the existing
+- [x] [AI] **REFACTOR**: align the new `--cursor` flag and value-parser branch with the existing
       `--opencode`/`--amazonq` code shape (same argument ordering, same match-arm style), and
       confirm nothing regressed
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
@@ -742,7 +742,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### TDD Cycle E2 — an execution-grade agent pins Composer 2.5 with fast disabled
 
-- [ ] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
+- [x] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
       `apps/rhino-cli/tests/cursor_binding.rs`, reusing the shared fixture builder and `Given`/`When`
       steps, leaving each body as `todo!("bind in GREEN")`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "An execution-grade agent pins Composer 2.5 with fast disabled"`
@@ -758,20 +758,20 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted identifier is byte-identical to the thinking-grade agent's identifier
   ```
 
-- [ ] [AI] **GREEN**: assert the emitted identifier equals the thinking-grade agent's identifier
+- [x] [AI] **GREEN**: assert the emitted identifier equals the thinking-grade agent's identifier
       from Cycle E1 — no new production branch is expected here, since `convert_cursor_model`'s tier
       collapse (Cycle A) already resolves both aliases to the same literal; this scenario proves that
       collapse holds end-to-end through the CLI path Cycle E1 wired
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "An execution-grade agent pins Composer 2.5 with fast disabled"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: confirm no duplicate fixture-agent construction crept in between the two
+- [x] [AI] **REFACTOR**: confirm no duplicate fixture-agent construction crept in between the two
       scenarios' step bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle E3 — an agent that omits the model field pins Composer 2.5 with fast disabled
 
-- [ ] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
+- [x] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
       `apps/rhino-cli/tests/cursor_binding.rs`, reusing the shared fixture builder (called with no
       tier alias) and the `Given a Claude agent whose frontmatter carries no model field` /
       `When the developer runs harness bindings generate` steps, leaving each body as
@@ -789,18 +789,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And no conversion warning is emitted for the absent model field
   ```
 
-- [ ] [AI] **GREEN**: confirm the omitted-field branch of `convert_cursor_model` (Cycle A) reaches
+- [x] [AI] **GREEN**: confirm the omitted-field branch of `convert_cursor_model` (Cycle A) reaches
       the CLI path without emitting a warning
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "An agent that omits the model field pins Composer 2.5 with fast disabled"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: confirm the conversion-report assertion helper used here matches the one
+- [x] [AI] **REFACTOR**: confirm the conversion-report assertion helper used here matches the one
       Cycle G will reuse for its own warning check, rather than diverging
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle E4 — a fast-grade agent pins Composer 2.5 with fast disabled
 
-- [ ] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
+- [x] [AI] **RED**: add this scenario's `Then`/`And` step definitions to
       `apps/rhino-cli/tests/cursor_binding.rs`, reusing the shared fixture builder and `Given`/`When`
       steps, leaving each body as `todo!("bind in GREEN")`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A fast-grade agent pins Composer 2.5 with fast disabled"`
@@ -816,17 +816,17 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted identifier is byte-identical to the thinking-grade agent's identifier
   ```
 
-- [ ] [AI] **GREEN**: confirm the fast-grade branch of `convert_cursor_model` (Cycle A) reaches the
+- [x] [AI] **GREEN**: confirm the fast-grade branch of `convert_cursor_model` (Cycle A) reaches the
       CLI path and emits the same non-fast literal as every other tier
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A fast-grade agent pins Composer 2.5 with fast disabled"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: run all four model-tier scenarios together and confirm none regressed
+- [x] [AI] **REFACTOR**: run all four model-tier scenarios together and confirm none regressed
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "pins"`
       — acceptance: exits 0 reporting `4` scenarios passed
 
 ### TDD Cycle F — one emitted file per Claude agent
 
-- [ ] [AI] **RED**: add the step definitions for this scenario to
+- [x] [AI] **RED**: add the step definitions for this scenario to
       `apps/rhino-cli/tests/cursor_binding.rs` with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "Generating emits one Cursor agent file per Claude agent"`
       — acceptance: exits non-zero
@@ -842,17 +842,17 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And each emitted filename matches its Claude source filename
   ```
 
-- [ ] [AI] **GREEN**: implement the directory walk in the Cursor emitter so it writes one
+- [x] [AI] **GREEN**: implement the directory walk in the Cursor emitter so it writes one
       `.cursor/agents/<name>.md` per `.claude/agents/<name>.md`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "Generating emits one Cursor agent file per Claude agent"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: reuse the existing directory-walk helper rather than adding a second one
+- [x] [AI] **REFACTOR**: reuse the existing directory-walk helper rather than adding a second one
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no previously-passing scenario regressed
 
 ### TDD Cycle G — the color field is dropped
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The Claude color field is dropped from the Cursor frontmatter"`
       — acceptance: exits non-zero
 
@@ -866,18 +866,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And a conversion warning records that color has no Cursor equivalent
   ```
 
-- [ ] [AI] **GREEN**: wire `CURSOR_FIELD_POLICY_TABLE` into the emitter so `color` is dropped and a
+- [x] [AI] **GREEN**: wire `CURSOR_FIELD_POLICY_TABLE` into the emitter so `color` is dropped and a
       warning is recorded on the conversion report
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The Claude color field is dropped from the Cursor frontmatter"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: confirm the warning text names Cursor, not OpenCode, and carries the agent
+- [x] [AI] **REFACTOR**: confirm the warning text names Cursor, not OpenCode, and carries the agent
       filename
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle H — the name and description are preserved
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The Claude name field is preserved in the Cursor frontmatter"`
       — acceptance: exits non-zero
 
@@ -891,17 +891,17 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted frontmatter declares the same description value
   ```
 
-- [ ] [AI] **GREEN**: emit `name` and `description` verbatim through the preserve policy
+- [x] [AI] **GREEN**: emit `name` and `description` verbatim through the preserve policy
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The Claude name field is preserved in the Cursor frontmatter"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: confirm a description containing a colon or a quote round-trips unchanged by
+- [x] [AI] **REFACTOR**: confirm a description containing a colon or a quote round-trips unchanged by
       extending the fixture, not by adding a second scenario
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle I — the body is copied unchanged
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The agent body is copied unchanged below the frontmatter"`
       — acceptance: exits non-zero
 
@@ -915,18 +915,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the emitted file separates frontmatter from body with a single delimiter line
   ```
 
-- [ ] [AI] **GREEN**: route the body through `encode_cursor_agent` from Cycle D without
+- [x] [AI] **GREEN**: route the body through `encode_cursor_agent` from Cycle D without
       re-serialising it
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The agent body is copied unchanged below the frontmatter"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: assert byte equality with a checksum rather than a string compare so a
+- [x] [AI] **REFACTOR**: assert byte equality with a checksum rather than a string compare so a
       trailing-newline difference cannot slip through
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle J — generation is idempotent
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "Generating twice is byte-identical"`
       — acceptance: exits non-zero
 
@@ -940,18 +940,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And every emitted Cursor agent file is byte-for-byte identical to the first emission
   ```
 
-- [ ] [AI] **GREEN**: make the emitter deterministic — sort the directory listing before writing and
+- [x] [AI] **GREEN**: make the emitter deterministic — sort the directory listing before writing and
       emit frontmatter fields in the fixed order set in Cycle D
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "Generating twice is byte-identical"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: confirm determinism holds when the source directory is enumerated in a
+- [x] [AI] **REFACTOR**: confirm determinism holds when the source directory is enumerated in a
       different order by shuffling the fixture's creation order
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle K — the README is not mirrored
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The Claude agents README is not mirrored into the Cursor binding"`
       — acceptance: exits non-zero
 
@@ -965,18 +965,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And every other Claude agent filename has a Cursor counterpart
   ```
 
-- [ ] [AI] **GREEN**: skip `README.md` in the emitter's directory walk, matching the existing
+- [x] [AI] **GREEN**: skip `README.md` in the emitter's directory walk, matching the existing
       `count_markdown_files` behaviour in `apps/rhino-cli/src/application/agents/sync_validator.rs`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The Claude agents README is not mirrored into the Cursor binding"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: extract the skip predicate into one shared helper so the emitter and the
+- [x] [AI] **REFACTOR**: extract the skip predicate into one shared helper so the emitter and the
       validator cannot drift apart on which filenames are ignored
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle L — the emitter is roster-agnostic
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The emitter mirrors whatever roster the repository holds"`
       — acceptance: exits non-zero
 
@@ -990,19 +990,19 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And no roster size is hard-coded in the emitter
   ```
 
-- [ ] [AI] **GREEN**: implement the step by building two fixtures of different sizes in one scenario
+- [x] [AI] **GREEN**: implement the step by building two fixtures of different sizes in one scenario
       and asserting each mirror matches its own source count; satisfy the second `And` with a
       source assertion that no integer literal appears in the emitter's count path
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The emitter mirrors whatever roster the repository holds"`
       — acceptance: exits 0. This is the scenario that lets the same feature file pass unchanged in
       a 90-agent, a 64-agent, and a 53-agent tree.
-- [ ] [AI] **REFACTOR**: name the two fixture sizes as constants in the test so the intent is legible
+- [x] [AI] **REFACTOR**: name the two fixture sizes as constants in the test so the intent is legible
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle M — a matching mirror passes validation
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A Cursor mirror matching the generator passes validation"`
       — acceptance: exits non-zero
 
@@ -1016,20 +1016,20 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the output reports the Cursor mirror checks as passing
   ```
 
-- [ ] [AI] **GREEN**: add the Cursor content-parity branch to `validate_bindings` in
+- [x] [AI] **GREEN**: add the Cursor content-parity branch to `validate_bindings` in
       `apps/rhino-cli/src/application/agents/bindings.rs`, regenerating each agent in memory and
       comparing it against the on-disk `.cursor/agents/` file
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A Cursor mirror matching the generator passes validation"`
       — acceptance: exits 0
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: reuse the emitter itself as the oracle rather than re-deriving expected
+- [x] [AI] **REFACTOR**: reuse the emitter itself as the oracle rather than re-deriving expected
       content in the validator, so the two cannot drift
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle N — a hand-edited mirror fails validation
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A hand-edited Cursor agent file fails validation"`
       — acceptance: exits non-zero
 
@@ -1044,19 +1044,19 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the output advises re-running the binding generator
   ```
 
-- [ ] [AI] **GREEN**: emit a drift violation naming the file and carrying the remediation sentence
+- [x] [AI] **GREEN**: emit a drift violation naming the file and carrying the remediation sentence
       that names `harness bindings generate`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A hand-edited Cursor agent file fails validation"`
       — acceptance: exits 0. Falsifiable in both directions: the scenario mutates a byte and expects
       failure, while Cycle M's untouched mirror expects success.
-- [ ] [AI] **REFACTOR**: make the remediation sentence a shared constant with the OpenCode drift
+- [x] [AI] **REFACTOR**: make the remediation sentence a shared constant with the OpenCode drift
       message rather than a second hand-written string
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle O — a stale mirror file fails validation
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A Cursor agent file with no Claude counterpart fails validation"`
       — acceptance: exits non-zero
 
@@ -1070,18 +1070,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the output names the stale Cursor agent file
   ```
 
-- [ ] [AI] **GREEN**: walk the mirror as well as the source so an orphan file is detected, not just
+- [x] [AI] **GREEN**: walk the mirror as well as the source so an orphan file is detected, not just
       a drifted one
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A Cursor agent file with no Claude counterpart fails validation"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: express the check as a set difference in both directions rather than two
+- [x] [AI] **REFACTOR**: express the check as a set difference in both directions rather than two
       separate loops
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle P — a missing mirror file fails validation
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A missing Cursor agent file fails validation"`
       — acceptance: exits non-zero
 
@@ -1095,18 +1095,18 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the output names the missing Cursor agent file
   ```
 
-- [ ] [AI] **GREEN**: report the missing-file case with its own violation kind, distinct from drift
+- [x] [AI] **GREEN**: report the missing-file case with its own violation kind, distinct from drift
       and from the orphan case
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A missing Cursor agent file fails validation"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: confirm the three violation kinds (drift, orphan, missing) each carry a
+- [x] [AI] **REFACTOR**: confirm the three violation kinds (drift, orphan, missing) each carry a
       distinct message prefix so a reader can tell them apart
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: no regression
 
 ### TDD Cycle Q — a mirror absent from the catalog fails validation
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A present Cursor directory absent from the catalog fails validation"`
       — acceptance: exits non-zero
 
@@ -1120,11 +1120,11 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the output identifies the Cursor directory as missing a catalog row
   ```
 
-- [ ] [AI] **GREEN**: exercise `validate_catalog_coverage` against a fixture whose catalog text omits
+- [x] [AI] **GREEN**: exercise `validate_catalog_coverage` against a fixture whose catalog text omits
       `.cursor`, confirming the existing `KNOWN_BINDING_DIRS` entry produces the violation
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "A present Cursor directory absent from the catalog fails validation"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: annotate the step definition with the honest limitation recorded in
+- [x] [AI] **REFACTOR**: annotate the step definition with the honest limitation recorded in
       `tech-docs.md` — `validate_catalog_coverage` is a coarse substring match, so this guard is real
       inside a fixture whose catalog omits the string, and **vacuous** in the real tree where all
       three catalogs already contain `.cursor` for the rules-shim row. Cycles R and S below are the
@@ -1134,7 +1134,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### TDD Cycle R — the naming validator catches a deleted mirror file
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The naming validator reports mirror drift for a deleted Cursor agent file"`
       — acceptance: exits non-zero
 
@@ -1148,13 +1148,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the violation names the deleted agent as present in the source but absent from the Cursor mirror
   ```
 
-- [ ] [AI] **GREEN**: assert the violation comes from the existing registry-driven path — no new
+- [x] [AI] **GREEN**: assert the violation comes from the existing registry-driven path — no new
       Rust branch should be needed, because `harness naming validate` filters registry entries by
       `is_generated_with_agents()` and the Phase 2 flip already qualifies the `cursor` entry
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The naming validator reports mirror drift for a deleted Cursor agent file"`
       — acceptance: exits 0. If a new branch **is** required, record why in `learnings.md` — the
       registry-reach table in `tech-docs.md` would then be wrong and must be corrected.
-- [ ] [AI] **REFACTOR**: confirm the hardcoded skip list in
+- [x] [AI] **REFACTOR**: confirm the hardcoded skip list in
       `apps/rhino-cli/src/commands/harness_validate_naming.rs` (`README.md` and
       `ci-monitor-subagent.md`) applies to the Cursor mirror identically, so a legitimately absent
       file is not reported as drift
@@ -1163,7 +1163,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### TDD Cycle S — the naming validator catches an unsourced mirror file
 
-- [ ] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
+- [x] [AI] **RED**: add this scenario's step definitions with `todo!` bodies
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The naming validator reports mirror drift for an unsourced Cursor agent file"`
       — acceptance: exits non-zero
 
@@ -1177,12 +1177,12 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the violation names the added agent as present in the Cursor mirror but absent from the source
   ```
 
-- [ ] [AI] **GREEN**: assert the reverse direction of `validate_mirror_with_dirs` fires — the
+- [x] [AI] **GREEN**: assert the reverse direction of `validate_mirror_with_dirs` fires — the
       function is already bidirectional, so this scenario proves the registry flip bought both
       directions, not just one
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The naming validator reports mirror drift for an unsourced Cursor agent file"`
       — acceptance: exits 0
-- [ ] [AI] **REFACTOR**: run the whole suite once with no name filter and confirm no
+- [x] [AI] **REFACTOR**: run the whole suite once with no name filter and confirm no
       previously-bound scenario regressed. Only **eighteen** of nineteen scenarios are bound at this
       point — the Registry scenario (AC-15) does not bind into this suite until Cycle T below; Cycle
       T's own REFACTOR is where the count reaches nineteen
@@ -1203,7 +1203,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 > redundant: Cycle B proves the registry flip in isolation at the pure-data layer; this cycle proves
 > the identical fact holds from the aggregate feature file's perspective.
 
-- [ ] [AI] **RED**: add the `Given the harness registry section of repo-config.yml`,
+- [x] [AI] **RED**: add the `Given the harness registry section of repo-config.yml`,
       `When the cursor entry is read`, and the three `Then`/`And` step definitions for this scenario
       to `apps/rhino-cli/tests/cursor_binding.rs`, leaving each body as `todo!("bind in GREEN")`
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The cursor registry entry declares the generated tier and its mirror source"`
@@ -1220,7 +1220,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
     And the entry declares .claude/agents as the source it mirrors
   ```
 
-- [ ] [AI] **GREEN**: implement the step bodies against the `CursorWorld` fixture's own
+- [x] [AI] **GREEN**: implement the step bodies against the `CursorWorld` fixture's own
       `repo-config.yml` (already carrying the Cycle-B-shaped `cursor` entry as part of the shared
       fixture bootstrap established in Phase 3 setup, since every generate-based scenario from
       Cycle E1 onward depends on the fixture registry declaring Cursor as generated tier). The
@@ -1237,20 +1237,20 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding -- --name "The cursor registry entry declares the generated tier and its mirror source"`
       — acceptance: exits 0
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: run the whole suite once with no name filter and confirm all nineteen
+- [x] [AI] **REFACTOR**: run the whole suite once with no name filter and confirm all nineteen
       scenarios pass together
       — command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding`
       — acceptance: exits 0 reporting `19` scenarios passed
 
 ### Generate the real `ose-public` output and close the loop
 
-- [ ] [AI] Add `.cursor/agents/**/*.md` to the `inputs` array of the `naming:harness-validation`
+- [x] [AI] Add `.cursor/agents/**/*.md` to the `inputs` array of the `naming:harness-validation`
       target in `apps/rhino-cli/project.json` (it currently lists only `.claude/agents/**/*.md` and
       `.opencode/agents/**/*.md`), so Nx does not serve a stale cached result when only the Cursor
       mirror changes
       — acceptance: `grep -c "cursor/agents" apps/rhino-cli/project.json` returns `1` (returned `0`
       before this step)
-- [ ] [AI] Add the Cursor catalog row to `docs/reference/platform-bindings.md`, describing
+- [x] [AI] Add the Cursor catalog row to `docs/reference/platform-bindings.md`, describing
       `.cursor/agents/` as a generated binding mirrored from `.claude/agents/`, and stating in one
       sentence that the pin governs delegated subagents only — not the interactive session, not the
       `cursor-agent` CLI default, and not Auto/Router mode
@@ -1261,12 +1261,12 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       agent-resolution order (`.cursor/agents/*.md` also reads `.claude/agents/`, `.codex/agents/`),
       which is unrelated to whether this repository has generated the directory.
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] Generate the real mirror: `npx nx run rhino-cli:run -- harness bindings generate`
+- [x] [AI] Generate the real mirror: `npx nx run rhino-cli:run -- harness bindings generate`
       — acceptance: exits 0 and
       `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `90`, matching the `ose-public` roster count
       recorded in `evidence/phase-0-baseline.txt`. Use the recorded baseline number rather than the
       literal 90 if the roster moved.
-- [ ] [AI] Verify the pin actually landed in the generated output:
+- [x] [AI] Verify the pin actually landed in the generated output:
       `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l`
       — acceptance: reads `90` — every agent file in the roster. Also confirm the fast slug never
       appears: `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` exits non-zero (no matches).
@@ -1278,16 +1278,16 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       real scale (`90` files, `90` matches), `/usr/bin/grep -lc … | wc -l` would read `169`, not `90`.
       Plain `-l` (no `-c`) is unambiguous under every implementation — use it, pinned to
       `/usr/bin/grep` for consistency with the phase gates elsewhere in this file.
-- [ ] [AI] Confirm the generated tree carries no README:
+- [x] [AI] Confirm the generated tree carries no README:
       `test -e .cursor/agents/README.md; echo $?` — acceptance: prints `1`
-- [ ] [AI] Decide the Prettier disposition for `.cursor/agents/**` by running
+- [x] [AI] Decide the Prettier disposition for `.cursor/agents/**` by running
       `npx prettier --check ".cursor/agents/**/*.md"` — if it reports differences, add
       `.cursor/agents/` to `.prettierignore` exactly as `.amazonq/` is handled, because a pre-commit
       Prettier pass over generated output breaks byte-equality on the next `harness bindings validate`
       — acceptance: either `npx prettier --check ".cursor/agents/**/*.md"` exits 0 with no changes,
       or `grep -c "cursor/agents" .prettierignore` returns `1`; record which branch was taken in
       `learnings.md`
-- [ ] [AI] Decide the markdownlint disposition for `.cursor/agents/**` — the same hazard class as
+- [x] [AI] Decide the markdownlint disposition for `.cursor/agents/**` — the same hazard class as
       the Prettier step above, since six-plus delivery steps in this plan invoke `npm run lint:md:fix`
       (`markdownlint-cli2 --fix "**/*.md"`), and `.markdownlint-cli2.jsonc`'s `ignores` array has no
       `.cursor/` entry today. Run `npx markdownlint-cli2 ".cursor/agents/*.md"` — if it reports errors,
@@ -1296,10 +1296,10 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — acceptance: either `npx markdownlint-cli2 ".cursor/agents/*.md"` exits 0 with no errors, or
       `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`; record which branch was taken in
       `learnings.md`
-- [ ] [AI] Prove idempotency on the real tree: run
+- [x] [AI] Prove idempotency on the real tree: run
       `npx nx run rhino-cli:run -- harness bindings generate` a second time
       — acceptance: `git status --short .cursor/` prints nothing after the second run
-- [ ] [AI] Honour `--dry-run` in the Cursor branch. The flag exists today and its doc comment scopes
+- [x] [AI] Honour `--dry-run` in the Cursor branch. The flag exists today and its doc comment scopes
       it to the OpenCode sync
       (`/// Preview changes without modifying files (applies to OpenCode sync)`)
       [Repo-grounded — `apps/rhino-cli/src/commands/harness_generate_bindings.rs`], so the new
@@ -1307,7 +1307,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — command: `npx nx run rhino-cli:run -- harness bindings generate --harness cursor --dry-run`
       — acceptance: exits 0, prints what it would write, and `git status --short .cursor/` prints
       nothing afterwards. Falsifiable: dropping `--dry-run` makes the same command write files.
-- [ ] [AI] Capture the full **CLI evidence contract** (all nine rows of the table in
+- [x] [AI] Capture the full **CLI evidence contract** (all nine rows of the table in
       `tech-docs.md §CLI evidence contract`) for `ose-public` into
       `evidence/phase-3-ose-public-cli.txt`, plus the JSON verdict into
       `evidence/phase-3-bindings-validate.json`. The nine rows are:
@@ -1325,23 +1325,23 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding` exits 0
+- [x] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test cursor_binding` exits 0
       reporting `19` scenarios passed
-- [ ] [AI] `npx nx run rhino-cli:test:integration` exits 0
-- [ ] [AI] `npx nx run rhino-cli:specs:behavior:coverage` exits 0 — it exited non-zero at the start
+- [x] [AI] `npx nx run rhino-cli:test:integration` exits 0
+- [x] [AI] `npx nx run rhino-cli:specs:behavior:coverage` exits 0 — it exited non-zero at the start
       of this phase, so this check is falsifiable in both directions
-- [ ] [AI] `npx nx run rhino-cli:specs:gherkin-cardinality-validation` exits 0
-- [ ] [AI] `npx nx run rhino-cli:naming:harness-validation` exits 0 against the real 90-file mirror
-- [ ] [AI] `npx nx run rhino-cli:test:quick` exits 0 (chains typecheck, lint, test:unit,
+- [x] [AI] `npx nx run rhino-cli:specs:gherkin-cardinality-validation` exits 0
+- [x] [AI] `npx nx run rhino-cli:naming:harness-validation` exits 0 against the real 90-file mirror
+- [x] [AI] `npx nx run rhino-cli:test:quick` exits 0 (chains typecheck, lint, test:unit,
       test:coverage, test:specs)
-- [ ] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `90` and
+- [x] [AI] `/bin/ls -1 .cursor/agents/*.md | wc -l` reads `90` and
       `test -e .cursor/agents/README.md; echo $?` prints `1`
-- [ ] [AI] Re-running `harness bindings generate` leaves `git status --short .cursor/` empty
-- [ ] [AI] `evidence/phase-3-ose-public-cli.txt` exists with all nine command/output pairs, and
+- [x] [AI] Re-running `harness bindings generate` leaves `git status --short .cursor/` empty
+- [x] [AI] `evidence/phase-3-ose-public-cli.txt` exists with all nine command/output pairs, and
       `evidence/phase-3-bindings-validate.json` exists and parses as JSON
-- [ ] [AI] Both falsifiability rows of the CLI evidence contract recorded a **non-zero** exit and the
+- [x] [AI] Both falsifiability rows of the CLI evidence contract recorded a **non-zero** exit and the
       tree was restored — `git status --short .cursor/` prints nothing
-- [ ] [AI] No PR exists yet for this branch —
+- [x] [AI] No PR exists yet for this branch —
       `gh pr list --head adopt-cursor-platform-binding --json number --jq 'length'` returns `0`
 
 > **Pause Safety**: the emitter, validator, feature file, and real generated mirror all exist and
@@ -1362,17 +1362,17 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Shared rows (S1-S10) — applied here, repeated verbatim in Phases 6 and 7
 
-- [ ] [AI] **S1** — already done in Phase 2 Cycle B; confirm only:
+- [x] [AI] **S1** — already done in Phase 2 Cycle B; confirm only:
       `grep -c "tier: generated" repo-config.yml` returns `3`
-- [ ] [AI] **S2** — record **NO CHANGE** for the `instruction-size` glob `.cursor/rules/*.mdc` in
+- [x] [AI] **S2** — record **NO CHANGE** for the `instruction-size` glob `.cursor/rules/*.mdc` in
       `repo-config.yml`: this plan adds no instruction surface
       — acceptance: `git diff --stat repo-config.yml` shows only the `harness:` entry changed
-- [ ] [AI] **S3** — reclassify Cursor from native to generated in the doc comments of
+- [x] [AI] **S3** — reclassify Cursor from native to generated in the doc comments of
       `apps/rhino-cli/src/application/agents/bindings.rs`, leaving the `KNOWN_BINDING_DIRS` entry
       itself untouched
       — acceptance: `grep -c "cursor" apps/rhino-cli/src/application/agents/bindings.rs` is unchanged
       in count while `git diff` shows only comment lines altered
-- [ ] [AI] **S4** — move Cursor out of the native-tier clause in
+- [x] [AI] **S4** — move Cursor out of the native-tier clause in
       `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/harness-bindings.feature` (the clause naming
       "the native tier (Copilot, Cursor, Windsurf, …)") into the generated-tier clause, so the
       generated-tier clause reads "the generated tier (OpenCode, Amazon Q, Cursor) is regenerated and
@@ -1392,7 +1392,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --test specs_tree` exits `0` after this
       edit (falsifiable: it exits non-zero — an unmatched-step failure, not an assertion failure — if
       the feature text is edited without updating the matcher, or vice versa)
-- [ ] [AI] **S5** — create `specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/README.md`
+- [x] [AI] **S5** — create `specs/apps/rhino/behavior/rhino-cli/gherkin/cursor-binding/README.md`
       _New file_ indexing the new directory's sole `cursor-binding.feature` file, following the
       shape of an existing sibling topic README (e.g.
       `specs/apps/rhino/behavior/rhino-cli/gherkin/system/README.md`). `harness/README.md` is
@@ -1401,23 +1401,23 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       returns `1` (returned `0` before, since the file did not exist); and
       `grep -c "cursor-binding.feature" specs/apps/rhino/behavior/rhino-cli/gherkin/harness/README.md`
       returns `0` both before and after (harness/README.md is never touched by this plan)
-- [ ] [AI] **S6** — update the Cursor row in `docs/reference/rhino-cli-command-triage.md`: tier
+- [x] [AI] **S6** — update the Cursor row in `docs/reference/rhino-cli-command-triage.md`: tier
       becomes generated and the artifact column names `.cursor/agents/`
       — acceptance: `grep -c "\.cursor/agents" docs/reference/rhino-cli-command-triage.md` returns at
       least `1` (returned `0` before)
-- [ ] [AI] **S7** — change only the native-tier list occurrence in
+- [x] [AI] **S7** — change only the native-tier list occurrence in
       `docs/reference/rhino-cli-command-triage.md`; record **NO CHANGE** for the three
       instruction/no-shadowing occurrences
       — acceptance: `git diff docs/reference/rhino-cli-command-triage.md` touches exactly two lines
       (S6's row and S7's list entry)
-- [ ] [AI] **S8** — record **NO CHANGE** for the instruction-size surface list in
+- [x] [AI] **S8** — record **NO CHANGE** for the instruction-size surface list in
       `docs/reference/sdlc-gate-standard.md`
       — acceptance: `git diff --stat docs/reference/sdlc-gate-standard.md` prints nothing
-- [ ] [AI] **S9** — record **NO CHANGE** for
+- [x] [AI] **S9** — record **NO CHANGE** for
       `repo-governance/conventions/structure/instruction-file-size-budget.md`
       — acceptance: `git diff --stat repo-governance/conventions/structure/instruction-file-size-budget.md`
       prints nothing
-- [ ] [AI] **S10** — record **NO CHANGE** for `.husky/pre-commit` and `.husky/pre-push`: both already
+- [x] [AI] **S10** — record **NO CHANGE** for `.husky/pre-commit` and `.husky/pre-push`: both already
       run bindings generate and validate, so the Cursor mirror is already covered
       — acceptance: `git diff --stat .husky/` prints nothing, and a deliberate hand-edit to one
       `.cursor/agents/*.md` file makes a local `npx nx run rhino-cli:run -- harness bindings validate`
@@ -1425,11 +1425,11 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### `ose-public` rows (P1-P13)
 
-- [ ] [AI] **P1** — in `docs/reference/platform-bindings.md`, change the Cursor row's `Status`
+- [x] [AI] **P1** — in `docs/reference/platform-bindings.md`, change the Cursor row's `Status`
       column from `Reserved` to the generated tier for the agent surface
       — acceptance: `grep -c "Reserved" docs/reference/platform-bindings.md` decreases by exactly 1
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] **P2** — append a dated amendment note under `### Optional thin pointers` in
+- [x] [AI] **P2** — append a dated amendment note under `### Optional thin pointers` in
       `docs/reference/platform-bindings.md`, using the sentinel phrase "Amended for the agent
       surface only" verbatim, recording that the standing "no thin pointer files" decision is
       amended for the agent surface only and unchanged for the instruction surface (DD-2)
@@ -1438,36 +1438,36 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       `grep -c "2026-07"` as the signal here: this file already contains an unrelated pre-existing
       "Verified 2026-07-20 against AWS and Kiro primary sources" note (Amazon Q → Kiro succession
       section), so that bare date substring already reads `1`, not `0`, before this step.
-- [ ] [AI] **P3** — add a Cursor model-translation subsection under `## Translation Artifacts` in
+- [x] [AI] **P3** — add a Cursor model-translation subsection under `## Translation Artifacts` in
       `docs/reference/platform-bindings.md`, in the same shape as the existing
       `### … (Claude Code → OpenCode)` subsections
       — acceptance: `grep -c "Claude Code → Cursor" docs/reference/platform-bindings.md` returns `1`
-- [ ] [AI] **P4** — in `## Adding a New Platform Binding`, repoint the worked example (which used
+- [x] [AI] **P4** — in `## Adding a New Platform Binding`, repoint the worked example (which used
       `.cursor/rules/`, now a real binding) and add the registry-entry step
       — acceptance: the five-step procedure names `repo-config.yml` and no longer uses
       `.cursor/rules/` as its hypothetical example
-- [ ] [AI] **P5** — add the out-of-reach onboarding note to `docs/reference/platform-bindings.md`,
+- [x] [AI] **P5** — add the out-of-reach onboarding note to `docs/reference/platform-bindings.md`,
       stating in plain words that the pin governs delegated subagents launched from
       `.cursor/agents/` only, and does **not** govern the interactive Cursor session's model, the
       `cursor-agent` CLI default, or anything under Auto/Router mode
       — acceptance: `grep -ci "does not govern" docs/reference/platform-bindings.md` returns at
       least `1`. This is the honesty framing; a version of this note must exist in all three repos.
-- [ ] [AI] **P6** — rewrite the Cursor bullet under `### Active Tier-1 bindings` in
+- [x] [AI] **P6** — rewrite the Cursor bullet under `### Active Tier-1 bindings` in
       `repo-governance/conventions/structure/multi-harness-binding.md` so "reads `AGENTS.md`
       natively" is scoped to instructions and the generated agent surface is named
       — acceptance: the bullet mentions both `AGENTS.md` and `.cursor/agents/`
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] **P7** — update the Cursor row in
+- [x] [AI] **P7** — update the Cursor row in
       `repo-governance/conventions/structure/governance-vendor-independence.md` to reflect the
       generated agent surface
       — acceptance: `grep -c "\.cursor/agents" repo-governance/conventions/structure/governance-vendor-independence.md`
       returns at least `1`
-- [ ] [AI] **P8** — add the Cursor full-tier-collapse mapping to `### Model ID Mapping` in
+- [x] [AI] **P8** — add the Cursor full-tier-collapse mapping to `### Model ID Mapping` in
       `repo-governance/development/agents/model-selection.md`, including the explicit prohibition
       against emitting `composer-2.5-fast`
       — acceptance: `grep -c "Composer" repo-governance/development/agents/model-selection.md`
       returns at least `1` (returned `0` before)
-- [ ] [AI] **P9** — amend the `AGENTS.md` line that groups Cursor with tools that "read root
+- [x] [AI] **P9** — amend the `AGENTS.md` line that groups Cursor with tools that "read root
       `AGENTS.md` natively … no per-tool instruction file", so it still says Cursor reads
       `AGENTS.md` but now also carries a generated agent binding. **Byte-budget constraint —
       verify before writing, do not assume it fits**: `wc -c AGENTS.md` measures `29978` bytes
@@ -1485,34 +1485,34 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       `0`. FYI (not a separate acceptance clause, only 439 bytes of slack so watch it on any future
       CLAUDE.md edit): the `resolved_tree` composite (`CLAUDE.md` + its `@AGENTS.md` import) measures
       `37561` bytes against a `fail: 38000` threshold in the same `repo-config.yml` section.
-- [ ] [AI] **P10** — in `CLAUDE.md`, add `.cursor/` to the secondary generated-artifact set under
+- [x] [AI] **P10** — in `CLAUDE.md`, add `.cursor/` to the secondary generated-artifact set under
       `### Multi-harness configuration (Claude Code + OpenCode + Amazon Q)` and extend the heading to
       name Cursor
       — acceptance: `grep -c "\.cursor/" CLAUDE.md` returns at least `1` (returned `0` before)
-- [ ] [AI] **P11** — add a model-pin drift dimension to
+- [x] [AI] **P11** — add a model-pin drift dimension to
       `.claude/agents/repo-harness-compatibility-checker.md`, so a Cursor agent file whose `model:`
       no longer matches the pinned literal is reported
       — acceptance: `grep -ci "model-pin\|model pin" .claude/agents/repo-harness-compatibility-checker.md`
       returns at least `1`
   - _Suggested executor: `agent-maker`_
-- [ ] [AI] **P12** — **VERIFY THEN DECIDE**: read
+- [x] [AI] **P12** — **VERIFY THEN DECIDE**: read
       `.claude/agents/repo-harness-compatibility-fixer.md` and change it only if it enumerates tiers
       or bindings independently of the catalog
       — acceptance: either the file is changed and `git diff` shows the enumeration updated, or the
       verdict "no independent enumeration — NO CHANGE" is recorded in this checklist
-- [ ] [AI] **P13** — **VERIFY THEN DECIDE**: apply whichever Prettier branch Phase 3 selected, and
+- [x] [AI] **P13** — **VERIFY THEN DECIDE**: apply whichever Prettier branch Phase 3 selected, and
       the same for the markdownlint check (`tech-docs.md §Markdownlint Interaction`)
       — acceptance: matches the Phase 3 Prettier decision exactly (if `.prettierignore` gained a
       `.cursor/agents/` line, `grep -c "cursor/agents" .prettierignore` returns `1`) and matches the
       Phase 3 markdownlint decision exactly (if `.markdownlint-cli2.jsonc` gained a
       `.cursor/agents/**/*.md` entry, `grep -c "cursor/agents" .markdownlint-cli2.jsonc` returns `1`)
-- [ ] [AI] Re-sync the platform bindings after touching `.claude/agents/`:
+- [x] [AI] Re-sync the platform bindings after touching `.claude/agents/`:
       `npm run generate:bindings`
       — acceptance: exits 0 and `git status --short .opencode/ .amazonq/` reflects only the expected
       re-sync of the agents edited in P11/P12 (or prints nothing if neither was edited)
-- [ ] [AI] Run the markdown gates: `npm run lint:md:fix`
+- [x] [AI] Run the markdown gates: `npm run lint:md:fix`
       — acceptance: exits 0 and leaves no unstaged changes
-- [ ] [AI] Commit the governance sweep separately from the Rust and generated-output commits, per
+- [x] [AI] Commit the governance sweep separately from the Rust and generated-output commits, per
       the Commit Guidelines standing section
       — acceptance: `git log --oneline -n 1` shows a `docs(...)` or `chore(governance)` subject, not
       a mixed one
@@ -1521,23 +1521,23 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] Every row S1-S10 and P1-P13 has a recorded verdict in this checklist — applied, or
+- [x] [AI] Every row S1-S10 and P1-P13 has a recorded verdict in this checklist — applied, or
       explicitly **NO CHANGE** with its reason.
       `/usr/bin/grep -c '^- \[x\] \[AI\] \*\*[SP][0-9]' plans/in-progress/adopt-cursor-platform-binding/delivery.md`
       equals `23`. The `[SP][0-9]` marker is phase-unique — every occurrence in the whole file is
       this phase's (S1-S10, P1-P13) — so a whole-file grep gives the exact phase-scoped count.
       Falsifiable: a skipped row leaves the count below 23.
-- [ ] [AI] `npx nx run rhino-cli:test:quick` exits 0
-- [ ] [AI] `npx nx run rhino-cli:test:integration` exits 0
-- [ ] [AI] `npx nx run rhino-cli:naming:harness-validation` exits 0
-- [ ] [AI] `npx nx run rhino-cli:governance:vendor-audit-validation` exits 0 — the governance edits
+- [x] [AI] `npx nx run rhino-cli:test:quick` exits 0
+- [x] [AI] `npx nx run rhino-cli:test:integration` exits 0
+- [x] [AI] `npx nx run rhino-cli:naming:harness-validation` exits 0
+- [x] [AI] `npx nx run rhino-cli:governance:vendor-audit-validation` exits 0 — the governance edits
       must not introduce vendor-specific content outside a `## Platform Binding Examples` heading
-- [ ] [AI] `npx nx run rhino-cli:instruction-size:validation` exits 0 — no instruction surface grew
-- [ ] [AI] `npm run generate:bindings` is idempotent: running it twice leaves
+- [x] [AI] `npx nx run rhino-cli:instruction-size:validation` exits 0 — no instruction surface grew
+- [x] [AI] `npm run generate:bindings` is idempotent: running it twice leaves
       `git status --short .opencode/ .amazonq/ .cursor/` empty
-- [ ] [AI] The honesty note exists: `grep -ci "does not govern" docs/reference/platform-bindings.md`
+- [x] [AI] The honesty note exists: `grep -ci "does not govern" docs/reference/platform-bindings.md`
       returns at least `1`
-- [ ] [AI] No PR exists yet —
+- [x] [AI] No PR exists yet —
       `gh pr list --head adopt-cursor-platform-binding --json number --jq 'length'` returns `0`
 
 > **Pause Safety**: `ose-public` now holds the complete change — emitter, validator, specs,
@@ -1560,7 +1560,7 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Manual behavioral verification — the live subagent probe
 
-- [ ] [HUMAN] Launch Cursor against this worktree and delegate a task to any agent from
+- [x] [HUMAN] Launch Cursor against this worktree and delegate a task to any agent from
       `.cursor/agents/` (for example `web-researcher`), then read the model actually reported for
       that subagent run in the Cursor UI
       — **why `[HUMAN]`**: this requires an interactive Cursor session with the user's own
@@ -1568,16 +1568,16 @@ These blocks are referenced by name from the phase gates below. Run them whereve
       — **observable resume signal**: a screenshot saved to
       `evidence/phase-5-cursor-subagent-model.png` showing the delegated subagent and its reported
       model. The `[AI]` executor resumes as soon as that file exists.
-- [ ] [AI] Record the probe verdict in `evidence/phase-5-probe.md` with three fields: the model the
+- [x] [AI] Record the probe verdict in `evidence/phase-5-probe.md` with three fields: the model the
       subagent reported, whether it matched the pinned literal, and — if it did not — which of the
       two staff-confirmed Cursor defects the mismatch is consistent with
       — acceptance: the file exists and names all three fields
-- [ ] [AI] If the probe shows a mismatch, do **not** revert the plan. Amend `brd.md` and
+- [x] [AI] If the probe shows a mismatch, do **not** revert the plan. Amend `brd.md` and
       `docs/reference/platform-bindings.md` so the reach claim reads "best-effort, defeated by a
       known Cursor defect in version `<recorded version>`" and add the evidence link
       — acceptance: the amended sentence exists, or the checklist records "probe matched — no
       amendment needed". Both branches are recorded; silence is not acceptable.
-- [ ] [AI] Assert the two cheap repo-local facts for `ose-public`:
+- [x] [AI] Assert the two cheap repo-local facts for `ose-public`:
       `/usr/bin/grep -l "<the Phase 1 non-fast literal>" .cursor/agents/*.md | wc -l` reads `90`, and
       `/usr/bin/grep -r "composer-2.5-fast" .cursor/agents/` returns no matches, and
       `test -e .cursor/cli.json; echo $?` prints `1`
@@ -1586,13 +1586,13 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 ### Local quality gates and integration
 
-- [ ] [AI] Run the **Local Quality Gates (Before Push)** standing section in full
+- [x] [AI] Run the **Local Quality Gates (Before Push)** standing section in full
       — acceptance: every listed command exits 0
-- [ ] [AI] Commit and push to `origin adopt-cursor-platform-binding`
+- [x] [AI] Commit and push to `origin adopt-cursor-platform-binding`
       — acceptance: `git push` exits 0 and
       `git ls-remote --heads origin adopt-cursor-platform-binding | grep -c .` returns `1` (returned
       `0` before)
-- [ ] [AI] Open a draft PR against `main`:
+- [x] [AI] Open a draft PR against `main`:
       `gh pr create --draft --base main --head adopt-cursor-platform-binding --title "feat(rhino-cli): emit a generated Cursor platform binding"`
       with a body that states the honest reach boundary in its first paragraph
       — acceptance: `gh pr list --head adopt-cursor-platform-binding --json number --jq 'length'`
@@ -1619,8 +1619,8 @@ These blocks are referenced by name from the phase gates below. Run them whereve
 
 > All checks below must pass before starting Phases 6 and 7 (which may then run concurrently).
 
-- [ ] [AI] `evidence/phase-5-cursor-subagent-model.png` and `evidence/phase-5-probe.md` both exist
-- [ ] [AI] The probe verdict is recorded in one of its two branches — matched, or amended-with-caveat
+- [x] [AI] `evidence/phase-5-cursor-subagent-model.png` and `evidence/phase-5-probe.md` both exist
+- [x] [AI] The probe verdict is recorded in one of its two branches — matched, or amended-with-caveat
 - [ ] [AI] PR 1 is merged: `gh pr view --json state --jq '.state'` returns `MERGED`
 - [ ] [AI] CI is green on `origin/main` after the merge
 - [ ] [AI] The shared source is now on `main` and available to be propagated: the sibling landings
