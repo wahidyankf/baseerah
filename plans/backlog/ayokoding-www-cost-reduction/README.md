@@ -30,7 +30,7 @@ Solo-maintainer polyglot Nx monorepo (see [AGENTS.md](../../../AGENTS.md)). The 
 hand-curated static-data tool — `cost-of-living-calculator` — and is mid-way through an active
 content programme ([`ayokoding-learning-path-04`](../../in-progress/ayokoding-learning-path-04-course-authoring/README.md))
 that is shipping roughly one course per week, plus a backlog plan
-[`ayokoding-www-tools-ai-benchmark`](../ayokoding-www-tools-ai-benchmark/README.md) waiting on the
+[`ayokoding-www-tools-ai-benchmark`](../../in-progress/ayokoding-www-tools-ai-benchmark/README.md) waiting on the
 same calculator-style surface. **Concurrent sessions are likely** during plan execution, so every
 unit binds one worktree → one branch → one PR per the `worktree-to-pr` default.
 
@@ -153,8 +153,8 @@ Phases 3, 4, or 5. The full `### Delivery Boundaries` table and the per-phase wo
 
 - [Dependency Bump Stability & Safety Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md)
   — Path A / Path B / Path C decision tree the dep-modernization phase binds to.
-- [`ayokoding-www-tools-ai-benchmark`](../ayokoding-www-tools-ai-benchmark/README.md) — the sibling
-  backlog plan that copies the `cost-of-living-calculator` FCIS pattern; their file-impact surfaces
+- [`ayokoding-www-tools-ai-benchmark`](../../in-progress/ayokoding-www-tools-ai-benchmark/README.md) — the sibling
+  plan that copies the `cost-of-living-calculator` FCIS pattern; their file-impact surfaces
   overlap on `libs/web-ui-token/src/ayokoding.css` only, so concurrent execution is safe under the
   one-worktree-per-unit rule.
 - [`apps/ayokoding-www/README.md`](../../../apps/ayokoding-www/README.md) — the app README whose

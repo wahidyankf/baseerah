@@ -38,7 +38,7 @@ Standalone plans (outside the `ayokoding-learning-path-*` programme):
 - [merge-queue-adoption](./merge-queue-adoption/README.md)
   — Hardens merge-precondition (c) under concurrent integration; owns the merge-queue work deferred
   from `worktree-to-pr-hardening`.
-- [ayokoding-www-tools-ai-benchmark](./ayokoding-www-tools-ai-benchmark/README.md)
+- [ayokoding-www-tools-ai-benchmark](../in-progress/ayokoding-www-tools-ai-benchmark/README.md)
   — A public `/tools/ai-benchmark` page comparing capability and token price across the models
   exposed by Codex, Claude Code, Cursor, OpenCode Go and OpenCode Zen, banded into `opus` /
   `sonnet` / `light` classes.
