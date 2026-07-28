@@ -174,7 +174,7 @@ stateDiagram-v2
 flowchart LR
   RB["refresh runbook<br/>+ web-researcher"] --> M["core/data/models.ts<br/>SINGLE SOURCE<br/>OF TRUTH"]
   M --> UI["/tools/ai-benchmark<br/>(public page)"]
-  M --> GEN["generate-benchmark-<br/>reference.mjs"]
+  M --> GEN["generate-benchmark-<br/>reference.ts"]
   GEN --> REF["ai-model-<br/>benchmarks.md"]
 
   style M fill:#0072B2,color:#FFFFFF
@@ -406,8 +406,8 @@ verbatim.
 <!-- END GENERATED: roster -->
 ```
 
-- `apps/ayokoding-www/scripts/generate-benchmark-reference.mjs` rewrites only the text between marker
-  pairs; everything outside is untouched.
+- `apps/ayokoding-www/src/scripts/generate-benchmark-reference.ts` rewrites only the text between
+  marker pairs; everything outside is untouched.
 - Nx target `generate-benchmark-reference` writes; `validate-benchmark-reference` regenerates to a
   temp file and diffs, exiting non-zero on drift. The validate target joins the phase gate and the
   repo's pre-push surface for this project.
@@ -454,7 +454,7 @@ The bands **alias existing hues** rather than introducing new hex values (R5 reu
 | --------- | ---------------------- | ------------------------------------- | --------- | ------------------------------------------------------- |
 | `opus`    | `--chart-band-opus`    | `var(--hue-plum)` + `-ink` / `-wash`  | 305       | Far from both others in hue and in lightness            |
 | `sonnet`  | `--chart-band-sonnet`  | `var(--hue-teal)` + `-ink` / `-wash`  | 200       | ~105° from opus, ~125° from light                       |
-| `light`   | `--chart-band-light`   | `var(--hue-honey)` + `-ink` / `-wash` | 75        | ~130° from sonnet                                       |
+| `light`   | `--chart-band-light`   | `var(--hue-honey)` + `-ink` / `-wash` | 75        | ~125° from sonnet                                       |
 | `unrated` | `--chart-band-unrated` | `var(--warm-400)`                     | neutral   | Desaturated by design — reads as "no data", not a class |
 
 The three hues are ≥105° apart in OKLCH hue and differ in lightness, which preserves separability
@@ -547,7 +547,7 @@ These are the tests that make the honesty surface enforceable rather than aspira
 | `apps/ayokoding-www/src/features/i18n/core/translations.ts`                          | **Modify** | Add every page string under both `en` and `id`                                |
 | `libs/web-ui-token/src/ayokoding.css`                                                | **Modify** | Add the four band tokens to the light `@theme` and the dark override block    |
 | `apps/ayokoding-www/docs/ai-benchmark/data-sourcing-prompt.md`                       | **Create** | Refresh runbook. _New file_                                                   |
-| `apps/ayokoding-www/scripts/generate-benchmark-reference.mjs`                        | **Create** | Marker-delimited generator. _New file_                                        |
+| `apps/ayokoding-www/src/scripts/generate-benchmark-reference.ts`                     | **Create** | Marker-delimited generator. _New file_                                        |
 | `apps/ayokoding-www/project.json`                                                    | **Modify** | Add `generate-benchmark-reference` and `validate-benchmark-reference` targets |
 | `docs/reference/ai-model-benchmarks.md`                                              | **Modify** | Insert generation markers; regenerate tables; reconcile contradicted prose    |
 | `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature`     | **Create** | Scenarios AC-1…AC-38 except AC-3. _New file_                                  |

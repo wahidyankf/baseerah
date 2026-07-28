@@ -178,7 +178,7 @@ into an unresolvable placeholder.
 - `<I18N>` = `apps/ayokoding-www/src/features/i18n/core/translations.ts`
 - `<TOKENS>` = `libs/web-ui-token/src/ayokoding.css`
 - `<RUNBOOK>` = `apps/ayokoding-www/docs/ai-benchmark/data-sourcing-prompt.md`
-- `<GEN>` = `apps/ayokoding-www/scripts/generate-benchmark-reference.mjs`
+- `<GEN>` = `apps/ayokoding-www/src/scripts/generate-benchmark-reference.ts`
 - `<REF>` = `docs/reference/ai-model-benchmarks.md`
 - `<PROJ>` = `apps/ayokoding-www/project.json`
 - `<SPECS>` = `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/`
@@ -565,7 +565,7 @@ rev-parse --show-toplevel` prints the worktree path
       `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-3-reference-derivation
 origin/main` — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-3-reference-derivation
 rev-parse --show-toplevel` prints the worktree path
-- [ ] [AI] **G-1 RED**: create `apps/ayokoding-www/scripts/generate-benchmark-reference.unit.test.mjs`
+- [ ] [AI] **G-1 RED**: create `apps/ayokoding-www/src/scripts/generate-benchmark-reference.unit.test.ts`
       asserting that the generator (a) replaces only the text between a
       `<!-- BEGIN GENERATED: <name> -->` / `<!-- END GENERATED: <name> -->` pair, (b) leaves every
       byte outside the markers untouched, and (c) **throws** when a `BEGIN` marker has no matching
@@ -816,48 +816,116 @@ rev-parse --show-toplevel` prints the worktree path
       — acceptance: fails because `<USTEPS>ai-benchmark.steps.tsx` does not exist
   - _Gherkin (binds) → AC-4 "A model reaching the opus anchor renders in the opus band" — same
     scenario as B-1 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: A model reaching the opus anchor renders in the opus band
+      Given a fixture model whose composite index equals the opus anchor index
+      When the capability groups are computed
+      Then that model belongs to the "opus" band
+    ```
+
 - [ ] [AI] **Z-2 GREEN**: wire `assignBand`'s opus comparison into the AC-4 step definition
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-4 passes
 - [ ] [AI] **Z-3 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-5
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-5 "A model between the two anchors renders in the sonnet band" — same
     scenario as B-3 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: A model between the two anchors renders in the sonnet band
+      Given a fixture model whose composite index is above the sonnet anchor index
+      And that model's composite index is below the opus anchor index
+      When the capability groups are computed
+      Then that model belongs to the "sonnet" band
+    ```
+
 - [ ] [AI] **Z-4 GREEN**: wire `assignBand`'s sonnet comparison into the AC-5 step definition
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-5 passes
 - [ ] [AI] **Z-5 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-6
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-6 "A model below the sonnet anchor renders in the light band" — same
     scenario as B-5 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: A model below the sonnet anchor renders in the light band
+      Given a fixture model whose composite index is below the sonnet anchor index
+      When the capability groups are computed
+      Then that model belongs to the "light" band
+    ```
+
 - [ ] [AI] **Z-6 GREEN**: wire `assignBand`'s light fallthrough into the AC-6 step definition
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-6 passes
 - [ ] [AI] **Z-7 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-7
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-7 "Each anchor model occupies the band it defines" — same scenario as
     B-7 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: Each anchor model occupies the band it defines
+      Given the two anchor models are present in the roster
+      When the capability groups are computed
+      Then the opus anchor belongs to the "opus" band
+      And the sonnet anchor belongs to the "sonnet" band
+    ```
+
 - [ ] [AI] **Z-8 GREEN**: wire the anchor-pinning short-circuit into the AC-7 step definition
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-7 passes
 - [ ] [AI] **Z-9 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-8
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-8 "A model with no published benchmark score renders in the unrated
     group" — same scenario as C-7 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: A model with no published benchmark score renders in the unrated group
+      Given a fixture model with no score on any composite benchmark
+      When the capability groups are computed
+      Then that model belongs to the "unrated" group
+      And that model has no composite index
+    ```
+
 - [ ] [AI] **Z-10 GREEN**: wire the zero-coverage case from `<CORE>score.ts` into the AC-8 step
       definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-8 passes
 - [ ] [AI] **Z-11 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-9
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-9 "Every roster model belongs to exactly one capability group" — same
     scenario as B-9 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: Every roster model belongs to exactly one capability group
+      Given the full roster is loaded
+      When the capability groups are computed
+      Then each model appears in exactly one of "opus", "sonnet", "light", or "unrated"
+    ```
+
 - [ ] [AI] **Z-12 GREEN**: wire `groupByBand(dataset)` over the full roster into the AC-9 step
       definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-9 passes
 - [ ] [AI] **Z-13 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-10
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-10 "A model missing a benchmark is scored over the benchmarks it has" —
     same scenario as C-5 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: A model missing a benchmark is scored over the benchmarks it has
+      Given a fixture model with a score on two of the four composite benchmarks
+      When its composite index is computed
+      Then the index equals the weight-renormalized mean of those two normalized scores
+      And its coverage ratio equals the summed weight of those two benchmarks divided by one hundred
+    ```
+
 - [ ] [AI] **Z-14 GREEN**: wire `computeIndex`/`coverage` from `<CORE>score.ts` into the AC-10 step
       definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-10 passes
 - [ ] [AI] **Z-15 RED**: extend `<USTEPS>ai-benchmark.steps.tsx` binding AC-11
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-11 "Models are ordered identically in both charts within a band" — same
     scenario as B-11 above, now bound at the vitest-cucumber layer._
+
+    ```gherkin
+    Scenario: Models are ordered identically in both charts within a band
+      Given the full roster is loaded
+      When both charts are rendered
+      Then each band lists its models in the same order in the capability chart and the price chart
+    ```
+
 - [ ] [AI] **Z-16 GREEN**: wire `groupByBand`'s canonical per-band ordering into the AC-11 step
       definition — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-11 passes
 - [ ] [AI] **Z-17 REFACTOR**: extract the fixture-dataset builder shared by Z-1…Z-16 into one helper
@@ -1058,6 +1126,15 @@ rev-parse --show-toplevel` prints the worktree path
       serves the route
   - _Gherkin (binds) → AC-1 "The English page renders its localized heading" — same scenario as
     W-1a, now bound at the e2e layer._
+
+    ```gherkin
+    Scenario: The English page renders its localized heading
+      Given the locale is "en"
+      When the AI benchmark page renders
+      Then the page shows a level-one heading in English
+      And the document language attribute is "en"
+    ```
+
 - [ ] [AI] **W-3b GREEN**: confirm the English locale route renders — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the AC-1 e2e scenario passes
 - [ ] [AI] **W-4a RED**: add the `@e2e` binding for **only** AC-2 in `<ESTEPS>ai-benchmark.steps.ts`,
@@ -1066,6 +1143,15 @@ rev-parse --show-toplevel` prints the worktree path
       serves the route
   - _Gherkin (binds) → AC-2 "The Indonesian page renders its localized heading" — same scenario as
     W-2a, now bound at the e2e layer._
+
+    ```gherkin
+    Scenario: The Indonesian page renders its localized heading
+      Given the locale is "id"
+      When the AI benchmark page renders
+      Then the page shows a level-one heading in Indonesian
+      And the document language attribute is "id"
+    ```
+
 - [ ] [AI] **W-4b GREEN**: confirm the Indonesian locale route renders — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: the AC-2 e2e scenario passes, and the
       AC-1 e2e scenario still passes
@@ -1462,6 +1548,15 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-36 "Each chart exposes an accessible name" — same scenario as A-11
     above, now bound for the price chart._
+
+    ```gherkin
+    Scenario: Each chart exposes an accessible name
+      Given the full roster is loaded
+      When the page renders
+      Then the capability chart exposes an accessible name
+      And the price chart exposes an accessible name
+    ```
+
 - [ ] [AI] **Y-8 GREEN**: give the price SVG `role="img"` and a localized `<title>`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-36 passes in full
 - [ ] [AI] **Y-9 RED**: extend `<SHELL>price-chart.test.tsx` asserting both the mobile variant
@@ -1518,7 +1613,16 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
       `npx nx run ayokoding-www:specs:structure-validation` exits 0
 - [ ] [AI] **N-1 RED**: bind AC-22 in both the unit and e2e step files
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
-  - _Gherkin (binds) → AC-22, embedded verbatim at step F-3 above._
+  - _Gherkin (binds) → AC-22 "The page with no query parameters shows the whole roster" — same
+    scenario as F-3 above, now bound at both the unit and e2e layers._
+
+    ```gherkin
+    Scenario: The page with no query parameters shows the whole roster
+      Given the URL carries no query parameters
+      When the page renders
+      Then every roster model is shown in the data table
+    ```
+
 - [ ] [AI] **N-2 GREEN**: wire `decodeState(useSearchParams())` in `<ROUTE>benchmark-content.tsx` and
       pass the filtered roster to both charts and the table
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-22 passes
@@ -1554,6 +1658,14 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
 - [ ] [AI] **N-7 RED**: bind AC-25 — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-25 "Harness and class parameters intersect" — same scenario as F-1
     above, now bound at the UI layer._
+
+    ```gherkin
+    Scenario: Harness and class parameters intersect
+      Given the URL carries both a harness parameter and a class parameter
+      When the page renders
+      Then only models satisfying both filters are shown
+    ```
+
 - [ ] [AI] **N-8 GREEN**: intersect both filters over one filtered dataset, so the bands re-scale to
       what remains (DD-11) — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-25 passes
 - [ ] [AI] **N-9 RED**: bind AC-18 in both the unit and e2e step files
@@ -1572,6 +1684,15 @@ pixelWidth)` maps `0 → 0`, `domainMax → pixelWidth`, and is monotonic in bet
 - [ ] [AI] **N-11 RED**: bind AC-26 — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
   - _Gherkin (binds) → AC-26 "An unrecognized filter value falls back to the unfiltered view" —
     same scenario as F-5 above, now bound at the UI layer._
+
+    ```gherkin
+    Scenario: An unrecognized filter value falls back to the unfiltered view
+      Given the URL carries a harness parameter with an unknown value
+      When the page renders
+      Then every roster model is shown
+      But no error is surfaced to the reader
+    ```
+
 - [ ] [AI] **N-12 GREEN**: confirm the sanitizer path surfaces no error to the reader
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: AC-26 passes
 - [ ] [AI] **N-13 RED**: bind AC-28 — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
