@@ -55,3 +55,24 @@ so the executor recognises a learning when it appears.
 ## Entries
 
 <!-- Append entries below this line, newest last. -->
+
+## Learning: Shared CARGO_TARGET_DIR causes cross-repo E0460
+
+- **Context**: Running `rhino-cli` release builds in ose-primer/ose-infra worktrees after copying from ose-public
+- **Observation**: `serde_norway` E0460 when sandbox/shared cache mixes artifacts from different repo checkouts
+- **Why it might generalize**: Any sibling landing that rsyncs rhino-cli while sharing `CARGO_TARGET_DIR` or ose-public cache paths will hit stale rlib mismatches
+- **Routing**: docs/how-to/worktree-setup.md or rhino-cli README — note per-worktree `apps/rhino-cli/target` isolation
+
+## Learning: ose-primer pre-push blocked on broken anchor in copied platform-bindings.md
+
+- **Context**: Phase 6 push after copying ose-public governance verbatim
+- **Observation**: `#platform-binding-color-translation` anchor missing in ose-primer's `ai-agents.md`; correct anchor is `#color-translation-table`
+- **Why it might generalize**: Shared-surface copies from ose-public must not assume identical heading anchors across repos
+- **Routing**: plan backlog — add cross-repo link validation to parity workflow
+
+## Learning: composer-2.5-fast grep false positive in generated checker agent
+
+- **Context**: Phase 5 repo-local assertion `grep -r composer-2.5-fast .cursor/agents/`
+- **Observation**: Documentation in `repo-harness-compatibility-checker.md` contained the literal string, failing the gate
+- **Why it might generalize**: Any grep-based "must not exist" gate applies to prose mentions, not just frontmatter values
+- **Routing**: model-selection.md prohibition section — reference `^model:` scoped grep pattern
