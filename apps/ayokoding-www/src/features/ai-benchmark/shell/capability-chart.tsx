@@ -84,14 +84,24 @@ function computeLayout(
 
 export type CapabilityChartProps = {
   dataset?: Dataset;
+  /**
+   * The full unfiltered roster. Band thresholds (the anchor indices) and the roster-max map are
+   * ALWAYS derived from this dataset, never from `dataset` — `dataset` may be a harness/class
+   * filtered subset that excludes both anchor models, and re-deriving thresholds from it would
+   * silently collapse every rated model to `light` (DD-5a: bands are roster-relative to the FULL
+   * population; filtering governs display only). REQUIRED, not optional: an omitted `fullDataset`
+   * reproduces the identical bug with identical silence, so this is a compile-time guard rather
+   * than a silent self-fallback.
+   */
+  fullDataset: Dataset;
   locale: Locale;
 };
 
-export function CapabilityChart({ dataset = defaultDataset, locale }: CapabilityChartProps) {
+export function CapabilityChart({ dataset = defaultDataset, fullDataset, locale }: CapabilityChartProps) {
   const titleId = useId();
   const unratedHeadingId = useId();
 
-  const groups = computeGroups(dataset);
+  const groups = computeGroups(dataset, fullDataset);
   const { bands, plotHeight } = computeLayout(groups, locale);
   const scale = scaleLinear(COMPOSITE_INDEX_MAX, PLOT_WIDTH);
   const axisLabel = t(locale, "aiBenchChartAxisMaxLabel");
