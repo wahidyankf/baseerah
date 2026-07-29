@@ -21,7 +21,7 @@ import {
   type Model,
 } from "../core/data/models";
 import { computeGroups } from "../core/bands";
-import { CapabilityChart } from "./capability-chart";
+import { CapabilityChart, MARKER_MIN_MARGIN, PLOT_WIDTH, PLOT_X, SVG_WIDTH } from "./capability-chart";
 
 function fig(benchmark: BenchmarkId, value: number): Figure {
   return { benchmark, value, grade: "verified", source: "https://example.test/source" };
@@ -152,5 +152,70 @@ describe("CapabilityChart — fullDataset keeps a harness-filtered survivor in i
     }
     expect(collapsedById.get(survivor!.id)).toBe("light");
     expect(fullRosterBand.get(survivor!.id)).not.toBe("light");
+  });
+});
+
+// ─── Regression: DWT-001's right-margin fix (pr-review-synthesis-maker HIGH finding, PR #122
+// cycle 1) had zero automated coverage — verification was live-screenshot-only. This is a pure
+// computed-geometry assertion (no browser needed): the right margin the low-coverage marker text
+// renders into (`SVG_WIDTH - (PLOT_X + PLOT_WIDTH)`) must stay at least `MARKER_MIN_MARGIN` — the
+// documented, locale-derived minimum the marker needs at `text-[9px]` to avoid the SVG clipping it
+// past its own `viewBox`.
+//
+// NOTE (PR #122 cycle 2 fix): `PLOT_WIDTH = SVG_WIDTH - PLOT_X - MARKER_MIN_MARGIN` by definition
+// (capability-chart.tsx:77), so `actualMargin` below is ALGEBRAICALLY IDENTICAL to
+// `MARKER_MIN_MARGIN` for any value of the constants that compose it — comparing it back against
+// `MARKER_MIN_MARGIN` can never fail. The `toBe(164)` assertion is the real regression guard: it
+// locks the *current* computed value of `MARKER_MIN_MARGIN` (derived from `MARKER_GAP`,
+// `MARKER_SAFETY_BUFFER`, `MARKER_CHAR_WIDTH_RATIO`, `WORST_CASE_MARKER_LENGTH`, and
+// `MARKER_FONT_SIZE`) to a literal, so any future edit to those inputs shows up as a failing diff
+// requiring deliberate justification, rather than silently passing regardless of margin sign. The
+// `toBeGreaterThanOrEqual(140)` assertion independently floors it above the empirically measured
+// clip threshold. Historically, pre-fix geometry (`SVG_WIDTH=600`, `PLOT_WIDTH=380` hardcoded
+// literal) gave a margin of 60 — well under both guards here.
+describe("CapabilityChart — DWT-001 right-margin regression", () => {
+  it("reserves at least the documented minimum margin for the longest localized low-coverage marker", () => {
+    const actualMargin = SVG_WIDTH - (PLOT_X + PLOT_WIDTH);
+    // Locks the computed margin to a literal: any change to MARKER_GAP, MARKER_SAFETY_BUFFER,
+    // MARKER_CHAR_WIDTH_RATIO, WORST_CASE_MARKER_LENGTH, or MARKER_FONT_SIZE now shows up as a
+    // diff requiring deliberate re-justification, instead of comparing MARKER_MIN_MARGIN to itself.
+    expect(MARKER_MIN_MARGIN).toBe(164);
+    // ...and independently floors it above the empirically-measured clip threshold.
+    expect(MARKER_MIN_MARGIN).toBeGreaterThanOrEqual(140);
+    // Sanity: actualMargin still equals MARKER_MIN_MARGIN by construction (see NOTE above) — kept
+    // to document that relationship, not as the regression guard itself.
+    expect(actualMargin).toBe(MARKER_MIN_MARGIN);
+  });
+
+  it("keeps SVG_WIDTH at its pre-regression value — the margin comes from PLOT_WIDTH, not an SVG_WIDTH inflation that would downscale the whole chart", () => {
+    // Locks in the root-cause-correct fix: widening SVG_WIDTH scales EVERY user-unit quantity
+    // uniformly (SVG 1.1 §Coordinate Systems — CSS `px` inside an SVG is a user unit), so it is
+    // not a valid way to buy margin without also shrinking bars/labels/ticks by the same factor.
+    expect(SVG_WIDTH).toBe(600);
+  });
+});
+
+// ─── Regression: the axis-maximum label must right-align to the plot's TRUE right edge
+// (`PLOT_X + PLOT_WIDTH`), not to `SVG_WIDTH` (pr-review-synthesis-maker MEDIUM finding F1, PR
+// #122 cycle 3). `chart-primitives.tsx`'s own `AxisProps.width` JSDoc documents it as "Right edge
+// of the plot area, in pixels — the axis-maximum label right-aligns to this." `TickRow`'s own
+// rightmost tick lands at `PLOT_X + scale(COMPOSITE_INDEX_MAX)` = `PLOT_X + PLOT_WIDTH`, so
+// passing `SVG_WIDTH` instead detaches the always-visible label from where the chart's own scale
+// terminates — reverting `capability-chart.tsx:159` back to `width={SVG_WIDTH}` fails this test.
+describe("CapabilityChart — axis-maximum label right-alignment", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("right-aligns the axis-maximum label to the plot's true right edge (PLOT_X + PLOT_WIDTH), not SVG_WIDTH", () => {
+    const ratedModel = fixtureModel("rated-model", [fig("swe-bench-verified", 80)]);
+    const ds = fixtureDataset([ratedModel]);
+    render(<CapabilityChart dataset={ds} fullDataset={ds} locale="en" />);
+
+    const axisMax = screen.getByTestId("chart-axis-max");
+    expect(axisMax.getAttribute("x")).toBe(String(PLOT_X + PLOT_WIDTH));
+    // Sanity: this is NOT the same value as SVG_WIDTH, so the assertion above cannot be
+    // accidentally satisfied by the pre-fix (defective) call site.
+    expect(PLOT_X + PLOT_WIDTH).not.toBe(SVG_WIDTH);
   });
 });
