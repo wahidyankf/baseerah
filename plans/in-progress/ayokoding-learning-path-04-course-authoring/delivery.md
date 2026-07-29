@@ -1864,7 +1864,7 @@ MERGED_COMMIT: 7e9f5add4db37dad1568690127b4aef8b084e620
       credential, token, or private hostname to a `<placeholder>` token, or discard if unsanitizable —
       acceptance: `learnings.md` contains no raw secret.
 - [ ] [AI] Apply the **repo-relevance gate** — infra-private content (Terraform, k3s, Proxmox, real
-      hostnames/inventories) stays in `ose-infra` only and is NEVER cross-routed into
+      hostnames/inventories) stays in `ose-private` only and is NEVER cross-routed into
       `ose-public`/`ose-primer`; public-governance content may propagate via the existing parity loop —
       acceptance: no infra-private content appears in this repo's routed output.
 - [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing matrix
