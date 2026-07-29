@@ -2284,10 +2284,28 @@ typecheck, lint for 25 projects and 6 tasks they depend on` (52 of 56 tasks serv
     `capability-chart.tsx` at Phase 6's A-3..A-16 note (same pattern, same non-blocking
     classification, matching repo convention). No error, no other new warning class from this
     phase's files.
-- [ ] [AI] Run the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
+- [x] [AI] Run the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
       for branch `ayokoding-www-tools-ai-benchmark/phase-6-7-charts` in worktree
       `worktrees/ayokoding-www-tools-ai-benchmark-phase-6-7-charts/`
-- [ ] [AI] Run [Post-Push CI Verification](#post-push-ci-verification)
+  - **Date**: 2026-07-29
+  - **Status**: done
+  - **Notes**: PR #117 opened as draft, ran 3 sequential CI-gated PR-Review Maker→Fixer cycles (8
+    discipline specialists → `pr-review-synthesis-maker` → `pr-review-fixer` each cycle); cycle 3
+    completed clean after one fix round (governance HIGH + docs MEDIUM findings fixed in commit
+    `ac8e20917`). Flipped to ready, one remaining LOW/advisory thread deferred with reason and
+    resolved, then merged via squash — `gh pr view 117 --json state --jq '.state'` → `MERGED`,
+    merge commit `e40087390c9a1c8c92f091a9377c1939f992399f`. `git rev-parse main origin/main` →
+    both print `e40087390c9a1c8c92f091a9377c1939f992399f` (identical). Worktree removed:
+    `git worktree list | grep -c ayokoding-www-tools-ai-benchmark-phase-6-7-charts` → `0`.
+- [x] [AI] Run [Post-Push CI Verification](#post-push-ci-verification)
+  - **Date**: 2026-07-29
+  - **Status**: done
+  - **Notes**: All 3 post-merge GitHub Actions workflow runs on `main` for merge commit
+    `e40087390c9a1c8c92f091a9377c1939f992399f` concluded `success`: `validate-env` (run
+    `30436687723`), `publish-images` (run `30436687654`), `pr-quality-gate` (run `30436687640`,
+    the TypeScript/.NET/Rust/Markdown quality gates). `gh run list --branch main --limit 5
+--json databaseId,status,conclusion,headSha` confirms all three `"status":"completed"`,
+    `"conclusion":"success"`.
 
 > **Pause Safety**: both requested diagrams render, banded, on the still-unlinked page, backed by the
 > full data table. Safe to stop. To resume: `npx nx run ayokoding-www:test:quick`.
@@ -2665,10 +2683,30 @@ apps/ayokoding-www/src/app/\[locale\]/tools/page.tsx
     `Successfully ran targets typecheck, lint for 25 projects and 6 tasks they depend on`, all 56
     tasks served from cache, exit 0 — no new error, no new warning class beyond the
     already-recorded `jsx-a11y(prefer-tag-over-role)` pattern from Phase 6/7.
-- [ ] [AI] Run the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
+- [x] [AI] Run the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
       for branch `ayokoding-www-tools-ai-benchmark/phase-8-filters` in worktree
       `worktrees/ayokoding-www-tools-ai-benchmark-phase-8-filters/`
-- [ ] [AI] Run [Post-Push CI Verification](#post-push-ci-verification)
+  - **Date**: 2026-07-29
+  - **Status**: done
+  - **Notes**: PR #118 opened as draft, ran 3 sequential CI-gated PR-Review Maker→Fixer cycles;
+    cycle 3 fixed governance HIGH (delivery.md checkbox gap) + docs MEDIUM (stale `rateFor` name)
+    findings in commit `a35bb5ad3`. Branch fell BEHIND `main` by 2 unrelated commits under
+    `required_status_checks.strict`; updated via `gh api pulls/118/update-branch`, creating merge
+    commit `1d949a63af5f71dc162f2d8dda57565f473fc118`, CI green on it (`validate-env` run
+    `30455192970`, `pr-quality-gate` run `30455193956`, both `success`). Flipped to ready, merged
+    via `gh pr merge 118 --squash` — `gh pr view 118 --json state,mergedAt,mergeCommit` →
+    `"state":"MERGED"`, `"mergedAt":"2026-07-29T13:35:30Z"`, merge commit
+    `075702c6c521879cfc342c306ba1c2ba671e9a4a`. Fast-forwarded local `main` to `origin/main` at
+    that commit and removed the worktree: `git worktree list | grep -c
+ayokoding-www-tools-ai-benchmark-phase-8-filters` → `0`.
+- [x] [AI] Run [Post-Push CI Verification](#post-push-ci-verification)
+  - **Date**: 2026-07-29
+  - **Status**: done
+  - **Notes**: All 3 post-merge GitHub Actions workflow runs on `main` for merge commit
+    `075702c6c521879cfc342c306ba1c2ba671e9a4a` concluded `success`: `validate-env` (run
+    `30456713982`), `publish-images` (run `30456714008`), `pr-quality-gate` (run `30456714296`,
+    covering TypeScript/.NET/Rust/Markdown quality gates). `gh run view 30456714296 --json
+status,conclusion` → `"status":"completed"`, `"conclusion":"success"`.
 
 > **Pause Safety**: the page is functionally complete and still unlinked — every behaviour the plan
 > promised works at a direct URL. Safe to stop. To resume: `npx nx run ayokoding-www:test:quick`.
