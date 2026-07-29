@@ -21,7 +21,11 @@ vi.mock("next/navigation", () => ({
 import "./helpers/test-setup";
 import AiBenchmarkPage from "@/app/[locale]/tools/ai-benchmark/page";
 import { OPERATORS } from "@/features/ai-benchmark/core/data/operators";
-import { BENCHMARK_COLUMNS, HARNESS_DISPLAY_NAMES } from "@/features/ai-benchmark/core/data/benchmarks";
+import {
+  BAND_LABEL_KEYS,
+  BENCHMARK_COLUMNS,
+  HARNESS_DISPLAY_NAMES,
+} from "@/features/ai-benchmark/core/data/benchmarks";
 import {
   BENCHMARK_WEIGHTS,
   OPUS_ANCHOR_ID,
@@ -31,9 +35,18 @@ import {
   type ConflictedFigure,
   type Dataset,
   type Figure,
+  type HarnessId,
+  type MeteredPrice,
   type Model,
+  type SubscriptionPrice,
 } from "@/features/ai-benchmark/core/data/models";
-import { computeIndex, computeRosterMaxes, coverage } from "@/features/ai-benchmark/core/score";
+import {
+  COMPOSITE_INDEX_MAX,
+  LOW_COVERAGE_THRESHOLD,
+  computeIndex,
+  computeRosterMaxes,
+  coverage,
+} from "@/features/ai-benchmark/core/score";
 import {
   anchors,
   assignBand,
@@ -44,6 +57,9 @@ import {
   type IndexMap,
 } from "@/features/ai-benchmark/core/bands";
 import { ModelTable } from "@/features/ai-benchmark/shell/model-table";
+import { CapabilityChart } from "@/features/ai-benchmark/shell/capability-chart";
+import { PriceChart } from "@/features/ai-benchmark/shell/price-chart";
+import { formatCoverage, formatIndex, formatPriceUsd } from "@/features/ai-benchmark/shell/format";
 import { t } from "@/features/i18n/core/translations";
 import type { Locale } from "@/features/i18n/core/config";
 
@@ -832,6 +848,287 @@ describeFeature(feature, ({ Background, Scenario, ScenarioOutline, AfterEachScen
       // Every aiBench* key resolves to localized copy via t(); a missing key renders as its raw
       // identifier (which always starts with "aiBench"), so any leak surfaces as the substring.
       expect(text).not.toMatch(/aiBench/);
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Phase 6 — shared chart primitives and the capability chart (AC-12/13/14/36/37).
+  // ════════════════════════════════════════════════════════════════════════════
+
+  // The three RATED bands, in the same canonical order `computeGroups` produces them.
+  const RATED_BAND_KEYS = ["opus", "sonnet", "light"] as const;
+
+  // ─── AC-13 — bar length proportional to the composite index ────────────────────
+
+  Scenario("Bar length is proportional to the composite index", ({ Given, When, Then, And }) => {
+    Given("two fixture models whose composite indices differ", () => {
+      const low = fixtureModel("cap-low", [fig("swe-bench-verified", 40)]);
+      const high = fixtureModel("cap-high", [
+        fig("swe-bench-verified", 80),
+        fig("swe-bench-pro", 80),
+        fig("terminal-bench-2-1", 80),
+        fig("gpqa-diamond", 80),
+      ]);
+      ctx.fixtureDataset = fixtureDataset([low, high]);
+    });
+
+    When("the capability chart is rendered", () => {
+      render(React.createElement(CapabilityChart, { dataset: ctx.fixtureDataset!, locale: "en" }));
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:Bar length is proportional to the composite index
+    Then("the ratio of their bar lengths equals the ratio of their composite indices", () => {
+      const groups = computeGroups(ctx.fixtureDataset!);
+      const all = [...groups.opus, ...groups.sonnet, ...groups.light];
+      const lowScore = all.find((s) => s.model.id === "cap-low");
+      const highScore = all.find((s) => s.model.id === "cap-high");
+      expect(lowScore?.index).toBeDefined();
+      expect(highScore?.index).toBeDefined();
+
+      const lowBar = screen.getByTestId("capability-chart-bar-cap-low");
+      const highBar = screen.getByTestId("capability-chart-bar-cap-high");
+      const lowWidth = Number(lowBar.getAttribute("width"));
+      const highWidth = Number(highBar.getAttribute("width"));
+
+      const expectedRatio = (lowScore!.index ?? 0) / (highScore!.index ?? 1);
+      const actualRatio = lowWidth / highWidth;
+      expect(actualRatio).toBeCloseTo(expectedRatio, 5);
+    });
+
+    And("the chart states its axis maximum", () => {
+      const axisMax = screen.getByTestId("chart-axis-max");
+      expect(axisMax.textContent ?? "").toContain(formatIndex(COMPOSITE_INDEX_MAX, "en"));
+    });
+  });
+
+  // ─── AC-14 — every bar carries its model name and index in text ────────────────
+
+  Scenario("Every capability bar carries its model name and index in text", ({ Given, When, Then, And }) => {
+    Given("the full roster is loaded", () => {
+      // dataset is the full roster.
+    });
+
+    When("the capability chart is rendered", () => {
+      render(React.createElement(CapabilityChart, { dataset, locale: "en" }));
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:Every capability bar carries its model name and index in text
+    Then("every bar has a text label carrying the model name", () => {
+      const groups = computeGroups(dataset);
+      for (const key of RATED_BAND_KEYS) {
+        for (const s of groups[key]) {
+          const label = screen.getByTestId(`capability-chart-label-mobile-${s.model.id}`);
+          expect(label.textContent ?? "").toContain(s.model.name);
+        }
+      }
+    });
+
+    And("every bar has a text label carrying its numeric composite index", () => {
+      const groups = computeGroups(dataset);
+      for (const key of RATED_BAND_KEYS) {
+        for (const s of groups[key]) {
+          const label = screen.getByTestId(`capability-chart-label-mobile-${s.model.id}`);
+          expect(label.textContent ?? "").toContain(formatIndex(s.index ?? 0, "en"));
+        }
+      }
+    });
+  });
+
+  // ─── AC-12 — a low-coverage model is marked as low coverage ────────────────────
+
+  Scenario("A low-coverage model is marked as low coverage", ({ Given, When, Then, And }) => {
+    Given("a fixture model whose coverage ratio is below the low-coverage threshold", () => {
+      // swe-bench-verified alone carries weight 25 → coverage 0.25, below the 0.5 threshold.
+      const lowCoverage = fixtureModel("cap-low-coverage", [fig("swe-bench-verified", 50)]);
+      ctx.fixtureDataset = fixtureDataset([lowCoverage]);
+      const [score] = computeGroups(ctx.fixtureDataset).light;
+      expect(score?.coverage).toBeLessThan(LOW_COVERAGE_THRESHOLD);
+    });
+
+    When("the capability chart is rendered", () => {
+      render(React.createElement(CapabilityChart, { dataset: ctx.fixtureDataset!, locale: "en" }));
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A low-coverage model is marked as low coverage
+    Then("that model's row carries a low-coverage marker", () => {
+      expect(screen.getByTestId("capability-chart-low-coverage-cap-low-coverage")).not.toBeNull();
+    });
+
+    And("the marker states the model's coverage ratio in text", () => {
+      const marker = screen.getByTestId("capability-chart-low-coverage-cap-low-coverage");
+      const [score] = computeGroups(ctx.fixtureDataset!).light;
+      expect(marker.textContent ?? "").toContain(formatCoverage(score!.coverage, "en"));
+    });
+  });
+
+  // ─── AC-37 — capability class is carried textually, not by colour alone ────────
+
+  Scenario("The capability class is carried textually, not by colour alone", ({ Given, When, Then, And }) => {
+    Given("the full roster is loaded", () => {
+      // dataset is the full roster.
+    });
+
+    When("the capability chart is rendered", () => {
+      render(React.createElement(CapabilityChart, { dataset, locale: "en" }));
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:The capability class is carried textually, not by colour alone
+    Then("every band group carries its class name as text", () => {
+      for (const band of RATED_BAND_KEYS) {
+        const header = screen.getByTestId(`capability-chart-band-${band}-label`);
+        const key = BAND_LABEL_KEYS[band];
+        expect(header.textContent).toBe(key ? t("en", key) : band);
+      }
+    });
+
+    And("every model row carries its class as text in the data table", () => {
+      cleanup();
+      render(React.createElement(ModelTable, { dataset, locale: "en" }));
+      const groups = computeGroups(dataset);
+      for (const list of [groups.opus, groups.sonnet, groups.light, groups.unrated]) {
+        for (const s of list) {
+          const row = document.querySelector(`tbody tr[data-model-id="${s.model.id}"]`);
+          expect(row, `row for ${s.model.id}`).not.toBeNull();
+          const key = BAND_LABEL_KEYS[s.band];
+          expect(row!.textContent ?? "").toContain(key ? t("en", key) : s.band);
+        }
+      }
+    });
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Phase 7 — price chart (AC-15/16/17).
+  // ════════════════════════════════════════════════════════════════════════════
+
+  function meteredFixture(id: string, input: number, output: number, harness: HarnessId = "claude-code"): Model {
+    const rate: MeteredPrice = { kind: "metered", input, output, grade: "verified", source: SRC };
+    return { id, name: id, vendor: "Test", harnesses: [harness], figures: [], pricing: { [harness]: rate } };
+  }
+
+  // ─── AC-15 — a metered model shows separate labelled input and output bars ────
+
+  Scenario("A metered model shows separate labelled input and output bars", ({ Given, When, Then, And }) => {
+    Given("a fixture model with a per-token input rate and output rate", () => {
+      ctx.fixtureDataset = fixtureDataset([meteredFixture("price-metered", 3, 15)]);
+    });
+
+    When("the price chart is rendered", () => {
+      render(React.createElement(PriceChart, { dataset: ctx.fixtureDataset!, locale: "en" }));
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A metered model shows separate labelled input and output bars
+    Then("that model has one bar labelled as the input rate", () => {
+      expect(screen.getByTestId("price-chart-bar-in-price-metered")).not.toBeNull();
+      const label = screen.getByTestId("price-chart-label-in-price-metered");
+      expect(label.textContent ?? "").toContain(formatPriceUsd(3, "en"));
+    });
+
+    And("that model has one bar labelled as the output rate", () => {
+      expect(screen.getByTestId("price-chart-bar-out-price-metered")).not.toBeNull();
+      const label = screen.getByTestId("price-chart-label-out-price-metered");
+      expect(label.textContent ?? "").toContain(formatPriceUsd(15, "en"));
+    });
+  });
+
+  // ─── AC-16 — a subscription-only model renders in the subscription group ──────
+
+  Scenario("A subscription-only model renders in the subscription group", ({ Given, When, Then, But }) => {
+    Given("a fixture model available only under a flat-rate subscription", () => {
+      const rate: SubscriptionPrice = {
+        kind: "subscription",
+        planCostUsd: 10,
+        grade: "verified",
+        source: SRC,
+        caps: "First month $5, then $10/month.",
+      };
+      const m: Model = {
+        id: "price-sub-only",
+        name: "price-sub-only",
+        vendor: "Test",
+        harnesses: ["opencode-go"],
+        figures: [],
+        pricing: { "opencode-go": rate },
+      };
+      ctx.fixtureDataset = fixtureDataset([m]);
+    });
+
+    When("the price chart is rendered", () => {
+      render(React.createElement(PriceChart, { dataset: ctx.fixtureDataset!, locale: "en" }));
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A subscription-only model renders in the subscription group
+    Then("that model appears in the subscription group", () => {
+      const group = screen.getByTestId("price-chart-subscription");
+      expect(group.textContent ?? "").toContain("price-sub-only");
+    });
+
+    But("that model renders no per-token bar and no zero value", () => {
+      expect(screen.queryByTestId("price-chart-bar-in-price-sub-only")).toBeNull();
+      expect(screen.queryByTestId("price-chart-bar-out-price-sub-only")).toBeNull();
+      const group = screen.getByTestId("price-chart-subscription");
+      expect(group.textContent ?? "").not.toContain("$0.00");
+      expect(group.textContent ?? "").not.toMatch(/\$0\b/);
+    });
+  });
+
+  // ─── AC-17 — an unfiltered price chart shows the lowest harness rate ──────────
+
+  Scenario("An unfiltered price chart shows the lowest harness rate", ({ Given, When, Then, And }) => {
+    Given("a fixture model priced differently by two harnesses", () => {
+      const m: Model = {
+        id: "price-two-harness",
+        name: "price-two-harness",
+        vendor: "Test",
+        harnesses: ["claude-code", "cursor"],
+        figures: [],
+        pricing: {
+          "claude-code": { kind: "metered", input: 5, output: 25, grade: "verified", source: SRC },
+          cursor: { kind: "metered", input: 3, output: 15, grade: "verified", source: SRC },
+        },
+      };
+      ctx.fixtureDataset = fixtureDataset([m]);
+    });
+
+    When("the price chart is rendered without a harness filter", () => {
+      render(React.createElement(PriceChart, { dataset: ctx.fixtureDataset!, locale: "en" }));
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:An unfiltered price chart shows the lowest harness rate
+    Then("that model's bars use the lower of the two harness rates", () => {
+      const inLabel = screen.getByTestId("price-chart-label-in-price-two-harness");
+      expect(inLabel.textContent ?? "").toContain(formatPriceUsd(3, "en"));
+      expect(inLabel.textContent ?? "").not.toContain(formatPriceUsd(5, "en"));
+    });
+
+    And("the chart states that it shows the lowest available harness rate", () => {
+      const subtitle = screen.getByTestId("price-chart-subtitle");
+      expect(subtitle.textContent).toBe(t("en", "aiBenchPriceLowestSubtitle"));
+    });
+  });
+
+  // ─── AC-36 (capability half) — the capability chart exposes an accessible name ─
+
+  Scenario("Each chart exposes an accessible name", ({ Given, When, Then, And }) => {
+    Given("the full roster is loaded", () => {
+      // dataset is the full roster.
+    });
+
+    When("the page renders", () => {
+      renderPageForLocale("en");
+    });
+
+    // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:Each chart exposes an accessible name
+    Then("the capability chart exposes an accessible name", () => {
+      const chart = screen.getByRole("img", { name: t("en", "aiBenchCapabilityChartTitle") });
+      expect(chart).not.toBeNull();
+    });
+
+    And("the price chart exposes an accessible name", () => {
+      // Phase 7's Y-7 replaces the Phase-6 vacuous stub (which merely asserted no price-chart node
+      // existed yet) with a real accessible-name assertion now that `price-chart.tsx` is wired onto
+      // the page (Y-7/Y-8).
+      const chart = screen.getByRole("img", { name: t("en", "aiBenchPriceChartTitle") });
+      expect(chart).not.toBeNull();
     });
   });
 });
