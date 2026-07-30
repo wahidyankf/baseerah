@@ -519,8 +519,20 @@ rev-parse --show-toplevel` prints the worktree path
   - **Date**: 2026-07-28
   - **Status**: done
   - **Notes**: passed — ayokoding-www + ayokoding-www-fe-e2e clean.
-- [ ] [AI] `<EV>phase-1-band-contrast.md` records a passing contrast ratio and hue separation for
+- [x] [AI] `<EV>phase-1-band-contrast.md` records a passing contrast ratio and hue separation for
       every band in both themes
+  - **Date**: 2026-07-30 (reconciled at Phase 12 archival verification; content originally written
+    2026-07-28, corrected/re-verified during Phase 9)
+  - **Status**: done
+  - **Notes**: `evidence/phase-1-band-contrast.md` records all 4 bands passing ≥ 4.5:1 contrast in
+    both themes (light: 18.41:1, dark: 16.10:1, using the corrected WCAG-formula canvas-sampled
+    methodology from Phase 9, superseding the original rounded-luminance approximation) and ≥ 105°
+    hue separation for every hued-band pair (opus/sonnet/light), with the `unrated` band's
+    low-chroma neutrality documented as the intentional colour-blind-safe design for that band. This
+    checkbox itself was left unticked at original execution time despite the evidence file being
+    complete and later reconciled during Phase 9 — a bookkeeping gap, not a content gap; ticked now
+    per Resume Reconciliation with the evidence file's real content cited above, not bulk-ticked from
+    memory.
 - [x] [AI] Run the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
       for branch `ayokoding-www-tools-ai-benchmark/phase-1-design-and-tokens` in worktree
       `worktrees/ayokoding-www-tools-ai-benchmark-phase-1-design-and-tokens/`
@@ -3972,45 +3984,111 @@ ayokoding-www-tools-ai-benchmark-phase-9-10-verify-reveal-retest` → `0`.
 >
 > Non-boundary phase — commits to the Phase 11-12 branch and opens no PR of its own.
 
-- [ ] [AI] Provision the Phase 11-12 unit's worktree from the latest `origin/main` — this is the
+- [x] [AI] Provision the Phase 11-12 unit's worktree from the latest `origin/main` — this is the
       unit's first phase, before its boundary at Phase 12:
       `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-11-12-capture-archival origin/main`
       — acceptance: `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-11-12-capture-archival
 rev-parse --show-toplevel` prints the worktree path
-- [ ] [AI] Apply the litmus test to every `<PLAN>learnings.md` entry — keep only if a durable surface
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: `git worktree add worktrees/ayokoding-www-tools-ai-benchmark-phase-11-12-capture-archival
+origin/main -b ayokoding-www-tools-ai-benchmark/phase-11-12-capture-archival` → created at
+    `b705280b6ea3bb9ec8f44206ded1ab836a7c6c0d` (origin/main HEAD at provisioning time).
+    `git -C worktrees/ayokoding-www-tools-ai-benchmark-phase-11-12-capture-archival rev-parse
+--show-toplevel` → prints the worktree path.
+- [x] [AI] Apply the litmus test to every `<PLAN>learnings.md` entry — keep only if a durable surface
       would catch this automatically next time; discard the rest with a one-line reason
       — acceptance: every entry has either a route or a discard reason
-- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: all 4 entries (the 3 pre-existing plus the `vitest.config.ts` glob-coverage learning
+    added this phase) pass the litmus test — each names a durable surface (a backlog plan, an
+    inline doc caveat, or an already-shipped code fix) that would catch the same issue automatically
+    next time. None discarded outright; all 4 have a route.
+- [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
       credential, token, or private hostname to a `<placeholder>` token, or discard if unsanitizable
       — acceptance: `<PLAN>learnings.md` contains no raw secret
-- [ ] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: re-verified all 4 entries — no secret, credential, token, or hostname of any kind
+    appears (port numbers 3101/3200 and public URLs are not secrets); `grep -niE
+"password|api[_-]?key|secret|token|-----BEGIN"
+    plans/in-progress/ayokoding-www-tools-ai-benchmark/learnings.md` → no match.
+- [x] [AI] Apply the **repo-relevance gate** to every surviving entry — infra-private content
       (Terraform, k3s, Proxmox, real hostnames or inventories) stays in `ose-private` only and is NEVER
       cross-routed into `ose-public`/`ose-primer`; public-governance content may propagate via the
       existing parity loop — acceptance: no infra-private content appears in this repo's routed output
-- [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: all 4 entries are `ayokoding-www` app-level content (Playwright config, cmdk search,
+    Tailwind design tokens, Vitest config) — none references Terraform, k3s, Proxmox, or any
+    `ose-private` infrastructure. N/A confirmed, no cross-routing violation possible.
+- [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
       matrix — non-code homes may land inline (small edit) or as a `plans/backlog/` follow-up (large);
       code homes (`apps/`, `libs/`, tests) are **ALWAYS** filed as a separate `plans/backlog/<slug>/`
       plan and **NEVER** landed inline
       — acceptance: every `<PLAN>learnings.md` entry records its terminal routing state
-- [ ] [AI] Specifically consider routing the three method learnings this plan is most likely to
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: (1) `reuseExistingServer` → code-homed, filed as
+    `plans/backlog/audit-e2e-reuse-existing-server-config/`. (2) cmdk `value` → already routed
+    inline in `search-dialog.tsx`, terminal state confirmed, no new action. (3) Tailwind `@theme`
+    drop → non-code doc home, landed inline as a caveat on both
+    `repo-governance/development/frontend/design-tokens.md` and the `swe-developing-frontend-ui`
+    skill's `reference/design-tokens.md`. (4) `vitest.config.ts` glob-mismatch → code/tooling-homed,
+    filed as `plans/backlog/vitest-glob-coverage-guard/`. All 4 entries in `learnings.md` now record
+    their terminal state.
+- [x] [AI] Specifically consider routing the three method learnings this plan is most likely to
       surface, if they held during execution: the DD-5a normalization defect (coverage
       renormalization plus identity normalization systematically rewards narrow reporting), the
       DD-20a anchor-subset degeneracy, and the marker-first idempotence guard in `<GEN>`
       — acceptance: each is either routed with a named home or discarded with a reason
-- [ ] [AI] If no generalizable learning surfaced, record the explicit escape in `<PLAN>learnings.md`:
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: all 3 were already anticipated, documented design decisions from Phase 3-4, not new
+    surprises requiring fresh routing — DD-5a and DD-20a documented in `tech-docs.md` (lines 240 and
+    302 respectively), marker-first guard already implemented in
+    `apps/ayokoding-www/src/scripts/generate-benchmark-reference.ts` (its BEGIN/END marker-pair
+    scanner throws if any BEGIN lacks a matching END). Recorded in `learnings.md`'s
+    "Considered-and-already-handled" section as already-handled-by-design, not new learnings.
+- [x] [AI] If no generalizable learning surfaced, record the explicit escape in `<PLAN>learnings.md`:
       `No generalizable learnings — <one-line reason>` — acceptance: `learnings.md` is never silently
       empty
+  - **Date**: 2026-07-30
+  - **Status**: done — **not applicable**, escape not needed
+  - **Notes**: this plan DID surface 4 generalizable learnings, all triaged to a terminal state above;
+    `learnings.md` is not empty and the "none" escape line does not apply. Recording the exemption
+    here per the acceptance clause's own instruction not to leave the check silently absent.
 
 ### Phase 11 Gate
 
 > All checks below must pass before Plan Archival. **Non-boundary** — commit to the unit branch and
 > open no PR.
 
-- [ ] [AI] Every `<PLAN>learnings.md` entry is in a terminal state (routed inline, filed as backlog,
+- [x] [AI] Every `<PLAN>learnings.md` entry is in a terminal state (routed inline, filed as backlog,
       or discarded with reason), or the file records the explicit "none" escape
-- [ ] [AI] No code-homed learning landed inline in this plan's own commits or PR
-- [ ] [AI] Commit per the [Commit Guidelines](#commit-guidelines) to
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: all 4 entries carry a "Terminal state" line — 2 filed as `plans/backlog/` plans
+    (`audit-e2e-reuse-existing-server-config`, `vitest-glob-coverage-guard`), 2 routed inline
+    (cmdk `value` fix already merged; Tailwind `@theme` caveat added to both `design-tokens.md`
+    surfaces this phase).
+- [x] [AI] No code-homed learning landed inline in this plan's own commits or PR
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: the two code-homed learnings (`reuseExistingServer` config audit,
+    `vitest.config.ts` glob-coverage guard) were both filed as separate `plans/backlog/<slug>/`
+    plans, never landed inline in this plan's own commits — verified by `git status --short`
+    showing no `apps/*-e2e/playwright.config.ts` or `vitest.config.ts` changes staged in this
+    unit's own diff (the `unit-fe` glob widening was already merged in PR #122, prior to this
+    unit).
+- [x] [AI] Commit per the [Commit Guidelines](#commit-guidelines) to
       `ayokoding-www-tools-ai-benchmark/phase-11-12-capture-archival` — no push, no PR yet
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: committed as `docs(ayokoding-www-tools-ai-benchmark): triage Knowledge Capture
+learnings for Phase 11` — see commit hash recorded in the worktree's local git log; not pushed,
+    no PR opened yet per this phase's non-boundary rule.
 
 > **Pause Safety**: `learnings.md` is fully triaged (or explicitly recorded as empty); no future
 > process depends on querying it later. Safe to stop. To resume: re-read `<PLAN>learnings.md` and
@@ -4024,43 +4102,136 @@ rev-parse --show-toplevel` prints the worktree path
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items above are ticked
-- [ ] [AI] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a
+- [x] [AI] Verify ALL delivery checklist items above are ticked
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: full-file sweep found one live gap, fixed during this verification pass: (1)
+    `evidence/phase-1-band-contrast.md`'s Phase 1-gate checkbox was unticked despite the evidence
+    file being complete — now ticked with cited content. (2) Phase 9-10's Delivery-Boundary
+    Integration Protocol and Post-Push CI Verification checkboxes were found already ticked on this
+    branch — **not by this pass**: `git show 3b5ea260e` (`docs(plans): tick
+async-python-and-fastapi-services in lp-04 delivery checklist`) shows an out-of-band commit,
+    pushed directly to `main` and later merged into this branch, silently flipped both checkboxes
+    while reconciling an unrelated plan (`lp-04`). This pass **verified** the underlying facts
+    (merge commit `b705280b6ea3bb9ec8f44206ded1ab836a7c6c0d`, PR #122 merged, CI green) rather than
+    applying the ticks. One item remains deliberately unticked with full written rationale: line
+    ~2644's `ayokoding-www-fe-e2e:test:e2e` Phase-8-gate check, explicitly marked "NOT done — left
+    unticked deliberately, do not bulk-tick" — a documented, pre-existing, unrelated environmental
+    flake (confirmed not touching this plan's diff, confirmed CI doesn't run `test:e2e` for this
+    gate) that was later superseded by clean runs recorded at Phase 9/10 (lines ~2960, ~3871). This
+    is an accepted, adjudicated historical exception, not a live gap.
+- [x] [AI] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a
       terminal state (routed inline, filed as a `plans/backlog/` plan, or discarded with reason) or
       the file records the explicit `No generalizable learnings — <reason>` escape; both the
       secret/sensitivity gate and the repo-relevance gate were applied to every surviving entry
-- [ ] [AI] Verify ALL quality gates pass (local + CI) — acceptance:
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: all 4 `learnings.md` entries carry a terminal "Terminal state" line (2 filed as
+    backlog plans, 2 routed inline); both gates applied and recorded in Phase 11's own gate ticks
+    above.
+- [x] [AI] Verify ALL quality gates pass (local + CI) — acceptance:
       `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` exits 0 and the latest `main` CI
       run concludes `success`
-- [ ] [AI] Verify ALL manual assertions pass with committed evidence in `<EV>` — six locale ×
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: `npx nx affected -t typecheck lint test:quick specs:behavior:coverage
+--base=origin/main --parallel=3` → `NX   No tasks were run` (exit 0; this unit's diff so far is
+    docs/plans-only, touching no `apps/`/`libs/` project). Latest `main` CI (`gh run list --branch
+main --limit 3`) for head `3b5ea260ef8d856632173a0b39b314bbdfa8fb48` shows `publish-images`,
+    `validate-env`, `pr-quality-gate` all `success`.
+- [x] [AI] Verify ALL manual assertions pass with committed evidence in `<EV>` — six locale ×
       breakpoint screenshots plus two dark-theme screenshots, all referenced from this file
-- [ ] [AI] Verify ALL supported locales were exercised in UI verification, not just the default
-- [ ] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: `evidence/` contains `phase-9-ai-benchmark-{en,id}-{375,768,1280}px.png` (6 locale ×
+    breakpoint) plus `phase-9-ai-benchmark-{en,id}-1280px-dark.png` (2 dark-theme), all referenced
+    from Phase 9's delivery.md entries.
+- [x] [AI] Verify ALL supported locales were exercised in UI verification, not just the default
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: both `en` (default) and `id` locales appear across the Phase 9/10 evidence screenshots
+    (e.g. `phase-9-ai-benchmark-id-1280px.png`, `phase-10-uwt-benchmark-id-768px.png`,
+    `phase-10-ewt-locale-switch-after-id-1280px.png`) — not default-only.
+- [x] [AI] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires
       explicit user permission and is allowed only when the fix is genuinely impossible; SG-###
       proposals and USS-### suggestions may be triaged or deferred with written rationale
-- [ ] [AI] Rule-16 API exploratory retest — **not applicable**: this plan adds no REST or GraphQL
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: `grep -n "DWT-00\|EWT-00\|UWT-00\|USS-00" delivery.md` confirms all 3 DWT, 4 EWT, 6
+    UWT, and 2 USS findings are ticked `[x]` with individual resolution notes — DWT-001..003,
+    EWT-001..004, UWT-001..006, USS-001/002. None deferred; every finding fixed.
+- [x] [AI] Rule-16 API exploratory retest — **not applicable**: this plan adds no REST or GraphQL
       endpoint. Record the exemption here rather than leaving the check absent.
-- [ ] [AI] Verify the feature gate is removed and no gate residue remains — acceptance:
+  - **Date**: 2026-07-30
+  - **Status**: done — **not applicable**
+  - **Notes**: `/tools/ai-benchmark` is a static-content page reading a build-time-generated
+    reference document; it exposes no REST or GraphQL endpoint of its own. Rule-16 API exploratory
+    retest is exempt, recorded here rather than left absent.
+- [x] [AI] Verify the feature gate is removed and no gate residue remains — acceptance:
       `grep -rn "link gate\|link-gate" apps/ayokoding-www/src` prints nothing
-- [ ] [AI] Rename and move:
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: `grep -rn "link gate\|link-gate" apps/ayokoding-www/src` → no output, exit 1 (no
+    match) — no gate residue.
+- [x] [AI] Rename and move:
       `git mv plans/in-progress/ayokoding-www-tools-ai-benchmark/ plans/done/YYYY-MM-DD__ayokoding-www-tools-ai-benchmark/`
       using **today's** date as the completion date, not the creation date — acceptance: the folder
       exists under `plans/done/` and the `evidence/` and `assets/` subfolders moved with it
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with its completion date
-- [ ] [AI] Update any other README that references this plan — acceptance:
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: `git mv plans/in-progress/ayokoding-www-tools-ai-benchmark
+plans/done/2026-07-30__ayokoding-www-tools-ai-benchmark` — folder now exists under `plans/done/`
+    with `evidence/` (36 files) and `assets/` (4 files) moved with it, confirmed via `git status
+--short` showing every file as an `R` (rename) entry.
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: removed the `ayokoding-www-tools-ai-benchmark` bullet; the unrelated
+    `ayokoding-learning-path-04-course-authoring` entry left untouched.
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with its completion date
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: added a new bullet at the top of "## Completed Projects" (before the
+    `2026-07-28: adopt-cursor-platform-binding` entry), summarizing the 8 delivery-boundary PRs
+    (#110, #112, #113, #114, #115, #117, #118, #122), the M-12 band-contrast fix, the Rule-15
+    three-tester retest, and Knowledge Capture routing — completion date 2026-07-30.
+- [x] [AI] Update any other README that references this plan — acceptance:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate`
       exits 0 and
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`
       exits 0
-- [ ] [AI] Commit the archival: `chore(plans): move ayokoding-www-tools-ai-benchmark to done`
+  - **Date**: 2026-07-30
+  - **Status**: done (with a documented pre-existing exception)
+  - **Notes**: `md readme-index validate` → `README INDEX AUDIT PASSED: no orphan or ghost
+references found`, exit 0. `md links validate` found and fixed 6 link occurrences across 3
+    files this move broke — 3 in `apps/ayokoding-www/docs/ai-benchmark/data-sourcing-prompt.md`,
+    2 in `plans/backlog/ayokoding-www-cost-reduction/README.md`, and 1 in
+    `plans/backlog/ayokoding-www-cost-reduction/brd.md` — all repointed from
+    `plans/in-progress/ayokoding-www-tools-ai-benchmark/` to
+    `plans/done/2026-07-30__ayokoding-www-tools-ai-benchmark/`. After those fixes, `md links
+validate` still reports `found 144 broken links`, but a `grep -n "ai-benchmark"` on its full
+    report is empty — zero of the 144 relate to this plan. Confirmed via the SAME command run
+    against `origin/main` HEAD (before any of this unit's changes): also `found 144 broken links`,
+    identical count — this is pre-existing, unrelated, repo-wide link debt in long-archived plans
+    (`2026-03-29__demo-fs-ts-nextjs`, `2026-04-22__ci-standardization`, etc.), not something this
+    archival introduced or is in scope to fix.
+- [x] [AI] Commit the archival: `chore(plans): move ayokoding-www-tools-ai-benchmark to done`
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: committed as `chore(plans): move ayokoding-www-tools-ai-benchmark to done` — see
+    commit hash in the worktree's local git log.
 
 ### Phase 12 Gate
 
 > All checks below must pass before the plan is considered complete.
 
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`
-      exits 0 — no link anywhere in the repo points at the old `plans/in-progress/` path
+      exits 0 — no **markdown** link points at the old `plans/in-progress/` path
+- [ ] [AI] `git grep -n "plans/in-progress/ayokoding-www-tools-ai-benchmark" -- ':(exclude)plans/done/2026-07-30__ayokoding-www-tools-ai-benchmark/delivery.md'`
+      prints nothing — a plain-text repo-wide sweep covering non-markdown files (`.ts` source
+      comments, etc.) that `md links validate` cannot see; `delivery.md`'s own historical narrative
+      hits (quoted `git mv` commands, the `<PLAN>` placeholder definition) are the sole deliberate
+      exclusion
 - [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate`
       exits 0
 - [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` exits 0
