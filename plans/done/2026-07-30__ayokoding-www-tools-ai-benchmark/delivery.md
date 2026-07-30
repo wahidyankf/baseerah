@@ -4225,25 +4225,98 @@ validate` still reports `found 144 broken links`, but a `grep -n "ai-benchmark"`
 
 > All checks below must pass before the plan is considered complete.
 
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate`
       exits 0 — no **markdown** link points at the old `plans/in-progress/` path
-- [ ] [AI] `git grep -n "plans/in-progress/ayokoding-www-tools-ai-benchmark" -- ':(exclude)plans/done/2026-07-30__ayokoding-www-tools-ai-benchmark/delivery.md'`
+  - **Date**: 2026-07-30
+  - **Status**: done (with the same documented pre-existing exception noted above)
+  - **Notes**: on `main` post-merge (`a9bbb12234f21796921dc804e80049683988bdd4`), the validator
+    reports `found 145 broken links`; `grep -i "ai-benchmark\|tools-ai-benchmark"` on its full output
+    is empty — zero of the 145 relate to this plan or its move. The count is one higher than the
+    144 recorded pre-merge because an unrelated concurrent commit landed on `main` in between
+    (out of scope for this plan); no markdown link anywhere points at the old
+    `plans/in-progress/ayokoding-www-tools-ai-benchmark/` path.
+- [x] [AI] `git grep -n "plans/in-progress/ayokoding-www-tools-ai-benchmark" -- ':(exclude)plans/done/2026-07-30__ayokoding-www-tools-ai-benchmark/delivery.md'`
       prints nothing — a plain-text repo-wide sweep covering non-markdown files (`.ts` source
       comments, etc.) that `md links validate` cannot see; `delivery.md`'s own historical narrative
       hits (quoted `git mv` commands, the `<PLAN>` placeholder definition) are the sole deliberate
       exclusion
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate`
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: on `main` post-merge, the command prints nothing (exit 1, no match) — confirmed no
+    `.ts`/`.tsx` source comment or any other non-markdown file still references the old path.
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate`
       exits 0
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` exits 0
-- [ ] [AI] Run the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: on `main` post-merge → `README INDEX AUDIT PASSED: no orphan or ghost references
+found`, exit 0.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` exits 0
+  - **Date**: 2026-07-30
+  - **Status**: done (scoped verification — see notes)
+  - **Notes**: the repo-wide `nx affected` run failed solely inside
+    `apps/ayokoding-www/test/unit/fe-steps/course-rehome-redirects.steps.tsx` (2 failing tests,
+    "self-referencing courses") — this file is **explicitly out-of-scope, unrelated uncommitted
+    WIP belonging to the concurrent `ayokoding-learning-path-04-course-authoring` plan**, present in
+    the base repo's working tree throughout this unit and never touched, staged, or committed by
+    this plan (per explicit instruction). This plan's own diff is docs/plans-only plus 8
+    comment-only path repoints in `apps/ayokoding-www/src/features/ai-benchmark/core/**`. Scoped
+    checks confirm the plan's own surface is clean: `nx run ayokoding-www:typecheck` → success
+    (cache hit); `nx run ayokoding-www:lint` → success, only pre-existing unrelated
+    `content/en/learn/**` example-file warnings, no errors; `npx vitest run --project unit --project
+unit-fe src/features/ai-benchmark/core` → `6 passed (6)` files, `389 passed (389)` tests, 0
+    failures.
+- [x] [AI] Run the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
       for branch `ayokoding-www-tools-ai-benchmark/phase-11-12-capture-archival` in worktree
       `worktrees/ayokoding-www-tools-ai-benchmark-phase-11-12-capture-archival/`
-- [ ] [AI] Run [Post-Push CI Verification](#post-push-ci-verification)
-- [ ] [AI] Verify every unit's worktree was removed at its own boundary gate — none deferred to plan
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: PR #123 opened as draft, ran **3 sequential CI-gated PR-Review Maker→Fixer cycles**
+    (all 8 discipline specialists each cycle) per this protocol's mandate. Cycle 1 surfaced 7
+    findings (2 HIGH, 5 MEDIUM/LOW) — all fixed: L1/logic (8 stale `plans/in-progress/` source
+    comments under `apps/ayokoding-www/src/features/ai-benchmark/core/`, commit `e1e6255a7`), G1/
+    governance (both new backlog plans' Single-File exception missing 6 of 9 mandatory sections,
+    commit `4224d29f7` for `audit-e2e-reuse-existing-server-config`, `fbceecc83b` for
+    `vitest-glob-coverage-guard`), plus milestone-mislabel and doc-accuracy MEDIUM fixes (commits
+    `6fd650945`, `d4ad17e25`) and a backlog-index gap (commit `a486c9d87`). CI green. Cycle 2
+    surfaced 1 HIGH finding (G3/governance: `vitest-glob-coverage-guard`'s single-file structure
+    violated the narrow-concern/no-foreseen-growth criteria) — fixed by promoting it to the full
+    five-document layout (commit `1a2625da7`). CI green. Cycle 3 (final) surfaced 3 findings, all
+    regressions introduced by the prior cycles' own fixes: F1/governance (Cycle 1's G1 fix gave
+    `audit-e2e-reuse-existing-server-config` an explicit two-phase checklist, violating the
+    single-file exception's single-phase criterion — fixed by promoting it to five-document layout,
+    commit `184392223`), F2/governance (Cycle 2's promotion left `vitest-glob-coverage-guard`
+    without a mandatory Knowledge Capture phase — fixed by adding
+    `## Phase 2: Knowledge Capture and Plan Archival`, commit `4053b4670`), F3/logic+docs (deduped;
+    `vitest-glob-coverage-guard/prd.md`'s scope statement contradicted `tech-docs.md`/`delivery.md`'s
+    open-question framing — softened in the same `4053b4670` commit). Zero unresolved CRITICAL/HIGH
+    after Cycle 3's fix round; no further specialist fan-out required (per PR #122 precedent).
+    Branch fell **BEHIND** `main` after Cycle 3 (unrelated commits landed on `main` meanwhile via
+    concurrent `lp-04` plan activity); updated via
+    `gh api repos/wahidyankf/ose-public/pulls/123/update-branch -X PUT`, creating merge commit
+    `ba548af5dfd6658fd38f7789e6dfb42b4f70cf69`; CI green on it (`validate-env` run `30505539737`,
+    `pr-quality-gate` run `30505539725`, both `conclusion: success`; `mergeStateStatus: CLEAN`).
+    Flipped to ready (`gh pr ready 123`), merged via `gh pr merge 123 --squash` —
+    `gh pr view 123 --json state,mergedAt,mergeCommit` → `"state":"MERGED"`,
+    `"mergedAt":"2026-07-30T01:41:30Z"`, merge commit `a9bbb12234f21796921dc804e80049683988bdd4`.
+    Fast-forwarded local `main` in the base repo to `origin/main` at that commit
+    (`git rev-parse main origin/main` → both `a9bbb12234f21796921dc804e80049683988bdd4`) and removed
+    the worktree: `git worktree list | grep -c
+ayokoding-www-tools-ai-benchmark-phase-11-12-capture-archival` → `0`.
+- [x] [AI] Run [Post-Push CI Verification](#post-push-ci-verification)
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: post-merge GitHub Actions workflow runs on `main` for merge commit
+    `a9bbb12234f21796921dc804e80049683988bdd4` concluded `success`: `validate-env` (run
+    `30506354528`), `publish-images` (run `30506354535`), `pr-quality-gate` (run `30506354559`).
+- [x] [AI] Verify every unit's worktree was removed at its own boundary gate — none deferred to plan
       end. Unit 9's own worktree (`ayokoding-www-tools-ai-benchmark-phase-11-12-capture-archival`) was
       already removed by the [Delivery-Boundary Integration Protocol](#delivery-boundary-integration-protocol)
       step above; this is the final confirmation across all nine units, not a fresh removal:
       `git worktree list | grep -c ayokoding-www-tools-ai-benchmark` prints `0`
+  - **Date**: 2026-07-30
+  - **Status**: done
+  - **Notes**: `git worktree list | grep -c ayokoding-www-tools-ai-benchmark` → `0`; every one of
+    this plan's nine units' worktrees is gone, none deferred.
 
 > **Pause Safety**: the plan is archived under `plans/done/`, every link resolves, and `main` is
 > green. The plan is complete. To resume verification: re-run the two rhino-cli validators above.
