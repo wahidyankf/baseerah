@@ -33,12 +33,14 @@ breakpoint (mobile, tablet, desktop) with no layout switch, avoiding Option C's 
   `price-chart.tsx`, which are deleted.
 - Three bars per rated (opus/sonnet/light) model row: capability, price-in, price-out — reusing
   `core/price.ts` and `chart-primitives.tsx` unchanged.
-- A per-band sort control (`FilterSelect`-styled native `<select>`) for each of the four bands
-  (opus/sonnet/light/unrated), three options: Capability (default, descending), Price low→high,
-  Price high→low — sorting by the **output rate**, tie-broken by input rate.
+- A per-band sort control (`FilterSelect`-styled native `<select>`) for each of the three RATED
+  bands (opus/sonnet/light — the `unrated` band has no composite index to sort by and never had a
+  control), three options: Capability (default, descending), Price low→high, Price high→low —
+  sorting by the **output rate**, tie-broken by input rate.
 - New pure comparator module `core/sort.ts` (`byCapabilityDesc`, `byPriceAsc`, `byPriceDesc`).
-- URL-encoded per-band sort state (`sortOpus`, `sortSonnet`, `sortLight`, `sortUnrated` query
-  params), extending `core/url-state.ts`.
+- URL-encoded per-band sort state (`sortOpus`, `sortSonnet`, `sortLight` query params), extending
+  `core/url-state.ts`. (A `sortUnrated` param existed briefly and round-tripped despite having no
+  rendering effect — removed as dead code in the PR #125 fixer cycle.)
 - A new Design Decision (DD-1) for how a **rated** model billed only by subscription (no metered
   rate) renders inline within its own row — see
   [`tech-docs.md` §DD-1](./tech-docs.md#dd-1--rated--subscription-only-model-rendering).
@@ -49,7 +51,9 @@ breakpoint (mobile, tablet, desktop) with no layout switch, avoiding Option C's 
 **Out of scope**
 
 - `model-table.tsx` (the accessible full-data table) — untouched.
-- `benchmark-filters.tsx` (harness/class filter bar) — untouched.
+- `benchmark-filters.tsx` (harness/class filter bar) — no behavioral change to its own filter
+  bar, other than the backward-compatible `allLabel?` widening of the shared `FilterSelect`
+  required by the PR #125 cycle-1 sort-dropdown fix.
 - Any new benchmark, price, or model data — the dataset (`core/data/models.ts`) is unchanged.
 - Any runtime data fetch — the dataset stays static, per the prior plan's own scope.
 - A backend, API, or database.
@@ -65,7 +69,7 @@ flowchart TB
   S --> C["shell/benchmark-chart.tsx<br/>(NEW) cap + 2 price bars/row"]
   P --> C
   CP["shell/chart-primitives.tsx<br/>reused (Bar, Axis, etc.)"] --> C
-  U["core/url-state.ts<br/>+4 sort query params"] --> C
+  U["core/url-state.ts<br/>+3 sort query params"] --> C
   C --> Page["/tools/ai-benchmark<br/>merged chart + ModelTable"]
 
   style C fill:#0072B2,color:#FFFFFF

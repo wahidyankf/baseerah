@@ -5,7 +5,11 @@
 Replace the AI Benchmark tool's two stacked charts (capability index, token price) with one merged
 chart: one row per rated model, carrying a capability bar and two price bars (input, output)
 together, grouped into the same four bands (opus/sonnet/light/unrated) the page already uses, each
-band independently sortable.
+RATED band (opus/sonnet/light) independently sortable. **Correction (pr-review-synthesis-maker
+MEDIUM finding, PR #125 fixer cycle):** the `unrated` band is never sortable — it has no composite
+index to order by, renders as a plain text list, and never had a sort dropdown. An earlier
+`sortUnrated` URL parameter round-tripped despite this and has been removed as dead code rather than
+wired up; see `tech-docs.md`'s corrected DD-4.
 
 ## Personas
 
@@ -224,25 +228,25 @@ finishing touch — it is the specific property that avoids the prior plan's Opt
 
 ### In scope
 
-| #    | Feature                                                                                                               |
-| ---- | --------------------------------------------------------------------------------------------------------------------- |
-| PS-1 | One merged chart component replacing `capability-chart.tsx` + `price-chart.tsx`                                       |
-| PS-2 | Three bars per rated model row: capability, price-in, price-out                                                       |
-| PS-3 | Per-band sort control (Capability default / Price low→high / Price high→low), sorted by output rate (input tie-break) |
-| PS-4 | URL-encoded per-band sort state (`sortOpus`/`sortSonnet`/`sortLight`/`sortUnrated`)                                   |
-| PS-5 | New `core/sort.ts` pure comparator module                                                                             |
-| PS-6 | DD-1: rated + subscription-only model renders inline `Subscription ($cost)` text in place of price bars               |
-| PS-7 | Rewritten + extended Gherkin in the existing `ai-benchmark.feature`                                                   |
-| PS-8 | DD-8: harness-specific price display (AC-17/AC-18) carries over unchanged via a `harness` prop on the merged chart    |
+| #    | Feature                                                                                                                                                 |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PS-1 | One merged chart component replacing `capability-chart.tsx` + `price-chart.tsx`                                                                         |
+| PS-2 | Three bars per rated model row: capability, price-in, price-out                                                                                         |
+| PS-3 | Per-band sort control (Capability default / Price low→high / Price high→low), sorted by output rate (input tie-break)                                   |
+| PS-4 | URL-encoded per-band sort state for the three RATED bands (`sortOpus`/`sortSonnet`/`sortLight` — `unrated` is never sortable, see the correction above) |
+| PS-5 | New `core/sort.ts` pure comparator module                                                                                                               |
+| PS-6 | DD-1: rated + subscription-only model renders inline `Subscription ($cost)` text in place of price bars                                                 |
+| PS-7 | Rewritten + extended Gherkin in the existing `ai-benchmark.feature`                                                                                     |
+| PS-8 | DD-8: harness-specific price display (AC-17/AC-18) carries over unchanged via a `harness` prop on the merged chart                                      |
 
 ### Out of scope
 
-| #     | Feature                                                           |
-| ----- | ----------------------------------------------------------------- |
-| OOS-1 | Any change to `model-table.tsx` or `benchmark-filters.tsx`        |
-| OOS-2 | Any new benchmark, price, or model entering `core/data/models.ts` |
-| OOS-3 | Any runtime data fetch, backend, API, or database                 |
-| OOS-4 | Any change to the harness/class URL params (`harness`, `class`)   |
+| #     | Feature                                                                                                                                                                                                                                   |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OOS-1 | Any change to `model-table.tsx`; no behavioral change to `benchmark-filters.tsx`'s own filter bar, other than the backward-compatible `allLabel?` widening of the shared `FilterSelect` required by the PR #125 cycle-1 sort-dropdown fix |
+| OOS-2 | Any new benchmark, price, or model entering `core/data/models.ts`                                                                                                                                                                         |
+| OOS-3 | Any runtime data fetch, backend, API, or database                                                                                                                                                                                         |
+| OOS-4 | Any change to the harness/class URL params (`harness`, `class`)                                                                                                                                                                           |
 
 ### Product-level risks
 
@@ -267,7 +271,7 @@ Feature: AI model benchmark tool — merged capability/price chart
     Given a model with a composite index of 85.7 and an output rate of $15.00
     When the merged chart renders that model's row
     Then the capability bar's length is proportional to 85.7 over the composite index max
-    And the price-out bar's length is proportional to $15.00 over that band's price axis max
+    And the price-out bar's length is proportional to $15.00 over the chart's shared price axis max
 
   Scenario: A band's sort control reorders only that band
     Given the sonnet band is displaying models in capability-descending order
@@ -293,6 +297,17 @@ Feature: AI model benchmark tool — merged capability/price chart
     Then the row shows its capability bar as normal
     And the price-bar area of that row shows "Subscription ($cost)" text instead of two bars
 
+  # AC-48 — added post-merge (pr-review-synthesis-maker MEDIUM finding): a rated model with no
+  # reported price at all (no metered rate, no subscription, under any harness) is genuinely new
+  # rendering behaviour the retired `price-chart.tsx` never had — it used to omit such models from
+  # the plot entirely, so nothing rendered for them; the merged chart instead renders an inline
+  # "not reported" placeholder, which had no owning scenario until now.
+  Scenario: A rated model with no reported price shows a not-reported placeholder
+    Given a model in the light band with no metered rate and no subscription rate
+    When the merged chart renders that model's row
+    Then the row shows its capability bar as normal
+    And the price-bar area of that row shows a "not reported" placeholder instead of two bars
+
   Scenario: An unrated model still renders in the existing text-only list
     Given a model with no published composite score on any benchmark
     When the merged chart renders the roster
@@ -302,7 +317,7 @@ Feature: AI model benchmark tool — merged capability/price chart
   Scenario: The merged chart keeps its accessible name and text alternative
     Given the merged chart has replaced the two former charts
     When a screen reader encounters the chart
-    Then the chart is one svg with role image and one localized title as its accessible name
+    Then each rated band renders its own svg with role image and its own localized title as its accessible name
     And every figure the chart encodes is still reachable via the unchanged ModelTable below
 
   Scenario: The merged chart uses the identical DOM structure at every breakpoint

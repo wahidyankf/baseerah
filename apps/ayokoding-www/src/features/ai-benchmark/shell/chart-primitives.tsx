@@ -1,11 +1,14 @@
 // AI BENCHMARK — shared chart primitives (Phase 6, A-2; refactored A-17; reused by Phase 7).
 //
-// The capability chart and the price chart share ONE set of SVG building blocks so neither chart
-// re-derives its own scale, axis, bar, or band-header rendering (Y-11 proves this by hoisting
-// anything the two charts still duplicate back here). `Legend` also lives here but is currently
-// used by the capability chart only — see its own docstring below. Every colour reference resolves
-// through the `--chart-band-*` design tokens declared in `<TOKENS>` (Phase 1) — no component in
-// this file (or any file that imports it) may name a hue directly (A-17).
+// `benchmark-chart.tsx` (the merged chart, Phase 2) is the sole consumer of this shared set of SVG
+// building blocks today — it never re-derives its own scale, axis, bar, or band-header rendering.
+// This module predates the merge: the retired `capability-chart.tsx` and `price-chart.tsx`
+// (deleted, Phase 3c — see git history) used to share it (Y-11 hoisted anything they duplicated
+// back here), which is why the primitives still live in their own module rather than being folded
+// into `benchmark-chart.tsx` directly. `Legend` also lives here but is currently used by
+// `how-to-read.tsx` only — see its own docstring below. Every colour reference resolves through the
+// `--chart-band-*` design tokens declared in `<TOKENS>` (Phase 1) — no component in this file (or
+// any file that imports it) may name a hue directly (A-17).
 //
 // FCIS boundary: this module holds NO literal benchmark score, price, model name, or class
 // threshold — `ChartBand` is a closed four-value union (the same one `core/bands.ts` produces),
@@ -22,8 +25,8 @@ import type { Band as ChartBand } from "../core/bands";
  * `core/bands.ts`'s `Band` rather than redeclared, so a future band added there is a compile
  * error here for every `Record<ChartBand, …>` map below (each becomes exhaustively unsatisfied).
  * That guarantee covers only this colour-token layer — it does NOT reach a chart's own
- * array-literal band list. `price-chart.tsx`'s `ALL_BANDS` and `capability-chart.tsx`'s
- * `RATED_BANDS` are current positive examples: both already derive from `core/filter.ts`'s
+ * array-literal band list. The retired price chart's `ALL_BANDS` and the retired capability
+ * chart's `RATED_BANDS` were current positive examples: both already derived from `core/filter.ts`'s
  * `BANDS` (the single source of truth, F-9) rather than hand-writing their own band array, so
  * neither is at risk today. The caveat this docstring records is a general one for any future
  * chart-owned band list: a hand-written array-literal band list (one that does not derive from
@@ -74,10 +77,10 @@ export function bandSwatchClass(band: ChartBand): string {
 }
 
 /**
- * A band's localized class-name label — the single place either chart looks up
- * `BAND_LABEL_KEYS[band] → t(locale, key)` (Y-11 refactor: `capability-chart.tsx` and
- * `price-chart.tsx` each carried their own identical copy of this lookup; the fallback-to-band-id
- * guard can no longer drift between the two charts now that it lives here once).
+ * A band's localized class-name label — the single place the chart looks up
+ * `BAND_LABEL_KEYS[band] → t(locale, key)` (Y-11 refactor: the two now-retired charts each used to
+ * carry their own identical copy of this lookup; the fallback-to-band-id guard cannot drift
+ * between duplicate copies now that it lives here once).
  */
 export function bandLabel(band: ChartBand, locale: Locale): string {
   const key = BAND_LABEL_KEYS[band];
@@ -192,9 +195,9 @@ export type LegendProps = {
 };
 
 /**
- * A compact swatch + text legend, currently used by the capability chart only (`price-chart.tsx`
- * does not render one — each of its band groups already carries a text header via `BandGroup`, so
- * AC-37's "class is never colour-only" holds there without a legend). The swatch is `aria-hidden`
+ * A compact swatch + text legend, used by `how-to-read.tsx` — the merged chart itself does not
+ * render one, since each of its band groups already carries a text header via `BandGroup`, so
+ * AC-37's "class is never colour-only" holds there without a legend. The swatch is `aria-hidden`
  * decoration — the label text beside it is what actually carries the band's identity (never colour
  * alone).
  */
@@ -213,10 +216,10 @@ export function Legend({ items }: LegendProps) {
 
 /**
  * `count + 1` evenly spaced values from `0` to `max`, inclusive — the domain values an lg-only
- * tick row renders (Y-11 refactor target: both charts built their own near-identical
- * "even ticks up to a max" generator; `capability-chart.tsx`'s fixed-20-unit-interval ticks over
- * `COMPOSITE_INDEX_MAX` (100) are exactly `evenTicks(100, 5)`, so no chart's tick VALUES change,
- * only where the generator lives). A non-positive `max` or non-positive `count` degenerates to a
+ * tick row renders (Y-11 refactor target: both retired charts built their own near-identical
+ * "even ticks up to a max" generator; the retired capability chart's fixed-20-unit-interval ticks
+ * over `COMPOSITE_INDEX_MAX` (100) were exactly `evenTicks(100, 5)`, so no chart's tick VALUES
+ * changed, only where the generator lives). A non-positive `max` or non-positive `count` degenerates to a
  * single `[0]` tick rather than dividing by zero or looping forever.
  */
 export function evenTicks(max: number, count: number): number[] {
@@ -229,7 +232,7 @@ export function evenTicks(max: number, count: number): number[] {
 }
 
 export type TickRowProps = {
-  /** The outer `<g>`'s `data-testid` (the whole row, e.g. `"capability-chart-ticks"`). */
+  /** The outer `<g>`'s `data-testid` (the whole row, e.g. `"benchmark-chart-ticks"`). */
   testId: string;
   /** Each individual tick's `data-testid` prefix — the tick's own testid is `${tickTestId}-${value}`. */
   tickTestId: string;

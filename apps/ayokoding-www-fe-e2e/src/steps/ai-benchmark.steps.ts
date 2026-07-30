@@ -63,16 +63,14 @@ Then("the document language attribute is {string}", async ({ page }, expectedLan
   await expect(page.locator("html")).toHaveAttribute("lang", expectedLang);
 });
 
-// ── Chart accessible-name assertions (AC-36) ──────────────────────────────────
+// ── Chart accessible-name assertion (AC-36) ───────────────────────────────────
 
-// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:Each chart exposes an accessible name
-Then("the capability chart exposes an accessible name", async ({ page }) => {
-  await expect(page.getByTestId("capability-chart-svg")).toHaveAccessibleName(/.+/);
-});
-
-// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:Each chart exposes an accessible name
-Then("the price chart exposes an accessible name", async ({ page }) => {
-  await expect(page.getByTestId("price-chart-svg")).toHaveAccessibleName(/.+/);
+// UWT-002 fix (Rule-15, 2026-07-30): the chart is now one svg PER rated band
+// (`benchmark-chart-svg-{opus,sonnet,light}`), not one shared `benchmark-chart-svg` — the first
+// band's own svg is enough to prove the family carries a real accessible name.
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:The merged chart exposes an accessible name
+Then("the merged chart exposes an accessible name", async ({ page }) => {
+  await expect(page.locator('[data-testid^="benchmark-chart-svg-"]').first()).toHaveAccessibleName(/.+/);
 });
 
 // ── Phase 8 — harness and class filters (AC-18, AC-22, AC-27) ─────────────────
@@ -94,25 +92,25 @@ Then("every roster model is shown in the data table", async ({ page }) => {
   await expect(page.locator('[data-testid="model-table-desktop"] tbody tr[data-model-id]')).toHaveCount(38);
 });
 
-// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A harness filter switches the price chart to that harness's rate
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A harness filter switches the merged chart to that harness's rate
 Given("a fixture model priced differently by two harnesses", async ({}) => {
   // The e2e layer exercises the REAL roster (no fixture injection over HTTP) — Grok 4.5
   // (core/data/models.ts) is genuinely priced differently by two harnesses: cursor/opencode-zen at
   // a metered $2/$6 rate, opencode-go at a flat-rate subscription instead.
 });
 
-// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A harness filter switches the price chart to that harness's rate
-When("the harness filter selects the more expensive harness", async ({ page }) => {
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A harness filter switches the merged chart to that harness's rate
+When("the merged chart renders with that harness selected", async ({ page }) => {
   await page.goto("/en/tools/ai-benchmark?harness=opencode-go");
   await page.waitForLoadState("networkidle");
 });
 
-// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A harness filter switches the price chart to that harness's rate
-Then("that model's bars use that harness's rate", async ({ page }) => {
+// @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A harness filter switches the merged chart to that harness's rate
+Then("that model's price bars use that harness's own rate, not its lowest available rate", async ({ page }) => {
   // opencode-go carries Grok 4.5 as a flat-rate subscription, not a per-token rate — selecting it
-  // must remove Grok 4.5's metered bar and list it in the subscription group instead.
-  await expect(page.getByTestId("price-chart-bar-in-grok-4.5")).toHaveCount(0);
-  await expect(page.getByTestId("price-chart-subscription-grok-4.5")).toBeVisible();
+  // must remove Grok 4.5's metered bar and show its inline subscription text instead (DD-1).
+  await expect(page.getByTestId("benchmark-chart-bar-price-in-grok-4.5")).toHaveCount(0);
+  await expect(page.getByTestId("benchmark-chart-subscription-grok-4.5")).toBeVisible();
 });
 
 // @covers specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/ai-benchmark.feature:A reloaded filtered URL reproduces the same view
@@ -159,7 +157,7 @@ Then("the same filtered set of models is shown", async ({ page }) => {
 //
 // The four band tokens all share ONE `-ink` value and ONE `-wash` value per theme (see
 // `libs/web-ui-token/src/ayokoding.css`) — only the BASE (`--chart-band-<band>`) hue differs
-// per band, and neither chart currently renders `-wash` as an actual background (see
+// per band, and the chart currently renders no `-wash` as an actual background (see
 // `tech-docs.md`'s "Feature gating" is unrelated; the relevant note is in the Band design tokens
 // section: "-ink/-wash pair provides the text-on-background contrast" — a token-level contract,
 // not tied to any one component's current usage). Reading the CSS custom properties directly,
@@ -168,7 +166,7 @@ Then("the same filtered set of models is shown", async ({ page }) => {
 
 const BAND_IDS = ["opus", "sonnet", "light", "unrated"] as const;
 
-// The three bands that actually render as a bar (`capability-chart.tsx` never plots `unrated` as
+// The three bands that actually render as a bar (`benchmark-chart.tsx` never plots `unrated` as
 // a bar — it is a plain text list) — the base/bar-fill token `--chart-band-<band>` against
 // `--color-background` (the page background a bar renders directly onto) is the pair the M-14 fix
 // (delivery.md, Phase 9 Round 1a) actually changed and the one WCAG 1.4.11's 3:1 non-text minimum

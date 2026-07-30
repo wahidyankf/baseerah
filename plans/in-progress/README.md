@@ -6,9 +6,6 @@ Active project plans currently being worked on.
 
 - [ayokoding-learning-path-04-course-authoring](./ayokoding-learning-path-04-course-authoring/README.md)
   — Wave 2. Authors the `careers/` course bodies band by band, each from its `syllabus/` spec.
-- [ayokoding-www-ai-benchmark-merged-chart](./ayokoding-www-ai-benchmark-merged-chart/README.md) —
-  Merges the AI Benchmark tool's capability and price charts into one per-model row with a
-  per-band sort control, replacing `capability-chart.tsx` + `price-chart.tsx`.
 - [vercel-function-cost-reduction](./vercel-function-cost-reduction/README.md) — Cuts gross metered
   Vercel usage from ~$57/mo to under $20/mo so the Pro plan's included credit absorbs it and the
   invoice stays at the $20 subscription. Fixes the root cause: `ayokoding-www` prerenders zero of
