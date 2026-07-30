@@ -9,6 +9,10 @@ Active project plans currently being worked on.
 - [ayokoding-www-ai-benchmark-merged-chart](./ayokoding-www-ai-benchmark-merged-chart/README.md) —
   Merges the AI Benchmark tool's capability and price charts into one per-model row with a
   per-band sort control, replacing `capability-chart.tsx` + `price-chart.tsx`.
+- [vercel-function-cost-reduction](./vercel-function-cost-reduction/README.md) — Cuts gross metered
+  Vercel usage from ~$57/mo to under $20/mo so the Pro plan's included credit absorbs it and the
+  invoice stays at the $20 subscription. Fixes the root cause: `ayokoding-www` prerenders zero of
+  its ~2,068 content pages.
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.
