@@ -4,6 +4,10 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
+- [baseerah-repo-reset](./baseerah-repo-reset/README.md) — Strips this `ose-public` clone down to
+  `rhino-cli` and the engineering harness, then stands up Baseerah — a personal-assistant product
+  within the OSE ecosystem — as `baseerah-be` (:19320), `baseerah-be-e2e`, `baseerah-fe` (:19310),
+  and `baseerah-fe-e2e`. Deletes the other two plans in this folder along with the apps they target.
 - [ayokoding-learning-path-04-course-authoring](./ayokoding-learning-path-04-course-authoring/README.md)
   — Wave 2. Authors the `careers/` course bodies band by band, each from its `syllabus/` spec.
 - [vercel-function-cost-reduction](./vercel-function-cost-reduction/README.md) — Cuts gross metered
