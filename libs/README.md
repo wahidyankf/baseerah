@@ -10,12 +10,13 @@ The `libs/` directory contains **reusable library packages** that can be shared 
 
 ```
 libs/
-├── fsharp-crane-core/         # Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
 ├── rust-commons/              # Shared Rust utilities (link-checking, HTTP)
-├── ts-ui/                     # TypeScript UI component library
-├── web-ui/                    # Web UI component library
+├── web-ui/                    # Shared React component library
 └── web-ui-token/              # Web UI design token library
 ```
+
+Every prior lib (`fsharp-crane-core`, `ts-ui`) was deleted by the 2026 Baseerah repo reset — see the
+[baseerah-repo-reset plan](../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
 ## Naming Convention
 
@@ -31,31 +32,26 @@ This flat structure with language prefixes supports a **polyglot monorepo** wher
 
 ### Examples
 
-**TypeScript libraries** (planned):
+**TypeScript libraries** (current):
 
-- `ts-utils` - TypeScript utility functions
-- `ts-components` - Reusable React components
-- `ts-hooks` - Custom React hooks
-- `ts-api` - API client libraries
+- `web-ui` - Shared React component library
+- `web-ui-token` - Web UI design token library
 
 **Rust libraries** (current):
 
 - `rust-commons` - Shared Rust utilities (link-checking, HTTP)
 
-**F# libraries** (current):
-
-- `fsharp-crane-core` - Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
-
 ## Current Implementation
 
-**`rust-commons`** - Shared Rust utilities (link-checking, HTTP) used by the Rust CLIs
-(`ayokoding-cli`, `ose-cli`, `rhino-cli`).
+**`rust-commons`** - Shared Rust utilities (link-checking, HTTP). No current app consumes it —
+`rhino-cli` is self-contained; its former consumers (`ayokoding-cli`, `ose-cli`) were deleted.
 
-**`fsharp-crane-core`** - Shared F# PDF-to-Markdown core (PdfPig + Tesseract) consumed by `crane-cli`.
+**`web-ui`** / **`web-ui-token`** - Shared React component library and its design-token package.
+`web-ui` depends on `web-ui-token`; `baseerah-fe` is the sole app consumer of both.
 
 ## Library Characteristics
 
-- **Polyglot-Ready** - Designed to support multiple languages (TypeScript, Rust, F# active)
+- **Polyglot-Ready** - Designed to support multiple languages (TypeScript, Rust active)
 - **Flat Structure** - All libs at same level (no nested scopes)
 - **Language-Specific** - Each language uses its own conventions and tools
 - **Reusable** - Libs are designed to be imported by apps and other libs
