@@ -1147,7 +1147,7 @@ generate` only adds/updates mirrors for agents still present under `.claude/agen
       1224→1203 packages). Delegated the remaining 959-hit categorization to a background agent, which
       found and fixed 6 more genuine leftover bugs: `README.md`'s CI badges linking to 4 deleted
       workflow files (replaced with prose note); 4 `.claude/skills/swe-programming-{golang,csharp,
-  fsharp,rust}/SKILL.md` files linking to the deleted `apps/ayokoding-www/content/...` path
+fsharp,rust}/SKILL.md` files linking to the deleted `apps/ayokoding-www/content/...` path
       (repointed to the live `https://ayokoding.com/...` equivalent, verified reachable via WebFetch);
       and `plans/backlog/audit-e2e-reuse-existing-server-config/` (README/prd/tech-docs/delivery + the
       backlog index entry) — its entire original scope named 7 apps all since deleted, rescoped to the
@@ -1159,7 +1159,7 @@ generate` only adds/updates mirrors for agents still present under `.claude/agen
       README.md/CONTRIBUTING.md), `docs/explanation/software-engineering/**` (Decision 12 exclusion),
       `apps/rhino-cli/**` test fixtures and `specs/apps/rhino/**` (mirror rhino-cli's own test/spec
       structure, already swept task #143), `libs/web-ui-token/src/{organiclever,ayokoding,
-  wahidyankf}.css` (deliberately kept per task #155), historical citations already de-linked with
+wahidyankf}.css` (deliberately kept per task #155), historical citations already de-linked with
       no regressions (`ROADMAP.md`, `docs/reference/project-dependency-graph.md`,
       `docs/explanation/standardize-app-spec-trees-parity-decisions.md`, etc.), and 2 categories
       explicitly already deferred to a documented future task rather than Phase-3 leftovers
@@ -1208,7 +1208,23 @@ generate` only adds/updates mirrors for agents still present under `.claude/agen
       plain `npm install`/`npm install --package-lock-only` reported "up to date" and did not prune
       them (npm doesn't re-scan workspace globs against a lockfile it considers current); a full
       `rm package-lock.json && npm install` regenerated it clean (1224 → 1203 packages, 0 remaining
-      stale-app matches).
+      stale-app matches). **Corrected in a follow-up fix**: that full regen, run on macOS, tripped the
+      known npm optional-dependencies bug (npm/cli#4828) — it dropped every non-darwin platform
+      variant of `@rolldown/binding-*` (and likely other native-binding optional deps) from the
+      lockfile, since npm only resolves optional deps for the platform it's running on when doing a
+      from-scratch install rather than an incremental one. CI's `pr-quality-gate` caught it
+      immediately: `web-ui-token:test:unit` failed on ubuntu-latest with "Cannot find module
+      '../rolldown-binding.linux-x64-gnu.node'". Root-caused via `gh run view --log-failed`, confirmed
+      by diffing the regenerated lockfile against the prior, already-CI-green commit `a853f44e6`'s
+      lockfile (which had the correct multi-platform bindings plus the original 14 harmless residual
+      stale-app entries). Fix: `git checkout a853f44e6 -- package-lock.json` (reverting the regen
+      entirely, restoring the proven-good multi-platform lockfile) + `npm install` to resync
+      `node_modules`, accepting the 14 stale-app-name lockfile entries as a legitimate keep — this
+      session's established "acceptance bar doesn't hold once correctly classified" pattern: they're
+      inert metadata (npm ignores lockfile entries whose workspace directory no longer exists) and
+      the only alternative (a full regen) breaks CI's cross-platform native bindings, which is a far
+      worse outcome than 14 cosmetic stale strings. Verified locally via
+      `npx nx run web-ui-token:test:unit --skip-nx-cache` (6/6 passed) before re-pushing.
 - [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — `conclusion` is `success` and every
       `jobs[].conclusion` is `success` or `skipped`.
 
