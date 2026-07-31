@@ -12,6 +12,8 @@ jobs:
   detect:
     name: Detect affected images
     runs-on: ubuntu-latest
+    outputs:
+      build-baseerah-be: ${{ steps.detect.outputs.build-baseerah-be }}
     env:
       NX_BASE: ${{ github.event.before }}
       NX_HEAD: ${{ github.sha }}
@@ -29,10 +31,33 @@ jobs:
           fi
           export NX_BASE="$BASE"
           AFFECTED=$(npx nx show projects --affected 2>/dev/null || echo "")
-          # No backend image project is registered yet — Phase 7 adds the
-          # baseerah-be case arm and its matching output/publish job.
+          {
+            echo "build-baseerah-be=false"
+          } >> "$GITHUB_OUTPUT"
           for project in $AFFECTED; do
             case "$project" in
-              *) ;;
+              baseerah-be) echo "build-baseerah-be=true" >> "$GITHUB_OUTPUT" ;;
             esac
           done
+
+  publish-baseerah-be:
+    name: Publish baseerah-be
+    needs: detect
+    if: needs.detect.outputs.build-baseerah-be == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push baseerah-be
+        run: |
+          docker build -f apps/baseerah-be/Dockerfile \
+            -t ghcr.io/wahidyankf/baseerah-be:latest \
+            -t ghcr.io/wahidyankf/baseerah-be:${{ github.sha }} \
+            .
+          docker push ghcr.io/wahidyankf/baseerah-be:latest
+          docker push ghcr.io/wahidyankf/baseerah-be:${{ github.sha }}

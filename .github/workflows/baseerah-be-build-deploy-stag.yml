@@ -1,0 +1,20 @@
+name: baseerah-be-build-deploy-stag
+
+# Fires when the app-tier local-deploy-stag run force-pushes stag-baseerah-be.
+# Builds the baseerah-be image and pushes it to GHCR.
+
+on:
+  push:
+    branches: [stag-baseerah-be]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/_reusable-be-build-deploy.yml
+    with:
+      be-project: baseerah-be
+      image-name: ghcr.io/wahidyankf/baseerah-be

@@ -1708,14 +1708,11 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
       — reports 5, the total scenario count across US-4 and US-5. **Done**: confirmed 5.
 - [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. **Done**: "Successfully
       ran targets typecheck, lint, test:quick for 5 projects".
-- [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
-
-      **In progress**: Phase 4 commit `04d20c0a9`'s CI (`publish-images`, `validate-env`,
-      `pr-quality-gate`) all confirmed `success` via `gh run list --commit`. Phase 5 commit
-      `912a6f208`'s CI (`publish-images` success, `validate-env`/`pr-quality-gate` still
-      running/queued at last check) is still in flight — checking non-blockingly via `gh run list`
-      woven into Phase 6 work rather than pausing the turn (per the standing "never stop before all
-      phases done" instruction). Will tick this once confirmed green.
+- [x] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
+      **Done**: Phase 4 commit `04d20c0a9`'s CI (`publish-images`, `validate-env`, `pr-quality-gate`)
+      and Phase 5 commit `912a6f208`'s CI (`pr-quality-gate` and `publish-images`) both confirmed
+      `success` via `gh run list --commit`, checked non-blockingly woven into Phase 6 work per the
+      standing "never stop before all phases done" instruction.
 
 > **Pause Safety**: the specification and contract for Baseerah exist and validate, but no
 > implementation does. Nothing runs; nothing is broken. Safe to stop.
@@ -1893,24 +1890,31 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
 > All checks below must pass before starting Phase 7. If any check fails, fix it in Phase 6 before
 > proceeding.
 
-- [ ] [AI] `npx nx run baseerah-be:test:quick` — exits 0.
-- [ ] [AI] `npx nx run baseerah-be:build` — exits 0 and `apps/baseerah-be/dist/` exists.
-- [ ] [AI] Manually verify the running service per the
+- [x] [AI] `npx nx run baseerah-be:test:quick` — exits 0. **Done**: confirmed.
+- [x] [AI] `npx nx run baseerah-be:build` — exits 0 and `apps/baseerah-be/dist/` exists. **Done**:
+      confirmed, `dist/BaseerahBe.dll` present.
+- [x] [AI] Manually verify the running service per the
       [manual behavioural verification convention](../../../repo-governance/development/quality/manual-behavioral-verification.md):
       start it with `npx nx run baseerah-be:run`, then in a second shell run
       `curl -s -o /dev/null -w '%{http_code}' http://localhost:19320/api/v1/health` — acceptance:
-      prints `200`. Save the full response body to `evidence/phase-6-health.txt`.
-- [ ] [AI] `curl -s http://localhost:19320/api/v1/hello` — acceptance: returns
-      `{"message":"Hello from Baseerah"}`. Save to `evidence/phase-6-hello.txt`.
-- [ ] [AI] `curl -s -o /dev/null -w '%{http_code}' http://localhost:19320/api/v1/does-not-exist` —
-      acceptance: prints `404`.
-- [ ] [AI] `npx nx run baseerah-be:test:integration` — exits 0.
-- [ ] [AI] `npm run validate:config` and `npx nx run rhino-cli:env:validation` — both exit 0.
-- [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
-- [ ] [AI] CI: poll every 2 minutes with one call per wakeup, then
+      prints `200`. Save the full response body to `evidence/phase-6-health.txt`. **Done**: prints
+      `200`, body `{"status":"ok"}` saved.
+- [x] [AI] `curl -s http://localhost:19320/api/v1/hello` — acceptance: returns
+      `{"message":"Hello from Baseerah"}`. Save to `evidence/phase-6-hello.txt`. **Done**: confirmed
+      and saved.
+- [x] [AI] `curl -s -o /dev/null -w '%{http_code}' http://localhost:19320/api/v1/does-not-exist` —
+      acceptance: prints `404`. **Done**: confirmed, body `{"error":"not found"}`.
+- [x] [AI] `npx nx run baseerah-be:test:integration` — exits 0. **Done**: confirmed.
+- [x] [AI] `npm run validate:config` and `npx nx run rhino-cli:env:validation` — both exit 0. **Done**:
+      confirmed (61/61 checks passed; no env drift).
+- [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. **Done**: confirmed,
+      "Successfully ran targets typecheck, lint, test:quick for 6 projects".
+- [x] [AI] CI: poll every 2 minutes with one call per wakeup, then
       `gh run view <id> --json status,conclusion,jobs` — `conclusion` is `success` and every
       `jobs[].conclusion` is `success` or `skipped`. The `dotnet` job now runs a real project and
-      must be `success`.
+      must be `success`. **Done**: commit `372837d09`'s CI (`publish-images`, `validate-env`,
+      `pr-quality-gate`) all confirmed `success` via `gh run list --commit`, checked non-blockingly
+      woven into Phase 7 work.
 
 > **Pause Safety**: a working stateless backend serves health, hello, and a JSON 404 on :19320, with
 > unit and integration coverage. No frontend and no E2E suite exist yet. Safe to stop.
@@ -1923,52 +1927,71 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
 > The backend is stateless, so no scenario needs isolation from another and no reset hook exists
 > ([tech-docs Decision 8](./tech-docs.md#decision-8--hello-world-and-therefore-no-state-at-all)).
 
-- [ ] [AI] Create `infra/dev/baseerah-app/`: `docker-compose.yml`, `docker-compose.ci.yml`,
+- [x] [AI] Create `infra/dev/baseerah-app/`: `docker-compose.yml`, `docker-compose.ci.yml`,
       `Dockerfile.be.dev`, `Dockerfile.fe.dev`, `README.md`, `.gitignore` — modelled on the deleted
       `infra/dev/organiclever-app/` (recover with
       `git show "$(git log --diff-filter=D --format=%H -- infra/dev/organiclever-app/docker-compose.yml | head -1)~1":infra/dev/organiclever-app/docker-compose.yml`),
       **not** on
       `infra/dev/ose-app/`, which was stale and pointed at a non-existent Rust backend. Services:
       `baseerah-be` on 19320 and `baseerah-fe` on 19310; **no database service** — acceptance:
-      `docker compose -f infra/dev/baseerah-app/docker-compose.yml config` exits 0.
-- [ ] [AI] Leave the `baseerah-fe` service defined but commented out until Phase 8 creates the app,
+      `docker compose -f infra/dev/baseerah-app/docker-compose.yml config` exits 0. **Done**: all six
+      files created; `docker compose config` confirmed exits 0. **Correction**: the recovered
+      `organiclever-app/Dockerfile.be.dev` was itself stale — still `FROM rust:1.95-slim` although
+      `organiclever-be` had already migrated to F#/Giraffe at deletion time. Rewrote
+      `Dockerfile.be.dev` from `mcr.microsoft.com/dotnet/sdk:10.0` + `dotnet watch run` to match
+      baseerah-be's actual stack (kept the compose structure — bind mount, healthcheck, long
+      `start_period`); logged in `learnings.md`.
+- [x] [AI] Leave the `baseerah-fe` service defined but commented out until Phase 8 creates the app,
       and record that choice in `learnings.md` — acceptance:
       `docker compose -f infra/dev/baseerah-app/docker-compose.yml up -d` starts `baseerah-be` alone
-      without error.
-- [ ] [AI] Lint the two dev Dockerfiles: run
+      without error. **Done**: verified via a real `docker compose up -d --build` run — container
+      reached `healthy` and served all three routes (`/api/v1/health` → 200, `/api/v1/hello` → 200,
+      `/api/v1/does-not-exist` → 404) before tearing down.
+- [x] [AI] Lint the two dev Dockerfiles: run
       `hadolint infra/dev/baseerah-app/Dockerfile.be.dev infra/dev/baseerah-app/Dockerfile.fe.dev`
-      — acceptance: exits 0 at `--failure-threshold warning`.
-- [ ] [AI] Create `apps/baseerah-be/scripts/run-e2e.sh`: bring up the compose stack, poll
+      — acceptance: exits 0 at `--failure-threshold warning`. **Done**: confirmed 0 findings after
+      adding `--no-install-recommends` to clear the one DL3015 info-level note.
+- [x] [AI] Create `apps/baseerah-be/scripts/run-e2e.sh`: bring up the compose stack, poll
       `GET /api/v1/health` until it returns 200 or a bounded timeout elapses, then run
       `npx bddgen && npx playwright test` in `apps/baseerah-be-e2e`, and tear the stack down on exit
       via a `trap` — acceptance: `shellcheck --severity=warning apps/baseerah-be/scripts/run-e2e.sh`
-      exits 0.
-- [ ] [AI] Scaffold `apps/baseerah-be-e2e/` with `package.json` (private, devDeps `@playwright/test`
+      exits 0. **Done**: confirmed 0 findings.
+- [x] [AI] Scaffold `apps/baseerah-be-e2e/` with `package.json` (private, devDeps `@playwright/test`
       1.60.0 and `playwright-bdd` 8.5.1, `volta.extends` pointing at the root), `tsconfig.json`,
       `.gitignore`, `README.md`, and `e2e-coverage-baseline.json` with an empty `allowedUnbound`
-      array — acceptance: `npm install` exits 0.
-- [ ] [AI] Create `apps/baseerah-be-e2e/playwright.config.ts` with
+      array — acceptance: `npm install` exits 0. **Done**: all six files created; `npm install`
+      confirmed exits 0.
+- [x] [AI] Create `apps/baseerah-be-e2e/playwright.config.ts` with
       `defineBddConfig({ featuresRoot: "../../specs/apps/baseerah/behavior/baseerah-be/gherkin", features: ".../**/*.feature", steps: ["./steps/**/*.ts"] })`,
       `fullyParallel: false`, `workers: 1`, and
       `baseURL: process.env.API_BASE_URL || "http://localhost:19320"` — acceptance:
-      `npx tsc --noEmit -p apps/baseerah-be-e2e/tsconfig.json` exits 0.
-- [ ] [AI] Implement `apps/baseerah-be-e2e/steps/health.steps.ts` binding "The service reports
-      liveness" — acceptance: `npx nx run baseerah-be-e2e:test:e2e` runs that scenario green.
-- [ ] [AI] Implement `apps/baseerah-be-e2e/steps/greeting.steps.ts` binding "The service returns a
+      `npx tsc --noEmit -p apps/baseerah-be-e2e/tsconfig.json` exits 0. **Done**: confirmed. No `tags`
+      filter applied (unlike `ose-be-e2e`'s `not @unit and not @integration`) — baseerah's design
+      intent is that the same three scenarios are exercised at both unit and e2e level, not
+      partitioned by level, so every scenario in both feature files runs here.
+- [x] [AI] Implement `apps/baseerah-be-e2e/steps/health.steps.ts` binding "The service reports
+      liveness" — acceptance: `npx nx run baseerah-be-e2e:test:e2e` runs that scenario green. **Done**:
+      confirmed green against the real Docker stack via `run-e2e.sh`.
+- [x] [AI] Implement `apps/baseerah-be-e2e/steps/greeting.steps.ts` binding "The service returns a
       greeting" and "An unknown route is refused" — acceptance:
-      `npx nx run baseerah-be-e2e:test:e2e` runs all three scenarios green.
-- [ ] [AI] Create `apps/baseerah-be-e2e/project.json` with `install`, `typecheck`, `lint`
+      `npx nx run baseerah-be-e2e:test:e2e` runs all three scenarios green. **Done**: `3 passed`
+      confirmed against the real Docker stack.
+- [x] [AI] Create `apps/baseerah-be-e2e/project.json` with `install`, `typecheck`, `lint`
       (`npx oxlint@latest .`), echoes for `test:unit` / `test:coverage` / `test:integration`,
       `test:quick`, `test:e2e` (delegating to `apps/baseerah-be/scripts/run-e2e.sh`), `test:e2e:ui`,
       `test:e2e:report`, `specs:behavior:coverage`, `specs:e2e:coverage`,
       `specs:structure-validation`, `test:specs`, `deps:audit`, `compat:min-version`; tags
       `["type:e2e","platform:playwright","lang:ts","domain:baseerah"]`; `implicitDependencies:
 ["baseerah-be"]` — acceptance: `npx nx show project baseerah-be-e2e --json` lists all of them.
-- [ ] [AI] Register in `repo-config.yml`: `coverage.projects` entry for `baseerah-be-e2e` with
-      `levels: [e2e]` — acceptance: `npm run validate:config` exits 0.
-- [ ] [AI] Verify every backend scenario is bound: run
+      **Done**: modelled on the recovered `ose-be-e2e/project.json` (the current modern-target-contract
+      precedent, not the older `organiclever-be-e2e` which predated this contract and still referenced
+      a deleted Java `organiclever-be-jasb` sibling); all targets confirmed present.
+- [x] [AI] Register in `repo-config.yml`: `coverage.projects` entry for `baseerah-be-e2e` with
+      `levels: [e2e]` — acceptance: `npm run validate:config` exits 0. **Done**: confirmed.
+- [x] [AI] Verify every backend scenario is bound: run
       `npx nx run baseerah-be-e2e:specs:e2e:coverage` — acceptance: exits 0 with no unbound scenario
-      outside the empty baseline.
+      outside the empty baseline. **Done**: "E2E COVERAGE GAP DETECTOR PASSED: 0 new unbound
+      scenario(s) beyond baseline".
 
 ### CI callers — the OSE pattern, applied to Baseerah
 
@@ -1978,20 +2001,26 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
 > The workflows land wired but dormant: their trigger branches do not exist yet, and creating them
 > belongs to a deploy plan, not this one.
 
-- [ ] [AI] Create `.github/workflows/baseerah-be-build-deploy-stag.yml` calling
+- [x] [AI] Create `.github/workflows/baseerah-be-build-deploy-stag.yml` calling
       `./.github/workflows/_reusable-be-build-deploy.yml` with `be-project: baseerah-be` and
       `image-name: ghcr.io/wahidyankf/baseerah-be`, triggered by `push` to `stag-baseerah-be`.
       Recover the exact caller shape with
       `git show "$(git log --diff-filter=D --format=%H -- .github/workflows/ose-be-build-deploy-stag.yml | head -1)~1":.github/workflows/ose-be-build-deploy-stag.yml`
       — acceptance: `actionlint .github/workflows/baseerah-be-build-deploy-stag.yml` exits 0 and the
-      file is under 25 lines, matching the thin-caller pattern.
-- [ ] [AI] Re-populate `.github/workflows/publish-images.yml`: add the `build-baseerah-be` output,
+      file is under 25 lines, matching the thin-caller pattern. **Done**: 20 lines, `actionlint`
+      exits 0.
+- [x] [AI] Re-populate `.github/workflows/publish-images.yml`: add the `build-baseerah-be` output,
       its `case` arm in the `detect` job, and the `publish-baseerah-be` job, following the structure
       Phase 1 left intact — acceptance: `actionlint .github/workflows/publish-images.yml` exits 0 and
       `rg -n 'baseerah-be' .github/workflows/publish-images.yml` returns at least three matches.
-- [ ] [AI] Confirm the reusable templates are now genuinely called: run
+      **Done**: modelled on the recovered pre-reset `publish-images.yml` (`organiclever-be`/`ose-be`
+      arms); 12 matches, `actionlint` exits 0. Omitted the `organiclever-be` caller's "Generate OpenAPI
+      contract types" step — baseerah-be's Dockerfile deliberately doesn't consume generated contract
+      types (Phase 6 decision), so there is nothing for that step to generate.
+- [x] [AI] Confirm the reusable templates are now genuinely called: run
       `rg -n 'uses:\s*\./\.github/workflows/_reusable' .github/workflows/` — acceptance: at least one
-      match, resolving the Phase 1 note that they were temporarily uncalled.
+      match, resolving the Phase 1 note that they were temporarily uncalled. **Done**: 1 match, in
+      `baseerah-be-build-deploy-stag.yml`.
 - [ ] [AI] Commit: `git add -A && git commit -m "feat(baseerah-be-e2e): add the backend E2E suite, local Docker stack, and CI callers"`
       — acceptance: the pre-commit gate passes.
 - [ ] [AI] Push: `git push origin main` — acceptance: exits 0.

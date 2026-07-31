@@ -18,6 +18,8 @@
     "affected:build": "nx affected -t build",
     "affected:test": "nx affected -t test:quick",
     "affected:lint": "nx affected -t lint",
+    "baseerah:dev": "docker compose -f infra/dev/baseerah-app/docker-compose.yml up --build",
+    "baseerah:dev:restart": "docker compose -f infra/dev/baseerah-app/docker-compose.yml down -v && docker compose -f infra/dev/baseerah-app/docker-compose.yml up --build",
     "graph": "nx graph",
     "nx": "nx",
     "prepare": "husky",

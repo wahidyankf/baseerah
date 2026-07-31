@@ -1,0 +1,10 @@
+services:
+  baseerah-be:
+    environment:
+      BASEERAH_BE_PORT: "19320"
+      BASEERAH_BE_CORS_ORIGINS: "*"
+
+  # baseerah-fe: commented out until Phase 8 creates apps/baseerah-fe/.
+  # baseerah-fe:
+  #   environment:
+  #     BASEERAH_FE_API_BASE_URL: "http://baseerah-be:19320"

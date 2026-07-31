@@ -64,6 +64,24 @@ concurrent-clone setup (`ose-public`/`ose-primer`/`ose-private`/`baseerah` all u
 artifacts under `libs/*/tests/**/coverage.json` (and any sibling `.NET` coverage output), or fixing
 the coverage generator to emit relative paths.
 
+### `infra/dev/organiclever-app/Dockerfile.be.dev` was stale, not just `ose-app`
+
+**Noticed**: Phase 7, recovering `infra/dev/organiclever-app/` as the model for
+`infra/dev/baseerah-app/`
+**Learning**: delivery.md's guidance to model on `organiclever-app` rather than the known-stale
+`ose-app` assumed `organiclever-app`'s own files were current. They were not: at its deletion
+commit, `organiclever-be` was already F# (Giraffe/.NET 10, confirmed via its `.fsproj`/`Program.fs`),
+but `infra/dev/organiclever-app/Dockerfile.be.dev` still read `FROM rust:1.95-slim` with a
+`cargo run` entrypoint — a leftover from before that backend's language migration that nobody
+updated. Copied the compose/dev-container _structure_ (bind-mount + healthcheck + long
+`start_period` for a cold in-container build) but rewrote `Dockerfile.be.dev` from
+`mcr.microsoft.com/dotnet/sdk:10.0` + `dotnet watch run`, matching baseerah-be's actual stack, and
+left `baseerah-fe`'s service commented out in both compose files until Phase 8 creates
+`apps/baseerah-fe/` (so `docker compose config`/`up -d` don't reference a nonexistent Dockerfile).
+**Candidate home**: discard — narrated for auditability, but no durable home is warranted; the fix
+is already in `infra/dev/baseerah-app/Dockerfile.be.dev` itself, and there's no reusable convention
+to extract from "an old infra artifact for an app that changed language was never updated."
+
 <!--
 Append new entries below this line as you work. Do not delete the two seeded entries — they were
 identified during planning and are already carrying a routing obligation into Phase 11.

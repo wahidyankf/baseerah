@@ -77,6 +77,10 @@ coverage:
       levels: [unit, integration]
       specs: "specs/apps/baseerah/behavior/baseerah-be/**"
 
+    - name: baseerah-be-e2e
+      levels: [e2e]
+      specs: "specs/apps/baseerah/behavior/baseerah-be/**"
+
     # Deliberately excluded, not omitted by oversight: baseerah-contracts's test-level
     # targets (test:unit/test:integration/test:e2e) are documented no-ops ("target not
     # applicable for this project"). Its real quality gate is lint (redocly) and bundle,
