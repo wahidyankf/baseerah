@@ -27,6 +27,7 @@
         "command": "next build",
         "cwd": "{projectRoot}"
       },
+      "dependsOn": ["codegen"],
       "outputs": ["{projectRoot}/.next"]
     },
     "start": {
@@ -41,7 +42,8 @@
       "options": {
         "command": "tsc --noEmit",
         "cwd": "{projectRoot}"
-      }
+      },
+      "dependsOn": ["codegen"]
     },
     "lint": {
       "executor": "nx:run-commands",
@@ -54,6 +56,7 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "cache": true,
+      "dependsOn": ["codegen"],
       "inputs": ["default", "{projectRoot}/src/generated-contracts/**/*"],
       "options": {
         "command": "if grep -rn -E --include='*.ts' --include='*.tsx' --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=dist --exclude-dir=coverage '\\b(it|test|describe)\\.(skip|only|todo)\\(' .; then echo 'ERROR: .skip()/.only()/.todo() found in test files above - remove before merging'; exit 1; fi && npx vitest run",
@@ -66,6 +69,7 @@
         "command": "npx vitest run --coverage",
         "cwd": "{projectRoot}"
       },
+      "dependsOn": ["codegen"],
       "cache": true,
       "outputs": ["{projectRoot}/coverage"],
       "inputs": ["{projectRoot}/src/**/*"]
