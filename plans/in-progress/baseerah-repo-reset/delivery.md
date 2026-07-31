@@ -2204,22 +2204,40 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
       excluding the module from coverage, since it is real logic, not composition-root boilerplate.
 - [x] [AI] Commit: `git add -A && git commit -m "feat(baseerah-fe): add the Next.js hello-world frontend"`
       — acceptance: the pre-commit gate passes.
-- [x] [AI] Push: `git push origin main` — acceptance: exits 0.
+- [x] [AI] Push: `git push origin main` — acceptance: exits 0. **Done**: first attempt was blocked by
+      the pre-push gate — `baseerah-be:lint` failed with `Package FSharp.Core, version 10.1.302 was
+not found`, a stale local NuGet restore (cache held `10.1.300`) unrelated to this phase's
+      changes. Root-caused via `dotnet restore apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj`,
+      re-ran `baseerah-be:lint` clean, then pushed `e9003ffb5..9e403b037`.
 
 ### Phase 8 Gate
 
 > All checks below must pass before starting Phase 9.
 
-- [ ] [AI] `npx nx run baseerah-fe:test:quick` — exits 0.
-- [ ] [AI] `npx nx run baseerah-fe:build` — exits 0.
-- [ ] [AI] Manual behavioural verification with Playwright MCP against `http://localhost:19310` —
+- [x] [AI] `npx nx run baseerah-fe:test:quick` — exits 0. **Done**: typecheck/lint/test:unit/
+      test:coverage (100% lines/branches/functions/statements)/test:specs all green.
+- [x] [AI] `npx nx run baseerah-fe:build` — exits 0. **Done**: `next build` (Turbopack) compiles,
+      typechecks, and prerenders `/_not-found` clean; `/` is server-rendered on demand as designed.
+- [x] [AI] Manual behavioural verification with Playwright MCP against `http://localhost:19310` —
       acceptance: the page shows the heading `Baseerah` and the text `Hello from Baseerah`, and the
       greeting disappears when `baseerah-be` is stopped, proving it is fetched rather than hardcoded.
       Save one screenshot per breakpoint into `evidence/phase-8-landing-1280.png`,
-      `evidence/phase-8-landing-768.png`, and `evidence/phase-8-landing-390.png`.
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` — exits 0; the `prd.md` mockup embeds resolve.
-- [ ] [AI] `npm run validate:config` — exits 0.
-- [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
+      `evidence/phase-8-landing-768.png`, and `evidence/phase-8-landing-390.png`. **Done**: snapshot
+      at 1280×800 confirmed heading, greeting, بصيرة chip, and all four landmarks
+      (banner/main/contentinfo + the RTL chip); screenshots saved at all three breakpoints. Found and
+      fixed a real bug in the process: `docker ps` showed `baseerah-fe` as `(unhealthy)` — the
+      `HEALTHCHECK`'s `wget http://localhost:19310/` resolves `localhost` to `::1` first inside
+      Alpine, but Next's server only binds IPv4 (`0.0.0.0`), so every health probe got
+      `Connection refused` even though the app served real traffic on `127.0.0.1`/the published port.
+      Fixed by changing the `HEALTHCHECK` to hit `http://127.0.0.1:19310/` explicitly (`apps/baseerah-fe/Dockerfile`);
+      rebuilt and confirmed `docker ps` now reports `(healthy)`. Then stopped
+      `baseerah-app-baseerah-be-1` and reloaded — the page returned HTTP 500 (dynamic render failing
+      without a backend) instead of a hardcoded greeting, proving the fetch is live; restarted
+      `baseerah-be` and confirmed `Hello from Baseerah` returns once it's healthy again.
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` — exits 0; the `prd.md` mockup embeds resolve. **Done**: "All links valid! No broken links found."
+- [x] [AI] `npm run validate:config` — exits 0. **Done**: "VALIDATION PASSED" (61/61 checks).
+- [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. **Done**: all 8 projects
+      green (24/26 tasks cache-hit, `baseerah-be:lint` and one other re-ran live and passed).
 - [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
 
 > **Pause Safety**: the full stack runs locally — `baseerah-fe` on 19310 fetching its greeting from

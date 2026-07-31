@@ -48,6 +48,6 @@ USER app
 EXPOSE 19310
 ENV PORT=19310 HOSTNAME="0.0.0.0" NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:19310/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:19310/ || exit 1
 
 CMD ["node", "server.js"]
