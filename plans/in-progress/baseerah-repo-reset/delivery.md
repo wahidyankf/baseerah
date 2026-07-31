@@ -1225,8 +1225,14 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
       the only alternative (a full regen) breaks CI's cross-platform native bindings, which is a far
       worse outcome than 14 cosmetic stale strings. Verified locally via
       `npx nx run web-ui-token:test:unit --skip-nx-cache` (6/6 passed) before re-pushing.
-- [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — `conclusion` is `success` and every
+- [x] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — `conclusion` is `success` and every
       `jobs[].conclusion` is `success` or `skipped`.
+      **Done**: first push (commit `939d12ce3`) went CI-red — `pr-quality-gate` failed with
+      `web-ui-token:test:unit` unable to resolve `@rolldown/binding-linux-x64-gnu` (the npm
+      optional-deps regression documented above). Root-caused, fixed, and pushed as commit
+      `2658b4943`. Polled `gh run list --branch main` for that commit's 3 workflows
+      (`pr-quality-gate`, `publish-images`, `validate-env`) — all three `status: completed`,
+      `conclusion: success`. Phase 3 Gate is green.
 
 > **Pause Safety**: the repository is now a clean engineering harness — `rhino-cli`, its libs, the
 > generic agent fleet, and `repo-governance/` with its principles layer verified identical to
