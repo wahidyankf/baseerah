@@ -18,10 +18,10 @@ Git hooks, GitHub Actions workflows, Nx build system, and development workflow f
 > revisions of this document (`ayokoding-www-test-local-deploy-prod.yml`,
 > `ose-www-test-local-deploy-prod.yml`, `wahidyankf-www-test-local-deploy-prod.yml`,
 > `organiclever-app-test-local-deploy-stag.yml`, `organiclever-app-test-stag.yml`,
-> `web-ui-build-deploy-prod.yml`) were deleted along with their apps. `rhino-cli` is the sole
-> surviving app; `baseerah-fe` and `baseerah-be` are planned but not yet scaffolded. See
-> [applications.md](./applications.md) and the
-> [baseerah-repo-reset plan](../../../plans/in-progress/baseerah-repo-reset/README.md).
+> `web-ui-build-deploy-prod.yml`) were deleted along with their apps, then `baseerah-fe` and
+> `baseerah-be` were scaffolded along with CI callers that are wired but dormant (no `prod-*`/
+> `stag-*` branch exists yet to trigger them). See [applications.md](./applications.md) and the
+> [baseerah-repo-reset plan](../../../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
 ## CI/CD Pipeline Overview
 

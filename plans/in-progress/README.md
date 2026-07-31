@@ -4,12 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [baseerah-repo-reset](./baseerah-repo-reset/README.md) — Strips this `ose-public` clone down to
-  `rhino-cli` and the engineering harness, then stands up Baseerah — a personal-assistant product
-  within the OSE ecosystem — as `baseerah-be` (:19320), `baseerah-be-e2e`, `baseerah-fe` (:19310),
-  and `baseerah-fe-e2e`. Deleted the other two plans that were previously in this folder
-  (`ayokoding-learning-path-04-course-authoring`, `vercel-function-cost-reduction`) along with the
-  apps they targeted.
+None currently — `baseerah-repo-reset` completed and archived to
+[`../done/2026-07-31__baseerah-repo-reset/`](../done/2026-07-31__baseerah-repo-reset/README.md).
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.

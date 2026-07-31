@@ -9,7 +9,7 @@ Behavioral scenarios for the `baseerah-be` F#/Giraffe REST API, organized by dom
 - [hello/greeting.feature](./hello/greeting.feature) — greeting + unknown-route handling
   (2 scenarios)
 
-Copied verbatim from [prd.md US-4](../../../../../../plans/in-progress/baseerah-repo-reset/prd.md#us-4--serve-hello-world-from-baseerah-be).
+Copied verbatim from [prd.md US-4](../../../../../../plans/done/2026-07-31__baseerah-repo-reset/prd.md#us-4--serve-hello-world-from-baseerah-be).
 
 ## Related
 

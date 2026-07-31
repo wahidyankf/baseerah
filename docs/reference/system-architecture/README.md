@@ -15,11 +15,10 @@ created: 2025-11-29
 
 Comprehensive reference for the Baseerah platform architecture, including application inventory, interactions, deployment infrastructure, and CI/CD pipelines.
 
-> **2026 Baseerah repo reset**: every prior application except `rhino-cli` was deleted. `rhino-cli`
-> is the sole surviving app; `baseerah-fe` and `baseerah-be` are planned but not yet scaffolded.
-> The diagrams below describe the current, much smaller system plus the planned Baseerah product
-> stack. See [applications.md](./applications.md) and the
-> [baseerah-repo-reset plan](../../../plans/in-progress/baseerah-repo-reset/README.md).
+> **2026 Baseerah repo reset**: every prior application except `rhino-cli` was deleted, then
+> `baseerah-fe` and `baseerah-be` were scaffolded as the Baseerah product's hello-world skeleton.
+> The diagrams below describe that current system. See [applications.md](./applications.md) and the
+> [baseerah-repo-reset plan](../../../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
 ## System Overview
 

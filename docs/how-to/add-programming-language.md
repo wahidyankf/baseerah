@@ -15,7 +15,7 @@ created: 2025-12-18
 
 > **Historical note**: `ayokoding-www` — the app this guide targets — was removed from this
 > repository in the Baseerah repo-reset (this repo no longer serves AyoKoding's educational
-> content; see [tech-docs Decision 12](../../plans/in-progress/baseerah-repo-reset/tech-docs.md)).
+> content; see [tech-docs Decision 12](../../plans/done/2026-07-31__baseerah-repo-reset/tech-docs.md)).
 > None of the steps below are actionable here — the `ayokoding-web-*` agents they reference no
 > longer exist in `.claude/agents/`, and `apps/ayokoding-www/` no longer exists in this repo. The
 > AyoKoding site and its source continue to live in the sibling `ose-public` repository. This guide

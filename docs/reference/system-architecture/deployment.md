@@ -15,11 +15,13 @@ Deployment architecture, environment branches, and Vercel configuration for the 
 
 > **2026 Baseerah repo reset**: every deployed web app and its environment branches/workflows
 > (`ose-www`, `ayokoding-www`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`,
-> `wahidyankf-www`, `ose-be`) were deleted. `rhino-cli` (the sole surviving app) is a CLI tool
-> distributed as a local binary, not deployed via Vercel. `baseerah-fe` and `baseerah-be` are
-> planned but not yet scaffolded, so no deployment pipeline exists for them yet. See
+> `wahidyankf-www`, `ose-be`) were deleted. `rhino-cli` is a CLI tool distributed as a local binary,
+> not deployed via Vercel. `baseerah-fe` and `baseerah-be` are now scaffolded, and their deployer
+> agents and CI caller workflows exist, but no deploy target is provisioned yet (no `prod-baseerah-fe`
+> Vercel project, no `stag-baseerah-be` consumer) — see
+> [baseerah-first-deploy](../../../plans/ideas/baseerah-first-deploy.md). See
 > [applications.md](./applications.md) and the
-> [baseerah-repo-reset plan](../../../plans/in-progress/baseerah-repo-reset/README.md).
+> [baseerah-repo-reset plan](../../../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
 ## Deployment Diagram
 

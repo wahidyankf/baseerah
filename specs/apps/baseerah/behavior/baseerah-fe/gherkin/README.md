@@ -7,7 +7,7 @@ Behavioral scenarios for the `baseerah-fe` Next.js landing page, organized by do
 - [hello/landing-page.feature](./hello/landing-page.feature) — product name + greeting content,
   and a baseline accessibility scan (2 scenarios)
 
-Copied verbatim from [prd.md US-5](../../../../../../plans/in-progress/baseerah-repo-reset/prd.md#us-5--render-hello-world-in-baseerah-fe).
+Copied verbatim from [prd.md US-5](../../../../../../plans/done/2026-07-31__baseerah-repo-reset/prd.md#us-5--render-hello-world-in-baseerah-fe).
 
 ## Related
 

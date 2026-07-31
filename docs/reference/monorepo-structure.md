@@ -78,15 +78,13 @@ Flat structure - all apps at the same level, no subdirectories.
 
 `[domain]-[type]`
 
-**Current Apps** (as of the 2026 Baseerah repo reset, the sole surviving app):
+**Current Apps** (as of the 2026 Baseerah repo reset, see
+[baseerah-repo-reset plan](../../plans/done/2026-07-31__baseerah-repo-reset/README.md)):
 
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23 (predecessor Go source recoverable from git history).
-
-**Planned Apps** (not yet scaffolded — see [related plan](../../plans/in-progress/baseerah-repo-reset/README.md)):
-
-- `baseerah-fe` - Baseerah frontend (Next.js 16 App Router, planned port 19310)
+- `baseerah-fe` - Baseerah frontend (Next.js 16 App Router, port 19310)
 - `baseerah-fe-e2e` - Playwright FE E2E tests for baseerah-fe
-- `baseerah-be` - Baseerah backend (likely F#/Giraffe/ASP.NET REST API, planned port 19320; framework TBD pending backend tech-stack decision)
+- `baseerah-be` - Baseerah backend (F#/Giraffe/ASP.NET REST API, port 19320)
 - `baseerah-be-e2e` - E2E tests for baseerah-be
 
 Every other app previously listed here (`ose-www`, `ose-be`, `ayokoding-www`, `ayokoding-cli`, `ose-cli`, `crane-cli`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`, `wahidyankf-www`, and their `-e2e` counterparts) was deleted by the Baseerah repo reset. The structural examples below use generic `apps/<app-name>/` placeholders except where `rhino-cli` illustrates a real, currently-scaffolded app.
@@ -530,10 +528,10 @@ Configured in `tsconfig.base.json`:
 
 ## Port Allocation
 
-| App                                 | Port    | Status                       |
-| ----------------------------------- | ------- | ---------------------------- |
-| `baseerah-fe` (Next.js 16 frontend) | `19310` | Planned — not yet scaffolded |
-| `baseerah-be` (F#/Giraffe backend)  | `19320` | Planned — not yet scaffolded |
+| App                                 | Port    | Status  |
+| ----------------------------------- | ------- | ------- |
+| `baseerah-fe` (Next.js 16 frontend) | `19310` | Current |
+| `baseerah-be` (F#/Giraffe backend)  | `19320` | Current |
 
 **Rule**: Baseerah deliberately allocates outside every port band the sibling repos occupy, since all
 four repos (`ose-public`, `ose-primer`, `ose-private`, and this repo) can run concurrently on one
@@ -549,7 +547,7 @@ development machine:
 
 `19310`/`19320` were verified free across all three sibling repos
 (`rg -n '19310|19320'` across `ose-public`, `ose-primer`, and `ose-private` returns no matches) before
-being adopted. See [tech-docs Decision 5](../../plans/in-progress/baseerah-repo-reset/tech-docs.md#decision-5--f--giraffe-backend-on-19320-nextjs-16-frontend-on-19310)
+being adopted. See [tech-docs Decision 5](../../plans/done/2026-07-31__baseerah-repo-reset/tech-docs.md#decision-5--f--giraffe-backend-on-19320-nextjs-16-frontend-on-19310)
 for the full rationale.
 
 ## Build Outputs

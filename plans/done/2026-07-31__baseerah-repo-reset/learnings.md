@@ -110,3 +110,22 @@ troubleshooting note under `repo-governance/development/quality/` or `docs/refer
 Append new entries below this line as you work. Do not delete the two seeded entries — they were
 identified during planning and are already carrying a routing obligation into Phase 11.
 -->
+
+## Phase 11 Triage Table
+
+| #   | Entry                                                                             | Routed to                                                                                    | Notes                                                                                                                                                                                                                                                                    |
+| --- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Coverage thresholds disagree across three sources                                 | Confirmed landed                                                                             | `repo-governance/development/infra/nx-targets.md` (`test:coverage` row + guidance line) and `docs/reference/code-coverage.md` (lines 39/45-50) both now state 90% line for new projects, per tech-docs.md Decision 11. No further action needed.                         |
+| 2   | There is no port registry, only prose                                             | `plans/backlog/cross-repo-port-registry/`                                                    | New backlog plan filed (README/brd/prd/tech-docs/delivery/learnings), proposing a shared, machine-checkable port registry across `ose-public`/`ose-primer`/`ose-private`/`baseerah`.                                                                                     |
+| 3   | Tracked coverage artifact bakes in checkout-local absolute paths                  | `plans/backlog/coverage-artifact-relative-paths/`                                            | New backlog plan filed, proposing gitignoring generated coverage artifacts or fixing the generator to emit relative paths.                                                                                                                                               |
+| 4   | `infra/dev/organiclever-app/Dockerfile.be.dev` was stale                          | Discard                                                                                      | Already decided at the time the entry was written: the fix landed inline in `infra/dev/baseerah-app/Dockerfile.be.dev` itself; no reusable convention to extract from a one-off stale infra artifact for an app whose language migrated. Narrated for auditability only. |
+| 5   | A stale NuGet HTTP cache, not just a stale `obj/`, can starve `dotnet fsharplint` | `docs/explanation/software-engineering/programming-languages/f-sharp/build-configuration.md` | Added a new "Troubleshooting: Stale NuGet HTTP Cache Breaks `fsharplint`" section (before `## Enforcement`) documenting the design-time-build vs. plain-build distinction and the `dotnet nuget locals http-cache --clear` fix.                                          |
+
+**Secret/sensitivity gate**: all 5 entries reviewed — none reference credentials, tokens, internal
+hostnames, or personal data. All are safe for their routed destinations (2 public backlog plans, 1
+public docs page, 1 discard, 1 confirmed-already-public governance doc).
+
+**Repo-relevance gate**: all 5 entries concern tooling/process/governance generalizable beyond this
+plan's specific deletion-and-rebuild scope (coverage thresholds, port allocation, coverage-artifact
+hygiene, infra staleness, and F# toolchain flakiness) — none are `baseerah-repo-reset`-specific
+implementation details that would be meaningless outside this plan.

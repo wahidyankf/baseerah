@@ -20,11 +20,11 @@ Run `nx graph` to visualize this interactively.
 > [ose-primer](https://github.com/wahidyankf/ose-primer) on 2026-04-18. That repository is the
 > authoritative reference for polyglot showcase dependency patterns.
 >
-> **2026 Baseerah repo reset**: every app except `rhino-cli` was deleted (see
-> [monorepo-structure.md](./monorepo-structure.md)). The diagrams and tables below reflect the
-> current, much smaller dependency graph, followed by the graph the [`baseerah-repo-reset`
-> plan](../../plans/in-progress/baseerah-repo-reset/README.md) expects once `baseerah-fe` and
-> `baseerah-be` are scaffolded.
+> **2026 Baseerah repo reset**: every app except `rhino-cli` was deleted, then the
+> [`baseerah-repo-reset` plan](../../plans/done/2026-07-31__baseerah-repo-reset/README.md) stood up
+> `baseerah-be`, `baseerah-fe`, and their E2E suites (see
+> [monorepo-structure.md](./monorepo-structure.md)). The diagrams and tables below reflect that
+> current dependency graph.
 
 ## Dependency Mechanisms
 
@@ -62,73 +62,53 @@ invalidated and `nx affected` flags the project.
 
 ```mermaid
 graph TD
-  %% Current app
+  %% E2E tests (top level)
+  FEE2E[baseerah-fe-e2e]
+  BEE2E[baseerah-be-e2e]
+
+  %% Apps
+  FE[baseerah-fe]
+  BE[baseerah-be]
   RC[rhino-cli]
 
-  %% Current libs
+  %% Contracts project
+  BC[baseerah-contracts]
+
+  %% Libs
   RSC[rust-commons]
   WUI[web-ui]
   WUT[web-ui-token]
 
   %% Edges
+  FEE2E --> FE
+  FEE2E --> BE
+  BEE2E --> BE
+  FE --> WUI
+  FE --> WUT
+  FE --> BC
+  BE --> BC
+  BE --> RC
   WUI --> WUT
 
   classDef lib fill:#029E73,stroke:#016B4E,color:#FFFFFF
   classDef cli fill:#DE8F05,stroke:#A56A04,color:#FFFFFF
+  classDef app fill:#0173B2,stroke:#025580,color:#FFFFFF
 
   class RSC,WUI,WUT lib
   class RC cli
+  class FE,BE,BC,FEE2E,BEE2E app
 ```
 
-`rhino-cli` and `rust-commons` currently have no dependency edges to other projects — their
-former consumers (`ayokoding-cli`, `ose-cli`, and the deleted content sites) were removed by the
-Baseerah repo reset.
-
-**Planned Baseerah product stack** (not yet scaffolded — per
-[tech-docs.md § Dependencies](../../plans/in-progress/baseerah-repo-reset/tech-docs.md)):
-
-```mermaid
-graph TD
-  %% Planned E2E tests (top level)
-  FEE2E[baseerah-fe-e2e]
-  BEE2E[baseerah-be-e2e]
-
-  %% Planned apps
-  FE[baseerah-fe]
-  BE[baseerah-be]
-
-  %% Planned contracts project
-  BC[baseerah-contracts]
-
-  %% Existing shared projects the planned apps are expected to use
-  WUI[web-ui]
-  WUT[web-ui-token]
-  RC[rhino-cli]
-
-  %% Edges
-  FEE2E -.-> FE
-  BEE2E -.-> BE
-  FE -.-> WUI
-  FE -.-> WUT
-  FE -.-> BC
-  BE -.-> BC
-  FE -.-> RC
-  BE -.-> RC
-
-  classDef planned fill:#CA9161,stroke:#977048,color:#FFFFFF
-  classDef current fill:#029E73,stroke:#016B4E,color:#FFFFFF
-  classDef cli fill:#DE8F05,stroke:#A56A04,color:#FFFFFF
-
-  class FE,BE,BC,FEE2E,BEE2E planned
-  class WUI,WUT current
-  class RC cli
-```
+`rust-commons` currently has no dependency edges to other projects — its former consumers
+(`ayokoding-cli`, `ose-cli`) were removed by the Baseerah repo reset. `baseerah-fe` does not
+declare `rhino-cli` as an Nx `implicitDependency` (it invokes `rhino-cli` via a raw `cargo run`
+command in its `specs:*` targets instead); `baseerah-be` does declare it.
 
 **Legend**:
 
-- Green: Libraries (current)
-- Orange: CLI tools (current)
-- Brown, dashed edges: Planned Baseerah projects (not yet scaffolded)
+- Green: Libraries
+- Orange: CLI tools
+- Blue: Baseerah product apps and E2E suites
 
 ## Shared Infrastructure Projects
 
@@ -139,9 +119,9 @@ graph TD
 Repository management CLI used by most projects for spec coverage (`rhino-cli specs coverage`)
 and other validation tasks.
 
-- **Dependents**: None currently — every prior consumer app was deleted by the 2026 Baseerah
-  repo reset. Once scaffolded, `baseerah-fe` and `baseerah-be` are each expected to declare
-  `rhino-cli` as an `implicitDependency` for spec validation.
+- **Dependents**: `baseerah-be` (declares `rhino-cli` as an `implicitDependency` for spec
+  validation). `baseerah-fe` invokes `rhino-cli` via a raw `cargo run` command in its `specs:*`
+  targets instead of declaring it as an `implicitDependency`.
 - **Mechanism**: `implicitDependencies`
 - **Own dependency**: None (self-contained Rust application with only Rust crate dependencies)
 - **Note**: rhino-cli was ported from Go to Rust (2026-05-23).
@@ -163,30 +143,23 @@ Both consumer CLIs were later deleted by the 2026 Baseerah repo reset.
 
 Shared React component library (`web-ui`) and its design-token package (`web-ui-token`).
 `web-ui` depends on `web-ui-token` via an npm workspace `package.json` dependency.
-No app currently consumes either lib; `baseerah-fe` is the planned consumer once scaffolded.
+`baseerah-fe` is the sole app consumer of both, via `implicitDependencies`.
 
 ## Project Dependency Table
 
-### Current Projects
+| Project            | Dependencies                             | Notes                                         |
+| ------------------ | ---------------------------------------- | --------------------------------------------- |
+| rhino-cli          | (none — self-contained)                  | rhino-cli/\* (test:integration)               |
+| rust-commons       | (none)                                   | rust-commons/\* (test:unit)                   |
+| web-ui             | web-ui-token                             | web-ui/\* (test:unit)                         |
+| web-ui-token       | (none)                                   | web-ui-token/\* (test:unit)                   |
+| baseerah-contracts | (none)                                   | OpenAPI contract source consumed by fe and be |
+| baseerah-be        | baseerah-contracts, rhino-cli            | F#/Giraffe, port 19320                        |
+| baseerah-fe        | web-ui, web-ui-token, baseerah-contracts | Next.js 16 App Router, port 19310             |
+| baseerah-be-e2e    | baseerah-be                              | Playwright                                    |
+| baseerah-fe-e2e    | baseerah-fe, baseerah-be                 | Playwright                                    |
 
-| Project      | Dependencies            | Spec Inputs                     |
-| ------------ | ----------------------- | ------------------------------- |
-| rhino-cli    | (none — self-contained) | rhino-cli/\* (test:integration) |
-| rust-commons | (none)                  | rust-commons/\* (test:unit)     |
-| web-ui       | web-ui-token            | web-ui/\* (test:unit)           |
-| web-ui-token | (none)                  | web-ui-token/\* (test:unit)     |
-
-### Planned Projects (not yet scaffolded)
-
-| Project            | Expected Dependencies                               | Notes                                             |
-| ------------------ | --------------------------------------------------- | ------------------------------------------------- |
-| baseerah-contracts | (none)                                              | OpenAPI contract source consumed by fe and be     |
-| baseerah-be        | baseerah-contracts, rhino-cli                       | Framework TBD pending backend tech-stack decision |
-| baseerah-fe        | web-ui, web-ui-token, baseerah-contracts, rhino-cli | Next.js 16 App Router, planned port 19310         |
-| baseerah-be-e2e    | baseerah-be                                         | Planned                                           |
-| baseerah-fe-e2e    | baseerah-fe                                         | Planned                                           |
-
-See [tech-docs.md § Dependencies](../../plans/in-progress/baseerah-repo-reset/tech-docs.md) for
+See [tech-docs.md § Dependencies](../../plans/done/2026-07-31__baseerah-repo-reset/tech-docs.md) for
 the source of this table. That document also records the resolved verdict (delete) on the
 conditional `libs/fsharp-crane-core` dependency it once considered for `baseerah-be` — the lib
 was `crane-cli`-specific and was deleted alongside `crane-cli`.
@@ -196,12 +169,12 @@ was `crane-cli`-specific and was deleted alongside `crane-cli`.
 All Gherkin specs and API contracts live under `specs/` and are consumed via
 `{workspaceRoot}` inputs.
 
-| Spec Directory                   | Consumed By              | Targets                            |
-| -------------------------------- | ------------------------ | ---------------------------------- |
-| `specs/apps/rhino/`              | rhino-cli                | test:integration                   |
-| `specs/libs/web-ui/`             | web-ui                   | test:unit                          |
-| `specs/libs/web-ui-token/`       | web-ui-token             | test:unit                          |
-| `specs/apps/baseerah/` (planned) | baseerah-fe, baseerah-be | test:integration (once scaffolded) |
+| Spec Directory             | Consumed By              | Targets          |
+| -------------------------- | ------------------------ | ---------------- |
+| `specs/apps/rhino/`        | rhino-cli                | test:integration |
+| `specs/libs/web-ui/`       | web-ui                   | test:unit        |
+| `specs/libs/web-ui-token/` | web-ui-token             | test:unit        |
+| `specs/apps/baseerah/`     | baseerah-fe, baseerah-be | test:specs       |
 
 ## Related Documentation
 

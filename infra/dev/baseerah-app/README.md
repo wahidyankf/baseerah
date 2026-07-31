@@ -31,9 +31,9 @@ from the default compose file (making `BASEERAH_BE_PORT` and `BASEERAH_BE_CORS_O
 
 ## baseerah-fe
 
-The `baseerah-fe` service is commented out in both compose files until Phase 8 creates
-`apps/baseerah-fe/`. See [learnings.md](../../../plans/in-progress/baseerah-repo-reset/learnings.md)
-for the rationale.
+The `baseerah-fe` service is active in both compose files, alongside `baseerah-be`. It was
+commented out until `apps/baseerah-fe/` was scaffolded — see
+[learnings.md](../../../plans/done/2026-07-31__baseerah-repo-reset/learnings.md) for the rationale.
 
 ## Behavior & Architecture
 

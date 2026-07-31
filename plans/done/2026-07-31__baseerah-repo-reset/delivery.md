@@ -3051,7 +3051,7 @@ application/xml`/`text/plain` content negotiation, double-slash, trailing slash,
       `ls .claude/agents/*.md | sed 's|.*/||; s|\.md$||' | grep -vE -- '-(maker|checker|fixer|dev|deployer|manager|tester|researcher)$' | grep -v '^README$'`
       — acceptance: outputs only the known preexisting `api-exploratory-tester` violation. **Done,
       with a discrepancy noted**: this command actually outputs zero violations (`api-exploratory-
-  tester` ends in `-tester`, which the regex already allows — this plan's stated expectation of
+tester` ends in `-tester`, which the regex already allows — this plan's stated expectation of
       a preexisting violation does not match reality, and is not something these 5 new agents
       introduced). The authoritative check —
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness naming validate`
@@ -3066,15 +3066,14 @@ application/xml`/`text/plain` content negotiation, double-slash, trailing slash,
       exit 0. **Done**: `validate:sync` reports 66/66 checks passed; `git status --short` shows only
       the intended new/modified files (no unexpected drift).
 - [x] [AI] Commit: `git add -A && git commit -m "feat(agents): add the Baseerah content and deployer agent fleet"`
-      — acceptance: the pre-commit gate passes. **Done**: see commit hash recorded in the Phase 10
-      Gate section below.
-- [x] [AI] Push: `git push origin main` — acceptance: exits 0. **Done**: see push range recorded
-      below.
+      — acceptance: the pre-commit gate passes. **Done**: committed as `27fce24cd`.
+- [x] [AI] Push: `git push origin main` — acceptance: exits 0. **Done**: pushed `594f771a7..27fce24cd`
+      to `origin main`.
 
 ### Phase 10 Gate
 
 - [x] [AI] The agent-naming enforcement command above — no new violation. **Done**: `harness naming
-  validate` passes with 0 violations.
+validate` passes with 0 violations.
 - [x] [AI] `npm run validate:sync` — exits 0. **Done**.
 - [x] [AI] `npm run harness:bindings-validation` — exits 0. **Done**: ran as
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness bindings validate`,
@@ -3085,7 +3084,8 @@ application/xml`/`text/plain` content negotiation, double-slash, trailing slash,
 - [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. **Done**: exits 0 for all 9
       projects.
 - [x] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
-      **Done**: see CI run IDs recorded below.
+      **Done**: `validate-env` (30641135951), `publish-images` (30641136183), `pr-quality-gate`
+      (30641136243) all `completed`/`success` for the `27fce24cd` push.
 
 > **Pause Safety**: every user story in `prd.md` is now satisfied. The repo has its product, its
 > stack, its tests, and its agent fleet. Safe to stop. To resume: `npm run validate:sync`.

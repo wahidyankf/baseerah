@@ -374,6 +374,28 @@ COPY --from=build /app/publish .
 ENTRYPOINT ["./ZakatService"]
 ```
 
+## Troubleshooting: Stale NuGet HTTP Cache Breaks `fsharplint`
+
+`dotnet fsharplint lint` runs its own Buildalyzer-driven **design-time MSBuild build**
+(`ResolveAssemblyReferencesDesignTime`, `ResolveProjectReferencesDesignTime`, etc.) — a separate
+invocation from the plain `dotnet build` that Nx's `typecheck` target uses. This design-time build can
+fail with `Package FSharp.Core, version X was not found` even when:
+
+- Plain `dotnet build` succeeds on the exact same `obj/`.
+- `obj/project.assets.json` already lists the correct `FSharp.Core` version.
+- A clean `rm -rf obj bin && dotnet restore --force` was just run.
+
+Root cause: a stale entry in the **NuGet HTTP cache**
+(`~/.local/share/NuGet/http-cache`), not the project's own `obj/`. Fix:
+
+```bash
+dotnet nuget locals http-cache --clear
+rm -rf obj bin
+dotnet restore --force --no-cache
+```
+
+Re-run `dotnet fsharplint lint` after clearing the cache — do not assume a fresh `obj/` alone fixes it.
+
 ## Enforcement
 
 - **Nx targets** - All build, test, lint commands run through Nx for monorepo consistency
