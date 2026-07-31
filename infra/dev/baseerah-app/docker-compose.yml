@@ -17,18 +17,16 @@ services:
       # mount); a cold CI build has no NuGet cache, so allow a long warm-up.
       start_period: 600s
 
-  # baseerah-fe: commented out until Phase 8 creates apps/baseerah-fe/ — see
-  # ./learnings.md for the rationale.
-  # baseerah-fe:
-  #   build:
-  #     context: ../../..
-  #     dockerfile: apps/baseerah-fe/Dockerfile
-  #     args:
-  #       BASEERAH_FE_API_BASE_URL: http://baseerah-be:19320
-  #   ports:
-  #     - "19310:19310"
-  #   environment:
-  #     BASEERAH_FE_API_BASE_URL: "http://baseerah-be:19320"
-  #   depends_on:
-  #     baseerah-be:
-  #       condition: service_healthy
+  baseerah-fe:
+    build:
+      context: ../../..
+      dockerfile: apps/baseerah-fe/Dockerfile
+      args:
+        BASEERAH_FE_API_BASE_URL: http://baseerah-be:19320
+    ports:
+      - "19310:19310"
+    environment:
+      BASEERAH_FE_API_BASE_URL: "http://baseerah-be:19320"
+    depends_on:
+      baseerah-be:
+        condition: service_healthy

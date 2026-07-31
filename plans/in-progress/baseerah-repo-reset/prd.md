@@ -353,13 +353,11 @@ finalist instead, authored after Select rather than before it:
 The finalist's high-fidelity mockups are authored into this plan's `assets/` folder as the first
 step of Phase 8, before any component is written, and embedded here:
 
-- `![Baseerah landing page, desktop 1280px](./assets/landing-desktop-1280.png)`
-- `![Baseerah landing page, mobile 390px](./assets/landing-mobile-390.png)`
-- `![Baseerah landing page, tablet 768px](./assets/landing-tablet-768.png)`
+![Baseerah landing page mockup at desktop 1280px width, showing the header with the Baseerah wordmark, the بصيرة (insight · wawasan) chip and "Hello from Baseerah" greeting centered in the main region, and a footer reading "baseerah-fe · connected to :19320"](./assets/landing-desktop-1280.png)
 
-Until Phase 8 authors those files these are deliberately inert code-fenced paths rather than live
-`![]()` embeds, so this document never renders a broken image. Phase 8's first checklist item
-converts them to live embeds in the same commit that adds the assets.
+![Baseerah landing page mockup at tablet 768px width, showing the same header/main/footer shell reflowed to a narrower single column](./assets/landing-tablet-768.png)
+
+![Baseerah landing page mockup at mobile 390px width, showing the بصيرة chip's Arabic text and "insight · wawasan" gloss stacked vertically above the greeting](./assets/landing-mobile-390.png)
 
 ### Select
 

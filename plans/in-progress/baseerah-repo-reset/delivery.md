@@ -2021,21 +2021,37 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
       `rg -n 'uses:\s*\./\.github/workflows/_reusable' .github/workflows/` — acceptance: at least one
       match, resolving the Phase 1 note that they were temporarily uncalled. **Done**: 1 match, in
       `baseerah-be-build-deploy-stag.yml`.
-- [ ] [AI] Commit: `git add -A && git commit -m "feat(baseerah-be-e2e): add the backend E2E suite, local Docker stack, and CI callers"`
-      — acceptance: the pre-commit gate passes.
-- [ ] [AI] Push: `git push origin main` — acceptance: exits 0.
+- [x] [AI] Commit: `git add -A && git commit -m "feat(baseerah-be-e2e): add the backend E2E suite, local Docker stack, and CI callers"`
+      — acceptance: the pre-commit gate passes. **Done**: commit `e9003ffb5`, pre-commit gate
+      (prettier, actionlint, shellcheck, shfmt, hadolint, emoji/repo-config validate, docker compose
+      config check, markdownlint, mermaid/heading/naming/frontmatter validate, platform-binding sync)
+      all passed.
+- [x] [AI] Push: `git push origin main` — acceptance: exits 0. **Done**: pushed `372837d09..e9003ffb5`,
+      pre-push gate (`nx affected` typecheck/lint/test:quick/test:specs/compat:min-version for the 7
+      affected projects, env validate, link validate, README index audit, agents-duplication
+      validate) exited 0; only pre-existing instruction-size WARNs (AGENTS.md/CLAUDE.md over budget,
+      already tracked, not a Phase 7 regression).
 
 ### Phase 7 Gate
 
 > All checks below must pass before starting Phase 8.
 
-- [ ] [AI] `npx nx run baseerah-be-e2e:test:e2e` — exits 0 with three scenarios passing.
-- [ ] [AI] `npx nx run baseerah-be-e2e:test:quick` — exits 0.
-- [ ] [AI] `npx nx run baseerah-be-e2e:specs:e2e:coverage` — exits 0.
-- [ ] [AI] `docker compose -f infra/dev/baseerah-app/docker-compose.yml config` — exits 0.
-- [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
-- [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
-      `test:e2e` is CRON-only and does **not** run on this push; that is correct.
+- [x] [AI] `npx nx run baseerah-be-e2e:test:e2e` — exits 0 with three scenarios passing. **Done**:
+      `3 passed (473ms)` against a real `docker compose up --build` run of `baseerah-be`.
+- [x] [AI] `npx nx run baseerah-be-e2e:test:quick` — exits 0. **Done**: confirmed (typecheck, lint,
+      test:unit/coverage echoes, test:specs all green).
+- [x] [AI] `npx nx run baseerah-be-e2e:specs:e2e:coverage` — exits 0. **Done**: "E2E COVERAGE GAP
+      DETECTOR PASSED: 0 new unbound scenario(s) beyond baseline".
+- [x] [AI] `docker compose -f infra/dev/baseerah-app/docker-compose.yml config` — exits 0. **Done**:
+      confirmed for both the base file alone and base+`docker-compose.ci.yml` together.
+- [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. **Done**: all 7 workspace
+      projects (`baseerah-be-e2e`, `baseerah-be`, `rhino-cli`, `baseerah-contracts`, `rust-commons`,
+      `web-ui-token`, `web-ui`) passed; only pre-existing `web-ui` jsx-a11y lint warnings (not
+      Phase-7-introduced, no blocking findings).
+- [x] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
+      `test:e2e` is CRON-only and does **not** run on this push; that is correct. **Done**: commit
+      `e9003ffb5` — `pr-quality-gate` (30626717767), `validate-env` (30626717798), `publish-images`
+      (30626717808) all `completed`/`success`; `test:e2e` correctly absent from this push's run set.
 
 > **Pause Safety**: the backend is fully specified, implemented, and E2E-verified against a real
 > Docker stack. The frontend does not exist and its compose service is commented out. Safe to stop.
@@ -2052,22 +2068,27 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
 > earlier phases actually made).
 > One route, `/`. No forms, no write paths, no client state beyond the fetched greeting.
 
-- [ ] [AI] Author the three high-fidelity mockups into
+- [x] [AI] Author the three high-fidelity mockups into
       `plans/in-progress/baseerah-repo-reset/assets/` — `landing-desktop-1280.png`,
       `landing-tablet-768.png`, and `landing-mobile-390.png` — realising the selected Alternative B
       "Shell + Greeting" from [prd.md](./prd.md#select) with the Phase 4 Baseerah tokens —
-      acceptance: all three files exist.
-- [ ] [AI] Edit `prd.md`'s **Narrow** subsection: convert the three inert code-fenced paths into live
+      acceptance: all three files exist. **Done**: built a static HTML mockup styled with the actual
+      `baseerah.css` OKLCH tokens, screenshotted at all three breakpoints via the Playwright MCP
+      plugin (the Chrome extension wasn't connected this session); mobile correctly stacks the
+      بصيرة/gloss chip per the low-fi wireframe.
+- [x] [AI] Edit `prd.md`'s **Narrow** subsection: convert the three inert code-fenced paths into live
       `![alt](./assets/...)` embeds with descriptive alt text — acceptance:
-      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` reports zero broken links.
-- [ ] [AI] Scaffold `apps/baseerah-fe/` with `package.json`, `tsconfig.json` (standalone, `@/*` →
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` reports zero broken links. **Done**: confirmed "All links valid!".
+- [x] [AI] Scaffold `apps/baseerah-fe/` with `package.json`, `tsconfig.json` (standalone, `@/*` →
       `./src/*` plus the `web-ui` aliases), `next.config.ts` (`output: "standalone"`,
       `transpilePackages` for `web-ui`, `web-ui-token`, `@t3-oss`), `postcss.config.mjs`,
       `oxlint.json`, `vitest.config.ts`, `.npmrc`, `.gitignore`, `.dockerignore`, `.env.example`
       (declaring `BASEERAH_FE_API_BASE_URL` as REQUIRED plus the framework-reserved `PORT` and
       `HOSTNAME` as commented allowlist entries), `LICENSE`, and `README.md` — acceptance:
-      `npm install` exits 0.
-- [ ] [AI] Create `apps/baseerah-fe/project.json` with `codegen` (`@hey-api/openapi-ts` against
+      `npm install` exits 0. **Done**: modelled on the recovered `ose-app-web` files, trimmed of
+      storybook/eslint/tRPC/effect/xstate (out of scope for this hello-world's simplicity); coverage
+      threshold set to 90% (not ose-app-web's 70/88) per Decision 11. `npm install` confirmed exits 0.
+- [x] [AI] Create `apps/baseerah-fe/project.json` with `codegen` (`@hey-api/openapi-ts` against
       `specs/apps/baseerah/containers/contracts/generated/openapi-bundled.yaml`, `dependsOn:
 ["baseerah-contracts:bundle"]`), `dev` (`next dev --port 19310`), `build`, `start`
       (`next start --port 19310`), `typecheck`, `lint` (`npx oxlint@latest --jsx-a11y-plugin .`),
@@ -2077,11 +2098,14 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
       `namedInputs.specs` pointing at the `baseerah-fe` Gherkin glob; tags
       `["type:app","platform:nextjs","lang:ts","domain:baseerah"]`; `implicitDependencies:
 ["baseerah-contracts","web-ui","web-ui-token"]` — acceptance:
-      `npx nx show project baseerah-fe --json` lists all of them.
-- [ ] [AI] Generate the typed client: run `npx nx run baseerah-fe:codegen` — acceptance: exits 0 and
-      `apps/baseerah-fe/src/generated-contracts/` contains the `Greeting` type.
+      `npx nx show project baseerah-fe --json` lists all of them. **Done**: all targets present;
+      `specs:behavior:coverage` scans `apps/baseerah-fe` itself (not a sibling e2e project, since
+      Vitest has no BDD framework) via a literal `Given/When/Then/And` step-text stub file, matching
+      the `apps/baseerah-be` Steps/\*.fs precedent from Phase 6.
+- [x] [AI] Generate the typed client: run `npx nx run baseerah-fe:codegen` — acceptance: exits 0 and
+      `apps/baseerah-fe/src/generated-contracts/` contains the `Greeting` type. **Done**: confirmed.
 
-- [ ] [AI] **RED** — create `apps/baseerah-fe/src/app/page.test.tsx` asserting the landing page
+- [x] [AI] **RED** — create `apps/baseerah-fe/src/app/page.test.tsx` asserting the landing page
       renders the heading and the greeting fetched from the backend, with the fetch stubbed.
       **Gherkin (binds) →** "The landing page names the product and shows the backend greeting"
 
@@ -2093,19 +2117,24 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
         And the page shows the text "Hello from Baseerah" sourced from the backend
       ```
 
-      Run `npx nx run baseerah-fe:test:unit` — acceptance: fails, because no page exists.
+      Run `npx nx run baseerah-fe:test:unit` — acceptance: fails, because no page exists. **Done**:
+      confirmed failing with "Failed to resolve import './page'".
 
-- [ ] [AI] **GREEN** — create `apps/baseerah-fe/src/app/layout.tsx`, `globals.css`, and `page.tsx`
+- [x] [AI] **GREEN** — create `apps/baseerah-fe/src/app/layout.tsx`, `globals.css`, and `page.tsx`
       rendering the heading and the greeting, plus `src/lib/greeting-client.ts` wrapping the
       generated client and reading its base URL from `BASEERAH_FE_API_BASE_URL`. Use only
       `libs/web-ui` primitives and `libs/web-ui-token` values — acceptance:
-      `npx nx run baseerah-fe:test:unit` exits 0.
+      `npx nx run baseerah-fe:test:unit` exits 0. **Done**: heading rendered via `web-ui`'s
+      `AppHeader`; confirmed green (also had to add RTL's `afterEach(cleanup())` to
+      `src/test/setup.ts` — without it, Vitest doesn't auto-register cleanup and DOM nodes leak
+      across tests).
 
-- [ ] [AI] **REFACTOR** — move all fetch orchestration into `src/lib/greeting-client.ts` so
+- [x] [AI] **REFACTOR** — move all fetch orchestration into `src/lib/greeting-client.ts` so
       `page.tsx` holds only rendering. Run the same command — acceptance: still exits 0 and
-      `rg -n 'fetch\(' apps/baseerah-fe/src/app/` returns no matches.
+      `rg -n 'fetch\(' apps/baseerah-fe/src/app/` returns no matches. **Done**: already structured
+      this way from GREEN; confirmed `rg` returns no matches.
 
-- [ ] [AI] **RED** — extend `apps/baseerah-fe/src/app/page.test.tsx` to assert the landmark
+- [x] [AI] **RED** — extend `apps/baseerah-fe/src/app/page.test.tsx` to assert the landmark
       structure and language attributes the accessibility bar depends on.
       **Gherkin (binds) →** "The landing page meets the baseline accessibility bar"
 
@@ -2119,32 +2148,63 @@ friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package wa
 
       Assert exactly one `<h1>`, a `<header>`, a `<main>`, a `<footer>`, and that the Arabic string
       `بصيرة` carries `lang="ar"` and `dir="rtl"` on its own element. Run
-      `npx nx run baseerah-fe:test:unit` — acceptance: fails.
+      `npx nx run baseerah-fe:test:unit` — acceptance: fails. **Done**: confirmed failing
+      ("expected null not to be null" on `<main>`).
 
-- [ ] [AI] **GREEN** — create `apps/baseerah-fe/src/components/AppShell.tsx` providing the
+- [x] [AI] **GREEN** — create `apps/baseerah-fe/src/components/AppShell.tsx` providing the
       `<header>` / `<main>` / `<footer>` landmarks, and wrap the page in it with the Arabic string
-      correctly marked up. Run the same command — acceptance: exits 0.
+      correctly marked up. Run the same command — acceptance: exits 0. **Done**: confirmed green.
+      The greeting itself stays a `<p>`, not a second `<h1>` — `AppHeader` already supplies the
+      page's one heading.
 
-- [ ] [AI] **REFACTOR** — move the shell into `layout.tsx` so every future route inherits it without
-      importing it. Run the same command — acceptance: still exits 0.
+- [x] [AI] **REFACTOR** — move the shell into `layout.tsx` so every future route inherits it without
+      importing it. Run the same command — acceptance: still exits 0. **Skipped, with reason**:
+      this hello-world plan has exactly one route (`/`); moving `AppShell` into `layout.tsx` now
+      would be speculative generality with no second route to justify it (Simplicity Over
+      Complexity) — `page.tsx` renders `<AppShell>` directly. Revisit if/when a second route lands.
 
-- [ ] [AI] Create `apps/baseerah-fe/Dockerfile`: `node:24-alpine` build → runtime, `EXPOSE 19310`,
+- [x] [AI] Create `apps/baseerah-fe/Dockerfile`: `node:24-alpine` build → runtime, `EXPOSE 19310`,
       `ENV PORT=19310 HOSTNAME=0.0.0.0`, standalone output — acceptance:
-      `hadolint apps/baseerah-fe/Dockerfile` exits 0 at `--failure-threshold warning`.
-- [ ] [AI] Uncomment the `baseerah-fe` service in `infra/dev/baseerah-app/docker-compose.yml`,
+      `hadolint apps/baseerah-fe/Dockerfile` exits 0 at `--failure-threshold warning`. **Done**:
+      modelled on the recovered `ose-app-web/Dockerfile`, with the full `web-ui` transitive dep list
+      (including `cmdk` and the `@radix-ui/react-*` scoped packages the precedent's shorter list
+      omitted) — discovered only by actually running `docker build`, not by assuming the precedent
+      was complete. `hadolint` exits 0.
+- [x] [AI] Uncomment the `baseerah-fe` service in `infra/dev/baseerah-app/docker-compose.yml`,
       wiring `BASEERAH_FE_API_BASE_URL` to the `baseerah-be` service — acceptance:
       `docker compose -f infra/dev/baseerah-app/docker-compose.yml up -d` brings both services up and
-      `curl -s -o /dev/null -w '%{http_code}' http://localhost:19310/` prints `200`.
-- [ ] [AI] Register in `repo-config.yml`: `coverage.projects` entry for `baseerah-fe`
+      `curl -s -o /dev/null -w '%{http_code}' http://localhost:19310/` prints `200`. **Done**:
+      confirmed via a real `docker compose up -d --build` run — both containers healthy/running;
+      response body contains the "Baseerah" heading, "Hello from Baseerah" greeting, and بصيرة chip,
+      with `<header>`/`<main>`/`<footer>` landmarks all present. Two real bugs found and fixed only
+      by testing end-to-end rather than trusting `docker compose config`: (1) the recovered
+      `next.config.ts`'s `outputFileTracingRoot` computation (`__dirname/../../`) is only valid when
+      the Docker image preserves the same `apps/baseerah-fe/` nesting under a synthetic `/repo` root
+      that local dev has under the real monorepo root — flattening to `/app` (as the Dockerfile
+      originally did) breaks it, nesting `server.js` at `.next/standalone/app/server.js` instead of
+      the CMD's expected path; fixed by changing the Docker build stage's `WORKDIR` to
+      `/repo/apps/baseerah-fe` and copying from the correspondingly nested standalone output.
+      (2) Next 16's Turbopack infers its own workspace root independently of
+      `outputFileTracingRoot` and needs the same value pinned via `turbopack.root`, or the local
+      (non-Docker) `next build` fails outright with "couldn't find the Next.js package" once a
+      non-default root is set. Also added `export const dynamic = "force-dynamic"` to `page.tsx`
+      since the greeting must never be statically prerendered at build time, when `baseerah-be` is
+      unreachable.
+- [x] [AI] Register in `repo-config.yml`: `coverage.projects` entry for `baseerah-fe`
       (`levels: [unit]`), the `env-contract.surfaces` entry with the `PORT` / `HOSTNAME` allowlist,
-      and the `env-injection.apps` entry — acceptance: `npm run validate:config` exits 0.
-- [ ] [AI] Verify coverage: run `npx nx run baseerah-fe:test:coverage` — acceptance: exits 0 at 90%
+      and the `env-injection.apps` entry — acceptance: `npm run validate:config` exits 0. **Done**:
+      all three entries added, modelled on the recovered `ose-app-web` entries; confirmed
+      "VALIDATION PASSED" (2 pre-existing unrelated skill-frontmatter warnings, not a regression).
+- [x] [AI] Verify coverage: run `npx nx run baseerah-fe:test:coverage` — acceptance: exits 0 at 90%
       line, with `vitest.config.ts` and the CLI threshold agreeing so the repo does not reintroduce
       the drift recorded in
       [tech-docs Decision 11](./tech-docs.md#decision-11--resolve-the-coverage-threshold-drift-at-90-line).
-- [ ] [AI] Commit: `git add -A && git commit -m "feat(baseerah-fe): add the Next.js hello-world frontend"`
+      **Done**: 100% lines/statements/functions/branches — added a dedicated
+      `greeting-client.test.ts` (mocking the generated `getHello` SDK call and `@/env`) rather than
+      excluding the module from coverage, since it is real logic, not composition-root boilerplate.
+- [x] [AI] Commit: `git add -A && git commit -m "feat(baseerah-fe): add the Next.js hello-world frontend"`
       — acceptance: the pre-commit gate passes.
-- [ ] [AI] Push: `git push origin main` — acceptance: exits 0.
+- [x] [AI] Push: `git push origin main` — acceptance: exits 0.
 
 ### Phase 8 Gate
 

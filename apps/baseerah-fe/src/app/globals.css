@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@source "../../../../libs/web-ui/src/**/*.{ts,tsx}";
+@import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
+@import "@open-sharia-enterprise/web-ui-token/src/baseerah.css";
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}

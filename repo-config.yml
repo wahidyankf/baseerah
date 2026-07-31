@@ -81,6 +81,10 @@ coverage:
       levels: [e2e]
       specs: "specs/apps/baseerah/behavior/baseerah-be/**"
 
+    - name: baseerah-fe
+      levels: [unit]
+      specs: "specs/apps/baseerah/behavior/baseerah-fe/**"
+
     # Deliberately excluded, not omitted by oversight: baseerah-contracts's test-level
     # targets (test:unit/test:integration/test:e2e) are documented no-ops ("target not
     # applicable for this project"). Its real quality gate is lint (redocly) and bundle,
@@ -162,6 +166,13 @@ env-contract:
         # (browser-facing CORS isn't needed yet — baseerah-fe fetches server-side).
         - BASEERAH_BE_CORS_ORIGINS
 
+    - root: apps/baseerah-fe
+      kind: app
+      lang: typescript
+      allowlist:
+        - PORT
+        - HOSTNAME
+
 env-injection:
   # Value-less injection contract (extends env-contract:).
   # Declares, per app, the injection HOME for its env keys at every deploy stage
@@ -176,6 +187,10 @@ env-injection:
   apps:
     - app: baseerah-be
       keys-from: apps/baseerah-be/.env.example
+      runtime: { local-ci: compose }
+
+    - app: baseerah-fe
+      keys-from: apps/baseerah-fe/.env.example
       runtime: { local-ci: compose }
 
   # CI test-harness keys — test-only, NEVER in any apps/<app>/.env.example.
