@@ -1,31 +1,23 @@
-# 🌙 Open Sharia Enterprise
+# 🔭 Baseerah
 
-✨ An enterprise solutions platform for Sharia-compliant business systems.
+✨ A personal operating layer — an AI assistant, a content builder, a posting helper, and a personal
+workflow engine under one roof, for a single maintainer.
 
-🌐 **Live Sites**:
+**Baseerah** (Arabic بصيرة) means _insight_, _inner vision_ — in Indonesian, _wawasan_ or
+_kejernihan pandang_. See the [Baseerah Vision](./repo-governance/vision/baseerah.md) for the full
+"why".
 
-- **OSE Platform** ([oseplatform.com](https://oseplatform.com)) - Main platform website (under construction)
-- **AyoKoding** ([ayokoding.com](https://ayokoding.com)) - Engineering research and learnings from this project, shared publicly as educational content
-- **OrganicLever** ([organiclever.com](https://www.organiclever.com/)) - Landing and promotional website (Phase 1, in development)
+🌳 **Ecosystem**: Baseerah is a product **within** the [Open Sharia Enterprise
+(OSE)](./repo-governance/vision/open-sharia-enterprise.md) ecosystem, not a replacement for it — it
+inherits OSE's governance hierarchy, development practices, and AI agent fleet, while its own app
+roster, agents, and identity are specific to this product. See the [Vision
+Index](./repo-governance/vision/README.md) for the parent/child relationship.
 
 ## 🚧 Project Status
 
-> ⚠️ **Phase 1 - In Development** - APIs and implementations may change significantly. **Contributions and pull requests are not being accepted** at this time.
-
-**Current Phase: Phase 1 (OrganicLever - Productivity Tracker)**
-
-Building OrganicLever, a full-stack individual productivity tracker:
-
-- 🌐 **Landing site**: [organiclever.com](https://www.organiclever.com/) - Next.js promotional website
-- ✅ **Phase 0 complete**: [ayokoding.com](https://ayokoding.com), [oseplatform.com](https://oseplatform.com), AI agents, governance, CLI tools
-
-**Next Phase: Phase 2 (SMB Application)** - Small and medium business application building on OrganicLever's foundation.
-
-**What to Expect:**
-
-- 🔄 Breaking changes without notice
-- 📐 Architecture still evolving
-- 🧪 Experimental implementations
+> ⚠️ **Walking skeleton** — a stateless F#/Giraffe backend (`baseerah-be`) and a Next.js frontend
+> (`baseerah-fe`) proving the engineering harness end-to-end. No assistant, content-building, or
+> posting capability exists yet; those are the deferred roadmap, not built claims.
 
 See **[ROADMAP.md](./ROADMAP.md)** for complete development phases and strategy.
 
@@ -45,16 +37,10 @@ npm install
 
 **Guiding Principle**: Technologies that keep you free - open formats, portable data, no vendor lock-in.
 
-**Phase 0 (Complete):**
-
-- Node.js & npm (via Volta) - Tooling and development infrastructure
-- Next.js 16 - Public websites and content platforms
-- Golang/Rust - CLI tools ([rhino-cli](./apps/rhino-cli/)) and future security infrastructure
-
-**Current Phase 1 (OrganicLever):**
-
-- Frontend (landing): Next.js + TypeScript
-- Infrastructure: Kubernetes
+- Node.js & npm (via Volta) — tooling and development infrastructure
+- Golang/Rust — CLI tools ([rhino-cli](./apps/rhino-cli/))
+- F# / Giraffe / ASP.NET 10 — `baseerah-be` (planned, Phase 6)
+- Next.js 16 + TypeScript — `baseerah-fe` (planned, Phase 8)
 
 See **[ROADMAP.md](./ROADMAP.md)** for complete tech stack evolution across all phases.
 
@@ -63,7 +49,7 @@ See **[ROADMAP.md](./ROADMAP.md)** for complete tech stack evolution across all 
 This project uses **Nx** to manage applications and libraries:
 
 ```
-open-sharia-enterprise/
+baseerah/
 ├── apps/                  # Deployable applications (Nx monorepo)
 ├── libs/                  # Reusable libraries (Nx monorepo, flat structure)
 ├── docs/                  # Project documentation (Diataxis framework)
@@ -83,12 +69,14 @@ open-sharia-enterprise/
 
 **Applications** (`apps/`):
 
-- **Sites**: none currently in this repo — retired during the repo reset; `organiclever.com` is served
-  from a source not yet re-scaffolded here
-- **CLI tools**: [`rhino-cli`](./apps/rhino-cli/)
-- **Polyglot demo apps**: extracted 2026-04-18 to the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template repository, which is now authoritative for the polyglot showcase (Go, Java, Elixir, F#, Python, Rust, Kotlin, TypeScript, C#, Clojure backends + Next.js, TanStack Start, Flutter Web frontends).
+- **CLI tools**: [`rhino-cli`](./apps/rhino-cli/) — a fork of the OSE ecosystem tool, not bound by
+  the upstream byte-identity rule
+- **`baseerah-be`, `baseerah-fe`**: planned walking-skeleton apps, not yet scaffolded (see
+  [ROADMAP.md](./ROADMAP.md))
+- **Polyglot demo apps**: extracted 2026-04-18 to the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template repository (Go, Java, Elixir, F#, Python, Rust, Kotlin, TypeScript, C#, Clojure backends + Next.js, TanStack Start, Flutter Web frontends).
 
-**Libraries** (`libs/`): Reusable shared code
+**Libraries** (`libs/`): [`rust-commons`](./libs/rust-commons/), [`web-ui`](./libs/web-ui/),
+[`web-ui-token`](./libs/web-ui-token/)
 
 **Learn More**: [Monorepo Structure Reference](./docs/reference/monorepo-structure.md) | [How to Add New App](./docs/how-to/add-new-app.md) | [How to Add New Library](./docs/how-to/add-new-lib.md) | [How to Run Nx Commands](./docs/how-to/run-nx-commands.md)
 
@@ -117,10 +105,6 @@ All projects enforce ≥90% test coverage as part of `test:quick`.
 
 **Quality gates**: pre-commit hooks (formatting, linting), pre-push hooks (`typecheck`, `lint`, `test:quick` for affected projects), and [PR quality gate](./.github/workflows/pr-quality-gate.yml).
 
-The per-app deploy-workflow badges this section previously listed (`ose-www`, `ayokoding-www`,
-`organiclever-app`, `wahidyankf-www`) were removed along with their workflow files during the repo
-reset; no equivalent per-app workflow exists for the current `rhino-cli`.
-
 - [`rhino-cli`](./apps/rhino-cli/)
 
 For polyglot demo app CI badges, see the [`ose-primer`](https://github.com/wahidyankf/ose-primer) repository.
@@ -133,41 +117,31 @@ See [`docs/README.md`](./docs/README.md) for details.
 
 ## 🔗 Related Repositories
 
-- **[`ose-primer`](https://github.com/wahidyankf/ose-primer)** — public, MIT-licensed template repository derived from `ose-public`. Packages scaffolding (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) into a reusable starting point. `ose-public` is upstream source of truth; content parity with `ose-primer` is maintained manually via the multi-repo parity planning workflows. For the upstream/downstream relationship and license difference, see [Related Repositories reference](./docs/reference/related-repositories.md).
+Baseerah is a fourth repository, standing outside the three-repo OSE parity loop (`ose-public`,
+`ose-primer`, `ose-private`). It scaffolded from that ecosystem but does not participate in
+cross-repo parity syncs. See [Related Repositories reference](./docs/reference/related-repositories.md)
+for the full picture.
 
 ## 🎯 Motivation
 
-Our mission is to democratize access to trustworthy, Sharia-compliant enterprise technology for organizations of all sizes, regardless of region or industry.
-
-**The Opportunity:**
-
-- Islamic enterprise (finance, commerce, cooperatives) is a multi-trillion dollar global market
-- Existing platforms are proprietary, expensive, and domain-limited
-- Most organizations rely on legacy systems retrofitted for Sharia compliance
-- The gap: open-source, compliance-first solutions with radical transparency
-
-**Our Solution:**
-
-- Progressive complexity: individual (Phase 1) → SMB (Phase 2) → enterprise (Phase 3)
-- Each phase funds the next; Phase 1/2 success funds Phase 3's certification budget
-- Sharia-compliance built in from the ground up, not bolted on after
+Personal productivity and content work today is scattered across disconnected tools — a chat
+assistant here, a note-taking app there, a separate posting workflow for each platform, no shared
+memory or workflow engine tying any of it together. Baseerah exists to give one person a coherent,
+self-owned operating layer for assistant work, content building, and posting, instead of stitching
+together someone else's SaaS tools.
 
 **What We Believe:**
 
-- 🕌 **Sharia-compliance as a foundation** - Built in from the ground up, not bolted on later
-- 🔓 **Transparency builds trust** - Open source code enables community verification of Sharia compliance
-- 🤖 **AI-assisted development** - Systematic use of AI tools to enhance productivity and code quality
-- 🛡️ **Security and governance from day one** - Architectural foundations, not afterthoughts
-- 📚 **Learning in public** - Share our research and knowledge through [ayokoding.com](https://ayokoding.com)
-- 🏗️ **Long-term foundation over quick wins** - Building solid foundations for a life-long project
+- 🔓 **Transparency builds trust** — open source code, self-owned over rented SaaS
+- 🤖 **AI-assisted development** — systematic use of AI tools to enhance productivity and code quality
+- 🛡️ **Security and governance from day one** — architectural foundations, not afterthoughts
+- 🏗️ **Long-term foundation over quick wins** — building solid foundations for a life-long project
 
 For complete principles, see [repo-governance/principles/](./repo-governance/principles/README.md).
 
 ## 🤝 Contributing
 
-🔒 **Contributions are currently closed** while we stabilize the architecture and patterns.
-
-🎉 **Forking is welcome!** Build your own version for your region or use case — once the foundation is solid, we'll open contributions to the community.
+🔒 **Contributions are currently closed** while the architecture and patterns stabilize.
 
 ## 📜 License
 

@@ -1,7 +1,7 @@
 {
-  "name": "open-sharia-enterprise",
+  "name": "baseerah",
   "version": "1.0.0",
-  "description": "Fintech application with monorepo architecture",
+  "description": "Personal operating layer (assistant, content, posting) monorepo",
   "private": true,
   "workspaces": [
     "apps/*",

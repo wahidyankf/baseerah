@@ -5,9 +5,13 @@
 
 ## Repository Overview
 
-**open-sharia-enterprise** — Enterprise platform for Sharia-compliant business systems, Nx monorepo.
+**Baseerah** (Arabic بصيرة — _insight_, _wawasan_, _kejernihan pandang_) — a personal operating
+layer covering an AI assistant, a content builder, a posting helper, and a personal workflow engine,
+built as an Nx monorepo. Baseerah is a **product within the Open Sharia Enterprise (OSE) ecosystem**,
+not a replacement for it — see [Baseerah Vision](./repo-governance/vision/baseerah.md) and its parent
+[Open Sharia Enterprise Vision](./repo-governance/vision/open-sharia-enterprise.md).
 
-**Status**: Phase 1 (OrganicLever — Productivity Tracker)
+**Status**: Walking skeleton (`baseerah-be` + `baseerah-fe` hello world)
 **License**: MIT
 **Main Branch**: `main` (Trunk Based Development)
 
@@ -17,7 +21,8 @@
 - **npm**: 11.10.1
 - **Monorepo**: Nx workspace
 - **App naming tiers**: `[domain]-www` = public website at the domain root; `[domain]-app-web` = product
-  web client at `app.*`; `[domain]-be` = generic HTTP backend for a product domain.
+  web client at `app.*`; `[domain]-be` = generic HTTP backend for a product domain; `[domain]-fe` =
+  the product web client when the domain has no separate marketing site.
 - **Current Apps**: Next.js sites, F# backends, Rust and F# CLIs, a contract spec, and paired E2E
   suites — names and ports in the Web Sites table below and in
   [monorepo structure](./docs/reference/monorepo-structure.md).
@@ -27,7 +32,7 @@ Polyglot demo apps extracted 2026-04-18 to [`ose-primer`](https://github.com/wah
 
 ## Project Structure
 
-`apps/` (Nx apps), `libs/` (`rust-commons`, `fsharp-crane-core`, `web-ui`), `docs/` (Diátaxis:
+`apps/` (Nx apps), `libs/` (`rust-commons`, `web-ui`, `web-ui-token`), `docs/` (Diátaxis:
 tutorials/how-to/reference/explanation), `repo-governance/`
 (conventions/development/principles/workflows/vision), `plans/` (backlog/in-progress/done), `.claude/`
 (primary binding: agents + skills), `.opencode/` (auto-synced from `.claude/`).
@@ -335,7 +340,9 @@ Phase 0 first, `[AI]`/`[HUMAN]` tags, gated phases. See
 
 **Development**: swe-{golang,typescript,e2e,csharp,fsharp,rust}-dev
 
-**Operations**: none currently — every prior deployer targeted an app removed from this repo
+**Operations**: planned — `apps-baseerah-fe-{content-maker,content-checker,content-fixer,deployer}`,
+`apps-baseerah-be-deployer`; none exist yet — every prior deployer targeted an app removed from this
+repo
 
 **Content**: pdf-to-md-{maker,checker,fixer}
 
@@ -369,19 +376,13 @@ modes) serving agents — not a governance layer.
 
 ## Web Sites
 
-| App                  | Domain                                                   | Port | Prod Branch                 |
-| -------------------- | -------------------------------------------------------- | ---- | --------------------------- |
-| ose-www              | [oseplatform.com](https://oseplatform.com)               | 3100 | `prod-ose-www`              |
-| ayokoding-www        | [ayokoding.com](https://ayokoding.com)                   | 3101 | `prod-ayokoding-www`        |
-| organiclever-www     | [www.organiclever.com](https://www.organiclever.com/)    | 3200 | `prod-organiclever-www`     |
-| organiclever-app-web | TBD                                                      | 3202 | `prod-organiclever-app-web` |
-| wahidyankf-www       | [www.wahidyankf.com](https://www.wahidyankf.com/)        | 3201 | `prod-wahidyankf-www`       |
-| ose-app-web          | [app.oseplatform.com](https://app.oseplatform.com) (TBD) | 3300 | `prod-ose-app-web` (TBD)    |
-| ose-be               | api.oseplatform.com (F# / Giraffe / ASP.NET 10)          | 8302 | —                           |
-| organiclever-be      | (F# / Giraffe / ASP.NET 10, Kubernetes)                  | 8202 | —                           |
+| App         | Domain | Port  | Prod Branch |
+| ----------- | ------ | ----- | ----------- |
+| baseerah-fe | TBD    | 19310 | TBD         |
+| baseerah-be | TBD    | 19320 | TBD         |
 
 Each app README at `apps/[app-name]/README.md` covers framework, deployment, E2E tests, and content
-details. Staging branches: `stag-organiclever-app-web`, `stag-ose-app-web`.
+details.
 
 ## Temporary Files for AI Agents
 
@@ -419,9 +420,10 @@ details. Staging branches: `stag-organiclever-app-web`, `stag-ose-app-web`.
 
 ## Related Repositories
 
-Three independent sibling repositories (no parent coordination repo):
+This repo (`baseerah`) is a **fourth repository, outside** the three-repo OSE parity loop below —
+it scaffolded from that ecosystem but does not participate in cross-repo parity syncs:
 
-- [`ose-public`](https://github.com/wahidyankf/ose-public) — this repo; upstream source of truth for
+- [`ose-public`](https://github.com/wahidyankf/ose-public) — upstream source of truth for
   scaffolding. MIT licensed.
 - [`ose-primer`](https://github.com/wahidyankf/ose-primer) — downstream public template (scaffolding
   layer: governance, AI agents, skills, conventions, CI harness, polyglot demo apps). MIT licensed.
@@ -430,11 +432,13 @@ Three independent sibling repositories (no parent coordination repo):
 
 Content parity between `ose-public` and `ose-primer` maintained via
 [plan-multi-repo-parity-planning](./repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
-workflow. `ose-private` does not participate in the parity loop.
+workflow. `ose-private` and `baseerah` do not participate in the parity loop.
 
-`apps/rhino-cli` must be byte-identical (zero carve-outs) across all three repos, including its
-Gherkin behavior tree at `specs/apps/rhino/behavior/rhino-cli/gherkin/**`, per the
-[SDLC Gate Standard](./docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary).
+`apps/rhino-cli` must be byte-identical (zero carve-outs) across those three parity repos, including
+its Gherkin behavior tree at `specs/apps/rhino/behavior/rhino-cli/gherkin/**`, per the
+[SDLC Gate Standard](./docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary). This
+repo's `apps/rhino-cli` is a **fork** of that shared tool and is explicitly **not** bound by the
+byte-identity rule (tech-docs Decision 14).
 
 See: [Related Repositories reference](./docs/reference/related-repositories.md).
 

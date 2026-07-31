@@ -52,9 +52,28 @@ import { colorTokens, spacing, radius, typography } from "@open-sharia-enterpris
 For apps with a distinctive brand identity, a dedicated brand token file lives alongside
 `tokens.css` and is imported **only** by that app — the base shared tokens stay unchanged.
 
+### `baseerah.css`
+
+Indigo-violet OKLCH design system for Baseerah apps (`baseerah-fe`), evoking بصيرة (insight, inner
+vision):
+
+- **6 semantic hues × 3 tints** — terracotta, honey, sage, teal, sky, plum (base / ink / wash)
+- **Cool neutral scale** — `--warm-0` through `--warm-900` (OKLCH with hue ~265, tinted toward the
+  indigo primary)
+- **Semantic overrides** — `--color-primary: var(--hue-sky)`, `--color-ring: var(--hue-sky)`
+- **Baseerah radius scale** — sm 0.375 rem → 2xl 1.625 rem
+- **Indigo-tinted shadow scale**
+- **Dark mode block** — `[data-theme="dark"], .dark { … }` with indigo hue lifts
+
+```css
+/* apps/baseerah-fe/src/app/globals.css */
+@import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
+@import "@open-sharia-enterprise/web-ui-token/src/baseerah.css";
+```
+
 ### `organiclever.css`
 
-Warm OKLCH design system for OrganicLever apps (`organiclever-web`):
+Warm OKLCH design system, retained from a retired app (`organiclever-web`, no longer in this repo):
 
 - **6 semantic hues × 3 tints** — terracotta, honey, sage, teal, sky, plum (base / ink / wash)
 - **Warm neutral scale** — `--warm-0` through `--warm-900` (OKLCH with hue ~80)
@@ -63,14 +82,9 @@ Warm OKLCH design system for OrganicLever apps (`organiclever-web`):
 - **Warm-tinted shadow scale**
 - **Dark mode block** — `[data-theme="dark"], .dark { … }` with warm hue lifts
 
-```css
-/* apps/organiclever-web/src/app/globals.css */
-@import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
-@import "@open-sharia-enterprise/web-ui-token/src/organiclever.css";
-```
-
-Other apps (`ayokoding-www`, `ose-www`, `wahidyankf-www`) import only `tokens.css`.
-The warm OKLCH tokens are intentionally opt-in.
+No app in this repository currently imports it. `ose.css`, `ayokoding.css`, and `wahidyankf.css`
+are similarly retained from other retired apps and are unused; the warm/cool OKLCH brand tokens are
+intentionally opt-in per app.
 
 ## Customization Layers
 

@@ -2,18 +2,21 @@
 
 Per-app brand guidance for UI development decisions.
 
-## organiclever-www
+## baseerah-fe
 
-- **Product**: Business productivity tracker (OrganicLever)
-- **URL**: www.organiclever.com
-- **Audience**: Business professionals, team managers
-- **Personality**: Professional, efficient, trustworthy
-- **Tone**: Formal but approachable, data-driven
-- **Palette**: Neutral grayscale — `--primary: 0 0% 9%` (near-black)
-- **Typography**: Clean sans-serif (currently Arial — migrating to next/font)
-- **Unique tokens**: `--chart-1` through `--chart-5` for data visualization
-- **UI character**: Dense data tables, charts, minimal decoration, productivity-focused
-- **Framework**: Next.js 16, Tailwind v4, shadcn/ui, Storybook
+- **Product**: Baseerah — a personal operating layer (AI assistant, content builder, posting
+  helper, personal workflow engine)
+- **URL**: TBD (walking-skeleton phase; see [Baseerah Vision](../../../../repo-governance/vision/baseerah.md))
+- **Audience**: One maintainer (single-tenant, personal tool — not multi-tenant SaaS)
+- **Personality**: Clear, insightful, self-owned — بصيرة (insight, inner vision)
+- **Tone**: Direct, personal, no marketing gloss
+- **Palette**: Indigo-violet OKLCH — `--color-primary: var(--hue-sky)` (hue 265, insight/clarity);
+  see `libs/web-ui-token/src/baseerah.css`
+- **Typography**: Shared `web-ui-token` typography scale; font loading via next/font
+- **Unique tokens**: none yet — the hello-world page uses only the shared semantic tokens
+- **UI character**: Minimal — current scope is a single landing page (header/main/footer shell)
+  rendering a greeting fetched from `baseerah-be`
+- **Framework**: Next.js 16, Tailwind v4, shadcn/ui
 
 ## ayokoding-web
 
@@ -27,10 +30,3 @@ Per-app brand guidance for UI development decisions.
 - **Unique tokens**: `--sidebar-*` (8 tokens) for navigation sidebar
 - **UI character**: Content-focused, long-form reading, code blocks with syntax highlighting
 - **Framework**: Next.js 16, Tailwind v4 + @tailwindcss/typography, shadcn/ui, rehype-pretty-code
-
-## ose-web
-
-- **Product**: OSE Platform marketing site
-- **URL**: oseplatform.com
-- **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
-- **Note**: Uses React components — can share UI components following the standard component patterns

@@ -1246,84 +1246,225 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
 
 > Amends both naming vocabularies **before** anything is named against them (tech-docs Decision 6).
 
-- [ ] [AI] Create `repo-governance/vision/baseerah.md`: a Layer 0 product vision stating that
+- [x] [AI] Create `repo-governance/vision/baseerah.md`: a Layer 0 product vision stating that
       Baseerah (Arabic بصيرة — _insight_, _wawasan_, _kejernihan pandang_) is a personal operating
       layer covering assistant, content building, and posting; that it is a product **within** the
       Open Sharia Enterprise ecosystem, not a replacement for it; and that
       `repo-governance/vision/open-sharia-enterprise.md` remains its parent ecosystem vision —
       acceptance: the file exists, has a single H1, and links to the OSE vision doc.
-- [ ] [AI] Confirm `repo-governance/vision/open-sharia-enterprise.md` is unmodified: run
+      **Done**: created `repo-governance/vision/baseerah.md` grounded in this plan's own README.md
+      (name meaning, "personal operating layer" framing) and tech-docs.md Decision 4 (product-within-
+      ecosystem relationship). Single H1 confirmed (`grep -c '^# '` → 1); links to
+      `./open-sharia-enterprise.md` twice (prose + Related Documentation).
+- [x] [AI] Confirm `repo-governance/vision/open-sharia-enterprise.md` is unmodified: run
       `git diff HEAD -- repo-governance/vision/open-sharia-enterprise.md` — acceptance: no output.
-- [ ] [AI] Update `repo-governance/vision/README.md` to index both documents and state the
+      **Done**: `git diff HEAD -- repo-governance/vision/open-sharia-enterprise.md` produced zero
+      output — confirmed untouched.
+- [x] [AI] Update `repo-governance/vision/README.md` to index both documents and state the
       parent (ecosystem) / child (product) relationship — acceptance:
       `rg -n 'baseerah' repo-governance/vision/README.md` returns at least one match and the OSE
       entry survives.
-- [ ] [AI] Edit `AGENTS.md` **Tech Stack → App naming tiers**: add the `[domain]-fe` tier —
+      **Done**: added a "Parent/Child" framing paragraph plus a new "Baseerah Vision — Child
+      (Product)" subsection; relabeled the existing entry "Open Sharia Enterprise Vision — Parent
+      (Ecosystem)". `rg -n 'baseerah'` → 1 match (smart-case matches `Baseerah`); OSE entry intact.
+- [x] [AI] Edit `AGENTS.md` **Tech Stack → App naming tiers**: add the `[domain]-fe` tier —
       _"`[domain]-fe` = the product web client when the domain has no separate marketing site"_ —
       alongside the existing `-www`, `-app-web`, and `-be` tiers — acceptance:
       `rg -n '\[domain\]-fe' AGENTS.md` returns a match.
-- [ ] [AI] Edit `AGENTS.md` **Repository Overview**: replace the "open-sharia-enterprise — Enterprise
+      **Done**: appended the `[domain]-fe` clause to the existing App naming tiers bullet.
+      `rg -n '\[domain\]-fe' AGENTS.md` → 1 match.
+- [x] [AI] Edit `AGENTS.md` **Repository Overview**: replace the "open-sharia-enterprise — Enterprise
       platform for Sharia-compliant business systems" opening with a Baseerah description that names
       the product, its meaning, and its membership in the OSE ecosystem — acceptance:
       `rg -n 'Baseerah' AGENTS.md` returns matches and the OSE ecosystem is named.
-- [ ] [AI] Edit `AGENTS.md` **Web Sites** table: replace all eight rows with `baseerah-fe` (port 19310) and `baseerah-be` (port 19320), marking domains and prod branches `TBD` — acceptance: the
+      **Done**: rewrote the Repository Overview opening + Status line; linked both vision docs.
+      Incidental fix (Root Cause Orientation): the adjacent Project Structure line still listed
+      the deleted `fsharp-crane-core` lib and was missing `web-ui-token` — corrected to the real
+      current `libs/` list (`rust-commons`, `web-ui`, `web-ui-token`), verified via
+      `find libs -maxdepth 1 -type d`.
+- [x] [AI] Edit `AGENTS.md` **Web Sites** table: replace all eight rows with `baseerah-fe` (port 19310) and `baseerah-be` (port 19320), marking domains and prod branches `TBD` — acceptance: the
       table has exactly two data rows.
-- [ ] [AI] Edit `AGENTS.md` **AI Agents** roster: remove every deleted agent name and add the
+
+      **Done**: replaced 8-row table w/ 2 rows (`baseerah-fe` 19310, `baseerah-be` 19320), domain +
+      prod branch both `TBD` per acceptance. Also fixed adjacent stale prose (staging-branch refs to
+      deleted apps) since table replacement made it stale (Root Cause Orientation). Verified via
+      `grep -n "## Web Sites" -A 12 AGENTS.md` — exactly 2 data rows.
+
+- [x] [AI] Edit `AGENTS.md` **AI Agents** roster: remove every deleted agent name and add the
       Phase 10 `apps-baseerah-*` agents as planned entries — acceptance:
       `rg -n 'apps-ayokoding|apps-ose-www|apps-organiclever|apps-wahidyankf|apps-web-ui-storybook' AGENTS.md`
       returns no matches.
-- [ ] [AI] Edit `AGENTS.md` **Related Repositories** and the `rhino-cli` byte-identity clause: state
+
+      **Done**: roster already clean of deleted-agent names (pruned in Phase 3); rg check confirmed
+      0 matches. Replaced `**Operations**: none currently` line with planned Phase 10 entries —
+      `apps-baseerah-fe-{content-maker,content-checker,content-fixer,deployer}`,
+      `apps-baseerah-be-deployer` — no link to the in-progress plan folder (would break on Phase 11
+      archival).
+
+- [x] [AI] Edit `AGENTS.md` **Related Repositories** and the `rhino-cli` byte-identity clause: state
       that `baseerah` is a fourth repo **outside** the `ose-public` / `ose-primer` / `ose-private`
       parity loop, and that its `apps/rhino-cli` is a fork not bound by the byte-identity rule
       (tech-docs Decision 14) — acceptance: `rg -n 'byte-identical' AGENTS.md` shows the clause now
       scoped to the three parity repos and explicitly excluding this one.
-- [ ] [AI] Edit `AGENTS.md` **Delivery Mode** and **Plans** sections only if they name a deleted app;
+
+      **Done**: rewrote intro to name `baseerah` as 4th repo outside parity loop; fixed stale
+      "this repo" mislabel on the `ose-public` bullet (this repo is baseerah, not ose-public);
+      rescoped byte-identical clause to the 3 parity repos + added explicit fork/Decision-14
+      exclusion sentence. Verified via `rg -n 'byte-identical' AGENTS.md`.
+
+- [x] [AI] Edit `AGENTS.md` **Delivery Mode** and **Plans** sections only if they name a deleted app;
       leave every governance rule unchanged — acceptance: `git diff AGENTS.md` shows no rule text
       altered, only identity and roster text.
-- [ ] [AI] Rewrite `README.md` for Baseerah: what it is, what the name means, the OSE-ecosystem
+
+      **Done**: inspected both sections (`### Delivery Mode` lines 113-135, `## Plans` lines 395-400)
+      — neither names any app, deleted or otherwise (pure governance rules); no edit needed, no-op
+      confirmed correct rather than blindly editing.
+
+- [x] [AI] Rewrite `README.md` for Baseerah: what it is, what the name means, the OSE-ecosystem
       relationship, the current walking-skeleton status, and how to run it — acceptance:
       `rg -n 'Sharia-compliant business systems|oseplatform\.com' README.md` returns no matches, and
       the OSE ecosystem is still named as the parent.
-- [ ] [AI] Rewrite `ROADMAP.md` for Baseerah: replace the four-phase Sharia-fintech business strategy
+
+      **Done**: full rewrite — title/name meaning, walking-skeleton status banner, ecosystem
+      relationship linking both vision docs, honest current-state Project Structure (only
+      `rhino-cli` exists; `baseerah-be`/`baseerah-fe` marked planned), fourth-repo-outside-parity-loop
+      Related Repositories section, Baseerah-specific Motivation. Verified via
+      `rg -n 'Sharia-compliant business systems|oseplatform\.com' README.md` — 0 matches.
+
+- [x] [AI] Rewrite `ROADMAP.md` for Baseerah: replace the four-phase Sharia-fintech business strategy
       with a Baseerah roadmap whose Phase 1 is this hello-world quad and whose later phases name the
       deferred capabilities from `prd.md`'s Out of Scope — acceptance:
       `rg -n 'halal|Sharia certification|OrganicLever' ROADMAP.md` returns no matches.
-- [ ] [AI] Edit `CONTRIBUTING.md`: retitle to Baseerah, update the app list and the structure
+
+      **Done**: full rewrite — Phase 1 is the hello-world quad (`baseerah-be`/`baseerah-fe`,
+      explicit Out-of-Scope-this-phase list pulled from `prd.md`'s Out of Scope section), Phases
+      2-4 name the deferred capabilities (Assistant Core, Content Building, Posting & Scheduling)
+      as `TBD`-scoped planned phases, mermaid diagram updated to match. Verified via
+      `rg -n 'halal|Sharia certification|OrganicLever' ROADMAP.md` — 0 matches.
+
+- [x] [AI] Edit `CONTRIBUTING.md`: retitle to Baseerah, update the app list and the structure
       section; leave every convention and workflow instruction unchanged — acceptance:
       `rg -n 'Open Sharia Enterprise' CONTRIBUTING.md` returns matches only where the ecosystem is
       deliberately named.
-- [ ] [AI] Edit `SECURITY.md`: replace "enterprise platform with financial services" with an accurate
+
+      **Done**: retitled H1 + intro line, added ecosystem-inheritance sentence linking OSE vision,
+      fixed stale `ose-public` clone URL to actual `git@github.com:wahidyankf/baseerah.git` remote
+      (verified via `git remote -v`), updated structure tree root dir name, retitled closing thank-you
+      line. Left Git Workflow/Code Conventions/Testing/PR sections untouched. Verified via
+      `rg -n 'Open Sharia Enterprise' CONTRIBUTING.md` — 1 match, the deliberate ecosystem mention.
+
+- [x] [AI] Edit `SECURITY.md`: replace "enterprise platform with financial services" with an accurate
       Baseerah description; leave the reporting address and process unchanged — acceptance:
       `rg -n 'financial services' SECURITY.md` returns no matches.
-- [ ] [AI] Edit `LICENSING-NOTICE.md`: update the app list in the per-directory override table to
+
+      **Done**: replaced both "enterprise platform with financial services" phrasings with a
+      personal-operating-layer description; retitled closing thank-you line. Reporting address
+      (`wahidyankf@gmail.com`), process, and severity sections untouched. Verified via
+      `rg -n 'financial services' SECURITY.md` — 0 matches.
+
+- [x] [AI] Edit `LICENSING-NOTICE.md`: update the app list in the per-directory override table to
       name `apps/rhino-cli` and the four `baseerah-*` apps — acceptance: no deleted app is named.
-- [ ] [AI] Edit `package.json`: set `"name": "baseerah"` and rewrite `"description"` to describe a
+
+      **Done**: file has no literal table (prose form) — no deleted app was named even before
+      editing. Made the License Structure prose explicit: named the 3 current LICENSE-carrying
+      libs, and named `apps/rhino-cli` + the planned `baseerah-be`/`baseerah-fe`/`baseerah-be-e2e`/
+      `baseerah-fe-e2e` apps (plus `baseerah-contracts`) as the root-LICENSE-fallback set once they
+      exist. Verified via `rg -n 'ayokoding|organiclever|wahidyankf-www|ose-www|ose-app-web'
+      LICENSING-NOTICE.md` — 0 matches.
+
+- [x] [AI] Edit `package.json`: set `"name": "baseerah"` and rewrite `"description"` to describe a
       personal-assistant monorepo. **Do not touch the `@open-sharia-enterprise/*` scope**
       (tech-docs Decision 3) — acceptance: `npm install` exits 0 and `git diff package-lock.json`
       shows only the root-name change.
-- [ ] [AI] Edit `CLAUDE.md`: refresh only its agent-roster and app references; its binding
+
+      **Done**: set `"name": "baseerah"`, rewrote description to "Personal operating layer
+      (assistant, content, posting) monorepo"; left `@open-sharia-enterprise/*` workspace scope
+      untouched (Decision 3). Verified `npm install` exit 0 (1224 packages, up to date) and
+      `git diff package-lock.json` — only the 2 root `"name"` lines changed, no dependency drift.
+
+- [x] [AI] Edit `CLAUDE.md`: refresh only its agent-roster and app references; its binding
       documentation is identity-free and stays — acceptance:
       `rg -n 'ayokoding|organiclever|ose-www' CLAUDE.md` returns no matches.
-- [ ] [AI] Rebrand `libs/web-ui-token`: update the brand token values (palette, typography scale)
+
+      **Done**: already clean — `CLAUDE.md` is a pure platform-binding shim (RTK, caveman, harness
+      mechanics) with no app or agent-roster identity content; no edit needed. Verified via
+      `rg -n 'ayokoding|organiclever|ose-www' CLAUDE.md` — 0 matches.
+
+- [x] [AI] Rebrand `libs/web-ui-token`: update the brand token values (palette, typography scale)
       for Baseerah, keeping every token **name** unchanged so `libs/web-ui` needs no edit —
       acceptance: `npx nx run web-ui-token:test:quick` exits 0 and `npx nx run web-ui:test:quick`
       exits 0 without any `web-ui` source change.
-- [ ] [AI] Verify every rebranded colour pair meets WCAG AA: check each foreground/background pairing
+
+      **Done**: `colors.ts`/`typography.ts`/`spacing.ts` are brand-agnostic (token names only, no
+      per-brand values) so no edit needed there. Added new `libs/web-ui-token/src/baseerah.css`
+      following the existing `organiclever.css`/`ose.css` per-brand-file pattern: same token names
+      (`--hue-{terracotta,honey,sage,teal,sky,plum}` ± ink/wash, `--warm-*` neutral scale, radius
+      and shadow scales), new indigo-violet OKLCH hue values (primary = `--hue-sky` at hue 265,
+      evoking بصيرة/insight) plus a light+dark block. Documented in `README.md`, noting the other
+      per-brand files (`ose.css`, `ayokoding.css`, `wahidyankf.css`) are retained-but-unused from
+      retired apps. Verified: `npx nx run web-ui-token:test:quick` — 6/6 passed; confirmed
+      `git status --porcelain libs/web-ui/` empty before running `npx nx run web-ui:test:quick` —
+      passed (118 scenarios, 311 steps, all covered).
+
+- [x] [AI] Verify every rebranded colour pair meets WCAG AA: check each foreground/background pairing
       in the new token set against a 4.5:1 ratio for body text and 3:1 for large text — acceptance:
       record the computed ratios in `evidence/phase-4-token-contrast.md`; every pair passes.
-- [ ] [AI] Rewrite `.claude/skills/swe-developing-frontend-ui/reference/brand-context.md` for
+
+      **Done**: computed all 8 light-mode + 8 dark-mode semantic pairs via a standalone Node OKLCH→
+      sRGB→luminance→contrast script (Ottosson OKLab matrices, WCAG contrast formula). First draft
+      failed 3 pairs — light `destructive`/`-foreground` (3.56:1), dark `primary`/`-foreground`
+      (2.99:1), dark `destructive`/`-foreground` (2.83:1) — all white-text-on-too-light-hue. Fixed by
+      lowering each hue's `L` (same chroma/hue angle) until >=4.5:1 with margin: light terracotta
+      64%→56%, dark sky 68%→54%, dark terracotta 70%→56%. Re-verified all 16 pairs pass; re-ran
+      `npx nx run web-ui-token:test:quick --skip-nx-cache` — still green. Recorded full method,
+      table, and before/after defect log in `evidence/phase-4-token-contrast.md`.
+
+- [x] [AI] Rewrite `.claude/skills/swe-developing-frontend-ui/reference/brand-context.md` for
       Baseerah, removing the OrganicLever and OSE Platform brand sections — acceptance:
       `rg -n 'OrganicLever|OSE Platform' .claude/skills/swe-developing-frontend-ui/reference/brand-context.md`
       returns no matches.
-- [ ] [AI] Rename the Amazon Q default agent config: `git mv .amazonq/cli-agents/ose-default.json .amazonq/cli-agents/baseerah-default.json`,
+
+      **Done**: removed `organiclever-www` and `ose-web` sections; added a new `baseerah-fe` section
+      (product, personality, palette pointing at `libs/web-ui-token/src/baseerah.css`, current
+      minimal UI character) linking to `repo-governance/vision/baseerah.md`. Left `ayokoding-web`
+      untouched (not named by this task's acceptance). Verified via
+      `rg -n 'OrganicLever|OSE Platform' .claude/skills/swe-developing-frontend-ui/reference/brand-context.md`
+      — 0 matches; confirmed the vision-doc link target exists.
+
+- [x] [AI] Rename the Amazon Q default agent config: `git mv .amazonq/cli-agents/ose-default.json .amazonq/cli-agents/baseerah-default.json`,
       then confirm the emitter produces that name by running `npm run generate:bindings` —
       acceptance: `git status --porcelain .amazonq/` shows no unexpected regeneration back to the old
       name. If the emitter hardcodes `ose-default`, fix the emitter in
       `apps/rhino-cli/src/commands/harness_emit_bindings.rs` under TDD with companion Gherkin.
-- [ ] [AI] Verify the rewritten instruction surface stays inside its budget: run
+
+      **Done**: emitter hardcoded `ose-default` in `apps/rhino-cli/src/application/agents/bindings.rs`
+      (actual location — not `src/commands/harness_emit_bindings.rs` as the task guessed; that path
+      doesn't exist in this codebase), both in `AMAZONQ_AGENT_DEFINITION`'s path constant and in
+      `AGENT_DEFINITION_CONTENT`'s embedded `"name"` field. Fixed under TDD: updated the Gherkin
+      scenario (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature`) and the
+      cucumber step defs + unit tests (`apps/rhino-cli/tests/agents.rs`,
+      `.../bindings.rs` `#[cfg(test)]` module) to expect `baseerah-default` first (RED), then flipped
+      the two source constants to match (GREEN); `cargo fmt` for the resulting line-length rewrap.
+      `git mv`'d the actual JSON file, then ran `npm run generate:bindings` — regenerated
+      `.amazonq/cli-agents/baseerah-default.json` with the correct `"name"` in place, no reversion to
+      the old name (`git status --porcelain .amazonq/` shows only the rename). Also fixed the two
+      stale doc references (`repo-governance/development/agents/ai-agents.md`,
+      `docs/reference/platform-bindings.md`) so no doc goes stale (Root Cause Orientation). Verified:
+      `cargo test --release --test agents` (47/47 scenarios), `cargo test --release --lib
+      agents::bindings` (12/12), full `npx nx run rhino-cli:test:quick --skip-nx-cache` (1255 passed,
+      60 specs/373 scenarios/1552 steps covered) — all green.
+
+- [x] [AI] Verify the rewritten instruction surface stays inside its budget: run
       `npx nx run rhino-cli:instruction-size:validation` — acceptance: exits 0. If `AGENTS.md`
       exceeds its threshold, apply progressive disclosure (move detail into a linked
       `repo-governance/` file), never trim a rule.
+
+      **Done**: exit 0, 4 WARN findings (`AGENTS.md` 29239 B over the 27000 B warn threshold ×2,
+      `CLAUDE.md` 7400 B over its 6000 B target, resolved tree 36639 B over 34000 B) — none are FAIL.
+      Confirmed pre-existing, not introduced by Phase 4: `git show HEAD:AGENTS.md | wc -c` = 29451 B
+      vs current 29239 B — Phase 4's edits net *shrank* `AGENTS.md` by 212 bytes despite adding new
+      content, so no progressive-disclosure action is triggered by this task's conditional.
+
 - [ ] [AI] Commit: `git add -A && git commit -m "feat(repo): establish Baseerah identity within the OSE ecosystem"`
       — acceptance: the pre-commit gate passes.
 - [ ] [AI] Push: `git push origin main` — acceptance: exits 0.

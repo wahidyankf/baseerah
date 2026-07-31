@@ -113,13 +113,14 @@ fn walk_naming_path(root: &str, exempt_globs: &[String]) -> Vec<DocsNamingFindin
 
 /// Returns `true` when `basename` should be skipped during naming validation.
 ///
-/// `README.md`, `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `LICENSING-NOTICE.md`, and
-/// `ROADMAP.md` are always exempt (all are fixed filenames dictated by an external convention —
-/// GitHub-style directory indexes, the Claude Code Agent Skills spec, the agents.md standard, the
-/// Claude Code root-instruction shim, GitHub's contributing-guide convention, this repo's own
-/// licensing-notice convention, and GitHub's roadmap-file convention, respectively — not a naming
-/// choice this repo's kebab-case rule governs; the rule's own stated scope is "files in `docs/`,
-/// `repo-governance/`, and similar repository locations", not ecosystem-standard root files).
+/// `README.md`, `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `LICENSING-NOTICE.md`,
+/// `ROADMAP.md`, and `SECURITY.md` are always exempt (all are fixed filenames dictated by an
+/// external convention — GitHub-style directory indexes, the Claude Code Agent Skills spec, the
+/// agents.md standard, the Claude Code root-instruction shim, GitHub's contributing-guide
+/// convention, this repo's own licensing-notice convention, GitHub's roadmap-file convention, and
+/// GitHub's security-policy convention, respectively — not a naming choice this repo's kebab-case
+/// rule governs; the rule's own stated scope is "files in `docs/`, `repo-governance/`, and similar
+/// repository locations", not ecosystem-standard root files).
 /// `_index.md` is likewise always
 /// exempt: Hugo (used by every `apps/*-www` app in this repo) reserves `_index.md` as the
 /// structurally-required filename for a content section's list/branch page, not a naming choice
@@ -138,6 +139,7 @@ fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
             | "CONTRIBUTING.md"
             | "LICENSING-NOTICE.md"
             | "ROADMAP.md"
+            | "SECURITY.md"
     ) {
         return true;
     }
@@ -265,6 +267,22 @@ mod tests {
     fn roadmap_md_always_exempt() {
         let tmp = TempDir::new().unwrap();
         fs::write(tmp.path().join("ROADMAP.md"), "x").unwrap();
+        let findings =
+            validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    /// Regression: `SECURITY.md` at repo root must be exempt, matching
+    /// `README.md`/`AGENTS.md`/`CLAUDE.md`/`CONTRIBUTING.md`/`LICENSING-NOTICE.md`/`ROADMAP.md` — it
+    /// is GitHub's ecosystem-standard security-policy filename, not a naming choice the kebab-case
+    /// rule governs. `SECURITY.md` existed since before this rule shipped but was never
+    /// staged/changed in a commit that ran `md naming validate` until a Baseerah-identity rewrite
+    /// pass edited it, tripping the pre-commit hook — same discovery pattern as the
+    /// `ROADMAP.md` regression above.
+    #[test]
+    fn security_md_always_exempt() {
+        let tmp = TempDir::new().unwrap();
+        fs::write(tmp.path().join("SECURITY.md"), "x").unwrap();
         let findings =
             validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.is_empty());

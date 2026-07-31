@@ -2466,7 +2466,7 @@ This repository maintains **multi-harness compatibility** across multiple AI cod
     ├── rules/
     │   └── 00-agents-md.md # Pointer directing Amazon Q to read AGENTS.md
     └── cli-agents/
-        └── ose-default.json # Minimal Amazon Q agent definition
+        └── baseerah-default.json # Minimal Amazon Q agent definition
 ```
 
 ### Source of Truth Hierarchy
