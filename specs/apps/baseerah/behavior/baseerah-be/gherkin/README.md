@@ -1,0 +1,18 @@
+# baseerah-be — Gherkin
+
+Behavioral scenarios for the `baseerah-be` F#/Giraffe REST API, organized by domain.
+
+## Feature Files (2)
+
+- [health/service-health.feature](./health/service-health.feature) — liveness check
+  (1 scenario)
+- [hello/greeting.feature](./hello/greeting.feature) — greeting + unknown-route handling
+  (2 scenarios)
+
+Copied verbatim from [prd.md US-4](../../../../../../plans/in-progress/baseerah-repo-reset/prd.md#us-4--serve-hello-world-from-baseerah-be).
+
+## Related
+
+- [behavior/README.md](../../README.md) — behavior index
+- [../../../containers/contracts/](../../../containers/contracts/README.md) — the OpenAPI
+  contract these scenarios exercise

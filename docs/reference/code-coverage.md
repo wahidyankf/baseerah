@@ -32,58 +32,36 @@ line-based algorithm counts:
 
 Partial lines count as NOT covered.
 
-## Per-Project Coverage Details
+## Per-Project Coverage Thresholds
 
-### Rust Projects
+**Single source of truth** — every current or planned project appears exactly once below, with its
+tool, format, and enforced threshold. This resolves the 80%/88%/95% drift the retired apps left
+behind (tech-docs Decision 11 of the `baseerah-repo-reset` plan): new projects use **90% line**,
+matching the `nx-targets.md` governance rule, rather than reproducing the old F# backends' 95% or
+the old web apps' 70–88%.
 
-**Tool**: `cargo llvm-cov`
-**Format**: LCOV at project `lcov.info`
-**Threshold**: 90% line coverage
+| Project        | Status                      | Tool                           | Format        | Threshold                                                                                            |
+| -------------- | --------------------------- | ------------------------------ | ------------- | ---------------------------------------------------------------------------------------------------- |
+| `rhino-cli`    | Current                     | `cargo llvm-cov`               | LCOV          | 90% line                                                                                             |
+| `rust-commons` | Current                     | `cargo llvm-cov`               | LCOV          | 90% line                                                                                             |
+| `web-ui`       | Current                     | Vitest + `@vitest/coverage-v8` | LCOV          | 70% line (preexisting; not retroactively raised)                                                     |
+| `web-ui-token` | Current                     | N/A                            | N/A           | N/A — deliberately omitted; the single vitest-cucumber scenario already covers this token-export lib |
+| `baseerah-be`  | Planned, not yet scaffolded | NUnit/xUnit + Coverlet         | Cobertura XML | 90% line (new project — Decision 11)                                                                 |
+| `baseerah-fe`  | Planned, not yet scaffolded | Vitest + `@vitest/coverage-v8` | LCOV          | 90% line (new project — Decision 11)                                                                 |
+
+### Enforcement commands by tool
 
 ```bash
+# Rust (rhino-cli, rust-commons)
 cargo llvm-cov --lib --fail-under-lines 90
-```
 
-### TypeScript Projects
+# TypeScript (web-ui: 70%; baseerah-fe once scaffolded: 90%)
+npx vitest run --coverage --coverage.thresholds.lines=<threshold>
 
-**Tool**: Vitest with `@vitest/coverage-v8`
-**Format**: LCOV at `coverage/lcov.info`
-
-| Project      | Threshold | Exclusions                                                                                        |
-| ------------ | --------- | ------------------------------------------------------------------------------------------------- |
-| web-ui       | 70%       | None                                                                                              |
-| web-ui-token | N/A       | Coverage deliberately omitted — the single vitest-cucumber scenario already covers this token lib |
-
-> The prior TypeScript apps (`organiclever-app-web`, `ayokoding-www`, `ose-www`, `wahidyankf-www`)
-> were removed along with their coverage configs in the `baseerah-repo-reset`. `baseerah-fe` (planned
-> Next.js frontend, not yet scaffolded) will get its own threshold row once it exists.
-
-### F# Projects
-
-No F# projects exist in the repo currently — `organiclever-be` and `ose-be` (both F#/Giraffe, 95%
-threshold via Coverlet) were removed along with their apps in the `baseerah-repo-reset`.
-`baseerah-be` — the planned backend (port 19320, likely F#/Giraffe) — is expected to follow the same
-pattern once scaffolded, but no project exists yet to threshold.
-
-**Tool** (standing convention, applies once an F# project exists): NUnit / xUnit + Coverlet
-**Format**: Cobertura XML (enforced via Coverlet threshold flags)
-
-```bash
+# F# (baseerah-be once scaffolded)
 dotnet test --collect:"XPlat Code Coverage" \
-  /p:Threshold=95 /p:ThresholdType=line /p:ThresholdStat=Total
+  /p:Threshold=90 /p:ThresholdType=line /p:ThresholdStat=Total
 ```
-
-## Thresholds
-
-| Project Type          | Threshold | Rationale                                                         |
-| --------------------- | --------- | ----------------------------------------------------------------- |
-| CLI tools (Rust)      | >= 90%    | Core business logic (`rhino-cli`)                                 |
-| Rust libraries        | >= 90%    | Shared utilities (`rust-commons`)                                 |
-| web-ui (TS lib)       | >= 70%    | Shared UI component library with rendering code                   |
-| web-ui-token (TS lib) | N/A       | Token-export lib; coverage deliberately omitted (see table above) |
-
-`baseerah-fe` (planned Next.js frontend) and `baseerah-be` (planned backend) will each get a
-threshold row once scaffolded; neither exists yet.
 
 ## CI Integration
 

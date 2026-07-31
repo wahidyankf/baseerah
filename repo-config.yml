@@ -72,6 +72,13 @@ coverage:
       levels: [unit, integration]
       specs: "specs/apps/rhino/behavior/rhino-cli/**"
 
+    # Deliberately excluded, not omitted by oversight: baseerah-contracts's test-level
+    # targets (test:unit/test:integration/test:e2e) are documented no-ops ("target not
+    # applicable for this project"). Its real quality gate is lint (redocly) and bundle,
+    # not a Gherkin-driven test level this registry models — an entry here would
+    # misleadingly claim behavior-spec coverage that doesn't exist. Same reasoning the
+    # predecessor repo applied to its own ose-contracts/organiclever-contracts projects.
+
 specs:
   # Areas that must carry a ddd/ folder (bounded-context registry). Lifts the
   # hardcoded apps_with_ddd() allowlist into explicit config.
