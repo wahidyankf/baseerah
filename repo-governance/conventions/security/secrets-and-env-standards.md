@@ -68,15 +68,15 @@ the `standardize-secrets-and-env` plan to match the canonical name.
 
 ### Variable classes
 
-| Class                      | Rule                                        | Example                                           |
-| -------------------------- | ------------------------------------------- | ------------------------------------------------- |
-| App-defined value          | `SCREAMING_SNAKE`, per-app prefix           | `ORGANICLEVER_BE_PORT`, `OSE_BE_OPENROUTER_MODEL` |
-| Framework-reserved         | Keep the framework's required name          | `NEXT_PUBLIC_*`, Next.js `PORT`                   |
-| Shared service connection  | Unprefixed, conventional name               | `DATABASE_URL`                                    |
-| Environment tier in a name | **Forbidden** (keys identical across tiers) | not `PROD_DATABASE_URL`                           |
+| Class                      | Rule                                        | Example                                            |
+| -------------------------- | ------------------------------------------- | -------------------------------------------------- |
+| App-defined value          | `SCREAMING_SNAKE`, per-app prefix           | `BASEERAH_BE_PORT`, `BASEERAH_BE_OPENROUTER_MODEL` |
+| Framework-reserved         | Keep the framework's required name          | `NEXT_PUBLIC_*`, Next.js `PORT`                    |
+| Shared service connection  | Unprefixed, conventional name               | `DATABASE_URL`                                     |
+| Environment tier in a name | **Forbidden** (keys identical across tiers) | not `PROD_DATABASE_URL`                            |
 
-The **per-app prefix** is the app's Nx project name upcased with `_` separators: `ose-be` →
-`OSE_BE_`, `ose-www` → `OSE_WWW_`.
+The **per-app prefix** is the app's Nx project name upcased with `_` separators: `baseerah-be` →
+`BASEERAH_BE_`, `baseerah-fe` → `BASEERAH_FE_`.
 
 ### Framework-reserved exempt names
 
@@ -89,8 +89,8 @@ The **per-app prefix** is the app's Nx project name upcased with `_` separators:
 | `HOSTNAME`      | Platform convention for Next.js dev server                                    |
 
 **Critical asymmetry**: The **Next.js dev server** reads `PORT` natively — renaming it to
-`OSE_WWW_PORT` would break `nx dev ose-www`. Rust **backend** ports are app-defined code, so they
-**do** take the prefix (`ORGANICLEVER_BE_PORT`, `OSE_BE_PORT`). This is the single most
+`BASEERAH_FE_PORT` would break `nx dev baseerah-fe`. **Backend** ports are app-defined code, so they
+**do** take the prefix (`BASEERAH_BE_PORT`, `EXAMPLE_BE_PORT`). This is the single most
 error-prone point of the naming standard.
 
 ## 3. Layout Standard — One Template per App
@@ -139,7 +139,7 @@ Rules:
 pub struct Config {
     pub database_url: String,               // required; no default
     #[serde(default = "default_port")]
-    pub organiclever_be_port: u16,          // optional; typed default
+    pub example_be_port: u16,               // optional; typed default
 }
 
 impl Config {
@@ -150,7 +150,7 @@ impl Config {
 }
 ```
 
-- `envy` maps struct field `organiclever_be_port` ↔ env var `ORGANICLEVER_BE_PORT` automatically.
+- `envy` maps struct field `example_be_port` ↔ env var `EXAMPLE_BE_PORT` automatically.
 - Required fields are non-`Option`, no `#[serde(default)]` — a missing value is a typed error at
   startup naming the field.
 - Deps: `dotenvy = "0.15.7"` (exact pin, successor to the unmaintained `dotenv` RUSTSEC-2021-0141),
@@ -204,7 +204,7 @@ Backup coverage = hardcoded floor ∪ `backup_globs` from the `env-contract:` se
 | `*.tfvars`, `*.tfvars.json`  | commented forward-scaffold — activate when IaC is added |
 | Generated inventories        | commented forward-scaffold — activate when IaC is added |
 
-The default backup target is `~/<repo-root-basename>-env-backup/` (e.g. `~/ose-public-env-backup/`).
+The default backup target is `~/<repo-root-basename>-env-backup/` (e.g. `~/baseerah-env-backup/`).
 This is the canonical per-repo backup directory aligned across the ose-public/ose-primer/ose-private
 sibling repos.
 
@@ -215,11 +215,11 @@ The `env-contract:` section in `repo-config.yml` at repo root declares each surf
 ```yaml
 env-contract:
   surfaces:
-    - root: apps/organiclever-be
+    - root: apps/baseerah-be
       kind: app
-      lang: rust
+      lang: fsharp
       allowlist: []
-    - root: apps/ose-www
+    - root: apps/baseerah-fe
       kind: app
       lang: typescript
       allowlist: [PORT, HOSTNAME]
@@ -251,7 +251,7 @@ The table below extends §2 with the injection home for each class:
 
 | Class                      | Example                                                                     | `.env.example`?    | Injection home                                                                                 |
 | -------------------------- | --------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
-| App-runtime (server)       | `DATABASE_URL`, `ORGANICLEVER_BE_NATS_URL`                                  | **yes**            | local `.env.local` · GitHub Env (CI) · Vercel encrypted env · k3s secret                       |
+| App-runtime (server)       | `DATABASE_URL`, `BASEERAH_BE_NATS_URL`                                      | **yes**            | local `.env.local` · GitHub Env (CI) · Vercel encrypted env · k3s secret                       |
 | App-runtime (public build) | `NEXT_PUBLIC_*`                                                             | **yes**            | same homes as server class, but **build-time** bundled by Next.js (never a secret)             |
 | CI test-harness            | `WEB_BASE_URL`, `VERCEL_AUTOMATION_BYPASS_SECRET`, `PLAYWRIGHT_GREP_INVERT` | **no** (test-only) | GitHub Environment `vars.`/`secrets.` only; registered in `env-injection:` (`repo-config.yml`) |
 | Platform-injected          | `VERCEL_GIT_COMMIT_REF`, `PORT`, `HOSTNAME`                                 | allowlisted        | supplied by the platform or framework; never declared by us, never set by us                   |
@@ -296,12 +296,12 @@ Two load-bearing boundaries follow from the matrix:
 ### `infra/dev/<stack>` compose env — no duplicate templates
 
 §3 forbids a second template per app. Compose stacks must not introduce their own `.env.example`
-key list. They load a gitignored local `.env` (e.g. `infra/dev/organiclever-app/.env`, already
+key list. They load a gitignored local `.env` (e.g. `infra/dev/baseerah-app/.env`, already
 gitignored) and override with inline `environment:` in `docker-compose.ci.yml` for CI — never a
 committed second template. Any value a CI job needs is set inline in the compose override or
 sourced from the app's canonical `apps/<app>/.env.example` keys (placeholders only), so the drift
-guard still sees one source of truth. New stacks (e.g. `infra/dev/organiclever-www/`) and stack
-renames (e.g. `infra/dev/organiclever` → `infra/dev/organiclever-app`) follow this rule and keep
+guard still sees one source of truth. New stacks (e.g. `infra/dev/baseerah-fe/`) and stack
+renames (e.g. `infra/dev/baseerah` → `infra/dev/baseerah-app`) follow this rule and keep
 the gitignored `.env` in place.
 
 ### GitHub Environment key registry
@@ -331,20 +331,20 @@ documented home at each stage the app runs; every CI test-harness key is registe
 # repo-config.yml — env-injection: section (value-less injection contract)
 env-injection:
   apps:
-    - app: organiclever-app-web
+    - app: baseerah-fe
       runtime: { local: env-local, staging: vercel-preview, production: vercel-production }
-      keys-from: apps/organiclever-app-web/.env.example
-    - app: organiclever-be
+      keys-from: apps/baseerah-fe/.env.example
+    - app: baseerah-be
       runtime: { local-ci: compose, staging: k3s-coralpolyp }
-      keys-from: apps/organiclever-be/.env.example
+      keys-from: apps/baseerah-be/.env.example
   ci-harness:
     # test-only keys, never in any .env.example
     - key: WEB_BASE_URL
       class: var
-      environments: [organiclever-app-staging, ose-app-staging]
+      environments: [baseerah-app-staging]
     - key: VERCEL_AUTOMATION_BYPASS_SECRET
       class: secret
-      environments: [organiclever-app-staging, ose-app-staging]
+      environments: [baseerah-app-staging]
 ```
 
 `rhino-cli env validate` gains a manifest-consistency pass — not a separate Nx target. The manifest

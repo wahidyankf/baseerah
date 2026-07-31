@@ -89,10 +89,10 @@ ASCII art and Mermaid solve different representational problems.
 
 ```
 apps/
-├── organiclever-www/
+├── baseerah-fe/
 │   ├── src/
 │   └── tests/
-└── organiclever-be/
+└── baseerah-be/
     ├── src/
     └── tests/
 ```
@@ -439,7 +439,7 @@ The `rhino-cli md mermaid validate` command enforces a maximum horizontal width 
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate
 ```
 
-Run without flags to perform a repo-wide scan (the Nx target runs with `--exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` plus the standardized noise-skip set) using defaults (MaxWidth=4, unlimited depth). Pass additional `--exclude <prefix>` flags to suppress noise in project-specific runs.
+Run without flags to perform a repo-wide scan (CI runs with `--exclude apps/rhino-cli/tests/fixtures --exclude plans/done` plus the standardized noise-skip set) using defaults (MaxWidth=4, unlimited depth). Pass additional `--exclude <prefix>` flags to suppress noise in project-specific runs.
 
 **Gate location**: Runs at **pre-commit (staged `.md` files only)** via the `rhino-cli` pre-commit
 hook (lint-staged) via `npx nx run rhino-cli:mermaid:validation`. Does NOT run at pre-push or in a
@@ -1955,7 +1955,8 @@ This section governs how draft UI screens are represented inside plan documents 
 `plans/`). It is part of the diagrams convention because plan UI mockups are a third visualization
 category alongside Mermaid diagrams and ASCII art, and keeping them here avoids convention sprawl.
 
-Originating plan: [`plans/done/2026-06-16__plan-doc-ui-mockup-convention/`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/)
+Originating plan: `plan-doc-ui-mockup-convention` (2026-06-16, since archived and removed from
+`plans/done/` by the Baseerah repo reset; the decisions it reached are captured in this section).
 
 ### Principles in Practice (UI Mockups)
 
@@ -1982,8 +1983,8 @@ are exempt.
 ### Rendering-Support Matrix
 
 The following rendering-support matrix summarises the candidate formats evaluated during the
-research that produced this section (research in
-[tech-docs.md](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/tech-docs.md)):
+research that produced this section (research in the originating plan's `tech-docs.md`, no longer
+present in `plans/done/` — see the Historical note under Worked Example below):
 
 | Format                           | VSCode built-in | VSCode + extension      | GitHub.com              | Diffable      | Lint-safe |
 | -------------------------------- | --------------- | ----------------------- | ----------------------- | ------------- | --------- |
@@ -2238,17 +2239,21 @@ alternatives are informed by real-world patterns rather than invented from a bla
 
 ### Worked Example
 
-The full funnel is demonstrated for the Salary Savings Calculator compare-all screen in
-[`plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/):
+> **Historical note**: the worked example below was `plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/`,
+> demonstrating the full funnel on the (now-deleted) `ayokoding-www` Salary Savings Calculator's
+> compare-all screen. That plan and its assets were removed by the Baseerah repo reset along with
+> `plans/done/` in full; the example files no longer exist in this repo (they remain in the upstream
+> `ose-public` history). The stage descriptions below are kept as prose narration of what a
+> completed funnel looks like — the rule itself (this section's Scope and Principles above) is
+> unaffected and applies to the next UI-bearing plan regardless.
 
-- Stage 1 diverge (low-fi): three named alternatives in
-  [`example-low-fi-wireframe.md`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/example-low-fi-wireframe.md)
-- Stage 2 narrow (hi-fi finalists):
-  [`example-hi-fi-option-a-ranked-table.png`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/example-hi-fi-option-a-ranked-table.png)
-  and
-  [`example-hi-fi-option-c-split.png`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/example-hi-fi-option-c-split.png)
-- Stages 3–4 select + justify: named selection (Option A) and the rationale table in
-  [`assets/README.md`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/README.md)
+The full funnel was demonstrated for the Salary Savings Calculator compare-all screen:
+
+- Stage 1 diverge (low-fi): three named alternatives in a `example-low-fi-wireframe.md` file
+- Stage 2 narrow (hi-fi finalists): two `.png` mockups, `example-hi-fi-option-a-ranked-table.png`
+  and `example-hi-fi-option-c-split.png`
+- Stages 3–4 select + justify: named selection (Option A) and the rationale table in the plan's
+  `assets/README.md`
 
 ## Related Documentation
 

@@ -176,4 +176,5 @@ Revisit this architectural decision if any of the following conditions change:
 
 - [Reproducible Environments](./reproducible-environments.md) - Broader reproducibility practices (Volta, lockfiles, Docker for services)
 - [Development Environment Setup](../../workflows/infra/development-environment-setup.md) - Workflow for setting up a development environment
-- [Native Dev Setup Improvements Plan](../../../plans/done/2026-04-04__native-dev-setup-improvements/README.md) - Completed plan that implemented `doctor --fix` and related improvements
+- `native-dev-setup-improvements` (2026-04-04, since archived and removed from `plans/done/`) —
+  completed plan that implemented `doctor --fix` and related improvements

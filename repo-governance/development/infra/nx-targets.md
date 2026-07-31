@@ -209,12 +209,12 @@ Tags are the standard mechanism for attaching structured metadata to projects in
 
 Every project declares tags along four dimensions. Each dimension uses a fixed prefix and a controlled vocabulary.
 
-| Dimension | Prefix      | Allowed Values                                                             | Required                       | Purpose                                                       |
-| --------- | ----------- | -------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
-| Type      | `type:`     | `app`, `lib`, `e2e`                                                        | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
-| Platform  | `platform:` | `cli`, `nextjs`, `axum`, `playwright`                                      | Apps and e2e projects          | Framework or runtime environment                              |
-| Language  | `lang:`     | `ts`, `rust`, `dotnet`                                                     | Projects with application code | Primary language of source code                               |
-| Domain    | `domain:`   | `ayokoding`, `crane`, `ose`, `organiclever`, `wahidyankf`, `tooling`, `ui` | Always                         | Business or product domain                                    |
+| Dimension | Prefix      | Allowed Values                        | Required                       | Purpose                                                       |
+| --------- | ----------- | ------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| Type      | `type:`     | `app`, `lib`, `e2e`                   | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
+| Platform  | `platform:` | `cli`, `nextjs`, `axum`, `playwright` | Apps and e2e projects          | Framework or runtime environment                              |
+| Language  | `lang:`     | `ts`, `rust`, `dotnet`                | Projects with application code | Primary language of source code                               |
+| Domain    | `domain:`   | `baseerah`, `tooling`, `ui`           | Always                         | Business or product domain                                    |
 
 ### Special Rules
 
@@ -224,29 +224,23 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 
 ### Current Project Tags
 
-| Project                    | Tags                                                                     |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `ayokoding-www`            | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`         |
-| `ayokoding-cli`            | `["type:app", "platform:cli", "lang:rust", "domain:ayokoding"]`          |
-| `rhino-cli`                | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`            |
-| `organiclever-app-web`     | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`      |
-| `organiclever-be`          | `["type:app", "platform:giraffe", "lang:dotnet", "domain:organiclever"]` |
-| `organiclever-app-web-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
-| `organiclever-be-e2e`      | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
-| `ose-cli`                  | `["type:app", "platform:cli", "lang:rust", "domain:ose"]`                |
-| `ose-www`                  | `["type:app", "platform:nextjs", "lang:ts", "domain:ose"]`               |
-| `wahidyankf-www`           | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`        |
-| `wahidyankf-www-fe-e2e`    | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`    |
-| `rust-commons`             | `["type:lib", "lang:rust"]`                                              |
+| Project        | Status                      | Tags                                                                                      |
+| -------------- | --------------------------- | ----------------------------------------------------------------------------------------- |
+| `rhino-cli`    | Current                     | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`                             |
+| `web-ui`       | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                    |
+| `web-ui-token` | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                    |
+| `rust-commons` | Current                     | `["type:lib", "lang:rust"]`                                                               |
+| `baseerah-fe`  | Planned, not yet scaffolded | `["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"]`                           |
+| `baseerah-be`  | Planned, not yet scaffolded | `["type:app", "domain:baseerah"]` (platform/lang TBD pending backend tech-stack decision) |
 
 ### Example: Complete Tag Declaration
 
-An F#/Giraffe backend app declares all four dimensions:
+A Rust CLI app declares all four dimensions:
 
 ```json
 {
-  "name": "organiclever-be",
-  "tags": ["type:app", "platform:giraffe", "lang:dotnet", "domain:organiclever"]
+  "name": "rhino-cli",
+  "tags": ["type:app", "platform:cli", "lang:rust", "domain:tooling"]
 }
 ```
 
@@ -290,9 +284,9 @@ is compulsory for all apps and E2E runners.
 
 **Product backend `typecheck` examples** (all statically typed backends use `typecheck` with `dependsOn: ["codegen"]` where codegen applies):
 
-| Backend           | `typecheck` command                                                   |
-| ----------------- | --------------------------------------------------------------------- |
-| `organiclever-be` | `dotnet build apps/organiclever-be/organiclever-be.fsproj -c Release` |
+| Backend                                                         | `typecheck` command                                           |
+| --------------------------------------------------------------- | ------------------------------------------------------------- |
+| `baseerah-be` (planned; illustrative — e.g. an F#/.NET backend) | `dotnet build apps/baseerah-be/baseerah-be.fsproj -c Release` |
 
 > For polyglot backend `typecheck` patterns (Go, F#, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, Clojure), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -401,7 +395,7 @@ TypeScript and other statically typed projects:
 | ----------- | -------------------------------------------------------------------------- |
 | `typecheck` | Run the type checker without emitting artifacts (`tsc --noEmit`, `mypy .`) |
 
-**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. The `ose-be` example: `dotnet build apps/ose-be/ose-be.fsproj -c Release`.
+**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. A planned `baseerah-be` example (illustrative — backend tech TBD): `dotnet build apps/baseerah-be/baseerah-be.fsproj -c Release`.
 
 **Not required for dynamically typed languages** (plain JavaScript, Ruby) or languages where
 compilation already enforces types and `build` covers it — except when an additional static
@@ -447,16 +441,16 @@ Rust, .NET, TypeScript apps:
 
 Two integration test patterns exist depending on project type:
 
-| Pattern             | Projects                                              | Requirement                                                                                                                                                | Cacheable |
-| ------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Docker + PostgreSQL | API backends (`organiclever-be`)                      | Real PostgreSQL via `docker-compose.integration.yml`; calls application code directly (no HTTP layer); runs all shared Gherkin scenarios; fresh DB per run | No        |
-| In-process mocking  | `organiclever-app-web` (MSW), Rust CLIs (cucumber-rs) | In-process mocking only (MSW / cucumber-rs / mock fixtures); no real database or external services; fully deterministic                                    | Yes       |
+| Pattern             | Projects                                                      | Requirement                                                                                                                                                | Cacheable |
+| ------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Docker + PostgreSQL | API backends (`baseerah-be`, once scaffolded)                 | Real PostgreSQL via `docker-compose.integration.yml`; calls application code directly (no HTTP layer); runs all shared Gherkin scenarios; fresh DB per run | No        |
+| In-process mocking  | `baseerah-fe` (MSW, once scaffolded), Rust CLIs (cucumber-rs) | In-process mocking only (MSW / cucumber-rs / mock fixtures); no real database or external services; fully deterministic                                    | Yes       |
 
 **API backends** expose `test:integration` which runs `docker compose -f docker-compose.integration.yml up --abort-on-container-exit --build`. This starts a fresh PostgreSQL container, runs migrations, and executes all shared Gherkin scenarios by calling application service/repository functions directly — no HTTP layer. Each backend has a `docker-compose.integration.yml` (postgres + test runner services) and a `Dockerfile.integration` (language runtime + test execution). Coverage is NOT measured at the integration level — coverage comes from `test:unit` only.
 
 > For polyglot `test:integration` Docker infrastructure patterns across 11 backend languages, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
-**Rust CLIs** (`ayokoding-cli`, `ose-cli`, `rhino-cli`) consume Gherkin specs at both test levels. Each command has two test files:
+**Rust CLIs** (`rhino-cli`) consume Gherkin specs at both test levels. Each command has two test files:
 
 - `{domain}_{action}_test.rs` (unit, inline `#[cfg(test)]` or separate file) — cucumber-rs unit step definitions; runs in `test:quick` via `cargo test`; mocks all I/O via injected function types; coverage measured here
 - `tests/{domain}_{action}_integration_test.rs` — cucumber-rs integration step definitions; drives the command via process invocation against controlled `/tmp` filesystem fixtures; runs in `test:integration`
@@ -494,7 +488,8 @@ Playwright suites (`*-e2e`):
 **BDD suites**: When the E2E project uses playwright-bdd, `test:e2e` runs
 `npx bddgen && npx playwright test`. The `bddgen` step regenerates `.features-gen/`
 spec files from the Gherkin feature files before Playwright executes them.
-See `apps/organiclever-be-e2e/project.json` for a canonical product-app example.
+Once `baseerah-fe` and `baseerah-be` are scaffolded, `apps/baseerah-be-e2e/project.json` (or
+equivalent) would serve as the canonical product-app example.
 
 **API backend `test:integration` with docker-compose**: API backends expose `test:integration`
 which runs `docker compose -f docker-compose.integration.yml down -v && docker compose -f docker-compose.integration.yml up --abort-on-container-exit --build`.
@@ -518,20 +513,18 @@ exercised at the correct test level. It is enforced by the pre-push hook alongsi
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--shared-steps`             | Validates steps across ALL source files rather than requiring 1:1 file-to-feature matching; used by all projects. `@wip`-tagged scenarios are fully exempt from step-gap reporting in this mode (same rule as the `@covers`-marker coverage model) — a step definition is never required for a scenario tagged `@wip` |
 | `--exclude-dir test-support` | Excludes E2E-only `test-support` API spec files from non-E2E projects; used by demo-be backends and demo-fe frontends                                                                                                                                                                                                 |
-| `--exclude-source-dir <dir>` | Excludes a directory name from the **app-tree source walk only** (never the `.feature`-file walk); for a directory name legitimate in both trees but that must not be scanned as source, e.g. ayokoding-www's Next.js `content/` directory colliding with a Gherkin `content/` spec folder                            |
+| `--exclude-source-dir <dir>` | Excludes a directory name from the **app-tree source walk only** (never the `.feature`-file walk); for a directory name legitimate in both trees but that must not be scanned as source, e.g. a future `baseerah-fe`'s Next.js `content/` directory colliding with a Gherkin `content/` spec folder                   |
 
 **Project coverage status**:
 
-| Project group                                                   | Status   | Notes                                                                                                                   |
-| --------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Rust CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`)         | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                                                |
-| API backends (`organiclever-be`)                                | Enforced | `--shared-steps --exclude-dir test-support`                                                                             |
-| E2E runners (`organiclever-be-e2e`, `organiclever-app-web-e2e`) | Enforced | `--shared-steps` only; test-support steps are implemented here                                                          |
-| Content platforms (`ose-www`)                                   | Enforced | `--shared-steps`                                                                                                        |
-| Content platforms (`ayokoding-www`)                             | Enforced | `--shared-steps --exclude-source-dir content` (excludes the Next.js `content/` directory from the app-tree source walk) |
-| Web UI apps (`organiclever-app-web`)                            | Enforced | `--shared-steps`                                                                                                        |
-| Libraries (`rust-commons`)                                      | Enforced | `--shared-steps`                                                                                                        |
-| Projects with genuine step gaps                                 | Deferred | `specs:behavior:coverage` target exists but validation deferred until step implementation is complete                   |
+| Project group                                                       | Status             | Notes                                                                                                                                    |
+| ------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Rust CLI apps (`rhino-cli`)                                         | Enforced           | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                                                                 |
+| API backends (`baseerah-be`, once scaffolded)                       | Enforced (planned) | `--shared-steps --exclude-dir test-support`                                                                                              |
+| E2E runners (`baseerah-be-e2e`, `baseerah-fe-e2e`, once scaffolded) | Enforced (planned) | `--shared-steps` only; test-support steps are implemented here                                                                           |
+| Content / Web UI platform (`baseerah-fe`, once scaffolded)          | Enforced (planned) | `--shared-steps` (add `--exclude-source-dir content` if its Next.js `content/` directory collides with a Gherkin `content/` spec folder) |
+| Libraries (`rust-commons`)                                          | Enforced           | `--shared-steps`                                                                                                                         |
+| Projects with genuine step gaps                                     | Deferred           | `specs:behavior:coverage` target exists but validation deferred until step implementation is complete                                    |
 
 All apps and E2E runners are required to have a `specs:behavior:coverage` target. Projects with
 genuine step gaps have the target deferred temporarily until step implementations are complete.
@@ -544,11 +537,11 @@ source files as inputs so the cache invalidates when specs or step definitions c
   "executor": "nx:run-commands",
   "cache": true,
   "inputs": [
-    "{workspaceRoot}/specs/apps/organiclever-be/**/*.feature",
+    "{workspaceRoot}/specs/apps/baseerah-be/**/*.feature",
     "{projectRoot}/src/**/*.rs"
   ],
   "options": {
-    "command": "rhino-cli specs behavior-coverage validate specs/apps/organiclever-be --shared-steps --exclude-dir test-support apps/organiclever-be/src"
+    "command": "rhino-cli specs behavior-coverage validate specs/apps/baseerah-be --shared-steps --exclude-dir test-support apps/baseerah-be/src"
   }
 }
 ```
@@ -563,9 +556,9 @@ Accessibility testing is compulsory for all UI-related projects. It operates at 
 **Static a11y linting** (enforced via the `lint` target at all three gates: pre-push hook, PR
 quality gate, and scheduled Test CI workflows):
 
-| Project                                                                               | Static a11y tool           |
-| ------------------------------------------------------------------------------------- | -------------------------- |
-| `organiclever-app-web`, `organiclever-www`, `ayokoding-www`, `ose-www`, `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
+| Project                                        | Static a11y tool           |
+| ---------------------------------------------- | -------------------------- |
+| `baseerah-fe` (once scaffolded), `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
 
 Static a11y linting catches common accessibility violations at compile time: missing alt text,
 missing ARIA labels, invalid ARIA attributes, missing form labels, and incorrect role usage.
@@ -717,14 +710,14 @@ Example for `rhino-cli` `test:unit` inputs:
 ]
 ```
 
-**Rust CLI apps** (`ayokoding-cli`, `ose-cli`) also consume Gherkin specs in `test:unit`. Their `test:unit` and `test:quick` inputs must include the CLI's own spec files:
+**Future Rust CLI apps** (when introduced beyond `rhino-cli`) must follow the same pattern. For a
+hypothetical project `<cli-name>`:
 
-| CLI App         | Gherkin specs input                                 |
-| --------------- | --------------------------------------------------- |
-| `ayokoding-cli` | `{workspaceRoot}/specs/apps/ayokoding/**/*.feature` |
-| `ose-cli`       | `{workspaceRoot}/specs/apps/ose/**/*.feature`       |
+| CLI App      | Gherkin specs input                                  |
+| ------------ | ---------------------------------------------------- |
+| `<cli-name>` | `{workspaceRoot}/specs/apps/<cli-name>/**/*.feature` |
 
-Example for `ayokoding-cli` `test:unit` inputs:
+Example `test:unit` inputs for a Go-based CLI (the pattern also applies to non-Rust CLIs):
 
 ```json
 "inputs": [
@@ -732,7 +725,7 @@ Example for `ayokoding-cli` `test:unit` inputs:
   "{projectRoot}/internal/**/*.go",
   "{projectRoot}/go.mod",
   "{projectRoot}/go.sum",
-  "{workspaceRoot}/specs/apps/ayokoding/**/*.feature"
+  "{workspaceRoot}/specs/apps/<cli-name>/**/*.feature"
 ]
 ```
 
@@ -764,14 +757,14 @@ the "Specs:Behavior:Coverage Projects" section for flags and project-by-project 
    enforced by `rhino-cli repo-config validate`).
 
 See [SDLC Gate Standard §rhino-cli Byte-Identity Boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)
-for the divergence-policy boundary this standard establishes, and
-[tech-docs.md §4 "rhino-cli Source-Identity Standard"](../../../plans/done/2026-07-03__unify-rhino-cli-sdlc-parity/tech-docs.md#4-rhino-cli-source-identity-standard)
-for the full synthesis approach.
+for the divergence-policy boundary this standard establishes; the full synthesis approach was
+worked out in the `unify-rhino-cli-sdlc-parity` plan's `tech-docs.md` §4 "rhino-cli Source-Identity
+Standard" (2026-07-03, since archived and removed from `plans/done/`).
 
 ## Codegen Dependency Chain
 
 Apps with OpenAPI contract specs share a `codegen` target that generates types and
-encoders/decoders from the spec (e.g., `specs/apps/organiclever/containers/contracts/`) into
+encoders/decoders from the spec (e.g., `specs/apps/baseerah/containers/contracts/`) into
 `generated-contracts/`.
 
 The dependency chain is:

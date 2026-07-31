@@ -36,7 +36,7 @@ open-sharia-enterprise/
 │   └── k8s/                  # Kubernetes deployments
 ├── specs/                     # Gherkin acceptance specs, C4 diagrams, and OpenAPI contracts
 │   ├── apps/                  # Per-app specs (C4-aware five-folder layout)
-│   │   └── [domain]/         # e.g. organiclever/, rhino/
+│   │   └── [domain]/         # e.g. rhino/, baseerah/ (planned)
 │   │       ├── product/      # PM-first content (overview, roadmap)
 │   │       ├── system-context/ # C4 L1 — system boundary diagram
 │   │       ├── containers/   # C4 L2 — runtime containers + OpenAPI contracts
@@ -78,46 +78,37 @@ Flat structure - all apps at the same level, no subdirectories.
 
 `[domain]-[type]`
 
-**Current Apps**:
+**Current Apps** (as of the 2026 Baseerah repo reset, the sole surviving app):
 
-- `ose-www` - OSE Platform public website (Next.js 16 content platform, port 3100)
-- `ose-www-be-e2e` - Playwright BE E2E tests for ose-www tRPC API
-- `ose-www-fe-e2e` - Playwright FE E2E tests for ose-www UI
-- `ose-be` - OSE Application F#/Giraffe/ASP.NET REST API backend (port 8302)
-- `ose-be-e2e` - Playwright BE E2E tests for ose-be
-- `ayokoding-www` - AyoKoding educational platform (Next.js 16 fullstack content platform, port 3101)
-- `ayokoding-www-be-e2e` - Playwright BE E2E tests for ayokoding-www tRPC API
-- `ayokoding-www-fe-e2e` - Playwright FE E2E tests for ayokoding-www UI
-- `ayokoding-cli` - AyoKoding CLI tool (Rust application)
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23 (predecessor Go source recoverable from git history).
-- `ose-cli` - OSE Platform site maintenance CLI (Rust application)
-- `crane-cli` - PDF-to-Markdown pipeline CLI (F# application)
-- `organiclever-www` - OrganicLever marketing website (Next.js 16, port 3200)
-- `organiclever-www-fe-e2e` - Playwright FE E2E tests for organiclever-www
-- `organiclever-www-be-e2e` - Playwright BE E2E slot for organiclever-www (placeholder — no backend API)
-- `organiclever-app-web` - OrganicLever app frontend (Next.js 16 application, port 3202)
-- `organiclever-app-web-e2e` - Playwright FE E2E tests for organiclever-app-web
-- `organiclever-be` - OrganicLever F#/Giraffe/ASP.NET REST API backend (port 8202)
-- `organiclever-be-e2e` - Playwright BE E2E tests for organiclever-be
-- `wahidyankf-www` - Personal portfolio website (Next.js 16 application, port 3201)
-- `wahidyankf-www-fe-e2e` - Playwright FE E2E tests for wahidyankf-www
 
-### App Structure (Next.js Application — ose-www)
+**Planned Apps** (not yet scaffolded — see [related plan](../../plans/in-progress/baseerah-repo-reset/README.md)):
+
+- `baseerah-fe` - Baseerah frontend (Next.js 16 App Router, planned port 19310)
+- `baseerah-fe-e2e` - Playwright FE E2E tests for baseerah-fe
+- `baseerah-be` - Baseerah backend (likely F#/Giraffe/ASP.NET REST API, planned port 19320; framework TBD pending backend tech-stack decision)
+- `baseerah-be-e2e` - E2E tests for baseerah-be
+
+Every other app previously listed here (`ose-www`, `ose-be`, `ayokoding-www`, `ayokoding-cli`, `ose-cli`, `crane-cli`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`, `wahidyankf-www`, and their `-e2e` counterparts) was deleted by the Baseerah repo reset. The structural examples below use generic `apps/<app-name>/` placeholders except where `rhino-cli` illustrates a real, currently-scaffolded app.
+
+### App Structure (Next.js Application — planned, e.g. `baseerah-fe`)
 
 ```
-apps/ose-www/
+apps/<app-name>/
 ├── src/                       # Source code (App Router)
 ├── public/                    # Static assets
 ├── next.config.mjs            # Next.js configuration
 ├── project.json               # Nx project configuration
-├── vercel.json                # Deployment configuration
+├── vercel.json                # Deployment configuration (if deployed via Vercel)
 └── README.md                  # App documentation
 ```
 
-### App Structure (Rust CLI Application)
+A Next.js app may also add `.storybook/` (Storybook) and a `Dockerfile` (containerized deployment) depending on its deployment target.
+
+### App Structure (Rust CLI Application — rhino-cli)
 
 ```
-apps/ayokoding-cli/
+apps/rhino-cli/
 ├── src/                       # Source code
 │   ├── commands/              # CLI command handlers
 │   ├── domain/                # Domain logic
@@ -134,23 +125,10 @@ apps/ayokoding-cli/
 └── README.md                  # App documentation
 ```
 
-### App Structure (Next.js Application)
+### App Structure (F#/Giraffe Application — planned, e.g. `baseerah-be`)
 
 ```
-apps/organiclever-app-web/
-├── src/                       # Source code
-├── public/                    # Static assets
-├── .storybook/                # Storybook configuration
-├── Dockerfile                 # Production multi-stage build (repo-root context)
-├── next.config.mjs            # Next.js configuration
-├── project.json               # Nx project configuration
-└── README.md                  # App documentation
-```
-
-### App Structure (F#/Giraffe Application)
-
-```
-apps/organiclever-be/
+apps/<app-name>/
 ├── src/                       # Source code (F# modules)
 ├── tests/                     # Test suites (unit/, integration/)
 ├── Dockerfile                 # Production multi-stage build
@@ -188,9 +166,9 @@ Contains reusable library packages.
 
 **Language Prefixes**:
 
-- `ts-` - TypeScript (future)
+- `ts-` - TypeScript (e.g., `web-ui`, `web-ui-token`)
 - `rust-` - Rust (e.g., `rust-commons`)
-- `fsharp-` - F# (e.g., `fsharp-crane-core`)
+- `fsharp-` - F# (future; `fsharp-crane-core` was deleted 2026 alongside `crane-cli`, its sole consumer, by the Baseerah repo reset)
 - `java-` - Java (future)
 - `kt-` - Kotlin (future)
 - `py-` - Python (future)
@@ -198,8 +176,8 @@ Contains reusable library packages.
 **Current Libraries**:
 
 - `rust-commons` - Shared Rust utilities (link-checking, HTTP)
-- `fsharp-crane-core` - Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
 - `web-ui` - Shared React component library (shadcn/ui patterns, Radix UI primitives, Tailwind CSS)
+- `web-ui-token` - Shared design tokens for `web-ui`
 
 **Examples** (planned):
 
@@ -240,7 +218,8 @@ libs/ts-utils/
 
 ### Current Scope
 
-Rust (`rust-commons`), F# (`fsharp-crane-core`), and TypeScript (`web-ui`) libraries.
+Rust (`rust-commons`) and TypeScript (`web-ui`, `web-ui-token`) libraries. No F# library currently exists;
+`fsharp-crane-core` was deleted by the Baseerah repo reset (it was `crane-cli`-specific, not generic).
 
 ## Nx Monorepo Projects (`apps/` and `libs/`)
 
@@ -277,31 +256,31 @@ Rust (`rust-commons`), F# (`fsharp-crane-core`), and TypeScript (`web-ui`) libra
 
 Location: `apps/[app-name]/project.json` or `libs/[lib-name]/project.json`
 
-**Next.js App Example** (`ose-www`):
+**Next.js App Example** (illustrative — no Next.js app is scaffolded yet; shape matches the planned `baseerah-fe`):
 
 ```json
 {
-  "name": "ose-www",
-  "sourceRoot": "apps/ose-www",
+  "name": "app-name",
+  "sourceRoot": "apps/app-name",
   "projectType": "application",
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next dev --port 3100",
-        "cwd": "apps/ose-www"
+        "cwd": "apps/app-name"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next build",
-        "cwd": "apps/ose-www"
+        "cwd": "apps/app-name"
       },
       "outputs": ["{projectRoot}/.next"]
     }
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ose"]
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"]
 }
 ```
 
@@ -372,12 +351,12 @@ Location: `apps/[app-name]/project.json` or `libs/[lib-name]/project.json`
 
 All projects use a standard four-dimension tag scheme:
 
-| Dimension   | Values                                                      | Required                 | Purpose                 |
-| ----------- | ----------------------------------------------------------- | ------------------------ | ----------------------- |
-| `type:`     | `app`, `lib`, `e2e`                                         | Yes                      | Project kind            |
-| `platform:` | `cli`, `nextjs`, `spring-boot`, `playwright`                | For apps/e2e             | Framework/runtime       |
-| `lang:`     | `rust`, `ts`, `dotnet`                                      | Where source code exists | Primary language        |
-| `domain:`   | `ayokoding`, `ose`, `organiclever`, `wahidyankf`, `tooling` | Yes                      | Business/product domain |
+| Dimension   | Values                                       | Required                 | Purpose                 |
+| ----------- | -------------------------------------------- | ------------------------ | ----------------------- |
+| `type:`     | `app`, `lib`, `e2e`                          | Yes                      | Project kind            |
+| `platform:` | `cli`, `nextjs`, `spring-boot`, `playwright` | For apps/e2e             | Framework/runtime       |
+| `lang:`     | `rust`, `ts`, `dotnet`                       | Where source code exists | Primary language        |
+| `domain:`   | `baseerah`, `tooling`, `ui`                  | Yes                      | Business/product domain |
 
 **Notes**:
 
@@ -441,9 +420,9 @@ All projects use a standard four-dimension tag scheme:
 **Rust Apps** use `Cargo.toml` for dependency management:
 
 ```toml
-# apps/ayokoding-cli/Cargo.toml
+# apps/rhino-cli/Cargo.toml
 [package]
-name = "ayokoding-cli"
+name = "rhino-cli"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.88"
@@ -494,7 +473,7 @@ rust-version = "1.88"
 **Apps importing libs** (TypeScript apps):
 
 ```typescript
-// In apps/organiclever-app-web/app/page.tsx
+// In apps/<app-name>/app/page.tsx
 import { formatDate } from "@open-sharia-enterprise/ts-utils";
 ```
 
@@ -520,7 +499,7 @@ import { formatDate } from "@open-sharia-enterprise/ts-utils";
 nx graph
 
 # View specific project dependencies
-nx graph --focus=ose-www
+nx graph --focus=rhino-cli
 
 # View affected projects
 nx affected:graph
@@ -548,6 +527,30 @@ Configured in `tsconfig.base.json`:
 - `@open-sharia-enterprise/ts-utils`
 - `@open-sharia-enterprise/ts-components`
 - `@open-sharia-enterprise/ts-hooks`
+
+## Port Allocation
+
+| App                                 | Port    | Status                       |
+| ----------------------------------- | ------- | ---------------------------- |
+| `baseerah-fe` (Next.js 16 frontend) | `19310` | Planned — not yet scaffolded |
+| `baseerah-be` (F#/Giraffe backend)  | `19320` | Planned — not yet scaffolded |
+
+**Rule**: Baseerah deliberately allocates outside every port band the sibling repos occupy, since all
+four repos (`ose-public`, `ose-primer`, `ose-private`, and this repo) can run concurrently on one
+development machine:
+
+- `3000-3401` — sibling Next.js/web app ports
+- `8000-8302` — sibling backend service ports
+- `4222-4224` — NATS
+- `5432-5438` — PostgreSQL
+- `6006` — Storybook
+- `6379` — Redis
+- `9090-9411`, `14250`, `14268`, `16686`, `24224` — observability stack (Prometheus, Jaeger, Fluentd)
+
+`19310`/`19320` were verified free across all three sibling repos
+(`rg -n '19310|19320'` across `ose-public`, `ose-primer`, and `ose-private` returns no matches) before
+being adopted. See [tech-docs Decision 5](../../plans/in-progress/baseerah-repo-reset/tech-docs.md#decision-5--f--giraffe-backend-on-19320-nextjs-16-frontend-on-19310)
+for the full rationale.
 
 ## Build Outputs
 

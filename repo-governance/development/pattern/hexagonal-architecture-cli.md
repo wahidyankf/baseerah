@@ -44,23 +44,26 @@ implementations satisfy those ports.
 
 ## Directory Layout
 
-The table below shows the canonical layout for all four CLI apps.
+The table below shows the canonical layout across the two CLI language stacks this repo has used:
+`rhino-cli` (Rust, the sole surviving CLI app after the app-inventory reset) and the F# layout
+pattern previously proven out by the now-removed `crane-cli` — preserved here as the reference
+shape for any future F# CLI.
 
-| Layer              | rhino-cli (Rust)      | crane-cli (F#)      | ose-cli (Rust)        | ayokoding-cli (Rust)  |
-| ------------------ | --------------------- | ------------------- | --------------------- | --------------------- |
-| Inbound adapter    | `src/commands/`       | `src/Adapters/In/`  | `src/commands/`       | `src/commands/`       |
-| Application        | `src/application/`    | `src/Core/Logic/`   | `src/application/`    | `src/application/`    |
-| Domain             | `src/domain/`         | `src/Core/Domain/`  | `src/domain/`         | `src/domain/`         |
-| Outbound adapters  | `src/infrastructure/` | `src/Adapters/Out/` | `src/infrastructure/` | `src/infrastructure/` |
-| I/O port contracts | —                     | `src/Core/Ports.fs` | —                     | —                     |
-| Binary entry point | `src/main.rs`         | `src/Program.fs`    | `src/main.rs`         | `src/main.rs`         |
+| Layer              | rhino-cli (Rust)      | F# CLI pattern (formerly `crane-cli`) |
+| ------------------ | --------------------- | ------------------------------------- |
+| Inbound adapter    | `src/commands/`       | `src/Adapters/In/`                    |
+| Application        | `src/application/`    | `src/Core/Logic/`                     |
+| Domain             | `src/domain/`         | `src/Core/Domain/`                    |
+| Outbound adapters  | `src/infrastructure/` | `src/Adapters/Out/`                   |
+| I/O port contracts | —                     | `src/Core/Ports.fs`                   |
+| Binary entry point | `src/main.rs`         | `src/Program.fs`                      |
 
 **`src/internal/` backward-compatibility shim**: `rhino-cli` retains a `src/internal/` directory containing
 thin re-export modules (e.g., `pub use crate::application::agents::*;`). These exist solely for callers that
 were written before the hexagonal migration (P7, 2026-05-23). No new code should import from `src/internal/`;
 import from `src/domain/`, `src/application/`, or `src/infrastructure/` directly.
 
-**crane-cli F# layout note**: crane-cli's F# implementation departs from the flat `src/commands/` layout because F#
+**F# CLI layout note (historical `crane-cli` pattern)**: `crane-cli`'s F# implementation departed from the flat `src/commands/` layout because F#
 compile order is explicit — all files must be declared in the `.fsproj` in dependency order. Grouped subdirectories
 (`src/Core/Domain/`, `src/Core/Logic/`, `src/Adapters/`) make compile-order intent visible. An additional
 `src/Core/Ports.fs` module declares all I/O boundaries as function type aliases (e.g.,

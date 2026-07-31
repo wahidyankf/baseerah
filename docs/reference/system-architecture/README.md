@@ -13,18 +13,28 @@ created: 2025-11-29
 
 > **Note:** This document is a work in progress (WIP/Draft). Content and diagrams are subject to change as the platform evolves.
 
-Comprehensive reference for the Open Sharia Enterprise platform architecture, including application inventory, interactions, deployment infrastructure, and CI/CD pipelines.
+Comprehensive reference for the Baseerah platform architecture, including application inventory, interactions, deployment infrastructure, and CI/CD pipelines.
+
+> **2026 Baseerah repo reset**: every prior application except `rhino-cli` was deleted. `rhino-cli`
+> is the sole surviving app; `baseerah-fe` and `baseerah-be` are planned but not yet scaffolded.
+> The diagrams below describe the current, much smaller system plus the planned Baseerah product
+> stack. See [applications.md](./applications.md) and the
+> [baseerah-repo-reset plan](../../../plans/in-progress/baseerah-repo-reset/README.md).
 
 ## System Overview
 
-Open Sharia Enterprise is a monorepo-based platform built with Nx, containing multiple applications that serve different aspects of the Sharia-compliant enterprise ecosystem. The system follows a microservices-style architecture where applications are independent but share common libraries and build infrastructure.
+Baseerah is a monorepo-based platform built with Nx. The system follows an independent-applications
+architecture where applications share common libraries and build infrastructure but do not import
+from one another.
 
 **Key Characteristics:**
 
-- **Monorepo Architecture**: Nx workspace with multiple independent applications
+- **Monorepo Architecture**: Nx workspace, currently one app (`rhino-cli`) plus shared libraries,
+  with `baseerah-fe`/`baseerah-be` planned
 - **Trunk-Based Development**: All development on `main` branch
 - **Automated Quality Gates**: Git hooks + GitHub Actions + Nx caching
-- **Deployment**: Vercel for static sites and web applications
+- **Deployment**: Vercel is the expected target for `baseerah-fe` once scaffolded; no web app is
+  deployed today
 - **Build Optimization**: Nx affected builds ensure only changed code is rebuilt
 
 ## C4 Model Architecture
@@ -40,58 +50,55 @@ Shows how the Open Sharia Enterprise platform fits into the world, including use
 ```mermaid
 graph LR
     subgraph "External Users"
-        DEVS[Developers<br/>Building enterprise apps]
-        AUTHORS[Content Authors<br/>Writing educational content]
+        DEVS[Developers<br/>Building the platform]
     end
 
     subgraph "External Systems"
         GITHUB[GitHub<br/>Source control & CI/CD]
     end
 
-    OSE_PLATFORM[OSE Platform<br/>Monorepo - 9 apps<br/>Nx workspace]
+    BASEERAH[Baseerah<br/>Monorepo<br/>Nx workspace]
 
     DEVS -->|Clone, commit, push| GITHUB
-    AUTHORS -->|Write markdown content| GITHUB
-    GITHUB -->|Webhook triggers| OSE_PLATFORM
+    GITHUB -->|Webhook triggers| BASEERAH
 
-    style OSE_PLATFORM fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
+    style BASEERAH fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
     style DEVS fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style AUTHORS fill:#2a9d8f,stroke:#264653,color:#ffffff
     style GITHUB fill:#6a4c93,stroke:#22223b,color:#ffffff
 ```
 
-**Content delivery flow:**
+**Planned end-user flow** (once `baseerah-fe`/`baseerah-be` are scaffolded — not yet real):
 
 ```mermaid
 graph LR
     subgraph "External Users"
-        LEARNERS[Learners<br/>Studying prog/AI/security]
+        USERS[End Users]
     end
 
-    OSE_PLATFORM[OSE Platform<br/>Monorepo - 9 apps<br/>Nx workspace]
+    BASEERAH[Baseerah<br/>Monorepo<br/>Nx workspace]
 
-    subgraph "External Systems"
-        VERCEL[Vercel<br/>Static site hosting]
+    subgraph "External Systems (planned)"
+        VERCEL[Vercel<br/>baseerah-fe hosting]
         DNS[DNS/CDN<br/>Domain management]
     end
 
-    LEARNERS -->|Read tutorials & guides| OSE_PLATFORM
-    OSE_PLATFORM -->|Deploy static sites| VERCEL
-    VERCEL -->|Serve websites| LEARNERS
-    DNS -->|Route traffic| VERCEL
+    USERS -.->|Use the product| BASEERAH
+    BASEERAH -.->|Deploy| VERCEL
+    VERCEL -.->|Serve| USERS
+    DNS -.->|Route traffic| VERCEL
 
-    style OSE_PLATFORM fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
-    style LEARNERS fill:#2a9d8f,stroke:#264653,color:#ffffff
+    style BASEERAH fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
+    style USERS fill:#2a9d8f,stroke:#264653,color:#ffffff
     style VERCEL fill:#6a4c93,stroke:#22223b,color:#ffffff
     style DNS fill:#6a4c93,stroke:#22223b,color:#ffffff
 ```
 
 **Key Relationships:**
 
-- **Developers & Authors**: Interact with GitHub (source of truth) to build applications and create content
-- **Learners**: Access educational content via Vercel-hosted sites (ayokoding-www, ose-www)
+- **Developers**: Interact with GitHub (source of truth) to build the platform
 - **GitHub**: Central hub for CI/CD automation and quality gates
-- **Vercel**: Automated deployment platform for Next.js web applications
+- **Vercel**: Expected deployment platform for `baseerah-fe` once scaffolded; no web app is
+  deployed today
 
 ## Contents
 

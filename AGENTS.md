@@ -306,17 +306,14 @@ maintain a live task list, marking in-progress/completed and adding discovered t
 
 ## AI Agents
 
-**Content Creation**: docs-{maker,tutorial-maker}, readme-maker, specs-maker,
-apps-ayokoding-www-{general,by-example,annotated-concept,primer,in-the-field}-maker, apps-ose-www-content-maker, swe-ui-maker
+**Content Creation**: docs-{maker,tutorial-maker}, readme-maker, specs-maker, swe-ui-maker
 
-**Validation**: docs-{checker,tutorial-checker,link-checker,software-engineering-separation-checker},
-readme-checker, specs-checker, apps-ayokoding-www-{general,by-example,annotated-concept,primer,in-the-field,facts,link}-checker,
-apps-ose-www-content-checker, swe-{code,ui}-checker, ci-checker, web-researcher,
+**Validation**: docs-{checker,tutorial-checker,link-checker},
+readme-checker, specs-checker, swe-{code,ui}-checker, ci-checker, web-researcher,
 repo-{rules,workflow,harness-compatibility}-checker
 
-**Fixing**: docs-{fixer,tutorial-fixer,software-engineering-separation-fixer,file-manager}, readme-fixer,
-specs-fixer, apps-ayokoding-www-{general,by-example,annotated-concept,primer,in-the-field,facts,link}-fixer,
-apps-ose-www-content-fixer, swe-ui-fixer, ci-fixer, repo-{rules,workflow,harness-compatibility}-fixer,
+**Fixing**: docs-{fixer,tutorial-fixer,file-manager}, readme-fixer,
+specs-fixer, swe-ui-fixer, ci-fixer, repo-{rules,workflow,harness-compatibility}-fixer,
 pr-review-fixer
 
 **PR Review Cycle**: fan-out (pr-review-{architecture,logic,governance,security,integrity,performance,docs,instruction}-maker)
@@ -338,11 +335,11 @@ Phase 0 first, `[AI]`/`[HUMAN]` tags, gated phases. See
 
 **Development**: swe-{golang,typescript,e2e,csharp,fsharp,rust}-dev
 
-**Operations**: apps-{ayokoding-www,ose-www,organiclever-www,organiclever-app-web,ose-app-web,wahidyankf-www,web-ui-storybook}-deployer
+**Operations**: none currently — every prior deployer targeted an app removed from this repo
 
 **Content**: pdf-to-md-{maker,checker,fixer}
 
-**Meta**: agent-maker, repo-{rules,workflow}-maker, social-linkedin-post-maker
+**Meta**: agent-maker, repo-{rules,workflow}-maker
 
 **Maker-Checker-Fixer Pattern**: Three-stage workflow with criticality levels (CRITICAL/HIGH/MEDIUM/LOW),
 confidence assessment (HIGH/MEDIUM/FALSE_POSITIVE).

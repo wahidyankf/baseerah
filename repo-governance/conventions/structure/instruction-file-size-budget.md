@@ -113,20 +113,20 @@ remains fully accessible — it is just no longer inlined.
 ❌ **Before** (inline-expanded, 2,700 bytes):
 
 ```markdown
-### ose-www
+### baseerah-fe
 
-- **URL**: <https://oseplatform.com>
-- **Production branch**: `prod-ose-www`
-- **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
+- **URL**: TBD (not yet deployed)
+- **Production branch**: `prod-baseerah-fe`
+- **Framework**: Next.js 16 (App Router, TypeScript)
 - **Deployment**: Vercel
-- **Dev port**: 3100
-- **E2E tests**: `ose-www-be-e2e`, `ose-www-fe-e2e`
+- **Dev port**: 19310
+- **E2E tests**: `baseerah-fe-e2e`
 ```
 
 ✅ **After** (progressive disclosure, ~50 bytes added to a table):
 
 ```markdown
-| `ose-www` | oseplatform.com | 3100 | `prod-ose-www` |
+| `baseerah-fe` | TBD | 19310 | `prod-baseerah-fe` |
 ```
 
 See per-app `README.md` for framework, deployment, and E2E details.

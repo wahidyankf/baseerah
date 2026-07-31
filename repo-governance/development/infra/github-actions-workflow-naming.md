@@ -46,7 +46,7 @@ Two problems motivate this convention:
    file requires opening files until the matching name is found.
 
 2. **Grouping**: Sorting `.github/workflows/` alphabetically should cluster files by the product/domain
-   they serve. A domain-first filename prefix (`organiclever-app-*`, `commons-*`, etc.) ensures related
+   they serve. A domain-first filename prefix (`baseerah-fe-*`, `commons-*`, etc.) ensures related
    workflows appear together regardless of what action they perform.
 
 This convention eliminates both friction points with a two-part standard: a domain-first grammar for
@@ -77,11 +77,11 @@ Every workflow filename follows this grammar:
 [_reusable-]{domain}-{action-chain}.yml
 ```
 
-| Token            | Description                                                                                                                                                                                                                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `_reusable-`     | Optional prefix. Use **only** for `workflow_call` reusables. Never use on caller workflows.                                                                                                                                                                                                      |
-| `{domain}`       | The app or cross-cutting group the workflow serves. App/group values: `ose-www`, `ayokoding-www`, `organiclever-www`, `wahidyankf-www`, `organiclever-app`, `ose-app`, `organiclever-be`, `ose-be`. Cross-cutting values: `commons`, `markdown`, `docs`, or any `{cli-name}` (e.g. `crane-cli`). |
-| `{action-chain}` | One or more verbs and environment qualifiers joined by `-`, written left-to-right in execution order (see vocabulary below).                                                                                                                                                                     |
+| Token            | Description                                                                                                                                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_reusable-`     | Optional prefix. Use **only** for `workflow_call` reusables. Never use on caller workflows.                                                                                                                          |
+| `{domain}`       | The app or cross-cutting group the workflow serves. App/group values (current + planned): `baseerah-fe`, `baseerah-be`. Cross-cutting values: `commons`, `markdown`, `docs`, or any `{cli-name}` (e.g. `rhino-cli`). |
+| `{action-chain}` | One or more verbs and environment qualifiers joined by `-`, written left-to-right in execution order (see vocabulary below).                                                                                         |
 
 ### Verb and Qualifier Vocabulary
 
@@ -167,6 +167,13 @@ flowchart TD
 
 ## Target File Set
 
+> **Historical note**: The table below documents the 17-file workflow set established by the
+> `standardize-github-actions-pipeline-naming` plan for the pre-reset multi-app repository
+> (`ose-www`, `ayokoding-www`, `organiclever-www`, `wahidyankf-www`, `organiclever-app`, `ose-app`,
+> `organiclever-be`, `ose-be`). All of those apps were removed by the Baseerah repo-reset plan, and
+> none of the listed files currently exist under `.github/workflows/`. The grammar itself remains in
+> force and will apply to `baseerah-fe` / `baseerah-be` once those apps are scaffolded.
+
 The 17 workflow files that the `standardize-github-actions-pipeline-naming` plan establishes as the
 canonical set, organized by tier:
 
@@ -233,27 +240,27 @@ Derivation: `PR - Quality Gate` → lowercase → `pr - quality gate` → spaces
 ---
 
 ```yaml
-# File: .github/workflows/organiclever-app-test-local-deploy-stag.yml
-name: OrganicLever App - Test Local Deploy Stag
+# File: .github/workflows/baseerah-fe-test-local-deploy-stag.yml
+name: Baseerah FE - Test Local Deploy Stag
 ```
 
-Derivation: lowercase + spaces-to-hyphens + collapse → `organiclever-app-test-local-deploy-stag` →
-append `.yml` → `organiclever-app-test-local-deploy-stag.yml`. Matches filename.
+Derivation: lowercase + spaces-to-hyphens + collapse → `baseerah-fe-test-local-deploy-stag` →
+append `.yml` → `baseerah-fe-test-local-deploy-stag.yml`. Matches filename.
 
 ### FAIL: Wrong prefix order (action before domain)
 
 ```yaml
-# File: .github/workflows/test-and-deploy-organiclever-www.yml  ← action first
-name: Test and Deploy - OrganicLever WWW
+# File: .github/workflows/test-and-deploy-baseerah-fe.yml  ← action first
+name: Test and Deploy - Baseerah FE
 ```
 
-The domain (`organiclever-www`) must come first. Correct filename:
-`organiclever-www-test-local-deploy-prod.yml`.
+The domain (`baseerah-fe`) must come first. Correct filename:
+`baseerah-fe-test-local-deploy-prod.yml`.
 
 ### FAIL: Using `_reusable-` on a caller workflow
 
 ```yaml
-# File: .github/workflows/_reusable-organiclever-app-test-local-deploy-stag.yml  ← wrong
+# File: .github/workflows/_reusable-baseerah-fe-test-local-deploy-stag.yml  ← wrong
 ```
 
 The `_reusable-` prefix is reserved for `workflow_call` reusables only. Caller workflows must
@@ -292,10 +299,10 @@ passes on `main` but manually dispatched tests fail (or vice versa).
 
 **Workflows that must stay aligned**:
 
-| Language | `pr-quality-gate.yml` step | Scheduled workflows to update                                                       |
-| -------- | -------------------------- | ----------------------------------------------------------------------------------- |
-| Node.js  | `node-version`             | All workflows installing Node.js                                                    |
-| .NET     | `dotnet-version`           | `organiclever-app-test-local-deploy-stag.yml`, `ose-app-test-local-deploy-stag.yml` |
+| Language | `pr-quality-gate.yml` step | Scheduled workflows to update                                                                       |
+| -------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Node.js  | `node-version`             | All workflows installing Node.js                                                                    |
+| .NET     | `dotnet-version`           | `baseerah-be-test-local-deploy-stag.yml` (once `baseerah-be` is scaffolded, if its stack uses .NET) |
 
 ### Adding new workflows
 

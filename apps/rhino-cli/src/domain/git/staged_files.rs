@@ -1,12 +1,7 @@
 //! Pure filter helpers for staged-file lists — no I/O.
 
 /// Directories skipped by the staged-mermaid and staged-heading steps.
-pub const STAGED_SKIP_PREFIXES: &[&str] = &[
-    "plans/done",
-    "apps/ayokoding-www/content",
-    "apps/ose-www/content",
-    "apps/rhino-cli/tests/fixtures",
-];
+pub const STAGED_SKIP_PREFIXES: &[&str] = &["plans/done", "apps/rhino-cli/tests/fixtures"];
 
 /// Returns the subset of `staged` files that end with `.md` and whose
 /// repo-relative path does not start with any of the named `skip_prefixes`.
@@ -41,7 +36,7 @@ mod tests {
         let staged = vec![
             "docs/foo.md".to_string(),
             "plans/done/old.md".to_string(),
-            "apps/ayokoding-www/content/page.md".to_string(),
+            "apps/rhino-cli/tests/fixtures/page.md".to_string(),
             "src/main.rs".to_string(),
         ];
         let result = staged_md_files(&staged, STAGED_SKIP_PREFIXES);

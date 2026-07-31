@@ -251,7 +251,7 @@ Same as SWE by-example. Production-focused, active voice, specific to the scenar
 
 ## Applies To
 
-This convention governs scenario by-example content in ayokoding-www:
+This convention governs scenario by-example content in `baseerah-fe` (once scaffolded):
 
 - `information-security/roles/ciso/by-example/` — CISO security governance track
 

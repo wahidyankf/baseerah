@@ -69,14 +69,13 @@ order:
 | 1    | Validate `.claude/` and `.opencode/` config (YAML, tools, model, skills, semantic equivalence) | Blocks commit               |
 | 2    | Validate `docker-compose` files found in staged changes                                        | Blocks commit               |
 | 3    | Run `nx affected run-pre-commit` (format checks, lightweight per-project hooks)                | Warn only — does not block  |
-| 4    | Stage `ayokoding-www` content files (auto-generated link data)                                 | N/A (staging step)          |
-| 5    | Run lint-staged (format all staged files by language)                                          | Blocks commit               |
-| 6    | Sync app `package-lock.json` files                                                             | Blocks commit if sync fails |
-| 7    | Validate docs file naming convention across staged files                                       | Blocks commit               |
-| 8    | Validate markdown links in staged files                                                        | Blocks commit               |
-| 9    | Lint all markdown files (`markdownlint-cli2`)                                                  | Blocks commit               |
+| 4    | Run lint-staged (format all staged files by language)                                          | Blocks commit               |
+| 5    | Sync app `package-lock.json` files                                                             | Blocks commit if sync fails |
+| 6    | Validate docs file naming convention across staged files                                       | Blocks commit               |
+| 7    | Validate markdown links in staged files                                                        | Blocks commit               |
+| 8    | Lint all markdown files (`markdownlint-cli2`)                                                  | Blocks commit               |
 
-**Lint-staged language formatters (step 5)**:
+**Lint-staged language formatters (step 4)**:
 
 | Language / File Type                              | Formatter       |
 | ------------------------------------------------- | --------------- |
@@ -168,28 +167,28 @@ per-backend implementation patterns, see the
 Each app type implements the three levels according to its domain. The table below shows how each
 app type realises each level.
 
-| App Type                                          | Unit (`test:unit`)                                    | Integration (`test:integration`)                                              | E2E (`test:e2e`)                                     |
-| ------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------- |
-| **BE API** (`organiclever-be`)                    | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
-| **FE** (`organiclever-app-web`)                   | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
-| **CLI** (`*-cli`)                                 | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                       |
-| **Content platform** (`ayokoding-www`, `ose-www`) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
-| **Library** (`rust-commons`)                      | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                       |
-| **E2E runner** (`*-e2e`)                          | Not applicable                                        | Not applicable                                                                | Playwright — this project IS the E2E suite           |
+| App Type                                           | Unit (`test:unit`)                                    | Integration (`test:integration`)                                              | E2E (`test:e2e`)                                     |
+| -------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **BE API** (`baseerah-be`, planned)                | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
+| **FE** (`baseerah-fe`, planned)                    | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
+| **CLI** (`*-cli`)                                  | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                       |
+| **Content platform** (none currently in this repo) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
+| **Library** (`rust-commons`)                       | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                       |
+| **E2E runner** (`*-e2e`)                           | Not applicable                                        | Not applicable                                                                | Playwright — this project IS the E2E suite           |
 
 ## Gherkin Consumption Matrix
 
 All testable projects must consume Gherkin specifications at every applicable test level. E2E
 runner projects ARE the Gherkin consumers at the E2E level.
 
-| App Type                    | Unit consumes Gherkin                                                  | Integration consumes Gherkin | E2E consumes Gherkin                 |
-| --------------------------- | ---------------------------------------------------------------------- | ---------------------------- | ------------------------------------ |
-| BE API (`organiclever-be`)  | Yes — `specs/apps/organiclever/behavior/organiclever-be/gherkin/`      | Yes — same specs             | Yes — same specs                     |
-| FE (`organiclever-app-web`) | Yes — `specs/apps/organiclever/behavior/organiclever-app-web/gherkin/` | Yes — same specs             | Yes — via `organiclever-app-web-e2e` |
-| CLI (`*-cli`)               | Yes — `specs/apps/{domain}/behavior/<product>-cli/gherkin/`            | Yes — same specs             | Not applicable                       |
-| Content platform            | Yes — project-local specs                                              | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e`    |
-| Library                     | Yes — library-specific specs                                           | Yes — same specs             | Not applicable                       |
-| E2E runner                  | Not applicable                                                         | Not applicable               | Yes — consumes shared specs          |
+| App Type                        | Unit consumes Gherkin                                       | Integration consumes Gherkin | E2E consumes Gherkin              |
+| ------------------------------- | ----------------------------------------------------------- | ---------------------------- | --------------------------------- |
+| BE API (`baseerah-be`, planned) | Yes — `specs/apps/baseerah/behavior/baseerah-be/gherkin/`   | Yes — same specs             | Yes — same specs                  |
+| FE (`baseerah-fe`, planned)     | Yes — `specs/apps/baseerah/behavior/baseerah-fe/gherkin/`   | Yes — same specs             | Yes — via `baseerah-fe-e2e`       |
+| CLI (`*-cli`)                   | Yes — `specs/apps/{domain}/behavior/<product>-cli/gherkin/` | Yes — same specs             | Not applicable                    |
+| Content platform                | Yes — project-local specs                                   | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e` |
+| Library                         | Yes — library-specific specs                                | Yes — same specs             | Not applicable                    |
+| E2E runner                      | Not applicable                                              | Not applicable               | Yes — consumes shared specs       |
 
 ## Coverage Threshold Rationale
 
@@ -197,11 +196,11 @@ Coverage thresholds are enforced by the native `test:coverage` Nx target as part
 Thresholds differ by project type to reflect the realistic upper bound achievable through mocked
 unit tests.
 
-| Threshold | App Types                                                | Rationale                                                                                                                                                                       |
-| --------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **90%**   | BE API backends (`organiclever-be`), CLI apps, Rust libs | Core business logic with high mock isolation. Service functions operate on pure data structures; 90% is achievable without heroic effort.                                       |
-| **80%**   | Content platforms (`ayokoding-www`, `ose-www`)           | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
-| **70%**   | FE apps (`organiclever-app-web`)                         | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
+| Threshold | App Types                                                     | Rationale                                                                                                                                                                       |
+| --------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **90%**   | BE API backends (`baseerah-be`, planned), CLI apps, Rust libs | Core business logic with high mock isolation. Service functions operate on pure data structures; 90% is achievable without heroic effort.                                       |
+| **80%**   | Content platforms (none currently in this repo)               | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
+| **70%**   | FE apps (`baseerah-fe`, planned)                              | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
 
 Coverage is measured via the appropriate reporter for each language and converted to LCOV or
 JaCoCo XML. Coverage enforcement runs inside each project's native `test:coverage` Nx target. See
@@ -296,6 +295,14 @@ Broad exclusion prevents accidentally including large directories (e.g., `node_m
 ## GitHub Actions Conventions
 
 ### File Organisation
+
+> **Historical note**: The "Concrete examples (after-state)" column below documents the file set
+> produced by the `standardize-github-actions-pipeline-naming` plan for the pre-reset multi-app
+> repository (`ose-www`, `ayokoding-www`, `organiclever-www`, `wahidyankf-www`, `organiclever-app`,
+> `ose-app`, `organiclever-be`, `ose-be`). All of those apps were removed by the Baseerah repo-reset
+> plan; the concrete filenames are kept here as a worked historical example of the pattern column
+> to their left. The pattern itself remains in force for `baseerah-fe` / `baseerah-be` once those
+> apps are scaffolded.
 
 | Artifact                     | Path pattern                                                | Concrete examples (after-state)                                                                                                                                              |
 | ---------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -393,20 +400,20 @@ encodes ordered execution phases left-to-right (e.g., `test-local-deploy-stag`).
 [GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md) for the complete
 grammar, allowed tokens, and the rule that the workflow `name:` field must mirror the filename.
 
-| Entity                    | Pattern                                                                                   | Example                                                     |
-| ------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Backend app               | `{domain}-be` or `{domain}-be-{lang}-{framework}`                                         | `organiclever-be`                                           |
-| Frontend app              | `{domain}-app-web`                                                                        | `organiclever-app-web`                                      |
-| www site app              | `{domain}-www`                                                                            | `organiclever-www`                                          |
-| Infra dev directory       | `infra/dev/{app-name}/`                                                                   | `infra/dev/organiclever-be/`                                |
-| Specs directory           | See [Specs Directory Structure](../../conventions/structure/specs-directory-structure.md) | `specs/apps/organiclever/behavior/organiclever-be/gherkin/` |
-| Reusable workflow         | `_reusable-{purpose}.yml`                                                                 | `_reusable-app-test-local-deploy-stag.yml`                  |
-| www deploy workflow       | `{domain}-www-test-local-deploy-prod.yml`                                                 | `organiclever-www-test-local-deploy-prod.yml`               |
-| App staging workflow      | `{domain}-app-test-local-deploy-stag.yml`                                                 | `organiclever-app-test-local-deploy-stag.yml`               |
-| App staging-gate workflow | `{domain}-app-test-stag.yml`                                                              | `organiclever-app-test-stag.yml`                            |
-| BE build+deploy workflow  | `{domain}-be-build-deploy-stag.yml`                                                       | `organiclever-be-build-deploy-stag.yml`                     |
-| Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `pr-quality-gate.yml`, `validate-env.yml`                   |
-| Composite action          | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                     |
+| Entity                    | Pattern                                                                                   | Example                                                       |
+| ------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Backend app               | `{domain}-be` or `{domain}-be-{lang}-{framework}`                                         | `baseerah-be` (planned)                                       |
+| Frontend app              | `{domain}-fe` (Baseerah has no separate www/app-web split)                                | `baseerah-fe` (planned)                                       |
+| www site app              | `{domain}-www`                                                                            | none currently — Baseerah is a single-frontend repo           |
+| Infra dev directory       | `infra/dev/{app-name}/`                                                                   | `infra/dev/baseerah-be/` (planned)                            |
+| Specs directory           | See [Specs Directory Structure](../../conventions/structure/specs-directory-structure.md) | `specs/apps/baseerah/behavior/baseerah-be/gherkin/` (planned) |
+| Reusable workflow         | `_reusable-{purpose}.yml`                                                                 | `_reusable-app-test-local-deploy-stag.yml`                    |
+| www deploy workflow       | `{domain}-www-test-local-deploy-prod.yml`                                                 | none currently — Baseerah is a single-frontend repo           |
+| App staging workflow      | `{domain}-app-test-local-deploy-stag.yml`                                                 | `baseerah-fe-test-local-deploy-stag.yml` (planned)            |
+| App staging-gate workflow | `{domain}-app-test-stag.yml`                                                              | `baseerah-fe-test-stag.yml` (planned)                         |
+| BE build+deploy workflow  | `{domain}-be-build-deploy-stag.yml`                                                       | `baseerah-be-build-deploy-stag.yml` (planned)                 |
+| Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `pr-quality-gate.yml`, `validate-env.yml`                     |
+| Composite action          | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                       |
 
 ## Adding a New App to CI
 
@@ -437,11 +444,11 @@ Follow this checklist in order when adding a new app variant to the monorepo.
 
 Each app pairs with dedicated E2E runner projects for end-to-end testing.
 
-| App Type                                           | E2E Pairing                                    |
-| -------------------------------------------------- | ---------------------------------------------- |
-| Backend (`organiclever-be`, `ayokoding-www`, etc.) | Dedicated `*-be-e2e` Playwright runner project |
-| Frontend (`organiclever-app-web`, etc.)            | Dedicated `*-fe-e2e` Playwright runner project |
-| Content platforms                                  | Both `*-be-e2e` and `*-fe-e2e` runners         |
+| App Type                                | E2E Pairing                                    |
+| --------------------------------------- | ---------------------------------------------- |
+| Backend (`baseerah-be`, planned, etc.)  | Dedicated `*-be-e2e` Playwright runner project |
+| Frontend (`baseerah-fe`, planned, etc.) | Dedicated `*-fe-e2e` Playwright runner project |
+| Content platforms                       | Both `*-be-e2e` and `*-fe-e2e` runners         |
 
 Each product app has its own dedicated E2E runner (`*-be-e2e`, `*-fe-e2e`) scoped to that product's
 scenarios.
@@ -599,7 +606,7 @@ as flowchart diagrams:
   Use abbreviations or split composite states when labels exceed this limit.
 
 Both rules are enforced by `rhino-cli:mermaid:validation`, which scans the entire repo (excluding
-`plans/done/`, `apps/ayokoding-www/content/`, and the standard noise-skip set).
+`plans/done/`, `apps/rhino-cli/tests/fixtures/`, and the standard noise-skip set).
 
 ### Affected-First PR-Gate Principle
 

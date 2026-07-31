@@ -35,7 +35,7 @@
 //!   and `ose-private` produces three resulting symlink targets that differ
 //!   in *only* the repo-name path segment.
 //! - **"Nx build caching is unaffected for crates that emit only dist"**:
-//!   actual Nx cache-hit verification (`nx run ayokoding-cli:build` twice,
+//!   actual Nx cache-hit verification (`nx run rhino-cli:build` twice,
 //!   checking for "Nx read the output from the cache") is
 //!   `delivery.md` Phase 3, after the `project.json` `build.outputs` edits
 //!   this plan's Phase 1/2 does not make. What Phase 1/2 *can* and does

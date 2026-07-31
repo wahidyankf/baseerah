@@ -1,8 +1,7 @@
 # Vitest Glob-Coverage Guard
 
 > **Status**: Backlog (not started). Filed from a Knowledge Capture learning surfaced during
-> [`ayokoding-www-tools-ai-benchmark`](../../done/2026-07-30__ayokoding-www-tools-ai-benchmark/README.md)'s
-> PR #122 cycle-3 review (`pr-review-integrity-maker`, HIGH finding F2).
+> `ayokoding-www-tools-ai-benchmark`'s PR #122 cycle-3 review (`pr-review-integrity-maker`, HIGH finding F2).
 
 ## Context
 

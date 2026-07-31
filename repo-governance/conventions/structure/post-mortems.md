@@ -108,11 +108,11 @@ Where:
 
 **Examples**:
 
-| PASS: Correct                                           | FAIL: Incorrect                           | Why                                                            |
-| ------------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------- |
-| `2026-06-05-github-actions-nx-affected-stall.md`        | `post-mortem-2026-06-05.md`               | Missing system and failure                                     |
-| `2025-11-01-organiclever-www-vercel-outage.md`          | `2025-11-01__organiclever-www__vercel.md` | Double underscore is plans-folder style, not post-mortem style |
-| `2025-09-14-rhino-cli-coverage-threshold-regression.md` | `2025-09-14-Rhino-CLI.md`                 | Uppercase not allowed                                          |
+| PASS: Correct                                           | FAIL: Incorrect                      | Why                                                            |
+| ------------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------- |
+| `2026-06-05-github-actions-nx-affected-stall.md`        | `post-mortem-2026-06-05.md`          | Missing system and failure                                     |
+| `2025-11-01-baseerah-fe-vercel-outage.md`               | `2025-11-01__baseerah-fe__vercel.md` | Double underscore is plans-folder style, not post-mortem style |
+| `2025-09-14-rhino-cli-coverage-threshold-regression.md` | `2025-09-14-Rhino-CLI.md`            | Uppercase not allowed                                          |
 
 ### Blameless Principle
 
@@ -338,10 +338,11 @@ Use the format `Sev-N — Label` in the metadata table, e.g., `Sev-3 — Moderat
 
 **Software severity examples**:
 
-- **Sev-1**: Production database migration gone wrong corrupts user records across all OrganicLever
-  accounts; Vercel deployment serves a broken build to all visitors of `www.organiclever.com`.
+- **Sev-1**: Production database migration gone wrong corrupts user records across all Baseerah
+  accounts; Vercel deployment serves a broken build to every visitor of the production `baseerah-fe` site.
 - **Sev-2**: GitHub Actions CI is blocked for all PRs due to a broken Nx Cloud integration;
-  multi-site Vercel outage takes `ayokoding.com` and `oseplatform.com` offline simultaneously.
+  a platform-wide Vercel incident takes `baseerah-fe` and every other OSE-family production site
+  offline simultaneously.
 - **Sev-3**: Prettier post-tool hook reformats generated `.amazonq/` binding files, breaking the
   cross-vendor parity guard on every `Edit` operation; coverage-threshold regression blocks
   `test:quick` for one app after a dependency bump.
@@ -381,12 +382,12 @@ WCAG AA hex codes: `#0173B2` (blue), `#DE8F05` (orange), `#029E73` (teal), `#CC7
 
 ### Filename examples
 
-| PASS: Correct                                                 | FAIL: Wrong                                      | Reason                                                        |
-| ------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------- |
-| `2026-06-04-github-actions-nx-affected-stall.md`              | `post-mortem-github-actions-2026.md`             | No incident date prefix; year is not an ISO date              |
-| `2025-11-01-organiclever-www-vercel-deploy-failure.md`        | `2025-11-01__organiclever-www__vercel.md`        | Double underscores are for `plans/` folders, not post-mortems |
-| `2025-09-14-organiclever-be-coverage-threshold-regression.md` | `2025-09-14-OrganicleverBe-Coverage.md`          | Uppercase components                                          |
-| `2026-03-20-amazonq-binding-parity-guard-break.md`            | `docs/how-to/post-mortems/parity-guard-break.md` | Wrong Diátaxis tier; post-mortems are explanation, not how-to |
+| PASS: Correct                                             | FAIL: Wrong                                      | Reason                                                        |
+| --------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------- |
+| `2026-06-04-github-actions-nx-affected-stall.md`          | `post-mortem-github-actions-2026.md`             | No incident date prefix; year is not an ISO date              |
+| `2025-11-01-baseerah-fe-vercel-deploy-failure.md`         | `2025-11-01__baseerah-fe__vercel.md`             | Double underscores are for `plans/` folders, not post-mortems |
+| `2025-09-14-baseerah-be-coverage-threshold-regression.md` | `2025-09-14-BaseerahBe-Coverage.md`              | Uppercase components                                          |
+| `2026-03-20-amazonq-binding-parity-guard-break.md`        | `docs/how-to/post-mortems/parity-guard-break.md` | Wrong Diátaxis tier; post-mortems are explanation, not how-to |
 
 ### Action item table
 

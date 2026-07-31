@@ -32,8 +32,8 @@ but they all share the same Nx build system and git hooks.
 
 - **Minimal** — Node.js + Docker + jq. Covers git hooks, TypeScript projects, and
   basic E2E tests.
-- **Full** — All tools checked by doctor. Required for working on F# backend apps
-  (`organiclever-be`, `ose-be`) and Rust CLI tools.
+- **Full** — All tools checked by doctor. Required for the planned `baseerah-be` F# backend
+  (not yet scaffolded) and Rust CLI tools (`rhino-cli`).
 - **Automated** — Run `npm run doctor -- --fix` to auto-install missing tools. Use
   `npm run doctor -- --fix --dry-run` to preview what would be installed.
 
@@ -147,7 +147,7 @@ volta install npm@11.10.1
 
 ### Step 4: Rust Toolchain
 
-Required for `rhino-cli`, `ose-cli`, `ayokoding-cli`, and `libs/rust-commons`. The toolchain version is pinned via `rust-toolchain.toml` in each project — `rustup` picks it up automatically.
+Required for `rhino-cli` and `libs/rust-commons`. The toolchain version is pinned via `rust-toolchain.toml` in each project — `rustup` picks it up automatically.
 
 ```bash
 # Install rustup (if not present)
@@ -244,12 +244,17 @@ This also warms the Nx cache, making subsequent pushes fast.
 
 ### Test integration tests
 
+No app in this repo currently has a `test:integration` target (the planned `baseerah-be` F#
+backend, once scaffolded, will use Docker + PostgreSQL and expose one). Until then, verify Docker
+and database tooling directly:
+
 ```bash
-# Run the OrganicLever backend's integration suite (uses Docker + PostgreSQL)
-nx run organiclever-be:test:integration
+docker compose version
+docker info
 ```
 
-If this passes, Docker and database integration work correctly.
+Once `baseerah-be` exists, run `nx run baseerah-be:test:integration` to confirm the full
+Docker + PostgreSQL integration path works.
 
 ## Troubleshooting
 
@@ -323,13 +328,13 @@ npx playwright install-deps
 
 All version requirements are auto-detected by `npm run doctor` from these config files:
 
-| Tool       | Version Source                                   |
-| ---------- | ------------------------------------------------ |
-| Node.js    | `package.json` → `volta.node`                    |
-| npm        | `package.json` → `volta.npm`                     |
-| Rust       | `apps/rhino-cli/rust-toolchain.toml` → `channel` |
-| .NET       | `apps/organiclever-be/global.json` → `sdk`       |
-| Docker, jq | Any (no pinned version)                          |
+| Tool       | Version Source                                                                      |
+| ---------- | ----------------------------------------------------------------------------------- |
+| Node.js    | `package.json` → `volta.node`                                                       |
+| npm        | `package.json` → `volta.npm`                                                        |
+| Rust       | `apps/rhino-cli/rust-toolchain.toml` → `channel`                                    |
+| .NET       | `apps/baseerah-be/global.json` → `sdk` (planned — `baseerah-be` not yet scaffolded) |
+| Docker, jq | Any (no pinned version)                                                             |
 
 Never hardcode version numbers in scripts — always read from these source-of-truth files.
 

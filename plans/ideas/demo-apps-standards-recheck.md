@@ -20,9 +20,9 @@ three-tier testing). Drift, if any, is easiest to catch before it compounds.
 ## Prior art / precedents
 
 - **standardize-repo-toolchain-parity plan (done)** — the standards shift the extracted demo apps may
-  now lag behind. [toolchain-parity](../done/2026-06-13__standardize-repo-toolchain-parity/README.md)
+  now lag behind.
 - **lint-safety-parity plan (done)** — companion parity work whose lint gates the demo apps must now
-  meet. [lint-safety-parity](../done/2026-06-12__lint-safety-parity/README.md)
+  meet.
 - **Related Repositories reference** — documents ose-primer as authoritative for the extracted demo
   apps, framing the repo-ownership open question. [related-repositories](../../docs/reference/related-repositories.md)
 - **ci-checker** — the conformance-check agent to run against the demo apps. [ci-checker agent](../../.claude/agents/ci-checker.md)

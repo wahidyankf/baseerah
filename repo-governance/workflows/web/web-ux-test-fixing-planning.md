@@ -231,7 +231,7 @@ cross-tester completeness critic in Phase 3.5.
 - Verify every URL in `target-urls` returns HTTP 200 (curl). If the server is down, abort and ask
   the user to start it — the testers cannot run against a dead target.
 - Resolve `plan-mode`. For `new`, resolve `plan-identifier` (input, else derive from the target,
-  e.g. `ayokoding-www-calc-test-fixing`). For `merge`, require `target-plan-path` to point at an
+  e.g. `baseerah-fe-calc-test-fixing`). For `merge`, require `target-plan-path` to point at an
   existing folder under `plans/in-progress/`; abort if absent.
 - Resolve `breakpoints` and `locales` (defaults = testers' own standard coverage; `locales` defaults
   to ALL locales the target supports — discovered from the app's i18n config or locale-prefixed
@@ -387,10 +387,9 @@ prioritization, fix approach, and any UI direction, then authors:
 **Conditional — UI-bearing gate**: if **any** finding's fix adds or changes a user-facing screen or
 component under `apps/`/`libs/`, the plan is **UI-bearing** and MUST carry an `assets/` folder with
 the both-tiers mockups required by the
-[UI Mockups in Plan Docs convention](../../conventions/formatting/diagrams.md#ui-mockups-in-plan-docs),
-exactly as the originating
-[salary-savings-calculator plan](../../../plans/done/2026-06-19__ayokoding-www-salary-savings-calculator/assets)
-does:
+[UI Mockups in Plan Docs convention](../../conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
+— the same both-tiers shape the (since-archived and removed) `ayokoding-www` salary-savings-calculator
+plan originally demonstrated:
 
 - **Tier 1 (low-fidelity)** — ASCII/Unicode wireframes inline, plus a `ui-<screen>-low-fi-alternatives.md`
   capturing the design-funnel divergence for each changed screen.

@@ -228,7 +228,7 @@ mod tests {
     /// `README.md` isn't a naming choice for GitHub. 268 pre-existing `_index.md` files already
     /// violated the unfixed rule without ever being caught, because `md naming validate` in
     /// lint-staged only runs on newly-staged/changed files; the first newly-staged `_index.md`
-    /// (scaffolded by `apps-ayokoding-www-general-maker`) tripped the pre-commit hook.
+    /// (scaffolded by a content-maker agent) tripped the pre-commit hook.
     #[test]
     fn index_md_always_exempt() {
         let tmp = TempDir::new().unwrap();

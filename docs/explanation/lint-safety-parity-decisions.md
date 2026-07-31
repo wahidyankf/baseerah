@@ -22,8 +22,7 @@ This document records the ose-public decisions in the cross-repo
 and unsafe-code posture to an **equal** standard across three sibling
 repositories — ose-public (this repo), ose-primer, and ose-private — so the shared
 scaffolding layer stops drifting. The full per-row deviation matrix lives in the
-plan's
-[`tech-docs.md`](../../plans/done/2026-06-12__lint-safety-parity/tech-docs.md).
+plan's `tech-docs.md` (`plans/done/2026-06-12__lint-safety-parity/tech-docs.md`).
 
 Sibling plans:
 
@@ -57,12 +56,15 @@ markdown/prettier are already gated.
 **Decision**: Delete the root `.golangci.yml`.
 
 **Rationale**: ose-public has **zero `go.mod` files** — Go was fully removed and
-the former Go CLIs (`ayokoding-cli`, `ose-cli`) are now Rust projects. No
-`project.json` lint target invokes `golangci-lint run`, and the `setup-golang`
-composite action installs the binary only for the `oapi-codegen` toolchain, never
-to lint. The config was dead. The `golangci-lint` references that remain are in
-ayokoding-www **educational content** and a few stale READMEs — preexisting
-doc-drift, out of this dimension's scope.
+the former Go CLIs (`ayokoding-cli`, `ose-cli`) are now Rust projects. (Both
+Rust CLIs were later removed entirely in the `baseerah-repo-reset`; only
+`rhino-cli` survives today.) No `project.json` lint target invokes
+`golangci-lint run`, and the `setup-golang` composite action installs the
+binary only for the `oapi-codegen` toolchain, never to lint. The config was
+dead. The `golangci-lint` references that remain are in ayokoding-www
+**educational content** and a few stale READMEs — preexisting doc-drift, out of
+this dimension's scope. (The `ayokoding-www` app itself has since been removed
+in the `baseerah-repo-reset`.)
 
 ### D7 — Shell lint (shellcheck)
 
@@ -173,6 +175,6 @@ inline at the point of suppression.
 
 ## Related
 
-- Plan: [`plans/done/2026-06-12__lint-safety-parity/`](../../plans/done/2026-06-12__lint-safety-parity/README.md)
+- Plan: `plans/done/2026-06-12__lint-safety-parity/README.md`
 - Convention: [Cross-Language Lint Strictness](../../repo-governance/development/quality/cross-language-lint-strictness.md)
 - Sibling precedent: [Gherkin Step-Keyword Cardinality — Parity Decisions](./gherkin-step-keyword-cardinality-parity-decisions.md)

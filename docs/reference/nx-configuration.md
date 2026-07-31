@@ -262,24 +262,27 @@ Per-project:
 
 ### Complete Example (Next.js App)
 
+Illustrative — no Next.js app is scaffolded yet; shape matches the planned `baseerah-fe`
+(see [monorepo-structure.md](./monorepo-structure.md)):
+
 ```json
 {
-  "name": "ose-www",
-  "sourceRoot": "apps/ose-www",
+  "name": "app-name",
+  "sourceRoot": "apps/app-name",
   "projectType": "application",
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next dev --port 3100",
-        "cwd": "apps/ose-www"
+        "cwd": "apps/app-name"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next build",
-        "cwd": "apps/ose-www"
+        "cwd": "apps/app-name"
       },
       "outputs": ["{projectRoot}/.next"]
     },
@@ -287,11 +290,11 @@ Per-project:
       "executor": "nx:run-commands",
       "options": {
         "command": "rm -rf .next",
-        "cwd": "apps/ose-www"
+        "cwd": "apps/app-name"
       }
     }
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ose"]
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"]
 }
 ```
 
@@ -349,12 +352,12 @@ Per-project:
 
 All projects use a standard four-dimension tag scheme:
 
-| Dimension   | Values                                                      | Required                 | Purpose                 |
-| ----------- | ----------------------------------------------------------- | ------------------------ | ----------------------- |
-| `type:`     | `app`, `lib`, `e2e`                                         | Yes                      | Project kind            |
-| `platform:` | `cli`, `nextjs`, `flutter`, `spring-boot`, `playwright`     | For apps/e2e             | Framework/runtime       |
-| `lang:`     | `rust`, `ts`, `dotnet`                                      | Where source code exists | Primary language        |
-| `domain:`   | `ayokoding`, `ose`, `organiclever`, `wahidyankf`, `tooling` | Yes                      | Business/product domain |
+| Dimension   | Values                                                  | Required                 | Purpose                 |
+| ----------- | ------------------------------------------------------- | ------------------------ | ----------------------- |
+| `type:`     | `app`, `lib`, `e2e`                                     | Yes                      | Project kind            |
+| `platform:` | `cli`, `nextjs`, `flutter`, `spring-boot`, `playwright` | For apps/e2e             | Framework/runtime       |
+| `lang:`     | `rust`, `ts`, `dotnet`                                  | Where source code exists | Primary language        |
+| `domain:`   | `baseerah`, `tooling`, `ui`                             | Yes                      | Business/product domain |
 
 **Notes**:
 
@@ -373,7 +376,7 @@ Project name used by Nx CLI.
 
 **Examples**:
 
-- `"ose-www"` (app)
+- `"rhino-cli"` (app)
 - `"ts-utils"` (lib)
 
 #### `sourceRoot`
@@ -386,7 +389,7 @@ Location of source code.
 
 **Examples**:
 
-- `"apps/ose-www"` (app root)
+- `"apps/rhino-cli"` (app root)
 - `"libs/ts-utils/src"` (lib source)
 
 #### `projectType`
@@ -440,7 +443,7 @@ Executor options.
   - Examples: `"next build"`, `"tsc -p tsconfig.json"`
 - `cwd` (string): Working directory
   - Optional (defaults to workspace root)
-  - Examples: `"apps/ose-www"`, `"."`
+  - Examples: `"apps/app-name"`, `"."`
 
 **Example**:
 
@@ -448,7 +451,7 @@ Executor options.
 {
   "options": {
     "command": "next build",
-    "cwd": "apps/ose-www"
+    "cwd": "apps/app-name"
   }
 }
 ```
@@ -698,7 +701,7 @@ Skip Nx cache.
 **Usage**:
 
 ```bash
-NX_SKIP_NX_CACHE=true nx build ose-www
+NX_SKIP_NX_CACHE=true nx build rhino-cli
 ```
 
 #### `NX_DAEMON`
@@ -708,7 +711,7 @@ Enable/disable Nx daemon.
 **Usage**:
 
 ```bash
-NX_DAEMON=false nx build ose-www
+NX_DAEMON=false nx build rhino-cli
 ```
 
 ## Related Documentation

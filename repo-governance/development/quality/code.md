@@ -136,14 +136,13 @@ npx prettier --write [file-path]
 | 1    | `.claude/` or `.opencode/` staged      | Validate → Sync → Validate-sync                                              | exit 1     |
 | 2    | `docker-compose.ya?ml` staged          | `docker compose -f <file> config` per file                                   | exit 1     |
 | 3    | always                                 | `nx affected -t run-pre-commit --skip-nx-cache`                              | warn only  |
-| 4    | always                                 | `git add apps/ayokoding-www/content/`                                        | ignored    |
-| 5    | always                                 | `npx lint-staged`                                                            | exit 1     |
-| 5b   | `apps/<app>/package.json` staged       | Regenerate + stage `apps/<app>/package-lock.json`                            | exit 1     |
-| 6    | `docs/` staged                         | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/`   | exit 1     |
-| 6m   | staged `.md` files (skip 3 exclusions) | `mermaid:validation` — diagram width, label length, syntax (staged-only)     | exit 1     |
-| 6h   | staged `.md` in prose allowlist        | `headings:hierarchy-validation` — single H1, no skipped levels (staged-only) | exit 1     |
-| 7    | always                                 | Validate markdown links + `#fragment` anchors (staged only)                  | exit 1     |
-| 8    | always                                 | `npm run lint:md`                                                            | exit 1     |
+| 4    | always                                 | `npx lint-staged`                                                            | exit 1     |
+| 4b   | `apps/<app>/package.json` staged       | Regenerate + stage `apps/<app>/package-lock.json`                            | exit 1     |
+| 5    | `docs/` staged                         | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/`   | exit 1     |
+| 5m   | staged `.md` files (skip 3 exclusions) | `mermaid:validation` — diagram width, label length, syntax (staged-only)     | exit 1     |
+| 5h   | staged `.md` in prose allowlist        | `headings:hierarchy-validation` — single H1, no skipped levels (staged-only) | exit 1     |
+| 6    | always                                 | Validate markdown links + `#fragment` anchors (staged only)                  | exit 1     |
+| 7    | always                                 | `npm run lint:md`                                                            | exit 1     |
 
 1. Commit proceeds if no errors
 
@@ -172,10 +171,10 @@ Validates primary and secondary platform binding directory consistency before co
 
 **Markdown:**
 
-- Validates Mermaid diagrams in staged `.md` files (width, label length, syntax) — step 6m
-- Validates heading hierarchy in staged prose-allowlist `.md` files (single H1, no skipped levels) — step 6h
-- Validates markdown links + `#fragment` anchors in staged files only (fast, targeted) — step 7
-- Validates all markdown files meet linting standards (comprehensive) — step 8
+- Validates Mermaid diagrams in staged `.md` files (width, label length, syntax) — step 5m
+- Validates heading hierarchy in staged prose-allowlist `.md` files (single H1, no skipped levels) — step 5h
+- Validates markdown links + `#fragment` anchors in staged files only (fast, targeted) — step 6
+- Validates all markdown files meet linting standards (comprehensive) — step 7
 
 **What Happens on Failure**:
 
@@ -270,25 +269,25 @@ $ git push origin main
 > nx affected -t typecheck
 
  Running target typecheck for affected projects...
-   organiclever-www
+   rhino-cli
  All checks passed
 
 > nx affected -t lint
 
  Running target lint for affected projects...
-   organiclever-www
+   rhino-cli
  All checks passed
 
 > nx affected -t test:quick
 
  Running target test:quick for affected projects...
-   organiclever-www
+   rhino-cli
  All checks passed
 
 > nx affected -t specs:coverage
 
  Running target specs:coverage for affected projects...
-   organiclever-www
+   rhino-cli
  All checks passed
 
 Enumerating objects: 5, done.
@@ -471,60 +470,19 @@ git commit -m "fix: correct validation logic"
 # Commit includes formatted version automatically
 ```
 
-## ayokoding-www Link Validation
+## Content-Platform-Specific Link Validation (Historical)
 
-Internal links in ayokoding-www content are validated
-automatically on every `test:quick` run via `ayokoding-cli links check`.
-
-**Convention:**
-
-- Internal links are validated for correctness
-- External links (`http://`, `https://`, `mailto:`) are NOT validated by this tool — use the
-  `apps-ayokoding-www-link-checker` AI agent for those
-- Same-page anchors (`#section`) are not validated
-
-**Examples:**
-
-```markdown
-<!-- Correct internal link -->
-
-[Overview](/en/learn/swe/overview)
-
-<!-- Correct — resolves to _index.md for section pages -->
-
-[Learn](/en/learn)
-
-<!-- Wrong — relative paths break in sidebar/menu contexts -->
-
-[Overview](../overview)
-
-<!-- Wrong — .md extension is not used in internal links -->
-
-[Overview](/en/learn/swe/overview.md)
-```
-
-**Validation runs automatically** as part of `test:quick` (pre-push hook and CI):
-
-```bash
-# Full quality gate including link check
-nx run ayokoding-www:test:quick
-
-# Link check only (standalone)
-nx run ayokoding-www:links:check
-```
-
-**When broken links are found:**
-
-1. The command exits with code 1 — CI fails
-2. Output table shows source file, line number, link text, and broken target
-3. Fix by correcting the target path in the source file
-4. Re-run `nx run ayokoding-www:links:check` to confirm
-
-**Dependency chain:** `ayokoding-cli:build` → `ayokoding-www:links:check` → `ayokoding-www:test:quick`
+The pre-reset multi-app repository had a project-local `links check` subcommand
+(`ayokoding-cli links check`) that validated Hugo-style internal links in `ayokoding-www` content on
+every `test:quick` run, in addition to the repo-wide markdown link validation described above. That
+app and its dedicated CLI were removed in the Baseerah repo-reset; no app in this repo currently has
+a project-local link-validation layer. If a future content-heavy app needs Hugo-path-style internal
+link validation beyond the repo-wide `rhino-cli md validate links` check, add an equivalent
+project-local `links:check` Nx target and document it here.
 
 ## Rust CLI Linting
 
-Rust CLI projects (`apps/ayokoding-cli`, `apps/ose-cli`, `apps/rhino-cli`) use [Clippy](https://github.com/rust-lang/rust-clippy) for static analysis.
+Rust CLI projects (currently just `apps/rhino-cli`) use [Clippy](https://github.com/rust-lang/rust-clippy) for static analysis.
 
 **Configuration**: Each project declares lints in its `Cargo.toml` under `[lints.clippy]`. The standard pedantic profile is used with selective allows.
 
@@ -541,12 +499,10 @@ Rust CLI projects (`apps/ayokoding-cli`, `apps/ose-cli`, `apps/rhino-cli`) use [
 
 ```bash
 # Run via Nx (standard)
-nx lint ayokoding-cli
-nx lint ose-cli
-nx lint organiclever-be
+nx lint rhino-cli
 
 # Run directly
-cargo clippy --manifest-path apps/ayokoding-cli/Cargo.toml --all-targets -- -D warnings
+cargo clippy --manifest-path apps/rhino-cli/Cargo.toml --all-targets -- -D warnings
 ```
 
 ## Language-Specific Auto-Formatters

@@ -12,7 +12,16 @@ created: 2025-11-29
 
 # CI/CD Pipeline
 
-Git hooks, GitHub Actions workflows, Nx build system, and development workflow for the Open Sharia Enterprise platform.
+Git hooks, GitHub Actions workflows, Nx build system, and development workflow for the Baseerah platform.
+
+> **2026 Baseerah repo reset**: the app-specific scheduled deploy workflows described in earlier
+> revisions of this document (`ayokoding-www-test-local-deploy-prod.yml`,
+> `ose-www-test-local-deploy-prod.yml`, `wahidyankf-www-test-local-deploy-prod.yml`,
+> `organiclever-app-test-local-deploy-stag.yml`, `organiclever-app-test-stag.yml`,
+> `web-ui-build-deploy-prod.yml`) were deleted along with their apps. `rhino-cli` is the sole
+> surviving app; `baseerah-fe` and `baseerah-be` are planned but not yet scaffolded. See
+> [applications.md](./applications.md) and the
+> [baseerah-repo-reset plan](../../../plans/in-progress/baseerah-repo-reset/README.md).
 
 ## CI/CD Pipeline Overview
 
@@ -37,23 +46,23 @@ graph LR
     style PUSH fill:#0077b6,stroke:#03045e,color:#ffffff
 ```
 
-**Pre-commit quality gates (run in parallel):**
+**Pre-commit quality gates (sequential):**
 
 ```mermaid
 graph LR
     PRE_COMMIT[Pre-commit Hook]
-    AYOKODING[AyoKoding Update]
-    PRETTIER[Prettier Format]
-    LINK_VAL[Link Validator]
+    ENV_GUARD[Env Staged Guard]
+    LINT_STAGED[lint-staged<br/>Format+Lint]
+    BINDINGS[Harness Bindings<br/>Regenerate]
 
-    PRE_COMMIT --> AYOKODING
-    PRE_COMMIT --> PRETTIER
-    PRE_COMMIT --> LINK_VAL
+    PRE_COMMIT --> ENV_GUARD
+    ENV_GUARD --> LINT_STAGED
+    LINT_STAGED --> BINDINGS
 
     style PRE_COMMIT fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style PRETTIER fill:#457b9d,stroke:#1d3557,color:#ffffff
-    style AYOKODING fill:#457b9d,stroke:#1d3557,color:#ffffff
-    style LINK_VAL fill:#457b9d,stroke:#1d3557,color:#ffffff
+    style ENV_GUARD fill:#e76f51,stroke:#9d0208,color:#ffffff
+    style LINT_STAGED fill:#457b9d,stroke:#1d3557,color:#ffffff
+    style BINDINGS fill:#457b9d,stroke:#1d3557,color:#ffffff
 ```
 
 **Pre-push and remote CI flow:**
@@ -83,16 +92,16 @@ graph LR
 
 **Execution Order:**
 
-1. **AyoKoding Content Processing** (if affected):
-   - Validate links in ayokoding-www content
-2. **Prettier Formatting** (via lint-staged):
-   - Format all staged files
-   - Auto-stage formatted changes
-3. **Link Validation**:
-   - Validate markdown links in staged files only
-   - Exit with error if validation fails
+1. **Env staged-guard**: rejects any staged real `.env*` file (`rhino-cli env staged-guard validate`)
+2. **repo-config.yml schema-parity gate** (only when `repo-config.yml` is staged): `rhino-cli repo-config validate`
+3. **lint-staged** (per-file formatters, tool-linters, and validators, dispatched by file type) —
+   formats staged files (Prettier, `rustfmt`, `fantomas`, etc.), lints `.github/workflows/*.yml`
+   with `actionlint`, and for staged markdown runs `rhino-cli md mermaid validate`,
+   `md heading-hierarchy validate`, `md naming validate`, and `md frontmatter validate`
+4. **Harness bindings regenerate + auto-stage** (`rhino-cli harness bindings generate`)
+5. **Lockfile sync**: regenerates and stages `package-lock.json` for any staged app `package.json`
 
-**Impact**: Ensures all committed code is formatted and content is processed
+**Impact**: Ensures all committed code is formatted, validated, and platform bindings stay in sync
 
 ### Commit-msg Hook
 
@@ -112,14 +121,15 @@ graph LR
 
 **Execution Order:**
 
-1. **Nx Affected Tests**:
-   - Run `test:quick` target for all affected projects
-   - Only tests projects changed since last push
-2. **Markdown Linting**:
-   - Run markdownlint-cli2 on all markdown files
-   - Exit with error if linting fails
+1. **Nx affected `test:quick`** and **`compat:min-version`** for all affected projects (parallelism: cores-1)
+2. **`rhino-cli` repo-wide gates**: `env validate`, `md links validate` (excluding `plans/done`),
+   `md readme-index validate`, `harness duplication validate`
+3. **Scoped naming/governance validators** — run only when the diff touches the relevant tree
+   (agent/skill naming, workflow naming, governance vendor/license conventions, harness binding
+   parity, instruction-size budget)
 
-**Impact**: Prevents pushing code that fails tests or has markdown violations
+**Impact**: Prevents pushing code that fails tests, breaks minimum-version compatibility, has
+broken links, or violates naming/governance conventions
 
 ## GitHub Actions Workflows
 
@@ -160,90 +170,30 @@ harness-duplication, governance validation — but across **all** projects
 **Purpose**: Catches drift that affected-only PR checks can miss, by re-running the full gate
 against the entire monorepo on a fixed cadence independent of any single PR
 
-### AyoKoding Web Test + Deploy Workflow
+### App Deploy Workflows — Deleted, Reusable Templates Remain
 
-**File**: `.github/workflows/ayokoding-www-test-local-deploy-prod.yml`
+Every app-specific scheduled deploy workflow (`ayokoding-www-test-local-deploy-prod.yml`,
+`ose-www-test-local-deploy-prod.yml`, `wahidyankf-www-test-local-deploy-prod.yml`,
+`organiclever-app-test-local-deploy-stag.yml`, `organiclever-app-test-stag.yml`,
+`web-ui-build-deploy-prod.yml`) was deleted along with its app by the 2026 Baseerah repo reset.
+`rhino-cli` (a CLI tool, not a deployed web app) has no deploy workflow of its own.
 
-**Trigger**: Scheduled (6 AM and 6 PM WIB daily) or manual `workflow_dispatch` — no push trigger
+Three **generic, parameterized reusable workflows** survived the reset and remain wired for future
+use once `baseerah-fe`/`baseerah-be` are scaffolded:
 
-**Steps**: Full local-stack test pipeline via `_reusable-www-test-local-deploy.yml` (lint, typecheck, test:quick, E2E), then "deploy" by force-pushing `main` to `prod-ayokoding-www`; Vercel auto-builds.
+- **`.github/workflows/_reusable-app-test-local-deploy-stag.yml`** — reusable heavy-test pipeline
+  for a web + backend + E2E app group; runs the full stack locally via docker-compose, then on
+  success force-pushes the staging web branch (Vercel builds it) and the staging backend branch
+  (triggers the backend build-deploy workflow → GHCR). Takes `web-project`, `be-project`,
+  `contracts-project`, `compose-dir`, `stag-web-branch`, `stag-be-branch`, `be-port`, and
+  `web-port` as inputs — no app names are hardcoded.
+- **`.github/workflows/_reusable-app-test-stag.yml`** — reusable gated E2E health check against a
+  deployed staging URL.
+- **`.github/workflows/_reusable-be-build-deploy.yml`** — reusable backend image build + deploy.
 
-**Purpose**: Deploy ayokoding.com (Next.js 16 fullstack content platform)
-
-### OSE Platform Web Test + Deploy Workflow
-
-**File**: `.github/workflows/ose-www-test-local-deploy-prod.yml`
-
-**Trigger**: Scheduled (6 AM and 6 PM WIB daily) or manual `workflow_dispatch`
-
-**Steps:**
-
-1. Detect changes in `apps/ose-www/` vs `prod-ose-www` branch
-2. If changes exist (or `force_deploy=true`): setup Node (Volta)
-3. Install dependencies and run `nx build ose-www`
-4. Force-push `main` to `prod-ose-www`; Vercel auto-builds
-
-**Purpose**: Automated scheduled deployments for oseplatform.com with change detection to avoid unnecessary builds
-
-### wahidyankf-web Test + Deploy Workflow
-
-**File**: `.github/workflows/wahidyankf-www-test-local-deploy-prod.yml`
-
-**Trigger**: Scheduled or manual `workflow_dispatch`
-
-**Steps:**
-
-1. Detect changes in `apps/wahidyankf-www/` vs `prod-wahidyankf-www` branch
-2. If changes exist (or `force_deploy=true`): setup Node (Volta)
-3. Install dependencies and run `nx build wahidyankf-www`
-4. Force-push `main` to `prod-wahidyankf-www`; Vercel auto-builds
-
-**Purpose**: Automated deployments for www.wahidyankf.com with change detection to avoid unnecessary builds
-
-### OrganicLever App Test + Local-Deploy Staging Workflow
-
-**File**: `.github/workflows/organiclever-app-test-local-deploy-stag.yml`
-
-**Trigger**: Scheduled (3 AM and 3 PM WIB daily) or manual `workflow_dispatch`
-
-**Steps:**
-
-1. Run `specs:coverage` across the OrganicLever app projects (`organiclever-be`, `organiclever-app-web`, `organiclever-be-e2e`, and the app-web E2E projects)
-2. Run `fe-lint` for `organiclever-app-web`
-3. Run `be-integration` tests with docker-compose (real PostgreSQL) under the `organiclever-app-staging` env
-4. Run `fe-integration` tests (MSW-mocked)
-5. Run combined `e2e` stage: full stack via docker-compose, then the `organiclever-be-e2e` (`BASE_URL: http://localhost:8202`) and `organiclever-app-web` FE E2E (`WEB_BASE_URL: http://localhost:3202`) Playwright tests
-6. `detect-changes`: check the app paths vs previous commit
-7. `deploy` (gated on all test jobs + `detect-changes == true`): "deploy" by force-pushing `HEAD` to BOTH `stag-organiclever-app-web` (Vercel auto-builds the staging app) and `stag-organiclever-be` (the be-build-deploy workflow fires for the backend image)
-
-**Purpose**: Automated scheduled staging deploys for the OrganicLever app group, gated on the full FE+BE test suite, with change detection to avoid unnecessary builds. Production continuous delivery is **deferred** to a separate plan — no production-CD workflow exists yet.
-
-### OrganicLever App Test-Staging Gate Workflow
-
-**File**: `.github/workflows/organiclever-app-test-stag.yml`
-
-**Trigger**: Scheduled (+2.5h after the local-deploy-stag run) or manual `workflow_dispatch`
-
-**Steps:**
-
-1. Single job `e2e-staging` under the `organiclever-app-staging` env
-2. Runs the `organiclever-app-web` FE E2E suite against the deployed staging URL using `WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}` (Vercel bypass secret)
-3. Uploads the Playwright report as an artifact
-
-**Purpose**: Continuous gated health check of the staging deployment. Despite the `-deploy-prod` name slot reserved for the future promote step, this workflow currently **stops on pass without promoting** — production CD is deferred. It never deploys today.
-
-### Web UI Storybook Deploy Workflow
-
-**File**: `.github/workflows/web-ui-build-deploy-prod.yml`
-
-**Trigger**: Scheduled (daily at 00:00 UTC) or manual `workflow_dispatch`
-
-**Steps:**
-
-1. Build the shared `web-ui` lib's Storybook (`nx run web-ui:build-storybook`)
-2. Force-push `HEAD` to `prod-web-ui`
-
-**Purpose**: Publish the `web-ui` component library's Storybook to the `prod-web-ui` branch on a fixed daily cadence, independent of any single PR — the same scheduled-CD pattern as the `*-www-test-local-deploy-prod.yml` workflows above, but for the shared component-library Storybook rather than an app.
+No caller workflow currently invokes these templates (no app group exists yet to invoke them
+with); a future phase of the `baseerah-repo-reset` plan is expected to add
+`baseerah-app-test-local-deploy-stag.yml` (or similar) once `baseerah-fe` and `baseerah-be` exist.
 
 ### PR Quality Gate Workflow (duplicate entry)
 
@@ -308,9 +258,9 @@ against the entire monorepo on a fixed cadence independent of any single PR
    ```
 
    - Pre-commit hook runs:
-     - Formats code with Prettier
-     - Processes ayokoding-www content if affected
-     - Validates links
+     - Rejects staged real `.env*` files
+     - Formats and validates staged files via lint-staged
+     - Regenerates and auto-stages harness platform bindings
    - Commit-msg hook validates format
    - Commit created
 
@@ -325,23 +275,25 @@ against the entire monorepo on a fixed cadence independent of any single PR
    ```
 
    - Pre-push hook runs (on any push target):
-     - Tests affected projects
-     - Lints markdown
+     - Tests affected projects (`test:quick`, `compat:min-version`)
+     - Runs `rhino-cli` repo-wide and scoped naming/governance gates
 
 5. **Open a Pull Request** — the default path (`worktree-to-pr`); skip only under a declared direct-push mode:
    - GitHub Actions run the full quality gate on every PR event
    - PR-Review Maker→Fixer Cycle runs before the merge
    - Merge once the five hardened merge preconditions hold — `[AI]` by default
 
-6. **Deploy** (for Vercel-deployed apps):
+6. **Deploy** (once a deployable app exists): no app-specific deploy workflow exists today
+   (see the App Deploy Workflows section above). Once `baseerah-fe`/`baseerah-be` are scaffolded
+   and wired to the reusable templates, deployment follows the env-branch pattern:
 
    ```bash
-   git checkout prod-[app-name]
+   git checkout stag-[app-name]  # or prod-[app-name] once production CD is wired
    git merge main
-   git push origin prod-[app-name]
+   git push origin stag-[app-name]
    ```
 
-   - Vercel automatically builds and deploys
+   - Vercel (frontend) / the backend build-deploy workflow automatically build and deploy
 
 ### Quality Assurance Layers
 
@@ -402,13 +354,13 @@ graph TB
 
 **Auto-fix Gates** (Non-blocking with automatic fixes):
 
-- Prettier formatting
-- AyoKoding content processing
-- PR format workflow
+- Prettier and per-language formatters (lint-staged)
+- Harness platform-binding regeneration
 
 **Blocking Gates** (Must pass to proceed):
 
-- Link validation (pre-commit, PR)
+- Markdown validators — mermaid, heading-hierarchy, naming, frontmatter (pre-commit); links,
+  readme-index (pre-push)
 - Commitlint format check
-- Affected tests (pre-push)
-- Markdown linting (pre-push)
+- Affected tests and `compat:min-version` (pre-push)
+- Scoped naming/governance validators (pre-push)

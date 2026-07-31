@@ -25,7 +25,7 @@ The authoritative combined convention — covering what content belongs in app R
 
 This convention implements the following core principles:
 
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The directory structure communicates spec scope through path segments. Reading a path like `specs/apps/organiclever/behavior/organiclever-be/gherkin/expenses/expense-management.feature` immediately reveals the project, C4 level, layer, domain, and feature without any external metadata.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The directory structure communicates spec scope through path segments. Reading a path like `specs/apps/baseerah/behavior/baseerah-be/gherkin/hello/greeting.feature` immediately reveals the project, C4 level, layer, domain, and feature without any external metadata.
 
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Every surface (BE, web, CLI) uses domain subdirectories under `gherkin/`. Single-feature domains are permitted for CLI surfaces with a small command surface area — the domain name still communicates the command group without requiring multiple files.
 
@@ -116,7 +116,7 @@ specs/apps/<app-family>/
 │       └── <bc>.md
 └── behavior/                       # Cross-cutting Gherkin (all C4 levels)
     ├── README.md
-    └── <product>-<surface>/         # e.g., organiclever-be, ayokoding-www, rhino-cli
+    └── <product>-<surface>/         # e.g., baseerah-be, baseerah-fe, rhino-cli
         └── gherkin/
             ├── README.md
             └── <domain>/            # Domain subdir — required for all surfaces
@@ -135,12 +135,12 @@ specs/apps/<app-family>/
 
 ### Per-Surface Variants
 
-| Surface profile                   | Folders populated                                                                                                                                        | Folders absent or empty                         |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Full-stack (e.g., `organiclever`) | All five; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/organiclever-be/gherkin/` + `behavior/organiclever-app-web/gherkin/` | None                                            |
-| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/wahidyankf-www/gherkin/`                                                      | `containers/contracts/`, `components/be/`       |
-| CLI-only (e.g., `rhino`)          | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                           | `components/{be,web}/`, `containers/contracts/` |
-| Multi-CLI (e.g., `ayokoding`)     | Same as CLI-only, plus web layers if applicable                                                                                                          | Nothing additional omitted                      |
+| Surface profile                                                  | Folders populated                                                                                                                           | Folders absent or empty                         |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Full-stack (e.g., `baseerah`)                                    | All five; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/baseerah-be/gherkin/` + `behavior/baseerah-fe/gherkin/` | None                                            |
+| Web-only (e.g., a marketing site with no backend)                | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/<product>-www/gherkin/`                                          | `containers/contracts/`, `components/be/`       |
+| CLI-only (e.g., `rhino`)                                         | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                              | `components/{be,web}/`, `containers/contracts/` |
+| Multi-CLI (e.g., a family shipping two or more independent CLIs) | Same as CLI-only, plus web layers if applicable                                                                                             | Nothing additional omitted                      |
 
 ## Gherkin Feature File Placement
 
@@ -154,9 +154,9 @@ specs/apps/<app-family>/behavior/<product>-<surface>/gherkin/{domain}/{feature}.
 
 Where:
 
-- **`<app-family>`** = project name (e.g., `organiclever`, `ayokoding`, `rhino`)
+- **`<app-family>`** = project name (e.g., `baseerah`, `rhino`)
 - **`<product>-<surface>`** = flat slug combining product name and perspective (e.g.,
-  `organiclever-be`, `ayokoding-www`, `rhino-cli`, `ayokoding-build-tools`)
+  `baseerah-be`, `baseerah-fe`, `rhino-cli`)
 - **`{domain}`** = business domain grouping folder (all surfaces, including CLI)
 - **`{feature}`** = feature file name in kebab-case
 
@@ -167,14 +167,15 @@ Deprecated slugs (bare `be`, `web`, `cli`, `api`) must not be used for new surfa
 
 **Every surface** (BE, web, CLI) uses domain subdirectories under `gherkin/`. Each domain folder groups related feature files by business domain or command group, not by technical concern. Single-feature domains are permitted when the surface area is small.
 
-Build-time features for `ayokoding` live under their own surface `ayokoding-build-tools/` —
-renamed from the old bare `build-tools/` slug during the `standardize-app-spec-trees` plan.
+Build-time features for a CLI product live under their own `<product>-build-tools/` surface —
+historically `ayokoding-build-tools/`, renamed from the old bare `build-tools/` slug during the
+`standardize-app-spec-trees` plan (both `ayokoding-build-tools` and its parent app family have
+since been retired from this repo).
 
 ```
-specs/apps/organiclever/behavior/organiclever-be/gherkin/expenses/expense-management.feature
-specs/apps/organiclever/behavior/organiclever-be/gherkin/authentication/password-login.feature
-specs/apps/organiclever/behavior/organiclever-app-web/gherkin/authentication/google-login.feature
-specs/apps/ayokoding/behavior/ayokoding-www/gherkin/accessibility/accessibility.feature
+specs/apps/baseerah/behavior/baseerah-be/gherkin/health/service-health.feature
+specs/apps/baseerah/behavior/baseerah-be/gherkin/hello/greeting.feature
+specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature
 ```
 
 A domain folder may contain one or many feature files.
@@ -185,7 +186,6 @@ A domain folder may contain one or many feature files.
 specs/apps/rhino/behavior/rhino-cli/gherkin/system/doctor.feature
 specs/apps/rhino/behavior/rhino-cli/gherkin/env/env-backup.feature
 specs/apps/rhino/behavior/rhino-cli/gherkin/spec-coverage/spec-coverage-validate.feature
-specs/apps/ayokoding/behavior/ayokoding-cli/gherkin/links/links-check.feature
 ```
 
 `rhino-cli specs validate-tree` enforces this rule: a `.feature` file placed directly under `behavior/<product>-<surface>/gherkin/` (with no domain subdirectory) is a HIGH finding.
@@ -229,10 +229,10 @@ specs/
 
 Not every project has all directories. Presence of subdirectories depends on the project's surface profile:
 
-- **`containers/contracts/`**: Present for apps with OpenAPI contract specs (e.g., `organiclever`)
-- **`components/be/`**: Present for apps with a backend container (e.g., `organiclever`)
+- **`containers/contracts/`**: Present for apps with OpenAPI contract specs (e.g., `baseerah`)
+- **`components/be/`**: Present for apps with a backend container (e.g., `baseerah`)
 - **`ddd/`**: Present when DDD is adopted (lives at the app root, not under `components/web/`, because the ubiquitous language belongs to the bounded context, not to one implementation surface)
-- **`behavior/<product>-be/gherkin/`**: Present for apps with backend Gherkin specs (e.g., `behavior/organiclever-be/gherkin/`)
+- **`behavior/<product>-be/gherkin/`**: Present for apps with backend Gherkin specs (e.g., `behavior/baseerah-be/gherkin/`)
 - **`behavior/<product>-cli/gherkin/`**: Present for CLI apps (e.g., `behavior/rhino-cli/gherkin/`)
 
 ## README Index Files
@@ -291,18 +291,20 @@ apps completed migration to the universal domain-subdir layout, then renamed to
 - `ose-cli` — bare `cli/` renamed to `ose-cli/` under `specs/apps/ose/behavior/`.
 
 The bare `build-tools` surface was renamed to `ayokoding-build-tools` during the
-`standardize-app-spec-trees` plan to follow `<product>-<surface>` naming; it remains an active
-surface.
+`standardize-app-spec-trees` plan to follow `<product>-<surface>` naming; both it and the
+`ayokoding` app family it belonged to have since been retired from this repo.
 
-`ose` (merged from `ose-app` + `ose-platform`) was added to the `AppsWithDDD` allowlist. The
-single source of truth is `apps/rhino-cli/src/internal/allowlist.rs`.
+`ose` (merged from `ose-app` + `ose-platform`) was, at the time, added to the `AppsWithDDD`
+allowlist; the `ose` app family has since been retired from this repo along with its allowlist
+entry. The single source of truth for the current allowlist is `apps/rhino-cli/src/internal/allowlist.rs`.
 
 ## Adding New Specs
 
 ### Adding a Feature File to an Existing Project
 
-1. Identify the correct `<product>-<surface>` slug (e.g., `organiclever-be`, `ayokoding-www`,
-   `rhino-cli`). For ayokoding build-time features, use `ayokoding-build-tools`
+1. Identify the correct `<product>-<surface>` slug (e.g., `baseerah-be`, `baseerah-fe`,
+   `rhino-cli`). For build-time features scoped to a CLI, use a dedicated `<product>-build-tools`
+   surface (as `ayokoding-build-tools` did, historically)
 2. Place the file in the appropriate domain subdirectory under
    `behavior/<product>-<surface>/gherkin/<domain>/`, creating the domain folder if it does not exist
 3. For CLI: choose a domain that matches the command group (e.g., `system/`, `env/`, `links/`); single-feature domains are permitted
@@ -345,7 +347,7 @@ These commands run as part of the `specs-quality-gate` workflow deterministic-of
 
 - Positional `<folder>` or `<app>` — single-target legacy behavior preserved.
 - `--apps <csv>` — multi-app validation across an explicit list.
-- No positional, no flag — defaults to the `AppsWithDDD` allowlist (`organiclever`, `ose`).
+- No positional, no flag — defaults to the `AppsWithDDD` allowlist (`baseerah`).
 
 The single source of truth for the allowlist is `apps/rhino-cli/src/internal/allowlist.rs`. Pre-push and CI surfaces invoke the four targets without arguments so adding a new app is a one-line edit there.
 
@@ -358,13 +360,13 @@ The single source of truth for the allowlist is `apps/rhino-cli/src/internal/all
 `specs/apps/<app>/ddd/bounded-contexts.yaml` accepts both scalar and list forms for the `gherkin:` field. A scalar auto-converts to a single-element list at load time:
 
 ```yaml
-gherkin: behavior/organiclever-app-web/gherkin/content # scalar (most BCs)
+gherkin: behavior/baseerah-fe/gherkin/content # scalar (most BCs)
 gherkin: # list (multi-perspective BCs)
-  - behavior/organiclever-app-web/gherkin/content
-  - behavior/organiclever-be/gherkin/content
+  - behavior/baseerah-fe/gherkin/content
+  - behavior/baseerah-be/gherkin/content
 ```
 
-The validator iterates every declared path in `checkGherkin`, `registeredGherkin`, and `gherkinRoots`. Glossary `Used in features` lookups resolve under any declared path (first-match-wins). This unblocks BCs that legitimately have both web and be gherkin trees (e.g., ayokoding's `content`, `search`, `i18n`, `navigation`).
+The validator iterates every declared path in `checkGherkin`, `registeredGherkin`, and `gherkinRoots`. Glossary `Used in features` lookups resolve under any declared path (first-match-wins). This unblocks BCs that legitimately have both web and be gherkin trees (e.g., a bounded context spanning both perspectives, such as `content`).
 
 #### Severity audit log + env var
 
@@ -389,7 +391,7 @@ The validator handles Scenario Outline forms in both directions: outline steps a
 
 #### Combined gherkin scopes per app
 
-`rhino-cli specs coverage` accepts a variadic specs-dirs list (`specs coverage <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (ose-www has web + api; ayokoding-www has web + api + cli) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
+`rhino-cli specs coverage` accepts a variadic specs-dirs list (`specs coverage <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (e.g., an app combining web + api + cli specs) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
 
 #### Expanded relationship symmetry (DDD validators)
 
@@ -406,7 +408,7 @@ Every `validate:specs-*` target runs on all four gating surfaces — no surface 
 - `.husky/pre-push` (every developer push, single line)
 - `.github/workflows/pr-quality-gate.yml` (every PR, dedicated `specs-gate` job in `quality-gate.needs:`)
 - `.github/workflows/_reusable-www-test-local-deploy.yml` (called by the www cron deploys, `specs-gate` job in `deploy.needs:`)
-- `.github/workflows/organiclever-app-test-local-deploy-stag.yml` (cron on `main`, `specs-gate` job in `deploy.needs:`)
+- `.github/workflows/baseerah-fe-test-local-deploy-stag.yml` (cron on `main`, `specs-gate` job in `deploy.needs:`) — wired once `baseerah-fe` has a staging cron deploy workflow
 
 `docs validate-links` is NOT gated by this plan — it scans the entire repo's markdown (repo-governance/, docs/, app READMEs) and is owned by a separate planned validator-unification effort.
 

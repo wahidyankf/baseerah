@@ -14,7 +14,7 @@ created: 2026-03-28
 
 # Styling Convention
 
-CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across `organiclever-www` and `ayokoding-www`.
+CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across the repo's frontend apps, including the planned `baseerah-fe`.
 
 ## Tailwind v4 Directives
 
@@ -25,11 +25,11 @@ Each app's `globals.css` uses a specific set of Tailwind v4 directives. Use only
 @import "tailwindcss";
 
 /* Content scan path — required when files live outside the default scan root */
-/* ayokoding-www uses this because source lives in a non-default location */
+/* e.g. baseerah-fe would need this if its source lives in a non-default location */
 @source "../../src/**/*.{ts,tsx}";
 
 /* Tailwind plugins */
-/* ayokoding-www uses @tailwindcss/typography for prose content */
+/* e.g. baseerah-fe would need @tailwindcss/typography for prose content */
 @plugin "@tailwindcss/typography";
 
 /* Dark mode variant — class-based (.dark), not media-query-based */
@@ -54,7 +54,7 @@ Each app's `globals.css` uses a specific set of Tailwind v4 directives. Use only
 }
 ```
 
-See `apps/organiclever-app-web/src/app/globals.css` and `apps/ayokoding-www/src/app/globals.css` for the full reference implementations.
+See `apps/baseerah-fe/src/app/globals.css` for the full reference implementation, once `baseerah-fe` is scaffolded.
 
 ## Utility-First Approach
 
@@ -97,21 +97,21 @@ Never use `!important`. Use `@layer` ordering or Tailwind modifiers for specific
 }
 ```
 
-**Known violation (revisited 2026-07-22)**: `ayokoding-www/src/app/globals.css` contains 10
-`!important` declarations in code block styles. The rules are already placed outside `@layer base`
-(the fix this note originally called for), yet the `!important` on the
-`figure[data-rehype-pretty-code-figure] pre` background rules cannot be dropped by cascade-ordering
-alone: `rehype-pretty-code`'s `keepBackground: true` option
-(`apps/ayokoding-www/src/features/content/core/parser.ts`) writes an inline
-`style="--shiki-light-bg:#fff"` attribute on every code block, and an element's inline `style`
-attribute always outranks any external stylesheet rule regardless of `@layer`/source order — only
-`!important` (or removing the inline style at its source) can override it. Dropping the
-`!important` here was tried and reverted as a real regression (DWT-001, tracked in
+**Known historical violation (documented 2026-07-22, now moot — `ayokoding-www` removed)**: the app's
+`globals.css` contained 10 `!important` declarations in code block styles. The rules were already
+placed outside `@layer base` (the fix this note originally called for), yet the `!important` on the
+`figure[data-rehype-pretty-code-figure] pre` background rules could not be dropped by cascade-ordering
+alone: `rehype-pretty-code`'s `keepBackground: true` option (in the app's content-parsing feature)
+wrote an inline `style="--shiki-light-bg:#fff"` attribute on every code block, and an element's inline
+`style` attribute always outranks any external stylesheet rule regardless of `@layer`/source order —
+only `!important` (or removing the inline style at its source) can override it. Dropping the
+`!important` was tried and reverted as a real regression (DWT-001, tracked in
 `plans/done/2026-07-16__web-ui-code-block-copy-button/learnings.md`): the light-theme code
-background rendered pure white instead of the intended `#f6f8fa`. Full removal requires reworking
-the `rehype-pretty-code` config (e.g. disabling `keepBackground`) — a design change, not a
-mechanical CSS edit — so this is tracked as deliberate, currently-necessary debt rather than
-"scheduled for removal" on any near-term timeline.
+background rendered pure white instead of the intended `#f6f8fa`. **Any future app that renders
+Markdown/MDX code blocks via `rehype-pretty-code` with `keepBackground: true` (for example, a
+scaffolded `baseerah-fe`) will hit the same inline-style-vs-cascade conflict** and needs the same
+`!important` escape hatch (or a `keepBackground: false` config change) rather than a mechanical CSS
+edit.
 
 ## No `@apply` Outside `@layer base`
 
@@ -273,7 +273,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-**Known violation**: `organiclever-www/src/app/globals.css` declares `font-family: Arial, Helvetica, sans-serif` inside `@layer utilities`. This is scheduled for removal in favour of a `next/font` declaration in the app's root layout.
+**Known historical violation (now moot — `organiclever-www` removed)**: its `globals.css` declared `font-family: Arial, Helvetica, sans-serif` inside `@layer utilities` instead of a `next/font` declaration in the app's root layout. Avoid repeating this pattern in `baseerah-fe` once it is scaffolded — declare fonts via `next/font`, not a CSS layer.
 
 ## Fluid Typography
 

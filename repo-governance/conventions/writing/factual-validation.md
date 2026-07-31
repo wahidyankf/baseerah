@@ -856,7 +856,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 
 **Agent:** `docs-checker`, `docs-fixer`
 
-### Educational Content (ayokoding-www)
+### Educational Content (e.g., a future tutorial-format web app such as `baseerah-fe`)
 
 **Validation Focus:**
 
@@ -866,9 +866,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 - Indonesian/English consistency
 - Educational sequences are logical
 
-**Agent:** `apps-ayokoding-www-facts-checker`, `apps-ayokoding-www-facts-fixer`
-
-### Platform Content (ose-www)
+### Platform Content (e.g., `baseerah-fe` marketing/product pages)
 
 **Validation Focus:**
 
@@ -904,7 +902,6 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 **Implementation Agents:**
 
 - `docs-checker.md` - Documentation factual accuracy validator (implements this convention for `docs/`)
-- `apps-ayokoding-www-facts-checker.md` - Educational content factual validator (implements this convention for ayokoding-www)
 - `plan-checker.md` - Plan accuracy validator (implements portions of this convention)
 
 **Quality Standards:**

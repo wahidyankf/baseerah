@@ -149,31 +149,24 @@ Use this table when uncertain whether a change requires a spec update:
 
 ## Existing Patterns to Follow
 
-### organiclever specs
+### baseerah specs (planned)
 
-`specs/apps/organiclever/` serves both the backend (`organiclever-be`) and frontend (`organiclever-app-web`) from a shared set of specs:
+`specs/apps/baseerah/` will serve both the backend (`baseerah-be`) and frontend (`baseerah-fe`) from a shared set of specs, once those apps are scaffolded:
 
-- `specs/apps/organiclever/system-context/` — C4 L1 context diagram for OrganicLever
-- `specs/apps/organiclever/containers/` — C4 L2 container diagram and deployment topology
-- `specs/apps/organiclever/components/` — C4 L3 component diagrams (be/, web/)
-- `specs/apps/organiclever/behavior/organiclever-be/gherkin/` — Shared Gherkin scenarios consumed by the backend at unit, integration, and E2E levels
-- `specs/apps/organiclever/behavior/organiclever-app-web/gherkin/` — Shared Gherkin scenarios consumed by the frontend
-- `specs/apps/organiclever/containers/contracts/` — OpenAPI 3.1 contract spec that both backend and frontend implement
+- `specs/apps/baseerah/system-context/` — C4 L1 context diagram for Baseerah
+- `specs/apps/baseerah/containers/` — C4 L2 container diagram and deployment topology
+- `specs/apps/baseerah/components/` — C4 L3 component diagrams (be/, web/)
+- `specs/apps/baseerah/behavior/baseerah-be/gherkin/` — Shared Gherkin scenarios consumed by the backend at unit, integration, and E2E levels
+- `specs/apps/baseerah/behavior/baseerah-fe/gherkin/` — Shared Gherkin scenarios consumed by the frontend
+- `specs/apps/baseerah/containers/contracts/` — OpenAPI 3.1 contract spec that both backend and frontend implement
 
-When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, both the corresponding Gherkin scenarios and the C4 component diagram must be updated to reflect the new behavior and component.
+When a new endpoint is added to the OpenAPI spec, both the corresponding Gherkin scenarios and the C4 component diagram must be updated to reflect the new behavior and component.
 
-### ayokoding-www specs
-
-`specs/apps/ayokoding/` maintains C4 diagrams and Gherkin scenarios for the Next.js 16 fullstack platform:
-
-- `specs/apps/ayokoding/system-context/`, `containers/`, `components/` — C4 diagrams kept current with the Next.js App Router structure and tRPC routers
-- `specs/apps/ayokoding/behavior/organiclever-be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-www-be-e2e`
-
-When a new tRPC router is added to `apps/ayokoding-www/`, a new component entry appears in the C4 component diagram and new scenarios are added to the Gherkin directory.
+> **Historical note**: An earlier version of this convention illustrated a second pattern — a tRPC-based Next.js fullstack content platform with specs at `specs/apps/ayokoding/` — for an app removed in the Baseerah repo-reset. No app in this repo currently uses that pattern; if a future app needs it, document its concrete spec layout here.
 
 ### CLI apps
 
-CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`) use the automated enforcement path:
+CLI apps (currently just `rhino-cli`) use the automated enforcement path:
 
 - Each Cobra command file maps to a `@tag` in a Gherkin feature file
 - `rhino-cli specs coverage` enforces the 1:1 mapping automatically
@@ -185,21 +178,21 @@ See [BDD Spec-to-Test Mapping](../infra/bdd-spec-test-mapping.md) for the full C
 
 ### PASS: Adding an endpoint with synchronized specs
 
-A developer adds a `GET /api/products/:id` endpoint to `organiclever-be`.
+A developer adds a `GET /api/products/:id` endpoint to `baseerah-be`.
 
 They:
 
-1. Update `specs/apps/organiclever/containers/contracts/` (OpenAPI spec) with the new endpoint definition
-2. Run `nx run organiclever-contracts:codegen` and related codegen targets
-3. Add a Gherkin scenario to `specs/apps/organiclever/behavior/organiclever-be/gherkin/products/get-product.feature`
-4. Update the C4 component diagram in `specs/apps/organiclever/system-context/` if the endpoint belongs to a new component
-5. Implement the endpoint in `apps/organiclever-be/`
+1. Update `specs/apps/baseerah/containers/contracts/` (OpenAPI spec) with the new endpoint definition
+2. Run `nx run baseerah-contracts:codegen` and related codegen targets
+3. Add a Gherkin scenario to `specs/apps/baseerah/behavior/baseerah-be/gherkin/products/get-product.feature`
+4. Update the C4 component diagram in `specs/apps/baseerah/system-context/` if the endpoint belongs to a new component
+5. Implement the endpoint in `apps/baseerah-be/`
 
 All changes are in a single commit or PR.
 
 ### FAIL: Adding an endpoint without updating specs
 
-A developer adds `GET /api/products/:id` to `apps/organiclever-be/` but does not update the OpenAPI contract, Gherkin feature files, or C4 diagrams.
+A developer adds `GET /api/products/:id` to `apps/baseerah-be/` but does not update the OpenAPI contract, Gherkin feature files, or C4 diagrams.
 
 The `codegen` target dependency fails at `typecheck` because the generated types are stale. Even if `codegen` is run, the missing Gherkin scenario means the behavior is unspecified, and the C4 diagram no longer reflects what the system does.
 
@@ -219,9 +212,9 @@ The C4 diagram is updated to remove the container if it was represented separate
 
 ### FAIL: Renaming an app without updating specs
 
-The team renames `apps/organiclever-app-web` to `apps/organiclever-landing`. The `specs/apps/organiclever-app-web/` folder is not renamed.
+The team renames `apps/baseerah-fe` to `apps/baseerah-web`. The `specs/apps/baseerah-fe/` folder is not renamed.
 
-CI now has a mismatch: the app path and the spec path use different names. Reviewers and new contributors cannot determine whether `specs/apps/organiclever-app-web/` refers to the current `organiclever-landing` app or a removed app. This is a violation.
+CI now has a mismatch: the app path and the spec path use different names. Reviewers and new contributors cannot determine whether `specs/apps/baseerah-fe/` refers to the current `baseerah-web` app or a removed app. This is a violation.
 
 ### PASS: Bug fix with no spec change
 

@@ -34,7 +34,7 @@ validation at the end.
 **❌ Not Included:**
 
 - Content quality validation (that's docs/)
-- ayokoding-web content validation (that's ayokoding-web/)
+- Web UX test-fixing planning (that's web/)
 - Single-agent operations (use agents directly)
 
 ## Workflows

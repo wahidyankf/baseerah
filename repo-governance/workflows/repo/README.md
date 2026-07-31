@@ -27,7 +27,7 @@ These workflows define **WHEN and HOW to validate and synchronize repository art
 **❌ Not Included:**
 
 - Content quality validation (that's docs/)
-- ayokoding-web content validation (that's ayokoding-web/)
+- App-specific content validation (that would live in a dedicated per-app workflows family, e.g. a future `baseerah-fe/`)
 - Plan validation (that's plan/)
 
 ## Workflows

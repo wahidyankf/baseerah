@@ -178,11 +178,11 @@ Coverage is measured **only at the unit level**. Integration tests (`test:integr
 
 Different project types carry different coverage thresholds, reflecting the practical testability of each category:
 
-| Threshold | Projects                                                   | Rationale                                                                                           |
-| --------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| 90%       | API backends (`organiclever-be`), Rust CLI apps, Rust libs | Core business logic with high mock isolation; all execution paths reachable in unit tests           |
-| 80%       | Content platforms (`ayokoding-www`, `ose-www`)             | Significant UI rendering code; some React rendering paths are hard to unit-test                     |
-| 70%       | FE apps (`organiclever-app-web`)                           | API/auth/query layers are fully mocked by design; threshold reflects intentional mocking boundaries |
+| Threshold | Projects                                                        | Rationale                                                                                           |
+| --------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| 90%       | API backends (`baseerah-be`, planned), Rust CLI apps, Rust libs | Core business logic with high mock isolation; all execution paths reachable in unit tests           |
+| 80%       | Content platforms (none currently in this repo)                 | Significant UI rendering code; some React rendering paths are hard to unit-test                     |
+| 70%       | FE apps (`baseerah-fe`, planned)                                | API/auth/query layers are fully mocked by design; threshold reflects intentional mocking boundaries |
 
 ## Mandatory Test Levels Matrix
 
@@ -198,10 +198,10 @@ The table below states which test levels are mandatory per app type:
 | E2E runners                      | N/A       | N/A                              | Mandatory              |
 
 **The integration tier is for app-tier products that cross a real integration boundary** — API
-backends (real PostgreSQL), CLI apps (real filesystem), and **product app-web clients** (`*-app-web`,
-e.g. `organiclever-app-web`, `ose-app-web`) that integrate with a real backend API (mocked in-process
-via MSW). **Content platforms and marketing front-ends** (`*-www`, e.g. `ayokoding-www`, `ose-www`,
-`organiclever-www`, `wahidyankf-www`) have **no integration tier**: their `test:integration` target is a
+backends (real PostgreSQL), CLI apps (real filesystem), and **product frontend clients** (e.g.
+`baseerah-fe`, planned) that integrate with a real backend API (mocked in-process
+via MSW). **Content platforms and marketing front-ends** (`*-www`; none currently in this repo)
+have **no integration tier**: their `test:integration` target is a
 no-op `echo`, and their full Gherkin contract is consumed at the **unit** tier (all external
 dependencies mocked) plus the **e2e** tier. A site that renders content and calls a typed tRPC layer
 does not integrate a separate backend service, so a middle tier would only duplicate unit coverage.
@@ -254,7 +254,7 @@ Integration: Service -> RealRepository -> PostgreSQL
 
 Apps with OpenAPI 3.1 contracts use a `codegen` target to define the API surface:
 
-- **OrganicLever**: OpenAPI 3.1 spec at `specs/apps/organiclever/containers/contracts/`; the `codegen` Nx target generates types and encoders/decoders into `generated-contracts/` (gitignored)
+- **Baseerah** (planned): OpenAPI 3.1 spec at `specs/apps/baseerah/containers/contracts/`; the `codegen` Nx target generates types and encoders/decoders into `generated-contracts/` (gitignored)
 - **Content platforms**: Use tRPC, which is typed at compile time without a separate contract file
 
 The `typecheck` and `build` Nx targets depend on `codegen`. This means contract violations surface during `nx affected -t typecheck` and the pre-push `test:quick` gate. Rust and Flutter additionally declare `codegen` as a dependency of `test:unit` because generated code is required at compile time.
@@ -325,7 +325,7 @@ All UI projects must include static accessibility checks in their `lint` target.
 common accessibility violations at compile time and are enforced at all three gates: pre-push hook,
 PR quality gate, and scheduled Test CI workflows.
 
-- **TypeScript UI projects** (`organiclever-app-web`, `ayokoding-www`, `ose-www`, `libs/web-ui`):
+- **TypeScript UI projects** (`libs/web-ui`; `baseerah-fe` once scaffolded):
   `oxlint --jsx-a11y-plugin`
 
 ### Runtime Accessibility E2E Tests (via `test:e2e`)
@@ -354,8 +354,8 @@ linting and the enforcement gates.
 
 The following gaps are known and tracked for future resolution:
 
-- **FE unit tests lack Gherkin**: `organiclever-app-web` does not yet consume Gherkin specs at the unit level. A BDD runner compatible with Vitest-based unit tests needs to be selected.
-- **Content platform Gherkin pending**: `ayokoding-www` and `ose-www` do not yet consume Gherkin specs at any test level. Gherkin consumption for content platforms is planned at the **unit + e2e** tiers (content platforms have no integration tier; `test:integration` is a no-op `echo`).
+- **FE unit tests lack Gherkin**: No FE app exists in this repo yet — `baseerah-fe` (planned) will need a BDD runner compatible with Vitest-based unit tests selected before it can consume Gherkin specs at the unit level.
+- **Content platform Gherkin pending**: No content-platform app currently exists in this repo. If one is added in the future, Gherkin consumption for content platforms is planned at the **unit + e2e** tiers (content platforms have no integration tier; `test:integration` is a no-op `echo`).
 - **specs:coverage deferred for some projects**: Some projects have `specs:coverage` temporarily deferred until step implementations are complete. See "Spec-Coverage Validation" above and [Nx Target Standards](../infra/nx-targets.md) for the deferred project list.
 
 ## Per-Backend Implementation Pattern
@@ -376,7 +376,7 @@ The exact directory structure varies by language convention (e.g., Rust uses `#[
 
 ## CLI App Implementation Pattern
 
-The Rust CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`) consume the same Gherkin specs from `specs/apps/<cli-name>/` at both the unit and integration levels. The difference is what the tests use as their I/O substrate:
+The Rust CLI apps (currently just `rhino-cli`) consume the same Gherkin specs from `specs/apps/<cli-name>/` at both the unit and integration levels. The difference is what the tests use as their I/O substrate:
 
 | Level       | Test File Location               | Implementation                                                       | What's Real                   |
 | ----------- | -------------------------------- | -------------------------------------------------------------------- | ----------------------------- |
@@ -398,14 +398,14 @@ Integration: Behaviour -> Command run   -> Real /tmp filesystem
 
 The three-level standard applies universally, with adaptations per project type:
 
-| Project Type                    | Unit                          | Integration                      | E2E                | test:quick | Gherkin Specs                          |
-| ------------------------------- | ----------------------------- | -------------------------------- | ------------------ | ---------- | -------------------------------------- |
-| API backend (`organiclever-be`) | All mocked + specs            | Real PostgreSQL, no HTTP + specs | Playwright + specs | Yes        | `specs/apps/<backend-name>/`           |
-| Product app-web (`*-app-web`)   | Vitest mocks + specs          | MSW in-process (cacheable)       | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
-| Content platform & marketing FE | Vitest mocks + all specs      | N/A (no-op `echo`)               | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
-| CLI app (Rust)                  | cargo test unit + integration | cargo integration (cacheable)    | N/A                | Yes        | `specs/apps/<cli-name>/`               |
-| Library (Rust)                  | cargo test unit               | cargo integration (cacheable)    | N/A                | Yes        | `specs/libs/<lib-name>/`               |
-| E2E runner                      | N/A                           | N/A                              | Playwright         | N/A        | Shared specs                           |
+| Project Type                         | Unit                          | Integration                      | E2E                | test:quick | Gherkin Specs                          |
+| ------------------------------------ | ----------------------------- | -------------------------------- | ------------------ | ---------- | -------------------------------------- |
+| API backend (`baseerah-be`, planned) | All mocked + specs            | Real PostgreSQL, no HTTP + specs | Playwright + specs | Yes        | `specs/apps/<backend-name>/`           |
+| Product app-web (`*-app-web`)        | Vitest mocks + specs          | MSW in-process (cacheable)       | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
+| Content platform & marketing FE      | Vitest mocks + all specs      | N/A (no-op `echo`)               | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
+| CLI app (Rust)                       | cargo test unit + integration | cargo integration (cacheable)    | N/A                | Yes        | `specs/apps/<cli-name>/`               |
+| Library (Rust)                       | cargo test unit               | cargo integration (cacheable)    | N/A                | Yes        | `specs/libs/<lib-name>/`               |
+| E2E runner                           | N/A                           | N/A                              | Playwright         | N/A        | Shared specs                           |
 
 **Key rules by project type**:
 

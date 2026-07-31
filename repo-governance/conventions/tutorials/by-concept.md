@@ -117,7 +117,7 @@ Sections prioritize:
 - Platform-specific advanced features
 - Deprecated features
 
-**Coverage verification**: The apps-ayokoding-www-general-checker agent validates coverage against comprehensive checklists for each language/framework.
+**Coverage verification**: Validated against comprehensive checklists for each language/framework by the applicable content-checker agent.
 
 ### 3. Section Count: 40-60 Total
 
@@ -637,7 +637,7 @@ Before publishing by-concept content, verify:
 
 ### Automated Validation
 
-The **apps-ayokoding-www-general-checker** agent validates:
+Content validation checks the following:
 
 - **Coverage percentage**: 95% target achieved
 - **Section count**: 40-60 total (beginner: 15-25, intermediate: 12-20, advanced: 10-20)
@@ -652,15 +652,6 @@ The **apps-ayokoding-www-general-checker** agent validates:
 
 - Current: 40-60 sections, 8-15 diagrams, minimal annotation
 - Target: 40-60 sections, 30-50 diagrams, 1.0-2.25 annotation density
-
-### Quality Gate Workflow
-
-The **by-concept-quality-gate** workflow orchestrates:
-
-1. **apps-ayokoding-www-general-maker**: Creates/updates sections
-2. **apps-ayokoding-www-general-checker**: Validates against standards
-3. **User review**: Reviews audit report
-4. **apps-ayokoding-www-general-fixer**: Applies validated fixes
 
 ## Relationship to Other Tutorial Types
 
@@ -702,7 +693,7 @@ When creating by-concept tutorials for multiple languages:
 
 ## Production-Validated Standards Summary
 
-This convention reflects standards that should be achieved by by-concept tutorials on ayokoding-www:
+This convention reflects standards that should be achieved by by-concept tutorials on `baseerah-fe` (once scaffolded):
 
 **Section Count**: 40-60 total
 
@@ -748,7 +739,7 @@ This convention reflects standards that should be achieved by by-concept tutoria
 
 This convention implements and respects:
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via apps-ayokoding-www-general-checker agent
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via the applicable content-checker agent
 - **[Progressive Disclosure](../../principles/content/progressive-disclosure.md)**: Content organized in complexity levels (beginner/intermediate/advanced)
 - **[No Time Estimates](../../principles/content/no-time-estimates.md)**: Uses coverage percentages instead of time-based estimates
 - **[Accessibility First](../../principles/content/accessibility-first.md)**: Color-blind friendly diagrams and accessible formatting
@@ -758,8 +749,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all by-concept tutorial content** across the repository:
 
-- **apps/ayokoding-www/content/** - Canonical location for programming language tutorials (Java, Golang, Python, etc.)
-- **apps/ose-www/content/** - Platform tutorials using by-concept approach
+- **apps/baseerah-fe/content/** - Planned canonical location for both programming-language tutorials
+  and platform tutorials using the by-concept approach, once `baseerah-fe` is scaffolded
 - **Any other location** - By-concept tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.
@@ -779,7 +770,6 @@ This convention implements and respects:
 - **General tutorial standards** - Covered in [Tutorials Convention](./general.md)
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
 - **Code quality** - Source code standards in development conventions
-- **Tutorial validation** - Covered by apps-ayokoding-www-general-checker agent
 
 ## Related Documentation
 

@@ -540,8 +540,6 @@ Conventions are most effective when enforced or assisted by agents:
 
 - **docs-checker** - Validates documentation follows conventions
 - **docs-link-checker** - Enforces linking convention
-- **apps-ayokoding-www-general-checker** - Validates general ayokoding-web content conventions
-- **apps-ayokoding-www-by-example-checker** - Validates by-example tutorial conventions
 - **repo-rules-checker** - Audits convention compliance
 
 ### Agent Integration Checklist

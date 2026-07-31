@@ -1,6 +1,6 @@
 ---
 title: "Programming Language Content Standard"
-description: "Universal content architecture for programming language education on ayokoding-www with mandatory structure, coverage model, and quality benchmarks"
+description: "Historical: universal content architecture for programming language education on ayokoding-www (removed app) with mandatory structure, coverage model, and quality benchmarks; no current applicability in this repo"
 category: explanation
 subcategory: conventions
 tags:
@@ -13,6 +13,14 @@ created: 2025-12-18
 ---
 
 # Programming Language Content Standard
+
+> **Historical note**: This convention was authored for `ayokoding-www`, a programming-language
+> education content platform removed by the Baseerah repo-reset plan. No app in this repo currently
+> hosts programming-language tutorial content, and Baseerah's planned apps (`baseerah-fe`,
+> `baseerah-be`) are not educational-content platforms, so this convention has no current
+> applicability. It is retained for reference in case a future content-education app is added to
+> this repo; the `ayokoding-www` references below describe that historical implementation and are
+> deliberately left unchanged rather than mechanically renamed onto an unrelated app.
 
 **Defines the universal content architecture for programming language education on ayokoding-www.**
 
@@ -45,7 +53,6 @@ This convention applies to:
   - **ayokoding-www** (`apps/ayokoding-www/content/[lang]/learn/swe/programming-languages/[language]/`) - canonical location
   - **Any other location** where programming language tutorials exist
 - Includes: tutorials (foundational, by-concept, by-example, cookbook), how-to guides, best practices, anti-patterns
-- Enforced by: `apps-ayokoding-www-general-checker`, `apps-ayokoding-www-by-example-checker`, `apps-ayokoding-www-general-maker`, `apps-ayokoding-www-by-example-maker`, `apps-ayokoding-www-facts-checker` agents
 
 **Implementation Notes**: While the Full Set Tutorial Package architecture applies universally, implementation details (frontmatter, weight values, navigation) are documented in the Content Requirements section below.
 
@@ -673,7 +680,7 @@ From benchmark analysis:
 
 Content creators MUST:
 
-1. **Use apps-ayokoding-www-general-maker or apps-ayokoding-www-by-example-maker agent** for initial content creation
+1. **Follow the structure defined in this convention** for initial content creation
 2. **Follow this standard exactly** (don't improvise structure)
 3. **Test all code examples** (ensure they run)
 4. **Verify factual accuracy** (check documentation, official sources)
@@ -683,9 +690,9 @@ Content creators MUST:
 
 Content MUST pass:
 
-1. **apps-ayokoding-www-general-checker** or **apps-ayokoding-www-by-example-checker** validation (quality principles)
-2. **apps-ayokoding-www-facts-checker** verification (factual correctness)
-3. **apps-ayokoding-www-link-checker** validation (all links work)
+1. **Quality-principles validation** (structure, annotation density, coverage)
+2. **Factual-correctness verification** (versions, syntax, code examples)
+3. **Link validation** (all links work)
 4. **Manual review** (pedagogical effectiveness, clarity)
 
 ### Post-Publishing

@@ -8,6 +8,12 @@
 > flat product-surface compound names (`organiclever-be/`, `ayokoding-web/`, etc.),
 > why `ose-app` and `ose-platform` spec trees were merged into a single `ose/` tree,
 > and why `build-tools` was renamed to `ayokoding-build-tools` rather than retired.
+>
+> **Historical note**: The `baseerah-repo-reset` plan later deleted every app referenced below
+> (`organiclever`, `ayokoding`, `ose-app`/`ose-platform`, `crane`, `wahidyankf`) except `rhino`,
+> along with their `specs/apps/` trees and the `allowlist.rs` file described in the Allowlist
+> Impact section. This document is preserved as an accurate record of the naming decisions made
+> at the time; it does not describe the current spec tree.
 
 ## Context
 
@@ -156,4 +162,4 @@ this plan corrected both the code and the convention doc.
 
 - [Specs Directory Structure Convention](../../repo-governance/conventions/structure/specs-directory-structure.md)
 - [App README vs Specs Convention](../../repo-governance/conventions/structure/app-readme-vs-specs.md)
-- [Plan: standardize-app-spec-trees](../../plans/done/2026-06-11__standardize-app-spec-trees/prd.md)
+- Plan: standardize-app-spec-trees (`plans/done/2026-06-11__standardize-app-spec-trees/prd.md`)

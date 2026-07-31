@@ -11,45 +11,43 @@ created: 2025-11-29
 
 # Technology Stack
 
-Technology stack summary, quality tools, and future architecture considerations for the Open Sharia Enterprise platform.
+Technology stack summary, quality tools, and future architecture considerations for the Baseerah platform.
+
+> **2026 Baseerah repo reset**: every prior application except `rhino-cli` was deleted. The
+> Frontend and Backend sections below describe the **planned** `baseerah-fe`/`baseerah-be` stack
+> (not yet scaffolded); the CLI Tools section describes the **current** state. See
+> [applications.md](./applications.md).
 
 ## Technology Stack Summary
 
-### Frontend
+### Frontend (planned — `baseerah-fe` not yet scaffolded)
 
-**Web Applications** (Next.js):
+**Web Application** (Next.js):
 
 - **Next.js**: 16 (App Router)
 - **React**: 19
 - **Styling**: TailwindCSS + Radix UI / shadcn-ui
-- **Deployment**: Vercel
-- **Applications**: ose-www, organiclever-www, organiclever-app-web, ayokoding-www, wahidyankf-www (with tRPC backend)
+- **Deployment**: Vercel (planned)
+- **Applications**: `baseerah-fe` (planned, port 19310)
 
-### Backend
+### Backend (planned — `baseerah-be` not yet scaffolded)
 
-**REST API** (F#/Giraffe):
+**REST API**:
 
-- **Framework**: Giraffe (ASP.NET Core)
-- **Language**: F# (.NET 10)
-- **Build**: dotnet via Nx
-- **Testing**: NUnit / xUnit + Testcontainers (>=90% coverage)
-- **Applications**: organiclever-be, ose-be
+- **Framework**: Likely Giraffe (ASP.NET Core) — framework TBD pending backend tech-stack decision
+- **Language**: Likely F# (.NET 10)
+- **Build**: dotnet via Nx (if F#)
+- **Applications**: `baseerah-be` (planned, port 19320)
 
-### CLI Tools
+### CLI Tools (current)
 
 **Rust CLI Tools**:
 
 - **Language**: Rust (edition 2024, rust-version 1.88)
 - **Build**: Cargo via Nx
 - **Distribution**: Local binaries
-- **Applications**: rhino-cli (Repository Hygiene & INtegration Orchestrator), ayokoding-cli, ose-cli
-
-**F# CLI Tools**:
-
-- **Language**: F# (.NET)
-- **Build**: dotnet via Nx
-- **Distribution**: Local binaries
-- **Applications**: crane-cli (Content Retrieval And Normalization Engine)
+- **Applications**: `rhino-cli` (Repository Hygiene & INtegration Orchestrator) — the sole
+  surviving app after the 2026 Baseerah repo reset
 
 ### Infrastructure
 
@@ -58,7 +56,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **Package Manager**: npm 11.10.1
 - **Git Workflow**: Trunk-Based Development
 - **CI**: GitHub Actions
-- **CD**: Vercel (Next.js apps)
+- **CD**: Vercel (planned, for `baseerah-fe` once scaffolded — no app is deployed today)
 
 ### Quality Tools
 
@@ -85,7 +83,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 ### Scalability Considerations
 
 - **Nx Cloud**: Distributed task execution and caching
-- **CDN**: Static asset delivery optimization (currently Vercel for Next.js sites)
+- **CDN**: Static asset delivery optimization (Vercel, once `baseerah-fe` is deployed)
 - **Additional Next.js Sites**: More specialized content platforms
 - **CLI Tool Suite Expansion**: More specialized automation tools
 - **Shared Rust Crates**: Common functionality across Rust CLI tools

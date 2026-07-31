@@ -6,7 +6,7 @@ subcategory: conventions
 tags:
   - programming-languages
   - tutorials
-  - ayokoding-www
+  - baseerah-fe
   - education
   - structure
 created: 2025-12-27
@@ -14,7 +14,7 @@ created: 2025-12-27
 
 # Programming Language Tutorial Structure Convention
 
-**Defines the dual-path tutorial directory organization for programming language content on ayokoding-www.**
+**Defines the dual-path tutorial directory organization for programming language content on `baseerah-fe` (once scaffolded).**
 
 This convention standardizes how programming language tutorials are organized as a **Full Set Tutorial Package** with 5 mandatory components: foundational tutorials (initial-setup, quick-start), two complementary learning tracks (narrative-driven by-concept and code-first by-example, both achieving 95% coverage), and practical cookbook for problem-solving. All 5 components are required for complete language content.
 
@@ -41,14 +41,12 @@ This convention ensures:
 **Applies to:**
 
 - **All programming language tutorial structures** across the repository:
-  - **ayokoding-www** (`apps/ayokoding-www/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`) - canonical location
+  - **baseerah-fe** (`apps/baseerah-fe/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`, once scaffolded) - canonical location
   - **Any other location** where programming language tutorials are organized
 - Languages: Java, Elixir, Golang, Kotlin, Python, Rust (and future additions)
 
 **Enforced by:**
 
-- `apps-ayokoding-www-general-checker` (validates by-concept structure)
-- `apps-ayokoding-www-by-example-checker` (validates by-example structure)
 - `docs-tutorial-checker` (validates docs/ tutorial quality)
 
 **Implementation Notes**: The Full Set Tutorial Package structure is universal. Platform-specific details (weight values, frontmatter, navigation) are covered in site-specific skills.
@@ -102,7 +100,7 @@ Languages with only by-concept path (by-example not yet created):
 
 ## The Full Set Tutorial Package Components
 
-A complete programming language on ayokoding-www requires **all 5 mandatory components**:
+A complete programming language on `baseerah-fe` (once scaffolded) requires **all 5 mandatory components**:
 
 ### Component 1-2: Foundational Tutorials (Mandatory)
 
@@ -308,7 +306,7 @@ tutorials/
 
 ### Weight Values
 
-Uses ayokoding-www's level-based weight system with powers of 10 ranges:
+Uses `baseerah-fe`'s level-based weight system with powers of 10 ranges:
 
 **Path Calculation:**
 
@@ -370,7 +368,7 @@ tutorials/
 2. **Content INSIDE folder** is one level deeper → uses level N+1 base weight
 3. **Weights RESET per parent**: by-concept/ and by-example/ both start at 10000000 for overview.md (different parents, independent sequences)
 
-See the ayokoding-www developing content skill for complete level-based weight system details.
+See the `baseerah-fe` developing content skill for complete level-based weight system details.
 
 ## Full Set Completeness Requirements
 
@@ -411,8 +409,8 @@ tags: ["language-name", "tutorial-type", "skill-level"]
 
 **Rules:**
 
-- **No categories field**: Not used in ayokoding-www content
-- **No author field**: Not used in ayokoding-www content
+- **No categories field**: Not used in `baseerah-fe` content
+- **No author field**: Not used in `baseerah-fe` content
 - **Date format**: UTC+7 with ISO 8601 format
 - **Weight field**: MANDATORY - uses level-based system
 - **Tags**: JSON array format `["tag1", "tag2"]` (NOT dash-based YAML)
@@ -548,7 +546,7 @@ weight: 100002
 
 ### Automated Validation
 
-**apps-ayokoding-www-general-checker** validates:
+By-concept structure validation checks:
 
 - PASS: By-concept directory structure exists
 - PASS: All mandatory files present (\_index.md, overview.md, beginner/intermediate/advanced.md)
@@ -557,7 +555,7 @@ weight: 100002
 - PASS: Frontmatter completeness
 - PASS: No H1 headings in content
 
-**apps-ayokoding-www-by-example-checker** validates:
+By-example structure validation checks:
 
 - PASS: By-example directory structure (when exists)
 - PASS: 75-90 examples across three files
@@ -706,7 +704,7 @@ If a language is missing components (created before Full Set requirement), follo
 **Step 1: Audit current state**
 
 ```bash
-cd apps/ayokoding-www/content/en/learn/software-engineering/programming-language/[language]/tutorials/
+cd apps/baseerah-fe/content/en/learn/software-engineering/programming-language/[language]/tutorials/
 ls -la  # Check what exists
 ```
 
@@ -763,7 +761,7 @@ Follow [By Example Tutorial Convention](./swe-by-example.md) to create 75-90 ann
 
 **Step 6: Validate**
 
-Run `apps-ayokoding-www-by-example-checker` to verify structure and content quality.
+Validate the resulting structure and content quality against this convention.
 
 ## Related Conventions
 

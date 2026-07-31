@@ -502,7 +502,7 @@ file, err := os.Open(filepath)
 
 ### Quality Validation
 
-**Automated checks** (by apps-ayokoding-www-general-checker):
+**Automated checks** (by the applicable content-checker agent):
 
 - ✅ Recipe has all required sections
 - ✅ Code is properly annotated (0.5-1.5 ratio)
@@ -524,7 +524,7 @@ file, err := os.Open(filepath)
 
 This convention implements and respects:
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via apps-ayokoding-www-general-checker agent
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via the applicable content-checker agent
 - **[Progressive Disclosure](../../principles/content/progressive-disclosure.md)**: Recipes organized by problem complexity within categories
 - **[No Time Estimates](../../principles/content/no-time-estimates.md)**: Focus on problem solved, not time to implement
 - **[Accessibility First](../../principles/content/accessibility-first.md)**: Color-blind friendly diagrams and accessible formatting
@@ -534,8 +534,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all cookbook tutorial content** across the repository:
 
-- **apps/ayokoding-www/content/** - Canonical location for programming language cookbooks (Java, Golang, Python, etc.)
-- **apps/ose-www/content/** - Platform cookbooks using recipe approach
+- **apps/baseerah-fe/content/** - Planned canonical location for both programming language cookbooks
+  and platform cookbooks using the recipe approach, once `baseerah-fe` is scaffolded
 - **Any other location** - Cookbook tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.

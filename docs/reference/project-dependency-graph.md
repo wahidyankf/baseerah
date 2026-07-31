@@ -19,6 +19,12 @@ Run `nx graph` to visualize this interactively.
 > their contract/spec infrastructure were extracted to
 > [ose-primer](https://github.com/wahidyankf/ose-primer) on 2026-04-18. That repository is the
 > authoritative reference for polyglot showcase dependency patterns.
+>
+> **2026 Baseerah repo reset**: every app except `rhino-cli` was deleted (see
+> [monorepo-structure.md](./monorepo-structure.md)). The diagrams and tables below reflect the
+> current, much smaller dependency graph, followed by the graph the [`baseerah-repo-reset`
+> plan](../../plans/in-progress/baseerah-repo-reset/README.md) expects once `baseerah-fe` and
+> `baseerah-be` are scaffolded.
 
 ## Dependency Mechanisms
 
@@ -46,92 +52,83 @@ invalidated and `nx affected` flags the project.
 ```json
 "inputs": [
   "default",
-  "{workspaceRoot}/specs/apps/organiclever/**/*.feature"
+  "{workspaceRoot}/specs/apps/rhino/**/*.feature"
 ]
 ```
 
 ## Visual Dependency Graph
 
-**Rust CLI ecosystem and content sites:**
+**Current apps and libs:**
 
 ```mermaid
 graph TD
-  %% Content sites (top level)
-  AKW[ayokoding-www]
-  OPW[ose-www]
-  WKF[wahidyankf-www]
-
-  %% CLI tools
-  AKC[ayokoding-cli]
-  OPC[ose-cli]
+  %% Current app
   RC[rhino-cli]
 
-  %% Rust lib
+  %% Current libs
   RSC[rust-commons]
+  WUI[web-ui]
+  WUT[web-ui-token]
 
-  %% Content site → CLI
-  AKW --> AKC
-  OPW --> OPC
-
-  %% CLI → shared libs
-  AKC --> RSC
-  AKC --> RC
-  OPC --> RSC
-  OPC --> RC
+  %% Edges
+  WUI --> WUT
 
   classDef lib fill:#029E73,stroke:#016B4E,color:#FFFFFF
   classDef cli fill:#DE8F05,stroke:#A56A04,color:#FFFFFF
-  classDef site fill:#CC78BC,stroke:#9A5A8E,color:#FFFFFF
 
-  class RSC lib
-  class RC,AKC,OPC cli
-  class AKW,OPW,WKF site
+  class RSC,WUI,WUT lib
+  class RC cli
 ```
 
-**OrganicLever product stack:**
+`rhino-cli` and `rust-commons` currently have no dependency edges to other projects — their
+former consumers (`ayokoding-cli`, `ose-cli`, and the deleted content sites) were removed by the
+Baseerah repo reset.
+
+**Planned Baseerah product stack** (not yet scaffolded — per
+[tech-docs.md § Dependencies](../../plans/in-progress/baseerah-repo-reset/tech-docs.md)):
 
 ```mermaid
 graph TD
-  %% E2E tests (top level)
-  OLWWWFEE2E[organiclever-www-fe-e2e]
-  OLWWWBEE2E[organiclever-www-be-e2e]
-  OLAPPE2E[organiclever-app-web-e2e]
-  OLBE2E[organiclever-be-e2e]
+  %% Planned E2E tests (top level)
+  FEE2E[baseerah-fe-e2e]
+  BEE2E[baseerah-be-e2e]
 
-  %% Apps
-  OLWWW[organiclever-www]
-  OLAPP[organiclever-app-web]
-  OLB[organiclever-be]
+  %% Planned apps
+  FE[baseerah-fe]
+  BE[baseerah-be]
 
-  %% Shared
-  OLC[organiclever-contracts]
+  %% Planned contracts project
+  BC[baseerah-contracts]
+
+  %% Existing shared projects the planned apps are expected to use
+  WUI[web-ui]
+  WUT[web-ui-token]
   RC[rhino-cli]
 
   %% Edges
-  OLWWWFEE2E --> OLWWW
-  OLWWWBEE2E -.-> OLWWW
-  OLAPPE2E --> OLAPP
-  OLBE2E --> OLB
-  OLAPP --> OLC
-  OLAPP --> RC
-  OLB --> OLC
+  FEE2E -.-> FE
+  BEE2E -.-> BE
+  FE -.-> WUI
+  FE -.-> WUT
+  FE -.-> BC
+  BE -.-> BC
+  FE -.-> RC
+  BE -.-> RC
 
+  classDef planned fill:#CA9161,stroke:#977048,color:#FFFFFF
+  classDef current fill:#029E73,stroke:#016B4E,color:#FFFFFF
   classDef cli fill:#DE8F05,stroke:#A56A04,color:#FFFFFF
-  classDef product fill:#CA9161,stroke:#977048,color:#FFFFFF
-  classDef e2e fill:#0173B2,stroke:#01537F,color:#FFFFFF
 
+  class FE,BE,BC,FEE2E,BEE2E planned
+  class WUI,WUT current
   class RC cli
-  class OLWWW,OLAPP,OLB,OLC product
-  class OLWWWFEE2E,OLWWWBEE2E,OLAPPE2E,OLBE2E e2e
 ```
 
 **Legend**:
 
-- Green: Libraries
-- Orange: CLI tools
-- Purple: Web sites
-- Brown: OrganicLever product apps
-- Blue: E2E tests
+- Green: Libraries (current)
+- Orange: CLI tools (current)
+- Brown, dashed edges: Planned Baseerah projects (not yet scaffolded)
 
 ## Shared Infrastructure Projects
 
@@ -142,7 +139,9 @@ graph TD
 Repository management CLI used by most projects for spec coverage (`rhino-cli specs coverage`)
 and other validation tasks.
 
-- **Dependents**: CLI tools, libs, content platforms, organiclever-app-web
+- **Dependents**: None currently — every prior consumer app was deleted by the 2026 Baseerah
+  repo reset. Once scaffolded, `baseerah-fe` and `baseerah-be` are each expected to declare
+  `rhino-cli` as an `implicitDependency` for spec validation.
 - **Mechanism**: `implicitDependencies`
 - **Own dependency**: None (self-contained Rust application with only Rust crate dependencies)
 - **Note**: rhino-cli was ported from Go to Rust (2026-05-23).
@@ -153,59 +152,56 @@ and other validation tasks.
 
 Shared Rust utilities (link-checking, HTTP utilities). Created 2026-05-25 to
 consolidate logic shared by `ose-cli` and `ayokoding-cli` after their Go-to-Rust migration.
+Both consumer CLIs were later deleted by the 2026 Baseerah repo reset.
 
-- **Dependents**: `ose-cli`, `ayokoding-cli`
+- **Dependents**: None currently.
 - **Mechanism**: Cargo workspace `path` dependency
+
+### web-ui / web-ui-token
+
+**Location**: `libs/web-ui/`, `libs/web-ui-token/`
+
+Shared React component library (`web-ui`) and its design-token package (`web-ui-token`).
+`web-ui` depends on `web-ui-token` via an npm workspace `package.json` dependency.
+No app currently consumes either lib; `baseerah-fe` is the planned consumer once scaffolded.
 
 ## Project Dependency Table
 
-### Content Platforms
+### Current Projects
 
-| Project        | Dependencies  | Spec Inputs |
-| -------------- | ------------- | ----------- |
-| ayokoding-www  | ayokoding-cli | (none)      |
-| ose-www        | ose-cli       | (none)      |
-| wahidyankf-www | (none)        | (none)      |
+| Project      | Dependencies            | Spec Inputs                     |
+| ------------ | ----------------------- | ------------------------------- |
+| rhino-cli    | (none — self-contained) | rhino-cli/\* (test:integration) |
+| rust-commons | (none)                  | rust-commons/\* (test:unit)     |
+| web-ui       | web-ui-token            | web-ui/\* (test:unit)           |
+| web-ui-token | (none)                  | web-ui-token/\* (test:unit)     |
 
-### OrganicLever
+### Planned Projects (not yet scaffolded)
 
-| Project                  | Dependencies                      | Spec Inputs                                     |
-| ------------------------ | --------------------------------- | ----------------------------------------------- |
-| organiclever-contracts   | (none)                            | (self — project root is spec dir)               |
-| organiclever-www         | rhino-cli                         | organiclever-www/\* (test:integration)          |
-| organiclever-app-web     | rhino-cli, organiclever-contracts | organiclever-app-web/\* (test:integration)      |
-| organiclever-be          | organiclever-contracts            | organiclever-be/\* (test:integration)           |
-| organiclever-www-fe-e2e  | organiclever-www                  | organiclever-www/\* (test:e2e)                  |
-| organiclever-www-be-e2e  | (none — placeholder slot)         | organiclever-www-be/\* (test:e2e)               |
-| organiclever-app-web-e2e | organiclever-app-web              | organiclever-app-web/\* (typecheck, test:quick) |
-| organiclever-be-e2e      | organiclever-be                   | organiclever-be/\* (typecheck, test:quick)      |
+| Project            | Expected Dependencies                               | Notes                                             |
+| ------------------ | --------------------------------------------------- | ------------------------------------------------- |
+| baseerah-contracts | (none)                                              | OpenAPI contract source consumed by fe and be     |
+| baseerah-be        | baseerah-contracts, rhino-cli                       | Framework TBD pending backend tech-stack decision |
+| baseerah-fe        | web-ui, web-ui-token, baseerah-contracts, rhino-cli | Next.js 16 App Router, planned port 19310         |
+| baseerah-be-e2e    | baseerah-be                                         | Planned                                           |
+| baseerah-fe-e2e    | baseerah-fe                                         | Planned                                           |
 
-### CLI Tools
-
-| Project       | Dependencies            | Spec Inputs                         |
-| ------------- | ----------------------- | ----------------------------------- |
-| ayokoding-cli | rust-commons, rhino-cli | ayokoding-cli/\* (test:integration) |
-| ose-cli       | rust-commons, rhino-cli | ose-cli/\* (test:integration)       |
-| rhino-cli     | (none — self-contained) | rhino-cli/\* (test:integration)     |
-
-### Libraries
-
-| Project      | Dependencies | Spec Inputs                 |
-| ------------ | ------------ | --------------------------- |
-| rust-commons | (none)       | rust-commons/\* (test:unit) |
+See [tech-docs.md § Dependencies](../../plans/in-progress/baseerah-repo-reset/tech-docs.md) for
+the source of this table. That document also records the resolved verdict (delete) on the
+conditional `libs/fsharp-crane-core` dependency it once considered for `baseerah-be` — the lib
+was `crane-cli`-specific and was deleted alongside `crane-cli`.
 
 ## Spec Directory Mapping
 
 All Gherkin specs and API contracts live under `specs/` and are consumed via
 `{workspaceRoot}` inputs.
 
-| Spec Directory                                  | Consumed By                                    | Targets                                 |
-| ----------------------------------------------- | ---------------------------------------------- | --------------------------------------- |
-| `specs/apps/organiclever/containers/contracts/` | organiclever-app-web, organiclever-be          | codegen                                 |
-| `specs/apps/organiclever/`                      | organiclever-app-web, organiclever-app-web-e2e | test:integration, typecheck, test:quick |
-| `specs/apps/rhino/`                             | rhino-cli                                      | test:integration                        |
-| `specs/apps/ayokoding/`                         | ayokoding-cli, ayokoding-www                   | test:integration                        |
-| `specs/apps/ose/`                               | ose-cli, ose-www                               | test:integration                        |
+| Spec Directory                   | Consumed By              | Targets                            |
+| -------------------------------- | ------------------------ | ---------------------------------- |
+| `specs/apps/rhino/`              | rhino-cli                | test:integration                   |
+| `specs/libs/web-ui/`             | web-ui                   | test:unit                          |
+| `specs/libs/web-ui-token/`       | web-ui-token             | test:unit                          |
+| `specs/apps/baseerah/` (planned) | baseerah-fe, baseerah-be | test:integration (once scaffolded) |
 
 ## Related Documentation
 

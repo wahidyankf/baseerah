@@ -751,22 +751,15 @@ mod tests {
         );
     }
 
-    #[test]
-    fn run_domain_runs_full_scan_for_eligible_project() {
-        let _cwd = CwdLock::acquire();
-        // "ose-be" IS listed in repo-config.yml's specs.domain-areas — falls through to run().
-        let mut args = base_args(vec![
-            "specs/apps/ose/behavior/be/gherkin".to_string(),
-            "apps/ose-be".to_string(),
-        ]);
-        args.shared_steps = true;
-        args.exclude_dir = vec!["messaging".to_string()];
-        let result = run_domain(&args, OutputFormat::Text);
-        assert!(
-            result.is_ok(),
-            "expected the real scan to pass for ose-be (matches its existing Nx target), got {result:?}"
-        );
-    }
+    // `run_domain`'s eligible → falls-through-to-`run()` branch was previously exercised here
+    // against "ose-be", which used to be listed in the real repo-config.yml's specs.domain-areas.
+    // Phase 2 of the baseerah-repo-reset plan emptied specs.domain-areas (no domain-bounded-context
+    // backend exists in this repo yet), so that fixture silently degraded to testing the skip
+    // branch instead — the same branch `run_domain_skips_project_not_in_domain_areas` already
+    // covers. The eligibility decision itself (`is_eligible`) is unit-tested independently of any
+    // real repo-config.yml in `application::domain_coverage::tests`, so no coverage is lost by
+    // removing the now-misleading integration test rather than fabricating a full isolated
+    // temp-repo fixture just to keep exercising a three-line if/else.
 
     #[test]
     fn three_level_fails_when_integration_and_e2e_missing() {

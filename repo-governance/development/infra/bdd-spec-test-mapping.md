@@ -47,9 +47,10 @@ All CLI apps in this monorepo use **Clap subcommands** grouped by domain. The do
 
 ```
 rhino-cli {domain} {action}
-ayokoding-cli {domain} {action}
-ose-cli {domain} {action}
 ```
+
+The pattern applies to any future Rust CLI app added to the monorepo (`rhino-cli` is currently the
+only one).
 
 ## Mapping Layers
 
@@ -57,8 +58,8 @@ The mapping operates at three levels:
 
 ### 1. Command to Tag (mandatory)
 
-> **Scope note**: The file naming and tag derivation rules below apply to all Rust CLI apps
-> (`ayokoding-cli`, `ose-cli`, `rhino-cli`). See the
+> **Scope note**: The file naming and tag derivation rules below apply to all Rust CLI apps in the
+> monorepo (currently just `rhino-cli`). See the
 > ["CLI App Families"](#cli-apps-dual-level-spec-consumption) section for `.rs` file patterns
 > and test file locations.
 
@@ -159,7 +160,7 @@ which differ from the CLI app naming patterns the tool currently expects. This w
 
 ## Adding a New Command
 
-### Rust CLI apps (ayokoding-cli, ose-cli, rhino-cli)
+### Rust CLI apps (currently rhino-cli)
 
 1. Create the feature file `specs/apps/{app}/behavior/<product>-cli/gherkin/{domain}/{domain}-{action}.feature`
 2. Create `apps/{app}/src/commands/{domain}_{action}.rs` with the Clap subcommand (register in `main.rs`)
@@ -169,7 +170,7 @@ which differ from the CLI app naming patterns the tool currently expects. This w
 
 ## CLI Apps: Dual-Level Spec Consumption
 
-All Rust CLI apps (`ayokoding-cli`, `ose-cli`, `rhino-cli`) consume Gherkin specs at both the unit and integration test levels. The same feature files serve as the contract for both levels — only the step implementations differ.
+All Rust CLI apps (currently just `rhino-cli`) consume Gherkin specs at both the unit and integration test levels. The same feature files serve as the contract for both levels — only the step implementations differ.
 
 ### Architecture
 

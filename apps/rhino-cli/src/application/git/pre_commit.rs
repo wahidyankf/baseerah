@@ -1,4 +1,4 @@
-//! Pre-commit pipeline use case — the 8-step pre-commit runner.
+//! Pre-commit pipeline use case — the 7-step pre-commit runner.
 //!
 //! Reproduces the pipeline originally in `internal/git.rs`, now as a
 //! hexagonal use case with injected I/O via [`Deps`].
@@ -192,15 +192,6 @@ fn step3_nx_pre_commit(git_root: &Path, deps: &mut Deps) {
     }
 }
 
-/// Step 4: stages any changes in `apps/ayokoding-www/content/` produced by earlier steps.
-fn step4_stage_ayokoding(git_root: &Path, _deps: &mut Deps) {
-    let _ = Command::new("git")
-        .arg("add")
-        .arg("apps/ayokoding-www/content/")
-        .current_dir(git_root)
-        .status();
-}
-
 /// Step 5: runs `npx lint-staged` to format and lint staged files.
 fn step5_lint_staged(git_root: &Path, _deps: &mut Deps) -> Result<(), Error> {
     let status = Command::new("npx")
@@ -337,12 +328,7 @@ fn step7_validate_links(git_root: &Path, deps: &mut Deps) -> Result<(), Error> {
     let r = validate_all_links(&ScanOptions {
         repo_root: git_root.to_path_buf(),
         staged_only: true,
-        skip_paths: vec![
-            ".claude/worktrees/".to_string(),
-            "plans/done".to_string(),
-            "apps/ayokoding-www/content".to_string(),
-            "apps/ose-www/content".to_string(),
-        ],
+        skip_paths: vec![".claude/worktrees/".to_string(), "plans/done".to_string()],
     })?;
     if !r.broken_links.is_empty() {
         let text = crate::internal::docs::links::format_link_text(&r, false, false);
@@ -395,12 +381,6 @@ pub fn run(deps: &mut Deps) -> Result<(), Error> {
     let root3 = git_root.clone();
     run_with_step_timeout(total_start, "step3NxPreCommit", deps, move |d| {
         step3_nx_pre_commit(&root3, d);
-        Ok(())
-    })?;
-
-    let root4 = git_root.clone();
-    run_with_step_timeout(total_start, "step4StageAyokoding", deps, move |d| {
-        step4_stage_ayokoding(&root4, d);
         Ok(())
     })?;
 

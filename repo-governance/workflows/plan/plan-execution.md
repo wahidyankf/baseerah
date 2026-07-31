@@ -90,7 +90,7 @@ The orchestrator selects the best agent for each delivery checklist item using t
 
 0. **Suggested-executor annotation (HIGHEST priority)**: If the checkbox carries a `_Suggested executor: <agent-name>_` annotation per [Plan Anti-Hallucination Convention §Specialized-Agent Delegation](../../development/quality/plan-anti-hallucination.md#specialized-agent-delegation-hallucination-reduction), verify the agent file exists at `.claude/agents/<name>.md` and use that agent. The annotation is the plan author's explicit choice — it overrides heuristics 1–4 below. If the annotated agent does not exist, terminate the item with status `fail` and surface the missing-agent error to the user (do not silently fall back).
 
-1. **Match by project/app name**: If the checklist item names a specific app (e.g., `organiclever-be`), use the agent for that app's language (e.g., `swe-rust-dev`). Refer to [CLAUDE.md](../../../CLAUDE.md) for the full app list and their tech stacks.
+1. **Match by project/app name**: If the checklist item names a specific app (e.g., `baseerah-be`), use the agent for that app's language (e.g., `swe-fsharp-dev`). Refer to [CLAUDE.md](../../../CLAUDE.md) for the full app list and their tech stacks.
 
 2. **Match by file extension**: If the item references files with a recognizable extension (`.ts`, `.java`, `.py`, `.go`, `.kt`, `.fs`, `.cs`, `.clj`, `.ex`, `.rs`, `.dart`), use the corresponding `swe-{language}-dev` agent.
 

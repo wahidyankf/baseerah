@@ -55,7 +55,7 @@ This workflow validates **source definitions only**. Source includes governance 
 - PASS: **Validates**: `.claude/agents/` (primary agent source definitions — agent-to-agent duplication, agent-Skill duplication, frontmatter compliance)
 - PASS: **Validates**: `.claude/skills/` (primary agent-skill source — agent-skill-to-agent-skill consolidation opportunities, agent-skill content quality). Agent skills are NOT mirrored to secondary bindings — primary binding skill packages are read natively by all supporting coding-agent platforms, so `.claude/skills/` IS the source of truth and IS in scope.
 - PASS: **Validates (partial)**: `docs/explanation/` (Diátaxis tree — preflight frontmatter audit covers tutorial / how-to / reference / explanation per the Diátaxis schema; software-engineering subtree validated by Step 8 in the AI checker for principle alignment, README index accuracy, and version documentation) and `docs/explanation/README.md` (Diátaxis explanation index — Step 1 Rules Governance scope) and `docs/explanation/software-engineering/` (~265 files / 345k lines — Step 8 dedicated validation: governance-principle alignment, cross-reference completeness, file naming, document structure, template completeness, diagram accessibility, README index accuracy, version documentation).
-- FAIL: **Skips**: the rest of `docs/` (`docs/tutorials/`, `docs/how-to/`, `docs/reference/`, `docs/explanation/` non-software-engineering subtrees, `docs/metadata/`) — out of scope for this workflow today; validated by the specialized `docs/` agent family (`docs-checker`, `docs-tutorial-checker`, `docs-link-checker`, `docs-software-engineering-separation-checker`). Extending coverage to all of `docs/` is a backlog item — see Backlog below.
+- FAIL: **Skips**: the rest of `docs/` (`docs/tutorials/`, `docs/how-to/`, `docs/reference/`, `docs/explanation/` non-software-engineering subtrees, `docs/metadata/`) — out of scope for this workflow today; validated by the specialized `docs/` agent family (`docs-checker`, `docs-tutorial-checker`, `docs-link-checker`). Extending coverage to all of `docs/` is a backlog item — see Backlog below.
 - FAIL: **Skips**: secondary platform binding agent directories (e.g., `.opencode/agents/`) — auto-generated from `.claude/agents/` via `npm run generate:bindings`. Validate via the sync script + `cross-vendor:parity-validation` Nx target, not this workflow.
 
 **Generated Output Validation**: Use CLI validation commands for validating generated content. This workflow ensures SOURCE is correct, then sync commands validate output generation.
@@ -478,7 +478,7 @@ This workflow ensures repository consistency through iterative validation and fi
 
 ## Backlog
 
-- Extend `repo-rules-checker` scope to all of `docs/` (tutorials, how-to, reference, explanation non-software-engineering subtrees, metadata) — currently delegated to the specialized `docs/` agent family (docs-checker, docs-tutorial-checker, docs-link-checker, docs-software-engineering-separation-checker); consolidation would simplify gate orchestration.
+- Extend `repo-rules-checker` scope to all of `docs/` (tutorials, how-to, reference, explanation non-software-engineering subtrees, metadata) — currently delegated to the specialized `docs/` agent family (docs-checker, docs-tutorial-checker, docs-link-checker); consolidation would simplify gate orchestration.
 
 ## Principles Implemented/Respected
 

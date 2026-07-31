@@ -7,13 +7,9 @@ Active project plans currently being worked on.
 - [baseerah-repo-reset](./baseerah-repo-reset/README.md) — Strips this `ose-public` clone down to
   `rhino-cli` and the engineering harness, then stands up Baseerah — a personal-assistant product
   within the OSE ecosystem — as `baseerah-be` (:19320), `baseerah-be-e2e`, `baseerah-fe` (:19310),
-  and `baseerah-fe-e2e`. Deletes the other two plans in this folder along with the apps they target.
-- [ayokoding-learning-path-04-course-authoring](./ayokoding-learning-path-04-course-authoring/README.md)
-  — Wave 2. Authors the `careers/` course bodies band by band, each from its `syllabus/` spec.
-- [vercel-function-cost-reduction](./vercel-function-cost-reduction/README.md) — Cuts gross metered
-  Vercel usage from ~$57/mo to under $20/mo so the Pro plan's included credit absorbs it and the
-  invoice stays at the $20 subscription. Fixes the root cause: `ayokoding-www` prerenders zero of
-  its ~2,068 content pages.
+  and `baseerah-fe-e2e`. Deleted the other two plans that were previously in this folder
+  (`ayokoding-learning-path-04-course-authoring`, `vercel-function-cost-reduction`) along with the
+  apps they targeted.
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.
@@ -22,7 +18,7 @@ work begins.
 
 **Idea Capture**: For ideas not ready for formal planning, write a two-pager in `../ideas/`.
 
-**Naming**: Plans in `in-progress/` use NO date prefix — just the slug (e.g., `organiclever-web-responsive-breakpoints/`). `backlog/` also uses no date prefix, so moving from `backlog/` is a pure move.
+**Naming**: Plans in `in-progress/` use NO date prefix — just the slug (e.g., `baseerah-repo-reset/`). `backlog/` also uses no date prefix, so moving from `backlog/` is a pure move.
 
 When starting work on a plan:
 

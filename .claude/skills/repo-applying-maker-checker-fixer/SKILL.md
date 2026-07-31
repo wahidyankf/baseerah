@@ -602,12 +602,10 @@ Fixer:
 Multiple agent families implement this pattern. See [AI Agents Index](../../../.claude/agents/README.md) for the complete list. Key families include:
 
 1. **repo-rules-\*** - Repository-wide consistency
-2. **apps-ayokoding-www-\*** - Content (ayokoding-web, Next.js)
-3. **docs-tutorial-\*** - Tutorial quality
-4. **apps-ose-www-content-\*** - Next.js 16 content (ose-web)
-5. **readme-\*** - README quality
-6. **docs-\*** - Documentation factual accuracy
-7. **plan-\*** - Plan completeness and structure
+2. **docs-tutorial-\*** - Tutorial quality
+3. **readme-\*** - README quality
+4. **docs-\*** - Documentation factual accuracy
+5. **plan-\*** - Plan completeness and structure
 
 Each family has:
 

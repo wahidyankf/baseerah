@@ -131,13 +131,10 @@ Next.js framework constructs are effects and belong in `shell/`:
 
 ## Reference Implementations
 
-All three Next.js content apps follow this pattern identically:
+The Next.js content app in this repo follows this pattern:
 
-- `apps/ose-www/` — content/landing/search/seo/rss-feed features, each split into `core/` (parsers, schemas, builders)
-  and `shell/` (fs repositories, tRPC routers, React components)
-- `apps/ayokoding-www/` — content/i18n/navigation/search features in the same split
-- `apps/wahidyankf-www/` — portfolio features; pure CV/project/search data and helpers in `core/`, React UI in
-  `shell/`
+- `apps/baseerah-fe/` — content/landing/search/navigation features, each split into `core/` (parsers, schemas,
+  builders) and `shell/` (fs repositories, tRPC routers, React components)
 
 ## Related
 

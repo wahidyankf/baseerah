@@ -49,16 +49,23 @@ cargo llvm-cov --lib --fail-under-lines 90
 **Tool**: Vitest with `@vitest/coverage-v8`
 **Format**: LCOV at `coverage/lcov.info`
 
-| Project              | Threshold | Exclusions |
-| -------------------- | --------- | ---------- |
-| organiclever-app-web | 70%       | None       |
-| ayokoding-www        | 80%       | None       |
-| ose-www              | 80%       | None       |
-| wahidyankf-www       | 80%       | None       |
+| Project      | Threshold | Exclusions                                                                                        |
+| ------------ | --------- | ------------------------------------------------------------------------------------------------- |
+| web-ui       | 70%       | None                                                                                              |
+| web-ui-token | N/A       | Coverage deliberately omitted — the single vitest-cucumber scenario already covers this token lib |
+
+> The prior TypeScript apps (`organiclever-app-web`, `ayokoding-www`, `ose-www`, `wahidyankf-www`)
+> were removed along with their coverage configs in the `baseerah-repo-reset`. `baseerah-fe` (planned
+> Next.js frontend, not yet scaffolded) will get its own threshold row once it exists.
 
 ### F# Projects
 
-**Tool**: NUnit / xUnit + Coverlet
+No F# projects exist in the repo currently — `organiclever-be` and `ose-be` (both F#/Giraffe, 95%
+threshold via Coverlet) were removed along with their apps in the `baseerah-repo-reset`.
+`baseerah-be` — the planned backend (port 19320, likely F#/Giraffe) — is expected to follow the same
+pattern once scaffolded, but no project exists yet to threshold.
+
+**Tool** (standing convention, applies once an F# project exists): NUnit / xUnit + Coverlet
 **Format**: Cobertura XML (enforced via Coverlet threshold flags)
 
 ```bash
@@ -66,23 +73,17 @@ dotnet test --collect:"XPlat Code Coverage" \
   /p:Threshold=95 /p:ThresholdType=line /p:ThresholdStat=Total
 ```
 
-| Project         | Threshold | Notes                      |
-| --------------- | --------- | -------------------------- |
-| organiclever-be | 95%       | Line coverage via Coverlet |
-| ose-be          | 95%       | Line coverage via Coverlet |
-
 ## Thresholds
 
-| Project Type         | Threshold | Rationale                               |
-| -------------------- | --------- | --------------------------------------- |
-| CLI tools (Rust)     | >= 90%    | Core business logic                     |
-| Rust libraries       | >= 90%    | Shared utilities                        |
-| organiclever-be      | >= 95%    | F#/Giraffe backend API                  |
-| ose-be               | >= 95%    | F#/Giraffe backend API                  |
-| organiclever-app-web | >= 70%    | Frontend app with MSW integration tests |
-| ayokoding-www        | >= 80%    | Content platform with UI rendering code |
-| ose-www              | >= 80%    | Content platform with UI rendering code |
-| wahidyankf-www       | >= 80%    | Personal portfolio (Next.js)            |
+| Project Type          | Threshold | Rationale                                                         |
+| --------------------- | --------- | ----------------------------------------------------------------- |
+| CLI tools (Rust)      | >= 90%    | Core business logic (`rhino-cli`)                                 |
+| Rust libraries        | >= 90%    | Shared utilities (`rust-commons`)                                 |
+| web-ui (TS lib)       | >= 70%    | Shared UI component library with rendering code                   |
+| web-ui-token (TS lib) | N/A       | Token-export lib; coverage deliberately omitted (see table above) |
+
+`baseerah-fe` (planned Next.js frontend) and `baseerah-be` (planned backend) will each get a
+threshold row once scaffolded; neither exists yet.
 
 ## CI Integration
 

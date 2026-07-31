@@ -11,84 +11,101 @@ created: 2025-11-29
 
 # Deployment Architecture
 
-Deployment architecture, environment branches, and Vercel configuration for the Open Sharia Enterprise platform.
+Deployment architecture, environment branches, and Vercel configuration for the Baseerah platform.
+
+> **2026 Baseerah repo reset**: every deployed web app and its environment branches/workflows
+> (`ose-www`, `ayokoding-www`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`,
+> `wahidyankf-www`, `ose-be`) were deleted. `rhino-cli` (the sole surviving app) is a CLI tool
+> distributed as a local binary, not deployed via Vercel. `baseerah-fe` and `baseerah-be` are
+> planned but not yet scaffolded, so no deployment pipeline exists for them yet. See
+> [applications.md](./applications.md) and the
+> [baseerah-repo-reset plan](../../../plans/in-progress/baseerah-repo-reset/README.md).
 
 ## Deployment Diagram
+
+**Current state** — no deployed web app exists; `rhino-cli` builds to a local binary:
 
 ```mermaid
 graph LR
     subgraph "Source Control"
         MAIN[main branch<br/>Trunk-Based Dev]
-        PROD_OSE[prod-ose-www<br/>Deploy Only]
-        PROD_AYO[prod-ayokoding-www<br/>Deploy Only - Next.js]
-        PROD_OL[prod-organiclever-www<br/>Deploy Only]
     end
 
     subgraph "Build System"
         NX_BUILD[Nx Build System<br/>Affected Detection]
-        NEXT_BUILD[Next.js Build<br/>Standalone Output]
-        SPRING_BUILD[Spring Boot Build<br/>Maven]
-        RUST_BUILD[Rust Build<br/>CLI Tools]
+        RUST_BUILD[Rust Build<br/>rhino-cli]
     end
 
     subgraph "Deployment Targets"
-        VERCEL_OSE[Vercel<br/>oseplatform.com]
-        VERCEL_AYO[Vercel<br/>ayokoding.com]
-        VERCEL_OL[Vercel<br/>www.organiclever.com]
-        LOCAL[Local Binary<br/>CLI Tools]
+        LOCAL[Local Binary<br/>rhino-cli]
     end
 
-    MAIN -->|Merge/Push| PROD_OSE
-    MAIN -->|Merge/Push| PROD_AYO
-    MAIN -->|Merge/Push| PROD_OL
-
-    PROD_OSE --> NEXT_BUILD
-    PROD_AYO --> NEXT_BUILD
-    PROD_OL --> NEXT_BUILD
     MAIN --> RUST_BUILD
-    MAIN --> SPRING_BUILD
-
-    NEXT_BUILD --> VERCEL_OSE
-    NEXT_BUILD --> VERCEL_AYO
-    NEXT_BUILD --> VERCEL_OL
     RUST_BUILD --> LOCAL
-
-    NX_BUILD -.->|Orchestrates| NEXT_BUILD
-    NX_BUILD -.->|Orchestrates| SPRING_BUILD
     NX_BUILD -.->|Orchestrates| RUST_BUILD
 
     style MAIN fill:#0077b6,stroke:#03045e,color:#ffffff
-    style PROD_OSE fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style PROD_AYO fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style PROD_OL fill:#2a9d8f,stroke:#264653,color:#ffffff
     style NX_BUILD fill:#6a4c93,stroke:#22223b,color:#ffffff
-    style NEXT_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
-    style SPRING_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
     style RUST_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
-    style VERCEL_OSE fill:#e76f51,stroke:#9d0208,color:#ffffff
-    style VERCEL_AYO fill:#e76f51,stroke:#9d0208,color:#ffffff
-    style VERCEL_OL fill:#e76f51,stroke:#9d0208,color:#ffffff
     style LOCAL fill:#6a4c93,stroke:#22223b,color:#ffffff
+```
+
+**Planned Baseerah deployment** (once `baseerah-fe`/`baseerah-be` are scaffolded — not yet real):
+
+```mermaid
+graph LR
+    subgraph "Source Control (planned)"
+        MAIN2[main branch]
+        STAG_FE[stag-baseerah-fe]
+        STAG_BE[stag-baseerah-be]
+    end
+
+    subgraph "Build System"
+        NEXT_BUILD[Next.js Build<br/>Standalone Output]
+        BE_BUILD[Backend Build<br/>framework TBD]
+    end
+
+    subgraph "Deployment Targets"
+        VERCEL_FE[Vercel<br/>baseerah-fe]
+        BE_TARGET[Backend Host<br/>TBD]
+    end
+
+    MAIN2 -.->|Force-push| STAG_FE
+    MAIN2 -.->|Force-push| STAG_BE
+    STAG_FE -.-> NEXT_BUILD
+    STAG_BE -.-> BE_BUILD
+    NEXT_BUILD -.-> VERCEL_FE
+    BE_BUILD -.-> BE_TARGET
+
+    style MAIN2 fill:#0077b6,stroke:#03045e,color:#ffffff
+    style STAG_FE fill:#2a9d8f,stroke:#264653,color:#ffffff
+    style STAG_BE fill:#2a9d8f,stroke:#264653,color:#ffffff
+    style NEXT_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
+    style BE_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
+    style VERCEL_FE fill:#e76f51,stroke:#9d0208,color:#ffffff
+    style BE_TARGET fill:#e76f51,stroke:#9d0208,color:#ffffff
 ```
 
 ## Deployment Configuration
 
 ### Vercel Deployment
 
-**Next.js Sites** (ose-www, ayokoding-www, organiclever-www):
+No Vercel-deployed site currently exists. Once scaffolded, `baseerah-fe` (Next.js 16, planned
+port 19310) is expected to deploy via Vercel with the same conventions as the platform's prior
+Next.js sites:
 
 - **Build Framework**: Next.js (standalone output)
 - **Build Command**: `next build`
 - **Output Directory**: `.next/`
 
-**Security Headers (All Vercel Sites):**
+**Security Headers** (expected on all Vercel sites, per prior convention):
 
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: SAMEORIGIN`
 - `X-XSS-Protection: 1; mode=block`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 
-**Caching Strategy:**
+**Caching Strategy** (expected):
 
 - Static assets (css/js/fonts/images): 1 year immutable cache
 - HTML pages: Standard caching
@@ -96,16 +113,15 @@ graph LR
 ### Environment Branches
 
 - **Purpose**: Deployment triggers only
-- **Branches**: `prod-ose-www`, `prod-ayokoding-www`, `prod-wahidyankf-www`, `stag-organiclever-app-web`, `stag-organiclever-be`
-- **Policy**: NEVER commit directly to these branches outside CI automation
-- **Workflows** (here, "deploy" means a **branch force-push** — Vercel builds web from the pushed branch;
-  a be-build-deploy workflow fires for backends):
-  - `ayokoding-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ayokoding-www`
-  - `ose-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ose-www`
-  - `wahidyankf-www-test-local-deploy-prod.yml` (scheduled) → `prod-wahidyankf-www`
-  - `organiclever-app-test-local-deploy-stag.yml` (3 AM / 3 PM WIB) → `stag-organiclever-app-web`
-    and `stag-organiclever-be` (deploys to **staging**, not production)
-  - `organiclever-app-test-stag.yml` (+2.5h after the stag deploy) — gated FE E2E
-    against the staging URL; **stops on pass without promoting**. Production continuous delivery
-    is deferred to a separate plan, so no production-CD workflow exists yet.
-  - All workflows can also be triggered manually from the GitHub Actions UI
+- **Current state**: No environment branches exist for `rhino-cli` — CLI tools are not deployed
+  via env-branch force-push.
+- **Deleted branches**: `prod-ose-www`, `prod-ayokoding-www`, `prod-wahidyankf-www`,
+  `stag-organiclever-app-web`, `stag-organiclever-be`, and their deploy workflows
+  (`ayokoding-www-test-local-deploy-prod.yml`, `ose-www-test-local-deploy-prod.yml`,
+  `wahidyankf-www-test-local-deploy-prod.yml`, `organiclever-app-test-local-deploy-stag.yml`,
+  `organiclever-app-test-stag.yml`) were removed by the 2026 Baseerah repo reset. See
+  [ci-cd.md § App Deploy Workflows](./ci-cd.md#app-deploy-workflows--deleted-reusable-templates-remain)
+  for the generic reusable templates that survived and remain available for future reuse.
+- **Planned**: `stag-baseerah-fe`, `stag-baseerah-be` (and corresponding `prod-*` branches once
+  production CD is designed), following the same **NEVER commit directly outside CI automation**
+  policy as every prior environment branch.

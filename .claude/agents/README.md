@@ -9,18 +9,11 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[docs-maker](docs-maker.md)** - Expert documentation writer
 - **[docs-tutorial-maker](docs-tutorial-maker.md)** - Tutorial creation specialist
 - **[readme-maker](readme-maker.md)** - README file writer
-- **[apps-ayokoding-www-general-maker](apps-ayokoding-www-general-maker.md)** - General content for AyoKoding
-- **[apps-ayokoding-www-by-example-maker](apps-ayokoding-www-by-example-maker.md)** - By-example tutorials
-- **[apps-ayokoding-www-annotated-concept-maker](apps-ayokoding-www-annotated-concept-maker.md)** - Annotated-concept tutorials (concept-centric worked examples + diagrams; validated no-code sub-mode for leadership topics)
-- **[apps-ayokoding-www-primer-maker](apps-ayokoding-www-primer-maker.md)** - Primer ("Just Enough X") language/tool on-ramps
-- **[apps-ayokoding-www-in-the-field-maker](apps-ayokoding-www-in-the-field-maker.md)** - In-the-field tutorials for AyoKoding
-- **[apps-ose-www-content-maker](apps-ose-www-content-maker.md)** - OSE Platform content
 - **[pdf-to-md-maker](pdf-to-md-maker.md)** - PDF to verbatim Markdown conversion (text-based and image-only via OCR)
 - **[plan-maker](plan-maker.md)** - Project plan creation
 - **[repo-rules-maker](repo-rules-maker.md)** - Governance document creation
 - **[repo-workflow-maker](repo-workflow-maker.md)** - Workflow documentation
 - **[specs-maker](specs-maker.md)** - Spec area scaffolding and feature file creation
-- **[social-linkedin-post-maker](social-linkedin-post-maker.md)** - LinkedIn content creation
 - **[agent-maker](agent-maker.md)** - Agent definition creation
 - **[swe-ui-maker](swe-ui-maker.md)** - UI component creation
 - **[pr-review-architecture-maker](pr-review-architecture-maker.md)** - PR-review specialist scoped to architecture only: new tradeoffs, module boundaries, reversibility, blast radius, quality-attribute effects, novel dependencies
@@ -38,16 +31,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[docs-checker](docs-checker.md)** - Factual accuracy validation
 - **[docs-tutorial-checker](docs-tutorial-checker.md)** - Tutorial quality validation
 - **[docs-link-checker](docs-link-checker.md)** - Link validity checking
-- **[docs-software-engineering-separation-checker](docs-software-engineering-separation-checker.md)** - Programming language docs separation validation
 - **[readme-checker](readme-checker.md)** - README quality validation
-- **[apps-ayokoding-www-general-checker](apps-ayokoding-www-general-checker.md)** - General content validation
-- **[apps-ayokoding-www-by-example-checker](apps-ayokoding-www-by-example-checker.md)** - By-example validation
-- **[apps-ayokoding-www-annotated-concept-checker](apps-ayokoding-www-annotated-concept-checker.md)** - Annotated-concept validation (mode detection, worked-example/scenario density, diagram accessibility)
-- **[apps-ayokoding-www-primer-checker](apps-ayokoding-www-primer-checker.md)** - Primer validation (density, structure, scope discipline)
-- **[apps-ayokoding-www-in-the-field-checker](apps-ayokoding-www-in-the-field-checker.md)** - In-the-field content validation
-- **[apps-ayokoding-www-facts-checker](apps-ayokoding-www-facts-checker.md)** - Factual accuracy for AyoKoding
-- **[apps-ayokoding-www-link-checker](apps-ayokoding-www-link-checker.md)** - Link validation for AyoKoding
-- **[apps-ose-www-content-checker](apps-ose-www-content-checker.md)** - OSE content validation
 - **[pdf-to-md-checker](pdf-to-md-checker.md)** - PDF-to-Markdown fidelity validation (text completeness, tables, figures, Mermaid, OCR quality)
 - **[plan-checker](plan-checker.md)** - Project plan validation
 - **[plan-execution-checker](plan-execution-checker.md)** - Plan execution validation
@@ -65,16 +49,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[docs-file-manager](docs-file-manager.md)** - File organization and management
 - **[docs-fixer](docs-fixer.md)** - Apply validated documentation fixes
 - **[docs-tutorial-fixer](docs-tutorial-fixer.md)** - Apply tutorial fixes
-- **[docs-software-engineering-separation-fixer](docs-software-engineering-separation-fixer.md)** - Fix programming language docs separation issues
 - **[readme-fixer](readme-fixer.md)** - Apply README fixes
-- **[apps-ayokoding-www-general-fixer](apps-ayokoding-www-general-fixer.md)** - Apply general content fixes
-- **[apps-ayokoding-www-by-example-fixer](apps-ayokoding-www-by-example-fixer.md)** - Apply by-example fixes
-- **[apps-ayokoding-www-annotated-concept-fixer](apps-ayokoding-www-annotated-concept-fixer.md)** - Apply Annotated-concept fixes
-- **[apps-ayokoding-www-primer-fixer](apps-ayokoding-www-primer-fixer.md)** - Apply Primer fixes
-- **[apps-ayokoding-www-in-the-field-fixer](apps-ayokoding-www-in-the-field-fixer.md)** - Fix in-the-field content issues
-- **[apps-ayokoding-www-facts-fixer](apps-ayokoding-www-facts-fixer.md)** - Apply factual corrections
-- **[apps-ayokoding-www-link-fixer](apps-ayokoding-www-link-fixer.md)** - Fix broken links
-- **[apps-ose-www-content-fixer](apps-ose-www-content-fixer.md)** - Fix OSE content issues
 - **[pdf-to-md-fixer](pdf-to-md-fixer.md)** - Apply validated PDF-to-Markdown fixes (re-extracts missing content from PDF source)
 - **[plan-fixer](plan-fixer.md)** - Apply plan fixes
 - **[repo-rules-fixer](repo-rules-fixer.md)** - Fix governance compliance issues
@@ -98,13 +73,8 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 ### 🟪 Operations
 
-- **[apps-ayokoding-www-deployer](apps-ayokoding-www-deployer.md)** - AyoKoding marketing site deployment (`prod-ayokoding-www`, Next.js via Vercel)
-- **[apps-ose-www-deployer](apps-ose-www-deployer.md)** - OSE Platform marketing site deployment (`prod-ose-www`)
-- **[apps-organiclever-www-deployer](apps-organiclever-www-deployer.md)** - OrganicLever marketing site deployment (`prod-organiclever-www`)
-- **[apps-organiclever-app-web-deployer](apps-organiclever-app-web-deployer.md)** - OrganicLever app-group staging deployment (`stag-organiclever-app-web` + `stag-organiclever-be`; prod CD deferred)
-- **[apps-ose-app-web-deployer](apps-ose-app-web-deployer.md)** - OSE Application app-group staging deployment (`stag-ose-app-web` + `stag-ose-be`; prod CD deferred)
-- **[apps-wahidyankf-www-deployer](apps-wahidyankf-www-deployer.md)** - wahidyankf portfolio deployment (`prod-wahidyankf-www`, Next.js via Vercel)
-- **[apps-web-ui-storybook-deployer](apps-web-ui-storybook-deployer.md)** - web-ui Storybook deployment to Vercel via `prod-web-ui` force-push
+No deployer agents currently exist — every prior deployer targeted an app removed from this repo.
+The `deployer` role remains a valid naming-convention role for future Baseerah deployment agents.
 
 ### 💻 Development
 
@@ -135,7 +105,7 @@ Normative source: [Agent Naming Convention](../../repo-governance/conventions/st
 | `checker`    | Validates an artifact against standards                                                | `plan-checker`, `plan-execution-checker`, `swe-code-checker`                                    |
 | `fixer`      | Applies validated checker findings                                                     | `plan-fixer`, `swe-ui-fixer`                                                                    |
 | `dev`        | Writes code in a language or test framework                                            | `swe-rust-dev`, `swe-e2e-dev`                                                                   |
-| `deployer`   | Deploys an application to an environment                                               | `apps-ayokoding-www-deployer`                                                                   |
+| `deployer`   | Deploys an application to an environment                                               | none currently — see Operations section above                                                   |
 | `manager`    | Performs file or resource operations (rename/move/delete)                              | `docs-file-manager`                                                                             |
 | `tester`     | Explores or evaluates a running system, live site, or API and reports defects/friction | `web-exploratory-tester`, `web-usability-tester`, `web-design-tester`, `api-exploratory-tester` |
 | `researcher` | Gathers and verifies external information; read-only research                          | `web-researcher`                                                                                |

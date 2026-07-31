@@ -68,7 +68,7 @@ This convention implements/respects the following conventions:
   one of the six required layers, not replaced.
 
 - **[Three-Level Testing Standard](./three-level-testing-standard.md)**: CLI apps in this monorepo
-  (`rhino-cli`, `ayokoding-cli`, `ose-cli`) run integration tests against real `/tmp` filesystem
+  (currently just `rhino-cli`) run integration tests against real `/tmp` filesystem
   fixtures per that standard's "CLI App Implementation Pattern." Any such fixture that also shells
   out to `git` (to build a throwaway repository as test data) is squarely inside this convention's
   scope -- the isolation boundary the Three-Level Testing Standard draws around the filesystem must
@@ -387,7 +387,7 @@ API's environment-variable and working-directory controls.
 
 | Language / stack  | Env-var injection API                                                  | Notes                                                                                                                   |
 | ----------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Rust              | `std::process::Command::env(...)`                                      | Pattern used throughout this document; matches `rhino-cli`, `ayokoding-cli`, `ose-cli`                                  |
+| Rust              | `std::process::Command::env(...)`                                      | Pattern used throughout this document; matches `rhino-cli` (currently the only Rust CLI app in this monorepo)           |
 | Go                | `exec.Cmd.Env` (append to `os.Environ()`, do not replace it wholesale) | Must append, not overwrite -- a fully replaced `Env` drops `PATH`, breaking `git` resolution                            |
 | TypeScript / Node | `child_process.spawn(cmd, args, { env: { ...process.env, ... } })`     | Same append-not-replace rule as Go                                                                                      |
 | Python            | `subprocess.run([...], env={**os.environ, ...})`                       | Same append-not-replace rule                                                                                            |

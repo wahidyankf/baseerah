@@ -33,7 +33,7 @@ Every workflow filename (basename without the `.md` extension) MUST match the st
 Token definitions:
 
 - **`<scope>`** — Exactly one token from the [Scope Vocabulary](#scope-vocabulary) below, matching the parent directory under `repo-governance/workflows/`. Appears first.
-- **`<qualifier>`** — Zero or more lowercase kebab tokens narrowing the scope. Each qualifier is a single hyphen-separated word or a compound kebab phrase (e.g., `rules`, `by-example`, `software-engineering-separation`). Qualifiers stack in order from broadest to narrowest.
+- **`<qualifier>`** — Zero or more lowercase kebab tokens narrowing the scope. Each qualifier is a single hyphen-separated word or a compound kebab phrase (e.g., `rules`, `dependency-bump`, `harness-compatibility`). Qualifiers stack in order from broadest to narrowest.
 - **`<type>`** — Exactly one token from the [Type Vocabulary](#type-vocabulary) below. Names the execution model. Appears last.
 
 **No exceptions** (except `meta/` reference docs, below). Every workflow has exactly one scope (first) and exactly one type (last); everything between is qualifier. Filenames that cannot be parsed against this structure are governance violations regardless of history.
@@ -45,7 +45,7 @@ Additional filename rules inherit from the [File Naming Convention](./file-namin
 Workflow scope MUST match its parent directory under `repo-governance/workflows/`. Current scopes:
 
 - **`api`** — Workflows that operate against a live running HTTP API (REST or GraphQL): contract-conformance, auth/authz, pagination, idempotency, and edge-case exploratory testing of a deployed service. Aligned with agent scope `api` (`api-exploratory-tester`).
-- **`ayokoding-web`** — Workflows scoped to the AyoKoding Web application (content quality gates).
+- **`baseerah-fe`** — Workflows scoped to the Baseerah frontend application (content quality gates).
 - **`ci`** — Workflows that diagnose, validate, or repair continuous-integration pipelines.
 - **`docs`** — Workflows scoped to the `docs/` tree (Diátaxis content, link integrity, software-engineering separation).
 - **`infra`** — Workflows that provision development environments or infrastructure resources.
@@ -109,7 +109,7 @@ The `rhino-cli repo-governance workflows naming validate` subcommand wraps this 
 
 Current workflows, grouped by type, all conforming to the rule:
 
-- **`quality-gate`** — `plan-quality-gate` (scope `plan`, type `quality-gate`), `repo-rules-quality-gate` (scope `repo`, qualifier `rules`, type `quality-gate`), `specs-quality-gate` (scope `specs`, type `quality-gate`), `docs-quality-gate` (scope `docs`, type `quality-gate`), `ci-quality-gate` (scope `ci`, type `quality-gate`), `ui-quality-gate` (scope `ui`, type `quality-gate`), `ayokoding-web-swe-by-example-quality-gate` (scope `ayokoding-web`, qualifier `by-example`, type `quality-gate`), `pdf-to-md-quality-gate` (scope `pdf-to-md`, type `quality-gate`, hosted in `content/` directory), `pr-review-quality-gate` (scope `pr`, qualifier `review`, type `quality-gate`)
+- **`quality-gate`** — `plan-quality-gate` (scope `plan`, type `quality-gate`), `repo-rules-quality-gate` (scope `repo`, qualifier `rules`, type `quality-gate`), `specs-quality-gate` (scope `specs`, type `quality-gate`), `docs-quality-gate` (scope `docs`, type `quality-gate`), `ci-quality-gate` (scope `ci`, type `quality-gate`), `ui-quality-gate` (scope `ui`, type `quality-gate`), `baseerah-fe-content-quality-gate` (scope `baseerah-fe`, qualifier `content`, type `quality-gate`), `pdf-to-md-quality-gate` (scope `pdf-to-md`, type `quality-gate`, hosted in `content/` directory), `pr-review-quality-gate` (scope `pr`, qualifier `review`, type `quality-gate`)
 - **`execution`** — `plan-execution` (scope `plan`, type `execution`)
 - **`planning`** — `plan-planning` (scope `plan`, type `planning`), `plan-idea-promotion-planning` (scope `plan`, qualifier `idea-promotion`, type `planning`), `repo-dependency-bump-planning` (scope `repo`, qualifier `dependency-bump`, type `planning`), `web-ux-test-fixing-planning` (scope `web`, qualifier `ux`, descriptor `test-fixing`, type `planning`)
 - **`setup`** — `infra-development-environment-setup` would be the fully qualified form; the file is stored as `development-environment-setup.md` in the `infra/` directory, making the scope implicit from directory location. The enforcement command (type-suffix check) passes. New `setup` workflows SHOULD include the scope prefix explicitly (e.g., `infra-something-setup.md`).

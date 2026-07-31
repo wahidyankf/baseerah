@@ -101,7 +101,7 @@ graph TD
 #### Layer 5: Workflows (WHEN - Multi-Step Processes)
 
 - **[Workflows](./workflows/README.md)** - Orchestrated multi-step processes composing agents, procedures, and/or other workflows
-  - Workflows across categories (ayokoding-web, ci, content, docs, infra, meta, plan, repo, specs, ui)
+  - Workflows across categories (web, ci, content, docs, infra, meta, plan, repo, specs, ui)
   - Define sequences (sequential/parallel/conditional), state management, termination criteria
   - Examples: Maker-Checker-Fixer, Plan-Execute-Validate
   - Orchestrate agents from Layer 4

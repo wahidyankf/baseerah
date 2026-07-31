@@ -4,8 +4,7 @@ One-line summary: `ose-primer` and `ose-private` have no post-merge CI signal on
 only workflow that would provide one is schedule-triggered — so a merge to `main` in either sibling
 is verified by its PR checks and then never re-verified in its merged state.
 
-> Provenance: the single unticked box in
-> [`plans/done/2026-07-22__bare-repo-governance-hardening`](../done/2026-07-22__bare-repo-governance-hardening/README.md)
+> Provenance: the single unticked box in `plans/done/2026-07-22__bare-repo-governance-hardening`
 > (188 checked, 1 unchecked). Recorded there as partially unmet rather than ticked; filed here so it
 > does not die in `done/`.
 
@@ -35,10 +34,8 @@ that is green because nothing looked, not because something passed.
   the evidence is already gathered — the cheapest moment to act.
 - Three-repo parity is a standing norm here, and `ose-public` having a post-merge signal its siblings
   lack is precisely the kind of asymmetry that parity work exists to remove.
-- A plan is currently in progress
-  ([learning-plan-syllabus-folder-convention](../done/2026-07-22__learning-plan-syllabus-folder-convention/README.md))
-  whose Phase 6 merges PRs into both siblings. It will land changes there under exactly this blind
-  spot.
+- A plan is currently in progress (`learning-plan-syllabus-folder-convention`) whose Phase 6 merges
+  PRs into both siblings. It will land changes there under exactly this blind spot.
 
 ## Prior art / precedents
 
@@ -50,8 +47,7 @@ that is green because nothing looked, not because something passed.
 - **[ci-post-push-verification](../../repo-governance/development/workflow/ci-post-push-verification.md)**
   — the repo's existing rule that pushed app/lib code must have CI triggered and verified; this brief
   is that rule's unenforced case.
-- **[standardize-repo-toolchain-parity](../done/2026-06-13__standardize-repo-toolchain-parity/README.md)**
-  — the prior three-repo CI-standardization effort;
+- **`standardize-repo-toolchain-parity`** — the prior three-repo CI-standardization effort;
   whatever it did or did not normalize about triggers is the first thing to read.
 - **[ci-setup-rust-toolchain-retry](./ci-setup-rust-toolchain-retry.md)** — an already-filed
   cross-repo CI defect, same family, and a candidate to fix in the same pass.

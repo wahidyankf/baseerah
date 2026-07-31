@@ -1,10 +1,10 @@
 ---
 title: "Why It Matters Content Convention"
-description: Rule prohibiting corporate case studies and fabricated platform scenarios in Why It Matters sections of ayokoding-www tutorials; requires theoretical explanations only
+description: Rule prohibiting corporate case studies and fabricated platform scenarios in Why It Matters sections of baseerah-fe tutorials; requires theoretical explanations only
 category: explanation
 subcategory: conventions
 tags:
-  - ayokoding-www
+  - baseerah-fe
   - tutorial-content
   - factual-accuracy
   - why-it-matters
@@ -15,7 +15,7 @@ created: 2026-05-09
 # Why It Matters Content Convention
 
 This convention defines the content rules for `**Why It Matters**:` sections in
-ayokoding-www tutorials. These sections must use theoretical explanations only.
+baseerah-fe tutorials. These sections must use theoretical explanations only.
 Corporate case studies, anecdotal company events, and fabricated platform scenarios
 are prohibited regardless of how plausible they appear.
 
@@ -66,9 +66,9 @@ This convention eliminates the problem at the source by prohibiting the pattern 
 
 ### What This Convention Covers
 
-- All `**Why It Matters**:` sections in ayokoding-www tutorial files
-- Applies to both by-example tutorials (`apps/ayokoding-www/content/en/learn/**/by-example/`)
-- Applies to in-the-field guides (`apps/ayokoding-www/content/en/learn/**/in-the-field/`)
+- All `**Why It Matters**:` sections in baseerah-fe tutorial files
+- Applies to both by-example tutorials (`apps/baseerah-fe/content/en/learn/**/by-example/`)
+- Applies to in-the-field guides (`apps/baseerah-fe/content/en/learn/**/in-the-field/`)
 - Applies to all future tutorial formats that include a Why It Matters section
 - Applies equally to English and Indonesian content
 
@@ -226,16 +226,6 @@ failure rather than a runtime disaster.
 This is permitted because the NASA event is documented in the official accident
 investigation report, and the fact is citable.
 
-## Tools and Automation
-
-- **`apps-ayokoding-www-by-example-checker`** — Validates by-example tutorial content,
-  including scanning `**Why It Matters**:` sections for prohibited patterns
-- **`apps-ayokoding-www-in-the-field-checker`** — Validates in-the-field tutorial content
-  using the same Why It Matters rules
-- **`apps-ayokoding-www-by-example-fixer`** — Applies fixes to by-example tutorial content,
-  rewriting prohibited Why It Matters patterns as theoretical explanations
-- **`apps-ayokoding-www-in-the-field-fixer`** — Applies fixes to in-the-field tutorial content
-
 ## References
 
 **Related Conventions:**
@@ -253,12 +243,3 @@ investigation report, and the fact is citable.
 - [Root Cause Orientation](../../principles/general/root-cause-orientation.md)
 - [Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)
 - [Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)
-
-**Agents:**
-
-- `apps-ayokoding-www-by-example-maker` — Creates by-example tutorials; must follow this convention
-- `apps-ayokoding-www-in-the-field-maker` — Creates in-the-field guides; must follow this convention
-- `apps-ayokoding-www-by-example-checker` — Validates Why It Matters sections in by-example tutorials
-- `apps-ayokoding-www-in-the-field-checker` — Validates Why It Matters sections in in-the-field guides
-- `apps-ayokoding-www-by-example-fixer` — Fixes prohibited patterns in by-example tutorials
-- `apps-ayokoding-www-in-the-field-fixer` — Fixes prohibited patterns in in-the-field guides

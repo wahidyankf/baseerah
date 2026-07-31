@@ -90,7 +90,7 @@ When the Nx workspace resolves dependencies, it reads from `node_modules/` relat
 
 ### Worktrees Routinely Touch Many Languages
 
-AI agents working on worktrees routinely touch apps across many languages: `ose-be` and `organiclever-be` (F#/Giraffe), `rhino-cli` and `crane-cli` (Rust CLIs), `ayokoding-cli` and `ose-cli` (Rust CLIs), TypeScript frontends, and more. The probability that a new worktree session will need a toolchain that has drifted is high, and the cost of discovering the drift mid-task — through an obscure Gradle, Cargo, `mix`, or `dotnet` error — is much higher than the cost of running `npm run doctor -- --fix` deliberately upfront.
+AI agents working on worktrees routinely touch apps across many languages: `baseerah-be` (F#/Giraffe), `rhino-cli` (Rust CLI), `baseerah-fe` (TypeScript), and more. The probability that a new worktree session will need a toolchain that has drifted is high, and the cost of discovering the drift mid-task — through an obscure Gradle, Cargo, `mix`, or `dotnet` error — is much higher than the cost of running `npm run doctor -- --fix` deliberately upfront.
 
 Even worktree sessions whose stated intent is "I'm just editing docs" should run the full two-step init, because the pre-push hook runs `nx affected -t typecheck lint test:quick specs:coverage` which can fan out to arbitrary language tasks depending on what the doc change touches.
 
@@ -127,7 +127,7 @@ their own build/test/typecheck invocation (Rust's `cargo`, TypeScript's package-
 executors, Go's module cache, Python's `uv`/`pip`), so this gap is invisible for them. Two
 ecosystems do NOT auto-restore and need an explicit one-time step in a freshly provisioned
 worktree — this surfaced concretely in **ose-primer**'s polyglot demo-app fan-out (`ose-public`
-itself currently has no Elixir projects; its own F# apps, e.g. `ose-be`/`organiclever-be`, use
+itself currently has no Elixir projects; its own F# apps, e.g. `baseerah-be`, use
 per-domain names rather than the `*-fsharp-*` demo-app naming below and are unaffected by this
 specific glob):
 

@@ -88,16 +88,17 @@ Date-prefixed files use ISO 8601 (`YYYY-MM-DD`) and remain kebab-case overall:
 Apps in `apps/` follow the `[domain]-[type]` naming convention. The following `[type]` suffixes are
 used in this repository:
 
-| Type suffix | Meaning                                                           | Example                                                          |
-| ----------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `www`       | Public website at the domain root (marketing, portfolio, content) | `ose-www`, `ayokoding-www`, `wahidyankf-www`, `organiclever-www` |
-| `app-web`   | Web client at the `app.*` subdomain (the product application UI)  | `organiclever-app-web`, `ose-app-web`                            |
-| `be`        | Generic HTTP backend for a product domain                         | `organiclever-be`, `ose-be`                                      |
-| `cli`       | Command-line tool                                                 | `rhino-cli`, `ayokoding-cli`, `ose-cli`, `crane-cli`             |
-| `e2e`       | End-to-end test suite (Playwright)                                | `ose-www-fe-e2e`, `organiclever-be-e2e`                          |
+| Type suffix | Meaning                                                           | Example                              |
+| ----------- | ----------------------------------------------------------------- | ------------------------------------ |
+| `www`       | Public website at the domain root (marketing, portfolio, content) | `<domain>-www`                       |
+| `app-web`   | Web client at the `app.*` subdomain (the product application UI)  | `<domain>-app-web`                   |
+| `be`        | Generic HTTP backend for a product domain                         | `baseerah-be`                        |
+| `cli`       | Command-line tool                                                 | `rhino-cli`                          |
+| `e2e`       | End-to-end test suite (Playwright)                                | `baseerah-fe-e2e`, `baseerah-be-e2e` |
 
 This type vocabulary ensures that the folder name alone communicates the tier and deployment target
-without ambiguity.
+without ambiguity. This repo currently has no `www` or `app-web` app — Baseerah is a single-product
+repo with no separate marketing site — so those two rows have no live in-repo example.
 
 ## Related Documentation
 

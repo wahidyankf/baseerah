@@ -11,27 +11,16 @@ created: 2025-11-29
 
 # Components & Code Architecture
 
-C4 Level 3 component diagrams and Level 4 code architecture for the Open Sharia Enterprise platform.
+C4 Level 3 component diagrams and Level 4 code architecture for the Baseerah platform.
+
+> **2026 Baseerah repo reset**: the `ose-www`, `ayokoding-cli`, and `ayokoding-www` components
+> previously documented here were deleted along with their apps. `rhino-cli` is the sole
+> surviving app; `baseerah-fe` and `baseerah-be` are planned but not yet scaffolded, so no
+> component diagram exists for them yet. See [applications.md](./applications.md).
 
 ## C4 Level 3: Component Diagrams
 
 Shows the internal components within each container. Components are groupings of related functionality behind a well-defined interface.
-
-### ose-www Components (Next.js 16)
-
-**Component Responsibilities:**
-
-- **Next.js App Router**: Static generation and routing for platform content
-- **tRPC API**: Backend API for content retrieval and navigation
-- **Source Directory**: App source at `apps/ose-www/src/`
-- **Static Assets**: Images and public assets at `apps/ose-www/public/`
-
-### ayokoding-cli Components (Rust CLI Tool)
-
-**Component Responsibilities:**
-
-- **Root Command**: CLI entry point, command routing, help text
-- **Links Check Command**: Validate internal links in ayokoding-www content
 
 ### rhino-cli Components (Rust CLI Tool)
 
@@ -64,21 +53,10 @@ graph TB
 
 - **Root Command**: CLI entry point for repository automation tasks
 - **Automation Module**: Extensible module system for automation workflows
-- **Config Loader**: Load butler-specific configuration
-
-### ayokoding-www Components (Next.js Fullstack Platform)
-
-**Component Responsibilities:**
-
-- **Next.js App Router**: Static generation and routing for educational content
-- **tRPC API**: Backend API for content retrieval, search, and navigation
-- **Content Directory**: Co-located markdown content at `apps/ayokoding-www/content/`
-- **Bilingual Support**: Default English with Indonesian content
+- **Config Loader**: Load repository-hygiene configuration
 
 ## C4 Level 4: Code Architecture
 
-Shows implementation details for critical components. Focus on Rust CLI tool package structures and key implementation patterns.
-
-### ayokoding-cli Package Structure (Rust)
-
-ayokoding-cli now provides only `links check` for validating internal links in ayokoding-www content. The title update and navigation regeneration commands were removed as part of the migration from Hugo to Next.js.
+Shows implementation details for critical components. No Level 4 breakdown is documented yet
+beyond the `rhino-cli` Level 3 diagram above; this section will gain entries for `baseerah-fe`
+and `baseerah-be` once those apps are scaffolded.

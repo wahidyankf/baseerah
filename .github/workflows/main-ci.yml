@@ -111,7 +111,7 @@ jobs:
       - name: markdownlint-cli2 (all .md)
         run: npx markdownlint-cli2 "**/*.md" "#node_modules" "#.nx" "#archived"
       - name: Mermaid diagram validation (all .md)
-        run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --exclude apps/rhino-cli/tests/fixtures --exclude plans/done
+        run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --exclude apps/rhino-cli/tests/fixtures
       - name: Heading hierarchy validation (all .md)
         run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate
       - name: Gherkin cardinality validation (all .feature)
@@ -170,7 +170,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
-      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate
 
   readme-index:
     name: README index validation (repo-wide)

@@ -32,7 +32,7 @@ mod tests {
     // @covers specs/apps/rhino/behavior/rhino-cli/gherkin/specs/domain-coverage.feature:A project not in the domain-areas allowlist is skipped
     #[test]
     fn non_domain_area_project_is_skipped() {
-        let domain_areas = vec!["organiclever-be".to_string(), "ose-be".to_string()];
+        let domain_areas = vec!["baseerah-be".to_string(), "example-be".to_string()];
         assert!(
             !is_eligible("rhino-cli", &domain_areas),
             "rhino-cli must not be eligible for domain-coverage — not in domain-areas"
@@ -42,10 +42,10 @@ mod tests {
     // @covers specs/apps/rhino/behavior/rhino-cli/gherkin/specs/domain-coverage.feature:An uncovered domain scenario fails the gate
     #[test]
     fn domain_area_project_is_eligible() {
-        let domain_areas = vec!["organiclever-be".to_string(), "ose-be".to_string()];
+        let domain_areas = vec!["baseerah-be".to_string(), "example-be".to_string()];
         assert!(
-            is_eligible("organiclever-be", &domain_areas),
-            "organiclever-be must be eligible for domain-coverage — listed in domain-areas"
+            is_eligible("baseerah-be", &domain_areas),
+            "baseerah-be must be eligible for domain-coverage — listed in domain-areas"
         );
     }
 }

@@ -117,7 +117,7 @@ Examples prioritize:
 - Platform-specific advanced features
 - Deprecated features
 
-**Coverage verification**: The apps-ayokoding-www-by-example-checker agent validates coverage against comprehensive checklists for each language/framework.
+**Coverage verification**: Validated against comprehensive checklists for each language/framework by the applicable content-checker agent.
 
 ### 3. Example Count: 75-85 Total
 
@@ -419,7 +419,7 @@ The Java by-example tutorial demonstrates this principle for programming languag
 
 ### Validation Criteria
 
-The apps-ayokoding-www-by-example-checker validates:
+Content validation checks the following:
 
 - **Beginner dependency count**: 0 external dependencies/abstractions (CRITICAL)
 - **Intermediate dependency justification**: Each external dependency has explicit "Why Not Core Features" explanation (HIGH)
@@ -928,7 +928,7 @@ go processRequest(req)  // => Goroutine spawned (runs concurrently with minimal 
 - Keep code annotations focused on state tracking (`// =>` notation)
 - Reserve extensive explanations for "Brief Explanation" and "Why It Matters" sections
 
-**Note**: This annotation density standard (1-2.25 per example) is the general ayokoding-www code annotation standard applied to all content. By-example tutorials follow the same standard as other tutorial types, with additional requirements for self-containment and five-part format.
+**Note**: This annotation density standard (1-2.25 per example) is the general by-example code annotation standard applied to all content. By-example tutorials follow the same standard as other tutorial types, with additional requirements for self-containment and five-part format.
 
 ### Output Annotation Pattern
 
@@ -1282,9 +1282,9 @@ three separate level pages.
 - [Example 27: The Three-Way Match Guard](/en/learn/software-engineering/software-architecture/procurement-platform-be/by-example/intermediate#example-27-the-three-way-match-guard)
 ```
 
-The live FSM by-example tutorial at
-`apps/ayokoding-www/content/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/by-example/overview.md`
-follows this exact pattern and can be used as a reference implementation.
+Once `baseerah-fe` is scaffolded, an FSM by-example tutorial at
+`apps/baseerah-fe/content/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/by-example/overview.md`
+should follow this exact pattern and can be used as a reference implementation.
 
 > **NOTE**: This section is automatically regenerable. If a heading on any level page changes,
 > regenerate every affected bullet in the overview list (slug AND link text both change). Stale
@@ -1395,7 +1395,7 @@ Before publishing by-example content, verify:
 
 ### Automated Validation
 
-The **apps-ayokoding-www-by-example-checker** agent validates:
+Content validation checks the following:
 
 - **Coverage percentage**: 95% target achieved
 - **Example count**: 75-85 total (beginner: 27-30, intermediate: 20-30, advanced: 25-28)
@@ -1416,15 +1416,6 @@ The **apps-ayokoding-www-by-example-checker** agent validates:
 - Kotlin: ✅ 81 examples, 48 diagrams, 2.1 avg density
 - Elixir: ✅ 85 examples, 46 diagrams, 2.0 avg density
 - Clojure: ✅ 80 examples, 32 diagrams, 1.8 avg density
-
-### Quality Gate Workflow
-
-The **by-example-quality-gate** workflow orchestrates:
-
-1. **apps-ayokoding-www-by-example-maker**: Creates/updates examples
-2. **apps-ayokoding-www-by-example-checker**: Validates against standards
-3. **User review**: Reviews audit report
-4. **apps-ayokoding-www-by-example-fixer**: Applies validated fixes
 
 ## Relationship to Other Tutorial Types
 
@@ -1504,7 +1495,7 @@ This convention reflects standards validated by **7 production languages** (75-8
 
 This convention implements and respects:
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via apps-ayokoding-www-by-example-checker agent
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via the applicable content-checker agent
 - **[Progressive Disclosure](../../principles/content/progressive-disclosure.md)**: Content organized in complexity levels (beginner/intermediate/advanced)
 - **[No Time Estimates](../../principles/content/no-time-estimates.md)**: Uses coverage percentages instead of time-based estimates
 - **[Accessibility First](../../principles/content/accessibility-first.md)**: Color-blind friendly diagrams and accessible formatting
@@ -1514,8 +1505,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all by-example tutorial content** across the repository:
 
-- **apps/ayokoding-www/content/** - Canonical location for programming language tutorials (Java, Golang, Python, etc.)
-- **apps/ose-www/content/** - Platform tutorials using by-example approach
+- **apps/baseerah-fe/content/** - Planned canonical location for both programming language tutorials
+  and platform tutorials using the by-example approach, once `baseerah-fe` is scaffolded
 - **Any other location** - By-example tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.
@@ -1535,7 +1526,6 @@ This convention implements and respects:
 - **General tutorial standards** - Covered in [Tutorials Convention](./general.md)
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
 - **Code quality** - Source code standards in development conventions
-- **Tutorial validation** - Covered by apps-ayokoding-www-by-example-checker agent
 
 ## Related Documentation
 
@@ -1545,15 +1535,11 @@ This convention implements and respects:
 - [Color Accessibility Convention](../formatting/color-accessibility.md): Color-blind friendly palette
 - [Diátaxis Framework](../structure/diataxis-framework.md): Tutorial categorization framework
 
-## Related Agents
-
-- [apps-ayokoding-www-by-example-maker](../../../.claude/agents/apps-ayokoding-www-by-example-maker.md) - Creates by-example content
-- [apps-ayokoding-www-by-example-checker](../../../.claude/agents/apps-ayokoding-www-by-example-checker.md) - Validates by-example standards
-- [apps-ayokoding-www-by-example-fixer](../../../.claude/agents/apps-ayokoding-www-by-example-fixer.md) - Applies validated fixes
-
 ## Related Workflows
 
-- [ayokoding-web-swe-by-example-quality-gate](../../workflows/ayokoding-web/ayokoding-web-swe-by-example-quality-gate.md) - Quality assurance workflow for by-example tutorials
+- **By-example quality gate** - No dedicated workflow exists yet; once `baseerah-fe` is scaffolded, a
+  content quality-gate workflow analogous to the other [`repo-governance/workflows/content/`](../../workflows/content/)
+  gates should govern by-example tutorials
 
 ## Related agent skills
 

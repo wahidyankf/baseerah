@@ -97,7 +97,7 @@ authoring.
 
 **Actions**:
 
-- Confirm the `ose-public` working tree is clean (`git status --porcelain` empty).
+- Confirm the working tree is clean (`git status --porcelain` empty).
 - Resolve `as-of-date` (input, else current date). Compute and record the Path B cutoff:
   `cutoff = as-of-date − 60 days`. This is written verbatim into the clearance report per the
   policy's [Cutoff Date Computation](../../development/workflow/dependency-bump-policy.md) section.
@@ -119,15 +119,15 @@ governed by the policy (intersected with `scope-filter`/`ecosystems`):
   `devDependencies`, `optionalDependencies`), `apps/*/package.json`, `libs/*/package.json`, and the
   `.opencode/package.json` binding manifest.
 - **Cargo**: `apps/*/Cargo.toml` and `libs/*/Cargo.toml` `[dependencies]` (e.g. `rhino-cli`,
-  `rust-commons`, `ose-cli`, `ayokoding-cli`), plus per-project `rust-toolchain.toml`
+  `rust-commons`), plus per-project `rust-toolchain.toml`
   compiler-channel pins (every Rust app **and** `libs/rust-commons`).
-- **.NET**: `apps/*/*.fsproj`/`*.csproj` `<PackageReference>` (e.g. `crane-cli`). The .NET SDK
+- **.NET**: `apps/*/*.fsproj`/`*.csproj` `<PackageReference>` (e.g. the planned `baseerah-be`
+  F#/Giraffe/ASP.NET backend once scaffolded). The .NET SDK
   version is **not** pinned via a per-app `global.json` here — it lives in the
   `.github/actions/setup-dotnet` composite-action default (see GitHub Actions below). Inventory a
   `global.json` only if one exists.
 - **Go**: `apps/*/go.mod` Go version + module requirements **if any exist**. The active tree
-  currently has no Go modules (former Go CLIs `ayokoding-cli` and `ose-cli` are now Rust/Cargo);
-  treat Go as empty unless a `go.mod` is found.
+  currently has no Go modules; treat Go as empty unless a `go.mod` is found.
 - **Docker**: `FROM` base-image tags in **all** Dockerfiles (`apps/*/Dockerfile*` including
   `Dockerfile.integration`, and `infra/**/Dockerfile*`) plus the `image:` references in
   `apps/*/docker-compose*.yml` and `infra/**/docker-compose*.yml`.
@@ -258,7 +258,7 @@ catch newly-eligible versions or newly-disclosed CVEs.
 Feature: repository dependency bump planning
 
 Scenario: Planning sweep produces a backlog plan without touching manifests
-  Given the ose-public working tree is clean
+  Given the working tree is clean
   When the workflow runs to completion
   Then a clearance report appears under generated-reports/repo-dependency-bump-planning__*__report.md
   And a plan exists at plans/backlog/dependency-bump/

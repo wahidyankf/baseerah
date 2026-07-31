@@ -235,7 +235,7 @@ Development: AI Agents Convention — agent colors use accessible palette
 **Scope**:
 
 - **docs/** directory (all documentation)
-- **apps/** (ayokoding-www, ose-www content)
+- **apps/** (`rhino-cli` docs, plus future `baseerah-fe`/`baseerah-be` content)
 - **plans/** directory (project planning)
 - **README files** (repository root and project READMEs)
 
@@ -244,7 +244,7 @@ Development: AI Agents Convention — agent colors use accessible palette
 - **Structure**: File naming, Diátaxis framework, plans organization, programming language docs separation
 - **Formatting**: Linking, indentation, emoji usage, diagrams, color accessibility, mathematical notation, timestamp, nested code fences, UI mockups in plan docs (both-tiers rule, design funnel)
 - **Writing**: Content quality, README quality, factual validation, conventions writing, dynamic collection references, OSS documentation
-- **Linking**: Internal AyoKoding references and cross-repository linking patterns
+- **Linking**: Documentation linking format and cross-repository linking patterns
 - **Tutorials**: Tutorial types, naming, programming language content and structure, Indonesian content policy
 
 **Example Conventions**:
@@ -783,7 +783,7 @@ As the repository grows, additional layers might be considered:
 
 **As project matures**:
 
-- **New domains**: Additional Islamic finance domain patterns as ose-be grows
+- **New domains**: Additional Islamic finance domain patterns as `baseerah-be` grows
 - **Enhanced validation**: More sophisticated checker/fixer agents
 - **Performance conventions**: Optimization and scalability standards
 

@@ -313,19 +313,20 @@ Agents can reference multiple agent skills that work together:
 
 ```yaml
 ---
-name: apps-ayokoding-www-general-maker
-description: Expert at creating general Next.js content for ayokoding-www. Use when creating or updating general content pages for the AyoKoding website.
-tools: Read, Write, Edit, Glob, Grep
+name: docs-tutorial-maker
+description: Creates and updates tutorial documentation following Diátaxis framework and tutorial conventions.
+tools: Read, Write, Edit, Grep, Glob, Bash
 model: sonnet
 color: blue
 skills:
-  - apps-ayokoding-www-developing-content
   - docs-creating-accessible-diagrams
-  - docs-validating-factual-accuracy
+  - docs-applying-content-quality
+  - docs-applying-diataxis-framework
+  - docs-creating-by-example-tutorials
 ---
 ```
 
-When this agent is invoked, all three agent skills auto-load if the task description matches their triggers. Agent skills compose seamlessly to provide comprehensive knowledge.
+When this agent is invoked, all four agent skills auto-load if the task description matches their triggers. Agent skills compose seamlessly to provide comprehensive knowledge.
 
 #### Best Practices for agent skills References
 
@@ -445,7 +446,7 @@ After frontmatter, agents should follow this structure:
 
 **Required Sections:**
 
-1. **Title (H1)**: Must follow pattern `# [Name] Agent`. Exception: App-scoped agents may use `# [Role] for [app-name]` (e.g., `# Content Checker for ose-www`)
+1. **Title (H1)**: Must follow pattern `# [Name] Agent`. Exception: App-scoped agents may use `# [Role] for [app-name]` (e.g., `# Content Checker for baseerah-fe`)
 2. **Core Expertise/Responsibility (H2)**: Clear purpose statement
 3. **Reference Documentation (H2)**: Links to relevant conventions and guidance
 
@@ -467,8 +468,8 @@ Agent files follow the authoritative pattern defined in the [Agent Naming Conven
 
 Where:
 
-- `scope`: one token from the scope vocabulary in `agent-naming.md` (e.g., `docs`, `repo`, `apps-ayokoding-web`, `plan`)
-- `qualifier`: zero or more narrowing tokens (e.g., `by-example`, `software-engineering-separation`)
+- `scope`: one token from the scope vocabulary in `agent-naming.md` (e.g., `docs`, `repo`, `apps`, `plan`)
+- `qualifier`: zero or more narrowing tokens (e.g., `by-example`, `execution`)
 - `role`: one of `maker`, `checker`, `fixer`, `dev`, `deployer`, etc.
 
 ```
@@ -478,18 +479,16 @@ PASS: Good - General agents (no scope prefix):
 - plan-execution-checker.md
 - readme-maker.md
 
-PASS: Good - App-scoped agents:
-- apps-ayokoding-www-general-maker.md
-- apps-ayokoding-www-by-example-checker.md
-- apps-ose-www-content-maker.md
-- apps-ose-www-deployer.md
+PASS: Good - App-scoped agents (illustrative pattern — no app-scoped agents currently exist; all were removed in the Baseerah reset):
+- apps-example-app-checker.md
+- apps-example-app-deployer.md
 
 FAIL: Bad:
 - DocWriter.md (PascalCase)
 - doc_writer.md (snake_case)
 - documentation-writer-agent.md (redundant suffix)
-- ayokoding-general-maker.md (missing scope)
-- apps_ayokoding-web_general-maker.md (underscores forbidden — use hyphens)
+- example-app-checker.md (missing scope)
+- apps_example-app_checker.md (underscores forbidden — use hyphens)
 - libs__ts-auth__validator.md (double-underscores forbidden — violates file naming convention)
 ```
 
@@ -500,9 +499,9 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 **When to use scope prefixes:**
 
 1. **`apps-[app-name]-`** - Agent works ONLY with a specific app
-   - Content creation for Next.js sites (ayokoding-www, ose-www)
    - App-specific validation, deployment, structure management
-   - Examples: `apps-ayokoding-www-general-maker`, `apps-ose-www-deployer`
+   - No app-scoped agents currently exist (all were removed in the Baseerah reset); illustrative
+     examples: `apps-example-app-checker`, `apps-example-app-deployer`
 
 2. **`libs-[lib-name]-`** - Agent works ONLY with a specific library
    - Future use when monorepo has libraries with specific agents
@@ -517,7 +516,7 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 
 **Scope naming rules:**
 
-- App/lib names must match directory names exactly (e.g., `ayokoding-www` matches `apps/ayokoding-www/`)
+- App/lib names must match directory names exactly (e.g., `baseerah-fe` matches `apps/baseerah-fe/`)
 - Use kebab-case throughout (no camelCase, PascalCase, or snake_case)
 - Hyphens `-` separate all parts of the agent name (consistent kebab-case throughout)
 - Agent name after scope uses standard kebab-case patterns
@@ -543,11 +542,11 @@ name: docs-maker # Short, kebab-case, no scope (general-purpose)
 description: Expert documentation writer specializing in GitHub-compatible markdown and Diátaxis framework. Use when creating, editing, or organizing project documentation. # Detailed usage guidance
 ```
 
-Example - App-scoped agent:
+Example - App-scoped agent (illustrative — no app-scoped agents currently exist):
 
 ```yaml
-name: apps-ayokoding-www-general-maker # Includes scope prefix
-description: Expert at creating general Next.js content for ayokoding-www. Use when creating or updating general content pages for the AyoKoding website. # Detailed usage guidance
+name: apps-example-app-checker # Includes scope prefix
+description: Expert at validating example-app structure and configuration. Use when checking app-specific compliance. # Detailed usage guidance
 ```
 
 ## Tool Access Patterns
@@ -587,25 +586,18 @@ ALL checker agents MUST write their validation/audit reports to `generated-repor
 
 1. repo-rules-checker
 2. repo-workflow-checker
-3. apps-ayokoding-www-general-checker
-4. apps-ayokoding-www-by-example-checker
-5. apps-ayokoding-www-in-the-field-checker
-6. apps-ayokoding-www-facts-checker
-7. apps-ayokoding-www-link-checker
-8. apps-ose-www-content-checker
-9. docs-checker
-10. docs-tutorial-checker
-11. docs-link-checker
-12. docs-software-engineering-separation-checker
-13. pdf-to-md-checker
-14. readme-checker
-15. plan-checker
-16. plan-execution-checker
-17. specs-checker
-18. swe-code-checker
-19. ci-checker
-20. swe-ui-checker
-21. repo-harness-compatibility-checker
+3. docs-checker
+4. docs-tutorial-checker
+5. docs-link-checker
+6. pdf-to-md-checker
+7. readme-checker
+8. plan-checker
+9. plan-execution-checker
+10. specs-checker
+11. swe-code-checker
+12. ci-checker
+13. swe-ui-checker
+14. repo-harness-compatibility-checker
 
 > **Harness compatibility (Phase 0 + Phase 1)**: `repo-harness-compatibility-checker`
 > (green) and `repo-harness-compatibility-fixer` (yellow) validate both internal
@@ -742,12 +734,12 @@ color: blue
 
 Agents are categorized by their **primary role** which aligns with naming suffixes and tool permissions:
 
-| Color         | Role             | Purpose                               | Tool Pattern                            | Agents                                                                                                             |
-| ------------- | ---------------- | ------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 🟦 **Blue**   | **Makers**       | Create new content from scratch       | Has `Write` tool                        | docs-maker<br>plan-maker<br>docs-tutorial-maker<br>repo-rules-maker                                                |
-| 🟩 **Green**  | **Checkers**     | Validate and generate reports         | Has `Write`, `Bash` (no `Edit`)\*\*     | repo-rules-checker<br>plan-checker<br>docs-checker<br>docs-link-checker\*\*<br>apps-ayokoding-www-link-checker\*\* |
-| 🟨 **Yellow** | **Fixers**       | Modify and propagate existing content | Has `Edit` (usually not `Write`)        | docs-file-manager<br>readme-fixer<br>repo-rules-fixer                                                              |
-| 🟪 **Purple** | **Implementors** | Execute plans with full tool access   | Has `Write`, `Edit`, `Bash` (or Bash)\* | deployers\*<br>swe-\*-dev agents                                                                                   |
+| Color         | Role             | Purpose                               | Tool Pattern                            | Agents                                                                      |
+| ------------- | ---------------- | ------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
+| 🟦 **Blue**   | **Makers**       | Create new content from scratch       | Has `Write` tool                        | docs-maker<br>plan-maker<br>docs-tutorial-maker<br>repo-rules-maker         |
+| 🟩 **Green**  | **Checkers**     | Validate and generate reports         | Has `Write`, `Bash` (no `Edit`)\*\*     | repo-rules-checker<br>plan-checker<br>docs-checker<br>docs-link-checker\*\* |
+| 🟨 **Yellow** | **Fixers**       | Modify and propagate existing content | Has `Edit` (usually not `Write`)        | docs-file-manager<br>readme-fixer<br>repo-rules-fixer                       |
+| 🟪 **Purple** | **Implementors** | Execute plans with full tool access   | Has `Write`, `Edit`, `Bash` (or Bash)\* | swe-\*-dev agents (no deployer agents currently exist)\*                    |
 
 ### Platform Binding Color Translation
 
@@ -781,8 +773,8 @@ The content below is platform-specific. It documents the concrete translation ap
 **Edge Case Notes:**
 
 - **\*Yellow with Write**: Some Yellow fixer agents (e.g., readme-fixer, repo-rules-fixer) may have Write tool for audit report generation. Documented exception.
-- **\*Purple Bash-only**: Deployers (apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-app-web-deployer) only need Bash for git/deployment orchestration. Purple without Write/Edit is valid for Bash-only orchestrators.
-- **\*\*Green with Write + Edit**: Link checker agents (docs-link-checker, apps-ayokoding-www-link-checker) also have Edit and Write tools for cache file management, but their primary role is validation (checker). Color is green to reflect primary role. See "Link Checker Agents Note" below.
+- **\*Purple Bash-only**: Deployers only need Bash for git/deployment orchestration (no deployer agents currently exist — all were removed in the Baseerah reset; the pattern remains documented for any future deployer agent). Purple without Write/Edit is valid for Bash-only orchestrators.
+- **\*\*Green with Write + Edit**: Link checker agents (docs-link-checker) also have Edit and Write tools for cache file management, but their primary role is validation (checker). Color is green to reflect primary role. See "Link Checker Agents Note" below.
 - **\*\*\*Green research agent (`web-researcher`)**: The `web-researcher` agent has the `researcher` role suffix and `color: green`. Green is used because the agent's purpose is validation-adjacent research — verifying external claims and gathering current information — which sits in the validation family rather than content creation. See "Research Agent Note" below.
 
 **Color Accessibility Note**: The four active role colors (blue, green, yellow, purple) are from the verified accessible palette defined in [Color Accessibility Convention](../../conventions/formatting/color-accessibility.md) — the master reference for all color usage in this repository. These colors meet WCAG AA standards for both light and dark modes and work for all types of color blindness (protanopia, deuteranopia, and tritanopia). The additional reserved colors (red, orange, pink, cyan) are reserved for future role categories; when adopted they MUST also be drawn from the accessible palette and verified against the Color Accessibility Convention. See the accessibility section below for details on how agents are identified beyond color. All color-related work must reference the Color Accessibility Convention as the authoritative source.
@@ -804,7 +796,6 @@ This role-based categorization was chosen because it:
 **Link Checker Agents:**
 
 - **docs-link-checker** - Validates documentation links + manages external-links-status.yaml cache
-- **apps-ayokoding-www-link-checker** - Validates ayokoding-www content links + manages ayokoding-links-status.yaml cache
 
 **Why green (not purple)?**
 
@@ -815,14 +806,14 @@ This role-based categorization was chosen because it:
 
 **Why they have Write + Edit tools (beyond standard green pattern):**
 
-- Cache files (`external-links-status.yaml`, `ayokoding-links-status.yaml`) are operational metadata, NOT temporary reports
+- Cache files (`external-links-status.yaml`) are operational metadata, NOT temporary reports
 - Cache management is essential functionality, NOT general file writing capability
 - Write tool is scoped specifically to designated cache file paths (explicit over implicit)
 - This exception respects the Explicit Over Implicit principle by documenting the extended tool access
 
 **Cache files are NOT temporary:**
 
-- Location: `docs/metadata/` (docs-link-checker) and `apps/ayokoding-www/` (apps-ayokoding-www-link-checker)
+- Location: `docs/metadata/` (docs-link-checker)
 - Purpose: Long-term link status tracking (6-month expiry), shared across team
 - Committed to git: Yes (operational metadata)
 - Updated every run: Yes (including lastFullScan timestamp)
@@ -884,12 +875,12 @@ Start: What is the agent's primary capability?
   - Write tool needed for audit reports in generated-reports/
   - Edit tool needed for cache file management (external-links-status.yaml updates)
   - Bash tool needed for UTC+7 timestamps
-  - Examples: docs-link-checker, apps-ayokoding-www-link-checker
+  - Examples: docs-link-checker
 - **Deployers with Bash only**: Use `purple` (Implementor)
   - Execute deployment orchestration (purple's "executes plans/orchestrates tasks")
   - Don't create or edit files, only run git/deployment commands
   - Edge case: purple without Write/Edit tools (Bash-only orchestration)
-  - Examples: apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-app-web-deployer
+  - No deployer agents currently exist (all were removed in the Baseerah reset); pattern retained for future deployer agents
 - **Fixers with Write tool**: Investigate actual usage
   - Yellow (Fixers) should have Edit but NOT Write
   - If Write is needed for creating new convention files → keep yellow, document exception
@@ -1296,11 +1287,9 @@ Agent files are organized into **three complexity tiers** with corresponding siz
 
 **Examples**:
 
-- apps-ayokoding-www-deployer (deployment automation)
-- apps-ose-www-deployer (deployment automation)
-- apps-organiclever-app-web-deployer (deployment automation)
-- social-linkedin-post-maker (single-purpose content generation)
 - repo-workflow-maker (workflow document creation)
+- repo-workflow-checker (workflow document validation)
+- ci-fixer (applying CI audit fixes)
 
 **When to use this tier**:
 
@@ -1330,9 +1319,8 @@ Agent files are organized into **three complexity tiers** with corresponding siz
 - docs-tutorial-checker (tutorial quality validation)
 - docs-file-manager (file organization, relative path calculation, link updates)
 - agent-maker (agent creation automation)
-- apps-ayokoding-www-general-maker (general Next.js content creation for ayokoding-www)
-- apps-ayokoding-www-by-example-maker (by-example tutorial creation)
-- apps-ose-www-content-maker (Next.js content creation for ose-www)
+- readme-maker (README creation)
+- specs-maker (spec scaffolding)
 
 **When to use this tier**:
 
@@ -1376,11 +1364,11 @@ Agent files are organized into **three complexity tiers** with corresponding siz
 
 Quick categorization for existing agents:
 
-| Tier                 | Agents                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Tier 1: Simple**   | apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-app-web-deployer, social-linkedin-post-maker, apps-ayokoding-www-facts-fixer, apps-ayokoding-www-link-fixer, apps-ose-www-content-fixer, repo-workflow-maker, repo-workflow-checker, repo-workflow-fixer, ci-fixer, swe-ui-fixer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| **Tier 2: Standard** | docs-maker, docs-tutorial-maker, docs-checker, docs-tutorial-checker, docs-file-manager, docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-maker, readme-checker, readme-fixer, agent-maker, plan-fixer, apps-ayokoding-www-general-maker, apps-ayokoding-www-general-checker, apps-ayokoding-www-general-fixer, apps-ayokoding-www-by-example-maker, apps-ayokoding-www-by-example-checker, apps-ayokoding-www-by-example-fixer, apps-ayokoding-www-in-the-field-maker, apps-ayokoding-www-in-the-field-checker, apps-ayokoding-www-in-the-field-fixer, apps-ayokoding-www-link-checker, apps-ayokoding-www-facts-checker, apps-ose-www-content-maker, apps-ose-www-content-checker, swe-typescript-dev, swe-golang-dev, swe-e2e-dev, swe-csharp-dev, swe-fsharp-dev, swe-rust-dev, swe-code-checker, specs-maker, specs-checker, specs-fixer, ci-checker, web-researcher, swe-ui-maker, swe-ui-checker |
-| **Tier 3: Complex**  | plan-maker, plan-checker, plan-execution-checker, repo-rules-maker, repo-rules-checker, repo-rules-fixer, docs-link-checker, docs-software-engineering-separation-checker                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Tier                 | Agents                                                                                                                                                                                                                                                                                                                                                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tier 1: Simple**   | repo-workflow-maker, repo-workflow-checker, repo-workflow-fixer, ci-fixer, swe-ui-fixer                                                                                                                                                                                                                                                                                                                           |
+| **Tier 2: Standard** | docs-maker, docs-tutorial-maker, docs-checker, docs-tutorial-checker, docs-file-manager, docs-fixer, docs-tutorial-fixer, readme-maker, readme-checker, readme-fixer, agent-maker, plan-fixer, swe-typescript-dev, swe-golang-dev, swe-e2e-dev, swe-csharp-dev, swe-fsharp-dev, swe-rust-dev, swe-code-checker, specs-maker, specs-checker, specs-fixer, ci-checker, web-researcher, swe-ui-maker, swe-ui-checker |
+| **Tier 3: Complex**  | plan-maker, plan-checker, plan-execution-checker, repo-rules-maker, repo-rules-checker, repo-rules-fixer, docs-link-checker                                                                                                                                                                                                                                                                                       |
 
 ### When to Condense or Split Agents
 
@@ -1850,12 +1838,12 @@ If information cannot be verified: (1) State the limitation explicitly, (2) Prov
 
 ### Git Worktree Awareness
 
-Agents spawned via the Agent tool (delegated agents) run with a working directory that may be a git worktree, not the main checkout. For example, the active worktree may be at `/Users/wkf/ose-projects/ose-public/.claude/worktrees/repo/` while the main checkout is at `/Users/wkf/ose-projects/ose-public/`. Reading a file using an absolute path from the main checkout returns stale content from the wrong tree and causes false verification failures.
+Agents spawned via the Agent tool (delegated agents) run with a working directory that may be a git worktree, not the main checkout. For example, the active worktree may be at `/Users/wkf/ose-projects/baseerah/.claude/worktrees/repo/` while the main checkout is at `/Users/wkf/ose-projects/baseerah/`. Reading a file using an absolute path from the main checkout returns stale content from the wrong tree and causes false verification failures.
 
 **Rules for file access in agents**:
 
 1. **Prefer relative paths** — Use paths relative to the current working directory when reading or writing files. This resolves correctly regardless of which worktree the agent runs in.
-2. **Never hardcode main-checkout absolute paths** — Do not construct absolute paths by prepending the known main-checkout root (e.g., `/Users/wkf/ose-projects/ose-public/repo-governance/...`). These paths bypass the active worktree and return main-tree content.
+2. **Never hardcode main-checkout absolute paths** — Do not construct absolute paths by prepending the known main-checkout root (e.g., `/Users/wkf/ose-projects/baseerah/repo-governance/...`). These paths bypass the active worktree and return main-tree content.
 3. **Read files fresh before verifying** — When a checker or fixer agent verifies that a fix was applied, it must read the file again from the current working directory. It must not rely on a previously cached read from a different path.
 4. **Confirm the working directory when uncertain** — If an agent cannot determine which worktree it runs in, it should use `Bash` (`pwd`) to confirm the working directory before constructing any path.
 5. **Initialize the full toolchain in the root worktree after creating or entering a worktree — two steps, in order** — When an agent creates a worktree via `git worktree add`, the `EnterWorktree` tool, or an `isolation: "worktree"` configuration, or when an agent begins a session inside an existing worktree, it MUST immediately run BOTH of the following in the root repository worktree, in order: (a) `npm install` to keep `node_modules/` consistent with `package-lock.json` (ensures Nx task caching, builds, tests, and linting function correctly across all worktrees), and (b) `npm run doctor -- --fix` to actively converge the polyglot toolchains managed by `rhino-cli doctor` (Rust, .NET/F#, TypeScript/Node). Doing only the first step is NOT sufficient: `package.json`'s `postinstall` hook runs `npm run doctor || true`, and the trailing `|| true` deliberately swallows toolchain drift so that `npm install` can complete while the native toolchain is broken. The explicit `npm run doctor -- --fix` invocation is the only action that guarantees convergence. The rule is triggered by execution mode (any worktree entry), not by intent (even "docs-only" worktree sessions go through both steps, because the pre-push hook can fan out to arbitrary language tasks via `nx affected -t typecheck lint test:quick specs:coverage`). See [Worktree Toolchain Initialization](../workflow/worktree-setup.md) for the full rationale, procedure, and relationship to [Native-First Toolchain Management](../workflow/native-first-toolchain.md).
@@ -1870,7 +1858,7 @@ Read: repo-governance/development/agents/ai-agents.md
 
 <!-- FAIL: Hardcoded main-checkout path — reads stale content when run in a worktree -->
 
-Read: /Users/wkf/ose-projects/ose-public/repo-governance/development/agents/ai-agents.md
+Read: /Users/wkf/ose-projects/baseerah/repo-governance/development/agents/ai-agents.md
 ```
 
 **Consequence of violation**: A checker agent reads a file from the main checkout after a fixer has already corrected it in the active worktree. The checker reports the issue as "not fixed" because it compared against stale content, producing a false negative and blocking the workflow.
@@ -2331,60 +2319,6 @@ See `repo-assessing-criticality-confidence` Skill for level definitions.
 
 **Result**: 450 lines removed (56%), all functionality preserved.
 
-#### Example 2: Ayokoding Content Agent
-
-**Before Simplification** (1,100+ lines):
-
-```markdown
-# apps-ayokoding-www-by-example-maker
-
-## Weight System
-
-[150 lines explaining level-based weights]
-
-## Annotation Standards
-
-[200 lines defining 1-2.25 comment ratio]
-
-## Bilingual Strategy
-
-[100 lines of Indonesian/English patterns]
-
-## Five-Part Example Structure
-
-[150 lines of example format]
-
-## Creation Workflow
-
-[500 lines of task-specific content creation]
-```
-
-**After Simplification** (500 lines):
-
-```markdown
----
-skills:
-  - apps-ayokoding-www-developing-content
-  - docs-creating-by-example-tutorials
----
-
-# apps-ayokoding-www-by-example-maker
-
-## Content Patterns
-
-See `apps-ayokoding-www-developing-content` Skill for weight system, bilingual strategy.
-
-## Example Structure
-
-See `docs-creating-by-example-tutorials` Skill for five-part format, annotation density.
-
-## Creation Workflow
-
-[500 lines of task-specific content creation - RETAINED]
-```
-
-**Result**: 600 lines removed (55%), all patterns available via agent skills.
-
 ### Decision Tree Examples
 
 **Scenario 1**: Adding color palette to diagram-creating agent
@@ -2488,8 +2422,6 @@ When simplifying an agent:
 - `repo-generating-validation-reports` - Report generation, UUID chains, timestamps
 - `repo-assessing-criticality-confidence` - Criticality levels, confidence assessment
 - `repo-applying-maker-checker-fixer` - Three-stage workflow, mode handling
-- `apps-ayokoding-www-developing-content` - Next.js 16 content patterns for ayokoding-www, bilingual content strategy
-- `apps-ose-www-developing-content` - Next.js 16 content patterns for ose-www
 - `docs-creating-by-example-tutorials` - Annotation standards, five-part structure
 - `docs-creating-accessible-diagrams` - Color palettes, accessibility
 - `docs-applying-content-quality` - Markdown quality standards

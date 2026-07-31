@@ -1365,13 +1365,14 @@ fn given_fd_created(w: &mut DocsWorld) {
     w.file_a = Some("repo-governance/created.md".to_string());
 }
 
-#[given("a markdown file with forbidden date metadata under a website app directory")]
-fn given_fd_website_exempt(w: &mut DocsWorld) {
+#[given("a markdown file with forbidden date metadata under an application directory")]
+fn given_fd_no_app_exempt(w: &mut DocsWorld) {
     w.write(
-        "apps/ayokoding-www/content/post.md",
+        "apps/baseerah-fe/content/post.md",
         "---\nupdated: 2026-01-01\n---\n",
     );
-    w.frontmatter_target = Some("apps/ayokoding-www".to_string());
+    w.frontmatter_target = Some("apps/baseerah-fe".to_string());
+    w.file_a = Some("apps/baseerah-fe/content/post.md".to_string());
 }
 
 #[when("the developer runs md frontmatter validate on the directory")]

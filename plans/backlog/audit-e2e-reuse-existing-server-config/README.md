@@ -1,8 +1,7 @@
 # Audit `reuseExistingServer` Across `*-e2e` Playwright Configs
 
 > **Status**: Backlog (not started). Filed from a Knowledge Capture learning surfaced during
-> [`ayokoding-www-tools-ai-benchmark`](../../done/2026-07-30__ayokoding-www-tools-ai-benchmark/README.md)'s
-> Phase 10 Rule-15 retest.
+> `ayokoding-www-tools-ai-benchmark`'s Phase 10 Rule-15 retest.
 
 ## Context
 

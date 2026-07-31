@@ -222,7 +222,7 @@ context: |
 
 ```
 docs-checker.md
-apps-ayokoding-www-general-maker.md
+docs-tutorial-maker.md
 plan-execution-checker.md
 ```
 

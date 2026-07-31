@@ -1,6 +1,6 @@
 ---
 title: "How to Add a Programming Language"
-description: "Step-by-step guide for adding programming languages to ayokoding-www following the Programming Language Content Standard"
+description: "Historical record of the ayokoding-www content-authoring workflow. ayokoding-www no longer lives in this repo (see Baseerah repo-reset); not currently actionable here."
 category: how-to
 tags:
   - programming-languages
@@ -13,6 +13,17 @@ created: 2025-12-18
 
 # How to Add a Programming Language
 
+> **Historical note**: `ayokoding-www` — the app this guide targets — was removed from this
+> repository in the Baseerah repo-reset (this repo no longer serves AyoKoding's educational
+> content; see [tech-docs Decision 12](../../plans/in-progress/baseerah-repo-reset/tech-docs.md)).
+> None of the steps below are actionable here — the `ayokoding-web-*` agents they reference no
+> longer exist in `.claude/agents/`, and `apps/ayokoding-www/` no longer exists in this repo. The
+> AyoKoding site and its source continue to live in the sibling `ose-public` repository. This guide
+> is retained as a historical record of the content-authoring workflow for reference only.
+>
+> The note below (about the Hugo-to-Next.js migration) predates the repo-reset and describes state
+> that was current in `ose-public` at the time of writing.
+>
 > **Note**: This guide was written when ayokoding-www was a Hugo static site. ayokoding-www has since migrated to Next.js 16. The content structure and tutorial standards remain applicable, but Hugo-specific instructions (frontmatter weights, `_index.md` navigation files, Hugo build commands, Hextra shortcodes) no longer apply. Content now lives at `apps/ayokoding-www/content/`.
 
 **Step-by-step guide for adding a new programming language to ayokoding-www following the Programming Language Content Standard.**

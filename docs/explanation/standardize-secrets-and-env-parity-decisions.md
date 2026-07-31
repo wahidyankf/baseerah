@@ -20,7 +20,7 @@ This document records every cross-repo parity decision from the `standardize-sec
 (2026-06-10). The plan ships naming convention, `.env.example` layout, startup validation, the
 `rhino-cli env` toolchain, and the drift guard (`env-contract:` section in `repo-config.yml`) to ose-public. The full
 technical design lives in
-[`plans/done/2026-06-10__standardize-secrets-and-env/tech-docs.md`](../../plans/done/2026-06-10__standardize-secrets-and-env/tech-docs.md).
+`plans/done/2026-06-10__standardize-secrets-and-env/tech-docs.md`.
 
 Sibling repo plans: the ose-private and ose-primer repositories carry equivalent plans; this document
 records only the ose-public decisions and deviations.
@@ -121,7 +121,10 @@ an explicitly-blessed unprefixed shared name, not an oversight.
 
 **Decision**: In Next.js webs (`ose-www`, `ayokoding-www`, etc.), `PORT` stays unprefixed — it is a
 framework-reserved name the Next.js dev server reads natively. In F# backends (`organiclever-be`,
-`ose-be`), the port var takes the full prefix (`ORGANICLEVER_BE_PORT`, `OSE_BE_PORT`).
+`ose-be`), the port var takes the full prefix (`ORGANICLEVER_BE_PORT`, `OSE_BE_PORT`). (All apps
+named here were later removed in the `baseerah-repo-reset`; the underlying rule — framework-reserved
+names stay unprefixed, app-owned backend vars take the full prefix — still applies to the planned
+`baseerah-fe`/`baseerah-be` apps.)
 
 **Why**: This asymmetry follows from who owns the binding. The Next.js dev server reads `PORT` from
 the platform (PaaS or OS) with no indirection through app code — renaming it to `OSE_WWW_PORT` would

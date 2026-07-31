@@ -49,7 +49,7 @@ This convention establishes comprehensive standards for tutorial content across 
 ### What This Convention Does NOT Cover
 
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
-- **ayokoding-web-specific implementation** - Platform-specific frontmatter and navigation details covered in the ayokoding-web developing content skill
+- **baseerah-fe-specific implementation** - Platform-specific frontmatter and navigation details covered in the `baseerah-fe` developing content skill (once scaffolded)
 - **Non-tutorial content** - How-To guides, Reference, Explanation covered separately
 - **Tutorial validation** - Covered by docs-tutorial-checker agent
 
@@ -61,11 +61,11 @@ Tutorials are **learning-oriented** documentation that guide learners through ac
 
 **Scope**: Applies to **all tutorial content in the repository**, including:
 
-- **apps/ayokoding-www/content/** - Canonical location for programming language and educational tutorials (Java, Golang, Python, etc.)
-- **apps/ose-www/content/** - Platform tutorials and guides
+- **apps/baseerah-fe/content/** - Planned canonical location for programming language, educational,
+  and platform tutorials, once `baseerah-fe` is scaffolded
 - **Any other location** - Tutorial content regardless of directory
 
-**Implementation Notes**: While these standards apply universally, implementation details (frontmatter, weight values, navigation structure) vary by platform and are covered in site-specific skills (see the ayokoding-web developing content skill).
+**Implementation Notes**: While these standards apply universally, implementation details (frontmatter, weight values, navigation structure) vary by platform and are covered in site-specific skills (see the `baseerah-fe` developing content skill, once scaffolded).
 
 ## Diátaxis Principles for Tutorials
 
@@ -1494,7 +1494,7 @@ One might consider using this approach. [impersonal]
 
 ### Exemplary Tutorial: Quick Start Structure
 
-See existing tutorials in `apps/ayokoding-www/content/` as examples. Future tutorials should exemplify:
+Once `baseerah-fe` is scaffolded, see tutorials under `apps/baseerah-fe/content/` as examples. Future tutorials should exemplify:
 
 **These exemplify**: - Clear structure with all required sections - Progressive scaffolding from simple to complex - Visual completeness with diagrams and formulas - Hands-on practice exercises and challenges - Narrative flow with teacher voice - Real-world relevance throughout
 

@@ -1,10 +1,10 @@
 ---
-title: "Indonesian Content Policy - ayokoding-www"
-description: Policy defining when and how to create Indonesian content in ayokoding-www bilingual platform
+title: "Indonesian Content Policy - baseerah-fe"
+description: Policy defining when and how to create Indonesian content in baseerah-fe bilingual platform
 category: explanation
 subcategory: conventions
 tags:
-  - ayokoding-www
+  - baseerah-fe
   - indonesian
   - bilingual
   - content-policy
@@ -12,9 +12,9 @@ tags:
 created: 2026-02-07
 ---
 
-# Indonesian Content Policy - ayokoding-www
+# Indonesian Content Policy - baseerah-fe
 
-This document defines the policy for Indonesian language content in ayokoding-www, establishing when Indonesian content should be created and what types of content are appropriate for Indonesian translation.
+This document defines the policy for Indonesian language content in baseerah-fe, establishing when Indonesian content should be created and what types of content are appropriate for Indonesian translation.
 
 ## Principles Implemented/Respected
 
@@ -28,7 +28,7 @@ This convention implements the following core principles:
 
 ## Purpose
 
-This convention establishes a clear content language policy for ayokoding-www to:
+This convention establishes a clear content language policy for baseerah-fe to:
 
 - Define the primary language for different content types
 - Prevent redundant translation effort for technical tutorials
@@ -55,7 +55,7 @@ This convention establishes a clear content language policy for ayokoding-www to
 
 ## Core Policy: English-First for Technical Tutorials
 
-**CRITICAL RULE**: ayokoding-www is **English-first** for technical tutorials and programming language content.
+**CRITICAL RULE**: baseerah-fe is **English-first** for technical tutorials and programming language content.
 
 **Rationale**:
 
@@ -230,7 +230,7 @@ START: Should I create Indonesian content?
 
 ### Content Creation Agents
 
-**apps-ayokoding-www-general-maker**, **apps-ayokoding-www-by-example-maker**, **apps-ayokoding-www-in-the-field-maker**:
+Any agent creating tutorial content:
 
 - **Default behavior**: Create technical tutorials in English under `/en/learn/`
 - **Do NOT automatically mirror** to Indonesian (`/id/belajar/`)
@@ -250,7 +250,7 @@ Agent: Creates /id/celoteh/2024/02/belajar-typescript.md
 
 ### Validation Agents
 
-**apps-ayokoding-www-general-checker**:
+Any agent validating tutorial content:
 
 - Validates that technical tutorials in English do NOT have automatic Indonesian mirrors
 - Flags Indonesian technical tutorials without explicit translation justification
@@ -324,7 +324,7 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Agent creates English tutorial only
-# apps/ayokoding-www/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/baseerah-fe/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # No automatic Indonesian creation
 # /id/belajar/swe/programming-languages/typescript/ does NOT exist
@@ -334,10 +334,10 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Agent creates English tutorial
-# apps/ayokoding-www/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/baseerah-fe/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # Agent ALSO creates Indonesian mirror (WRONG!)
-# apps/ayokoding-www/content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/baseerah-fe/content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 # This violates English-first policy unless explicitly requested
 ```
 
@@ -349,7 +349,7 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Create Indonesian personal essay (encouraged)
-# apps/ayokoding-www/content/id/celoteh/2024/02/refleksi-belajar-golang.md
+# apps/baseerah-fe/content/id/celoteh/2024/02/refleksi-belajar-golang.md
 ```
 
 **Content Focus**:
@@ -375,13 +375,13 @@ User: "Please translate the Golang Initial Setup tutorial to Indonesian. This is
 
 ```bash
 # Create Indonesian translation
-# apps/ayokoding-www/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
+# apps/baseerah-fe/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in English version
-echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> apps/ayokoding-www/content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> apps/baseerah-fe/content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in Indonesian version with machine translation disclaimer
-echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> apps/ayokoding-www/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> apps/baseerah-fe/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 ```
 
 **Key Points**:
@@ -419,10 +419,3 @@ Before creating Indonesian content, verify:
 - [Automation Over Manual](../../principles/software-engineering/automation-over-manual.md) - Avoiding manual translation burden
 - [Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md) - Simplified content strategy
 - [Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md) - Clear translation policy
-
-**Agents**:
-
-- `apps-ayokoding-www-general-maker` - Creates ayokoding-www content following this policy
-- `apps-ayokoding-www-by-example-maker` - Creates by-example tutorials (English-first)
-- `apps-ayokoding-www-in-the-field-maker` - Creates in-the-field production guides (English-first)
-- `apps-ayokoding-www-general-checker` - Validates compliance with this policy

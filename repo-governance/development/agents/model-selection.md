@@ -121,10 +121,9 @@ Mistakes).
 
 **Agent examples**:
 
-- **All checkers** -- validate content against conventions using defined rulesets and produce structured audit reports (docs-checker, docs-tutorial-checker, docs-software-engineering-separation-checker, readme-checker, specs-checker, repo-rules-checker, repo-workflow-checker, plan-checker, plan-execution-checker, swe-code-checker, swe-ui-checker, ci-checker, apps-\*-checker)
-- **Most fixers** -- apply corrections from checker audit reports following documented fix procedures (docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-fixer, specs-fixer, repo-rules-fixer, repo-workflow-fixer, plan-fixer, swe-ui-fixer, ci-fixer, apps-\*-fixer)
-- **social-linkedin-post-maker** -- generates social media posts following a defined template and tone guidelines
-- **Structured makers** -- makers with tight, well-defined skills that pin down most decisions, making them rule-following rather than open-ended creation (docs-maker, readme-maker, agent-maker, specs-maker, repo-workflow-maker, apps-ose-www-content-maker, apps-ayokoding-www-by-example-maker, apps-ayokoding-www-general-maker, apps-ayokoding-www-in-the-field-maker, repo-rules-maker)
+- **All checkers** -- validate content against conventions using defined rulesets and produce structured audit reports (docs-checker, docs-tutorial-checker, readme-checker, specs-checker, repo-rules-checker, repo-workflow-checker, plan-checker, plan-execution-checker, swe-code-checker, swe-ui-checker, ci-checker)
+- **Most fixers** -- apply corrections from checker audit reports following documented fix procedures (docs-fixer, docs-tutorial-fixer, readme-fixer, specs-fixer, repo-rules-fixer, repo-workflow-fixer, plan-fixer, swe-ui-fixer, ci-fixer)
+- **Structured makers** -- makers with tight, well-defined skills that pin down most decisions, making them rule-following rather than open-ended creation (docs-maker, readme-maker, agent-maker, specs-maker, repo-workflow-maker, repo-rules-maker)
 - **swe-e2e-dev** -- writes Playwright E2E tests following a dedicated skill with defined patterns (locators, fixtures, waits); lower stakes than production code written by language developer agents
 
 **Frontmatter**: Specify `model: sonnet` explicitly.
@@ -155,20 +154,22 @@ color: green
 
 **Agent examples**:
 
-- **Deployers** (apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-app-web-deployer, apps-wahidyankf-www-deployer) -- execute git branch operations and deployment commands following a fixed procedure
-- **Link checkers** (docs-link-checker, apps-ayokoding-www-link-checker) -- validate URLs by checking HTTP status codes and managing cache files
-- **apps-ayokoding-www-link-fixer** -- applies checker-identified broken links via deterministic URL replacement; no independent analysis required
+- **Link checkers** (docs-link-checker) -- validate URLs by checking HTTP status codes and managing cache files
 - **docs-file-manager** -- performs deterministic file operations (move, rename, delete) with `git mv`, kebab-case pattern matching, and mechanical link updates; no judgment calls required
+
+Deployers previously anchored this tier (fixed git/deployment command sequences with no reasoning);
+no deployer agents currently exist (all were removed in the Baseerah reset). The tier guidance
+remains valid for any future deployer agent.
 
 **Frontmatter**: Specify `model: haiku` explicitly.
 
 ```yaml
 ---
-name: apps-ayokoding-www-deployer
-description: Expert deployment orchestrator...
-tools: [Bash, Read, Glob, Grep]
+name: docs-file-manager
+description: Expert at managing files and directories in docs/ directory...
+tools: [Read, Edit, Glob, Grep, Bash]
 model: haiku
-color: purple
+color: yellow
 ---
 ```
 
@@ -244,7 +245,7 @@ For a deployer agent:
 | **Task ambiguity**     | Handles open-ended problems                                                                 | Handles structured problems                                                                   | Requires deterministic flow                                                                  |
 | **Output originality** | Creates new content/code                                                                    | Transforms per rules                                                                          | Executes predefined steps                                                                    |
 | **Error recovery**     | Adapts to unexpected states                                                                 | Follows fallback rules                                                                        | Fails or retries                                                                             |
-| **Typical agents**     | Creative makers, developers                                                                 | Checkers, fixers, structured makers                                                           | Deployers, link checkers, file manager                                                       |
+| **Typical agents**     | Creative makers, developers                                                                 | Checkers, fixers, structured makers                                                           | Link checkers, file manager                                                                  |
 | **SWE-bench Verified** | [87.6%](../../../docs/reference/ai-model-benchmarks.md#claude-opus-47) (Verified, Apr 2026) | [79.6%](../../../docs/reference/ai-model-benchmarks.md#claude-sonnet-46) (Verified, Feb 2026) | [73.3%](../../../docs/reference/ai-model-benchmarks.md#claude-haiku-45) (Verified, Oct 2025) |
 
 ## Common Mistakes
@@ -331,15 +332,11 @@ Some agents straddle tier boundaries. When uncertain:
 
 ### Link Checkers as Fast-Tier
 
-Link checker agents (docs-link-checker, apps-ayokoding-www-link-checker) use the fast tier despite being categorized as checkers (green). This is because their validation is purely mechanical (HTTP status code checking), not rule-based reasoning. The checker color reflects their role in the maker-checker-fixer workflow, while the model reflects their cognitive requirements.
-
-### Social Media Maker as Execution-Grade
-
-The social-linkedin-post-maker uses execution-grade despite being a "maker" agent. This is because LinkedIn post generation follows a rigid template and tone guide, making it a structured pattern-following task rather than creative content creation.
+Link checker agents (docs-link-checker) use the fast tier despite being categorized as checkers (green). This is because their validation is purely mechanical (HTTP status code checking), not rule-based reasoning. The checker color reflects their role in the maker-checker-fixer workflow, while the model reflects their cognitive requirements.
 
 ### Structured Makers as Execution-Grade
 
-Several maker agents use execution-grade because their output is structured by tight skills with well-defined rubrics (docs-maker, readme-maker, agent-maker, specs-maker, repo-workflow-maker, apps-ose-www-content-maker, apps-ayokoding-www-by-example-maker, apps-ayokoding-www-general-maker, apps-ayokoding-www-in-the-field-maker, repo-rules-maker). Each has an execution-grade checker and execution-grade fixer in its maker-checker-fixer trio, and the skill pins down most decisions. Contrast with planning-grade makers (plan-maker, docs-tutorial-maker, swe-ui-maker) where the creative work is open-ended, pedagogically demanding, or multi-concern.
+Several maker agents use execution-grade because their output is structured by tight skills with well-defined rubrics (docs-maker, readme-maker, agent-maker, specs-maker, repo-workflow-maker, repo-rules-maker). Each has an execution-grade checker and execution-grade fixer in its maker-checker-fixer trio, and the skill pins down most decisions. Contrast with planning-grade makers (plan-maker, docs-tutorial-maker, swe-ui-maker) where the creative work is open-ended, pedagogically demanding, or multi-concern.
 
 ### E2E Test Developer as Execution-Grade
 
@@ -348,10 +345,6 @@ The swe-e2e-dev uses execution-grade despite the other 12 language developer age
 ### File Manager as Fast-Tier
 
 The docs-file-manager uses the fast tier despite being categorized as a fixer (yellow). This is because its operations are deterministic file manipulation (`git mv`, `git rm`, find-and-replace link updates) with no judgment calls. The `agent-developing-agents` skill cites it as the canonical fast-tier example.
-
-### Link Fixer as Fast-Tier
-
-The apps-ayokoding-www-link-fixer uses the fast tier despite being a fixer (yellow) — previously execution-grade. Its work is deterministic URL replacement driven entirely by a checker audit report: no independent link analysis, no content reasoning, just old-URL → new-URL substitution followed by an HTTP status re-check. The fast-tier model (73.3% SWE-bench Verified — [benchmark reference](../../../docs/reference/ai-model-benchmarks.md#claude-haiku-45)) is fully sufficient and costs 5× less per token than the execution-grade tier. This is the fixer analogue of the Link Checkers as Fast-Tier rule above.
 
 ## Tools and Automation
 

@@ -86,10 +86,9 @@ Blue columns (required) are always non-null and populated by the database defaul
 
 Each backend uses the idiomatic migration tool for its language and framework ecosystem. All tools must apply the same six audit columns to every table.
 
-| App             | Migration Tool | License |
-| --------------- | -------------- | ------- |
-| organiclever-be | DbUp           | MIT     |
-| ose-be          | DbUp           | MIT     |
+| App         | Migration Tool | License |
+| ----------- | -------------- | ------- |
+| baseerah-be | DbUp           | MIT     |
 
 > For polyglot migration tool patterns (Liquibase, Ecto, Alembic, goose, Flyway, EF Core, Migratus, @effect/sql, SQLx, Drizzle), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -116,15 +115,15 @@ The following example shows the `members` table as the reference implementation.
 ```sql
 -- Migrations/20240101000001_CreateMembers.sql
 CREATE TABLE members (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    -- audit columns
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by VARCHAR(255) NOT NULL DEFAULT 'system',
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by VARCHAR(255) NOT NULL DEFAULT 'system',
-    deleted_at TIMESTAMPTZ,
-    deleted_by VARCHAR(255)
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+  name TEXT NOT NULL,
+  -- audit columns
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now (),
+  created_by VARCHAR(255) NOT NULL DEFAULT 'system',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now (),
+  updated_by VARCHAR(255) NOT NULL DEFAULT 'system',
+  deleted_at TIMESTAMPTZ,
+  deleted_by VARCHAR(255)
 );
 ```
 
@@ -296,7 +295,8 @@ Use this checklist when adding a new table or reviewing an existing one.
 
 **Project Plans:**
 
-- [Auth Register/Login Tech Docs](../../../plans/done/2026-04-22__auth-register-login/tech-docs.md) - Reference implementation of the `users` table applying this pattern
+- `auth-register-login` tech docs (2026-04-22, since archived and removed from `plans/done/`) —
+  reference implementation of the `users` table applying this pattern
 
 **External (F# / DbUp / EF Core):**
 

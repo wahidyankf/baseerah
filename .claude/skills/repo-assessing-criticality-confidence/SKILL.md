@@ -214,13 +214,11 @@ Fixer agents MUST process findings in strict priority order:
 
 ### Dual-Label Pattern
 
-**Five agents require BOTH verification/status AND criticality**:
+**These agents require BOTH verification/status AND criticality**:
 
 - `docs-checker` - [Verified]/[Error]/[Outdated]/[Unverified] + criticality
 - `docs-tutorial-checker` - Verification labels + criticality
-- `apps-ayokoding-www-facts-checker` - Verification labels + criticality
 - `docs-link-checker` - [OK]/[BROKEN]/[REDIRECT] + criticality
-- `apps-ayokoding-www-link-checker` - Status labels + criticality
 
 **Format**:
 

@@ -400,11 +400,10 @@ Both dimensions provide complementary information.
 
 ### Factual Validation Agents
 
-Three agents implement this methodology end-to-end (check → finding → fix):
+These agents implement this methodology end-to-end (check → finding → fix):
 
 - **docs-checker** — Validates documentation factual accuracy
 - **docs-tutorial-checker** — Validates tutorial factual accuracy
-- **apps-ayokoding-www-facts-checker** — Validates ayokoding-web factual accuracy
 
 All use the same validation workflow and confidence classification.
 
@@ -519,7 +518,6 @@ Step 3: Compare and classify
 
 - `docs-checker` - Documentation factual validation
 - `docs-tutorial-checker` - Tutorial factual validation
-- `apps-ayokoding-www-facts-checker` - ayokoding-web factual validation
 
 ---
 

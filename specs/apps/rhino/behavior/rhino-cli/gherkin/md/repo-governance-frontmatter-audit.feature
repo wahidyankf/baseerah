@@ -29,8 +29,8 @@ Feature: Governance Frontmatter Date-Metadata Audit
     Then the command exits with a failure code
     And the output identifies the forbidden inline annotation and its location
 
-  Scenario: File under website app directory is exempt and passes
-    Given a markdown file with forbidden date metadata under a website app directory
+  Scenario: No application path is exempt from the frontmatter audit
+    Given a markdown file with forbidden date metadata under an application directory
     When the developer runs md frontmatter validate on the file
-    Then the command exits successfully
-    And the output reports zero frontmatter findings
+    Then the command exits with a failure code
+    And the output identifies the forbidden frontmatter field and its location

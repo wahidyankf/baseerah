@@ -7,7 +7,8 @@
 - If CI runners are ephemeral per job, the risk is local-development-only — the fix might be
   documentation (a caveat on developers running e2e locally) rather than a config change.
 - If CI runners are shared/persistent (self-hosted runners are used in this repo — see
-  [`plans/done/2026-07-19__fundamentally-strong-software-engineer/learnings.md`](../../done/2026-07-19__fundamentally-strong-software-engineer/learnings.md#openapi-generator-cli-jar-download-race-is-a-second-concurrency-flake-class),
+  `plans/done/2026-07-19__fundamentally-strong-software-engineer/learnings.md`
+  ("OpenAPI Generator CLI jar download race is a second concurrency-flake class"),
   which records a shared-tool-cache concurrency race on a co-triggered self-hosted runner and
   generalizes it as "any tool with a shared local cache, invoked by 2+ workflows the same push
   fires concurrently"), the six hardcoded configs should likely match `organiclever-app-web-e2e`'s

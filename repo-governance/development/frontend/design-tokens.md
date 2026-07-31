@@ -105,8 +105,11 @@ Brand tokens express each app's visual identity. Apps define these in their own 
 
 **App-specific extensions**
 
-- `organiclever-app-web`: chart tokens `--chart-1` through `--chart-5`
-- `ayokoding-www`: sidebar tokens `--sidebar-background`, `--sidebar-foreground`, `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-accent`, `--sidebar-accent-foreground`, `--sidebar-border`, `--sidebar-ring`
+- `baseerah-fe` (once scaffolded): apps commonly extend the shared palette with their own tokens
+  following this same per-app pattern — for example, chart tokens (`--chart-1` through `--chart-5`)
+  for data visualization, or sidebar tokens (`--sidebar-background`, `--sidebar-foreground`,
+  `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-accent`,
+  `--sidebar-accent-foreground`, `--sidebar-border`, `--sidebar-ring`) for a dashboard layout
 
 ## Naming Convention
 
@@ -141,9 +144,10 @@ The `--color-{name}` form is what Tailwind v4 resolves to utility classes like `
 
 ## Token Format: Two Current Approaches
 
-The monorepo currently has two formatting approaches in production apps.
+This monorepo has documented two formatting approaches, based on prior production apps (both since
+removed from the app portfolio).
 
-**Double indirection** (`organiclever-app-web`):
+**Double indirection** (the discouraged pattern, previously used by `organiclever-app-web`):
 
 ```css
 /* globals.css */
@@ -158,7 +162,7 @@ The monorepo currently has two formatting approaches in production apps.
 
 The bare variable holds only the HSL components (no `hsl()` wrapper), and the `@theme` alias wraps it.
 
-**Direct value** (`ayokoding-www`):
+**Direct value** (the recommended pattern, previously used by `ayokoding-www`; adopt this for `baseerah-fe`):
 
 ```css
 /* globals.css */
@@ -242,7 +246,9 @@ This keeps component code free of CSS property names and ensures the token layer
 
 ## OKLCH Brand Tokens (OrganicLever)
 
-`organiclever-app-web` uses a warm OKLCH palette rather than HSL. OKLCH is the CSS Colors Level 4
+The `organiclever.css` brand token file in `libs/web-ui-token` (its original consuming app,
+`organiclever-app-web`, has since been removed from the app portfolio) uses a warm OKLCH palette
+rather than HSL. OKLCH is the CSS Colors Level 4
 perceptual color space — it provides **perceptually uniform chroma** so that hues at the same
 `L%` and `C` level look equally vivid, unlike HSL where `50% saturation` produces wildly
 different perceived intensity across hues.

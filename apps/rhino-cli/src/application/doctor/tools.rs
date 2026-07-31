@@ -85,7 +85,9 @@ static PATHS: OnceLock<Paths> = OnceLock::new();
 struct Paths {
     /// Path to the root `package.json` (for `volta.node` / `volta.npm`).
     package_json: PathBuf,
-    /// Path to `apps/ose-be/global.json` (for .NET `sdk.version`).
+    /// Path to the repo's sole `global.json` (for .NET `sdk.version`). No app currently owns
+    /// this path — `read_dotnet_version` degrades gracefully via `unwrap_or_default` (same as
+    /// `read_node_v`/`read_npm_v`) until a future .NET backend adds one back.
     global_json: PathBuf,
     /// Path to `apps/rhino-cli/Cargo.toml` (for `rust-version`).
     cargo_toml: PathBuf,

@@ -239,7 +239,7 @@ Same as SWE by-example. Production-focused, active voice, specific to the techni
 
 ## Applies To
 
-This convention governs security by-example content in ayokoding-www:
+This convention governs security by-example content in `baseerah-fe` (once scaffolded):
 
 - `information-security/foundations/by-example/` — IT security foundations track
 - `information-security/roles/red-team/by-example/` — Red Team offensive track

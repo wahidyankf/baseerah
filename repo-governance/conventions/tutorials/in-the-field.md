@@ -127,7 +127,7 @@ In-the-field prioritizes:
 - Comprehensive language coverage (by-example achieves 95%)
 - Sequential skill building (by-example/by-concept handle this)
 
-**Coverage verification**: The apps-ayokoding-www-general-checker agent validates production scenario completeness.
+**Coverage verification**: Validated for production scenario completeness by the applicable content-checker agent.
 
 ### 3. Topic Count: 20-40 Production Guides
 
@@ -2066,7 +2066,8 @@ When creating in-the-field content for a new domain:
 
 ### Example: Java Programming Language
 
-See actual implementation in `/apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/java/in-the-field/`:
+Once `baseerah-fe` is scaffolded, an equivalent implementation would live at
+`/apps/baseerah-fe/content/en/learn/software-engineering/programming-languages/java/in-the-field/`:
 
 ```yaml
 # Foundation Layer (10000000-10000003)
@@ -2211,7 +2212,7 @@ Before publishing in-the-field content, verify:
 
 ### Automated Validation
 
-The **apps-ayokoding-www-general-checker** agent validates:
+Content validation checks the following:
 
 - **Production topic coverage**: 20-40 guides
 - **Standard library first**: Built-in examples precede frameworks
@@ -2222,15 +2223,6 @@ The **apps-ayokoding-www-general-checker** agent validates:
 - **Diagram frequency**: 10-20 total diagrams (25-50% of guides)
 - **Color-blind palette**: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
 - **Frontmatter completeness**: Title, date, weight, description, tags present
-
-### Quality Gate Workflow
-
-The **in-the-field-quality-gate** workflow orchestrates:
-
-1. **apps-ayokoding-www-general-maker**: Creates/updates production guides
-2. **apps-ayokoding-www-general-checker**: Validates against standards
-3. **User review**: Reviews audit report
-4. **apps-ayokoding-www-general-fixer**: Applies validated fixes
 
 ## Relationship to Other Tutorial Types
 
@@ -2383,8 +2375,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all in-the-field tutorial content** across the repository:
 
-- **apps/ayokoding-www/content/** - Canonical location for programming language in-the-field guides (Java, Golang, Python, etc.)
-- **apps/ose-www/content/** - Platform in-the-field guides
+- **apps/baseerah-fe/content/** - Planned canonical location for both programming language and
+  platform in-the-field guides (Java, Golang, Python, etc.), once `baseerah-fe` is scaffolded
 - **Any other location** - In-the-field tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.
@@ -2404,7 +2396,6 @@ This convention implements and respects:
 - **General tutorial standards** - Covered in [Tutorials Convention](./general.md)
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
 - **Code quality** - Source code standards in development conventions
-- **Tutorial validation** - Covered by apps-ayokoding-www-general-checker agent
 
 ## Related Documentation
 
@@ -2416,15 +2407,11 @@ This convention implements and respects:
 - [Color Accessibility Convention](../formatting/color-accessibility.md): Color-blind friendly palette
 - [Core Features First Principle](./swe-by-example.md): Foundation for standard library first approach
 
-## Related Agents
-
-- [apps-ayokoding-www-in-the-field-maker](../../../.claude/agents/apps-ayokoding-www-in-the-field-maker.md) - Creates in-the-field content
-- [apps-ayokoding-www-in-the-field-checker](../../../.claude/agents/apps-ayokoding-www-in-the-field-checker.md) - Validates in-the-field standards
-- [apps-ayokoding-www-in-the-field-fixer](../../../.claude/agents/apps-ayokoding-www-in-the-field-fixer.md) - Applies validated fixes
-
 ## Related Workflows
 
-- [ayokoding-web-in-the-field-quality-gate](../../workflows/ayokoding-web/ayokoding-web-in-the-field-quality-gate.md) - Quality assurance workflow for in-the-field tutorials
+- **In-the-field quality gate** - No dedicated workflow exists yet; once `baseerah-fe` is scaffolded, a
+  content quality-gate workflow analogous to the other [`repo-governance/workflows/content/`](../../workflows/content/)
+  gates should govern in-the-field tutorials
 
 ## Related agent skills
 

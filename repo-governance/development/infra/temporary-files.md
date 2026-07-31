@@ -57,22 +57,15 @@ This convention establishes designated directories for temporary files created b
 All checker agents in the following families MUST write audit reports to `generated-reports/`:
 
 1. **repo-rules-checker** - Repository consistency validation
-2. **apps-ayokoding-www-general-checker** - General content validation (ayokoding-www)
-3. **apps-ayokoding-www-by-example-checker** - By-example tutorial validation (ayokoding-www)
-4. **apps-ayokoding-www-facts-checker** - Educational content factual accuracy validation
-5. **apps-ayokoding-www-link-checker** - Link validation (ayokoding-www)
-6. **apps-ose-www-content-checker** - Content validation (ose-www, Next.js)
-7. **docs-checker** - Documentation factual accuracy validation
-8. **docs-link-checker** - External and internal link validation
-9. **docs-tutorial-checker** - Tutorial quality validation
-10. **readme-checker** - README quality validation
-11. **plan-checker** - Plan readiness validation
-12. **plan-execution-checker** - Implementation validation
-13. **apps-ayokoding-www-in-the-field-checker** - In-the-field content validation (ayokoding-www)
-14. **docs-software-engineering-separation-checker** - Software engineering docs separation validation
-15. **repo-workflow-checker** - Workflow documentation quality validation
-16. **specs-checker** - Gherkin/BDD specs directory structural and content validation
-17. **swe-code-checker** - Software code quality validation
+2. **docs-checker** - Documentation factual accuracy validation
+3. **docs-link-checker** - External and internal link validation
+4. **docs-tutorial-checker** - Tutorial quality validation
+5. **readme-checker** - README quality validation
+6. **plan-checker** - Plan readiness validation
+7. **plan-execution-checker** - Implementation validation
+8. **repo-workflow-checker** - Workflow documentation quality validation
+9. **specs-checker** - Gherkin/BDD specs directory structural and content validation
+10. **swe-code-checker** - Software code quality validation
 
 **NO EXCEPTIONS**: Checker agents MUST NOT output results in conversation only. All validation findings MUST be written to audit report files.
 
@@ -105,7 +98,7 @@ All checker agents MUST follow the universal naming pattern:
 
 **Components** (4 parts separated by `__`):
 
-- `{agent-family}`: Agent name WITHOUT the `-checker` suffix (e.g., `repo-rules`, `ayokoding-web`, `docs`, `plan`)
+- `{agent-family}`: Agent name WITHOUT the `-checker` suffix (e.g., `repo-rules`, `swe-ui`, `docs`, `plan`)
 - `{uuid-chain}`: Execution hierarchy as underscore-separated 6-char UUIDs (e.g., `a1b2c3`, `a1b2c3_d4e5f6`)
 - `{YYYY-MM-DD--HH-MM}`: Timestamp in UTC+7 (double dash between date and time)
 - `{type}`: Report type suffix (`audit`, `validation`, `fix`)
@@ -122,9 +115,9 @@ All checker agents MUST follow the universal naming pattern:
 
 ```
 generated-reports/repo-rules__a1b2c3__2025-12-14--20-45__audit.md
-generated-reports/ayokoding-web-general__d4e5f6__2025-12-14--15-30__audit.md
-generated-reports/ayokoding-web-by-example__a1b2c3_d4e5f6__2025-12-14--15-45__audit.md
-generated-reports/ose-web-content__g7h8i9__2025-12-14--16-00__audit.md
+generated-reports/swe-ui__d4e5f6__2025-12-14--15-30__audit.md
+generated-reports/swe-code__a1b2c3_d4e5f6__2025-12-14--15-45__audit.md
+generated-reports/ci__g7h8i9__2025-12-14--16-00__audit.md
 generated-reports/docs__a1b2c3_d4e5f6_g7h8i9__2025-12-15--10-00__audit.md
 generated-reports/plan__b2c3d4__2025-12-15--11-30__validation.md
 generated-reports/plan-execution__c3d4e5__2025-12-15--14-00__validation.md
@@ -167,8 +160,8 @@ To enable accurate parent-child hierarchy tracking across concurrent workflow ru
 | readme-checker        | `readme`        | `.execution-chain-readme`        |
 | plan-checker          | `plan`          | `.execution-chain-plan`          |
 | docs-link-checker     | `docs-link`     | `.execution-chain-docs-link`     |
-| ayokoding-web-\* (ts) | `ayokoding`     | `.execution-chain-ayokoding`     |
-| ose-web-\*            | `ose`           | `.execution-chain-ose`           |
+| swe-ui-checker        | `swe-ui`        | `.execution-chain-swe-ui`        |
+| ci-checker            | `ci`            | `.execution-chain-ci`            |
 
 **Tracking File Format**: `{unix-timestamp} {uuid-chain}`
 
@@ -242,17 +235,17 @@ This prevents race conditions when multiple children run in parallel.
 Scope-based tracking enables correct parent tracking for concurrent workflows:
 
 ```
-T0: ayokoding-workflow writes .execution-chain-ayokoding = "aaa111"
-T1: ose-workflow writes .execution-chain-ose = "bbb222"
-T2: ayokoding-checker reads .execution-chain-ayokoding → "aaa111"
-T3: ose-checker reads .execution-chain-ose → "bbb222"
+T0: swe-ui-workflow writes .execution-chain-swe-ui = "aaa111"
+T1: ci-workflow writes .execution-chain-ci = "bbb222"
+T2: swe-ui-checker reads .execution-chain-swe-ui → "aaa111"
+T3: ci-checker reads .execution-chain-ci → "bbb222"
 ```
 
 Each workflow scope is isolated, preventing cross-contamination.
 
 ### Documented Limitation
 
-> **Edge case:** If the same workflow with the same scope runs concurrently (e.g., two ayokoding by-example validations simultaneously), parent tracking may be imperfect within that scope. This is expected behavior for concurrent operations on the same resource. The unique UUID still ensures no file collisions.
+> **Edge case:** If the same workflow with the same scope runs concurrently (e.g., two `swe-ui-checker` validations simultaneously), parent tracking may be imperfect within that scope. This is expected behavior for concurrent operations on the same resource. The unique UUID still ensures no file collisions.
 
 ### Backward Compatibility
 
@@ -397,22 +390,15 @@ This progressive approach ensures findings persist even if context is compacted 
 ALL \*-checker agents must implement progressive writing:
 
 1. repo-rules-checker
-2. apps-ayokoding-www-general-checker
-3. apps-ayokoding-www-by-example-checker
-4. apps-ayokoding-www-facts-checker
-5. apps-ayokoding-www-link-checker
-6. apps-ose-www-content-checker
-7. docs-checker
-8. docs-link-checker
-9. docs-tutorial-checker
-10. readme-checker
-11. plan-checker
-12. plan-execution-checker
-13. apps-ayokoding-www-in-the-field-checker
-14. docs-software-engineering-separation-checker
-15. repo-workflow-checker
-16. specs-checker
-17. swe-code-checker
+2. docs-checker
+3. docs-link-checker
+4. docs-tutorial-checker
+5. readme-checker
+6. plan-checker
+7. plan-execution-checker
+8. repo-workflow-checker
+9. specs-checker
+10. swe-code-checker
 
 **Validation**: See repo-rules-checker agent for validation rules that verify progressive writing compliance across all checker agents.
 
@@ -424,7 +410,7 @@ ALL \*-checker agents must implement progressive writing:
 
 **Components** (4 parts):
 
-- `{agent-family}`: Agent name WITHOUT checker/fixer/maker suffix (e.g., `repo-rules`, `ayokoding-web`, `docs`, `plan`, `plan-execution`)
+- `{agent-family}`: Agent name WITHOUT checker/fixer/maker suffix (e.g., `repo-rules`, `swe-ui`, `docs`, `plan`, `plan-execution`)
 - `{uuid-chain}`: Execution hierarchy as underscore-separated 6-char UUIDs (e.g., `a1b2c3`, `a1b2c3_d4e5f6`)
 - `{YYYY-MM-DD--HH-MM}`: Timestamp in UTC+7 with double dash between date and time
 - `{suffix}`: Report type suffix (`audit`, `fix`, `validation`)
@@ -451,9 +437,9 @@ ALL \*-checker agents must implement progressive writing:
 ```
 generated-reports/repo-rules__a1b2c3__2025-12-14--20-45__audit.md
 generated-reports/repo-rules__a1b2c3__2025-12-14--20-45__fix.md
-generated-reports/ayokoding-web__d4e5f6__2025-12-14--15-30__audit.md
-generated-reports/ayokoding-web__a1b2c3_d4e5f6__2025-12-14--15-30__audit.md
-generated-reports/ose-web-content__g7h8i9__2025-12-14--15-30__audit.md
+generated-reports/swe-ui__d4e5f6__2025-12-14--15-30__audit.md
+generated-reports/swe-ui__a1b2c3_d4e5f6__2025-12-14--15-30__audit.md
+generated-reports/pdf-to-md__g7h8i9__2025-12-14--15-30__audit.md
 generated-reports/docs__b2c3d4__2025-12-15--10-00__validation.md
 generated-reports/plan__c3d4e5__2025-12-15--11-30__validation.md
 generated-reports/plan-execution__d4e5f6__2025-12-15--14-00__validation.md
@@ -467,7 +453,7 @@ generated-reports/plan-execution__d4e5f6__2025-12-15--14-00__validation.md
 - UUID MUST be 6 lowercase hex characters (generated via `uuidgen | head -c 6`)
 - Timestamp MUST be UTC+7 (YYYY-MM-DD--HH-MM format)
 - Zero-pad all timestamp components (01 not 1, 09 not 9)
-- Agent family is lowercase with single dashes (multi-word: `ose-web-content`, `plan-execution`)
+- Agent family is lowercase with single dashes (multi-word: `pdf-to-md`, `plan-execution`)
 - Suffix is lowercase, no plurals (`audit` not `audits`)
 
 **CRITICAL - UUID and Timestamp Generation:**
@@ -524,7 +510,7 @@ filename="repo-rules__${uuid}__${timestamp}__audit.md"
 
 #### Fixer Reports (Universal Pattern)
 
-**Agents**: All fixer agents (repo-rules-fixer, apps-ayokoding-www-general-fixer, apps-ayokoding-www-by-example-fixer, apps-ayokoding-www-facts-fixer, apps-ayokoding-www-in-the-field-fixer, apps-ayokoding-www-link-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, apps-ose-www-content-fixer, readme-fixer, docs-fixer, plan-fixer, repo-workflow-fixer, specs-fixer)
+**Agents**: All fixer agents (repo-rules-fixer, docs-tutorial-fixer, readme-fixer, docs-fixer, plan-fixer, repo-workflow-fixer, specs-fixer)
 
 **Pattern**: `{agent-family}__{uuid-chain}__{YYYY-MM-DD--HH-MM}__fix.md`
 
@@ -538,15 +524,15 @@ filename="repo-rules__${uuid}__${timestamp}__audit.md"
 
 **Report Pairing Examples**:
 
-| Agent Family    | Audit Report                                                | Fix Report                                                |
-| --------------- | ----------------------------------------------------------- | --------------------------------------------------------- |
-| repo-rules      | `repo-rules__a1b2c3__2025-12-14--20-45__audit.md`           | `repo-rules__a1b2c3__2025-12-14--20-45__fix.md`           |
-| ayokoding-web   | `ayokoding-web__d4e5f6__2025-12-14--15-30__audit.md`        | `ayokoding-web__d4e5f6__2025-12-14--15-30__fix.md`        |
-| ose-web-content | `ose-web-content__g7h8i9__2025-12-14--16-00__audit.md`      | `ose-web-content__g7h8i9__2025-12-14--16-00__fix.md`      |
-| docs-tutorial   | `docs-tutorial__a1b2c3_d4e5f6__2025-12-14--10-15__audit.md` | `docs-tutorial__a1b2c3_d4e5f6__2025-12-14--10-15__fix.md` |
-| readme          | `readme__b2c3d4__2025-12-14--09-45__audit.md`               | `readme__b2c3d4__2025-12-14--09-45__fix.md`               |
-| docs            | `docs__c3d4e5__2025-12-15--10-00__validation.md`            | `docs__c3d4e5__2025-12-15--10-00__fix.md`                 |
-| plan            | `plan__d4e5f6__2025-12-15--11-30__validation.md`            | `plan__d4e5f6__2025-12-15--11-30__fix.md`                 |
+| Agent Family  | Audit Report                                                | Fix Report                                                |
+| ------------- | ----------------------------------------------------------- | --------------------------------------------------------- |
+| repo-rules    | `repo-rules__a1b2c3__2025-12-14--20-45__audit.md`           | `repo-rules__a1b2c3__2025-12-14--20-45__fix.md`           |
+| swe-ui        | `swe-ui__d4e5f6__2025-12-14--15-30__audit.md`               | `swe-ui__d4e5f6__2025-12-14--15-30__fix.md`               |
+| pdf-to-md     | `pdf-to-md__g7h8i9__2025-12-14--16-00__audit.md`            | `pdf-to-md__g7h8i9__2025-12-14--16-00__fix.md`            |
+| docs-tutorial | `docs-tutorial__a1b2c3_d4e5f6__2025-12-14--10-15__audit.md` | `docs-tutorial__a1b2c3_d4e5f6__2025-12-14--10-15__fix.md` |
+| readme        | `readme__b2c3d4__2025-12-14--09-45__audit.md`               | `readme__b2c3d4__2025-12-14--09-45__fix.md`               |
+| docs          | `docs__c3d4e5__2025-12-15--10-00__validation.md`            | `docs__c3d4e5__2025-12-15--10-00__fix.md`                 |
+| plan          | `plan__d4e5f6__2025-12-15--11-30__validation.md`            | `plan__d4e5f6__2025-12-15--11-30__fix.md`                 |
 
 **Why Same UUID and Timestamp?**
 
@@ -603,22 +589,6 @@ All fixer reports include these sections:
 6. Fixer generates fix report with same timestamp as audit
 
 **Retention**: Keep alongside audit reports for complete audit trail. Provides transparency on automated fixes vs manual review items vs false positives.
-
-#### Content Validation Reports
-
-**Agents**: apps-ayokoding-www-general-checker, apps-ayokoding-www-by-example-checker, apps-ayokoding-www-facts-checker, apps-ayokoding-www-in-the-field-checker, apps-ayokoding-www-link-checker, apps-ose-www-content-checker
-**Pattern**: `{site}__{uuid-chain}__{YYYY-MM-DD--HH-MM}__audit.md`
-
-**Examples**:
-
-- `ayokoding-web-general__a1b2c3__2025-12-14--15-30__audit.md`
-- `ayokoding-web-by-example__d4e5f6__2025-12-14--15-45__audit.md`
-- `ayokoding-web-facts__a1b2c3__2025-12-14--15-50__audit.md`
-- `ayokoding-web-in-the-field__d4e5f6__2025-12-14--15-55__audit.md`
-- `ayokoding-web-link__g7h8i9__2025-12-14--16-00__audit.md`
-- `ose-web-content__g7h8i9__2025-12-14--16-10__audit.md`
-
-**Content**: Content validation results (quality, factual accuracy, links)
 
 #### Documentation Validation Reports
 

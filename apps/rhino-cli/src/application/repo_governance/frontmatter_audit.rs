@@ -23,14 +23,11 @@ pub struct FrontmatterFinding {
     pub message: String,
 }
 
-/// Path prefixes that identify website app content directories, which are
-/// exempt from this audit.
-const WEBSITE_APP_PREFIXES: &[&str] = &[
-    "apps/ayokoding-www/",
-    "apps/ose-www/",
-    "apps/organiclever-app-web/",
-    "apps/wahidyankf-www/",
-];
+/// Path prefixes that identify website app content directories exempt from
+/// this audit. Currently empty — no application path is exempt — retained as
+/// the documented extension point for a future Baseerah content tree that
+/// legitimately needs a frontmatter-audit exemption.
+const WEBSITE_APP_PREFIXES: &[&str] = &[];
 
 /// Returns a compiled `Regex` matching a `**Last Updated**` bold marker in
 /// body text.
@@ -293,14 +290,21 @@ mod tests {
     }
 
     #[test]
-    fn skips_website_apps() {
+    fn no_application_path_is_exempt_from_the_audit() {
+        assert!(!is_website_app("apps/baseerah-fe/content/post.md"));
+        assert!(!is_website_app("apps/ayokoding-www/content/x.md"));
+    }
+
+    #[test]
+    fn no_longer_skips_former_website_apps() {
         let tmp = TempDir::new().unwrap();
         let dir = tmp.path().join("apps/ose-www/content");
         fs::create_dir_all(&dir).unwrap();
         fs::write(dir.join("post.md"), "---\nupdated: 2026-01-01\n---\n").unwrap();
         let findings =
             audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
-        assert!(findings.is_empty());
+        assert_eq!(findings.len(), 1);
+        assert!(findings[0].message.contains("updated:"));
     }
 
     #[test]

@@ -44,7 +44,7 @@ This convention governs THREE interrelated decisions:
 
 A fourth rule covers adoption expectations for BDD, DDD, and API contracts.
 
-The convention applies to all apps and infra directories in the monorepo. Its OrganicLever application is the reference pilot. Rollout to `ayokoding`, `ose`, `wahidyankf`, and `rhino` follows the same rules.
+The convention applies to all apps and infra directories in the monorepo. Its `baseerah` application family (`baseerah-fe` / `baseerah-be`) is the reference pilot. Rollout to `rhino` follows the same rules.
 
 ## Scope
 
@@ -218,12 +218,12 @@ specs/apps/<app-family>/
 
 #### Per-surface variant table
 
-| Surface profile                   | Folders populated                                                                                                                                                          | Folders absent or empty                                 |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Full-stack (e.g., `organiclever`) | All five top-level folders; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/organiclever-be/gherkin/` + `behavior/organiclever-app-web/gherkin/` | None — full tree                                        |
-| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/wahidyankf-www/gherkin/`                                                                        | `containers/contracts/` (no API), `components/be/`      |
-| CLI-only (e.g., `rhino`)          | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                                             | `components/{be,web}/`, `containers/contracts/`         |
-| Multi-CLI (e.g., `ayokoding`)     | Same as CLI-only, with `components/cli/` + `behavior/ayokoding-cli/gherkin/` alongside web layers if applicable                                                            | Nothing additional omitted — same shape, more populated |
+| Surface profile                                                                     | Folders populated                                                                                                                                             | Folders absent or empty                                 |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Full-stack (e.g., `baseerah`)                                                       | All five top-level folders; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/baseerah-be/gherkin/` + `behavior/baseerah-fe/gherkin/` | None — full tree                                        |
+| Web-only (e.g., a marketing site with no backend)                                   | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/<product>-www/gherkin/`                                                            | `containers/contracts/` (no API), `components/be/`      |
+| CLI-only (e.g., `rhino`)                                                            | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                                | `components/{be,web}/`, `containers/contracts/`         |
+| Multi-CLI (e.g., a family shipping two or more independently packaged CLI binaries) | Same as CLI-only, with `components/cli/` + `behavior/<product>-cli/gherkin/` alongside web layers if applicable                                               | Nothing additional omitted — same shape, more populated |
 
 #### Creation rules
 
@@ -250,17 +250,17 @@ Every NEW or MOVED file under `specs/apps/` must be readable by a **SWE-backgrou
 
 **Terms that DO need glossing on first use within each file** (genuinely niche to this product):
 
-| Term                                                                     | Gloss to use on first occurrence                                                                                                     |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| DDD (when first introducing the OrganicLever-specific application of it) | Domain-Driven Design — here applied as one bounded context per UI screen domain                                                      |
-| bounded context                                                          | a self-contained slice of the app with its own vocabulary, types, and rules; contexts communicate only through narrow published APIs |
-| aggregate                                                                | a cluster of domain objects treated as one consistent unit by writes                                                                 |
-| ubiquitous language                                                      | the shared vocabulary used by both the team and the code for one bounded context                                                     |
-| PGlite                                                                   | Postgres-WASM — Postgres compiled to WebAssembly running directly in the browser, persisted via IndexedDB                            |
-| XState                                                                   | a JavaScript/TypeScript state-machine library used here for UI flow orchestration                                                    |
-| Effect TS                                                                | a TypeScript library for typed effect composition, used in the infrastructure layer                                                  |
-| F#                                                                       | functional .NET language used for the OrganicLever backend                                                                           |
-| Giraffe                                                                  | F# web framework on top of ASP.NET Core, used for the OrganicLever HTTP API                                                          |
+| Term                                                                 | Gloss to use on first occurrence                                                                                                     |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| DDD (when first introducing the Baseerah-specific application of it) | Domain-Driven Design — here applied as one bounded context per UI screen domain                                                      |
+| bounded context                                                      | a self-contained slice of the app with its own vocabulary, types, and rules; contexts communicate only through narrow published APIs |
+| aggregate                                                            | a cluster of domain objects treated as one consistent unit by writes                                                                 |
+| ubiquitous language                                                  | the shared vocabulary used by both the team and the code for one bounded context                                                     |
+| PGlite                                                               | Postgres-WASM — Postgres compiled to WebAssembly running directly in the browser, persisted via IndexedDB                            |
+| XState                                                               | a JavaScript/TypeScript state-machine library used here for UI flow orchestration                                                    |
+| Effect TS                                                            | a TypeScript library for typed effect composition, used in the infrastructure layer                                                  |
+| F#                                                                   | functional .NET language used for the Baseerah backend                                                                               |
+| Giraffe                                                              | F# web framework on top of ASP.NET Core, used for the Baseerah HTTP API                                                              |
 
 #### Rule 1 — Required header block
 
@@ -331,13 +331,10 @@ This standard defines adoption expectations per app type and rollout timeline. "
 
 #### Rollout adoption mapping
 
-| App            | BDD              | DDD                          | Contracts       |
-| -------------- | ---------------- | ---------------------------- | --------------- |
-| `organiclever` | Adopted (pilot)  | Adopted (pilot)              | Adopted (pilot) |
-| `ose`          | SHOULD — backlog | SHOULD — backlog             | SHOULD          |
-| `ayokoding`    | Adopted          | Deferred (multi-CLI profile) | NOT APPLICABLE  |
-| `wahidyankf`   | SHOULD — backlog | SHOULD — backlog             | NOT APPLICABLE  |
-| `rhino`        | Adopted          | Deferred (CLI)               | NOT APPLICABLE  |
+| App        | BDD             | DDD             | Contracts       |
+| ---------- | --------------- | --------------- | --------------- |
+| `baseerah` | Adopted (pilot) | Adopted (pilot) | Adopted (pilot) |
+| `rhino`    | Adopted         | Deferred (CLI)  | NOT APPLICABLE  |
 
 #### Validation hooks
 
@@ -383,7 +380,7 @@ The app is split into five bounded contexts: journal, stats, workout-session...
 ```markdown
 ## Behavior and Architecture
 
-OrganicLever Web is a productivity tracker. See [specs/apps/organiclever/](../../specs/apps/organiclever/README.md) for routes, screens, bounded-context map, architecture decisions, and design system.
+Baseerah Web is a personal-assistant app. See [specs/apps/baseerah/](../../specs/apps/baseerah/README.md) for routes, screens, bounded-context map, architecture decisions, and design system.
 ```
 
 ### Before/After — PM-Readable Spec File Header
@@ -403,11 +400,11 @@ The journal context owns the `JournalEvent` aggregate and exposes `appendEvent`,
 
 > **Audience**: Engineers, Technical Product/Project Managers
 >
-> **Plain-language summary**: OrganicLever Web stores and displays productivity data in the browser using a local database. The app divides its logic into five areas — journal (what happened), stats (summaries), workout-session (active workout), routines (templates), and diagnostics. Each area owns its data and exposes a narrow API to the others.
+> **Plain-language summary**: Baseerah Web stores and displays personal-assistant data in the browser using a local database. The app divides its logic into five areas — journal (what happened), stats (summaries), session (active session), routines (templates), and diagnostics. Each area owns its data and exposes a narrow API to the others.
 
 ## Journal
 
-The journal records every life-event the user logs — workouts, meals, reading, focus sessions. It is the system of record; every other area either writes events here or reads from here.
+The journal records every life-event the user logs — tasks, reminders, conversations, focus sessions. It is the system of record; every other area either writes events here or reads from here.
 
 Under the hood the journal area uses PGlite (Postgres-WASM — Postgres compiled to WebAssembly running directly in the browser, persisted via IndexedDB) and models its core record as a `JournalEvent` aggregate (a cluster of domain objects treated as one consistent unit by writes).
 ```
@@ -417,7 +414,7 @@ Under the hood the journal area uses PGlite (Postgres-WASM — Postgres compiled
 **Before** (flat-root layout):
 
 ```
-specs/apps/organiclever/
+specs/apps/baseerah/
 ├── be/
 │   └── gherkin/
 ├── web/
@@ -430,7 +427,7 @@ specs/apps/organiclever/
 **After** (C4-aware five-folder layout):
 
 ```
-specs/apps/organiclever/
+specs/apps/baseerah/
 ├── product/
 ├── system-context/
 ├── containers/

@@ -154,22 +154,22 @@ fix(project-name): add missing Gherkin step definitions for existing commands
 ### PASS: Fixing a preexisting blocker
 
 ```
-Developer: I'm implementing a new feature in organiclever-www.
-           Running test:quick, I see that organiclever-be has
+Developer: I'm implementing a new feature in baseerah-fe.
+           Running test:quick, I see that baseerah-be has
            a failing typecheck due to a stale codegen output.
 
 Action:
-1. Run nx run organiclever-be:codegen to regenerate types
-2. Run nx run organiclever-be:typecheck to confirm it passes
-3. Commit: "fix(organiclever-be): regenerate types from updated contract"
-4. Continue with organiclever-www feature work
+1. Run nx run baseerah-be:codegen to regenerate types
+2. Run nx run baseerah-be:typecheck to confirm it passes
+3. Commit: "fix(baseerah-be): regenerate types from updated contract"
+4. Continue with baseerah-fe feature work
 ```
 
 ### FAIL: Bypassing the blocker
 
 ```
-Developer: I'm implementing a new feature in organiclever-www.
-           Running test:quick, I see that organiclever-be has
+Developer: I'm implementing a new feature in baseerah-fe.
+           Running test:quick, I see that baseerah-be has
            a failing typecheck. That's not my project.
 
 Action: git push --no-verify

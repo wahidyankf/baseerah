@@ -27,14 +27,12 @@ These workflows define **WHEN and HOW to validate documentation**, orchestrating
 
 **❌ Not Included:**
 
-- ayokoding-web content validation (that's ayokoding-web/)
 - README validation (that's separate workflow)
 - Single-agent operations (use agents directly)
 
 ## Workflows
 
 - [Documentation Quality Gate](./docs-quality-gate.md) - Validate all docs/ content quality (factual accuracy, pedagogical structure, link validity), apply fixes iteratively until ZERO findings
-- [Documentation Software Engineering Separation Quality Gate](./docs-software-engineering-separation-quality-gate.md) - Validate software engineering documentation separation, apply fixes iteratively until ZERO findings
 
 ## Related Documentation
 

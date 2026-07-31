@@ -39,9 +39,8 @@ build is a deliberate trigger rather than a rediscovery.
 
 ## Prior art / precedents
 
-- The [`learning-plan-syllabus-folder-convention`](../done/2026-07-22__learning-plan-syllabus-folder-convention/README.md)
-  plan — this brief is its deferred deterministic-validator half, and the convention + recipe are its
-  shipped output.
+- The `learning-plan-syllabus-folder-convention` plan (done 2026-07-22) — this brief is its deferred
+  deterministic-validator half, and the convention + recipe are its shipped output.
 - [`mermaid-validator-does-not-check-syntax`](./mermaid-validator-does-not-check-syntax.md) — a cautionary
   precedent: a `rhino-cli md` validator whose green result is trusted for a property it does not test.
   A syllabus validator must actually parse the section shape, not merely count files.

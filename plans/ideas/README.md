@@ -12,11 +12,6 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 
 - [acceptance-clause-vacuity](./acceptance-clause-vacuity.md) — acceptance clauses that cannot fail certify nothing; require falsifiability in both directions.
 - [agents-md-progressive-disclosure](./agents-md-progressive-disclosure.md) — `AGENTS.md` sits under 20 B beneath its 30,000 B ceiling; restore headroom via progressive disclosure.
-- [ayokoding-content-checker-coverage](./ayokoding-content-checker-coverage.md) — enforce the canonical topic-tree shape in the content checkers; add a by-concept checker.
-- [ayokoding-i18n-nav-hardening](./ayokoding-i18n-nav-hardening.md) — pre-existing id-locale, language-switcher-404, and sidebar-clip defects surfaced by the url-restructure Phase-5 retest.
-- [ayokoding-mermaid-diagram-remediation](./ayokoding-mermaid-diagram-remediation.md) — 636 mermaid violations exposed by the `detect_kind` fix; remediate and drop the temporary CI exclude.
-- [ayokoding-www-e2e-coverage-gaps](./ayokoding-www-e2e-coverage-gaps.md) — implement the ~104 + 83 missing Playwright step defs so e2e can revert to `fail-on-gen`.
-- [ayokoding-www-e2e-parallel-load-flake](./ayokoding-www-e2e-parallel-load-flake.md) — the e2e suite flakes under full-suite parallel-worker load (isolated re-runs pass); stabilize or quarantine.
 - [bare-repo-landing-method-step-count-drift](./bare-repo-landing-method-step-count-drift.md) — the landing method numbers eight steps but is summarized as "seven-step" in nine sites across three repos.
 - [behavior-coverage-json-report-wiring](./behavior-coverage-json-report-wiring.md) — wire rhino-cli's JSON-run-report cross-check into project targets + CI.
 - [ci-setup-rust-toolchain-retry](./ci-setup-rust-toolchain-retry.md) — `setup-rust` flaked 7× in one phase on the toolchain download; add a retry in all three repos.
@@ -40,7 +35,6 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 - [web-ui-alert-destructive-dark-contrast](./web-ui-alert-destructive-dark-contrast.md) — shared `Alert variant="destructive"` renders at 1.99:1 in dark mode; the obvious token fix is unsafe.
 - [sdlc-gate-standard-property-bound-lag](./sdlc-gate-standard-property-bound-lag.md) — `ose-public`'s SDLC gate standard trails both siblings on two name-bound bareness claims; adopt their wording.
 - [sibling-main-ci-never-runs-on-merge](./sibling-main-ci-never-runs-on-merge.md) — `main-ci` is schedule-triggered in both siblings, so a merge to their `main` gets no post-merge CI signal.
-- [simplify-ayokoding-ose-cli](./simplify-ayokoding-ose-cli.md) — simplify `ayokoding-cli` / `ose-cli`; fold overlaps into rhino-cli.
 - [source-code-credential-scanning](./source-code-credential-scanning.md) — evaluate Betterleaks (gitleaks successor) for pre-commit + CI credential detection in source.
 - [standardize-cis](./standardize-cis.md) — audit for any CI-standardization residual left by the toolchain-parity work.
 - [syllabus-conformance-validator](./syllabus-conformance-validator.md) — a deterministic `rhino-cli md syllabus validate` for course-file section conformance, deferred until the format settles.

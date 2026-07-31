@@ -291,13 +291,8 @@ Finding: [BROKEN] - Internal Link to Non-Existent File
 - repo-applying-maker-checker-fixer - Checker workflow patterns
 - repo-generating-validation-reports - Report format and progressive writing
 
-**Domain Skills**:
-
-- apps-ayokoding-www-developing-content - ayokoding-web content linking patterns (Next.js)
-
 ## Related Agents
 
 **Link Validation Agents**:
 
 - docs-link-checker - Validates links in docs/, repo-governance/, plans/
-- apps-ayokoding-www-link-checker - Validates links in ayokoding-web content

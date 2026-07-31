@@ -28,10 +28,9 @@ This convention establishes a universal **four-level criticality system** (CRITI
 
 ### Why This Convention Exists
 
-**Problem**: Seven different severity classification systems existed across checker agents, causing confusion and inconsistency:
+**Problem**: Multiple different severity classification systems existed across checker agents, causing confusion and inconsistency:
 
 - `repo-rules-checker`: Critical/Important/Minor
-- `apps-ayokoding-www-general-checker`: Must Fix/Warnings/Suggestions
 - `readme-checker`: High/Medium/Low Priority
 - `docs-checker`: [Verified]/[Error]/[Outdated] (verification-based, NOT severity)
 - `docs-link-checker`: [OK]/[BROKEN]/[REDIRECT] (status-based, NOT severity)
@@ -55,7 +54,7 @@ See [Fixer Confidence Levels Convention](./fixer-confidence-levels.md) for compl
 
 ### 1. Missing Required Field Breaks Content Validation
 
-**File**: `apps/ayokoding-www/content/en/programming/python/_index.md:3`
+**File**: `apps/baseerah-fe/content/en/programming/python/_index.md:3`
 **Criticality**: CRITICAL - Breaks Next.js content validation
 **Confidence**: HIGH - Field objectively missing from frontmatter
 
@@ -94,7 +93,7 @@ See [Fixer Confidence Levels Convention](./fixer-confidence-levels.md) for compl
 - Agent `name` field doesn't match filename (breaks agent discovery)
 - Broken internal link to non-existent file in documentation
 
-**Next.js Content (ayokoding-www/ose-www)**:
+**Next.js Content (`baseerah-fe`, planned)**:
 
 - Missing required `title` field (content validation fails)
 - Invalid frontmatter syntax (YAML parsing error)
@@ -542,13 +541,11 @@ Run `{agent-family}-fixer` on this audit report:
 
 ### Dual-Label Pattern
 
-**Five agents require both verification/status AND criticality labels**:
+**Three agents require both verification/status AND criticality labels**:
 
 - `docs-checker` - Verification labels ([Verified], [Error], [Outdated], [Unverified])
 - `docs-tutorial-checker` - Verification labels
-- `apps-ayokoding-www-facts-checker` - Verification labels
 - `docs-link-checker` - Status labels ([OK], [BROKEN], [REDIRECT])
-- `apps-ayokoding-www-link-checker` - Status labels
 
 **Format for dual-label findings**:
 
@@ -652,62 +649,6 @@ Update link to current documentation URL or find alternative resource
 - Suggest adding related links
 - Consider alternative organization
 - Potential future sections
-
-### Next.js Content - ayokoding-www (general-checker, facts-checker, link-checker)
-
-**CRITICAL**:
-
-- Missing required `title` field (content validation fails)
-- Invalid YAML syntax in frontmatter (parsing error)
-- Broken internal link without language prefix (404 on site)
-- Code example won't compile (verified via web search)
-
-**HIGH**:
-
-- Missing `weight` field (navigation order undefined)
-- Wrong internal link format (relative instead of absolute)
-- Incorrect heading hierarchy (H3 before H2)
-- Outdated tutorial sequence (verified via official docs)
-
-**MEDIUM**:
-
-- Missing optional `description` field
-- Suboptimal weight spacing (still ordered correctly)
-- Minor bilingual inconsistency (both versions functional)
-- Unverified external claim (needs web verification)
-
-**LOW**:
-
-- Suggest adding optional tags
-- Consider alternative content structure
-- Potential cross-linking opportunity
-- Suggest mentioning alternative approach
-
-### Next.js Content - ose-www (content-checker)
-
-**CRITICAL**:
-
-- Missing required frontmatter for Next.js content validation
-- Broken internal link (404 error)
-- Invalid markdown syntax (rendering breaks)
-
-**HIGH**:
-
-- Missing recommended metadata for SEO
-- Wrong heading hierarchy
-- Accessibility violation (missing alt text)
-
-**MEDIUM**:
-
-- Suboptimal content organization
-- Minor formatting inconsistency
-- Missing optional PaperMod feature
-
-**LOW**:
-
-- Suggest adding cover image
-- Consider adding tags
-- Potential cross-reference
 
 ### Documentation (docs-checker, docs-tutorial-checker, docs-link-checker)
 
@@ -817,32 +758,6 @@ Update link to current documentation URL or find alternative resource
 - Suggest additional examples
 - Consider alternative agent selection
 - Potential optimization
-
-### By-Example Tutorials (apps-ayokoding-www-by-example-checker)
-
-**CRITICAL**:
-
-- Code example won't run (syntax error verified)
-- Missing critical example for core concept
-- Coverage <95% (below requirement)
-
-**HIGH**:
-
-- Example missing educational annotation
-- Missing diagram for complex concept
-- Code example incomplete (missing imports)
-
-**MEDIUM**:
-
-- Annotation could be more detailed
-- Alternative approach not shown
-- Minor code style inconsistency
-
-**LOW**:
-
-- Suggest additional edge case
-- Consider showing optimization
-- Potential alternative syntax
 
 ---
 
@@ -1374,19 +1289,12 @@ Existing agents using different terminology should migrate to this convention.
 
 **Severity-Based Family**:
 
-- apps-ayokoding-www-general-checker
-- apps-ayokoding-www-by-example-checker
-- apps-ayokoding-www-in-the-field-checker
-- apps-ose-www-content-checker
 - repo-workflow-checker
 
 **Dual-Label Family** (preserve existing labels + add criticality):
 
 - docs-checker ([Verified]/[Error]/[Outdated] + CRITICAL/HIGH/MEDIUM/LOW)
 - docs-tutorial-checker
-- docs-software-engineering-separation-checker
-- apps-ayokoding-www-facts-checker
-- apps-ayokoding-www-link-checker
 - docs-link-checker ([OK]/[BROKEN]/[REDIRECT] + CRITICAL/HIGH/MEDIUM/LOW)
 - repo-rules-checker
 
@@ -1401,14 +1309,7 @@ Existing agents using different terminology should migrate to this convention.
 Update all fixer agents to use priority-based execution:
 
 - repo-rules-fixer (pilot)
-- apps-ayokoding-www-general-fixer
-- apps-ayokoding-www-by-example-fixer
-- apps-ayokoding-www-facts-fixer
-- apps-ayokoding-www-in-the-field-fixer
-- apps-ayokoding-www-link-fixer
 - docs-tutorial-fixer
-- docs-software-engineering-separation-fixer
-- apps-ose-www-content-fixer
 - readme-fixer
 - docs-fixer
 - plan-fixer

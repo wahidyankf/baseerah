@@ -6,7 +6,7 @@ termination: "Zero outstanding in-threshold AET-### findings on two consecutive 
 inputs:
   - name: scope
     type: string
-    description: 'Base URL or endpoint set to exercise, plus the contract to test against (e.g., "http://localhost:8302 with apps/ose-be/openapi.yaml")'
+    description: 'Base URL or endpoint set to exercise, plus the contract to test against (e.g., "http://localhost:19320 with apps/baseerah-be/openapi.yaml")'
     required: true
   - name: mode
     type: enum
@@ -61,7 +61,7 @@ read as though there were. The loop is:
 1. [`api-exploratory-tester`](../../../.claude/agents/api-exploratory-tester.md) drives the live API
    and emits `AET-###` findings.
 2. The appropriate `swe-*-dev` agent — chosen by the implementing language of the service under
-   test (`swe-fsharp-dev` for `ose-be` / `organiclever-be`, `swe-typescript-dev`, `swe-rust-dev`,
+   test (`swe-fsharp-dev` for `baseerah-be`, `swe-typescript-dev`, `swe-rust-dev`,
    and so on) — fixes each finding.
 3. The tester re-runs against the rebuilt/redeployed service.
 
@@ -80,8 +80,8 @@ Read/Write/Edit when Agent Delegation is unavailable.
 **How to Execute**:
 
 ```
-User: "Run API quality gate for http://localhost:8302 against apps/ose-be/openapi.yaml"
-User: "Run API quality gate for the organiclever-be GraphQL endpoint"
+User: "Run API quality gate for http://localhost:19320 against apps/baseerah-be/openapi.yaml"
+User: "Run API quality gate for the baseerah-be GraphQL endpoint"
 ```
 
 ## Preconditions

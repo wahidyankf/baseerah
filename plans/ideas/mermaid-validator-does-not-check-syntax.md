@@ -41,9 +41,11 @@ Three independent forces make this the moment:
 - The repo is in the middle of a broad sweep against exactly this failure class — acceptance clauses
   that pass without measuring what they claim. Several were fixed this week in plan documents; this
   one is in the tooling those documents call.
-- A remediation backlog already exists (`ayokoding-mermaid-diagram-remediation`, 636 violations
-  exposed when a `detect_kind` fix landed). If that work is validated with this tool, a syntactically
-  broken diagram can be "remediated" to green.
+- A remediation backlog for the app that first exposed this (`ayokoding-mermaid-diagram-remediation`,
+  636 violations exposed when a `detect_kind` fix landed) existed at filing time; that app and its
+  content were since removed by the Baseerah repo reset, so the specific 636-violation corpus is
+  moot, but the underlying gate defect is unrelated to any one app's content and remains live: any
+  future corpus can be "remediated" to a false-green pass under this tool exactly the same way.
 
 ## Prior art / precedents
 
@@ -54,8 +56,6 @@ Three independent forces make this the moment:
   diagrams outside a browser. [github.com/mermaid-js/mermaid-cli](https://github.com/mermaid-js/mermaid-cli)
 - **The repo's own `md links validate`** — the counterexample worth copying: it actually resolves each
   target and fails on a dead one, which is why a moved corpus is a hard push failure today.
-- **`ayokoding-mermaid-diagram-remediation`** ([idea brief](./ayokoding-mermaid-diagram-remediation.md))
-  — the downstream consumer that would be validated by this gate.
 - **`doc-command-existence-validation`** ([idea brief](./doc-command-existence-validation.md)) — the
   same shape of gap (a documented thing asserted but never verified), already captured.
 
@@ -75,15 +75,15 @@ In scope: the parse stage, its wiring into the existing hook and CI invocations,
 find diagrams already broken and currently passing (count unknown until the check exists — do not
 guess it).
 
-Out of scope: changing the current style rules; re-litigating the label-length caps; the
-`ayokoding-mermaid-diagram-remediation` backlog itself, which is separate work that this would make
-verifiable. Also out of scope: rendering diagrams to images in CI — parse-only is the cheap 90%.
+Out of scope: changing the current style rules; re-litigating the label-length caps; remediating any
+specific corpus this would newly flag (a downstream cleanup, not this tooling fix). Also out of
+scope: rendering diagrams to images in CI — parse-only is the cheap 90%.
 
 ## Risks & open questions
 
 - **How many existing diagrams fail a real parse?** Unknown, and deliberately not estimated here. If
-  the number is large, this becomes a remediation programme rather than a tooling fix, and it should
-  probably merge with the existing mermaid remediation brief instead of standing alone. (open)
+  the number is large, this becomes a remediation programme rather than a tooling fix and should be
+  filed as its own idea brief once the count is known. (open)
 - Invoking the real parser means a Node dependency inside a Rust CLI's validation path; whether that
   belongs in `rhino-cli` or in a separate target is a genuine design question, given `rhino-cli` must
   stay byte-identical across three repos. (open)

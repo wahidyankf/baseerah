@@ -57,6 +57,17 @@ outputs:
 
 # PDF-to-Markdown Quality Gate Workflow
 
+> **Known blocker (regression, discovered 2026-07-31)**: `apps/crane-cli` — the sole tool this
+> workflow and the `pdf-to-md-{maker,checker,fixer}` agents depend on — was deleted in Phase 2 of
+> the `baseerah-repo-reset` plan along with every other retired app, without checking this
+> cross-dependency. This workflow is currently **non-functional**: `crane` cannot be built and every
+> step below fails. This is NOT a dead-tooling situation to prune — `docs/reference/security/frameworks/nist-sp-800-53-rev5.md`
+> is a real, currently-linked verbatim conversion (referenced from 3 README indexes) that this
+> workflow produced and would be needed to re-validate or re-convert. Restoring `crane-cli` or
+> porting its PDF-extraction/validation subcommands into `rhino-cli` is out of scope for a
+> pruning-focused plan; this note exists so the blocker is visible rather than silently discovered
+> via a `crane: command not found` failure. Track resolution as its own backlog item.
+
 **Purpose**: Convert a PDF file to a complete, verbatim Markdown representation, then validate
 conversion fidelity iteratively until all issues are resolved. The resulting Markdown serves as a
 cross-reference source-of-truth proxy for the original PDF.

@@ -1,6 +1,6 @@
 ---
 title: "Programming Language Documentation Separation Convention"
-description: Establishes the relationship between docs/explanation/programming-languages/ repository-specific style guides and ayokoding-www educational content
+description: "Partially historical: the docs/explanation/ style-guide scope rules (Rule 1) remain valid guidance; the ayokoding-www educational-content side and all cross-referencing rules (Rules 2-5) describe a platform removed by the Baseerah repo-reset plan and have no current applicability"
 category: explanation
 subcategory: conventions
 tags:
@@ -13,6 +13,18 @@ created: 2026-02-04
 ---
 
 # Programming Language Documentation Separation Convention
+
+> **Historical note (partial)**: This convention originally coordinated two platforms —
+> repository-specific style guides in `docs/explanation/software-engineering/programming-languages/`
+> and educational tutorial content on `ayokoding-www`. The Baseerah repo-reset plan removed
+> `ayokoding-www` permanently; no app in this repo is an educational-content platform, and neither
+> `baseerah-fe` nor `baseerah-be` will be one. **Rule 1** (style-guide scope for `docs/explanation/`)
+> remains valid on its own — that directory and its 168 files are kept — but **Rules 2-5** below
+> (ayokoding-www's content scope, the prerequisite-statement requirement, and the
+> cross-referencing/no-duplication rules) describe a relationship with a platform that no longer
+> exists and are retained only for reference, in case a future content-education app is added to
+> this repo. The `ayokoding-www` examples below are left unchanged rather than mechanically renamed
+> onto an unrelated app.
 
 This convention establishes the clear separation between **repository-specific programming language style guides** in `docs/explanation/software-engineering/programming-languages/` and **educational programming language content** in ayokoding-www. It prevents duplication, defines scope boundaries, and ensures prerequisite knowledge relationships.
 
@@ -818,19 +830,14 @@ Before publishing programming language documentation:
 **Makers**:
 
 - `docs-maker` - Creates style guide content in docs/explanation/ following this convention
-- `apps-ayokoding-www-general-maker` - Creates educational content in ayokoding-www following this convention
-- `apps-ayokoding-www-by-example-maker` - Creates by-example tutorials following separation rules
 
 **Checkers**:
 
 - `docs-checker` - Validates style guides follow this convention (prerequisite statements, no duplication)
-- `apps-ayokoding-www-general-checker` - Validates educational content scope (no OSE Platform-specific content)
-- `apps-ayokoding-www-facts-checker` - Validates factual correctness of educational content
 
 **Fixers**:
 
 - `docs-fixer` - Fixes style guide violations (adds missing prerequisite statements, removes duplicated content)
-- `apps-ayokoding-www-general-fixer` - Fixes educational content violations (removes OSE Platform-specific content)
 
 ---
 

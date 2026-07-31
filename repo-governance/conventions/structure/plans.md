@@ -244,10 +244,10 @@ routing matrix names `plans/ideas/` as one of its candidate durable homes.
 
 ### Worked Examples
 
-Two illustrative short-proposal artifacts already live in the repo's teaching content and are useful
-models for the two-pager's shape: a Shape Up pitch
-(`apps/ayokoding-www/content/en/learn/fundamentally-strong/software-engineer/software-product-engineering/learning/artifacts/ex-29-shape-up-pitch.md`)
-and a product brief (`…/ex-30-full-product-brief-consistency.md`).
+Two illustrative short-proposal artifact shapes are useful models for the two-pager's format: a Shape
+Up pitch and a product brief. (Worked examples of both previously lived under the now-removed
+`ayokoding-www` teaching content; once `baseerah-fe` hosts equivalent educational content, worked
+examples can be restored there.)
 
 ## Plan Folder Naming
 
@@ -470,9 +470,9 @@ Plans are executed by execution-grade (sonnet-tier) agents, not planning-grade a
 
 **Each checkbox MUST contain all of the following that apply:**
 
-- **Explicit file path(s)**: Name the exact file path(s) when known (e.g., `apps/ose-www/src/server/trpc.ts`). When the path cannot be determined at authoring time (e.g., a new file whose location is implementation-dependent), provide the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-www/src/lib/` following the pattern of sibling `auth.ts`").
-- **Explicit shell command(s)**: State the verbatim invocation when a command is involved (e.g., `npx nx run ose-www:test:quick`), not a vague instruction like "run the lint".
-- **Concrete acceptance criterion**: State the observable change that proves done (e.g., "all assertions in `trpc.test.ts` pass" or "`nx run ose-www:typecheck` exits 0"). No bare "implement X", "set up Y", or "configure Z" without a concrete verifiable outcome.
+- **Explicit file path(s)**: Name the exact file path(s) when known (e.g., `apps/baseerah-be/src/server/trpc.ts`). When the path cannot be determined at authoring time (e.g., a new file whose location is implementation-dependent), provide the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/baseerah-fe/src/lib/` following the pattern of sibling `auth.ts`").
+- **Explicit shell command(s)**: State the verbatim invocation when a command is involved (e.g., `npx nx run baseerah-be:test:quick`), not a vague instruction like "run the lint".
+- **Concrete acceptance criterion**: State the observable change that proves done (e.g., "all assertions in `trpc.test.ts` pass" or "`nx run baseerah-be:typecheck` exits 0"). No bare "implement X", "set up Y", or "configure Z" without a concrete verifiable outcome.
 - **One scenario per behavior cycle + inline Gherkin**: Every behavior-implementing
   RED→GREEN→REFACTOR cycle targets **exactly one** Gherkin scenario. Its RED step carries a
   single-scenario `**Gherkin (binds) →** "<title>"` tag line followed immediately by that
@@ -495,9 +495,9 @@ Plans are executed by execution-grade (sonnet-tier) agents, not planning-grade a
 **Good** (explicit path, explicit command, explicit criterion):
 
 ```markdown
-- [ ] Edit `apps/ose-www/src/server/trpc.ts`: wrap the public router with
+- [ ] Edit `apps/baseerah-be/src/server/trpc.ts`: wrap the public router with
       `unstable_cache(..., { revalidate: 300 })`. Verify by running
-      `npx nx run ose-www:test:quick` — all tests pass.
+      `npx nx run baseerah-be:test:quick` — all tests pass.
 ```
 
 **Acceptance Criteria**: All user stories in `prd.md` (or the condensed PRD section of a single-file plan's `README.md`) must include testable acceptance criteria using Gherkin format. See [Acceptance Criteria Convention](../../development/infra/acceptance-criteria.md) for complete details, including the **step-keyword cardinality HARD rule**: every `Scenario` uses exactly one primary `Given`, one `When`, and one `Then`; additional steps chain with `And`/`But`. `Background` blocks and `Scenario Outline` `Examples` tables are exempt. `plan-checker` and `repo-rules-checker` enforce this rule on Gherkin fences in `plans/in-progress/` and `plans/backlog/`; `plans/done/` is exempt as an immutable archive.
@@ -527,7 +527,7 @@ Any of these three steps becomes `[HUMAN]` or `[AI+HUMAN]` ONLY when the user or
 **Placement**: the tag goes at the START of the checkbox text, immediately after `- [ ]`:
 
 ```markdown
-- [ ] [AI] Edit `apps/ose-www/src/server/trpc.ts`: … — acceptance: …
+- [ ] [AI] Edit `apps/baseerah-be/src/server/trpc.ts`: … — acceptance: …
 - [ ] [HUMAN] Unplug the power cable to the test rig and confirm the LED is off — acceptance: operator confirms power removed
 ```
 
@@ -1047,7 +1047,7 @@ Plan files sit three directory levels deep from the repository root: `plans/` �
 | ------------------------------------------------ | -------------- |
 | `repo-governance/conventions/structure/plans.md` | `../../../`    |
 | `docs/how-to/organize-work.md`                   | `../../../`    |
-| `apps/organiclever-be/README.md`                 | `../../../`    |
+| `apps/rhino-cli/README.md`                       | `../../../`    |
 | Sibling file in the same plan folder             | `./`           |
 
 **Two-pagers are one level shallower.** A two-pager lives directly at `plans/ideas/<slug>.md`
