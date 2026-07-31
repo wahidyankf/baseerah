@@ -1,3 +1,0 @@
-new fish
-new dog
-cat new

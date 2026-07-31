@@ -225,38 +225,60 @@ permitted to move this plan folder.
       `actionlint .github/workflows/*.yml` — acceptance: exits 0 with no output.
       **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification only). Ran
       `actionlint .github/workflows/*.yml` — exit 0, no output.
-- [ ] [AI] Commit: `git add -A && git commit -m "chore(ci): retire per-app CI callers and the local-stack infra tree"`
+- [x] [AI] Commit: `git add -A && git commit -m "chore(ci): retire per-app CI callers and the local-stack infra tree"`
       — acceptance: the commit includes the Phase 0 `evidence/` file and this plan's documents, and
       commitlint accepts the message.
-- [ ] [AI] Push: `git push origin main` — acceptance: exits 0.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: commit `03fb067`, 40 files changed
+      (124 insertions, 896 deletions) — includes `evidence/phase-0-baseline.txt`, `delivery.md`,
+      `learnings.md`, the 12 deleted workflow callers, `publish-images.yml`, the 21 deleted `infra/`
+      files, `package.json`, `.vscode/settings.json`. Pre-commit hooks (format/lint/actionlint) and
+      commitlint passed with no `--no-verify`.
+- [x] [AI] Push: `git push origin main` — acceptance: exits 0.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. Pushed `d4b900897..03fb0675e`
+      to `main` — pre-push hooks (env validate, link validation, README index audit, agents
+      duplication check — 204/204 passed) and push both exited 0.
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2. If any check fails, fix it in Phase 1 before
 > proceeding.
 
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0.
-- [ ] [AI] `ls .github/workflows/` — lists exactly `README.md`, `_reusable-app-test-local-deploy-stag.yml`,
+- [x] [AI] `actionlint .github/workflows/*.yml` — exits 0.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). Exit 0, no output.
+- [x] [AI] `ls .github/workflows/` — lists exactly `README.md`, `_reusable-app-test-local-deploy-stag.yml`,
       `_reusable-app-test-stag.yml`, `_reusable-be-build-deploy.yml`, `deps-audit.yml`,
       `main-ci.yml`, `pr-quality-gate.yml`, `publish-images.yml`, `validate-env.yml`.
-- [ ] [AI] **CI architecture parity — composite actions unchanged**:
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). `ls` output
+      matched exactly the 9 expected files, no extras, no omissions.
+- [x] [AI] **CI architecture parity — composite actions unchanged**:
       `diff -r /Users/wkf/ose-projects/ose-public/.github/actions /Users/wkf/ose-projects/baseerah/.github/actions`
       — exits 0 with no output.
-- [ ] [AI] **CI architecture parity — `main-ci.yml` job set unchanged**:
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). Exit 0, no output.
+- [x] [AI] **CI architecture parity — `main-ci.yml` job set unchanged**:
       `diff <(rg -oN '^  [a-z0-9-]+:$' /Users/wkf/ose-projects/ose-public/.github/workflows/main-ci.yml) <(rg -oN '^  [a-z0-9-]+:$' .github/workflows/main-ci.yml)`
       — exits 0 with no output. Baseerah's language set (TypeScript, F#, Rust) matches `ose-public`'s
       exactly, so `typescript`, `dotnet`, and `rust` must all still be present.
-- [ ] [AI] **CI architecture parity — `pr-quality-gate.yml` job set unchanged**:
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). Exit 0, no output.
+- [x] [AI] **CI architecture parity — `pr-quality-gate.yml` job set unchanged**:
       `diff <(rg -oN '^  [a-z0-9-]+:$' /Users/wkf/ose-projects/ose-public/.github/workflows/pr-quality-gate.yml) <(rg -oN '^  [a-z0-9-]+:$' .github/workflows/pr-quality-gate.yml)`
       — exits 0 with no output.
-- [ ] [AI] `test ! -d infra` — exits 0.
-- [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. (The apps still exist;
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). Exit 0, no output.
+- [x] [AI] `test ! -d infra` — exits 0.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). Exit 0.
+- [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. (The apps still exist;
       only their deploy plumbing is gone.)
-- [ ] [AI] Wait for CI, polling every 2 minutes with one call per wakeup per the
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). "Successfully
+      ran targets typecheck, lint, test:quick for 29 projects and 5 tasks they depend on" — 92/92
+      tasks resolved (mostly cache hits from Phase 0's baseline sweep since only CI/infra files
+      changed, no app source).
+- [x] [AI] Wait for CI, polling every 2 minutes with one call per wakeup per the
       [CI monitoring convention](../../../repo-governance/development/workflow/ci-monitoring.md):
       `gh run list --branch main --limit 1 --json databaseId,status,conclusion` then
       `gh run view <id> --json status,conclusion,jobs` — acceptance: `conclusion` is `success` **and**
       every element of `jobs[].conclusion` is `success` or `skipped`; no job is `failure`.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). CI run
+      30603862559 on `main` (headSha `03fb0675e`) finished with overall `conclusion: success`; all 19
+      jobs `success` or `skipped`, none `failure`. Phase 1 complete.
 
 > **Pause Safety**: all apps and libs still exist and still build. Only the 11 per-app deploy
 > callers, the one `-www` reusable template with no tier to serve, the `infra/` local-stack tree, and
@@ -275,83 +297,194 @@ permitted to move this plan folder.
 > the **pre-commit** staged gate. Splitting spec deletion from config deletion produces a commit that
 > cannot be made (tech-docs Mechanics 2).
 
-- [ ] [AI] Read the `repo-config.yml` schema to determine whether empty lists validate: inspect
+- [x] [AI] Read the `repo-config.yml` schema to determine whether empty lists validate: inspect
       `apps/rhino-cli/src/` for the `repo_config` module (`rg -l 'repo_config' apps/rhino-cli/src/`)
       and read its deserialisation and validation code for `ddd-areas`, `domain-areas`,
       `env-contract.surfaces`, and `env-injection.apps` — acceptance: record in
       `evidence/phase-2-repo-config-schema.md` whether each key accepts `[]`, and whether it may be
       omitted entirely. This verdict drives the two `repo-config.yml` steps below.
-- [ ] [AI] Audit `libs/fsharp-crane-core`: read every `.fs` file under `libs/fsharp-crane-core/src/`
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**:
+      `evidence/phase-2-repo-config-schema.md` (new). Read `repo_config/mod.rs`, `env/validate.rs`'s
+      `Contract`, and `env/injection.rs`'s `Manifest`. Verdict: all four keys accept `[]`; three of the
+      four (`ddd-areas`, `domain-areas`, `env-injection.apps`) may also be omitted entirely
+      (field-level `#[serde(default)]`), but `env-contract.surfaces` has no field-level default so it
+      is required once the `env-contract:` section itself is present — this plan sets it to `[]` rather
+      than omitting the whole section. Chose `[]` uniformly for all four for consistency.
+- [x] [AI] Audit `libs/fsharp-crane-core`: read every `.fs` file under `libs/fsharp-crane-core/src/`
       and determine whether its modules are generic F# utilities or `crane-cli`-specific — acceptance:
       write the verdict plus a per-module table to `evidence/phase-2-fsharp-crane-core-audit.md`
       ending with a single line reading exactly `VERDICT: KEEP` or `VERDICT: DELETE`.
-- [ ] [AI] Confirm nothing outside `crane-cli` consumes it: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**:
+      `evidence/phase-2-fsharp-crane-core-audit.md` (new). Read all 17 `.fs` files; every module lives
+      under `CraneCore.*` and is specific to the crane-cli PDF-to-Markdown pipeline (PDF/OCR ports and
+      adapters, fidelity checkers, report assembly) — no generic, domain-independent utility code.
+      **VERDICT: DELETE**.
+- [x] [AI] Confirm nothing outside `crane-cli` consumes it: run
       `rg -n 'fsharp-crane-core|CraneCore' --glob '!libs/fsharp-crane-core/**' --glob '!plans/**'`
       — acceptance: every hit is inside `apps/crane-cli/`, `specs/apps/crane/`, or `repo-config.yml`.
       Append the command output to the audit file.
-- [ ] [AI] Delete the 22 retired app directories: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**:
+      `evidence/phase-2-fsharp-crane-core-audit.md`. **Correction**: the stated acceptance homes
+      (`apps/crane-cli/`, `specs/apps/crane/`, `repo-config.yml`) undercounted legitimate doc/prose
+      references — actual hits also touched `AGENTS.md`, `libs/README.md`,
+      `docs/reference/monorepo-structure.md`, `repo-governance/.../licensing.md`, `specs/README.md`,
+      `specs/libs/fsharp-crane-core/**`, `apps/ose-www/content/`, and `generated-socials/`. Verified
+      the real intent instead: every **code-consumption** hit (`ProjectReference`, `open CraneCore.*`,
+      `implicitDependencies`) is confined to `apps/crane-cli/`, confirming DELETE is dependency-safe.
+      The prose hits are either deleted by this same phase (`specs/libs/fsharp-crane-core`,
+      `apps/ose-www`) or fall to Phase 3's repo-wide doc sweeps — documented in the audit file rather
+      than silently left unaddressed.
+- [x] [AI] Delete the 22 retired app directories: run
       `git rm -r apps/ayokoding-cli apps/ayokoding-www apps/ayokoding-www-be-e2e apps/ayokoding-www-fe-e2e apps/crane-cli apps/organiclever-app-web apps/organiclever-app-web-e2e apps/organiclever-be apps/organiclever-be-e2e apps/organiclever-www apps/organiclever-www-be-e2e apps/organiclever-www-fe-e2e apps/ose-app-web apps/ose-app-web-e2e apps/ose-be apps/ose-be-e2e apps/ose-cli apps/ose-www apps/ose-www-be-e2e apps/ose-www-fe-e2e apps/wahidyankf-www apps/wahidyankf-www-fe-e2e`
       — acceptance: exits 0 and `ls apps/` lists only `README.md` and `rhino-cli`.
-- [ ] [AI] If and only if `evidence/phase-2-fsharp-crane-core-audit.md` ends `VERDICT: DELETE`, run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: 22 app directories removed from git
+      (thousands of tracked files across TS/F#/Rust apps). `git rm -r` exited 0 for all 22, but `ls apps/`
+      still showed 19 stale directory shells afterward — `git rm` only removes tracked files, and each
+      app had gitignored build artifacts (`node_modules/`, `coverage/`, `bin/`, `obj/`, `target/`,
+      `tsconfig.tsbuildinfo`, `generated-contracts/`) or empty untracked dir shells left behind.
+      Verified via `git status --porcelain --ignored=matching apps/` that every remaining entry was
+      `??` (empty shell) or `!!` (gitignored artifact) — no source, nothing tracked, nothing of value —
+      then `rm -rf` the 19 leftover directories (not a git operation; these were already fully removed
+      from git's index). `ls apps/` now lists exactly `README.md` and `rhino-cli`, matching the
+      acceptance criterion as intended (the plan's stated acceptance didn't anticipate gitignored
+      build-artifact leftovers surviving `git rm -r`).
+- [x] [AI] If and only if `evidence/phase-2-fsharp-crane-core-audit.md` ends `VERDICT: DELETE`, run
       `git rm -r libs/fsharp-crane-core specs/libs/fsharp-crane-core` — acceptance: exits 0. If the
       verdict is `KEEP`, skip this step and record the skip in `learnings.md`.
-- [ ] [AI] Delete the five retired spec-area trees, which also removes the `ose-contracts` and
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `libs/fsharp-crane-core/**` (17 `.fs`
+      files, `fsharp-crane-core.fsproj`, `project.json`, `fsharplint.json`, `LICENSE`, 13 test files)
+      and `specs/libs/fsharp-crane-core/**` (11 files) removed via `git rm -r`, exit 0. Same
+      gitignored-artifact leftover pattern as the app-directory deletion (`bin/`, `obj/` under both
+      `libs/fsharp-crane-core/` and its `tests/unit/`) — cleaned up with `rm -rf libs/fsharp-crane-core`
+      since `git rm` had already removed every tracked file. `libs/` now lists exactly `rust-commons`,
+      `web-ui`, `web-ui-token`.
+- [x] [AI] Delete the five retired spec-area trees, which also removes the `ose-contracts` and
       `organiclever-contracts` Nx projects nested inside them: run
       `git rm -r specs/apps/ayokoding specs/apps/crane specs/apps/organiclever specs/apps/ose specs/apps/wahidyankf`
       — acceptance: exits 0 and `ls specs/apps/` lists only `rhino` and `README.md`.
-- [ ] [AI] Confirm `specs/libs/` retains exactly the trees for surviving libs: run `ls specs/libs/`
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: 5 spec-area trees removed (315 files).
+      `git rm -r` exit 0. **Correction**: `specs/apps/README.md` never existed on disk — `ls specs/apps/`
+      lists only `rhino`, which matches the real intent (the plan's acceptance text assumed a README
+      file that isn't there). No leftover artifacts (spec trees are pure markdown/gherkin, no build
+      output).
+- [x] [AI] Confirm `specs/libs/` retains exactly the trees for surviving libs: run `ls specs/libs/`
       — acceptance: lists `web-ui`, `web-ui-token`, `rust-commons`, and `fsharp-crane-core` only if
       the audit verdict was `KEEP`.
-- [ ] [AI] Delete the solution file, which registers only `crane-cli` projects: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). `ls specs/libs/`
+      lists exactly `rust-commons`, `web-ui`, `web-ui-token` — no `fsharp-crane-core`, consistent with
+      the `DELETE` verdict.
+- [x] [AI] Delete the solution file, which registers only `crane-cli` projects: run
       `git rm open-sharia-enterprise.sln` — acceptance: exits 0. A fresh `baseerah.sln` is created in
       Phase 6.
-- [ ] [AI] Edit `/Users/wkf/ose-projects/baseerah/repo-config.yml`: delete all 25 non-`rhino-cli`
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `open-sharia-enterprise.sln` removed.
+      Exit 0.
+- [x] [AI] Edit `/Users/wkf/ose-projects/baseerah/repo-config.yml`: delete all 25 non-`rhino-cli`
       entries from `coverage.projects` (lines ~61-169) and the trailing exclusion comment naming
       `web-ui-token`, `organiclever-contracts`, and `ose-contracts` — acceptance: exactly one entry
       remains, `rhino-cli`, and the list is never empty.
-- [ ] [AI] Edit `repo-config.yml`: clear `specs.ddd-areas`, `specs.domain-areas`,
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `repo-config.yml`. Removed 25
+      entries (8 `ose-*`, 7 `organiclever-*`, 4 `ayokoding-*`, 2 `wahidyankf-*`, 1 `crane-cli`, and the
+      3 lib entries `rust-commons`/`web-ui`/`fsharp-crane-core`) plus the trailing exclusion comment.
+      Only `rhino-cli` remains. Note: `rust-commons` and `web-ui` survive as Nx projects but lose their
+      coverage-registry entry here per the plan's literal acceptance text — their only prior consumers
+      (the 22 deleted apps) are gone, and Phases 6/7/8/9 register fresh `baseerah-be`/`baseerah-fe`
+      entries rather than restoring these two.
+- [x] [AI] Edit `repo-config.yml`: clear `specs.ddd-areas`, `specs.domain-areas`,
       `env-contract.surfaces`, and `env-injection.apps` — using `[]` or full key omission per the
       verdict recorded in `evidence/phase-2-repo-config-schema.md` — and strip the
       `organiclever-app-staging` / `ose-app-staging` environment arrays from
       `env-injection.ci-harness` — acceptance: `rg -n 'organiclever|ayokoding|wahidyankf|crane|ose-' repo-config.yml`
       returns no matches.
-- [ ] [AI] Verify the config still validates: run `npm run validate:config` — acceptance: exits 0.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `repo-config.yml`. Set all four keys
+      to `[]` per the schema verdict; removed all 8 `env-contract.surfaces` app entries and all 8
+      `env-injection.apps` entries; cleared the `environments:` array on the three affected
+      `ci-harness` keys (`API_BASE_URL`, `WEB_BASE_URL`, `VERCEL_AUTOMATION_BYPASS_SECRET`) to `[]`.
+      **Correction**: the literal acceptance regex (`...|ose-`) still matches two pre-existing header-
+      comment lines — "`ose-public, ose-primer, ose-private`" (line 4, describing the byte-identical
+      schema shared across sibling repos) and "`ose-private coralpolyp secret store`" (the
+      `k3s-coralpolyp` injection-home doc comment) — neither is a retired Baseerah app reference, both
+      are accurate documentation this step doesn't touch, and neither is flagged by the Phase 2 Gate's
+      actual sweep pattern (which uses `ose-www|ose-app-web|ose-cli`, not bare `ose-`). Left as-is;
+      documented here rather than deleting legitimate content to force a mis-scoped regex to pass.
+- [x] [AI] Verify the config still validates: run `npm run validate:config` — acceptance: exits 0.
       If it fails on an empty list, apply the omission form instead and re-run.
-- [ ] [AI] Edit `/Users/wkf/ose-projects/baseerah/tsconfig.base.json`: leave the `@open-sharia-enterprise/*`
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). Exit 0. Also ran
+      `cargo run ... -- repo-config validate` directly for the semantic schema check specifically:
+      "repo-config.yml matches the canonical schema (key set + enums OK)", exit 0. `[]` form worked
+      first try, no omission fallback needed.
+- [x] [AI] Edit `/Users/wkf/ose-projects/baseerah/tsconfig.base.json`: leave the `@open-sharia-enterprise/*`
       scope and the `web-ui` / `web-ui-token` paths **unchanged** (tech-docs Decision 3); remove a
       path entry only if its target directory was deleted — acceptance:
       `npx tsc -p tsconfig.base.json --noEmit --showConfig` resolves without error.
-- [ ] [AI] Edit `/Users/wkf/ose-projects/baseerah/.prettierignore`: delete the trailing block
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. All four `paths` entries
+      (`ts-*` glob, `web-ui`, `web-ui/primitives`, `web-ui-token`) target surviving directories — none
+      deleted this phase — so no edit was needed. `--showConfig` resolved cleanly, exit 0, `files`
+      list contains only `libs/web-ui*` sources.
+- [x] [AI] Edit `/Users/wkf/ose-projects/baseerah/.prettierignore`: delete the trailing block
       containing `apps/ayokoding-www/content/**/code/**/*.sql` and its comment naming the F# backends
       — acceptance: `rg -n 'ayokoding|organiclever|ose-be' .prettierignore` returns no matches.
-- [ ] [AI] Rewrite `/Users/wkf/ose-projects/baseerah/.dockerignore`: delete the `apps/ayokoding-cli`
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.prettierignore`. Removed the
+      7-line trailing block (comment + exclusion glob). Verified no matches.
+- [x] [AI] Rewrite `/Users/wkf/ose-projects/baseerah/.dockerignore`: delete the `apps/ayokoding-cli`
       and `apps/ose-cli` lines and replace the nine stale `!specs/...` re-include lines with a single
       `!specs/apps/rhino/` re-include — acceptance: `rg -n 'ayokoding|organiclever|ose-app|a-demo' .dockerignore`
       returns no matches.
-- [ ] [AI] Edit `/Users/wkf/ose-projects/baseerah/.gitignore`: delete the `crane-cli` integration-test
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.dockerignore`. Removed
+      `apps/ayokoding-cli`/`apps/ose-cli` lines, replaced the nine `!specs/apps/{a-demo,organiclever,
+ose-app}/...` re-includes with one `!specs/apps/rhino/`. **Also removed**, since the acceptance
+      regex covers them and the plan's step text didn't call them out explicitly: the stray
+      `apps/organiclever-be/target` line (organiclever-be is deleted this phase) and the trailing
+      `!apps/a-demo-be-elixir-phoenix/test` / `!apps/a-demo-fs-ts-nextjs/test` re-includes (these
+      `a-demo-*` apps don't exist anywhere in this repo — leftover from the polyglot-demo extraction to
+      `ose-primer` noted in `AGENTS.md`). Verified no matches.
+- [x] [AI] Edit `/Users/wkf/ose-projects/baseerah/.gitignore`: delete the `crane-cli` integration-test
       state block (line ~176), keeping the two `rhino-cli` lines — acceptance:
       `rg -n 'crane-cli' .gitignore` returns no matches and `rg -n 'rhino-cli' .gitignore` returns two.
-- [ ] [AI] Now that the excluded content is gone, drop the stale markdown-lint excludes in
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.gitignore`. Removed the 2-line
+      `crane-cli`-comment + `.execution-chain-*` block. Verified: `crane-cli` no matches, `rhino-cli`
+      two matches.
+- [x] [AI] Now that the excluded content is gone, drop the stale markdown-lint excludes in
       `/Users/wkf/ose-projects/baseerah/package.json`: remove `--exclude apps/ayokoding-www/content`
       from the lint-staged `md mermaid validate` invocation — acceptance:
       `rg -n 'apps/ayokoding-www' package.json` returns no matches.
-- [ ] [AI] Drop the same excludes from `/Users/wkf/ose-projects/baseerah/.husky/pre-push`: remove
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `package.json`. Removed the
+      `--exclude apps/ayokoding-www/content` flag. Verified no matches.
+- [x] [AI] Drop the same excludes from `/Users/wkf/ose-projects/baseerah/.husky/pre-push`: remove
       `--exclude apps/ayokoding-www/content --exclude apps/ose-www/content` from the
       `md links validate` invocation, leaving `--exclude plans/done` in place for now — acceptance:
       `rg -n 'apps/(ayokoding-www|ose-www)' .husky/pre-push` returns no matches.
-- [ ] [AI] Drop the same excludes from `.github/workflows/main-ci.yml` (the `md mermaid validate` at
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.husky/pre-push`. Removed the two
+      `--exclude` flags, kept `--exclude plans/done`. Verified no matches.
+- [x] [AI] Drop the same excludes from `.github/workflows/main-ci.yml` (the `md mermaid validate` at
       line ~124 and `md links validate` at line ~183) and from
       `.github/workflows/pr-quality-gate.yml` (line ~246), and delete the stale comments at
       `main-ci.yml` lines ~61-64 and ~113-121 naming `ayokoding-www` and a
       `plans/ideas/ayokoding-mermaid-diagram-remediation.md` file — acceptance:
       `rg -n 'ayokoding|ose-www' .github/workflows/` returns no matches.
-- [ ] [AI] Confirm the `.NET` CI jobs are **kept**, not deleted — `baseerah-be` needs them from
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.github/workflows/main-ci.yml`,
+      `.github/workflows/pr-quality-gate.yml`. Removed the `--exclude apps/ayokoding-www/content`
+      / `--exclude apps/ose-www/content` flags from both files' `md links validate` calls and from
+      `main-ci.yml`'s `md mermaid validate` call. The `~61-64` comment explained a still-true
+      `--parallel=1` concurrency constraint (nx OOM under high parallelism) using ayokoding-www's
+      heaviest suite as its concrete example — reworded to "the heaviest TS suite" rather than
+      deleted outright, preserving the (still-valid) technical justification. The `~113-121`
+      "TEMPORARY EXCLUDE" comment justified only the now-removed ayokoding-www mermaid-debt
+      exclusion and had no remaining purpose once that flag was gone, so it was deleted in full
+      (not reworded). Verified `actionlint .github/workflows/*.yml` still exits 0 and the acceptance
+      grep returns no matches.
+- [x] [AI] Confirm the `.NET` CI jobs are **kept**, not deleted — `baseerah-be` needs them from
       Phase 6 (tech-docs Decision 5). Read `main-ci.yml`'s `dotnet` job and `pr-quality-gate.yml`'s
       `.NET quality gate` job — acceptance: both jobs are present and unmodified, and
       `.config/dotnet-tools.json` still exists.
-- [ ] [AI] Regenerate the project graph and confirm the survivors: run `npx nx show projects` —
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). `main-ci.yml`'s
+      `dotnet` job and `pr-quality-gate.yml`'s conditional `dotnet` job (`.NET quality gate`) both
+      present, neither touched by this phase's edits. `.config/dotnet-tools.json` exists.
+- [x] [AI] Regenerate the project graph and confirm the survivors: run `npx nx show projects` —
       acceptance: output is exactly `rhino-cli`, `rust-commons`, `web-ui`, `web-ui-token`, and
       `fsharp-crane-core` (the last only if the audit verdict was `KEEP`).
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification). Output: exactly
+      `rust-commons`, `web-ui-token`, `rhino-cli`, `web-ui` — no `fsharp-crane-core`, consistent with
+      `DELETE`.
 - [ ] [AI] Commit everything in one commit, since the spec trees and their `repo-config.yml` entries
       cannot be split: `git add -A && git commit -m "feat(repo)!: remove retired OSE apps, libs, specs, and config registrations"`
       — acceptance: the pre-commit staged gate passes and the commit is created.

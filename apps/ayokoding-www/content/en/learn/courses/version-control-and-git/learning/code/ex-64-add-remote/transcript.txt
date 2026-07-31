@@ -1,2 +1,0 @@
-origin	../remote.git (fetch)
-origin	../remote.git (push)

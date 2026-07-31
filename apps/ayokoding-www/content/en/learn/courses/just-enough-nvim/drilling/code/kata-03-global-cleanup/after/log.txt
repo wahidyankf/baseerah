@@ -1,3 +1,0 @@
-INFO: server started
-INFO: request received
-INFO: response sent

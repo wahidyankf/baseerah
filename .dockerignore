@@ -11,10 +11,7 @@ coverage
 **/obj
 **/bin
 **/target
-apps/organiclever-be/target
-apps/ayokoding-cli
 archived
-apps/ose-cli
 apps/rhino-cli
 docs
 plans
@@ -22,15 +19,7 @@ governance
 generated-reports
 local-temp
 specs
-!specs/apps/a-demo/be/gherkin
-!specs/apps/a-demo/fe/gherkin
-!specs/apps/a-demo/contracts/generated
-!specs/apps/organiclever/behavior/be/gherkin
-!specs/apps/organiclever/behavior/web/gherkin
-!specs/apps/organiclever/containers/contracts/generated
-!specs/apps/ose-app/behavior/be/gherkin
-!specs/apps/ose-app/behavior/web/gherkin
-!specs/apps/ose-app/containers/contracts/generated
+!specs/apps/rhino/
 infra
 .claude
 .opencode
@@ -40,6 +29,3 @@ playwright-report
 test-results
 **/vitest.config.ts
 **/test
-# Re-include test directories needed by integration Dockerfiles
-!apps/a-demo-be-elixir-phoenix/test
-!apps/a-demo-fs-ts-nextjs/test

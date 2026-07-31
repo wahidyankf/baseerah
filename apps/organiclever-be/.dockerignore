@@ -1,6 +1,0 @@
-target/
-.git
-*.md
-project.json
-checkstyle.xml
-pmd-ruleset.xml

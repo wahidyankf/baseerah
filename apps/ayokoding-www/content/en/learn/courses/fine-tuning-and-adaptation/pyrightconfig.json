@@ -1,5 +1,0 @@
-{
-  "typeCheckingMode": "strict",
-  "pythonVersion": "3.13",
-  "include": ["learning/code", "learning/capstone"]
-}

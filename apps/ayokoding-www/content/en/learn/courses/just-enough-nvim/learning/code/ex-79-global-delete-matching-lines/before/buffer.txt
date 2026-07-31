@@ -1,4 +1,0 @@
-TODO fix login
-done: docs
-TODO refactor parser
-keep this

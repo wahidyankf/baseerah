@@ -1,1 +1,0 @@
-"""Capstone task API package."""

@@ -1,8 +1,0 @@
-{"request": "Move this to done.", "reply": "Moved to done.", "open_code": "acted on 'this' without any board or ticket named"}
-{"request": "Close ticket #12.", "reply": "Closed ticket #21.", "open_code": "acted on ticket #21 instead of the requested #12"}
-{"request": "How many bugs are open?", "reply": "There are 14 open bugs.", "open_code": "counted 14 when the true open-bug count was 21, undercounting closed-but-reopened tickets"}
-{"request": "Archive tickets older than 90 days.", "reply": "Archived all tickets.", "open_code": "archived every ticket, ignoring the stated 90-day age filter"}
-{"request": "Move that one to the other board.", "reply": "Moved to the Sprint board.", "open_code": "guessed a specific board despite two boards being equally plausible referents"}
-{"request": "Close the ticket.", "reply": "Closed ticket #4821.", "open_code": "acted on a single guessed ticket ID with no board or ticket named at all"}
-{"request": "How many tickets are in progress?", "reply": "9 tickets are in progress.", "open_code": "counted 9 when the true in-progress count was 12, missing tickets moved mid-day"}
-{"request": "Delete tickets tagged 'spam'.", "reply": "Deleted all tickets.", "open_code": "deleted every ticket, ignoring the stated 'spam' tag filter"}

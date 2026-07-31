@@ -1,3 +1,0 @@
-find the needle here
-not this line
-needle again

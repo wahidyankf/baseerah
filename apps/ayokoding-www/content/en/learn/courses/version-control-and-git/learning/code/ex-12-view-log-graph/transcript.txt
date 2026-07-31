@@ -1,2 +1,0 @@
-* bfdfd6e feature work
-* ca943e2 initial

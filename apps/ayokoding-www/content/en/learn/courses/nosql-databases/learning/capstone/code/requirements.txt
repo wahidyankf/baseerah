@@ -1,3 +1,0 @@
-redis==8.0.1
-pymongo==4.17.0
-cassandra-driver==3.30.1

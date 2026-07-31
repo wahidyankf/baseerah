@@ -61,9 +61,9 @@ jobs:
       # workers + rhino-cli cargo subprocesses (test:specs now runs on every TS project, not
       # just a few) to exceed the hosted runner's memory/CPU headroom — first SIGKILLing the
       # process outright (no error output, exit code 1), and later (after test:specs rollout
-      # broadened the total concurrent workload) causing ayokoding-www's heaviest suite to miss
-      # its own vitest worker heartbeat under CPU starvation (reports the exact default 20000ms
-      # timeout regardless of --testTimeout, since that's a different vitest-internal signal).
+      # broadened the total concurrent workload) causing the heaviest TS suite to miss its own
+      # vitest worker heartbeat under CPU starvation (reports the exact default 20000ms timeout
+      # regardless of --testTimeout, since that's a different vitest-internal signal).
       # Fully serializing cross-project concurrency removes the contention rather than chasing
       # ever-larger timeouts.
       - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust' --parallel=1
@@ -110,18 +110,8 @@ jobs:
       - uses: ./.github/actions/setup-rust
       - name: markdownlint-cli2 (all .md)
         run: npx markdownlint-cli2 "**/*.md" "#node_modules" "#.nx" "#archived"
-      # TEMPORARY EXCLUDE: apps/ayokoding-www/content carries 636 pre-existing
-      # mermaid violations across 241 tutorial files. They were latent until the
-      # detect_kind fix (a leading `%%` comment used to disable validation for a
-      # block entirely), so this is uncovered debt being surfaced, not new
-      # breakage. Remediating educational diagrams is a content project, tracked
-      # at plans/ideas/ayokoding-mermaid-diagram-remediation.md. Remove this
-      # exclude when that lands. The other two excludes are long-standing and
-      # not part of that debt: plans/done is archived, immutable history, and
-      # the rhino-cli fixtures are deliberately-invalid validator test inputs.
-      # Every non-excluded tree is fully enforced.
       - name: Mermaid diagram validation (all .md)
-        run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --exclude apps/rhino-cli/tests/fixtures --exclude plans/done --exclude apps/ayokoding-www/content
+        run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate --exclude apps/rhino-cli/tests/fixtures --exclude plans/done
       - name: Heading hierarchy validation (all .md)
         run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate
       - name: Gherkin cardinality validation (all .feature)
@@ -180,7 +170,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
-      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done
 
   readme-index:
     name: README index validation (repo-wide)
