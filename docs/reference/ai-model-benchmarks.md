@@ -13,14 +13,14 @@ created: 2026-04-19
 
 Canonical benchmark reference for all AI models used in this project. Last updated: 2026-07-28 (generated tables — roster, pricing, frontier, capability-summary); hand-curated model-by-model prose was last refreshed 2026-07-05 — see the snapshot captions inside each generated block for the authoritative date.
 
-> **Derived data tables.** The data tables in this reference are generated from
-> [`apps/ayokoding-www/src/features/ai-benchmark/core/data/models.ts`](../../apps/ayokoding-www/src/features/ai-benchmark/core/data/models.ts)
-> (the single source of truth) — namely the OpenCode Go roster, the per-harness pricing, the
+> **Derived data tables.** The data tables in this reference were generated from
+> `apps/ayokoding-www/src/features/ai-benchmark/core/data/models.ts` (deleted along with the
+> `ayokoding-www` app; the tables below are now a static snapshot until this reference gets a new
+> generation source) — namely the OpenCode Go roster, the per-harness pricing, the
 > frontier/big-brand reference, and the composite-benchmark capability summary. Each table is
-> rewritten between a matched pair of HTML-comment markers (`BEGIN GENERATED` / `END GENERATED`), so
-> hand-edits inside those pairs are overwritten on every refresh — edit `models.ts` instead, then
-> regenerate. Refresh with `npx nx run ayokoding-www:generate-benchmark-reference`; check for drift
-> with `npx nx run ayokoding-www:validate-benchmark-reference`. All other prose (benchmark
+> rewritten between a matched pair of HTML-comment markers (`BEGIN GENERATED` / `END GENERATED`).
+> The `ayokoding-www:generate-benchmark-reference` / `ayokoding-www:validate-benchmark-reference` Nx
+> targets that produced and checked these tables no longer exist. All other prose (benchmark
 > definitions, tier rationale, caveats) is hand-maintained and preserved verbatim.
 
 ## Purpose and Scope

@@ -16,7 +16,7 @@ created: 2026-02-09
 
 ## Prerequisite Knowledge
 
-**REQUIRED**: Complete [AyoKoding DDD Entities](../../../../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/software-architecture/patterns-and-principles/) before using these standards.
+**REQUIRED**: Complete AyoKoding DDD Entities before using these standards.
 
 ## Purpose
 

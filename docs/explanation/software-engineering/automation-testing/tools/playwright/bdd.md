@@ -292,10 +292,6 @@ npx bddgen && npx playwright test
 
 - **[BDD Standards](../../../development/behavior-driven-development-bdd/README.md)** — Framework
   requirements, Three Amigos process, coverage rules
-- **[specs/apps/organiclever/behavior/organiclever-be/gherkin/](../../../../../../specs/apps/organiclever/behavior/organiclever-be/gherkin/README.md)** — Feature files
-  and their organization
 - **[Configuration Standards](configuration.md)** — playwright.config.ts
   patterns including the BDD configuration section
 - **[Playwright Framework Index](README.md)** — Playwright standards overview
-- **[apps/organiclever-be-e2e/README.md](../../../../../../apps/organiclever-be-e2e/README.md)** —
-  E2E test project README

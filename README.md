@@ -16,7 +16,7 @@
 
 Building OrganicLever, a full-stack individual productivity tracker:
 
-- 🌐 **Landing site**: [organiclever.com](https://www.organiclever.com/) ([organiclever-web](./apps/organiclever-app-web/)) - Next.js promotional website
+- 🌐 **Landing site**: [organiclever.com](https://www.organiclever.com/) - Next.js promotional website
 - ✅ **Phase 0 complete**: [ayokoding.com](https://ayokoding.com), [oseplatform.com](https://oseplatform.com), AI agents, governance, CLI tools
 
 **Next Phase: Phase 2 (SMB Application)** - Small and medium business application building on OrganicLever's foundation.
@@ -49,7 +49,7 @@ npm install
 
 - Node.js & npm (via Volta) - Tooling and development infrastructure
 - Next.js 16 - Public websites and content platforms
-- Golang - CLI tools ([ayokoding-cli](./apps/ayokoding-cli/), [rhino-cli](./apps/rhino-cli/)) and future security infrastructure
+- Golang/Rust - CLI tools ([rhino-cli](./apps/rhino-cli/)) and future security infrastructure
 
 **Current Phase 1 (OrganicLever):**
 
@@ -83,8 +83,9 @@ open-sharia-enterprise/
 
 **Applications** (`apps/`):
 
-- **Sites**: [`ose-web`](./apps/ose-www/), [`ayokoding-web`](./apps/ayokoding-www/), [`organiclever-web`](./apps/organiclever-app-web/), [`organiclever-be`](./apps/organiclever-be/), [`organiclever-web-e2e`](./apps/organiclever-app-web-e2e/), [`organiclever-be-e2e`](./apps/organiclever-be-e2e/), [`wahidyankf-web`](./apps/wahidyankf-www/), [`wahidyankf-web-fe-e2e`](./apps/wahidyankf-www-fe-e2e/)
-- **CLI tools**: [`ayokoding-cli`](./apps/ayokoding-cli/), [`rhino-cli`](./apps/rhino-cli/), [`ose-cli`](./apps/ose-cli/)
+- **Sites**: none currently in this repo — retired during the repo reset; `organiclever.com` is served
+  from a source not yet re-scaffolded here
+- **CLI tools**: [`rhino-cli`](./apps/rhino-cli/)
 - **Polyglot demo apps**: extracted 2026-04-18 to the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template repository, which is now authoritative for the polyglot showcase (Go, Java, Elixir, F#, Python, Rust, Kotlin, TypeScript, C#, Clojure backends + Next.js, TanStack Start, Flutter Web frontends).
 
 **Libraries** (`libs/`): Reusable shared code

@@ -38,10 +38,6 @@ Standalone plans (outside the `ayokoding-learning-path-*` programme):
 - [merge-queue-adoption](./merge-queue-adoption/README.md)
   — Hardens merge-precondition (c) under concurrent integration; owns the merge-queue work deferred
   from `worktree-to-pr-hardening`.
-- [ayokoding-www-cost-reduction](./ayokoding-www-cost-reduction/README.md)
-  — Runtime-and-hosting cost reduction for `apps/ayokoding-www`: Pagefind migration, build-time
-  Mermaid, `html-react-parser` removal, calculator lazy-load, Docker/trace narrowing, and a
-  dependency modernization sweep bound to the repo's bump policy.
 - [audit-e2e-reuse-existing-server-config](./audit-e2e-reuse-existing-server-config/README.md)
   — Audits whether `reuseExistingServer: true` (hardcoded unconditionally in six `*-e2e`
   `playwright.config.ts` files) risks silently reusing a stale, unrelated server, and applies a

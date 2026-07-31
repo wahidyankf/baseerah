@@ -322,12 +322,7 @@ The following checks determine whether an FP-variant by-example page complies wi
 - [`apps-ayokoding-www-by-example-checker`](../../../.claude/agents/apps-ayokoding-www-by-example-checker.md) — validates compliance
 - [`apps-ayokoding-www-by-example-fixer`](../../../.claude/agents/apps-ayokoding-www-by-example-fixer.md) — fixes violations
 
-**In-FP-by-example overview pages:**
-
-- [Architecture by-example: FP overview](../../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/software-architecture/patterns-and-principles/in-fp-by-example/overview.md)
-- [DDD: FP by-example overview](../../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/software-architecture/domain-driven-design-ddd/in-fp-by-example/overview.md)
-- [Hexagonal Architecture: FP by-example overview](../../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/software-architecture/hexagonal-architecture/in-fp-by-example/overview.md)
-- [FSM: FP by-example overview](../../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/software-architecture/finite-state-machine-fsm/in-fp-by-example/overview.md)
+**In-FP-by-example overview pages** (under `apps/ayokoding-www/content/en/learn/legacy/software-engineering/software-architecture/`, path per topic — e.g. `patterns-and-principles/in-fp-by-example/overview.md`, `domain-driven-design-ddd/in-fp-by-example/overview.md`, `hexagonal-architecture/in-fp-by-example/overview.md`, `finite-state-machine-fsm/in-fp-by-example/overview.md`):
 
 **Repository Architecture:**
 

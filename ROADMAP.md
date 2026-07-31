@@ -54,15 +54,13 @@ graph TB
 
 **Website Launches:**
 
-- 🌐 [**ayokoding.com**](https://ayokoding.com) ([`apps/ayokoding-www/`](./apps/ayokoding-www/)) - Bilingual educational platform (Indonesian/English) built with Next.js 16. Programming tutorials, AI guides, security content
-- 🏢 [**oseplatform.com**](https://oseplatform.com) ([`apps/ose-www/`](./apps/ose-www/)) - Platform marketing website built with Next.js 16. Project updates, announcements, landing page
+- 🌐 [**ayokoding.com**](https://ayokoding.com) - Bilingual educational platform (Indonesian/English) built with Next.js 16. Programming tutorials, AI guides, security content. Retired from this repo during a later repo reset.
+- 🏢 [**oseplatform.com**](https://oseplatform.com) - Platform marketing website built with Next.js 16. Project updates, announcements, landing page. Retired from this repo during a later repo reset.
 
 **CLI Tools:**
 
-- 🛠️ **ayokoding-cli** ([`apps/ayokoding-cli/`](./apps/ayokoding-cli/)) - Golang CLI for content automation (title updates, navigation generation)
-- 🦏 **rhino-cli** ([`apps/rhino-cli/`](./apps/rhino-cli/)) - Golang CLI for repository management (Repository Hygiene & INtegration Orchestrator; includes `java validate-annotations`)
-- 🏢 **ose-cli** ([`apps/ose-cli/`](./apps/ose-cli/)) - Golang CLI for OSE Platform site validation (link checking)
-- 🔐 **Golang Foundation** - Golang will be used extensively on the information security side of the platform
+- 🦏 **rhino-cli** ([`apps/rhino-cli/`](./apps/rhino-cli/)) - Rust CLI for repository management (Repository Hygiene & INtegration Orchestrator; includes `java validate-annotations`)
+- 🔐 **Security Foundation** - CLI tooling will be used extensively on the information security side of the platform
 
 **Strategic Value:**
 
@@ -82,10 +80,10 @@ graph TB
 
 **Repository Apps (In Development):**
 
-- 🌐 [`organiclever-web`](./apps/organiclever-app-web/) - Next.js landing/promotional website (www.organiclever.com)
-- 🔧 [`organiclever-be`](./apps/organiclever-be/) - F#/Giraffe REST API backend (port 8202)
-- 🧪 [`organiclever-web-e2e`](./apps/organiclever-app-web-e2e/) - Playwright FE E2E tests for organiclever-web
-- 🧪 [`organiclever-be-e2e`](./apps/organiclever-be-e2e/) - Playwright BE E2E tests for organiclever-be
+- 🌐 `organiclever-web` - Next.js landing/promotional website (www.organiclever.com)
+- 🔧 `organiclever-be` - F#/Giraffe REST API backend (port 8202)
+- 🧪 `organiclever-web-e2e` - Playwright FE E2E tests for organiclever-web
+- 🧪 `organiclever-be-e2e` - Playwright BE E2E tests for organiclever-be
 
 **Tech Stack:**
 

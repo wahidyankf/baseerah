@@ -113,13 +113,14 @@ fn walk_naming_path(root: &str, exempt_globs: &[String]) -> Vec<DocsNamingFindin
 
 /// Returns `true` when `basename` should be skipped during naming validation.
 ///
-/// `README.md`, `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, and `LICENSING-NOTICE.md`
-/// are always exempt (all are fixed filenames dictated by an external convention — GitHub-style
-/// directory indexes, the Claude Code Agent Skills spec, the agents.md standard, the Claude Code
-/// root-instruction shim, GitHub's contributing-guide convention, and this repo's own
-/// licensing-notice convention, respectively — not a naming choice this repo's kebab-case rule
-/// governs; the rule's own stated scope is "files in `docs/`, `repo-governance/`, and similar
-/// repository locations", not ecosystem-standard root files). `_index.md` is likewise always
+/// `README.md`, `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `LICENSING-NOTICE.md`, and
+/// `ROADMAP.md` are always exempt (all are fixed filenames dictated by an external convention —
+/// GitHub-style directory indexes, the Claude Code Agent Skills spec, the agents.md standard, the
+/// Claude Code root-instruction shim, GitHub's contributing-guide convention, this repo's own
+/// licensing-notice convention, and GitHub's roadmap-file convention, respectively — not a naming
+/// choice this repo's kebab-case rule governs; the rule's own stated scope is "files in `docs/`,
+/// `repo-governance/`, and similar repository locations", not ecosystem-standard root files).
+/// `_index.md` is likewise always
 /// exempt: Hugo (used by every `apps/*-www` app in this repo) reserves `_index.md` as the
 /// structurally-required filename for a content section's list/branch page, not a naming choice
 /// either. This repo's Hugo content trees localize by directory (`content/en/`, `content/id/`),
@@ -136,6 +137,7 @@ fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
             | "_index.md"
             | "CONTRIBUTING.md"
             | "LICENSING-NOTICE.md"
+            | "ROADMAP.md"
     ) {
         return true;
     }
@@ -247,6 +249,22 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         fs::write(tmp.path().join("CONTRIBUTING.md"), "x").unwrap();
         fs::write(tmp.path().join("LICENSING-NOTICE.md"), "x").unwrap();
+        let findings =
+            validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    /// Regression: `ROADMAP.md` at repo root must be exempt, matching
+    /// `README.md`/`AGENTS.md`/`CLAUDE.md`/`CONTRIBUTING.md`/`LICENSING-NOTICE.md` — it is
+    /// GitHub's ecosystem-standard roadmap filename, not a naming choice the kebab-case rule
+    /// governs. `ROADMAP.md` existed since before this rule shipped but was never staged/changed in
+    /// a commit that ran `md naming validate` until a link-fix pass edited it, tripping the
+    /// pre-commit hook — same discovery pattern as the `AGENTS.md`/`CLAUDE.md` and `_index.md`
+    /// regressions above.
+    #[test]
+    fn roadmap_md_always_exempt() {
+        let tmp = TempDir::new().unwrap();
+        fs::write(tmp.path().join("ROADMAP.md"), "x").unwrap();
         let findings =
             validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.is_empty());

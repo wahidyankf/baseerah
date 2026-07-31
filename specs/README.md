@@ -26,19 +26,13 @@ Acceptance specs belong at the monorepo root rather than inside app directories 
 
 ## App Specs
 
-- **[ayokoding](./apps/ayokoding/README.md)** — AyoKoding educational website specifications (Next.js 16, multilingual programming, AI, and security tutorials)
-- **[crane](./apps/crane/README.md)** — crane-cli specifications (Content Retrieval And Normalization Engine CLI, Python/pytest-bdd)
-- **[organiclever](./apps/organiclever/README.md)** — OrganicLever fullstack specifications (F#/Giraffe backend REST API + Next.js 16 frontend)
-- **[ose](./apps/ose/README.md)** — OSE family specifications (ose-be/web GRC platform + ose-web platform site, unified under one spec tree)
 - **[rhino](./apps/rhino/README.md)** — rhino-cli specifications (Repository Hygiene and INtegration Orchestrator CLI, Rust)
-- **[wahidyankf](./apps/wahidyankf/README.md)** — wahidyankf-web specifications (personal portfolio site, Next.js 16, static)
 
 ## Library Specs
 
 - **[web-ui](./libs/web-ui/)** — Shared web UI component specifications
 - **[web-ui-token](./libs/web-ui-token/)** — Shared design-token package specifications
 - **[rust-commons](./libs/rust-commons/)** — Shared Rust utility crate specifications
-- **[fsharp-crane-core](./libs/fsharp-crane-core/)** — Shared F# PDF-to-Markdown domain/logic core specifications
 
 ## Standard Folder Pattern
 

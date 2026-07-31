@@ -110,28 +110,17 @@ func (ScopeFull) isScope() {}; func (ScopeFull) Code() string { return "full" };
 
 **Documentation Separation**:
 
-- **[AyoKoding](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/)** - "How to code in Go" (educational, universal patterns)
-
-> **Note**: `ose-public` no longer ships a Go style-guide tree under `docs/explanation/`; Go was removed from active apps (the CLIs are now Rust). This agent authors Go for the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template, which is authoritative for Go standards. Use the AyoKoding educational content below for universal Go idioms.
-
-**You MUST complete the AyoKoding Go learning path before authoring Go:**
-
-1. **[Go Learning Path](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/)** - Initial setup, overview, quick start (0-95% language coverage)
-2. **[Go By Example](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/by-example/)** - 75+ annotated code examples (beginner to advanced)
-3. **[Go In the Field](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/in-the-field/)** - 37+ production implementation guides (standard library first, framework integration)
-4. **[Go Release Highlights](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/release-highlights/)** - Go 1.18-1.26 features (generics, fuzzing, PGO, iterators, Green Tea GC default, self-referential generics, errors.AsType)
+> **Note**: `ose-public` carries no Go documentation of any kind — no style-guide tree under `docs/explanation/` and no educational tutorial tree (Go was removed from active apps; the CLIs are now Rust). This agent authors Go for the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template, which is authoritative for both Go standards and Go learning material. Apply universal Go idioms (Effective Go, standard-library-first, generics, error wrapping) from general knowledge and `ose-primer`.
 
 **See**: [Programming Language Documentation Separation](../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 
 ## Coding Standards
 
-**Authoritative Reference**: The AyoKoding Go educational content at [`apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/`](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/), plus the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template for Go style guides. `ose-public` no longer hosts a Go style-guide tree under `docs/explanation/`.
+**Authoritative Reference**: The downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template for Go style guides. `ose-public` hosts no Go style-guide or tutorial tree of any kind.
 
-All Go code MUST follow universal Go idioms covered in the AyoKoding learning path:
-
-1. **[Go Overview](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/overview.md)** - Naming conventions, package organization, Effective Go idioms
-2. **[Go By Example](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/by-example/)** - Annotated patterns including testing, concurrency, error handling, generics
-3. **[Go In the Field](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/in-the-field/)** - Production guides: security, DDD, API design, performance, dependency management
+All Go code MUST follow universal Go idioms: naming conventions, package organization, Effective Go
+principles, testing, concurrency, error handling, and generics — applied from general knowledge and
+`ose-primer`'s standards.
 
 **See `swe-programming-golang` Skill** for quick access to coding standards during development.
 
@@ -154,7 +143,7 @@ All Go code MUST follow universal Go idioms covered in the AyoKoding learning pa
 
 **Coding Standards** (Authoritative):
 
-- [AyoKoding Go learning path](../../apps/ayokoding-www/content/en/learn/legacy/software-engineering/programming-languages/golang/) - Universal Go idioms (ose-public no longer ships a Go style-guide tree; downstream Go standards live in `ose-primer`)
+- [`ose-primer`](https://github.com/wahidyankf/ose-primer) - `ose-public` ships no Go style-guide or tutorial tree; downstream Go standards live in `ose-primer`
 
 **Development Practices**:
 

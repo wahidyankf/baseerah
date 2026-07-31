@@ -803,7 +803,6 @@ Before publishing programming language documentation:
 **Platform Documentation**:
 
 - [Software Design Index](../../../docs/explanation/software-engineering/README.md) - Parent documentation for programming language style guides
-- [ayokoding-www](../../../apps/ayokoding-www/README.md) - Educational programming content platform
 
 **Repository Architecture**:
 
