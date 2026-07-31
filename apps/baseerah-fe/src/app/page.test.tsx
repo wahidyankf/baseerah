@@ -27,4 +27,17 @@ describe("Backend hello world", () => {
     expect(arabic).toHaveAttribute("lang", "ar");
     expect(arabic).toHaveAttribute("dir", "rtl");
   });
+
+  test("tells a first-time visitor what Baseerah is, glosses the multilingual chip, and offers a way to learn more", async () => {
+    const { default: Page } = await import("./page");
+    render(await Page());
+
+    expect(screen.getByText(/Baseerah is a personal operating layer/i)).toBeInTheDocument();
+
+    const chip = screen.getByText("بصيرة").closest("div");
+    expect(chip).toHaveAttribute("title", "insight (English) · wawasan (Indonesian) · بصيرة (Arabic)");
+
+    const githubLink = screen.getByRole("link", { name: /view on github/i });
+    expect(githubLink).toHaveAttribute("href", "https://github.com/wahidyankf/baseerah");
+  });
 });

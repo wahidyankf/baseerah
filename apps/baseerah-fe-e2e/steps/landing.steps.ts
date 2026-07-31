@@ -48,3 +48,48 @@ Then("the page shows the text {string} sourced from the backend", async ({ page,
   expect(body.message).toBe(text);
   await expect(page.getByText(text)).toBeVisible();
 });
+
+// @covers specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature:The homepage tells a first-time visitor what Baseerah is
+Given("a first-time visitor with no prior context navigates to {string}", async ({ page }, path: string) => {
+  await page.context().clearCookies();
+  await page.goto(path);
+});
+
+When("the page finishes loading", async ({ page }) => {
+  await page.waitForLoadState("networkidle");
+});
+
+Then("a one-line description of what Baseerah does is visible without scrolling", async ({ page }) => {
+  await expect(page.getByText(/Baseerah is a personal operating layer/i)).toBeVisible();
+});
+
+// @covers specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature:The multilingual brand chip is understandable to a non-Arabic, non-Indonesian reader
+Given("a first-time visitor viewing the homepage brand chip", async ({ page }) => {
+  await page.goto("/");
+});
+
+When('they read or hover the "بصيرة" and "wawasan" terms', async ({ page }) => {
+  await page.getByText("بصيرة").hover();
+});
+
+Then("a plain-language English gloss or tooltip explains what each term means", async ({ page }) => {
+  const chip = page.getByText("بصيرة").locator("..");
+  await expect(chip).toHaveAttribute("title", "insight (English) · wawasan (Indonesian) · بصيرة (Arabic)");
+});
+
+// @covers specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature:A visitor to a non-existent path can recover
+Given("a visitor navigates to a non-existent path on baseerah-fe", async ({ page }) => {
+  await page.goto("/this-route-does-not-exist");
+});
+
+When("the 404 page renders", async ({ page }) => {
+  await page.waitForLoadState("networkidle");
+});
+
+Then("it shows Baseerah branding", async ({ page }) => {
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Baseerah");
+});
+
+Then("it offers a link back to the homepage", async ({ page }) => {
+  await expect(page.getByRole("link", { name: /back to home/i })).toHaveAttribute("href", "/");
+});

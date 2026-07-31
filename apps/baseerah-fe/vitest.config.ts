@@ -18,6 +18,9 @@ export default defineConfig({
       exclude: [
         // Next.js route infrastructure — covered by e2e, not unit tests
         "src/app/layout.tsx",
+        // Uses next/og's ImageResponse, which jsdom can't meaningfully render; verified via
+        // curl/Playwright against a real build instead (see delivery.md EWT-005/UWT-006 fix).
+        "src/app/icon.tsx",
         "src/env.ts",
         "src/test/**",
         "src/generated-contracts/**",

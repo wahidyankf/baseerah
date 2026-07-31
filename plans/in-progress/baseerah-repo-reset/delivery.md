@@ -2362,16 +2362,472 @@ assertions, and app-group CI callers`); commit `629b01723`, 15 files changed.
 > [prd.md](./prd.md#justify), not a separate locale route), so this round covers
 > that single locale in full; there is no second locale to retest.
 
-- [ ] [AI] With `baseerah-be` and `baseerah-fe` both running locally, invoke the
+- [x] [AI] With `baseerah-be` and `baseerah-fe` both running locally, invoke the
       [`web-ux-test-fixing-planning`](../../../repo-governance/workflows/web/web-ux-test-fixing-planning.md)
       workflow against `http://localhost:19310` with `output-mode: delivery` and this plan's path —
       acceptance: the workflow runs `web-exploratory-tester`, `web-usability-tester`, and
       `web-design-tester`, and this section is populated in place with their findings as unchecked
       `- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN:` checkboxes (or states explicitly that
-      zero findings were returned).
-- [ ] [AI] Fix every `EWT-NNN`/`UWT-NNN`/`DWT-NNN` checkbox recorded above and tick it — acceptance:
+      zero findings were returned). **Done**: per the workflow's own "Output-mode note" and
+      `plan-execution.md`'s Rule-15 procedure, the three testers were invoked **directly** (not via
+      the full `web-ux-test-fixing-planning` workflow, which defaults to filing a brand-new separate
+      backlog plan) — each with `output-mode: delivery` and this plan's path, run sequentially
+      (`web-exploratory-tester` → `web-usability-tester` → `web-design-tester`, each folding its
+      findings in before the next ran). Result: 5 `EWT-NNN` + 1 `SG-001` (exploratory), 6 `UWT-NNN` +
+      4 `USS-NNN` (usability), 4 `DWT-NNN` + 1 `SG-002` (design) — all recorded below.
+
+**`web-exploratory-tester` findings, recorded 2026-07-31** — non-destructive session against
+`http://localhost:19310` (single supported locale `en`; breakpoints 320/375/768/1024/1280/1440 px;
+`baseerah-be` toggled off and back on via `docker stop`/`docker start` to observe the backend-down
+edge case, then verified healthy again — no lasting side effects). Ground truth:
+`specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature`,
+[`prd.md` §Justify — Accessibility commitments](./prd.md#justify). The two existing Gherkin
+scenarios (product naming + backend greeting; baseline a11y scan on `/`) were both exercised and
+PASS as written — `axe-core` reports **zero** violations on `/` at every breakpoint, matching
+Scenario 2 verbatim. All findings below are on surfaces/states the existing scenarios do not cover
+(the 404 and backend-down paths), so none of them is a divergence from an existing passing
+scenario.
+
+- [x] EWT-001: Navigating to any unknown path (e.g. `/this-route-does-not-exist`) serves Next.js's
+      generic built-in 404 fallback instead of a Baseerah-branded page, because
+      `apps/baseerah-fe/src/app/` defines no `not-found.tsx`. **Severity**: Minor. **Priority**:
+      Medium (violates the general spirit of the [`prd.md` §Justify](./prd.md#justify) commitment
+      "the page uses real landmarks — `<header>`, `<main>`, `<footer>` — and exactly one `<h1>`",
+      which the fallback page does not honor). **Steps**: `curl -sS http://localhost:19310/does-not-exist`
+      or navigate there in a browser. **Expected**: a Baseerah-shelled 404 page reusing `AppShell`
+      (or at minimum the same header/footer landmarks as `/`). **Actual**: the generic Next.js
+      "404: This page could not be found." page renders with **zero** `<header>`/`<footer>`
+      elements (confirmed via Playwright: `header: 0, footer: 0` vs. `header: 1, footer: 1` on `/`)
+      and its own bare `<h1>404</h1>`, not the site's single branded `<h1>Baseerah</h1>`.
+      `@axe-core/playwright` reports **2 moderate violations** on this page
+      (`landmark-one-main`, `region`) that do not occur on `/` (0 violations) — a regression in
+      accessibility posture specific to this unhandled surface. **Evidence**:
+      `./evidence/phase-ewt-notfound-en-1280px.png`; axe output:
+      `{"violationCount":2,"relevant404":[{"id":"landmark-one-main","impact":"moderate","help":"Document should have one main landmark","nodes":1},{"id":"region","impact":"moderate","help":"All page content should be contained by landmarks","nodes":2}]}`.
+      **Reproducibility**: Always. **Defect type**: Accessibility / Consistency. **Suggested fix
+      locus**: add `apps/baseerah-fe/src/app/not-found.tsx` reusing `AppShell`/`AppHeader`.
+      **Fixed**: added `apps/baseerah-fe/src/app/not-found.tsx` and a shared `AppFrame` chrome
+      component (also reused by `error.tsx` and `AppShell`) — the 404 page now renders the same
+      header/main/footer landmarks and a single branded `<h1>Baseerah</h1>`. Verified via
+      `not-found.test.tsx` and the new e2e scenario "A visitor to a non-existent path can recover"
+      (both green).
+- [x] EWT-002: The same unhandled-404 fallback page renders **3** `<title>` elements inside
+      `<head>` simultaneously (`"Baseerah"`, `"404: This page could not be found."`, `"Baseerah"`
+      again) instead of the single `<title>` the HTML standard permits per document. **Severity**:
+      Trivial. **Priority**: Low. **Steps**: navigate to `http://localhost:19310/does-not-exist` and
+      run `document.querySelectorAll('head > title').length` in the console (or
+      `page.locator("head > title").count()` via Playwright). **Expected**: exactly one `<title>`
+      element, ideally reading something like "404 · Baseerah". **Actual**: 3 `<title>` elements;
+      the browser resolves `document.title` to the uninformative `"Baseerah"` (the first one found)
+      rather than anything indicating the page is a 404. **Evidence**: Playwright output —
+      `{"titleTagCount":3,"titleTags":["Baseerah","404: This page could not be found.","Baseerah"],"docTitle":"Baseerah"}`.
+      **Reproducibility**: Always. **Defect type**: UI / Accessibility (invalid markup — HTML permits
+      at most one `title` per document). **Suggested fix locus**: same `not-found.tsx` addition as
+      EWT-001, which also removes the conflicting metadata title.
+      **Fixed**: `not-found.tsx` exports its own `metadata: { title: "404 · Baseerah" }`; the custom
+      page replaces Next's built-in fallback entirely so there is exactly one `<title>` now.
+- [x] EWT-003: When `baseerah-be` is unreachable, `GET /` correctly fails loud with HTTP 500 (no
+      stale/cached greeting is silently served — confirmed via `curl -sS -D - http://localhost:19310/`
+      returning `HTTP/1.1 500 Internal Server Error` while `baseerah-app-baseerah-be-1` was
+      `docker stop`-ped), but the rendered error page is Next.js's fully generic, unbranded
+      `__next_error__` boundary — no `AppShell`, no `<header>`/`<footer>`, no user-facing message,
+      only an opaque `{"digest":"..."}` — because `apps/baseerah-fe/src/app/` defines no
+      `error.tsx`. **Severity**: Minor (scaffold-appropriate; the 500 status itself is correct and
+      no core flow silently misbehaves). **Priority**: Medium. **Steps**:
+      `docker stop baseerah-app-baseerah-be-1 && curl -sS -D - http://localhost:19310/`, then
+      `docker start baseerah-app-baseerah-be-1` to restore (verified healthy again afterward —
+      `curl -sS http://localhost:19320/api/v1/hello` → `{"message":"Hello from Baseerah"}`).
+      **Expected**: an on-brand degraded state (e.g. `AppShell` with an apology message), still
+      returning a 5xx status. **Actual**: the blank generic Next.js error boundary page. **Evidence**:
+      `./evidence/phase-ewt-backend-down-en-1280px.png`. **Reproducibility**: Always (while backend
+      is down). **Defect type**: Functional / UI / Consistency. **Suggested fix locus**: add
+      `apps/baseerah-fe/src/app/error.tsx` reusing `AppShell`.
+      **Fixed**: added `apps/baseerah-fe/src/app/error.tsx` (a Client Component, per Next.js's
+      App Router requirement for `error.tsx`) reusing the same `AppFrame` chrome, with a "Try
+      again" button calling `reset()`. Verified via `error.test.tsx` (renders branded
+      header/main/footer + calls `reset` on click); `fetchGreeting`'s throw-on-missing-data
+      behavior (which triggers this boundary) was already covered by
+      `greeting-client.test.ts`.
+- [x] EWT-004: `baseerah-fe` sends no baseline security response headers on `/` —
+      `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`/CSP
+      `frame-ancestors`, `Referrer-Policy`, and `Permissions-Policy` are all absent — and discloses
+      its framework via `X-Powered-By: Next.js`. **Severity**: Minor. **Priority**: Low (local
+      scaffold, not yet publicly deployed, but the gap carries forward unless addressed before wider
+      exposure). **Steps**: `curl -sS -D - -o /dev/null http://localhost:19310/`. **Expected**: at
+      minimum `X-Content-Type-Options: nosniff`, a `Referrer-Policy`, and `poweredByHeader: false`
+      in `next.config.ts`. **Actual**: none of the observation headers present; `X-Powered-By:
+Next.js` present. **Evidence**: header dump shows only
+      `Vary`, `link`, `X-Powered-By: Next.js`, `Cache-Control`, `Content-Type`, `Date`, `Connection`,
+      `Keep-Alive`, `Transfer-Encoding` — no security headers. **Reproducibility**: Always.
+      **Defect type**: Security (passive/observational only — no exploit attempted). **Suggested fix
+      locus**: `apps/baseerah-fe/next.config.ts` — add a `headers()` function and set
+      `poweredByHeader: false`.
+      **Fixed**: `next.config.ts` now sets `poweredByHeader: false` and a `headers()` function
+      adding `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`,
+      and `Content-Security-Policy: frame-ancestors 'none'` to every route. Verified via
+      `curl -sS -D - -o /dev/null http://localhost:19310/` against the rebuilt Docker image — all
+      five headers present, `X-Powered-By` gone.
+- [x] EWT-005: `apps/baseerah-fe` ships no favicon asset — `GET /favicon.ico` returns Next.js's own
+      404 (`Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate`, prerendered),
+      confirmed no `favicon`/`icon` file exists anywhere under
+      `apps/baseerah-fe/src/app/` via `find`. **Severity**: Trivial. **Priority**: Low. **Steps**:
+      `curl -sS -o /dev/null -w "%{http_code}\n" http://localhost:19310/favicon.ico` → `404`.
+      **Expected**: a Baseerah-branded favicon (e.g. derived from the بصيرة chip) returning 200.
+      **Actual**: 404, generic browser-tab icon shown. **Evidence**: curl status code above.
+      **Reproducibility**: Always. **Defect type**: UI / Content. **Suggested fix locus**: add
+      `apps/baseerah-fe/src/app/icon.png` (or `favicon.ico`) per Next.js App Router file
+      conventions.
+      **Fixed**: added `apps/baseerah-fe/src/app/icon.tsx` (a `next/og` `ImageResponse` rendering a
+      32×32 branded "ب" mark on the primary-blue token colour). Verified against the rebuilt Docker
+      image: `GET /icon` returns `200`/`image/png`, and the served HTML now declares
+      `<link rel="icon" href="/icon?...">`, so the browser tab shows the branded icon (confirmed via
+      Playwright — the prior favicon-404 console error is gone). The legacy static
+      `GET /favicon.ico` path itself still 404s (Next.js's `icon.tsx` and `favicon.ico` are separate
+      conventions), but that path is no longer what any current browser actually uses for the tab
+      icon, so the observable defect (generic/missing tab icon) is resolved.
+- [x] SG-001: **Proposed Gherkin gap** — the backend-down fail-loud behavior verified while
+      producing EWT-003 (HTTP 5xx returned, no stale/cached greeting silently served, per
+      `apps/baseerah-fe/src/app/page.tsx`'s `export const dynamic = "force-dynamic"` and
+      `greeting-client.ts`'s `throwOnError: false` + explicit `throw` on missing data) is itself
+      correct, intended behavior but is not covered by any scenario in
+      `specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature`. Propose adding:
+      `Scenario: The landing page fails loudly when the backend is unreachable\n  Given baseerah-be is not reachable from baseerah-fe\n  When I navigate to "/"\n  Then the response status is 5xx\n  And no stale or cached greeting is served`
+      to that feature file (best paired with the EWT-003 fix, so the new `error.tsx` becomes the
+      scenario's asserted rendered state too).
+      **Triaged, not added as a new Gherkin scenario**: the underlying behavior itself is already
+      fixed (EWT-003) and covered by `greeting-client.test.ts` (throw-on-missing-data) and
+      `error.test.tsx` (branded rendering) at the unit level. Automating the _end-to-end_ scenario
+      would require the shared e2e Playwright suite to stop/start the `baseerah-be` Docker
+      container mid-run (the SSR fetch happens server-side, so `page.route()` can't fault-inject
+      it — the same limitation already documented in `apps/baseerah-fe-e2e/steps/landing.steps.ts`).
+      That is real operational risk in an unattended CI suite (container-name assumptions, races
+      with other jobs) for a proposal-tier item; deferred as a backlog e2e-hardening candidate
+      rather than added now.
+
+**`web-usability-tester` findings, recorded 2026-07-31** — non-destructive, spec-blind heuristic
+evaluation of `http://localhost:19310` (single supported locale `en`; breakpoints 320/375/768/1280 px
+via Playwright, `npx playwright` screenshots saved to `./evidence/phase-uwt-landing-en-*px.png`;
+`curl -D -` against `/`, `/nonexistent-page`, `/favicon.ico`, `/robots.txt`, `/sitemap.xml`). No
+console/page errors at any breakpoint; content and DOM identical across all four breakpoints (no
+responsive-parity defect); `html[lang]="en"` correct; 0 focusable/interactive elements found on the
+page at any breakpoint. Ground truth was **not** read (`specs/**` untouched) — every finding below
+cites a Nielsen heuristic, UX law, ISO 9241-110 principle, or WCAG criterion instead.
+
+- [x] UWT-001: **Landing page is a self-descriptiveness dead end — no next step, nav, or product
+      explanation** — cognitive walkthrough (persona: first-time visitor, task: "understand what
+      Baseerah is and decide whether to continue") fails at Question 1 (will the user try to achieve
+      the right result?) and Question 2 (will they notice a correct action?): the rendered page has
+      zero links, buttons, or nav (`0` focusable/interactive elements confirmed via
+      `page.$$eval('a, button, input, select, textarea, [tabindex]', …)` at 320/375/768/1280px), and
+      no visible tagline states what the product does — only "Baseerah" (header), a decorative
+      chip, and "Hello from Baseerah" (main). Violates ISO 9241-110 §2 self-descriptiveness and
+      Krug's self-evident-page rule; also Heuristic 4 (external consistency / Jakob's Law — virtually
+      every site offers at least one nav or footer link, this offers none). Severity 3 (major;
+      persistent every visit, no path forward for any user). Steps to reproduce: navigate to
+      `http://localhost:19310/` in a fresh browser tab with no prior context; observe there is
+      nothing to click and nothing explaining the product's purpose. Evidence:
+      `./evidence/phase-uwt-landing-en-1280px.png`. Suggested clarification: add a one-line tagline
+      describing what Baseerah does, and at least one link (even a placeholder "Learn more" or repo
+      link) so the page is not a dead end.
+      **Fixed**: added a one-line tagline ("Baseerah is a personal operating layer — an AI
+      assistant, a content builder, a posting helper, and a workflow engine in one.") and a
+      "View on GitHub" link to `AppShell`. Verified via `page.test.tsx` and the new e2e scenario
+      "The homepage tells a first-time visitor what Baseerah is".
+- [x] UWT-002: **Footer leaks raw internal implementation detail to end users** — the footer renders
+      verbatim `baseerah-fe · connected to :19320` on every page load — the app's internal Nx-project
+      name (`-fe` suffix) and a raw backend port number, neither of which means anything to a
+      first-time visitor. Violates Heuristic 2 (Match Between System and the Real World — no internal
+      jargon) and Heuristic 8 (Aesthetic & Minimalist Design — irrelevant technical content competing
+      for attention); rated up from a nominal "minor" because it is maximally visible (footer of the
+      only page, every visit) per NN/g's severity guidance for highly-visible problems. Severity 3.
+      Steps to reproduce: load `http://localhost:19310/`; read the footer. Actual text (verbatim):
+      "baseerah-fe · connected to :19320". Evidence: `./evidence/phase-uwt-landing-en-1280px.png`.
+      Suggested clarification: replace with plain-language copy (e.g. a copyright line, or omit the
+      footer entirely) with no internal service names or raw ports.
+      **Fixed**: the shared `AppFrame` footer now reads "© Baseerah" — no service name, no port
+      number, on every surface (landing, 404, error). Verified via manual `curl`/Playwright check
+      against the rebuilt Docker image.
+- [x] UWT-003: **Multilingual brand chip shows unglossed foreign-language terms** — the chip renders
+      `بصيرة` (Arabic script, `lang="ar" dir="rtl"`) beside `insight · wawasan`; "wawasan" (Indonesian)
+      is presented with no translation, tooltip, or gloss, and the Arabic script itself is
+      undecipherable to a non-Arabic-reading first-time visitor. Violates Heuristic 2 (Match Between
+      System and the Real World) and the Mandatory Systematic Probe B (per-label jargon scan); also
+      touches WCAG 2.2 Understandable (unusual/foreign terms with no identification mechanism).
+      Severity 2 (minor — decorative, does not block a task, but a first-time reader genuinely cannot
+      decode it without external help). Steps to reproduce: load `http://localhost:19310/`; read the
+      chip text. Evidence: `./evidence/phase-uwt-landing-en-1280px.png`. Suggested clarification: add
+      a `title` attribute or adjacent gloss translating both terms (e.g. "insight (English) ·
+      wawasan (Indonesian) · بصيرة (Arabic)").
+      **Fixed**: added exactly that `title` attribute to the chip's wrapping `<div>`. Verified via
+      `page.test.tsx` and the new e2e scenario "The multilingual brand chip is understandable to a
+      non-Arabic, non-Indonesian reader".
+- [x] UWT-004: **Generic unbranded 404 page strands lost visitors** — `curl` to
+      `http://localhost:19310/nonexistent-page` returns HTTP 404 with the stock Next.js
+      "404: This page could not be found." page: no Baseerah branding, no header, no footer, and no
+      link back to the homepage — a visitor who mistypes a URL or follows a stale link has no
+      in-page way back except manually editing the address bar. Violates Heuristic 9 (Help Users
+      Recognize, Diagnose, and Recover from Errors) — the message names the problem but offers no
+      recovery path. Severity 3 (major — every broken/mistyped link is an unrecoverable dead end).
+      Steps to reproduce: `curl -sS http://localhost:19310/nonexistent-page` (or navigate to it in a
+      browser) — response is the bare "404: This page could not be found." page with no navigation.
+      Suggested clarification: add a custom `not-found.tsx` with Baseerah branding and a link back to
+      `/`.
+      **Fixed**: same `not-found.tsx` as EWT-001/DWT-003, which includes a "Back to home" link to
+      `/`. Verified via `not-found.test.tsx` and the e2e scenario "A visitor to a non-existent path
+      can recover".
+- [x] UWT-005: **Visual hierarchy inversion — placeholder-style greeting outweighs site identity** —
+      "Hello from Baseerah" renders at `text-4xl font-bold` (the single largest, boldest text on the
+      page), while the actual site heading "Baseerah" in the header renders at `text-xl` — a
+      first-time visitor's eye is drawn most strongly to a generic hello-world-style greeting rather
+      than to any statement of product identity or purpose. Violates Heuristic 8 (Aesthetic &
+      Minimalist Design / Law of Prägnanz — visual prominence should track informational importance).
+      Severity 2 (minor; compounds UWT-001 but does not independently block a task). Steps to
+      reproduce: load `http://localhost:19310/` at 1280px; compare font sizes of the header "Baseerah"
+      versus the main "Hello from Baseerah". Evidence: `./evidence/phase-uwt-landing-en-1280px.png`.
+      Suggested clarification: either de-emphasize the greeting or add a genuinely prominent tagline
+      that explains the product.
+      **Fixed**: both — the new tagline (`text-lg`) is now the most prominent body text, and the
+      backend-sourced greeting was demoted to `text-sm text-muted-foreground` (previously
+      `text-4xl font-bold`), so visual weight now tracks informational importance: header identity > tagline > chip > greeting. Verified via manual Playwright screenshot against the rebuilt
+      Docker image.
+- [x] UWT-006: **Missing favicon hampers tab recognition among multiple open tabs** —
+      `curl -D - http://localhost:19310/favicon.ico` returns HTTP 404; the page relies on the `<title>`
+      text alone ("Baseerah") for tab identification, with no icon. Violates Heuristic 6 (Recognition
+      Rather Than Recall — a visual icon lets a user re-find a tab without reading text). Severity 1
+      (cosmetic; low impact, single-tab-typical usage). Steps to reproduce:
+      `curl -sS -D - -o /dev/null http://localhost:19310/favicon.ico` — 404 Not Found. Suggested
+      clarification: add a favicon under `apps/baseerah-fe/src/app/`.
+      **Fixed**: same `apps/baseerah-fe/src/app/icon.tsx` as EWT-005 — the tab now shows a real
+      branded icon via `<link rel="icon" href="/icon?...">` (confirmed present in the served HTML
+      and via Playwright, which also confirmed the prior favicon-404 console error no longer
+      appears).
+- [x] USS-001: **Proposed Gherkin — friendly fallback when the backend is unreachable** — grounded in
+      Heuristic 1 (Visibility of System Status) and Heuristic 9, paired conceptually with UWT-001 (no
+      edge-state affordance was directly re-exercised here since stopping the shared docker-compose
+      stack was out of scope for this pass's non-destructive session — see the sibling
+      `web-exploratory-tester`'s EWT-003/SG-001 entries above for the observed backend-down behavior).
+      Proposed scenario: `Scenario: The homepage explains itself when the backend is unreachable\n  Given a first-time visitor with no prior context\n  When baseerah-be is unreachable and the page fails to load the greeting\n  Then the visitor sees a plain-language explanation, not a blank or broken-looking page\n  And the visitor is offered a way to retry`.
+      **Spec-blind caveat**: this agent did not read `specs/**`; a spec-aware reviewer must confirm
+      this is not already covered (it may overlap with `SG-001` above) before adding it.
+      **Triaged as a duplicate of `SG-001`**: confirmed by the spec-aware reconciliation this
+      caveat asked for — same underlying behavior (backend-unreachable → plain-language degraded
+      state), already fixed via `error.tsx` and unit-tested (see `SG-001`'s note above for why the
+      end-to-end Gherkin automation itself is deferred rather than added now).
+- [x] USS-002: **Proposed Gherkin — self-descriptive tagline on first load** — paired with UWT-001;
+      grounded in ISO 9241-110 §2 self-descriptiveness. Proposed scenario:
+      `Scenario: The homepage tells a first-time visitor what Baseerah is\n  Given a first-time visitor with no prior context navigates to "/"\n  When the page finishes loading\n  Then a one-line description of what Baseerah does is visible without scrolling`.
+      **Spec-blind caveat**: this agent did not read `specs/**`; a spec-aware reviewer must confirm
+      this is not already covered before adding it.
+      **Added**: confirmed not already covered, so added as-is to `landing-page.feature`
+      ("The homepage tells a first-time visitor what Baseerah is"), with matching unit
+      (`page.test.tsx`) and e2e (`baseerah-fe-e2e`) step implementations — both green.
+- [x] USS-003: **Proposed Gherkin — gloss the multilingual brand chip** — paired with UWT-003;
+      grounded in Heuristic 2 (Match Between System and the Real World). Proposed scenario:
+      `Scenario: The multilingual brand chip is understandable to a non-Arabic, non-Indonesian reader\n  Given a first-time visitor viewing the homepage brand chip\n  When they read or hover the "بصيرة" and "wawasan" terms\n  Then a plain-language English gloss or tooltip explains what each term means`.
+      **Spec-blind caveat**: this agent did not read `specs/**`; a spec-aware reviewer must confirm
+      this is not already covered before adding it.
+      **Added**: confirmed not already covered, so added as-is to `landing-page.feature`
+      ("The multilingual brand chip is understandable to a non-Arabic, non-Indonesian reader"),
+      with matching unit and e2e step implementations — both green.
+- [x] USS-004: **Proposed Gherkin — branded, recoverable 404 page** — paired with UWT-004; grounded
+      in Heuristic 9 (Help Users Recognize, Diagnose, and Recover from Errors). Proposed scenario:
+      `Scenario: A visitor to a non-existent path can recover\n  Given a visitor navigates to a non-existent path on baseerah-fe\n  When the 404 page renders\n  Then it shows Baseerah branding\n  And it offers a link back to the homepage`.
+      **Spec-blind caveat**: this agent did not read `specs/**`; a spec-aware reviewer must confirm
+      this is not already covered before adding it.
+      **Added**: confirmed not already covered, so added as-is to `landing-page.feature`
+      ("A visitor to a non-existent path can recover"), with matching unit (`not-found.test.tsx`)
+      and e2e step implementations — both green.
+
+**`web-design-tester` findings, recorded 2026-07-31** — non-destructive design-fidelity pass against
+`http://localhost:19310` (single supported locale `en`; breakpoints 320/375/768/1280 px via
+`npx playwright`, computed styles read via `page.evaluate(getComputedStyle(...))`, no external
+Figma/mockup URL supplied so that ground-truth source is skipped). Five ground-truth sources
+consulted: (1) committed hi-fi mockups `./assets/landing-desktop-1280.png`,
+`./assets/landing-tablet-768.png`, `./assets/landing-mobile-390.png`; (2) runtime design tokens at
+`libs/web-ui-token/src/baseerah.css`; (3) `libs/web-ui` primitives (`AppHeader`, `Badge`); (4) no
+external source; (5) general design-practice principles (visual hierarchy, alignment, Gestalt
+proximity/consistency), cited inline without needing `web-researcher` delegation since each is a
+well-established, non-contested design heuristic already used elsewhere in this same section.
+Mandatory Systematic Checks: the raw/unstyled native-element audit (A) and the intra-form/
+cross-surface styling-consistency matrix (B) are **both vacuous on this page** — `document.querySelectorAll('a,button,input,select,textarea,[tabindex]').length === 0`
+at every breakpoint (confirmed independently of `web-usability-tester`'s UWT-001 count), so there are
+no native controls to enumerate and no repeated control-kind to matrix; this is recorded as covered,
+not skipped. Chip/badge accent colors (`bg-accent`/`text-accent-foreground`), the chip's `rounded-lg`
+radius (computed `14px`, matching `--radius-lg`), the footer's `bg-secondary`/`border-t` tokens, and
+the responsive `flex-direction` swap of the identity chip (`column` at 320/375 px, `row` at 768/1280 px,
+matching all three mockups) all read back as correct, on-token, on-mockup fidelity — no findings on
+those elements.
+
+- [x] DWT-001: **The shared `AppHeader` primitive's own Tailwind utility classes are entirely absent
+      from the compiled runtime CSS, so the header renders fully unstyled at every breakpoint** — a
+      runtime-only defect invisible to a static source read (the JSX correctly carries
+      `px-4 py-3 gap-3 items-center` on the `<header>` and `truncate text-xl leading-none
+font-extrabold tracking-tight` on the `<h1>`, per `libs/web-ui/src/components/app-header/app-header.tsx`
+      lines 12 and 24). **Violated ground truth**: mockup fidelity — all three committed hi-fi mockups
+      (`./assets/landing-desktop-1280.png`, `./assets/landing-tablet-768.png`,
+      `./assets/landing-mobile-390.png`) show a padded, bordered header row roughly 64-72px tall with
+      bold, primary-blue "Baseerah" text — **and** runtime token fidelity — the `--color-primary`
+      token (`var(--hue-sky)`, `libs/web-ui-token/src/baseerah.css` line 52) and the `--text-xl`/
+      `--font-weight-extrabold` type-scale tokens never reach the rendered `<h1>`. **Severity**:
+      Critical (the only page's primary chrome element — the brand mark itself — renders with zero
+      design-system styling). **Priority**: High. **Environment**: `http://localhost:19310/`, `en`,
+      Chromium via Playwright 1.60.0, viewports 320/375/768/1280 px, 2026-07-31. **Steps to
+      reproduce**: (1) navigate to `http://localhost:19310/` at any of 320/375/768/1280 px; (2) run
+      `getComputedStyle(document.querySelector('header')).height` and
+      `getComputedStyle(document.querySelector('header h1')).fontSize` in the console (or via
+      Playwright `page.evaluate`); (3) `curl -s http://localhost:19310/_next/static/chunks/0kxmc_f.tvcvd.css | grep -c 'text-xl\|px-4'`.
+      **Expected**: header bounding box padded to roughly `py-3`/`px-4` (12px/16px) plus `text-xl`
+      (20px) line-height, `<h1>` `font-size: 20px` bold-800, ideally coloured with the primary token
+      per the mockups. **Actual**: header bounding box is `{x:0,y:0,w:<viewport>,h:24}` at **every**
+      breakpoint tested (320/375/768/1280); `<h1>` computed `font-size: 16px`, `font-weight: 400`,
+      `color: lab(5.2 -0.19 -5.13)` (the plain `--color-foreground` default, not primary); the
+      compiled CSS bundle `0kxmc_f.tvcvd.css` (the page's **only** loaded stylesheet) contains
+      exactly 31 class selectors total and **zero** occurrences of `.px-4`, `.text-xl`,
+      `.font-extrabold`, `.tracking-tight`, `.gap-3`, or `.min-w-0` — the classes used only inside
+      `AppHeader.tsx`/its wrapping `<div>` in `AppShell.tsx` — while sibling classes used directly in
+      `apps/baseerah-fe/src/components/AppShell.tsx` (`.text-2xl`, `.font-semibold`, `.px-5`, `.py-2`,
+      `.rounded-lg`, `.px-8`, `.py-4`, `.text-4xl`, `.font-bold`, `.bg-secondary`, `.border-t`) are all
+      present and correctly styled. **Evidence**:
+      `./evidence/phase-dwt-header-unstyled-en-1280px.png` (fresh crop of the header region showing
+      bare, unpadded, uncoloured text); corroborated by the pre-existing
+      `./evidence/phase-ewt-landing-en-1280px.png` and `./evidence/phase-ewt-landing-en-375px.png`.
+      **Reproducibility**: Always, all four breakpoints tested. **Defect type**: Token / Consistency
+      (a `libs/web-ui`-only component's utility classes are dropped from the compiled output).
+      **Suggested fix locus**: `apps/baseerah-fe/src/app/globals.css`'s
+      `@source "../../../../libs/web-ui/src/**/*.{ts,tsx}";` directive / the app's Tailwind v4 content
+      scanning — the path resolves correctly on disk
+      (`ls apps/baseerah-fe/src/app/../../../../libs/web-ui/src/components/app-header/app-header.tsx`
+      succeeds) but the compiled bundle proves the scan is not actually picking up classes used only
+      inside that file; `baseerah-fe` is the only current consumer of `@source` for `libs/web-ui` in
+      this repo, so there is no working sibling app to diff against. This is a build-pipeline
+      hypothesis for a developer/`swe-ui-checker` to confirm, not a source-code claim.
+      **Fixed — root cause confirmed**: the `@source` path resolves relative to `globals.css`
+      itself; `../../../../libs/web-ui/src` lands at `/repo/libs/web-ui/src`, which is a real
+      directory in a local checkout but is **never created inside the Docker build**
+      (`apps/baseerah-fe/Dockerfile` copies `libs/web-ui/src` into
+      `node_modules/@open-sharia-enterprise/web-ui/src` instead, and no `COPY` targets `/repo/libs/`
+      at all) — the glob silently matched zero files in the shipped image. Also discovered: local
+      dev and Docker resolve the package to _different_ real paths (npm workspaces hoist it to the
+      repo-root `node_modules/` locally; the Dockerfile copies it to a nested
+      `apps/baseerah-fe/node_modules/...` instead), so a single path can't cover both — fixed with
+      two `@source` directives, one per real location, each a no-op glob in the context where it
+      doesn't apply. Verified two ways: (1) a fresh `next build` locally now has `.px-4{...}`,
+      `.text-xl{...}`, `.font-extrabold{...}` in the compiled CSS; (2) rebuilding and recreating the
+      `baseerah-app-baseerah-fe-1` Docker container and checking its _actual served_ CSS bundle
+      shows the same three selectors present, and a live Playwright check now reads
+      `header height: 44px`, `h1 font-size: 20px`, `font-weight: 800` (previously `24px`/`16px`/`400`).
+- [x] DWT-002: **Independent of DWT-001's CSS bug, the shared `AppHeader` primitive itself carries no
+      border-separator or brand-colour styling hook, so even a full CSS fix would still not match the
+      mockups' bordered, primary-blue header.** **Violated ground truth**: mockup fidelity — all three
+      committed mockups show a clear horizontal border line separating the header from the page body,
+      and the "Baseerah" wordmark rendered in bold primary blue (visually consistent with
+      `--color-primary: var(--hue-sky)`, `libs/web-ui-token/src/baseerah.css` line 52), not the plain
+      foreground/black used for body text. **Severity**: Major. **Priority**: Medium. **Environment**:
+      same as DWT-001. **Steps to reproduce**: (1) open
+      `libs/web-ui/src/components/app-header/app-header.tsx`; (2) note line 12's `<header
+className="flex items-center gap-3 px-4 py-3">` carries no `border-b`/`border-border` class and
+      no text-colour class, and no `AppHeaderProps` field exists to opt into either; (3) compare
+      against `./assets/landing-desktop-1280.png`. **Expected**: a header with a bottom border (e.g.
+      `border-b border-border`) and the brand title in a primary/accent colour, per the mockup.
+      **Actual**: `AppHeader` renders with `border-bottom-width: 0px` and inherits plain foreground
+      text colour in every story (`libs/web-ui/src/components/app-header/app-header.stories.tsx`
+      documents no colour/border variant either) — this is a generic, brand-neutral shell by design,
+      not a bug in the CSS build. **Evidence**: `./assets/landing-desktop-1280.png` vs.
+      `./evidence/phase-dwt-header-unstyled-en-1280px.png`. **Reproducibility**: Always.
+      **Defect type**: Mockup-fidelity / Consistency. **Suggested fix locus**: either
+      `apps/baseerah-fe/src/components/AppShell.tsx` (wrap the `AppHeader` usage with a bordered
+      container and pass a coloured title), or extend `libs/web-ui`'s `AppHeader` with an optional
+      `className`/variant for consuming apps that want a bordered, branded header — a call for
+      `swe-ui-maker`/the component owner, since it changes a shared primitive.
+      **Fixed at the app level**: `AppShell.tsx` now wraps `<AppHeader>` in
+      `<div className="border-b border-border text-primary">`, adding the bottom border and
+      primary-colour text without touching the shared `libs/web-ui` primitive (no other consumer
+      exists yet to justify a primitive-level variant). Verified via the rebuilt Docker image and a
+      live Playwright screenshot (header now bordered, "Baseerah" rendered in primary blue).
+- [x] DWT-003: **The unhandled-404 page (already flagged for accessibility by EWT-001 and for
+      recoverability by UWT-004) is, from a pure design-fidelity lens, a total abandonment of the
+      design system — zero tokens, zero `libs/web-ui` primitive reuse.** **Violated ground truth**:
+      design tokens at runtime + design-system-primitive reuse — the running `/` page's `<body>`
+      resolves `--color-background` (`var(--warm-0)`, `oklch(99% 0.004 265)`, a faint blue-tinted
+      near-white) and reuses `AppHeader`/the `AppShell` chip/footer, while
+      `http://localhost:19310/does-not-exist` resolves a flat, untinted `rgb(255, 255, 255)`
+      background and `rgb(0, 0, 0)` text with **exactly one** element in the entire document carrying
+      any `class` attribute (an inline-styled wrapper `<div>`) — no `AppHeader`, no `AppShell`, no
+      accent/secondary tokens anywhere. **Severity**: Major (this is a distinct design-fidelity
+      concern from EWT-001's landmark/a11y framing and UWT-004's recovery-path framing — it is the
+      Consistency & Repetition principle, and the general design-practice expectation that a shared
+      chrome/design language persists across every rendered surface of an app, that is broken here).
+      **Priority**: Medium (shares a remediation with EWT-001/UWT-004). **Environment**:
+      `http://localhost:19310/does-not-exist`, `en`, Chromium via Playwright, 1280 px, 2026-07-31.
+      **Steps to reproduce**: (1) navigate to `http://localhost:19310/does-not-exist`; (2) run
+      `getComputedStyle(document.body).backgroundColor` (→ `rgb(255, 255, 255)`, not the app's
+      `--color-background` token) and `document.querySelectorAll('[class]').length` (→ `1`) in the
+      console. **Expected**: the 404 surface reuses `AppShell`'s tokens (`--color-background`,
+      `--color-foreground`) and ideally its header/footer chrome, per the Consistency & Repetition
+      design principle and the "cross-surface visual consistency" dimension. **Actual**: pure
+      untinted white/black defaults, zero `libs/web-ui` primitives, zero custom classes. **Evidence**:
+      `./evidence/phase-ewt-notfound-en-1280px.png` (pre-existing, reused — depicts the same
+      unbranded page this finding assesses from the design lens). **Reproducibility**: Always.
+      **Defect type**: Mockup-fidelity / Token / Primitive-reuse / Consistency. **Suggested fix
+      locus**: `apps/baseerah-fe/src/app/not-found.tsx` (new file, reusing `AppShell`) — the same file
+      EWT-001 and UWT-004 already name; fixing it once satisfies all three findings.
+      **Fixed**: same `not-found.tsx`/`AppFrame` fix as EWT-001/UWT-004 — the 404 page now resolves
+      the app's real `--color-background`/`--color-foreground` tokens and reuses `AppHeader`/the
+      shared footer, confirmed via the rebuilt Docker image.
+- [x] DWT-004: **The multilingual identity chip is a hand-rolled `<div>` rather than a reuse of the
+      shared `libs/web-ui` `Badge` primitive, and its corner radius diverges from that primitive's
+      established radius convention.** **Violated ground truth**: design-system-primitive reuse +
+      radius-scale consistency — `libs/web-ui/src/components/badge/badge.tsx` line 7 defines the
+      shared pill/label primitive with a fixed `rounded-full` corner treatment across all its variants
+      (`default`, `outline`, `secondary`, `destructive`), while the chip built directly in
+      `apps/baseerah-fe/src/components/AppShell.tsx` line 12 (`className="bg-accent
+text-accent-foreground flex flex-col items-center gap-1 rounded-lg px-5 py-2 sm:flex-row
+sm:gap-2"`) uses `rounded-lg` (computed `14px`), a different point on the radius scale than any
+      badge on the page would use. **Severity**: Minor. **Priority**: Low. **Judgment call**: `Badge`'s
+      uppercase, 11-13px, single-line styling is not obviously suited to this chip's two-line
+      bilingual content (Arabic term + English gloss at 24px/16px), so this is flagged as a
+      consistency gap to evaluate, not a clear-cut "should have reused `Badge` verbatim" defect.
+      **Environment**: `http://localhost:19310/`, `en`, all breakpoints, 2026-07-31. **Steps to
+      reproduce**: (1) compare `libs/web-ui/src/components/badge/badge.tsx` line 7's
+      `rounded-full` against the computed `border-radius: 14px` on `main > div` at
+      `http://localhost:19310/`. **Expected**: either the identity chip reuses `Badge` (with a new
+      variant/size if needed) or, if a bespoke chip is kept, its radius should be a deliberate design
+      decision recorded somewhere, not an ad hoc `rounded-lg`. **Actual**: bespoke `div`, `rounded-lg`,
+      no recorded rationale. **Evidence**: `libs/web-ui/src/components/badge/badge.tsx` (source
+      citation, not a runtime screenshot — this is a design-language consistency observation).
+      **Reproducibility**: Always. **Defect type**: Primitive-reuse / Consistency. **Suggested fix
+      locus**: `apps/baseerah-fe/src/components/AppShell.tsx`, in consultation with the `libs/web-ui`
+      component owner.
+      **Fixed via the finding's own second option**: kept the bespoke chip (confirmed `Badge`'s
+      `inline-flex`, uppercase, 11-13px, single-line styling genuinely doesn't fit this chip's
+      two-line, 24px/16px bilingual content — reusing `Badge` would require a new variant, which is
+      a bigger, shared-primitive change than this scaffold-stage finding warrants) and recorded the
+      rationale as a source comment directly above the chip in `AppShell.tsx`, satisfying "if a
+      bespoke chip is kept, its radius should be a deliberate design decision recorded somewhere."
+- [x] SG-002: **Proposed Gherkin gap** — DWT-001's runtime-only CSS-purge symptom (a `libs/web-ui`
+      component's own utility classes silently missing from the compiled bundle) is not covered by
+      any scenario in `specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature`,
+      and is exactly the class of regression a visual/computed-style assertion would catch
+      automatically next time. Propose adding:
+      `Scenario: The header renders with its design-system styling applied\n  Given the landing page has loaded\n  When the computed styles of the header and its title are read\n  Then the header has non-zero padding\n  And the title font size and weight match the design system's heading scale`
+      to that feature file, best paired with the DWT-001 fix so the assertion has something correct to
+      pin down.
+      **Triaged, not added as a new Gherkin scenario**: a computed-style assertion of this kind is
+      only meaningful against real compiled CSS in a real browser — `vitest`/jsdom (this app's unit
+      test layer) doesn't load stylesheets, so a jsdom-based version of this assertion would be
+      vacuous (always reading browser defaults) and would not have caught the actual DWT-001
+      regression, which was itself only found by a live Docker-image Playwright check. A real e2e
+      version is a legitimate regression guard, but the DWT-001 fix (dual `@source` paths) already
+      closes the gap it exists to catch; deferred as a backlog e2e-hardening candidate (a
+      "computed-style snapshot" step pattern) rather than added under retest time pressure.
+
+- [x] [AI] Fix every `EWT-NNN`/`UWT-NNN`/`DWT-NNN` checkbox recorded above and tick it — acceptance:
       no unchecked Rule-15 defect checkbox remains in this section. Any `SG-###`/`USS-###` proposal
-      may instead be triaged with written rationale recorded under its checkbox.
+      may instead be triaged with written rationale recorded under its checkbox. **Done**:
+      `rg -n '^- \[ \] (EWT|UWT|DWT)-' delivery.md` returns no matches. All 5 EWT + 6 UWT + 4 DWT
+      defects fixed and verified (unit tests, e2e scenarios, and/or a rebuilt-and-recreated Docker
+      image + live Playwright check); SG-001/SG-002/USS-001 triaged with written rationale;
+      USS-002/003/004 added as new Gherkin scenarios with matching unit + e2e coverage.
 - [ ] [AI] Commit and push the retest fixes (if any): `git add -A && git commit -m "fix(baseerah-fe): address rule-15 three-tester retest findings"`
       then `git push origin main` — acceptance: exits 0. Skip this step if zero findings were
       returned above.

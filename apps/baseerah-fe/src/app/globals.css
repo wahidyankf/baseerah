@@ -1,5 +1,13 @@
 @import "tailwindcss";
-@source "../../../../libs/web-ui/src/**/*.{ts,tsx}";
+/* Two @source paths, because local dev and the Docker build resolve @open-sharia-enterprise/web-ui
+   differently and neither glob errors when its target doesn't exist: locally, npm workspaces hoist
+   the package to the repo-root node_modules/ (no nested apps/baseerah-fe/node_modules/ copy exists
+   at all); apps/baseerah-fe/Dockerfile instead copies libs/web-ui/src into a nested
+   apps/baseerah-fe/node_modules/@open-sharia-enterprise/web-ui/src and never creates the repo-root
+   one. The original "../../../../libs/web-ui/src" form matched neither of these two real locations
+   inside the shipped Docker image, so AppHeader's own utility classes were silently purged there. */
+@source "../../../../node_modules/@open-sharia-enterprise/web-ui/src/**/*.{ts,tsx}";
+@source "../../node_modules/@open-sharia-enterprise/web-ui/src/**/*.{ts,tsx}";
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
 @import "@open-sharia-enterprise/web-ui-token/src/baseerah.css";
 
