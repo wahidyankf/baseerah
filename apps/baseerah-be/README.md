@@ -51,5 +51,4 @@ See `.env.example` for a local template.
 
 ## Related
 
-- [baseerah-be-e2e](../baseerah-be-e2e/README.md) — Playwright BE E2E tests
 - [specs/apps/baseerah/](../../specs/apps/baseerah/README.md) — full spec tree
