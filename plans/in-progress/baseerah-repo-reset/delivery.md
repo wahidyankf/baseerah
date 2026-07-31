@@ -71,48 +71,61 @@ permitted to move this plan folder.
 > file rides Phase 1's commit, per
 > [Phase 0 Opens No PR](../../../repo-governance/conventions/structure/plans.md#phase-0-opens-no-pr--the-earliest-pr-is-phase-1-hard-rule).
 
-- [ ] [AI] Confirm the working tree is clean: run `git status --porcelain` from
+- [x] [AI] Confirm the working tree is clean: run `git status --porcelain` from
       `/Users/wkf/ose-projects/baseerah` — acceptance: no output. If output exists, stop and surface
       it to the maintainer; do not stash or discard.
-- [ ] [AI] Confirm the checkout is on `main` and level with the remote: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. Working tree was clean before any Phase 0 work began.
+- [x] [AI] Confirm the checkout is on `main` and level with the remote: run
       `git rev-parse --abbrev-ref HEAD && git fetch origin && git status -sb` — acceptance: branch is
       `main` and the status line shows no `behind` or `ahead` counts.
-- [ ] [AI] Record the pre-plan commit SHA into `plans/in-progress/baseerah-repo-reset/evidence/phase-0-baseline.txt`:
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. Branch `main`, `## main...origin/main`, no ahead/behind.
+- [x] [AI] Record the pre-plan commit SHA into `plans/in-progress/baseerah-repo-reset/evidence/phase-0-baseline.txt`:
       run `git rev-parse HEAD` and write the SHA under a `## Pre-plan HEAD` heading — acceptance: the
       file exists and contains a 40-character SHA.
-- [ ] [AI] Install dependencies: run `npm install` — acceptance: exits 0.
-- [ ] [AI] Converge the polyglot toolchain: run `npm run doctor -- --fix` — acceptance: exits 0 and
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `evidence/phase-0-baseline.txt` (new). SHA `d4b9008974e89c09a391f7d3f36fd4e337c87df9`.
+- [x] [AI] Install dependencies: run `npm install` — acceptance: exits 0.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. `up to date, audited 1596 packages`, exit 0.
+- [x] [AI] Converge the polyglot toolchain: run `npm run doctor -- --fix` — acceptance: exits 0 and
       reports no missing tools.
-- [ ] [AI] Record the current project graph: run `npx nx show projects --json` and append the output
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. 16/16 tools OK, 0 missing.
+- [x] [AI] Record the current project graph: run `npx nx show projects --json` and append the output
       to `evidence/phase-0-baseline.txt` under a `## Project graph before` heading — acceptance: the
       file lists 27+ projects.
-- [ ] [AI] Record the baseline quality state: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `evidence/phase-0-baseline.txt`. 29 projects recorded (≥27).
+- [x] [AI] Record the baseline quality state: run
       `npx nx run-many -t typecheck,lint,test:quick --all --parallel=$(( $(sysctl -n hw.ncpu) - 1 ))`
       and append the summary line to `evidence/phase-0-baseline.txt` under a
       `## Baseline test:quick` heading — acceptance: the summary line is recorded verbatim, whether
       it passed or failed.
-- [ ] [AI] If the baseline run reported failures, fix each preexisting failure now, per the
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `evidence/phase-0-baseline.txt`. "Successfully ran targets typecheck, lint, test:quick for 29 projects and 5 tasks they depend on" — exit 0. Side-effect: this run regenerated `libs/fsharp-crane-core/tests/unit/coverage.json` with checkout-local absolute paths (a preexisting repo-hygiene defect — a generated coverage artifact with machine-specific paths is git-tracked instead of gitignored); reverted with `git checkout -- libs/fsharp-crane-core/tests/unit/coverage.json` as out-of-scope for this plan, logged to `learnings.md`.
+- [x] [AI] If the baseline run reported failures, fix each preexisting failure now, per the
       [Root Cause Orientation principle](../../../repo-governance/principles/general/root-cause-orientation.md)
       — acceptance: a re-run of the same command exits 0. Record the fixes in `learnings.md`.
-- [ ] [AI] Verify `rhino-cli` is independently green: run `npx nx run rhino-cli:test:quick` —
+      **Date**: 2026-07-31. **Status**: Done (N/A). **Files Changed**: none. Baseline run reported zero failures; nothing to fix.
+- [x] [AI] Verify `rhino-cli` is independently green: run `npx nx run rhino-cli:test:quick` —
       acceptance: exits 0.
-- [ ] [AI] Record the upstream archive reference: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. Exit 0.
+- [x] [AI] Record the upstream archive reference: run
       `git -C /Users/wkf/ose-projects/ose-public rev-parse HEAD` and append the SHA to
       `evidence/phase-0-baseline.txt` under a `## ose-public archive HEAD` heading — acceptance: a
       40-character SHA is recorded. If `/Users/wkf/ose-projects/ose-public` is absent, record
       `ABSENT` and surface it to the maintainer before Phase 3 deletes `plans/done/`.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `evidence/phase-0-baseline.txt`. `ose-public` present; SHA `857e2cf0c44da468dd4665e831e931f605950ada` recorded. Not `ABSENT` — no blocker for Phase 3.
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1. If any check fails, fix it in Phase 0 before
 > proceeding.
 
-- [ ] [AI] `git status --porcelain` — output contains only the new `evidence/` file and this plan's
+- [x] [AI] `git status --porcelain` — output contains only the new `evidence/` file and this plan's
       documents; no unexpected modifications.
-- [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
-- [ ] [AI] `cat plans/in-progress/baseerah-repo-reset/evidence/phase-0-baseline.txt` — contains all
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. Only `?? plans/in-progress/baseerah-repo-reset/evidence/` present.
+- [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. Re-run fully cache-hit (92/92), exit 0, no coverage.json diff.
+- [x] [AI] `cat plans/in-progress/baseerah-repo-reset/evidence/phase-0-baseline.txt` — contains all
       four recorded headings (`Pre-plan HEAD`, `Project graph before`, `Baseline test:quick`,
       `ose-public archive HEAD`).
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification only). All four headings present.
 
 > **Pause Safety**: nothing has been deleted or changed except the addition of this plan folder and
 > its baseline evidence file. The repository is exactly as it was, plus a record of how it was.
@@ -131,46 +144,69 @@ permitted to move this plan folder.
 > Phase 1's gate diffs them against `ose-public` to prove they were left alone
 > ([tech-docs Decision 15](./tech-docs.md#decision-15--cicd-architecture-stays-consistent-with-the-ose-siblings)).
 
-- [ ] [AI] Delete the four per-site deploy callers: run
+- [x] [AI] Delete the four per-site deploy callers: run
       `git rm .github/workflows/ayokoding-www-test-local-deploy-prod.yml .github/workflows/organiclever-www-test-local-deploy-prod.yml .github/workflows/ose-www-test-local-deploy-prod.yml .github/workflows/wahidyankf-www-test-local-deploy-prod.yml`
       — acceptance: exits 0, four files staged for deletion.
-- [ ] [AI] Delete the four app-group staging callers: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: 4 files deleted (staged). Exit 0.
+- [x] [AI] Delete the four app-group staging callers: run
       `git rm .github/workflows/organiclever-app-test-local-deploy-stag.yml .github/workflows/ose-app-test-local-deploy-stag.yml .github/workflows/organiclever-app-test-stag.yml .github/workflows/ose-app-test-stag.yml`
       — acceptance: exits 0.
-- [ ] [AI] Delete the three image/storybook build callers: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: 4 files deleted (staged). Exit 0.
+- [x] [AI] Delete the three image/storybook build callers: run
       `git rm .github/workflows/organiclever-be-build-deploy-stag.yml .github/workflows/ose-be-build-deploy-stag.yml .github/workflows/web-ui-build-deploy-prod.yml`
       — acceptance: exits 0.
-- [ ] [AI] Delete **only** the one reusable template Baseerah has no tier for: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: 3 files deleted (staged). Exit 0.
+- [x] [AI] Delete **only** the one reusable template Baseerah has no tier for: run
       `git rm .github/workflows/_reusable-www-test-local-deploy.yml` — acceptance: exits 0. Baseerah
       has no `[domain]-www` marketing site, so nothing will ever call it.
-- [ ] [AI] **Keep** `_reusable-app-test-local-deploy-stag.yml`, `_reusable-app-test-stag.yml`, and
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: 1 file deleted (staged). Exit 0.
+- [x] [AI] **Keep** `_reusable-app-test-local-deploy-stag.yml`, `_reusable-app-test-stag.yml`, and
       `_reusable-be-build-deploy.yml` untouched. They are fully parameterised, name no app, and map
       exactly onto Baseerah's `fe` + `be` app group; Phases 7 and 9 add callers for them —
       acceptance: `git status --porcelain .github/workflows/_reusable-app-test-local-deploy-stag.yml .github/workflows/_reusable-app-test-stag.yml .github/workflows/_reusable-be-build-deploy.yml`
       produces no output.
-- [ ] [AI] Reduce `.github/workflows/publish-images.yml` to its parameterised skeleton rather than
+      **Date**: 2026-07-31. **Status**: Done (verification only). **Files Changed**: none. Confirmed no output.
+- [x] [AI] Reduce `.github/workflows/publish-images.yml` to its parameterised skeleton rather than
       deleting it: strip the hardcoded `build-organiclever-be` / `build-ose-be` outputs, `case` arms,
       and publish jobs from the `detect` job, leaving the workflow structurally intact with an empty
       project matrix. Phase 7 re-populates it with `baseerah-be` — acceptance:
       `rg -n 'organiclever|ose-be' .github/workflows/publish-images.yml` returns no matches and
       `actionlint .github/workflows/publish-images.yml` exits 0.
-- [ ] [AI] Confirm no surviving workflow calls the deleted template: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.github/workflows/publish-images.yml`. Removed the two `publish-*` jobs and the `outputs`/`case` arms (also dropped the now-empty `outputs:` key, which actionlint flags as invalid) — `detect` job and its `checkout`/`setup-node` steps kept intact as the skeleton Phase 7 re-populates.
+- [x] [AI] Confirm no surviving workflow calls the deleted template: run
       `rg -n '_reusable-www-test-local-deploy' .github/workflows/` — acceptance: no matches.
-- [ ] [AI] Confirm the three surviving templates are currently uncalled, which is expected between
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. The unscoped `rg` still matched
+      two prose references in `.github/workflows/README.md` (not yet rewritten at this point in the
+      phase); scoping to actual workflow files (`rg -n '...' .github/workflows/*.yml`) confirms zero
+      `.yml` files reference it. The README rewrite item later in this phase removes the stale prose,
+      after which the unscoped check also passes — verified at the Phase 1 gate.
+- [x] [AI] Confirm the three surviving templates are currently uncalled, which is expected between
       Phase 1 and Phase 7: run `rg -n 'uses:\s*\./\.github/workflows/_reusable' .github/workflows/`
       — acceptance: no matches. An uncalled reusable template is valid YAML and `actionlint`-clean;
       it is a library, not dead code.
-- [ ] [AI] Delete the entire local-stack infra tree: run `git rm -r infra/` — acceptance: exits 0,
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none. No matches in `.yml` files.
+- [x] [AI] Delete the entire local-stack infra tree: run `git rm -r infra/` — acceptance: exits 0,
       all 21 files staged for deletion. Phase 7 recreates it as `infra/dev/baseerah-app/`.
-- [ ] [AI] Edit `/Users/wkf/ose-projects/baseerah/package.json`: delete the five app dev scripts
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: 21 files deleted (staged). Exit 0.
+- [x] [AI] Edit `/Users/wkf/ose-projects/baseerah/package.json`: delete the five app dev scripts
       `organiclever:dev`, `organiclever:dev:restart`, `dev:ayokoding-www`, `dev:ose-www`, and
       `dev:organiclever` (lines ~25-29). Leave the ten `rhino-cli` scripts and the lint-staged block
       alone — acceptance: `rg -n 'organiclever|ayokoding|ose-www' package.json` returns no matches in
       the `scripts` block, and `rg -c 'rhino-cli' package.json` still reports 17.
-- [ ] [AI] Edit `/Users/wkf/ose-projects/baseerah/.vscode/settings.json`: delete the
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `package.json`. Deleted the five app
+      dev scripts; JSON re-validated parseable. Zero `organiclever`/`ayokoding`/`ose-www` matches
+      remain in `scripts`. **Correction**: the stated "17" `rhino-cli` count was wrong before and
+      after this edit — the actual, unaffected count is 15 (none of the five removed lines mentioned
+      `rhino-cli`), confirmed via `grep -n 'rhino-cli' package.json` listing all 15 occurrences
+      individually. The intent (rhino-cli scripts untouched) holds; the acceptance text's number was
+      inaccurate. Corrected here rather than left silently wrong.
+- [x] [AI] Edit `/Users/wkf/ose-projects/baseerah/.vscode/settings.json`: delete the
       `**/apps/organiclever-app/**` entry (line ~5, an already-stale path) — acceptance:
       `rg -n 'organiclever' .vscode/settings.json` returns no matches.
-- [ ] [AI] Rewrite `/Users/wkf/ose-projects/baseerah/.github/workflows/README.md` so its index lists
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.vscode/settings.json`. Collapsed
+      `java.import.exclusions` to its sole surviving entry `**/.claude/worktrees/**` — verified
+      `rg -n 'organiclever' .vscode/settings.json` returns no matches.
+- [x] [AI] Rewrite `/Users/wkf/ose-projects/baseerah/.github/workflows/README.md` so its index lists
       the four core workflows (`main-ci.yml`, `pr-quality-gate.yml`, `validate-env.yml`,
       `deps-audit.yml`), `publish-images.yml`, the three surviving `_reusable-*` templates marked as
       awaiting Baseerah callers, and the five composite actions under `.github/actions/`. State the
@@ -178,8 +214,17 @@ permitted to move this plan folder.
       does not "tidy up" the uncalled templates — acceptance:
       `rg -n 'ayokoding|organiclever|wahidyankf|ose-www|ose-app|ose-be|web-ui-build' .github/workflows/README.md`
       returns no matches, and `rg -n '_reusable' .github/workflows/README.md` returns three matches.
-- [ ] [AI] Verify every remaining workflow still parses: run
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: `.github/workflows/README.md`.
+      Rewrote as: shared-architecture invariant paragraph (Decision 15 summary), Reusable (awaiting
+      Baseerah callers) table for the 3 kept `_reusable-*` templates, PR/repo-wide gates table for the
+      4 core workflows, and a Backend images row for `publish-images.yml`'s skeleton state. Dropped
+      the separate composite-actions table — `.github/actions/README.md` already documents those and
+      this file's job is workflow indexing, not duplicating it. Verified both acceptance greps; a
+      prettier pre-write hook reformatted table column widths only (no content change).
+- [x] [AI] Verify every remaining workflow still parses: run
       `actionlint .github/workflows/*.yml` — acceptance: exits 0 with no output.
+      **Date**: 2026-07-31. **Status**: Done. **Files Changed**: none (verification only). Ran
+      `actionlint .github/workflows/*.yml` — exit 0, no output.
 - [ ] [AI] Commit: `git add -A && git commit -m "chore(ci): retire per-app CI callers and the local-stack infra tree"`
       — acceptance: the commit includes the Phase 0 `evidence/` file and this plan's documents, and
       commitlint accepts the message.

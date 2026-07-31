@@ -47,6 +47,23 @@ sibling touches, and by adding a re-verification step before the allocation is c
 **Candidate home**: a `plans/backlog/` two-pager proposing a shared, machine-checkable port registry
 across the four repos — likely a `repo-config.yml` key plus a `rhino-cli` validator.
 
+### Tracked coverage artifact bakes in checkout-local absolute paths
+
+**Noticed**: Phase 0, running the baseline `test:quick` sweep
+**Learning**: `libs/fsharp-crane-core/tests/unit/coverage.json` is git-tracked but is a generated
+.NET coverage artifact that embeds absolute filesystem paths from whichever checkout last ran the
+test suite. Running the suite from `/Users/wkf/ose-projects/baseerah` regenerated it with this
+checkout's paths (previously baked with `ose-public`'s), producing an 11-line diff with zero relation
+to any actual code change. This will dirty the tree on every `test:quick` run from any checkout whose
+absolute path differs from whoever committed it last — a latent hazard for exactly the kind of
+concurrent-clone setup (`ose-public`/`ose-primer`/`ose-private`/`baseerah` all under
+`/Users/wkf/ose-projects/`) this workspace already has. Reverted the regenerated file
+(`git checkout -- libs/fsharp-crane-core/tests/unit/coverage.json`) as out of this plan's scope
+(a pruning/deletion plan, not a coverage-tooling fix).
+**Candidate home**: a `plans/backlog/` two-pager proposing either gitignoring generated coverage
+artifacts under `libs/*/tests/**/coverage.json` (and any sibling `.NET` coverage output), or fixing
+the coverage generator to emit relative paths.
+
 <!--
 Append new entries below this line as you work. Do not delete the two seeded entries — they were
 identified during planning and are already carrying a routing obligation into Phase 11.

@@ -1,8 +1,0 @@
-FROM rust:1.95-slim
-
-# curl is required by the compose healthcheck (rust:*-slim does not ship it).
-RUN apt-get update && apt-get install -y pkg-config libssl-dev curl && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /workspace
-
-CMD ["cargo", "run"]

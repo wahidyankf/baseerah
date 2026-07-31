@@ -1,7 +1,0 @@
-services:
-  ose-app-be:
-    environment: {}
-
-  ose-app-web:
-    environment:
-      OSE_APP_BE_URL: "http://ose-app-be:8302"

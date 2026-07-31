@@ -5,14 +5,27 @@ CI/CD workflows for the monorepo. Filenames follow the
 the [CI Conventions](../../repo-governance/development/infra/ci-conventions.md) define the
 reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour staging→prod gap).
 
-## Reusable
+## Shared-architecture invariant (do not "tidy up" the uncalled templates)
+
+This repo's CI/CD design is intentionally kept consistent with the `ose-public`/`ose-primer`/
+`ose-private` sibling repos rather than invented fresh. Four core workflows —
+`main-ci.yml`, `pr-quality-gate.yml`, `deps-audit.yml`, `validate-env.yml` — and their non-language
+job sets stay byte-identical in shape across every sibling; the language jobs (`typescript`,
+`dotnet`, `rust`) track the languages actually present in the repo, unchanged by this reset because
+Baseerah's language set is identical to `ose-public`'s. The three `_reusable-*.yml` templates below
+are kept even though **no caller currently references them**: they are fully parameterised, name no
+app, and map exactly onto the `fe`/`be` app-group shape this repo will grow into (Phases 7 and 9 add
+Baseerah callers with the same shape). Deleting them as "dead code" would silently diverge from the
+shared architecture — see tech-docs Decision 15 for the full invariant list and verification
+commands.
+
+## Reusable (awaiting Baseerah callers)
 
 | Workflow                                   | Role                                                                                                     |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| `_reusable-www-test-local-deploy.yml`      | Full local-stack test pipeline (lint, unit, integration, E2E) then force-push to a `prod-*-www` branch.  |
 | `_reusable-app-test-local-deploy-stag.yml` | App-group local-stack pipeline; on pass force-pushes BOTH the `stag-*-app-web` and `stag-*-be` branches. |
 | `_reusable-app-test-stag.yml`              | FE E2E gate against the deployed staging URL (Vercel bypass secret). Stops on pass — no promote.         |
-| `_reusable-be-build-deploy.yml`            | Build a backend image and push it to GHCR (rolled out by ose-private `coralpolyp`).                      |
+| `_reusable-be-build-deploy.yml`            | Build a backend image and push it to GHCR.                                                               |
 
 ## PR and repo-wide gates
 
@@ -23,34 +36,8 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 | `main-ci.yml`         | 4x/day CRON + dispatch | Same as PR gate but runs across all projects (`nx run-many --all`) — no push trigger                                              |
 | `deps-audit.yml`      | Nightly CRON           | Language-native dependency audit (npm audit, cargo deny, dotnet vulnerable) — CRON-only                                           |
 
-## www tier — direct deploy (scheduled callers of `_reusable-www-test-local-deploy.yml`)
+## Backend images
 
-| Workflow                                      | Site                                |
-| --------------------------------------------- | ----------------------------------- |
-| `ayokoding-www-test-local-deploy-prod.yml`    | ayokoding-www → ayokoding.com       |
-| `ose-www-test-local-deploy-prod.yml`          | ose-www → oseplatform.com           |
-| `organiclever-www-test-local-deploy-prod.yml` | organiclever-www → organiclever.com |
-| `wahidyankf-www-test-local-deploy-prod.yml`   | wahidyankf-www → www.wahidyankf.com |
-
-## app tier — gated promotion (local-deploy-stag → test-stag; prod CD deferred)
-
-| Workflow                                      | Stage                                                            |
-| --------------------------------------------- | ---------------------------------------------------------------- |
-| `organiclever-app-test-local-deploy-stag.yml` | Test the organiclever app group, force-push web + be stag branch |
-| `organiclever-app-test-stag.yml`              | FE E2E gate vs staging (+2.5h); stops on pass                    |
-| `ose-app-test-local-deploy-stag.yml`          | Test the ose-app group, force-push web + be stag branch          |
-| `ose-app-test-stag.yml`                       | FE E2E gate vs staging (+2.5h); stops on pass                    |
-
-## Backend images and CLIs
-
-| Workflow                                | Role                                                                                                                          |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `publish-images.yml`                    | Build and push `organiclever-be` / `ose-be` images to GHCR (deployed by the ose-private k3s plans, not Vercel) — transitional |
-| `organiclever-be-build-deploy-stag.yml` | Build the `organiclever-be` image and push it to GHCR; triggered on `stag-organiclever-be` push                               |
-| `ose-be-build-deploy-stag.yml`          | Build the `ose-be` image and push it to GHCR; triggered on `stag-ose-be` push                                                 |
-
-## web-ui — Storybook (scheduled deploy)
-
-| Workflow                       | Trigger                           | Role                                                                          |
-| ------------------------------ | --------------------------------- | ----------------------------------------------------------------------------- |
-| `web-ui-build-deploy-prod.yml` | Daily CRON (00:00 UTC) + dispatch | Build the `web-ui` lib's Storybook and force-push the output to `prod-web-ui` |
+| Workflow             | Role                                                                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publish-images.yml` | Detects affected backend image projects and publishes them to GHCR — currently a skeleton with no case arm; Phase 7 registers the `baseerah-be` image and its publish job. |
