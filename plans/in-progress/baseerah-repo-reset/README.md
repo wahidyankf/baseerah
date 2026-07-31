@@ -40,15 +40,15 @@ keeps the OSE Layer 0 vision as its ecosystem parent and adds a Baseerah product
 | `libs/web-ui`, `libs/web-ui-token`                           | Design-system primitives + tokens consumed by `baseerah-fe`                                                                                                                             |
 | `libs/fsharp-crane-core`                                     | Shared F# core consumed by `baseerah-be` (audited in Phase 2)                                                                                                                           |
 | `docs/explanation/software-engineering/` (168 files)         | Generic engineering reference, load-bearing for `swe-*` agents                                                                                                                          |
-| ~59 generic agents, ~26 generic skills, `repo-governance/**` | The SDLC harness this plan exists to preserve                                                                                                                                           |
+| ~59 generic agents, ~27 generic skills, `repo-governance/**` | The SDLC harness this plan exists to preserve                                                                                                                                           |
 | `repo-governance/principles/**` (16 files)                   | **Byte-identical to `ose-public`** — a checked invariant, not an aspiration. See [tech-docs.md § Decision 13](./tech-docs.md#decision-13--governance-principles-stay-identical-to-ose-) |
 
 **Removed**
 
 22 apps (`ayokoding-*`, `organiclever-*`, `ose-www`, `ose-app-web`, `ose-be`, `ose-cli`,
-`crane-cli`, `wahidyankf-www`, and their E2E pairs), their spec trees, their `infra/` stacks, the 12
-per-app CI **callers** and the one `-www` reusable template Baseerah has no tier for, 30 app-scoped
-agents, 3 app-scoped skills, `repo-governance/workflows/ayokoding-web/`, `generated-socials/` (34 OSE
+`crane-cli`, `wahidyankf-www`, and their E2E pairs), their spec trees, their `infra/` stacks, the 11
+per-app CI **callers** and the one `-www` reusable template Baseerah has no tier for, 29 app-scoped
+agents, 4 app-scoped/doctrine-moot skills, `repo-governance/workflows/ayokoding-web/`, `generated-socials/` (33 OSE
 LinkedIn update posts) with the `social-linkedin-post-maker` agent that wrote them, and the OSE plan
 archive.
 
@@ -85,23 +85,39 @@ Plus a Baseerah product vision, a rewritten root identity surface, and the
 
 ## Approach Summary
 
-Eleven phases on a single serial spine. Under `main-to-origin-main` every phase ends with a commit
-and a push to `origin main`, so `main` moves forward eleven times rather than through seven PRs.
+Twelve phases (0-11) on a single serial spine. Under `main-to-origin-main`, eleven of the twelve —
+every phase except Phase 0 — end with a commit and a push to `origin main`, so `main` moves forward
+eleven times rather than through seven PRs.
 
-```text
-Phase 0   setup + baseline                              (no push — baseline rides Phase 1)
-Phase 1   retire CI, infra, and deploy surface          → push
-Phase 2   delete retired apps, specs, and config        → push
-Phase 3   prune agents, governance, docs, plan archive  → push
-Phase 4   Baseerah identity within the OSE ecosystem    → push
-Phase 5   specs/apps/baseerah + baseerah-contracts      → push
-Phase 6   baseerah-be         (F# / Giraffe)            → push
-Phase 7   baseerah-be-e2e     + local stack             → push
-Phase 8   baseerah-fe         (Next.js 16)              → push
-Phase 9   baseerah-fe-e2e     (full stack)              → push
-Phase 10  Baseerah agent fleet + deployers              → push
-Phase 11  knowledge capture + archival                  → push
+```mermaid
+flowchart TB
+    P0["Phase 0: setup + baseline"]
+    P1["Phase 1: retire CI + infra"]
+    P2["Phase 2: delete retired apps"]
+    P3["Phase 3: prune agents + docs"]
+    P4["Phase 4: Baseerah identity"]
+    P5["Phase 5: specs + contracts"]
+    P6["Phase 6: baseerah-be"]
+    P7["Phase 7: baseerah-be-e2e"]
+    P8["Phase 8: baseerah-fe"]
+    P9["Phase 9: baseerah-fe-e2e"]
+    P10["Phase 10: agent fleet"]
+    P11["Phase 11: archival"]
+    P0 --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+    P4 --> P5
+    P5 --> P6
+    P6 --> P7
+    P7 --> P8
+    P8 --> P9
+    P9 --> P10
+    P10 --> P11
 ```
+
+Phase 0 does not push (its baseline rides Phase 1's commit); every other phase ends with a commit and
+a push to `origin main`.
 
 The order is chosen so the repo is green at every gate: CI callers die before the apps they call,
 apps die in the same commit as their `repo-config.yml` entries and spec trees (the pre-commit

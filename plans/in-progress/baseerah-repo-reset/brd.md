@@ -9,7 +9,7 @@ product, while keeping the engineering harness that made `ose-public` productive
 the six-layer governance hierarchy, the CI gates, the plan lifecycle, and `rhino-cli`.
 
 The goal is explicitly **not** "start a fresh repo." A fresh repo would mean rebuilding ~200
-governance files, ~59 generic agents, 26 skills, and a working polyglot CI harness from scratch. The
+governance files, ~59 generic agents, 27 skills, and a working polyglot CI harness from scratch. The
 goal is to keep that harness and swap the product beneath it.
 
 ## Business Rationale
@@ -21,10 +21,10 @@ The repo currently contains a product it will never ship:
 | Surface                      | Count belonging to the old product                                                              |
 | ---------------------------- | ----------------------------------------------------------------------------------------------- |
 | Nx apps                      | 22 of 23 (only `rhino-cli` is wanted)                                                           |
-| `.github/workflows/`         | 12 per-app workflows + 4 reusable templates, of ~22 files                                       |
+| `.github/workflows/`         | 11 per-app workflows + 1 reusable template, of ~21 files                                        |
 | `infra/`                     | 21 files — 100% of the tree                                                                     |
 | `.claude/agents/`            | 29 of 90 app-scoped, plus 2 agents premised on the OSE↔AyoKoding split                          |
-| `.claude/skills/`            | 3 of 31 app-scoped, plus 2 identity-coupled                                                     |
+| `.claude/skills/`            | 3 of 31 app-scoped, plus 1 doctrine-moot                                                        |
 | `repo-config.yml`            | 25 of 26 `coverage.projects` entries; all 8 `env-contract.surfaces`; all 8 `env-injection.apps` |
 | `repo-governance/workflows/` | `ayokoding-web/` — 6 files, ~113 KB                                                             |
 | `plans/done/`                | 174 archived plan folders for apps that will not exist                                          |
@@ -46,17 +46,19 @@ lands into a repo that describes itself accurately.
 
 There is also a correctness deadline. `AGENTS.md` states that `apps/rhino-cli` must be
 **byte-identical (zero carve-outs)** across `ose-public`, `ose-primer`, and `ose-private`. This repo
-is a fourth clone carrying that rule, and Phase 3 makes real source edits to `rhino-cli` (removing
-hardcoded `["organiclever","ose"]` spec-area defaults and an `apps/ayokoding-www/` frontmatter
-allowlist). Until `AGENTS.md` states that `baseerah` is outside the parity loop, the repo's own
-instructions forbid the edit the repo needs.
+is a fourth clone carrying that rule, and Phase 3 makes real source edits to `rhino-cli`: emptying
+the `WEBSITE_APP_PREFIXES` frontmatter-audit **exemption** list — whose four entries all name apps
+this plan deletes — plus test-fixture renames in `specs_validate_counts.rs`, where the retired app
+names appear only inside a unit test and the production default already reads from
+`repo-config.yml`. Until `AGENTS.md` states that `baseerah` is outside the parity loop, the repo's
+own instructions forbid the edit the repo needs.
 
 ## Business Impact
 
 **Pain points removed**
 
 - Agents no longer plan against, search, or validate a product that isn't here.
-- CI stops running — and stops being maintained for — 16 workflow files with no target.
+- CI stops running — and stops being maintained for — 12 workflow files with no target.
 - `repo-config.yml`, the file three separate CI gates validate, stops describing 25 absent projects.
 - Grep for any product term stops returning hundreds of hits from `plans/done/`.
 
@@ -85,8 +87,10 @@ Solo-maintainer repo; these are hats and agent consumers, not sign-off parties.
 ## Success Metrics
 
 1. **Observable fact** — `npx nx show projects` lists exactly: `rhino-cli`, `rust-commons`,
-   `web-ui`, `web-ui-token`, `fsharp-crane-core`, `baseerah-be`, `baseerah-be-e2e`, `baseerah-fe`,
-   `baseerah-fe-e2e`. Nothing else.
+   `web-ui`, `web-ui-token`, `baseerah-contracts`, `baseerah-be`, `baseerah-be-e2e`, `baseerah-fe`,
+   `baseerah-fe-e2e`, plus `fsharp-crane-core` if the Phase 2 audit keeps it (see
+   [tech-docs.md § Dependencies](./tech-docs.md#dependencies)). Nine or ten projects total. Nothing
+   else.
 2. **Observable fact** — `rg -l 'ayokoding|organiclever|wahidyankf|crane-cli|ose-www|ose-app-web|ose-be|ose-cli'`
    returns zero hits outside `plans/` (this plan's own docs) and git history.
 3. **Observable fact** — `main-ci.yml` passes on `origin/main` after every phase push, with no job

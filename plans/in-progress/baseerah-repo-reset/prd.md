@@ -50,7 +50,8 @@ Feature: Retired project surface is fully removed
   Scenario: The project graph contains only the kept and new projects
     Given the purge phases have completed
     When I run "npx nx show projects"
-    Then the output lists exactly rhino-cli, rust-commons, web-ui, web-ui-token, fsharp-crane-core, baseerah-contracts, baseerah-be, baseerah-be-e2e, baseerah-fe and baseerah-fe-e2e
+    Then the output lists rhino-cli, rust-commons, web-ui, web-ui-token, baseerah-contracts, baseerah-be, baseerah-be-e2e, baseerah-fe and baseerah-fe-e2e
+    And the output also lists fsharp-crane-core if and only if the Phase 2 audit kept it
     And no other project name appears
 
   Scenario: No retired app name survives outside the plan folder
@@ -206,7 +207,7 @@ Feature: Baseerah-scoped agent fleet
 ### In scope
 
 - Removal of 22 apps, their spec trees, CI, infra, and config registrations
-- Preservation of `rhino-cli`, four libs, ~59 generic agents, ~26 generic skills, `repo-governance/`,
+- Preservation of `rhino-cli`, four libs, ~59 generic agents, ~27 generic skills, `repo-governance/`,
   with `repo-governance/principles/**` verified byte-identical to `ose-public`
 - A Baseerah identity surface: `README.md`, `ROADMAP.md`, `AGENTS.md`, `CONTRIBUTING.md`,
   `SECURITY.md`, and a new `repo-governance/vision/baseerah.md`
@@ -253,6 +254,23 @@ Feature: Baseerah-scoped agent fleet
 [UI Mockups in Plan Docs](../../../repo-governance/conventions/formatting/diagrams.md#placement--the-ui-lives-in-prdmd-hard-rule)
 placement rule. The funnel is deliberately small, matching a one-page hello world.
 
+### Grounding
+
+Both alternatives below draw exclusively from what already exists rather than inventing new
+primitives: `libs/web-ui`'s current component inventory (`AppShell` header/footer regions,
+typography scale, landmark-aware layout primitives) and `libs/web-ui-token`'s existing colour,
+spacing, and contrast tokens (rebranded for Baseerah in Phase 4, not newly authored). No component
+proposed here requires a `libs/web-ui` addition.
+
+### Prior art
+
+A `web-researcher` sweep of comparable hello-world/health-check landing pages (framework
+starter-kit default pages — Next.js's own `create-next-app` template, Vercel's platform starters,
+and typical `/status` pages for backend services) confirms the two-alternative split below —
+content-only versus content-in-a-persistent-shell — is the standard fork for this exact page type;
+no third pattern recurs often enough to warrant a Diverge slot. Depth stops here: for a one-page
+hello world, a fuller competitive survey would cost more than the decision is worth.
+
 ### Diverge — two alternatives
 
 **Alternative A — "Bare Greeting"**: the greeting is the whole page. No chrome, no shell, no
@@ -269,6 +287,15 @@ DESKTOP 1280px — Alternative A                MOBILE 390px — Alternative A
 │                                        │    │                      │
 │                                        │    │                      │
 └────────────────────────────────────────┘    └──────────────────────┘
+
+TABLET 768px — Alternative A
+┌──────────────────────────────┐
+│                              │
+│           Baseerah           │
+│                              │
+│     Hello from Baseerah      │
+│                              │
+└──────────────────────────────┘
 ```
 
 **Alternative B — "Shell + Greeting"**: the greeting sits inside a persistent app shell — a header
@@ -288,15 +315,47 @@ DESKTOP 1280px — Alternative B                MOBILE 390px — Alternative B
 ├────────────────────────────────────────┤    ├──────────────────────┤
 │  baseerah-fe · connected to :19320     │    │ connected to :19320  │
 └────────────────────────────────────────┘    └──────────────────────┘
+
+TABLET 768px — Alternative B
+┌──────────────────────────────┐
+│  Baseerah                    │
+├──────────────────────────────┤
+│                              │
+│   بصيرة — insight, wawasan   │
+│                              │
+│   Hello from Baseerah        │
+│                              │
+├──────────────────────────────┤
+│  connected to :19320         │
+└──────────────────────────────┘
 ```
 
-### Narrow — high-fidelity mockups
+At all three breakpoints the shell reflows to a single column; only the header/footer padding and
+the greeting's font size scale down. No layout restructuring happens between 1280px and 768px — the
+first restructuring point (stacking header text) is at 390px, already shown above.
+
+### Narrow — one hi-fi finalist, not two (explicit trade-off)
+
+The convention's Narrow stage calls for carrying the **two** strongest alternatives forward as
+high-fidelity mockups before Select happens. This plan deliberately narrows to **one** hi-fi
+finalist instead, authored after Select rather than before it:
+
+- **What's skipped**: Alternative A never receives a hi-fi treatment at any point in this plan.
+- **Why**: the Select decision below is already lopsided on the low-fi wireframes alone — B wins
+  four of six Justify criteria outright, including the two that matter most for a hello-world scope
+  (proving the Phase 4 token rebrand actually renders, and giving the accessibility scan real
+  landmarks to check). A hi-fi pass on the alternative that isn't going to win would be spent effort
+  with no decision left to inform, on a page whose entire purpose is to be small.
+- **What still happens**: the low-fi wireframes above are detailed enough (real copy, real
+  breakpoints, real token-bearing regions) to Select on with the same confidence a hi-fi pass would
+  add. The winner still gets a genuine hi-fi mockup — just after Select, not before it.
 
 The finalist's high-fidelity mockups are authored into this plan's `assets/` folder as the first
 step of Phase 8, before any component is written, and embedded here:
 
 - `![Baseerah landing page, desktop 1280px](./assets/landing-desktop-1280.png)`
 - `![Baseerah landing page, mobile 390px](./assets/landing-mobile-390.png)`
+- `![Baseerah landing page, tablet 768px](./assets/landing-tablet-768.png)`
 
 Until Phase 8 authors those files these are deliberately inert code-fenced paths rather than live
 `![]()` embeds, so this document never renders a broken image. Phase 8's first checklist item

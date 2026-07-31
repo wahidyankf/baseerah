@@ -213,7 +213,7 @@ permitted to move this plan folder.
       `gh run view <id> --json status,conclusion,jobs` — acceptance: `conclusion` is `success` **and**
       every element of `jobs[].conclusion` is `success` or `skipped`; no job is `failure`.
 
-> **Pause Safety**: all apps and libs still exist and still build. Only the 12 per-app deploy
+> **Pause Safety**: all apps and libs still exist and still build. Only the 11 per-app deploy
 > callers, the one `-www` reusable template with no tier to serve, the `infra/` local-stack tree, and
 > the npm dev scripts pointing into it are gone. The four core workflows, their full job sets, the
 > composite actions, and the three app-group reusable templates are untouched and verified identical
@@ -348,10 +348,12 @@ permitted to move this plan folder.
       — acceptance: exits 0.
 - [ ] [AI] Delete the four app-scoped and now-moot skills: run
       `git rm -r .claude/skills/apps-ayokoding-www-developing-content .claude/skills/apps-organiclever-www-developing-content .claude/skills/apps-ose-www-developing-content .claude/skills/docs-validating-software-engineering-separation`
-      — acceptance: exits 0 and `ls .claude/skills/ | wc -l` reports 27.
+      — acceptance: exits 0 and `find .claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l` reports
+      27 (equivalently, `ls .claude/skills/ | wc -l` reports 28, since that count also includes
+      `README.md`).
 - [ ] [AI] Delete the OSE social-post archive: run `git rm -r generated-socials` — acceptance: exits
-      0, 34 files staged. Every file is an "OSE update week NNNN" LinkedIn post about products this
-      repo no longer contains; `ose-public` retains the archive.
+      0, 34 files staged (33 "OSE update week NNNN" LinkedIn posts about products this repo no
+      longer contains, plus the directory's own `README.md`); `ose-public` retains the archive.
 - [ ] [AI] Delete the agent whose sole output home was that directory: run
       `git rm .claude/agents/social-linkedin-post-maker.md` — acceptance: exits 0. Its charter is
       writing OSE-family updates across `ose-public` / `ose-primer` / `ose-private`, none of which
@@ -374,64 +376,97 @@ permitted to move this plan folder.
       [Dynamic Collection References convention](../../../repo-governance/conventions/writing/dynamic-collection-references.md)
       — acceptance: `rg -n '\b(9[0-9]|[0-9]{2}) agents\b' .claude/agents/README.md` returns no matches.
 
-### `rhino-cli` de-hardcoding (TDD — one scenario per cycle)
+### `rhino-cli` de-coupling from the retired apps
 
-> `rhino-cli` is application code, so every change follows RED → GREEN → REFACTOR with companion
-> Gherkin under `specs/apps/rhino/behavior/rhino-cli/gherkin/**`, per
+> `rhino-cli` is application code, so any **behaviour** change follows RED → GREEN → REFACTOR with
+> companion Gherkin under `specs/apps/rhino/behavior/rhino-cli/gherkin/**`, per
 > [Specs & Gherkin Completeness](../../../repo-governance/development/quality/feature-change-completeness.md).
+> Test-fixture renames that change no behaviour are exempt from that rule, exactly as pure refactors
+> are — and one of the two changes below turns out to be precisely that.
 
-- [ ] [AI] **RED** — add a failing test asserting the default spec-area list is `["baseerah"]`, in
-      `apps/rhino-cli/src/commands/specs_validate_counts.rs`'s test module.
-      **Gherkin (binds) →** "Default spec areas resolve to the repository's own product"
+- [ ] [AI] **Establish what is actually hardcoded before changing anything.** Read
+      `apps/rhino-cli/src/commands/specs_validate_counts.rs` and
+      `apps/rhino-cli/src/application/repo_governance/frontmatter_audit.rs` in full, and record the
+      finding in `evidence/phase-3-rhino-coupling-audit.md` — acceptance: the file states, per
+      source file, whether each occurrence of a retired app name is production behaviour, a test
+      fixture, or a doc comment. The two entries below are the expected result and are pre-recorded
+      here; **if the code disagrees with them, the code wins** and these steps are rewritten before
+      execution continues.
+
+#### `specs_validate_counts.rs` — a test fixture, not a hardcode (no behaviour change)
+
+`run_at_root` reads its default area list from `repo_config::load_or_default(repo_root).specs.ddd_areas`
+— that is, from `repo-config.yml`'s `specs.ddd-areas` key, which Phase 2 already emptied. The
+`["organiclever", "ose"]` literal lives **only** inside the unit test
+`resolve_folders_default_reads_config_areas`, whose own comment states the default is config-supplied
+rather than hardcoded. There is therefore no production hardcode to remove, and no Gherkin scenario
+to bind: renaming a fixture string changes no observable behaviour.
+
+- [ ] [AI] Rename the fixture strings in the `resolve_folders_default_reads_config_areas` test in
+      `apps/rhino-cli/src/commands/specs_validate_counts.rs` (~lines 105-118) from
+      `["organiclever", "ose"]` to `["baseerah"]`, updating the expected
+      `specs/apps/organiclever` / `specs/apps/ose` assertions to `specs/apps/baseerah` — acceptance:
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml specs_validate_counts` exits 0, and
+      `rg -n 'organiclever|"ose"' apps/rhino-cli/src/commands/specs_validate_counts.rs` returns no
+      matches.
+- [ ] [AI] Confirm no production default was touched: run
+      `git diff apps/rhino-cli/src/commands/specs_validate_counts.rs` — acceptance: every changed
+      line is inside a `#[cfg(test)]` module. If any non-test line changed, revert and reassess.
+
+#### `frontmatter_audit.rs` — an exemption list, not an allowlist (behaviour change)
+
+`WEBSITE_APP_PREFIXES` is a **skip** list: `is_website_app` returns `true` for paths under those
+prefixes, and `audit_frontmatter` **excludes** them. All four entries name deleted apps, so the list
+is entirely dead. Emptying it makes the audit apply everywhere — strictly more coverage, which is a
+real behaviour change and therefore carries a bound scenario.
+
+> Note the inversion: adding `apps/baseerah-fe/` to this list would **exempt** the Baseerah frontend
+> from the audit, which is the opposite of what is wanted. The list is emptied, not repointed.
+
+- [ ] [AI] **RED** — add a failing test in
+      `apps/rhino-cli/src/application/repo_governance/frontmatter_audit.rs`'s test module asserting
+      that a path under `apps/baseerah-fe/` is **not** skipped by `is_website_app`.
+      **Gherkin (binds) →** "No application path is exempt from the frontmatter audit"
 
       ```gherkin
-      Scenario: Default spec areas resolve to the repository's own product
-        Given no explicit area argument is supplied to "specs validate-counts"
-        When the command resolves its default area list
-        Then the list contains exactly "baseerah"
-      ```
-
-      Add the scenario verbatim to
-      `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/specs-validate-counts.feature`. Run
-      `cargo test --manifest-path apps/rhino-cli/Cargo.toml specs_validate_counts` — acceptance: the
-      new test fails with the current `["organiclever","ose"]` default.
-
-- [ ] [AI] **GREEN** — edit `apps/rhino-cli/src/commands/specs_validate_counts.rs` lines ~108 and
-      ~113, replacing the `["organiclever", "ose"]` defaults with `["baseerah"]`. Run
-      `cargo test --manifest-path apps/rhino-cli/Cargo.toml specs_validate_counts` — acceptance:
-      exits 0.
-- [ ] [AI] **REFACTOR** — extract the default area list to a single named `const` so the two call
-      sites cannot drift, in the same file. Run
-      `cargo test --manifest-path apps/rhino-cli/Cargo.toml specs_validate_counts` — acceptance:
-      still exits 0 and `rg -n '"baseerah"' apps/rhino-cli/src/commands/specs_validate_counts.rs`
-      returns exactly one match.
-- [ ] [AI] **RED** — add a failing test asserting the frontmatter-audit allowlist covers
-      `apps/baseerah-fe/`, in `apps/rhino-cli/src/application/repo_governance/frontmatter_audit.rs`'s
-      test module.
-      **Gherkin (binds) →** "Frontmatter audit applies to the Baseerah frontend content tree"
-
-      ```gherkin
-      Scenario: Frontmatter audit applies to the Baseerah frontend content tree
-        Given a markdown file under "apps/baseerah-fe/content/"
-        When the frontmatter audit resolves whether the path is in scope
+      Scenario: No application path is exempt from the frontmatter audit
+        Given a markdown file under "apps/baseerah-fe/"
+        When the frontmatter audit resolves whether the path is exempt
         Then the path is reported as in scope
       ```
 
       Add the scenario verbatim to
-      `specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/frontmatter-audit.feature`. Run
+      `specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/frontmatter-audit.feature`,
+      creating the file if it does not exist. Run
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml frontmatter_audit` — acceptance: the new
-      test fails.
+      test passes trivially today (no prefix matches `baseerah`), so **also** add a second assertion
+      that `is_website_app("apps/ayokoding-www/content/x.md")` returns `false`; that assertion fails
+      against the current list and is the genuine RED.
 
-- [ ] [AI] **GREEN** — edit `apps/rhino-cli/src/application/repo_governance/frontmatter_audit.rs`
-      lines ~29-32, replacing the four-app allowlist with `apps/baseerah-fe/`. Run
+- [ ] [AI] **GREEN** — empty `WEBSITE_APP_PREFIXES` in
+      `apps/rhino-cli/src/application/repo_governance/frontmatter_audit.rs` (~lines 26-33) to
+      `&[]`, and update its doc comment to state that no path is currently exempt. Run
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml frontmatter_audit` — acceptance: exits 0.
-- [ ] [AI] **REFACTOR** — remove the now-dead allowlist entries and any comment naming a deleted app
-      in the same file. Run `cargo test --manifest-path apps/rhino-cli/Cargo.toml` — acceptance:
-      exits 0.
+
+- [ ] [AI] **REFACTOR** — if `is_website_app` and the const are now trivially `false` for every
+      input, keep the function and the const rather than inlining them: they are the documented
+      extension point for a future Baseerah content tree. Add a one-line comment saying so. Run
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml` — acceptance: exits 0.
+
+- [ ] [AI] Run the audit end to end to prove the widened scope did not surface pre-existing
+      violations: run
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance frontmatter audit docs repo-governance`
+      — acceptance: exits 0. If it now reports findings that the exemption previously hid, fix them
+      here per the
+      [Root Cause Orientation principle](../../../repo-governance/principles/general/root-cause-orientation.md)
+      rather than restoring the exemption.
+
 - [ ] [AI] Sweep the remaining `rhino-cli` fixtures and doc comments naming deleted apps: run
       `rg -n 'ayokoding|organiclever|wahidyankf|crane|ose-www|ose-app|ose-be' apps/rhino-cli/src/ apps/rhino-cli/tests/`
-      and replace each with a `baseerah`-based or neutral equivalent — acceptance: re-running the
-      command returns no matches, and `cargo test --manifest-path apps/rhino-cli/Cargo.toml` exits 0.
+      and replace each with a `baseerah`-based or neutral equivalent. Classify each hit in
+      `evidence/phase-3-rhino-coupling-audit.md` as fixture, comment, or behaviour; only the last
+      category needs a bound scenario — acceptance: re-running the command returns no matches, and
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml` exits 0.
 
 ### Governance, docs, and plan-archive pruning
 
@@ -479,20 +514,21 @@ permitted to move this plan folder.
       `git rm -r plans/in-progress/ayokoding-learning-path-04-course-authoring plans/in-progress/vercel-function-cost-reduction`
       — acceptance: exits 0 and `ls plans/in-progress/` lists only `README.md` and
       `baseerah-repo-reset`.
-- [ ] [AI] Triage `plans/backlog/`: `git rm -r` the 5 app-specific plans
+- [ ] [AI] Triage `plans/backlog/`: `git rm -r` the 5 `ayokoding`-scoped plans
       (`ayokoding-learning-path-05*`, `ayokoding-learning-path-06*`, `ayokoding-learning-path-07*`,
-      `ayokoding-www-cost-reduction*`, `harden-ayokoding-www-fe-e2e*`, and
-      `ose-private-opencode-ci-monitor-orphan*` — confirm exact folder names with `ls plans/backlog/`
-      first) and keep every generic tooling/governance plan — acceptance: every surviving backlog
-      plan's `README.md` scope names only surviving code.
-- [ ] [AI] Triage `plans/ideas/`: read all 37 two-pagers, `git rm` those about deleted apps, keep
+      `ayokoding-www-cost-reduction*`, `harden-ayokoding-www-fe-e2e*` — confirm exact folder names
+      with `ls plans/backlog/` first). Keep every generic tooling/governance plan, including
+      `ose-private-opencode-ci-monitor-orphan` — its scope is a sibling repo's `.opencode/` mirror
+      artifact, not any app this plan deletes — acceptance: every surviving backlog plan's
+      `README.md` scope names only surviving code or generic tooling/governance.
+- [ ] [AI] Triage `plans/ideas/`: read all 36 two-pagers, `git rm` those about deleted apps, keep
       those about tooling, governance, or `rhino-cli` — acceptance: re-running
       `rg -ln 'ayokoding|organiclever|wahidyankf' plans/ideas/` returns no matches.
 - [ ] [AI] Update `plans/in-progress/README.md`, `plans/backlog/README.md`, and
       `plans/ideas/README.md` indexes to match the surviving contents, and delete
       `plans/done/README.md`'s parent reference wherever `plans/README.md` links to it — acceptance:
-      `npx nx run rhino-cli:md:links-validation` (or the repo's `md links validate` invocation from
-      `.husky/pre-push`) reports zero broken links.
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done`
+      reports zero broken links.
 - [ ] [AI] Now that `plans/done/` is gone, drop the `--exclude plans/done` flags from
       `.husky/pre-push`, `package.json` lint-staged, `main-ci.yml`, and `pr-quality-gate.yml` —
       acceptance: `rg -n 'exclude plans/done' .husky/ package.json .github/` returns no matches.
@@ -519,7 +555,7 @@ permitted to move this plan folder.
       — exits 0 with no output. The principles layer is byte-identical to `ose-public`.
 - [ ] [AI] `npm run generate:bindings && npm run validate:sync` — both exit 0, and
       `git diff --exit-code` afterwards reports no drift.
-- [ ] [AI] `npx nx run rhino-cli:harness:bindings-validation` — exits 0.
+- [ ] [AI] `npm run harness:bindings-validation` — exits 0.
 - [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
 - [ ] [AI] `ls .claude/agents/*.md | sed 's|.*/||; s|\.md$||' | grep -vE -- '-(maker|checker|fixer|dev|deployer|manager|tester|researcher)$' | grep -v '^README$'`
       — outputs only the known preexisting violation `api-exploratory-tester`; no new violation.
@@ -660,15 +696,13 @@ permitted to move this plan folder.
       (tech-docs Decision 11) — acceptance: the table lists `rhino-cli`, `rust-commons`, `web-ui`,
       `web-ui-token`, `baseerah-be`, and `baseerah-fe`, each with one unambiguous threshold.
 - [ ] [AI] Create the five-folder C4 spec tree: `specs/apps/baseerah/{product,system-context,containers,components,behavior}`,
-      each with a `README.md` index — acceptance: `npx nx run rhino-cli:md:readme-index-validation`
-      (or the equivalent `md readme-index validate` invocation from `.husky/pre-push`) exits 0.
+      each with a `README.md` index — acceptance: `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate` exits 0.
 - [ ] [AI] Author `specs/apps/baseerah/product/README.md` describing the hello-world scope and naming the
       deferred capabilities — acceptance: the file exists with a single H1 and no fabricated metric.
 - [ ] [AI] Author `specs/apps/baseerah/system-context/README.md` with a Mermaid context diagram
       (browser → `baseerah-fe` → `baseerah-be`) using the accessible palette and a text description
       per the [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md) —
-      acceptance: `npx nx run rhino-cli:md:mermaid-validation` (or the `md mermaid validate`
-      invocation from `.husky/pre-push`) exits 0.
+      acceptance: `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate` exits 0.
 - [ ] [AI] Create `specs/apps/baseerah/containers/contracts/openapi.yaml`: OpenAPI 3.1 defining
       `GET /api/v1/health` (→ `Health`), `GET /api/v1/hello` (→ `Greeting`), and the shared `Error`
       schema used by the 404 response. Three `GET` routes, no request bodies, no write operations —
@@ -676,8 +710,8 @@ permitted to move this plan folder.
       reports no errors.
 - [ ] [AI] Create `specs/apps/baseerah/containers/contracts/project.json` registering the Nx project
       `baseerah-contracts`, modelled on the deleted `ose-contracts` project (recover it with
-      `git show HEAD~3:specs/apps/ose/containers/contracts/project.json` if the exact shape is
-      needed), with a `bundle` target writing `generated/openapi-bundled.yaml`, a real `lint` target,
+      `git show "$(git log --diff-filter=D --format=%H -- specs/apps/ose/containers/contracts/project.json | head -1)~1":specs/apps/ose/containers/contracts/project.json`
+      if the exact shape is needed), with a `bundle` target writing `generated/openapi-bundled.yaml`, a real `lint` target,
       the mandatory six with echoes where inapplicable, `namedInputs.specs`, and tags
       `["type:lib","lang:ts","domain:baseerah"]` — acceptance: `npx nx show projects` includes
       `baseerah-contracts`.
@@ -700,7 +734,7 @@ permitted to move this plan folder.
       file must sit in a domain subdirectory under `gherkin/`, never bare directly beneath it.
 - [ ] [AI] Author `specs/apps/baseerah/components/README.md` and
       `specs/apps/baseerah/containers/README.md` indexes whose stated `.feature` counts match the
-      files actually present — acceptance: `npx nx run rhino-cli:md:readme-index-validation` exits 0.
+      files actually present — acceptance: `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate` exits 0.
 - [ ] [AI] Register the area in `repo-config.yml`: add a `coverage.projects` entry for
       `baseerah-contracts` with its `specs` glob; leave `specs.ddd-areas` empty since no `ddd/`
       folder exists — acceptance: `npm run validate:config` exits 0.
@@ -729,7 +763,9 @@ permitted to move this plan folder.
 ## Phase 6: `baseerah-be` — F# / Giraffe Hello World on :19320
 
 > Modelled on `apps/organiclever-be` (which matches its F# backend) rather than `apps/ose-be`.
-> Recover reference files with `git show HEAD~4:apps/organiclever-be/<path>` as needed.
+> Recover reference files with
+> `git show "$(git log --diff-filter=D --format=%H -- apps/organiclever-be/<path> | head -1)~1":apps/organiclever-be/<path>`
+> as needed (deletion-commit lookup, not a fixed `HEAD~N` offset).
 > **Stateless hello world** — no database, no in-memory store, no write route
 > ([tech-docs Decision 8](./tech-docs.md#decision-8--hello-world-and-therefore-no-state-at-all)).
 
@@ -884,7 +920,8 @@ permitted to move this plan folder.
 - [ ] [AI] Create `infra/dev/baseerah-app/`: `docker-compose.yml`, `docker-compose.ci.yml`,
       `Dockerfile.be.dev`, `Dockerfile.fe.dev`, `README.md`, `.gitignore` — modelled on the deleted
       `infra/dev/organiclever-app/` (recover with
-      `git show HEAD~6:infra/dev/organiclever-app/docker-compose.yml`), **not** on
+      `git show "$(git log --diff-filter=D --format=%H -- infra/dev/organiclever-app/docker-compose.yml | head -1)~1":infra/dev/organiclever-app/docker-compose.yml`),
+      **not** on
       `infra/dev/ose-app/`, which was stale and pointed at a non-existent Rust backend. Services:
       `baseerah-be` on 19320 and `baseerah-fe` on 19310; **no database service** — acceptance:
       `docker compose -f infra/dev/baseerah-app/docker-compose.yml config` exits 0.
@@ -939,9 +976,9 @@ permitted to move this plan folder.
       `./.github/workflows/_reusable-be-build-deploy.yml` with `be-project: baseerah-be` and
       `image-name: ghcr.io/wahidyankf/baseerah-be`, triggered by `push` to `stag-baseerah-be`.
       Recover the exact caller shape with
-      `git show HEAD~6:.github/workflows/ose-be-build-deploy-stag.yml` — acceptance:
-      `actionlint .github/workflows/baseerah-be-build-deploy-stag.yml` exits 0 and the file is under
-      25 lines, matching the thin-caller pattern.
+      `git show "$(git log --diff-filter=D --format=%H -- .github/workflows/ose-be-build-deploy-stag.yml | head -1)~1":.github/workflows/ose-be-build-deploy-stag.yml`
+      — acceptance: `actionlint .github/workflows/baseerah-be-build-deploy-stag.yml` exits 0 and the
+      file is under 25 lines, matching the thin-caller pattern.
 - [ ] [AI] Re-populate `.github/workflows/publish-images.yml`: add the `build-baseerah-be` output,
       its `case` arm in the `detect` job, and the `publish-baseerah-be` job, following the structure
       Phase 1 left intact — acceptance: `actionlint .github/workflows/publish-images.yml` exits 0 and
@@ -974,17 +1011,20 @@ permitted to move this plan folder.
 ## Phase 8: `baseerah-fe` — Next.js 16 Hello World on :19310
 
 > Modelled on `apps/ose-app-web` minus the DDD bounded-context layering (tech-docs Decision 9).
-> Recover reference files with `git show HEAD~7:apps/ose-app-web/<path>`.
+> Recover reference files with
+> `git show "$(git log --diff-filter=D --format=%H -- apps/ose-app-web/<path> | head -1)~1":apps/ose-app-web/<path>`
+> (deletion-commit lookup, not a fixed `HEAD~N` offset — safe regardless of how many commits the
+> earlier phases actually made).
 > One route, `/`. No forms, no write paths, no client state beyond the fetched greeting.
 
-- [ ] [AI] Author the two high-fidelity mockups into
-      `plans/in-progress/baseerah-repo-reset/assets/` — `landing-desktop-1280.png` and
-      `landing-mobile-390.png` — realising the selected Alternative B "Shell + Greeting" from
-      [prd.md](./prd.md#select) with the Phase 4 Baseerah tokens — acceptance: both files exist.
-- [ ] [AI] Edit `prd.md`'s **Narrow** subsection: convert the two inert code-fenced paths into live
+- [ ] [AI] Author the three high-fidelity mockups into
+      `plans/in-progress/baseerah-repo-reset/assets/` — `landing-desktop-1280.png`,
+      `landing-tablet-768.png`, and `landing-mobile-390.png` — realising the selected Alternative B
+      "Shell + Greeting" from [prd.md](./prd.md#select) with the Phase 4 Baseerah tokens —
+      acceptance: all three files exist.
+- [ ] [AI] Edit `prd.md`'s **Narrow** subsection: convert the three inert code-fenced paths into live
       `![alt](./assets/...)` embeds with descriptive alt text — acceptance:
-      `npx nx run rhino-cli:md:links-validation` (or the `md links validate` invocation from
-      `.husky/pre-push`) reports zero broken links.
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` reports zero broken links.
 - [ ] [AI] Scaffold `apps/baseerah-fe/` with `package.json`, `tsconfig.json` (standalone, `@/*` →
       `./src/*` plus the `web-ui` aliases), `next.config.ts` (`output: "standalone"`,
       `transpilePackages` for `web-ui`, `web-ui-token`, `@t3-oss`), `postcss.config.mjs`,
@@ -1080,9 +1120,9 @@ permitted to move this plan folder.
 - [ ] [AI] Manual behavioural verification with Playwright MCP against `http://localhost:19310` —
       acceptance: the page shows the heading `Baseerah` and the text `Hello from Baseerah`, and the
       greeting disappears when `baseerah-be` is stopped, proving it is fetched rather than hardcoded.
-      Save one screenshot per breakpoint into `evidence/phase-8-landing-1280.png` and
-      `evidence/phase-8-landing-390.png`.
-- [ ] [AI] `npx nx run rhino-cli:md:links-validation` — exits 0; the `prd.md` mockup embeds resolve.
+      Save one screenshot per breakpoint into `evidence/phase-8-landing-1280.png`,
+      `evidence/phase-8-landing-768.png`, and `evidence/phase-8-landing-390.png`.
+- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` — exits 0; the `prd.md` mockup embeds resolve.
 - [ ] [AI] `npm run validate:config` — exits 0.
 - [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
 - [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
@@ -1139,8 +1179,8 @@ permitted to move this plan folder.
       `contracts-project: baseerah-contracts`, `compose-dir: infra/dev/baseerah-app`,
       `stag-web-branch: stag-baseerah-fe`, `stag-be-branch: stag-baseerah-be`, `be-port: 19320`,
       `web-port: 19310`, and `environment: baseerah-app-local`. Recover the exact caller shape with
-      `git show HEAD~8:.github/workflows/ose-app-test-local-deploy-stag.yml` — acceptance:
-      `actionlint .github/workflows/baseerah-app-test-local-deploy-stag.yml` exits 0.
+      `git show "$(git log --diff-filter=D --format=%H -- .github/workflows/ose-app-test-local-deploy-stag.yml | head -1)~1":.github/workflows/ose-app-test-local-deploy-stag.yml`
+      — acceptance: `actionlint .github/workflows/baseerah-app-test-local-deploy-stag.yml` exits 0.
 - [ ] [AI] Create `.github/workflows/baseerah-app-test-stag.yml` calling
       `./.github/workflows/_reusable-app-test-stag.yml` with `fe-e2e-project: baseerah-fe-e2e`,
       `environment: baseerah-app-staging`, and `secrets: inherit` — acceptance:
@@ -1156,6 +1196,47 @@ permitted to move this plan folder.
       — acceptance: the pre-commit gate passes.
 - [ ] [AI] Push: `git push origin main` — acceptance: exits 0.
 
+### Rule-15 three-tester retest follow-ups
+
+> Per [User-Facing Delivery Hardening Rule 15](../../../repo-governance/development/quality/user-facing-delivery-hardening.md),
+> a web-UI feature-change plan runs a near-end round of all three live-site testers against the
+> running UI before archival. `baseerah-fe` has exactly one supported locale (`en` — the Arabic
+> string بصيرة is a decorative `lang="ar"` fragment inside the English page per
+> [prd.md](./prd.md#justify), not a separate locale route), so this round covers
+> that single locale in full; there is no second locale to retest.
+
+- [ ] [AI] With `baseerah-be` and `baseerah-fe` both running locally, invoke the
+      [`web-ux-test-fixing-planning`](../../../repo-governance/workflows/web/web-ux-test-fixing-planning.md)
+      workflow against `http://localhost:19310` with `output-mode: delivery` and this plan's path —
+      acceptance: the workflow runs `web-exploratory-tester`, `web-usability-tester`, and
+      `web-design-tester`, and this section is populated in place with their findings as unchecked
+      `- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN:` checkboxes (or states explicitly that
+      zero findings were returned).
+- [ ] [AI] Fix every `EWT-NNN`/`UWT-NNN`/`DWT-NNN` checkbox recorded above and tick it — acceptance:
+      no unchecked Rule-15 defect checkbox remains in this section. Any `SG-###`/`USS-###` proposal
+      may instead be triaged with written rationale recorded under its checkbox.
+- [ ] [AI] Commit and push the retest fixes (if any): `git add -A && git commit -m "fix(baseerah-fe): address rule-15 three-tester retest findings"`
+      then `git push origin main` — acceptance: exits 0. Skip this step if zero findings were
+      returned above.
+
+### Rule-16 API exploratory-test retest follow-ups
+
+> Per [User-Facing Delivery Hardening Rule 16](../../../repo-governance/development/quality/user-facing-delivery-hardening.md),
+> an API feature-change plan runs a near-end `api-exploratory-tester` round against the running API
+> before archival, with the OpenAPI contract as ground truth.
+
+- [ ] [AI] With `baseerah-be` running locally, invoke `api-exploratory-tester` against
+      `http://localhost:19320` with `specs/apps/baseerah/containers/contracts/openapi.yaml` as
+      ground truth, `output-mode: delivery`, and this plan's path — acceptance: this section is
+      populated in place with its findings as unchecked `- [ ] AET-NNN:` checkboxes (or states
+      explicitly that zero findings were returned).
+- [ ] [AI] Fix every `AET-NNN` checkbox recorded above and tick it — acceptance: no unchecked
+      Rule-16 defect checkbox remains in this section. Any `SG-###` proposal may instead be triaged
+      with written rationale recorded under its checkbox.
+- [ ] [AI] Commit and push the retest fixes (if any): `git add -A && git commit -m "fix(baseerah-be): address rule-16 API exploratory-test retest findings"`
+      then `git push origin main` — acceptance: exits 0. Skip this step if zero findings were
+      returned above.
+
 ### Phase 9 Gate
 
 > All checks below must pass before starting Phase 10.
@@ -1163,15 +1244,20 @@ permitted to move this plan folder.
 - [ ] [AI] `npx nx run baseerah-fe-e2e:test:e2e` — exits 0 with two scenarios passing.
 - [ ] [AI] `npx nx run baseerah-be-e2e:test:e2e` — still exits 0; the backend suite did not regress.
 - [ ] [AI] `npx nx run baseerah-fe-e2e:specs:e2e:coverage` — exits 0.
-- [ ] [AI] `npx nx show projects` — lists exactly the nine expected projects and nothing else,
+- [ ] [AI] `npx nx show projects` — lists exactly the nine expected projects, plus
+      `fsharp-crane-core` as a tenth if and only if the Phase 2 audit kept it, and nothing else,
       satisfying [prd.md US-1](./prd.md#us-1--purge-the-old-product).
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0 across all twelve workflow files.
+- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0 across all eleven workflow files.
 - [ ] [AI] **CI architecture parity still holds** after adding the callers:
       `diff <(rg -oN '^  [a-z0-9-]+:$' /Users/wkf/ose-projects/ose-public/.github/workflows/main-ci.yml) <(rg -oN '^  [a-z0-9-]+:$' .github/workflows/main-ci.yml)`
       and the same diff for `pr-quality-gate.yml` and `.github/actions/` — all exit 0 with no output.
       Adding callers must never have perturbed the core gates.
 - [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
 - [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
+- [ ] [AI] No unchecked Rule-15 or Rule-16 defect checkbox remains: run
+      `rg -n '^- \[ \] (EWT|UWT|DWT|AET)-' delivery.md` — acceptance: no matches (unfixed
+      `SG-###`/`USS-###` proposals with recorded triage rationale are not defect checkboxes and are
+      exempt from this check).
 
 > **Pause Safety**: every user story in `prd.md` except US-6 is implemented and verified at unit,
 > integration, and E2E level. The repo is a complete, working, self-consistent Baseerah monorepo
@@ -1187,9 +1273,12 @@ permitted to move this plan folder.
 > [Agent Naming Convention](../../../repo-governance/conventions/structure/agent-naming.md).
 
 - [ ] [AI] Create `.claude/agents/apps-baseerah-fe-content-maker.md` using `agent-maker`, modelled on
-      the deleted `apps-ose-www-content-maker` (recover with
-      `git show HEAD~7:.claude/agents/apps-ose-www-content-maker.md`) — acceptance: the file has
-      valid frontmatter with `name`, `description`, `tools`, and a named colour.
+      the deleted `apps-ose-www-content-maker` (recover its last committed content with
+      `git show "$(git log --diff-filter=D --format=%H -- .claude/agents/apps-ose-www-content-maker.md | head -1)~1":.claude/agents/apps-ose-www-content-maker.md`
+      — this looks up the deletion commit directly rather than assuming a fixed `HEAD~N` offset,
+      which stays correct even if Phase 9's Rule-15/16 retest sections added extra commits) —
+      acceptance: the file has valid frontmatter with `name`, `description`, `tools`, and a named
+      colour.
 - [ ] [AI] Create `.claude/agents/apps-baseerah-fe-content-checker.md` — acceptance: same.
 - [ ] [AI] Create `.claude/agents/apps-baseerah-fe-content-fixer.md` — acceptance: same.
 - [ ] [AI] Create `.claude/agents/apps-baseerah-fe-deployer.md`, documenting the (not yet existing)
@@ -1218,7 +1307,7 @@ permitted to move this plan folder.
 
 - [ ] [AI] The agent-naming enforcement command above — no new violation.
 - [ ] [AI] `npm run validate:sync` — exits 0.
-- [ ] [AI] `npx nx run rhino-cli:harness:bindings-validation` — exits 0.
+- [ ] [AI] `npm run harness:bindings-validation` — exits 0.
 - [ ] [AI] `npx nx run rhino-cli:instruction-size:validation` — exits 0.
 - [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
 - [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
@@ -1234,6 +1323,11 @@ permitted to move this plan folder.
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md).
 > Archival is **blocked** until every `learnings.md` entry reaches a terminal state.
 
+- [ ] [AI] Confirm the Rule-15/Rule-16 retest gate before doing anything else: run
+      `rg -n '^- \[ \] (EWT|UWT|DWT|AET)-' plans/in-progress/baseerah-repo-reset/delivery.md` —
+      acceptance: no matches. Per
+      [User-Facing Delivery Hardening Rules 15-16](../../../repo-governance/development/quality/user-facing-delivery-hardening.md),
+      archival is blocked while any Rule-15/16 defect checkbox is unchecked.
 - [ ] [AI] Read `plans/in-progress/baseerah-repo-reset/learnings.md` end to end — acceptance: every
       entry is enumerated in a triage table written into the same file.
 - [ ] [AI] Run the secret/sensitivity gate on every entry: confirm no entry contains a credential,
@@ -1245,8 +1339,14 @@ permitted to move this plan folder.
       `plans/backlog/` follow-up if the fix is large — acceptance: the entry has a named terminal
       state and a link to where it landed.
 - [ ] [AI] Route every remaining entry to exactly one home — a convention, a doc, an agent, a skill,
-      code, a test, or a discard with a one-line reason — acceptance: no entry is left unrouted. If
-      there are none, record the explicit escape `No generalizable learnings — <reason>`.
+      code, a test, or a discard with a one-line reason. Per the
+      [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md),
+      any entry routed to `code`/`a test` (i.e. to `apps/`, `libs/`, or a test suite) MUST be filed
+      as a **new** `plans/backlog/` plan rather than landed inline in this plan's own commits — this
+      plan is already closing, and Phase 11 does not reopen `apps/`/`libs/` work. Acceptance: no
+      entry is left unrouted, and no `code`/`a test`-routed entry has an inline diff in this plan's
+      history — only a `plans/backlog/` filing. If there are none, record the explicit escape
+      `No generalizable learnings — <reason>`.
 - [ ] [AI] File a `plans/backlog/` two-pager or plan for each deferred capability named in
       [prd.md § Out of scope](./prd.md#out-of-scope) that the maintainer wants queued — at minimum
       persistence, deploy provisioning, and the first LLM integration — acceptance: each has a
@@ -1262,7 +1362,7 @@ permitted to move this plan folder.
       using the **actual** completion date, not today's — acceptance: `ls plans/in-progress/` lists
       only `README.md`.
 - [ ] [AI] Update `plans/in-progress/README.md` and `plans/done/README.md` indexes — acceptance:
-      `npx nx run rhino-cli:md:links-validation` reports zero broken links.
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` reports zero broken links.
 - [ ] [AI] Re-add the `--exclude plans/done` flags to `.husky/pre-push`, `package.json` lint-staged,
       `main-ci.yml`, and `pr-quality-gate.yml`, since `plans/done/` now exists again with this
       plan in it — acceptance: `rg -n 'exclude plans/done' .husky/pre-push package.json` returns

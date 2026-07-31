@@ -67,14 +67,14 @@ additionally depends on `baseerah-be` because it runs against the full local Doc
 ### Decision 1 — Purge the product, keep the harness
 
 **Chosen**: delete 22 apps, their specs, CI, infra, and registrations; keep `rhino-cli`, four libs,
-the generic agent fleet, all 31-minus-5 skills, and every layer of `repo-governance/`.
+the generic agent fleet, all 31-minus-4 skills, and every layer of `repo-governance/`.
 
-**Rejected — start a clean repo**: would discard ~200 governance files, ~59 agents, 26 skills, a
+**Rejected — start a clean repo**: would discard ~200 governance files, ~59 agents, 27 skills, a
 working polyglot CI harness, and `rhino-cli` itself. The harness is the reason this clone was made.
 
 **Rejected — leave the old apps in place and add Baseerah alongside**: the instruction surface is
 auto-loaded into every agent session. Leaving `AGENTS.md` describing eight web properties that do not
-ship from this repo poisons every planning decision made here, and CI keeps running 16 workflow files
+ship from this repo poisons every planning decision made here, and CI keeps running 12 workflow files
 against nothing.
 
 ### Decision 2 — `main-to-origin-main` delivery mode
@@ -87,10 +87,15 @@ No worktree, no PR, no PR-Review Maker→Fixer Cycle.
 specialists reviewing `git rm`. The [PRs Open at Delivery Boundaries](../../../repo-governance/conventions/structure/plans.md#prs-open-at-delivery-boundaries-not-every-phase-hard-rule)
 rule binds `*-to-pr` modes only; a per-phase commit-and-push cadence is explicitly correct here.
 
-**Consequence — the gate replaces the review.** Because no reviewer sees the diff, each phase gate
-runs the full pre-push and CI-equivalent command set locally _before_ the push step, and asserts
-per-job CI status after it. Recovery from a bad push is a forward `git revert`, never a force-push
-or history rewrite, per [No Destructive Git Operations](../../../repo-governance/development/workflow/no-destructive-git-operations.md).
+**Consequence — the gate replaces the review.** Because no reviewer sees the diff, `.husky/pre-push`
+automatically runs the affected-scope typecheck/lint/test:quick/specs:coverage set on every `git
+push` — including each phase's push in `delivery.md` — so a push that would fail those checks never
+lands on `origin/main` in the first place. Each phase's `### Phase N Gate` then runs a broader,
+**whole-repo** `npx nx run-many -t typecheck,lint,test:quick --all` after the push (the hook's
+affected-only scope can miss regressions in projects the phase didn't touch directly) and asserts
+per-job CI status with `gh run view --json jobs`. Recovery from a bad push is a forward `git revert`,
+never a force-push or history rewrite, per
+[No Destructive Git Operations](../../../repo-governance/development/workflow/no-destructive-git-operations.md).
 
 ### Decision 3 — Keep the `@open-sharia-enterprise` npm scope
 
@@ -249,8 +254,9 @@ by `open-sharia-enterprise` occurrence count are all in `plans/done/`), and ever
 is history for a product this repo no longer contains. `ose-public` remains untouched and is the
 authoritative archive.
 
-**Safety**: Phase 3 records the upstream `ose-public` commit SHA in
-`evidence/phase-3-upstream-archive.txt` before deleting, so the archive is addressable. Generic
+**Safety**: Phase 0 records the upstream `ose-public` commit SHA into `evidence/phase-0-baseline.txt`
+(under a `## ose-public archive HEAD` heading), and Phase 3 confirms it is present before deleting
+`plans/done/`, so the archive stays addressable. Generic
 `plans/ideas/` two-pagers about tooling and governance are **kept** and triaged individually, not
 bulk-deleted.
 
@@ -293,7 +299,7 @@ The only structural governance changes this plan makes are the four already item
    (Decision 6)
 4. add `repo-governance/vision/baseerah.md` beneath the unchanged OSE vision (Decision 4)
 
-**Rationale**: direct maintainer instruction — _"make sure we have the same principles as `ose-_`"\*.
+**Rationale**: direct maintainer instruction — _"make sure we have the same principles as `ose-*`"_.
 Principles are Layer 1, the layer every convention and practice traces back to. Divergence there
 would silently fork every downstream rule and make governance fixes uncopyable between the sibling
 repos.
@@ -315,13 +321,14 @@ of this one.
 
 `AGENTS.md` currently states `apps/rhino-cli` must be byte-identical across `ose-public`,
 `ose-primer`, and `ose-private`. `baseerah` is a **fourth** clone that is not in that parity loop,
-and Phase 3 makes real source edits to `rhino-cli`:
+and Phase 3 makes real source edits to `rhino-cli`. Reading both files in full first (see
+`delivery.md`'s Phase 3 audit step) shows the two changes are not symmetric:
 
-| File                                                                                                        | Change                                                                                                                       |
-| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `src/commands/specs_validate_counts.rs`                                                                     | default areas `["organiclever","ose"]` → `["baseerah"]`                                                                      |
-| `src/application/repo_governance/frontmatter_audit.rs`                                                      | allowlist `apps/ayokoding-www/`, `apps/ose-www/`, `apps/organiclever-app-web/`, `apps/wahidyankf-www/` → `apps/baseerah-fe/` |
-| `src/commands/md_validate_links.rs`, `md_validate_heading_hierarchy.rs`, `specs_coverage.rs`, `env_init.rs` | test fixtures and doc comments naming removed apps                                                                           |
+| File                                                                                                        | What's actually there                                                                                                    | Change                                                                                                        |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `src/commands/specs_validate_counts.rs`                                                                     | `["organiclever","ose"]` is a **test fixture** only — the production default reads `repo-config.yml`'s `specs.ddd-areas` | rename the fixture strings to `["baseerah"]`; no behaviour change, no bound scenario                          |
+| `src/application/repo_governance/frontmatter_audit.rs`                                                      | `WEBSITE_APP_PREFIXES` is an **exemption (skip) list** naming the four deleted `-www`/content apps                       | empty the list to `&[]` — a real behaviour change (audit now applies everywhere), bound to a Gherkin scenario |
+| `src/commands/md_validate_links.rs`, `md_validate_heading_hierarchy.rs`, `specs_coverage.rs`, `env_init.rs` | test fixtures and doc comments naming removed apps                                                                       | swept and renamed                                                                                             |
 
 Phase 4 therefore rewrites the byte-identity clause in `AGENTS.md` to state that this repo is
 **outside** the parity loop and that `rhino-cli` here is a fork. Doing the source edits before that
@@ -372,7 +379,7 @@ makes "consistent with `ose-*`" a checkable claim rather than a slogan.
   app, and map exactly onto Baseerah's `fe` + `be` app group. Only
   `_reusable-www-test-local-deploy.yml` is deleted, because Baseerah has no `-www` tier for it to
   serve.
-- **Deletes only the 12 per-app callers** plus the app-specific job bodies inside
+- **Deletes only the 11 per-app callers** plus the app-specific job bodies inside
   `publish-images.yml`, and re-adds Baseerah callers with the same shape in Phases 7 and 9.
 
 **Verification** — Phase 1's gate diffs the invariant surface against the upstream sibling rather
@@ -427,13 +434,13 @@ merely-untidy diff.
 | `apps/{wahidyankf-www,wahidyankf-www-fe-e2e}`                                                                                                               | 2                                                                                                                      |
 | `specs/apps/{ayokoding,crane,organiclever,ose,wahidyankf}`                                                                                                  | includes the `ose-contracts` and `organiclever-contracts` `project.json` files, which live inside `specs/` not `apps/` |
 | `infra/`                                                                                                                                                    | all 21 files, recreated as `infra/dev/baseerah-app/` in Phase 7                                                        |
-| `.github/workflows/` — 12 per-app + 4 `_reusable-*` + `publish-images.yml`                                                                                  | 17 of ~22 files                                                                                                        |
+| `.github/workflows/` — 11 per-app + 1 `_reusable-*` (`_reusable-www-test-local-deploy.yml`)                                                                 | 12 of ~21 files (`publish-images.yml` is reduced to a skeleton, not deleted)                                           |
 | `open-sharia-enterprise.sln`                                                                                                                                | contains only `crane-cli` projects                                                                                     |
 | `.claude/agents/` — 29 app-scoped + 2 separation agents                                                                                                     | mirrors regenerate, never hand-edited                                                                                  |
 | `.claude/skills/` — 3 app-scoped + `docs-validating-software-engineering-separation`                                                                        | 4 directories                                                                                                          |
 | `repo-governance/workflows/ayokoding-web/`                                                                                                                  | 6 files, ~113 KB                                                                                                       |
 | `repo-governance/conventions/linking/internal-ayokoding-references.md`                                                                                      | 1                                                                                                                      |
-| `generated-socials/`                                                                                                                                        | 34 OSE weekly LinkedIn update posts plus its `README.md`                                                               |
+| `generated-socials/`                                                                                                                                        | 33 OSE weekly LinkedIn update posts plus its `README.md`                                                               |
 | `.claude/agents/social-linkedin-post-maker.md`                                                                                                              | its sole output home was `generated-socials/`, and its charter is the OSE tri-repo family this repo is not part of     |
 | `plans/done/` (174), app-specific `plans/backlog/` (5), both `plans/in-progress/`                                                                           | see Decision 10                                                                                                        |
 | `.config/dotnet-tools.json`                                                                                                                                 | **NOT deleted** — kept for `baseerah-be` (Decision 5)                                                                  |
@@ -508,18 +515,18 @@ and both branches are spelled out in `delivery.md`.
 
 ## Risks and Mitigations
 
-| Risk                                                                                               | Severity | Mitigation                                                                                                                                                                    |
-| -------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Emptying a `repo-config.yml` list fails schema validation and blocks every subsequent commit       | High     | Phase 2 step 1 reads the schema first and removes keys rather than leaving `[]` if empty lists are rejected (Mechanics 4)                                                     |
-| `rhino-cli` edits break `generate:bindings`, which every later phase depends on                    | High     | TDD with companion Gherkin; Phase 3's gate runs `generate:bindings` + `validate:sync` + `harness:bindings-validation` end to end                                              |
-| A direct push lands red on `origin/main` with no reviewer to catch it                              | High     | Every phase gate runs the pre-push command set locally before the push item, then asserts per-job CI status with `gh run view --json jobs`                                    |
-| Deleting `specs/apps/ose/` orphans the `ose-contracts` Nx project that lives inside it             | Medium   | Called out explicitly in the deletion table; `nx show projects` in the Phase 2 gate catches any survivor                                                                      |
-| `_reusable-*` workflow templates are deleted while a caller still references them                  | Medium   | Phase 1 deletes callers and templates in one commit and its gate runs `actionlint` over the whole `.github/` tree                                                             |
-| The `dotnet` CI job fails on zero projects between Phases 2 and 6                                  | Medium   | Phase 2's gate explicitly asserts the `dotnet` job's status is `success`, not merely that the run concluded                                                                   |
-| `libs/web-ui` primitives carry OrganicLever/OSE brand assumptions into Baseerah's UI               | Medium   | Phase 4 rebrands `libs/web-ui-token` and `brand-context.md`; `web-ui` component APIs are brand-neutral                                                                        |
-| Governance prose still naming removed apps survives the sweep                                      | Medium   | Phase 3's gate is an `rg` sweep with a zero-hit acceptance criterion, not a manual read                                                                                       |
-| `plans/done/` deletion loses decisions that were never written down elsewhere                      | Medium   | Upstream SHA recorded in `evidence/` first; `ose-public` untouched                                                                                                            |
-| Hello world under-exercises the quad, so a wiring defect stays hidden until the first real feature | Medium   | The greeting is fetched from `baseerah-be` rather than hardcoded in `baseerah-fe`, so `baseerah-fe-e2e` traverses the full FE → BE path against the Docker stack (Decision 8) |
+| Risk                                                                                               | Severity | Mitigation                                                                                                                                                                                                                         |
+| -------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Emptying a `repo-config.yml` list fails schema validation and blocks every subsequent commit       | High     | Phase 2 step 1 reads the schema first and removes keys rather than leaving `[]` if empty lists are rejected (Mechanics 4)                                                                                                          |
+| `rhino-cli` edits break `generate:bindings`, which every later phase depends on                    | High     | TDD with companion Gherkin; Phase 3's gate runs `generate:bindings` + `validate:sync` + `harness:bindings-validation` end to end                                                                                                   |
+| A direct push lands red on `origin/main` with no reviewer to catch it                              | High     | `.husky/pre-push` runs the affected-scope command set locally on every push, blocking a failing push before it lands; each phase gate then runs a whole-repo re-check and asserts per-job CI status with `gh run view --json jobs` |
+| Deleting `specs/apps/ose/` orphans the `ose-contracts` Nx project that lives inside it             | Medium   | Called out explicitly in the deletion table; `nx show projects` in the Phase 2 gate catches any survivor                                                                                                                           |
+| `_reusable-*` workflow templates are deleted while a caller still references them                  | Medium   | Phase 1 deletes callers and templates in one commit and its gate runs `actionlint` over the whole `.github/` tree                                                                                                                  |
+| The `dotnet` CI job fails on zero projects between Phases 2 and 6                                  | Medium   | Phase 2's gate explicitly asserts the `dotnet` job's status is `success`, not merely that the run concluded                                                                                                                        |
+| `libs/web-ui` primitives carry OrganicLever/OSE brand assumptions into Baseerah's UI               | Medium   | Phase 4 rebrands `libs/web-ui-token` and `brand-context.md`; `web-ui` component APIs are brand-neutral                                                                                                                             |
+| Governance prose still naming removed apps survives the sweep                                      | Medium   | Phase 3's gate is an `rg` sweep with a zero-hit acceptance criterion, not a manual read                                                                                                                                            |
+| `plans/done/` deletion loses decisions that were never written down elsewhere                      | Medium   | Upstream SHA recorded in `evidence/` first; `ose-public` untouched                                                                                                                                                                 |
+| Hello world under-exercises the quad, so a wiring defect stays hidden until the first real feature | Medium   | The greeting is fetched from `baseerah-be` rather than hardcoded in `baseerah-fe`, so `baseerah-fe-e2e` traverses the full FE → BE path against the Docker stack (Decision 8)                                                      |
 
 ## Rollback
 
