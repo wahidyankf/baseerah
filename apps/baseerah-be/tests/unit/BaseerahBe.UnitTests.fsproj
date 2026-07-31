@@ -14,6 +14,9 @@
 
   <ItemGroup>
     <Compile Include="Steps/BddState.fs" />
+    <Compile Include="Steps/HealthSteps.fs" />
+    <Compile Include="Steps/GreetingSteps.fs" />
+    <Compile Include="Steps/NotFoundSteps.fs" />
     <Compile Include="Tests/HealthHandlerTests.fs" />
     <Compile Include="Tests/GreetingHandlerTests.fs" />
     <Compile Include="Tests/NotFoundHandlerTests.fs" />
@@ -27,6 +30,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
+    <PackageReference Include="TickSpec" Version="2.0.5" />
     <PackageReference Include="coverlet.collector" Version="8.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
