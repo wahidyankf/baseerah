@@ -15,6 +15,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[repo-workflow-maker](repo-workflow-maker.md)** - Workflow documentation
 - **[specs-maker](specs-maker.md)** - Spec area scaffolding and feature file creation
 - **[agent-maker](agent-maker.md)** - Agent definition creation
+- **[apps-baseerah-fe-content-maker](apps-baseerah-fe-content-maker.md)** - Creates and updates baseerah-fe landing-page copy (tagline, brand chip, footer, not-found/error text)
 - **[swe-ui-maker](swe-ui-maker.md)** - UI component creation
 - **[pr-review-architecture-maker](pr-review-architecture-maker.md)** - PR-review specialist scoped to architecture only: new tradeoffs, module boundaries, reversibility, blast radius, quality-attribute effects, novel dependencies
 - **[pr-review-logic-maker](pr-review-logic-maker.md)** - PR-review specialist scoped to business-logic/correctness only: behavior vs. domain intent plus Gherkin acceptance-criteria conformance across edge/error cases
@@ -43,6 +44,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[swe-code-checker](swe-code-checker.md)** - Validates projects against platform coding standards (validates application code rather than documentation)
 - **[swe-ui-checker](swe-ui-checker.md)** - UI component quality validation
 - **[ci-checker](ci-checker.md)** - CI/CD standards validation (mandatory Nx targets, coverage thresholds, Docker setup, Gherkin specs)
+- **[apps-baseerah-fe-content-checker](apps-baseerah-fe-content-checker.md)** - Validates baseerah-fe landing-page content quality (accessibility, token usage, documented content surface)
 
 ### 🟨 Fixing (Fixers)
 
@@ -58,6 +60,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[specs-fixer](specs-fixer.md)** - Fix specs structural and accuracy issues
 - **[swe-ui-fixer](swe-ui-fixer.md)** - Apply validated UI component fixes
 - **[ci-fixer](ci-fixer.md)** - Apply validated CI/CD standards fixes
+- **[apps-baseerah-fe-content-fixer](apps-baseerah-fe-content-fixer.md)** - Apply validated baseerah-fe content fixes
 - **[pr-review-fixer](pr-review-fixer.md)** - Triages and resolves `pr-review-synthesis-maker`'s consolidated findings on a GitHub PR (fix / reject-with-reason / defer-with-reason / clarify), replying to and resolving review threads; the fixer half of the PR-Review Maker→Fixer Cycle
 
 ### 🔍 Research (Green)
@@ -73,8 +76,8 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 ### 🟪 Operations
 
-No deployer agents currently exist — every prior deployer targeted an app removed from this repo.
-The `deployer` role remains a valid naming-convention role for future Baseerah deployment agents.
+- **[apps-baseerah-fe-deployer](apps-baseerah-fe-deployer.md)** - Force-pushes main to `prod-baseerah-fe` for baseerah-fe production deploys. No production target is provisioned yet — documents the intended workflow ahead of that provisioning.
+- **[apps-baseerah-be-deployer](apps-baseerah-be-deployer.md)** - Force-pushes main to `stag-baseerah-be`, triggering the existing image-build CI job. No running staging server consumes the image yet.
 
 ### 💻 Development
 
@@ -105,7 +108,7 @@ Normative source: [Agent Naming Convention](../../repo-governance/conventions/st
 | `checker`    | Validates an artifact against standards                                                | `plan-checker`, `plan-execution-checker`, `swe-code-checker`                                    |
 | `fixer`      | Applies validated checker findings                                                     | `plan-fixer`, `swe-ui-fixer`                                                                    |
 | `dev`        | Writes code in a language or test framework                                            | `swe-rust-dev`, `swe-e2e-dev`                                                                   |
-| `deployer`   | Deploys an application to an environment                                               | none currently — see Operations section above                                                   |
+| `deployer`   | Deploys an application to an environment                                               | `apps-baseerah-fe-deployer`, `apps-baseerah-be-deployer`                                        |
 | `manager`    | Performs file or resource operations (rename/move/delete)                              | `docs-file-manager`                                                                             |
 | `tester`     | Explores or evaluates a running system, live site, or API and reports defects/friction | `web-exploratory-tester`, `web-usability-tester`, `web-design-tester`, `api-exploratory-tester` |
 | `researcher` | Gathers and verifies external information; read-only research                          | `web-researcher`                                                                                |

@@ -82,6 +82,30 @@ left `baseerah-fe`'s service commented out in both compose files until Phase 8 c
 is already in `infra/dev/baseerah-app/Dockerfile.be.dev` itself, and there's no reusable convention
 to extract from "an old infra artifact for an app that changed language was never updated."
 
+### A stale NuGet HTTP cache, not just a stale `obj/`, can starve `dotnet fsharplint`
+
+**Noticed**: Phase 9, Rule-16 retest fixes — `baseerah-be:lint` failed deterministically (100% of
+retries, not just occasionally) with "Package FSharp.Core, version 10.1.302 was not found" even
+immediately after a clean `rm -rf obj bin && dotnet restore --force` that itself succeeded and wrote
+the correct `FSharp.Core/10.1.302` entry into `obj/project.assets.json`.
+**Learning**: `apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj` already carries a comment
+documenting this exact symptom as a known flip-flop between 10.1.300/10.1.302, mitigated by pinning
+the exact version — but that mitigation doesn't cover every trigger. `dotnet fsharplint lint` runs a
+Buildalyzer-driven **design-time build** (`ResolveAssemblyReferencesDesignTime;...` targets), a
+different MSBuild invocation from the plain `dotnet build` that `typecheck` runs, and it is this
+design-time build specifically that failed every time while the plain build kept succeeding on the
+same `obj/`. The fix that broke the 100%-repro cycle was `dotnet nuget locals http-cache --clear`
+before the next `rm -rf obj bin && dotnet restore --force` — i.e., the on-disk NuGet HTTP
+response cache (`~/.local/share/NuGet/http-cache`), not the project's own `obj/`, was the actual
+stale state. A plain `dotnet restore` apparently tolerates or bypasses that staleness where the
+design-time build does not.
+**Candidate home**: append this as a second remediation step to whatever documents the existing
+"stale `obj/`/`bin/` → `rm -rf` + `dotnet restore --force`" fix for this repo (if one exists in
+`repo-governance/development/quality/` or a troubleshooting doc) — `dotnet nuget locals http-cache
+--clear` first, if the plain `rm -rf`+restore fix doesn't resolve a `baseerah-be:lint` failure. If no
+such doc exists yet, this and the FSharp.Core pin comment are candidates for a small
+troubleshooting note under `repo-governance/development/quality/` or `docs/reference/`.
+
 <!--
 Append new entries below this line as you work. Do not delete the two seeded entries — they were
 identified during planning and are already carrying a routing obligation into Phase 11.

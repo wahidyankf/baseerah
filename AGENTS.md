@@ -340,9 +340,9 @@ Phase 0 first, `[AI]`/`[HUMAN]` tags, gated phases. See
 
 **Development**: swe-{golang,typescript,e2e,csharp,fsharp,rust}-dev
 
-**Operations**: planned — `apps-baseerah-fe-{content-maker,content-checker,content-fixer,deployer}`,
-`apps-baseerah-be-deployer`; none exist yet — every prior deployer targeted an app removed from this
-repo
+**Operations**: `apps-baseerah-fe-{content-maker,content-checker,content-fixer,deployer}`,
+`apps-baseerah-be-deployer` — the deployer agents document their intended workflow honestly: no
+production/staging deploy target is provisioned yet (see each agent's own file for specifics)
 
 **Content**: pdf-to-md-{maker,checker,fixer}
 
