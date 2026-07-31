@@ -25,6 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Pinned explicitly: the SDK's implicit FSharp.Core reference resolved a different
+         version (10.1.300 vs 10.1.302) depending on whether the invoking dotnet command hit
+         the local NuGet cache or a fresh network listing, causing restores to flip-flop and
+         intermittently fail downstream tools (fsharplint) that expect a stable lock. -->
+    <PackageReference Update="FSharp.Core" Version="10.1.302" />
     <PackageReference Include="Giraffe" Version="8.2.0" />
     <!-- F# static analyzers (G-Research) — runs via dotnet msbuild /t:AnalyzeFSharpProject -->
     <PackageReference Include="FSharp.Analyzers.Build" Version="0.5.0">
