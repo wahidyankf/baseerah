@@ -22,3 +22,15 @@ let ``I send a GET request to "/api/v1/hello"`` () =
 [<Then>]
 let ``the response body field "message" equals "Hello from Baseerah"`` () =
     Assert.Contains("Hello from Baseerah", lastBody)
+
+// Rule-16 finding SG-004: an undeclared query string is ignored. The `\?` here
+// is a literal backslash-escape, not a typo — rhino-cli's spec-coverage
+// checker compiles this backtick name directly as a `^…$` regex pattern
+// (see apps/rhino-cli/src/application/speccoverage/extractors.rs), so an
+// unescaped "?" would be read as a regex quantifier and never match the
+// Gherkin step's literal "?".
+[<When>]
+let ``I send a GET request to "/api/v1/hello\?extra=param"`` () =
+    let resp = client.Value.GetAsync("/api/v1/hello?extra=param").Result
+    lastStatus <- int resp.StatusCode
+    lastBody <- resp.Content.ReadAsStringAsync().Result

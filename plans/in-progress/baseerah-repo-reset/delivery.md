@@ -2828,9 +2828,15 @@ sm:gap-2"`) uses `rounded-lg` (computed `14px`), a different point on the radius
       defects fixed and verified (unit tests, e2e scenarios, and/or a rebuilt-and-recreated Docker
       image + live Playwright check); SG-001/SG-002/USS-001 triaged with written rationale;
       USS-002/003/004 added as new Gherkin scenarios with matching unit + e2e coverage.
-- [ ] [AI] Commit and push the retest fixes (if any): `git add -A && git commit -m "fix(baseerah-fe): address rule-15 three-tester retest findings"`
+- [x] [AI] Commit and push the retest fixes (if any): `git add -A && git commit -m "fix(baseerah-fe): address rule-15 three-tester retest findings"`
       then `git push origin main` — acceptance: exits 0. Skip this step if zero findings were
-      returned above.
+      returned above. **Done**: full `run-many -t typecheck,lint,test:quick --all` green (also
+      fixed two pre-existing, unrelated staleness issues hit along the way: `icon.tsx` needed
+      excluding from `vitest.config.ts` coverage thresholds like `layout.tsx` already was, since
+      jsdom can't render `next/og`'s `ImageResponse`; and a stale `baseerah-be/src/BaseerahBe/obj/`
+      dir caused the same intermittent FSharp.Core `ResolvePackageAssets` failure documented earlier
+      in Phase 8/9, fixed via `rm -rf obj bin && dotnet restore --force`). Committed
+      `1c85ebf41` and pushed `ad0201549..1c85ebf41` to `origin main` — exits 0.
 
 ### Rule-16 API exploratory-test retest follow-ups
 
@@ -2838,14 +2844,119 @@ sm:gap-2"`) uses `rounded-lg` (computed `14px`), a different point on the radius
 > an API feature-change plan runs a near-end `api-exploratory-tester` round against the running API
 > before archival, with the OpenAPI contract as ground truth.
 
-- [ ] [AI] With `baseerah-be` running locally, invoke `api-exploratory-tester` against
+- [x] [AI] With `baseerah-be` running locally, invoke `api-exploratory-tester` against
       `http://localhost:19320` with `specs/apps/baseerah/containers/contracts/openapi.yaml` as
       ground truth, `output-mode: delivery`, and this plan's path — acceptance: this section is
       populated in place with its findings as unchecked `- [ ] AET-NNN:` checkboxes (or states
-      explicitly that zero findings were returned).
-- [ ] [AI] Fix every `AET-NNN` checkbox recorded above and tick it — acceptance: no unchecked
+      explicitly that zero findings were returned). **Done**: session-based exploratory retest run
+      2026-07-31 against the live `baseerah-app-baseerah-be-1` container (both endpoints healthy).
+      Charters run: (1) contract-conformance sweep of both documented operations against
+      `openapi.yaml` (status/schema/headers/content-type), (2) antisocial/negative-method tour
+      (POST/PUT/DELETE/OPTIONS/HEAD against both routes), (3) configuration tour (`Accept:
+application/xml`/`text/plain` content negotiation, double-slash, trailing slash, case
+      variance, query strings, percent-encoding, path traversal, Unicode, a 5000-char path,
+      Content-Type-with-body-on-GET), (4) safe passive security pass (response headers, CORS,
+      stack disclosure). Mandatory sweeps: operation × property matrix — both
+      `GET /api/v1/health` and `GET /api/v1/hello` ✓ status / ✓ schema (`jq` type+value assertions
+      against `Health`/`Greeting`/`Error` schemas) / ✓ content-type / n-a declared headers (none
+      declared beyond content-type); cross-cutting convention round-trip — the
+      `{"error": string}` 404 envelope verified uniform across every non-2xx path tried (unknown
+      route, every wrong-method variant, trailing slash, case mismatch, double slash, path
+      traversal, Unicode, oversized path) — ✓ all; declared-invariant pass — the
+      `info.description`'s "exactly three GET routes ... 404 handler for anything else" invariant
+      verified to hold for every non-matching request tried — ✓ holds. Result: **1 defect
+      (AET-001, Minor/Low) and 2 spec-gap proposals (SG-003, SG-004)** filed below; zero
+      Blocker/Critical/Major findings. Evidence captured to
+      `evidence/phase-9-aet-001-response-headers.http`,
+      `evidence/phase-9-sg-003-method-mismatch.http`,
+      `evidence/phase-9-sg-004-query-string-tolerance.http`. Areas not covered: no write
+      operations exist to test (contract declares zero POST/PUT/PATCH/DELETE routes so the
+      idempotency/side-effect dimension is n/a); no auth scheme exists (`security: []`) so the
+      auth/authorization dimension is n/a; TLS/HSTS is n/a for a local plaintext HTTP dev target;
+      no pagination/filtering exists in this two-route API. (`SG-003`/`SG-004` are numbered to
+      avoid colliding with the Rule-15 `SG-001`/`SG-002` IDs already used earlier in this
+      `delivery.md`.)
+- [x] AET-001: Every response (200 and 404 alike) discloses the underlying server stack via
+      `Server: Kestrel` and omits the `X-Content-Type-Options: nosniff` hardening header.
+      **Operation**: all operations — `GET /api/v1/health`, `GET /api/v1/hello`, and the 404
+      fallback; the Kestrel/Giraffe host is configured in
+      `apps/baseerah-be/src/BaseerahBe/WebApp.fs` and its `Program.fs` bootstrap. **Severity**:
+      Minor. **Priority**: Low (local dev target, not yet publicly deployed, but the gap carries
+      forward unless addressed before wider exposure). **Steps**:
+      `curl -sS -D - -o /dev/null http://localhost:19320/api/v1/health`. **Expected**: per OWASP
+      API Security passive-checklist guidance (no version/stack over-disclosure; standard
+      hardening headers present where relevant), the `Server` header should not name the specific
+      web server (`Kestrel`), and `X-Content-Type-Options: nosniff` should be present. The
+      OpenAPI contract does not declare response headers beyond `Content-Type`, so this is a
+      security-hygiene finding rather than a contract-conformance violation. **Actual**:
+      `Server: Kestrel` present on every response; `X-Content-Type-Options` absent — verified
+      consistently across `/api/v1/health` (200), `/api/v1/hello` (200), and the 404 fallback.
+      **Evidence**: `./evidence/phase-9-aet-001-response-headers.http`. **Reproducibility**:
+      Always. **Defect type**: Security. **Suggested fix locus**: the Kestrel host-configuration
+      site under `apps/baseerah-be/src/BaseerahBe/` — suppress the `Server` header
+      (`webBuilder.UseKestrel(fun o -> o.AddServerHeader <- false)`) and add a small
+      `X-Content-Type-Options: nosniff` middleware. _Hypothesis — verify against the actual host
+      bootstrap file before implementing._ **Fixed**: `Program.fs`'s
+      `ConfigureWebHostDefaults` chain now calls `.ConfigureKestrel(fun opts -> opts.AddServerHeader <- false)`,
+      suppressing the `Server` header at the Kestrel level; `WebApp.fs` composes a new
+      `securityHeaders` handler (`setHttpHeader "X-Content-Type-Options" "nosniff"`) at the front
+      of the `webApp` pipeline so it applies to every route including the 404 fallback. Verified
+      via `HealthHandlerTests.fs`'s new `health route response carries the X-Content-Type-Options header`
+      unit test (passing) and a live rebuilt+recreated `baseerah-app-baseerah-be-1` container
+      `curl -sS -D -` check confirming `Server` is absent and `X-Content-Type-Options: nosniff` is
+      present.
+- [ ] SG-003: **Proposed Gherkin gap** — a non-`GET` request to a declared route
+      (`POST`/`PUT`/`DELETE`/`OPTIONS`/`HEAD` against `/api/v1/health` or `/api/v1/hello`) falls
+      through Giraffe's `choose` combinator to the catch-all `notFoundHandler` and returns the
+      same `{"error":"not found"}` 404 envelope as a genuinely unknown path — verified for
+      `POST /api/v1/hello`, `PUT /api/v1/hello`, `DELETE /api/v1/hello`, `OPTIONS /api/v1/hello`,
+      `HEAD /api/v1/hello`, and `POST /api/v1/health` (all 404). This is intended,
+      contract-consistent behavior — the OpenAPI `info.description` itself states "Exactly three
+      GET routes ... and a 404 handler for anything else" — not a defect, but the existing
+      Gherkin only covers a genuinely nonexistent path (`/api/v1/does-not-exist` in
+      `greeting.feature`'s "An unknown route is refused" scenario), never a method mismatch on a
+      _valid_ path, so this behavior is currently unprotected by any regression test. Propose
+      adding to `specs/apps/baseerah/behavior/baseerah-be/gherkin/hello/greeting.feature`:
+      `Scenario Outline: A wrong HTTP method on a declared route is refused\n  Given the service has finished starting\n  When I send a "<method>" request to "<path>"\n  Then the response status is 404\n  And the response body field "error" is a non-empty string\n\n  Examples:\n    | method | path           |\n    | POST   | /api/v1/hello  |\n    | PUT    | /api/v1/hello  |\n    | DELETE | /api/v1/hello  |\n    | POST   | /api/v1/health |`
+      **Evidence**: `./evidence/phase-9-sg-003-method-mismatch.http`.
+      Triage: either add the proposed Scenario Outline (with matching unit-test step support in
+      `apps/baseerah-be/tests/unit/Steps/GreetingSteps.fs`, since the existing step defs assume a
+      `GET`-only `When I send a GET request to "..."` phrasing) or record an explicit written
+      rationale here for deferring it. **Deferred, not added as Gherkin** — mirroring the Rule-15
+      SG-001/SG-002 triage pattern, the existing `apps/baseerah-be` TickSpec `Steps/*.fs` files are
+      a literal-text registry satisfying `rhino-cli`'s spec-coverage checker rather than a live
+      executing BDD runner, so introducing the first parametrized/regex-capture step definition
+      (`"<method>"`/`"<path>"`) under retest time pressure, unverified against this codebase's only
+      existing literal-text convention, carries more risk than value here. Kept as a genuine plain
+      xunit regression test instead: `NotFoundHandlerTests.fs`'s new
+      `a wrong HTTP method on a declared route returns 404 with a non-empty JSON error` `[<Theory>]`
+      (4 `[<InlineData>]` cases matching the Examples table above) — passing.
+- [ ] SG-004: **Proposed Gherkin gap** — an undeclared query string appended to a declared route
+      (`GET /api/v1/hello?extra=param`) is silently ignored; the endpoint still returns its normal
+      200 greeting (`{"message":"Hello from Baseerah"}`). Correct and intended — the contract
+      declares no query parameters for this operation, so ignoring an extra one is the right
+      behavior — but it is currently unprotected: the existing scenario in `greeting.feature`
+      only issues a bare `GET /api/v1/hello` with no query string. Propose adding to
+      `specs/apps/baseerah/behavior/baseerah-be/gherkin/hello/greeting.feature`:
+      `Scenario: An undeclared query string is ignored\n  Given the service has finished starting\n  When I send a GET request to "/api/v1/hello?extra=param"\n  Then the response status is 200\n  And the response body field "message" equals "Hello from Baseerah"`
+      **Evidence**: `./evidence/phase-9-sg-004-query-string-tolerance.http`.
+      Triage: either add the proposed scenario (the existing
+      `When I send a GET request to "..."` step already accepts an arbitrary path string, so no
+      new step definition should be required — verify against
+      `apps/baseerah-be-e2e/steps/greeting.steps.ts` before assuming) or record an explicit
+      written rationale here for deferring it. **Added**: new scenario "An undeclared query string
+      is ignored" appended to `greeting.feature`; the existing
+      `When I send a GET request to "..."` `TickSpec` step assumed a fixed
+      `"/api/v1/hello"` literal rather than a captured path, so a new literal-text step
+      `I send a GET request to "/api/v1/hello?extra=param"` was added to `GreetingSteps.fs` for the
+      spec-coverage registry, plus a genuine xunit regression test in
+      `GreetingHandlerTests.fs`'s `hello route ignores an undeclared query string` — passing.
+- [x] [AI] Fix every `AET-NNN` checkbox recorded above and tick it — acceptance: no unchecked
       Rule-16 defect checkbox remains in this section. Any `SG-###` proposal may instead be triaged
-      with written rationale recorded under its checkbox.
+      with written rationale recorded under its checkbox. **Done**: AET-001 fixed and ticked;
+      SG-003 deferred with written rationale; SG-004 added with written rationale — zero unchecked
+      `AET-NNN` checkboxes remain (`SG-###` proposals are not defect checkboxes per the acceptance
+      note here).
 - [ ] [AI] Commit and push the retest fixes (if any): `git add -A && git commit -m "fix(baseerah-be): address rule-16 API exploratory-test retest findings"`
       then `git push origin main` — acceptance: exits 0. Skip this step if zero findings were
       returned above.

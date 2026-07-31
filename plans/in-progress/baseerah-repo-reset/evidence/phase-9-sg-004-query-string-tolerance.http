@@ -1,0 +1,18 @@
+### Request
+GET /api/v1/hello?extra=param HTTP/1.1
+Host: localhost:19320
+
+### Response (captured 2026-07-31)
+HTTP/1.1 200 OK
+Content-Length: 33
+Content-Type: application/json; charset=utf-8
+Date: Fri, 31 Jul 2026 13:58:24 GMT
+Server: Kestrel
+
+{"message":"Hello from Baseerah"}
+
+### Observation
+An undeclared query string appended to a declared route is silently ignored; the endpoint still
+returns its normal 200 greeting. Correct and intended (the contract declares no query
+parameters for this operation), but uncovered by existing Gherkin -- `greeting.feature`'s
+scenario only issues a bare `GET /api/v1/hello`. Proposed as SG-004.

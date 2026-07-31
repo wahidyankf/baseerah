@@ -25,6 +25,8 @@ let main args =
         .ConfigureWebHostDefaults(fun webHostBuilder ->
             webHostBuilder
                 .UseUrls($"http://0.0.0.0:%d{port ()}")
+                // Suppresses the "Server: Kestrel" response header — Rule-16 finding AET-001.
+                .ConfigureKestrel(fun opts -> opts.AddServerHeader <- false)
                 .Configure(configureApp)
                 .ConfigureServices(configureServices)
             |> ignore)

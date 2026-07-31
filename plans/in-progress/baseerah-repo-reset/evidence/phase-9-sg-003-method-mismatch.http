@@ -1,0 +1,28 @@
+### Request
+POST /api/v1/hello HTTP/1.1
+Host: localhost:19320
+
+### Response (captured 2026-07-31)
+HTTP/1.1 404 Not Found
+Content-Length: 21
+Content-Type: application/json; charset=utf-8
+Date: Fri, 31 Jul 2026 13:58:24 GMT
+Server: Kestrel
+
+{"error":"not found"}
+
+### Additional captures (same behavior observed)
+PUT /api/v1/hello -> 404 {"error":"not found"}
+DELETE /api/v1/hello -> 404 {"error":"not found"}
+OPTIONS /api/v1/hello -> 404 {"error":"not found"}
+HEAD /api/v1/hello -> 404 (no body, per HEAD semantics)
+POST /api/v1/health -> 404 {"error":"not found"}
+
+### Observation
+Sending any non-GET method to a declared route falls through Giraffe's `choose` combinator
+straight to the catch-all `notFoundHandler`, returning the same `{"error":"not found"}` 404
+envelope as a genuinely unknown path. This matches the OpenAPI `info.description`'s own framing
+("Exactly three GET routes ... and a 404 handler for anything else") -- it is intended Phase-1
+behavior, not a defect. No existing Gherkin scenario exercises a method mismatch on a *valid*
+path though; only `greeting.feature`'s "An unknown route is refused" scenario, which targets an
+entirely nonexistent path (`/api/v1/does-not-exist`). Proposed as SG-003.
