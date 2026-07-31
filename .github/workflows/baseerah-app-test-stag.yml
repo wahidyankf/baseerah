@@ -1,0 +1,25 @@
+name: baseerah-app-test-stag
+
+# Staging gate for baseerah-app: FE E2E against the deployed staging URL.
+# Scheduled +2.5h after baseerah-app-test-local-deploy-stag so the Vercel build
+# + coralpolyp rollout have settled. On pass it STOPS (prod CD deferred).
+
+on:
+  schedule:
+    - cron: "30 22 * * *" # 5:30 AM WIB (UTC+7), +2.5h after stag
+    - cron: "30 10 * * *" # 5:30 PM WIB (UTC+7), +2.5h after stag
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-stag:
+    uses: ./.github/workflows/_reusable-app-test-stag.yml
+    with:
+      fe-e2e-project: baseerah-fe-e2e
+      environment: baseerah-app-staging
+    # Environment VARIABLES (WEB_BASE_URL) reach a reusable workflow automatically,
+    # but environment SECRETS (VERCEL_AUTOMATION_BYPASS_SECRET) require secrets: inherit.
+    # Without this the staging E2E hits the Vercel SSO wall (401 "Log in to Vercel").
+    secrets: inherit

@@ -1,0 +1,148 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "baseerah-fe-e2e",
+  "sourceRoot": "apps/baseerah-fe-e2e/steps",
+  "projectType": "application",
+  "targets": {
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx playwright install --with-deps chromium",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["default", "{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-fe/gherkin/**/*.feature"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx oxlint@latest .",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:unit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:integration": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "specs:behavior:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "commands": [
+          "npx nx run baseerah-fe-e2e:typecheck",
+          "npx nx run baseerah-fe-e2e:lint",
+          "npx nx run baseerah-fe-e2e:test:unit",
+          "npx nx run baseerah-fe-e2e:test:coverage",
+          "npx nx run baseerah-fe-e2e:test:specs"
+        ],
+        "parallel": false
+      },
+      "inputs": ["default", "specs"]
+    },
+    "test:e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "if grep -rn -E --include='*.ts' --exclude-dir=node_modules --exclude-dir=.features-gen --exclude-dir=test-results --exclude-dir=playwright-report '\\$?test\\.skip\\([^,)]*\\)' .; then echo 'ERROR: unconditional test.skip() found in test files above - use test.skip(condition, reason) for legitimate environment guards, or remove'; exit 1; fi && npx bddgen && npx playwright test",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:e2e:ui": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx bddgen && npx playwright test --ui",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:e2e:report": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx playwright show-report",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "specs:e2e:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx bddgen && cargo run --release --quiet --manifest-path ../../apps/rhino-cli/Cargo.toml -- specs e2e-coverage validate --project baseerah-fe-e2e --features \"../../specs/apps/baseerah/behavior/baseerah-fe/gherkin/**/*.feature\" --features-gen .features-gen --baseline e2e-coverage-baseline.json",
+        "cwd": "apps/baseerah-fe-e2e"
+      },
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/apps/rhino-cli/src/**/*.rs",
+        "{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-fe/gherkin/**/*.feature",
+        "{projectRoot}/steps/**/*.steps.ts",
+        "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/e2e-coverage-baseline.json"
+      ]
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run baseerah-fe-e2e:specs:structure-validation",
+          "npx nx run baseerah-fe-e2e:specs:behavior:coverage",
+          "npx nx run baseerah-fe-e2e:specs:e2e:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true
+    },
+    "deps:audit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
+      },
+      "cache": true
+    }
+  },
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:baseerah"],
+  "implicitDependencies": ["baseerah-fe", "baseerah-be"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-fe/gherkin/**/*.feature"]
+  }
+}

@@ -2239,6 +2239,8 @@ not found`, a stale local NuGet restore (cache held `10.1.300`) unrelated to thi
 - [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. **Done**: all 8 projects
       green (24/26 tasks cache-hit, `baseerah-be:lint` and one other re-ran live and passed).
 - [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
+      In progress for `87810d956` as of 2026-07-31T12:10Z (`validate-env`, `publish-images`
+      in_progress; `pr-quality-gate` pending) — checking non-blockingly while Phase 9 work proceeds.
 
 > **Pause Safety**: the full stack runs locally — `baseerah-fe` on 19310 fetching its greeting from
 > `baseerah-be` on 19320 — with unit coverage on both. The frontend E2E suite does not exist yet, so
@@ -2249,28 +2251,38 @@ not found`, a stale local NuGet restore (cache held `10.1.300`) unrelated to thi
 
 ## Phase 9: `baseerah-fe-e2e` — Playwright Against the Full Stack
 
-- [ ] [AI] Scaffold `apps/baseerah-fe-e2e/` with `package.json` (`type: "module"`, devDeps
+- [x] [AI] Scaffold `apps/baseerah-fe-e2e/` with `package.json` (`type: "module"`, devDeps
       `@axe-core/playwright` 4.10.1, `@playwright/test` 1.60.0, `playwright-bdd` 8.5.1,
       `typescript` 5.8.3), standalone `tsconfig.json`, `.gitignore`, `README.md`, and
       `e2e-coverage-baseline.json` with an empty `allowedUnbound` array — acceptance: `npm install`
-      exits 0.
-- [ ] [AI] Create `apps/baseerah-fe-e2e/playwright.config.ts` with
+      exits 0. **Done**: scaffolded modelled on the recovered `ose-app-web-e2e` precedent; `npm
+install` added 3 packages, exit 0.
+- [x] [AI] Create `apps/baseerah-fe-e2e/playwright.config.ts` with
       `defineBddConfig({ featuresRoot: "../../specs/apps/baseerah/behavior/baseerah-fe/gherkin", steps: ["./steps/**/*.steps.ts"] })`,
       `timeout: 60000`, `fullyParallel: false`, `workers: 1`,
       `baseURL: process.env.WEB_BASE_URL || "http://localhost:19310"`, and a single `chromium`
-      project — acceptance: `npx tsc --noEmit -p apps/baseerah-fe-e2e/tsconfig.json` exits 0.
-- [ ] [AI] Implement `apps/baseerah-fe-e2e/steps/landing.steps.ts` binding "The landing page names
+      project — acceptance: `npx tsc --noEmit -p apps/baseerah-fe-e2e/tsconfig.json` exits 0. **Done**.
+- [x] [AI] Implement `apps/baseerah-fe-e2e/steps/landing.steps.ts` binding "The landing page names
       the product and shows the backend greeting", with a `// @covers` marker comment — acceptance:
-      `npx nx run baseerah-fe-e2e:test:e2e` runs it green against the running stack.
-- [ ] [AI] Implement `apps/baseerah-fe-e2e/steps/accessibility.steps.ts` binding "The landing page
+      `npx nx run baseerah-fe-e2e:test:e2e` runs it green against the running stack. **Done**: both
+      scenarios pass (2 passed, 2.7s) against the live `docker compose` stack.
+- [x] [AI] Implement `apps/baseerah-fe-e2e/steps/accessibility.steps.ts` binding "The landing page
       meets the baseline accessibility bar" via `@axe-core/playwright` — acceptance: the scan reports
       zero `serious` and zero `critical` violations, satisfying the accessibility commitments in
-      [prd.md](./prd.md#justify).
-- [ ] [AI] Assert the greeting genuinely crosses the wire: add a step that intercepts the
+      [prd.md](./prd.md#justify). **Done**: scenario passes; the `Then` steps throw (failing the
+      test) on any serious/critical finding, so the green run is itself proof of zero violations.
+- [x] [AI] Assert the greeting genuinely crosses the wire: add a step that intercepts the
       `/api/v1/hello` request and fails if the page renders the greeting without it — acceptance:
       the assertion passes, proving `baseerah-fe-e2e` exercises the full FE → BE path rather than a
-      static render.
-- [ ] [AI] Create `apps/baseerah-fe-e2e/project.json` with `install`
+      static render. **Deviation, documented in code**: `page.tsx` is an async Server Component
+      (`dynamic = "force-dynamic"`), so its fetch to `baseerah-be` runs inside the Next.js server
+      process during SSR and never crosses the browser's own network stack — `page.route()` /
+      `page.on("request")` structurally cannot observe it. Implemented the closest sound equivalent
+      instead: the step independently queries the live `/api/v1/hello` endpoint via the `request`
+      fixture and asserts the rendered page shows that exact value. The stronger "not hardcoded"
+      proof (stopping `baseerah-be` breaks the page rather than falling back to a static string) was
+      already established manually in the Phase 8 Gate (HTTP 500 with the backend stopped).
+- [x] [AI] Create `apps/baseerah-fe-e2e/project.json` with `install`
       (`npx playwright install --with-deps chromium`), `typecheck`, `lint`, echoes for `test:unit` /
       `test:coverage` / `test:integration` / `specs:behavior:coverage`, `test:quick`, `test:e2e`
       (with the unconditional-`test.skip` guard grep, then `npx bddgen && npx playwright test`),
@@ -2278,15 +2290,17 @@ not found`, a stale local NuGet restore (cache held `10.1.300`) unrelated to thi
       `test:specs`, `deps:audit`, `compat:min-version`; tags
       `["type:e2e","platform:playwright","lang:ts","domain:baseerah"]`; `implicitDependencies:
 ["baseerah-fe","baseerah-be"]` — acceptance: `npx nx show project baseerah-fe-e2e --json`
-      lists all of them.
-- [ ] [AI] Register in `repo-config.yml`: `coverage.projects` entry for `baseerah-fe-e2e` with
-      `levels: [e2e]` — acceptance: `npm run validate:config` exits 0.
-- [ ] [AI] Verify every frontend scenario is bound: run
+      lists all of them. **Done**.
+- [x] [AI] Register in `repo-config.yml`: `coverage.projects` entry for `baseerah-fe-e2e` with
+      `levels: [e2e]` — acceptance: `npm run validate:config` exits 0. **Done**: "VALIDATION PASSED"
+      (61/61 checks).
+- [x] [AI] Verify every frontend scenario is bound: run
       `npx nx run baseerah-fe-e2e:specs:e2e:coverage` — acceptance: exits 0 with no unbound scenario.
+      **Done**: "E2E COVERAGE GAP DETECTOR PASSED: 0 new unbound scenario(s) beyond baseline".
 
 ### CI callers — the app-group pair
 
-- [ ] [AI] Create `.github/workflows/baseerah-app-test-local-deploy-stag.yml` calling
+- [x] [AI] Create `.github/workflows/baseerah-app-test-local-deploy-stag.yml` calling
       `./.github/workflows/_reusable-app-test-local-deploy-stag.yml` with
       `web-project: baseerah-fe`, `be-project: baseerah-be`,
       `contracts-project: baseerah-contracts`, `compose-dir: infra/dev/baseerah-app`,
@@ -2294,17 +2308,36 @@ not found`, a stale local NuGet restore (cache held `10.1.300`) unrelated to thi
       `web-port: 19310`, and `environment: baseerah-app-local`. Recover the exact caller shape with
       `git show "$(git log --diff-filter=D --format=%H -- .github/workflows/ose-app-test-local-deploy-stag.yml | head -1)~1":.github/workflows/ose-app-test-local-deploy-stag.yml`
       — acceptance: `actionlint .github/workflows/baseerah-app-test-local-deploy-stag.yml` exits 0.
-- [ ] [AI] Create `.github/workflows/baseerah-app-test-stag.yml` calling
+      **Done**: recovered at `03fb0675eb8790b90d26ef1f417794c171429c15~1`.
+- [x] [AI] Create `.github/workflows/baseerah-app-test-stag.yml` calling
       `./.github/workflows/_reusable-app-test-stag.yml` with `fe-e2e-project: baseerah-fe-e2e`,
       `environment: baseerah-app-staging`, and `secrets: inherit` — acceptance:
-      `actionlint .github/workflows/baseerah-app-test-stag.yml` exits 0.
-- [ ] [AI] Add the `baseerah-app-staging` environment entry to `repo-config.yml`'s
+      `actionlint .github/workflows/baseerah-app-test-stag.yml` exits 0. **Done**.
+- [x] [AI] Add the `baseerah-app-staging` environment entry to `repo-config.yml`'s
       `env-injection.ci-harness` for the `API_BASE_URL`, `WEB_BASE_URL`, and
       `VERCEL_AUTOMATION_BYPASS_SECRET` keys, restoring the structure Phase 2 emptied —
-      acceptance: `npm run validate:config` exits 0.
-- [ ] [AI] Update `.github/workflows/README.md` to index the three new callers and drop the
+      acceptance: `npm run validate:config` exits 0. **Done**.
+- [x] [AI] Update `.github/workflows/README.md` to index the three new callers and drop the
       "awaiting Baseerah callers" note from the reusable-template entries — acceptance:
-      `rg -n 'awaiting' .github/workflows/README.md` returns no matches.
+      `rg -n 'awaiting' .github/workflows/README.md` returns no matches. **Done**: added an
+      "App-group callers" table (all three: the two new + the Phase 7
+      `baseerah-be-build-deploy-stag.yml`, which had also never been indexed), and corrected the
+      stale `publish-images.yml` description while there.
+- [x] [AI] Fix a preexisting `baseerah-be` flakiness hit while running the full `run-many` sweep,
+      split into its own commit per Conventional Commits domain-splitting since it's unrelated to
+      the `baseerah-fe-e2e` feature: `baseerah-be:lint` intermittently failed with
+      `Package FSharp.Core, version 10.1.302 was not found` (or the inverse, a downgrade error),
+      because none of the three `.fsproj` files (`BaseerahBe.fsproj`,
+      `BaseerahBe.UnitTests.fsproj`, `BaseerahBe.IntegrationTests.fsproj`) pinned an explicit
+      `FSharp.Core` version — the main project's `G-Research.FSharp.Analyzers` transitively floors
+      it at `10.1.302`, above the test projects' own SDK-implicit `10.1.300` floor, so whether a
+      given `dotnet` invocation surfaced the version conflict depended on which part of the project
+      graph it touched. Fixed by adding `<PackageReference Update="FSharp.Core" Version="10.1.302" />`
+      to all three `.fsproj` files, making every restore resolve the same version deterministically.
+      Verified via two consecutive `dotnet restore` + `nx run baseerah-be:lint` runs and a full
+      `nx run-many -t typecheck,lint,test:quick --all` sweep, all clean. Commit:
+      `git add -A && git commit -m "fix(baseerah-be): pin FSharp.Core to resolve a restore-order flakiness across the three .fsproj files"`
+      — acceptance: the pre-commit gate passes.
 - [ ] [AI] Commit: `git add -A && git commit -m "feat(baseerah-fe-e2e): add the frontend E2E suite, accessibility assertions, and app-group CI callers"`
       — acceptance: the pre-commit gate passes.
 - [ ] [AI] Push: `git push origin main` — acceptance: exits 0.

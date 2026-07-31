@@ -5,7 +5,7 @@ CI/CD workflows for the monorepo. Filenames follow the
 the [CI Conventions](../../repo-governance/development/infra/ci-conventions.md) define the
 reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour staging→prod gap).
 
-## Shared-architecture invariant (do not "tidy up" the uncalled templates)
+## Shared-architecture invariant
 
 This repo's CI/CD design is intentionally kept consistent with the `ose-public`/`ose-primer`/
 `ose-private` sibling repos rather than invented fresh. Four core workflows —
@@ -13,19 +13,24 @@ This repo's CI/CD design is intentionally kept consistent with the `ose-public`/
 job sets stay byte-identical in shape across every sibling; the language jobs (`typescript`,
 `dotnet`, `rust`) track the languages actually present in the repo, unchanged by this reset because
 Baseerah's language set is identical to `ose-public`'s. The three `_reusable-*.yml` templates below
-are kept even though **no caller currently references them**: they are fully parameterised, name no
-app, and map exactly onto the `fe`/`be` app-group shape this repo will grow into (Phases 7 and 9 add
-Baseerah callers with the same shape). Deleting them as "dead code" would silently diverge from the
-shared architecture — see tech-docs Decision 15 for the full invariant list and verification
-commands.
+are fully parameterised, name no app, and map onto the `fe`/`be` app-group shape — see tech-docs
+Decision 15 for the full invariant list and verification commands.
 
-## Reusable (awaiting Baseerah callers)
+## Reusable templates
 
 | Workflow                                   | Role                                                                                                     |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | `_reusable-app-test-local-deploy-stag.yml` | App-group local-stack pipeline; on pass force-pushes BOTH the `stag-*-app-web` and `stag-*-be` branches. |
 | `_reusable-app-test-stag.yml`              | FE E2E gate against the deployed staging URL (Vercel bypass secret). Stops on pass — no promote.         |
 | `_reusable-be-build-deploy.yml`            | Build a backend image and push it to GHCR.                                                               |
+
+## App-group callers (baseerah-app)
+
+| Workflow                                  | Trigger                     | Role                                                                                                                                                |
+| ----------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baseerah-app-test-local-deploy-stag.yml` | Twice-daily CRON + dispatch | Calls `_reusable-app-test-local-deploy-stag.yml` for `baseerah-fe` + `baseerah-be`; on pass force-pushes `stag-baseerah-fe` and `stag-baseerah-be`. |
+| `baseerah-app-test-stag.yml`              | Twice-daily CRON + dispatch | Calls `_reusable-app-test-stag.yml`; runs `baseerah-fe-e2e` against the deployed staging URL, +2.5h after the local-deploy-stag run.                |
+| `baseerah-be-build-deploy-stag.yml`       | Push to `stag-baseerah-be`  | Calls `_reusable-be-build-deploy.yml`; builds the `baseerah-be` image and pushes it to GHCR.                                                        |
 
 ## PR and repo-wide gates
 
@@ -38,6 +43,6 @@ commands.
 
 ## Backend images
 
-| Workflow             | Role                                                                                                                                                                       |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publish-images.yml` | Detects affected backend image projects and publishes them to GHCR — currently a skeleton with no case arm; Phase 7 registers the `baseerah-be` image and its publish job. |
+| Workflow             | Role                                                                                                                          |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `publish-images.yml` | Detects affected backend image projects on push to `main` and publishes them to GHCR — currently one case arm, `baseerah-be`. |
