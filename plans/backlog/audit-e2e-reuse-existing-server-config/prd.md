@@ -15,7 +15,9 @@ already be bound to the port.
 
 ## Product Scope
 
-Covers the six `playwright.config.ts` files enumerated in `README.md`'s Context; does not cover the
+Covers `libs/web-ui/e2e/playwright.config.ts`, the sole surviving `playwright.config.ts` still
+hardcoding `reuseExistingServer: true` per `README.md`'s Context (the six originally-enumerated
+`*-e2e` configs were deleted along with their apps by the Baseerah repo reset); does not cover the
 e2e test scenarios or assertions themselves.
 
 ## Acceptance Criteria (Gherkin)
@@ -31,8 +33,8 @@ Feature: reuseExistingServer audit and remedy
   Scenario: CI runners are confirmed shared or persistent
     Given the availability investigation confirms CI runners are shared or persistent
     When the audit concludes
-    Then each of the six hardcoded-true configs is gated to match
-      "organiclever-app-web-e2e"'s "reuseExistingServer: !process.env.CI" pattern
+    Then "libs/web-ui/e2e/playwright.config.ts" is gated to
+      "reuseExistingServer: !process.env.CI"
 
   Scenario: A future *-e2e config is added
     Given the audit's chosen remedy includes an automated guard

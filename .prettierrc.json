@@ -1,6 +1,5 @@
 {
   "printWidth": 120,
   "proseWrap": "preserve",
-  "plugins": ["prettier-plugin-sql", "prettier-plugin-tailwindcss"],
-  "tailwindStylesheet": "./apps/organiclever-app-web/src/app/globals.css"
+  "plugins": ["prettier-plugin-sql", "prettier-plugin-tailwindcss"]
 }

@@ -22,34 +22,37 @@ deleting the worktree after the plan is archived and pushed.
 
 ## Phase 1: CI Runner Persistence Investigation
 
-- [ ] [AI] Determine whether each of the six configs' CI runners are ephemeral-per-job or
-      shared/persistent (checking workflow YAML runner labels against this repo's self-hosted vs.
-      GitHub-hosted runner usage)
-- [ ] [AI] Record the availability/persistence matrix per config, with the evidence used for each
-      verdict
+- [ ] [AI] Determine whether `libs/web-ui/e2e/playwright.config.ts`'s CI runner is ephemeral-per-job
+      or shared/persistent (checking workflow YAML runner labels against this repo's self-hosted
+      vs. GitHub-hosted runner usage). The plan's originally-cited six configs were deleted along
+      with their apps by the Baseerah repo reset; this is the sole surviving hardcoded-`true`
+      config as of 2026-07-31 — re-run the repo-wide `playwright.config.ts` search before starting
+      in case new `*-e2e` projects were added since.
+- [ ] [AI] Record the availability/persistence verdict, with the evidence used
 
 ### Phase 1 Gate
 
-- [ ] [AI] Every one of the six configs has a recorded, evidenced ephemeral-or-persistent verdict
+- [ ] [AI] `libs/web-ui/e2e/playwright.config.ts` (and any other config the re-run search finds) has
+      a recorded, evidenced ephemeral-or-persistent verdict
 
 > **Pause Safety**: this plan is Backlog (not started) — no work has begun, so there is nothing to
 > resume. Promotion to `in-progress/` re-reads this `README.md` from the top.
 
 ## Phase 2: Remedy Selection and Application
 
-- [ ] [AI] Based on Phase 1's verdicts, choose the remedy per config: a `!process.env.CI` gate
-      (matching `organiclever-app-web-e2e`), a documentation caveat, or both
-- [ ] [AI] Apply the chosen remedy to each of the six configs
+- [ ] [AI] Based on Phase 1's verdict, choose the remedy: a
+      `reuseExistingServer: !process.env.CI` gate, a documentation caveat, or both
+- [ ] [AI] Apply the chosen remedy
 - [ ] [AI] Decide whether an automated guard (checker rule or comment convention) is warranted and,
       if so, add it
 
 ### Phase 2 Gate
 
-- [ ] [AI] Every one of the six configs matches its chosen remedy; no config is left
-      unconditionally hardcoded `true` without a documented, evidenced reason
+- [ ] [AI] Every config in scope matches its chosen remedy; no config is left unconditionally
+      hardcoded `true` without a documented, evidenced reason
 
 > **Pause Safety**: work is only underway once Phase 1 completes; a partial Phase 2 leaves the
-> matrix from Phase 1 as the resumption point.
+> verdict from Phase 1 as the resumption point.
 
 ## Quality Gates
 
@@ -59,7 +62,7 @@ Protocol.
 
 ## Verification
 
-The plan is complete when all six configs have a recorded, evidenced ephemeral-or-persistent
+The plan is complete when every config in scope has a recorded, evidenced ephemeral-or-persistent
 verdict and a remedy applied consistent with that verdict, and (if added) the automated guard
 passes against the current repo state.
 

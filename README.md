@@ -117,14 +117,10 @@ All projects enforce ≥90% test coverage as part of `test:quick`.
 
 **Quality gates**: pre-commit hooks (formatting, linting), pre-push hooks (`typecheck`, `lint`, `test:quick` for affected projects), and [PR quality gate](./.github/workflows/pr-quality-gate.yml).
 
-- OSE Platform
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/ose-www-test-local-deploy-prod.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/ose-www-test-local-deploy-prod.yml)
-- AyoKoding
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/ayokoding-www-test-local-deploy-prod.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/ayokoding-www-test-local-deploy-prod.yml)
-- OrganicLever (app — staging)
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/organiclever-app-test-local-deploy-stag.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/organiclever-app-test-local-deploy-stag.yml)
-- Wahidyankf
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/wahidyankf-www-test-local-deploy-prod.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/wahidyankf-www-test-local-deploy-prod.yml)
+The per-app deploy-workflow badges this section previously listed (`ose-www`, `ayokoding-www`,
+`organiclever-app`, `wahidyankf-www`) were removed along with their workflow files during the repo
+reset; no equivalent per-app workflow exists for the current `rhino-cli`.
+
 - [`rhino-cli`](./apps/rhino-cli/)
 
 For polyglot demo app CI badges, see the [`ose-primer`](https://github.com/wahidyankf/ose-primer) repository.

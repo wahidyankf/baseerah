@@ -7,9 +7,10 @@ that genuinely need a full plan's depth to answer.
 ## Planned Projects
 
 - [audit-e2e-reuse-existing-server-config](./audit-e2e-reuse-existing-server-config/README.md)
-  — Audits whether `reuseExistingServer: true` (hardcoded unconditionally in six `*-e2e`
-  `playwright.config.ts` files) risks silently reusing a stale, unrelated server, and applies a
-  CI-conditional gate, doc caveat, or automated check depending on runner persistence.
+  — Audits whether `reuseExistingServer: true` (hardcoded unconditionally in
+  `libs/web-ui/e2e/playwright.config.ts`, the sole surviving offender after the Baseerah repo reset
+  deleted the plan's six originally-cited apps) risks silently reusing a stale, unrelated server,
+  and applies a CI-conditional gate, doc caveat, or automated check depending on runner persistence.
 - [cross-repo-governance-link-parity](./cross-repo-governance-link-parity/README.md)
   — Validates shared governance doc anchors across `ose-public`, `ose-primer`, and `ose-private`
   during multi-repo landings.
