@@ -3235,9 +3235,17 @@ package.json` still returns matches (from `.husky/pre-push`), satisfying the acc
 - [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
       **Done**: exits 0 for all 9 (8 real + `rhino-cli`) tasked projects.
 - [x] [AI] `npx nx run baseerah-be-e2e:test:e2e && npx nx run baseerah-fe-e2e:test:e2e` — both exit 0.
-      **Done**: see verification run below.
+      **Done**: `baseerah-be-e2e` 4/4 passed; `baseerah-fe-e2e` 5/5 passed. Both required the
+      `infra/dev/baseerah-app` compose stack running locally first (`baseerah-fe-e2e` has no
+      `webServer` in its `playwright.config.ts` — it expects an already-running target, same pattern
+      as the existing `audit-e2e-reuse-existing-server-config` backlog item); brought the stack up,
+      ran both suites, then tore it back down.
 - [x] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
-      **Done**: see CI run IDs recorded below.
+      **Done**: two archival commits, both fully green. `d00c487fe` (initial archival commit):
+      `validate-env` (30642987710), `pr-quality-gate` (30642988076), `publish-images` (30642988034)
+      — all `completed`/`success`. `1b8d3c4bc` (Phase 11 Gate stale-name fixes): `validate-env`
+      (30643567410), `pr-quality-gate` (30643567396), `publish-images` (30643567422) — all
+      `completed`/`success`.
 
 > **Pause Safety**: the plan is complete and archived. The repository is Baseerah — a personal
 > assistant monorepo inside the OSE ecosystem, with a working full-stack hello-world quad, tests at
