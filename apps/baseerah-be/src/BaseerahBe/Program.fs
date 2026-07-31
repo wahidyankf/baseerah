@@ -24,7 +24,7 @@ let main args =
         .CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(fun webHostBuilder ->
             webHostBuilder
-                .UseUrls($"http://0.0.0.0:{port ()}")
+                .UseUrls($"http://0.0.0.0:%d{port ()}")
                 .Configure(configureApp)
                 .ConfigureServices(configureServices)
             |> ignore)
