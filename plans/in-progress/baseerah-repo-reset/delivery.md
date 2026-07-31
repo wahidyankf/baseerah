@@ -666,10 +666,27 @@ wahidyankf-*,ose-cli}/` paths across 3 spots (landing-site mention, Golang CLI-t
       depth — a plan-authoring gap in the same category as the discovered-blocker link gap, not a
       Phase 2 execution failure. Treating it as informational and proceeding; Phase 3 Gate (below,
       line ~859) is the real whole-repo zero-matches checkpoint and already accounts for this.
-- [ ] [AI] CI: poll per the 2-minute convention and run `gh run view <id> --json status,conclusion,jobs`
+- [x] [AI] CI: poll per the 2-minute convention and run `gh run view <id> --json status,conclusion,jobs`
       — `conclusion` is `success` and **every** `jobs[].conclusion` is `success` or `skipped`. In
       particular assert the `dotnet` job is not `failure`: it now runs over zero projects and must
       pass trivially.
+      **Done**: first CI attempt (`pr-quality-gate` run 30605946585 for commit `fdf9b63f3`) failed —
+      `TypeScript quality gate` → `web-ui:typecheck` errored on `react-dom/server` type resolution.
+      Root-caused to a stale `package-lock.json`: Phase 2's `git rm -r` of 9 app workspaces
+      (`apps/ayokoding-www`, `apps/organiclever-app-web`, etc.) never triggered `npm install`, so the
+      lockfile kept phantom-hoisting `@types/react-dom` into `web-ui`'s resolved tree from those now
+      -deleted workspaces; CI's clean `npm ci` genuinely lacked it while local stale `node_modules`
+      masked the gap. Fixed by adding `"@types/react-dom": "19.2.3"` as an explicit `web-ui`
+      devDependency and regenerating the lockfile (pruned 367 stale packages), committed as
+      `9032b5890` "fix(web-ui): add missing @types/react-dom devDependency, refresh lockfile" and
+      pushed (`fdf9b63f3..9032b5890 main -> main`). Verified locally first via
+      `npx nx run web-ui:typecheck --skip-nx-cache` and
+      `npx nx run-many -t typecheck,lint,test:quick --all --skip-nx-cache` (all green) before pushing.
+      Re-ran CI (`pr-quality-gate` run 30606791786 for commit `9032b5890`): `status=completed`,
+      `conclusion=success`, all 19 jobs `success` except `Auto-format affected (lint-staged)` and
+      `.NET quality gate` which are `skipped` (the latter confirmed passing trivially over zero
+      `.NET` projects, per acceptance). `TypeScript quality gate` — the job that previously failed —
+      now `success`.
 
 > **Pause Safety**: the repository now contains exactly one app (`rhino-cli`), its libs, and the
 > governance harness. Everything builds, lints, and tests green. No Baseerah code exists yet, and
