@@ -1679,21 +1679,43 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
       `npm run validate:config` → exit 0 ("VALIDATION PASSED WITH WARNINGS" — the one warning is a
       preexisting unrelated skill-frontmatter field, not caused by this change).
 
-- [ ] [AI] Commit: `git add -A && git commit -m "feat(specs): add the baseerah spec area and contracts project"`
+- [x] [AI] Commit: `git add -A && git commit -m "feat(specs): add the baseerah spec area and contracts project"`
       — acceptance: the pre-commit gate passes.
-- [ ] [AI] Push: `git push origin main` — acceptance: exits 0.
+
+      **Done**: staged 22 files (4 modified: `.gitignore`, `docs/reference/code-coverage.md`,
+      `repo-config.yml`, `delivery.md`; 18 new under `specs/apps/baseerah/`). Pre-commit gate passed
+      clean on the first attempt — commit `912a6f208`.
+
+- [x] [AI] Push: `git push origin main` — acceptance: exits 0.
+
+      **Done**: `04d20c0a9..912a6f208 main -> main`. Pre-push gate (typecheck/lint/test:quick/specs
+      for the 2 affected projects `rhino-cli` + `baseerah-contracts`, plus links/README-index/agents-
+      duplication/instruction-size/env validators) all passed. Instruction-size shows the same 4
+      preexisting WARN findings as Phase 4 (not FAIL) — unrelated to this commit.
 
 ### Phase 5 Gate
 
-- [ ] [AI] `npx nx show projects` — includes `baseerah-contracts`.
-- [ ] [AI] `npx nx run baseerah-contracts:test:quick` — exits 0.
-- [ ] [AI] `npx nx run rhino-cli:specs:structure-validation` — exits 0.
-- [ ] [AI] `npm run validate:config` — exits 0.
-- [ ] [AI] `find specs/apps/baseerah/behavior -name '*.feature' | wc -l` — reports 3.
-- [ ] [AI] `grep -c '^  Scenario' specs/apps/baseerah/behavior/*/gherkin/*/*.feature | awk -F: '{s+=$2} END {print s}'`
-      — reports 5, the total scenario count across US-4 and US-5.
-- [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0.
+- [x] [AI] `npx nx show projects` — includes `baseerah-contracts`. **Done**: confirmed present.
+- [x] [AI] `npx nx run baseerah-contracts:test:quick` — exits 0. **Done**: "Successfully ran target
+      test:quick for project baseerah-contracts".
+- [x] [AI] `npx nx run rhino-cli:specs:structure-validation` — exits 0. **Done**: 0 findings for
+      both `baseerah` and `rhino`.
+- [x] [AI] `npm run validate:config` — exits 0. **Done**: "VALIDATION PASSED" (61/61 sync checks;
+      one preexisting unrelated skill-frontmatter warning).
+- [x] [AI] `find specs/apps/baseerah/behavior -name '*.feature' | wc -l` — reports 3. **Done**:
+      confirmed 3.
+- [x] [AI] `grep -c '^  Scenario' specs/apps/baseerah/behavior/*/gherkin/*/*.feature | awk -F: '{s+=$2} END {print s}'`
+      — reports 5, the total scenario count across US-4 and US-5. **Done**: confirmed 5.
+- [x] [AI] `npx nx run-many -t typecheck,lint,test:quick --all` — exits 0. **Done**: "Successfully
+      ran targets typecheck, lint, test:quick for 5 projects".
 - [ ] [AI] CI: `gh run view <id> --json status,conclusion,jobs` — all jobs `success` or `skipped`.
+
+      **In progress**: Phase 4 commit `04d20c0a9`'s CI (`publish-images`, `validate-env`,
+      `pr-quality-gate`) all confirmed `success` via `gh run list --commit`. Phase 5 commit
+      `912a6f208`'s CI (`publish-images` success, `validate-env`/`pr-quality-gate` still
+      running/queued at last check) is still in flight — checking non-blockingly via `gh run list`
+      woven into Phase 6 work rather than pausing the turn (per the standing "never stop before all
+      phases done" instruction). Will tick this once confirmed green.
 
 > **Pause Safety**: the specification and contract for Baseerah exist and validate, but no
 > implementation does. Nothing runs; nothing is broken. Safe to stop.
@@ -1710,21 +1732,28 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
 > **Stateless hello world** — no database, no in-memory store, no write route
 > ([tech-docs Decision 8](./tech-docs.md#decision-8--hello-world-and-therefore-no-state-at-all)).
 
-- [ ] [AI] Scaffold the directory: create `apps/baseerah-be/` with `.editorconfig`, `.dockerignore`,
+- [x] [AI] Scaffold the directory: create `apps/baseerah-be/` with `.editorconfig`, `.dockerignore`,
       `.gitignore`, `global.json` (SDK 10, `rollForward: latestMinor`), `dotnet-tools.json`,
       `fsharplint.json`, `LICENSE`, and `README.md`, each copied from the recovered
       `organiclever-be` equivalents with names substituted — acceptance: all eight files exist.
-- [ ] [AI] Create `apps/baseerah-be/.env.example` declaring `BASEERAH_BE_PORT` and
+      **Done**: all eight boilerplate files created under `apps/baseerah-be/`.
+- [x] [AI] Create `apps/baseerah-be/.env.example` declaring `BASEERAH_BE_PORT` and
       `BASEERAH_BE_CORS_ORIGINS` as OPTIONAL, each using the strict
       `# REQUIRED|OPTIONAL | <type> | <description>` line format that `rhino-cli env validate` parses.
       Declare **no** test-hook flag — the service is stateless and needs none — acceptance:
       `npx nx run rhino-cli:env:validation` exits 0 after the `repo-config.yml` registration step below.
-- [ ] [AI] Create `apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj` plus `Program.fs` and
+      **Done**: `.env.example` created; `env validate`/`rhino-cli:env:validation` confirmed passing
+      after the paren-call fix below and the `repo-config.yml` registration.
+- [x] [AI] Create `apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj` plus `Program.fs` and
       `WebApp.fs` — acceptance: `dotnet build apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj`
-      exits 0.
-- [ ] [AI] Create `baseerah.sln` at the repo root registering `BaseerahBe.fsproj` and the two test
-      projects created below — acceptance: `dotnet build baseerah.sln` exits 0.
-- [ ] [AI] Create `apps/baseerah-be/project.json` with the target set from
+      exits 0. **Done**: created; build exits 0. Fixed a false `env validate` drift finding by
+      rewriting `Environment.GetEnvironmentVariable "BASEERAH_BE_PORT"` (paren-less F# call, invisible
+      to the validator's regex) as `GetEnvironmentVariable("BASEERAH_BE_PORT")`.
+- [x] [AI] Create `baseerah.sln` at the repo root registering `BaseerahBe.fsproj` and the two test
+      projects created below — acceptance: `dotnet build baseerah.sln` exits 0. **Done**: `dotnet new
+sln` defaults to `.slnx` in .NET 10; re-ran with `--format sln` for the classic format required
+      here. `dotnet build baseerah.sln` confirmed 0 errors with all 3 projects registered.
+- [x] [AI] Create `apps/baseerah-be/project.json` with the target set from
       [tech-docs § Nx target contract](./tech-docs.md#nx-target-contract-for-the-four-new-projects):
       `codegen` (depending on `baseerah-contracts:bundle`), `build`, `typecheck`, `lint` (fantomas +
       fsharplint + the 13 G-Research analyzer rules, `"parallel": false`), `dev`, `run`, `test:unit`,
@@ -1735,15 +1764,16 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
       `{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature`; tags
       `["type:app","platform:giraffe","lang:fsharp","domain:baseerah"]`; `implicitDependencies:
 ["baseerah-contracts","rhino-cli"]` — acceptance: `npx nx show project baseerah-be --json`
-      lists all of them.
-- [ ] [AI] Register in `repo-config.yml`: add the `coverage.projects` entry for `baseerah-be`
+      lists all of them. **Done**: all targets present, confirmed via `nx show project`.
+- [x] [AI] Register in `repo-config.yml`: add the `coverage.projects` entry for `baseerah-be`
       (`levels: [unit, integration]`), the `env-contract.surfaces` entry
       (`{root: apps/baseerah-be, kind: app, lang: fsharp}`), and the `env-injection.apps` entry —
-      acceptance: `npm run validate:config` exits 0.
+      acceptance: `npm run validate:config` exits 0. **Done**: all three entries added; `npm run
+validate:config` and `npx nx run rhino-cli:env:validation` both confirmed exit 0.
 
 ### Behaviour cycles (one Gherkin scenario each)
 
-- [ ] [AI] **RED** — create `apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj` and
+- [x] [AI] **RED** — create `apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj` and
       `tests/unit/Steps/HealthSteps.fs` asserting the health handler returns 200 with
       `{"status":"ok"}`.
       **Gherkin (binds) →** "The service reports liveness"
@@ -1757,17 +1787,24 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
       ```
 
       Run `dotnet test apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj` — acceptance: fails,
-      because no health route exists.
+      because no health route exists. **Done**: verified RED. **Deviation**: read
+      `apps/rhino-cli/src/application/behavior_coverage/{extract,validator}.rs` directly and confirmed
+      the modern coverage gate validates `// @covers <spec-path>:<scenario>` comment markers plus
+      `@unit`/`@integration`/`@e2e`/`@wip` Gherkin tags — not TickSpec step-binding. Used a plain
+      xunit `[<Fact>]` in `Tests/HealthHandlerTests.fs` with a `// @covers` marker instead of a
+      `Steps/HealthSteps.fs` TickSpec binding; functionally equivalent and simpler for this
+      hello-world scope.
 
-- [ ] [AI] **GREEN** — add the `/api/v1/health` route in
+- [x] [AI] **GREEN** — add the `/api/v1/health` route in
       `apps/baseerah-be/src/BaseerahBe/Api/HealthHandlers.fs` and wire it in `WebApp.fs`. Run
       `dotnet test apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj` — acceptance: exits 0.
+      **Done**: verified GREEN.
 
-- [ ] [AI] **REFACTOR** — extract the readiness payload into
+- [x] [AI] **REFACTOR** — extract the readiness payload into
       `apps/baseerah-be/src/BaseerahBe/Domain/Readiness.fs` as a record with one serialisation point.
-      Run the same command — acceptance: still exits 0.
+      Run the same command — acceptance: still exits 0. **Done**: verified still GREEN.
 
-- [ ] [AI] **RED** — add `apps/baseerah-be/tests/unit/Steps/GreetingSteps.fs` asserting the greeting.
+- [x] [AI] **RED** — add `apps/baseerah-be/tests/unit/Steps/GreetingSteps.fs` asserting the greeting.
       **Gherkin (binds) →** "The service returns a greeting"
 
       ```gherkin
@@ -1779,18 +1816,20 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
       ```
 
       Run `dotnet test apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj` — acceptance: fails.
+      **Done**: verified RED via `Tests/GreetingHandlerTests.fs` (same `@covers`-marker deviation as
+      above).
 
-- [ ] [AI] **GREEN** — implement `apps/baseerah-be/src/BaseerahBe/Domain/Greeting.fs` holding the
+- [x] [AI] **GREEN** — implement `apps/baseerah-be/src/BaseerahBe/Domain/Greeting.fs` holding the
       constant greeting and `apps/baseerah-be/src/BaseerahBe/Api/GreetingHandlers.fs` serving
-      `GET /api/v1/hello`. Run the same command — acceptance: exits 0.
+      `GET /api/v1/hello`. Run the same command — acceptance: exits 0. **Done**: verified GREEN.
 
-- [ ] [AI] **REFACTOR** — make the greeting text a single named value in `Domain/Greeting.fs` so the
+- [x] [AI] **REFACTOR** — make the greeting text a single named value in `Domain/Greeting.fs` so the
       handler holds no literal, per the
       [functional core / imperative shell pattern](../../../repo-governance/development/pattern/functional-programming.md).
       Run the same command — acceptance: still exits 0 and
-      `rg -n 'Hello from Baseerah' apps/baseerah-be/src/` returns exactly one match.
+      `rg -n 'Hello from Baseerah' apps/baseerah-be/src/` returns exactly one match. **Done**: verified.
 
-- [ ] [AI] **RED** — add `apps/baseerah-be/tests/unit/Steps/NotFoundSteps.fs` asserting the fallback.
+- [x] [AI] **RED** — add `apps/baseerah-be/tests/unit/Steps/NotFoundSteps.fs` asserting the fallback.
       **Gherkin (binds) →** "An unknown route is refused"
 
       ```gherkin
@@ -1802,26 +1841,41 @@ wahidyankf}.css` (deliberately kept per task #155), historical citations already
       ```
 
       Run `dotnet test apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj` — acceptance: fails,
-      because the default Giraffe fallthrough returns a bare 404 with no JSON body.
+      because the default Giraffe fallthrough returns a bare 404 with no JSON body. **Done**: verified
+      RED via `Tests/NotFoundHandlerTests.fs` (same `@covers`-marker deviation as above).
 
-- [ ] [AI] **GREEN** — add a `setStatusCode 404` JSON fallback handler at the end of the router in
+- [x] [AI] **GREEN** — add a `setStatusCode 404` JSON fallback handler at the end of the router in
       `apps/baseerah-be/src/BaseerahBe/WebApp.fs`, returning the contract's `Error` schema. Run the
-      same command — acceptance: exits 0.
+      same command — acceptance: exits 0. **Done**: verified GREEN.
 
-- [ ] [AI] **REFACTOR** — route the 404 through the same single error-formatting function the rest of
+- [x] [AI] **REFACTOR** — route the 404 through the same single error-formatting function the rest of
       the app will use, defined once in `WebApp.fs`. Run the same command — acceptance: still exits 0.
+      **Done**: verified via the shared `errorBody` function in `WebApp.fs`.
 
-- [ ] [AI] Create `apps/baseerah-be/tests/integration/BaseerahBe.IntegrationTests.fsproj` with an
+- [x] [AI] Create `apps/baseerah-be/tests/integration/BaseerahBe.IntegrationTests.fsproj` with an
       in-process host boot test asserting the app starts and serves `/api/v1/health` — acceptance:
-      `npx nx run baseerah-be:test:integration` exits 0.
-- [ ] [AI] Create `apps/baseerah-be/Dockerfile`: two-stage `dotnet/sdk:10.0` → `dotnet/aspnet:10.0`,
+      `npx nx run baseerah-be:test:integration` exits 0. **Done**: `HostBootTests.fs` boots a real
+      Kestrel host on an ephemeral port and asserts a live HTTP 200 — passing.
+- [x] [AI] Create `apps/baseerah-be/Dockerfile`: two-stage `dotnet/sdk:10.0` → `dotnet/aspnet:10.0`,
       `EXPOSE 19320`, `ENV BASEERAH_BE_PORT=19320` — acceptance:
-      `hadolint apps/baseerah-be/Dockerfile` exits 0 at `--failure-threshold warning`.
-- [ ] [AI] Verify coverage clears the chosen threshold: run `npx nx run baseerah-be:test:coverage` —
-      acceptance: exits 0 at 90% line.
-- [ ] [AI] Commit: `git add -A && git commit -m "feat(baseerah-be): add the F# Giraffe hello-world backend"`
+      `hadolint apps/baseerah-be/Dockerfile` exits 0 at `--failure-threshold warning`. **Done**:
+      confirmed zero hadolint findings.
+- [x] [AI] Verify coverage clears the chosen threshold: run `npx nx run baseerah-be:test:coverage` —
+      acceptance: exits 0 at 90% line. **Done**: initial run with the `--collect:"XPlat Code
+  Coverage"` pattern (copied from organiclever-be) failed — `Unable to find a datacollector with
+  friendly name 'XPlat Code Coverage'`, because no `coverlet.collector` package was referenced.
+      Investigation via `git show` found organiclever-be's own historical fsproj had the same gap —
+      a latent, never-fixed bug in that deleted reference app, not a pattern to replicate. Cross-check
+      of `apps/crane-cli` and `libs/fsharp-crane-core` (both recovered via `git show`) found the
+      correct working pattern: `coverlet.collector` + `coverlet.msbuild` v8.0.1 packages with
+      `/p:CollectCoverage=true /p:Threshold=<N> /p:ThresholdType=line`, plus `/p:ExcludeByFile=**/Program.fs`
+      excluding the composition-root entry point (imperative-shell wiring covered instead by the
+      integration host-boot test) from the line-coverage denominator — `crane-cli` excludes its own
+      `Program.fs` the same way. Applied both fixes; re-ran and confirmed 100% line/branch/method
+      coverage, clearing the 90% threshold.
+- [x] [AI] Commit: `git add -A && git commit -m "feat(baseerah-be): add the F# Giraffe hello-world backend"`
       — acceptance: the pre-commit gate passes.
-- [ ] [AI] Push: `git push origin main` — acceptance: exits 0.
+- [x] [AI] Push: `git push origin main` — acceptance: exits 0.
 
 ### Phase 6 Gate
 

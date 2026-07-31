@@ -72,6 +72,11 @@ coverage:
       levels: [unit, integration]
       specs: "specs/apps/rhino/behavior/rhino-cli/**"
 
+    # baseerah domain
+    - name: baseerah-be
+      levels: [unit, integration]
+      specs: "specs/apps/baseerah/behavior/baseerah-be/**"
+
     # Deliberately excluded, not omitted by oversight: baseerah-contracts's test-level
     # targets (test:unit/test:integration/test:e2e) are documented no-ops ("target not
     # applicable for this project"). Its real quality gate is lint (redocly) and bundle,
@@ -144,7 +149,14 @@ env-contract:
   #   kind      — "app" (active); "terraform"/"ansible" are forward-scaffold
   #   lang      — "rust" or "typescript" (app kind only)
   #   allowlist — keys exempt from drift detection (framework-injected, test-only, etc.)
-  surfaces: []
+  surfaces:
+    - root: apps/baseerah-be
+      kind: app
+      lang: fsharp
+      allowlist:
+        # Forward-declared config not yet consumed by the Phase 1 F# shell
+        # (browser-facing CORS isn't needed yet — baseerah-fe fetches server-side).
+        - BASEERAH_BE_CORS_ORIGINS
 
 env-injection:
   # Value-less injection contract (extends env-contract:).
@@ -157,7 +169,10 @@ env-injection:
   #   vercel-preview     — Vercel project env, Preview scope (stag-*-app-web branch)
   #   vercel-production  — Vercel project env, Production scope (prod-*-www / prod-*-app-web)
   #   k3s-coralpolyp     — ose-private coralpolyp secret store (backend k3s rollout)
-  apps: []
+  apps:
+    - app: baseerah-be
+      keys-from: apps/baseerah-be/.env.example
+      runtime: { local-ci: compose }
 
   # CI test-harness keys — test-only, NEVER in any apps/<app>/.env.example.
   ci-harness:

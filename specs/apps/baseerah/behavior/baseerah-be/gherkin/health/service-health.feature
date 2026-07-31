@@ -3,6 +3,7 @@ Feature: Backend hello world
   Background:
     Given the baseerah-be service is running on port 19320
 
+  @unit
   Scenario: The service reports liveness
     Given the service has finished starting
     When I send a GET request to "/api/v1/health"
