@@ -1,27 +1,27 @@
-# Integration test runner for baseerah-be.
+# Integration test runner for beaver-nest-be.
 # Build context is the monorepo root (../../ relative to this file, per docker-compose.integration.yml).
 FROM mcr.microsoft.com/dotnet/sdk:10.0
 
 WORKDIR /build
 
 # Copy solution-level files first for dependency caching.
-COPY apps/baseerah-be/global.json .
-COPY apps/baseerah-be/dotnet-tools.json .
-COPY apps/baseerah-be/.editorconfig .
+COPY apps/beaver-nest-be/global.json .
+COPY apps/beaver-nest-be/dotnet-tools.json .
+COPY apps/beaver-nest-be/.editorconfig .
 
 # Copy project files for restore (before code to cache the restore layer).
-COPY apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj src/BaseerahBe/
-COPY apps/baseerah-be/tests/integration/BaseerahBe.IntegrationTests.fsproj tests/integration/
+COPY apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj src/BeaverNestBe/
+COPY apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj tests/integration/
 
-RUN dotnet restore tests/integration/BaseerahBe.IntegrationTests.fsproj
+RUN dotnet restore tests/integration/BeaverNestBe.IntegrationTests.fsproj
 
 # Copy source and test code.
-COPY apps/baseerah-be/src/ src/
-COPY apps/baseerah-be/tests/integration/ tests/integration/
+COPY apps/beaver-nest-be/src/ src/
+COPY apps/beaver-nest-be/tests/integration/ tests/integration/
 
 # Build the test project (restore already ran; --no-restore keeps the layer cache useful).
-RUN dotnet build tests/integration/BaseerahBe.IntegrationTests.fsproj --no-restore
+RUN dotnet build tests/integration/BeaverNestBe.IntegrationTests.fsproj --no-restore
 
 # HostBootTests.fs boots the real Kestrel host in-process and calls it over HTTP —
 # no external services (DB, message bus) required.
-CMD ["dotnet", "test", "tests/integration/BaseerahBe.IntegrationTests.fsproj", "--no-build", "--logger", "console;verbosity=normal"]
+CMD ["dotnet", "test", "tests/integration/BeaverNestBe.IntegrationTests.fsproj", "--no-build", "--logger", "console;verbosity=normal"]

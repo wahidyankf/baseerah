@@ -1,6 +1,6 @@
-module BaseerahBe.Api.GreetingHandlers
+module BeaverNestBe.Api.GreetingHandlers
 
 open Giraffe
-open BaseerahBe.Domain.Greeting
+open BeaverNestBe.Domain.Greeting
 
 let greetingHandler: HttpHandler = fun next ctx -> json greeting next ctx

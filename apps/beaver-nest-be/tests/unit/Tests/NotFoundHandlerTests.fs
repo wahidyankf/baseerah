@@ -1,13 +1,13 @@
-module BaseerahBe.Tests.Unit.Tests.NotFoundHandlerTests
+module BeaverNestBe.Tests.Unit.Tests.NotFoundHandlerTests
 
 open System.Net
 open System.Net.Http
 open System.Text.Json
 open Xunit
-open BaseerahBe.WebApp
-open BaseerahBe.Tests.Unit.Steps.BddState
+open BeaverNestBe.WebApp
+open BeaverNestBe.Tests.Unit.Steps.BddState
 
-// @covers specs/apps/baseerah/behavior/baseerah-be/gherkin/hello/greeting.feature:An unknown route is refused
+// @covers specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/hello/greeting.feature:An unknown route is refused
 [<Fact>]
 let ``unknown route returns 404 with a non-empty JSON error`` () =
     let client = buildClient webApp

@@ -1,8 +1,8 @@
-# No backing services (Postgres, NATS, etc.) — baseerah-be's integration test
+# No backing services (Postgres, NATS, etc.) — beaver-nest-be's integration test
 # (HostBootTests.fs) boots the Kestrel host in-process and calls it over real HTTP,
 # with no external dependencies to wire up here.
 services:
   test-runner:
     build:
       context: ../..
-      dockerfile: apps/baseerah-be/Dockerfile.integration
+      dockerfile: apps/beaver-nest-be/Dockerfile.integration

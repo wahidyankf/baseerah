@@ -1,13 +1,13 @@
 {
-  "name": "baseerah-be",
+  "name": "beaver-nest-be",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/baseerah-be/src",
+  "sourceRoot": "apps/beaver-nest-be/src",
   "projectType": "application",
   "targets": {
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/baseerah-be/generated-contracts --model-package BaseerahBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
+        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/beaver-nest-be/generated-contracts --model-package BeaverNestBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
       },
       "dependsOn": ["beaver-nest-contracts:bundle"],
       "cache": true,
@@ -17,27 +17,27 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet publish apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj -c Release -o apps/baseerah-be/dist"
+        "command": "dotnet publish apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj -c Release -o apps/beaver-nest-be/dist"
       },
       "dependsOn": ["codegen"],
       "outputs": ["{projectRoot}/dist"],
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
-        "{projectRoot}/src/BaseerahBe/BaseerahBe.fsproj",
+        "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj",
         "{projectRoot}/generated-contracts/**/*.fs"
       ]
     },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet build apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj"
+        "command": "dotnet build apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj"
       },
       "dependsOn": ["codegen"],
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
-        "{projectRoot}/src/BaseerahBe/BaseerahBe.fsproj",
+        "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj",
         "{projectRoot}/generated-contracts/**/*.fs"
       ]
     },
@@ -46,44 +46,44 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "fantomas --check apps/baseerah-be/src",
-          "dotnet tool restore && dotnet fsharplint lint apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj --lint-config apps/baseerah-be/fsharplint.json",
-          "dotnet tool restore && dotnet fsharp-analyzers --project apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj --analyzers-path $(find $(dotnet nuget locals global-packages --list | sed 's/.*: //')g-research.fsharp.analyzers -path '*/analyzers/dotnet/fs' -type d | head -1) --treat-as-error GRA-STRING-001 GRA-STRING-002 GRA-STRING-003 GRA-STRING-004 GRA-UNIONCASE-001 GRA-VIRTUALCALL-001 GRA-JSONOPTS-001 GRA-DISPBEFOREASYNC-001 GRA-IMMUTABLECOLLECTIONEQUALITY-001 GRA-LOGARGFUNCFULLAPP-001 GRA-LOGTEMPLMISSVALS-001 GRA-TYPE-ANNOTATE-001 GRA-INTERPOLATED-001"
+          "fantomas --check apps/beaver-nest-be/src",
+          "dotnet tool restore && dotnet fsharplint lint apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj --lint-config apps/beaver-nest-be/fsharplint.json",
+          "dotnet tool restore && dotnet fsharp-analyzers --project apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj --analyzers-path $(find $(dotnet nuget locals global-packages --list | sed 's/.*: //')g-research.fsharp.analyzers -path '*/analyzers/dotnet/fs' -type d | head -1) --treat-as-error GRA-STRING-001 GRA-STRING-002 GRA-STRING-003 GRA-STRING-004 GRA-UNIONCASE-001 GRA-VIRTUALCALL-001 GRA-JSONOPTS-001 GRA-DISPBEFOREASYNC-001 GRA-IMMUTABLECOLLECTIONEQUALITY-001 GRA-LOGARGFUNCFULLAPP-001 GRA-LOGTEMPLMISSVALS-001 GRA-TYPE-ANNOTATE-001 GRA-INTERPOLATED-001"
         ],
         "parallel": false
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/BaseerahBe/BaseerahBe.fsproj"]
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj"]
     },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet watch run --project apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj"
+        "command": "dotnet watch run --project apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj"
       }
     },
     "run": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet run --project apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj"
+        "command": "dotnet run --project apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj"
       }
     },
     "test:unit": {
       "dependsOn": ["codegen", "typecheck"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "if grep -rn -E --include='*.fs' 'Skip\\s*=' apps/baseerah-be/tests/unit; then echo 'ERROR: xunit Skip= attribute found in test files above'; exit 1; fi && dotnet test apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj"
+        "command": "if grep -rn -E --include='*.fs' 'Skip\\s*=' apps/beaver-nest-be/tests/unit; then echo 'ERROR: xunit Skip= attribute found in test files above'; exit 1; fi && dotnet test apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj"
       },
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
         "{projectRoot}/tests/unit/**/*.fs",
-        "{projectRoot}/src/BaseerahBe/BaseerahBe.fsproj"
+        "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj"
       ]
     },
     "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/baseerah-be/tests/unit/BaseerahBe.UnitTests.fsproj /p:CollectCoverage=true /p:Threshold=90 /p:ThresholdType=line \"/p:ExcludeByFile=**/Program.fs\""
+        "command": "dotnet test apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj /p:CollectCoverage=true /p:Threshold=90 /p:ThresholdType=line \"/p:ExcludeByFile=**/Program.fs\""
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/tests/unit/**/*.fs"]
@@ -92,11 +92,11 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "npx nx run baseerah-be:typecheck",
-          "npx nx run baseerah-be:lint",
-          "npx nx run baseerah-be:test:unit",
-          "npx nx run baseerah-be:test:coverage",
-          "npx nx run baseerah-be:test:specs"
+          "npx nx run beaver-nest-be:typecheck",
+          "npx nx run beaver-nest-be:lint",
+          "npx nx run beaver-nest-be:test:unit",
+          "npx nx run beaver-nest-be:test:coverage",
+          "npx nx run beaver-nest-be:test:specs"
         ],
         "parallel": false
       },
@@ -107,14 +107,14 @@
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/baseerah-be/tests/integration/BaseerahBe.IntegrationTests.fsproj"
+        "command": "dotnet test apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj"
       },
       "cache": false
     },
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin apps/baseerah-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin apps/beaver-nest-be"
       },
       "cache": true,
       "inputs": [
@@ -125,7 +125,7 @@
     "specs:domain:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'specs:domain:coverage: no-op (baseerah is not in specs.domain-areas — no domain/** bounded-context features)'"
+        "command": "echo 'specs:domain:coverage: no-op (beaver-nest is not in specs.domain-areas — no domain/** bounded-context features)'"
       },
       "cache": true
     },
@@ -139,7 +139,7 @@
     "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet list apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj package --vulnerable"
+        "command": "dotnet list apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj package --vulnerable"
       },
       "cache": false
     },
@@ -162,9 +162,9 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "npx nx run baseerah-be:specs:structure-validation",
-          "npx nx run baseerah-be:specs:behavior:coverage",
-          "npx nx run baseerah-be:specs:domain:coverage"
+          "npx nx run beaver-nest-be:specs:structure-validation",
+          "npx nx run beaver-nest-be:specs:behavior:coverage",
+          "npx nx run beaver-nest-be:specs:domain:coverage"
         ],
         "parallel": false
       },
@@ -175,6 +175,6 @@
   "namedInputs": {
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
   },
-  "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:baseerah"],
+  "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:beaver-nest"],
   "implicitDependencies": ["beaver-nest-contracts", "rhino-cli"]
 }

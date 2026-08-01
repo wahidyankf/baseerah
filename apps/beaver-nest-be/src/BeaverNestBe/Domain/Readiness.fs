@@ -1,4 +1,4 @@
-module BaseerahBe.Domain.Readiness
+module BeaverNestBe.Domain.Readiness
 
 /// The single liveness payload shape, serialised once at the health handler.
 type Readiness = { Status: string }

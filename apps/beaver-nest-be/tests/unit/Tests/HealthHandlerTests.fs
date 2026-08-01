@@ -1,11 +1,11 @@
-module BaseerahBe.Tests.Unit.Tests.HealthHandlerTests
+module BeaverNestBe.Tests.Unit.Tests.HealthHandlerTests
 
 open System.Net
 open Xunit
-open BaseerahBe.WebApp
-open BaseerahBe.Tests.Unit.Steps.BddState
+open BeaverNestBe.WebApp
+open BeaverNestBe.Tests.Unit.Steps.BddState
 
-// @covers specs/apps/baseerah/behavior/baseerah-be/gherkin/health/service-health.feature:The service reports liveness
+// @covers specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/service-health.feature:The service reports liveness
 [<Fact>]
 let ``health route returns 200 with status ok`` () =
     let client = buildClient webApp

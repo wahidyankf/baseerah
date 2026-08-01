@@ -1,10 +1,10 @@
-module BaseerahBe.Tests.Unit.Steps.NotFoundSteps
+module BeaverNestBe.Tests.Unit.Steps.NotFoundSteps
 
 open System.Net.Http
 open TickSpec
 open Xunit
-open BaseerahBe.WebApp
-open BaseerahBe.Tests.Unit.Steps.BddState
+open BeaverNestBe.WebApp
+open BeaverNestBe.Tests.Unit.Steps.BddState
 
 // Step definitions for the 404-fallback scenario, binding the Gherkin steps
 // to the in-process Giraffe routing surface for the spec coverage validator.

@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Pinned to match ../../src/BaseerahBe/BaseerahBe.fsproj's pin: G-Research.FSharp.Analyzers
+    <!-- Pinned to match ../../src/BeaverNestBe/BeaverNestBe.fsproj's pin: G-Research.FSharp.Analyzers
          there requires FSharp.Core >= 10.1.302, above this project's own SDK-implicit floor, and
          the mismatch surfaces as an NU1605 package-downgrade error via the ProjectReference below. -->
     <PackageReference Update="FSharp.Core" Version="10.1.302" />
@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/BaseerahBe/BaseerahBe.fsproj" />
+    <ProjectReference Include="../../src/BeaverNestBe/BeaverNestBe.fsproj" />
   </ItemGroup>
 
 </Project>

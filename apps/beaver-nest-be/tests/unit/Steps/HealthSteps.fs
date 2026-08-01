@@ -1,10 +1,10 @@
-module BaseerahBe.Tests.Unit.Steps.HealthSteps
+module BeaverNestBe.Tests.Unit.Steps.HealthSteps
 
 open System.Net.Http
 open TickSpec
 open Xunit
-open BaseerahBe.WebApp
-open BaseerahBe.Tests.Unit.Steps.BddState
+open BeaverNestBe.WebApp
+open BeaverNestBe.Tests.Unit.Steps.BddState
 
 // Step definitions binding the health/greeting Gherkin backgrounds and shared
 // assertions to the in-process Giraffe routing surface, so the spec coverage
@@ -15,7 +15,7 @@ let mutable private lastStatus = 0
 let mutable private lastBody = ""
 
 [<Given>]
-let ``the baseerah-be service is running on port 19320`` () = client <- Some(buildClient webApp)
+let ``the beaver-nest-be service is running on port 19320`` () = client <- Some(buildClient webApp)
 
 [<Given>]
 let ``the service has finished starting`` () = client <- Some(buildClient webApp)

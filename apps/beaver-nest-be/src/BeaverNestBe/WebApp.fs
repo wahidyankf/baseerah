@@ -1,9 +1,9 @@
-module BaseerahBe.WebApp
+module BeaverNestBe.WebApp
 
 open Giraffe
-open BaseerahBe.Domain.ErrorBody
-open BaseerahBe.Api.HealthHandlers
-open BaseerahBe.Api.GreetingHandlers
+open BeaverNestBe.Domain.ErrorBody
+open BeaverNestBe.Api.HealthHandlers
+open BeaverNestBe.Api.GreetingHandlers
 
 /// Single error-formatting function every non-2xx response goes through.
 let private errorBody (message: string) : ErrorBody = { Error = message }

@@ -1,10 +1,10 @@
-module BaseerahBe.Tests.Unit.Steps.GreetingSteps
+module BeaverNestBe.Tests.Unit.Steps.GreetingSteps
 
 open System.Net.Http
 open TickSpec
 open Xunit
-open BaseerahBe.WebApp
-open BaseerahBe.Tests.Unit.Steps.BddState
+open BeaverNestBe.WebApp
+open BeaverNestBe.Tests.Unit.Steps.BddState
 
 // Step definitions for the greeting scenario, binding the Gherkin steps to
 // the in-process Giraffe routing surface for the spec coverage validator.
@@ -20,8 +20,8 @@ let ``I send a GET request to "/api/v1/hello"`` () =
     lastBody <- resp.Content.ReadAsStringAsync().Result
 
 [<Then>]
-let ``the response body field "message" equals "Hello from Baseerah"`` () =
-    Assert.Contains("Hello from Baseerah", lastBody)
+let ``the response body field "message" equals "Hello from BeaverNest"`` () =
+    Assert.Contains("Hello from BeaverNest", lastBody)
 
 // Rule-16 finding SG-004: an undeclared query string is ignored. The `\?` here
 // is a literal backslash-escape, not a typo — rhino-cli's spec-coverage

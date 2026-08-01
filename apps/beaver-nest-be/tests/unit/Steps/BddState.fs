@@ -1,4 +1,4 @@
-module BaseerahBe.Tests.Unit.Steps.BddState
+module BeaverNestBe.Tests.Unit.Steps.BddState
 
 open Microsoft.AspNetCore.TestHost
 open Microsoft.AspNetCore.Hosting

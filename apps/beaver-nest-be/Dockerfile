@@ -1,19 +1,19 @@
-# Production multi-stage Dockerfile for baseerah-be (F# / Giraffe on .NET 10).
-# Build context: repo root (e.g. `docker build -f apps/baseerah-be/Dockerfile .`).
+# Production multi-stage Dockerfile for beaver-nest-be (F# / Giraffe on .NET 10).
+# Build context: repo root (e.g. `docker build -f apps/beaver-nest-be/Dockerfile .`).
 
 # Stage 1: restore + publish the release build.
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy the project file first for restore-layer caching.
-COPY apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj apps/baseerah-be/src/BaseerahBe/
+COPY apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj apps/beaver-nest-be/src/BeaverNestBe/
 
-RUN dotnet restore apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj
+RUN dotnet restore apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj
 
 # Copy the remaining sources and publish.
-COPY apps/baseerah-be/src apps/baseerah-be/src/
+COPY apps/beaver-nest-be/src apps/beaver-nest-be/src/
 
-RUN dotnet publish apps/baseerah-be/src/BaseerahBe/BaseerahBe.fsproj \
+RUN dotnet publish apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj \
   -c Release -o /app/publish --no-restore
 
 # Stage 2: minimal ASP.NET runtime image.
@@ -22,8 +22,8 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Default port — override at runtime via BASEERAH_BE_PORT.
-ENV BASEERAH_BE_PORT=19320
+# Default port — override at runtime via BEAVER_NEST_BE_PORT.
+ENV BEAVER_NEST_BE_PORT=19320
 EXPOSE 19320
 
-ENTRYPOINT ["dotnet", "BaseerahBe.dll"]
+ENTRYPOINT ["dotnet", "BeaverNestBe.dll"]

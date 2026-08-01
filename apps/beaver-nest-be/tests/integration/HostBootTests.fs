@@ -1,4 +1,4 @@
-module BaseerahBe.Tests.Integration.HostBootTests
+module BeaverNestBe.Tests.Integration.HostBootTests
 
 open System.Net
 open System.Net.Http
@@ -10,7 +10,7 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
 open Xunit
-open BaseerahBe.WebApp
+open BeaverNestBe.WebApp
 
 /// Boots the real Kestrel host on an ephemeral port and serves a live HTTP
 /// request — distinct from the unit-level in-memory `TestServer` harness,
