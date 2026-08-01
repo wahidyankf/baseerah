@@ -89,6 +89,15 @@ gh run view <run-id> --log-failed
 gh run list --limit=10
 ```
 
+**Nx affected-detection scope gotcha**: `nx show projects --affected` (and every `nx affected -t ...`
+call) scopes strictly to files inside a project's own input glob. Renaming or editing files _outside_
+an app's directory — CI workflow files, `infra/` compose files, other conceptually-related paths —
+never marks that app affected on its own, however related the change feels; only a change under the
+app's own directory (or a direct/transitive Nx dependency, e.g. a shared codegen/tooling project)
+triggers it. Don't assume a plan step like "this workflow rename will trigger a rebuild because the
+app is affected" holds without checking `nx show projects --affected` (or the workflow's own
+`detect`/`build-*` job outputs) directly — verify the assumption, don't trust it at authoring time.
+
 ## When This Convention Applies
 
 This convention applies after **any** push that touches the following, regardless of whether the target is a PR branch or `origin main`:

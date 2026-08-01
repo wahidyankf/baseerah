@@ -259,6 +259,29 @@ E2E tests live in a dedicated `*-e2e` Playwright project. Steps make real HTTP r
 - Tests the full HTTP API contract
 - Must run all shared scenarios
 
+**Gotcha — a literal `/` in Gherkin step text is a Cucumber Expression alternation delimiter, not a
+literal slash.** A step like `Then no foo/bar-style thing is present` registered verbatim as
+`Then("no foo/bar-style thing is present", ...)` in a `playwright-bdd` `createBdd()` step compiles
+fine, but `bddgen` reports it as a **missing** step — Cucumber Expressions treat an unescaped `/`
+between two words as `cat/dog`-style alternative text, so the compiled matcher never matches a
+Gherkin line that actually contains the slash character. Escape it in the step-definition string
+(`Then("no foo\\/bar-style thing is present", ...)`) to restore literal-slash matching. This only
+affects real `createBdd()` step registries (Cucumber Expression parsing) — plain-string no-op step
+files that just register dummy functions without parsing don't hit it.
+
+**Gotcha — renaming shared Gherkin prose orphans every literal-text-matching step touching the
+renamed string, not just the one scenario you meant to change.** A blanket find-and-replace across a
+`.feature` file's prose (e.g. renaming a product identifier throughout) orphans **every** step whose
+implementation does `[exact]` literal-string matching against the old text — potentially many steps
+across several projects' step-definition files, not just the single scenario the change was targeting.
+For `playwright-bdd`-based e2e projects specifically, `bddgen` (invoked as a prerequisite inside
+`typecheck`/`test:quick`) hard-fails with a non-zero exit and no partial output the moment **any**
+Gherkin step lacks a matching step definition — so the blast radius includes `typecheck` itself, not
+just the specs-coverage target. After any shared-spec rename, confirm the full RED footprint
+project-by-project (grep every step-definition file for the old string, and run each affected
+project's `typecheck`/`test:quick` directly) rather than assuming only the intentionally-changed
+scenario is affected.
+
 ### Validation
 
 To verify all scenarios pass at each level for a given backend:

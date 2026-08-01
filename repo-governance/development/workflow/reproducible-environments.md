@@ -225,6 +225,24 @@ git commit -m "chore: update dependencies"
 - Check for unexpected version bumps
 - Verify sub-dependency changes don't introduce vulnerabilities
 
+**Prefer `npm install` over `rm package-lock.json && npm install` for renames/refreshes**: a package
+that declares OS/arch-specific `optionalDependencies` (e.g. `@rolldown/binding-*`, one entry per
+platform) can have its non-local-platform `packages` entries silently dropped by a full lockfile
+regeneration run on a single machine — this is npm's documented optional-dependency lockfile bug
+([npm/cli#4828](https://github.com/npm/cli/issues/4828)). The version pins under
+`optionalDependencies` still look intact (grepping for the package name finds nothing wrong), but
+`npm ci` on a different-platform CI runner (e.g. Linux, when the regeneration ran on macOS) then has
+no lockfile entry to resolve its own platform's native binding from, and fails with `Cannot find
+native binding`. A plain `npm install` against an existing lockfile does not have this problem —
+reserve full lockfile deletion for genuine from-scratch regenerations, and when one is unavoidable,
+diff the resulting lockfile's per-package entry _counts_ (not just presence) for every known
+multi-platform optional dependency against the prior lockfile before committing.
+
+**BSD vs. GNU shell tool flags**: commands copied from Linux-oriented docs or plans may assume GNU
+coreutils flags that don't exist on macOS's BSD toolchain — e.g. `xargs -a <file>` (GNU-only; BSD
+`xargs` has no `-a`). Prefer the portable form (`< <file> xargs -I{} ...`, redirecting stdin instead
+of `-a`) so the same command works on both a macOS dev machine and Linux CI.
+
 ## Shared Cargo Target Directories
 
 `npm run doctor -- --fix` provisions a shared cargo build-artifact cache for local development, in addition to the toolchain convergence described in [Worktree Toolchain Initialization](./worktree-setup.md). This mechanism targets build-artifact reuse across worktrees of the same repo — it does not change dependency resolution, which remains governed by `Cargo.lock`.

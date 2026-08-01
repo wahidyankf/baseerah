@@ -190,6 +190,18 @@ prd.md Gherkin scenario → first failing test → minimum implementation → re
 `plan-checker` will flag delivery checklist items that reference code changes without a
 corresponding test-first step as a HIGH finding.
 
+**Cross-phase RED spans and the pre-push hook**: a plan that deliberately reds out a target across
+multiple phases (e.g. phase N renames a shared spec/contract, phases N+1..M each fix one consuming
+project) must check whether `.husky/pre-push` runs that same target as part of `test:quick` — if it
+does, the hook itself blocks `git push` locally (not just CI) the moment the plan tries to push
+mid-span, since pre-push validates the whole affected set, not just the current phase's files. This
+conflicts with `test:quick` being blocking-by-default. Resolve it at plan-authoring time, not
+mid-execution: either collapse the push cadence to match the RED span (commit locally through every
+phase, push once when the whole span reaches green), or restructure the phases so no target regresses
+across a push boundary. Don't assume the plan's own RED callout is complete, either — literal-string
+step matching can orphan every step referencing the renamed text, not just the one scenario the plan
+intended to change; confirm the full RED footprint project-by-project once the rename lands.
+
 ### Plan Execution
 
 `plan-executor` (the calling context orchestrating the plan-execution workflow) and all

@@ -230,6 +230,17 @@ env-contract:
 reporting `declared-but-unread` (stale template entry) and `read-but-undeclared` (undocumented read)
 drift findings. Invoked by `.husky/pre-push` and `.github/workflows/validate-env.yml`.
 
+**Renaming an app directory or env var**: don't rename `env-contract.surfaces[].root`,
+`env-injection.apps[].keys-from` (or its `app:` label), or a CORS-allowlist entry name ahead of the
+physical directory move or the actual `.env.example` key rename. Both `root`/`keys-from` resolve
+against the filesystem (`env validate` reads `apps/<name>/.env.example` at that literal path) and the
+allowlist entry must match a key genuinely declared in that file — renaming the config field early
+breaks the pre-push `env validate` hook with a missing-directory error or a `declared-but-unread`
+drift, even though the rename looks purely cosmetic. By contrast, a glob field that a validator treats
+as an opaque string/label (not resolved against the filesystem) is safe to rename ahead of the actual
+move — check what each field's validator actually does (path/key resolution vs. opaque string) before
+renaming it early.
+
 ## 7. Tiered Injection Standard
 
 The sections above standardize how an app **declares** its env vars locally — naming convention (§2),

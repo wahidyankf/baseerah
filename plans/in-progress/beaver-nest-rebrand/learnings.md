@@ -19,6 +19,9 @@ Minor/Low edge case unreachable by any real client. Worth remembering for any fu
 Core/Giraffe backend in this repo: don't assume app-level middleware can normalize every error path —
 malformed request-line/target errors are a hard exception.
 
+**Routing**: `apps/beaver-nest-be` (code) — ALWAYS filed as backlog. Already filed at
+`plans/ideas/beaver-nest-be-nullbyte-path-error-envelope.md` during Phase 16 execution. Terminal.
+
 ## Phase 16: `development-environment-setup.md`'s preserved-citation count is 4, not the 2 Phase 17 expects
 
 Phase 16's repo-wide residual sweep confirmed `repo-governance/workflows/infra/development-environment-setup.md`
@@ -32,6 +35,11 @@ structure, not a residual defect; no fix applied here since Phase 16 doesn't tou
 already handles multiple lines (global across the file), so the flip step itself needs no change —
 only its acceptance-criterion prose undercounts this one file by 2. Flag this if Phase 17's automated
 count check fails; the true expected count for this file is 4, not 2.
+
+**Routing**: discard — not generalizable. The discrepancy was in this plan's own delivery.md
+acceptance-criterion prose (undercounted by 2), already resolved by Phase 17's actual grep-verified
+flip (counts confirmed 2/2/1/1/1 for GitHub-URL citations specifically, which is what the gate text
+meant). No repo convention gap; no future plan references this count.
 
 ## Phase 13: the GHCR-image acceptance check assumed the cutover push itself would trigger a rebuild — it didn't, and that's fine
 
@@ -80,6 +88,10 @@ rebuild because the app is affected"), verify that assumption explicitly rather 
 plan-authoring time — `nx show projects --affected` scopes strictly to files inside a project's own
 input glob, so renaming files _outside_ an app's directory (workflows, infra compose files) never
 marks that app as affected, however conceptually related the change feels.
+
+**Routing**: `repo-governance/development/workflow/ci-post-push-verification.md` (non-code, small) —
+routed INLINE, landed in this plan's Phase 19 commit as a new "Nx affected-detection scope gotcha"
+callout after the Commands section.
 
 ## Phase 11 (addendum 2): `rm package-lock.json && npm install` on macOS silently dropped 16 of 17 cross-platform `@rolldown/binding-*` lockfile entries, breaking `npm ci` on Linux CI
 
@@ -140,6 +152,9 @@ the prior lockfile for every known multi-platform optional dependency before pus
 `git grep` for the package name is not enough, since the version pin under `optionalDependencies`
 survives even when the platform-specific `packages` entry doesn't.
 
+**Routing**: `repo-governance/development/workflow/reproducible-environments.md` (non-code, small) —
+routed INLINE, landed in this plan's Phase 19 commit in the Lockfile Best Practices section.
+
 ## Phase 11 (addendum): the push-collapse decision silently deferred `md links validate` too, not just `test:quick`
 
 The Phase 6 push-collapse decision (see below) was scoped to the conflict with `test:quick`'s nested
@@ -174,6 +189,10 @@ of all at once. Also: a Decision-6 citation-revert step that only matches the li
 (`baseerah-repo-reset`) will NOT catch a renamed anchor _fragment_ inside an otherwise-correct link to
 that citation — anchor fragments encoding a heading's old name need their own explicit check.
 
+**Routing**: `repo-governance/development/workflow/large-scale-rename-plan-link-management.md`
+(non-code, small — new dedicated doc) — routed INLINE, landed in this plan's Phase 19 commit as
+Rule 3 ("Deferring a Push Cadence Defers EVERY Pre-Push-Only Check").
+
 ## Phase 11: a literal `/` in Gherkin step text is a Cucumber Expression alternation delimiter, not a literal slash
 
 The new scenario's step text (authored in Phase 10, per the plan's own literal wording) reads
@@ -195,6 +214,9 @@ to bind despite looking identical to the eye. The plain-string no-op step-def fi
 unit-test side's `landing.steps.ts`, which only registers dummy `Given`/`When`/`Then` functions with
 no real Cucumber Expression parsing) don't hit this — only real `playwright-bdd` `createBdd()` step
 registries do, so check e2e step files specifically whenever a Gherkin line contains a bare `/`.
+
+**Routing**: `repo-governance/development/infra/bdd-spec-test-mapping.md` (non-code, small) — routed
+INLINE, landed in this plan's Phase 19 commit as a gotcha note under E2E-Level Step Definitions.
 
 ## Phase 8: `git add` on an invalid multi-pathspec call can stage some paths with STALE content, silently
 
@@ -220,6 +242,10 @@ working tree — a working-tree-only check can pass while the actual commit stil
 especially after a multi-pathspec `git add` call that partially failed. Never batch a rename-path and
 a not-yet-renamed path in the same `git add` invocation; stage each already-confirmed-final path
 individually or verify the command's exit code before trusting anything got staged from it.
+
+**Routing**: `repo-governance/development/workflow/no-destructive-git-operations.md` (non-code,
+small) — routed INLINE, landed in this plan's Phase 19 commit right after the Whole-Tree-Staging
+section.
 
 ## Phase 6 (addendum): the cross-phase RED/GREEN/REFACTOR design conflicts with `.husky/pre-push`, blocking the push itself (not just CI)
 
@@ -249,6 +275,10 @@ a repo with a blocking pre-push hook, check whether the hook's target set (here 
 the very target the cycle deliberately reds out — if so, the push cadence itself must collapse to
 match the cycle's span, not just the phase-by-phase content plan.
 
+**Routing**: `repo-governance/development/workflow/test-driven-development.md` (non-code, small) —
+routed INLINE, landed in this plan's Phase 19 commit as a new callout after the Plan Creation
+section ("Cross-phase RED spans and the pre-push hook").
+
 ## Phase 1: pre-push `md links validate` blocks on ANY repo-wide broken link, not just the current phase's file set
 
 Renaming `repo-governance/vision/baseerah.md` → `beaver-nest.md` immediately broke 27 inbound
@@ -265,6 +295,11 @@ string, leaving the referencing file's own full `baseerah`→`beaver-nest` prose
 designated phase. Verify with `git grep -l "<old-path>"` before push to catch every reference, and
 re-run `md links validate` before every push, not just at the phase whose own gate mentions it.
 
+**Routing**: `repo-governance/development/workflow/large-scale-rename-plan-link-management.md`
+(non-code, small — new dedicated doc, consolidated with the Phase 4 addendum below since it's the
+same rule) — routed INLINE, landed in this plan's Phase 19 commit as Rule 1 ("A `git mv` Breaks
+Repo-Wide Inbound Links").
+
 ## Phase 3: content sed can rename an outbound link's target path before the target file itself moves
 
 `docs/reference/system-architecture/deployment.md` linked to
@@ -278,6 +313,10 @@ rule was about inbound links breaking when a path moves; this is an outbound lin
 renamed before the path moves). **Generalizable rule**: whenever a phase's content sweep touches a
 markdown link whose _target_ is renamed by a _later_ phase, revert that one link's text in the
 current phase and add an explicit repoint step to the later phase's `git mv` item.
+
+**Routing**: `repo-governance/development/workflow/large-scale-rename-plan-link-management.md`
+(non-code, small) — routed INLINE, landed in this plan's Phase 19 commit as Rule 2 ("An Outbound
+Link's Target Text Can Get Renamed Before the Target Itself Moves").
 
 ## Phase 6: renamed Gherkin prose orphans EVERY step in a file, not just the one deleted scenario — and `bddgen` hard-fails typecheck for e2e projects
 
@@ -344,6 +383,9 @@ CLI that no validator checks that glob's filesystem existence, only its schema s
 resolves it against the filesystem (path existence, key-presence-in-file) versus treating it as an
 opaque string/label — only the latter is safe to rename ahead of the phase that does the actual move.
 
+**Routing**: `repo-governance/conventions/security/secrets-and-env-standards.md` (non-code, small) —
+routed INLINE, landed in this plan's Phase 19 commit under the `env-contract:` section.
+
 ## Phase 4: renaming a file leaves repo-wide inbound links dangling, same as Phase 1
 
 Confirmed the same class of bug documented in the Phase 1 entry above, this time for a `git mv`
@@ -356,6 +398,10 @@ since e.g. `apps/README.md` still legitimately says `baseerah-fe`/`baseerah-be` 
 Phases 8-11). **Reconfirms the Phase 1 rule**: every phase with a `git mv` (Phases 6, 8, 9, 10, 11, 12) must re-run `git grep -l "<old-path>"` across the whole repo, not just its own file set, before
 pushing.
 
+**Routing**: same rule as the Phase 1 entry above — consolidated into
+`repo-governance/development/workflow/large-scale-rename-plan-link-management.md` Rule 1. No separate
+routing needed.
+
 ## Phase 2: BSD `xargs` on macOS has no `-a` flag
 
 The plan's own reference commands use `xargs -a <file> -I{} ...` to feed a captured citation-file
@@ -363,3 +409,7 @@ list into a revert command. This is GNU-xargs syntax; BSD `xargs` (macOS, this d
 `-a` option and errors immediately (`xargs: invalid option -- a`). Portable equivalent:
 `< <file> xargs -I{} ...` (redirect stdin instead of `-a`). Every later phase's citation-revert step
 that copies this exact command needs this substitution when executing on macOS.
+
+**Routing**: `repo-governance/development/workflow/reproducible-environments.md` (non-code, small) —
+routed INLINE, landed in this plan's Phase 19 commit alongside the npm-lockfile note (Lockfile Best
+Practices section).

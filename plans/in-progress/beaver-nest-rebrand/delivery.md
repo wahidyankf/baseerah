@@ -1509,20 +1509,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                    ```gherkin
-                                                    Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                      Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                      When nx run rhino-cli:test:integration runs
-                                                      Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                      And the generated file's "name" field reads "beaver-nest-default"
-                                                    ```
+                                                      ```gherkin
+                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                        When nx run rhino-cli:test:integration runs
+                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                        And the generated file's "name" field reads "beaver-nest-default"
+                                                      ```
 
-                                                    Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                    target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                    error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                    the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                    against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                    state).
+                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                      state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
@@ -2111,8 +2111,10 @@ CONTRIBUTING.md` — acceptance: `git grep -lic "wahidyankf/baseerah\|^\s*cd bas
       shows the expected count in each (2, 2, 1, 1, 1 respectively, matching Phase 2/10's preserved
       counts). **Done 2026-08-01**: all 5 files show the expected counts, residual grep returns no
       matches.
-- [ ] [AI] Commit and push this flip: `chore(rebrand): flip preserved GitHub URL citations now that
-the repository rename is live` — monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push this flip: `chore(rebrand): flip preserved GitHub URL citations now that
+the repository rename is live` — monitor CI; fix and re-push on any failure. **Done 2026-08-01**:
+      committed as `b582e2a2a` and pushed; `validate-env`, `pr-quality-gate`, and `publish-images` all
+      completed with `conclusion: success`.
 
 ### Phase 17 Gate
 

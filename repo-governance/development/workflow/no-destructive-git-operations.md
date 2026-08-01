@@ -141,6 +141,18 @@ per-instance approval:
 The cost is a few named paths. The failure it prevents is committing someone else's work, or a
 secret, into a history that cannot be rewritten without coordinating with everyone who has pulled it.
 
+**A multi-path `git add <path1> <path2> ... <pathN>` call can partially succeed and stage stale
+content, silently.** Git processes pathspecs left-to-right and aborts on the first one that no longer
+exists (e.g. a path already `git mv`'d away) — but every path listed _before_ the bad one is already
+staged from whatever the working tree held at that exact moment, even if a later, separate edit has
+since landed in the working tree but not yet been re-staged. `git status` still shows clean rename
+entries and pre-commit hooks (formatters/linters) still pass green, because they reformat the staged
+content rather than checking it semantically against the intended final state. Verify a
+rename-plus-content-edit commit against `git show HEAD:<path>` (or `git diff HEAD`, expecting empty)
+after committing, not just the working tree beforehand — and never batch an already-final path with a
+not-yet-renamed path in the same `git add` invocation; stage each individually or check the command's
+exit code before trusting anything got staged from it.
+
 ## No Corner-Cutting — Root-Cause Orientation Is Binding
 
 Under parallel execution the cheapest way to make a gate go green is to weaken the gate. When a gate,
