@@ -89,3 +89,5 @@ exists in `ose-private`/`coralpolyp` and this push is meant to reach it.
 
 **Related Repositories**: `ose-private` (`coralpolyp`) — out of scope for this repo, owns the actual
 k3s rollout once wired up.
+
+- [File-Touch Discipline](../../repo-governance/development/practice/file-touch-discipline.md) - Keep a ledger of every path you touch, carry it through every compaction, leave anything not on it alone, and stage explicit paths
