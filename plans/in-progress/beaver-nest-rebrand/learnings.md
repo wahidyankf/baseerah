@@ -3,6 +3,40 @@
 
 # Learnings: beaver-nest-rebrand
 
+## Phase 11 (addendum): the push-collapse decision silently deferred `md links validate` too, not just `test:quick`
+
+The Phase 6 push-collapse decision (see below) was scoped to the conflict with `test:quick`'s nested
+`specs:behavior:coverage`/`specs:e2e:coverage`. But `.husky/pre-push` also runs `md links validate`
+repo-wide — a check that lives ONLY in the pre-push hook, not in any Nx target the "Local Quality
+Gates" step runs (`nx affected -t typecheck lint test:quick`). Deferring the push from Phase 6 through
+Phase 11 meant link validation silently went unchecked for that entire stretch too, even though each
+phase's own git-mv steps were individually careful about forward-fixing links they touched. When the
+collapsed push finally ran pre-push, it surfaced 3 accumulated broken links that no phase's own
+acceptance checks caught:
+
+1. `infra/dev/baseerah-app/README.md` (owned by Phase 12, not yet touched) linked to
+   `specs/apps/baseerah/system-context/README.md` — broken the moment Phase 6 renamed
+   `specs/apps/baseerah` → `specs/apps/beaver-nest`. Fixed with a targeted path-only repoint (same
+   Phase-1-rule class of bug, just never caught until push time).
+2. Two Gherkin `README.md` files' `Copied verbatim from` citations to the archived
+   `plans/done/2026-07-31__baseerah-repo-reset/prd.md`'s `US-4`/`US-5` anchors got their anchor
+   _fragment text_ renamed by Phase 6's `<CANONICAL-SED>` pass (`...from-baseerah-be` →
+   `...from-beaver-nest-be`), but the archived doc's actual heading (`### US-4 — Serve hello world
+from \`baseerah-be\``) is a Decision-6 citation that was correctly never touched — so the
+anchor-fragment rename broke the link even though the CANONICAL-SED's file-level citation-revert
+step (which only greps for the literal string`baseerah-repo-reset`) doesn't catch anchor-fragment
+drift inside a link that still points at the right file. Reverted both anchor fragments back to
+`-baseerah-be`/`-baseerah-fe`.
+
+**Generalizable rule**: any decision to skip or defer a normal push cadence must explicitly enumerate
+EVERY check that lives only in the pre-push hook (not just the specific one motivating the deferral) —
+`md links validate` runs alongside `test:quick` in `.husky/pre-push` but is invisible to `nx affected`
+commands run manually during "Local Quality Gates." Run `cargo run ... -- md links validate` directly
+after every phase in a deferred-push stretch, not just at the end, to catch these incrementally instead
+of all at once. Also: a Decision-6 citation-revert step that only matches the literal plan-id string
+(`baseerah-repo-reset`) will NOT catch a renamed anchor _fragment_ inside an otherwise-correct link to
+that citation — anchor fragments encoding a heading's old name need their own explicit check.
+
 ## Phase 11: a literal `/` in Gherkin step text is a Cucumber Expression alternation delimiter, not a literal slash
 
 The new scenario's step text (authored in Phase 10, per the plan's own literal wording) reads

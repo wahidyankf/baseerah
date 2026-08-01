@@ -37,5 +37,5 @@ commented out until `apps/baseerah-fe/` was scaffolded — see
 
 ## Behavior & Architecture
 
-See [specs/apps/baseerah/system-context/README.md](../../../specs/apps/baseerah/system-context/README.md)
+See [specs/apps/beaver-nest/system-context/README.md](../../../specs/apps/beaver-nest/system-context/README.md)
 for the C4 system context.
