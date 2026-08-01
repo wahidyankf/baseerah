@@ -33,6 +33,17 @@ itself — workflow/job/output renames, the GHCR image name inside `publish-imag
 dual-publish bridge — is code-complete and independently verified (0 residual `baseerah` in
 `.github/workflows/`, `actionlint` clean, stale GitHub Environments deleted).
 
+**Addendum (Phase 15)**: the gap closed sooner than expected — Phase 15's commit (`4ae448647`,
+`apps/rhino-cli/` source/tests + the `.amazonq` binding rename only, nothing under
+`apps/beaver-nest-be/`) still caused `publish-images.yml`'s `detect` job to report
+`build-beaver-nest-be=true`, and the `Publish beaver-nest-be` job ran and succeeded. Most likely
+explanation: `beaver-nest-be` depends on `rhino-cli` (used for codegen/validation tooling), so Nx's
+affected-detection marked it affected transitively even though no file under `apps/beaver-nest-be/`
+itself changed — a different mechanism than the "organic future code change" this entry originally
+predicted, but the same practical outcome. `gh api /users/wahidyankf/packages/container/beaver-nest-be/versions`
+still 403s for this session's `gh` token (missing `read:packages` scope, unrelated to the gap itself)
+so the publish was verified via the workflow run's own `success` conclusion instead. Gap: **closed**.
+
 **Generalizable rule**: when a plan step's acceptance criterion depends on Nx's affected-detection
 firing as a side effect of an unrelated file change (e.g., "this workflow-file rename will trigger a
 rebuild because the app is affected"), verify that assumption explicitly rather than trusting it at
