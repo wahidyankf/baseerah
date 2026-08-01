@@ -1338,19 +1338,35 @@ gh api -X DELETE repos/wahidyankf/baseerah/environments/baseerah-app-staging` �
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor ALL GitHub Actions workflows including
+- [x] [AI] Commit and push to origin main; monitor ALL GitHub Actions workflows including
       `publish-images` (which will attempt to build and push `ghcr.io/wahidyankf/beaver-nest-be` on
       this push, since `apps/beaver-nest-be` is now affected) — verify the push succeeds; fix and
-      re-push on any failure.
-- [ ] [AI] Verify the new image landed: run `gh api
+      re-push on any failure. **Done 2026-08-01**: pushed as `e420b7772`; all three workflows
+      (`publish-images`, `validate-env`, `pr-quality-gate`) completed successfully.
+- [x] [AI] Verify the new image landed: run `gh api
 /users/wahidyankf/packages/container/beaver-nest-be/versions --jq '.[0].id'` — acceptance:
       returns a numeric version id (confirms at least one image was pushed under the new name).
+      **Revised 2026-08-01**: this assumption didn't hold — this commit touched only
+      `.github/workflows/` and `infra/dev/`, not `apps/beaver-nest-be/` itself, so Nx correctly
+      determined `beaver-nest-be` was NOT affected and `publish-images.yml`'s "Publish
+      beaver-nest-be" job was **skipped** (not failed — the `detect` job ran successfully and
+      reported `build-beaver-nest-be=false`). `gh api
+      /users/wahidyankf/packages/container/beaver-nest-be/versions` 404s ("Package not found") as a
+      result. Confirmed with the human this is expected and acceptable: BeaverNest has no staging
+      deploy provisioned yet (per the pre-existing `apps-baseerah-be-deployer` agent's own
+      documented caveat) and currently only runs locally, so there is no pressure for the GHCR image
+      to exist immediately — it will publish organically the next time a real code change lands in
+      `apps/beaver-nest-be/`. The cutover itself (workflow renames, job/output names, GHCR image
+      name in `publish-images.yml`, no dual-publish) is code-complete and verified by the other
+      Phase 13 gate checks below; see learnings.md for the full write-up.
 
 ### Phase 13 Gate
 
 - [x] [AI] `git grep -lic baseerah .github/workflows/` returns no matches.
 - [x] [AI] `actionlint .github/workflows/*.yml` exits 0.
-- [ ] [AI] The GHCR package-version check above returns a numeric id.
+- [x] [AI] The GHCR package-version check above returns a numeric id. **Revised 2026-08-01**: not
+      met yet, by design — see the Post-Push CI Verification note above. Deferred to the next real
+      `apps/beaver-nest-be/` change; not a blocker for this plan (confirmed with the human).
 - [x] [AI] `gh api repos/wahidyankf/baseerah/environments --jq '.environments[].name'` returns empty
       output (the two stale `baseerah-app-*` Environment objects are deleted).
 
@@ -1493,20 +1509,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                                                                                                                      ```gherkin
-                                                                                                                                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                                                                                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                                                                                                                        When nx run rhino-cli:test:integration runs
-                                                                                                                                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                                                                                                                        And the generated file's "name" field reads "beaver-nest-default"
-                                                                                                                                                                      ```
+                                                                                                                                                                          ```gherkin
+                                                                                                                                                                          Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                                                                                                                            Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                                                                                                                            When nx run rhino-cli:test:integration runs
+                                                                                                                                                                            Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                                                                                                                            And the generated file's "name" field reads "beaver-nest-default"
+                                                                                                                                                                          ```
 
-                                                                                                                                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                                                                                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                                                                                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                                                                                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                                                                                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                                                                                                                      state).
+                                                                                                                                                                          Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                                                                                                                          target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                                                                                                                          error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                                                                                                                          the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                                                                                                                          against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                                                                                                                          state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

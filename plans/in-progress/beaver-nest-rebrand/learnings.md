@@ -3,6 +3,43 @@
 
 # Learnings: beaver-nest-rebrand
 
+## Phase 13: the GHCR-image acceptance check assumed the cutover push itself would trigger a rebuild — it didn't, and that's fine
+
+Phase 13's delivery.md acceptance criterion for the GHCR cutover assumed that pushing the renamed
+`.github/workflows/*.yml` + `publish-images.yml` would itself trigger `publish-images.yml` to build
+and push `ghcr.io/wahidyankf/beaver-nest-be` for the first time under the new name, "since
+`apps/beaver-nest-be` is now affected." That assumption was wrong: the Phase 13 commit only touched
+`.github/workflows/` and `infra/dev/` — it did not modify anything under `apps/beaver-nest-be/`
+itself — so Nx's affected-detection correctly reported `beaver-nest-be` as NOT affected, and
+`publish-images.yml`'s `detect` job set `build-beaver-nest-be=false`. The `Publish beaver-nest-be`
+job then correctly **skipped** (not failed) per its `if: needs.detect.outputs.build-beaver-nest-be
+== 'true'` guard. The overall workflow run still shows `conclusion: success`, since a skipped job is
+not a failing job — but `gh api /users/wahidyankf/packages/container/beaver-nest-be/versions` 404s
+("Package not found") because nothing was ever built or pushed under the new name.
+
+No later phase in this plan (14 through the residual sweep in 16) touches `apps/beaver-nest-be/`'s
+own files again — a `git grep -lic baseerah apps/beaver-nest-be/` check came back with 0 residual
+already, so the residual sweep won't touch it either. That means CI has no organic trigger to build
+the renamed image anywhere within this plan's remaining scope.
+
+Surfaced this to the human rather than forcing a fix (options considered: manually replicate the
+`docker build`/`docker push` steps from `publish-images.yml` locally to push an image under the new
+name immediately, vs. accepting the gap and documenting it). The human's answer: BeaverNest has no
+staging deploy provisioned yet (consistent with the pre-existing `apps-baseerah-be-deployer` agent's
+own documented caveat that no production/staging deploy target exists) — it currently only runs
+locally, so there's no pressure for the GHCR image to exist immediately. Deferred: the image will
+publish organically the next time a real code change lands in `apps/beaver-nest-be/`. The cutover
+itself — workflow/job/output renames, the GHCR image name inside `publish-images.yml`, no
+dual-publish bridge — is code-complete and independently verified (0 residual `baseerah` in
+`.github/workflows/`, `actionlint` clean, stale GitHub Environments deleted).
+
+**Generalizable rule**: when a plan step's acceptance criterion depends on Nx's affected-detection
+firing as a side effect of an unrelated file change (e.g., "this workflow-file rename will trigger a
+rebuild because the app is affected"), verify that assumption explicitly rather than trusting it at
+plan-authoring time — `nx show projects --affected` scopes strictly to files inside a project's own
+input glob, so renaming files _outside_ an app's directory (workflows, infra compose files) never
+marks that app as affected, however conceptually related the change feels.
+
 ## Phase 11 (addendum 2): `rm package-lock.json && npm install` on macOS silently dropped 16 of 17 cross-platform `@rolldown/binding-*` lockfile entries, breaking `npm ci` on Linux CI
 
 After fixing the 3 broken links and pushing the collapsed Phases 6-11 commit stretch
