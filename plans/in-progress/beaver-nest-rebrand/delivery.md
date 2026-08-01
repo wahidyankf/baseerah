@@ -1509,20 +1509,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                  ```gherkin
-                                                  Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                    Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                    When nx run rhino-cli:test:integration runs
-                                                    Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                    And the generated file's "name" field reads "beaver-nest-default"
-                                                  ```
+                                                    ```gherkin
+                                                    Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                      Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                      When nx run rhino-cli:test:integration runs
+                                                      Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                      And the generated file's "name" field reads "beaver-nest-default"
+                                                    ```
 
-                                                  Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                  target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                  error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                  the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                  against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                  state).
+                                                    Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                    target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                    error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                    the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                    against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                    state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
@@ -2119,8 +2119,9 @@ the repository rename is live` — monitor CI; fix and re-push on any failure.
 - [x] [AI] `gh repo view wahidyankf/beaver-nest --json name --jq .name` returns `beaver-nest`.
       **Verified 2026-08-01** (originally `[HUMAN]`; the AI verified this directly since it also
       performed the authorized rename above).
-- [ ] [AI] `git grep -lic "wahidyankf/baseerah" -- . ':!plans/done' ':!generated-reports'
-':!plans/in-progress/beaver-nest-rebrand'` returns no matches.
+- [x] [AI] `git grep -lic "wahidyankf/baseerah" -- . ':!plans/done' ':!generated-reports'
+':!plans/in-progress/beaver-nest-rebrand'` returns no matches. **Verified 2026-08-01**: empty
+      result.
 
 > **Pause Safety**: the GitHub repository is renamed; the local checkout's `origin` remote still
 > points at the old URL, which GitHub's redirect keeps working. Safe to stop. To resume: proceed to
@@ -2132,21 +2133,26 @@ the repository rename is live` — monitor CI; fix and re-push on any failure.
 
 > Per Decision 5/Q4: this happens after the GitHub rename, once everything else has merged.
 
-- [ ] [HUMAN] Rename the local checkout folder (e.g. `mv /Users/wkf/ose-projects/baseerah
+- [x] [AI] Rename the local checkout folder (e.g. `mv /Users/wkf/ose-projects/baseerah
 /Users/wkf/ose-projects/beaver-nest`) — acceptance: the new path exists and contains the `.git`
-      directory. **Resume signal**: the maintainer confirms the folder move completed and has
-      changed their working directory into the new path.
-- [ ] [HUMAN] Re-point the `origin` remote to the renamed GitHub URL: `git remote set-url origin
+      directory. (Originally `[HUMAN]`: moving the AI's own live working directory carried a
+      disclosed risk that the current session's tools could break mid-move. The maintainer
+      explicitly authorized the AI to attempt it anyway in chat on 2026-08-01, having been told the
+      risk.) **Done 2026-08-01**: `mv` completed; `/Users/wkf/ose-projects/beaver-nest` exists and
+      contains `.git`; the session's Bash cwd and Read tool both continued resolving correctly
+      against the new path afterward (verified via `pwd`, `ls -la`, and a `Read` of the new
+      `package.json`), so no session disruption occurred.
+- [x] [AI] Re-point the `origin` remote to the renamed GitHub URL: `git remote set-url origin
 git@github.com:wahidyankf/beaver-nest.git` (or the equivalent HTTPS URL, matching whichever
       protocol the maintainer's existing remote used) — acceptance: `git remote -v` shows `origin`
-      pointing at the `beaver-nest` URL.
-- [ ] [HUMAN] Verify the re-pointed remote works: `git fetch origin` — acceptance: exits 0 with no
-      error.
+      pointing at the `beaver-nest` URL. **Done 2026-08-01**.
+- [x] [AI] Verify the re-pointed remote works: `git fetch origin` — acceptance: exits 0 with no
+      error. **Done 2026-08-01**: exit 0.
 
 ### Phase 18 Gate
 
-- [ ] [HUMAN] `git remote -v` shows `origin` pointing at `wahidyankf/beaver-nest`; `git fetch origin`
-      exits 0.
+- [x] [AI] `git remote -v` shows `origin` pointing at `wahidyankf/beaver-nest`; `git fetch origin`
+      exits 0. **Verified 2026-08-01**.
 
 > **Pause Safety**: the local checkout folder and remote are fully re-pointed; every subsequent git
 > operation in this repo now happens under the new name and path. Safe to stop. To resume: proceed
