@@ -33,6 +33,25 @@ renamed before the path moves). **Generalizable rule**: whenever a phase's conte
 markdown link whose _target_ is renamed by a _later_ phase, revert that one link's text in the
 current phase and add an explicit repoint step to the later phase's `git mv` item.
 
+## Phase 5: `repo-config.yml` path-referencing fields must NOT rename ahead of their physical directory rename
+
+Phase 5's own instructions said to rename `env-contract.surfaces[].root`, `env-injection.apps[].keys-from`
+(and its `app:` label), and the CORS allowlist env-var name to their `beaver-nest-*` forms. But
+`apps/baseerah-be/` and `apps/baseerah-fe/` are not physically renamed until Phase 8/10, and their
+`.env.example` files still declare `BASEERAH_BE_CORS_ORIGINS` (not renamed until Phase 8 touches the
+app's own env vars). Renaming these fields early broke the pre-push `env validate` hook two ways:
+(1) `root`/`keys-from` pointed at a directory that doesn't exist yet (`cannot read
+apps/beaver-nest-be/.env.example`), and (2) the CORS allowlist entry name no longer matched the key
+actually declared in the `.env.example` (`declared-but-unread` drift). **Fix**: reverted `root:`,
+`keys-from:`, the `app:` labels, and the CORS allowlist entry back to their `baseerah-*` forms —
+these four fields will flip to `beaver-nest-*` in Phase 8/10 alongside the actual directory/env-var
+renames, not before. By contrast, `coverage.projects[].specs` glob (pointing at the not-yet-renamed
+`specs/apps/beaver-nest/`) was safe to rename now: confirmed via `repo-config validate` and the specs
+CLI that no validator checks that glob's filesystem existence, only its schema shape.
+**Generalizable rule**: before renaming ANY field in a shared config file, check whether a validator
+resolves it against the filesystem (path existence, key-presence-in-file) versus treating it as an
+opaque string/label — only the latter is safe to rename ahead of the phase that does the actual move.
+
 ## Phase 4: renaming a file leaves repo-wide inbound links dangling, same as Phase 1
 
 Confirmed the same class of bug documented in the Phase 1 entry above, this time for a `git mv`
