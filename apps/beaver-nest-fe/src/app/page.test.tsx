@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 vi.mock("@/lib/greeting-client", () => ({
-  fetchGreeting: vi.fn().mockResolvedValue("Hello from Baseerah"),
+  fetchGreeting: vi.fn().mockResolvedValue("Hello from BeaverNest"),
 }));
 
 describe("Backend hello world", () => {
@@ -10,8 +10,8 @@ describe("Backend hello world", () => {
     const { default: Page } = await import("./page");
     render(await Page());
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Baseerah");
-    expect(screen.getByText("Hello from Baseerah")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("BeaverNest");
+    expect(screen.getByText("Hello from BeaverNest")).toBeInTheDocument();
   });
 
   test("The landing page meets the baseline accessibility bar", async () => {
@@ -22,20 +22,14 @@ describe("Backend hello world", () => {
     expect(container.querySelector("header")).not.toBeNull();
     expect(container.querySelector("main")).not.toBeNull();
     expect(container.querySelector("footer")).not.toBeNull();
-
-    const arabic = screen.getByText("بصيرة");
-    expect(arabic).toHaveAttribute("lang", "ar");
-    expect(arabic).toHaveAttribute("dir", "rtl");
   });
 
-  test("tells a first-time visitor what Baseerah is, glosses the multilingual chip, and offers a way to learn more", async () => {
+  test("tells a first-time visitor what BeaverNest is and offers a way to learn more", async () => {
     const { default: Page } = await import("./page");
     render(await Page());
 
-    expect(screen.getByText(/Baseerah is a personal operating layer/i)).toBeInTheDocument();
-
-    const chip = screen.getByText("بصيرة").closest("div");
-    expect(chip).toHaveAttribute("title", "insight (English) · wawasan (Indonesian) · بصيرة (Arabic)");
+    expect(screen.getByText(/BeaverNest is a personal operating layer/i)).toBeInTheDocument();
+    expect(screen.queryByTitle(/insight/i)).not.toBeInTheDocument();
 
     const githubLink = screen.getByRole("link", { name: /view on github/i });
     expect(githubLink).toHaveAttribute("href", "https://github.com/wahidyankf/baseerah");

@@ -1,13 +1,13 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "baseerah-fe",
-  "sourceRoot": "apps/baseerah-fe/src",
+  "name": "beaver-nest-fe",
+  "sourceRoot": "apps/beaver-nest-fe/src",
   "projectType": "application",
   "targets": {
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx @hey-api/openapi-ts -i specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml -o apps/baseerah-fe/src/generated-contracts -s"
+        "command": "npx @hey-api/openapi-ts -i specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml -o apps/beaver-nest-fe/src/generated-contracts -s"
       },
       "dependsOn": ["beaver-nest-contracts:bundle"],
       "cache": true,
@@ -93,11 +93,11 @@
       "cache": true,
       "options": {
         "commands": [
-          "npx nx run baseerah-fe:typecheck",
-          "npx nx run baseerah-fe:lint",
-          "npx nx run baseerah-fe:test:unit",
-          "npx nx run baseerah-fe:test:coverage",
-          "npx nx run baseerah-fe:test:specs"
+          "npx nx run beaver-nest-fe:typecheck",
+          "npx nx run beaver-nest-fe:lint",
+          "npx nx run beaver-nest-fe:test:unit",
+          "npx nx run beaver-nest-fe:test:coverage",
+          "npx nx run beaver-nest-fe:test:specs"
         ],
         "parallel": false
       },
@@ -106,7 +106,7 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin apps/baseerah-fe"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin apps/beaver-nest-fe"
       },
       "cache": true,
       "inputs": [
@@ -140,8 +140,8 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "npx nx run baseerah-fe:specs:structure-validation",
-          "npx nx run baseerah-fe:specs:behavior:coverage"
+          "npx nx run beaver-nest-fe:specs:structure-validation",
+          "npx nx run beaver-nest-fe:specs:behavior:coverage"
         ],
         "parallel": false
       },
@@ -152,6 +152,6 @@
   "namedInputs": {
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature"]
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"],
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:beaver-nest"],
   "implicitDependencies": ["beaver-nest-contracts", "web-ui", "web-ui-token"]
 }

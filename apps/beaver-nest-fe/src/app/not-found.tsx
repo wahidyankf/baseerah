@@ -3,7 +3,7 @@ import Link from "next/link";
 import { AppFrame } from "@/components/AppFrame";
 
 export const metadata: Metadata = {
-  title: "404 · Baseerah",
+  title: "404 · BeaverNest",
 };
 
 export default function NotFound() {

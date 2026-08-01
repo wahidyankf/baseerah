@@ -7,7 +7,7 @@ describe("Branded 404 page", () => {
     const { container } = render(<NotFound />);
 
     expect(container.querySelectorAll("h1")).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Baseerah");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("BeaverNest");
     expect(container.querySelector("header")).not.toBeNull();
     expect(container.querySelector("main")).not.toBeNull();
     expect(container.querySelector("footer")).not.toBeNull();

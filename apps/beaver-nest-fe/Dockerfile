@@ -1,15 +1,15 @@
-# Build context: workspace root (../../.. from apps/baseerah-fe/)
+# Build context: workspace root (../../.. from apps/beaver-nest-fe/)
 #
-# WORKDIR preserves the real apps/baseerah-fe/ nesting under a synthetic /repo root — Next's
+# WORKDIR preserves the real apps/beaver-nest-fe/ nesting under a synthetic /repo root — Next's
 # outputFileTracingRoot and turbopack.root (next.config.ts) are pinned to "two levels up from this
 # file" for both local dev (the real monorepo root) and this Docker build, so keeping the same
 # nesting here means the standalone output always lands at the same relative path in both:
-# .next/standalone/apps/baseerah-fe/server.js.
+# .next/standalone/apps/beaver-nest-fe/server.js.
 FROM node:24-alpine AS build
-WORKDIR /repo/apps/baseerah-fe
+WORKDIR /repo/apps/beaver-nest-fe
 
 # Copy app package.json and strip workspace dependency before install
-COPY apps/baseerah-fe/package.json ./
+COPY apps/beaver-nest-fe/package.json ./
 RUN node -e " \
   const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8')); \
   delete pkg.dependencies['@open-sharia-enterprise/web-ui']; \
@@ -27,23 +27,23 @@ COPY libs/web-ui-token/src/ ./node_modules/@open-sharia-enterprise/web-ui-token/
 COPY libs/web-ui-token/package.json ./node_modules/@open-sharia-enterprise/web-ui-token/
 
 # Copy app source
-COPY apps/baseerah-fe/src/ ./src/
-COPY apps/baseerah-fe/package.json apps/baseerah-fe/tsconfig.json apps/baseerah-fe/next.config.ts apps/baseerah-fe/postcss.config.mjs ./
+COPY apps/beaver-nest-fe/src/ ./src/
+COPY apps/beaver-nest-fe/package.json apps/beaver-nest-fe/tsconfig.json apps/beaver-nest-fe/next.config.ts apps/beaver-nest-fe/postcss.config.mjs ./
 
 ENV NEXT_TELEMETRY_DISABLED=1
-ARG BASEERAH_FE_API_BASE_URL=http://baseerah-be:19320
-ENV BASEERAH_FE_API_BASE_URL=${BASEERAH_FE_API_BASE_URL}
+ARG BEAVER_NEST_FE_API_BASE_URL=http://beaver-nest-be:19320
+ENV BEAVER_NEST_FE_API_BASE_URL=${BEAVER_NEST_FE_API_BASE_URL}
 RUN npx next build
 
 FROM node:24-alpine
 
 LABEL org.opencontainers.image.source="https://github.com/wahidyankf/baseerah"
-LABEL org.opencontainers.image.description="Baseerah hello-world frontend built with Next.js"
+LABEL org.opencontainers.image.description="BeaverNest hello-world frontend built with Next.js"
 
 RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
-COPY --from=build --chown=app:app /repo/apps/baseerah-fe/.next/standalone/apps/baseerah-fe/ ./
-COPY --from=build --chown=app:app /repo/apps/baseerah-fe/.next/static ./.next/static
+COPY --from=build --chown=app:app /repo/apps/beaver-nest-fe/.next/standalone/apps/beaver-nest-fe/ ./
+COPY --from=build --chown=app:app /repo/apps/beaver-nest-fe/.next/static ./.next/static
 USER app
 EXPOSE 19310
 ENV PORT=19310 HOSTNAME="0.0.0.0" NODE_ENV=production NEXT_TELEMETRY_DISABLED=1

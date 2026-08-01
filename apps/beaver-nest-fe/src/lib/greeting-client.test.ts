@@ -5,24 +5,24 @@ vi.mock("@/generated-contracts", () => ({
 }));
 
 vi.mock("@/env", () => ({
-  env: { BASEERAH_FE_API_BASE_URL: "http://localhost:19320" },
+  env: { BEAVER_NEST_FE_API_BASE_URL: "http://localhost:19320" },
 }));
 
 describe("fetchGreeting", () => {
-  test("returns the greeting message when baseerah-be responds successfully", async () => {
+  test("returns the greeting message when beaver-nest-be responds successfully", async () => {
     const { getHello } = await import("@/generated-contracts");
     vi.mocked(getHello).mockResolvedValue({
-      data: { message: "Hello from Baseerah" },
+      data: { message: "Hello from BeaverNest" },
       error: undefined,
       request: new Request("http://localhost"),
       response: new Response(),
     } as never);
 
     const { fetchGreeting } = await import("./greeting-client");
-    await expect(fetchGreeting()).resolves.toBe("Hello from Baseerah");
+    await expect(fetchGreeting()).resolves.toBe("Hello from BeaverNest");
   });
 
-  test("throws when baseerah-be returns an error", async () => {
+  test("throws when beaver-nest-be returns an error", async () => {
     const { getHello } = await import("@/generated-contracts");
     vi.mocked(getHello).mockResolvedValue({
       data: undefined,
@@ -32,6 +32,6 @@ describe("fetchGreeting", () => {
     } as never);
 
     const { fetchGreeting } = await import("./greeting-client");
-    await expect(fetchGreeting()).rejects.toThrow("baseerah-be did not return a greeting");
+    await expect(fetchGreeting()).rejects.toThrow("beaver-nest-be did not return a greeting");
   });
 });

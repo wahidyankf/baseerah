@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/AppShell";
 import { fetchGreeting } from "@/lib/greeting-client";
 
-// The greeting is fetched from baseerah-be on every request — it must never be
+// The greeting is fetched from beaver-nest-be on every request — it must never be
 // statically prerendered at build time, when the backend is unreachable.
 export const dynamic = "force-dynamic";
 

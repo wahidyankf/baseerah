@@ -170,7 +170,7 @@ env-contract:
         # (browser-facing CORS isn't needed yet — beaver-nest-fe fetches server-side).
         - BEAVER_NEST_BE_CORS_ORIGINS
 
-    - root: apps/baseerah-fe
+    - root: apps/beaver-nest-fe
       kind: app
       lang: typescript
       allowlist:
@@ -193,8 +193,8 @@ env-injection:
       keys-from: apps/beaver-nest-be/.env.example
       runtime: { local-ci: compose }
 
-    - app: baseerah-fe
-      keys-from: apps/baseerah-fe/.env.example
+    - app: beaver-nest-fe
+      keys-from: apps/beaver-nest-fe/.env.example
       runtime: { local-ci: compose }
 
   # CI test-harness keys — test-only, NEVER in any apps/<app>/.env.example.

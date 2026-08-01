@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 import path from "node:path";
 
 // Both local dev (this app nested 2 levels under the real monorepo root) and the Docker build
-// (which preserves that same apps/baseerah-fe/ nesting under a synthetic /repo root — see
+// (which preserves that same apps/beaver-nest-fe/ nesting under a synthetic /repo root — see
 // Dockerfile) genuinely have a real root 2 levels up from this file, with node_modules/next
 // resolvable from it. Only npm's own lockfile-based auto-detection is ambiguous (a sibling git
 // worktree's lockfile is also visible in the ancestor chain in local dev) — pinning the root
