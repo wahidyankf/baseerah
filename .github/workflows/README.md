@@ -12,7 +12,7 @@ This repo's CI/CD design is intentionally kept consistent with the `ose-public`/
 `main-ci.yml`, `pr-quality-gate.yml`, `deps-audit.yml`, `validate-env.yml` — and their non-language
 job sets stay byte-identical in shape across every sibling; the language jobs (`typescript`,
 `dotnet`, `rust`) track the languages actually present in the repo, unchanged by this reset because
-Baseerah's language set is identical to `ose-public`'s. The three `_reusable-*.yml` templates below
+BeaverNest's language set is identical to `ose-public`'s. The three `_reusable-*.yml` templates below
 are fully parameterised, name no app, and map onto the `fe`/`be` app-group shape — see tech-docs
 Decision 15 for the full invariant list and verification commands.
 
@@ -24,13 +24,13 @@ Decision 15 for the full invariant list and verification commands.
 | `_reusable-app-test-stag.yml`              | FE E2E gate against the deployed staging URL (Vercel bypass secret). Stops on pass — no promote.         |
 | `_reusable-be-build-deploy.yml`            | Build a backend image and push it to GHCR.                                                               |
 
-## App-group callers (baseerah-app)
+## App-group callers (beaver-nest-app)
 
-| Workflow                                  | Trigger                     | Role                                                                                                                                                |
-| ----------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baseerah-app-test-local-deploy-stag.yml` | Twice-daily CRON + dispatch | Calls `_reusable-app-test-local-deploy-stag.yml` for `baseerah-fe` + `baseerah-be`; on pass force-pushes `stag-baseerah-fe` and `stag-baseerah-be`. |
-| `baseerah-app-test-stag.yml`              | Twice-daily CRON + dispatch | Calls `_reusable-app-test-stag.yml`; runs `baseerah-fe-e2e` against the deployed staging URL, +2.5h after the local-deploy-stag run.                |
-| `baseerah-be-build-deploy-stag.yml`       | Push to `stag-baseerah-be`  | Calls `_reusable-be-build-deploy.yml`; builds the `baseerah-be` image and pushes it to GHCR.                                                        |
+| Workflow                                     | Trigger                       | Role                                                                                                                                                            |
+| -------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `beaver-nest-app-test-local-deploy-stag.yml` | Twice-daily CRON + dispatch   | Calls `_reusable-app-test-local-deploy-stag.yml` for `beaver-nest-fe` + `beaver-nest-be`; on pass force-pushes `stag-beaver-nest-fe` and `stag-beaver-nest-be`. |
+| `beaver-nest-app-test-stag.yml`              | Twice-daily CRON + dispatch   | Calls `_reusable-app-test-stag.yml`; runs `beaver-nest-fe-e2e` against the deployed staging URL, +2.5h after the local-deploy-stag run.                         |
+| `beaver-nest-be-build-deploy-stag.yml`       | Push to `stag-beaver-nest-be` | Calls `_reusable-be-build-deploy.yml`; builds the `beaver-nest-be` image and pushes it to GHCR.                                                                 |
 
 ## PR and repo-wide gates
 
@@ -43,6 +43,6 @@ Decision 15 for the full invariant list and verification commands.
 
 ## Backend images
 
-| Workflow             | Role                                                                                                                          |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `publish-images.yml` | Detects affected backend image projects on push to `main` and publishes them to GHCR — currently one case arm, `baseerah-be`. |
+| Workflow             | Role                                                                                                                             |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `publish-images.yml` | Detects affected backend image projects on push to `main` and publishes them to GHCR — currently one case arm, `beaver-nest-be`. |

@@ -13,7 +13,7 @@ jobs:
     name: Detect affected images
     runs-on: ubuntu-latest
     outputs:
-      build-baseerah-be: ${{ steps.detect.outputs.build-baseerah-be }}
+      build-beaver-nest-be: ${{ steps.detect.outputs.build-beaver-nest-be }}
     env:
       NX_BASE: ${{ github.event.before }}
       NX_HEAD: ${{ github.sha }}
@@ -32,18 +32,18 @@ jobs:
           export NX_BASE="$BASE"
           AFFECTED=$(npx nx show projects --affected 2>/dev/null || echo "")
           {
-            echo "build-baseerah-be=false"
+            echo "build-beaver-nest-be=false"
           } >> "$GITHUB_OUTPUT"
           for project in $AFFECTED; do
             case "$project" in
-              baseerah-be) echo "build-baseerah-be=true" >> "$GITHUB_OUTPUT" ;;
+              beaver-nest-be) echo "build-beaver-nest-be=true" >> "$GITHUB_OUTPUT" ;;
             esac
           done
 
-  publish-baseerah-be:
-    name: Publish baseerah-be
+  publish-beaver-nest-be:
+    name: Publish beaver-nest-be
     needs: detect
-    if: needs.detect.outputs.build-baseerah-be == 'true'
+    if: needs.detect.outputs.build-beaver-nest-be == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -53,11 +53,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push baseerah-be
+      - name: Build and push beaver-nest-be
         run: |
-          docker build -f apps/baseerah-be/Dockerfile \
-            -t ghcr.io/wahidyankf/baseerah-be:latest \
-            -t ghcr.io/wahidyankf/baseerah-be:${{ github.sha }} \
+          docker build -f apps/beaver-nest-be/Dockerfile \
+            -t ghcr.io/wahidyankf/beaver-nest-be:latest \
+            -t ghcr.io/wahidyankf/beaver-nest-be:${{ github.sha }} \
             .
-          docker push ghcr.io/wahidyankf/baseerah-be:latest
-          docker push ghcr.io/wahidyankf/baseerah-be:${{ github.sha }}
+          docker push ghcr.io/wahidyankf/beaver-nest-be:latest
+          docker push ghcr.io/wahidyankf/beaver-nest-be:${{ github.sha }}
