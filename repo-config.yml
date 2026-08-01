@@ -72,24 +72,24 @@ coverage:
       levels: [unit, integration]
       specs: "specs/apps/rhino/behavior/rhino-cli/**"
 
-    # baseerah domain
-    - name: baseerah-be
+    # beaver-nest domain
+    - name: beaver-nest-be
       levels: [unit, integration]
-      specs: "specs/apps/baseerah/behavior/baseerah-be/**"
+      specs: "specs/apps/beaver-nest/behavior/beaver-nest-be/**"
 
-    - name: baseerah-be-e2e
+    - name: beaver-nest-be-e2e
       levels: [e2e]
-      specs: "specs/apps/baseerah/behavior/baseerah-be/**"
+      specs: "specs/apps/beaver-nest/behavior/beaver-nest-be/**"
 
-    - name: baseerah-fe
+    - name: beaver-nest-fe
       levels: [unit]
-      specs: "specs/apps/baseerah/behavior/baseerah-fe/**"
+      specs: "specs/apps/beaver-nest/behavior/beaver-nest-fe/**"
 
-    - name: baseerah-fe-e2e
+    - name: beaver-nest-fe-e2e
       levels: [e2e]
-      specs: "specs/apps/baseerah/behavior/baseerah-fe/**"
+      specs: "specs/apps/beaver-nest/behavior/beaver-nest-fe/**"
 
-    # Deliberately excluded, not omitted by oversight: baseerah-contracts's test-level
+    # Deliberately excluded, not omitted by oversight: beaver-nest-contracts's test-level
     # targets (test:unit/test:integration/test:e2e) are documented no-ops ("target not
     # applicable for this project"). Its real quality gate is lint (redocly) and bundle,
     # not a Gherkin-driven test level this registry models — an entry here would
@@ -162,15 +162,15 @@ env-contract:
   #   lang      — "rust" or "typescript" (app kind only)
   #   allowlist — keys exempt from drift detection (framework-injected, test-only, etc.)
   surfaces:
-    - root: apps/baseerah-be
+    - root: apps/beaver-nest-be
       kind: app
       lang: fsharp
       allowlist:
         # Forward-declared config not yet consumed by the Phase 1 F# shell
-        # (browser-facing CORS isn't needed yet — baseerah-fe fetches server-side).
-        - BASEERAH_BE_CORS_ORIGINS
+        # (browser-facing CORS isn't needed yet — beaver-nest-fe fetches server-side).
+        - BEAVER_NEST_BE_CORS_ORIGINS
 
-    - root: apps/baseerah-fe
+    - root: apps/beaver-nest-fe
       kind: app
       lang: typescript
       allowlist:
@@ -189,25 +189,25 @@ env-injection:
   #   vercel-production  — Vercel project env, Production scope (prod-*-www / prod-*-app-web)
   #   k3s-coralpolyp     — ose-private coralpolyp secret store (backend k3s rollout)
   apps:
-    - app: baseerah-be
-      keys-from: apps/baseerah-be/.env.example
+    - app: beaver-nest-be
+      keys-from: apps/beaver-nest-be/.env.example
       runtime: { local-ci: compose }
 
-    - app: baseerah-fe
-      keys-from: apps/baseerah-fe/.env.example
+    - app: beaver-nest-fe
+      keys-from: apps/beaver-nest-fe/.env.example
       runtime: { local-ci: compose }
 
   # CI test-harness keys — test-only, NEVER in any apps/<app>/.env.example.
   ci-harness:
     - key: API_BASE_URL
       class: var
-      environments: [baseerah-app-staging]
+      environments: [beaver-nest-app-staging]
     - key: WEB_BASE_URL
       class: var
-      environments: [baseerah-app-staging]
+      environments: [beaver-nest-app-staging]
     - key: VERCEL_AUTOMATION_BYPASS_SECRET
       class: secret
-      environments: [baseerah-app-staging]
+      environments: [beaver-nest-app-staging]
     - key: PLAYWRIGHT_GREP_INVERT
       class: literal
       environments: []
