@@ -37,6 +37,19 @@ Running this agent's steps today will push a branch that nothing listens to. Do 
 a successful production deploy — say plainly that the push happened but no build was triggered,
 because no target consumes `prod-beaver-nest-fe` yet.
 
+**Confirm this state rather than trusting this paragraph** — it is a snapshot and the provisioning
+may since have happened. Both checks are cheap: `git branch -r` for the branch, and a Vercel MCP
+project listing for the build target. A project that now exists changes this agent from "no-op" to
+"live deploy", which is exactly the kind of drift a stale note hides.
+
+**Once a production target does exist**, verify the deploy through the Vercel MCP instead of
+inferring success from the push: confirm a deployment whose commit SHA matches the pushed SHA,
+follow it until it leaves `BUILDING`, and report the terminal state (`READY` / `ERROR` with build
+logs / `CANCELED`). Address the project by **slug, never by an opaque identifier**. If the MCP is
+unavailable, say so and fall back to the CI run plus an HTTP check of the live URL — never report a
+successful deployment on the strength of the push alone. See
+[Vercel MCP Capability Convention](../../repo-governance/development/infra/vercel-mcp.md).
+
 ## Intended Workflow (once a production target exists)
 
 ### Step 1: Validate Current Branch

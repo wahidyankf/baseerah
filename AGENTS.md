@@ -423,7 +423,8 @@ details.
 This repo (`beaver-nest`) is one of **four sibling repositories** in the Open Sharia Enterprise (OSE)
 family, which cross-reference each other directly — no parent container repo exists. `beaver-nest` is
 a full member of the family and stands **outside** the three-repo OSE parity loop below: it
-scaffolded from that ecosystem but does not participate in cross-repo parity syncs.
+scaffolded from that ecosystem but does not participate in cross-repo parity syncs. **"All of the OSE
+repos" means exactly these four** — `beaver-nest` is always included, parity loop notwithstanding.
 
 - [`ose-public`](https://github.com/wahidyankf/ose-public) — upstream source of truth for
   scaffolding. MIT licensed.

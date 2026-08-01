@@ -166,7 +166,8 @@ Development practices in this directory fall into several categories:
 - [Acceptance Criteria Convention](./infra/acceptance-criteria.md) - Writing testable acceptance criteria using Gherkin format for clarity and automation. Covers Gherkin syntax and common patterns
 - [BDD Spec-to-Test Mapping Convention](./infra/bdd-spec-test-mapping.md) - Mandatory 1:1 mapping between CLI commands and Gherkin specifications. Covers domain-prefixed subcommand pattern, Go file naming (underscores), feature file naming (hyphens), and coverage enforcement via `rhino-cli specs coverage`
 - [GitHub Actions Workflow Naming Convention](./infra/github-actions-workflow-naming.md) - Workflow filenames must mirror their `name:` field using a consistent kebab-case derivation rule, enabling developers to navigate between the GitHub UI and the filesystem without ambiguity
-- [Vercel Deployment Convention](./infra/vercel-deployment.md) - Rules for configuring `vercel.json` when Nx build targets must run before the framework build
+- [Vercel Deployment Convention](./infra/vercel-deployment.md)
+- [Vercel MCP Capability Convention](./infra/vercel-mcp.md) - An MCP server for Vercel is an assumed capability for plans touching a Vercel-deployed surface, probed at planning time and again at execution Phase 0 - Rules for configuring `vercel.json` when Nx build targets must run before the framework build
 - [Docker Monorepo Build Patterns](./infra/docker-monorepo-builds.md) - Patterns and pitfalls for building Docker images in an npm workspace monorepo (workspace symlink resolution, direct node_modules injection, transitive dependency hoisting)
 - [CI/CD Conventions](./infra/ci-conventions.md) - Central reference for CI/CD conventions: git hooks, test level definitions, coverage thresholds, Docker patterns, GitHub Actions structure, and naming rules
 
