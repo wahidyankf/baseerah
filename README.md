@@ -117,10 +117,25 @@ See [`docs/README.md`](./docs/README.md) for details.
 
 ## 🔗 Related Repositories
 
-BeaverNest is a fourth repository, standing outside the three-repo OSE parity loop (`ose-public`,
-`ose-primer`, `ose-private`). It scaffolded from that ecosystem but does not participate in
-cross-repo parity syncs. See [Related Repositories reference](./docs/reference/related-repositories.md)
-for the full picture.
+`beaver-nest` is one of four sibling repositories in the Open Sharia Enterprise (OSE) family. The
+four repositories cross-reference each other directly — no parent container repository exists.
+
+- **[`ose-public`](https://github.com/wahidyankf/ose-public)** — MIT, public. Main OSE platform
+  monorepo and upstream source of truth for governance, conventions, and scaffolding. The original
+  upstream of the scaffolding `beaver-nest` was built from.
+- **[`ose-primer`](https://github.com/wahidyankf/ose-primer)** — MIT, public. Downstream public
+  template (governance, AI agents, skills, conventions, CI harness). Authoritative home of the
+  polyglot demo apps extracted from this lineage on 2026-04-18.
+- **[`ose-private`](https://github.com/wahidyankf/ose-private)** — Proprietary, private. The
+  unexposed surface of OSE: self-hosted CI runner stack and the `coralpolyp` app. Not publicly
+  accessible.
+- **[`beaver-nest`](https://github.com/wahidyankf/beaver-nest)** — MIT, public. This repository.
+
+BeaverNest is a full member of the family and a **fourth repository standing outside the three-repo
+OSE parity loop** (`ose-public`, `ose-primer`, `ose-private`). It scaffolded from that ecosystem but
+does not participate in cross-repo parity syncs, and its `apps/rhino-cli` is a fork not bound by the
+loop's byte-identity rule. See
+[Related Repositories reference](./docs/reference/related-repositories.md) for the full catalogue.
 
 ## 🎯 Motivation
 

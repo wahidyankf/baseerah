@@ -420,8 +420,10 @@ details.
 
 ## Related Repositories
 
-This repo (`beaver-nest`) is a **fourth repository, outside** the three-repo OSE parity loop below —
-it scaffolded from that ecosystem but does not participate in cross-repo parity syncs:
+This repo (`beaver-nest`) is one of **four sibling repositories** in the Open Sharia Enterprise (OSE)
+family, which cross-reference each other directly — no parent container repo exists. `beaver-nest` is
+a full member of the family and stands **outside** the three-repo OSE parity loop below: it
+scaffolded from that ecosystem but does not participate in cross-repo parity syncs.
 
 - [`ose-public`](https://github.com/wahidyankf/ose-public) — upstream source of truth for
   scaffolding. MIT licensed.
@@ -429,6 +431,8 @@ it scaffolded from that ecosystem but does not participate in cross-repo parity 
   layer: governance, AI agents, skills, conventions, CI harness, polyglot demo apps). MIT licensed.
 - [`ose-private`](https://github.com/wahidyankf/ose-private) — private infrastructure repo (GitHub Actions
   runner stack, `coralpolyp` app). Proprietary; not publicly accessible.
+- [`beaver-nest`](https://github.com/wahidyankf/beaver-nest) — this repo; BeaverNest, a personal
+  operating layer built as a product within the OSE ecosystem. MIT licensed.
 
 Content parity between `ose-public` and `ose-primer` maintained via
 [plan-multi-repo-parity-planning](./repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
