@@ -56,12 +56,12 @@ graph LR
         GITHUB[GitHub<br/>Source control & CI/CD]
     end
 
-    BASEERAH[BeaverNest<br/>Monorepo<br/>Nx workspace]
+    BEAVERNEST[BeaverNest<br/>Monorepo<br/>Nx workspace]
 
     DEVS -->|Clone, commit, push| GITHUB
-    GITHUB -->|Webhook triggers| BASEERAH
+    GITHUB -->|Webhook triggers| BEAVERNEST
 
-    style BASEERAH fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
+    style BEAVERNEST fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
     style DEVS fill:#2a9d8f,stroke:#264653,color:#ffffff
     style GITHUB fill:#6a4c93,stroke:#22223b,color:#ffffff
 ```
@@ -74,19 +74,19 @@ graph LR
         USERS[End Users]
     end
 
-    BASEERAH[BeaverNest<br/>Monorepo<br/>Nx workspace]
+    BEAVERNEST[BeaverNest<br/>Monorepo<br/>Nx workspace]
 
     subgraph "External Systems (planned)"
         VERCEL[Vercel<br/>beaver-nest-fe hosting]
         DNS[DNS/CDN<br/>Domain management]
     end
 
-    USERS -.->|Use the product| BASEERAH
-    BASEERAH -.->|Deploy| VERCEL
+    USERS -.->|Use the product| BEAVERNEST
+    BEAVERNEST -.->|Deploy| VERCEL
     VERCEL -.->|Serve| USERS
     DNS -.->|Route traffic| VERCEL
 
-    style BASEERAH fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
+    style BEAVERNEST fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
     style USERS fill:#2a9d8f,stroke:#264653,color:#ffffff
     style VERCEL fill:#6a4c93,stroke:#22223b,color:#ffffff
     style DNS fill:#6a4c93,stroke:#22223b,color:#ffffff
