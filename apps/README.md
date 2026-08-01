@@ -135,8 +135,8 @@ nx run baseerah-be-e2e:test:e2e
 
 `baseerah-fe` and `baseerah-be` have deployer agents and CI caller workflows wired but dormant — no
 `prod-baseerah-fe`/`stag-baseerah-be` deploy target is provisioned yet. See
-[apps-baseerah-fe-deployer](../.claude/agents/apps-baseerah-fe-deployer.md),
-[apps-baseerah-be-deployer](../.claude/agents/apps-baseerah-be-deployer.md), and the
+[apps-baseerah-fe-deployer](../.claude/agents/apps-beaver-nest-fe-deployer.md),
+[apps-baseerah-be-deployer](../.claude/agents/apps-beaver-nest-be-deployer.md), and the
 [baseerah-first-deploy](../plans/ideas/beaver-nest-first-deploy.md) idea brief for the deferred
 provisioning work.
 
