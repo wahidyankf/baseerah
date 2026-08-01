@@ -16,7 +16,7 @@ export function AppShell({ greeting }: AppShellProps) {
         {greeting}
       </p>
       <a
-        href="https://github.com/wahidyankf/baseerah"
+        href="https://github.com/wahidyankf/beaver-nest"
         target="_blank"
         rel="noreferrer"
         className="text-primary underline underline-offset-4"

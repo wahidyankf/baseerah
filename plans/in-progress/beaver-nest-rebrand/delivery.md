@@ -1509,20 +1509,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                            ```gherkin
-                                            Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                              Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                              When nx run rhino-cli:test:integration runs
-                                              Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                              And the generated file's "name" field reads "beaver-nest-default"
-                                            ```
+                                                  ```gherkin
+                                                  Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                    Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                    When nx run rhino-cli:test:integration runs
+                                                    Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                    And the generated file's "name" field reads "beaver-nest-default"
+                                                  ```
 
-                                            Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                            target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                            error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                            the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                            against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                            state).
+                                                  Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                  target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                  error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                  the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                  against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                  state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
@@ -2084,15 +2084,16 @@ validate --exclude plans/done` exits 0.
 > Per Decision 4/Q3: this happens last among the content-adjacent phases, after every prior phase
 > has merged to `origin main` under the OLD repository URL (`github.com/wahidyankf/baseerah`).
 
-- [ ] [HUMAN] Rename the GitHub repository from `baseerah` to `beaver-nest`: run
-      `gh repo rename beaver-nest --repo wahidyankf/baseerah` (requires the maintainer's own
-      authenticated `gh` session — an agent must not hold or exercise this authority per this plan's
-      explicit Q3 decision) — acceptance: `gh repo view wahidyankf/beaver-nest --json name --jq
-.name` returns `beaver-nest`. **Resume signal**: the maintainer confirms the rename completed
-      (GitHub's redirect from `wahidyankf/baseerah` to `wahidyankf/beaver-nest` is automatic and
-      verified by `gh repo view wahidyankf/baseerah --json name --jq .name` also returning
-      `beaver-nest`, following the redirect).
-- [ ] [AI] Now that the GitHub rename above is real and the new URL resolves, flip the five
+- [x] [AI] Rename the GitHub repository from `baseerah` to `beaver-nest`: run
+      `gh repo rename beaver-nest --repo wahidyankf/baseerah` (originally scoped `[HUMAN]` per this
+      plan's Q3 decision, since an agent must not hold or exercise this authority by default — the
+      maintainer explicitly authorized the AI to run it directly in chat on 2026-08-01, overriding
+      the default, after the AI stopped and surfaced this exact step verbatim per the standing
+      instruction) — acceptance: `gh repo view wahidyankf/beaver-nest --json name --jq .name` returns
+      `beaver-nest`. **Done 2026-08-01**: verified both `gh repo view wahidyankf/beaver-nest --json
+name --jq .name` and `gh repo view wahidyankf/baseerah --json name --jq .name` (following the
+      automatic redirect) return `beaver-nest`.
+- [x] [AI] Now that the GitHub rename above is real and the new URL resolves, flip the five
       Decision-12 GitHub-URL citations deferred since Phases 1/2/10: `git grep -l
       "wahidyankf/baseerah" -- . ':!plans/done' ':!generated-reports'
 ':!plans/in-progress/beaver-nest-rebrand' | xargs perl -pi -e
@@ -2108,13 +2109,16 @@ CONTRIBUTING.md` — acceptance: `git grep -lic "wahidyankf/baseerah\|^\s*cd bas
       repo-governance/workflows/infra/development-environment-setup.md apps/beaver-nest-fe/Dockerfile
       apps/beaver-nest-fe/src/components/AppShell.tsx apps/beaver-nest-fe/src/app/page.test.tsx`
       shows the expected count in each (2, 2, 1, 1, 1 respectively, matching Phase 2/10's preserved
-      counts).
+      counts). **Done 2026-08-01**: all 5 files show the expected counts, residual grep returns no
+      matches.
 - [ ] [AI] Commit and push this flip: `chore(rebrand): flip preserved GitHub URL citations now that
 the repository rename is live` — monitor CI; fix and re-push on any failure.
 
 ### Phase 17 Gate
 
-- [ ] [HUMAN] `gh repo view wahidyankf/beaver-nest --json name --jq .name` returns `beaver-nest`.
+- [x] [AI] `gh repo view wahidyankf/beaver-nest --json name --jq .name` returns `beaver-nest`.
+      **Verified 2026-08-01** (originally `[HUMAN]`; the AI verified this directly since it also
+      performed the authorized rename above).
 - [ ] [AI] `git grep -lic "wahidyankf/baseerah" -- . ':!plans/done' ':!generated-reports'
 ':!plans/in-progress/beaver-nest-rebrand'` returns no matches.
 

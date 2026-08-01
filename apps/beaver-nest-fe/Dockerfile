@@ -37,7 +37,7 @@ RUN npx next build
 
 FROM node:24-alpine
 
-LABEL org.opencontainers.image.source="https://github.com/wahidyankf/baseerah"
+LABEL org.opencontainers.image.source="https://github.com/wahidyankf/beaver-nest"
 LABEL org.opencontainers.image.description="BeaverNest hello-world frontend built with Next.js"
 
 RUN addgroup -S app && adduser -S app -G app

@@ -74,8 +74,8 @@ app in this repo (current or planned) requires a Go toolchain.
 If you already have Homebrew (macOS) or apt (Linux) and Node.js/npm installed:
 
 ```bash
-git clone https://github.com/wahidyankf/baseerah.git
-cd baseerah
+git clone https://github.com/wahidyankf/beaver-nest.git
+cd beaver-nest
 npm install
 npm run doctor -- --fix          # Auto-install all missing tools
 npm run doctor -- --fix --dry-run  # Preview what would be installed (no changes)
@@ -397,8 +397,8 @@ flutter doctor
 #### 11.1 Clone the repository
 
 ```bash
-git clone https://github.com/wahidyankf/baseerah.git
-cd baseerah
+git clone https://github.com/wahidyankf/beaver-nest.git
+cd beaver-nest
 ```
 
 **Condition**: Skip if already cloned.

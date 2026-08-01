@@ -63,8 +63,8 @@ After installation, restart your terminal and Volta will automatically manage No
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/wahidyankf/baseerah.git
-   cd baseerah
+   git clone https://github.com/wahidyankf/beaver-nest.git
+   cd beaver-nest
    ```
 
 2. **Install dependencies**:

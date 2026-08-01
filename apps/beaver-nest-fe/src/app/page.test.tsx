@@ -32,7 +32,7 @@ describe("Backend hello world", () => {
     expect(screen.queryByTitle(/insight/i)).not.toBeInTheDocument();
 
     const githubLink = screen.getByRole("link", { name: /view on github/i });
-    expect(githubLink).toHaveAttribute("href", "https://github.com/wahidyankf/baseerah");
+    expect(githubLink).toHaveAttribute("href", "https://github.com/wahidyankf/beaver-nest");
     expect(githubLink).toHaveAccessibleName(/opens in new tab/i);
   });
 
