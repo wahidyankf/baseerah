@@ -1,13 +1,13 @@
 services:
-  baseerah-be:
+  beaver-nest-be:
     build:
       context: .
       dockerfile: Dockerfile.be.dev
     ports:
       - "19320:19320"
     volumes:
-      - ../../../apps/baseerah-be:/workspace:rw
-      - ../../../specs/apps/baseerah/behavior/baseerah-be/gherkin:/specs/apps/baseerah/behavior/baseerah-be/gherkin:ro
+      - ../../../apps/beaver-nest-be:/workspace:rw
+      - ../../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin:/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:19320/api/v1/health"]
       interval: 30s
@@ -17,16 +17,16 @@ services:
       # mount); a cold CI build has no NuGet cache, so allow a long warm-up.
       start_period: 600s
 
-  baseerah-fe:
+  beaver-nest-fe:
     build:
       context: ../../..
-      dockerfile: apps/baseerah-fe/Dockerfile
+      dockerfile: apps/beaver-nest-fe/Dockerfile
       args:
-        BASEERAH_FE_API_BASE_URL: http://baseerah-be:19320
+        BEAVER_NEST_FE_API_BASE_URL: http://beaver-nest-be:19320
     ports:
       - "19310:19310"
     environment:
-      BASEERAH_FE_API_BASE_URL: "http://baseerah-be:19320"
+      BEAVER_NEST_FE_API_BASE_URL: "http://beaver-nest-be:19320"
     depends_on:
-      baseerah-be:
+      beaver-nest-be:
         condition: service_healthy

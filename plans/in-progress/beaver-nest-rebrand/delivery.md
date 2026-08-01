@@ -694,7 +694,7 @@ specs/apps/beaver-nest/containers/contracts/project.json` returns `0`.
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI (the `beaver-nest-fe`/`beaver-nest-be`
+- [x] [AI] Commit and push to origin main; monitor CI (the `beaver-nest-fe`/`beaver-nest-be`
       `specs:behavior:coverage` targets are expected to still fail here — record that in the push notes, it
       resolves by Phase 11's gate).
       **Deferred 2026-08-01 (plan amendment, user-directed)**: the push itself is blocked, not just
@@ -710,6 +710,10 @@ specs/apps/beaver-nest/containers/contracts/project.json` returns `0`.
       Local Quality Gates / Commit Guidelines / Phase Gate checks that don't require a push (i.e.
       everything except the literal `git push`) still run and are recorded normally per phase;
       **only** the "push to origin main + verify CI" step is deferred until the RED resolves.
+      **Confirmed green 2026-08-01**: executed as the collapsed push (task #360, `8a9d1a163..902d8c29e`
+      then `..4ed30fdb1`) — see the Phase 11 Post-Push CI Verification note for the full outcome,
+      including a real regression the push surfaced (dropped `@rolldown/binding-*` lockfile entries)
+      and its fix.
 
 ### Phase 6 Gate
 
@@ -767,10 +771,12 @@ libs/web-ui-token/README.md` returns `0`.
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
       **Deferred 2026-08-01**: per the Phase 6 push-collapse decision (see
       [learnings.md](./learnings.md)), this commit stays local — pushed together with Phases 6-11
       once the accumulated RED resolves (tracked as harness task #360).
+      **Confirmed green 2026-08-01**: part of the collapsed push (task #360); see the Phase 11
+      Post-Push CI Verification note for the full CI outcome.
 
 ### Phase 7 Gate
 
@@ -867,11 +873,13 @@ run beaver-nest-be:test:unit` — acceptance: exits 0, all prior `BaseerahBe` te
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
       2026-08-01 (plan amendment, user-directed)**: per the Phase 6 push-collapse decision (see
       [learnings.md](./learnings.md)), this commit stays local; push happens once for the whole
       Phase 6-11 stretch once `nx affected -t test:quick` is fully clean (tracked as harness task
       #360).
+      **Confirmed green 2026-08-01**: part of the collapsed push; see the Phase 11 Post-Push CI
+      Verification note for the full CI outcome.
 
 ### Phase 8 Gate
 
@@ -912,10 +920,12 @@ run beaver-nest-be:test:unit` — acceptance: exits 0, all prior `BaseerahBe` te
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
       2026-08-01 (plan amendment, user-directed)**: per the Phase 6 push-collapse decision (see
       [learnings.md](./learnings.md)), stays local; push happens once for the whole Phase 6-11
       stretch (task #360).
+      **Confirmed green 2026-08-01**: part of the collapsed push; see the Phase 11 Post-Push CI
+      Verification note for the full CI outcome.
 
 ### Phase 9 Gate
 
@@ -1075,10 +1085,12 @@ beaver-nest-fe:specs:behavior:coverage` exits 0 (this resolves Phase 6's deliber
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
       2026-08-01 (plan amendment, user-directed)**: per the Phase 6 push-collapse decision (see
       [learnings.md](./learnings.md)), stays local; push happens once for the whole Phase 6-11
       stretch (task #360).
+      **Confirmed green 2026-08-01**: part of the collapsed push; see the Phase 11 Post-Push CI
+      Verification note for the full CI outcome.
 
 ### Phase 10 Gate
 
@@ -1180,10 +1192,30 @@ apps/beaver-nest-fe-e2e/steps/landing.steps.ts` returns `0` (confirms the orphan
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Executed as
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Executed as
       the collapsed push** (task #360) covering the entire Phases 6-11 commit stretch together, per
       the Phase 6 push-collapse decision — see [learnings.md](./learnings.md) and the note at the
       end of this phase.
+      **Confirmed green 2026-08-01**: pushed `8a9d1a163..902d8c29e` (fixing 3 broken links the
+      `md links validate` pre-push step caught — see learnings.md). First CI attempt on `902d8c29e`
+      showed all jobs green except `TypeScript quality gate`, which failed with `Cannot find native
+binding` for `@rolldown/binding-linux-x64-gnu` (npm/cli#4828-style error). Reran the failed job
+      once — failed again identically, ruling out a transient flake. Root-caused by diffing
+      `package-lock.json` against the last known-good lockfile at `8a9d1a163`: this window's
+      `rm package-lock.json && npm install` steps (Phases 9 and 11, run on macOS) had silently
+      dropped 16 of the 17 platform-specific `@rolldown/binding-*` entries from the lockfile's
+      `packages` section (only `darwin-arm64` survived), even though all 17 remained listed as valid
+      `optionalDependencies` — so `npm ci` on the Linux CI runner had nothing to resolve
+      `linux-x64-gnu` from. Confirmed no other multi-platform optional dep (lightningcss, sharp,
+      esbuild) was affected, and that the underlying dependency graph was unchanged (only
+      `package-lock.json` itself needed repair). Restored the missing 16 entries from the
+      `8a9d1a163` lockfile, verified `npm ci` succeeded locally and the full `nx affected -t
+typecheck lint test:quick specs:behavior:coverage` suite passed, then committed
+      (`4ed30fdb1`, `fix(deps): restore dropped cross-platform @rolldown/binding lockfile entries`)
+      and pushed. CI on `4ed30fdb1` came back fully green: `publish-images`, `validate-env`, and
+      `pr-quality-gate` (TypeScript, .NET, Rust, and Markdown quality gates) all succeeded. This is
+      the actual final green state for the entire Phases 6-11 stretch. See learnings.md for the full
+      write-up of the stale-lockfile discovery.
 
 ### Phase 11 Gate
 
@@ -1204,9 +1236,9 @@ apps/beaver-nest-fe-e2e/steps/landing.steps.ts` returns `0` (confirms the orphan
 
 ## Phase 12: `infra/dev/beaver-nest-app/` and Root npm Scripts
 
-- [ ] [AI] Rename the infra directory: `git mv infra/dev/baseerah-app infra/dev/beaver-nest-app` —
-      acceptance: `test -d infra/dev/beaver-nest-app` succeeds.
-- [ ] [AI] Apply `<CANONICAL-SED>` to `infra/dev/beaver-nest-app/docker-compose.yml`,
+- [x] [AI] Rename the infra directory: `git mv infra/dev/baseerah-app infra/dev/beaver-nest-app` —
+      acceptance: `test -d infra/dev/beaver-nest-app` succeeds. **Done 2026-08-01**.
+- [x] [AI] Apply `<CANONICAL-SED>` to `infra/dev/beaver-nest-app/docker-compose.yml`,
       `infra/dev/beaver-nest-app/docker-compose.ci.yml`, `infra/dev/beaver-nest-app/README.md`,
       **and** `infra/dev/beaver-nest-app/Dockerfile.be.dev` (renames the `baseerah-be`/`baseerah-fe`
       service names, the `BASEERAH_*` env vars, and — in `Dockerfile.be.dev` — the `CMD`'s
@@ -1224,32 +1256,37 @@ local-temp/rebrand-citations-phase12.txt`; (2) run `perl -pi -e '<CANONICAL-SED-
 "baseerah-repo-reset" -- infra/dev/beaver-nest-app/ | diff -
       local-temp/rebrand-citations-phase12.txt` reports no differences, and `git grep -lic baseerah
 infra/dev/beaver-nest-app/` returns only that same captured file set.
-- [ ] [AI] Confirm `package.json`'s `beaver-nest:dev`/`beaver-nest:dev:restart` scripts (renamed in
+- [x] [AI] Confirm `package.json`'s `beaver-nest:dev`/`beaver-nest:dev:restart` scripts (renamed in
       Phase 1) now point at `infra/dev/beaver-nest-app/docker-compose.yml` — acceptance:
-      `grep -c "infra/dev/beaver-nest-app" package.json` returns `2`.
-- [ ] [AI] Run `npm run beaver-nest:dev:restart` locally (or `docker compose -f
+      `grep -c "infra/dev/beaver-nest-app" package.json` returns `2`. **Done 2026-08-01**: already
+      pointed at the new path since Phase 1's rename; no change needed.
+- [x] [AI] Run `npm run beaver-nest:dev:restart` locally (or `docker compose -f
 infra/dev/beaver-nest-app/docker-compose.yml config` as a non-destructive syntax check if a
       full stack boot is impractical in this environment) — acceptance: the compose config parses
-      with no error and references only `beaver-nest-be`/`beaver-nest-fe` service names.
+      with no error and references only `beaver-nest-be`/`beaver-nest-fe` service names. **Done
+      2026-08-01**: ran the non-destructive `docker compose config` syntax check — parses cleanly,
+      both services and the `default` network reference only `beaver-nest-be`/`beaver-nest-fe`.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures. **Done 2026-08-01**: 0
+      tasks affected (`infra/dev/` isn't in any project's Nx inputs) — trivially green.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename infra/dev/baseerah-app to infra/dev/beaver-nest-app`
+- [x] [AI] Commit: `chore(rebrand): rename infra/dev/baseerah-app to infra/dev/beaver-nest-app`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
 
 ### Phase 12 Gate
 
-- [ ] [AI] `git grep -l "baseerah-repo-reset" -- infra/dev/beaver-nest-app/ | diff -
+- [x] [AI] `git grep -l "baseerah-repo-reset" -- infra/dev/beaver-nest-app/ | diff -
       local-temp/rebrand-citations-phase12.txt` reports no differences, and `git grep -lic baseerah
-infra/dev/beaver-nest-app/` returns only that same captured file set.
-- [ ] [AI] `docker compose -f infra/dev/beaver-nest-app/docker-compose.yml config` exits 0.
+infra/dev/beaver-nest-app/` returns only that same captured file set. **Done 2026-08-01**: verified.
+- [x] [AI] `docker compose -f infra/dev/beaver-nest-app/docker-compose.yml config` exits 0. **Done
+      2026-08-01**: verified.
 
 > **Pause Safety**: the local dev stack is fully renamed and its compose files parse cleanly. Safe
 > to stop. To resume: confirm level with `origin/main`, then start Phase 13.
@@ -1451,20 +1488,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                                                                                              ```gherkin
-                                                                                                                                              Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                                                                                                Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                                                                                                When nx run rhino-cli:test:integration runs
-                                                                                                                                                Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                                                                                                And the generated file's "name" field reads "beaver-nest-default"
-                                                                                                                                              ```
+                                                                                                                                                                ```gherkin
+                                                                                                                                                                Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                                                                                                                  Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                                                                                                                  When nx run rhino-cli:test:integration runs
+                                                                                                                                                                  Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                                                                                                                  And the generated file's "name" field reads "beaver-nest-default"
+                                                                                                                                                                ```
 
-                                                                                                                                              Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                                                                                              target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                                                                                              error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                                                                                              the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                                                                                              against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                                                                                              state).
+                                                                                                                                                                Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                                                                                                                target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                                                                                                                error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                                                                                                                the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                                                                                                                against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                                                                                                                state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

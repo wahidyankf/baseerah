@@ -1,0 +1,9 @@
+services:
+  beaver-nest-be:
+    environment:
+      BEAVER_NEST_BE_PORT: "19320"
+      BEAVER_NEST_BE_CORS_ORIGINS: "*"
+
+  beaver-nest-fe:
+    environment:
+      BEAVER_NEST_FE_API_BASE_URL: "http://beaver-nest-be:19320"

@@ -3,6 +3,65 @@
 
 # Learnings: beaver-nest-rebrand
 
+## Phase 11 (addendum 2): `rm package-lock.json && npm install` on macOS silently dropped 16 of 17 cross-platform `@rolldown/binding-*` lockfile entries, breaking `npm ci` on Linux CI
+
+After fixing the 3 broken links and pushing the collapsed Phases 6-11 commit stretch
+(`8a9d1a163..902d8c29e`), CI's `TypeScript quality gate` job failed with:
+
+```
+Error: Cannot find native binding. npm has a bug related to optional dependencies
+(https://github.com/npm/cli/issues/4828). ...
+[cause]: Error: Cannot find module '@rolldown/binding-linux-x64-gnu'
+```
+
+hitting `web-ui-token:test:unit`, `web-ui:test:unit`, and (transitively) `beaver-nest-fe:test:unit`.
+Reran the job once (`gh run rerun --failed`) to rule out a transient registry/runner flake — it
+failed identically a second time, which meant it was a real, reproducible bug rather than
+transient noise (contrast with the genuinely-flaky `beaver-nest-be-e2e` task from earlier this
+window, which passed cleanly on a bare rerun).
+
+Root cause, found by diffing `package-lock.json` against the last known-good lockfile at
+`8a9d1a163` (the commit before this window's Phase 6 push): the old lockfile's `packages` section
+had 17 full resolved entries for `node_modules/@rolldown/binding-*` (one per OS/arch platform, each
+with its own `resolved`/`integrity`), matching all 17 platforms rolldown lists as
+`optionalDependencies`. The current lockfile had only **1** — `darwin-arm64`, the local machine's
+own platform. The other 16 were silently dropped even though they remained listed as valid
+`optionalDependencies` version pins under `rolldown`'s own package entry (so the drop wasn't visible
+by grepping for the package name — you had to compare package _counts_ against the old lockfile to
+notice). This matches npm's documented optional-dependency lockfile bug (npm/cli#4828): a full
+`rm package-lock.json && npm install` regeneration run on one platform (macOS, in this case, done
+twice — Phase 9 and Phase 11's package-lock regenerations after renaming `apps/baseerah-be-e2e` and
+`apps/baseerah-fe-e2e`) can omit the `packages` entries for platforms other than the one running the
+install, even though `npm install` against an _existing_ lockfile normally preserves them. `npm ci`
+on the Linux CI runner then had no lockfile entry to resolve `linux-x64-gnu` from, so the
+Node-native `rolldown` binding failed to load.
+
+Verified the blast radius was narrow before fixing: compared `packages` entry counts for every other
+known multi-platform optional native dependency (`lightningcss`, `sharp`, `esbuild`, `@napi-rs`)
+between the two lockfiles — all matched, only `@rolldown/binding` was affected (17 → 1). Also
+confirmed the root `package.json` and every app-level `package.json` were unchanged between
+`8a9d1a163` and `902d8c29e` (only path/rename edits, no new dependencies), so the dependency graph
+itself hadn't actually changed — only the lockfile's platform coverage had regressed.
+
+Fixed by writing a small Node script that parsed both lockfiles as JSON, copied the 16 missing
+`@rolldown/binding-*` package entries (and their nested sub-dependencies, e.g.
+`binding-wasm32-wasi`'s own `@napi-rs/wasm-runtime`/`@tybys/wasm-util`) from the old lockfile into
+the current one, and re-serialized with the same 2-space `JSON.stringify` formatting npm uses —
+producing a clean, mostly-additive diff. Verified `npm ci` succeeded locally and the full `nx
+affected -t typecheck lint test:quick specs:behavior:coverage` suite passed before committing
+(`4ed30fdb1`) and pushing; CI on that commit came back fully green.
+
+**Generalizable rule**: `rm package-lock.json && npm install` is not equivalent to `npm install`
+against an existing lockfile when a package declares OS/arch-specific `optionalDependencies` — a
+full regeneration on one platform can silently drop the other platforms' resolved lockfile entries
+even though the version pins survive under `optionalDependencies`. Prefer a plain `npm install`
+(no lockfile deletion) when the goal is just to refresh entries after a directory/name rename;
+reserve `rm package-lock.json && npm install` for cases that actually need a from-scratch
+regeneration, and when it's used, diff the resulting lockfile's per-package entry _counts_ against
+the prior lockfile for every known multi-platform optional dependency before pushing — a working-tree
+`git grep` for the package name is not enough, since the version pin under `optionalDependencies`
+survives even when the platform-specific `packages` entry doesn't.
+
 ## Phase 11 (addendum): the push-collapse decision silently deferred `md links validate` too, not just `test:quick`
 
 The Phase 6 push-collapse decision (see below) was scoped to the conflict with `test:quick`'s nested

@@ -5,4 +5,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 
 WORKDIR /workspace
 
-CMD ["dotnet", "watch", "run", "--project", "src/BaseerahBe/BaseerahBe.fsproj"]
+CMD ["dotnet", "watch", "run", "--project", "src/BeaverNestBe/BeaverNestBe.fsproj"]
