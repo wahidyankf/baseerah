@@ -15,7 +15,7 @@ libs/
 └── web-ui-token/              # Web UI design token library
 ```
 
-Every prior lib (`fsharp-crane-core`, `ts-ui`) was deleted by the 2026 Baseerah repo reset — see the
+Every prior lib (`fsharp-crane-core`, `ts-ui`) was deleted by the 2026 BeaverNest repo reset — see the
 [baseerah-repo-reset plan](../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
 ## Naming Convention
@@ -47,7 +47,7 @@ This flat structure with language prefixes supports a **polyglot monorepo** wher
 `rhino-cli` is self-contained; its former consumers (`ayokoding-cli`, `ose-cli`) were deleted.
 
 **`web-ui`** / **`web-ui-token`** - Shared React component library and its design-token package.
-`web-ui` depends on `web-ui-token`; `baseerah-fe` is the sole app consumer of both.
+`web-ui` depends on `web-ui-token`; `beaver-nest-fe` is the sole app consumer of both.
 
 ## Library Characteristics
 

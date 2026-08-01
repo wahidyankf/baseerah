@@ -3,6 +3,34 @@
 
 # Learnings: beaver-nest-rebrand
 
+## Phase 6 (addendum): the cross-phase RED/GREEN/REFACTOR design conflicts with `.husky/pre-push`, blocking the push itself (not just CI)
+
+Phase 6's Post-Push CI Verification note anticipated `beaver-nest-fe`/`beaver-nest-be`
+`specs:behavior:coverage` showing red **in CI** after the push. In practice the push never reaches
+CI: `.husky/pre-push` runs `npx nx affected -t test:quick`, and `test:quick` for all four affected
+projects (`baseerah-be`, `baseerah-be-e2e`, `baseerah-fe`, `baseerah-fe-e2e`) nests
+`specs:behavior:coverage`/`specs:e2e:coverage` as a dependency (via `test:specs`), so the hook itself
+fails and aborts the push with `husky - pre-push script failed (code 1)` before `git push` ever
+contacts `origin`. The plan's design (deliberate multi-phase RED, tolerated at the CI level) and this
+repo's blocking pre-push policy (`Never skip hooks unless explicitly requested`) are in direct
+conflict — no combination of local fixes resolves it without either bypassing the hook or restructuring
+when pushes happen.
+
+Surfaced to the user with four options (bypass hook for this documented window, collapse phases into
+one push, temporarily no-op the red targets, or stop). **User decision: collapse the per-phase push
+cadence** — commit locally through Phases 6 through however far the RED persists (Phase 8 fixes
+`baseerah-be`, Phase 9 fixes `baseerah-be-e2e`, Phase 10 fixes `baseerah-fe`, Phase 11 fixes
+`baseerah-fe-e2e` — full GREEN isn't reached until Phase 11), and push once for real once
+`nx affected -t test:quick` is clean across all of them. Every phase's own non-push steps (content
+changes, Local Quality Gates typecheck/lint, Commit Guidelines, Phase Gate checks not requiring a
+push) still execute and get recorded per-phase as normal; only the literal "push to origin main +
+verify CI" step is deferred and re-attempted once per this whole stretch instead of once per phase.
+
+**Generalizable rule**: before designing (or executing) any cross-phase RED/GREEN/REFACTOR cycle in
+a repo with a blocking pre-push hook, check whether the hook's target set (here `test:quick`) nests
+the very target the cycle deliberately reds out — if so, the push cadence itself must collapse to
+match the cycle's span, not just the phase-by-phase content plan.
+
 ## Phase 1: pre-push `md links validate` blocks on ANY repo-wide broken link, not just the current phase's file set
 
 Renaming `repo-governance/vision/baseerah.md` → `beaver-nest.md` immediately broke 27 inbound

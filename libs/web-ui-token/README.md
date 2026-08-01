@@ -52,23 +52,22 @@ import { colorTokens, spacing, radius, typography } from "@open-sharia-enterpris
 For apps with a distinctive brand identity, a dedicated brand token file lives alongside
 `tokens.css` and is imported **only** by that app — the base shared tokens stay unchanged.
 
-### `baseerah.css`
+### `beaver-nest.css`
 
-Indigo-violet OKLCH design system for Baseerah apps (`baseerah-fe`), evoking بصيرة (insight, inner
-vision):
+Indigo-violet OKLCH design system for BeaverNest apps (`beaver-nest-fe`):
 
 - **6 semantic hues × 3 tints** — terracotta, honey, sage, teal, sky, plum (base / ink / wash)
 - **Cool neutral scale** — `--warm-0` through `--warm-900` (OKLCH with hue ~265, tinted toward the
   indigo primary)
 - **Semantic overrides** — `--color-primary: var(--hue-sky)`, `--color-ring: var(--hue-sky)`
-- **Baseerah radius scale** — sm 0.375 rem → 2xl 1.625 rem
+- **BeaverNest radius scale** — sm 0.375 rem → 2xl 1.625 rem
 - **Indigo-tinted shadow scale**
 - **Dark mode block** — `[data-theme="dark"], .dark { … }` with indigo hue lifts
 
 ```css
-/* apps/baseerah-fe/src/app/globals.css */
+/* apps/beaver-nest-fe/src/app/globals.css */
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
-@import "@open-sharia-enterprise/web-ui-token/src/baseerah.css";
+@import "@open-sharia-enterprise/web-ui-token/src/beaver-nest.css";
 ```
 
 ### `organiclever.css`

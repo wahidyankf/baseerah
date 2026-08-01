@@ -1,7 +1,7 @@
 /* NO @import url(google fonts) — fonts are loaded via next/font/google */
 
-/* ── Baseerah reference palette (raw vars, referenced by @theme and dark block) ── */
-/* Brand: insight/clarity indigo-violet tones, evoking بصيرة (insight, inner vision) */
+/* ── BeaverNest reference palette (raw vars, referenced by @theme and dark block) ── */
+/* Brand: indigo-violet tones for BeaverNest's palette */
 :root {
   /* 6 semantic hues */
   --hue-terracotta: oklch(56% 0.15 45);
@@ -40,7 +40,7 @@
   --warm-900: oklch(18% 0.016 262);
 }
 
-/* ── Tailwind @theme overrides (baseerah-specific, overrides tokens.css defaults) ── */
+/* ── Tailwind @theme overrides (beaver-nest-specific, overrides tokens.css defaults) ── */
 @theme {
   /* Semantic color tokens */
   --color-background: var(--warm-0);

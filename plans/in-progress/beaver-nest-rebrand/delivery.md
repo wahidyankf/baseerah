@@ -694,9 +694,22 @@ specs/apps/beaver-nest/containers/contracts/project.json` returns `0`.
 
 ### Post-Push CI Verification
 
-- [x] [AI] Commit and push to origin main; monitor CI (the `beaver-nest-fe`/`beaver-nest-be`
+- [ ] [AI] Commit and push to origin main; monitor CI (the `beaver-nest-fe`/`beaver-nest-be`
       `specs:behavior:coverage` targets are expected to still fail here — record that in the push notes, it
       resolves by Phase 11's gate).
+      **Deferred 2026-08-01 (plan amendment, user-directed)**: the push itself is blocked, not just
+      CI — `.husky/pre-push` runs `npx nx affected -t test:quick`, and `test:quick` for
+      `baseerah-be`/`baseerah-be-e2e`/`baseerah-fe`/`baseerah-fe-e2e` nests `specs:behavior:coverage`/
+      `specs:e2e:coverage`, so the hook hard-fails before the commit ever reaches `origin main` — a
+      conflict between this plan's cross-phase RED/GREEN/REFACTOR design and the repo's
+      never-skip-hooks policy that the plan text didn't anticipate (it assumed CI, not the local
+      hook, would be the only thing showing red). Surfaced to the user; **user decision: collapse the
+      per-phase push cadence for this stretch** — commit locally through Phases 6-11 without pushing,
+      and push once for real after the cycle reaches GREEN (all four projects' `test:quick` passing).
+      See [learnings.md](./learnings.md) "Phase 6" entry (push-blocker addendum). Every phase's own
+      Local Quality Gates / Commit Guidelines / Phase Gate checks that don't require a push (i.e.
+      everything except the literal `git push`) still run and are recorded normally per phase;
+      **only** the "push to origin main + verify CI" step is deferred until the RED resolves.
 
 ### Phase 6 Gate
 
@@ -716,15 +729,17 @@ validate` exits 0.
 
 ## Phase 7: `libs/web-ui-token` Brand Palette File
 
-- [ ] [AI] Rename: `git mv libs/web-ui-token/src/baseerah.css libs/web-ui-token/src/beaver-nest.css`
+- [x] [AI] Rename: `git mv libs/web-ui-token/src/baseerah.css libs/web-ui-token/src/beaver-nest.css`
       — acceptance: `test -f libs/web-ui-token/src/beaver-nest.css` succeeds.
-- [ ] [AI] Edit `libs/web-ui-token/src/beaver-nest.css`: reword the two brand-meaning comments
+      **Done 2026-08-01**: confirmed.
+- [x] [AI] Edit `libs/web-ui-token/src/beaver-nest.css`: reword the two brand-meaning comments
       (lines 3-4 and 43) to plainly describe this as "BeaverNest's palette" with no بصيرة reference
       (per Decision 8/Q7) — leave every `oklch(...)` numeric value byte-identical — acceptance:
       `diff <(grep -o 'oklch([^)]*)' libs/web-ui-token/src/beaver-nest.css | sort) <(git show
 HEAD:libs/web-ui-token/src/baseerah.css | grep -o 'oklch([^)]*)' | sort)` reports no
       differences, and `grep -c "بصيرة" libs/web-ui-token/src/beaver-nest.css` returns `0`.
-- [ ] [AI] Apply `<CANONICAL-SED>` to `libs/web-ui-token/README.md` and `libs/README.md`, then hand-
+      **Done 2026-08-01**: both checks confirmed.
+- [x] [AI] Apply `<CANONICAL-SED>` to `libs/web-ui-token/README.md` and `libs/README.md`, then hand-
       edit `libs/web-ui-token/README.md`'s "`### baseerah.css`" section (now "`### beaver-nest.css`"):
       reword "Indigo-violet OKLCH design system for BeaverNest apps (`beaver-nest-fe`), evoking بصيرة
       (insight, inner vision):" to drop the بصيرة clause per Decision 8/9/Q7, matching the
@@ -737,29 +752,42 @@ HEAD:libs/web-ui-token/src/baseerah.css | grep -o 'oklch([^)]*)' | sort)` report
 libs/README.md` returns exactly `1` (the preserved citation, correctly restored), `grep -c
 "baseerah" libs/web-ui-token/README.md` returns `0`, and `grep -c "بصيرة"
 libs/web-ui-token/README.md` returns `0`.
+      **Done 2026-08-01**: all three checks confirmed exactly as specified.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures.
+      **Done 2026-08-01**: `web-ui-token` itself passes clean. The only failures are the
+      already-documented Phase 6 RED (`baseerah-be`/`baseerah-be-e2e`/`baseerah-fe`/`baseerah-fe-e2e`,
+      unaffected by this phase's changes) — see [learnings.md](./learnings.md).
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename brand palette file to beaver-nest.css`
+- [x] [AI] Commit: `chore(rebrand): rename brand palette file to beaver-nest.css`
 
 ### Post-Push CI Verification
 
 - [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+      **Deferred 2026-08-01**: per the Phase 6 push-collapse decision (see
+      [learnings.md](./learnings.md)), this commit stays local — pushed together with Phases 6-11
+      once the accumulated RED resolves (tracked as harness task #360).
 
 ### Phase 7 Gate
 
-- [ ] [AI] `test -f libs/web-ui-token/src/beaver-nest.css` succeeds; the OKLCH-value diff check
+- [x] [AI] `test -f libs/web-ui-token/src/beaver-nest.css` succeeds; the OKLCH-value diff check
       above reports zero differences.
-- [ ] [AI] `grep -c "baseerah" libs/README.md` returns exactly `1` (the historical citation).
-- [ ] [AI] `grep -c "بصيرة" libs/web-ui-token/README.md libs/web-ui-token/src/beaver-nest.css`
+      **Done 2026-08-01**: confirmed.
+- [x] [AI] `grep -c "baseerah" libs/README.md` returns exactly `1` (the historical citation).
+      **Done 2026-08-01**: confirmed.
+- [x] [AI] `grep -c "بصيرة" libs/web-ui-token/README.md libs/web-ui-token/src/beaver-nest.css`
       returns `0` for both.
+      **Done 2026-08-01**: confirmed.
 
 > **Pause Safety**: the brand palette file is renamed with byte-identical color values. Safe to
 > stop. To resume: confirm level with `origin/main`, then start Phase 8.
+> **Amendment**: `origin/main` is intentionally behind local `main` by the Phase 6+7 commits (push
+> collapsed per the Phase 6 decision) — "confirm level with origin/main" means confirm no one else
+> pushed to `origin/main` in the meantime, not that local matches it.
 
 ---
 
@@ -1354,20 +1382,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                                                ```gherkin
-                                                                                                Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                                                  Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                                                  When nx run rhino-cli:test:integration runs
-                                                                                                  Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                                                  And the generated file's "name" field reads "beaver-nest-default"
-                                                                                                ```
+                                                                                                      ```gherkin
+                                                                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                                                        When nx run rhino-cli:test:integration runs
+                                                                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                                                        And the generated file's "name" field reads "beaver-nest-default"
+                                                                                                      ```
 
-                                                                                                Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                                                target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                                                error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                                                the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                                                against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                                                state).
+                                                                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                                                      state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
