@@ -33,7 +33,7 @@ Every agent filename (basename without the `.md` extension) MUST match the struc
 Token definitions:
 
 - **`<scope>`** — Exactly one token from the [Scope Vocabulary](#scope-vocabulary) below. Names the domain or subsystem the agent operates in. Appears first.
-- **`<qualifier>`** — Zero or more lowercase kebab tokens narrowing the scope. Each qualifier is a single hyphen-separated word or a compound kebab phrase (e.g., `baseerah-fe`, `by-example`, `file`). Qualifiers stack in order from broadest to narrowest. Each qualifier token must be `[a-z0-9]+` and separated from its neighbours by single hyphens.
+- **`<qualifier>`** — Zero or more lowercase kebab tokens narrowing the scope. Each qualifier is a single hyphen-separated word or a compound kebab phrase (e.g., `beaver-nest-fe`, `by-example`, `file`). Qualifiers stack in order from broadest to narrowest. Each qualifier token must be `[a-z0-9]+` and separated from its neighbours by single hyphens.
 - **`<role>`** — Exactly one token from the [Role Vocabulary](#role-vocabulary) below. Names the functional responsibility. Appears last.
 
 **No exceptions.** Every agent has exactly one scope (first) and exactly one role (last); everything between is qualifier. Filenames that cannot be parsed against this structure are governance violations regardless of history, context, or convenience.

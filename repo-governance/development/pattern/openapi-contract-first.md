@@ -61,18 +61,18 @@ specs/
                 └── openapi.yaml
 ```
 
-| BE App        | Spec Path                                               |
-| ------------- | ------------------------------------------------------- |
-| `baseerah-be` | `specs/apps/baseerah/containers/contracts/openapi.yaml` |
+| BE App           | Spec Path                                                  |
+| ---------------- | ---------------------------------------------------------- |
+| `beaver-nest-be` | `specs/apps/beaver-nest/containers/contracts/openapi.yaml` |
 
 The spec file is the only artefact that humans edit. Generated files are never edited by hand.
 
 ## Codegen Tooling
 
-| Target                            | Tool                  | Output Path                | Notes                                     |
-| --------------------------------- | --------------------- | -------------------------- | ----------------------------------------- |
-| TypeScript client (`baseerah-fe`) | `@hey-api/openapi-ts` | `src/generated-contracts/` | Emits typed fetch client + schema types   |
-| F# server (`baseerah-be`)         | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
+| Target                               | Tool                  | Output Path                | Notes                                     |
+| ------------------------------------ | --------------------- | -------------------------- | ----------------------------------------- |
+| TypeScript client (`beaver-nest-fe`) | `@hey-api/openapi-ts` | `src/generated-contracts/` | Emits typed fetch client + schema types   |
+| F# server (`beaver-nest-be`)         | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
 
 Generated directories are committed to the repository. The CI drift check (see below) compares the freshly generated
 output against the committed files and fails if they differ.
@@ -81,24 +81,24 @@ output against the committed files and fails if they differ.
 
 Each app that participates in contract-first development exposes these Nx targets in its `project.json`:
 
-| Target    | App                  | Command                                                      |
-| --------- | -------------------- | ------------------------------------------------------------ |
-| `codegen` | `baseerah-fe`        | Runs `@hey-api/openapi-ts` against the contracts spec        |
-| `codegen` | `baseerah-be`        | Runs `nswag` F# target                                       |
-| `bundle`  | `baseerah-contracts` | Validates and bundles the OpenAPI spec (Redocly or Spectral) |
-| `docs`    | `baseerah-contracts` | Generates browsable API documentation                        |
+| Target    | App                     | Command                                                      |
+| --------- | ----------------------- | ------------------------------------------------------------ |
+| `codegen` | `beaver-nest-fe`        | Runs `@hey-api/openapi-ts` against the contracts spec        |
+| `codegen` | `beaver-nest-be`        | Runs `nswag` F# target                                       |
+| `bundle`  | `beaver-nest-contracts` | Validates and bundles the OpenAPI spec (Redocly or Spectral) |
+| `docs`    | `beaver-nest-contracts` | Generates browsable API documentation                        |
 
 Run codegen for a specific app:
 
 ```bash
-nx run baseerah-fe:codegen
-nx run baseerah-be:codegen
+nx run beaver-nest-fe:codegen
+nx run beaver-nest-be:codegen
 ```
 
 Validate the spec itself:
 
 ```bash
-nx run baseerah-contracts:bundle
+nx run beaver-nest-contracts:bundle
 ```
 
 ## Drift Enforcement
@@ -125,9 +125,9 @@ the spec change.
 
 Contract-first development covers these BE↔client pairs:
 
-| Backend       | Client        | Spec                                                    |
-| ------------- | ------------- | ------------------------------------------------------- |
-| `baseerah-be` | `baseerah-fe` | `specs/apps/baseerah/containers/contracts/openapi.yaml` |
+| Backend          | Client           | Spec                                                       |
+| ---------------- | ---------------- | ---------------------------------------------------------- |
+| `beaver-nest-be` | `beaver-nest-fe` | `specs/apps/beaver-nest/containers/contracts/openapi.yaml` |
 
 Apps outside this table (CLI tools, content-only web apps with no backend to contract against) do not participate
 in contract-first codegen.

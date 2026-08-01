@@ -25,7 +25,7 @@ The authoritative combined convention — covering what content belongs in app R
 
 This convention implements the following core principles:
 
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The directory structure communicates spec scope through path segments. Reading a path like `specs/apps/baseerah/behavior/baseerah-be/gherkin/hello/greeting.feature` immediately reveals the project, C4 level, layer, domain, and feature without any external metadata.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The directory structure communicates spec scope through path segments. Reading a path like `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/hello/greeting.feature` immediately reveals the project, C4 level, layer, domain, and feature without any external metadata.
 
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Every surface (BE, web, CLI) uses domain subdirectories under `gherkin/`. Single-feature domains are permitted for CLI surfaces with a small command surface area — the domain name still communicates the command group without requiring multiple files.
 
@@ -116,7 +116,7 @@ specs/apps/<app-family>/
 │       └── <bc>.md
 └── behavior/                       # Cross-cutting Gherkin (all C4 levels)
     ├── README.md
-    └── <product>-<surface>/         # e.g., baseerah-be, baseerah-fe, rhino-cli
+    └── <product>-<surface>/         # e.g., beaver-nest-be, beaver-nest-fe, rhino-cli
         └── gherkin/
             ├── README.md
             └── <domain>/            # Domain subdir — required for all surfaces
@@ -135,12 +135,12 @@ specs/apps/<app-family>/
 
 ### Per-Surface Variants
 
-| Surface profile                                                  | Folders populated                                                                                                                           | Folders absent or empty                         |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Full-stack (e.g., `baseerah`)                                    | All five; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/baseerah-be/gherkin/` + `behavior/baseerah-fe/gherkin/` | None                                            |
-| Web-only (e.g., a marketing site with no backend)                | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/<product>-www/gherkin/`                                          | `containers/contracts/`, `components/be/`       |
-| CLI-only (e.g., `rhino`)                                         | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                              | `components/{be,web}/`, `containers/contracts/` |
-| Multi-CLI (e.g., a family shipping two or more independent CLIs) | Same as CLI-only, plus web layers if applicable                                                                                             | Nothing additional omitted                      |
+| Surface profile                                                  | Folders populated                                                                                                                                 | Folders absent or empty                         |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Full-stack (e.g., `beaver-nest`)                                 | All five; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/beaver-nest-be/gherkin/` + `behavior/beaver-nest-fe/gherkin/` | None                                            |
+| Web-only (e.g., a marketing site with no backend)                | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/<product>-www/gherkin/`                                                | `containers/contracts/`, `components/be/`       |
+| CLI-only (e.g., `rhino`)                                         | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                    | `components/{be,web}/`, `containers/contracts/` |
+| Multi-CLI (e.g., a family shipping two or more independent CLIs) | Same as CLI-only, plus web layers if applicable                                                                                                   | Nothing additional omitted                      |
 
 ## Gherkin Feature File Placement
 
@@ -154,9 +154,9 @@ specs/apps/<app-family>/behavior/<product>-<surface>/gherkin/{domain}/{feature}.
 
 Where:
 
-- **`<app-family>`** = project name (e.g., `baseerah`, `rhino`)
+- **`<app-family>`** = project name (e.g., `beaver-nest`, `rhino`)
 - **`<product>-<surface>`** = flat slug combining product name and perspective (e.g.,
-  `baseerah-be`, `baseerah-fe`, `rhino-cli`)
+  `beaver-nest-be`, `beaver-nest-fe`, `rhino-cli`)
 - **`{domain}`** = business domain grouping folder (all surfaces, including CLI)
 - **`{feature}`** = feature file name in kebab-case
 
@@ -173,9 +173,9 @@ historically `ayokoding-build-tools/`, renamed from the old bare `build-tools/` 
 since been retired from this repo).
 
 ```
-specs/apps/baseerah/behavior/baseerah-be/gherkin/health/service-health.feature
-specs/apps/baseerah/behavior/baseerah-be/gherkin/hello/greeting.feature
-specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature
+specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/service-health.feature
+specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/hello/greeting.feature
+specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature
 ```
 
 A domain folder may contain one or many feature files.
@@ -229,10 +229,10 @@ specs/
 
 Not every project has all directories. Presence of subdirectories depends on the project's surface profile:
 
-- **`containers/contracts/`**: Present for apps with OpenAPI contract specs (e.g., `baseerah`)
-- **`components/be/`**: Present for apps with a backend container (e.g., `baseerah`)
+- **`containers/contracts/`**: Present for apps with OpenAPI contract specs (e.g., `beaver-nest`)
+- **`components/be/`**: Present for apps with a backend container (e.g., `beaver-nest`)
 - **`ddd/`**: Present when DDD is adopted (lives at the app root, not under `components/web/`, because the ubiquitous language belongs to the bounded context, not to one implementation surface)
-- **`behavior/<product>-be/gherkin/`**: Present for apps with backend Gherkin specs (e.g., `behavior/baseerah-be/gherkin/`)
+- **`behavior/<product>-be/gherkin/`**: Present for apps with backend Gherkin specs (e.g., `behavior/beaver-nest-be/gherkin/`)
 - **`behavior/<product>-cli/gherkin/`**: Present for CLI apps (e.g., `behavior/rhino-cli/gherkin/`)
 
 ## README Index Files
@@ -302,7 +302,7 @@ entry. The single source of truth for the current allowlist is `apps/rhino-cli/s
 
 ### Adding a Feature File to an Existing Project
 
-1. Identify the correct `<product>-<surface>` slug (e.g., `baseerah-be`, `baseerah-fe`,
+1. Identify the correct `<product>-<surface>` slug (e.g., `beaver-nest-be`, `beaver-nest-fe`,
    `rhino-cli`). For build-time features scoped to a CLI, use a dedicated `<product>-build-tools`
    surface (as `ayokoding-build-tools` did, historically)
 2. Place the file in the appropriate domain subdirectory under
@@ -347,7 +347,7 @@ These commands run as part of the `specs-quality-gate` workflow deterministic-of
 
 - Positional `<folder>` or `<app>` — single-target legacy behavior preserved.
 - `--apps <csv>` — multi-app validation across an explicit list.
-- No positional, no flag — defaults to the `AppsWithDDD` allowlist (`baseerah`).
+- No positional, no flag — defaults to the `AppsWithDDD` allowlist (`beaver-nest`).
 
 The single source of truth for the allowlist is `apps/rhino-cli/src/internal/allowlist.rs`. Pre-push and CI surfaces invoke the four targets without arguments so adding a new app is a one-line edit there.
 
@@ -360,10 +360,10 @@ The single source of truth for the allowlist is `apps/rhino-cli/src/internal/all
 `specs/apps/<app>/ddd/bounded-contexts.yaml` accepts both scalar and list forms for the `gherkin:` field. A scalar auto-converts to a single-element list at load time:
 
 ```yaml
-gherkin: behavior/baseerah-fe/gherkin/content # scalar (most BCs)
+gherkin: behavior/beaver-nest-fe/gherkin/content # scalar (most BCs)
 gherkin: # list (multi-perspective BCs)
-  - behavior/baseerah-fe/gherkin/content
-  - behavior/baseerah-be/gherkin/content
+  - behavior/beaver-nest-fe/gherkin/content
+  - behavior/beaver-nest-be/gherkin/content
 ```
 
 The validator iterates every declared path in `checkGherkin`, `registeredGherkin`, and `gherkinRoots`. Glossary `Used in features` lookups resolve under any declared path (first-match-wins). This unblocks BCs that legitimately have both web and be gherkin trees (e.g., a bounded context spanning both perspectives, such as `content`).
@@ -408,7 +408,7 @@ Every `validate:specs-*` target runs on all four gating surfaces — no surface 
 - `.husky/pre-push` (every developer push, single line)
 - `.github/workflows/pr-quality-gate.yml` (every PR, dedicated `specs-gate` job in `quality-gate.needs:`)
 - `.github/workflows/_reusable-www-test-local-deploy.yml` (called by the www cron deploys, `specs-gate` job in `deploy.needs:`)
-- `.github/workflows/baseerah-fe-test-local-deploy-stag.yml` (cron on `main`, `specs-gate` job in `deploy.needs:`) — wired once `baseerah-fe` has a staging cron deploy workflow
+- `.github/workflows/beaver-nest-fe-test-local-deploy-stag.yml` (cron on `main`, `specs-gate` job in `deploy.needs:`) — wired once `beaver-nest-fe` has a staging cron deploy workflow
 
 `docs validate-links` is NOT gated by this plan — it scans the entire repo's markdown (repo-governance/, docs/, app READMEs) and is owned by a separate planned validator-unification effort.
 

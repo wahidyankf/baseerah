@@ -15,9 +15,9 @@ created: 2025-12-18
 # Programming Language Content Standard
 
 > **Historical note**: This convention was authored for `ayokoding-www`, a programming-language
-> education content platform removed by the Baseerah repo-reset plan. No app in this repo currently
-> hosts programming-language tutorial content, and Baseerah's planned apps (`baseerah-fe`,
-> `baseerah-be`) are not educational-content platforms, so this convention has no current
+> education content platform removed by the BeaverNest repo-reset plan. No app in this repo currently
+> hosts programming-language tutorial content, and BeaverNest's planned apps (`beaver-nest-fe`,
+> `beaver-nest-be`) are not educational-content platforms, so this convention has no current
 > applicability. It is retained for reference in case a future content-education app is added to
 > this repo; the `ayokoding-www` references below describe that historical implementation and are
 > deliberately left unchanged rather than mechanically renamed onto an unrelated app.

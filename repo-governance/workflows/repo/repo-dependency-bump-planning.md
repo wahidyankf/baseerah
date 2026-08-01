@@ -121,7 +121,7 @@ governed by the policy (intersected with `scope-filter`/`ecosystems`):
 - **Cargo**: `apps/*/Cargo.toml` and `libs/*/Cargo.toml` `[dependencies]` (e.g. `rhino-cli`,
   `rust-commons`), plus per-project `rust-toolchain.toml`
   compiler-channel pins (every Rust app **and** `libs/rust-commons`).
-- **.NET**: `apps/*/*.fsproj`/`*.csproj` `<PackageReference>` (e.g. the planned `baseerah-be`
+- **.NET**: `apps/*/*.fsproj`/`*.csproj` `<PackageReference>` (e.g. the planned `beaver-nest-be`
   F#/Giraffe/ASP.NET backend once scaffolded). The .NET SDK
   version is **not** pinned via a per-app `global.json` here — it lives in the
   `.github/actions/setup-dotnet` composite-action default (see GitHub Actions below). Inventory a

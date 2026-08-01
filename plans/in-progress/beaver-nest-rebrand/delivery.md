@@ -233,27 +233,46 @@ zero tasks were affected; trivially green. `markdownlint-cli2` on all 8 touched 
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename root identity files and vision doc to BeaverNest`
+- [x] [AI] Commit: `chore(rebrand): rename root identity files and vision doc to BeaverNest`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main.
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by this push; verify ALL checks pass; fix
+- [x] [AI] Commit and push to origin main.
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by this push; verify ALL checks pass; fix
       and re-push if any fail.
+
+**Date**: 2026-08-01. **Status**: Pushed as 2 commits (52806c370 body, 06c6c9a1f link-repoint fix
+discovered mid-phase — see learnings.md). All 3 triggered workflows on 06c6c9a1f (`pr-quality-gate`,
+`publish-images`, `validate-env`) completed with `conclusion: success`. **Files Changed**: none
+(verification only).
 
 ### Phase 1 Gate
 
-- [ ] [AI] `git grep -lic baseerah README.md ROADMAP.md AGENTS.md package.json package-lock.json
-.gitignore SECURITY.md LICENSING-NOTICE.md repo-governance/vision/` returns no matches
-      (`CONTRIBUTING.md` is checked separately below, per Decision 12's deliberate exception).
-- [ ] [AI] `git grep -c baseerah CONTRIBUTING.md` returns exactly `2` (only the two preserved
+- [x] [AI] `git grep -lic baseerah README.md ROADMAP.md AGENTS.md package.json .gitignore
+SECURITY.md LICENSING-NOTICE.md repo-governance/vision/` returns no matches (`CONTRIBUTING.md` is
+      checked separately below, per Decision 12's deliberate exception). `package-lock.json` is
+      excluded from this blanket check: it legitimately still contains `apps/baseerah-fe`,
+      `apps/baseerah-fe-e2e`, and `apps/baseerah-be-e2e` workspace-path entries until those app
+      directories are themselves renamed in Phases 8-11 — instead check just the root `name` field:
+      `grep -c '"name": "beaver-nest"' package-lock.json` returns at least `1`.
+- [x] [AI] `git grep -c baseerah CONTRIBUTING.md` returns exactly `2` (only the two preserved
       GitHub-URL lines Decision 12 defers to Phase 17 — anything else would mean an unrelated
       residual snuck back in).
-- [ ] [AI] `test -f repo-governance/vision/beaver-nest.md` succeeds; `test -f
+- [x] [AI] `test -f repo-governance/vision/beaver-nest.md` succeeds; `test -f
 repo-governance/vision/baseerah.md` fails.
-- [ ] [AI] `grep -c "بصيرة\|wawasan\|kejernihan pandang" README.md AGENTS.md` returns `0` for both.
-- [ ] [AI] `grep -c "بصيرة\|ketajaman melihat\|wawasan\|kejernihan pandang"
+- [x] [AI] `grep -c "بصيرة\|wawasan\|kejernihan pandang" README.md AGENTS.md` returns `0` for both.
+- [x] [AI] `grep -c "بصيرة\|ketajaman melihat\|wawasan\|kejernihan pandang"
 repo-governance/vision/beaver-nest.md` returns `0`.
+
+**Date**: 2026-08-01. **Status**: Phase 1 Gate green — all 5 checks passed (verified live: root-file
+grep clean, CONTRIBUTING.md=2, vision doc renamed, etymology=0 in both README/AGENTS and vision.md).
+Found and fixed a genuine plan-design gap during verification: the gate's original blanket
+`package-lock.json` check could never pass at this point in the plan — `apps/baseerah-fe`,
+`apps/baseerah-fe-e2e`, `apps/baseerah-be-e2e` workspace-path entries legitimately remain until those
+app directories are renamed in Phases 8-11. Fixed by excluding `package-lock.json` from the blanket
+grep and checking only its root `name` field instead. **Files Changed**:
+`plans/in-progress/beaver-nest-rebrand/delivery.md` (gate-scope fix, not yet committed — rides into
+Phase 2's commit).
 
 > **Pause Safety**: root identity is fully renamed and pushed; every later phase can proceed
 > independently of this one. Safe to stop. To resume: `git status -sb` shows level with
@@ -263,14 +282,15 @@ repo-governance/vision/beaver-nest.md` returns `0`.
 
 ## Phase 2: `repo-governance/` Sweep
 
-- [ ] [AI] Apply `<CANONICAL-SED>` to every git-tracked file under `repo-governance/` except
+- [x] [AI] Apply `<CANONICAL-SED>` to every git-tracked file under `repo-governance/` except
       `repo-governance/vision/beaver-nest.md` (already done in Phase 1), preserving historical
       citations per [tech-docs.md Decision 6](./tech-docs.md#decision-log): (1) capture
       `git grep -l "baseerah-repo-reset" -- repo-governance/ >
 local-temp/rebrand-citations-phase2.txt`; (2) run `git ls-files -z repo-governance/ | grep -zv
       'vision/beaver-nest.md' | xargs -0 perl -pi -e '<CANONICAL-SED-BODY>'`; (3) revert the
-      captured files' mangled citation: `xargs -a local-temp/rebrand-citations-phase2.txt -I{} perl
-      -pi -e 's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}`; (4) per Decision 12, revert the
+      captured files' mangled citation: `< local-temp/rebrand-citations-phase2.txt xargs -I{} perl
+      -pi -e 's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}` (note: `xargs -a` is GNU-only;
+      BSD/macOS `xargs` lacks it — redirect the file into stdin instead); (4) per Decision 12, revert the
       two GitHub-URL clone blocks the sed pass just mangled in
       `repo-governance/workflows/infra/development-environment-setup.md`: `perl -pi -e
       's/github\.com\/wahidyankf\/beaver-nest/github.com\/wahidyankf\/baseerah/g;
@@ -284,7 +304,12 @@ local-temp/rebrand-citations-phase2.txt` reports no differences (the historical 
       "wahidyankf/baseerah\|^cd baseerah$"
 repo-governance/workflows/infra/development-environment-setup.md` returns `4` (two clone-URL lines + two `cd baseerah` lines, and nothing else — `git grep -c baseerah
       repo-governance/workflows/infra/development-environment-setup.md` returns exactly `4` too).
-- [ ] [AI] Spot-check `repo-governance/development/agents/ai-agents.md` and
+      **Done 2026-08-01**: citation diff clean, `git grep -lic baseerah repo-governance/` returns
+      exactly `pdf-to-md-quality-gate.md` + `development-environment-setup.md`, dev-env-setup count
+      = 4. Discovered `xargs -a` is BSD/macOS-unsupported (see [learnings.md](./learnings.md)) —
+      fixed manually for this phase and proactively rewrote all 5 occurrences of the pattern across
+      this file (Phases 2, 3, 4, 6, 12) to the portable `< file xargs -I{}` form.
+- [x] [AI] Spot-check `repo-governance/development/agents/ai-agents.md` and
       `repo-governance/conventions/structure/agent-naming.md` for illustrative examples that named
       `baseerah-fe` directly — `[Repo-grounded]`: as of 2026-08-01 these are ai-agents.md's `# Content
 Checker for baseerah-fe` title-pattern example, its "`baseerah-fe` matches `apps/baseerah-fe/`"
@@ -294,7 +319,11 @@ Checker for baseerah-fe` title-pattern example, its "`baseerah-fe` matches `apps
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+      **Done 2026-08-01**: nx affected (27 tasks, 26 cached) all succeed; `md links validate`
+      clean; `md mermaid validate` clean (only pre-existing unrelated fixture failures + 1
+      pre-existing warning, both outside repo-governance/); `markdownlint-cli2` on
+      `repo-governance/**/*.md` — 0 errors.
 
 ### Commit Guidelines
 
@@ -326,8 +355,9 @@ repo-governance/` returns only that same captured file set **plus**
       citations per [tech-docs.md Decision 6](./tech-docs.md#decision-log): (1) capture
       `git grep -l "baseerah-repo-reset" -- docs/ > local-temp/rebrand-citations-phase3.txt`; (2) run
       `git ls-files -z docs/ | xargs -0 perl -pi -e '<CANONICAL-SED-BODY>'`; (3) revert the captured
-      files' mangled citation: `xargs -a local-temp/rebrand-citations-phase3.txt -I{} perl -pi -e
-      's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}` — acceptance: `git grep -l
+      files' mangled citation: `< local-temp/rebrand-citations-phase3.txt xargs -I{} perl -pi -e
+      's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}` (BSD/macOS `xargs` has no `-a`; redirect
+      the file into stdin instead) — acceptance: `git grep -l
 "baseerah-repo-reset" -- docs/ | diff - local-temp/rebrand-citations-phase3.txt` reports no
       differences and `git grep -lic baseerah docs/` returns only that same captured file set.
 - [ ] [AI] Spot-check `docs/reference/system-architecture/applications.md` and
@@ -373,9 +403,9 @@ plans/ideas/baseerah-persistence-layer.md plans/ideas/beaver-nest-persistence-la
       lowercase `` `baseerah-repo-reset/` `` illustrative-example citation at line 17 and every
       other citing file under `plans/backlog/`/`plans/ideas/` — not a hardcoded 2-file list); (2) run
       `git ls-files -z plans/backlog/ plans/ideas/ plans/in-progress/README.md | xargs -0 perl -pi -e
-      '<CANONICAL-SED-BODY>'`; (3) revert the captured files' mangled citation: `xargs -a
-      local-temp/rebrand-citations-phase4.txt -I{} perl -pi -e
-      's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}` — acceptance: `git grep -l
+      '<CANONICAL-SED-BODY>'`; (3) revert the captured files' mangled citation: `< local-temp/rebrand-citations-phase4.txt xargs -I{} perl -pi -e
+      's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}` (BSD/macOS `xargs` has no `-a`; redirect the
+      file into stdin instead) — acceptance: `git grep -l
 "baseerah-repo-reset" -- plans/backlog/ plans/ideas/ plans/in-progress/README.md | diff -
       local-temp/rebrand-citations-phase4.txt` reports no differences (the citing files, including
       `plans/in-progress/README.md`'s line-17 lowercase citation, are intact and unmangled), and
@@ -502,8 +532,9 @@ specs/apps/beaver-nest/behavior/beaver-nest-fe` — acceptance: both new paths e
 local-temp/rebrand-citations-phase6.txt` (both `.../beaver-nest-be/gherkin/README.md` and
       `.../beaver-nest-fe/gherkin/README.md` cite the archived plan-id); (2) run `git ls-files -z
       specs/apps/beaver-nest/ | xargs -0 perl -pi -e '<CANONICAL-SED-BODY>'`; (3) revert the captured
-      files' mangled citation: `xargs -a local-temp/rebrand-citations-phase6.txt -I{} perl -pi -e
-      's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}` — acceptance: `git grep -l
+      files' mangled citation: `< local-temp/rebrand-citations-phase6.txt xargs -I{} perl -pi -e
+      's/beaver-nest-repo-reset/baseerah-repo-reset/g' {}` (BSD/macOS `xargs` has no `-a`; redirect
+      the file into stdin instead) — acceptance: `git grep -l
 "baseerah-repo-reset" -- specs/apps/beaver-nest/ | diff -
       local-temp/rebrand-citations-phase6.txt` reports no differences, and `git grep -lic baseerah
 specs/apps/beaver-nest/` returns only that same captured file set.
@@ -1195,20 +1226,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                ```gherkin
-                                Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                  Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                  When nx run rhino-cli:test:integration runs
-                                  Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                  And the generated file's "name" field reads "beaver-nest-default"
-                                ```
+                                                      ```gherkin
+                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                        When nx run rhino-cli:test:integration runs
+                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                        And the generated file's "name" field reads "beaver-nest-default"
+                                                      ```
 
-                                Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                state).
+                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                      state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

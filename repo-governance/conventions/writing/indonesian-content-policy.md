@@ -1,10 +1,10 @@
 ---
-title: "Indonesian Content Policy - baseerah-fe"
-description: Policy defining when and how to create Indonesian content in baseerah-fe bilingual platform
+title: "Indonesian Content Policy - beaver-nest-fe"
+description: Policy defining when and how to create Indonesian content in beaver-nest-fe bilingual platform
 category: explanation
 subcategory: conventions
 tags:
-  - baseerah-fe
+  - beaver-nest-fe
   - indonesian
   - bilingual
   - content-policy
@@ -12,9 +12,9 @@ tags:
 created: 2026-02-07
 ---
 
-# Indonesian Content Policy - baseerah-fe
+# Indonesian Content Policy - beaver-nest-fe
 
-This document defines the policy for Indonesian language content in baseerah-fe, establishing when Indonesian content should be created and what types of content are appropriate for Indonesian translation.
+This document defines the policy for Indonesian language content in beaver-nest-fe, establishing when Indonesian content should be created and what types of content are appropriate for Indonesian translation.
 
 ## Principles Implemented/Respected
 
@@ -28,7 +28,7 @@ This convention implements the following core principles:
 
 ## Purpose
 
-This convention establishes a clear content language policy for baseerah-fe to:
+This convention establishes a clear content language policy for beaver-nest-fe to:
 
 - Define the primary language for different content types
 - Prevent redundant translation effort for technical tutorials
@@ -55,7 +55,7 @@ This convention establishes a clear content language policy for baseerah-fe to:
 
 ## Core Policy: English-First for Technical Tutorials
 
-**CRITICAL RULE**: baseerah-fe is **English-first** for technical tutorials and programming language content.
+**CRITICAL RULE**: beaver-nest-fe is **English-first** for technical tutorials and programming language content.
 
 **Rationale**:
 
@@ -324,7 +324,7 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Agent creates English tutorial only
-# apps/baseerah-fe/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/beaver-nest-fe/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # No automatic Indonesian creation
 # /id/belajar/swe/programming-languages/typescript/ does NOT exist
@@ -334,10 +334,10 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Agent creates English tutorial
-# apps/baseerah-fe/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/beaver-nest-fe/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # Agent ALSO creates Indonesian mirror (WRONG!)
-# apps/baseerah-fe/content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/beaver-nest-fe/content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 # This violates English-first policy unless explicitly requested
 ```
 
@@ -349,7 +349,7 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Create Indonesian personal essay (encouraged)
-# apps/baseerah-fe/content/id/celoteh/2024/02/refleksi-belajar-golang.md
+# apps/beaver-nest-fe/content/id/celoteh/2024/02/refleksi-belajar-golang.md
 ```
 
 **Content Focus**:
@@ -375,13 +375,13 @@ User: "Please translate the Golang Initial Setup tutorial to Indonesian. This is
 
 ```bash
 # Create Indonesian translation
-# apps/baseerah-fe/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
+# apps/beaver-nest-fe/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in English version
-echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> apps/baseerah-fe/content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> apps/beaver-nest-fe/content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in Indonesian version with machine translation disclaimer
-echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> apps/baseerah-fe/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> apps/beaver-nest-fe/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 ```
 
 **Key Points**:

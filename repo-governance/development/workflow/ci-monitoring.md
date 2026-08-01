@@ -91,7 +91,7 @@ Trigger the run, record the run ID, schedule a wakeup for 2 minutes (2-5 minutes
 
 ```bash
 # Step 1: trigger and capture run ID
-gh workflow run baseerah-fe-test-local-deploy-stag.yml
+gh workflow run beaver-nest-fe-test-local-deploy-stag.yml
 # URL output contains run ID, e.g. https://github.com/.../runs/12345678
 
 # Step 2: ScheduleWakeup(delaySeconds=120)  ← check in 2 min (default)
@@ -259,8 +259,8 @@ If the rate limit is hit mid-plan, use `ScheduleWakeup delaySeconds=2100` and re
 ### PASS: Correct — Poll single run to completion (ScheduleWakeup pattern)
 
 ```bash
-gh workflow run baseerah-fe-test-local-deploy-stag.yml
-run_id=$(gh run list --workflow=baseerah-fe-test-local-deploy-stag.yml \
+gh workflow run beaver-nest-fe-test-local-deploy-stag.yml
+run_id=$(gh run list --workflow=beaver-nest-fe-test-local-deploy-stag.yml \
   --limit=1 --json databaseId --jq '.[0].databaseId')
 # [ScheduleWakeup delaySeconds=120]  ← default 2-minute interval
 # On wakeup:
@@ -278,15 +278,15 @@ gh run watch 98765432
 ### PASS: Correct — Check before triggering, then poll
 
 ```bash
-active=$(gh run list --workflow=baseerah-fe-test-local-deploy-stag.yml \
+active=$(gh run list --workflow=beaver-nest-fe-test-local-deploy-stag.yml \
   --limit=1 --json status --jq '.[0].status')
 if [ "$active" = "in_progress" ] || [ "$active" = "queued" ]; then
   echo "Run already active — polling existing run instead of triggering new one"
-  run_id=$(gh run list --workflow=baseerah-fe-test-local-deploy-stag.yml \
+  run_id=$(gh run list --workflow=beaver-nest-fe-test-local-deploy-stag.yml \
     --limit=1 --json databaseId --jq '.[0].databaseId')
   # [ScheduleWakeup delaySeconds=120] then: gh run view "$run_id" --json status,conclusion
 else
-  gh workflow run baseerah-fe-test-local-deploy-stag.yml
+  gh workflow run beaver-nest-fe-test-local-deploy-stag.yml
 fi
 ```
 
@@ -303,9 +303,9 @@ done
 
 ```bash
 # BAD: triggers three runs within two minutes, risking concurrency cancellation
-gh workflow run baseerah-fe-test-local-deploy-stag.yml
-gh workflow run baseerah-fe-test-local-deploy-stag.yml
-gh workflow run baseerah-fe-test-local-deploy-stag.yml
+gh workflow run beaver-nest-fe-test-local-deploy-stag.yml
+gh workflow run beaver-nest-fe-test-local-deploy-stag.yml
+gh workflow run beaver-nest-fe-test-local-deploy-stag.yml
 ```
 
 ### PASS: Correct — Rate limit recovery

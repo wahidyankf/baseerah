@@ -64,10 +64,10 @@ Plans drift from reality in predictable ways. Each category maps to a verificati
 
 | Category              | Example                                                   | Verification Ritual                                                                                            |
 | --------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **File path**         | `apps/baseerah-fe/src/server/trpc.ts`                     | `Glob` or `Bash test -f`; if NEW, mark `_New file_`                                                            |
+| **File path**         | `apps/beaver-nest-fe/src/server/trpc.ts`                  | `Glob` or `Bash test -f`; if NEW, mark `_New file_`                                                            |
 | **Directory path**    | `repo-governance/conventions/writing/`                    | `Bash test -d` or `Glob` for sibling                                                                           |
 | **Symbol / function** | `unstable_cache`, `getServerSession`, `RouteConfig`       | `Grep` against the codebase or cite the import path                                                            |
-| **Nx target**         | `nx run baseerah-fe:test:quick`                           | Read `apps/baseerah-fe/project.json` or `nx show project`                                                      |
+| **Nx target**         | `nx run beaver-nest-fe:test:quick`                        | Read `apps/beaver-nest-fe/project.json` or `nx show project`                                                   |
 | **Package version**   | `next@16.0.0`, `tRPC v11`                                 | Grep `package.json` (or `go.mod`, `Cargo.toml`, `*.csproj`, etc.)                                              |
 | **API signature**     | `unstable_cache(fn, keyParts, { revalidate })`            | `web-researcher` against authoritative docs                                                                    |
 | **Command flag**      | `npx nx affected -t typecheck --parallel=cores-1`         | `<cmd> --help` or repo's documented usage in `package.json` scripts                                            |
@@ -100,7 +100,7 @@ Every internal reference in a plan MUST be verified to exist in the current comm
 
 ```bash
 # File path
-test -f apps/baseerah-fe/src/server/trpc.ts && echo OK
+test -f apps/beaver-nest-fe/src/server/trpc.ts && echo OK
 
 # Directory path
 test -d repo-governance/conventions/writing/ && echo OK
@@ -109,7 +109,7 @@ test -d repo-governance/conventions/writing/ && echo OK
 rg -lE "(^|[^A-Za-z0-9_])unstable_cache([^A-Za-z0-9_]|$)" apps/ libs/
 
 # Nx target defined
-jq -r '.targets | keys[]' apps/baseerah-fe/project.json | grep -q '^test:quick$' && echo OK
+jq -r '.targets | keys[]' apps/beaver-nest-fe/project.json | grep -q '^test:quick$' && echo OK
 
 # Package version present in package.json
 jq -r '.dependencies.next // .devDependencies.next' package.json
@@ -321,15 +321,15 @@ If `package.json` was not grep'd before writing, the version is hearsay. Verify 
 
 ### AP-2: Inventing a file path that "should exist"
 
-> "Edit `apps/baseerah-fe/src/lib/cache.ts`..."
+> "Edit `apps/beaver-nest-fe/src/lib/cache.ts`..."
 
 Cache file may or may not exist at that path. `Glob` or `test -f` first. If NEW, write `_New file_` and add a creation step to the delivery checklist.
 
 ### AP-3: Citing an Nx target that may not exist
 
-> "Run `nx run baseerah-fe:integration-test`..."
+> "Run `nx run beaver-nest-fe:integration-test`..."
 
-Nx targets vary per project. Read `project.json` or run `nx show project baseerah-fe` to enumerate real targets. The actual target is `test:integration`, not `integration-test`.
+Nx targets vary per project. Read `project.json` or run `nx show project beaver-nest-fe` to enumerate real targets. The actual target is `test:integration`, not `integration-test`.
 
 ### AP-4: Inventing a function or method name
 
@@ -414,8 +414,8 @@ Domain-specialized agents hallucinate less than generic orchestration because th
 **Annotation format** (added under the checkbox prose, before implementation notes):
 
 ```markdown
-- [ ] Edit `apps/baseerah-be/src/Domain/User.fs`: add `email: string option` field with case-insensitive
-      uniqueness constraint. Verify by running `nx run baseerah-be:test:unit` — new test
+- [ ] Edit `apps/beaver-nest-be/src/Domain/User.fs`: add `email: string option` field with case-insensitive
+      uniqueness constraint. Verify by running `nx run beaver-nest-be:test:unit` — new test
       `User_RejectsDuplicateEmailIgnoringCase` passes.
   - _Suggested executor: `swe-fsharp-dev`_
 ```
@@ -455,17 +455,17 @@ Each plan agent applies this convention at a specific point in its workflow:
 ### Good — repo-grounded file path
 
 ```markdown
-- [ ] Edit `apps/baseerah-fe/src/server/trpc.ts` [Repo-grounded] — wrap public router with
+- [ ] Edit `apps/beaver-nest-fe/src/server/trpc.ts` [Repo-grounded] — wrap public router with
       `unstable_cache(fn, keyParts, { revalidate: 300 })` per Next.js 16 docs (verified
       2026-05-03 at https://nextjs.org/docs/app/api-reference/functions/unstable_cache,
       excerpt: "unstable_cache allows caching results of expensive operations") [Web-cited].
-      Verify by running `npx nx run baseerah-fe:test:quick` — all tests pass.
+      Verify by running `npx nx run beaver-nest-fe:test:quick` — all tests pass.
 ```
 
 ### Bad — invented file path + fabricated API
 
 ```markdown
-- [ ] Edit `apps/baseerah-fe/src/lib/cache-config.ts` to enable Next.js automatic edge caching
+- [ ] Edit `apps/beaver-nest-fe/src/lib/cache-config.ts` to enable Next.js automatic edge caching
       with `enableEdgeCache(true)`. Performance improves by 40%.
 ```
 
@@ -474,7 +474,7 @@ Problems: file path was not verified (probably does not exist); `enableEdgeCache
 ### Good — refuse-on-uncertainty
 
 ```markdown
-- [ ] Add Sharia-compliant interest-free billing model to `apps/baseerah-fe/src/components/Pricing.tsx`.
+- [ ] Add Sharia-compliant interest-free billing model to `apps/beaver-nest-fe/src/components/Pricing.tsx`.
       _Unknown — verify Vercel + Stripe Sharia-compliance posture before authoring_ — see follow-up
       research item under Open Questions.
 ```

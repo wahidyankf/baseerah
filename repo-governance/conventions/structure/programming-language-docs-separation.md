@@ -1,6 +1,6 @@
 ---
 title: "Programming Language Documentation Separation Convention"
-description: "Partially historical: the docs/explanation/ style-guide scope rules (Rule 1) remain valid guidance; the ayokoding-www educational-content side and all cross-referencing rules (Rules 2-5) describe a platform removed by the Baseerah repo-reset plan and have no current applicability"
+description: "Partially historical: the docs/explanation/ style-guide scope rules (Rule 1) remain valid guidance; the ayokoding-www educational-content side and all cross-referencing rules (Rules 2-5) describe a platform removed by the BeaverNest repo-reset plan and have no current applicability"
 category: explanation
 subcategory: conventions
 tags:
@@ -16,9 +16,9 @@ created: 2026-02-04
 
 > **Historical note (partial)**: This convention originally coordinated two platforms —
 > repository-specific style guides in `docs/explanation/software-engineering/programming-languages/`
-> and educational tutorial content on `ayokoding-www`. The Baseerah repo-reset plan removed
+> and educational tutorial content on `ayokoding-www`. The BeaverNest repo-reset plan removed
 > `ayokoding-www` permanently; no app in this repo is an educational-content platform, and neither
-> `baseerah-fe` nor `baseerah-be` will be one. **Rule 1** (style-guide scope for `docs/explanation/`)
+> `beaver-nest-fe` nor `beaver-nest-be` will be one. **Rule 1** (style-guide scope for `docs/explanation/`)
 > remains valid on its own — that directory and its 168 files are kept — but **Rules 2-5** below
 > (ayokoding-www's content scope, the prerequisite-statement requirement, and the
 > cross-referencing/no-duplication rules) describe a relationship with a platform that no longer

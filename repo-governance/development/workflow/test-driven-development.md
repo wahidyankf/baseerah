@@ -99,7 +99,7 @@ for the script structure and tooling defaults (Playwright MCP for UI, `curl` for
 When in doubt, prefer the cheapest test that meaningfully exercises the behavior:
 
 - A pure function bug → unit test (fastest feedback, deterministic).
-- A database query bug → integration test (real DB via docker-compose for `baseerah-be`,
+- A database query bug → integration test (real DB via docker-compose for `beaver-nest-be`,
   in-process mocks otherwise).
 - A user-visible flow bug → E2E (Playwright) plus manual verification before merge.
 - A contract change → contract test on the OpenAPI spec round-trip; both producer and
@@ -281,8 +281,8 @@ Exempt: pure refactors, docs/governance-only plans, and non-code delivery steps.
 
 ````markdown
 - [ ] [AI] **RED**: Write failing test for discount calculation in
-      `apps/baseerah-fe/src/features/pricing/core/discount.test.ts`
-      — command: `nx run baseerah-fe:test:unit`
+      `apps/beaver-nest-fe/src/features/pricing/core/discount.test.ts`
+      — command: `nx run beaver-nest-fe:test:unit`
       — acceptance: test fails with `TypeError: calculateDiscount is not a function`
 
   **Gherkin (binds) →** "10% discount reduces price"

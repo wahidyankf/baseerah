@@ -1,10 +1,10 @@
 ---
 title: "Why It Matters Content Convention"
-description: Rule prohibiting corporate case studies and fabricated platform scenarios in Why It Matters sections of baseerah-fe tutorials; requires theoretical explanations only
+description: Rule prohibiting corporate case studies and fabricated platform scenarios in Why It Matters sections of beaver-nest-fe tutorials; requires theoretical explanations only
 category: explanation
 subcategory: conventions
 tags:
-  - baseerah-fe
+  - beaver-nest-fe
   - tutorial-content
   - factual-accuracy
   - why-it-matters
@@ -15,7 +15,7 @@ created: 2026-05-09
 # Why It Matters Content Convention
 
 This convention defines the content rules for `**Why It Matters**:` sections in
-baseerah-fe tutorials. These sections must use theoretical explanations only.
+beaver-nest-fe tutorials. These sections must use theoretical explanations only.
 Corporate case studies, anecdotal company events, and fabricated platform scenarios
 are prohibited regardless of how plausible they appear.
 
@@ -66,9 +66,9 @@ This convention eliminates the problem at the source by prohibiting the pattern 
 
 ### What This Convention Covers
 
-- All `**Why It Matters**:` sections in baseerah-fe tutorial files
-- Applies to both by-example tutorials (`apps/baseerah-fe/content/en/learn/**/by-example/`)
-- Applies to in-the-field guides (`apps/baseerah-fe/content/en/learn/**/in-the-field/`)
+- All `**Why It Matters**:` sections in beaver-nest-fe tutorial files
+- Applies to both by-example tutorials (`apps/beaver-nest-fe/content/en/learn/**/by-example/`)
+- Applies to in-the-field guides (`apps/beaver-nest-fe/content/en/learn/**/in-the-field/`)
 - Applies to all future tutorial formats that include a Why It Matters section
 - Applies equally to English and Indonesian content
 

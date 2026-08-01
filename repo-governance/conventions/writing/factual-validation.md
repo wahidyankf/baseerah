@@ -856,7 +856,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 
 **Agent:** `docs-checker`, `docs-fixer`
 
-### Educational Content (e.g., a future tutorial-format web app such as `baseerah-fe`)
+### Educational Content (e.g., a future tutorial-format web app such as `beaver-nest-fe`)
 
 **Validation Focus:**
 
@@ -866,7 +866,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 - Indonesian/English consistency
 - Educational sequences are logical
 
-### Platform Content (e.g., `baseerah-fe` marketing/product pages)
+### Platform Content (e.g., `beaver-nest-fe` marketing/product pages)
 
 **Validation Focus:**
 

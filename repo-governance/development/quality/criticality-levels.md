@@ -54,7 +54,7 @@ See [Fixer Confidence Levels Convention](./fixer-confidence-levels.md) for compl
 
 ### 1. Missing Required Field Breaks Content Validation
 
-**File**: `apps/baseerah-fe/content/en/programming/python/_index.md:3`
+**File**: `apps/beaver-nest-fe/content/en/programming/python/_index.md:3`
 **Criticality**: CRITICAL - Breaks Next.js content validation
 **Confidence**: HIGH - Field objectively missing from frontmatter
 
@@ -93,7 +93,7 @@ See [Fixer Confidence Levels Convention](./fixer-confidence-levels.md) for compl
 - Agent `name` field doesn't match filename (breaks agent discovery)
 - Broken internal link to non-existent file in documentation
 
-**Next.js Content (`baseerah-fe`, planned)**:
+**Next.js Content (`beaver-nest-fe`, planned)**:
 
 - Missing required `title` field (content validation fails)
 - Invalid frontmatter syntax (YAML parsing error)

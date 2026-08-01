@@ -154,22 +154,22 @@ fix(project-name): add missing Gherkin step definitions for existing commands
 ### PASS: Fixing a preexisting blocker
 
 ```
-Developer: I'm implementing a new feature in baseerah-fe.
-           Running test:quick, I see that baseerah-be has
+Developer: I'm implementing a new feature in beaver-nest-fe.
+           Running test:quick, I see that beaver-nest-be has
            a failing typecheck due to a stale codegen output.
 
 Action:
-1. Run nx run baseerah-be:codegen to regenerate types
-2. Run nx run baseerah-be:typecheck to confirm it passes
-3. Commit: "fix(baseerah-be): regenerate types from updated contract"
-4. Continue with baseerah-fe feature work
+1. Run nx run beaver-nest-be:codegen to regenerate types
+2. Run nx run beaver-nest-be:typecheck to confirm it passes
+3. Commit: "fix(beaver-nest-be): regenerate types from updated contract"
+4. Continue with beaver-nest-fe feature work
 ```
 
 ### FAIL: Bypassing the blocker
 
 ```
-Developer: I'm implementing a new feature in baseerah-fe.
-           Running test:quick, I see that baseerah-be has
+Developer: I'm implementing a new feature in beaver-nest-fe.
+           Running test:quick, I see that beaver-nest-be has
            a failing typecheck. That's not my project.
 
 Action: git push --no-verify

@@ -145,7 +145,7 @@ Counts are acceptable in the following contexts:
 
 - **Index documents themselves** (e.g., the README in `.claude/agents/` may state the count as a footer note, but this single location becomes the authoritative source)
 - **Generated audit reports** in `generated-reports/` (these are point-in-time snapshots)
-- **Commit messages** describing a specific change ("add 3 new agents for baseerah-fe")
+- **Commit messages** describing a specific change ("add 3 new agents for beaver-nest-fe")
 - **Technical specifications** where the count is a constraint, not a description (e.g., "each agent has exactly 1 name field")
 - **Diátaxis category counts** and other truly static sets (4 categories, 2 delivery modes, etc.)
 
@@ -155,16 +155,16 @@ If a count is needed anywhere, the index document for that collection is the sin
 
 **The authoritative sources for collection sizes**:
 
-| Collection       | Authoritative Index                                          |
-| ---------------- | ------------------------------------------------------------ |
-| AI Agents        | `.claude/agents/README.md`                                   |
-| agent skills     | `.claude/skills/README.md`                                   |
-| Conventions      | `repo-governance/conventions/README.md`                      |
-| Principles       | `repo-governance/principles/README.md`                       |
-| Dev Practices    | `repo-governance/development/README.md`                      |
-| Workflows        | `repo-governance/workflows/README.md`                        |
-| BE Gherkin Specs | `specs/apps/baseerah/behavior/baseerah-be/gherkin/README.md` |
-| FE Gherkin Specs | `specs/apps/baseerah/behavior/baseerah-fe/gherkin/README.md` |
+| Collection       | Authoritative Index                                                |
+| ---------------- | ------------------------------------------------------------------ |
+| AI Agents        | `.claude/agents/README.md`                                         |
+| agent skills     | `.claude/skills/README.md`                                         |
+| Conventions      | `repo-governance/conventions/README.md`                            |
+| Principles       | `repo-governance/principles/README.md`                             |
+| Dev Practices    | `repo-governance/development/README.md`                            |
+| Workflows        | `repo-governance/workflows/README.md`                              |
+| BE Gherkin Specs | `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/README.md` |
+| FE Gherkin Specs | `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/README.md` |
 
 ## Examples
 

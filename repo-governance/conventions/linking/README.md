@@ -22,7 +22,7 @@ Linking conventions ensure consistent, maintainable internal references across t
 Standards for linking between documentation files across the repository, including relative path
 conventions, `.md` extension requirements, and cross-directory reference patterns — for example,
 linking from `rhino-cli` CLI docs into shared `repo-governance/` conventions, or from a future
-`baseerah-fe`/`baseerah-be` app's docs back into the same conventions tree.
+`beaver-nest-fe`/`beaver-nest-be` app's docs back into the same conventions tree.
 
 ## Principles Implemented/Respected
 

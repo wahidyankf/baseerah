@@ -540,7 +540,7 @@ All fixer agents MUST:
 
 ### 1. Missing Required Field Breaks Content Validation
 
-**File**: `apps/baseerah-fe/content/en/programming/python/_index.md:3`
+**File**: `apps/beaver-nest-fe/content/en/programming/python/_index.md:3`
 **Criticality**: CRITICAL - Breaks Next.js content validation
 **Confidence**: HIGH - Field objectively missing from frontmatter
 
@@ -841,7 +841,7 @@ FAIL: All agent files - Frontmatter comment detection
 - [Tutorial Convention](../../conventions/tutorials/general.md)
 - [Content Quality Principles](../../conventions/writing/quality.md) - Universal content quality standards
 - [README Quality Convention](../../conventions/writing/readme-quality.md)
-- [Indonesian Content Policy](../../conventions/writing/indonesian-content-policy.md) - baseerah-fe bilingual content policy (English-first for technical tutorials)
+- [Indonesian Content Policy](../../conventions/writing/indonesian-content-policy.md) - beaver-nest-fe bilingual content policy (English-first for technical tutorials)
 
 **Infrastructure:**
 - [Temporary Files Convention](../infra/temporary-files.md) - Where to store fix reports (`generated-reports/`)

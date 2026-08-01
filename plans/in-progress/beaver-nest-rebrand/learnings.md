@@ -18,3 +18,11 @@ repo-wide inbound link to the old path — a targeted single-string sed scoped t
 string, leaving the referencing file's own full `baseerah`→`beaver-nest` prose sweep to its
 designated phase. Verify with `git grep -l "<old-path>"` before push to catch every reference, and
 re-run `md links validate` before every push, not just at the phase whose own gate mentions it.
+
+## Phase 2: BSD `xargs` on macOS has no `-a` flag
+
+The plan's own reference commands use `xargs -a <file> -I{} ...` to feed a captured citation-file
+list into a revert command. This is GNU-xargs syntax; BSD `xargs` (macOS, this dev machine) has no
+`-a` option and errors immediately (`xargs: invalid option -- a`). Portable equivalent:
+`< <file> xargs -I{} ...` (redirect stdin instead of `-a`). Every later phase's citation-revert step
+that copies this exact command needs this substitution when executing on macOS.

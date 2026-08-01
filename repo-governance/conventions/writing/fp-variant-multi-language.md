@@ -1,6 +1,6 @@
 ---
 title: "FP-Variant Multi-Language Convention"
-description: Bidirectional idiomatic-language rule requiring F# AND Clojure tabs in FP-variant by-example tutorials in baseerah-fe, with each language kept idiomatically native rather than mechanically translated from the other
+description: Bidirectional idiomatic-language rule requiring F# AND Clojure tabs in FP-variant by-example tutorials in beaver-nest-fe, with each language kept idiomatically native rather than mechanically translated from the other
 category: explanation
 subcategory: conventions
 tags:
@@ -8,14 +8,14 @@ tags:
   - clojure
   - fsharp
   - by-example
-  - baseerah-fe
+  - beaver-nest-fe
   - tutorial
 created: 2026-05-17
 ---
 
 # FP-Variant Multi-Language Convention
 
-FP-variant by-example tutorials in baseerah-fe teach functional programming concepts through architecture examples. Without a normative language rule, authors may present only one language, mechanically translate idioms across languages, or present non-idiomatic code that misleads learners. This convention establishes the bidirectional idiomatic-language rule: every FP-variant by-example page presents code in F# AND Clojure using tabbed format, and each language stays idiomatic to its own community and runtime rather than being forced into the shape of the other.
+FP-variant by-example tutorials in beaver-nest-fe teach functional programming concepts through architecture examples. Without a normative language rule, authors may present only one language, mechanically translate idioms across languages, or present non-idiomatic code that misleads learners. This convention establishes the bidirectional idiomatic-language rule: every FP-variant by-example page presents code in F# AND Clojure using tabbed format, and each language stays idiomatic to its own community and runtime rather than being forced into the shape of the other.
 
 ## Principles Implemented/Respected
 
@@ -42,7 +42,7 @@ This convention exists to:
 
 ### What This Convention Covers
 
-- All FP-variant by-example tutorial files in `apps/baseerah-fe/content/en/learn/legacy/software-engineering/software-architecture/*/in-fp-by-example/` — specifically `beginner.md`, `intermediate.md`, and `advanced.md` level pages.
+- All FP-variant by-example tutorial files in `apps/beaver-nest-fe/content/en/learn/legacy/software-engineering/software-architecture/*/in-fp-by-example/` — specifically `beginner.md`, `intermediate.md`, and `advanced.md` level pages.
 - Overview pages (`overview.md`) under those paths, for any code snippets they contain.
 - Both English and Indonesian variants of those files when they exist.
 
@@ -308,9 +308,9 @@ The applicable content-checker agent enforces checks 1, 5, and 6. Checks 2, 3, a
 - [Content Quality Principles](./quality.md) — universal markdown quality standards (active voice, heading nesting, accessibility) that apply to all content including FP-variant by-example pages.
 - [Why It Matters Content Convention](./why-it-matters-content.md) — prohibits fabricated scenarios and unsourced claims in `**Why It Matters**:` sections; applies to both tabs in FP-variant examples.
 - [Programming Language Content Standard](../tutorials/programming-language-content.md) — Full Set Tutorial Package architecture; FP-variant by-example is Component 3 (code-first priority track).
-- [Programming Language Documentation Separation](../structure/programming-language-docs-separation.md) — scope boundary between baseerah-fe tutorial content and docs/explanation/ language reference material.
+- [Programming Language Documentation Separation](../structure/programming-language-docs-separation.md) — scope boundary between beaver-nest-fe tutorial content and docs/explanation/ language reference material.
 
-**In-FP-by-example overview pages** (under `apps/baseerah-fe/content/en/learn/legacy/software-engineering/software-architecture/`, path per topic — e.g. `patterns-and-principles/in-fp-by-example/overview.md`, `domain-driven-design-ddd/in-fp-by-example/overview.md`, `hexagonal-architecture/in-fp-by-example/overview.md`, `finite-state-machine-fsm/in-fp-by-example/overview.md`):
+**In-FP-by-example overview pages** (under `apps/beaver-nest-fe/content/en/learn/legacy/software-engineering/software-architecture/`, path per topic — e.g. `patterns-and-principles/in-fp-by-example/overview.md`, `domain-driven-design-ddd/in-fp-by-example/overview.md`, `hexagonal-architecture/in-fp-by-example/overview.md`, `finite-state-machine-fsm/in-fp-by-example/overview.md`):
 
 **Repository Architecture:**
 

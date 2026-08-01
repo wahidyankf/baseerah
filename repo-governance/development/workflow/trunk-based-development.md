@@ -455,7 +455,7 @@ how each mode changes Step 0 (worktree entry), the push target at each phase gat
 boundary**, not at every phase — see
 [Plans Organization Convention §PRs Open at Delivery Boundaries](../../conventions/structure/plans.md#prs-open-at-delivery-boundaries-not-every-phase-hard-rule).
 
-Note: this does **not** affect environment branches (e.g., `prod-baseerah-fe`, `stag-baseerah-be`, once those apps are scaffolded and their deployment workflows exist). Those follow their own documented deployment workflows.
+Note: this does **not** affect environment branches (e.g., `prod-beaver-nest-fe`, `stag-beaver-nest-be`, once those apps are scaffolded and their deployment workflows exist). Those follow their own documented deployment workflows.
 
 ## When Branches Are Appropriate
 
@@ -512,26 +512,26 @@ Environment branches serve deployment purposes, not feature isolation:
 
 **Key distinction**: Environment branches reflect deployment state, not development work.
 
-**Example (planned): `prod-baseerah-fe`**
+**Example (planned): `prod-beaver-nest-fe`**
 
-Once `baseerah-fe` is scaffolded, it is expected to follow the same production deployment branch
+Once `beaver-nest-fe` is scaffolded, it is expected to follow the same production deployment branch
 pattern this repo has used for its Next.js applications:
 
-- **Branch**: `prod-baseerah-fe`
-- **Purpose**: Triggers automatic deployment to `baseerah-fe`'s production domain via Vercel
-- **Location**: Deploys `apps/baseerah-fe/` (Next.js application)
+- **Branch**: `prod-beaver-nest-fe`
+- **Purpose**: Triggers automatic deployment to `beaver-nest-fe`'s production domain via Vercel
+- **Location**: Deploys `apps/beaver-nest-fe/` (Next.js application)
 - **Workflow** (automated):
   1. All development happens in `main`
-  2. A `baseerah-fe-test-local-deploy-prod.yml` GitHub Actions workflow detects changes in `apps/baseerah-fe/`, builds, then force-pushes `main` to `prod-baseerah-fe`
-  3. Push to `prod-baseerah-fe` triggers production deployment via Vercel
-- **Important**: Never commit directly to `prod-baseerah-fe` outside the CI automation
+  2. A `beaver-nest-fe-test-local-deploy-prod.yml` GitHub Actions workflow detects changes in `apps/beaver-nest-fe/`, builds, then force-pushes `main` to `prod-beaver-nest-fe`
+  3. Push to `prod-beaver-nest-fe` triggers production deployment via Vercel
+- **Important**: Never commit directly to `prod-beaver-nest-fe` outside the CI automation
 
 **Why this is TBD-compliant**:
 
 - Development still happens on `main` (trunk)
 - No feature isolation in branches
-- `prod-baseerah-fe` is a deployment trigger, not a development workspace
-- Changes flow from `main` to `prod-baseerah-fe`, never the reverse
+- `prod-beaver-nest-fe` is a deployment trigger, not a development workspace
+- Changes flow from `main` to `prod-beaver-nest-fe`, never the reverse
 - Consistent with TBD principles: environment branches are for release management, not feature development
 
 **Reference**: [TrunkBasedDevelopment.com - Branch for Release](https://trunkbaseddevelopment.com/branch-for-release/) explicitly describes release branches as acceptable in TBD.

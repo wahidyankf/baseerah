@@ -26,14 +26,14 @@ This convention implements the following core principles:
 
 ## Purpose
 
-This convention establishes universal quality standards that apply to **all markdown content** in the repository. It ensures consistent writing quality, accessibility compliance, and professional presentation across documentation, app content (e.g., the future `baseerah-fe`), planning documents, and repository root files. These standards make content readable, maintainable, and accessible to all users including those using assistive technologies.
+This convention establishes universal quality standards that apply to **all markdown content** in the repository. It ensures consistent writing quality, accessibility compliance, and professional presentation across documentation, app content (e.g., the future `beaver-nest-fe`), planning documents, and repository root files. These standards make content readable, maintainable, and accessible to all users including those using assistive technologies.
 
 ## Scope
 
 These principles apply to markdown content in:
 
 - **docs/** - Documentation (tutorials, how-to guides, reference, explanations)
-- **apps/** - `rhino-cli` docs, plus future `baseerah-fe`/`baseerah-be` content
+- **apps/** - `rhino-cli` docs, plus future `beaver-nest-fe`/`beaver-nest-be` content
 - **plans/** - Project planning documents
 - **Repository root files** - README.md, CONTRIBUTING.md, SECURITY.md, etc.
 
@@ -368,7 +368,7 @@ Heading hierarchy is mechanically enforced on a **prose allowlist** (default-den
 **Exempt paths** (skipped by the heading validator):
 
 - `.claude/**` — agent definition and skill files
-- `apps/baseerah-fe/content/` (once scaffolded) — site content using frontmatter title as H1, per
+- `apps/beaver-nest-fe/content/` (once scaffolded) — site content using frontmatter title as H1, per
   the website-app heading convention
 - `plans/done/` — frozen archived plans
 - All other paths not in the allowlist above
@@ -849,7 +849,7 @@ Coverage percentages are allowed because they indicate **depth/scope**, not **ti
 **Where This Applies**:
 
 - All tutorial content (`docs/tutorials/`)
-- Educational content in any future tutorial-format app (e.g., `baseerah-fe`)
+- Educational content in any future tutorial-format app (e.g., `beaver-nest-fe`)
 - How-to guides that teach concepts
 - Reference documentation with learning components
 

@@ -133,7 +133,7 @@ Next.js framework constructs are effects and belong in `shell/`:
 
 The Next.js content app in this repo follows this pattern:
 
-- `apps/baseerah-fe/` — content/landing/search/navigation features, each split into `core/` (parsers, schemas,
+- `apps/beaver-nest-fe/` — content/landing/search/navigation features, each split into `core/` (parsers, schemas,
   builders) and `shell/` (fs repositories, tRPC routers, React components)
 
 ## Related

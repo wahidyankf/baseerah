@@ -214,7 +214,7 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 | Type      | `type:`     | `app`, `lib`, `e2e`                   | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
 | Platform  | `platform:` | `cli`, `nextjs`, `axum`, `playwright` | Apps and e2e projects          | Framework or runtime environment                              |
 | Language  | `lang:`     | `ts`, `rust`, `dotnet`                | Projects with application code | Primary language of source code                               |
-| Domain    | `domain:`   | `baseerah`, `tooling`, `ui`           | Always                         | Business or product domain                                    |
+| Domain    | `domain:`   | `beaver-nest`, `tooling`, `ui`        | Always                         | Business or product domain                                    |
 
 ### Special Rules
 
@@ -224,14 +224,14 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 
 ### Current Project Tags
 
-| Project        | Status                      | Tags                                                                                      |
-| -------------- | --------------------------- | ----------------------------------------------------------------------------------------- |
-| `rhino-cli`    | Current                     | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`                             |
-| `web-ui`       | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                    |
-| `web-ui-token` | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                    |
-| `rust-commons` | Current                     | `["type:lib", "lang:rust"]`                                                               |
-| `baseerah-fe`  | Planned, not yet scaffolded | `["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"]`                           |
-| `baseerah-be`  | Planned, not yet scaffolded | `["type:app", "domain:baseerah"]` (platform/lang TBD pending backend tech-stack decision) |
+| Project          | Status                      | Tags                                                                                         |
+| ---------------- | --------------------------- | -------------------------------------------------------------------------------------------- |
+| `rhino-cli`      | Current                     | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`                                |
+| `web-ui`         | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                       |
+| `web-ui-token`   | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                       |
+| `rust-commons`   | Current                     | `["type:lib", "lang:rust"]`                                                                  |
+| `beaver-nest-fe` | Planned, not yet scaffolded | `["type:app", "platform:nextjs", "lang:ts", "domain:beaver-nest"]`                           |
+| `beaver-nest-be` | Planned, not yet scaffolded | `["type:app", "domain:beaver-nest"]` (platform/lang TBD pending backend tech-stack decision) |
 
 ### Example: Complete Tag Declaration
 
@@ -284,9 +284,9 @@ is compulsory for all apps and E2E runners.
 
 **Product backend `typecheck` examples** (all statically typed backends use `typecheck` with `dependsOn: ["codegen"]` where codegen applies):
 
-| Backend                                                         | `typecheck` command                                           |
-| --------------------------------------------------------------- | ------------------------------------------------------------- |
-| `baseerah-be` (planned; illustrative — e.g. an F#/.NET backend) | `dotnet build apps/baseerah-be/baseerah-be.fsproj -c Release` |
+| Backend                                                            | `typecheck` command                                                 |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `beaver-nest-be` (planned; illustrative — e.g. an F#/.NET backend) | `dotnet build apps/beaver-nest-be/beaver-nest-be.fsproj -c Release` |
 
 > For polyglot backend `typecheck` patterns (Go, F#, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, Clojure), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -395,7 +395,7 @@ TypeScript and other statically typed projects:
 | ----------- | -------------------------------------------------------------------------- |
 | `typecheck` | Run the type checker without emitting artifacts (`tsc --noEmit`, `mypy .`) |
 
-**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. A planned `baseerah-be` example (illustrative — backend tech TBD): `dotnet build apps/baseerah-be/baseerah-be.fsproj -c Release`.
+**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. A planned `beaver-nest-be` example (illustrative — backend tech TBD): `dotnet build apps/beaver-nest-be/beaver-nest-be.fsproj -c Release`.
 
 **Not required for dynamically typed languages** (plain JavaScript, Ruby) or languages where
 compilation already enforces types and `build` covers it — except when an additional static
@@ -441,10 +441,10 @@ Rust, .NET, TypeScript apps:
 
 Two integration test patterns exist depending on project type:
 
-| Pattern             | Projects                                                      | Requirement                                                                                                                                                | Cacheable |
-| ------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Docker + PostgreSQL | API backends (`baseerah-be`, once scaffolded)                 | Real PostgreSQL via `docker-compose.integration.yml`; calls application code directly (no HTTP layer); runs all shared Gherkin scenarios; fresh DB per run | No        |
-| In-process mocking  | `baseerah-fe` (MSW, once scaffolded), Rust CLIs (cucumber-rs) | In-process mocking only (MSW / cucumber-rs / mock fixtures); no real database or external services; fully deterministic                                    | Yes       |
+| Pattern             | Projects                                                         | Requirement                                                                                                                                                | Cacheable |
+| ------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Docker + PostgreSQL | API backends (`beaver-nest-be`, once scaffolded)                 | Real PostgreSQL via `docker-compose.integration.yml`; calls application code directly (no HTTP layer); runs all shared Gherkin scenarios; fresh DB per run | No        |
+| In-process mocking  | `beaver-nest-fe` (MSW, once scaffolded), Rust CLIs (cucumber-rs) | In-process mocking only (MSW / cucumber-rs / mock fixtures); no real database or external services; fully deterministic                                    | Yes       |
 
 **API backends** expose `test:integration` which runs `docker compose -f docker-compose.integration.yml up --abort-on-container-exit --build`. This starts a fresh PostgreSQL container, runs migrations, and executes all shared Gherkin scenarios by calling application service/repository functions directly — no HTTP layer. Each backend has a `docker-compose.integration.yml` (postgres + test runner services) and a `Dockerfile.integration` (language runtime + test execution). Coverage is NOT measured at the integration level — coverage comes from `test:unit` only.
 
@@ -488,7 +488,7 @@ Playwright suites (`*-e2e`):
 **BDD suites**: When the E2E project uses playwright-bdd, `test:e2e` runs
 `npx bddgen && npx playwright test`. The `bddgen` step regenerates `.features-gen/`
 spec files from the Gherkin feature files before Playwright executes them.
-Once `baseerah-fe` and `baseerah-be` are scaffolded, `apps/baseerah-be-e2e/project.json` (or
+Once `beaver-nest-fe` and `beaver-nest-be` are scaffolded, `apps/beaver-nest-be-e2e/project.json` (or
 equivalent) would serve as the canonical product-app example.
 
 **API backend `test:integration` with docker-compose**: API backends expose `test:integration`
@@ -513,18 +513,18 @@ exercised at the correct test level. It is enforced by the pre-push hook alongsi
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--shared-steps`             | Validates steps across ALL source files rather than requiring 1:1 file-to-feature matching; used by all projects. `@wip`-tagged scenarios are fully exempt from step-gap reporting in this mode (same rule as the `@covers`-marker coverage model) — a step definition is never required for a scenario tagged `@wip` |
 | `--exclude-dir test-support` | Excludes E2E-only `test-support` API spec files from non-E2E projects; used by demo-be backends and demo-fe frontends                                                                                                                                                                                                 |
-| `--exclude-source-dir <dir>` | Excludes a directory name from the **app-tree source walk only** (never the `.feature`-file walk); for a directory name legitimate in both trees but that must not be scanned as source, e.g. a future `baseerah-fe`'s Next.js `content/` directory colliding with a Gherkin `content/` spec folder                   |
+| `--exclude-source-dir <dir>` | Excludes a directory name from the **app-tree source walk only** (never the `.feature`-file walk); for a directory name legitimate in both trees but that must not be scanned as source, e.g. a future `beaver-nest-fe`'s Next.js `content/` directory colliding with a Gherkin `content/` spec folder                |
 
 **Project coverage status**:
 
-| Project group                                                       | Status             | Notes                                                                                                                                    |
-| ------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Rust CLI apps (`rhino-cli`)                                         | Enforced           | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                                                                 |
-| API backends (`baseerah-be`, once scaffolded)                       | Enforced (planned) | `--shared-steps --exclude-dir test-support`                                                                                              |
-| E2E runners (`baseerah-be-e2e`, `baseerah-fe-e2e`, once scaffolded) | Enforced (planned) | `--shared-steps` only; test-support steps are implemented here                                                                           |
-| Content / Web UI platform (`baseerah-fe`, once scaffolded)          | Enforced (planned) | `--shared-steps` (add `--exclude-source-dir content` if its Next.js `content/` directory collides with a Gherkin `content/` spec folder) |
-| Libraries (`rust-commons`)                                          | Enforced           | `--shared-steps`                                                                                                                         |
-| Projects with genuine step gaps                                     | Deferred           | `specs:behavior:coverage` target exists but validation deferred until step implementation is complete                                    |
+| Project group                                                             | Status             | Notes                                                                                                                                    |
+| ------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Rust CLI apps (`rhino-cli`)                                               | Enforced           | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                                                                 |
+| API backends (`beaver-nest-be`, once scaffolded)                          | Enforced (planned) | `--shared-steps --exclude-dir test-support`                                                                                              |
+| E2E runners (`beaver-nest-be-e2e`, `beaver-nest-fe-e2e`, once scaffolded) | Enforced (planned) | `--shared-steps` only; test-support steps are implemented here                                                                           |
+| Content / Web UI platform (`beaver-nest-fe`, once scaffolded)             | Enforced (planned) | `--shared-steps` (add `--exclude-source-dir content` if its Next.js `content/` directory collides with a Gherkin `content/` spec folder) |
+| Libraries (`rust-commons`)                                                | Enforced           | `--shared-steps`                                                                                                                         |
+| Projects with genuine step gaps                                           | Deferred           | `specs:behavior:coverage` target exists but validation deferred until step implementation is complete                                    |
 
 All apps and E2E runners are required to have a `specs:behavior:coverage` target. Projects with
 genuine step gaps have the target deferred temporarily until step implementations are complete.
@@ -537,11 +537,11 @@ source files as inputs so the cache invalidates when specs or step definitions c
   "executor": "nx:run-commands",
   "cache": true,
   "inputs": [
-    "{workspaceRoot}/specs/apps/baseerah-be/**/*.feature",
+    "{workspaceRoot}/specs/apps/beaver-nest-be/**/*.feature",
     "{projectRoot}/src/**/*.rs"
   ],
   "options": {
-    "command": "rhino-cli specs behavior-coverage validate specs/apps/baseerah-be --shared-steps --exclude-dir test-support apps/baseerah-be/src"
+    "command": "rhino-cli specs behavior-coverage validate specs/apps/beaver-nest-be --shared-steps --exclude-dir test-support apps/beaver-nest-be/src"
   }
 }
 ```
@@ -556,9 +556,9 @@ Accessibility testing is compulsory for all UI-related projects. It operates at 
 **Static a11y linting** (enforced via the `lint` target at all three gates: pre-push hook, PR
 quality gate, and scheduled Test CI workflows):
 
-| Project                                        | Static a11y tool           |
-| ---------------------------------------------- | -------------------------- |
-| `baseerah-fe` (once scaffolded), `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
+| Project                                           | Static a11y tool           |
+| ------------------------------------------------- | -------------------------- |
+| `beaver-nest-fe` (once scaffolded), `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
 
 Static a11y linting catches common accessibility violations at compile time: missing alt text,
 missing ARIA labels, invalid ARIA attributes, missing form labels, and incorrect role usage.
@@ -764,7 +764,7 @@ Standard" (2026-07-03, since archived and removed from `plans/done/`).
 ## Codegen Dependency Chain
 
 Apps with OpenAPI contract specs share a `codegen` target that generates types and
-encoders/decoders from the spec (e.g., `specs/apps/baseerah/containers/contracts/`) into
+encoders/decoders from the spec (e.g., `specs/apps/beaver-nest/containers/contracts/`) into
 `generated-contracts/`.
 
 The dependency chain is:

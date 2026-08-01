@@ -105,7 +105,7 @@ Brand tokens express each app's visual identity. Apps define these in their own 
 
 **App-specific extensions**
 
-- `baseerah-fe` (once scaffolded): apps commonly extend the shared palette with their own tokens
+- `beaver-nest-fe` (once scaffolded): apps commonly extend the shared palette with their own tokens
   following this same per-app pattern — for example, chart tokens (`--chart-1` through `--chart-5`)
   for data visualization, or sidebar tokens (`--sidebar-background`, `--sidebar-foreground`,
   `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-accent`,
@@ -162,7 +162,7 @@ removed from the app portfolio).
 
 The bare variable holds only the HSL components (no `hsl()` wrapper), and the `@theme` alias wraps it.
 
-**Direct value** (the recommended pattern, previously used by `ayokoding-www`; adopt this for `baseerah-fe`):
+**Direct value** (the recommended pattern, previously used by `ayokoding-www`; adopt this for `beaver-nest-fe`):
 
 ```css
 /* globals.css */

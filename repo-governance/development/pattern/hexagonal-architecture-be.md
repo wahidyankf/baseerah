@@ -16,7 +16,7 @@ created: 2026-05-26
 
 Backend apps combine hexagonal architecture with Domain-Driven Design (DDD) bounded contexts. Each bounded context
 lives under `contexts/<name>/` and owns its hexagonal layers independently. DDD applies **only** to backend apps
-(`baseerah-be`). Next.js web apps do not use hexagonal/DDD at all — they use the simpler
+(`beaver-nest-be`). Next.js web apps do not use hexagonal/DDD at all — they use the simpler
 functional-core / imperative-shell split (`features/<name>/{core,shell}/`) — see
 [Functional Core / Imperative Shell — Web Apps](./functional-core-imperative-shell-web.md).
 
@@ -54,7 +54,7 @@ and `api/mcp/` are reserved for future transports. All transport-specific code s
 
 ## Directory Layout
 
-### F#/Giraffe — `baseerah-be`
+### F#/Giraffe — `beaver-nest-be`
 
 ```
 src/

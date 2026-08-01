@@ -498,7 +498,7 @@ A specialized workflow pattern that achieves **perfect quality state** by fixing
 **When to use**:
 
 - Repository-wide validation (repo-rules-quality-gate)
-- Content quality assurance (plan-quality-gate, baseerah-fe-content-quality-gate)
+- Content quality assurance (plan-quality-gate, beaver-nest-fe-content-quality-gate)
 - Pre-release quality gates
 - Periodic health checks
 
@@ -774,7 +774,7 @@ termination: Content passes all quality checks
 inputs:
   - name: content-type
     type: enum
-    values: [docs, baseerah-fe, specs, readme]
+    values: [docs, beaver-nest-fe, specs, readme]
     required: true
   - name: scope
     type: string

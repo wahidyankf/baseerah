@@ -113,20 +113,20 @@ remains fully accessible — it is just no longer inlined.
 ❌ **Before** (inline-expanded, 2,700 bytes):
 
 ```markdown
-### baseerah-fe
+### beaver-nest-fe
 
 - **URL**: TBD (not yet deployed)
-- **Production branch**: `prod-baseerah-fe`
+- **Production branch**: `prod-beaver-nest-fe`
 - **Framework**: Next.js 16 (App Router, TypeScript)
 - **Deployment**: Vercel
 - **Dev port**: 19310
-- **E2E tests**: `baseerah-fe-e2e`
+- **E2E tests**: `beaver-nest-fe-e2e`
 ```
 
 ✅ **After** (progressive disclosure, ~50 bytes added to a table):
 
 ```markdown
-| `baseerah-fe` | TBD | 19310 | `prod-baseerah-fe` |
+| `beaver-nest-fe` | TBD | 19310 | `prod-beaver-nest-fe` |
 ```
 
 See per-app `README.md` for framework, deployment, and E2E details.

@@ -54,19 +54,19 @@ confirmation and shell access.
 
 All tools checked by `rhino-cli doctor`:
 
-| #   | Tool       | Required Version      | Version Source               | Manager        |
-| --- | ---------- | --------------------- | ---------------------------- | -------------- |
-| 1   | git        | Any                   | (no config file)             | System/Brew    |
-| 2   | volta      | Any                   | (no config file)             | curl script    |
-| 3   | node       | 24.13.1               | package.json > volta.node    | Volta          |
-| 4   | npm        | 11.10.1               | package.json > volta.npm     | Volta          |
-| 5   | dotnet     | >= global.json major  | apps/baseerah-be/global.json | Brew/Script    |
-| 6   | docker     | Any                   | (no config file)             | Docker Desktop |
-| 7   | jq         | Any                   | (no config file)             | Brew           |
-| 8   | playwright | (matches npm version) | node_modules                 | npx            |
+| #   | Tool       | Required Version      | Version Source                  | Manager        |
+| --- | ---------- | --------------------- | ------------------------------- | -------------- |
+| 1   | git        | Any                   | (no config file)                | System/Brew    |
+| 2   | volta      | Any                   | (no config file)                | curl script    |
+| 3   | node       | 24.13.1               | package.json > volta.node       | Volta          |
+| 4   | npm        | 11.10.1               | package.json > volta.npm        | Volta          |
+| 5   | dotnet     | >= global.json major  | apps/beaver-nest-be/global.json | Brew/Script    |
+| 6   | docker     | Any                   | (no config file)                | Docker Desktop |
+| 7   | jq         | Any                   | (no config file)                | Brew           |
+| 8   | playwright | (matches npm version) | node_modules                    | npx            |
 
 Note: `golang` was removed from this table (2026-05-25) — `ayokoding-cli` and `ose-cli`, the only
-Go-based tools this repo ever built, migrated to Rust, and neither survived the Baseerah reset. No
+Go-based tools this repo ever built, migrated to Rust, and neither survived the BeaverNest reset. No
 app in this repo (current or planned) requires a Go toolchain.
 
 ## Quick Start: `doctor --fix`
@@ -225,7 +225,7 @@ volta install npm@11.10.1
 ### Phase 4: Go Ecosystem (Retired)
 
 This phase is intentionally empty. `ayokoding-cli` and `ose-cli` — the only Go-based tools this
-repo ever built — migrated to Rust (2026-05-25), and neither survived the Baseerah reset. No app
+repo ever built — migrated to Rust (2026-05-25), and neither survived the BeaverNest reset. No app
 in this repo (current or planned) requires a Go toolchain; skip straight to Phase 6.
 
 ---
@@ -341,7 +341,7 @@ The required version is pinned in `.tool-versions` (currently `elixir 1.19.5-otp
 
 **Condition**: `{input.scope} == full`
 
-Required for: `baseerah-be`; also polyglot demo apps in ose-primer (extracted 2026-04-18)
+Required for: `beaver-nest-be`; also polyglot demo apps in ose-primer (extracted 2026-04-18)
 
 #### 9.1 Install .NET SDK
 
@@ -352,7 +352,7 @@ brew install dotnet
 # Linux — https://learn.microsoft.com/en-us/dotnet/core/install/linux
 ```
 
-The required major version is in `apps/baseerah-be/global.json` under `sdk.version`.
+The required major version is in `apps/beaver-nest-be/global.json` under `sdk.version`.
 
 **Success criteria**: `dotnet --version` shows a version with the same or higher major version
 as `global.json`.
@@ -420,7 +420,7 @@ This also triggers Husky to install git hooks (pre-commit, commit-msg, pre-push)
 (from `rhino-cli env backup`), restore them now:
 
 ```bash
-# Restore .env files from default backup location (~/baseerah-env-backup)
+# Restore .env files from default backup location (~/beaver-nest-env-backup)
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env restore --force
 
 # Include uncommitted config files (AI tool settings, Docker overrides, direnv, etc.)
@@ -438,7 +438,7 @@ This creates `.env` files from all `.env.example` templates in `infra/dev/`. Use
 to overwrite existing files.
 
 **Success criteria**: Restored files appear in their original app directories (e.g.,
-`apps/baseerah-fe/.env.local`, `apps/baseerah-be/.env`).
+`apps/beaver-nest-fe/.env.local`, `apps/beaver-nest-be/.env`).
 
 **On failure**: If no backup exists, copy `.env.example` to `.env` in each app you plan to
 work on and fill in the required values.
@@ -514,7 +514,7 @@ pushes are fast.
 
 ```bash
 # Validate Docker + PostgreSQL integration against the backend
-nx run baseerah-be:test:integration
+nx run beaver-nest-be:test:integration
 ```
 
 **Success criteria**: Integration tests pass. Docker starts PostgreSQL, runs migrations, and
@@ -526,11 +526,11 @@ executes Gherkin scenarios against a real database.
 
 ```bash
 # Start a backend
-nx run baseerah-be:dev &
+nx run beaver-nest-be:dev &
 
 # Wait for it to be ready, then run E2E
 sleep 5
-nx run baseerah-be-e2e:test:e2e
+nx run beaver-nest-be-e2e:test:e2e
 
 # Stop the backend
 kill %1

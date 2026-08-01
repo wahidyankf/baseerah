@@ -49,7 +49,7 @@ This convention establishes comprehensive standards for tutorial content across 
 ### What This Convention Does NOT Cover
 
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
-- **baseerah-fe-specific implementation** - Platform-specific frontmatter and navigation details covered in the `baseerah-fe` developing content skill (once scaffolded)
+- **beaver-nest-fe-specific implementation** - Platform-specific frontmatter and navigation details covered in the `beaver-nest-fe` developing content skill (once scaffolded)
 - **Non-tutorial content** - How-To guides, Reference, Explanation covered separately
 - **Tutorial validation** - Covered by docs-tutorial-checker agent
 
@@ -61,11 +61,11 @@ Tutorials are **learning-oriented** documentation that guide learners through ac
 
 **Scope**: Applies to **all tutorial content in the repository**, including:
 
-- **apps/baseerah-fe/content/** - Planned canonical location for programming language, educational,
-  and platform tutorials, once `baseerah-fe` is scaffolded
+- **apps/beaver-nest-fe/content/** - Planned canonical location for programming language, educational,
+  and platform tutorials, once `beaver-nest-fe` is scaffolded
 - **Any other location** - Tutorial content regardless of directory
 
-**Implementation Notes**: While these standards apply universally, implementation details (frontmatter, weight values, navigation structure) vary by platform and are covered in site-specific skills (see the `baseerah-fe` developing content skill, once scaffolded).
+**Implementation Notes**: While these standards apply universally, implementation details (frontmatter, weight values, navigation structure) vary by platform and are covered in site-specific skills (see the `beaver-nest-fe` developing content skill, once scaffolded).
 
 ## Diátaxis Principles for Tutorials
 
@@ -1494,7 +1494,7 @@ One might consider using this approach. [impersonal]
 
 ### Exemplary Tutorial: Quick Start Structure
 
-Once `baseerah-fe` is scaffolded, see tutorials under `apps/baseerah-fe/content/` as examples. Future tutorials should exemplify:
+Once `beaver-nest-fe` is scaffolded, see tutorials under `apps/beaver-nest-fe/content/` as examples. Future tutorials should exemplify:
 
 **These exemplify**: - Clear structure with all required sections - Progressive scaffolding from simple to complex - Visual completeness with diagrams and formulas - Hands-on practice exercises and challenges - Narrative flow with teacher voice - Real-world relevance throughout
 

@@ -48,7 +48,7 @@ After pushing app or library code — to the PR branch under `*-to-pr` modes, or
 
 | App(s) Changed                                              | Workflow to Trigger                                                                        |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `apps/baseerah-fe/`, `apps/baseerah-be/`                    | `baseerah-app-test-local-deploy-stag.yml`                                                  |
+| `apps/beaver-nest-fe/`, `apps/beaver-nest-be/`              | `beaver-nest-app-test-local-deploy-stag.yml`                                               |
 | `apps/rhino-cli/`                                           | `pr-quality-gate.yml` (no deploy workflow — the CLI ships as a binary, not a deployed app) |
 | `libs/`, shared infrastructure, or cross-cutting governance | All workflows for apps in blast radius                                                     |
 
@@ -74,10 +74,10 @@ See [CI Monitoring Convention](./ci-monitoring.md) for:
 git diff HEAD~1 --name-only
 
 # Trigger a specific workflow on main
-gh workflow run baseerah-app-test-local-deploy-stag.yml
+gh workflow run beaver-nest-app-test-local-deploy-stag.yml
 
 # List recent runs for a workflow to find the run ID
-gh run list --workflow=baseerah-app-test-local-deploy-stag.yml --limit=5
+gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --limit=5
 
 # Check run status (call every 2-5 min via ScheduleWakeup — do NOT use gh run watch for long jobs)
 gh run view <run-id> --json conclusion,status,jobs
@@ -147,15 +147,15 @@ The following actions are explicitly forbidden under this convention:
 ### PASS: Correct post-push verification
 
 ```
-Agent: Pushed feat(baseerah-fe): update hero section to origin main.
+Agent: Pushed feat(beaver-nest-fe): update hero section to origin main.
 
-Identifying blast radius: apps/baseerah-fe/ changed.
+Identifying blast radius: apps/beaver-nest-fe/ changed.
 
 Triggering CI:
-  gh workflow run baseerah-app-test-local-deploy-stag.yml
+  gh workflow run beaver-nest-app-test-local-deploy-stag.yml
 
 Monitoring:
-  gh run list --workflow=baseerah-app-test-local-deploy-stag.yml --limit=3
+  gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --limit=3
   gh run watch 12345678
 
 Result: All steps passed. Work is complete.
@@ -164,7 +164,7 @@ Result: All steps passed. Work is complete.
 ### FAIL: Declaring done before CI verification
 
 ```
-Agent: Pushed feat(baseerah-fe): update hero section to origin main.
+Agent: Pushed feat(beaver-nest-fe): update hero section to origin main.
 
 Work is complete.
 ```
@@ -185,22 +185,22 @@ The pre-push hook does not run integration tests, E2E tests, or deployment workf
 ### PASS: Fixing a CI failure discovered during verification
 
 ```
-Agent: Pushed feat(baseerah-be): update auth endpoint to origin main.
+Agent: Pushed feat(beaver-nest-be): update auth endpoint to origin main.
 
 Triggering CI:
-  gh workflow run baseerah-app-test-local-deploy-stag.yml
+  gh workflow run beaver-nest-app-test-local-deploy-stag.yml
 
-Monitoring: run 12345679 failed — integration test failure in baseerah-be.
+Monitoring: run 12345679 failed — integration test failure in beaver-nest-be.
 
 Root cause: Database migration step missing from integration test fixture.
 
 Fix:
-  git add apps/baseerah-be/tests/fixtures/migration.sql
-  git commit -m "fix(baseerah-be): add missing migration fixture for auth integration test"
+  git add apps/beaver-nest-be/tests/fixtures/migration.sql
+  git commit -m "fix(beaver-nest-be): add missing migration fixture for auth integration test"
   git push origin main
 
 Re-triggering CI:
-  gh workflow run baseerah-app-test-local-deploy-stag.yml
+  gh workflow run beaver-nest-app-test-local-deploy-stag.yml
 
 Result: All steps passed. Work is complete.
 ```

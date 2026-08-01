@@ -6,7 +6,7 @@ subcategory: conventions
 tags:
   - programming-languages
   - tutorials
-  - baseerah-fe
+  - beaver-nest-fe
   - education
   - structure
 created: 2025-12-27
@@ -14,7 +14,7 @@ created: 2025-12-27
 
 # Programming Language Tutorial Structure Convention
 
-**Defines the dual-path tutorial directory organization for programming language content on `baseerah-fe` (once scaffolded).**
+**Defines the dual-path tutorial directory organization for programming language content on `beaver-nest-fe` (once scaffolded).**
 
 This convention standardizes how programming language tutorials are organized as a **Full Set Tutorial Package** with 5 mandatory components: foundational tutorials (initial-setup, quick-start), two complementary learning tracks (narrative-driven by-concept and code-first by-example, both achieving 95% coverage), and practical cookbook for problem-solving. All 5 components are required for complete language content.
 
@@ -41,7 +41,7 @@ This convention ensures:
 **Applies to:**
 
 - **All programming language tutorial structures** across the repository:
-  - **baseerah-fe** (`apps/baseerah-fe/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`, once scaffolded) - canonical location
+  - **beaver-nest-fe** (`apps/beaver-nest-fe/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`, once scaffolded) - canonical location
   - **Any other location** where programming language tutorials are organized
 - Languages: Java, Elixir, Golang, Kotlin, Python, Rust (and future additions)
 
@@ -100,7 +100,7 @@ Languages with only by-concept path (by-example not yet created):
 
 ## The Full Set Tutorial Package Components
 
-A complete programming language on `baseerah-fe` (once scaffolded) requires **all 5 mandatory components**:
+A complete programming language on `beaver-nest-fe` (once scaffolded) requires **all 5 mandatory components**:
 
 ### Component 1-2: Foundational Tutorials (Mandatory)
 
@@ -306,7 +306,7 @@ tutorials/
 
 ### Weight Values
 
-Uses `baseerah-fe`'s level-based weight system with powers of 10 ranges:
+Uses `beaver-nest-fe`'s level-based weight system with powers of 10 ranges:
 
 **Path Calculation:**
 
@@ -368,7 +368,7 @@ tutorials/
 2. **Content INSIDE folder** is one level deeper → uses level N+1 base weight
 3. **Weights RESET per parent**: by-concept/ and by-example/ both start at 10000000 for overview.md (different parents, independent sequences)
 
-See the `baseerah-fe` developing content skill for complete level-based weight system details.
+See the `beaver-nest-fe` developing content skill for complete level-based weight system details.
 
 ## Full Set Completeness Requirements
 
@@ -409,8 +409,8 @@ tags: ["language-name", "tutorial-type", "skill-level"]
 
 **Rules:**
 
-- **No categories field**: Not used in `baseerah-fe` content
-- **No author field**: Not used in `baseerah-fe` content
+- **No categories field**: Not used in `beaver-nest-fe` content
+- **No author field**: Not used in `beaver-nest-fe` content
 - **Date format**: UTC+7 with ISO 8601 format
 - **Weight field**: MANDATORY - uses level-based system
 - **Tags**: JSON array format `["tag1", "tag2"]` (NOT dash-based YAML)
@@ -704,7 +704,7 @@ If a language is missing components (created before Full Set requirement), follo
 **Step 1: Audit current state**
 
 ```bash
-cd apps/baseerah-fe/content/en/learn/software-engineering/programming-language/[language]/tutorials/
+cd apps/beaver-nest-fe/content/en/learn/software-engineering/programming-language/[language]/tutorials/
 ls -la  # Check what exists
 ```
 

@@ -89,10 +89,10 @@ ASCII art and Mermaid solve different representational problems.
 
 ```
 apps/
-├── baseerah-fe/
+├── beaver-nest-fe/
 │   ├── src/
 │   └── tests/
-└── baseerah-be/
+└── beaver-nest-be/
     ├── src/
     └── tests/
 ```
@@ -1956,7 +1956,7 @@ This section governs how draft UI screens are represented inside plan documents 
 category alongside Mermaid diagrams and ASCII art, and keeping them here avoids convention sprawl.
 
 Originating plan: `plan-doc-ui-mockup-convention` (2026-06-16, since archived and removed from
-`plans/done/` by the Baseerah repo reset; the decisions it reached are captured in this section).
+`plans/done/` by the BeaverNest repo reset; the decisions it reached are captured in this section).
 
 ### Principles in Practice (UI Mockups)
 
@@ -2241,7 +2241,7 @@ alternatives are informed by real-world patterns rather than invented from a bla
 
 > **Historical note**: the worked example below was `plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/`,
 > demonstrating the full funnel on the (now-deleted) `ayokoding-www` Salary Savings Calculator's
-> compare-all screen. That plan and its assets were removed by the Baseerah repo reset along with
+> compare-all screen. That plan and its assets were removed by the BeaverNest repo reset along with
 > `plans/done/` in full; the example files no longer exist in this repo (they remain in the upstream
 > `ose-public` history). The stage descriptions below are kept as prose narration of what a
 > completed funnel looks like — the rule itself (this section's Scope and Principles above) is

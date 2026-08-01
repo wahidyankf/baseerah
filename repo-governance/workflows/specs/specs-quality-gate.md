@@ -6,7 +6,7 @@ termination: "Zero findings at the configured mode threshold on two consecutive 
 inputs:
   - name: folders
     type: file-list
-    description: "Explicit list of spec folders to validate (e.g., [specs/apps/baseerah-be, specs/apps/baseerah-fe]). Each folder and its subfolders are validated. Cross-folder consistency is checked between listed folders."
+    description: "Explicit list of spec folders to validate (e.g., [specs/apps/beaver-nest-be, specs/apps/beaver-nest-fe]). Each folder and its subfolders are validated. Cross-folder consistency is checked between listed folders."
     required: true
   - name: mode
     type: enum
@@ -54,7 +54,7 @@ fixes iteratively until all issues are resolved.
 
 **Key Design Principle**: This workflow only validates folders you explicitly list. It does not
 discover or scan the entire specs/ tree. Subfolders are included automatically — listing
-`specs/apps/baseerah-fe` includes `specs/apps/baseerah-fe/behavior/baseerah-fe/gherkin/`, etc.
+`specs/apps/beaver-nest-fe` includes `specs/apps/beaver-nest-fe/behavior/beaver-nest-fe/gherkin/`, etc.
 When multiple folders are listed, cross-folder consistency is checked between them (contradictions,
 coverage gaps, terminology drift).
 
@@ -90,9 +90,9 @@ the preferred approach when these agents exist as defined delegated agent types.
 **How to Execute**:
 
 ```
-User: "Run specs validation for specs/apps/baseerah-be"
-User: "Run specs validation for specs/apps/baseerah-be and specs/apps/baseerah-fe in strict mode"
-User: "Run specs validation for specs/apps/baseerah-be, specs/apps/baseerah-fe, specs/apps/rhino with max-iterations=5"
+User: "Run specs validation for specs/apps/beaver-nest-be"
+User: "Run specs validation for specs/apps/beaver-nest-be and specs/apps/beaver-nest-fe in strict mode"
+User: "Run specs validation for specs/apps/beaver-nest-be, specs/apps/beaver-nest-fe, specs/apps/rhino with max-iterations=5"
 ```
 
 The AI will:
@@ -107,7 +107,7 @@ The AI will:
 **Fallback (Manual Mode)**:
 
 ```
-User: "Run specs validation for specs/apps/baseerah-be in manual mode"
+User: "Run specs validation for specs/apps/beaver-nest-be in manual mode"
 ```
 
 The AI executes checker and fixer logic directly using Read/Write/Edit tools in the main
@@ -303,12 +303,12 @@ Report final status and summary.
 ### Single Folder (Normal Strictness)
 
 ```
-User: "Run specs validation for specs/apps/baseerah-be"
+User: "Run specs validation for specs/apps/beaver-nest-be"
 ```
 
 The AI will:
 
-- Validate `specs/apps/baseerah-be/` and all its subfolders
+- Validate `specs/apps/beaver-nest-be/` and all its subfolders
 - Fix CRITICAL and HIGH findings (missing READMEs, wrong counts, broken links)
 - Report MEDIUM/LOW findings without fixing them
 - Skip cross-folder consistency (only one folder listed)
@@ -316,7 +316,7 @@ The AI will:
 ### Multiple Folders — Cross-Folder Consistency
 
 ```
-User: "Run specs validation for specs/apps/baseerah-be and specs/apps/baseerah-fe"
+User: "Run specs validation for specs/apps/beaver-nest-be and specs/apps/beaver-nest-fe"
 ```
 
 The AI will:
@@ -330,7 +330,7 @@ The AI will:
 ### Strict Mode After Refactor
 
 ```
-User: "Run specs validation for specs/apps/baseerah-be, specs/apps/baseerah-fe in strict mode"
+User: "Run specs validation for specs/apps/beaver-nest-be, specs/apps/beaver-nest-fe in strict mode"
 ```
 
 The AI will:
@@ -342,7 +342,7 @@ The AI will:
 ### Comprehensive Audit (OCD Mode with Bounds)
 
 ```
-User: "Run specs validation for specs/apps/baseerah-be, specs/apps/baseerah-fe, specs/apps/rhino in ocd mode with max-iterations=10"
+User: "Run specs validation for specs/apps/beaver-nest-be, specs/apps/beaver-nest-fe, specs/apps/rhino in ocd mode with max-iterations=10"
 ```
 
 The AI will:
@@ -354,14 +354,14 @@ The AI will:
 
 ## Iteration Example
 
-Typical execution flow (folders: `[specs/apps/baseerah-be, specs/apps/baseerah-fe]`):
+Typical execution flow (folders: `[specs/apps/beaver-nest-be, specs/apps/beaver-nest-fe]`):
 
 ```
 Iteration 1:
-  Check baseerah-be → 4 findings (1 CRITICAL, 2 HIGH, 1 MEDIUM)
+  Check beaver-nest-be → 4 findings (1 CRITICAL, 2 HIGH, 1 MEDIUM)
     Examples: "Spec Tree Shape: missing containers/ folder [HIGH]",
               "Adoption Gaps: journal context has no Gherkin specs [HIGH]"
-  Check baseerah-fe → 3 findings (0 CRITICAL, 2 HIGH, 1 LOW)
+  Check beaver-nest-fe → 3 findings (0 CRITICAL, 2 HIGH, 1 LOW)
     Examples: "Drift Detection: routes-and-screens.md lists /stats but no matching route in app code [HIGH]"
   Cross-folder check → 5 findings (0 CRITICAL, 3 HIGH, 1 MEDIUM, 1 LOW)
   Total: 12 findings (1 CRITICAL, 7 HIGH, 2 MEDIUM, 2 LOW)

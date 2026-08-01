@@ -397,7 +397,7 @@ new pattern, rule, or gap surfaced during execution.
 ### FAIL: Code change landed inline instead of backlogged
 
 ```markdown
-**Routing**: `apps/baseerah-be` (code) — routed INLINE, landed in commit `def5678` of this
+**Routing**: `apps/beaver-nest-be` (code) — routed INLINE, landed in commit `def5678` of this
 governance plan's PR.
 ```
 

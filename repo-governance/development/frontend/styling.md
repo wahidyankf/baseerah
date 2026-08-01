@@ -14,7 +14,7 @@ created: 2026-03-28
 
 # Styling Convention
 
-CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across the repo's frontend apps, including the planned `baseerah-fe`.
+CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across the repo's frontend apps, including the planned `beaver-nest-fe`.
 
 ## Tailwind v4 Directives
 
@@ -25,11 +25,11 @@ Each app's `globals.css` uses a specific set of Tailwind v4 directives. Use only
 @import "tailwindcss";
 
 /* Content scan path — required when files live outside the default scan root */
-/* e.g. baseerah-fe would need this if its source lives in a non-default location */
+/* e.g. beaver-nest-fe would need this if its source lives in a non-default location */
 @source "../../src/**/*.{ts,tsx}";
 
 /* Tailwind plugins */
-/* e.g. baseerah-fe would need @tailwindcss/typography for prose content */
+/* e.g. beaver-nest-fe would need @tailwindcss/typography for prose content */
 @plugin "@tailwindcss/typography";
 
 /* Dark mode variant — class-based (.dark), not media-query-based */
@@ -54,7 +54,7 @@ Each app's `globals.css` uses a specific set of Tailwind v4 directives. Use only
 }
 ```
 
-See `apps/baseerah-fe/src/app/globals.css` for the full reference implementation, once `baseerah-fe` is scaffolded.
+See `apps/beaver-nest-fe/src/app/globals.css` for the full reference implementation, once `beaver-nest-fe` is scaffolded.
 
 ## Utility-First Approach
 
@@ -63,7 +63,7 @@ Apply styles with Tailwind utility classes directly in TSX components. Do NOT wr
 ```tsx
 /* Correct — utility classes in TSX */
 export function Card({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-lg border border-border bg-card p-6 shadow-sm">{children}</div>;
+  return <div className="border-border bg-card rounded-lg border p-6 shadow-sm">{children}</div>;
 }
 ```
 
@@ -109,7 +109,7 @@ only `!important` (or removing the inline style at its source) can override it. 
 `plans/done/2026-07-16__web-ui-code-block-copy-button/learnings.md`): the light-theme code
 background rendered pure white instead of the intended `#f6f8fa`. **Any future app that renders
 Markdown/MDX code blocks via `rehype-pretty-code` with `keepBackground: true` (for example, a
-scaffolded `baseerah-fe`) will hit the same inline-style-vs-cascade conflict** and needs the same
+scaffolded `beaver-nest-fe`) will hit the same inline-style-vs-cascade conflict** and needs the same
 `!important` escape hatch (or a `keepBackground: false` config change) rather than a mechanical CSS
 edit.
 
@@ -127,7 +127,7 @@ Use `@apply` only inside `@layer base` for base/reset styles. Using `@apply` ins
 
 /* Wrong — @apply in component styles */
 .my-button {
-  @apply rounded-lg bg-primary px-4 py-2 text-white;
+  @apply bg-primary rounded-lg px-4 py-2 text-white;
 }
 ```
 
@@ -273,7 +273,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-**Known historical violation (now moot — `organiclever-www` removed)**: its `globals.css` declared `font-family: Arial, Helvetica, sans-serif` inside `@layer utilities` instead of a `next/font` declaration in the app's root layout. Avoid repeating this pattern in `baseerah-fe` once it is scaffolded — declare fonts via `next/font`, not a CSS layer.
+**Known historical violation (now moot — `organiclever-www` removed)**: its `globals.css` declared `font-family: Arial, Helvetica, sans-serif` inside `@layer utilities` instead of a `next/font` declaration in the app's root layout. Avoid repeating this pattern in `beaver-nest-fe` once it is scaffolded — declare fonts via `next/font`, not a CSS layer.
 
 ## Fluid Typography
 

@@ -446,7 +446,7 @@ After frontmatter, agents should follow this structure:
 
 **Required Sections:**
 
-1. **Title (H1)**: Must follow pattern `# [Name] Agent`. Exception: App-scoped agents may use `# [Role] for [app-name]` (e.g., `# Content Checker for baseerah-fe`)
+1. **Title (H1)**: Must follow pattern `# [Name] Agent`. Exception: App-scoped agents may use `# [Role] for [app-name]` (e.g., `# Content Checker for beaver-nest-fe`)
 2. **Core Expertise/Responsibility (H2)**: Clear purpose statement
 3. **Reference Documentation (H2)**: Links to relevant conventions and guidance
 
@@ -479,7 +479,7 @@ PASS: Good - General agents (no scope prefix):
 - plan-execution-checker.md
 - readme-maker.md
 
-PASS: Good - App-scoped agents (illustrative pattern — no app-scoped agents currently exist; all were removed in the Baseerah reset):
+PASS: Good - App-scoped agents (illustrative pattern — no app-scoped agents currently exist; all were removed in the BeaverNest reset):
 - apps-example-app-checker.md
 - apps-example-app-deployer.md
 
@@ -500,7 +500,7 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 
 1. **`apps-[app-name]-`** - Agent works ONLY with a specific app
    - App-specific validation, deployment, structure management
-   - No app-scoped agents currently exist (all were removed in the Baseerah reset); illustrative
+   - No app-scoped agents currently exist (all were removed in the BeaverNest reset); illustrative
      examples: `apps-example-app-checker`, `apps-example-app-deployer`
 
 2. **`libs-[lib-name]-`** - Agent works ONLY with a specific library
@@ -516,7 +516,7 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 
 **Scope naming rules:**
 
-- App/lib names must match directory names exactly (e.g., `baseerah-fe` matches `apps/baseerah-fe/`)
+- App/lib names must match directory names exactly (e.g., `beaver-nest-fe` matches `apps/beaver-nest-fe/`)
 - Use kebab-case throughout (no camelCase, PascalCase, or snake_case)
 - Hyphens `-` separate all parts of the agent name (consistent kebab-case throughout)
 - Agent name after scope uses standard kebab-case patterns
@@ -773,7 +773,7 @@ The content below is platform-specific. It documents the concrete translation ap
 **Edge Case Notes:**
 
 - **\*Yellow with Write**: Some Yellow fixer agents (e.g., readme-fixer, repo-rules-fixer) may have Write tool for audit report generation. Documented exception.
-- **\*Purple Bash-only**: Deployers only need Bash for git/deployment orchestration (no deployer agents currently exist — all were removed in the Baseerah reset; the pattern remains documented for any future deployer agent). Purple without Write/Edit is valid for Bash-only orchestrators.
+- **\*Purple Bash-only**: Deployers only need Bash for git/deployment orchestration (no deployer agents currently exist — all were removed in the BeaverNest reset; the pattern remains documented for any future deployer agent). Purple without Write/Edit is valid for Bash-only orchestrators.
 - **\*\*Green with Write + Edit**: Link checker agents (docs-link-checker) also have Edit and Write tools for cache file management, but their primary role is validation (checker). Color is green to reflect primary role. See "Link Checker Agents Note" below.
 - **\*\*\*Green research agent (`web-researcher`)**: The `web-researcher` agent has the `researcher` role suffix and `color: green`. Green is used because the agent's purpose is validation-adjacent research — verifying external claims and gathering current information — which sits in the validation family rather than content creation. See "Research Agent Note" below.
 
@@ -880,7 +880,7 @@ Start: What is the agent's primary capability?
   - Execute deployment orchestration (purple's "executes plans/orchestrates tasks")
   - Don't create or edit files, only run git/deployment commands
   - Edge case: purple without Write/Edit tools (Bash-only orchestration)
-  - No deployer agents currently exist (all were removed in the Baseerah reset); pattern retained for future deployer agents
+  - No deployer agents currently exist (all were removed in the BeaverNest reset); pattern retained for future deployer agents
 - **Fixers with Write tool**: Investigate actual usage
   - Yellow (Fixers) should have Edit but NOT Write
   - If Write is needed for creating new convention files → keep yellow, document exception
@@ -1838,12 +1838,12 @@ If information cannot be verified: (1) State the limitation explicitly, (2) Prov
 
 ### Git Worktree Awareness
 
-Agents spawned via the Agent tool (delegated agents) run with a working directory that may be a git worktree, not the main checkout. For example, the active worktree may be at `/Users/wkf/ose-projects/baseerah/.claude/worktrees/repo/` while the main checkout is at `/Users/wkf/ose-projects/baseerah/`. Reading a file using an absolute path from the main checkout returns stale content from the wrong tree and causes false verification failures.
+Agents spawned via the Agent tool (delegated agents) run with a working directory that may be a git worktree, not the main checkout. For example, the active worktree may be at `/Users/wkf/ose-projects/beaver-nest/.claude/worktrees/repo/` while the main checkout is at `/Users/wkf/ose-projects/beaver-nest/`. Reading a file using an absolute path from the main checkout returns stale content from the wrong tree and causes false verification failures.
 
 **Rules for file access in agents**:
 
 1. **Prefer relative paths** — Use paths relative to the current working directory when reading or writing files. This resolves correctly regardless of which worktree the agent runs in.
-2. **Never hardcode main-checkout absolute paths** — Do not construct absolute paths by prepending the known main-checkout root (e.g., `/Users/wkf/ose-projects/baseerah/repo-governance/...`). These paths bypass the active worktree and return main-tree content.
+2. **Never hardcode main-checkout absolute paths** — Do not construct absolute paths by prepending the known main-checkout root (e.g., `/Users/wkf/ose-projects/beaver-nest/repo-governance/...`). These paths bypass the active worktree and return main-tree content.
 3. **Read files fresh before verifying** — When a checker or fixer agent verifies that a fix was applied, it must read the file again from the current working directory. It must not rely on a previously cached read from a different path.
 4. **Confirm the working directory when uncertain** — If an agent cannot determine which worktree it runs in, it should use `Bash` (`pwd`) to confirm the working directory before constructing any path.
 5. **Initialize the full toolchain in the root worktree after creating or entering a worktree — two steps, in order** — When an agent creates a worktree via `git worktree add`, the `EnterWorktree` tool, or an `isolation: "worktree"` configuration, or when an agent begins a session inside an existing worktree, it MUST immediately run BOTH of the following in the root repository worktree, in order: (a) `npm install` to keep `node_modules/` consistent with `package-lock.json` (ensures Nx task caching, builds, tests, and linting function correctly across all worktrees), and (b) `npm run doctor -- --fix` to actively converge the polyglot toolchains managed by `rhino-cli doctor` (Rust, .NET/F#, TypeScript/Node). Doing only the first step is NOT sufficient: `package.json`'s `postinstall` hook runs `npm run doctor || true`, and the trailing `|| true` deliberately swallows toolchain drift so that `npm install` can complete while the native toolchain is broken. The explicit `npm run doctor -- --fix` invocation is the only action that guarantees convergence. The rule is triggered by execution mode (any worktree entry), not by intent (even "docs-only" worktree sessions go through both steps, because the pre-push hook can fan out to arbitrary language tasks via `nx affected -t typecheck lint test:quick specs:coverage`). See [Worktree Toolchain Initialization](../workflow/worktree-setup.md) for the full rationale, procedure, and relationship to [Native-First Toolchain Management](../workflow/native-first-toolchain.md).
@@ -1858,7 +1858,7 @@ Read: repo-governance/development/agents/ai-agents.md
 
 <!-- FAIL: Hardcoded main-checkout path — reads stale content when run in a worktree -->
 
-Read: /Users/wkf/ose-projects/baseerah/repo-governance/development/agents/ai-agents.md
+Read: /Users/wkf/ose-projects/beaver-nest/repo-governance/development/agents/ai-agents.md
 ```
 
 **Consequence of violation**: A checker agent reads a file from the main checkout after a fixer has already corrected it in the active worktree. The checker reports the issue as "not fixed" because it compared against stale content, producing a false negative and blocking the workflow.
@@ -2466,7 +2466,7 @@ This repository maintains **multi-harness compatibility** across multiple AI cod
     ├── rules/
     │   └── 00-agents-md.md # Pointer directing Amazon Q to read AGENTS.md
     └── cli-agents/
-        └── baseerah-default.json # Minimal Amazon Q agent definition
+        └── beaver-nest-default.json # Minimal Amazon Q agent definition
 ```
 
 ### Source of Truth Hierarchy

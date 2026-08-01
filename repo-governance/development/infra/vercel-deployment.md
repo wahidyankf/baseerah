@@ -50,7 +50,7 @@ is invisible to Vercel unless it is explicitly added to `buildCommand`.
 ## Why This Matters
 
 Nx `dependsOn` is an orchestration instruction for the Nx task runner. When you run `nx build
-baseerah-fe` locally (once scaffolded), Nx resolves the dependency graph and runs `generate-indexes`
+beaver-nest-fe` locally (once scaffolded), Nx resolves the dependency graph and runs `generate-indexes`
 and `generate-search-data` first, then `next build`.
 
 Vercel bypasses Nx entirely. It calls `next build` (or the configured `buildCommand`) in the app
@@ -112,9 +112,9 @@ Include any directory that contains build-time generated files the runtime depen
 
 No app in this repo is currently deployed to Vercel — every previously Vercel-deployed Next.js app
 (`ayokoding-www`, `organiclever-www`, `organiclever-app-web`, `ose-www`, `wahidyankf-www`) was removed
-in the repo reset. Once `baseerah-fe` (the planned Next.js frontend) is scaffolded, audit its
+in the repo reset. Once `beaver-nest-fe` (the planned Next.js frontend) is scaffolded, audit its
 `project.json` for a `build` target `dependsOn` chain and follow [The Pattern](#the-pattern) above to
-keep `apps/baseerah-fe/vercel.json`'s `buildCommand` in sync.
+keep `apps/beaver-nest-fe/vercel.json`'s `buildCommand` in sync.
 
 ## When to Check
 
@@ -139,7 +139,7 @@ absent at runtime.
 
 ### Pitfall 2: Assuming Nx orchestration applies to Vercel builds
 
-**Scenario**: A developer runs `nx build baseerah-fe` and confirms the full pipeline works, then
+**Scenario**: A developer runs `nx build beaver-nest-fe` and confirms the full pipeline works, then
 assumes Vercel will do the same.
 
 **Fix**: `nx build` and Vercel's build are independent pipelines. `vercel.json`'s `buildCommand`
@@ -161,13 +161,13 @@ Vercel project settings).
 
 **Fix**: Confirm the Vercel project's root directory setting. Scripts in `buildCommand` run
 relative to that directory. In this monorepo, `buildCommand` runs from the app directory (e.g.,
-`apps/baseerah-fe/`).
+`apps/beaver-nest-fe/`).
 
 ## Examples
 
-### PASS: `baseerah-fe` — `buildCommand` mirrors `dependsOn`
+### PASS: `beaver-nest-fe` — `buildCommand` mirrors `dependsOn`
 
-`apps/baseerah-fe/project.json`:
+`apps/beaver-nest-fe/project.json`:
 
 ```json
 "build": {
@@ -175,7 +175,7 @@ relative to that directory. In this monorepo, `buildCommand` runs from the app d
 }
 ```
 
-`apps/baseerah-fe/vercel.json`:
+`apps/beaver-nest-fe/vercel.json`:
 
 ```json
 {
@@ -187,7 +187,7 @@ Both entries are present and in the same order.
 
 ### FAIL: `dependsOn` target added but `vercel.json` not updated
 
-`apps/baseerah-fe/project.json`:
+`apps/beaver-nest-fe/project.json`:
 
 ```json
 "build": {
@@ -195,7 +195,7 @@ Both entries are present and in the same order.
 }
 ```
 
-`apps/baseerah-fe/vercel.json`:
+`apps/beaver-nest-fe/vercel.json`:
 
 ```json
 {

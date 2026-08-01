@@ -138,7 +138,7 @@ the root MIT license by default.
 
 ```
 apps/
-  baseerah-fe/
+  beaver-nest-fe/
     LICENSE          <-- MIT (product app)
     src/
     ...

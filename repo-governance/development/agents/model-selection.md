@@ -158,7 +158,7 @@ color: green
 - **docs-file-manager** -- performs deterministic file operations (move, rename, delete) with `git mv`, kebab-case pattern matching, and mechanical link updates; no judgment calls required
 
 Deployers previously anchored this tier (fixed git/deployment command sequences with no reasoning);
-no deployer agents currently exist (all were removed in the Baseerah reset). The tier guidance
+no deployer agents currently exist (all were removed in the BeaverNest reset). The tier guidance
 remains valid for any future deployer agent.
 
 **Frontmatter**: Specify `model: haiku` explicitly.

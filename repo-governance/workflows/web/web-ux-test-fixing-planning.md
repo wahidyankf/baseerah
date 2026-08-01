@@ -231,7 +231,7 @@ cross-tester completeness critic in Phase 3.5.
 - Verify every URL in `target-urls` returns HTTP 200 (curl). If the server is down, abort and ask
   the user to start it — the testers cannot run against a dead target.
 - Resolve `plan-mode`. For `new`, resolve `plan-identifier` (input, else derive from the target,
-  e.g. `baseerah-fe-calc-test-fixing`). For `merge`, require `target-plan-path` to point at an
+  e.g. `beaver-nest-fe-calc-test-fixing`). For `merge`, require `target-plan-path` to point at an
   existing folder under `plans/in-progress/`; abort if absent.
 - Resolve `breakpoints` and `locales` (defaults = testers' own standard coverage; `locales` defaults
   to ALL locales the target supports — discovered from the app's i18n config or locale-prefixed

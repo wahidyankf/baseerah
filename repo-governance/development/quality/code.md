@@ -475,7 +475,7 @@ git commit -m "fix: correct validation logic"
 The pre-reset multi-app repository had a project-local `links check` subcommand
 (`ayokoding-cli links check`) that validated Hugo-style internal links in `ayokoding-www` content on
 every `test:quick` run, in addition to the repo-wide markdown link validation described above. That
-app and its dedicated CLI were removed in the Baseerah repo-reset; no app in this repo currently has
+app and its dedicated CLI were removed in the BeaverNest repo-reset; no app in this repo currently has
 a project-local link-validation layer. If a future content-heavy app needs Hugo-path-style internal
 link validation beyond the repo-wide `rhino-cli md validate links` check, add an equivalent
 project-local `links:check` Nx target and document it here.

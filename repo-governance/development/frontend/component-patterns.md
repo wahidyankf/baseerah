@@ -14,7 +14,7 @@ created: 2026-03-28
 
 # Component Patterns Convention
 
-Standards for building UI components in the open-sharia-enterprise monorepo. These rules govern how components are structured, composed, and styled across `baseerah-fe` and the shared `web-ui` component library.
+Standards for building UI components in the open-sharia-enterprise monorepo. These rules govern how components are structured, composed, and styled across `beaver-nest-fe` and the shared `web-ui` component library.
 
 ## File Structure
 
@@ -163,7 +163,7 @@ function DialogContent({ className, children, ...props }: React.ComponentProps<t
       <Dialog.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg bg-background p-6 shadow-lg",
+          "bg-background fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg p-6 shadow-lg",
           className,
         )}
         {...props}
@@ -214,7 +214,7 @@ return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, cl
 
 ## Complete Button Example
 
-The following is the canonical `baseerah-fe` implementation, which all new apps should follow.
+The following is the canonical `beaver-nest-fe` implementation, which all new apps should follow.
 
 ```tsx
 // components/ui/button.tsx

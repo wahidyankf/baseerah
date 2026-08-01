@@ -55,9 +55,9 @@ All markdown files outside the website app directories:
 
 Content files under the following app directories that render in the UI may keep their dates because human readers see "last updated" in the browser and it communicates content freshness directly:
 
-- `apps/baseerah-fe/` — Baseerah product marketing and content pages
+- `apps/beaver-nest-fe/` — BeaverNest product marketing and content pages
 
-The `date:` field in baseerah-fe post frontmatter (publication date, not maintenance date) is also unaffected.
+The `date:` field in beaver-nest-fe post frontmatter (publication date, not maintenance date) is also unaffected.
 
 ### The `created:` Frontmatter Field is Unaffected
 

@@ -1282,8 +1282,8 @@ three separate level pages.
 - [Example 27: The Three-Way Match Guard](/en/learn/software-engineering/software-architecture/procurement-platform-be/by-example/intermediate#example-27-the-three-way-match-guard)
 ```
 
-Once `baseerah-fe` is scaffolded, an FSM by-example tutorial at
-`apps/baseerah-fe/content/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/by-example/overview.md`
+Once `beaver-nest-fe` is scaffolded, an FSM by-example tutorial at
+`apps/beaver-nest-fe/content/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/by-example/overview.md`
 should follow this exact pattern and can be used as a reference implementation.
 
 > **NOTE**: This section is automatically regenerable. If a heading on any level page changes,
@@ -1505,8 +1505,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all by-example tutorial content** across the repository:
 
-- **apps/baseerah-fe/content/** - Planned canonical location for both programming language tutorials
-  and platform tutorials using the by-example approach, once `baseerah-fe` is scaffolded
+- **apps/beaver-nest-fe/content/** - Planned canonical location for both programming language tutorials
+  and platform tutorials using the by-example approach, once `beaver-nest-fe` is scaffolded
 - **Any other location** - By-example tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.
@@ -1537,7 +1537,7 @@ This convention implements and respects:
 
 ## Related Workflows
 
-- **By-example quality gate** - No dedicated workflow exists yet; once `baseerah-fe` is scaffolded, a
+- **By-example quality gate** - No dedicated workflow exists yet; once `beaver-nest-fe` is scaffolded, a
   content quality-gate workflow analogous to the other [`repo-governance/workflows/content/`](../../workflows/content/)
   gates should govern by-example tutorials
 

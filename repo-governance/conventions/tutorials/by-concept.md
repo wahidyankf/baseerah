@@ -693,7 +693,7 @@ When creating by-concept tutorials for multiple languages:
 
 ## Production-Validated Standards Summary
 
-This convention reflects standards that should be achieved by by-concept tutorials on `baseerah-fe` (once scaffolded):
+This convention reflects standards that should be achieved by by-concept tutorials on `beaver-nest-fe` (once scaffolded):
 
 **Section Count**: 40-60 total
 
@@ -749,8 +749,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all by-concept tutorial content** across the repository:
 
-- **apps/baseerah-fe/content/** - Planned canonical location for both programming-language tutorials
-  and platform tutorials using the by-concept approach, once `baseerah-fe` is scaffolded
+- **apps/beaver-nest-fe/content/** - Planned canonical location for both programming-language tutorials
+  and platform tutorials using the by-concept approach, once `beaver-nest-fe` is scaffolded
 - **Any other location** - By-concept tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.

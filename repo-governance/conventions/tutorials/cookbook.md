@@ -534,8 +534,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all cookbook tutorial content** across the repository:
 
-- **apps/baseerah-fe/content/** - Planned canonical location for both programming language cookbooks
-  and platform cookbooks using the recipe approach, once `baseerah-fe` is scaffolded
+- **apps/beaver-nest-fe/content/** - Planned canonical location for both programming language cookbooks
+  and platform cookbooks using the recipe approach, once `beaver-nest-fe` is scaffolded
 - **Any other location** - Cookbook tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.

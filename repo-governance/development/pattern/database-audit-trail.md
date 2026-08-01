@@ -86,9 +86,9 @@ Blue columns (required) are always non-null and populated by the database defaul
 
 Each backend uses the idiomatic migration tool for its language and framework ecosystem. All tools must apply the same six audit columns to every table.
 
-| App         | Migration Tool | License |
-| ----------- | -------------- | ------- |
-| baseerah-be | DbUp           | MIT     |
+| App            | Migration Tool | License |
+| -------------- | -------------- | ------- |
+| beaver-nest-be | DbUp           | MIT     |
 
 > For polyglot migration tool patterns (Liquibase, Ecto, Alembic, goose, Flyway, EF Core, Migratus, @effect/sql, SQLx, Drizzle), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 

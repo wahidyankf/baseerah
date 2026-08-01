@@ -88,16 +88,16 @@ Date-prefixed files use ISO 8601 (`YYYY-MM-DD`) and remain kebab-case overall:
 Apps in `apps/` follow the `[domain]-[type]` naming convention. The following `[type]` suffixes are
 used in this repository:
 
-| Type suffix | Meaning                                                           | Example                              |
-| ----------- | ----------------------------------------------------------------- | ------------------------------------ |
-| `www`       | Public website at the domain root (marketing, portfolio, content) | `<domain>-www`                       |
-| `app-web`   | Web client at the `app.*` subdomain (the product application UI)  | `<domain>-app-web`                   |
-| `be`        | Generic HTTP backend for a product domain                         | `baseerah-be`                        |
-| `cli`       | Command-line tool                                                 | `rhino-cli`                          |
-| `e2e`       | End-to-end test suite (Playwright)                                | `baseerah-fe-e2e`, `baseerah-be-e2e` |
+| Type suffix | Meaning                                                           | Example                                    |
+| ----------- | ----------------------------------------------------------------- | ------------------------------------------ |
+| `www`       | Public website at the domain root (marketing, portfolio, content) | `<domain>-www`                             |
+| `app-web`   | Web client at the `app.*` subdomain (the product application UI)  | `<domain>-app-web`                         |
+| `be`        | Generic HTTP backend for a product domain                         | `beaver-nest-be`                           |
+| `cli`       | Command-line tool                                                 | `rhino-cli`                                |
+| `e2e`       | End-to-end test suite (Playwright)                                | `beaver-nest-fe-e2e`, `beaver-nest-be-e2e` |
 
 This type vocabulary ensures that the folder name alone communicates the tier and deployment target
-without ambiguity. This repo currently has no `www` or `app-web` app — Baseerah is a single-product
+without ambiguity. This repo currently has no `www` or `app-web` app — BeaverNest is a single-product
 repo with no separate marketing site — so those two rows have no live in-repo example.
 
 ## Related Documentation

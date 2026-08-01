@@ -16,7 +16,7 @@ Standards for creating learning-oriented tutorial content. These conventions ans
 
 ## Purpose
 
-This directory contains standards for tutorial creation, structure, naming, and content that apply to **all tutorial content** across the repository (docs/, `baseerah-fe`, anywhere). These conventions **build upon and extend** the universal [writing conventions](../writing/README.md).
+This directory contains standards for tutorial creation, structure, naming, and content that apply to **all tutorial content** across the repository (docs/, `beaver-nest-fe`, anywhere). These conventions **build upon and extend** the universal [writing conventions](../writing/README.md).
 
 ## Documents
 

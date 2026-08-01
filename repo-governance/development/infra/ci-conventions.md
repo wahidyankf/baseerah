@@ -169,8 +169,8 @@ app type realises each level.
 
 | App Type                                           | Unit (`test:unit`)                                    | Integration (`test:integration`)                                              | E2E (`test:e2e`)                                     |
 | -------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------- |
-| **BE API** (`baseerah-be`, planned)                | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
-| **FE** (`baseerah-fe`, planned)                    | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
+| **BE API** (`beaver-nest-be`, planned)             | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
+| **FE** (`beaver-nest-fe`, planned)                 | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
 | **CLI** (`*-cli`)                                  | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                       |
 | **Content platform** (none currently in this repo) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
 | **Library** (`rust-commons`)                       | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                       |
@@ -181,14 +181,14 @@ app type realises each level.
 All testable projects must consume Gherkin specifications at every applicable test level. E2E
 runner projects ARE the Gherkin consumers at the E2E level.
 
-| App Type                        | Unit consumes Gherkin                                       | Integration consumes Gherkin | E2E consumes Gherkin              |
-| ------------------------------- | ----------------------------------------------------------- | ---------------------------- | --------------------------------- |
-| BE API (`baseerah-be`, planned) | Yes — `specs/apps/baseerah/behavior/baseerah-be/gherkin/`   | Yes — same specs             | Yes — same specs                  |
-| FE (`baseerah-fe`, planned)     | Yes — `specs/apps/baseerah/behavior/baseerah-fe/gherkin/`   | Yes — same specs             | Yes — via `baseerah-fe-e2e`       |
-| CLI (`*-cli`)                   | Yes — `specs/apps/{domain}/behavior/<product>-cli/gherkin/` | Yes — same specs             | Not applicable                    |
-| Content platform                | Yes — project-local specs                                   | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e` |
-| Library                         | Yes — library-specific specs                                | Yes — same specs             | Not applicable                    |
-| E2E runner                      | Not applicable                                              | Not applicable               | Yes — consumes shared specs       |
+| App Type                           | Unit consumes Gherkin                                           | Integration consumes Gherkin | E2E consumes Gherkin              |
+| ---------------------------------- | --------------------------------------------------------------- | ---------------------------- | --------------------------------- |
+| BE API (`beaver-nest-be`, planned) | Yes — `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/` | Yes — same specs             | Yes — same specs                  |
+| FE (`beaver-nest-fe`, planned)     | Yes — `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/` | Yes — same specs             | Yes — via `beaver-nest-fe-e2e`    |
+| CLI (`*-cli`)                      | Yes — `specs/apps/{domain}/behavior/<product>-cli/gherkin/`     | Yes — same specs             | Not applicable                    |
+| Content platform                   | Yes — project-local specs                                       | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e` |
+| Library                            | Yes — library-specific specs                                    | Yes — same specs             | Not applicable                    |
+| E2E runner                         | Not applicable                                                  | Not applicable               | Yes — consumes shared specs       |
 
 ## Coverage Threshold Rationale
 
@@ -196,11 +196,11 @@ Coverage thresholds are enforced by the native `test:coverage` Nx target as part
 Thresholds differ by project type to reflect the realistic upper bound achievable through mocked
 unit tests.
 
-| Threshold | App Types                                                     | Rationale                                                                                                                                                                       |
-| --------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **90%**   | BE API backends (`baseerah-be`, planned), CLI apps, Rust libs | Core business logic with high mock isolation. Service functions operate on pure data structures; 90% is achievable without heroic effort.                                       |
-| **80%**   | Content platforms (none currently in this repo)               | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
-| **70%**   | FE apps (`baseerah-fe`, planned)                              | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
+| Threshold | App Types                                                        | Rationale                                                                                                                                                                       |
+| --------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **90%**   | BE API backends (`beaver-nest-be`, planned), CLI apps, Rust libs | Core business logic with high mock isolation. Service functions operate on pure data structures; 90% is achievable without heroic effort.                                       |
+| **80%**   | Content platforms (none currently in this repo)                  | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
+| **70%**   | FE apps (`beaver-nest-fe`, planned)                              | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
 
 Coverage is measured via the appropriate reporter for each language and converted to LCOV or
 JaCoCo XML. Coverage enforcement runs inside each project's native `test:coverage` Nx target. See
@@ -299,9 +299,9 @@ Broad exclusion prevents accidentally including large directories (e.g., `node_m
 > **Historical note**: The "Concrete examples (after-state)" column below documents the file set
 > produced by the `standardize-github-actions-pipeline-naming` plan for the pre-reset multi-app
 > repository (`ose-www`, `ayokoding-www`, `organiclever-www`, `wahidyankf-www`, `organiclever-app`,
-> `ose-app`, `organiclever-be`, `ose-be`). All of those apps were removed by the Baseerah repo-reset
+> `ose-app`, `organiclever-be`, `ose-be`). All of those apps were removed by the BeaverNest repo-reset
 > plan; the concrete filenames are kept here as a worked historical example of the pattern column
-> to their left. The pattern itself remains in force for `baseerah-fe` / `baseerah-be` once those
+> to their left. The pattern itself remains in force for `beaver-nest-fe` / `beaver-nest-be` once those
 > apps are scaffolded.
 
 | Artifact                     | Path pattern                                                | Concrete examples (after-state)                                                                                                                                              |
@@ -400,20 +400,20 @@ encodes ordered execution phases left-to-right (e.g., `test-local-deploy-stag`).
 [GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md) for the complete
 grammar, allowed tokens, and the rule that the workflow `name:` field must mirror the filename.
 
-| Entity                    | Pattern                                                                                   | Example                                                       |
-| ------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Backend app               | `{domain}-be` or `{domain}-be-{lang}-{framework}`                                         | `baseerah-be` (planned)                                       |
-| Frontend app              | `{domain}-fe` (Baseerah has no separate www/app-web split)                                | `baseerah-fe` (planned)                                       |
-| www site app              | `{domain}-www`                                                                            | none currently — Baseerah is a single-frontend repo           |
-| Infra dev directory       | `infra/dev/{app-name}/`                                                                   | `infra/dev/baseerah-be/` (planned)                            |
-| Specs directory           | See [Specs Directory Structure](../../conventions/structure/specs-directory-structure.md) | `specs/apps/baseerah/behavior/baseerah-be/gherkin/` (planned) |
-| Reusable workflow         | `_reusable-{purpose}.yml`                                                                 | `_reusable-app-test-local-deploy-stag.yml`                    |
-| www deploy workflow       | `{domain}-www-test-local-deploy-prod.yml`                                                 | none currently — Baseerah is a single-frontend repo           |
-| App staging workflow      | `{domain}-app-test-local-deploy-stag.yml`                                                 | `baseerah-fe-test-local-deploy-stag.yml` (planned)            |
-| App staging-gate workflow | `{domain}-app-test-stag.yml`                                                              | `baseerah-fe-test-stag.yml` (planned)                         |
-| BE build+deploy workflow  | `{domain}-be-build-deploy-stag.yml`                                                       | `baseerah-be-build-deploy-stag.yml` (planned)                 |
-| Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `pr-quality-gate.yml`, `validate-env.yml`                     |
-| Composite action          | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                       |
+| Entity                    | Pattern                                                                                   | Example                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Backend app               | `{domain}-be` or `{domain}-be-{lang}-{framework}`                                         | `beaver-nest-be` (planned)                                          |
+| Frontend app              | `{domain}-fe` (BeaverNest has no separate www/app-web split)                              | `beaver-nest-fe` (planned)                                          |
+| www site app              | `{domain}-www`                                                                            | none currently — BeaverNest is a single-frontend repo               |
+| Infra dev directory       | `infra/dev/{app-name}/`                                                                   | `infra/dev/beaver-nest-be/` (planned)                               |
+| Specs directory           | See [Specs Directory Structure](../../conventions/structure/specs-directory-structure.md) | `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/` (planned) |
+| Reusable workflow         | `_reusable-{purpose}.yml`                                                                 | `_reusable-app-test-local-deploy-stag.yml`                          |
+| www deploy workflow       | `{domain}-www-test-local-deploy-prod.yml`                                                 | none currently — BeaverNest is a single-frontend repo               |
+| App staging workflow      | `{domain}-app-test-local-deploy-stag.yml`                                                 | `beaver-nest-fe-test-local-deploy-stag.yml` (planned)               |
+| App staging-gate workflow | `{domain}-app-test-stag.yml`                                                              | `beaver-nest-fe-test-stag.yml` (planned)                            |
+| BE build+deploy workflow  | `{domain}-be-build-deploy-stag.yml`                                                       | `beaver-nest-be-build-deploy-stag.yml` (planned)                    |
+| Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `pr-quality-gate.yml`, `validate-env.yml`                           |
+| Composite action          | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                             |
 
 ## Adding a New App to CI
 
@@ -444,11 +444,11 @@ Follow this checklist in order when adding a new app variant to the monorepo.
 
 Each app pairs with dedicated E2E runner projects for end-to-end testing.
 
-| App Type                                | E2E Pairing                                    |
-| --------------------------------------- | ---------------------------------------------- |
-| Backend (`baseerah-be`, planned, etc.)  | Dedicated `*-be-e2e` Playwright runner project |
-| Frontend (`baseerah-fe`, planned, etc.) | Dedicated `*-fe-e2e` Playwright runner project |
-| Content platforms                       | Both `*-be-e2e` and `*-fe-e2e` runners         |
+| App Type                                   | E2E Pairing                                    |
+| ------------------------------------------ | ---------------------------------------------- |
+| Backend (`beaver-nest-be`, planned, etc.)  | Dedicated `*-be-e2e` Playwright runner project |
+| Frontend (`beaver-nest-fe`, planned, etc.) | Dedicated `*-fe-e2e` Playwright runner project |
+| Content platforms                          | Both `*-be-e2e` and `*-fe-e2e` runners         |
 
 Each product app has its own dedicated E2E runner (`*-be-e2e`, `*-fe-e2e`) scoped to that product's
 scenarios.
